@@ -123,7 +123,7 @@ public class ValidatingReader extends DefaultHandler
 	{
 		if (this._logger != null && this._locator != null)
 		{
-			this._logger.logError(message, this._locator.getLineNumber(), this._locator.getColumnNumber());
+			this._logger.logError(message, this._locator.getLineNumber() - 1, this._locator.getColumnNumber());
 		}
 		else
 		{
@@ -140,7 +140,7 @@ public class ValidatingReader extends DefaultHandler
 	{
 		if (this._logger != null)
 		{
-			this._logger.logInfo(message, this._locator.getLineNumber(), this._locator.getColumnNumber());
+			this._logger.logInfo(message, this._locator.getLineNumber() - 1, this._locator.getColumnNumber());
 		}
 		else
 		{
@@ -157,7 +157,7 @@ public class ValidatingReader extends DefaultHandler
 	{
 		if (this._logger != null)
 		{
-			this._logger.logWarning(message, this._locator.getLineNumber(), this._locator.getColumnNumber());
+			this._logger.logWarning(message, this._locator.getLineNumber() - 1, this._locator.getColumnNumber());
 		}
 		else
 		{
