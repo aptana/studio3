@@ -34,8 +34,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
-import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
 import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
+import org.eclipse.jface.text.hyperlink.MultipleHyperlinkPresenter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -496,7 +496,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public IHyperlinkPresenter getHyperlinkPresenter(ISourceViewer sourceViewer)
 	{
 		RGB rgb = getCurrentTheme().getForegroundAsRGB("hyperlink"); //$NON-NLS-1$
-		return new DefaultHyperlinkPresenter(rgb);
+		return new MultipleHyperlinkPresenter(rgb);
 	}
 
 	protected Theme getCurrentTheme()
