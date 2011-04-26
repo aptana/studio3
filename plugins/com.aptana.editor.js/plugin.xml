@@ -183,6 +183,9 @@
       <super
             type="com.aptana.core.problem">
       </super>
+      <persistent
+            value="true">
+      </persistent>
       <attribute
             name="id">
       </attribute>
