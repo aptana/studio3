@@ -228,6 +228,7 @@ int ask_password(_TCHAR* message)
 			return 0;
 		}
 	} else {
+		int nDialogID = IDD_DIALOG;
 		::ZeroMemory(szKeyName, sizeof(szKeyName));
 		_TCHAR *lpszBegin = _tcschr(message, _T('\''));
 		if( lpszBegin != NULL ) {
@@ -238,18 +239,20 @@ int ask_password(_TCHAR* message)
 			}
 		}
 		::ZeroMemory(szPassword, sizeof(szPassword));
-		if( _tcslen(szKeyName) != 0 ) {
-			if( LoadPassword(szKeyName) ) {
-				_tprintf(_T("%s"), szPassword);
-				SavePassword(szKeyName);
-				::SecureZeroMemory(szPassword, sizeof(szPassword));
-				return 0;
-			} else {
-				ClearPassword(szKeyName);
-			}
+		if( _tcslen(szKeyName) == 0 ) {
+			_tcscpy_s(szKeyName, sizeof(szKeyName)/sizeof(szKeyName[0]), _T("default"));
+			nDialogID = IDD_DIALOG_ASKPASS;
+		}
+		if( LoadPassword(szKeyName) ) {
+			_tprintf(_T("%s"), szPassword);
+			SavePassword(szKeyName);
+			::SecureZeroMemory(szPassword, sizeof(szPassword));
+			return 0;
+		} else {
+			ClearPassword(szKeyName);
 		}
 		if( ::DialogBoxParam(GetModuleHandle(NULL),
-			MAKEINTRESOURCE(IDD_DIALOG),
+			MAKEINTRESOURCE(nDialogID),
 			NULL,
 			DialogProc,
 			(LPARAM)message) ) {

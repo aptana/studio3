@@ -126,6 +126,23 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Dialog
+//
+
+IDD_DIALOG_ASKPASS DIALOGEX 0, 0, 274, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "HTTP"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_PASSWORD,49,27,218,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,78,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,145,65,50,14
+    LTEXT           "Please provide HTTP authentication password",IDC_STATIC,7,7,260,20
+    CONTROL         "Password:",IDC_MESSAGE,"Static",SS_SIMPLE | WS_GROUP,7,30,42,11
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // DESIGNINFO
 //
 
@@ -147,6 +164,32 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_ASKPASS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 267
+        VERTGUIDE, 49
+        VERTGUIDE, 128
+        VERTGUIDE, 145
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+        HORZGUIDE, 27
+        HORZGUIDE, 41
+        HORZGUIDE, 56
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
