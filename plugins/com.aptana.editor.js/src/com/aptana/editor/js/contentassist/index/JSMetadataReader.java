@@ -980,7 +980,9 @@ public class JSMetadataReader extends MetadataReader
 
 		if (name != null)
 		{
-			result = (this.parseTypes(name) != null);
+			List<Type> types = this.parseTypes(name);
+
+			result = (types != null && types.size() == 1);
 		}
 
 		return result;
