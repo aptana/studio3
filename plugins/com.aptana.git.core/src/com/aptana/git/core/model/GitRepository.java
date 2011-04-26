@@ -1207,6 +1207,11 @@ public class GitRepository
 		{
 			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
 		}
+		IPath git_askpass = GitPlugin.getDefault().getGIT_ASKPASS();
+		if (git_askpass != null)
+		{
+			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
+		}
 		return env;
 	}
 

@@ -174,6 +174,15 @@ public class GitPlugin extends Plugin
 		return null;
 	}
 
+	public IPath getGIT_ASKPASS()
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			return getGIT_SSH();
+		}
+		return null;
+	}
+
 	public IGitRepositoryManager getGitRepositoryManager()
 	{
 		if (fGitRepoManager == null)
