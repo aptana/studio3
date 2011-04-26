@@ -8,12 +8,12 @@
 package com.aptana.git.core;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -26,7 +26,7 @@ import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepositoryManager;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -48,7 +48,6 @@ public class GitPlugin extends Plugin
 	private IResourceChangeListener fGitResourceListener;
 
 	private GitRepositoryManager fGitRepoManager;
-	private boolean updateSSHW = true;
 
 	/**
 	 * The constructor
@@ -166,27 +165,10 @@ public class GitPlugin extends Plugin
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			IPath path = getStateLocation().append("bin").append("sshw.exe"); //$NON-NLS-1$ //$NON-NLS-2$
-			File file = path.toFile();
-			if (!file.exists() || updateSSHW)
+			File sshwFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/sshw.exe"), null)); //$NON-NLS-1$
+			if (sshwFile.isFile())
 			{
-				try
-				{
-					file.getParentFile().mkdirs();
-					if (file.createNewFile())
-					{
-						IOUtil.extractFile(PLUGIN_ID, new Path("$os$/sshw.exe"), file); //$NON-NLS-1$
-					}
-				}
-				catch (IOException e)
-				{
-					logError("Extract file failed.", e); //$NON-NLS-1$
-				}
-				updateSSHW = false;
-			}
-			if (file.exists())
-			{
-				return path;
+				return Path.fromOSString(sshwFile.getAbsolutePath());
 			}
 		}
 		return null;
