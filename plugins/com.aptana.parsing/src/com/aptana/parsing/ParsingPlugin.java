@@ -51,6 +51,12 @@ public class ParsingPlugin extends Plugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
+	public static void logInfo(String message)
+	{
+		// TODO: uncomment when we have verbosity support for logging
+		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+	}
+
 	/**
 	 * The constructor
 	 */

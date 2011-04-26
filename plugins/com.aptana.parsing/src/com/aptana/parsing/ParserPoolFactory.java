@@ -216,15 +216,13 @@ public class ParserPoolFactory
 			else
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
-
 				ParsingPlugin.logError(message, null);
 			}
 		}
 		else
 		{
 			String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool, contentTypeId);
-
-			ParsingPlugin.logError(message, null);
+			ParsingPlugin.logInfo(message);
 		}
 
 		return result;

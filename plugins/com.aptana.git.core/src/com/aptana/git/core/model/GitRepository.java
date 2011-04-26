@@ -1184,7 +1184,7 @@ public class GitRepository
 	}
 
 	/**
-	 * Sets up the ENV so we can properly hit remotes over SSH.
+	 * Sets up the ENV so we can properly hit remotes over SSH/HTTPS.
 	 * 
 	 * @param readOrWrite
 	 *            if the process modifies the index or repo, it should be marked WRITE (only one at a time, no READS
@@ -1192,12 +1192,12 @@ public class GitRepository
 	 * @param args
 	 * @return
 	 */
-	IStatus executeWithGitSSH(ReadWrite readOrWrite, String... args)
+	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, gitSSHEnv(), args);
+		return execute(readOrWrite, gitShellEnv(), args);
 	}
 
-	private Map<String, String> gitSSHEnv()
+	private Map<String, String> gitShellEnv()
 	{
 		// Set up GIT_SSH!
 		Map<String, String> env = new HashMap<String, String>();
@@ -1206,6 +1206,11 @@ public class GitRepository
 		if (git_ssh != null)
 		{
 			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		IPath git_askpass = GitPlugin.getDefault().getGIT_ASKPASS();
+		if (git_askpass != null)
+		{
+			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
 		}
 		return env;
 	}
@@ -1650,7 +1655,7 @@ public class GitRepository
 				continue;
 			}
 
-			IStatus result = executeWithGitSSH(GitRepository.ReadWrite.READ, "ls-remote", "--heads", remote); //$NON-NLS-1$ //$NON-NLS-2$
+			IStatus result = executeWithPromptHandling(GitRepository.ReadWrite.READ, "ls-remote", "--heads", remote); //$NON-NLS-1$ //$NON-NLS-2$
 			if (result == null || !result.isOK())
 			{
 				// Failed to execute properly

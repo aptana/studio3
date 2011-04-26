@@ -50,7 +50,7 @@ public class HyperlinkDetector implements IHyperlinkDetector
 	 * Regexp pattern for the filepath in a rename file output line. Allows us to capture all the pieces to generate the
 	 * new and old paths.
 	 */
-	private static Pattern RENAME_PATTERN = Pattern.compile("(.+)\\{(.+?) => (.+?)\\}(.*)"); //$NON-NLS-1$
+	private static Pattern RENAME_PATTERN = Pattern.compile("(.+)\\{(.*?) => (.*?)\\}(.*)"); //$NON-NLS-1$
 
 	public IHyperlink[] detectHyperlinks(String contents)
 	{

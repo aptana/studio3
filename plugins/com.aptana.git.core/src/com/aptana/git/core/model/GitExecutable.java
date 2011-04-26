@@ -290,7 +290,7 @@ public class GitExecutable
 	}
 
 	/**
-	 * Sets up the environment map in a way that our special GIT_SSH env value is set so that the SSH passphrase prompt
+	 * Sets up the environment map in a way that our special GIT_SSH/GIT_ASKPASS env variables are set so that the SSH passphrase/HTTPS prompt
 	 * stuff is hooked up. Use this for clones/pushes/pulls.
 	 * 
 	 * @return
@@ -302,8 +302,12 @@ public class GitExecutable
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null)
 		{
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
 			env.put("GIT_ASKPASS", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		IPath git_askpass = GitPlugin.getDefault().getGIT_ASKPASS();
+		if (git_askpass != null)
+		{
+			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
 		}
 		if (!env.isEmpty())
 		{
