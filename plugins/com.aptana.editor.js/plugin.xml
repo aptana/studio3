@@ -100,7 +100,7 @@
       <validator
             class="com.aptana.editor.js.validator.SDocMLValidator"
             content-type="com.aptana.contenttype.sdocml"
-            marker-type="com.aptana.editor.js.sdocml.problem"
+            marker-type="com.aptana.editor.js.sdocml_problem"
             name="%validator.sdocml.name">
       </validator>
    </extension>
