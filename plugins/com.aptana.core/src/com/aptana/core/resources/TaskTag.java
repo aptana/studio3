@@ -1,4 +1,4 @@
-package com.aptana.editor.common.tasks;
+package com.aptana.core.resources;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,11 +10,13 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.core.ICorePreferenceConstants;
 
 public class TaskTag
 {
+
+	// We originally hung task tag prefs in the common editor plugin, so we look there for the prefs
+	private static final String PREF_PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
 
 	public static final String HIGH = "High"; //$NON-NLS-1$
 	public static final String NORMAL = "Normal"; //$NON-NLS-1$
@@ -73,17 +75,17 @@ public class TaskTag
 	public static boolean isCaseSensitive()
 	{
 		IScopeContext[] contexts = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
-		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+		return Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
+				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
 	}
 
 	public static Collection<TaskTag> getTaskTags()
 	{
 		IScopeContext[] contexts = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
-		String rawTagNames = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.TASK_TAG_NAMES, null, contexts);
-		String rawTagPriorities = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
+		String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
+				ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
+		String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
+				ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
 		List<TaskTag> tags = createTaskTags(rawTagNames, rawTagPriorities);
 		return tags;
 	}
