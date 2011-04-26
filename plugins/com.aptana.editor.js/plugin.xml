@@ -177,7 +177,7 @@
       </attribute>
    </extension>
    <extension
-         id="sdocml.problem"
+         id="sdocml_problem"
          name="%sdocml.problem.name"
          point="org.eclipse.core.resources.markers">
       <super
