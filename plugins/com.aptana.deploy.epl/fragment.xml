@@ -22,16 +22,21 @@
                   checkEnabled="false">
                <iterate
                      ifEmpty="false">
-                  <adapt
-                        type="org.eclipse.core.resources.IProject">
-                     <test
-                           property="org.eclipse.core.resources.open"
-                           value="open">
-                     </test>
-                  </adapt>
-                  <adapt
-                        type="org.eclipse.core.resources.IProject">
-                  </adapt>
+                  <or>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <test
+                              property="org.eclipse.core.resources.open"
+                              value="open">
+                        </test>
+                     </adapt>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFolder">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
+                     </instanceof>
+                  </or>
                </iterate>
             </visibleWhen>
          </command>

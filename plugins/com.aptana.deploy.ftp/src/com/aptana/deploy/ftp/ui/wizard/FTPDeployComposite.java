@@ -62,22 +62,25 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 
 	public void setSyncDirection(SyncDirection direction)
 	{
-		switch (direction)
+		if (direction != null)
 		{
-			case UPLOAD:
-				uploadButton.setSelection(true);
-				downloadButton.setSelection(false);
-				syncButton.setSelection(false);
-				break;
-			case DOWNLOAD:
-				downloadButton.setSelection(true);
-				uploadButton.setSelection(false);
-				syncButton.setSelection(false);
-				break;
-			case BOTH:
-				syncButton.setSelection(true);
-				uploadButton.setSelection(false);
-				downloadButton.setSelection(false);
+			switch (direction)
+			{
+				case UPLOAD:
+					uploadButton.setSelection(true);
+					downloadButton.setSelection(false);
+					syncButton.setSelection(false);
+					break;
+				case DOWNLOAD:
+					downloadButton.setSelection(true);
+					uploadButton.setSelection(false);
+					syncButton.setSelection(false);
+					break;
+				case BOTH:
+					syncButton.setSelection(true);
+					uploadButton.setSelection(false);
+					downloadButton.setSelection(false);
+			}
 		}
 	}
 

@@ -46,7 +46,12 @@ public class UniformFileStoreEditorInput extends FileStoreEditorInput implements
 	@Override
 	public String getName()
 	{
-		return fRealFileStore.getName();
+		String name = fRealFileStore.getName();
+		if (isRemote())
+		{
+			name = "(remote) " + name; //$NON-NLS-1$
+		}
+		return name;
 	}
 
 	@Override

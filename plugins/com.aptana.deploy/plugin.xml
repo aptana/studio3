@@ -70,7 +70,7 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="popup:com.aptana.explorer.view?before=group.edit">
+            locationURI="popup:org.eclipse.ui.popup.any?before=group.edit">
          <dynamic
                class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
                id="com.aptana.explorer.deploy.popup">
@@ -79,21 +79,10 @@
                <iterate
                      ifEmpty="false">
                   <adapt
-                        type="org.eclipse.core.resources.IProject">
-                     <test
-                           property="org.eclipse.core.resources.open"
-                           value="open">
-                     </test>
+                        type="org.eclipse.core.resources.IResource">
                   </adapt>
                </iterate>
             </visibleWhen>
-         </dynamic>
-      </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
-         <dynamic
-               class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
-               id="com.aptana.projectexplorer.deploy.popup">
          </dynamic>
       </menuContribution>
    </extension>
