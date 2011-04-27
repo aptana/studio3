@@ -160,6 +160,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 					{
 						// Remove preference from plugin preference store if it has the same value as the global editor
 						// value, or if the tab-policy is set to use the global settings.
+						removePluginDefaults();
 						getPluginPreferenceStore().remove(
 								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 					}
@@ -230,9 +231,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		else
 		{
+			removePluginDefaults();
 			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 		}
+
 		try
 		{
 			store.flush();
@@ -250,6 +253,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		IEclipsePreferences store = getPluginPreferenceStore();
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+
+		setPluginDefaults();
 		setTabSpaceCombo();
 		super.performDefaults();
 		try
@@ -270,6 +275,95 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
 				Messages.CommonEditorPreferencePage_auto_indent_label, autoIndentGroup);
 		addField(autoIndentTag);
+	}
+
+	/**
+	 * This method re-applies the plugin defaults for the spaces for tabs and tab width preferences from the default
+	 * scope of the plugin preference store.
+	 */
+	protected void setPluginDefaults()
+	{
+		IEclipsePreferences store = getDefaultPluginPreferenceStore();
+
+		if (store == null)
+		{
+			return;
+		}
+
+		store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
+				getDefaultSpacesForTabs());
+		store.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, getDefaultTabWidth());
+
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	/**
+	 * This method removes the spaces for tabs and tab width preferences from the default scope of the plugin preference
+	 * store.
+	 */
+	protected void removePluginDefaults()
+	{
+		IEclipsePreferences store = getDefaultPluginPreferenceStore();
+
+		if (store == null)
+		{
+			return;
+		}
+
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	/**
+	 * This class returns the default scope of the plugin preference store. This method should be overwritten when we
+	 * want to specify other default preferences for a particular editor rather than "Use Global Editor Defaults". NOTE:
+	 * When specifying other default preferences, we also need to overwrite getDefaultSpacesForTabs() and
+	 * getDefaultTabWidth()
+	 * 
+	 * @return
+	 */
+	protected IEclipsePreferences getDefaultPluginPreferenceStore()
+	{
+		return null;
+	}
+
+	/**
+	 * The default value for spaces for tabs preference. (Used with getDefaultPluginPreferenceStore() )
+	 * 
+	 * @return
+	 */
+
+	protected boolean getDefaultSpacesForTabs()
+	{
+		return getChainedEditorPreferenceStore().getBoolean(
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+	}
+
+	/**
+	 * The default value used for tab width preference. (Used with getDefaultPluginPreferenceStore() )
+	 * 
+	 * @return
+	 */
+
+	protected int getDefaultTabWidth()
+	{
+		return getChainedEditorPreferenceStore()
+				.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 	}
 
 }
