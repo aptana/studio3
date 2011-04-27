@@ -22,6 +22,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.aptana.parsing.ParsingPlugin;
+
 /**
  * @author Kevin Lindsey
  */
@@ -127,7 +129,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			// log error
+			ParsingPlugin.logError(message, null);
 		}
 	}
 
@@ -144,7 +146,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			// log info
+			ParsingPlugin.logInfo(message);
 		}
 	}
 
@@ -161,7 +163,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			// log info
+			ParsingPlugin.logWarning(message);
 		}
 	}
 
