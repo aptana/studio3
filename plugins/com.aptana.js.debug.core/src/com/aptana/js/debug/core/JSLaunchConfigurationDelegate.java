@@ -16,6 +16,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -135,6 +136,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				ILaunchConfigurationConstants.DEFAULT_SERVER_TYPE);
 		int startActionType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
+		boolean appendProjectName = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false);
 
 		URL launchURL = null;
 		IURIMapper urlMapper = null;
@@ -202,7 +204,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 					externalBaseUrl = externalBaseUrl + '/';
 				}
 				if (startResource != null) {
-					urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+					IFileStore rootFileStore = EFSUtils.getFileStore(appendProjectName ? ResourcesPlugin.getWorkspace().getRoot(): startResource.getProject());
+					urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), rootFileStore.toURI());
 				}
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,

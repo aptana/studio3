@@ -67,6 +67,11 @@ public interface ILaunchConfigurationConstants {
 	String CONFIGURATION_EXTERNAL_BASE_URL = "externalBaseUrl"; //$NON-NLS-1$
 
 	/**
+	 * CONFIGURATION_INCLUDE_PROJECT_NAME
+	 */
+	String CONFIGURATION_APPEND_PROJECT_NAME = "appendProjectName"; //$NON-NLS-1$
+
+	/**
 	 * CONFIGURATION_HTTP_GET_QUERY
 	 */
 	String CONFIGURATION_HTTP_GET_QUERY = "httpGetData"; //$NON-NLS-1$
