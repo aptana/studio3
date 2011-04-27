@@ -60,6 +60,7 @@ public class JSMetadataReader extends MetadataReader
 	private PropertyElement _currentProperty;
 	private ExceptionElement _currentException;
 
+	private SDocParser parser = new SDocParser();
 	private Map<String, TypeElement> _typesByName = new HashMap<String, TypeElement>();
 	private List<AliasElement> _aliases = new ArrayList<AliasElement>();
 
@@ -996,7 +997,6 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	protected List<Type> parseTypes(String typeSpec)
 	{
-		SDocParser parser = new SDocParser();
 		List<Type> types = null;
 
 		try
