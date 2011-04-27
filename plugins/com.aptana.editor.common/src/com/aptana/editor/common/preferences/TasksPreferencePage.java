@@ -39,9 +39,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.tasks.TaskTag;
 
 /**
  * Allows the user to edit the set of task tags and their priorities
@@ -96,7 +97,8 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		fCaseSensitiveButton.setFont(parent.getFont());
 		fCaseSensitiveButton.setText(Messages.TasksPreferencePage_CaseSensitiveLabel);
 		fCaseSensitiveButton.setSelection(getPreferenceStore()
-				.getBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
+.getBoolean(
+				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
 		setButtonLayoutData(fCaseSensitiveButton);
 	}
 
@@ -232,8 +234,8 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 	private List<TaskTag> getTaskTags()
 	{
-		String rawTagNames = getPreferenceStore().getString(IPreferenceConstants.TASK_TAG_NAMES);
-		String rawTagPriorities = getPreferenceStore().getString(IPreferenceConstants.TASK_TAG_PRIORITIES);
+		String rawTagNames = getPreferenceStore().getString(ICorePreferenceConstants.TASK_TAG_NAMES);
+		String rawTagPriorities = getPreferenceStore().getString(ICorePreferenceConstants.TASK_TAG_PRIORITIES);
 		return createTaskTags(rawTagNames, rawTagPriorities);
 	}
 
@@ -268,11 +270,11 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 			tagPriorities.add(tag.getPriorityName());
 		}
 
-		getPreferenceStore().setValue(IPreferenceConstants.TASK_TAG_NAMES,
+		getPreferenceStore().setValue(ICorePreferenceConstants.TASK_TAG_NAMES,
 				StringUtil.join(DELIMITER, tagNames.toArray(new String[tagNames.size()])));
-		getPreferenceStore().setValue(IPreferenceConstants.TASK_TAG_PRIORITIES,
+		getPreferenceStore().setValue(ICorePreferenceConstants.TASK_TAG_PRIORITIES,
 				StringUtil.join(DELIMITER, tagPriorities.toArray(new String[tagPriorities.size()])));
-		getPreferenceStore().setValue(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE,
+		getPreferenceStore().setValue(ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE,
 				fCaseSensitiveButton.getSelection());
 
 		return true;
@@ -285,13 +287,13 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 	{
 		super.performDefaults();
 
-		String rawTagNames = getPreferenceStore().getDefaultString(IPreferenceConstants.TASK_TAG_NAMES);
-		String rawTagPriorities = getPreferenceStore().getDefaultString(IPreferenceConstants.TASK_TAG_PRIORITIES);
+		String rawTagNames = getPreferenceStore().getDefaultString(ICorePreferenceConstants.TASK_TAG_NAMES);
+		String rawTagPriorities = getPreferenceStore().getDefaultString(ICorePreferenceConstants.TASK_TAG_PRIORITIES);
 		List<TaskTag> tags = createTaskTags(rawTagNames, rawTagPriorities);
 		fTasksTableViewer.setInput(tags);
 
 		fCaseSensitiveButton.setSelection(getPreferenceStore().getDefaultBoolean(
-				IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
+				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
 	}
 
 	protected List<TaskTag> createTaskTags(String rawTagNames, String rawTagPriorities)

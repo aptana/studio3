@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
+import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
