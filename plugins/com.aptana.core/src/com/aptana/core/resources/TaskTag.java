@@ -3,6 +3,7 @@ package com.aptana.core.resources;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.Platform;
@@ -22,6 +23,8 @@ public class TaskTag
 	public static final String NORMAL = "Normal"; //$NON-NLS-1$
 	public static final String LOW = "Low"; //$NON-NLS-1$
 
+	private static final Pattern fgCommaSplitter = Pattern.compile(","); //$NON-NLS-1$
+
 	private int fPriority;
 	private String fName;
 
@@ -38,11 +41,11 @@ public class TaskTag
 
 	private static int toIntegerValue(String priority)
 	{
-		if (priority.equalsIgnoreCase(HIGH))
+		if (HIGH.equalsIgnoreCase(priority))
 		{
 			return IMarker.PRIORITY_HIGH;
 		}
-		if (priority.equalsIgnoreCase(LOW))
+		if (LOW.equalsIgnoreCase(priority))
 		{
 			return IMarker.PRIORITY_LOW;
 		}
@@ -86,15 +89,15 @@ public class TaskTag
 				ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
 		String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
 				ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
-		List<TaskTag> tags = createTaskTags(rawTagNames, rawTagPriorities);
-		return tags;
+		return createTaskTags(rawTagNames, rawTagPriorities);
 	}
 
 	private static List<TaskTag> createTaskTags(String rawTagNames, String rawTagPriorities)
 	{
 		List<TaskTag> tags = new ArrayList<TaskTag>();
-		String[] tagNames = rawTagNames.split(","); //$NON-NLS-1$
-		String[] tagPriorities = rawTagPriorities.split(","); //$NON-NLS-1$
+		String[] tagNames = fgCommaSplitter.split(rawTagNames);
+		String[] tagPriorities = fgCommaSplitter.split(rawTagPriorities);
+		// TODO make sure arrays are same size!
 		for (int i = 0; i < tagNames.length; i++)
 		{
 			tags.add(new TaskTag(tagNames[i], tagPriorities[i]));
