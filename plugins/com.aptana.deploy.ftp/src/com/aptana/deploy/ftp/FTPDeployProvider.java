@@ -9,6 +9,7 @@ package com.aptana.deploy.ftp;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.StructuredSelection;
 
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -27,7 +28,7 @@ public class FTPDeployProvider implements IDeployProvider
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();
 		action.setActivePart(null, UIUtils.getActivePart());
-		action.setSelection(UIUtils.getActiveWorkbenchWindow().getSelectionService().getSelection());
+		action.setSelection(new StructuredSelection(selectedProject));
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
 		if (sites.length > 1)
 		{

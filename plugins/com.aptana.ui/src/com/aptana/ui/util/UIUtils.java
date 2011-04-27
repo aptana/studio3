@@ -166,6 +166,19 @@ public final class UIUtils
 					return ((IResource) selectedObject).getProject();
 				}
 			}
+			else
+			{
+				// checks the active editor
+				variable = currentState.getVariable(ISources.ACTIVE_EDITOR_NAME);
+				if (variable instanceof IEditorPart)
+				{
+					IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
+					if (editorInput instanceof IFileEditorInput)
+					{
+						return ((IFileEditorInput) editorInput).getFile().getProject();
+					}
+				}
+			}
 		}
 		return null;
 	}
