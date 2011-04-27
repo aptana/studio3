@@ -49,12 +49,9 @@ public class SDocScanner extends Scanner
 	 */
 	public void advance(int count)
 	{
-		if (count > 0)
+		for (int i = 0; i < count; i++)
 		{
-			for (int i = 0; i < count; i++)
-			{
-				fTokenScanner.read();
-			}
+			fTokenScanner.read();
 		}
 	}
 
