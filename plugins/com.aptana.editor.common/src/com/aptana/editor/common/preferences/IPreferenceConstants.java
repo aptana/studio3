@@ -98,4 +98,10 @@ public interface IPreferenceConstants
 	 * The preference key used to enable and disable auto indent.
 	 */
 	public static final String EDITOR_AUTO_INDENT = CommonEditorPlugin.PLUGIN_ID + ".autoIndent"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to enable and disable folding.
+	 */
+	public static final String EDITOR_ENABLE_FOLDING = CommonEditorPlugin.PLUGIN_ID + ".enableFolding"; //$NON-NLS-1$
+
 }

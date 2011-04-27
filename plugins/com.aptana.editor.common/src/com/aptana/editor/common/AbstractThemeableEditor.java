@@ -868,6 +868,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	}
 
 	/**
+	 * Returns true if the editor's preferences are set to fold.
+	 * 
+	 * @return True, if folding is on; False, in case it's off.
+	 */
+	public boolean isFoldingEnabled()
+	{
+		IPreferenceStore store = getPreferenceStore();
+		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING);
+	}
+
+	/**
 	 * Returns true if the editor's preferences are set to mark element occurrences.
 	 * 
 	 * @return True, if mark occurrences is on; False, in case it's off.

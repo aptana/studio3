@@ -31,6 +31,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
+import com.aptana.ui.preferences.ChainedBooleanFieldEditor;
 
 /**
  * The form for configuring the general top-level preferences for this plugin
@@ -44,6 +45,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	private Composite appearanceComposite;
 	private IntegerFieldEditor tabSize;
+	private ChainedBooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
 	private IPreferenceStore originalPref;
 
@@ -64,13 +66,12 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	{
 		originalPref = getPreferenceStore();
 		setPreferenceStore(getChainedEditorPreferenceStore());
+
 		appearanceComposite = getFieldEditorParent();
-
 		createMarkOccurrenceOptions(appearanceComposite);
-
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
-		setPreferenceStore(originalPref);
 
+		setPreferenceStore(originalPref);
 	}
 
 	protected void createTextEditingOptions(Composite parent, String groupName)
@@ -91,8 +92,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		setTabSpaceCombo();
 
-		final Composite fildEditorGroup = new Composite(group, SWT.NONE);
-		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		final Composite fieldEditorGroup = new Composite(group, SWT.NONE);
+		fieldEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		tabSpaceCombo.addSelectionListener(new SelectionListener()
 		{
@@ -103,7 +104,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				{
 					tabSize.setEnabled(
 							!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
-							fildEditorGroup);
+							fieldEditorGroup);
 				}
 			}
 
@@ -113,7 +114,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		});
 
 		tabSize = new IntegerFieldEditor(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH,
-				Messages.CommonEditorPreferencePage_Tab_Size_Label, fildEditorGroup, 5)
+				Messages.CommonEditorPreferencePage_Tab_Size_Label, fieldEditorGroup, 5)
 		{
 			@Override
 			protected void doLoadDefault()
@@ -126,7 +127,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				}
 				valueChanged();
 				setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
-						fildEditorGroup);
+						fieldEditorGroup);
 			}
 
 			@Override
@@ -175,10 +176,16 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		tabSize.setEmptyStringAllowed(false);
 		tabSize.setValidRange(1, 20);
 		tabSize.setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
-				fildEditorGroup);
+				fieldEditorGroup);
 		addField(tabSize);
 
 		createAutoIndentOptions(group);
+
+		group = AptanaPreferencePage.createGroup(parent, Messages.CommonEditorPreferencePage_Folding);
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		createFoldingOptions(group);
 
 	}
 
@@ -270,6 +277,17 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
 				Messages.CommonEditorPreferencePage_auto_indent_label, autoIndentGroup);
 		addField(autoIndentTag);
+	}
+
+	protected void createFoldingOptions(Composite parent)
+	{
+		Composite foldingGroup = new Composite(parent, SWT.NONE);
+		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
+
+		enableFolding = new ChainedBooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
+				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup,
+				getChainedEditorPreferenceStore());
+		addField(enableFolding);
 	}
 
 }

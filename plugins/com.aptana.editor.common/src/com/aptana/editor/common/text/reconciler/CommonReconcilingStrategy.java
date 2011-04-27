@@ -140,7 +140,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile)
 	{
-		calculatePositions(fMonitor);
-		fEditor.getFileService().validate();
+		if (fEditor.isFoldingEnabled())
+		{
+			calculatePositions(fMonitor);
+			fEditor.getFileService().validate();
+		}
 	}
 }

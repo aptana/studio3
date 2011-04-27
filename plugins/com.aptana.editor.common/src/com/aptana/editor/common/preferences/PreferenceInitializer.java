@@ -51,6 +51,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// wrap selection
 		prefs.putBoolean(IPreferenceConstants.EDITOR_WRAP_SELECTION, true);
 
+		// enable folding
+		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
+
 		if (EclipseUtil.isStandalone())
 		{
 			IPreferenceStore store = EditorsPlugin.getDefault().getPreferenceStore();
