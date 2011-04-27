@@ -14,6 +14,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
+import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
@@ -32,9 +33,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 
 		// Tasks
-		prefs.put(IPreferenceConstants.TASK_TAG_NAMES, "TODO,FIXME,XXX"); //$NON-NLS-1$
-		prefs.put(IPreferenceConstants.TASK_TAG_PRIORITIES, "NORMAL,HIGH,NORMAL"); //$NON-NLS-1$
-		prefs.putBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
+		prefs.put(ICorePreferenceConstants.TASK_TAG_NAMES, "TODO,FIXME,XXX"); //$NON-NLS-1$
+		prefs.put(ICorePreferenceConstants.TASK_TAG_PRIORITIES, "NORMAL,HIGH,NORMAL"); //$NON-NLS-1$
+		prefs.putBoolean(ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
 
 		// mark occurrences
 		prefs.putBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);

@@ -8,6 +8,7 @@
 
 package com.aptana.core;
 
+
 /**
  * @author Max Stepanov
  */
@@ -32,5 +33,21 @@ public interface ICorePreferenceConstants
 	 * contents outside the IDE.
 	 */
 	String PREF_AUTO_REFRESH_PROJECTS = "auto_refresh_projects"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the comma-separated list of task tag names.
+	 */
+	public static final String TASK_TAG_NAMES = "com.aptana.editor.common.taskTagNames"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the comma-separated list of task tag priorities. Order is important and lines up with
+	 * {@value #TASK_TAG_NAMES}
+	 */
+	public static final String TASK_TAG_PRIORITIES = "com.aptana.editor.common.taskTagPriorities"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for determining if task tags should be treated in a case-sensitive manner when detecting them.
+	 */
+	public static final String TASK_TAGS_CASE_SENSITIVE = "com.aptana.editor.common.taskTagsCaseSensitive"; //$NON-NLS-1$
 
 }
