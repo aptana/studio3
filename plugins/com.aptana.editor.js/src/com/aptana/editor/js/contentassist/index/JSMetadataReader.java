@@ -204,7 +204,7 @@ public class JSMetadataReader extends MetadataReader
 					else
 					{
 						String message = MessageFormat.format(
-								"Invalid superType ''{0}'' for type ''{1}''", superType, typeName); //$NON-NLS-1$
+								Messages.JSMetadataReader_Invalid_Base_Type, superType, typeName); 
 
 						this.logError(message);
 					}
@@ -217,7 +217,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			String message = MessageFormat.format("Invalid type name: {0}", typeName); //$NON-NLS-1$
+			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName); 
 
 			this.logError(message);
 		}
@@ -259,7 +259,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			this.logError("Invalid exception name: " + exceptionName); //$NON-NLS-1$
+			this.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName); 
 		}
 	}
 
@@ -375,7 +375,7 @@ public class JSMetadataReader extends MetadataReader
 			else
 			{
 				String message = MessageFormat.format(
-						"Invalid parameter type ''{0}'' for parameter ''{1}''", typespec, parameterName); //$NON-NLS-1$
+						Messages.JSMetadataReader_Invalid_Parameter_Type, typespec, parameterName); 
 
 				this.logError(message);
 			}
@@ -436,7 +436,7 @@ public class JSMetadataReader extends MetadataReader
 				else
 				{
 					String message = MessageFormat.format(
-							"Invalid property type ''{0}'' for property ''{1}''", propertyType, propertyName); //$NON-NLS-1$
+							Messages.JSMetadataReader_Invalid_Property_Type, propertyType, propertyName); 
 
 					this.logError(message);
 				}
@@ -489,7 +489,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			this.logError("Invalid return type: " + type); //$NON-NLS-1$
+			this.logError(Messages.JSMetadataReader_Invalid_Return_Type + type); 
 		}
 	}
 
