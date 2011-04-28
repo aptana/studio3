@@ -182,7 +182,10 @@ public class CorePlugin extends Plugin
 	 */
 	public static void logInfo(String string)
 	{
-		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		if (Platform.inDebugMode())
+		{
+			getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		}
 	}
 
 	/**

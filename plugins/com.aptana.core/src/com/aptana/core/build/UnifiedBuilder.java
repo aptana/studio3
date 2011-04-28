@@ -16,7 +16,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
@@ -80,8 +82,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
 	{
+		String projectName = getProject().getName();
+		long startTime = System.nanoTime();
+		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName));
+
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
+			CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName));
 			fullBuild(monitor);
 		}
 		else
@@ -89,13 +96,20 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null)
 			{
+				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta,
+						projectName));
 				fullBuild(monitor);
 			}
 			else
 			{
+				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName));
 				incrementalBuild(delta, monitor);
 			}
 		}
+
+		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
+		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime));
+
 		return null;
 	}
 
