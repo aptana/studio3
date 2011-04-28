@@ -52,10 +52,10 @@
             <visibleWhen
                   checkEnabled="false">
                <with
-                     variable="activePart">
-                  <instanceof
-                        value="org.eclipse.ui.IEditorPart">
-                  </instanceof>
+                     variable="activeEditorInput">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                  </adapt>anceof>
                </with>
             </visibleWhen>
          </command>

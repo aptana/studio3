@@ -11,13 +11,6 @@
             properties="isDeployable,isDeployType"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
-      <propertyTester
-            class="com.aptana.deploy.internal.EditorPropertyTester"
-            id="com.aptana.deploy.editorPropertyTester"
-            namespace="com.aptana.deploy.editor"
-            properties="isDeployable,isDeployType"
-            type="org.eclipse.ui.IEditorPart">
-      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -88,10 +81,10 @@
                      </adapt>
                   </iterate>
                   <with
-                        variable="activePart">
-                     <instanceof
-                           value="org.eclipse.ui.IEditorPart">
-                     </instanceof>
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
                   </with>
                </or>
             </visibleWhen>
@@ -105,16 +98,14 @@
             <visibleWhen
                   checkEnabled="false">
                <with
-                     variable="activePart">
-                  <and>
-                     <instanceof
-                           value="org.eclipse.ui.IEditorPart">
-                     </instanceof>
+                     variable="activeEditorInput">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
                      <test
-                           property="com.aptana.deploy.editor.isDeployable"
+                           property="com.aptana.deploy.project.isDeployable"
                            value="true">
                      </test>
-                  </and>
+                  </adapt>
                </with>
             </visibleWhen>
          </command>

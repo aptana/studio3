@@ -47,16 +47,14 @@
             <visibleWhen
                   checkEnabled="false">
                <with
-                     variable="activePart">
-                  <and>
-                     <instanceof
-                           value="org.eclipse.ui.IEditorPart">
-                     </instanceof>
+                     variable="activeEditorInput">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
                      <test
-                           property="com.aptana.deploy.editor.isDeployType"
+                           property="com.aptana.deploy.project.isDeployType"
                            value="com.aptana.deploy.engineyard.provider">
                      </test>
-                  </and>
+                  </adapt>
                </with>
             </visibleWhen>
          </dynamic>
