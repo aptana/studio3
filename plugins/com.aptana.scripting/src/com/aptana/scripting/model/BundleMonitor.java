@@ -470,9 +470,21 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0)
 			{
 				IResource resource = delta.getResource();
-				File file = resource.getLocation().toFile();
-				
-				this.reloadDependentScripts(file);
+
+				if (resource != null)
+				{
+					IPath location = resource.getLocation();
+
+					if (location != null)
+					{
+						File file = location.toFile();
+
+						if (file != null)
+						{
+							this.reloadDependentScripts(file);
+						}
+					}
+				}
 			}
 		}
 
