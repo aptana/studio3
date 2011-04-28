@@ -43,5 +43,28 @@
          </dynamic>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <dynamic
+               class="com.aptana.deploy.heroku.internal.ui.HerokuContributionItem"
+               id="com.aptana.explorer.deploy.heroku">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditorInput">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="com.aptana.deploy.project.isDeployType"
+                           value="com.aptana.deploy.heroku.provider">
+                     </test>
+                  </adapt>
+               </with>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
 
 </plugin>

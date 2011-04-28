@@ -154,6 +154,12 @@ public class ValidationManager implements IValidationManager
 			IValidator validator = validatorRef.getValidator();
 			IParseNode rootAST = fFileService.getParseResult();
 			List<IValidationItem> newItems = new ArrayList<IValidationItem>();
+
+			if (rootAST == null)
+			{
+				continue;
+			}
+
 			processASTForNestedLanguage(rootAST, nestedLanguage, validator, newItems);
 
 			String type = validatorRef.getMarkerType();
@@ -170,6 +176,10 @@ public class ValidationManager implements IValidationManager
 	private void processASTForNestedLanguage(IParseNode node, String language, IValidator validator,
 			List<IValidationItem> items)
 	{
+		if (node == null)
+		{
+			return;
+		}
 		if (node.getLanguage().equals(language))
 		{
 			if (!node.isEmpty())

@@ -58,13 +58,10 @@
                   checkEnabled="false">
                <iterate
                      ifEmpty="false">
-                  <or>
-                     <test
-                           forcePluginActivation="true"
-                           property="com.aptana.deploy.project.isDeployable"
-                           value="true">
-                     </test>
-                  </or>
+                  <test
+                        property="com.aptana.deploy.project.isDeployable"
+                        value="true">
+                  </test>
                </iterate>
             </visibleWhen>
          </command>
@@ -76,14 +73,42 @@
                id="com.aptana.explorer.deploy.popup">
             <visibleWhen
                   checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
-               </iterate>
+               <or>
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                  </iterate>
+                  <with
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                  </with>
+               </or>
             </visibleWhen>
          </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
+         <command
+               commandId="com.aptana.deploy.commands.deployApp"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditorInput">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="com.aptana.deploy.project.isDeployable"
+                           value="true">
+                     </test>
+                  </adapt>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
 

@@ -72,6 +72,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	private Button rbInternalServer;
 	private Button rbCustomServer;
 	private Text fbaseUrlText;
+	private Button fAddProjectName;
 
 	private Button rbManagedServer;
 	private ComboViewer managedServersView;
@@ -228,6 +229,10 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 
 		fbaseUrlText = new Text(group, SWT.SINGLE | SWT.BORDER);
 		fbaseUrlText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		fAddProjectName = new Button(group, SWT.CHECK);
+		fAddProjectName.setText(Messages.LaunchBrowserSettingsTab_AppendProjectName);
+		fAddProjectName.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
 	}
 
 	private void hookListeners(boolean hook) {
@@ -246,6 +251,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			rbCustomServer.addListener(SWT.Selection, dirtyListener);
 			rbManagedServer.addListener(SWT.Selection, dirtyListener);
 			managedServersView.getControl().addListener(SWT.Selection, dirtyListener);
+			fAddProjectName.addListener(SWT.Selection, dirtyListener);
 		} else {
 			fBrowserExeText.removeListener(SWT.Modify, dirtyListener);
 			fCommandArgsText.removeListener(SWT.Modify, dirtyListener);
@@ -261,6 +267,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			rbCustomServer.removeListener(SWT.Selection, dirtyListener);
 			rbManagedServer.removeListener(SWT.Selection, dirtyListener);
 			managedServersView.getControl().removeListener(SWT.Selection, dirtyListener);
+			fAddProjectName.addListener(SWT.Selection, dirtyListener);
 		}
 	}
 
@@ -275,6 +282,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		rbInternalServer.setEnabled(!startUrlEnabled);
 		rbManagedServer.setEnabled(!startUrlEnabled);
 		rbCustomServer.setEnabled(!startUrlEnabled);
+		fAddProjectName.setEnabled(rbCustomServer.getSelection()
+				&& (rbCurrentPage.getSelection() || rbSpecificPage.getSelection()));
 	}
 
 	private IResource chooseWorkspaceLocation() {
@@ -318,6 +327,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			rbStartUrl.setSelection(startActionType == ILaunchConfigurationConstants.START_ACTION_START_URL);
 			fStartUrlText.setText(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_URL, StringUtil.EMPTY));
+			fAddProjectName.setSelection(configuration.getAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false));
 
 			int serverType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_TYPE,
 					ILaunchConfigurationConstants.DEFAULT_SERVER_TYPE);
@@ -380,6 +391,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 
 		AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView.getSelection()).getFirstElement();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME, serverSelection != null ? serverSelection.getName() : null);
+
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, fAddProjectName.getSelection());
 	}
 
 	/**

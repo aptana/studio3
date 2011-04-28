@@ -6,7 +6,7 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.tasks.TaskTag;
+import com.aptana.core.resources.TaskTag;
 
 public class CommentScanner extends RuleBasedScanner
 {

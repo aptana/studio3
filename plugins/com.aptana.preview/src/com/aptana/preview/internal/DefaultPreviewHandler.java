@@ -9,7 +9,9 @@
 package com.aptana.preview.internal;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -18,10 +20,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
 
+import com.aptana.core.IURIMapper;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.preview.Activator;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.SourceConfig;
+import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.core.WorkspaceResolvingURIMapper;
 
 /**
  * @author Max Stepanov
@@ -57,10 +63,21 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 		if (contentTypeHTML != null && contentTypeHTML.isAssociatedWith(config.getLocation().lastSegment())) {
 			try {
 				IPath location = config.getLocation();
+				URI uri = null;
 				if (config.getProject() != null) {
-					location = ResourcesPlugin.getWorkspace().getRoot().getFile(location).getLocation();
+					IFile resource = ResourcesPlugin.getWorkspace().getRoot().getFile(location);
+					IURIMapper uriMapper = WebServerCorePlugin.getDefault().getDefaultWebServerConfiguration();
+					if (uriMapper != null) {
+						uri = new WorkspaceResolvingURIMapper(uriMapper).resolve(EFSUtils.getFileStore(resource));
+					}
+					if (uri == null) {
+						location = resource.getLocation();
+					}
 				}
-				return new PreviewConfig(location.toFile().toURI().toURL());
+				if (uri == null) {
+					uri = location.toFile().toURI();
+				}
+				return new PreviewConfig(uri.toURL());
 			} catch (MalformedURLException e) {
 				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e)); //$NON-NLS-1$
 			}

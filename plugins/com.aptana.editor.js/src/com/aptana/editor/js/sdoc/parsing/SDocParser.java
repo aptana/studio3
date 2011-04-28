@@ -10,7 +10,7 @@ import beaver.*;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "SDoc.grammar".
  */
-@SuppressWarnings({ "unchecked", "nls" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SDocParser extends Parser {
 	static public class AltGoals {
 		static public final short Types = 42;
@@ -70,8 +70,6 @@ public class SDocParser extends Parser {
 		}
 	}
 
-	private SDocScanner fScanner;
-
 	/**
 	 * parse
 	 *
@@ -90,6 +88,8 @@ public class SDocParser extends Parser {
 	 */
 	public Object parse(String source, int offset) throws java.lang.Exception
 	{
+		SDocScanner fScanner = new SDocScanner();
+
 		fScanner.setOffset(offset);
 		fScanner.setSource(source);
 
@@ -105,6 +105,8 @@ public class SDocParser extends Parser {
 	 */
 	public List<Type> parseType(String source) throws java.lang.Exception
 	{
+		SDocScanner fScanner = new SDocScanner();
+
 		fScanner.setOffset(0);
 		fScanner.setSource(source);
 		fScanner.queueTypeTokens(0, source.length());
@@ -119,7 +121,6 @@ public class SDocParser extends Parser {
 
 
 	report = new SDocEvents();
-	fScanner = new SDocScanner();
 	}
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {

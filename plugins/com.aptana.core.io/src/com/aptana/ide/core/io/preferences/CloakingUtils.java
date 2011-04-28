@@ -112,11 +112,11 @@ public class CloakingUtils {
         // escape all '.' characters which aren't followed by '*'
         result = expression.replaceAll("\\.(?=[^\\*])", "\\\\."); //$NON-NLS-1$//$NON-NLS-2$
 
-        // convert all '*' characters that are not preceded by '.' to ".*"
-        result = "(?i)" + result.replaceAll("(?<!\\.)\\*", ".*"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
         // convert all '.*' to regular expression
         result = result.replaceAll("\\.\\*", "^\\\\..*"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        // convert all '*' characters that are not preceded by '.' to ".*"
+        result = "(?i)" + result.replaceAll("(?<!\\.)\\*", ".*"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         return result;
     }

@@ -18,8 +18,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.aptana.parsing.ParsingPlugin;
 
 /**
  * @author Kevin Lindsey
@@ -30,6 +33,8 @@ public class ValidatingReader extends DefaultHandler
 	 * The schema associated with this reader
 	 */
 	protected Schema _schema;
+	protected IValidatingReaderLogger _logger;
+	protected Locator _locator;
 
 	/**
 	 * Create a new instance of ValidatingReader
@@ -112,6 +117,57 @@ public class ValidatingReader extends DefaultHandler
 	}
 
 	/**
+	 * logError
+	 * 
+	 * @param message
+	 */
+	public void logError(String message)
+	{
+		if (this._logger != null && this._locator != null)
+		{
+			this._logger.logError(message, this._locator.getLineNumber(), 0);
+		}
+		else
+		{
+			ParsingPlugin.logError(message, null);
+		}
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @param message
+	 */
+	public void logInfo(String message)
+	{
+		if (this._logger != null)
+		{
+			this._logger.logInfo(message, this._locator.getLineNumber(), 0);
+		}
+		else
+		{
+			ParsingPlugin.logInfo(message);
+		}
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @param message
+	 */
+	public void logWarning(String message)
+	{
+		if (this._logger != null)
+		{
+			this._logger.logWarning(message, this._locator.getLineNumber(), 0);
+		}
+		else
+		{
+			ParsingPlugin.logWarning(message);
+		}
+	}
+
+	/**
 	 * Load an XML stream and validate it against this reader's schema
 	 * 
 	 * @param in
@@ -140,6 +196,28 @@ public class ValidatingReader extends DefaultHandler
 		
 		// parse the XML
 		saxParser.parse(in, this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#setDocumentLocator(org.xml.sax.Locator)
+	 */
+	@Override
+	public void setDocumentLocator(Locator locator)
+	{
+		super.setDocumentLocator(locator);
+
+		this._locator = locator;
+	}
+
+	/**
+	 * setLogger
+	 * 
+	 * @param logger
+	 */
+	public void setLogger(IValidatingReaderLogger logger)
+	{
+		this._logger = logger;
 	}
 
 	/**
