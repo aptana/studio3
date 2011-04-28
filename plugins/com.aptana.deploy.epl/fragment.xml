@@ -42,4 +42,23 @@
          </command>
       </menuContribution>
       </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.wizard">
+         <command
+               commandId="com.aptana.deploy.commands.deploywizard"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.ui.IEditorPart">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
 </fragment>
