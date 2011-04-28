@@ -321,7 +321,7 @@
             contextId="org.eclipse.ui.contexts.window"
             platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G H">
+            sequence="M1+M4+G .">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_revision"
@@ -475,7 +475,7 @@
             commandId="com.aptana.git.ui.command.compare_with_HEAD"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M2+M3+G H">
+            sequence="M2+M3+G .">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_revision"
