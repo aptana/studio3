@@ -46,7 +46,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	private IntegerFieldEditor tabSize;
 	private BooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
-	private IPreferenceStore originalPref;
 
 	/**
 	 * EditorsPreferencePage
@@ -63,14 +62,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	protected void createFieldEditors()
 	{
-		originalPref = getPreferenceStore();
-		setPreferenceStore(getChainedEditorPreferenceStore());
-
 		appearanceComposite = getFieldEditorParent();
 		createMarkOccurrenceOptions(appearanceComposite);
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
-
-		setPreferenceStore(originalPref);
 	}
 
 	protected void createTextEditingOptions(Composite parent, String groupName)
@@ -191,13 +185,14 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	private void setTabSpaceCombo()
 	{
-		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		if (!getPreferenceStore().contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
 		{
 			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
 		}
 		else
 		{
-			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+			if (getChainedEditorPreferenceStore().getBoolean(
+					AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
 			{
 				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
 			}
@@ -208,40 +203,26 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 	}
 
-	/**
-	 * Create the Mark Occurrences group and options if there are any for this language/editor.
-	 * 
-	 * @param parent
-	 */
-	protected abstract void createMarkOccurrenceOptions(Composite parent);
-
-	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
-
-	protected abstract IEclipsePreferences getPluginPreferenceStore();
-
-	public void init(IWorkbench workbench)
-	{
-	}
-
 	public boolean performOk()
 	{
 		IEclipsePreferences store = getPluginPreferenceStore();
 
-		store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false);
-
 		if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
 		{
 			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+			store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false);
 		}
 		else if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseTabOption))
 		{
 			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+			store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false);
 		}
 		else
 		{
 			removePluginDefaults();
 			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+			store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, true);
 		}
 
 		try
@@ -298,7 +279,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	/**
 	 * This method re-applies the plugin defaults for the spaces for tabs and tab width preferences from the default
-	 * scope of the plugin preference store.
+	 * scope of the plugin preference store. The default values are taken from getDefaultTabWidth() and
+	 * getDefaultSpacesForTabs(). The default scope getDefaultPluginPreferenceStore() is used.
 	 */
 	protected void setPluginDefaults()
 	{
@@ -385,4 +367,18 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 	}
 
+	public void init(IWorkbench workbench)
+	{
+	}
+
+	/**
+	 * Create the Mark Occurrences group and options if there are any for this language/editor.
+	 * 
+	 * @param parent
+	 */
+	protected abstract void createMarkOccurrenceOptions(Composite parent);
+
+	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
+
+	protected abstract IEclipsePreferences getPluginPreferenceStore();
 }
