@@ -136,11 +136,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		// doing a full parse at the moment
 		fileService.parse();
 		// abort if parse failed
-		if (!fileService.hasValidParseResult())
-		{
-			return false;
-		}
-		return true;
+		return fileService.hasValidParseResult();
 	}
 
 	/**
@@ -163,13 +159,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		if (fEditor.isFoldingEnabled())
 		{
 			calculatePositions(fMonitor);
-			updatePositions();
 		}
 		else
 		{
 			fPositions.clear();
-			updatePositions();
 		}
+		updatePositions();
 		fEditor.getFileService().validate();
 	}
 }

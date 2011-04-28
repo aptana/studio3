@@ -181,7 +181,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		createAutoIndentOptions(group);
 
 		group = AptanaPreferencePage.createGroup(parent, Messages.CommonEditorPreferencePage_Folding);
-		group.setLayout(new GridLayout(3, false));
+		group.setLayout(new GridLayout(1, false));
 		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		createFoldingOptions(group);
@@ -281,7 +281,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void createFoldingOptions(Composite parent)
 	{
 		Composite foldingGroup = new Composite(parent, SWT.NONE);
-		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
+		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(1, 1).create());
 
 		enableFolding = new BooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
 				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup);
