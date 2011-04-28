@@ -176,6 +176,10 @@ public class ValidationManager implements IValidationManager
 	private void processASTForNestedLanguage(IParseNode node, String language, IValidator validator,
 			List<IValidationItem> items)
 	{
+		if (node == null)
+		{
+			return;
+		}
 		if (node.getLanguage().equals(language))
 		{
 			if (!node.isEmpty())

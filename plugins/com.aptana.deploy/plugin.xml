@@ -11,6 +11,13 @@
             properties="isDeployable,isDeployType"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
+      <propertyTester
+            class="com.aptana.deploy.internal.EditorPropertyTester"
+            id="com.aptana.deploy.editorPropertyTester"
+            namespace="com.aptana.deploy.editor"
+            properties="isDeployable,isDeployType"
+            type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -58,13 +65,10 @@
                   checkEnabled="false">
                <iterate
                      ifEmpty="false">
-                  <or>
-                     <test
-                           forcePluginActivation="true"
-                           property="com.aptana.deploy.project.isDeployable"
-                           value="true">
-                     </test>
-                  </or>
+                  <test
+                        property="com.aptana.deploy.project.isDeployable"
+                        value="true">
+                  </test>
                </iterate>
             </visibleWhen>
          </command>
@@ -76,14 +80,44 @@
                id="com.aptana.explorer.deploy.popup">
             <visibleWhen
                   checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                  </adapt>
-               </iterate>
+               <or>
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                  </iterate>
+                  <with
+                        variable="activePart">
+                     <instanceof
+                           value="org.eclipse.ui.IEditorPart">
+                     </instanceof>
+                  </with>
+               </or>
             </visibleWhen>
          </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
+         <command
+               commandId="com.aptana.deploy.commands.deployApp"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <and>
+                     <instanceof
+                           value="org.eclipse.ui.IEditorPart">
+                     </instanceof>
+                     <test
+                           property="com.aptana.deploy.editor.isDeployable"
+                           value="true">
+                     </test>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
 

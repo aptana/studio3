@@ -8,6 +8,7 @@
 
 package com.aptana.preview;
 
+import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,8 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -284,9 +287,21 @@ public final class PreviewManager {
 				return null;
 			}
 		} else if (editorInput instanceof IStorageEditorInput) {
-
+			// TODO
 		} else if (editorInput instanceof IURIEditorInput) {
-
+			IFileStore fileStore = EFS.getStore(((IURIEditorInput) editorInput).getURI());
+			if (fileStore != null) {
+				File file = fileStore.toLocalFile(EFS.NONE, null);
+				if (file != null) {
+					fileName = file.getName();
+					path = Path.fromOSString(file.getAbsolutePath());
+					IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toURI());
+					if (files.length > 0) {
+						project = files[0].getProject();
+						workspacePath = files[0].getFullPath();
+					}
+				}
+			}
 		} else if (editorInput instanceof PreviewEditorInput) {
 			return null;
 		}
@@ -403,10 +418,27 @@ public final class PreviewManager {
 
 	private void addFilewatchListener(IEditorPart editorPart) {
 		IEditorInput editorInput = editorPart.getEditorInput();
+		String watchPath = null;
 		if (editorInput instanceof IFileEditorInput) {
-			String projectPath = ((IFileEditorInput) editorInput).getFile().getProject().getLocation().toOSString();
+			watchPath = ((IFileEditorInput) editorInput).getFile().getProject().getLocation().toOSString();
+		} else if (editorInput instanceof IPathEditorInput) {
+			watchPath = ((IPathEditorInput) editorInput).getPath().toFile().getParentFile().getAbsolutePath();
+		} else if (editorInput instanceof IURIEditorInput) {
 			try {
-				int watchId = FileWatcher.addWatch(projectPath, IJNotify.FILE_ANY, true, new JNotifyAdapter() {
+				IFileStore fileStore = EFS.getStore(((IURIEditorInput) editorInput).getURI());
+				if (fileStore != null) {
+					File file = fileStore.toLocalFile(EFS.NONE, null);
+					if (file != null) {
+						watchPath = file.getParentFile().getAbsolutePath();
+					}
+				}
+			} catch (CoreException e) {
+				Activator.log(e);
+			}
+		}
+		if (watchPath != null) {
+			try {
+				int watchId = FileWatcher.addWatch(watchPath, IJNotify.FILE_ANY, true, new JNotifyAdapter() {
 
 					@Override
 					public void fileCreated(int wd, String rootPath, String name) {
@@ -430,7 +462,10 @@ public final class PreviewManager {
 
 	private void removeFilewatchListener(IEditorPart editorPart) {
 		try {
-			FileWatcher.removeWatch(filewatchIds.get(editorPart));
+			Integer id = filewatchIds.get(editorPart);
+			if (id != null) {
+				FileWatcher.removeWatch(id);
+			}
 		} catch (JNotifyException e) {
 			Activator.log(e);
 		}
