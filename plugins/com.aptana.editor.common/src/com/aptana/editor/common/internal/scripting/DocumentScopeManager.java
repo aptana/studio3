@@ -54,7 +54,9 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.scripting.IDocumentScopeManager#registerConfigurations(org.eclipse.jface.text.IDocument, com.aptana.editor.common.IPartitioningConfiguration[])
+	 * @see
+	 * com.aptana.editor.common.scripting.IDocumentScopeManager#registerConfigurations(org.eclipse.jface.text.IDocument,
+	 * com.aptana.editor.common.IPartitioningConfiguration[])
 	 */
 	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations)
 	{
@@ -66,7 +68,9 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.scripting.IDocumentScopeManager#registerConfiguration(org.eclipse.jface.text.IDocument, com.aptana.editor.common.IPartitioningConfiguration)
+	 * @see
+	 * com.aptana.editor.common.scripting.IDocumentScopeManager#registerConfiguration(org.eclipse.jface.text.IDocument,
+	 * com.aptana.editor.common.IPartitioningConfiguration)
 	 */
 	public void registerConfiguration(IDocument document, IPartitioningConfiguration configuration)
 	{
@@ -83,7 +87,8 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.scripting.IDocumentScopeManager#getContentType(org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.scripting.IDocumentScopeManager#getContentType(org.eclipse.jface.text.IDocument,
+	 * int)
 	 */
 	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
 	{
@@ -97,7 +102,14 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			return info.getContentType(document, offset);
 		}
 		// Return an unknown top level scope, with the raw partition name as sub-scope
-		return UNKNOWN.subtype(document.getContentType(offset));
+		try
+		{
+			return UNKNOWN.subtype(document.getContentType(offset));
+		}
+		catch (Exception e)
+		{
+			return UNKNOWN;
+		}
 	}
 
 	/*
@@ -139,7 +151,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		return partitionFragment;
 	}
-	
+
 	private String getTokenScopeFragments(ITextViewer viewer, IDocument document, int offset)
 	{
 		if (!(viewer instanceof ISourceViewer))
@@ -205,7 +217,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		return null;
 	}
-	
+
 	private static Object getLockObject(Object object)
 	{
 		if (object instanceof ISynchronizable)
@@ -234,7 +246,14 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			}
 			return translation.toString();
 		}
-		return document.getContentType(offset);
+		try
+		{
+			return document.getContentType(offset);
+		}
+		catch (Exception e)
+		{
+			return UNKNOWN.toString();
+		}
 	}
 
 	protected IContentTypeTranslator getContentTypeTranslator()
