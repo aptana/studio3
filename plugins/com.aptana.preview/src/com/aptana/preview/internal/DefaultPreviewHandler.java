@@ -74,6 +74,9 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 						location = resource.getLocation();
 					}
 				}
+				if (config.getContent() != null) {
+					return null; // we're not handling content preview requests
+				}
 				if (uri == null) {
 					uri = location.toFile().toURI();
 				}

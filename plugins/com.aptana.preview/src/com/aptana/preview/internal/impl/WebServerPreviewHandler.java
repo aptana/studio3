@@ -32,6 +32,9 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
 	 */
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
+		if (config.getContent() != null) {
+			return null; // we're not handling content preview requests
+		}
 		IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
 		try {
 			if (serverConfiguration != null) {
