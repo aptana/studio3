@@ -1005,6 +1005,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		catch (Exception e)
 		{
+			// we return null if the typeSpec is invalid
 		}
 
 		return types;
