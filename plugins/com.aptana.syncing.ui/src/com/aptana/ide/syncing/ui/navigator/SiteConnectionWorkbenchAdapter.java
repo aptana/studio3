@@ -8,6 +8,7 @@
 
 package com.aptana.ide.syncing.ui.navigator;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -137,6 +138,10 @@ public class SiteConnectionWorkbenchAdapter implements IWorkbenchAdapter, IDefer
 			if (IWorkbenchAdapter.class == adapterType
 					|| IDeferredWorkbenchAdapter.class == adapterType) {
 				return getInstance();
+			}
+			if (IFileStore.class == adapterType && adaptableObject instanceof ProjectSiteConnection)
+			{
+				return ((ProjectSiteConnection) adaptableObject).getAdapter(adapterType);
 			}
 			return null;
 		}
