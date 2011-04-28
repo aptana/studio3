@@ -7,7 +7,8 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -16,6 +17,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 import org.jruby.util.RegexpOptions;
@@ -65,11 +67,12 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.css";
 			}
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(3, positions.size());
-		assertEquals(new Position(0, 22), positions.get(0)); // eats whole line at end
-		assertEquals(new Position(23, 36), positions.get(1)); // eats whole line at end
-		assertEquals(new Position(91, 33), positions.get(2)); // only can go so far as EOF
+		assertTrue(positions.contains(new Position(0, 22))); // eats whole line at end
+		assertTrue(positions.contains(new Position(23, 36))); // eats whole line at end
+		assertTrue(positions.contains(new Position(91, 33))); // only can go so far as EOF
 	}
 	
 	public void testScriptdocFolding() throws Exception
@@ -96,9 +99,10 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.js";
 			}
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length()), positions.get(0)); // eats whole line at end
+		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 	
 	public void testJSCommentFolding() throws Exception
@@ -125,9 +129,10 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.js";
 			}
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length()), positions.get(0)); // eats whole line at end
+		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 	
 	public void testJSFunctionFolding() throws Exception
@@ -162,8 +167,9 @@ public class RubyRegexpFolderTest extends TestCase
 				return "source.js";
 			}
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length()), positions.get(0)); // eats whole line at end
+		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 }

@@ -7,13 +7,15 @@
  */
 package com.aptana.editor.js.internal.text;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.parsing.JSParser;
@@ -53,9 +55,10 @@ public class JSFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length()), positions.get(0)); // eats whole line at end
+		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 
 	public void testJSCommentFolding() throws Exception
@@ -78,9 +81,10 @@ public class JSFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length()), positions.get(0)); // eats whole line at end
+		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
 	}
 
 	public void testJSFunctionFolding() throws Exception
@@ -106,9 +110,10 @@ public class JSFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size()); // FIXME We're getting one too many here. Probably need to check if one already exists on this line!
-		assertEquals(new Position(0, src.length()), positions.get(0)); // eats whole line at end
-		assertEquals(new Position(63, 96), positions.get(1));
+		assertTrue(positions.contains(new Position(0, src.length()))); // eats whole line at end
+		assertTrue(positions.contains(new Position(63, 96)));
 	}
 }

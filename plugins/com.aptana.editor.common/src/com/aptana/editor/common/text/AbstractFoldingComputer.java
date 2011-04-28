@@ -2,7 +2,8 @@ package com.aptana.editor.common.text;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -10,6 +11,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -28,6 +30,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	private IDocument fDocument;
 	private AbstractThemeableEditor fEditor;
 	private ArrayList<Integer> fLines;
+	private boolean initialReconcile;
 
 	public AbstractFoldingComputer(AbstractThemeableEditor editor, IDocument document)
 	{
@@ -53,16 +56,18 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(org.eclipse.core.runtime.
-	 * IProgressMonitor)
+	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(boolean,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public synchronized List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
+	public Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, IProgressMonitor monitor)
+			throws BadLocationException
 	{
+		this.initialReconcile = initialReconcile;
 		fLines = new ArrayList<Integer>();
 		int lineCount = getDocument().getNumberOfLines();
 		if (lineCount <= 1) // Quick hack fix for minified files. We need at least two lines to have folding!
 		{
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
 		SubMonitor sub = null;
 		try
@@ -70,7 +75,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 			IParseNode parseNode = getAST();
 			if (parseNode == null)
 			{
-				return Collections.emptyList();
+				return Collections.emptyMap();
 			}
 			int length = parseNode.getChildCount();
 			if (parseNode instanceof ParseRootNode)
@@ -113,9 +118,9 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 		return children;
 	}
 
-	private List<Position> getPositions(IProgressMonitor monitor, IParseNode parseNode)
+	private Map<ProjectionAnnotation, Position> getPositions(IProgressMonitor monitor, IParseNode parseNode)
 	{
-		List<Position> newPositions = new ArrayList<Position>();
+		Map<ProjectionAnnotation, Position> newPositions = new HashMap<ProjectionAnnotation, Position>();
 		IParseNode[] children = getChildren(parseNode);
 		SubMonitor sub = SubMonitor.convert(monitor, 2 * children.length);
 		for (IParseNode child : children)
@@ -163,18 +168,30 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 				if (add)
 				{
 					end = Math.min(getDocument().getLength(), end);
-					newPositions.add(new Position(start, end - start));
+					newPositions.put(initialReconcile ? new ProjectionAnnotation(isCollapsed(child))
+							: new ProjectionAnnotation(), new Position(start, end - start));
 				}
 			}
 			if (traverseInto(child))
 			{
 				// Recurse into AST!
-				newPositions.addAll(getPositions(sub.newChild(1), child));
+				newPositions.putAll(getPositions(sub.newChild(1), child));
 			}
 			sub.worked(1);
 		}
 		sub.done();
 		return newPositions;
+	}
+
+	/**
+	 * Determine if a certain node type should be collapsed initially.
+	 * 
+	 * @param child
+	 * @return
+	 */
+	protected boolean isCollapsed(IParseNode child)
+	{
+		return false;
 	}
 
 	/**

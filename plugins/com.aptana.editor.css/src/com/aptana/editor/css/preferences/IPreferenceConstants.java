@@ -23,4 +23,14 @@ public interface IPreferenceConstants
 	 */
 	String CSS_ACTIVATION_CHARACTERS = "CSS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
 
+	/**
+	 * A pref key used to determine if comments are initially folded. Value is a boolean.
+	 */
+	String INITIALLY_FOLD_COMMENTS = "fold_comments"; //$NON-NLS-1$
+
+	/**
+	 * A pref key used to determine if rules are initially folded. Value is a boolean.
+	 */
+	String INITIALLY_FOLD_RULES = "fold_rules"; //$NON-NLS-1$
+
 }
