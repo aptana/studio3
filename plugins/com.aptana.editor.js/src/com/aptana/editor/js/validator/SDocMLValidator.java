@@ -20,7 +20,7 @@ import com.aptana.sax.IValidatingReaderLogger;
 
 public class SDocMLValidator implements IValidator
 {
-	private class Collector implements IValidatingReaderLogger
+	private class LogCollector implements IValidatingReaderLogger
 	{
 		private URI path;
 		private IValidationManager manager;
@@ -32,7 +32,7 @@ public class SDocMLValidator implements IValidator
 		 * @param manager
 		 * @param path
 		 */
-		public Collector(IValidationManager manager, URI path)
+		public LogCollector(IValidationManager manager, URI path)
 		{
 			this.path = path;
 			this.manager = manager;
@@ -49,13 +49,23 @@ public class SDocMLValidator implements IValidator
 			return this.items;
 		}
 
+		/**
+		 * addItem
+		 * 
+		 * @param item
+		 */
+		public void addItem(IValidationItem item)
+		{
+			items.add(item);
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * @see com.aptana.sax.IValidatingReaderLogger#logError(java.lang.String, int, int)
 		 */
 		public void logError(String message, int line, int column)
 		{
-			items.add(manager.addError(message, line, column, 0, this.path));
+			this.addItem(manager.addError(message, line, column, 0, this.path));
 		}
 
 		/*
@@ -73,7 +83,7 @@ public class SDocMLValidator implements IValidator
 		 */
 		public void logWarning(String message, int line, int column)
 		{
-			items.add(manager.addWarning(message, line, column, 0, this.path));
+			this.addItem(manager.addWarning(message, line, column, 0, this.path));
 		}
 	}
 
@@ -86,7 +96,7 @@ public class SDocMLValidator implements IValidator
 	{
 		JSMetadataReader reader = new JSMetadataReader();
 		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
-		Collector collector = new Collector(manager, path);
+		LogCollector collector = new LogCollector(manager, path);
 
 		reader.setLogger(collector);
 
@@ -96,6 +106,7 @@ public class SDocMLValidator implements IValidator
 		}
 		catch (Exception e)
 		{
+			collector.addItem(manager.addError(e.getMessage(), 0, 0, 0, path));
 		}
 
 		return collector.getItems();
