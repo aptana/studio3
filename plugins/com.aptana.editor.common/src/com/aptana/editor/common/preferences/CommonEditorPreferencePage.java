@@ -227,6 +227,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	{
 		IEclipsePreferences store = getPluginPreferenceStore();
 
+		store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false);
+
 		if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
 		{
 			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
@@ -257,6 +259,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void performDefaults()
 	{
 		IEclipsePreferences store = getPluginPreferenceStore();
+
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 

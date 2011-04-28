@@ -48,6 +48,22 @@ public interface IPreferenceConstants
 	public static final String SORT_OUTLINE_ALPHABETIC = CommonEditorPlugin.PLUGIN_ID + ".sortOutlineAlphabetic"; //$NON-NLS-1$
 
 	/**
+	 * The preference key for the comma-separated list of task tag names.
+	 */
+	public static final String TASK_TAG_NAMES = CommonEditorPlugin.PLUGIN_ID + ".taskTagNames"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the comma-separated list of task tag priorities. Order is important and lines up with
+	 * {@value #TASK_TAG_NAMES}
+	 */
+	public static final String TASK_TAG_PRIORITIES = CommonEditorPlugin.PLUGIN_ID + ".taskTagPriorities"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for determining if task tags should be treated in a case-sensitive manner when detecting them.
+	 */
+	public static final String TASK_TAGS_CASE_SENSITIVE = CommonEditorPlugin.PLUGIN_ID + ".taskTagsCaseSensitive"; //$NON-NLS-1$
+
+	/**
 	 * Enable highlighting of occurrences of selected text
 	 */
 	public static final String EDITOR_MARK_OCCURRENCES = CommonEditorPlugin.PLUGIN_ID + ".editorMarkOccurrences"; //$NON-NLS-1$
@@ -82,6 +98,11 @@ public interface IPreferenceConstants
 	 * The preference key used to enable and disable auto indent.
 	 */
 	public static final String EDITOR_AUTO_INDENT = CommonEditorPlugin.PLUGIN_ID + ".autoIndent"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to determine whether we use global defaults
+	 */
+	public static final String USE_GLOBAL_DEFAULTS = CommonEditorPlugin.PLUGIN_ID + ".useGlobalDefaults"; //$NON-NLS-1$
 
 	/**
 	 * The preference key used to enable and disable folding.
