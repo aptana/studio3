@@ -31,7 +31,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
-import com.aptana.ui.preferences.ChainedBooleanFieldEditor;
 
 /**
  * The form for configuring the general top-level preferences for this plugin
@@ -45,7 +44,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	private Composite appearanceComposite;
 	private IntegerFieldEditor tabSize;
-	private ChainedBooleanFieldEditor enableFolding;
+	private BooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
 	private IPreferenceStore originalPref;
 
@@ -284,9 +283,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		Composite foldingGroup = new Composite(parent, SWT.NONE);
 		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
 
-		enableFolding = new ChainedBooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
-				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup,
-				getChainedEditorPreferenceStore());
+		enableFolding = new BooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
+				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup);
 		addField(enableFolding);
 	}
 

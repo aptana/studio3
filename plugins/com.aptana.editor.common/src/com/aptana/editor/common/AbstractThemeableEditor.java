@@ -9,6 +9,7 @@ package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -26,6 +27,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
@@ -583,6 +585,21 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			fPeerCharacterCloser
 					.setAutoWrapEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue())));
+		}
+		else if (event.getProperty().equals(IPreferenceConstants.EDITOR_ENABLE_FOLDING))
+		{
+			if (isFoldingEnabled())
+			{
+				SourceViewerConfiguration config = getSourceViewerConfiguration();
+				if (config instanceof CommonSourceViewerConfiguration)
+				{
+					((CommonSourceViewerConfiguration) config).forceReconcile();
+				}
+			}
+			else
+			{
+				updateFoldingStructure(new ArrayList<Position>());
+			}
 		}
 	}
 

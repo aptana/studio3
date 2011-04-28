@@ -101,18 +101,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			return;
 		}
 
-		FileService fileService = fEditor.getFileService();
-		// doing a full parse at the moment
-		fileService.parse();
-		// abort if parse failed
-		if (!fileService.hasValidParseResult())
-		{
-			return;
-		}
-		if (monitor != null && monitor.isCanceled())
-		{
-			return;
-		}
 		// Folding...
 		fPositions.clear();
 		try
@@ -128,6 +116,38 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		if (monitor != null && monitor.isCanceled())
 			return;
 
+		updatePositions();
+	}
+
+	// Delete all the positions in the document
+	protected void clearPositions(IProgressMonitor monitor)
+	{
+		if (monitor != null && monitor.isCanceled())
+		{
+			return;
+		}
+		// clear folding positions
+		fPositions.clear();
+	}
+
+	protected boolean parseDocument(IProgressMonitor monitor)
+	{
+		FileService fileService = fEditor.getFileService();
+		// doing a full parse at the moment
+		fileService.parse();
+		// abort if parse failed
+		if (!fileService.hasValidParseResult())
+		{
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Update the folding positions in the document
+	 */
+	protected void updatePositions()
+	{
 		Display.getDefault().asyncExec(new Runnable()
 		{
 			public void run()
@@ -135,15 +155,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 				fEditor.updateFoldingStructure(fPositions);
 			}
 		});
-
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
+		parseDocument(fMonitor);
 		if (fEditor.isFoldingEnabled())
 		{
 			calculatePositions(fMonitor);
-			fEditor.getFileService().validate();
+			updatePositions();
 		}
+		else
+		{
+			fPositions.clear();
+			updatePositions();
+		}
+		fEditor.getFileService().validate();
 	}
 }
