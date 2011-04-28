@@ -1279,7 +1279,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	private boolean isValidAutoAssistLocation(char c, int keyCode, StyledText styledText)
 	{
-		if (keyCode == SWT.ESC || (keyCode & SWT.KEYCODE_BIT) != 0)
+		if (keyCode == SWT.ESC || keyCode == SWT.BS || (keyCode & SWT.KEYCODE_BIT) != 0)
 		{
 			return false;
 		}
