@@ -17,6 +17,10 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 
@@ -89,25 +93,38 @@ public class DeployHandler extends AbstractHandler
 		selectedProject = null;
 		if (evaluationContext instanceof EvaluationContext)
 		{
-			Object value = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-			if (value instanceof ISelection)
+			Object activePart = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_PART_NAME);
+			if (activePart instanceof IEditorPart)
 			{
-				ISelection selections = (ISelection) value;
-				if (!selections.isEmpty() && selections instanceof IStructuredSelection)
+				IEditorInput editorInput = ((IEditorPart) activePart).getEditorInput();
+				if (editorInput instanceof IFileEditorInput)
 				{
-					Object selection = ((IStructuredSelection) selections).getFirstElement();
-					IResource resource = null;
-					if (selection instanceof IResource)
+					selectedProject = ((IFileEditorInput) editorInput).getFile().getProject();
+				}
+			}
+			else
+			{
+				Object value = ((EvaluationContext) evaluationContext)
+						.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+				if (value instanceof ISelection)
+				{
+					ISelection selections = (ISelection) value;
+					if (!selections.isEmpty() && selections instanceof IStructuredSelection)
 					{
-						resource = (IResource) selection;
-					}
-					else if (selection instanceof IAdaptable)
-					{
-						resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
-					}
-					if (resource != null)
-					{
-						selectedProject = resource.getProject();
+						Object selection = ((IStructuredSelection) selections).getFirstElement();
+						IResource resource = null;
+						if (selection instanceof IResource)
+						{
+							resource = (IResource) selection;
+						}
+						else if (selection instanceof IAdaptable)
+						{
+							resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
+						}
+						if (resource != null)
+						{
+							selectedProject = resource.getProject();
+						}
 					}
 				}
 			}
@@ -139,7 +156,7 @@ public class DeployHandler extends AbstractHandler
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();
 		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
-		action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection());
+		action.setSelection(new StructuredSelection(selectedProject));
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
 		if (sites.length > 1)
 		{
