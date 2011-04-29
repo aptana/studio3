@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -198,9 +199,9 @@ public final class PreviewManager {
 		removePartListener();
 	}
 
-	public void openPreviewForEditor(IEditorPart editorPart) {
+	public void openPreviewForEditor(final IEditorPart editorPart) {
 		try {
-			IEditorInput editorInput = editorPart.getEditorInput();
+			final IEditorInput editorInput = editorPart.getEditorInput();
 			if (!editorPart.isDirty()) {
 				openPreview(editorPart, editorInput, null);
 			} else if (editorPart instanceof AbstractTextEditor) {
@@ -210,7 +211,18 @@ public final class PreviewManager {
 						IDocument document = documentProvider.getDocument(editorInput);
 						if (document != null) {
 							try {
-								openPreview(editorPart, editorInput, document.get());
+								if (!openPreview(editorPart, editorInput, document.get())) {
+									final boolean[] openPreview = new boolean[1];
+									UIUtils.getDisplay().syncExec(new Runnable() {
+										public void run() {
+											openPreview[0] = MessageDialog.openQuestion(editorPart.getSite().getShell(), Messages.PreviewManager_UnsavedPrompt_Title, Messages.PreviewManager_UnsavedPrompt_Message);
+										}
+									});
+									if (openPreview[0]) {
+										openPreview(editorPart, editorInput, null);
+									}
+
+								}
 							} catch (CoreException e) {
 								Activator.log(e);
 							}
@@ -263,8 +275,8 @@ public final class PreviewManager {
 		return false;
 	}
 
-	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
-		openPreview(editorPart, editorInput, content, true);
+	private boolean openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
+		return openPreview(editorPart, editorInput, content, true);
 	}
 
 	private SourceConfig getSourceConfig(IEditorInput editorInput, String content) throws CoreException {
@@ -312,8 +324,7 @@ public final class PreviewManager {
 		return new SourceConfig(editorInput, project, project != null ? workspacePath : path, content, contentType);
 	}
 
-	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen)
-			throws CoreException {
+	private boolean openPreview(final IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
 		SourceConfig sourceConfig = getSourceConfig(editorInput, content);
 		PreviewConfig previewConfig = null;
 		if (sourceConfig != null) {
@@ -328,9 +339,9 @@ public final class PreviewManager {
 		}
 		if (previewConfig != null) {
 			showEditor(editorPart, sourceConfig, previewConfig, forceOpen);
-		} else {
-			// TODO: add some user notification
+			return true;
 		}
+		return false;
 	}
 
 	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig,
