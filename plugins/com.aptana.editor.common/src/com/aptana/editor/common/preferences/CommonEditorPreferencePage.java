@@ -44,7 +44,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	private Composite appearanceComposite;
 	private IntegerFieldEditor tabSize;
-	private BooleanFieldEditor enableFolding;
+	protected BooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
 
 	/**
@@ -267,7 +267,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		addField(autoIndentTag);
 	}
 
-	protected void createFoldingOptions(Composite parent)
+	protected Composite createFoldingOptions(Composite parent)
 	{
 		Composite foldingGroup = new Composite(parent, SWT.NONE);
 		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(1, 1).create());
@@ -275,6 +275,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		enableFolding = new BooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
 				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup);
 		addField(enableFolding);
+
+		return foldingGroup;
 	}
 
 	/**

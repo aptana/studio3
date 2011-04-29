@@ -7,13 +7,14 @@
  */
 package com.aptana.editor.common;
 
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
 public interface IFoldingEditor
 {
 
-	public abstract void updateFoldingStructure(List<Position> positions);
+	public abstract void updateFoldingStructure(Map<ProjectionAnnotation, Position> positions);
 
 }

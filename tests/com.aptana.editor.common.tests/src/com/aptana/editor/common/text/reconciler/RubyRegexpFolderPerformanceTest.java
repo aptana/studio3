@@ -9,14 +9,12 @@ package com.aptana.editor.common.text.reconciler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.Position;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
@@ -63,7 +61,7 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 		{
 			IProgressMonitor monitor = new NullProgressMonitor();
 			startMeasuring();
-			List<Position> positions = folder.emitFoldingRegions(monitor);
+			folder.emitFoldingRegions(false, monitor);
 			stopMeasuring();
 			// TODO Verify the positions?
 		}

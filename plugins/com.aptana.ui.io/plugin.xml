@@ -100,7 +100,10 @@
                   </instanceof>
                   <instanceof
                         value="com.aptana.ide.core.io.LocalRoot">
-                  </instanceof></or>
+                  </instanceof>
+                  <adapt
+                        type="org.eclipse.core.filesystem.IFileStore">
+                  </adapt></or>
             </parentExpression>
          </commonSorter>
          <possibleChildren>

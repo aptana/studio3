@@ -9,12 +9,15 @@ package com.aptana.editor.common.internal;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
@@ -65,34 +68,38 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.List)
+	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.Map)
 	 */
-	public void updateFoldingStructure(List<Position> positions)
+	public void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
 	{
-		// The map we'll use to overwrite oldAnnotations with later
-		Map<ProjectionAnnotation, Position> newAnnotationMap = new HashMap<ProjectionAnnotation, Position>();
-		// The map of brand new positions
-		Map<ProjectionAnnotation, Position> toAdd = new HashMap<ProjectionAnnotation, Position>();
-		for (Position position : positions)
+		List<Annotation> deletions = new ArrayList<Annotation>();
+		Collection<Position> additions = annotations.values();
+		ProjectionAnnotationModel currentModel = getAnnotationModel();
+		if (currentModel == null)
 		{
-			ProjectionAnnotation annotation = findAnnotationWithPosition(position);
-			if (annotation == null)
+			return;
+		}
+		for (@SuppressWarnings("rawtypes")
+		Iterator iter = currentModel.getAnnotationIterator(); iter.hasNext();)
+		{
+			Object annotation = iter.next();
+			if (annotation instanceof ProjectionAnnotation)
 			{
-				// this is actually a brand new position, throw it on toAdd
-				annotation = new ProjectionAnnotation();
-				toAdd.put(annotation, position);
+				Position position = currentModel.getPosition((Annotation) annotation);
+				if (additions.contains(position))
+				{
+					additions.remove(position);
+				}
+				else
+				{
+					deletions.add((Annotation) annotation);
+				}
 			}
-			newAnnotationMap.put(annotation, position);
 		}
-
-		List<ProjectionAnnotation> toDelete = findDeletedAnnotations(newAnnotationMap);
-		ProjectionAnnotationModel model = getAnnotationModel();
-		if (model != null)
+		if (annotations.size() != 0 || deletions.size() != 0)
 		{
-			model.modifyAnnotations(toDelete.toArray(new ProjectionAnnotation[toDelete.size()]), toAdd,
-					new ProjectionAnnotation[0]);
+			currentModel.modifyAnnotations(deletions.toArray(new Annotation[deletions.size()]), annotations, null);
 		}
-		oldAnnotations = newAnnotationMap;
 	}
 
 	protected ProjectionAnnotationModel getAnnotationModel()
@@ -101,51 +108,6 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		if (viewer instanceof ProjectionViewer)
 		{
 			return ((ProjectionViewer) viewer).getProjectionAnnotationModel();
-		}
-		return null;
-	}
-
-	/**
-	 * Traverses our last map of saved annotations and checks for any there were in there, but are not in our new map.
-	 * That comprises the set of annotations to be deleted.
-	 * 
-	 * @param newAnnotationMap
-	 * @return
-	 */
-	private List<ProjectionAnnotation> findDeletedAnnotations(Map<ProjectionAnnotation, Position> newAnnotationMap)
-	{
-		List<ProjectionAnnotation> toDelete = new ArrayList<ProjectionAnnotation>();
-		if (oldAnnotations != null)
-		{
-			for (ProjectionAnnotation old : oldAnnotations.keySet())
-			{
-				if (!newAnnotationMap.containsKey(old)) // old isn't in new set, needs to be deleted
-				{
-					toDelete.add(old);
-				}
-			}
-		}
-		return toDelete;
-	}
-
-	private ProjectionAnnotation findAnnotationWithPosition(Position position)
-	{
-		ProjectionAnnotationModel model = getAnnotationModel();
-		if (model != null)
-		{
-			Position oldPosition;
-			for (Map.Entry<ProjectionAnnotation, Position> oldEntry : oldAnnotations.entrySet())
-			{
-				oldPosition = model.getPosition(oldEntry.getKey());
-				if (oldPosition == null)
-				{
-					continue;
-				}
-				if (position.equals(oldPosition))
-				{
-					return oldEntry.getKey();
-				}
-			}
 		}
 		return null;
 	}

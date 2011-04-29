@@ -9,7 +9,7 @@ package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -35,6 +35,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -602,7 +603,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 			else
 			{
-				updateFoldingStructure(new ArrayList<Position>());
+				updateFoldingStructure(new HashMap<ProjectionAnnotation, Position>());
 			}
 		}
 		else if (IPreferenceConstants.USE_GLOBAL_DEFAULTS.equals(property))
