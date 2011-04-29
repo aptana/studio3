@@ -610,8 +610,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			// Update the tab settings when we modify the use global defaults preference
 			IPreferenceStore store = getPreferenceStore();
 			if (store != null)
+			{
 				getSourceViewer().getTextWidget().setTabs(
 						store.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH));
+			}
 			if (isTabsToSpacesConversionEnabled())
 			{
 				installTabsToSpacesConverter();
