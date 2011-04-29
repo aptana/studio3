@@ -7,8 +7,8 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -18,6 +18,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -32,7 +33,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	/**
 	 * Code Folding.
 	 */
-	private List<Position> fPositions = new ArrayList<Position>();
+	private Map<ProjectionAnnotation, Position> fPositions = new HashMap<ProjectionAnnotation, Position>();
 
 	private IProgressMonitor fMonitor;
 
@@ -94,7 +95,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 	}
 
-	protected void calculatePositions(IProgressMonitor monitor)
+	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
 		{
@@ -105,7 +106,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fPositions.clear();
 		try
 		{
-			fPositions = folder.emitFoldingRegions(monitor);
+			fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
 		}
 		catch (BadLocationException e)
 		{
@@ -114,7 +115,9 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
 		// early because of cancel...
 		if (monitor != null && monitor.isCanceled())
+		{
 			return;
+		}
 
 		updatePositions();
 	}
@@ -158,13 +161,13 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		parseDocument(fMonitor);
 		if (fEditor.isFoldingEnabled())
 		{
-			calculatePositions(fMonitor);
+			calculatePositions(initialReconcile, fMonitor);
 		}
 		else
 		{
 			fPositions.clear();
+			updatePositions();
 		}
-		updatePositions();
 		fEditor.getFileService().validate();
 	}
 }

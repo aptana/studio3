@@ -44,9 +44,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	private Composite appearanceComposite;
 	private IntegerFieldEditor tabSize;
-	private BooleanFieldEditor enableFolding;
+	protected BooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
-	private IPreferenceStore originalPref;
 
 	/**
 	 * EditorsPreferencePage
@@ -63,14 +62,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	protected void createFieldEditors()
 	{
-		originalPref = getPreferenceStore();
-		setPreferenceStore(getChainedEditorPreferenceStore());
-
 		appearanceComposite = getFieldEditorParent();
 		createMarkOccurrenceOptions(appearanceComposite);
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
-
-		setPreferenceStore(originalPref);
 	}
 
 	protected void createTextEditingOptions(Composite parent, String groupName)
@@ -160,6 +154,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 					{
 						// Remove preference from plugin preference store if it has the same value as the global editor
 						// value, or if the tab-policy is set to use the global settings.
+						removePluginDefaults();
 						getPluginPreferenceStore().remove(
 								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 					}
@@ -190,13 +185,14 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	private void setTabSpaceCombo()
 	{
-		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		if (!getPreferenceStore().contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
 		{
 			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
 		}
 		else
 		{
-			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+			if (getChainedEditorPreferenceStore().getBoolean(
+					AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
 			{
 				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
 			}
@@ -207,21 +203,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 	}
 
-	/**
-	 * Create the Mark Occurrences group and options if there are any for this language/editor.
-	 * 
-	 * @param parent
-	 */
-	protected abstract void createMarkOccurrenceOptions(Composite parent);
-
-	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
-
-	protected abstract IEclipsePreferences getPluginPreferenceStore();
-
-	public void init(IWorkbench workbench)
-	{
-	}
-
 	public boolean performOk()
 	{
 		IEclipsePreferences store = getPluginPreferenceStore();
@@ -229,16 +210,21 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
 		{
 			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+			store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false);
 		}
 		else if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseTabOption))
 		{
 			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+			store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false);
 		}
 		else
 		{
+			removePluginDefaults();
 			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+			store.putBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, true);
 		}
+
 		try
 		{
 			store.flush();
@@ -254,8 +240,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void performDefaults()
 	{
 		IEclipsePreferences store = getPluginPreferenceStore();
+
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+
+		setPluginDefaults();
 		setTabSpaceCombo();
 		super.performDefaults();
 		try
@@ -278,7 +267,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		addField(autoIndentTag);
 	}
 
-	protected void createFoldingOptions(Composite parent)
+	protected Composite createFoldingOptions(Composite parent)
 	{
 		Composite foldingGroup = new Composite(parent, SWT.NONE);
 		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(1, 1).create());
@@ -286,6 +275,112 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		enableFolding = new BooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
 				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup);
 		addField(enableFolding);
+
+		return foldingGroup;
 	}
 
+	/**
+	 * This method re-applies the plugin defaults for the spaces for tabs and tab width preferences from the default
+	 * scope of the plugin preference store. The default values are taken from getDefaultTabWidth() and
+	 * getDefaultSpacesForTabs(). The default scope getDefaultPluginPreferenceStore() is used.
+	 */
+	protected void setPluginDefaults()
+	{
+		IEclipsePreferences store = getDefaultPluginPreferenceStore();
+
+		if (store == null)
+		{
+			return;
+		}
+
+		store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
+				getDefaultSpacesForTabs());
+		store.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, getDefaultTabWidth());
+
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	/**
+	 * This method removes the spaces for tabs and tab width preferences from the default scope of the plugin preference
+	 * store.
+	 */
+	protected void removePluginDefaults()
+	{
+		IEclipsePreferences store = getDefaultPluginPreferenceStore();
+
+		if (store == null)
+		{
+			return;
+		}
+
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	/**
+	 * This class returns the default scope of the plugin preference store. This method should be overwritten when we
+	 * want to specify other default preferences for a particular editor rather than "Use Global Editor Defaults". NOTE:
+	 * When specifying other default preferences, we also need to overwrite getDefaultSpacesForTabs() and
+	 * getDefaultTabWidth()
+	 * 
+	 * @return
+	 */
+	protected IEclipsePreferences getDefaultPluginPreferenceStore()
+	{
+		return null;
+	}
+
+	/**
+	 * The default value for spaces for tabs preference. (Used with getDefaultPluginPreferenceStore() )
+	 * 
+	 * @return
+	 */
+
+	protected boolean getDefaultSpacesForTabs()
+	{
+		return getChainedEditorPreferenceStore().getBoolean(
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+	}
+
+	/**
+	 * The default value used for tab width preference. (Used with getDefaultPluginPreferenceStore() )
+	 * 
+	 * @return
+	 */
+
+	protected int getDefaultTabWidth()
+	{
+		return getChainedEditorPreferenceStore()
+				.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+	}
+
+	public void init(IWorkbench workbench)
+	{
+	}
+
+	/**
+	 * Create the Mark Occurrences group and options if there are any for this language/editor.
+	 * 
+	 * @param parent
+	 */
+	protected abstract void createMarkOccurrenceOptions(Composite parent);
+
+	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
+
+	protected abstract IEclipsePreferences getPluginPreferenceStore();
 }

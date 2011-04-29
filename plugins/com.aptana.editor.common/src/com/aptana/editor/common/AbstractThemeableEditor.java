@@ -9,7 +9,7 @@ package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -35,6 +35,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -56,6 +57,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
@@ -574,19 +576,22 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
+		// Add case when the global editor settings have changed
+		String property = event.getProperty();
+
 		super.handlePreferenceStoreChanged(event);
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
+		if (property.equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
 		{
 			fPeerCharacterCloser.setAutoInsertEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event
 					.getNewValue())));
 		}
-		else if (event.getProperty().equals(IPreferenceConstants.EDITOR_WRAP_SELECTION))
+		else if (property.equals(IPreferenceConstants.EDITOR_WRAP_SELECTION))
 		{
 			fPeerCharacterCloser
 					.setAutoWrapEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue())));
 		}
-		else if (event.getProperty().equals(IPreferenceConstants.EDITOR_ENABLE_FOLDING))
+		else if (property.equals(IPreferenceConstants.EDITOR_ENABLE_FOLDING))
 		{
 			if (isFoldingEnabled())
 			{
@@ -598,8 +603,27 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 			else
 			{
-				updateFoldingStructure(new ArrayList<Position>());
+				updateFoldingStructure(new HashMap<ProjectionAnnotation, Position>());
 			}
+		}
+		else if (IPreferenceConstants.USE_GLOBAL_DEFAULTS.equals(property))
+		{
+			// Update the tab settings when we modify the use global defaults preference
+			IPreferenceStore store = getPreferenceStore();
+			if (store != null)
+			{
+				getSourceViewer().getTextWidget().setTabs(
+						store.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH));
+			}
+			if (isTabsToSpacesConversionEnabled())
+			{
+				installTabsToSpacesConverter();
+			}
+			else
+			{
+				uninstallTabsToSpacesConverter();
+			}
+			return;
 		}
 	}
 
