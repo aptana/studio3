@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -295,7 +296,8 @@ public class CorePlugin extends Plugin
 	private boolean inMigrationMode()
 	{
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, false, null);
+				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
+				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
 	}
 
 	private void addProjectListeners()
@@ -331,7 +333,7 @@ public class CorePlugin extends Plugin
 									if (delta.getKind() == IResourceDelta.ADDED
 											|| (delta.getKind() == IResourceDelta.CHANGED
 													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-														.isAccessible()))
+													.isAccessible()))
 									{
 										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 										{
@@ -531,7 +533,7 @@ public class CorePlugin extends Plugin
 							else if (delta.getKind() == IResourceDelta.REMOVED
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-												.isAccessible()))
+											.isAccessible()))
 							{
 								unhookFilewatcher(resource.getProject());
 							}
