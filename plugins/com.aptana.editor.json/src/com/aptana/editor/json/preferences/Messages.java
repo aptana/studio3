@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.json.preferences.messages"; //$NON-NLS-1$
+
 	public static String JSONFormatterBracesPage_blocks;
 	public static String JSONFormatterBracesPage_braces_group_label;
 	public static String JSONFormatterCommentsPage_comments_group_label;
@@ -18,6 +19,10 @@ public class Messages extends NLS
 	public static String JSONFormatterModifyDialog_indentation_page_tab_name;
 	public static String JSONFormatterModifyDialog_JSON_formater_title;
 	public static String JSONPreferencePage_JSON_Page_Title;
+	public static String JSONPreferencePage_initial_fold_options_label;
+	public static String JSONPreferencePage_fold_objects_label;
+	public static String JSONPreferencePage_fold_arrays_label;
+
 	static
 	{
 		// initialize resource bundle
