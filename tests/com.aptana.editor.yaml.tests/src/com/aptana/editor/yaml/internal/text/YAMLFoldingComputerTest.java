@@ -7,13 +7,15 @@
  */
 package com.aptana.editor.yaml.internal.text;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.yaml.parsing.YAMLParser;
@@ -53,9 +55,10 @@ public class YAMLFoldingComputerTest extends TestCase
 				return null;
 			};
 		};
-		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
+		Collection<Position> positions = annotations.values();
 		assertEquals(2, positions.size());
-		assertEquals(new Position(0, 30), positions.get(0));
-		assertEquals(new Position(31, 25), positions.get(1));
+		assertTrue(positions.contains(new Position(0, 30)));
+		assertTrue(positions.contains(new Position(31, 25)));
 	}
 }
