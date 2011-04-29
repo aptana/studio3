@@ -8,9 +8,9 @@
 
 package com.aptana.core.util;
 
-import org.eclipse.core.runtime.IPath;
-
 import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.IPath;
 
 public class EclipseUtilTest extends TestCase {
 
@@ -18,6 +18,7 @@ public class EclipseUtilTest extends TestCase {
 		IPath path = EclipseUtil.getApplicationLauncher();
 		assertNotNull(path);
 		assertTrue("Eclipse".equalsIgnoreCase(path.removeFileExtension().lastSegment())
-				|| "AptanaStudio3".equalsIgnoreCase(path.removeFileExtension().lastSegment()));
+				|| "AptanaStudio3".equalsIgnoreCase(path.removeFileExtension().lastSegment())
+				|| "Aptana Studio 3".equalsIgnoreCase(path.removeFileExtension().lastSegment()));
 	}
 }

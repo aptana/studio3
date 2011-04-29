@@ -185,7 +185,7 @@ public class EclipseUtil
 									return false;
 								}
 							}
-							if ("Eclipse".equalsIgnoreCase(name) || "AptanaStudio3".equalsIgnoreCase(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+							if ("Eclipse".equalsIgnoreCase(name) || "AptanaStudio3".equalsIgnoreCase(name) || "Aptana Studio 3".equalsIgnoreCase(name)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								return true;
 							}
 							return false;
