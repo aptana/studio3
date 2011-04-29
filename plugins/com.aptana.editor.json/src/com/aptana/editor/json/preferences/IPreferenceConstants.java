@@ -28,4 +28,14 @@ public interface IPreferenceConstants
 	public static final String WRAP_COMMENTS = FORMATTER_ID + ".wrap.comments"; //$NON-NLS-1$
 	public static final String WRAP_COMMENTS_LENGTH = FORMATTER_ID + ".wrap.comments.length"; //$NON-NLS-1$
 
+	/**
+	 * A pref key used to determine if objects are initially folded. Value is a boolean.
+	 */
+	public static final String INITIALLY_FOLD_OBJECTS = "fold_objects"; //$NON-NLS-1$
+
+	/**
+	 * A pref key used to determine if arrays are initially folded. Value is a boolean.
+	 */
+	public static final String INITIALLY_FOLD_ARRAYS = "fold_arrays"; //$NON-NLS-1$
+
 }

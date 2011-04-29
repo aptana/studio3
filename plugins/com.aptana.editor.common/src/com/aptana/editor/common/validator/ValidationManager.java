@@ -154,6 +154,12 @@ public class ValidationManager implements IValidationManager
 			IValidator validator = validatorRef.getValidator();
 			IParseNode rootAST = fFileService.getParseResult();
 			List<IValidationItem> newItems = new ArrayList<IValidationItem>();
+
+			if (rootAST == null)
+			{
+				continue;
+			}
+
 			processASTForNestedLanguage(rootAST, nestedLanguage, validator, newItems);
 
 			String type = validatorRef.getMarkerType();

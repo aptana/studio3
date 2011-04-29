@@ -11,13 +11,6 @@
             properties="isDeployable,isDeployType"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
-      <propertyTester
-            class="com.aptana.deploy.internal.EditorPropertyTester"
-            id="com.aptana.deploy.editorPropertyTester"
-            namespace="com.aptana.deploy.editor"
-            properties="isDeployable,isDeployType"
-            type="org.eclipse.ui.IEditorPart">
-      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -88,10 +81,10 @@
                      </adapt>
                   </iterate>
                   <with
-                        variable="activePart">
-                     <instanceof
-                           value="org.eclipse.ui.IEditorPart">
-                     </instanceof>
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
                   </with>
                </or>
             </visibleWhen>
@@ -104,18 +97,24 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <and>
+               <and>
+                  <with
+                        variable="activePart">
                      <instanceof
                            value="org.eclipse.ui.IEditorPart">
                      </instanceof>
-                     <test
-                           property="com.aptana.deploy.editor.isDeployable"
-                           value="true">
-                     </test>
-                  </and>
-               </with>
+                  </with>
+                  <with
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="com.aptana.deploy.project.isDeployType"
+                              value="com.aptana.deploy.heroku.provider">
+                        </test>
+                     </adapt>
+                  </with>
+               </and>
             </visibleWhen>
          </command>
       </menuContribution>

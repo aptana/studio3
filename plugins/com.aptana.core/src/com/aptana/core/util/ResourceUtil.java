@@ -227,6 +227,14 @@ public class ResourceUtil
 				addBuilder = false;
 				break;
 			}
+			// when a builder is disabled, Eclipse turns it into an external tool builder, so we have to do a little
+			// hack to see if the new builder id matches one of the disabled builds
+			String configHandler = (String) command.getArguments().get("LaunchConfigHandle"); //$NON-NLS-1$
+			if (configHandler != null && configHandler.indexOf(builderId) > -1)
+			{
+				addBuilder = false;
+				break;
+			}
 		}
 		// add builder to project
 		if (addBuilder)

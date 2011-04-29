@@ -154,18 +154,24 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -173,18 +179,24 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -192,18 +204,24 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </command>
             <menu
@@ -219,18 +237,24 @@
                </command>
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </menu>
             <separator
@@ -242,18 +266,24 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -261,18 +291,24 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </command>
             <separator
@@ -284,18 +320,24 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <and>
+                  <and>
+                     <with
+                           variable="activePart">
                         <instanceof
                               value="org.eclipse.ui.IEditorPart">
                         </instanceof>
-                        <test
-                              property="com.aptana.deploy.editor.isDeployType"
-                              value="com.aptana.deploy.ftp.provider">
-                        </test>
-                     </and>
-                  </with>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.heroku.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
                </visibleWhen>
             </command>
          </menuContribution>

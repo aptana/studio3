@@ -46,18 +46,24 @@
                id="com.aptana.explorer.deploy.engineyard">
             <visibleWhen
                   checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <and>
+               <and>
+                  <with
+                        variable="activePart">
                      <instanceof
                            value="org.eclipse.ui.IEditorPart">
                      </instanceof>
-                     <test
-                           property="com.aptana.deploy.editor.isDeployType"
-                           value="com.aptana.deploy.engineyard.provider">
-                     </test>
-                  </and>
-               </with>
+                  </with>
+                  <with
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="com.aptana.deploy.project.isDeployType"
+                              value="com.aptana.deploy.heroku.provider">
+                        </test>
+                     </adapt>
+                  </with>
+               </and>
             </visibleWhen>
          </dynamic>
       </menuContribution>
