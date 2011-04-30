@@ -307,7 +307,7 @@ public class Portal
 
 	protected char getProjectType(IProject selectedProject)
 	{
-		if (selectedProject != null)
+		if (selectedProject != null && selectedProject.isAccessible())
 		{
 			// R for Rails, D for pydev, W for web, P for PHP and O for other.
 			try
