@@ -16,6 +16,7 @@ public class Messages extends NLS
 	public static String GitExecutableLocationPage_CalculatePullIndicatorLabel;
 	public static String GitExecutableLocationPage_InvalidLocationErrorMessage;
 	public static String GitExecutableLocationPage_LocationLabel;
+	public static String GitPreferencePage_IgnoreMissingGitLabel;
 	static
 	{
 		// initialize resource bundle
