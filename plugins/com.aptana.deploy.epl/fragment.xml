@@ -62,10 +62,6 @@
                         variable="activeEditorInput">
                      <adapt
                            type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="com.aptana.deploy.project.isDeployType"
-                              value="com.aptana.deploy.heroku.provider">
-                        </test>
                      </adapt>
                   </with>
                </and>
