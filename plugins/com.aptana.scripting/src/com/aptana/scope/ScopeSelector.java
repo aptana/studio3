@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
+import com.aptana.core.util.StringUtil;
+
 public class ScopeSelector implements IScopeSelector
 {
 	private static final String NEGATIVE_LOOKAHEAD = "-"; //$NON-NLS-1$
@@ -352,6 +354,6 @@ public class ScopeSelector implements IScopeSelector
 	@Override
 	public String toString()
 	{
-		return (this._root == null) ? "null" : this._root.toString(); //$NON-NLS-1$
+		return (this._root == null) ? StringUtil.EMPTY : this._root.toString();
 	}
 }
