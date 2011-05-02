@@ -125,6 +125,10 @@ public class Theme
 			if (selectorIndex != -1)
 			{
 				scopeSelector = value.substring(selectorIndex + 1);
+				if ("null".equals(scopeSelector)) //$NON-NLS-1$
+				{
+					scopeSelector = null;
+				}
 				value = value.substring(0, selectorIndex);
 			}
 			List<String> values = tokenize(value);
