@@ -167,7 +167,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>
@@ -192,7 +192,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>
@@ -217,7 +217,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>
@@ -250,7 +250,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>
@@ -279,7 +279,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>
@@ -304,7 +304,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>
@@ -333,7 +333,7 @@
                               type="org.eclipse.core.resources.IResource">
                            <test
                                  property="com.aptana.deploy.project.isDeployType"
-                                 value="com.aptana.deploy.heroku.provider">
+                                 value="com.aptana.deploy.ftp.provider">
                            </test>
                         </adapt>
                      </with>

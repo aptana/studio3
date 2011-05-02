@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
@@ -71,8 +74,13 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.ActiveShellExpression;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.handlers.IHandlerActivation;
+import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -81,6 +89,17 @@ import com.aptana.git.ui.GitUIPlugin;
 
 class CommitDialog extends StatusDialog
 {
+	/**
+	 * Context specific to this dialog.
+	 */
+	private static final String COMMIT_DIALOG_CONTEXT_ID = "com.aptana.git.ui.context.dialog.commit"; //$NON-NLS-1$
+
+	/**
+	 * Command specific to this dialog to perform a commit (just like hitting Ok/Commit button), so we can bind a
+	 * keybinding to perform this.
+	 */
+	private static final String PERFORM_COMMIT_COMMAND_ID = "com.aptana.git.ui.command.commit.dialog"; //$NON-NLS-1$
+
 	private static final String CHANGED_FILE_DATA_KEY = "changedFile"; //$NON-NLS-1$
 
 	private GitRepository gitRepository;
@@ -98,6 +117,10 @@ class CommitDialog extends StatusDialog
 
 	private StagingButtons unstageButtons;
 	private StagingButtons stageButtons;
+
+	private IContextActivation contextActivation;
+
+	private IHandlerActivation commitHandler;
 
 	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -310,6 +333,40 @@ class CommitDialog extends StatusDialog
 		data.heightHint = 200;
 		data.widthHint = 300;
 		commitMessage.setLayoutData(data);
+
+		IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+		contextActivation = service.activateContext(COMMIT_DIALOG_CONTEXT_ID);
+
+		IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+		IHandler handler = new AbstractHandler()
+		{
+			public Object execute(ExecutionEvent event)
+			{
+				okPressed();
+				return null;
+			}
+		};
+		commitHandler = handlerService.activateHandler(PERFORM_COMMIT_COMMAND_ID, handler, new ActiveShellExpression(
+				getShell()));
+	}
+
+	@Override
+	public boolean close()
+	{
+		if (contextActivation != null)
+		{
+			IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+			service.deactivateContext(contextActivation);
+			contextActivation = null;
+		}
+		if (commitHandler != null)
+		{
+			IHandlerService service = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+			service.deactivateHandler(commitHandler);
+			commitHandler.getHandler().dispose();
+			commitHandler = null;
+		}
+		return super.close();
 	}
 
 	private Table createTable(Composite composite, final boolean staged)
@@ -550,9 +607,11 @@ class CommitDialog extends StatusDialog
 							}
 						}
 					}
-					
-					ContributionItem ci = new ContributionItem() {
-						public void fill(Menu menu, int index) {
+
+					ContributionItem ci = new ContributionItem()
+					{
+						public void fill(Menu menu, int index)
+						{
 							MenuItem item = new MenuItem(menu, SWT.NONE);
 							item.setText(Messages.CommitDialog_RevertLabel);
 							// need to remove the file(s) from staged table once action runs
@@ -567,9 +626,9 @@ class CommitDialog extends StatusDialog
 									{
 										copy.add(new ChangedFile(cf));
 									}
-									
+
 									gitRepository.index().discardChangesForFiles(changedFiles);
-									
+
 									PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 									{
 
@@ -592,7 +651,7 @@ class CommitDialog extends StatusDialog
 								}
 							});
 						}
-			    	};
+					};
 					manager.add(ci);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -830,8 +889,38 @@ class CommitDialog extends StatusDialog
 	protected Button createButton(Composite parent, int id, String label, boolean defaultButton)
 	{
 		if (id == IDialogConstants.OK_ID)
+		{
 			label = Messages.CommitDialog_CommitButton_Label;
+		}
 		return super.createButton(parent, id, label, defaultButton);
+	}
+
+	@Override
+	protected void okPressed()
+	{
+		// if there are still unstaged changes don't set return code and close.
+		if (unstagedTable.getItemCount() > 0)
+		{
+			// disable the buttons until commit is done
+			getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+			getButton(IDialogConstants.OK_ID).setEnabled(false);
+			boolean success = gitRepository.index().commit(getCommitMessage());
+			if (success)
+			{
+				// commit worked, wipe commit message and staged files in table
+				commitMessage.setText(""); //$NON-NLS-1$
+				stagedTable.removeAll();
+				// TODO Show some sort of success message?
+			}
+			// TODO What if the commit failed for some reason?!
+			// Re-enable buttons
+			getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+			getButton(IDialogConstants.OK_ID).setEnabled(true);
+		}
+		else
+		{
+			super.okPressed();
+		}
 	}
 
 	public String getCommitMessage()

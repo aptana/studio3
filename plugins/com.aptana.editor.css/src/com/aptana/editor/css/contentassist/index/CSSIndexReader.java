@@ -92,10 +92,10 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> items = index.query( //
-				new String[] { CSSIndexConstants.ELEMENT }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
-				);
+					new String[] { CSSIndexConstants.ELEMENT }, //
+					"*", //$NON-NLS-1$
+					SearchPattern.PATTERN_MATCH //
+					);
 
 			if (items != null)
 			{
@@ -118,10 +118,10 @@ public class CSSIndexReader extends IndexReader
 			for (String name : names)
 			{
 				List<QueryResult> elements = index.query( //
-					new String[] { CSSIndexConstants.ELEMENT }, //
-					name + CSSIndexConstants.DELIMITER, //
-					SearchPattern.PREFIX_MATCH //
-					);
+						new String[] { CSSIndexConstants.ELEMENT }, //
+						name + CSSIndexConstants.DELIMITER, //
+						SearchPattern.PREFIX_MATCH //
+						);
 
 				if (elements != null)
 				{
@@ -150,10 +150,10 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> properties = index.query( //
-				new String[] { CSSIndexConstants.PROPERTY }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
-				);
+					new String[] { CSSIndexConstants.PROPERTY }, //
+					"*", //$NON-NLS-1$
+					SearchPattern.PATTERN_MATCH //
+					);
 
 			if (properties != null)
 			{
@@ -184,10 +184,10 @@ public class CSSIndexReader extends IndexReader
 			for (String name : names)
 			{
 				List<QueryResult> properties = index.query( //
-					new String[] { CSSIndexConstants.PROPERTY }, //
-					name + CSSIndexConstants.DELIMITER, //
-					SearchPattern.PREFIX_MATCH //
-					);
+						new String[] { CSSIndexConstants.PROPERTY }, //
+						name + CSSIndexConstants.DELIMITER, //
+						SearchPattern.PREFIX_MATCH //
+						);
 
 				if (properties != null)
 				{
@@ -216,10 +216,10 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> pseudoClasses = index.query( //
-				new String[] { CSSIndexConstants.PSUEDO_CLASS }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
-				);
+					new String[] { CSSIndexConstants.PSUEDO_CLASS }, //
+					"*", //$NON-NLS-1$
+					SearchPattern.PATTERN_MATCH //
+					);
 
 			if (pseudoClasses != null)
 			{
@@ -247,10 +247,10 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> pseudoElements = index.query( //
-				new String[] { CSSIndexConstants.PSUEDO_ELEMENT }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
-				);
+					new String[] { CSSIndexConstants.PSUEDO_ELEMENT }, //
+					"*", //$NON-NLS-1$
+					SearchPattern.PATTERN_MATCH //
+					);
 
 			if (pseudoElements != null)
 			{
@@ -286,27 +286,18 @@ public class CSSIndexReader extends IndexReader
 		if (index != null && StringUtil.isEmpty(category) == false)
 		{
 			String pattern = "*"; //$NON-NLS-1$
-
-			try
+			List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
+			if (items != null && items.size() > 0)
 			{
-				List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
+				result = new HashMap<String, String>();
 
-				if (items != null && items.size() > 0)
+				for (QueryResult item : items)
 				{
-					result = new HashMap<String, String>();
+					Set<String> paths = item.getDocuments();
+					String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
 
-					for (QueryResult item : items)
-					{
-						Set<String> paths = item.getDocuments();
-						String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
-
-						result.put(item.getWord(), path);
-					}
+					result.put(item.getWord(), path);
 				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
 			}
 		}
 

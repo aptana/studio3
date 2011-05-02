@@ -472,7 +472,7 @@ public class Index implements IReadWriteMonitor
 	 * @return
 	 * @throws IOException
 	 */
-	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
+	public List<QueryResult> query(String[] categories, String key, int matchRule)
 	{
 		Map<String, QueryResult> results = null;
 
@@ -506,6 +506,14 @@ public class Index implements IReadWriteMonitor
 			{
 				results = this.diskIndex.addQueryResults(categories, key, rule, null);
 			}
+		}
+		catch (IOException e)
+		{
+			if (e instanceof java.io.EOFException)
+			{
+				e.printStackTrace();
+			}
+			IndexPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
