@@ -8,7 +8,6 @@
 
 package com.aptana.editor.html.preview;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
@@ -28,53 +27,59 @@ import com.aptana.preview.IEditorPreviewDelegate;
 /**
  * @author Michael Xia
  * @author Max Stepanov
- *
  */
-public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate {
+public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate
+{
 
 	private IEditorPart targetEditorPart;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.preview.IEditorPreviewDelegate#init(org.eclipse.ui.IEditorPart)
 	 */
-	public void init(IEditorPart targetEditorPart) {
+	public void init(IEditorPart targetEditorPart)
+	{
 		this.targetEditorPart = targetEditorPart;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.preview.IEditorPreviewDelegate#dispose()
 	 */
-	public void dispose() {
+	public void dispose()
+	{
 		targetEditorPart = null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.preview.IEditorPreviewDelegate#isLinked(java.net.URI)
 	 */
-	public boolean isLinked(URI uri) {
+	public boolean isLinked(URI uri)
+	{
 		// checks if this HTML file includes the source the changed editor is referencing (JS or CSS file)
 		IEditorInput targetEditorInput = targetEditorPart.getEditorInput();
-		if (targetEditorInput instanceof IFileEditorInput) {
+		if (targetEditorInput instanceof IFileEditorInput)
+		{
 			IFile htmlFile = ((IFileEditorInput) targetEditorInput).getFile();
 			Index index = IndexManager.getInstance().getIndex(htmlFile.getProject().getLocationURI());
-			List<QueryResult> queryResults = null;
-			try {
-				queryResults = index.query(new String[] {
-						HTMLIndexConstants.RESOURCE_CSS,
-						HTMLIndexConstants.RESOURCE_JS }, null, 0);
-			} catch (IOException e) {
-				return false;
-			}
-			if (queryResults != null) {
+			List<QueryResult> queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,
+					HTMLIndexConstants.RESOURCE_JS }, null, 0);
+			if (queryResults != null)
+			{
 				String includedFileToCheck = uri.toString();
 				String includedFile;
 				String htmlFileToCheck = URLEncoder.encode(htmlFile.getLocation().toPortableString(), null, null);
-				for (QueryResult result : queryResults) {
+				for (QueryResult result : queryResults)
+				{
 					includedFile = result.getWord();
-					if (includedFileToCheck.equals(includedFile)) {
+					if (includedFileToCheck.equals(includedFile))
+					{
 						Set<String> documents = result.getDocuments();
-						for (String document : documents) {
-							if (document.endsWith(htmlFileToCheck)) {
+						for (String document : documents)
+						{
+							if (document.endsWith(htmlFileToCheck))
+							{
 								return true;
 							}
 						}

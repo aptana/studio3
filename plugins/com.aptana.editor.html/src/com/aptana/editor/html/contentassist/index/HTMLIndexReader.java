@@ -90,10 +90,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null && name != null && name.length() > 0)
 		{
 			List<QueryResult> attributes = index.query( //
-				new String[] { HTMLIndexConstants.ATTRIBUTE }, //
-				name + CSSIndexConstants.DELIMITER, //
-				SearchPattern.PREFIX_MATCH //
-				);
+					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
 
 			if (attributes != null)
 			{
@@ -135,10 +135,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null && names != null)
 		{
 			List<QueryResult> attributes = index.query( //
-				new String[] { HTMLIndexConstants.ATTRIBUTE }, //
-				this.getAttributePattern(names), //
-				SearchPattern.REGEX_MATCH //
-				);
+					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+					this.getAttributePattern(names), //
+					SearchPattern.REGEX_MATCH //
+					);
 
 			if (attributes != null)
 			{
@@ -175,10 +175,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> elements = index.query( //
-				new String[] { HTMLIndexConstants.ELEMENT }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
-				);
+					new String[] { HTMLIndexConstants.ELEMENT }, //
+					"*", //$NON-NLS-1$
+					SearchPattern.PATTERN_MATCH //
+					);
 
 			if (elements != null)
 			{
@@ -209,10 +209,10 @@ public class HTMLIndexReader extends IndexReader
 			for (String name : names)
 			{
 				List<QueryResult> elements = index.query( //
-					new String[] { HTMLIndexConstants.ELEMENT }, //
-					name + CSSIndexConstants.DELIMITER, //
-					SearchPattern.PREFIX_MATCH //
-					);
+						new String[] { HTMLIndexConstants.ELEMENT }, //
+						name + CSSIndexConstants.DELIMITER, //
+						SearchPattern.PREFIX_MATCH //
+						);
 
 				if (elements != null)
 				{
@@ -240,10 +240,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> entities = index.query( //
-				new String[] { HTMLIndexConstants.ENTITY }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
-				);
+					new String[] { HTMLIndexConstants.ENTITY }, //
+					"*", //$NON-NLS-1$
+					SearchPattern.PATTERN_MATCH //
+					);
 
 			if (entities != null)
 			{
@@ -272,10 +272,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> entities = index.query( //
-				new String[] { HTMLIndexConstants.ENTITY }, //
-				name + CSSIndexConstants.DELIMITER, //
-				SearchPattern.PREFIX_MATCH //
-				);
+					new String[] { HTMLIndexConstants.ENTITY }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
 
 			if (entities != null)
 			{
@@ -307,10 +307,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> events = index.query( //
-				new String[] { HTMLIndexConstants.EVENT }, //
-				name + CSSIndexConstants.DELIMITER, //
-				SearchPattern.PREFIX_MATCH //
-				);
+					new String[] { HTMLIndexConstants.EVENT }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
 
 			if (events != null)
 			{
@@ -342,10 +342,10 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null && names != null)
 		{
 			List<QueryResult> events = index.query( //
-				new String[] { HTMLIndexConstants.EVENT }, //
-				this.getAttributePattern(names), //
-				SearchPattern.REGEX_MATCH //
-				);
+					new String[] { HTMLIndexConstants.EVENT }, //
+					this.getAttributePattern(names), //
+					SearchPattern.REGEX_MATCH //
+					);
 
 			if (events != null)
 			{
@@ -381,36 +381,27 @@ public class HTMLIndexReader extends IndexReader
 		if (index != null && StringUtil.isEmpty(category) == false)
 		{
 			String pattern = "*"; //$NON-NLS-1$
-
-			try
+			List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
+			if (items != null && items.size() > 0)
 			{
-				List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);
+				result = new HashMap<String, String>();
 
-				if (items != null && items.size() > 0)
+				for (QueryResult item : items)
 				{
-					result = new HashMap<String, String>();
+					Set<String> paths = item.getDocuments();
+					String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
 
-					for (QueryResult item : items)
+					try
 					{
-						Set<String> paths = item.getDocuments();
-						String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
+						URI uri = index.getRelativeDocumentPath(new URI(path));
 
-						try
-						{
-							URI uri = index.getRelativeDocumentPath(new URI(path));
-
-							result.put(item.getWord(), uri.toString());
-						}
-						catch (URISyntaxException e)
-						{
-							result.put(item.getWord(), path);
-						}
+						result.put(item.getWord(), uri.toString());
+					}
+					catch (URISyntaxException e)
+					{
+						result.put(item.getWord(), path);
 					}
 				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
 			}
 		}
 

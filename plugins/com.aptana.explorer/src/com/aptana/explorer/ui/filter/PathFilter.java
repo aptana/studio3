@@ -7,7 +7,6 @@
  */
 package com.aptana.explorer.ui.filter;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,13 +108,13 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 	private boolean isParentMatch(Viewer viewer, Object element)
 	{
 
-	    IResource resource = getResourceFromObject(element);
-	    if(resource == null)
-	    {
-	        return false;
-	    }
-	    
-	    // TODO Also check if name matches the text matchers!
+		IResource resource = getResourceFromObject(element);
+		if (resource == null)
+		{
+			return false;
+		}
+
+		// TODO Also check if name matches the text matchers!
 		if (wordMatches(resource.getName()))
 		{
 			return true;
@@ -131,27 +130,26 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		return false;
 	}
 
-	
 	/**
 	 * @return the IResource from the given object. May return null if unable to get a resource from the object.
 	 */
-    private IResource getResourceFromObject(Object element) 
-    {
-        IResource resource;
-        if (element instanceof IResource) 
-        {
-            resource = (IResource) element;
-        } 
-        else if (element instanceof IAdaptable)
-        {
-            resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
-        }
-        else
-        {
-            resource = null;
-        }
-        return resource;
-    }
+	private IResource getResourceFromObject(Object element)
+	{
+		IResource resource;
+		if (element instanceof IResource)
+		{
+			resource = (IResource) element;
+		}
+		else if (element instanceof IAdaptable)
+		{
+			resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+		}
+		else
+		{
+			resource = null;
+		}
+		return resource;
+	}
 
 	/**
 	 * Returns true if any of the elements makes it through the filter.
@@ -206,11 +204,11 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 
 	protected boolean doIsLeafMatch(Viewer viewer, Object element)
 	{
-        IResource resource = getResourceFromObject(element);
-        if(resource == null)
-        {
-            return false;
-        }
+		IResource resource = getResourceFromObject(element);
+		if (resource == null)
+		{
+			return false;
+		}
 
 		if (resource.equals(filterResource))
 		{
@@ -236,16 +234,8 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		{
 			// FIXME We should have a search API layer over the top of this and shouldn't be hitting indices directly.
 			// Pass a scope object to the search API and it calculates what indices to search within!
-			queryResults = new ArrayList<QueryResult>();
 			Index index = IndexManager.getInstance().getIndex(resource.getProject().getLocationURI());
-			try
-			{
-				queryResults = index.query(indexCategories(), null, 0);
-			}
-			catch (IOException e)
-			{
-				return false;
-			}
+			queryResults = index.query(indexCategories(), null, 0);
 		}
 		if (queryResults != null)
 		{
