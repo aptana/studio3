@@ -9,7 +9,6 @@ package com.aptana.editor.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -101,24 +100,18 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index,
 			List<ICompletionProposal> completionProposals, String category)
 	{
-		try
-		{
-			List<QueryResult> queryResults = index.query(new String[] { category }, "", SearchPattern.PREFIX_MATCH); //$NON-NLS-1$
+		List<QueryResult> queryResults = index.query(new String[] { category }, "", SearchPattern.PREFIX_MATCH); //$NON-NLS-1$
 
-			if (queryResults != null)
+		if (queryResults != null)
+		{
+			for (QueryResult queryResult : queryResults)
 			{
-				for (QueryResult queryResult : queryResults)
-				{
-					String text = queryResult.getWord();
-					int length = text.length();
-					String info = category + " : " + text; //$NON-NLS-1$
+				String text = queryResult.getWord();
+				int length = text.length();
+				String info = category + " : " + text; //$NON-NLS-1$
 
-					completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
-				}
+				completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
 			}
-		}
-		catch (IOException e)
-		{
 		}
 	}
 
