@@ -215,6 +215,10 @@
             id="com.aptana.git.ui.command.ignore"
             name="%IgnoreAction_label">
       </command>
+      <command
+            id="com.aptana.git.ui.command.commit.dialog"
+            name="Perform Commit">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -530,6 +534,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G I">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.commit.dialog"
+            contextId="com.aptana.git.ui.context.dialog.commit"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Enter">
       </key>
    </extension>
    <extension
@@ -1860,5 +1870,13 @@
       <detector
             class="com.aptana.git.ui.hyperlink.HyperlinkDetector">
       </detector>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.git.ui.context.dialog.commit"
+            name="Git Commit Dialog"
+            parentId="org.eclipse.ui.contexts.dialog">
+      </context>
    </extension>
 </plugin>
