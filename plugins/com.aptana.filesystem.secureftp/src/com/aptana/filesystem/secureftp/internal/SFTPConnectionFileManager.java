@@ -65,8 +65,6 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
  */
 public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager implements ISFTPConnectionFileManager {
 
-	private static final int KEEPALIVE_INTERVAL = 45*1000; /* 45 secs */
-
 	private SSHFTPClient ftpClient;
 	private IPath keyFilePath;
 	private String transferType;
