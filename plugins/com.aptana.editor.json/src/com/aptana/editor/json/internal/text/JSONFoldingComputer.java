@@ -5,14 +5,13 @@ import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.text.AbstractFoldingComputer;
-import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.editor.json.parsing.ast.JSONArrayNode;
 import com.aptana.editor.json.parsing.ast.JSONObjectNode;
 import com.aptana.editor.json.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSONFoldingComputer extends AbstractFoldingComputer implements IFoldingComputer
+public class JSONFoldingComputer extends AbstractFoldingComputer
 {
 
 	public JSONFoldingComputer(AbstractThemeableEditor editor, IDocument document)
@@ -21,13 +20,13 @@ public class JSONFoldingComputer extends AbstractFoldingComputer implements IFol
 	}
 
 	@Override
-	protected boolean isFoldable(IParseNode child)
+	public boolean isFoldable(IParseNode child)
 	{
 		return (child instanceof JSONObjectNode) || (child instanceof JSONArrayNode);
 	}
 
 	@Override
-	protected boolean isCollapsed(IParseNode child)
+	public boolean isCollapsed(IParseNode child)
 	{
 		if (child instanceof JSONObjectNode)
 		{

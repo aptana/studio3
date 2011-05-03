@@ -29,7 +29,7 @@ public class JSFoldingComputer extends AbstractFoldingComputer implements IFoldi
 	}
 
 	@Override
-	protected boolean isFoldable(IParseNode child)
+	public boolean isFoldable(IParseNode child)
 	{
 		return (child instanceof JSCommentNode)
 				|| (child instanceof JSFunctionNode)
@@ -42,7 +42,7 @@ public class JSFoldingComputer extends AbstractFoldingComputer implements IFoldi
 	}
 
 	@Override
-	protected boolean isCollapsed(IParseNode child)
+	public boolean isCollapsed(IParseNode child)
 	{
 		if (child instanceof JSCommentNode)
 		{

@@ -31,6 +31,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
@@ -210,5 +211,11 @@ public class HTMLEditor extends AbstractThemeableEditor
 			// no new pair, so don't highlight anything
 			fTagPairOccurrences = null;
 		}
+	}
+
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new HTMLFoldingComputer(this, document);
 	}
 }

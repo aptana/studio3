@@ -5,7 +5,6 @@ import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.text.AbstractFoldingComputer;
-import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.ast.CSSCommentNode;
 import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
@@ -16,7 +15,7 @@ import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
-public class CSSFoldingComputer extends AbstractFoldingComputer implements IFoldingComputer
+public class CSSFoldingComputer extends AbstractFoldingComputer
 {
 
 	public CSSFoldingComputer(AbstractThemeableEditor editor, IDocument document)
@@ -25,7 +24,7 @@ public class CSSFoldingComputer extends AbstractFoldingComputer implements IFold
 	}
 
 	@Override
-	protected boolean isFoldable(IParseNode child)
+	public boolean isFoldable(IParseNode child)
 	{
 		return (child instanceof CSSCommentNode) || (child instanceof CSSRuleNode) || (child instanceof CSSMediaNode)
 				|| (child instanceof CSSPageNode) || (child instanceof CSSFontFaceNode);
@@ -49,7 +48,7 @@ public class CSSFoldingComputer extends AbstractFoldingComputer implements IFold
 	}
 
 	@Override
-	protected boolean isCollapsed(IParseNode node)
+	public boolean isCollapsed(IParseNode node)
 	{
 		if (node instanceof CSSCommentNode)
 		{

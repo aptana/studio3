@@ -189,7 +189,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	 * @param child
 	 * @return
 	 */
-	protected boolean isCollapsed(IParseNode child)
+	public boolean isCollapsed(IParseNode child)
 	{
 		return false;
 	}
@@ -200,7 +200,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	 * @param child
 	 * @return
 	 */
-	protected abstract boolean isFoldable(IParseNode child);
+	public abstract boolean isFoldable(IParseNode child);
 
 	/**
 	 * Should we try traversing into this node and it's children? Base implementation is yes if it has children.
