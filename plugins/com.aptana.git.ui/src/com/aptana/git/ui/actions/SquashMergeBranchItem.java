@@ -20,17 +20,17 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.actions.SwitchBranchHandler;
+import com.aptana.git.ui.internal.actions.SquashMergeBranchHandler;
 
-public class SwitchBranchItem extends AbstractDynamicBranchItem
+public class SquashMergeBranchItem extends AbstractDynamicBranchItem
 {
 
-	public SwitchBranchItem()
+	public SquashMergeBranchItem()
 	{
 		super();
 	}
 
-	public SwitchBranchItem(String id)
+	public SquashMergeBranchItem(String id)
 	{
 		super(id);
 	}
@@ -51,20 +51,24 @@ public class SwitchBranchItem extends AbstractDynamicBranchItem
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
-		for (final String branchName : repo.localBranches())
+		for (final String branchName : repo.allBranches())
 		{
-			contributions.add(new SwitchBranchContributionItem(repo, branchName));
+			contributions.add(new SquashMergeBranchContributionItem(repo, branchName));
 		}
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 
-	private class SwitchBranchContributionItem extends ContributionItem
+	private void mergeBranch(final GitRepository repo, final String branchName)
 	{
+		SquashMergeBranchHandler.mergeBranch(repo, branchName);
+	}
 
+	private class SquashMergeBranchContributionItem extends ContributionItem
+	{
 		private GitRepository repo;
 		private String branchName;
 
-		SwitchBranchContributionItem(GitRepository repo, String branchName)
+		SquashMergeBranchContributionItem(GitRepository repo, String branchName)
 		{
 			this.repo = repo;
 			this.branchName = branchName;
@@ -73,7 +77,7 @@ public class SwitchBranchItem extends AbstractDynamicBranchItem
 		@Override
 		public void fill(Menu menu, int index)
 		{
-			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
 			menuItem.setText(branchName);
 			menuItem.setEnabled(!branchName.equals(repo.currentBranch()));
 			menuItem.addSelectionListener(new SelectionAdapter()
@@ -81,7 +85,7 @@ public class SwitchBranchItem extends AbstractDynamicBranchItem
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					SwitchBranchHandler.switchBranch(repo, branchName);
+					mergeBranch(repo, branchName);
 				}
 			});
 		}

@@ -145,6 +145,12 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.SquashMergeBranchHandler"
+            id="com.aptana.git.ui.command.squash_merge_branch"
+            name="%SquashMergeBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.DeleteBranchHandler"
             id="com.aptana.git.ui.command.delete_branch"
             name="%DeleteBranchAction_tooltip">
@@ -307,6 +313,13 @@
             sequence="M1+M4+G M">
       </key>
       <key
+            commandId="com.aptana.git.ui.command.squash_merge_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G Q">
+      </key>
+      <key
             commandId="com.aptana.git.ui.command.delete_branch"
             contextId="org.eclipse.ui.contexts.window"
             platform="carbon"
@@ -462,6 +475,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G M">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.squash_merge_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G Q">
       </key>
       <key
             commandId="com.aptana.git.ui.command.delete_branch"
@@ -683,50 +702,9 @@
                tooltip="%GithubNetworkAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -736,50 +714,9 @@
                tooltip="%ShowResourceInHistoryAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -790,50 +727,9 @@
                tooltip="%DiffAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
        </menuContribution>
@@ -847,50 +743,9 @@
                tooltip="%CreateBranchAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <menu
@@ -904,50 +759,9 @@
             </dynamic>
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </menu>
          <menu
@@ -961,50 +775,25 @@
             </dynamic>
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
+            </visibleWhen>
+         </menu>
+          <menu
+               commandId="com.aptana.git.ui.command.squash_merge_branch"
+               id="com.aptana.git.ui.actions.SquashMergeBranchAction"
+               label="%SquashMergeBranchAction_label"
+               tooltip="%SquashMergeBranchAction_tooltip">
+            <dynamic
+                  class="com.aptana.git.ui.actions.SquashMergeBranchItem"
+                  id="com.aptana.git.ui.command.squash_merge_branch.items">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
             </visibleWhen>
          </menu>
          <menu
@@ -1018,50 +807,9 @@
             </dynamic>
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
             </visibleWhen>
          </menu>
       </menuContribution>
@@ -1075,50 +823,9 @@
                tooltip="%CommitAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+              <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
             </visibleWhen>
          </command>
          <command
@@ -1128,50 +835,9 @@
                tooltip="%StageAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
             </visibleWhen>
          </command>
          <command
@@ -1181,50 +847,9 @@
                tooltip="%UnstageAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -1234,50 +859,9 @@
                tooltip="%RevertAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -1287,50 +871,9 @@
                tooltip="%BlameAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -1340,50 +883,9 @@
                tooltip="%MergeConflictsAction_tooltip">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
          <command
@@ -1392,50 +894,9 @@
                label="%IgnoreAction_label">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IFile">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -1449,50 +910,9 @@
                 tooltip="%StatusAction_tooltip">
              <visibleWhen
                    checkEnabled="false">
-                <or>
-                   <with
-                         variable="activeMenuSelection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="activeMenuEditorInput">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="selection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                </or>
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
              </visibleWhen>
           </command>
           <command
@@ -1502,50 +922,9 @@
                 tooltip="%PullAction_tooltip">
              <visibleWhen
                    checkEnabled="false">
-                <or>
-                   <with
-                         variable="activeMenuSelection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="activeMenuEditorInput">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="selection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                </or>
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
              </visibleWhen>
           </command>
           <command
@@ -1556,50 +935,9 @@
                 tooltip="%PushAction_tooltip">
              <visibleWhen
                    checkEnabled="false">
-                <or>
-                   <with
-                         variable="activeMenuSelection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="activeMenuEditorInput">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="selection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                </or>
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
              </visibleWhen>
              
           </command>
@@ -1610,50 +948,9 @@
                 tooltip="%AddRemoteAction_tooltip">
              <visibleWhen
                    checkEnabled="false">
-                <or>
-                   <with
-                         variable="activeMenuSelection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="activeMenuEditorInput">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="selection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IResource">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                </or>
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
              </visibleWhen>
           </command>
          <command
@@ -1663,50 +960,9 @@
                id="com.aptana.git.ui.actions.DisconnectAction">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <with
-                        variable="activeMenuSelection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="activeMenuEditorInput">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-                  <with
-                        variable="selection">
-                     <iterate
-                           ifEmpty="false">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                 property="org.eclipse.core.resources.projectPersistentProperty"
-                                 value="true">
-                           </test>
-                        </adapt>
-                     </iterate>
-                  </with>
-               </or>
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
             </visibleWhen>
          </command>
        </menuContribution>
@@ -1721,50 +977,9 @@
                 tooltip="%CompareWithHEADAction_tooltip">
              <visibleWhen
                    checkEnabled="false">
-                <or>
-                   <with
-                         variable="activeMenuSelection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IFile">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="activeMenuEditorInput">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IFile">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                   <with
-                         variable="selection">
-                      <iterate
-                            ifEmpty="false">
-                         <adapt
-                               type="org.eclipse.core.resources.IFile">
-                            <test
-                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                  property="org.eclipse.core.resources.projectPersistentProperty"
-                                  value="true">
-                            </test>
-                         </adapt>
-                      </iterate>
-                   </with>
-                </or>
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
              </visibleWhen>
           </command>
            <command
@@ -1774,50 +989,9 @@
                tooltip="%CompareWithRevisionAction_tooltip">
               <visibleWhen
                     checkEnabled="false">
-                 <or>
-                    <with
-                          variable="activeMenuSelection">
-                       <iterate
-                             ifEmpty="false">
-                          <adapt
-                                type="org.eclipse.core.resources.IFile">
-                             <test
-                                   args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                   property="org.eclipse.core.resources.projectPersistentProperty"
-                                   value="true">
-                             </test>
-                          </adapt>
-                       </iterate>
-                    </with>
-                    <with
-                          variable="activeMenuEditorInput">
-                       <iterate
-                             ifEmpty="false">
-                          <adapt
-                                type="org.eclipse.core.resources.IFile">
-                             <test
-                                   args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                   property="org.eclipse.core.resources.projectPersistentProperty"
-                                   value="true">
-                             </test>
-                          </adapt>
-                       </iterate>
-                    </with>
-                    <with
-                          variable="selection">
-                       <iterate
-                             ifEmpty="false">
-                          <adapt
-                                type="org.eclipse.core.resources.IFile">
-                             <test
-                                   args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
-                                   property="org.eclipse.core.resources.projectPersistentProperty"
-                                   value="true">
-                             </test>
-                          </adapt>
-                       </iterate>
-                    </with>
-                 </or>
+                 <reference
+                       definitionId="com.aptana.git.ui.hasGitRepository">
+                 </reference>
               </visibleWhen>
          </command>
        </menuContribution>
@@ -1878,5 +1052,55 @@
             name="Git Commit Dialog"
             parentId="org.eclipse.ui.contexts.dialog">
       </context>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.git.ui.hasGitRepository">
+         <or>
+            <with
+                  variable="activeMenuSelection">
+               <iterate
+                     ifEmpty="false">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                           property="org.eclipse.core.resources.projectPersistentProperty"
+                           value="true">
+                     </test>
+                  </adapt>
+               </iterate>
+            </with>
+            <with
+                  variable="activeMenuEditorInput">
+               <iterate
+                     ifEmpty="false">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                           property="org.eclipse.core.resources.projectPersistentProperty"
+                           value="true">
+                     </test>
+                  </adapt>
+               </iterate>
+            </with>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                           property="org.eclipse.core.resources.projectPersistentProperty"
+                           value="true">
+                     </test>
+                  </adapt>
+               </iterate>
+            </with>
+         </or>
+      </definition>
    </extension>
 </plugin>

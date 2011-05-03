@@ -27,7 +27,7 @@ import com.aptana.git.ui.internal.Launcher;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
 
-public class MergeBranchHandler extends AbstractGitHandler
+public class SquashMergeBranchHandler extends AbstractGitHandler
 {
 
 	@Override
@@ -64,7 +64,7 @@ public class MergeBranchHandler extends AbstractGitHandler
 
 	public static void mergeBranch(final GitRepository repo, final String branchName)
 	{
-		Job job = new Job(NLS.bind("git merge {0}", branchName)) //$NON-NLS-1$
+		Job job = new Job(NLS.bind("git merge --squash {0}", branchName)) //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -75,7 +75,7 @@ public class MergeBranchHandler extends AbstractGitHandler
 				try
 				{
 					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "merge", //$NON-NLS-1$
-							branchName);
+							"--squash", branchName); //$NON-NLS-1$
 					while (!launch.isTerminated())
 					{
 						Thread.sleep(50);
