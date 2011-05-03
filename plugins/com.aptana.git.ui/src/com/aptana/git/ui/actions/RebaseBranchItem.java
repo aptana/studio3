@@ -1,10 +1,3 @@
-/**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.git.ui.actions;
 
 import java.util.ArrayList;
@@ -20,17 +13,17 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.actions.MergeBranchHandler;
+import com.aptana.git.ui.internal.actions.RebaseBranchHandler;
 
-public class MergeBranchItem extends AbstractDynamicBranchItem
+public class RebaseBranchItem extends AbstractDynamicBranchItem
 {
 
-	public MergeBranchItem()
+	public RebaseBranchItem()
 	{
 		super();
 	}
 
-	public MergeBranchItem(String id)
+	public RebaseBranchItem(String id)
 	{
 		super(id);
 	}
@@ -53,22 +46,22 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
 		for (final String branchName : repo.allBranches())
 		{
-			contributions.add(new MergeBranchContributionItem(repo, branchName));
+			contributions.add(new RebaseBranchContributionItem(repo, branchName));
 		}
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 
-	private void mergeBranch(final GitRepository repo, final String branchName)
+	private void rebaseBranch(final GitRepository repo, final String branchName)
 	{
-		MergeBranchHandler.mergeBranch(repo, branchName);
+		RebaseBranchHandler.rebaseBranch(repo, branchName);
 	}
 
-	private class MergeBranchContributionItem extends ContributionItem
+	private class RebaseBranchContributionItem extends ContributionItem
 	{
 		private GitRepository repo;
 		private String branchName;
 
-		MergeBranchContributionItem(GitRepository repo, String branchName)
+		RebaseBranchContributionItem(GitRepository repo, String branchName)
 		{
 			this.repo = repo;
 			this.branchName = branchName;
@@ -85,7 +78,7 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					mergeBranch(repo, branchName);
+					rebaseBranch(repo, branchName);
 				}
 			});
 		}

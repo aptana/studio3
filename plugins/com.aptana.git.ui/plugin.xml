@@ -225,6 +225,12 @@
             id="com.aptana.git.ui.command.commit.dialog"
             name="Perform Commit">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.RebaseBranchHandler"
+            id="com.aptana.git.ui.command.rebase_branch"
+            name="%RebaseBranchAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -311,6 +317,13 @@
             platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G M">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.rebase_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G NUMPAD_DIVIDE">
       </key>
       <key
             commandId="com.aptana.git.ui.command.squash_merge_branch"
@@ -475,6 +488,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G M">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.rebase_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G NUMPAD_DIVIDE">
       </key>
       <key
             commandId="com.aptana.git.ui.command.squash_merge_branch"
@@ -811,6 +830,22 @@
                         definitionId="com.aptana.git.ui.hasGitRepository">
                   </reference>
             </visibleWhen>
+         </menu>
+         <menu
+               commandId="com.aptana.git.ui.command.rebase_branch"
+               id="com.aptana.git.ui.actions.RebaseBranchAction"
+               label="%RebaseBranchAction_label"
+               tooltip="%RebaseBranchAction_tooltip">
+            <dynamic
+                  class="com.aptana.git.ui.actions.RebaseBranchItem"
+                  id="com.aptana.git.ui.command.rebase_branch.items">
+            </dynamic>
+             <visibleWhen
+                   checkEnabled="false">
+                <reference
+                      definitionId="com.aptana.git.ui.hasGitRepository">
+                </reference>
+             </visibleWhen>
          </menu>
       </menuContribution>
       <menuContribution
