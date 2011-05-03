@@ -46,8 +46,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.team.ui.history.HistoryPage;
-import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
@@ -82,7 +80,6 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.preferences.IPreferenceConstants;
-import com.aptana.ui.IAptanaHistory;
 
 /**
  * This is a UIJob that tries to expand the influence of our themes to the JDT Editor; all Outline pages; Problems,
@@ -323,16 +320,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			PropertySheet outline = (PropertySheet) view;
 			IPage page = outline.getCurrentPage();
 			hookTheme(page.getControl(), revertToDefaults);
-			return;
-		}
-		else if (view instanceof IHistoryView)
-		{
-			if (!hijackHistory(view))
-			{
-				IHistoryView historyView = (IHistoryView) view;
-				HistoryPage page = (HistoryPage) historyView.getHistoryPage();
-				hookTheme(page.getControl(), revertToDefaults);
-			}
 			return;
 		}
 		else if (view instanceof IDebugView)
@@ -1130,7 +1117,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 	{
 		if (part instanceof IViewPart)
 		{
-			hijackHistory((IViewPart) part);
 			hijackConsole((IViewPart) part);
 			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
 			{
@@ -1147,28 +1133,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			return;
 
 		hijackOutline();
-	}
-
-	protected boolean hijackHistory(IViewPart view)
-	{
-		if (view instanceof IHistoryView)
-		{
-			IHistoryView historyView = (IHistoryView) view;
-			final HistoryPage page = (HistoryPage) historyView.getHistoryPage();
-			if (page instanceof IAptanaHistory)
-			{
-				Display.getCurrent().asyncExec(new Runnable()
-				{
-					public void run()
-					{
-						((IAptanaHistory) page).setTheme(false);
-					}
-				});
-				return true;
-			}
-
-		}
-		return false;
 	}
 
 	protected void hijackConsole(IViewPart view)
