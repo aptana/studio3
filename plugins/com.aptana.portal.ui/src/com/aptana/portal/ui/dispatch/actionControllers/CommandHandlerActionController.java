@@ -7,9 +7,17 @@
  */
 package com.aptana.portal.ui.dispatch.actionControllers;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
@@ -19,8 +27,14 @@ import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 /**
  * An action controller for calling Studio's command handlers that were contributed through the
  * 'org.eclipse.ui.commands' extension point.<br>
- * Executing example (for JS with Prototype):
+ * There are two forms of this command - One that supports arguments and one that doesn't.<br>
+ * <br>
+ * Executing example (for JS with Prototype):<br>
+ * <b>Command without parameters:</b><br>
  * <code>result = dispatch($H({controller:'portal.commands', action:"execute", args : [commandId].toJSON()}).toJSON());</code>
+ * <br>
+ * <b>Command with parameters (as map of name-value):</b><br>
+ * <code>result = dispatch($H({controller:'portal.commands', action:"execute", args : [commandId, {name:value, name2:value2 ... }].toJSON()}).toJSON());</code>
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
@@ -34,6 +48,7 @@ public class CommandHandlerActionController extends AbstractActionController
 	 * @param attributes
 	 *            We expect for an array that contains a single string Id for the command.
 	 */
+	@SuppressWarnings("rawtypes")
 	@ControllerAction
 	public Object execute(Object attributes)
 	{
@@ -42,11 +57,28 @@ public class CommandHandlerActionController extends AbstractActionController
 		{
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
+		// At this point we can tell that the command-arguments format is OK, so we can just ask for the optional
+		// arguments.
+		Map arguments = getCommandArguments(attributes);
 		try
 		{
+			ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(
+					ICommandService.class);
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
 					IHandlerService.class);
-			handlerService.executeCommand(commandId, null);
+			Command command = commandService.getCommand(commandId);
+			if (command == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, "Command not found - " //$NON-NLS-1$
+						+ commandId));
+			}
+			ExecutionEvent event = null;
+			if (arguments == null)
+			{
+				arguments = Collections.emptyMap();
+			}
+			event = new ExecutionEvent(command, arguments, null, handlerService.getCurrentState());
+			command.executeWithChecks(event);
 		}
 		catch (Exception e)
 		{
@@ -67,7 +99,7 @@ public class CommandHandlerActionController extends AbstractActionController
 		if (attributes instanceof Object[])
 		{
 			Object[] arr = (Object[]) attributes;
-			if (arr.length == 1 && arr[0] != null)
+			if ((arr.length == 1 || arr.length == 2) && arr[0] != null)
 			{
 				return arr[0].toString();
 			}
@@ -75,7 +107,7 @@ public class CommandHandlerActionController extends AbstractActionController
 			{
 				PortalUIPlugin
 						.logError(new Exception(
-								"Wrong argument count passed to CommandHandlerActionController::execute. Expected 1 and got " + arr.length));//$NON-NLS-1$
+								"Wrong argument count passed to CommandHandlerActionController::execute. Expected 1 or 2 and got " + arr.length));//$NON-NLS-1$
 			}
 		}
 		else
@@ -83,6 +115,30 @@ public class CommandHandlerActionController extends AbstractActionController
 			PortalUIPlugin.logError(new Exception(
 					"Wrong argument type passed to CommandHandlerActionController::execute. Expected Object[] and got " //$NON-NLS-1$
 							+ ((attributes == null) ? "null" : attributes.getClass().getName()))); //$NON-NLS-1$s
+		}
+		return null;
+	}
+
+	/**
+	 * @param attributes
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private Map getCommandArguments(Object attributes)
+	{
+		Object[] arr = (Object[]) attributes;
+		if (arr.length == 2)
+		{
+			if (arr[1] instanceof Map)
+			{
+				return (Map) arr[1];
+			}
+			else
+			{
+				PortalUIPlugin.logError(new Exception(
+						"Wrong argument type passed as command-arguments to CommandHandlerActionController::execute. Expected 'Map' and got " //$NON-NLS-1$
+								+ arr[1].getClass().getName()));
+			}
 		}
 		return null;
 	}
