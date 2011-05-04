@@ -8,6 +8,7 @@
 
 package com.aptana.editor.common;
 
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -21,4 +22,6 @@ public interface ISourceViewerConfiguration extends ITopContentTypesProvider {
 	
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer);
 	
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType);
+
 }

@@ -9,6 +9,7 @@
 package com.aptana.editor.xml;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -19,6 +20,8 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
@@ -33,8 +36,7 @@ import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 /**
  * @author Max Stepanov
  */
-public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
-{
+public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
 	public final static String PREFIX = "__xml_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
@@ -66,11 +68,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private XMLSourceConfiguration() {
 	}
-	
-	public static XMLSourceConfiguration getDefault()
-	{
-		if (instance == null)
-		{
+
+	public static XMLSourceConfiguration getDefault() {
+		if (instance == null) {
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML), new QualifiedContentType("text.xml")); //$NON-NLS-1$
@@ -90,8 +90,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes()
-	{
+	public String[] getContentTypes() {
 		return CONTENT_TYPES;
 	}
 
@@ -99,8 +98,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes()
-	{
+	public String[][] getTopContentTypes() {
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -108,8 +106,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules()
-	{
+	public IPredicateRule[] getPartitioningRules() {
 		return partitioningRules;
 	}
 
@@ -117,19 +114,16 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner()
-	{
+	public ISubPartitionScanner createSubPartitionScanner() {
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentContentType(java.lang.String)
 	 */
-	public String getDocumentContentType(String contentType)
-	{
-		if (contentType.startsWith(PREFIX))
-		{
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
 			return IXMLConstants.CONTENT_TYPE_XML;
 		}
 		return null;
@@ -137,11 +131,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
-	 * .presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
-	{
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -166,51 +158,49 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setRepairer(dr, XMLSourceConfiguration.COMMENT);
 	}
 
-	private ITokenScanner getCommentScanner()
-	{
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 */
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
+		return new CommonContentAssistProcessor(editor);
+	}
+
+	private ITokenScanner getCommentScanner() {
 		return new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getPreProcessorScanner()
-	{
-		if (preProcessorScanner == null)
-		{
+	private ITokenScanner getPreProcessorScanner() {
+		if (preProcessorScanner == null) {
 			preProcessorScanner = new XMLTagScanner();
 			preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		}
 		return preProcessorScanner;
 	}
 
-	private ITokenScanner getCDATAScanner()
-	{
-		if (cdataScanner == null)
-		{
+	private ITokenScanner getCDATAScanner() {
+		if (cdataScanner == null) {
 			cdataScanner = new RuleBasedScanner();
 			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		}
 		return cdataScanner;
 	}
 
-	private ITokenScanner getXMLScanner()
-	{
-		if (xmlScanner == null)
-		{
+	private ITokenScanner getXMLScanner() {
+		if (xmlScanner == null) {
 			xmlScanner = new XMLScanner();
 		}
 		return xmlScanner;
 	}
 
-	private ITokenScanner getXMLTagScanner()
-	{
-		if (xmlTagScanner == null)
-		{
+	private ITokenScanner getXMLTagScanner() {
+		if (xmlTagScanner == null) {
 			xmlTagScanner = new XMLTagScanner();
 		}
 		return xmlTagScanner;
 	}
 
-	private IToken getToken(String tokenName)
-	{
+	private IToken getToken(String tokenName) {
 		return new Token(tokenName);
 	}
 }

@@ -9,6 +9,7 @@
 package com.aptana.editor.svg;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -19,6 +20,7 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
@@ -33,6 +35,7 @@ import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.svg.contentassist.SVGContentAssistProcessor;
 import com.aptana.editor.xml.IXMLConstants;
 import com.aptana.editor.xml.XMLScanner;
 import com.aptana.editor.xml.XMLSourceConfiguration;
@@ -294,4 +297,22 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(commentScanner, XMLSourceConfiguration.COMMENT);
 		reconciler.setRepairer(commentScanner, XMLSourceConfiguration.COMMENT);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 */
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
+		{
+			return JSSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
+		}
+		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
+			return CSSSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
+		}
+		return new SVGContentAssistProcessor(editor);
+	}
+
 }
