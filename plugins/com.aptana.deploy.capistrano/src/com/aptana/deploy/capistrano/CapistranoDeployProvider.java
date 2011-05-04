@@ -7,6 +7,7 @@
  */
 package com.aptana.deploy.capistrano;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -18,16 +19,16 @@ public class CapistranoDeployProvider implements IDeployProvider
 
 	public static final String ID = "com.aptana.deploy.capistrano.provider"; //$NON-NLS-1$
 
-	public void deploy(IProject selectedProject, IProgressMonitor monitor)
+	public void deploy(IContainer selectedContainer, IProgressMonitor monitor)
 	{
-		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-				selectedProject.getLocation());
+		IProject project = selectedContainer.getProject();
+		TerminalView terminal = TerminalView.openView(project.getName(), project.getName(), project.getLocation());
 		terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
 	}
 
-	public boolean handles(IProject selectedProject)
+	public boolean handles(IContainer selectedContainer)
 	{
-		return selectedProject.getFile("Capfile").exists(); //$NON-NLS-1$
+		return selectedContainer.getProject().getFile("Capfile").exists(); //$NON-NLS-1$
 	}
 
 }

@@ -10,13 +10,16 @@ package com.aptana.deploy.ftp.ui.wizard;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.ftp.FTPDeployPlugin;
 import com.aptana.deploy.ftp.FTPDeployProvider;
@@ -33,16 +36,34 @@ import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
+import com.aptana.ui.util.UIUtils;
 
 public class FTPDeployWizard extends AbstractDeployWizard
 {
+
+	private IContainer selectedContainer;
+
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection)
+	{
+		super.init(workbench, selection);
+		Object element = selection.getFirstElement();
+		if (element instanceof IContainer)
+		{
+			selectedContainer = (IContainer) element;
+		}
+		else if (element instanceof IResource)
+		{
+			selectedContainer = ((IResource) element).getParent();
+		}
+	}
 
 	@Override
 	public void addPages()
 	{
 		super.addPages();
 
-		addPage(new FTPDeployWizardPage(getProject()));
+		addPage(new FTPDeployWizardPage(selectedContainer));
 	}
 
 	@Override
@@ -52,8 +73,8 @@ public class FTPDeployWizard extends AbstractDeployWizard
 		FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 		IRunnableWithProgress runnable = createFTPDeployRunnable(page);
 
-		DeployPreferenceUtil.setDeployType(getProject(), FTPDeployProvider.ID);
-		DeployPreferenceUtil.setDeployEndpoint(getProject(), page.getConnectionPoint().getName());
+		DeployPreferenceUtil.setDeployType(selectedContainer, FTPDeployProvider.ID);
+		DeployPreferenceUtil.setDeployEndpoint(selectedContainer, page.getConnectionPoint().getName());
 
 		if (runnable != null)
 		{
@@ -78,8 +99,7 @@ public class FTPDeployWizard extends AbstractDeployWizard
 		final IConnectionPoint destinationConnectionPoint = page.getConnectionPoint();
 		final boolean isAutoSyncSelected = page.isAutoSyncSelected();
 		final SyncDirection direction = page.getSyncDirection();
-		final IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.getActivePart();
+		final IWorkbenchPart activePart = UIUtils.getActivePart();
 
 		IRunnableWithProgress runnable = new IRunnableWithProgress()
 		{
@@ -90,14 +110,16 @@ public class FTPDeployWizard extends AbstractDeployWizard
 				try
 				{
 					ISiteConnection site = null;
-					ISiteConnection[] sites = SiteConnectionUtils.findSites(getProject(), destinationConnectionPoint);
+					ISiteConnection[] sites = SiteConnectionUtils.findSites(selectedContainer,
+							destinationConnectionPoint);
 					if (sites.length == 0)
 					{
 						// creates the site to link the project with the FTP connection
-						IConnectionPoint sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(getProject());
+						IConnectionPoint sourceConnectionPoint = SyncUtils
+								.findOrCreateConnectionPointFor(selectedContainer);
 						CoreIOPlugin.getConnectionPointManager().addConnectionPoint(sourceConnectionPoint);
 						site = SiteConnectionUtils.createSite(
-								MessageFormat.format("{0} <-> {1}", getProject().getName(), //$NON-NLS-1$
+								MessageFormat.format("{0} <-> {1}", selectedContainer.getName(), //$NON-NLS-1$
 										destinationConnectionPoint.getName()), sourceConnectionPoint,
 								destinationConnectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
@@ -111,7 +133,7 @@ public class FTPDeployWizard extends AbstractDeployWizard
 					{
 						// multiple FTP connections are associated with the project; finds the last one
 						// try for last remembered site first
-						String lastConnection = DeployPreferenceUtil.getDeployEndpoint(getProject());
+						String lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedContainer);
 						if (lastConnection != null)
 						{
 							site = SiteConnectionUtils.getSiteWithDestination(lastConnection, sites);
@@ -133,7 +155,7 @@ public class FTPDeployWizard extends AbstractDeployWizard
 								action = new SynchronizeProjectAction();
 						}
 						action.setActivePart(null, activePart);
-						action.setSelection(new StructuredSelection(getProject()));
+						action.setSelection(new StructuredSelection(selectedContainer));
 						action.setSelectedSite(site);
 						action.run(null);
 					}
@@ -146,5 +168,4 @@ public class FTPDeployWizard extends AbstractDeployWizard
 		};
 		return runnable;
 	}
-
 }

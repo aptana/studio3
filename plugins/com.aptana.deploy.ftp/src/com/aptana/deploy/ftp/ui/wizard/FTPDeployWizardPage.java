@@ -7,6 +7,7 @@
  */
 package com.aptana.deploy.ftp.ui.wizard;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -32,17 +33,18 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 	public static final String NAME = "FTPDeployment"; //$NON-NLS-1$
 	private static final String ICON_PATH = "icons/ftp.png"; //$NON-NLS-1$
 
-	private IProject project;
+	private IContainer container;
 	private FTPDeployComposite ftpConnectionComposite;
 	private IBaseRemoteConnectionPoint connectionPoint;
 
-	protected FTPDeployWizardPage(IProject project)
+	protected FTPDeployWizardPage(IContainer container)
 	{
 		super(NAME, Messages.FTPDeployWizardPage_Title, FTPDeployPlugin.getImageDescriptor(ICON_PATH));
-		this.project = project;
-		// checks if the project already has an associated FTP connection and fills the info automatically if one exists
-		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(project, true);
-		String lastConnection = DeployPreferenceUtil.getDeployEndpoint(project);
+		this.container = container;
+		// checks if the project/folder already has an associated FTP connection and fills the info automatically if one
+		// exists
+		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(container, true);
+		String lastConnection = DeployPreferenceUtil.getDeployEndpoint(container);
 		IConnectionPoint connection;
 		for (ISiteConnection site : sites)
 		{
@@ -76,6 +78,7 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		boolean complete = ftpConnectionComposite.completeConnection();
 		// persists the auto-sync setting
 		boolean autoSync = isAutoSyncSelected();
+		IProject project = container.getProject();
 		SyncPreferenceUtil.setAutoSync(project, autoSync);
 		if (autoSync)
 		{
@@ -95,6 +98,7 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		initializeDialogUnits(parent);
 		Dialog.applyDialogFont(ftpConnectionComposite);
 
+		IProject project = container.getProject();
 		boolean autoSync = SyncPreferenceUtil.isAutoSync(project);
 		ftpConnectionComposite.setAutoSyncSelected(autoSync);
 		if (autoSync)

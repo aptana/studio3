@@ -9,6 +9,7 @@ package com.aptana.deploy.preferences;
 
 import java.text.MessageFormat;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
@@ -59,24 +60,24 @@ public class DeployPreferenceUtil
 		return DeployType.NONE;
 	}
 
-	public static String getDeployEndpoint(IProject project)
+	public static String getDeployEndpoint(IContainer container)
 	{
 		return Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
 				MessageFormat.format("{0}:{1}", //$NON-NLS-1$
-						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()),
+						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()),
 				null, null);
 	}
 
-	public static String getDeployProviderId(IProject project)
+	public static String getDeployProviderId(IContainer container)
 	{
 		String id = null;
 		try
 		{
-			id = project.getPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider")); //$NON-NLS-1$
+			id = container.getPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider")); //$NON-NLS-1$
 			if (id == null)
 			{
 				// Add a compatibility layer with old stuff here
-				id = mapTypeToId(getDeployType(project));
+				id = mapTypeToId(getDeployType(container.getProject()));
 			}
 		}
 		catch (CoreException e)
@@ -116,11 +117,11 @@ public class DeployPreferenceUtil
 		return null;
 	}
 
-	public static void setDeployType(IProject project, String providerId)
+	public static void setDeployType(IContainer container, String providerId)
 	{
 		try
 		{
-			project.setPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
+			container.setPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
 		}
 		catch (CoreException e1)
 		{
@@ -128,10 +129,10 @@ public class DeployPreferenceUtil
 		}
 	}
 
-	public static void setDeployEndpoint(IProject project, String endpoint)
+	public static void setDeployEndpoint(IContainer container, String endpoint)
 	{
 		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
-		prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()), //$NON-NLS-1$
+		prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()), //$NON-NLS-1$
 				endpoint);
 		try
 		{

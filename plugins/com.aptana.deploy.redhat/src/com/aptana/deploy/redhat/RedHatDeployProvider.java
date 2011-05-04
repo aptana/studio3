@@ -7,6 +7,7 @@
  */
 package com.aptana.deploy.redhat;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,18 +24,17 @@ public class RedHatDeployProvider implements IDeployProvider
 
 	public static final String ID = "com.aptana.deploy.redhat.provider"; //$NON-NLS-1$
 
-	public void deploy(IProject selectedProject, IProgressMonitor monitor)
+	public void deploy(IContainer selectedContainer, IProgressMonitor monitor)
 	{
-
+		IProject project = selectedContainer.getProject();
 		try
 		{
 			IGitRepositoryManager manager = GitPlugin.getDefault().getGitRepositoryManager();
-			GitRepository repo = manager.createOrAttach(selectedProject, new NullProgressMonitor());
+			GitRepository repo = manager.createOrAttach(project, new NullProgressMonitor());
 			repo.index().stageFiles(repo.index().changedFiles());
 			repo.index().commit(Messages.DeployWizard_AutomaticGitCommitMessage);
 
-			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-					selectedProject.getLocation());
+			TerminalView terminal = TerminalView.openView(project.getName(), project.getName(), project.getLocation());
 			terminal.sendInput("git push\n"); //$NON-NLS-1$
 		}
 		catch (CoreException e)
@@ -46,10 +46,11 @@ public class RedHatDeployProvider implements IDeployProvider
 	/**
 	 * TODO This is a hack of mine. I'm assuming this may change as their service changes.
 	 */
-	public boolean handles(IProject selectedProject)
+	public boolean handles(IContainer selectedContainer)
 	{
 		// Check for a remote that looks like a RH one!
-		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
+		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager()
+				.getAttached(selectedContainer.getProject());
 		if (repo != null)
 		{
 			for (String remoteURL : repo.remoteURLs())

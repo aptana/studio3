@@ -7,7 +7,7 @@
  */
 package com.aptana.deploy.ftp;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.StructuredSelection;
 
@@ -24,18 +24,18 @@ public class FTPDeployProvider implements IDeployProvider
 
 	public static final String ID = "com.aptana.deploy.ftp.provider"; //$NON-NLS-1$
 
-	public void deploy(IProject selectedProject, IProgressMonitor monitor)
+	public void deploy(IContainer selectedContainer, IProgressMonitor monitor)
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();
 		action.setActivePart(null, UIUtils.getActivePart());
-		action.setSelection(new StructuredSelection(selectedProject));
-		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		action.setSelection(new StructuredSelection(selectedContainer));
+		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedContainer, true);
 		if (sites.length > 1)
 		{
-			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
+			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedContainer);
 			if (lastConnection == null)
 			{
-				lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
+				lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedContainer);
 			}
 			if (lastConnection != null)
 			{
@@ -45,9 +45,9 @@ public class FTPDeployProvider implements IDeployProvider
 		action.run(null);
 	}
 
-	public boolean handles(IProject selectedProject)
+	public boolean handles(IContainer selectedContainer)
 	{
-		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject, true);
+		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedContainer, true);
 		return siteConnections.length > 0;
 	}
 

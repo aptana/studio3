@@ -7,6 +7,7 @@
  */
 package com.aptana.deploy.heroku;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -20,17 +21,18 @@ public class HerokuDeployProvider implements IDeployProvider
 
 	public static final String ID = "com.aptana.deploy.heroku.provider"; //$NON-NLS-1$
 
-	public void deploy(IProject selectedProject, IProgressMonitor monitor)
+	public void deploy(IContainer selectedContainer, IProgressMonitor monitor)
 	{
-		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-				selectedProject.getLocation());
+		IProject project = selectedContainer.getProject();
+		TerminalView terminal = TerminalView.openView(project.getName(), project.getName(), project.getLocation());
 		terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
 	}
 
-	public boolean handles(IProject selectedProject)
+	public boolean handles(IContainer selectedContainer)
 	{
+		IProject project = selectedContainer.getProject();
 		// Check to see if a heroku remote exists on the git repo
-		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
+		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
 		if (repo != null)
 		{
 			for (String remote : repo.remotes())
