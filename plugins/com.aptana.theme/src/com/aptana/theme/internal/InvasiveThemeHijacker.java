@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
@@ -49,14 +51,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.console.ConsoleView;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
@@ -80,6 +81,7 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.preferences.IPreferenceConstants;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * This is a UIJob that tries to expand the influence of our themes to the JDT Editor; all Outline pages; Problems,
@@ -88,7 +90,8 @@ import com.aptana.theme.preferences.IPreferenceConstants;
  * @author cwilliams
  */
 @SuppressWarnings({ "restriction", "deprecation" })
-public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener, IStartup
+public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPreferenceChangeListener, IStartup,
+		IPageChangedListener
 {
 
 	private ISelectionChangedListener pageListener;
@@ -181,12 +184,12 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else
 		{
-			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, new RGB(0x80, //$NON-NLS-1$
-					0, 0));
+			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, //$NON-NLS-1$
+					currentTheme.getForegroundAsRGB("console.error")); //$NON-NLS-1$
 			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT, //$NON-NLS-1$
 					currentTheme.getForeground());
 			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT, //$NON-NLS-1$
-					currentTheme.getForeground());
+					currentTheme.getForegroundAsRGB("console.input")); //$NON-NLS-1$
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground())); //$NON-NLS-1$
 			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND", //$NON-NLS-1$
 					StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable"))); //$NON-NLS-1$
@@ -337,11 +340,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			{
 				hookTheme(memPane.getControl(), revertToDefaults);
 			}
-			return;
-		}
-		else if (view instanceof ConsoleView)
-		{
-			hijackConsole(view);
 			return;
 		}
 		else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView")) //$NON-NLS-1$
@@ -1047,111 +1045,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	// IPartListener
-	public void partOpened(IWorkbenchPart part)
-	{
-		if (part instanceof IEditorPart)
-		{
-			hijackEditor((IEditorPart) part, false);
-			if (part instanceof MultiPageEditorPart)
-			{
-				MultiPageEditorPart multi = (MultiPageEditorPart) part;
-				if (pageListener == null)
-				{
-					pageListener = new ISelectionChangedListener()
-					{
-
-						public void selectionChanged(SelectionChangedEvent event)
-						{
-							hijackOutline();
-						}
-					};
-				}
-				multi.getSite().getSelectionProvider().addSelectionChangedListener(pageListener);
-			}
-			return;
-		}
-
-		if (!(part instanceof IViewPart))
-			return;
-
-		IViewPart view = (IViewPart) part;
-		hijackView(view, false);
-	}
-
-	public void partDeactivated(IWorkbenchPart part)
-	{
-		if (!(part instanceof IEditorPart))
-			return;
-
-		hijackOutline();
-	}
-
-	public void partClosed(IWorkbenchPart part)
-	{
-		if (part instanceof MultiPageEditorPart)
-		{
-			MultiPageEditorPart multi = (MultiPageEditorPart) part;
-			if (pageListener != null)
-			{
-				multi.getSite().getSelectionProvider().removeSelectionChangedListener(pageListener);
-			}
-		}
-		// If it's a search view, remove any query listeners for it!
-		else if (part instanceof IViewPart)
-		{
-			IViewPart view = (IViewPart) part;
-			if (queryListeners.containsKey(view))
-			{
-				NewSearchUI.removeQueryListener(queryListeners.remove(view));
-			}
-		}
-	}
-
-	public void partBroughtToTop(IWorkbenchPart part)
-	{
-		partActivated(part);
-	}
-
-	public void partActivated(final IWorkbenchPart part)
-	{
-		if (part instanceof IViewPart)
-		{
-			hijackConsole((IViewPart) part);
-			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
-			{
-				Display.getCurrent().asyncExec(new Runnable()
-				{
-					public void run()
-					{
-						hijackView((IViewPart) part, false);
-					}
-				});
-			}
-		}
-		if (!(part instanceof IEditorPart))
-			return;
-
-		hijackOutline();
-	}
-
-	protected void hijackConsole(IViewPart view)
-	{
-		if (view instanceof ConsoleView)
-		{
-			IPage currentPage = ((ConsoleView) view).getCurrentPage();
-			hookTheme(currentPage.getControl(), false);
-		}
-	}
-
 	protected void hijackOutline()
 	{
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window == null || window.getActivePage() == null)
-		{
-			return;
-		}
-		IViewReference[] refs = window.getActivePage().getViewReferences();
+		IViewReference[] refs = UIUtils.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
 			if (ref.getId().equals(IPageLayout.ID_OUTLINE))
@@ -1189,5 +1085,114 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		prefs.removePreferenceChangeListener(this);
 
 		pageListener = null;
+	}
+
+	public void partActivated(IWorkbenchPartReference partRef)
+	{
+		if (partRef instanceof IViewReference)
+		{
+			IViewReference viewRef = (IViewReference) partRef;
+			final IViewPart part = viewRef.getView(false);
+			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
+			{
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						hijackView(part, false);
+					}
+				});
+			}
+		}
+		if (partRef instanceof IEditorReference)
+		{
+			hijackOutline();
+		}
+	}
+
+	public void partBroughtToTop(IWorkbenchPartReference partRef)
+	{
+		partActivated(partRef);
+	}
+
+	public void partClosed(IWorkbenchPartReference partRef)
+	{
+		if (partRef instanceof IEditorReference)
+		{
+			IEditorPart part = (IEditorPart) partRef.getPart(false);
+			if (part instanceof MultiPageEditorPart)
+			{
+				MultiPageEditorPart multi = (MultiPageEditorPart) part;
+				if (pageListener != null)
+				{
+					multi.getSite().getSelectionProvider().removeSelectionChangedListener(pageListener);
+				}
+			}
+		}
+		// If it's a search view, remove any query listeners for it!
+		else if (partRef instanceof IViewReference)
+		{
+			IViewPart view = (IViewPart) partRef.getPart(false);
+			if (queryListeners.containsKey(view))
+			{
+				NewSearchUI.removeQueryListener(queryListeners.remove(view));
+			}
+		}
+	}
+
+	public void partDeactivated(IWorkbenchPartReference partRef)
+	{
+		if (partRef instanceof IEditorReference)
+		{
+			hijackOutline();
+		}
+	}
+
+	public void partOpened(IWorkbenchPartReference partRef)
+	{
+		if (partRef instanceof IEditorReference)
+		{
+			IEditorPart editorPart = (IEditorPart) partRef.getPart(false);
+			hijackEditor(editorPart, false);
+			if (editorPart instanceof MultiPageEditorPart)
+			{
+				MultiPageEditorPart multi = (MultiPageEditorPart) editorPart;
+				if (pageListener == null)
+				{
+					pageListener = new ISelectionChangedListener()
+					{
+
+						public void selectionChanged(SelectionChangedEvent event)
+						{
+							hijackOutline();
+						}
+					};
+				}
+				multi.getSite().getSelectionProvider().addSelectionChangedListener(pageListener);
+			}
+			return;
+		}
+
+		if (partRef instanceof IViewReference)
+		{
+			IViewPart view = (IViewPart) partRef.getPart(false);
+			hijackView(view, false);
+		}
+	}
+
+	public void partHidden(IWorkbenchPartReference partRef)
+	{
+	}
+
+	public void partVisible(IWorkbenchPartReference partRef)
+	{
+	}
+
+	public void partInputChanged(IWorkbenchPartReference partRef)
+	{
+	}
+
+	public void pageChanged(PageChangedEvent event)
+	{
 	}
 }
