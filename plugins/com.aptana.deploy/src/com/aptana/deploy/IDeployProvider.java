@@ -7,27 +7,28 @@
  */
 package com.aptana.deploy;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IDeployProvider
 {
 
 	/**
-	 * Attempt to deploy the provided project.
+	 * Attempt to deploy the provided project or folder.
 	 * 
-	 * @param project
+	 * @param container
 	 * @param monitor
 	 */
-	public void deploy(IProject project, IProgressMonitor monitor);
+	public void deploy(IContainer container, IProgressMonitor monitor);
 
 	/**
-	 * Is this a project that can be handled by this provider? This method is used to implicitly bind a project to a
-	 * provider, when we haven't explicitly deployed via a provider yet. In real terms, this means looking to see if
-	 * this project was set up to deploy to this provider outside the deploy wizard (and maybe outside the IDE).
+	 * Is this a project or folder that can be handled by this provider? This method is used to implicitly bind a
+	 * container to a provider, when we haven't explicitly deployed via a provider yet. In real terms, this means
+	 * looking to see if this container was set up to deploy to this provider outside the deploy wizard (and maybe
+	 * outside the IDE).
 	 * 
-	 * @param selectedProject
+	 * @param selectedContainer
 	 * @return
 	 */
-	public boolean handles(IProject selectedProject);
+	public boolean handles(IContainer selectedContainer);
 }

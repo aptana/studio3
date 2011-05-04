@@ -8,7 +8,7 @@
 package com.aptana.deploy.internal;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 
 import com.aptana.deploy.IDeployProvider;
@@ -21,24 +21,32 @@ public class ProjectPropertyTester extends PropertyTester
 	{
 		if (receiver instanceof IResource)
 		{
-			IProject project = ((IResource) receiver).getProject();
-			if (!project.isAccessible())
+			IContainer container;
+			if (receiver instanceof IContainer)
+			{
+				container = (IContainer) receiver;
+			}
+			else
+			{
+				container = ((IResource) receiver).getParent();
+			}
+			if (!container.isAccessible())
 			{
 				return false;
 			}
 			if ("isDeployable".equals(property)) //$NON-NLS-1$
 			{
 				// Check if we have an explicitly set deployment provider
-				String id = DeployPreferenceUtil.getDeployProviderId(project);
+				String id = DeployPreferenceUtil.getDeployProviderId(container);
 				if (id != null)
 				{
 					return true;
 				}
-				return DeployProviderRegistry.getInstance().getProvider(project) != null;
+				return DeployProviderRegistry.getInstance().getProvider(container) != null;
 			}
 			else if ("isDeployType".equals(property)) //$NON-NLS-1$
 			{
-				String id = DeployPreferenceUtil.getDeployProviderId(project);
+				String id = DeployPreferenceUtil.getDeployProviderId(container);
 				String arg = (String) expectedValue;
 				if (id != null)
 				{
@@ -46,7 +54,7 @@ public class ProjectPropertyTester extends PropertyTester
 				}
 				// Instantiate provider with id, then call handles and check that!
 				IDeployProvider provider = DeployProviderRegistry.getInstance().getProviderById(arg);
-				return provider != null && provider.handles(project);
+				return provider != null && provider.handles(container);
 			}
 		}
 		return false;

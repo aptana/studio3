@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
@@ -43,8 +44,13 @@ public class HerokuContributionItem extends DeployContributionItem
 	@Override
 	public void fill(Menu menu, int index)
 	{
-		final IProject selectedProject = UIUtils.getSelectedProject();
+		IResource selectedResource = UIUtils.getSelectedResource();
+		if (selectedResource == null)
+		{
+			return;
+		}
 
+		final IProject selectedProject = selectedResource.getProject();
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
 		item.setText(Messages.HerokuContributionItem_OpenBrowserItem);
 		item.addSelectionListener(new SelectionAdapter()

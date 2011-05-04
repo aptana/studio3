@@ -150,7 +150,7 @@ public final class UIUtils
 		return null;
 	}
 
-	public static IProject getSelectedProject()
+	public static IResource getSelectedResource()
 	{
 		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
 				IEvaluationService.class);
@@ -163,7 +163,7 @@ public final class UIUtils
 				Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
 				if (selectedObject instanceof IResource)
 				{
-					return ((IResource) selectedObject).getProject();
+					return (IResource) selectedObject;
 				}
 			}
 			else
@@ -175,7 +175,7 @@ public final class UIUtils
 					IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
 					if (editorInput instanceof IFileEditorInput)
 					{
-						return ((IFileEditorInput) editorInput).getFile().getProject();
+						return ((IFileEditorInput) editorInput).getFile();
 					}
 				}
 			}

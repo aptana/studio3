@@ -10,8 +10,8 @@ package com.aptana.deploy.ftp.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
 
 import com.aptana.deploy.ftp.ui.wizard.FTPDeployPropertyDialog;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -27,20 +27,33 @@ public class DeploySettingsHandler extends AbstractHandler
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		FTPDeployPropertyDialog settingsDialog = new FTPDeployPropertyDialog(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell());
-		IProject selectedProject = UIUtils.getSelectedProject();
-		settingsDialog.setProject(selectedProject);
+		IResource selectedResource = UIUtils.getSelectedResource();
+		if (selectedResource == null)
+		{
+			return null;
+		}
+		IContainer container;
+		if (selectedResource instanceof IContainer)
+		{
+			container = (IContainer) selectedResource;
+		}
+		else
+		{
+			container = selectedResource.getParent();
+		}
 
-		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedProject);
+		FTPDeployPropertyDialog settingsDialog = new FTPDeployPropertyDialog(UIUtils.getActiveShell());
+		settingsDialog.setProject(container.getProject());
+
+		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(container);
 		ISiteConnection lastSiteConnection = null;
 		if (siteConnections.length > 1)
 		{
 			// try for last remembered site first
-			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(selectedProject);
+			String lastConnection = ResourceSynchronizationUtils.getLastSyncConnection(container);
 			if (lastConnection == null)
 			{
-				lastConnection = DeployPreferenceUtil.getDeployEndpoint(selectedProject);
+				lastConnection = DeployPreferenceUtil.getDeployEndpoint(container);
 			}
 			if (lastConnection != null)
 			{
@@ -58,8 +71,8 @@ public class DeploySettingsHandler extends AbstractHandler
 		}
 		else if (siteConnections.length > 1)
 		{
-			ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(), siteConnections);
+			ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(UIUtils.getActiveShell(),
+					siteConnections);
 			dialog.setShowRememberMyDecision(true);
 			dialog.open();
 
@@ -69,10 +82,10 @@ public class DeploySettingsHandler extends AbstractHandler
 				Boolean rememberMyDecision = dialog.isRememberMyDecision();
 				if (rememberMyDecision)
 				{
-					ResourceSynchronizationUtils.setRememberDecision(selectedProject, rememberMyDecision);
+					ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
 				}
 				// remembers the last sync connection
-				ResourceSynchronizationUtils.setLastSyncConnection(selectedProject, destination.getName());
+				ResourceSynchronizationUtils.setLastSyncConnection(container, destination.getName());
 			}
 			settingsDialog.setPropertySource(destination);
 		}

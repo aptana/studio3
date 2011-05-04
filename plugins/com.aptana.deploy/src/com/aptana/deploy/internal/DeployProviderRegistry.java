@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -61,9 +61,9 @@ public class DeployProviderRegistry
 		return fgInstance;
 	}
 
-	public IDeployProvider getProvider(IProject project)
+	public IDeployProvider getProvider(IContainer container)
 	{
-		IDeployProvider provider = getConfiguredProvider(project);
+		IDeployProvider provider = getConfiguredProvider(container);
 		if (provider == null)
 		{
 			// Grab providers from ext pt!
@@ -71,7 +71,7 @@ public class DeployProviderRegistry
 			// Now go through the providers and find one that handles this project
 			for (IDeployProvider aProvider : providers)
 			{
-				if (aProvider.handles(project))
+				if (aProvider.handles(container))
 				{
 					provider = aProvider;
 					break;
@@ -81,10 +81,10 @@ public class DeployProviderRegistry
 		return provider;
 	}
 
-	private IDeployProvider getConfiguredProvider(IProject project)
+	private IDeployProvider getConfiguredProvider(IContainer container)
 	{
 		// check what deploy provider id is stored for project, then get provider from ext pt matching that id.
-		String id = DeployPreferenceUtil.getDeployProviderId(project);
+		String id = DeployPreferenceUtil.getDeployProviderId(container);
 		if (id == null)
 		{
 			return null;

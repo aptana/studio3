@@ -11,7 +11,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,12 +33,13 @@ import com.aptana.deploy.preferences.DeployPreferenceUtil;
 public class DeployHandler extends AbstractHandler
 {
 
-	private IProject selectedProject;
+	private IContainer selectedContainer;
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
+		final IContainer container = selectedContainer;
 		final DeployProviderRegistry registry = DeployProviderRegistry.getInstance();
-		final IDeployProvider provider = registry.getProvider(selectedProject);
+		final IDeployProvider provider = registry.getProvider(container);
 
 		// TODO What if provider is still null? Prompt to choose explicitly? Run wizard?
 		if (provider != null)
@@ -49,10 +50,10 @@ public class DeployHandler extends AbstractHandler
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor)
 				{
-					provider.deploy(selectedProject, monitor);
+					provider.deploy(container, monitor);
 					// Store the deployment provider explicitly, since we may have had none explicitly set, but detected
 					// one that works.
-					DeployPreferenceUtil.setDeployType(selectedProject, registry.getIdForProvider(provider));
+					DeployPreferenceUtil.setDeployType(container, registry.getIdForProvider(provider));
 					return Status.OK_STATUS;
 				}
 			};
@@ -66,13 +67,13 @@ public class DeployHandler extends AbstractHandler
 	@Override
 	public boolean isEnabled()
 	{
-		return selectedProject != null && selectedProject.isAccessible();
+		return selectedContainer != null && selectedContainer.isAccessible();
 	}
 
 	@Override
 	public void setEnabled(Object evaluationContext)
 	{
-		selectedProject = null;
+		selectedContainer = null;
 		if (evaluationContext instanceof EvaluationContext)
 		{
 			Object activePart = ((EvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_PART_NAME);
@@ -81,7 +82,8 @@ public class DeployHandler extends AbstractHandler
 				IEditorInput editorInput = ((IEditorPart) activePart).getEditorInput();
 				if (editorInput instanceof IFileEditorInput)
 				{
-					selectedProject = ((IFileEditorInput) editorInput).getFile().getProject();
+					// uses the parent folder
+					selectedContainer = ((IFileEditorInput) editorInput).getFile().getParent();
 				}
 			}
 			else
@@ -94,18 +96,17 @@ public class DeployHandler extends AbstractHandler
 					if (!selections.isEmpty() && selections instanceof IStructuredSelection)
 					{
 						Object selection = ((IStructuredSelection) selections).getFirstElement();
-						IResource resource = null;
-						if (selection instanceof IResource)
+						if (selection instanceof IContainer)
 						{
-							resource = (IResource) selection;
+							selectedContainer = (IContainer) selection;
 						}
 						else if (selection instanceof IAdaptable)
 						{
-							resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
-						}
-						if (resource != null)
-						{
-							selectedProject = resource.getProject();
+							IResource resource = (IResource) ((IAdaptable) selection).getAdapter(IResource.class);
+							if (resource != null)
+							{
+								selectedContainer = resource.getParent();
+							}
 						}
 					}
 				}

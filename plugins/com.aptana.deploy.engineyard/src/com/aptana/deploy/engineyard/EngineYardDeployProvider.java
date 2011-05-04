@@ -7,6 +7,7 @@
  */
 package com.aptana.deploy.engineyard;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,14 +22,14 @@ public class EngineYardDeployProvider implements IDeployProvider
 
 	public static final String ID = "com.aptana.deploy.engineyard.provider"; //$NON-NLS-1$;
 
-	public void deploy(IProject selectedProject, IProgressMonitor monitor)
+	public void deploy(IContainer selectedContainer, IProgressMonitor monitor)
 	{
-		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
-				selectedProject.getLocation());
+		IProject project = selectedContainer.getProject();
+		TerminalView terminal = TerminalView.openView(project.getName(), project.getName(), project.getLocation());
 		terminal.sendInput("ey deploy\n"); //$NON-NLS-1$
 	}
 
-	public boolean handles(IProject selectedProject)
+	public boolean handles(IContainer selectedContainer)
 	{
 		// Engine Yard gem does not work in Windows
 		if (Platform.getOS().equals(Platform.OS_WIN32))
@@ -36,8 +37,8 @@ public class EngineYardDeployProvider implements IDeployProvider
 			return false;
 		}
 
-		// If tehre's a config/ey.yml file, then they probably use engine yard
-		IFile file = selectedProject.getFile(Path.fromPortableString("config/ey,yml")); //$NON-NLS-1$
+		// If there's a config/ey.yml file, then they probably use engine yard
+		IFile file = selectedContainer.getProject().getFile(Path.fromPortableString("config/ey.yml")); //$NON-NLS-1$
 		return file.exists();
 	}
 
