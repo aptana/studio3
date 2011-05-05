@@ -7,10 +7,13 @@
  */
 package com.aptana.scope;
 
+import java.util.Collections;
+import java.util.List;
+
 public class NegativeLookaheadSelector extends BinarySelector
 {
-	private int matchLength;
-	private int matchFragments;
+
+	private List<Integer> matchResults;
 
 	/**
 	 * NegativeLookaheadSelector
@@ -29,8 +32,7 @@ public class NegativeLookaheadSelector extends BinarySelector
 	 */
 	public boolean matches(MatchContext context)
 	{
-		matchLength = 0;
-		matchFragments = 0;
+		matchResults = null;
 		boolean result = true;
 
 		if (context != null && this._left != null && this._right != null)
@@ -50,24 +52,13 @@ public class NegativeLookaheadSelector extends BinarySelector
 			
 			if (result)
 			{
-				matchLength = this._left.matchLength();
-				matchFragments = this._left.matchFragments();
+				matchResults = this._left.matchResults();
 			}
 
 			context.popCurrentStep(!result);
 		}
 
 		return result;
-	}
-
-	public int matchFragments()
-	{
-		return matchFragments;
-	}
-
-	public int matchLength()
-	{
-		return matchLength;
 	}
 
 	/*
@@ -77,5 +68,14 @@ public class NegativeLookaheadSelector extends BinarySelector
 	protected String getOperator()
 	{
 		return " -"; //$NON-NLS-1$
+	}
+
+	public List<Integer> matchResults()
+	{
+		if (matchResults == null)
+		{
+			return Collections.emptyList();
+		}
+		return matchResults;
 	}
 }

@@ -219,4 +219,40 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(quoted, ScopeSelector.bestMatch(selectors, "source.php string.quoted"));
 	}
 
+	public void test2357()
+	{
+		ScopeSelector jsStorage = new ScopeSelector(
+				"source.js storage - storage.type.function - source.php, source.js constant - source.php, source.js keyword - source.php, source.js variable.language, source.js meta.brace, source.js punctuation.definition.parameters.begin, source.js punctuation.definition.parameters.end");
+		ScopeSelector constantNumeric = new ScopeSelector("constant.numeric");
+		ScopeSelector jsString = new ScopeSelector("source.js string - source.php, source.js keyword.operator");
+
+		assertTrue(new ScopeSelector("source.css string").matches("source.css string.quoted.single.css"));
+		assertTrue(new ScopeSelector("string").matches("source.css string.quoted.single.css"));
+		assertTrue(constantNumeric.matches("source.js constant.numeric.js"));
+		assertTrue(jsStorage.matches("source.js constant.numeric.js"));
+		assertTrue(jsString.matches("source.js string.quoted.single.js"));
+
+		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
+		selectors.add(jsStorage);
+		selectors.add(constantNumeric);
+		selectors.add(jsString);
+		assertEquals(constantNumeric, ScopeSelector.bestMatch(selectors, "source.js constant.numeric.js"));
+		assertEquals(jsString, ScopeSelector.bestMatch(selectors, "source.js string.quoted.single.js"));
+	}
+
+	/**
+	 * Test that ensures we move up the scope chain when deepest level match is of same length.
+	 */
+	public void testBestMatchAdvanced()
+	{
+		ScopeSelector metaTagBlockEntity = new ScopeSelector("meta.tag.block entity");
+		ScopeSelector metaTagEntity = new ScopeSelector("meta.tag entity");
+		// Order is important in inserting into list here!
+		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
+		selectors.add(metaTagEntity);
+		selectors.add(metaTagBlockEntity);
+		assertEquals(metaTagBlockEntity, ScopeSelector.bestMatch(selectors,
+				"text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html"));
+	}
+
 }

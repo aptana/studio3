@@ -9,6 +9,7 @@ package com.aptana.scope;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -41,10 +42,8 @@ public class ScopeSelector implements IScopeSelector
 		{
 			return null;
 		}
-		int bestOffset = -1;
-		int bestLength = 0;
-		IScopeSelector bestMatch = null;
 
+		IScopeSelector bestMatch = null;
 		for (IScopeSelector selector : selectors)
 		{
 			if (selector == null)
@@ -53,41 +52,60 @@ public class ScopeSelector implements IScopeSelector
 			}
 			if (selector.matches(scope))
 			{
-				int offset = selector.getMatchOffset(); // This offset is the fragment of scope (counting spaces,
-				// basically)
-				int fragments = selector.getMatchFragments();
-				offset += fragments - 1;
-
-				if (offset > bestOffset)
+				if (bestMatch == null)
 				{
-					bestOffset = offset;
 					bestMatch = selector;
-					bestLength = selector.getMatchLength();
+					continue;
 				}
-				else if (offset == bestOffset)
-				{
-					int length = selector.getMatchLength();
 
-					if (length > bestLength)
-					{
-						bestMatch = selector;
-					}
-					else if (length == bestLength)
-					{
-						// FIXME Need to match higher up steps?
-					}
+				if (betterMatch(selector.matchResults(), bestMatch.matchResults()))
+				{
+					bestMatch = selector;
 				}
 			}
 		}
-
 		return bestMatch;
 	}
 
-	private ISelectorNode _root;
-	private int matchOffset;
-	private int matchLength;
+	// FIXME Make like compareTo and return -1, 0, 1?
+	private static boolean betterMatch(List<Integer> results, List<Integer> matchResults)
+	{
+		// offset in list is offset of space-delimited part
+		// number at that offset is length of the match at that part
+		// winner is the one with longest deepest match
+		// so first look for highest offset with a non-zero value
 
-	private int matchFragments;
+		// if lists are not of same length, expand smaller one to match by filling with zeros
+		while (results.size() > matchResults.size())
+		{
+			matchResults.add(0);
+		}
+		while (matchResults.size() > results.size())
+		{
+			results.add(0);
+		}
+
+		// So starting at the end of the lists, look for the highest match length, ties go back an offset to be broken
+		for (int i = results.size() - 1; i >= 0; i--)
+		{
+			int firstVal = results.get(i);
+			int secondVal = matchResults.get(i);
+			// If one of the two has a longer match at the offset, it wins
+			if (firstVal > secondVal)
+			{
+				return true;
+			}
+			if (secondVal > firstVal)
+			{
+				return false;
+			}
+		}
+
+		return false;
+	}
+
+	private ISelectorNode _root;
+	private List<Integer> matchResults;
 
 	/**
 	 * ScopeSelector
@@ -119,33 +137,6 @@ public class ScopeSelector implements IScopeSelector
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#getMatchFragments()
-	 */
-	public int getMatchFragments()
-	{
-		return this.matchFragments;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#getMatchLength()
-	 */
-	public int getMatchLength()
-	{
-		return this.matchLength;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#getMatchOffset()
-	 */
-	public int getMatchOffset()
-	{
-		return this.matchOffset;
-	}
-
 	/**
 	 * getRoot
 	 * 
@@ -168,6 +159,7 @@ public class ScopeSelector implements IScopeSelector
 	 */
 	public boolean matches(String scope)
 	{
+		matchResults = new ArrayList<Integer>();
 		boolean result = false;
 
 		if (this._root != null && scope != null)
@@ -182,16 +174,13 @@ public class ScopeSelector implements IScopeSelector
 				// see if we match at this point within the context
 				if (this._root.matches(context))
 				{
-					// we need to save what step matched (looking for highest),
-					// plus how much of that step matched (looking for longest)
-					matchOffset = i;
-					matchLength = this._root.matchLength();
-					matchFragments = this._root.matchFragments();
+					matchResults.addAll(this._root.matchResults());
 
 					// we matched, so report success and stop looking for a match
 					result = true;
 					break;
 				}
+				matchResults.add(0); // Add a non-match
 
 				// restore position where we started and move forward one
 				context.popCurrentStep();
@@ -355,5 +344,14 @@ public class ScopeSelector implements IScopeSelector
 	public String toString()
 	{
 		return (this._root == null) ? StringUtil.EMPTY : this._root.toString();
+	}
+
+	public List<Integer> matchResults()
+	{
+		if (matchResults == null)
+		{
+			return Collections.emptyList();
+		}
+		return matchResults;
 	}
 }

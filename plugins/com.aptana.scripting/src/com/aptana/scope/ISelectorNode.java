@@ -7,11 +7,11 @@
  */
 package com.aptana.scope;
 
+import java.util.List;
+
 public interface ISelectorNode
 {
 	boolean matches(MatchContext context);
-	
-	int matchLength();
 
-	int matchFragments();
+	List<Integer> matchResults();
 }

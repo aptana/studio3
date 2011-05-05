@@ -7,6 +7,9 @@
  */
 package com.aptana.scope;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NameSelector implements ISelectorNode
 {
 	private String _name;
@@ -21,11 +24,6 @@ public class NameSelector implements ISelectorNode
 	{
 		this._name = name;
 	}
-
-	public int matchFragments()
-	{
-		return 1;
-	}
 	
 	/*
 	 * (non-Javadoc)
@@ -33,6 +31,7 @@ public class NameSelector implements ISelectorNode
 	 */
 	public boolean matches(MatchContext context)
 	{
+		matchLength = 0;
 		boolean result = false;
 		
 		if (context != null && this._name != null && this._name.length() > 0)
@@ -68,8 +67,11 @@ public class NameSelector implements ISelectorNode
 		return this._name;
 	}
 
-	public int matchLength()
+	public List<Integer> matchResults()
 	{
-		return matchLength;
+		// This is always just one segment, so only one value, and it is the length of this match
+		List<Integer> results = new ArrayList<Integer>();
+		results.add(matchLength);
+		return results;
 	}
 }
