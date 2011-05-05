@@ -845,7 +845,7 @@ public class CommandExecutionUtils
 		}
 	}
 
-	private static void showAsTooltip(CommandResult commandResult, ITextViewer textViewer, final int caretOffset)
+	private static void showAsTooltip(CommandResult commandResult, ITextViewer textViewer, int caretOffset)
 	{
 		String output = commandResult.getOutputString();
 		if (output == null || output.trim().length() == 0)
@@ -902,6 +902,8 @@ public class CommandExecutionUtils
 		tooltip.setSize(p.x, p.y);
 
 		StyledText textWidget = textViewer.getTextWidget();
+		caretOffset = textWidget.getCaretOffset();
+
 		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
 		Rectangle bounds = textWidget.getClientArea();
 		// Is caret visible in the client area
