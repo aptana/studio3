@@ -42,7 +42,14 @@ public class AndSelector extends BinarySelector
 			if (result)
 			{
 				matchResults = this._left.matchResults();
-				matchResults.addAll(this._right.matchResults());
+				if (matchResults.isEmpty())
+				{
+					matchResults = this._right.matchResults();
+				}
+				else
+				{
+					matchResults.addAll(this._right.matchResults());
+				}
 			}
 
 			context.popCurrentStep(!result);

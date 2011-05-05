@@ -14,7 +14,7 @@ public class NameSelector implements ISelectorNode
 {
 	private String _name;
 	private int matchLength = 0;
-	
+
 	/**
 	 * NameSelector
 	 * 
@@ -24,7 +24,7 @@ public class NameSelector implements ISelectorNode
 	{
 		this._name = name;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)
@@ -33,18 +33,18 @@ public class NameSelector implements ISelectorNode
 	{
 		matchLength = 0;
 		boolean result = false;
-		
+
 		if (context != null && this._name != null && this._name.length() > 0)
 		{
 			String step = context.getCurrentStep();
-			
+
 			if (step != null && step.startsWith(this._name))
 			{
 				// step matches as a prefix, now make sure we matched the whole step
 				// or up to a period
 				int nameLength = this._name.length();
 				int scopeLength = step.length();
-				
+
 				if (scopeLength == nameLength || step.charAt(nameLength) == '.')
 				{
 					result = true;
@@ -53,7 +53,7 @@ public class NameSelector implements ISelectorNode
 				}
 			}
 		}
-		
+
 		return result;
 	}
 

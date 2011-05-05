@@ -78,10 +78,19 @@ public class ScopeSelector implements IScopeSelector
 		// if lists are not of same length, expand smaller one to match by filling with zeros
 		while (results.size() > matchResults.size())
 		{
+			if (matchResults.isEmpty())
+			{
+				matchResults = new ArrayList<Integer>();
+			}
 			matchResults.add(0);
 		}
 		while (matchResults.size() > results.size())
 		{
+			if (results.isEmpty())
+			{
+				results = new ArrayList<Integer>();
+			}
+
 			results.add(0);
 		}
 
@@ -91,13 +100,9 @@ public class ScopeSelector implements IScopeSelector
 			int firstVal = results.get(i);
 			int secondVal = matchResults.get(i);
 			// If one of the two has a longer match at the offset, it wins
-			if (firstVal > secondVal)
+			if (firstVal != secondVal)
 			{
-				return true;
-			}
-			if (secondVal > firstVal)
-			{
-				return false;
+				return firstVal > secondVal;
 			}
 		}
 

@@ -49,7 +49,7 @@ public class NegativeLookaheadSelector extends BinarySelector
 
 				context.popCurrentStep();
 			}
-			
+
 			if (result)
 			{
 				matchResults = this._left.matchResults();
