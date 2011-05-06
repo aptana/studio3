@@ -124,6 +124,9 @@
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
+         <!-- this is a copy of org.eclipse.ui.navigator.resourceContent with our own drop adapter
+        		to address the issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=344880
+         -->
          <navigatorContent
             name="%resource.extension.name"
             priority="low"
