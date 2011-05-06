@@ -306,6 +306,13 @@
       </category>
    </extension>
    <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="com.aptana.ui.wizards.export.category"
+            name="%category.wizards.export.name">
+      </category>
+   </extension>
+   <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ui.ide.FileStoreEditorInput"

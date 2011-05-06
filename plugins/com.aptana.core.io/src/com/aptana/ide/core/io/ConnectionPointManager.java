@@ -107,7 +107,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * saveState
 	 * @param path
 	 */
-	/* package */ void saveState(IPath path) {
+	public void saveState(IPath path) {
 		XMLMemento memento = XMLMemento.createWriteRoot(ELEMENT_ROOT);
         synchronized (connections) {
             for (ConnectionPoint connectionPoint : connections) {

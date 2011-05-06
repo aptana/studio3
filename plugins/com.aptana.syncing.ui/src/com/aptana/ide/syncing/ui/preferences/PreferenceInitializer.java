@@ -8,28 +8,20 @@
 package com.aptana.ide.syncing.ui.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
-/**
- * @author Kevin Sawicki (ksawicki@aptana.com)
- */
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
-	/**
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-	 */
 	public void initializeDefaultPreferences()
 	{
-		IPreferenceStore store = SyncingUIPlugin.getDefault().getPreferenceStore();
-		store.setDefault(IPreferenceConstants.VIEW_MODE, IPreferenceConstants.VIEW_FLAT);
-		store.setDefault(IPreferenceConstants.DIRECTION_MODE, IPreferenceConstants.DIRECTION_BOTH);
-		store.setDefault(IPreferenceConstants.SHOW_SYNC_EXPLORER_TABLE, true);
-		store.setDefault(IPreferenceConstants.SHOW_DATE, true);
-		store.setDefault(IPreferenceConstants.SHOW_SIZE, true);
-		store.setDefault(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-"); //$NON-NLS-1$
-		store.setDefault(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx"); //$NON-NLS-1$
+		IEclipsePreferences prefs = new DefaultScope().getNode(SyncingUIPlugin.PLUGIN_ID);
+		prefs.put(IPreferenceConstants.VIEW_MODE, IPreferenceConstants.VIEW_FLAT);
+		prefs.put(IPreferenceConstants.DIRECTION_MODE, IPreferenceConstants.DIRECTION_BOTH);
+		prefs.put(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-"); //$NON-NLS-1$
+		prefs.put(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx"); //$NON-NLS-1$
 	}
 }
