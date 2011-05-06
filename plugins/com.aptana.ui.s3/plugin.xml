@@ -21,24 +21,6 @@
       </dialog>
    </extension>
    <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:com.aptana.ui.io.remoteview#PopupMenu?after=group.new">
-         <command
-               commandId="com.aptana.ui.s3.command.add"
-               icon="icons/full/etool16/new_connection.png"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <count
-                     value="0">
-               </count>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <category
             id="com.aptana.ui.s3.category"
@@ -50,6 +32,30 @@
             id="com.aptana.ui.s3.command.add"
             name="%newS3ConnectionAction.label">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.ui.s3.command.add"
+            icon="icons/full/etool16/new_connection.png">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:com.aptana.ui.io.remoteview#PopupMenu?after=group.new">
+         <command
+               commandId="com.aptana.ui.s3.command.add"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <count
+                     value="0">
+               </count>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
 
 </plugin>

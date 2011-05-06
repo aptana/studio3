@@ -39,13 +39,38 @@
       </factory>
    </extension>
    <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="com.aptana.ui.ftp.category"
+            name="%category.ftp.name">
+      </category>
+      <command
+            categoryId="com.aptana.ui.ftp.category"
+            defaultHandler="com.aptana.ui.ftp.handlers.NewFTPConnectionHandler"
+            id="com.aptana.ui.ftp.command.add"
+            name="%newFTPConnectionAction.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.ftp.category"
+            defaultHandler="com.aptana.ui.ftp.handlers.DuplicateConnectionHandler"
+            id="com.aptana.ui.ftp.command.duplicate"
+            name="%duplicateAction.label">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.ui.ftp.command.add"
+            icon="icons/full/etool16/new_connection.png">
+      </image>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
             locationURI="popup:com.aptana.ui.io.remoteview#PopupMenu?after=group.new">
          <command
                commandId="com.aptana.ui.ftp.command.add"
-               icon="icons/full/etool16/new_connection.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -68,25 +93,6 @@
             </visibleWhen>
          </command>
       </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            id="com.aptana.ui.ftp.category"
-            name="%category.ftp.name">
-      </category>
-      <command
-            categoryId="com.aptana.ui.ftp.category"
-            defaultHandler="com.aptana.ui.ftp.handlers.NewFTPConnectionHandler"
-            id="com.aptana.ui.ftp.command.add"
-            name="%newFTPConnectionAction.label">
-      </command>
-      <command
-            categoryId="com.aptana.ui.ftp.category"
-            defaultHandler="com.aptana.ui.ftp.handlers.DuplicateConnectionHandler"
-            id="com.aptana.ui.ftp.command.duplicate"
-            name="%duplicateAction.label">
-      </command>
    </extension>
 
 </plugin>

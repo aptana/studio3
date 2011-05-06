@@ -146,6 +146,17 @@
       </command>
    </extension>
    <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.terminal.commands.showTerminal"
+            icon="icons/terminal.png">
+      </image>
+      <image
+            commandId="com.aptana.terminal.commands.openTerminal"
+            icon="icons/terminal.png">
+      </image>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -153,7 +164,6 @@
                id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.terminal.commands.showTerminal"
-                  icon="icons/terminal.png"
                   style="push">
                <visibleWhen>
                   <reference
