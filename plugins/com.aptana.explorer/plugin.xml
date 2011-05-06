@@ -23,7 +23,7 @@
             viewerId="com.aptana.explorer.view">
          <includes>
             <contentExtension
-                  pattern="org.eclipse.ui.navigator.resourceContent">
+                  pattern="com.aptana.explorer.navigator.resourceContent">
             </contentExtension>
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
@@ -124,6 +124,74 @@
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
+         <navigatorContent
+            name="%resource.extension.name"
+            priority="low"
+            icon="platform:/plugin/org.eclipse.ui.navigator.resources/icons/full/eview16/resource_persp.gif"
+            activeByDefault="true"
+            			contentProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionContentProvider"
+            			labelProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionLabelProvider"
+            id="com.aptana.explorer.navigator.resourceContent">
+         <enablement>
+		         <or>
+		            <instanceof value="org.eclipse.core.resources.IResource" />
+		         </or>
+         </enablement>
+
+        <commonSorter
+        	  class="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionSorter"
+        	  id="org.eclipse.ui.navigator.resources.sorters.defaultSorter">
+           <parentExpression>
+           		 <or>
+           		 	<instanceof value="org.eclipse.core.resources.IResource" />
+           		 </or>
+		   </parentExpression>
+        </commonSorter>
+        <dropAssistant
+              class="com.aptana.explorer.navigator.resources.AppExplorerDropAdapterAssistant"
+              id="org.eclipse.ui.navigator.resources.resourceDropAdapter">
+           <possibleDropTargets>
+              <or>
+                 <adapt type="org.eclipse.core.resources.IProject"/>
+                 <adapt type="org.eclipse.core.resources.IFolder"/>
+                 <adapt type="org.eclipse.core.resources.IFile"/>
+              </or>
+           </possibleDropTargets>
+        </dropAssistant>
+
+        <actionProvider
+              class="org.eclipse.ui.internal.navigator.resources.actions.EditActionProvider"
+              id="org.eclipse.ui.navigator.resources.actions.EditActions"/>
+        <actionProvider
+              class="org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider"
+              id="org.eclipse.ui.navigator.resources.actions.RefactorActions"/>
+
+	      <!-- Menu Shortcut Actions for Wizards -->
+	      <commonWizard
+	      			type="new"
+	      			wizardId="org.eclipse.ui.wizards.new.folder">
+				<enablement>
+					<or>
+						<adapt type="org.eclipse.core.resources.IFile" />
+						<adapt type="org.eclipse.core.resources.IFolder" />
+						<adapt type="org.eclipse.core.resources.IProject" />
+						<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+					</or>
+		         </enablement>
+		    </commonWizard>
+	        <commonWizard
+	            type="new"
+	            wizardId="org.eclipse.ui.wizards.new.file">
+				<enablement>
+					<or>
+						<adapt type="org.eclipse.core.resources.IFile" />
+						<adapt type="org.eclipse.core.resources.IFolder" />
+						<adapt type="org.eclipse.core.resources.IProject" />
+						<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+					</or>
+		         </enablement>
+		     </commonWizard>
+      </navigatorContent>
       <commonWizard
             associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
             type="new"
