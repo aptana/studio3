@@ -139,7 +139,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 				{
 					int line = getDocument().getLineOfOffset(start);
 					// Don't bother adding multiple positions for the same starting line
-					if (fLines.contains(line))
+					if (fLines != null && fLines.contains(line))
 					{
 						add = false;
 					}
@@ -157,7 +157,10 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 							// editor.
 							IRegion endLineRegion = getDocument().getLineInformation(endLine);
 							end = endLineRegion.getOffset() + endLineRegion.getLength() + 1;
-							fLines.add(line);
+							if (fLines != null)
+							{
+								fLines.add(line);
+							}
 						}
 					}
 				}
