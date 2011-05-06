@@ -143,7 +143,7 @@
 
         <commonSorter
         	  class="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionSorter"
-        	  id="org.eclipse.ui.navigator.resources.sorters.defaultSorter">
+        	  id="com.aptana.explorer.navigator.resources.sorters.defaultSorter">
            <parentExpression>
            		 <or>
            		 	<instanceof value="org.eclipse.core.resources.IResource" />
@@ -152,7 +152,7 @@
         </commonSorter>
         <dropAssistant
               class="com.aptana.explorer.navigator.resources.AppExplorerDropAdapterAssistant"
-              id="org.eclipse.ui.navigator.resources.resourceDropAdapter">
+              id="com.aptana.explorer.navigator.resources.resourceDropAdapter">
            <possibleDropTargets>
               <or>
                  <adapt type="org.eclipse.core.resources.IProject"/>
@@ -164,10 +164,14 @@
 
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.EditActionProvider"
-              id="org.eclipse.ui.navigator.resources.actions.EditActions"/>
+              id="com.aptana.explorer.navigator.resources.actions.EditActions">
+           <enablement></enablement>
+        </actionProvider>
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider"
-              id="org.eclipse.ui.navigator.resources.actions.RefactorActions"/>
+              id="com.aptana.explorer.navigator.resources.actions.RefactorActions">
+           <enablement></enablement>
+        </actionProvider>
 
 	      <!-- Menu Shortcut Actions for Wizards -->
 	      <commonWizard
