@@ -49,6 +49,10 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 			}
 		}
 		if (uri != null) {
+			String scheme = uri.getScheme();
+			if ("http".equals(scheme) || "https".equals(scheme)) { //$NON-NLS-1$ //$NON-NLS-2$
+				return EMPTY;
+			}
 			IFileStore fileStore = EFS.getStore(uri);
 			if (fileStore.fetchInfo().exists()) {
 				IResource resource = (IResource) fileStore.getAdapter(IResource.class);
