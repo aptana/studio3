@@ -29,6 +29,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -217,5 +218,19 @@ public class HTMLEditor extends AbstractThemeableEditor
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return new HTMLFoldingComputer(this, document);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Object getAdapter(Class adapter)
+	{
+		if (IEditorLinkedResources.class == adapter)
+		{
+			return new HTMLEditorLinkedResources(this);
+		}
+		return super.getAdapter(adapter);
 	}
 }

@@ -54,10 +54,10 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.preview.internal.DefaultPreviewHandler;
 import com.aptana.preview.internal.EditorUtils;
-import com.aptana.preview.internal.Editors;
 import com.aptana.preview.internal.PreviewEditorInput;
 import com.aptana.preview.internal.PreviewEditorPart;
 import com.aptana.preview.internal.PreviewHandlers;
@@ -392,23 +392,17 @@ public final class PreviewManager {
 
 	private void checkLinkedEditor(URI uri) {
 		IEditorPart editorPart = null;
-		IEditorPreviewDelegate editorPreviewDelegate;
 		for (IEditorPart editor : trackedEditors.keySet()) {
-			editorPreviewDelegate = Editors.getInstance().getEditorPreviewDelegate(editor);
-			if (editorPreviewDelegate != null) {
-				try {
-					editorPreviewDelegate.init(editor);
-					if (editorPreviewDelegate.isLinked(uri)) {
-						editorPart = editor;
-						// TODO: what if multiple editors in the tracked list
-						// need to update?
-						// Need a way to know which editor the Preview editor is
-						// currently
-						// previewing against
-						break;
-					}
-				} finally {
-					editorPreviewDelegate.dispose();
+			IEditorLinkedResources editorLinkedResources = (IEditorLinkedResources) editor.getAdapter(IEditorLinkedResources.class);
+			if (editorLinkedResources != null) {
+				if (editorLinkedResources.hasReference(uri)) {
+					editorPart = editor;
+					// TODO: what if multiple editors in the tracked list
+					// need to update?
+					// Need a way to know which editor the Preview editor is
+					// currently
+					// previewing against
+					break;
 				}
 			}
 		}

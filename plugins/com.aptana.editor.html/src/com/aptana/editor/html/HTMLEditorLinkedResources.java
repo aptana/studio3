@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.html.preview;
+package com.aptana.editor.html;
 
 import java.net.URI;
 import java.util.List;
@@ -18,68 +18,48 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.core.util.URLEncoder;
+import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
-import com.aptana.preview.IEditorPreviewDelegate;
 
 /**
  * @author Michael Xia
  * @author Max Stepanov
  */
-public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate
-{
+public class HTMLEditorLinkedResources implements IEditorLinkedResources {
 
-	private IEditorPart targetEditorPart;
+	private final IEditorPart editorPart;
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IEditorPreviewDelegate#init(org.eclipse.ui.IEditorPart)
+	/**
+	 * @param targetEditorPart
 	 */
-	public void init(IEditorPart targetEditorPart)
-	{
-		this.targetEditorPart = targetEditorPart;
+	public HTMLEditorLinkedResources(IEditorPart editorPart) {
+		this.editorPart = editorPart;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IEditorPreviewDelegate#dispose()
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.IEditorLinkedResources#hasReference(java.net.URI)
 	 */
-	public void dispose()
-	{
-		targetEditorPart = null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IEditorPreviewDelegate#isLinked(java.net.URI)
-	 */
-	public boolean isLinked(URI uri)
-	{
-		// checks if this HTML file includes the source the changed editor is referencing (JS or CSS file)
-		IEditorInput targetEditorInput = targetEditorPart.getEditorInput();
-		if (targetEditorInput instanceof IFileEditorInput)
-		{
+	public boolean hasReference(URI uri) {
+		// checks if this HTML file includes the source the changed editor is
+		// referencing (JS or CSS file)
+		IEditorInput targetEditorInput = editorPart.getEditorInput();
+		if (targetEditorInput instanceof IFileEditorInput) {
 			IFile htmlFile = ((IFileEditorInput) targetEditorInput).getFile();
 			Index index = IndexManager.getInstance().getIndex(htmlFile.getProject().getLocationURI());
-			List<QueryResult> queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,
-					HTMLIndexConstants.RESOURCE_JS }, null, 0);
-			if (queryResults != null)
-			{
+			List<QueryResult> queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS, HTMLIndexConstants.RESOURCE_JS }, null, 0);
+			if (queryResults != null) {
 				String includedFileToCheck = uri.toString();
 				String includedFile;
 				String htmlFileToCheck = URLEncoder.encode(htmlFile.getLocation().toPortableString(), null, null);
-				for (QueryResult result : queryResults)
-				{
+				for (QueryResult result : queryResults) {
 					includedFile = result.getWord();
-					if (includedFileToCheck.equals(includedFile))
-					{
+					if (includedFileToCheck.equals(includedFile)) {
 						Set<String> documents = result.getDocuments();
-						for (String document : documents)
-						{
-							if (document.endsWith(htmlFileToCheck))
-							{
+						for (String document : documents) {
+							if (document.endsWith(htmlFileToCheck)) {
 								return true;
 							}
 						}
