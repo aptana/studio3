@@ -86,6 +86,7 @@ public final class SyncUtils {
 						try {
 							bytesRead = in.read(buffer);
 						} catch (IOException e) {
+							checkCanceled(monitor);
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Reading, source.toString()), e);
 						}
 						if (bytesRead == -1) {
@@ -95,6 +96,7 @@ public final class SyncUtils {
 						try {
 							out.write(buffer, 0, bytesRead);
 						} catch (IOException e) {
+							checkCanceled(monitor);
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Writing, destination.toString()), e);
 						}
 						subMonitor.worked(1);
