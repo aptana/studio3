@@ -74,6 +74,9 @@ public final class SyncUtils {
 				int totalWork = (length == -1) ? IProgressMonitor.UNKNOWN : 1 + (int) (length / buffer.length);
 				InputStream in = null;
 				OutputStream out = null;
+				// TODO: max - the interrupter does work for SFTP but FTP socket read ignores Thread interrupted state.
+				// Probably need a cancellation API in edtFTPj library
+				//ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(monitor);
 				try {
 					in = source.openInputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					out = destination.openOutputStream(EFS.NONE, subMonitorFor(monitor, 0));
@@ -103,6 +106,7 @@ public final class SyncUtils {
 					}
 					subMonitor.done();
 				} finally {
+					//interrupter.dispose();
 					safeClose(in);
 					safeClose(out);
 				}
