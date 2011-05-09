@@ -8,6 +8,9 @@
 package com.aptana.ide.syncing.ui.actions;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -80,6 +83,24 @@ public class UploadAction extends BaseSyncAction
 					if (fSelectedFromSource)
 					{
 						sourceFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
+						// adds the parent directories
+						List<IFileStore> newFiles = new ArrayList<IFileStore>();
+						for (IFileStore fileStore : fileStores)
+						{
+							List<IFileStore> folders = new ArrayList<IFileStore>();
+							IFileStore parent = fileStore.getParent();
+							while (parent != null && !sourceRoot.equals(parent))
+							{
+								if (!newFiles.contains(parent))
+								{
+									folders.add(0, parent);
+								}
+								parent = parent.getParent();
+							}
+							newFiles.addAll(folders);
+						}
+						newFiles.addAll(Arrays.asList(sourceFiles));
+						sourceFiles = newFiles.toArray(new IFileStore[newFiles.size()]);
 					}
 					else
 					{
@@ -109,7 +130,8 @@ public class UploadAction extends BaseSyncAction
 				catch (Exception e)
 				{
 					SyncingUIPlugin.logError(Messages.UploadAction_ERR_FailToUpload, e);
-					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.UploadAction_ERR_FailToUpload, e);
+					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.UploadAction_ERR_FailToUpload,
+							e);
 				}
 
 				return Status.OK_STATUS;
