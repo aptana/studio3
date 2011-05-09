@@ -19,4 +19,9 @@ public interface IPreferenceConstants
 	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
 	 */
 	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
+
+	/**
+	 * Pref key for a boolean value. Should we apply the monospaced text font to views?
+	 */
+	public static final String INVASIVE_FONT = "enable_invasive_font"; //$NON-NLS-1$
 }

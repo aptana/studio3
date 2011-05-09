@@ -199,6 +199,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private HashMap<Integer, Font> fFonts;
 
 	private Button fInvasiveThemeCheckbox;
+	private Button fInvasiveFontCheckbox;
 	private Button fAddThemeButton;
 	private Button fImportButton;
 	private Button fAddTokenButton;
@@ -287,6 +288,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				IPreferenceConstants.INVASIVE_THEMES, false, null));
 		fInvasiveThemeCheckbox.addSelectionListener(this);
 		fInvasiveThemeCheckbox.setToolTipText(Messages.ThemePreferencePage_InvasiveThemesToolTip);
+
+		fInvasiveFontCheckbox = new Button(themesComp, SWT.CHECK);
+		fInvasiveFontCheckbox.setText(Messages.ThemePreferencePage_InvasiveFontLBL);
+		fInvasiveFontCheckbox.setSelection(Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
+				IPreferenceConstants.INVASIVE_FONT, false, null));
+		fInvasiveFontCheckbox.addSelectionListener(this);
+		fInvasiveFontCheckbox.setToolTipText(Messages.ThemePreferencePage_InvasiveFontToolTip);
 	}
 
 	protected IThemeManager getThemeManager()
@@ -1181,6 +1189,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
 			prefs.putBoolean(IPreferenceConstants.INVASIVE_THEMES, fInvasiveThemeCheckbox.getSelection());
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e1)
+			{
+				ThemePlugin.logError(e1);
+			}
+		}
+		else if (source == fInvasiveFontCheckbox)
+		{
+			IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+			prefs.putBoolean(IPreferenceConstants.INVASIVE_FONT, fInvasiveFontCheckbox.getSelection());
 			try
 			{
 				prefs.flush();
