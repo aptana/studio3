@@ -502,6 +502,7 @@ public class CorePlugin extends Plugin
 			{
 				IResource project = event.getResource();
 				unhookFilewatcher(project.getProject());
+				return;
 			}
 			IResourceDelta delta = event.getDelta();
 			if (delta == null)
