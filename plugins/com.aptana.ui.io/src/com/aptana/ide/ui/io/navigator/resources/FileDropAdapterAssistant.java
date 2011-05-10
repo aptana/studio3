@@ -173,7 +173,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         return problems;
     }
 
-    private IStatus performMove(final CommonDropAdapter dropAdapter, IAdaptable[] sources) {
+    private IStatus performMove(final CommonDropAdapter dropAdapter, final IAdaptable[] sources) {
         MultiStatus problems = new MultiStatus(IOUIPlugin.PLUGIN_ID, 1,
                 Messages.FileDropAdapterAssistant_ERR_Moving, null);
         IStatus validate = validateDrop(dropAdapter.getCurrentTarget(), dropAdapter
@@ -187,7 +187,16 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         operation.copyFiles(sources, destination, new JobChangeAdapter() {
 
             public void done(IJobChangeEvent event) {
+            	// refreshes the target
                 refresh(dropAdapter.getCurrentTarget());
+                // refreshes the source's parent folder
+                IFileStore fileStore;
+                for (IAdaptable source : sources) {
+                	fileStore = (IFileStore) source.getAdapter(IFileStore.class);
+                	if (fileStore != null) {
+                		refresh(fileStore.getParent());
+                	}
+                }
             }
         });
 
