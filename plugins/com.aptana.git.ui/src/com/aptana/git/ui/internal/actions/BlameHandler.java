@@ -95,12 +95,13 @@ public class BlameHandler extends AbstractGitHandler
 		return null;
 	}
 
+	@SuppressWarnings("unused")
 	protected IHistoryView attachHistorySyncher(final IFile file, final GitRepository repo, IWorkbenchPage page)
 	{
 		IHistoryView historyView = TeamUI.getHistoryView();
 		if (historyView != null)
 		{
-			IHistoryPage historyPage = historyView.getHistoryPage();
+			IHistoryPage historyPage = historyView.showHistoryFor(file);
 			if (historyPage instanceof GitHistoryPage)
 			{
 				new RevisionAnnotationController(page, file, ((GitHistoryPage) historyPage).getSelectionProvider())
