@@ -445,6 +445,21 @@ public class GitRepositoryTest extends TestCase
 		// status.getMessage());
 	}
 
+	public void testRemoteURLs() throws Exception
+	{
+		GitRepository repo = createRepo();
+		File configFile = repoToGenerate().append(".git").append("config").toFile();
+		// Test that our regexp can handle when fetch is first or url is first as child of remote section in config
+		// file.
+		FileWriter writer = new FileWriter(configFile, true);
+		writer.append("\n[remote \"chris\"]\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n\turl = git@github.com:aptana/chris.git\n[remote \"bob\"]\n\turl = git@github.com:aptana/bob.git\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n");
+		writer.close();
+		Set<String> urls = repo.remoteURLs();
+		assertEquals(2, urls.size());
+		assertTrue(urls.contains("git@github.com:aptana/chris.git"));
+		assertTrue(urls.contains("git@github.com:aptana/bob.git"));
+	}
+
 	public void testFirePullEvent()
 	{
 		GitRepository repo = createRepo();

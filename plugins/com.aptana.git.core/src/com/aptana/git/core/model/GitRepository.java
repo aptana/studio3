@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -88,6 +89,8 @@ public class GitRepository
 		}
 	}
 
+	private static final String GITHUB_COM = "github.com"; //$NON-NLS-1$
+
 	/**
 	 * Filename to store ignores of files.
 	 */
@@ -125,7 +128,8 @@ public class GitRepository
 	/**
 	 * Regexp used to grab list of remote URLs out of .git/config.
 	 */
-	private final static Pattern fgRemoteURLPattern = Pattern.compile("\\[remote \"(.+?)\"\\]\\s+url = (.+?)\\s+"); //$NON-NLS-1$
+	private final static Pattern fgRemoteURLPattern = Pattern
+			.compile("\\[remote \"(.+?)\"\\](\\s+[^\\[]+)?\\s+url = (.+?)\\s+"); //$NON-NLS-1$
 
 	/**
 	 * Monitor to allow simultaneous read processes, but only one "write" process which alters the repo/index.
@@ -1080,7 +1084,7 @@ public class GitRepository
 			Matcher m = fgRemoteURLPattern.matcher(contents);
 			while (m.find())
 			{
-				remoteURLs.add(m.group(2));
+				remoteURLs.add(m.group(3));
 			}
 		}
 		catch (FileNotFoundException e)
@@ -1772,5 +1776,32 @@ public class GitRepository
 	void exitRead()
 	{
 		monitor.exitRead();
+	}
+
+	public Set<String> getGithubURLs()
+	{
+		Set<String> githubURLs = new HashSet<String>();
+		// Check the remote urls for github and use that to determine URL we need!
+		for (String remoteURL : remoteURLs())
+		{
+			if (!remoteURL.contains(GITHUB_COM))
+			{
+				continue;
+			}
+			String remaining = remoteURL.substring(remoteURL.indexOf(GITHUB_COM) + 10);
+			if (remaining.startsWith("/") || remaining.startsWith(":")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				remaining = remaining.substring(1);
+			}
+			if (remaining.endsWith(GitRepository.GIT_DIR))
+			{
+				remaining = remaining.substring(0, remaining.length() - 4);
+			}
+			int split = remaining.indexOf("/"); //$NON-NLS-1$
+			String userName = remaining.substring(0, split);
+			String repoName = remaining.substring(split + 1);
+			githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
+		}
+		return githubURLs;
 	}
 }

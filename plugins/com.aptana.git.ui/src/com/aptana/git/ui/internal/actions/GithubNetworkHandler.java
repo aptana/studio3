@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -34,8 +33,6 @@ import com.aptana.git.ui.GitUIPlugin;
 @SuppressWarnings({ "restriction", "rawtypes" })
 public class GithubNetworkHandler extends AbstractGitHandler
 {
-
-	private static final String GITHUB_COM = "github.com"; //$NON-NLS-1$
 	private static final String GITHUB_JS = "templates/github.js"; //$NON-NLS-1$
 	private String fgGithubJS;
 
@@ -105,27 +102,11 @@ public class GithubNetworkHandler extends AbstractGitHandler
 		{
 			return null;
 		}
-		// Check the remote urls for github and use that to determine URL we need!
-		Set<String> remoteURLs = repo.remoteURLs();
-		for (String remoteURL : remoteURLs)
+
+		Set<String> urls = repo.getGithubURLs();
+		if (!urls.isEmpty())
 		{
-			if (!remoteURL.contains(GITHUB_COM))
-			{
-				continue;
-			}
-			String remaining = remoteURL.substring(remoteURL.indexOf(GITHUB_COM) + 10);
-			if (remaining.startsWith("/") || remaining.startsWith(":")) //$NON-NLS-1$ //$NON-NLS-2$
-			{
-				remaining = remaining.substring(1);
-			}
-			if (remaining.endsWith(GitRepository.GIT_DIR))
-			{
-				remaining = remaining.substring(0, remaining.length() - 4);
-			}
-			int split = remaining.indexOf("/"); //$NON-NLS-1$
-			String userName = remaining.substring(0, split);
-			String repoName = remaining.substring(split + 1);
-			return MessageFormat.format("http://github.com/{0}/{1}/network", userName, repoName); //$NON-NLS-1$
+			return urls.iterator().next() + "/network"; //$NON-NLS-1$
 		}
 		return null;
 	}
