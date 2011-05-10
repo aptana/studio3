@@ -22,6 +22,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IViewActionDelegate;
@@ -112,12 +113,13 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 				{
 					ChooseSiteConnectionDialog dialog = new ChooseSiteConnectionDialog(getShell(), sites);
 					dialog.setShowRememberMyDecision(true);
-					dialog.open();
-
-					fSite = dialog.getSelectedSite();
-					if (fSite != null)
+					if (dialog.open() == Window.OK)
 					{
-						setRememberMyDecision(fSite, dialog.isRememberMyDecision());
+						fSite = dialog.getSelectedSite();
+						if (fSite != null)
+						{
+							setRememberMyDecision(fSite, dialog.isRememberMyDecision());
+						}
 					}
 				}
 			}
