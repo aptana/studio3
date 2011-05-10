@@ -97,7 +97,12 @@ public class ShowTerminalHandler extends AbstractHandler
 
 	protected boolean openBasedOnActiveEditorInput(ExecutionEvent event)
 	{
-		IEditorInput input = HandlerUtil.getActiveEditorInput(event);
+		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
+		if (editorPart == null)
+		{
+			return false;
+		}
+		IEditorInput input = editorPart.getEditorInput();
 		if (input instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileInput = (IFileEditorInput) input;
