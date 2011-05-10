@@ -47,8 +47,7 @@ public class FTPDeployProvider implements IDeployProvider
 
 	public boolean handles(IContainer selectedContainer)
 	{
-		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedContainer, true);
+		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(selectedContainer, false);
 		return siteConnections.length > 0;
 	}
-
 }
