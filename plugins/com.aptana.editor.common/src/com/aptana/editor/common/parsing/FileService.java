@@ -154,7 +154,7 @@ public class FileService
 
 	public void validate()
 	{
-		if (contentType != null)
+		if (contentType != null && fDocument != null)
 		{
 			fValidationManager.validate(fDocument.get(), contentType);
 		}
