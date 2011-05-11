@@ -196,7 +196,7 @@ public class ValidationManager implements IValidationManager
 						items.add(item);
 					}
 				}
-				catch (BadLocationException e)
+				catch (Exception e)
 				{
 				}
 			}

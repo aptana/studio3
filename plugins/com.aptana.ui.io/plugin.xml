@@ -692,6 +692,27 @@
             </objectState>
          </visibility>
       </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ui.io.filesystemObjectContribution"
+            objectClass="com.aptana.ide.ui.io.navigator.FileSystemObject">
+         <menu
+               id="compareWithMenu"
+               label="%menu.compare.label"
+               path="additions">
+            <separator
+                  name="compareWithGroup">
+            </separator>
+         </menu>
+         <action
+               class="com.aptana.ui.io.actions.CompareAction"
+               enablesFor="2"
+               id="com.aptana.ui.io.actions.compareWithEachOther"
+               label="%action.compare.eachother.label"
+               menubarPath="compareWithMenu/compareWithGroup"
+               tooltip="%action.compare.eachother.tooltip">
+         </action>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

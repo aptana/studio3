@@ -261,7 +261,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 	}
 	
 	private static FileSystemObject[] fetchFileSystemChildren(IFileStore parent, IProgressMonitor monitor) throws CoreException {
-		IFileInfo[] fileInfos = parent.childInfos(EFS.NONE, monitor);
+		IFileInfo[] fileInfos = FileSystemUtils.childInfos(parent, EFS.NONE, monitor);
 		List<FileSystemObject> list = new ArrayList<FileSystemObject>();
 		for (IFileInfo fi : fileInfos) {
 			list.add(new FileSystemObject(parent.getChild(fi.getName()), fi));

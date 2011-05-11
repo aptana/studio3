@@ -8,6 +8,10 @@
 
 package com.aptana.core.util;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -16,12 +20,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public class ProgressMonitorInterrupter {
 
+	public interface InterruptDelegate {
+		public void interrupt();
+	}
+
 	private static final int CHECK_INTERVAL = 1000; /* 1s */
-	
+
 	private final IProgressMonitor monitor;
 	private final Thread thread;
 	private final MonitorThread monitorThread;
-	
+
+	private static Map<Thread, InterruptDelegate> delegates = Collections.synchronizedMap(new WeakHashMap<Thread, ProgressMonitorInterrupter.InterruptDelegate>());
+
 	/**
 	 * 
 	 */
@@ -31,11 +41,32 @@ public class ProgressMonitorInterrupter {
 		monitorThread = new MonitorThread();
 		monitorThread.start();
 	}
-	
+
 	public void dispose() {
 		monitorThread.interrupt();
 	}
-		
+
+	/**
+	 * Sets interrupt delegate for the current thread
+	 * @param delegate
+	 */
+	public static void setCurrentThreadInterruptDelegate(InterruptDelegate delegate) {
+		if (delegate != null) {
+			delegates.put(Thread.currentThread(), delegate);
+		} else {
+			delegates.remove(Thread.currentThread());
+		}
+	}
+
+	private static void interruptThread(Thread thread) {
+		InterruptDelegate delegate = delegates.get(thread);
+		if (delegate != null) {
+			delegate.interrupt();
+		} else {
+			thread.interrupt();
+		}
+	}
+
 	private class MonitorThread extends Thread {
 
 		public MonitorThread() {
@@ -48,7 +79,7 @@ public class ProgressMonitorInterrupter {
 			try {
 				while (!interrupted()) {
 					if (monitor.isCanceled()) {
-						thread.interrupt();
+						interruptThread(thread);
 						break;
 					}
 					sleep(CHECK_INTERVAL);
@@ -57,7 +88,5 @@ public class ProgressMonitorInterrupter {
 				Thread.currentThread().interrupt();
 			}
 		}
-		
 	}
-
 }

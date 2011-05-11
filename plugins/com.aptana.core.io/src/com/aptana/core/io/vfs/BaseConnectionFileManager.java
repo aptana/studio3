@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.ExpiringMap;
+import com.aptana.core.util.ProgressMonitorInterrupter;
+import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.PermissionDeniedException;
@@ -53,6 +55,12 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 
 	private Map<IPath, ExtendedFileInfo> fileInfoCache;
 	private Map<IPath, ExtendedFileInfo[]> fileInfosCache;
+	
+	private final InterruptDelegate interruptDelegate = new InterruptDelegate() {
+		public void interrupt() {
+			interruptOperation();
+		}
+	};
 
 	protected final void promptPassword(String title, String message) {
 		password = CoreIOPlugin.getAuthenticationManager().promptPassword(
@@ -91,6 +99,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_gethering_details, path.toPortableString()), 2);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
 			ExtendedFileInfo fileInfo = getCachedFileInfo(path);
 			if (fileInfo == null) {
 				testOrConnect(monitor);
@@ -99,6 +108,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 			return (IExtendedFileInfo) fileInfo.clone();
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -110,6 +120,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_listing_directory, path.toPortableString()), 2);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
 			ExtendedFileInfo[] fileInfos = getCachedFileInfos(path);
 			if (fileInfos != null) {
 				List<String> list = new ArrayList<String>();
@@ -126,6 +137,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			setLastOperationTime();
 			return new String[0];
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -138,6 +150,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_gethering_details, path.toPortableString()), 2);
 		options = (options & IExtendedFileStore.DETAILED);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
 			ExtendedFileInfo[] fileInfos = getCachedFileInfos(path);
 			if (fileInfos == null) {
 				testOrConnect(monitor);
@@ -159,6 +172,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 			return fileInfos.clone();
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -169,8 +183,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	public final synchronized InputStream openInputStream(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_opening_file, path.toPortableString()), 3);
-		testOrConnect(monitor);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
+			testOrConnect(monitor);
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
 			setLastOperationTime();
 			if (!fileInfo.exists()) {
@@ -184,12 +199,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			if (fileInfo.getLength() == 0) {
 				return new ByteArrayInputStream(new byte[0]);
 			}
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			return readFile(basePath.append(path), Policy.subMonitorFor(monitor, 1));			
 		} catch (FileNotFoundException e) {
 			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -200,8 +217,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	public final synchronized OutputStream openOutputStream(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_opening_file, path.toPortableString()), 3);
-		testOrConnect(monitor);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
+			testOrConnect(monitor);
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
 			setLastOperationTime();
 			if (fileInfo.exists() && fileInfo.isDirectory()) {
@@ -225,6 +243,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e.getCause())));
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -236,8 +255,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		monitor = Policy.monitorFor(monitor);
 		monitor = new InfiniteProgressMonitor(monitor);
 		monitor.beginTask(Messages.BaseConnectionFileManager_deleting, 20);
-		testOrConnect(monitor);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
+			testOrConnect(monitor);
 			ExtendedFileInfo fileInfo = getCachedFileInfo(path);
 			if (fileInfo == null) {
 				fileInfo = fetchAndCacheFileInfo(path, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
@@ -259,6 +279,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				clearCache(path);
 			}
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -269,8 +290,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	public final synchronized void mkdir(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_creating_folder, path.toPortableString()), 3);
-		testOrConnect(monitor);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
+			testOrConnect(monitor);
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 			setLastOperationTime();
 			if (fileInfo.exists()) {
@@ -309,6 +331,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e).getCause()));
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -319,8 +342,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	public final synchronized void putInfo(IPath path, IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_putting_changes, path.toPortableString()), 5);
-		testOrConnect(monitor);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
+			testOrConnect(monitor);
 			if ((options & EFS.SET_LAST_MODIFIED) != 0) {
 				setModificationTime(basePath.append(path), info.getLastModified(), Policy.subMonitorFor(monitor, 1));
 				setLastOperationTime();
@@ -358,6 +382,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			clearCache(path);
 			monitor.done();
 		}
@@ -369,8 +394,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	public final synchronized void move(IPath sourcePath, IPath destinationPath, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_moving, sourcePath.toPortableString()), 5);
-		testOrConnect(monitor);
 		try {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(interruptDelegate);
+			testOrConnect(monitor);
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(sourcePath, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 			setLastOperationTime();
 			if (!fileInfo.exists()) {
@@ -411,6 +437,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(sourcePath, e.getCause())));
 		} finally {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
 		}
 	}
@@ -616,6 +643,10 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		}
 	}
 	
+	protected void interruptOperation() {
+		Thread.currentThread().interrupt();
+	}
+
 	protected void setLastOperationTime() {
 	}
 
