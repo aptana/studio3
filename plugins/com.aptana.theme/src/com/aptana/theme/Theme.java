@@ -733,7 +733,14 @@ public class Theme
 	public void updateRule(int index, ThemeRule newRule)
 	{
 		coloringRules.remove(index);
-		coloringRules.add(index, newRule);
+		if (index >= coloringRules.size())
+		{
+			coloringRules.add(newRule);
+		}
+		else
+		{
+			coloringRules.add(index, newRule);
+		}
 		wipeCache();
 		save();
 	}
