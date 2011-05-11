@@ -5,13 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.syncing.ui.old.editors;
+package com.aptana.ui.io.compare;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.CompareEditorInput;
@@ -23,8 +20,7 @@ import org.eclipse.compare.structuremergeviewer.DiffTreeViewer;
 import org.eclipse.compare.structuremergeviewer.Differencer;
 import org.eclipse.compare.structuremergeviewer.IDiffContainer;
 import org.eclipse.compare.structuremergeviewer.IDiffElement;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -36,52 +32,42 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @author Kevin Sawicki (ksawicki@aptana.com)
+ * @author Michael Xia (mxia@appcelerator.com)
  */
 @SuppressWarnings("restriction")
-public class FileCompareEditorInput extends CompareEditorInput
+public class FileStoreCompareEditorInput extends CompareEditorInput
 {
 
 	private Object fRoot;
-	private FileNode fLeft;
-	private FileNode fRight;
-	private File fLeftResource;
-	private File fRightResource;
+	private FileStoreNode fLeft;
+	private FileStoreNode fRight;
+	private IFileStore fLeftFileStore;
+	private IFileStore fRightFileStore;
 	private DiffTreeViewer fDiffViewer;
 	private IAction fOpenAction;
 
 	class MyDiffNode extends DiffNode
 	{
-
 		private boolean fDirty = false;
 		private ITypedElement fLastId;
 		private String fLastName;
 
-		/**
-		 * MyDiffNode constructor
-		 * 
-		 * @param parent
-		 * @param description
-		 * @param ancestor
-		 * @param left
-		 * @param right
-		 */
 		public MyDiffNode(IDiffContainer parent, int description, ITypedElement ancestor, ITypedElement left,
 				ITypedElement right)
 		{
 			super(parent, description, ancestor, left, right);
 		}
 
-		/**
-		 * @see org.eclipse.compare.structuremergeviewer.DiffNode#fireChange()
-		 */
+		@Override
 		public void fireChange()
 		{
 			super.fireChange();
 			setDirty(true);
 			fDirty = true;
 			if (fDiffViewer != null)
+			{
 				fDiffViewer.refresh(this);
+			}
 		}
 
 		void clearDirty()
@@ -89,51 +75,52 @@ public class FileCompareEditorInput extends CompareEditorInput
 			fDirty = false;
 		}
 
-		/**
-		 * @see org.eclipse.compare.structuremergeviewer.DiffNode#getName()
-		 */
+		@Override
 		public String getName()
 		{
 			if (fLastName == null)
+			{
 				fLastName = super.getName();
+			}
 			if (fDirty)
-				return '<' + fLastName + '>';
+			{
+				return MessageFormat.format("<{0}>", fLastName); //$NON-NLS-1$
+			}
 			return fLastName;
 		}
 
-		/**
-		 * @see org.eclipse.compare.structuremergeviewer.DiffNode#getId()
-		 */
+		@Override
 		public ITypedElement getId()
 		{
 			ITypedElement id = super.getId();
 			if (id == null)
+			{
 				return fLastId;
+			}
 			fLastId = id;
 			return id;
 		}
 	}
 
 	/**
-	 * Creates an compare editor input for the given selection.
+	 * Creates an compare editor input for the given file store selection.
 	 * 
 	 * @param config
 	 */
-	public FileCompareEditorInput(CompareConfiguration config)
+	public FileStoreCompareEditorInput(CompareConfiguration config)
 	{
 		super(config);
 	}
 
-	/**
-	 * @see org.eclipse.compare.CompareEditorInput#createDiffViewer(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public Viewer createDiffViewer(Composite parent)
 	{
 		fDiffViewer = new DiffTreeViewer(parent, getCompareConfiguration())
 		{
+
+			@Override
 			protected void fillContextMenu(IMenuManager manager)
 			{
-
 				if (fOpenAction == null)
 				{
 					fOpenAction = new Action()
@@ -156,16 +143,19 @@ public class FileCompareEditorInput extends CompareEditorInput
 						Object element = ss.getFirstElement();
 						if (element instanceof MyDiffNode)
 						{
-							ITypedElement te = ((MyDiffNode) element).getId();
-							if (te != null)
-								enable = !ITypedElement.FOLDER_TYPE.equals(te.getType());
+							ITypedElement typedElement = ((MyDiffNode) element).getId();
+							if (typedElement != null)
+							{
+								enable = !ITypedElement.FOLDER_TYPE.equals(typedElement.getType());
+							}
 						}
 						else
+						{
 							enable = true;
+						}
 					}
 				}
 				fOpenAction.setEnabled(enable);
-
 				manager.add(fOpenAction);
 
 				super.fillContextMenu(manager);
@@ -175,31 +165,31 @@ public class FileCompareEditorInput extends CompareEditorInput
 	}
 
 	/**
-	 * Sets the left resource
+	 * Sets the left file store.
 	 * 
-	 * @param resource
+	 * @param fileStore
 	 */
-	public void setLeftResource(File resource)
+	public void setLeftFileStore(IFileStore fileStore)
 	{
-		this.fLeftResource = resource;
-		this.fLeft = new FileNode(this.fLeftResource);
+		fLeftFileStore = fileStore;
+		fLeft = new FileStoreNode(fLeftFileStore);
 	}
 
 	/**
-	 * Sets the right resource
+	 * Sets the right file store.
 	 * 
 	 * @param resource
 	 */
-	public void setRightResource(File resource)
+	public void setRightFileStore(IFileStore fileStore)
 	{
-		this.fRightResource = resource;
-		this.fRight = new FileNode(this.fRightResource);
+		fRightFileStore = fileStore;
+		fRight = new FileStoreNode(fRightFileStore);
 	}
 
 	/**
 	 * Initializes the images in the compare configuration.
 	 */
-	void initializeCompareConfiguration()
+	public void initializeCompareConfiguration()
 	{
 		CompareConfiguration cc = getCompareConfiguration();
 		if (fLeft != null)
@@ -215,28 +205,23 @@ public class FileCompareEditorInput extends CompareEditorInput
 	}
 
 	/**
-	 * Method for any file prep-work before running the differencer
+	 * Method for any file prep-work before running the differecer. Does nothing by default; subclasses should override
 	 */
 	protected void prepareFiles()
 	{
-		// Does nothing by default, subclasses should override
 	}
 
-	/**
-	 * @see org.eclipse.compare.CompareEditorInput#prepareInput(org.eclipse.core.runtime.IProgressMonitor)
-	 */
+	@Override
 	public Object prepareInput(IProgressMonitor pm) throws InvocationTargetException
 	{
-
 		try
 		{
-
 			pm.beginTask(Utilities.getString("ResourceCompare.taskName"), IProgressMonitor.UNKNOWN); //$NON-NLS-1$
 
 			prepareFiles();
 
-			String leftLabel = fLeftResource.getName();
-			String rightLabel = fRightResource.getName();
+			String leftLabel = fLeftFileStore.getName();
+			String rightLabel = fRightFileStore.getName();
 
 			String format = Utilities.getString("ResourceCompare.twoWay.title"); //$NON-NLS-1$
 			String title = MessageFormat.format(format, new Object[] { leftLabel, rightLabel });
@@ -244,6 +229,8 @@ public class FileCompareEditorInput extends CompareEditorInput
 
 			Differencer d = new Differencer()
 			{
+
+				@Override
 				protected Object visit(Object parent, int description, Object ancestor, Object left, Object right)
 				{
 					return new MyDiffNode((IDiffContainer) parent, description, (ITypedElement) ancestor,
@@ -261,26 +248,21 @@ public class FileCompareEditorInput extends CompareEditorInput
 		}
 	}
 
-	/**
-	 * @see org.eclipse.compare.CompareEditorInput#getToolTipText()
-	 */
+	@Override
 	public String getToolTipText()
 	{
-		if (fLeftResource != null && fRightResource != null)
+		if (fLeftFileStore != null && fRightFileStore != null)
 		{
-			String leftLabel = fLeftResource.getAbsolutePath();
-			String rightLabel = fRightResource.getAbsolutePath();
+			String leftLabel = fLeftFileStore.toString();
+			String rightLabel = fRightFileStore.toString();
 
 			String format = Utilities.getString("ResourceCompare.twoWay.tooltip"); //$NON-NLS-1$
 			return MessageFormat.format(format, new Object[] { leftLabel, rightLabel });
 		}
-		// fall back
 		return super.getToolTipText();
 	}
 
-	/**
-	 * @see org.eclipse.compare.CompareEditorInput#saveChanges(org.eclipse.core.runtime.IProgressMonitor)
-	 */
+	@Override
 	public void saveChanges(IProgressMonitor pm) throws CoreException
 	{
 		super.saveChanges(pm);
@@ -293,7 +275,9 @@ public class FileCompareEditorInput extends CompareEditorInput
 			finally
 			{
 				if (fDiffViewer != null)
+				{
 					fDiffViewer.refresh();
+				}
 				setDirty(false);
 			}
 		}
@@ -304,83 +288,31 @@ public class FileCompareEditorInput extends CompareEditorInput
 	 */
 	private static void commit(IProgressMonitor pm, DiffNode node) throws CoreException
 	{
-
 		if (node instanceof MyDiffNode)
+		{
 			((MyDiffNode) node).clearDirty();
+		}
 
 		ITypedElement left = node.getLeft();
 		if (left instanceof BufferedResourceNode)
+		{
 			((BufferedResourceNode) left).commit(pm);
+		}
 
 		ITypedElement right = node.getRight();
 		if (right instanceof BufferedResourceNode)
+		{
 			((BufferedResourceNode) right).commit(pm);
+		}
 
 		IDiffElement[] children = node.getChildren();
 		if (children != null)
 		{
-			for (int i = 0; i < children.length; i++)
+			for (IDiffElement element : children)
 			{
-				IDiffElement element = children[i];
 				if (element instanceof DiffNode)
+				{
 					commit(pm, (DiffNode) element);
-			}
-		}
-	}
-
-	/**
-	 * @see org.eclipse.compare.CompareEditorInput#getAdapter(java.lang.Class)
-	 */
-	@SuppressWarnings("rawtypes")
-	public Object getAdapter(Class adapter)
-	{
-		if (IFile[].class.equals(adapter))
-		{
-			HashSet<IResource> collector = new HashSet<IResource>();
-			collectDirtyResources(fRoot, collector);
-			return collector.toArray(new IFile[collector.size()]);
-		}
-		return super.getAdapter(adapter);
-	}
-
-	private void collectDirtyResources(Object o, Set<IResource> collector)
-	{
-		if (o instanceof DiffNode)
-		{
-			DiffNode node = (DiffNode) o;
-
-			ITypedElement left = node.getLeft();
-			if (left instanceof BufferedResourceNode)
-			{
-				BufferedResourceNode bn = (BufferedResourceNode) left;
-				if (bn.isDirty())
-				{
-					IResource resource = bn.getResource();
-					if (resource instanceof IFile)
-						collector.add(resource);
-				}
-			}
-
-			ITypedElement right = node.getRight();
-			if (right instanceof BufferedResourceNode)
-			{
-				BufferedResourceNode bn = (BufferedResourceNode) right;
-				if (bn.isDirty())
-				{
-					IResource resource = bn.getResource();
-					if (resource instanceof IFile)
-						collector.add(resource);
-				}
-			}
-
-			IDiffElement[] children = node.getChildren();
-			if (children != null)
-			{
-				for (int i = 0; i < children.length; i++)
-				{
-					IDiffElement element = children[i];
-					if (element instanceof DiffNode)
-						collectDirtyResources(element, collector);
 				}
 			}
 		}
