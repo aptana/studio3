@@ -12,7 +12,6 @@ import java.net.URI;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -215,7 +214,7 @@ public final class UIUtils
 	{
 		if (Display.getCurrent() == null || exception != null)
 		{
-			UIJob job = new UIJob(title)
+			UIJob job = new UIJob(message)
 			{
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor)
@@ -225,7 +224,7 @@ public final class UIUtils
 						showErrorDialog(title, message);
 						return Status.OK_STATUS;
 					}
-					return new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, message, exception);
+					return new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, null, exception);
 				}
 			};
 			job.setPriority(Job.INTERACTIVE);

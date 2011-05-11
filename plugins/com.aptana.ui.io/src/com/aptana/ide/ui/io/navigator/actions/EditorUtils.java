@@ -25,7 +25,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.core.CoreStrings;
 import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
@@ -52,49 +51,44 @@ public class EditorUtils
 
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				final IEditorInput editorInput = UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore,
-						monitor);
-
-				if (editorInput == null)
-				{
-					UIUtils.showErrorMessage(CoreStrings.ERROR,
-							MessageFormat.format(Messages.EditorUtils_ERR_OpeningEditor, fileStore.toString()));
+				IEditorInput editorInput;
+				try {
+					editorInput = UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, monitor);
+				} catch (CoreException e) {
+					UIUtils.showErrorMessage(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString()), e);
+					return Status.CANCEL_STATUS;
 				}
-				else
-				{
-					UIJob openEditor = new UIJob("Opening editor") { //$NON-NLS-1$
+				final IEditorInput finalEditorInput = editorInput;
 
-						public IStatus runInUIThread(IProgressMonitor monitor)
+				UIJob openEditor = new UIJob(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString())) {
+
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
+						try
 						{
-							try
+							IWorkbenchPage page = UIUtils.getActivePage();
+							IEditorPart editorPart = null;
+							if (page != null)
 							{
-								IWorkbenchPage page = UIUtils.getActivePage();
-								IEditorPart editorPart = null;
-								if (page != null)
-								{
-									boolean opened = (page.findEditor(editorInput) != null);
+								boolean opened = (page.findEditor(finalEditorInput) != null);
 
-									editorPart = page.openEditor(editorInput,
-											IDE.getEditorDescriptor(editorInput.getName()).getId());
-									if (!opened && editorPart != null)
-									{
-										attachSaveListener(editorPart);
-									}
+								editorPart = page.openEditor(finalEditorInput,
+										IDE.getEditorDescriptor(finalEditorInput.getName()).getId());
+								if (!opened && editorPart != null)
+								{
+									attachSaveListener(editorPart);
 								}
 							}
-							catch (Exception e)
-							{
-								UIUtils.showErrorMessage(
-										MessageFormat.format(Messages.EditorUtils_ERR_OpeningEditor,
-												fileStore.toString()), e);
-							}
-							return Status.OK_STATUS;
 						}
-					};
-					openEditor.setSystem(true);
-					openEditor.schedule();
-				}
-
+						catch (Exception e)
+						{
+							return new Status(IStatus.ERROR, IOUIPlugin.PLUGIN_ID, null, e);
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				openEditor.setSystem(true);
+				openEditor.schedule();
 				return Status.OK_STATUS;
 			}
 		};

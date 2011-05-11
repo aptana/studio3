@@ -25,7 +25,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.core.io.efs.SyncUtils;
-import com.aptana.ide.ui.io.IOUIPlugin;
 
 public class UniformFileStoreEditorInputFactory implements IElementFactory
 {
@@ -60,22 +59,14 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 		return null;
 	}
 
-	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor)
+	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor) throws CoreException
 	{
 		if (fileStore.getFileSystem() == EFS.getLocalFileSystem()) {
 			return new FileStoreEditorInput(fileStore);
 		}
-		try
-		{
-			IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
-			IFileStore localFileStore = toLocalFileStore(fileStore, remoteFileInfo, monitor);
-			return new UniformFileStoreEditorInput(localFileStore, fileStore, remoteFileInfo);
-		}
-		catch (CoreException e)
-		{
-			IOUIPlugin.logError(e);
-		}
-		return null;
+		IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
+		IFileStore localFileStore = toLocalFileStore(fileStore, remoteFileInfo, monitor);
+		return new UniformFileStoreEditorInput(localFileStore, fileStore, remoteFileInfo);
 	}
 
 	static void saveState(IMemento memento, UniformFileStoreEditorInput input)

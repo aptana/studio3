@@ -9,6 +9,7 @@ package com.aptana.ide.ui.io.navigator;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -17,6 +18,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.navigator.ILinkHelper;
 
+import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
 
 public class FilesystemLinkHelper implements ILinkHelper
@@ -44,10 +46,11 @@ public class FilesystemLinkHelper implements ILinkHelper
 		{
 			FileSystemObject file = (FileSystemObject) element;
 			IFileStore fileStore = file.getFileStore();
-			IEditorPart editorPart = aPage.findEditor(UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, new NullProgressMonitor()));
-			if (editorPart != null)
-			{
+			try {
+				IEditorPart editorPart = aPage.findEditor(UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, new NullProgressMonitor()));
 				aPage.bringToTop(editorPart);
+			} catch (CoreException e) {
+				IOUIPlugin.logError(e);
 			}
 		}
 	}
