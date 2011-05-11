@@ -450,10 +450,6 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 * @see com.aptana.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public synchronized void disconnect(IProgressMonitor monitor) throws CoreException {
-		try {
-			checkConnected();
-		} catch (Exception ignore) {
-		}
 		if (!isConnected()) {
 			return;
 		}
@@ -544,6 +540,20 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				ftpFileCache.remove(p);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#interruptOperation()
+	 */
+	@Override
+	protected void interruptOperation() {
+		try {
+			if (ftpClient.connected()) {
+				ftpClient.quitImmediately();
+			}
+		} catch (Exception ignore) {
+		}
+		super.interruptOperation();
 	}
 
 	/* (non-Javadoc)

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.PermissionDeniedException;
 
@@ -74,9 +75,7 @@ public final class SyncUtils {
 				int totalWork = (length == -1) ? IProgressMonitor.UNKNOWN : 1 + (int) (length / buffer.length);
 				InputStream in = null;
 				OutputStream out = null;
-				// TODO: max - the interrupter does work for SFTP but FTP socket read ignores Thread interrupted state.
-				// Probably need a cancellation API in edtFTPj library
-				//ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(monitor);
+				ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(monitor);
 				try {
 					in = source.openInputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					out = destination.openOutputStream(EFS.NONE, subMonitorFor(monitor, 0));
@@ -106,7 +105,7 @@ public final class SyncUtils {
 					}
 					subMonitor.done();
 				} finally {
-					//interrupter.dispose();
+					interrupter.dispose();
 					safeClose(in);
 					safeClose(out);
 				}
