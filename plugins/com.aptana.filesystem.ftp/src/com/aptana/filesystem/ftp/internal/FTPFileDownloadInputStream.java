@@ -11,6 +11,8 @@ package com.aptana.filesystem.ftp.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.aptana.core.util.ProgressMonitorInterrupter;
+import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FileTransferInputStream;
 
@@ -28,22 +30,29 @@ public class FTPFileDownloadInputStream extends InputStream {
 	 * @param pool 
 	 * 
 	 */
-	public FTPFileDownloadInputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferInputStream ftpInputStream) {
-		this.ftpClient = ftpClient;
+	public FTPFileDownloadInputStream(FTPClientPool pool, FTPClientInterface _ftpClient, FileTransferInputStream ftpInputStream) {
+		this.ftpClient = _ftpClient;
 		this.pool = pool;
 		this.ftpInputStream = ftpInputStream;
+		ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(new InterruptDelegate() {
+			public void interrupt() {
+				try {
+					if (ftpClient.connected()) {
+						ftpClient.quitImmediately();
+					}
+				} catch (Exception ignore) {
+				}
+			}
+		});
 	}
 	
 	private void safeQuit() {
-		try
-		{
+		try {
 			ftpInputStream.close();
-		}
-		catch (IOException e)
-		{
-			// ignore
+		} catch (IOException ignore) {
 		}
 		pool.checkIn(ftpClient);
+		ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 	}
 
 	/* (non-Javadoc)

@@ -202,11 +202,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			return readFile(basePath.append(path), Policy.subMonitorFor(monitor, 1));			
 		} catch (FileNotFoundException e) {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
-		} finally {
+		} catch (CoreException e) {
 			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
+			throw e;
+		} finally {
 			monitor.done();
 		}
 	}
@@ -237,13 +240,17 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			    permissions = PreferenceUtils.getFilePermissions();
 			}
 			clearCache(path);
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			return writeFile(basePath.append(path), useTemporary, permissions, Policy.subMonitorFor(monitor, 1));
 		} catch (FileNotFoundException e) {
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e.getCause())));
-		} finally {
+		} catch (CoreException e) {
 			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
+			throw e;
+		} finally {
 			monitor.done();
 		}
 	}

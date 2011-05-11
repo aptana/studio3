@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import com.aptana.core.util.ProgressMonitorInterrupter;
+import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPException;
@@ -36,17 +38,27 @@ public class FTPFileUploadOutputStream extends OutputStream {
 	 * @param pool 
 	 * 
 	 */
-	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions, Runnable completeRunnable) {
-		this.ftpClient = ftpClient;
+	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface _ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions, Runnable completeRunnable) {
+		this.ftpClient = _ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
 		this.modificationTime = modificationTime;
 		this.permissions = permissions;
 		this.pool = pool;
 		this.completeRunnable = completeRunnable;
+		ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(new InterruptDelegate() {
+			public void interrupt() {
+				try {
+					if (ftpClient.connected()) {
+						ftpClient.quitImmediately();
+					}
+				} catch (Exception ignore) {
+				}
+			}
+		});
 	}
 
-	private void safeQuit(boolean failed) {		
+	private void safeQuit(boolean failed) {
 		try {
 			if (ftpClient.connected()) {
 				if (failed && filename != null) {
@@ -64,6 +76,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 				completeRunnable.run();
 				completeRunnable = null;
 			}
+			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 		}
 	}
 
