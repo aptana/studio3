@@ -15,7 +15,6 @@ public class Messages extends NLS {
 
     public static String EditorUtils_OpeningEditor;
     public static String EditorUtils_ERR_SavingRemoteFile;
-    public static String EditorUtils_MSG_OpeningRemoteFile;
     public static String EditorUtils_MSG_RemotelySaving;
     public static String EditorUtils_OpenFileJob_Title;
 

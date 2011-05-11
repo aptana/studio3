@@ -48,7 +48,7 @@ public class EditorUtils
 	 */
 	public static void openFileInEditor(final IFileStore fileStore, final IEditorDescriptor editorDescriptor)
 	{
-		Job job = new Job(Messages.EditorUtils_MSG_OpeningRemoteFile + fileStore.getName())
+		Job job = new Job(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.getName()))
 		{
 
 			protected IStatus run(IProgressMonitor monitor)
