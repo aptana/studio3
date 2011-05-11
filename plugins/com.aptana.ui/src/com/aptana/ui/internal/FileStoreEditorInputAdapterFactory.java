@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common.internal;
+package com.aptana.ui.internal;
 
 import java.net.URI;
 
@@ -19,25 +19,32 @@ import com.aptana.core.resources.IUniformResource;
 
 /**
  * @author Max Stepanov
- * 
  */
 @SuppressWarnings("rawtypes")
-public class FileStoreEditorInputAdapterFactory implements IAdapterFactory {
+public class FileStoreEditorInputAdapterFactory implements IAdapterFactory
+{
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (IUniformResource.class == adapterType) {
-			if (adaptableObject instanceof FileStoreEditorInput) {
+	public Object getAdapter(Object adaptableObject, Class adapterType)
+	{
+		if (IUniformResource.class == adapterType)
+		{
+			if (adaptableObject instanceof FileStoreEditorInput)
+			{
 				return new FileStoreEditorInputUniformResource((FileStoreEditorInput) adaptableObject);
 			}
-		} else if (IFile.class == adapterType) {
-			if (adaptableObject instanceof FileStoreEditorInput) {
+		}
+		else if (IFile.class == adapterType)
+		{
+			if (adaptableObject instanceof FileStoreEditorInput)
+			{
 				URI uri = ((FileStoreEditorInput) adaptableObject).getURI();
 				IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(uri);
-				if (files.length == 1) {
+				if (files.length == 1)
+				{
 					return files[0];
 				}
 			}
@@ -49,7 +56,8 @@ public class FileStoreEditorInputAdapterFactory implements IAdapterFactory {
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
-	public Class[] getAdapterList() {
+	public Class[] getAdapterList()
+	{
 		return new Class[] { IFile.class, IUniformResource.class };
 	}
 

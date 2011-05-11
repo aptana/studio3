@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common.internal;
+package com.aptana.ui.internal;
 
 import java.net.URI;
 
@@ -16,13 +16,14 @@ import com.aptana.core.resources.AbstractUniformResource;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ final class FileStoreEditorInputUniformResource extends AbstractUniformResource {
+/* package */final class FileStoreEditorInputUniformResource extends AbstractUniformResource
+{
 
 	private final FileStoreEditorInput editorInput;
-	
-	public FileStoreEditorInputUniformResource(FileStoreEditorInput editorInput) {
+
+	public FileStoreEditorInputUniformResource(FileStoreEditorInput editorInput)
+	{
 		super();
 		this.editorInput = editorInput;
 	}
@@ -31,7 +32,8 @@ import com.aptana.core.resources.AbstractUniformResource;
 	 * (non-Javadoc)
 	 * @see com.aptana.core.resources.IUniformResource#getURI()
 	 */
-	public URI getURI() {
+	public URI getURI()
+	{
 		return editorInput.getURI();
 	}
 
@@ -41,9 +43,11 @@ import com.aptana.core.resources.AbstractUniformResource;
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
-	public Object getAdapter(Class adapter) {
+	public Object getAdapter(Class adapter)
+	{
 		Object object = super.getAdapter(adapter);
-		if (object == null) {
+		if (object == null)
+		{
 			object = editorInput.getAdapter(adapter);
 		}
 		return object;
