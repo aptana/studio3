@@ -389,6 +389,9 @@
          <adapter
                type="org.eclipse.ui.IActionFilter">
          </adapter>
+         <adapter
+               type="org.eclipse.core.filesystem.IFileStore">
+         </adapter>
       </factory>
       <factory
             adaptableType="com.aptana.ide.core.io.auth.AuthenticationManager"
@@ -692,27 +695,6 @@
             </objectState>
          </visibility>
       </objectContribution>
-      <objectContribution
-            adaptable="false"
-            id="com.aptana.ui.io.filesystemObjectContribution"
-            objectClass="com.aptana.ide.ui.io.navigator.FileSystemObject">
-         <menu
-               id="compareWithMenu"
-               label="%menu.compare.label"
-               path="additions">
-            <separator
-                  name="compareWithGroup">
-            </separator>
-         </menu>
-         <action
-               class="com.aptana.ui.io.actions.CompareAction"
-               enablesFor="2"
-               id="com.aptana.ui.io.actions.compareWithEachOther"
-               label="%action.compare.eachother.label"
-               menubarPath="compareWithMenu/compareWithGroup"
-               tooltip="%action.compare.eachother.tooltip">
-         </action>
-      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -759,6 +741,15 @@
       </factory>
    </extension>
    <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.ui.io.compare.CompareWithEachOtherHandler"
+            description="%action.compare.eachother.tooltip"
+            id="com.aptana.ui.io.commands.compareWithEachOther"
+            name="%action.compare.eachother.label">
+      </command>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="toolbar:com.aptana.ui.io.remoteview?after=additions">
@@ -767,6 +758,30 @@
                icon="platform:/plugin/com.aptana.ui.ftp/icons/full/etool16/new_connection.png"
                style="push">
          </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <menu
+               label="%menu.compare.label">
+            <command
+                  commandId="com.aptana.ui.io.commands.compareWithEachOther"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="2">
+                     </count>
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.filesystem.IFileStore">
+                        </adapt>
+                     </iterate>
+                  </and>
+               </visibleWhen>
+            </command>
+         </menu>
       </menuContribution>
    </extension>
    <extension
