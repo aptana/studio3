@@ -7,12 +7,14 @@
  */
 package com.aptana.ide.ui.io.navigator.actions;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionConstants;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
@@ -20,6 +22,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
 import com.aptana.ui.io.epl.OpenWithMenu;
+import com.aptana.ui.io.epl.OpenWithMenu.Client;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -73,7 +76,14 @@ public class OpenActionProvider extends CommonActionProvider {
                 Messages.OpenActionProvider_LBL_OpenWith,
                 ICommonMenuConstants.GROUP_OPEN_WITH);
         submenu.add(new GroupMarker(ICommonMenuConstants.GROUP_TOP));
-        submenu.add(new OpenWithMenu(fSite.getPage(), (IAdaptable) element));
+		submenu.add(new OpenWithMenu(fSite.getPage(), (IAdaptable) element, new Client()
+		{
+
+			public void openEditor(IFileStore file, IEditorDescriptor editorDescriptor)
+			{
+				EditorUtils.openFileInEditor(file, editorDescriptor);
+			}
+		}));
         submenu.add(new GroupMarker(ICommonMenuConstants.GROUP_ADDITIONS));
 
         // adds the submenu

@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
@@ -40,11 +41,12 @@ public class EditorUtils
 	/**
 	 * Opens a remote file in its editor.
 	 * 
-	 * @param file
+	 * @param fileStore
 	 *            the file store of the remote file
-	 * @param editorDesc
+	 * @param editorDescriptor
+	 *            the editor descriptor to use, null if the default one for the file type is desired
 	 */
-	public static void openFileInEditor(final IFileStore fileStore)
+	public static void openFileInEditor(final IFileStore fileStore, final IEditorDescriptor editorDescriptor)
 	{
 		Job job = new Job(Messages.EditorUtils_MSG_OpeningRemoteFile + fileStore.getName())
 		{
@@ -72,8 +74,9 @@ public class EditorUtils
 							{
 								boolean opened = (page.findEditor(finalEditorInput) != null);
 
-								editorPart = page.openEditor(finalEditorInput,
-										IDE.getEditorDescriptor(finalEditorInput.getName()).getId());
+								String editorId = editorDescriptor == null ? IDE.getEditorDescriptor(
+										finalEditorInput.getName()).getId() : editorDescriptor.getId();
+								editorPart = page.openEditor(finalEditorInput, editorId);
 								if (!opened && editorPart != null)
 								{
 									attachSaveListener(editorPart);

@@ -110,7 +110,7 @@ public class NewFileAction extends BaseSelectionListenerAction {
                     }
 
                     // opens it in the editor
-                    EditorUtils.openFileInEditor(newFile);
+                    EditorUtils.openFileInEditor(newFile, null);
 
                     IOUIPlugin.refreshNavigatorView(element);
                 } catch (CoreException e) {

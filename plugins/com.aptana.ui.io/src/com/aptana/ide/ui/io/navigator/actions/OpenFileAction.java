@@ -31,7 +31,7 @@ public class OpenFileAction extends BaseSelectionListenerAction {
 
     public void run() {
         for (IFileStore fileStore : fFileStores) {
-            EditorUtils.openFileInEditor(fileStore);
+            EditorUtils.openFileInEditor(fileStore, null);
         }
     }
 

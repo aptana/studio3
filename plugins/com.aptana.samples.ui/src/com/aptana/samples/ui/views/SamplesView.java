@@ -300,7 +300,7 @@ public class SamplesView extends ViewPart
 					{
 						try
 						{
-							EditorUtils.openFileInEditor(EFS.getStore(file.toURI()));
+							EditorUtils.openFileInEditor(EFS.getStore(file.toURI()), null);
 						}
 						catch (CoreException e)
 						{
