@@ -700,7 +700,12 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void modifyText(ModifyEvent e)
 			{
 				// Update the scope selector for the current token!
-				TableItem item = table.getSelection()[0];
+				TableItem[] selection = table.getSelection();
+				if (selection == null || selection.length == 0)
+				{
+					return;
+				}
+				TableItem item = selection[0];
 				ThemeRule rule = (ThemeRule) item.getData();
 				int index = table.indexOf(item);
 				getTheme().updateRule(index, rule.setScopeSelector(new ScopeSelector(fScopeText.getText())));
