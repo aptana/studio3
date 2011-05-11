@@ -84,7 +84,7 @@ public class FileStoreCompareEditorInput extends CompareEditorInput
 			}
 			if (fDirty)
 			{
-				return '<' + fLastName + '>';
+				return MessageFormat.format("<{0}>", fLastName); //$NON-NLS-1$
 			}
 			return fLastName;
 		}

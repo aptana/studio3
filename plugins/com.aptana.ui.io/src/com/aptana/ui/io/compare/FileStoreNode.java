@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.FileUtil;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
@@ -44,7 +45,7 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 	@Override
 	protected InputStream createStream() throws CoreException
 	{
-		if (fileStore == null || fileStore.fetchInfo().isDirectory())
+		if (fileStore == null || Utils.isDirectory(fileStore))
 		{
 			return null;
 		}
@@ -83,6 +84,6 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 
 	public long getModificationDate()
 	{
-		return fileStore == null ? 0 : fileStore.fetchInfo().getLastModified();
+		return fileStore == null ? 0 : Utils.getDetailedFileInfo(fileStore).getLastModified();
 	}
 }

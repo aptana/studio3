@@ -7,13 +7,9 @@
  */
 package com.aptana.ide.syncing.ui.old.views;
 
-import java.io.File;
-
 import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.CompareUI;
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -50,7 +46,7 @@ import com.aptana.ide.syncing.core.old.SyncFolder;
 import com.aptana.ide.syncing.core.old.SyncState;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ide.syncing.ui.old.editors.FileCompareEditorInput;
+import com.aptana.ui.io.compare.FileStoreCompareEditorInput;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
@@ -432,37 +428,15 @@ public class SmartSyncViewer
 								|| file.getSyncState() == SyncState.ServerItemIsNewer)
 						{
 							final VirtualFileSyncPair pair = file.getPair();
-							File local = null;
-							try
-							{
-								local = pair.getSourceFile().toLocalFile(EFS.CACHE, null);
-							} catch (CoreException ex) {
-								ex.printStackTrace();
-							}
-							
-							FileCompareEditorInput input = new FileCompareEditorInput(new CompareConfiguration())
-							{
-
-								protected void prepareFiles()
-								{
-									File temp = null;
-									try
-									{
-										temp = pair.getDestinationFile().toLocalFile(EFS.CACHE, null);
-									} catch (CoreException e) {
-										e.printStackTrace();
-									}
-									setRightResource(temp);
-								}
-
-							};
-							input.setLeftResource(local);
+							FileStoreCompareEditorInput input = new FileStoreCompareEditorInput(new CompareConfiguration());
+							input.setLeftFileStore(pair.getSourceFile());
+							input.setRightFileStore(pair.getDestinationFile());
+							input.initializeCompareConfiguration();
 							CompareUI.openCompareDialog(input);
 						}
 					}
 				}
 			}
-
 		});
 		fShowDiffs.setImage(SyncingUIPlugin.getImage("icons/full/obj16/compare_view.gif")); //$NON-NLS-1$
 		fShowDiffs.setText(Messages.SmartSyncDialog_ShowDiffs);

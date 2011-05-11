@@ -11,7 +11,6 @@ import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.CompareUI;
 import org.eclipse.compare.internal.CompareEditor;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,6 +18,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.io.compare.FileStoreCompareEditorInput;
 
 @SuppressWarnings("restriction")
@@ -44,8 +44,8 @@ public class CompareAction implements IObjectActionDelegate
 		{
 			return;
 		}
-		IFileStore left = (IFileStore) ((IAdaptable) elements[0]).getAdapter(IFileStore.class);
-		IFileStore right = (IFileStore) ((IAdaptable) elements[1]).getAdapter(IFileStore.class);
+		IFileStore left = Utils.getFileStore(elements[0]);
+		IFileStore right = Utils.getFileStore(elements[1]);
 
 		CompareConfiguration cc = new CompareConfiguration();
 		// buffered merge mode: don't ask for confirmation when switching between modified resources

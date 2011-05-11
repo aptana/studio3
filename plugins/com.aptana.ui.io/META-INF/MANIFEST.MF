@@ -28,5 +28,6 @@ Export-Package: com.aptana.ide.ui.io,
  com.aptana.ide.ui.io.navigator.actions,
  com.aptana.ide.ui.io.navigator.resources,
  com.aptana.ide.ui.io.preferences,
- com.aptana.ide.ui.io.properties
+ com.aptana.ide.ui.io.properties,
+ com.aptana.ui.io.compare
 Eclipse-ExtensibleAPI: true
