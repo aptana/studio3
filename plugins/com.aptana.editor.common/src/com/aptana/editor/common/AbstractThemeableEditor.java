@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.Action;
@@ -31,6 +32,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
+import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -152,6 +154,105 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			handlePreferenceStoreChanged(event);
 		}
+	}
+
+	private class CommonProjectionViewer extends ProjectionViewer implements IAdaptable
+	{
+		public CommonProjectionViewer(Composite parent, IVerticalRuler ruler, IOverviewRuler overviewRuler,
+				boolean showsAnnotationOverview, int styles)
+		{
+			super(parent, ruler, overviewRuler, showsAnnotationOverview, styles);
+		}
+
+		protected Layout createLayout()
+		{
+			return new RulerLayout(RULER_EDITOR_GAP);
+		}
+
+		@Override
+		protected void handleDispose()
+		{
+			// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to
+			// report a bug with eclipse to clean this up.
+			try
+			{
+				Field f = TextViewer.class.getDeclaredField("fWidgetCommand"); //$NON-NLS-1$
+				if (f != null)
+				{
+					f.setAccessible(true);
+					f.set(this, null);
+				}
+			}
+			catch (Throwable t)
+			{
+				// ignore
+			}
+			finally
+			{
+				super.handleDispose();
+			}
+		}
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public IFormattingContext createFormattingContext()
+		{
+			final IFormattingContext context = super.createFormattingContext();
+			try
+			{
+				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getContentType(getDocument(), 0);
+				if (contentType != null && contentType.getPartCount() > 0)
+				{
+					String mainContentType = contentType.getParts()[0];
+					// We need to make sure that in case the given content type is actually a nested language in
+					// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
+					if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX))
+					{
+						mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
+					}
+					final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
+					if (factory != null)
+					{
+						// The code above might change the content type that is used to
+						// get the formatter, but we still need to save the original content-type so that the
+						// IScriptFormatter instance will handle the any required parsing by calling the right
+						// IParser.
+						factory.setMainContentType(contentType.getParts()[0]);
+
+						AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
+						IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
+								IResource.class);
+						context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+						IProject project = (file != null) ? file.getProject() : null;
+						Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
+						context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
+					}
+				}
+			}
+			catch (BadLocationException e)
+			{
+			}
+			return context;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+		 */
+		@SuppressWarnings("rawtypes")
+		public Object getAdapter(Class adapter)
+		{
+			Object result = null;
+
+			if (adapter == AbstractThemeableEditor.class)
+			{
+				result = AbstractThemeableEditor.this;
+			}
+
+			return result;
+		}
+
 	}
 
 	private static final int RULER_EDITOR_GAP = 5;
@@ -358,81 +459,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fOverviewRuler = createOverviewRuler(getSharedColors());
 
 		// Need to make it a projection viewer now that we have folding...
-		ProjectionViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(),
-				styles)
-		{
-			protected Layout createLayout()
-			{
-				return new RulerLayout(RULER_EDITOR_GAP);
-			}
-
-			@Override
-			protected void handleDispose()
-			{
-				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to
-				// report a bug with eclipse to clean this up.
-				try
-				{
-					Field f = TextViewer.class.getDeclaredField("fWidgetCommand"); //$NON-NLS-1$
-					if (f != null)
-					{
-						f.setAccessible(true);
-						f.set(this, null);
-					}
-				}
-				catch (Throwable t)
-				{
-					// ignore
-				}
-				finally
-				{
-					super.handleDispose();
-				}
-			}
-
-			@SuppressWarnings("rawtypes")
-			@Override
-			public IFormattingContext createFormattingContext()
-			{
-				final IFormattingContext context = super.createFormattingContext();
-				try
-				{
-					QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-							.getContentType(getDocument(), 0);
-					if (contentType != null && contentType.getPartCount() > 0)
-					{
-						String mainContentType = contentType.getParts()[0];
-						// We need to make sure that in case the given content type is actually a nested language in
-						// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
-						if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX))
-						{
-							mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
-						}
-						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
-						if (factory != null)
-						{
-							// The code above might change the content type that is used to
-							// get the formatter, but we still need to save the original content-type so that the
-							// IScriptFormatter instance will handle the any required parsing by calling the right
-							// IParser.
-							factory.setMainContentType(contentType.getParts()[0]);
-
-							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
-							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
-									IResource.class);
-							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
-							IProject project = (file != null) ? file.getProject() : null;
-							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
-							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
-						}
-					}
-				}
-				catch (BadLocationException e)
-				{
-				}
-				return context;
-			}
-		};
+		CommonProjectionViewer viewer = new CommonProjectionViewer(parent, ruler, getOverviewRuler(),
+				isOverviewRulerVisible(), styles);
 
 		this.fKeyListener = new ExpandSnippetVerifyKeyListener(this, viewer);
 		// add listener to our viewer

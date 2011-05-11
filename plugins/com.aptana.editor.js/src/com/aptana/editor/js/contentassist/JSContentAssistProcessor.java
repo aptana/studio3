@@ -11,7 +11,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +24,6 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -37,11 +35,8 @@ import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
-import com.aptana.editor.js.inferencing.JSTypeMapper;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -49,7 +44,6 @@ import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
-import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
@@ -57,13 +51,11 @@ import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
-import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
-	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
 	private IParseNode _targetNode;
@@ -185,7 +177,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = JSModelFormatter.getDescription(property, projectURI);
 				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
+				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
+						.getDocumentDisplayName(documents.get(0)) : null;
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -200,7 +193,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		JSGetPropertyNode node = this.getGetPropertyNode(this._targetNode, this._statementNode);
+		JSGetPropertyNode node = ASTUtil.getGetPropertyNode(this._targetNode, this._statementNode);
 		List<String> types = this.getParentObjectTypes(node, offset);
 
 		// add all properties of each type to our proposal list
@@ -274,7 +267,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (this._targetNode != null)
 		{
-			JSScope globalScope = this.getGlobalScope();
+			JSScope globalScope = ASTUtil.getGlobalScope(this._targetNode);
 
 			if (globalScope != null)
 			{
@@ -507,7 +500,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			result = ast.getNodeAtOffset(offset);
 
-			// We won't get a current node if the cursor is after the last position
+			// We won't get a current node if the cursor is outside of the positions
 			// recorded by the AST
 			if (result == null)
 			{
@@ -585,11 +578,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			JSPlugin.PLUGIN_ID, //
-			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				JSPlugin.PLUGIN_ID, //
+				IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -654,7 +647,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				case IN_PROPERTY_NAME:
 				{
-					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node, ((JSNode) node).getContainingStatementNode());
+					JSGetPropertyNode propertyNode = ASTUtil.getGetPropertyNode(node,
+							((JSNode) node).getContainingStatementNode());
 					List<String> types = this.getParentObjectTypes(propertyNode, offset);
 
 					if (types.size() > 0)
@@ -684,93 +678,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getGetPropertyNode
-	 * 
-	 * @param targetNode
-	 * @param statementNode
-	 * @return
-	 */
-	private JSGetPropertyNode getGetPropertyNode(IParseNode targetNode, IParseNode statementNode)
-	{
-		JSGetPropertyNode propertyNode = null;
-
-		if (targetNode != null)
-		{
-			if (targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
-			{
-				propertyNode = (JSGetPropertyNode) targetNode;
-			}
-			else if (targetNode.getNodeType() == JSNodeTypes.ARGUMENTS)
-			{
-				IParseNode candidate = targetNode.getParent().getFirstChild();
-
-				if (candidate instanceof JSGetPropertyNode)
-				{
-					propertyNode = (JSGetPropertyNode) candidate;
-				}
-			}
-			else
-			{
-				IParseNode parentNode = targetNode.getParent();
-
-				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
-				{
-					propertyNode = (JSGetPropertyNode) parentNode;
-				}
-			}
-		}
-
-		if (propertyNode == null && statementNode != null)
-		{
-			if (statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
-			{
-				propertyNode = (JSGetPropertyNode) statementNode;
-			}
-			else
-			{
-				IParseNode child = statementNode.getFirstChild();
-
-				if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
-				{
-					propertyNode = (JSGetPropertyNode) child;
-				}
-			}
-		}
-
-		return propertyNode;
-	}
-
-	/**
-	 * getGlobalScope
-	 * 
-	 * @return
-	 */
-	protected JSScope getGlobalScope()
-	{
-		JSScope result = null;
-
-		if (this._targetNode != null)
-		{
-			IParseNode root = this._targetNode;
-
-			while (root != null)
-			{
-				if (root instanceof JSParseRootNode)
-				{
-					result = ((JSParseRootNode) root).getGlobals();
-					break;
-				}
-				else
-				{
-					root = root.getParent();
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
 	 * getLocation
 	 * 
 	 * @param lexemeProvider
@@ -779,68 +686,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LocationType getLocation(IDocument document, int offset)
 	{
-		LocationType result = LocationType.UNKNOWN;
+		JSLocationIdentifier identifier = new JSLocationIdentifier(offset, this.getActiveASTNode(offset - 1));
+		LocationType result = identifier.getType();
 
-		// set up references to AST nodes around the current offset
-		this._targetNode = this.getActiveASTNode(offset - 1);
-		this._statementNode = null;
-		IParseNode ast = null;
-
-		if (this._targetNode instanceof JSParseRootNode)
-		{
-			this._statementNode = this._targetNode;
-			ast = this._targetNode;
-		}
-		else if (this._targetNode instanceof JSNode)
-		{
-			// set containing statement
-			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
-
-			// NOTE: We can't simply grab the AST since this will fail with JS
-			// is embedded in other languages. In those cases, we'll get the
-			// root node for the host language and not for JS
-
-			// find JS root node
-			IParseNode current = this._targetNode;
-
-			while (current != null)
-			{
-				if (current instanceof JSParseRootNode)
-				{
-					ast = current;
-					break;
-				}
-				else
-				{
-					current = current.getParent();
-				}
-			}
-		}
-
-		// try to determine the current offset's CA type via the AST
-		if (ast == null)
-		{
-			result = LocationType.IN_GLOBAL;
-
-			this._replaceRange = new Range(offset, offset - 1);
-		}
-		else if (ast instanceof JSParseRootNode)
-		{
-			JSLocationIdentifier typeWalker = new JSLocationIdentifier(offset);
-
-			((JSParseRootNode) ast).accept(typeWalker);
-
-			result = typeWalker.getType();
-
-			if (IGNORED_TYPES.contains(result) == false)
-			{
-				JSRangeFinder rangeWalker = new JSRangeFinder(offset);
-
-				((JSParseRootNode) ast).accept(rangeWalker);
-
-				this._replaceRange = rangeWalker.getRange();
-			}
-		}
+		this._targetNode = identifier.getTargetNode();
+		this._statementNode = identifier.getStatementNode();
+		this._replaceRange = identifier.getReplaceRange();
 
 		// if we couldn't determine the location type with the AST, then
 		// fallback to using lexemes
@@ -982,82 +833,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		List<String> result = new ArrayList<String>();
-
-		if (node != null)
-		{
-			JSScope localScope = this.getScopeAtOffset(offset);
-
-			if (localScope != null)
-			{
-				List<String> typeList = Collections.emptyList();
-
-				// lookup in current file
-				IParseNode lhs = node.getLeftHandSide();
-
-				if (lhs instanceof JSNode)
-				{
-					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, this.getIndex(), this.getURI());
-
-					typeWalker.visit((JSNode) lhs);
-
-					typeList = typeWalker.getTypes();
-				}
-
-				// TEMP: Show types for debugging info
-				if (Platform.inDevelopmentMode())
-				{
-					System.out.println("types: " + StringUtil.join(", ", typeList)); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-
-				// add all properties of each type to our proposal list
-				for (String type : typeList)
-				{
-					// Fix up type names as might be necessary
-					type = JSTypeMapper.getInstance().getMappedType(type);
-
-					if (JSTypeUtil.isFunctionPrefix(type))
-					{
-						String functionType = JSTypeUtil.getFunctionSignatureType(type);
-
-						result.add(functionType);
-					}
-					else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
-					{
-						result.add(JSTypeConstants.ARRAY_TYPE);
-					}
-					else
-					{
-						result.add(type);
-					}
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getScopeAtOffset
-	 * 
-	 * @param offset
-	 * @return
-	 */
-	protected JSScope getScopeAtOffset(int offset)
-	{
-		JSScope result = null;
-
-		// grab global scope
-		JSScope global = this.getGlobalScope();
-
-		if (global != null)
-		{
-			JSScope candidate = global.getScopeAtOffset(offset);
-
-			result = (candidate != null) ? candidate : global;
-		}
-
-		return result;
+		return ASTUtil.getParentObjectTypes(this.getIndex(), this.getURI(), this._targetNode, node, offset);
 	}
 
 	/**

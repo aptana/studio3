@@ -196,5 +196,16 @@
             name="arguments">
       </attribute>
    </extension>
+   <extension
+         point="com.aptana.editor.common.textHovers">
+      <hover
+            class="com.aptana.editor.js.text.JSTextHover"
+            id="com.aptana.editor.js.hover"
+            label="JS Documentation Hover">
+         <contentType
+               type="com.aptana.contenttype.js">
+         </contentType>
+      </hover>
+   </extension>
 
 </plugin>

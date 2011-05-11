@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.util.EnumSet;
+
 import beaver.Symbol;
 
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
@@ -55,21 +57,59 @@ import com.aptana.editor.js.parsing.ast.JSVarNode;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 
 public class JSLocationIdentifier extends JSTreeWalker
 {
+	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
+
 	private int _offset;
+	private IParseNode _targetNode;
+	private IParseNode _statementNode;
 	private LocationType _type;
+	private IRange _replaceRange;
 
 	/**
 	 * JSLocationWalker
 	 */
-	public JSLocationIdentifier(int offset)
+	public JSLocationIdentifier(int offset, IParseNode targetNode)
 	{
 		offset--;
 
 		this._offset = offset;
+		this._targetNode = targetNode;
 		this._type = LocationType.UNKNOWN;
+	}
+
+	/**
+	 * getReplaceRange
+	 * 
+	 * @return
+	 */
+	public IRange getReplaceRange()
+	{
+		return this._replaceRange;
+	}
+
+	/**
+	 * getStatementNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getStatementNode()
+	{
+		return this._statementNode;
+	}
+
+	/**
+	 * getTargetNode
+	 * 
+	 * @return
+	 */
+	public IParseNode getTargetNode()
+	{
+		return this._targetNode;
 	}
 
 	/**
@@ -79,6 +119,63 @@ public class JSLocationIdentifier extends JSTreeWalker
 	 */
 	public LocationType getType()
 	{
+		IParseNode ast = null;
+		int actualOffset = this._offset + 1;
+
+		this._statementNode = null;
+
+		if (this._targetNode instanceof JSParseRootNode)
+		{
+			this._statementNode = this._targetNode;
+			ast = this._targetNode;
+		}
+		else if (this._targetNode instanceof JSNode)
+		{
+			// set containing statement
+			this._statementNode = ((JSNode) this._targetNode).getContainingStatementNode();
+
+			// NOTE: We can't simply grab the AST since this will fail with JS
+			// is embedded in other languages. In those cases, we'll get the
+			// root node for the host language and not for JS
+
+			// find JS root node
+			IParseNode current = this._targetNode;
+
+			while (current != null)
+			{
+				if (current instanceof JSParseRootNode)
+				{
+					ast = current;
+					break;
+				}
+				else
+				{
+					current = current.getParent();
+				}
+			}
+		}
+
+		// try to determine the current offset's CA type via the AST
+		if (ast == null)
+		{
+			this._type = LocationType.IN_GLOBAL;
+
+			this._replaceRange = new Range(actualOffset, actualOffset - 1);
+		}
+		else if (ast instanceof JSParseRootNode)
+		{
+			((JSParseRootNode) ast).accept(this);
+
+			if (IGNORED_TYPES.contains(this._type) == false)
+			{
+				JSRangeFinder rangeWalker = new JSRangeFinder(actualOffset);
+
+				((JSParseRootNode) ast).accept(rangeWalker);
+
+				this._replaceRange = rangeWalker.getRange();
+			}
+		}
+
 		return this._type;
 	}
 
@@ -668,7 +765,8 @@ public class JSLocationIdentifier extends JSTreeWalker
 			IParseNode lhs = node.getLeftHandSide();
 			Symbol operator = node.getOperator();
 
-			if (lhs.contains(this._offset) || lhs.getEndingOffset() <= this._offset && this._offset < operator.getStart())
+			if (lhs.contains(this._offset) || lhs.getEndingOffset() <= this._offset
+					&& this._offset < operator.getStart())
 			{
 				this.setType(lhs);
 			}
