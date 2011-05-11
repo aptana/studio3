@@ -76,7 +76,7 @@
       <page
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.css.preferences.CSSPreferencePage"
-            id="com.aptana.editor.html.preferences.CSSPreferencePage"
+            id="com.aptana.editor.css.preferences.CSSPreferencePage"
             name="%page.css.name">
       </page>
    </extension>
