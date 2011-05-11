@@ -133,24 +133,13 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            categoryId="org.eclipse.ui.category.views"
-            defaultHandler="com.aptana.terminal.internal.handlers.ShowTerminalHandler"
-            description="Show Terminal view"
-            id="com.aptana.terminal.commands.showTerminal"
-            name="Show Terminal">
-      </command>
-      <command
-            defaultHandler="com.aptana.terminal.internal.handlers.OpenTerminalHandler"
+      		categoryId="org.eclipse.ui.category.views"
             id="com.aptana.terminal.commands.openTerminal"
             name="%command.openTerminal.name">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
-      <image
-            commandId="com.aptana.terminal.commands.showTerminal"
-            icon="icons/terminal.png">
-      </image>
       <image
             commandId="com.aptana.terminal.commands.openTerminal"
             icon="icons/terminal.png">
@@ -163,7 +152,7 @@
          <toolbar
                id="com.aptana.ui.globalActionSet">
             <command
-                  commandId="com.aptana.terminal.commands.showTerminal"
+                  commandId="com.aptana.terminal.commands.openTerminal"
                   style="push">
                <visibleWhen>
                   <reference
@@ -188,4 +177,11 @@
       </file>
    </extension>
 
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.terminal.internal.handlers.OpenTerminalHandler"
+            commandId="com.aptana.terminal.commands.openTerminal">
+      </handler>
+   </extension>
 </plugin>
