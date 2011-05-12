@@ -16,6 +16,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextViewer;
@@ -194,11 +195,11 @@ public class PeerCharacterCloserTest extends TestCase
 			}
 
 			@Override
-			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			protected ITypedRegion[] computePartitioning(IDocument document, int offset, int length)
+					throws BadLocationException
 			{
-				if (offset >= 2)
-					return "source.js comment.block";
-				return "source.js";
+				return new ITypedRegion[] { new TypedRegion(0, 2, "__js" + IDocument.DEFAULT_CONTENT_TYPE),
+						new TypedRegion(2, 4, "__js_comment") };
 			}
 		};
 		VerifyEvent event = sendEvent('(');
@@ -209,17 +210,7 @@ public class PeerCharacterCloserTest extends TestCase
 
 	public void testDontCountCharsInPrecedingCommentsForDeterminingPairBalance()
 	{
-		document = new Document("// '\n ")
-		{
-			@Override
-			public ITypedRegion getPartition(String partitioning, int offset, boolean preferOpenPartitions)
-					throws BadLocationException, BadPartitioningException
-			{
-				if (offset >= 0 && offset <= 4)
-					return new TypedRegion(0, 4, "comment");
-				return new TypedRegion(4, 2, DEFAULT_PARTITIONING);
-			}
-		};
+		document = new Document("// '\n ");
 		viewer.setDocument(document);
 
 		viewer.setSelectedRange(5, 0);
@@ -231,12 +222,22 @@ public class PeerCharacterCloserTest extends TestCase
 				return DEFAULT_PAIRS;
 			}
 
-			@Override
-			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			protected ITypedRegion getPartition(IDocumentExtension3 ext, String defaultPartitioning, int offset,
+					boolean b) throws BadLocationException, BadPartitioningException
 			{
-				if (offset <= 4)
-					return "source.js comment.block";
-				return "source.js";
+				if (offset >= 4)
+				{
+					return new TypedRegion(4, 2, "__js" + IDocument.DEFAULT_CONTENT_TYPE);
+				}
+				return new TypedRegion(0, 4, "__js_comment");
+			}
+
+			@Override
+			protected ITypedRegion[] computePartitioning(IDocument document, int offset, int length)
+					throws BadLocationException
+			{
+				return new ITypedRegion[] { new TypedRegion(0, 4, "__js_comment"),
+						new TypedRegion(4, 2, "__js" + IDocument.DEFAULT_CONTENT_TYPE) };
 			}
 		};
 		VerifyEvent event = sendEvent('\'');
