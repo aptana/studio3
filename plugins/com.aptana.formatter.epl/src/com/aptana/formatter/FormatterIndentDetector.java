@@ -13,6 +13,8 @@ package com.aptana.formatter;
 
 import org.eclipse.jface.text.IRegion;
 
+import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
+
 public class FormatterIndentDetector implements IFormatterWriter
 {
 
@@ -33,7 +35,7 @@ public class FormatterIndentDetector implements IFormatterWriter
 		// empty
 	}
 
-	public void excludeRegion(IRegion region)
+	public void excludeRegion(IRegion region, EXCLUDE_STRATEGY strategy)
 	{
 		// empty
 

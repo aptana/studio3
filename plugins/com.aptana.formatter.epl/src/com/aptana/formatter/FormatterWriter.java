@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
 
+import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
 import com.aptana.formatter.util.TextUtils;
 
 public class FormatterWriter implements IFormatterWriter
@@ -76,10 +77,20 @@ public class FormatterWriter implements IFormatterWriter
 		}
 		else
 		{
-			final IRegion[] regions = excludes.selectValidRanges(startOffset, endOffset);
-			for (int i = 0; i < regions.length; ++i)
+			// Check if we need to write the region as is, or just skip it.
+			EXCLUDE_STRATEGY excludeAction = excludes.getExcludeStrategy(startOffset, endOffset);
+			if (excludeAction != null && EXCLUDE_STRATEGY.WRITE_AS_IS.equals(excludeAction))
 			{
-				write(context, document.get(regions[i]));
+				// Write directly
+				writer.append(document.get(startOffset, endOffset));
+			}
+			else
+			{
+				final IRegion[] regions = excludes.selectValidRanges(startOffset, endOffset);
+				for (int i = 0; i < regions.length; ++i)
+				{
+					write(context, document.get(regions[i]));
+				}
 			}
 		}
 	}
@@ -467,9 +478,9 @@ public class FormatterWriter implements IFormatterWriter
 
 	private final ExcludeRegionList excludes = new ExcludeRegionList();
 
-	public void excludeRegion(IRegion region)
+	public void excludeRegion(IRegion region, EXCLUDE_STRATEGY strategy)
 	{
-		excludes.excludeRegion(region);
+		excludes.excludeRegion(region, strategy);
 	}
 
 	public void addNewLineCallback(IFormatterCallback callback)
