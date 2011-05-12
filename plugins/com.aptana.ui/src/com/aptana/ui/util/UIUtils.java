@@ -174,19 +174,6 @@ public final class UIUtils
 					IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
 					if (editorInput instanceof IFileEditorInput)
 					{
-						return ((IFileEditorInput) editorInput).getFile();
-					}
-				}
-			}
-			else
-			{
-				// checks the active editor
-				variable = currentState.getVariable(ISources.ACTIVE_EDITOR_NAME);
-				if (variable instanceof IEditorPart)
-				{
-					IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
-					if (editorInput instanceof IFileEditorInput)
-					{
 						return ((IFileEditorInput) editorInput).getFile().getProject();
 					}
 				}
