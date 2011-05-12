@@ -94,5 +94,14 @@
          </command>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.io.preferences.RemotePreferencePage"
+            class="com.aptana.ui.ftp.preferences.FTPPreferencePage"
+            id="com.aptana.ui.ftp.preferences.FTPPreferencePage"
+            name="%PreferencePage.ftp.label">
+      </page>
+   </extension>
 
 </plugin>
