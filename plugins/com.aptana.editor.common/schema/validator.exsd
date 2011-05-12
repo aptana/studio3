@@ -19,7 +19,7 @@
       <complexType>
          <sequence>
             <element ref="validator" minOccurs="1" maxOccurs="unbounded"/>
-            <element ref="language" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="content-type" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -60,20 +60,20 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="type" type="string" use="required">
+         <attribute name="marker-type" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="language" type="string" use="required">
+         <attribute name="content-type" type="string" use="required">
             <annotation>
                <documentation>
-                  The language type which the validator supports
+                  The content type which the validator supports
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="com.aptana.editor.common.validator/language/@type"/>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.editor.common.validator/content-type/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -90,19 +90,19 @@
       </complexType>
    </element>
 
-   <element name="language">
+   <element name="content-type">
       <complexType>
-         <attribute name="type" type="string" use="required">
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  The language type (e.g. text/html)
+                  The content type id
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  A display name for the language (e.g. HTML)
+                  A display name for the content type (e.g. HTML)
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>

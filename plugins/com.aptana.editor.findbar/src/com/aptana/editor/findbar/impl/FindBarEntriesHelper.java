@@ -169,8 +169,11 @@ public class FindBarEntriesHelper
 		modifyListener.startIgnore();
 		try
 		{
-			combo.setItems(items.toArray(new String[items.size()]));
-			combo.select(0);
+			if (!combo.isDisposed())
+			{
+				combo.setItems(items.toArray(new String[items.size()]));
+				combo.select(0);
+			}
 		}
 		finally
 		{

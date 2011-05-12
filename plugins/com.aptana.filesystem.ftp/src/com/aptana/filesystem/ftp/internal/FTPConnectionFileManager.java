@@ -450,10 +450,6 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 * @see com.aptana.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public synchronized void disconnect(IProgressMonitor monitor) throws CoreException {
-		try {
-			checkConnected();
-		} catch (Exception ignore) {
-		}
 		if (!isConnected()) {
 			return;
 		}
@@ -547,6 +543,20 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	}
 
 	/* (non-Javadoc)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#interruptOperation()
+	 */
+	@Override
+	protected void interruptOperation() {
+		try {
+			if (ftpClient.connected()) {
+				ftpClient.quitImmediately();
+			}
+		} catch (Exception ignore) {
+		}
+		super.interruptOperation();
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager#canUseTemporaryFile(org.eclipse.core.runtime.IPath, com.aptana.core.io.vfs.ExtendedFileInfo, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
@@ -610,7 +620,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					} catch (FileNotFoundException ignore) {
 					}
 					if (!fileInfo.exists()) {
-						fileInfo.setExists(ftpClient.existsFile(path.toPortableString()));
+						fileInfo.setExists(existsFile(path));
 					}
 					return fileInfo;
 				}
@@ -1061,6 +1071,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		} finally {
 			monitor.done();
 		}
+	}
+	
+	private boolean existsFile(IPath filePath) throws IOException, FTPException {
+		return ftpClient.existsFile(filePath.toPortableString());
 	}
 
 	private FTPFile[] ftpSTAT(String dirname) throws IOException, FTPException, ParseException {

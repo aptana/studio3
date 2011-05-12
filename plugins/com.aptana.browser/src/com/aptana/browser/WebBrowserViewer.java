@@ -25,6 +25,7 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -185,6 +186,38 @@ public class WebBrowserViewer extends Composite
 	{
 		disposeImage();
 		super.dispose();
+	}
+
+	/**
+	 * @param listener
+	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#addProgressListener(org.eclipse.swt.browser.ProgressListener)
+	 */
+	public void addProgressListener(ProgressListener listener) {
+		browser.addProgressListener(listener);
+	}
+
+	/**
+	 * @param listener
+	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#removeProgressListener(org.eclipse.swt.browser.ProgressListener)
+	 */
+	public void removeProgressListener(ProgressListener listener) {
+		browser.removeProgressListener(listener);
+	}
+
+	/**
+	 * @param listener
+	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#addTitleListener(org.eclipse.swt.browser.TitleListener)
+	 */
+	public void addTitleListener(TitleListener listener) {
+		browser.addTitleListener(listener);
+	}
+
+	/**
+	 * @param listener
+	 * @see com.aptana.swt.webkitbrowser.WebKitBrowser#removeTitleListener(org.eclipse.swt.browser.TitleListener)
+	 */
+	public void removeTitleListener(TitleListener listener) {
+		browser.removeTitleListener(listener);
 	}
 
 	private void createCommandBar(Composite parent)

@@ -7,8 +7,8 @@ package com.aptana.editor.css.parsing;
 public class Terminals {
 	static public final short EOF = 0;
 	static public final short IDENTIFIER = 1;
-	static public final short COLOR = 2;
-	static public final short PROPERTY = 3;
+	static public final short PROPERTY = 2;
+	static public final short COLOR = 3;
 	static public final short COLON = 4;
 	static public final short RCURLY = 5;
 	static public final short STRING = 6;

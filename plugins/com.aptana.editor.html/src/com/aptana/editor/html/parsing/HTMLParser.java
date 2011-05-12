@@ -19,9 +19,10 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import beaver.Scanner.Exception;
 import beaver.Symbol;
 
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -29,7 +30,7 @@ import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
-import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParserPoolFactory;
@@ -84,7 +85,7 @@ public class HTMLParser implements IParser
 		int startingOffset = parseState.getStartingOffset();
 
 		IParseRootNode root = new ParseRootNode( //
-				IHTMLParserConstants.LANGUAGE, //
+				IHTMLConstants.CONTENT_TYPE_HTML, //
 				new HTMLNode[0], //
 				startingOffset, //
 				startingOffset + source.length() //
@@ -347,11 +348,11 @@ public class HTMLParser implements IParser
 		String type = node.getAttributeValue(ATTR_TYPE);
 		if (type == null || isInArray(type, CSS_VALID_TYPE_ATTR))
 		{
-			language = ICSSParserConstants.LANGUAGE;
+			language = ICSSConstants.CONTENT_TYPE_CSS;
 		}
 		else if (isJavaScript(node))
 		{
-			language = IJSParserConstants.LANGUAGE;
+			language = IJSConstants.CONTENT_TYPE_JS;
 		}
 		processLanguage(language, HTMLTokens.STYLE_END);
 	}
@@ -363,7 +364,7 @@ public class HTMLParser implements IParser
 		String type = node.getAttributeValue(ATTR_TYPE);
 		if (type == null || isJavaScript(node))
 		{
-			language = IJSParserConstants.LANGUAGE;
+			language = IJSConstants.CONTENT_TYPE_JS;
 		}
 		processLanguage(language, HTMLTokens.SCRIPT_END);
 	}
@@ -401,7 +402,7 @@ public class HTMLParser implements IParser
 				if (HTMLUtils.isCSSAttribute(name))
 				{
 					String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-					IParseNode node = ParserPoolFactory.parse(ICSSParserConstants.LANGUAGE, text);
+					IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
 					// should always have a rule node
 					if (node.hasChildren())
 					{
@@ -420,7 +421,7 @@ public class HTMLParser implements IParser
 				// checks if we need to process the value as JS
 				else if (HTMLUtils.isJSAttribute(element.getName(), name))
 				{
-					IParseNode node = ParserPoolFactory.parse(IJSParserConstants.LANGUAGE, value);
+					IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
 					IParseNode[] children = node.getChildren();
 					for (IParseNode child : children)
 					{

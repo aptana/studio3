@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2005/schema/1.0">
+
+	<element name="child-node">
+		<attribute name="name" />
+	</element>
+
+	<element name="node">
+		<attribute name="name" />
+		<child-element name="child-node" />
+	</element>
+
+	<element name="test" type="root">
+		<child-element name="node" />
+	</element>
+
+</schema>

@@ -26,5 +26,6 @@ while (true) /** */
 {
 }
 ==FORMATTED==
-while (true) /** */ {
+while (true) /** */
+{
 }

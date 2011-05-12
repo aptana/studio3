@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.json.parsing.ast;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
+import com.aptana.editor.json.IJSONConstants;
 import com.aptana.parsing.ast.ParseNode;
 
 /**
@@ -32,7 +32,7 @@ public class JSONNode extends ParseNode
 	 */
 	public JSONNode(JSONNodeType type)
 	{
-		super(IJSONParserConstants.LANGUAGE);
+		super(IJSONConstants.CONTENT_TYPE_JSON);
 
 		this._type = type;
 	}

@@ -209,7 +209,7 @@ public class Diff
 	{
 		try
 		{
-			IStatus result = gitCommit.repository().executeWithGitSSH(GitRepository.ReadWrite.READ,
+			IStatus result = gitCommit.repository().executeWithPromptHandling(GitRepository.ReadWrite.READ,
 					"show", "--pretty=raw", "-M", "--no-color", gitCommit.sha()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			return parse(gitCommit, new StringReader(result.getMessage()));
 		}

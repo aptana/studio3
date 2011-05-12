@@ -21,8 +21,28 @@ public interface IPreferenceConstants
 
 	/**
 	 * The value is a string where each character in the string will be used as an auto-activation character in
-	 * CSSContentAssistProcessor
+	 * JSContentAssistProcessor
 	 */
 	String JS_ACTIVATION_CHARACTERS = "JS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
+
+	/**
+	 * A pref key used to determine if comments are initially folded. Value is a boolean.
+	 */
+	String INITIALLY_FOLD_COMMENTS = "fold_comments"; //$NON-NLS-1$
+
+	/**
+	 * A pref key used to determine if functions are initially folded. Value is a boolean.
+	 */
+	String INITIALLY_FOLD_FUNCTIONS = "fold_functions"; //$NON-NLS-1$
+
+	/**
+	 * A pref key used to determine if objects are initially folded. Value is a boolean.
+	 */
+	String INITIALLY_FOLD_OBJECTS = "fold_objects"; //$NON-NLS-1$
+
+	/**
+	 * A pref key used to determine if arrays are initially folded. Value is a boolean.
+	 */
+	String INITIALLY_FOLD_ARRAYS = "fold_arrays"; //$NON-NLS-1$
 
 }

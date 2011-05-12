@@ -5,6 +5,7 @@ import java.util.List;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 
+import com.aptana.editor.yaml.IYAMLConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.ParseNode;
 
@@ -15,7 +16,7 @@ public class SequenceParseNode extends ParseNode
 
 	public SequenceParseNode(SequenceNode node, IParseState parseState)
 	{
-		super(IYAMLParserConstants.LANGUAGE);
+		super(IYAMLConstants.CONTENT_TYPE_YAML);
 		setLocation(YAMLParseRootNode.getStart(node, parseState), YAMLParseRootNode.getEnd(node, parseState));
 		this.node = node;
 		traverse(parseState);

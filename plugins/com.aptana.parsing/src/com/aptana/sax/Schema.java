@@ -23,13 +23,24 @@ import com.aptana.core.util.SourcePrinter;
  */
 public class Schema
 {
-	private Map<String,SchemaElement> _elementsByName;
+	private Map<String, ISchemaElement> _elementsByName;
 	private SchemaElement _rootElement;
-	private Stack<SchemaElement> _elementStack;
-	private SchemaElement _currentElement;
+	private Stack<ISchemaElement> _elementStack;
+	private ISchemaElement _currentElement;
 
 	private Object _handler;
 	private Class<?> _handlerClass;
+	private boolean _allowFreeformMarkup;
+
+	/**
+	 * allowFreeformMarkup
+	 * 
+	 * @return
+	 */
+	public boolean allowFreeformMarkup()
+	{
+		return this._allowFreeformMarkup;
+	}
 
 	/**
 	 * Get the Class of the handler object used for element transition event handling
@@ -64,6 +75,16 @@ public class Schema
 	}
 
 	/**
+	 * setAllowFreeformMarkup
+	 * 
+	 * @param value
+	 */
+	public void setAllowFreeformMarkup(boolean value)
+	{
+		this._allowFreeformMarkup = value;
+	}
+
+	/**
 	 * Set the root element of this schema. If the element does not exist, it will be added automatically to this schema
 	 * 
 	 * @param name
@@ -71,7 +92,7 @@ public class Schema
 	 */
 	public void setRootElement(String name)
 	{
-		SchemaElement target;
+		ISchemaElement target;
 
 		if (this.hasElement(name))
 		{
@@ -106,8 +127,8 @@ public class Schema
 			this._handlerClass = handler.getClass();
 		}
 
-		this._elementsByName = new HashMap<String,SchemaElement>();
-		this._elementStack = new Stack<SchemaElement>();
+		this._elementsByName = new HashMap<String, ISchemaElement>();
+		this._elementStack = new Stack<ISchemaElement>();
 		this._rootElement = new SchemaElement(this, "#document"); //$NON-NLS-1$
 	}
 
@@ -123,7 +144,7 @@ public class Schema
 	 *            The name of the element to create
 	 * @return Returns the SchemaElement for the given name
 	 */
-	public SchemaElement createElement(String name)
+	public ISchemaElement createElement(String name)
 	{
 		return this.createElement(name, true);
 	}
@@ -137,9 +158,9 @@ public class Schema
 	 *            If true then only one element will ever be created created for a given name
 	 * @return Returns the SchemaElement for the given name
 	 */
-	public SchemaElement createElement(String name, boolean unique)
+	public ISchemaElement createElement(String name, boolean unique)
 	{
-		SchemaElement result = null;
+		ISchemaElement result = null;
 
 		if (unique)
 		{
@@ -150,7 +171,7 @@ public class Schema
 			else
 			{
 				result = new SchemaElement(this, name);
-	
+
 				this._elementsByName.put(name, result);
 			}
 		}
@@ -231,7 +252,7 @@ public class Schema
 		// print element stack
 		for (int i = 1; i < this._elementStack.size(); i++)
 		{
-			SchemaElement element = this._elementStack.get(i);
+			ISchemaElement element = this._elementStack.get(i);
 
 			writer.printlnWithIndent(element.toString()).increaseIndent();
 		}
@@ -259,7 +280,7 @@ public class Schema
 		// close element stack
 		for (int i = this._elementStack.size() - 1; i > 0; i--)
 		{
-			SchemaElement element = this._elementStack.get(i);
+			ISchemaElement element = this._elementStack.get(i);
 
 			writer.decreaseIndent().printWithIndent("</").print(element.getName()).println(">"); //$NON-NLS-1$ //$NON-NLS-2$
 		}

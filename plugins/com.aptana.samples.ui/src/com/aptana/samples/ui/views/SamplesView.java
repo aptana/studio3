@@ -21,6 +21,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -44,6 +45,8 @@ import org.eclipse.ui.part.ViewPart;
 import com.aptana.ide.ui.io.navigator.actions.EditorUtils;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
+import com.aptana.samples.model.LocalSample;
+import com.aptana.samples.model.RemoteSample;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -69,7 +72,6 @@ public class SamplesView extends ViewPart
 	private static final String ICON_IMPORT = "icons/import_wiz.gif"; //$NON-NLS-1$
 	private static final String ICON_PREVIEW = "icons/preview.gif"; //$NON-NLS-1$
 	private static final String ICON_HELP = "icons/book_open.png"; //$NON-NLS-1$
-
 	private TreeViewer treeViewer;
 
 	private Action importAction;
@@ -130,6 +132,7 @@ public class SamplesView extends ViewPart
 		treeViewer.setLabelProvider(new SamplesViewLabelProvider());
 		treeViewer.setInput(SamplesPlugin.getDefault().getSamplesManager());
 		treeViewer.setComparator(new ViewerComparator());
+		ColumnViewerToolTipSupport.enableFor(treeViewer);
 
 		return treeViewer;
 	}
@@ -160,17 +163,20 @@ public class SamplesView extends ViewPart
 					if (samplesRef.isRemote())
 					{
 						// imports from git
-						SampleProjectCreator.createSampleProject(samplesRef);
+						SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
 					}
 				}
-				SampleEntry sample = null;
-				if (firstElement instanceof SampleEntry)
+				else
 				{
-					sample = getRootSample((SampleEntry) firstElement);
-				}
-				if (sample != null)
-				{
-					SampleProjectCreator.createSampleProject(sample);
+					SampleEntry sampleEntry = null;
+					if (firstElement instanceof SampleEntry)
+					{
+						sampleEntry = getRootSample((SampleEntry) firstElement);
+					}
+					if (sampleEntry != null)
+					{
+						SampleProjectCreator.createSampleProject(new LocalSample(sampleEntry));
+					}
 				}
 			}
 		};
@@ -294,7 +300,7 @@ public class SamplesView extends ViewPart
 					{
 						try
 						{
-							EditorUtils.openFileInEditor(EFS.getStore(file.toURI()));
+							EditorUtils.openFileInEditor(EFS.getStore(file.toURI()), null);
 						}
 						catch (CoreException e)
 						{

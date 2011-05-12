@@ -52,6 +52,28 @@ public class ParsingPlugin extends Plugin
 	}
 
 	/**
+	 * logInfo
+	 * 
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		// TODO: uncomment when we have verbosity support for logging
+		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @param message
+	 */
+	public static void logWarning(String message)
+	{
+		// TODO: uncomment when we have verbosity support for logging
+		// getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+	}
+
+	/**
 	 * The constructor
 	 */
 	public ParsingPlugin()

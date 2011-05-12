@@ -9,6 +9,7 @@ package com.aptana.editor.common;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -16,31 +17,27 @@ import org.eclipse.jface.text.source.ISourceViewer;
 /**
  * SimpleSourceViewerConfiguration
  */
-public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewerConfiguration
-{
+public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+
 	/**
 	 * SimpleSourceViewerConfiguration
 	 * 
 	 * @param preferenceStore
 	 * @param editor
 	 */
-	public SimpleSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
-	{
+	public SimpleSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
 		super(preferenceStore, editor);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * 
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#
+	 * getConfiguredContentTypes(org.eclipse.jface.text.source .ISourceViewer)
 	 */
 	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
-	{
-		return TextUtils.combine( //
-			new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, this.getSourceViewerConfiguration().getContentTypes() } //
-		);
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, this.getSourceViewerConfiguration().getContentTypes() });
 	}
 
 	/**
@@ -52,13 +49,10 @@ public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewer
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		ISourceViewerConfiguration configuration = this.getSourceViewerConfiguration();
 
@@ -71,8 +65,16 @@ public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewer
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes()
-	{
+	public String[][] getTopContentTypes() {
 		return this.getSourceViewerConfiguration().getTopContentTypes();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 */
+	@Override
+	protected final IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType) {
+		return getSourceViewerConfiguration().getContentAssistProcessor(getEditor(), contentType);
 	}
 }

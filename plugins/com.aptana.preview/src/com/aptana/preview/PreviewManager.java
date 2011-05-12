@@ -8,6 +8,7 @@
 
 package com.aptana.preview;
 
+import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,8 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -28,6 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -50,10 +54,10 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.preview.internal.DefaultPreviewHandler;
 import com.aptana.preview.internal.EditorUtils;
-import com.aptana.preview.internal.Editors;
 import com.aptana.preview.internal.PreviewEditorInput;
 import com.aptana.preview.internal.PreviewEditorPart;
 import com.aptana.preview.internal.PreviewHandlers;
@@ -195,9 +199,9 @@ public final class PreviewManager {
 		removePartListener();
 	}
 
-	public void openPreviewForEditor(IEditorPart editorPart) {
+	public void openPreviewForEditor(final IEditorPart editorPart) {
 		try {
-			IEditorInput editorInput = editorPart.getEditorInput();
+			final IEditorInput editorInput = editorPart.getEditorInput();
 			if (!editorPart.isDirty()) {
 				openPreview(editorPart, editorInput, null);
 			} else if (editorPart instanceof AbstractTextEditor) {
@@ -207,7 +211,18 @@ public final class PreviewManager {
 						IDocument document = documentProvider.getDocument(editorInput);
 						if (document != null) {
 							try {
-								openPreview(editorPart, editorInput, document.get());
+								if (!openPreview(editorPart, editorInput, document.get())) {
+									final boolean[] openPreview = new boolean[1];
+									UIUtils.getDisplay().syncExec(new Runnable() {
+										public void run() {
+											openPreview[0] = MessageDialog.openQuestion(editorPart.getSite().getShell(), Messages.PreviewManager_UnsavedPrompt_Title, Messages.PreviewManager_UnsavedPrompt_Message);
+										}
+									});
+									if (openPreview[0]) {
+										openPreview(editorPart, editorInput, null);
+									}
+
+								}
 							} catch (CoreException e) {
 								Activator.log(e);
 							}
@@ -260,8 +275,8 @@ public final class PreviewManager {
 		return false;
 	}
 
-	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
-		openPreview(editorPart, editorInput, content, true);
+	private boolean openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
+		return openPreview(editorPart, editorInput, content, true);
 	}
 
 	private SourceConfig getSourceConfig(IEditorInput editorInput, String content) throws CoreException {
@@ -284,9 +299,21 @@ public final class PreviewManager {
 				return null;
 			}
 		} else if (editorInput instanceof IStorageEditorInput) {
-
+			// TODO
 		} else if (editorInput instanceof IURIEditorInput) {
-
+			IFileStore fileStore = EFS.getStore(((IURIEditorInput) editorInput).getURI());
+			if (fileStore != null) {
+				File file = fileStore.toLocalFile(EFS.NONE, null);
+				if (file != null) {
+					fileName = file.getName();
+					path = Path.fromOSString(file.getAbsolutePath());
+					IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toURI());
+					if (files.length > 0) {
+						project = files[0].getProject();
+						workspacePath = files[0].getFullPath();
+					}
+				}
+			}
 		} else if (editorInput instanceof PreviewEditorInput) {
 			return null;
 		}
@@ -297,8 +324,7 @@ public final class PreviewManager {
 		return new SourceConfig(editorInput, project, project != null ? workspacePath : path, content, contentType);
 	}
 
-	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen)
-			throws CoreException {
+	private boolean openPreview(final IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
 		SourceConfig sourceConfig = getSourceConfig(editorInput, content);
 		PreviewConfig previewConfig = null;
 		if (sourceConfig != null) {
@@ -313,9 +339,9 @@ public final class PreviewManager {
 		}
 		if (previewConfig != null) {
 			showEditor(editorPart, sourceConfig, previewConfig, forceOpen);
-		} else {
-			// TODO: add some user notification
+			return true;
 		}
+		return false;
 	}
 
 	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig,
@@ -366,23 +392,17 @@ public final class PreviewManager {
 
 	private void checkLinkedEditor(URI uri) {
 		IEditorPart editorPart = null;
-		IEditorPreviewDelegate editorPreviewDelegate;
 		for (IEditorPart editor : trackedEditors.keySet()) {
-			editorPreviewDelegate = Editors.getInstance().getEditorPreviewDelegate(editor);
-			if (editorPreviewDelegate != null) {
-				try {
-					editorPreviewDelegate.init(editor);
-					if (editorPreviewDelegate.isLinked(uri)) {
-						editorPart = editor;
-						// TODO: what if multiple editors in the tracked list
-						// need to update?
-						// Need a way to know which editor the Preview editor is
-						// currently
-						// previewing against
-						break;
-					}
-				} finally {
-					editorPreviewDelegate.dispose();
+			IEditorLinkedResources editorLinkedResources = (IEditorLinkedResources) editor.getAdapter(IEditorLinkedResources.class);
+			if (editorLinkedResources != null) {
+				if (editorLinkedResources.hasReference(uri)) {
+					editorPart = editor;
+					// TODO: what if multiple editors in the tracked list
+					// need to update?
+					// Need a way to know which editor the Preview editor is
+					// currently
+					// previewing against
+					break;
 				}
 			}
 		}
@@ -403,10 +423,27 @@ public final class PreviewManager {
 
 	private void addFilewatchListener(IEditorPart editorPart) {
 		IEditorInput editorInput = editorPart.getEditorInput();
+		String watchPath = null;
 		if (editorInput instanceof IFileEditorInput) {
-			String projectPath = ((IFileEditorInput) editorInput).getFile().getProject().getLocation().toOSString();
+			watchPath = ((IFileEditorInput) editorInput).getFile().getProject().getLocation().toOSString();
+		} else if (editorInput instanceof IPathEditorInput) {
+			watchPath = ((IPathEditorInput) editorInput).getPath().toFile().getParentFile().getAbsolutePath();
+		} else if (editorInput instanceof IURIEditorInput) {
 			try {
-				int watchId = FileWatcher.addWatch(projectPath, IJNotify.FILE_ANY, true, new JNotifyAdapter() {
+				IFileStore fileStore = EFS.getStore(((IURIEditorInput) editorInput).getURI());
+				if (fileStore != null) {
+					File file = fileStore.toLocalFile(EFS.NONE, null);
+					if (file != null) {
+						watchPath = file.getParentFile().getAbsolutePath();
+					}
+				}
+			} catch (CoreException e) {
+				Activator.log(e);
+			}
+		}
+		if (watchPath != null) {
+			try {
+				int watchId = FileWatcher.addWatch(watchPath, IJNotify.FILE_ANY, true, new JNotifyAdapter() {
 
 					@Override
 					public void fileCreated(int wd, String rootPath, String name) {
@@ -430,7 +467,10 @@ public final class PreviewManager {
 
 	private void removeFilewatchListener(IEditorPart editorPart) {
 		try {
-			FileWatcher.removeWatch(filewatchIds.get(editorPart));
+			Integer id = filewatchIds.get(editorPart);
+			if (id != null) {
+				FileWatcher.removeWatch(id);
+			}
 		} catch (JNotifyException e) {
 			Activator.log(e);
 		}

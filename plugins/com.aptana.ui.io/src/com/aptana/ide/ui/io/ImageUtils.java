@@ -10,7 +10,8 @@ package com.aptana.ide.ui.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.swing.Icon;
@@ -46,7 +47,9 @@ public final class ImageUtils {
 	private static javax.swing.JFileChooser jFileChooser;
 	private static final WeakHashMap<Object, String> iconToKeyMap = new WeakHashMap<Object, String>();
 
-	private static boolean shouldReset;
+	// Maintain a map of image keys that indicate if a specific icon needs a reset (usually after a theme change).
+	// We cannot just reset all images at once, as it yields image-disposed errors.
+	private static Map<String, Boolean> resetMap = new HashMap<String, Boolean>();
 
 	/**
 	 * 
@@ -93,13 +96,9 @@ public final class ImageUtils {
 			String imageKey = "os.fileType_" + fileType; //$NON-NLS-1$
 
 			ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
-			if (shouldReset) {
-				Collection<String> imageKeys = iconToKeyMap.values();
-				for (String key : imageKeys) {
-					imageRegistry.remove(key);
-				}
-				iconToKeyMap.clear();
-				shouldReset = false;
+			if (resetMap.get(imageKey) != null && resetMap.get(imageKey)) {
+				imageRegistry.remove(imageKey);
+				resetMap.remove(imageKey);
 			}
 			ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(imageKey);
 			if (imageDescriptor != null) {
@@ -125,6 +124,7 @@ public final class ImageUtils {
 					imageDescriptor = ImageDescriptor.createFromImageData(imageData);
 					imageRegistry.put(imageKey, imageDescriptor);
 					iconToKeyMap.put(icon, imageKey);
+					resetMap.put(imageKey, false);
 					return imageRegistry.getDescriptor(imageKey);
 				}
 			}
@@ -142,7 +142,11 @@ public final class ImageUtils {
 
 	public static void themeChanged()
 	{
-		shouldReset = true;
+		String[] keySet = resetMap.keySet().toArray(new String[resetMap.size()]);
+		for (String key : keySet)
+		{
+			resetMap.put(key, true);
+		}
 	}
 
 	private static ImageDescriptor getExtensionImageDescriptor(String extension) {

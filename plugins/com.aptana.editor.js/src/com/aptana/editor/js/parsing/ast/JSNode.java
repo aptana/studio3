@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
@@ -73,7 +73,7 @@ public class JSNode extends ParseNode
 	 */
 	protected JSNode(short type, JSNode... children)
 	{
-		super(IJSParserConstants.LANGUAGE);
+		super(IJSConstants.CONTENT_TYPE_JS);
 
 		// set node type
 		this.fType = type;

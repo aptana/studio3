@@ -29,7 +29,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.browser.WebBrowserViewer;
-import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
@@ -127,8 +126,7 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 	public void createPartControl(Composite parent) {
 		int style = WebBrowserViewer.NAVIGATION_BAR;
 		webBrowser = new WebBrowserViewer(parent, style);
-		WebKitBrowser browser = (WebKitBrowser) webBrowser.getBrowser();
-		browser.addProgressListener(new ProgressListener() {
+		webBrowser.addProgressListener(new ProgressListener() {
 			public void changed(ProgressEvent event) {
 				if (event.total == 0) {
 					return;
@@ -149,7 +147,7 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 				getStatusBarProgressMonitor().done();
 			}
 		});
-		browser.addTitleListener(new TitleListener() {
+		webBrowser.addTitleListener(new TitleListener() {
 			public void changed(TitleEvent event) {
 				setTitleToolTip(event.title);
 			}

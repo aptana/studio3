@@ -15,7 +15,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -65,14 +64,15 @@ public class CloakExpressionDialog extends TitleAreaDialog
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+		main.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
 		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		Label label = new Label(main, SWT.LEFT);
+		Label label = new Label(main, SWT.NONE);
 		label.setText(Messages.CloakExpressionDialog_LBL_Expression);
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		expressionText = new Text(main, SWT.SINGLE | SWT.BORDER);
-		expressionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		expressionText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		expressionText.setText(expression);
 		expressionText.addModifyListener(new ModifyListener()
 		{
@@ -101,7 +101,7 @@ public class CloakExpressionDialog extends TitleAreaDialog
 	@Override
 	protected void okPressed()
 	{
-		expression = expressionText.getText();
+		expression = expressionText.getText().trim();
 		super.okPressed();
 	}
 }

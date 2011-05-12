@@ -17,9 +17,6 @@ public final class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.preferences.messages";//$NON-NLS-1$
 
-	public static String FTPPreferencePage_DirectoryGroupTitle;
-	public static String FTPPreferencePage_FileGroupTitle;
-	public static String FTPPreferencePage_Notes;
 	public static String PermissionsGroup_All;
 	public static String PermissionsGroup_Execute;
 	public static String PermissionsGroup_Group;

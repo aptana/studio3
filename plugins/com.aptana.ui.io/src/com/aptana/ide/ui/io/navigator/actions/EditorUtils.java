@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
@@ -25,7 +26,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.core.CoreStrings;
 import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
@@ -41,60 +41,57 @@ public class EditorUtils
 	/**
 	 * Opens a remote file in its editor.
 	 * 
-	 * @param file
+	 * @param fileStore
 	 *            the file store of the remote file
-	 * @param editorDesc
+	 * @param editorDescriptor
+	 *            the editor descriptor to use, null if the default one for the file type is desired
 	 */
-	public static void openFileInEditor(final IFileStore fileStore)
+	public static void openFileInEditor(final IFileStore fileStore, final IEditorDescriptor editorDescriptor)
 	{
-		Job job = new Job(Messages.EditorUtils_MSG_OpeningRemoteFile + fileStore.getName())
+		Job job = new Job(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.getName()))
 		{
 
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				final IEditorInput editorInput = UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore,
-						monitor);
-
-				if (editorInput == null)
-				{
-					UIUtils.showErrorMessage(CoreStrings.ERROR,
-							MessageFormat.format(Messages.EditorUtils_ERR_OpeningEditor, fileStore.toString()));
+				IEditorInput editorInput;
+				try {
+					editorInput = UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, monitor);
+				} catch (CoreException e) {
+					UIUtils.showErrorMessage(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString()), e);
+					return Status.CANCEL_STATUS;
 				}
-				else
-				{
-					UIJob openEditor = new UIJob("Opening editor") { //$NON-NLS-1$
+				final IEditorInput finalEditorInput = editorInput;
 
-						public IStatus runInUIThread(IProgressMonitor monitor)
+				UIJob openEditor = new UIJob(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString())) {
+
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
+						try
 						{
-							try
+							IWorkbenchPage page = UIUtils.getActivePage();
+							IEditorPart editorPart = null;
+							if (page != null)
 							{
-								IWorkbenchPage page = UIUtils.getActivePage();
-								IEditorPart editorPart = null;
-								if (page != null)
-								{
-									boolean opened = (page.findEditor(editorInput) != null);
+								boolean opened = (page.findEditor(finalEditorInput) != null);
 
-									editorPart = page.openEditor(editorInput,
-											IDE.getEditorDescriptor(editorInput.getName()).getId());
-									if (!opened && editorPart != null)
-									{
-										attachSaveListener(editorPart);
-									}
+								String editorId = editorDescriptor == null ? IDE.getEditorDescriptor(
+										finalEditorInput.getName()).getId() : editorDescriptor.getId();
+								editorPart = page.openEditor(finalEditorInput, editorId);
+								if (!opened && editorPart != null)
+								{
+									attachSaveListener(editorPart);
 								}
 							}
-							catch (Exception e)
-							{
-								UIUtils.showErrorMessage(
-										MessageFormat.format(Messages.EditorUtils_ERR_OpeningEditor,
-												fileStore.toString()), e);
-							}
-							return Status.OK_STATUS;
 						}
-					};
-					openEditor.setSystem(true);
-					openEditor.schedule();
-				}
-
+						catch (Exception e)
+						{
+							return new Status(IStatus.ERROR, IOUIPlugin.PLUGIN_ID, null, e);
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				openEditor.setSystem(true);
+				openEditor.schedule();
 				return Status.OK_STATUS;
 			}
 		};
@@ -142,8 +139,9 @@ public class EditorUtils
 							try
 							{
 								IFileInfo currentFileInfo = originalFile.fetchInfo(EFS.NONE, monitor);
-								if (currentFileInfo.getLastModified() != originalFileInfo.getLastModified()
-										|| currentFileInfo.getLength() != originalFileInfo.getLength())
+								if (currentFileInfo.exists()
+										&& (currentFileInfo.getLastModified() != originalFileInfo.getLastModified() || currentFileInfo
+												.getLength() != originalFileInfo.getLength()))
 								{
 									if (!UIUtils.showPromptDialog(Messages.EditorUtils_OverwritePrompt_Title,
 											MessageFormat.format(Messages.EditorUtils_OverwritePrompt_Message,
@@ -159,11 +157,16 @@ public class EditorUtils
 								UIUtils.showErrorMessage(
 										MessageFormat.format(Messages.EditorUtils_ERR_SavingRemoteFile,
 												originalFile.getName()), e);
-							} finally {
+							}
+							finally
+							{
 								// update cached remote file info
-								try {
+								try
+								{
 									input.setFileInfo(originalFile.fetchInfo(EFS.NONE, monitor));
-								} catch (CoreException e) {
+								}
+								catch (CoreException e)
+								{
 									IOUIPlugin.logError(e);
 								}
 							}

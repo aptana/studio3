@@ -4,7 +4,7 @@
    <extension
          point="com.aptana.formatter.epl.formatterFactory">
       <engineContribution
-            contentType="com.aptana.contenttype.xml">
+            contentType="org.eclipse.core.runtime.xml">
          <formatterFactory
                class="com.aptana.editor.xml.formatter.XMLFormatterFactory"
                description="%xml_code_formatter_description"

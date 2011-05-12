@@ -63,9 +63,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private List<Character> pairs = Collections.emptyList();
 	private boolean autoInsertEnabled = true;
-
-	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
-	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
+	private boolean autoWrapEnabled = true;
 
 	public PeerCharacterCloser(ITextViewer textViewer)
 	{
@@ -105,7 +103,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				return;
 			}
 
-			if (length > 0)
+			if (length > 0 && isAutoWrapEnabled())
 			{
 				wrapSelection(event, document, offset, length);
 				return;
@@ -269,10 +267,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 			// Iterate through partitions sharing same prefix, which is a hacky way of doing "same language"
 			int stackLevel = 0;
-			ITypedRegion[] partitions = document.computePartitioning(0, document.getLength());
+			ITypedRegion[] partitions = computePartitioning(document, 0, document.getLength());
 			for (ITypedRegion part : partitions)
 			{
-				if (!part.getType().startsWith(prefix))
+				// HACK We skip comment or string partitions here. We rely on naming convention for partitions to do so!
+				if (part.getType().contains("_comment") || part.getType().contains("_string") //$NON-NLS-1$ //$NON-NLS-2$
+						|| !part.getType().startsWith(prefix))
 				{
 					continue;
 				}
@@ -296,25 +296,16 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 							char c = before.charAt(i);
 							if (c == openingChar && openingChar == closingCharacter)
 							{
-								if (!ignoreScope(document, i + start))
-								{
-									stackLevel++;
-									stackLevel = stackLevel % 2;
-								}
+								stackLevel++;
+								stackLevel = stackLevel % 2;
 							}
 							else if (c == openingChar)
 							{
-								if (!ignoreScope(document, i + start))
-								{
-									stackLevel++;
-								}
+								stackLevel++;
 							}
 							else if (c == closingCharacter)
 							{
-								if (!ignoreScope(document, i + start))
-								{
-									stackLevel--;
-								}
+								stackLevel--;
 							}
 						}
 					}
@@ -335,27 +326,18 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 						char c = after.charAt(i);
 						if (c == openingChar && openingChar == closingCharacter)
 						{
-							if (!ignoreScope(document, i + startAfter))
-							{
-								stackLevel++;
-								stackLevel = stackLevel % 2;
-							}
+							stackLevel++;
+							stackLevel = stackLevel % 2;
 						}
 						else if (c == openingChar)
 						{
-							if (!ignoreScope(document, i + startAfter))
-							{
-								stackLevel++;
-							}
+							stackLevel++;
 						}
 						else if (c == closingCharacter)
 						{
-							if (!ignoreScope(document, i + startAfter))
-							{
-								stackLevel--;
-								if (stackLevel < 0)
-									return true;
-							}
+							stackLevel--;
+							if (stackLevel < 0)
+								return true;
 						}
 					}
 				}
@@ -369,23 +351,10 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
-	/**
-	 * Checks the scope in the document at the offset. Determine if it's a scope that should be ignored for peer
-	 * characters.
-	 * 
-	 * @param document
-	 * @param offset
-	 * @return
-	 * @throws BadLocationException
-	 */
-	private boolean ignoreScope(IDocument document, int offset) throws BadLocationException
+	protected ITypedRegion[] computePartitioning(IDocument document, int offset, int length)
+			throws BadLocationException
 	{
-		return ignoreScope(getScopeAtOffset(document, offset));
-	}
-
-	private boolean ignoreScope(String scope)
-	{
-		return fgCommentSelector.matches(scope) || fgStringSelector.matches(scope);
+		return document.computePartitioning(offset, length);
 	}
 
 	private boolean isUnclosedPair(VerifyEvent event, IDocument document, int offset) throws BadLocationException
@@ -405,7 +374,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			try
 			{
 				IDocumentExtension3 ext = (IDocumentExtension3) document;
-				ITypedRegion region = ext.getPartition(IDocumentExtension3.DEFAULT_PARTITIONING, offset, false);
+				ITypedRegion region = getPartition(ext, IDocumentExtension3.DEFAULT_PARTITIONING, offset, false);
 				beginning = region.getOffset();
 			}
 			catch (BadPartitioningException e)
@@ -432,6 +401,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			}
 		}
 		return open;
+	}
+
+	protected ITypedRegion getPartition(IDocumentExtension3 ext, String defaultPartitioning, int offset, boolean b)
+			throws BadLocationException, BadPartitioningException
+	{
+		return ext.getPartition(defaultPartitioning, offset, b);
 	}
 
 	/**
@@ -511,20 +486,38 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	/**
 	 * Do we automatically insert matching characters?
-	 * @param autoInsertEnabled
 	 */
 	public boolean isAutoInsertEnabled()
 	{
 		return autoInsertEnabled;
 	}
-	
+
 	/**
 	 * Set the automatic insertion of matching characters on or off
+	 * 
 	 * @param autoInsertEnabled
 	 */
 	public void setAutoInsertEnabled(boolean autoInsertEnabled)
 	{
 		this.autoInsertEnabled = autoInsertEnabled;
+	}
+
+	/**
+	 * Do we automatically wrap selected text?
+	 */
+	public boolean isAutoWrapEnabled()
+	{
+		return autoWrapEnabled;
+	}
+
+	/**
+	 * Set the automatic wrapping of selected text on or off
+	 * 
+	 * @param autoWrapEnabled
+	 */
+	public void setAutoWrapEnabled(boolean autoWrapEnabled)
+	{
+		this.autoWrapEnabled = autoWrapEnabled;
 	}
 
 	/**

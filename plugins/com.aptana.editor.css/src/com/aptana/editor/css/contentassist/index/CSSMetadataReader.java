@@ -270,27 +270,27 @@ public class CSSMetadataReader extends MetadataReader
 		if (this._currentProperty != null)
 		{
 			// add example to the current parameter
-			this._currentProperty.setDescription(this.decodeHtml(text));
+			this._currentProperty.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentElement != null)
 		{
 			// add example to the current parameter
-			this._currentElement.setDescription(this.decodeHtml(text));
+			this._currentElement.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentUserAgent != null)
 		{
 			// add example to the current parameter
-			this._currentUserAgent.setDescription(this.decodeHtml(text));
+			this._currentUserAgent.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentPseudoClass != null)
 		{
 			// add example to the current pseudo-class
-			this._currentPseudoClass.setDescription(this.decodeHtml(text));
+			this._currentPseudoClass.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentPseudoElement != null)
 		{
 			// add example to the current pseudo-element
-			this._currentPseudoElement.setDescription(this.decodeHtml(text));
+			this._currentPseudoElement.setDescription(this.resolveEntities(text));
 		}
 	}
 
@@ -321,19 +321,19 @@ public class CSSMetadataReader extends MetadataReader
 
 		if (this._currentProperty != null)
 		{
-			this._currentProperty.setExample(this.decodeHtml(text));
+			this._currentProperty.setExample(this.resolveEntities(text));
 		}
 		else if (this._currentElement != null)
 		{
-			this._currentElement.setExample(this.decodeHtml(text));
+			this._currentElement.setExample(this.resolveEntities(text));
 		}
 		else if (this._currentPseudoClass != null)
 		{
-			this._currentPseudoClass.setExample(this.decodeHtml(text));
+			this._currentPseudoClass.setExample(this.resolveEntities(text));
 		}
 		else if (this._currentPseudoElement != null)
 		{
-			this._currentPseudoElement.setExample(this.decodeHtml(text));
+			this._currentPseudoElement.setExample(this.resolveEntities(text));
 		}
 	}
 
@@ -351,12 +351,12 @@ public class CSSMetadataReader extends MetadataReader
 		if (this._currentProperty != null)
 		{
 			// add hint to the current property
-			this._currentProperty.setHint(this.decodeHtml(text));
+			this._currentProperty.setHint(this.resolveEntities(text));
 		}
 		else if (this._currentElement != null)
 		{
 			// add hint to the current element
-			this._currentElement.setDescription(this.decodeHtml(text));
+			this._currentElement.setDescription(this.resolveEntities(text));
 		}
 	}
 

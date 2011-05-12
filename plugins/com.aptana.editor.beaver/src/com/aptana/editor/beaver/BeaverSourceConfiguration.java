@@ -8,6 +8,7 @@
 package com.aptana.editor.beaver;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
@@ -18,6 +19,8 @@ import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
@@ -179,5 +182,13 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 		NonRuleBasedDamagerRepairer blockDR = new NonRuleBasedDamagerRepairer(this.getToken("source.block.beaver")); //$NON-NLS-1$
 		reconciler.setDamager(blockDR, BEAVER_BLOCK);
 		reconciler.setRepairer(blockDR, BEAVER_BLOCK);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 */
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		return new CommonContentAssistProcessor(editor);
 	}
 }

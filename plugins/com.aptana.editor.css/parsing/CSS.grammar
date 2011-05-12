@@ -448,6 +448,11 @@ AttributeSelector
 		{:
 			return new CSSAttributeSelectorNode(c);
 		:}
+	|
+		PROPERTY.p // this catches a case when an attribute looks like a property, most likely indicating a deficiency in our scanner
+		{:
+			return new CSSAttributeSelectorNode(p);
+		:}
 	|	HASH.h
 		{:
 			return new CSSAttributeSelectorNode(h);

@@ -15,12 +15,10 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 @SuppressWarnings("restriction")
 public class CSSSourceEditor extends AbstractThemeableEditor
@@ -58,16 +56,6 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	{
 		return new ChainedPreferenceStore(new IPreferenceStore[] { CSSPlugin.getDefault().getPreferenceStore(),
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(ICSSParserConstants.LANGUAGE);
 	}
 
 	/*

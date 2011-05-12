@@ -7,11 +7,14 @@
  */
 package com.aptana.scope;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NameSelector implements ISelectorNode
 {
 	private String _name;
 	private int matchLength = 0;
-	
+
 	/**
 	 * NameSelector
 	 * 
@@ -22,30 +25,26 @@ public class NameSelector implements ISelectorNode
 		this._name = name;
 	}
 
-	public int matchFragments()
-	{
-		return 1;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)
 	 */
 	public boolean matches(MatchContext context)
 	{
+		matchLength = 0;
 		boolean result = false;
-		
+
 		if (context != null && this._name != null && this._name.length() > 0)
 		{
 			String step = context.getCurrentStep();
-			
+
 			if (step != null && step.startsWith(this._name))
 			{
 				// step matches as a prefix, now make sure we matched the whole step
 				// or up to a period
 				int nameLength = this._name.length();
 				int scopeLength = step.length();
-				
+
 				if (scopeLength == nameLength || step.charAt(nameLength) == '.')
 				{
 					result = true;
@@ -54,7 +53,7 @@ public class NameSelector implements ISelectorNode
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -68,8 +67,11 @@ public class NameSelector implements ISelectorNode
 		return this._name;
 	}
 
-	public int matchLength()
+	public List<Integer> matchResults()
 	{
-		return matchLength;
+		// This is always just one segment, so only one value, and it is the length of this match
+		List<Integer> results = new ArrayList<Integer>();
+		results.add(matchLength);
+		return results;
 	}
 }

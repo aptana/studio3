@@ -90,7 +90,7 @@ public class NewFileAction extends BaseSelectionListenerAction {
                         parentStore = fileStore.getParent();
                         // TODO: needs to find the element corresponding to
                         // the parent folder
-                        element = null;
+                        element = parentStore;
                     }
 
                     // creates an empty file
@@ -110,7 +110,7 @@ public class NewFileAction extends BaseSelectionListenerAction {
                     }
 
                     // opens it in the editor
-                    EditorUtils.openFileInEditor(newFile);
+                    EditorUtils.openFileInEditor(newFile, null);
 
                     IOUIPlugin.refreshNavigatorView(element);
                 } catch (CoreException e) {

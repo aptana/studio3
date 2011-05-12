@@ -10,6 +10,7 @@ package com.aptana.js.debug.ui.internal.launchConfigurations;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -20,8 +21,10 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -37,9 +40,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
@@ -50,8 +55,10 @@ import com.aptana.debug.ui.internal.ActiveResourcePathGetterAdapter;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.ui.IWebServerUIConstants;
 
 /**
  * Launch settings tab
@@ -198,11 +205,11 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		group.setFont(parent.getFont());
 
 		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		group.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).margins(10, 3).create());
+		group.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).margins(10, 3).create());
 
 		rbInternalServer = new Button(group, SWT.RADIO);
 		rbInternalServer.setText(Messages.LaunchBrowserSettingsTab_UseBuiltInWebServer);
-		rbInternalServer.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
+		rbInternalServer.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
 
 		rbManagedServer = new Button(group, SWT.RADIO);
 		rbManagedServer.setText(Messages.LaunchBrowserSettingsTab_Use_Selected_Server);
@@ -223,16 +230,31 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		});
 		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations());
 
+		Link configureLink = new Link(group, SWT.NONE);
+		configureLink.setText(MessageFormat.format("<a>{0}</a>", Messages.LaunchBrowserSettingsTab_Configure_Label)); //$NON-NLS-1$
+		configureLink.setLayoutData(GridDataFactory.swtDefaults().create());
+		configureLink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				PreferenceDialog dlg = PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(), IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID,
+						new String[] { IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID }, null, PreferencesUtil.OPTION_FILTER_LOCKED);
+				dlg.open();
+				ISelection selection = managedServersView.getSelection();
+				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations());
+				managedServersView.setSelection(selection);
+			}
+		});
+
 		rbCustomServer = new Button(group, SWT.RADIO);
 		rbCustomServer.setText(Messages.LaunchBrowserSettingsTab_UseExternalWebServer);
 		rbCustomServer.setLayoutData(GridDataFactory.fillDefaults().create());
 
 		fbaseUrlText = new Text(group, SWT.SINGLE | SWT.BORDER);
-		fbaseUrlText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		fbaseUrlText.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).grab(true, false).create());
 
 		fAddProjectName = new Button(group, SWT.CHECK);
 		fAddProjectName.setText(Messages.LaunchBrowserSettingsTab_AppendProjectName);
-		fAddProjectName.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(2, 1).create());
+		fAddProjectName.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(3, 1).create());
 	}
 
 	private void hookListeners(boolean hook) {

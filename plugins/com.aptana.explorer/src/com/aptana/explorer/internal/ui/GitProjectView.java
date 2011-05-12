@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -51,6 +52,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
@@ -300,12 +302,19 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				return false;
 			}
 		}
-		if (repo.switchBranch(branchName, new NullProgressMonitor()))
+		IStatus switchStatus = repo.switchBranch(branchName, new NullProgressMonitor());
+		if (switchStatus.isOK())
 		{
 			refreshViewer(); // might be new file structure
 			return true;
 		}
-		revertToCurrentBranch(repo);
+		String msg = switchStatus.getMessage();
+		if (switchStatus instanceof ProcessStatus)
+		{
+			msg = ((ProcessStatus) switchStatus).getStdErr();
+		}
+		MessageDialog.openError(getSite().getShell(), Messages.GitProjectView_SwitchBranchFailedTitle, msg);
+		// revertToCurrentBranch(repo);
 		return false;
 	}
 
@@ -338,7 +347,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					menuItem.setSelection(menuItem.getText().equals(currentBranchName));
 				}
 				branchesToolbar.pack(true);
-				// TODO Pop a dialog saying we couldn't branches
 				return Status.OK_STATUS;
 			}
 		};

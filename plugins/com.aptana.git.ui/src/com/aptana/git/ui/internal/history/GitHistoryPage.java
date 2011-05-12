@@ -59,9 +59,8 @@ import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.IAptanaHistory;
 
-public class GitHistoryPage extends HistoryPage implements IAptanaHistory
+public class GitHistoryPage extends HistoryPage
 {
 
 	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
@@ -194,6 +193,10 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		attachCommitSelectionChanged();
 		hookContextMenu(commentViewer);
 		layout();
+		setTheme(false);
+		commentViewer.setText("<html><head></head><body style=\"background-color: " //$NON-NLS-1$
+				+ toHex(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground())
+				+ ";\"></body></html>"); //$NON-NLS-1$
 	}
 
 	public ISelectionProvider getSelectionProvider()
@@ -416,7 +419,7 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		return false;
 	}
 
-	public void setTheme(boolean revert)
+	private void setTheme(boolean revert)
 	{
 		applyTheme(ourControl, revert);
 		applyTheme(graphDetailSplit, revert);

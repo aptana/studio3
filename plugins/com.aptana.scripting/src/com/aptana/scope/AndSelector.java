@@ -7,10 +7,12 @@
  */
 package com.aptana.scope;
 
+import java.util.Collections;
+import java.util.List;
+
 public class AndSelector extends BinarySelector
 {
-	private int matchFragments = 0;
-	private int matchLength;
+	private List<Integer> matchResults;
 
 	/**
 	 * AndSelector
@@ -29,8 +31,7 @@ public class AndSelector extends BinarySelector
 	 */
 	public boolean matches(MatchContext context)
 	{
-		matchFragments = 0;
-		matchLength = 0;
+		matchResults = null;
 		boolean result = false;
 
 		if (context != null && this._left != null && this._right != null)
@@ -40,19 +41,21 @@ public class AndSelector extends BinarySelector
 			result = this._left.matches(context) && this._right.matches(context);
 			if (result)
 			{
-				matchFragments = this._left.matchFragments() + this._right.matchFragments();
-				matchLength = this._left.matchLength() + this._right.matchLength();
+				matchResults = this._left.matchResults();
+				if (matchResults.isEmpty())
+				{
+					matchResults = this._right.matchResults();
+				}
+				else
+				{
+					matchResults.addAll(this._right.matchResults());
+				}
 			}
 
 			context.popCurrentStep(!result);
 		}
 
 		return result;
-	}
-
-	public int matchLength()
-	{
-		return matchLength;
 	}
 
 	/*
@@ -64,8 +67,12 @@ public class AndSelector extends BinarySelector
 		return ""; //$NON-NLS-1$
 	}
 
-	public int matchFragments()
+	public List<Integer> matchResults()
 	{
-		return matchFragments;
+		if (matchResults == null)
+		{
+			return Collections.emptyList();
+		}
+		return matchResults;
 	}
 }

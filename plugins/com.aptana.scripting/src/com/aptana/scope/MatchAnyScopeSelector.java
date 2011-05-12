@@ -7,6 +7,9 @@
  */
 package com.aptana.scope;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * MatchAnyScopeSelector
  */
@@ -55,5 +58,10 @@ public class MatchAnyScopeSelector implements IScopeSelector
 	public boolean matches(String[] scopes)
 	{
 		return true;
+	}
+
+	public List<Integer> matchResults()
+	{
+		return Collections.emptyList();
 	}
 }

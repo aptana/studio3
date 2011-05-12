@@ -7,17 +7,27 @@
  */
 package com.aptana.ide.ui.io.navigator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IWorkspaceRoot;
+
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 public class ProjectExplorerContentProvider extends FileTreeContentProvider
 {
+
+	private static final String LOCAL_SHORTCUTS_ID = "com.aptana.ide.core.io.localShortcuts"; //$NON-NLS-1$
 
 	@Override
 	public Object[] getElements(Object inputElement)
 	{
 		if (inputElement instanceof IWorkspaceRoot)
 		{
-			return new Object[] { LocalFileSystems.getInstance() };
+			List<Object> children = new ArrayList<Object>();
+			children.add(LocalFileSystems.getInstance());
+			children.add(CoreIOPlugin.getConnectionPointManager().getConnectionPointCategory(LOCAL_SHORTCUTS_ID));
+			return children.toArray(new Object[children.size()]);
 		}
 		return super.getElements(inputElement);
 	}

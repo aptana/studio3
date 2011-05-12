@@ -7,11 +7,17 @@
  */
 package com.aptana.scope;
 
+import java.util.List;
+
 public interface ISelectorNode
 {
 	boolean matches(MatchContext context);
-	
-	int matchLength();
 
-	int matchFragments();
+	/**
+	 * See {@link IScopeSelector#matchResults()}. Should never return null, if there are no matches, return an empty
+	 * List.
+	 * 
+	 * @return
+	 */
+	List<Integer> matchResults();
 }

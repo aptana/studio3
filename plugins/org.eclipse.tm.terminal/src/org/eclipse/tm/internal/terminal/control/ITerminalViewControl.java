@@ -18,6 +18,7 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 
 /**
@@ -29,7 +30,7 @@ public interface ITerminalViewControl {
 	 * Set the encoding that the Terminal uses to decode byte streams into
 	 * characters.
 	 *
-	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#setEncoding(String)
+	 * @see ITerminalControl#setEncoding(String)
 	 * @since org.eclipse.tm.terminal 2.0
 	 */
 	void setEncoding(String encoding) throws UnsupportedEncodingException;
@@ -38,7 +39,7 @@ public interface ITerminalViewControl {
 	 * Get the Terminal's current encoding.
 	 *
 	 * @return the current Encoding of the Terminal.
-	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#getEncoding()
+	 * @see ITerminalControl#getEncoding()
 	 * @since org.eclipse.tm.terminal 2.0
 	 */
 	String getEncoding();

@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -88,6 +89,8 @@ public class GitRepository
 		}
 	}
 
+	private static final String GITHUB_COM = "github.com"; //$NON-NLS-1$
+
 	/**
 	 * Filename to store ignores of files.
 	 */
@@ -116,6 +119,17 @@ public class GitRepository
 	static final String HEAD = "HEAD"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
+
+	/**
+	 * Regexp used to grab list of remote names out of .git/config.
+	 */
+	private final static Pattern fgRemoteNamePattern = Pattern.compile("\\[remote \"(.+?)\"\\]"); //$NON-NLS-1$
+
+	/**
+	 * Regexp used to grab list of remote URLs out of .git/config.
+	 */
+	private final static Pattern fgRemoteURLPattern = Pattern
+			.compile("\\[remote \"(.+?)\"\\](\\s+[^\\[]+)?\\s+url = (.+?)\\s+"); //$NON-NLS-1$
 
 	/**
 	 * Monitor to allow simultaneous read processes, but only one "write" process which alters the repo/index.
@@ -497,23 +511,33 @@ public class GitRepository
 	}
 
 	/**
-	 * Returns the set of remotes attached to this repository. 'git remote'
+	 * Returns the set of remotes attached to this repository. Equivalent of 'git remote'. For performance reasons, we
+	 * parse the list of remotes from .git/config file rather than run 'git remote' process.§We can't just look at
+	 * .git/remotes, because entries only appear there after a push has been performed.
 	 * 
 	 * @return
 	 */
 	public Set<String> remotes()
 	{
-		IStatus result = execute(GitRepository.ReadWrite.READ, "remote"); //$NON-NLS-1$
-		if (result == null || !result.isOK())
-		{
-			return Collections.emptySet();
-		}
-		String output = result.getMessage();
-		String[] lines = output.split("\r\n|\r|\n"); //$NON-NLS-1$
 		Set<String> set = new HashSet<String>();
-		for (String line : lines)
+		monitor.enterRead();
+		try
 		{
-			set.add(line);
+			File configFile = gitFile("config"); //$NON-NLS-1$
+			String contents = IOUtil.read(new FileInputStream(configFile));
+			Matcher m = fgRemoteNamePattern.matcher(contents);
+			while (m.find())
+			{
+				set.add(m.group(1));
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			GitPlugin.logError(e);
+		}
+		finally
+		{
+			monitor.exitRead();
 		}
 		return set;
 	}
@@ -567,11 +591,11 @@ public class GitRepository
 	 *            the new branch to use as the working branch
 	 * @return true if the switch happened. false otherwise.
 	 */
-	public boolean switchBranch(String branchName, IProgressMonitor monitor)
+	public IStatus switchBranch(String branchName, IProgressMonitor monitor)
 	{
 		if (branchName == null)
 		{
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "Branch to switch to must be provided.");
 		}
 		SubMonitor sub = SubMonitor.convert(monitor, 4);
 		try
@@ -591,13 +615,13 @@ public class GitRepository
 			if (result == null || !result.isOK())
 			{
 				openProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
-				return false;
+				return result;
 			}
 			_headRef = null;
 			readCurrentBranch();
 			fireBranchChangeEvent(oldBranchName, branchName);
 			sub.worked(1);
-			return true;
+			return result;
 		}
 		finally
 		{
@@ -1043,34 +1067,33 @@ public class GitRepository
 	}
 
 	/**
-	 * Returns the set of URLs for all remotes.
+	 * Returns the set of URLs for all remotes. For performance reasons, we read the .git/config file in and then run a
+	 * regexp to search for all remote's URLs. Takes roughly 1ms, versus running a git config regexp process which takes
+	 * about 45-55ms per remote.
 	 * 
 	 * @return
 	 */
 	public Set<String> remoteURLs()
 	{
-		Set<String> remotes = new HashSet<String>();
-		int index;
-		for (String remoteBranch : remoteBranches())
+		Set<String> remoteURLs = new HashSet<String>();
+		monitor.enterRead();
+		try
 		{
-			index = remoteBranch.indexOf("/"); //$NON-NLS-1$
-			if (index > -1)
+			File configFile = gitFile("config"); //$NON-NLS-1$
+			String contents = IOUtil.read(new FileInputStream(configFile));
+			Matcher m = fgRemoteURLPattern.matcher(contents);
+			while (m.find())
 			{
-				remotes.add(remoteBranch.substring(0, index));
+				remoteURLs.add(m.group(3));
 			}
 		}
-
-		Set<String> remoteURLs = new HashSet<String>();
-		for (String string : remotes)
+		catch (FileNotFoundException e)
 		{
-			IStatus result = execute(ReadWrite.READ, "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
-					"^remote\\." + string + "\\.url"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (result == null || !result.isOK())
-			{
-				continue;
-			}
-			String output = result.getMessage();
-			remoteURLs.add(output.substring(output.indexOf(".url ") + 5)); //$NON-NLS-1$
+			GitPlugin.logError(e);
+		}
+		finally
+		{
+			monitor.exitRead();
 		}
 		return remoteURLs;
 	}
@@ -1184,7 +1207,7 @@ public class GitRepository
 	}
 
 	/**
-	 * Sets up the ENV so we can properly hit remotes over SSH.
+	 * Sets up the ENV so we can properly hit remotes over SSH/HTTPS.
 	 * 
 	 * @param readOrWrite
 	 *            if the process modifies the index or repo, it should be marked WRITE (only one at a time, no READS
@@ -1192,12 +1215,12 @@ public class GitRepository
 	 * @param args
 	 * @return
 	 */
-	IStatus executeWithGitSSH(ReadWrite readOrWrite, String... args)
+	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, gitSSHEnv(), args);
+		return execute(readOrWrite, gitShellEnv(), args);
 	}
 
-	private Map<String, String> gitSSHEnv()
+	private Map<String, String> gitShellEnv()
 	{
 		// Set up GIT_SSH!
 		Map<String, String> env = new HashMap<String, String>();
@@ -1655,7 +1678,7 @@ public class GitRepository
 				continue;
 			}
 
-			IStatus result = executeWithGitSSH(GitRepository.ReadWrite.READ, "ls-remote", "--heads", remote); //$NON-NLS-1$ //$NON-NLS-2$
+			IStatus result = executeWithPromptHandling(GitRepository.ReadWrite.READ, "ls-remote", "--heads", remote); //$NON-NLS-1$ //$NON-NLS-2$
 			if (result == null || !result.isOK())
 			{
 				// Failed to execute properly
@@ -1753,5 +1776,32 @@ public class GitRepository
 	void exitRead()
 	{
 		monitor.exitRead();
+	}
+
+	public Set<String> getGithubURLs()
+	{
+		Set<String> githubURLs = new HashSet<String>();
+		// Check the remote urls for github and use that to determine URL we need!
+		for (String remoteURL : remoteURLs())
+		{
+			if (!remoteURL.contains(GITHUB_COM))
+			{
+				continue;
+			}
+			String remaining = remoteURL.substring(remoteURL.indexOf(GITHUB_COM) + 10);
+			if (remaining.startsWith("/") || remaining.startsWith(":")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				remaining = remaining.substring(1);
+			}
+			if (remaining.endsWith(GitRepository.GIT_DIR))
+			{
+				remaining = remaining.substring(0, remaining.length() - 4);
+			}
+			int split = remaining.indexOf("/"); //$NON-NLS-1$
+			String userName = remaining.substring(0, split);
+			String repoName = remaining.substring(split + 1);
+			githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
+		}
+		return githubURLs;
 	}
 }

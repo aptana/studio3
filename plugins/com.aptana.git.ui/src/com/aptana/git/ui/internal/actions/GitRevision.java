@@ -18,6 +18,7 @@ class GitRevision extends Revision
 
 	private String sha;
 	private String author;
+	@SuppressWarnings("unused")
 	private String committer;
 	private Date timestamp;
 	private String summary;
@@ -35,7 +36,7 @@ class GitRevision extends Revision
 	@Override
 	public Object getHoverInfo()
 	{
-		return MessageFormat.format("{0}<br />Author: {1}, Committer: {2}", this.summary, this.author, this.committer); //$NON-NLS-1$
+		return MessageFormat.format("{0} {1}<br />{2} {3}", this.sha, this.author, this.timestamp, this.summary); //$NON-NLS-1$
 	}
 
 	@Override

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import com.aptana.editor.dtd.IDTDConstants;
 import com.aptana.editor.dtd.parsing.ast.DTDAttListDeclNode;
 import com.aptana.editor.dtd.parsing.ast.DTDAttributeNode;
 import com.aptana.editor.dtd.parsing.ast.DTDElementDeclNode;
@@ -159,7 +159,7 @@ public class DTDTransformer
 
 		try
 		{
-			result = ParserPoolFactory.parse(DTDParserConstants.LANGUAGE, source);
+			result = ParserPoolFactory.parse(IDTDConstants.CONTENT_TYPE_DTD, source);
 		}
 		catch (Exception e)
 		{

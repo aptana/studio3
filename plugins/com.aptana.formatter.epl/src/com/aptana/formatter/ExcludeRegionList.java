@@ -14,8 +14,10 @@ package com.aptana.formatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
@@ -23,22 +25,50 @@ import org.eclipse.jface.text.Region;
 public class ExcludeRegionList
 {
 
+	/**
+	 * Defines the behavior that the writer should follow when hitting an excluded region.
+	 */
+	public static enum EXCLUDE_STRATEGY
+	{
+		SKIP, WRITE_AS_IS
+	};
+
 	private final List<IRegion> excludes = new ArrayList<IRegion>();
+	private final Map<IRegion, EXCLUDE_STRATEGY> excludeActions = new HashMap<IRegion, ExcludeRegionList.EXCLUDE_STRATEGY>();
 
 	public boolean isExcluded(int start, int end)
 	{
 		if (!excludes.isEmpty())
 		{
-			for (final IRegion region : excludes)
-			{
-				final int regionEnd = region.getOffset() + region.getLength();
-				if (start <= regionEnd && region.getOffset() <= end)
-				{
-					return true;
-				}
-			}
+			return findRegion(start, end) != null;
 		}
 		return false;
+	}
+
+	public EXCLUDE_STRATEGY getExcludeStrategy(int start, int end)
+	{
+		if (!excludes.isEmpty())
+		{
+			IRegion region = findRegion(start, end);
+			if (region != null)
+			{
+				return excludeActions.get(region);
+			}
+		}
+		return null;
+	}
+
+	private IRegion findRegion(int start, int end)
+	{
+		for (final IRegion region : excludes)
+		{
+			final int regionEnd = region.getOffset() + region.getLength();
+			if (start <= regionEnd && region.getOffset() <= end)
+			{
+				return region;
+			}
+		}
+		return null;
 	}
 
 	public IRegion[] selectValidRanges(int start, int end)
@@ -73,7 +103,7 @@ public class ExcludeRegionList
 		return Collections.unmodifiableList(excludes);
 	}
 
-	public void excludeRegion(IRegion region)
+	public void excludeRegion(IRegion region, EXCLUDE_STRATEGY strategy)
 	{
 		int start = region.getOffset();
 		int end = region.getOffset() + region.getLength();
@@ -107,10 +137,13 @@ public class ExcludeRegionList
 		if (start == region.getOffset() && end == region.getOffset() + region.getLength())
 		{
 			excludes.add(region);
+			excludeActions.put(region, strategy);
 		}
 		else
 		{
-			excludes.add(new Region(start, end - start));
+			Region newRegion = new Region(start, end - start);
+			excludes.add(newRegion);
+			excludeActions.put(newRegion, strategy);
 		}
 		Collections.sort(excludes, REGION_COMPARATOR);
 	}

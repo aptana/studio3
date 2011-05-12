@@ -28,15 +28,15 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -49,8 +49,8 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 
 	public HTMLOutlineContentProvider()
 	{
-		addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineContentProvider());
-		addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineContentProvider());
+		addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
+		addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				String attribute = getExternalCSSReference(item);
 				if (attribute != null && attribute.length() > 0)
 				{
-					return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
+					return getExternalChildren(parentElement, attribute, ICSSConstants.CONTENT_TYPE_CSS);
 				}
 			}
 			else
@@ -99,7 +99,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			String attribute = getExternalJSReference(item);
 			if (attribute != null && attribute.length() > 0)
 			{
-				return getExternalChildren(parentElement, attribute, IJSParserConstants.LANGUAGE);
+				return getExternalChildren(parentElement, attribute, IJSConstants.CONTENT_TYPE_JS);
 			}
 			return getChildren(item.getChild(0));
 		}

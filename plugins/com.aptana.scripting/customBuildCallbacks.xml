@@ -104,7 +104,7 @@
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="ruby.ruble" />
 		  	<param name="bundle.dir.name" value="ruby.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="development" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="rails.ruble" />

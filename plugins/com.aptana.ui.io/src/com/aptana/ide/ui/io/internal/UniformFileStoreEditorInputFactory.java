@@ -24,6 +24,8 @@ import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
+import com.aptana.core.io.efs.SyncUtils;
+
 public class UniformFileStoreEditorInputFactory implements IElementFactory
 {
 
@@ -57,21 +59,14 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 		return null;
 	}
 
-	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor)
+	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor) throws CoreException
 	{
 		if (fileStore.getFileSystem() == EFS.getLocalFileSystem()) {
 			return new FileStoreEditorInput(fileStore);
 		}
-		try
-		{
-			IFileStore localFileStore = toLocalFileStore(fileStore, monitor);
-			IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
-			return new UniformFileStoreEditorInput(localFileStore, fileStore, remoteFileInfo);
-		}
-		catch (CoreException e)
-		{
-		}
-		return null;
+		IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
+		IFileStore localFileStore = toLocalFileStore(fileStore, remoteFileInfo, monitor);
+		return new UniformFileStoreEditorInput(localFileStore, fileStore, remoteFileInfo);
 	}
 
 	static void saveState(IMemento memento, UniformFileStoreEditorInput input)
@@ -89,7 +84,7 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 	 *            the progress monitor (could be null)
 	 * @return File the local file store
 	 */
-	private static IFileStore toLocalFileStore(IFileStore fileStore, IProgressMonitor monitor) throws CoreException
+	private static IFileStore toLocalFileStore(IFileStore fileStore, IFileInfo fileInfo, IProgressMonitor monitor) throws CoreException
 	{
 		File file = fileStore.toLocalFile(EFS.NONE, monitor);
 		if (file != null)
@@ -111,7 +106,7 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 			return fileStore;
 		}
 		IFileStore localFileStore = EFS.getLocalFileSystem().fromLocalFile(file);
-		fileStore.copy(localFileStore, EFS.OVERWRITE, monitor);
+		SyncUtils.copy(fileStore, fileInfo, localFileStore, EFS.NONE, monitor);
 		file.deleteOnExit();
 
 		return localFileStore;

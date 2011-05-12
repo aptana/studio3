@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.actions;
 
 import java.util.ArrayList;
@@ -46,7 +53,7 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
 		for (final String branchName : repo.allBranches())
 		{
-			contributions.add(new MergeBranchContribtuionItem(repo, branchName));
+			contributions.add(new MergeBranchContributionItem(repo, branchName));
 		}
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
@@ -56,12 +63,12 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 		MergeBranchHandler.mergeBranch(repo, branchName);
 	}
 
-	private class MergeBranchContribtuionItem extends ContributionItem
+	private class MergeBranchContributionItem extends ContributionItem
 	{
 		private GitRepository repo;
 		private String branchName;
 
-		MergeBranchContribtuionItem(GitRepository repo, String branchName)
+		MergeBranchContributionItem(GitRepository repo, String branchName)
 		{
 			this.repo = repo;
 			this.branchName = branchName;

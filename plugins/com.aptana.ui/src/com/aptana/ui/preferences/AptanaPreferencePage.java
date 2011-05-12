@@ -22,6 +22,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.ui.Messages;
 import com.aptana.ui.UIPlugin;
 
@@ -29,6 +30,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 {
 
 	protected static String PAGE_ID = "com.aptana.ui.AptanaPreferencePage"; //$NON-NLS-1$
+
 	private Button debugButton;
 	private Button migrateButton;
 	private Button autoRefreshButton;
@@ -82,40 +84,41 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		return comp;
 	}
 
-	private boolean isInDebugMode()
+	private static boolean isInDebugMode()
 	{
 		// Don't use EclipseUtil.isInDebugMode, because that also checks for osgi.debug system property or -debug flag
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, false, null);
+				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, PreferenceInitializer.DEFAULT_DEBUG_MODE, null);
 	}
 
-	private boolean autoMigration()
+	private static boolean autoMigration()
 	{
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, false, null);
+				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
+				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
 	}
 
-	private boolean autoRefresh()
+	private static boolean autoRefresh()
 	{
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, true, null);
+				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
+				PreferenceInitializer.DEFAULT_AUTO_REFRESH_PROJECTS, null);
 	}
 
 	@Override
 	public boolean performOk()
 	{
+		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
+		prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, debugButton.getSelection());
+		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
+		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
-			prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, debugButton.getSelection());
-			prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
-			prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
 		{
 			UIPlugin.log(e);
-			return false;
 		}
 
 		return super.performOk();
@@ -124,19 +127,14 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	@Override
 	protected void performDefaults()
 	{
-		try
-		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
-			prefs.remove(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS);
-			prefs.remove(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS);
-			prefs.remove(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS);
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			UIPlugin.log(e);
-		}
-		debugButton.setSelection(isInDebugMode());
+		debugButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, PreferenceInitializer.DEFAULT_DEBUG_MODE, null));
+		migrateButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
+				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null));
+		autoRefreshButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
+				PreferenceInitializer.DEFAULT_AUTO_REFRESH_PROJECTS, null));
 
 		super.performDefaults();
 	}

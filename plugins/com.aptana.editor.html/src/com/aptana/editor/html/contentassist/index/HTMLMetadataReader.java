@@ -317,11 +317,11 @@ public class HTMLMetadataReader extends MetadataReader
 
 		if (this._currentAttribute != null)
 		{
-			this._currentAttribute.setDeprecated(this.decodeHtml(text));
+			this._currentAttribute.setDeprecated(this.resolveEntities(text));
 		}
 		else if (this._currentElement != null)
 		{
-			this._currentElement.setDeprecated(this.decodeHtml(text));
+			this._currentElement.setDeprecated(this.resolveEntities(text));
 		}
 	}
 
@@ -338,19 +338,19 @@ public class HTMLMetadataReader extends MetadataReader
 
 		if (this._currentAttribute != null)
 		{
-			this._currentAttribute.setDescription(this.decodeHtml(text));
+			this._currentAttribute.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentElement != null)
 		{
-			this._currentElement.setDescription(this.decodeHtml(text));
+			this._currentElement.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentEvent != null)
 		{
-			this._currentEvent.setDescription(this.decodeHtml(text));
+			this._currentEvent.setDescription(this.resolveEntities(text));
 		}
 		else if (this._currentEntity != null)
 		{
-			this._currentEntity.setDescription(this.decodeHtml(text));
+			this._currentEntity.setDescription(this.resolveEntities(text));
 		}
 	}
 
@@ -406,7 +406,7 @@ public class HTMLMetadataReader extends MetadataReader
 
 		if (this._currentElement != null)
 		{
-			this._currentElement.setExample(this.decodeHtml(text));
+			this._currentElement.setExample(this.resolveEntities(text));
 		}
 	}
 

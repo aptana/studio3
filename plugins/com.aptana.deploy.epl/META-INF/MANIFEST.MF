@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Deploy EPL
+Bundle-SymbolicName: com.aptana.deploy.epl;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: Appcelerator, Inc.
+Fragment-Host: com.aptana.deploy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

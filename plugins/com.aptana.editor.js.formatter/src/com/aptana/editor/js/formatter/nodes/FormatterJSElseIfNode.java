@@ -19,14 +19,18 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 public class FormatterJSElseIfNode extends FormatterBlockWithBeginEndNode
 {
 
+	private final boolean commentOnPreviousLine;
+
 	/**
 	 * @param document
+	 * @param commentOnPreviousLine
 	 * @param hasBlockedChild
 	 * @param isInAssignment
 	 */
-	public FormatterJSElseIfNode(IFormatterDocument document)
+	public FormatterJSElseIfNode(IFormatterDocument document, boolean commentOnPreviousLine)
 	{
 		super(document);
+		this.commentOnPreviousLine = commentOnPreviousLine;
 	}
 
 	/*
@@ -37,7 +41,8 @@ public class FormatterJSElseIfNode extends FormatterBlockWithBeginEndNode
 	protected boolean isAddingBeginNewLine()
 	{
 		// breaking else-if expressions?
-		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT);
+		return commentOnPreviousLine
+				|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT);
 	}
 
 	/*
@@ -72,7 +77,7 @@ public class FormatterJSElseIfNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode# shouldConsumePreviousWhiteSpaces()
 	 */
 	@Override
 	public boolean shouldConsumePreviousWhiteSpaces()

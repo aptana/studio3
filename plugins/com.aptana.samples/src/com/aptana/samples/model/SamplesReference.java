@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -23,12 +24,14 @@ public class SamplesReference
 
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 	private static final String ATTR_PREVIEW_HANDLER = "previewHandler"; //$NON-NLS-1$
+	public static final String REMOTE_DESCRIPTION_KEY = "remoteDescription"; //$NON-NLS-1$
 
 	private final SampleCategory category;
 	private final String path;
 	private final IConfigurationElement configElement;
 
 	private String name;
+	private Map<String, String> descriptions;
 	private boolean isRemote;
 	private String infoFile;
 	private ISampleProjectHandler projectHandler;
@@ -38,11 +41,13 @@ public class SamplesReference
 
 	private List<SampleEntry> samples;
 
-	public SamplesReference(SampleCategory category, String path, boolean isRemote, IConfigurationElement element)
+	public SamplesReference(SampleCategory category, String path, boolean isRemote, IConfigurationElement element,
+			Map<String, String> toolTipText)
 	{
 		this.category = category;
 		this.path = path;
 		this.isRemote = isRemote;
+		this.descriptions = toolTipText;
 		configElement = element;
 		natures = new String[0];
 		includePaths = new String[0];
@@ -52,6 +57,16 @@ public class SamplesReference
 		{
 			loadSamples();
 		}
+	}
+
+	public String getDescriptionText()
+	{
+		if (isRemote)
+		{
+			return descriptions.get(REMOTE_DESCRIPTION_KEY);
+		}
+
+		return null;
 	}
 
 	public SampleCategory getCategory()
@@ -152,13 +167,25 @@ public class SamplesReference
 
 		File samplesDirectory = new File(path);
 		File[] sampleFiles = samplesDirectory.listFiles();
-		if (sampleFiles != null)
+		if (sampleFiles == null)
+		{
+			samples.add(new SampleEntry(samplesDirectory, this, true));
+		}
+		else
 		{
 			for (File file : sampleFiles)
 			{
 				if (file.isDirectory())
 				{
-					samples.add(new SampleEntry(file, this, true));
+					String directoryName = file.getName();
+					if (descriptions.containsKey(directoryName))
+					{
+						samples.add(new SampleEntry(file, this, true, descriptions.get(directoryName)));
+					}
+					else
+					{
+						samples.add(new SampleEntry(file, this, true));
+					}
 				}
 			}
 		}

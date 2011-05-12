@@ -7,10 +7,12 @@
  */
 package com.aptana.scope;
 
+import java.util.Collections;
+import java.util.List;
+
 public class OrSelector extends BinarySelector
 {
-	private int matchFragments = 0;
-	private int matchLength;
+	private List<Integer> matchResults;
 
 	/**
 	 * OrSelector
@@ -29,9 +31,8 @@ public class OrSelector extends BinarySelector
 	 */
 	public boolean matches(MatchContext context)
 	{
+		matchResults = null;
 		boolean result = false;
-		matchFragments = 0;
-		matchLength = 0;
 
 		if (context != null)
 		{
@@ -42,8 +43,7 @@ public class OrSelector extends BinarySelector
 				result = this._left.matches(context);
 				if (result)
 				{
-					matchFragments = this._left.matchFragments();
-					matchLength = this._left.matchLength();
+					matchResults = this._left.matchResults();
 				}
 
 				if (result == false && this._right != null)
@@ -51,8 +51,7 @@ public class OrSelector extends BinarySelector
 					result = this._right.matches(context);
 					if (result)
 					{
-						matchFragments = this._right.matchFragments();
-						matchLength = this._right.matchLength();
+						matchResults = this._right.matchResults();
 					}
 				}
 			}
@@ -61,11 +60,6 @@ public class OrSelector extends BinarySelector
 		}
 
 		return result;
-	}
-
-	public int matchLength()
-	{
-		return matchLength;
 	}
 
 	/*
@@ -77,8 +71,12 @@ public class OrSelector extends BinarySelector
 		return ","; //$NON-NLS-1$
 	}
 
-	public int matchFragments()
+	public List<Integer> matchResults()
 	{
-		return matchFragments;
+		if (matchResults == null)
+		{
+			return Collections.emptyList();
+		}
+		return matchResults;
 	}
 }

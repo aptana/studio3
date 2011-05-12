@@ -8,6 +8,7 @@
 package com.aptana.ide.ui.io.internal;
 
 import java.net.URI;
+import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -46,7 +47,13 @@ public class UniformFileStoreEditorInput extends FileStoreEditorInput implements
 	@Override
 	public String getName()
 	{
-		return fRealFileStore.getName();
+		String name = fRealFileStore.getName();
+		if (fRealFileStore instanceof IExtendedFileStore)
+		{
+			name = MessageFormat.format("({0}) {1}", //$NON-NLS-1$
+					((IExtendedFileStore) fRealFileStore).toCanonicalURI().getScheme(), name);
+		}
+		return name;
 	}
 
 	@Override

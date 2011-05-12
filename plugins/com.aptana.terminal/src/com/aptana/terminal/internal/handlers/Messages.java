@@ -14,8 +14,7 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.terminal.internal.handlers.messages"; //$NON-NLS-1$
 
-	public static String ShowTerminalHandler_ERR_OpeningTerminal;
-	public static String ShowTerminalHandler_LBL_Terminal;
+	public static String OpenTerminalHandler_LBL_Terminal;
 
 	static
 	{

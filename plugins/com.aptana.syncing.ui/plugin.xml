@@ -530,6 +530,9 @@
          <adapter
                type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter">
          </adapter>
+         <adapter
+               type="org.eclipse.core.filesystem.IFileStore">
+         </adapter>
       </factory>
    </extension>
    <extension
@@ -561,6 +564,19 @@
             name="%wizard.import.name">
          <description>
             %wizard.import.description
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <wizard
+            category="com.aptana.ui.wizards.export.category"
+            class="com.aptana.syncing.ui.wizards.ExportConnectionsWizard"
+            icon="icons/full/obj16/transfer_files.png"
+            id="com.aptana.syncing.ui.wizards.export"
+            name="%wizard.export.name">
+         <description>
+            %wizard.export.description
          </description>
       </wizard>
    </extension>

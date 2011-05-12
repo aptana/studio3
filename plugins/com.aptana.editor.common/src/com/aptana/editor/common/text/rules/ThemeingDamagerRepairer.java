@@ -88,9 +88,16 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			{
 				last = scope;
 			}
-			else if (scope.length() > 0 && !scope.endsWith(last))
+			else if (scope.length() > 0)
 			{
-				last = scope + " " + last; //$NON-NLS-1$
+				if (scope.endsWith(last))
+				{
+					last = scope;
+				}
+				else
+				{
+					last = scope + " " + last; //$NON-NLS-1$
+				}
 			}
 			IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(last);
 			lastAttribute = super.getTokenTextAttribute(converted);

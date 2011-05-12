@@ -8,12 +8,10 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.yaml.internal.text.YAMLFoldingComputer;
 import com.aptana.editor.yaml.outline.YAMLOutlineContentProvider;
 import com.aptana.editor.yaml.outline.YAMLOutlineLabelProvider;
-import com.aptana.editor.yaml.parsing.IYAMLParserConstants;
 
 @SuppressWarnings("restriction")
 public class YAMLEditor extends AbstractThemeableEditor
@@ -38,16 +36,6 @@ public class YAMLEditor extends AbstractThemeableEditor
 	{
 		return new ChainedPreferenceStore(new IPreferenceStore[] { YAMLPlugin.getDefault().getPreferenceStore(),
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(IYAMLParserConstants.LANGUAGE);
 	}
 
 	/*

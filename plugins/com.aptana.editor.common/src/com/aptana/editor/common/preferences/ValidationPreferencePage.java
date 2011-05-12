@@ -9,6 +9,8 @@ package com.aptana.editor.common.preferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +109,14 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			}
 		});
 		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
+		Collections.sort(languages, new Comparator<ValidatorLanguage>()
+		{
+
+			public int compare(ValidatorLanguage o1, ValidatorLanguage o2)
+			{
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		});
 		languagesViewer.setInput(languages.toArray(new ValidatorLanguage[languages.size()]));
 
 		if (languages.size() > 0)

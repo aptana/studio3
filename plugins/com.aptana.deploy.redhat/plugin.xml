@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+<!-- Red Hat cannot deploy an existing project!
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.redhat.ui.wizard.RedHatDeployWizard"
+            icon="icons/redhat-16.gif"
+            id="com.aptana.deploy.redhat.wizard"
+            name="Red Hat Libra">
+      </wizard>
+   </extension>
+   -->
+   <extension
+         point="com.aptana.deploy.deployProviders">
+      <provider
+            class="com.aptana.deploy.redhat.RedHatDeployProvider"
+            id="com.aptana.deploy.redhat.provider">
+      </provider>
+   </extension>
+
+</plugin>

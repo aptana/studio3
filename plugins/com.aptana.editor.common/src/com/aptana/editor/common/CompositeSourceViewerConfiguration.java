@@ -30,8 +30,7 @@ import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 /**
  * @author Max Stepanov
  */
-public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration
-{
+public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 
 	private ITokenScanner startEndTokenScanner;
 	private ISourceViewerConfiguration defaultSourceViewerConfiguration;
@@ -45,23 +44,19 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	 * @param preferences
 	 * @param editor
 	 */
-	protected CompositeSourceViewerConfiguration(ISourceViewerConfiguration defaultSourceViewerConfiguration,
-			ISourceViewerConfiguration primarySourceViewerConfiguration, IPreferenceStore preferences,
-			AbstractThemeableEditor editor)
-	{
+	protected CompositeSourceViewerConfiguration(ISourceViewerConfiguration defaultSourceViewerConfiguration, ISourceViewerConfiguration primarySourceViewerConfiguration,
+			IPreferenceStore preferences, AbstractThemeableEditor editor) {
 		super(preferences, editor);
 		this.defaultSourceViewerConfiguration = defaultSourceViewerConfiguration;
 		this.primarySourceViewerConfiguration = primarySourceViewerConfiguration;
 
 		// Compute the top contents types
 		String[][] defaultTopContentTypesArray = defaultSourceViewerConfiguration.getTopContentTypes();
-		for (int i = 0; i < defaultTopContentTypesArray.length; i++)
-		{
+		for (int i = 0; i < defaultTopContentTypesArray.length; i++) {
 			defaultTopContentTypesArray[i][0] = getTopContentType();
 		}
 		String[][] primaryContentTypesArray = primarySourceViewerConfiguration.getTopContentTypes();
-		for (int i = 0; i < primaryContentTypesArray.length; i++)
-		{
+		for (int i = 0; i < primaryContentTypesArray.length; i++) {
 			String[] topContentTypes = primaryContentTypesArray[i];
 			primaryContentTypesArray[i] = new String[topContentTypes.length + 1];
 			primaryContentTypesArray[i][0] = getTopContentType();
@@ -72,38 +67,34 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override
-	public final String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
-	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				CompositePartitionScanner.SWITCHING_CONTENT_TYPES, primarySourceViewerConfiguration.getContentTypes(),
-				defaultSourceViewerConfiguration.getContentTypes() });
+	public final String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
+				primarySourceViewerConfiguration.getContentTypes(), defaultSourceViewerConfiguration.getContentTypes() });
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes()
-	{
+	public String[][] getTopContentTypes() {
 		return topContentTypesArray;
 	}
 
+	/**
+	 * Returns top (document) content type
+	 * @return
+	 */
 	protected abstract String getTopContentType();
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getStartEndTokenScanner());
@@ -118,19 +109,24 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 		return reconciler;
 	}
 
+	/**
+	 * Returns switching strategy for this composite partitioners viewer configuration
+	 * @return
+	 */
 	protected abstract IPartitionerSwitchStrategy getPartitionerSwitchStrategy();
 
+	/**
+	 * Returns content type of switching start and end tokens
+	 * @return
+	 */
 	protected abstract String getStartEndTokenType();
 
-	private ITokenScanner getStartEndTokenScanner()
-	{
-		if (startEndTokenScanner == null)
-		{
+	private ITokenScanner getStartEndTokenScanner() {
+		if (startEndTokenScanner == null) {
 			RuleBasedScanner ts = new RuleBasedScanner();
 			IToken seqToken = new Token(getStartEndTokenType());
 			List<IRule> rules = new ArrayList<IRule>();
-			for (String[] pair : getPartitionerSwitchStrategy().getSwitchTagPairs())
-			{
+			for (String[] pair : getPartitionerSwitchStrategy().getSwitchTagPairs()) {
 				rules.add(new SingleTagRule(pair[0], seqToken));
 				rules.add(new SingleTagRule(pair[1], seqToken));
 			}

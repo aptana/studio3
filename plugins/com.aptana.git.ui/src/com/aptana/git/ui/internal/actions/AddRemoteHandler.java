@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.internal.actions;
 
 import java.text.MessageFormat;
@@ -34,7 +41,7 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 		AddRemoteDialog dialog = new AddRemoteDialog(getShell(), repo, name, url);
 		if (dialog.open() == Window.OK)
 		{
-			name = dialog.getValue().trim();
+			name = dialog.getRemoteName().trim();
 			url = dialog.getRemoteURL();
 			if (dialog.track())
 			{

@@ -9,8 +9,7 @@ package com.aptana.explorer.navigator.actions;
 
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.explorer.ExplorerPlugin;
-import com.aptana.explorer.IExplorerUIConstants;
+import com.aptana.deploy.DeployPlugin;
 
 public class DeployActionProvider extends ExplorerActionProvider
 {
@@ -26,13 +25,13 @@ public class DeployActionProvider extends ExplorerActionProvider
 	@Override
 	protected Image getImage()
 	{
-		return ExplorerPlugin.getImage(IExplorerUIConstants.DEPLOY_MENU_ICON);
+		return DeployPlugin.getImage(DeployPlugin.DEPLOY_MENU_ICON);
 	}
 
 	@Override
 	protected String getMenuId()
 	{
-		return IExplorerUIConstants.DEPLOY_MENU_ID;
+		return DeployPlugin.DEPLOY_MENU_ID;
 	}
 
 	@Override

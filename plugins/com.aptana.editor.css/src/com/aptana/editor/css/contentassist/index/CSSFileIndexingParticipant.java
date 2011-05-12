@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.tasks.TaskTag;
-import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSCommentNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
@@ -67,7 +67,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// minor optimization when creating a new empty file
 				if (fileContents != null && fileContents.trim().length() > 0)
 				{
-					IParseNode ast = ParserPoolFactory.parse(ICSSParserConstants.LANGUAGE, fileContents);
+					IParseNode ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, fileContents);
 					sub.worked(50);
 					
 					if (ast != null)

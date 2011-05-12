@@ -359,7 +359,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 		if (property.equals(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR))
 		{
-			boolean isLinked = ((Boolean) event.getNewValue()).booleanValue();
+			boolean isLinked = Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue()));
 
 			fToggleLinkingAction.setChecked(isLinked);
 			TreeViewer viewer = getTreeViewer();
@@ -370,7 +370,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 		else if (property.equals(IPreferenceConstants.SORT_OUTLINE_ALPHABETIC))
 		{
-			boolean sort = ((Boolean) event.getNewValue()).booleanValue();
+			boolean sort = Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue()));
 			getTreeViewer().setComparator(sort ? new ViewerComparator() : null);
 		}
 	}

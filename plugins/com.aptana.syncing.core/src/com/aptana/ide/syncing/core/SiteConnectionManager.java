@@ -49,8 +49,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 
 	private static SiteConnectionManager instance;
 
-    private List<SiteConnection> connections = Collections
-            .synchronizedList(new ArrayList<SiteConnection>());
+    private List<SiteConnection> connections = Collections.synchronizedList(new ArrayList<SiteConnection>());
 	private boolean dirty = false;
 	
 	private ListenerList listeners = new ListenerList();
@@ -73,7 +72,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 	 * 
 	 * @param path
 	 */
-	public void loadState(IPath path) {
+	/* package */ void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
 			connections.clear();
@@ -86,7 +85,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 	 * saveState
 	 * @param path
 	 */
-	public void saveState(IPath path) {
+	/* package */ void saveState(IPath path) {
 		XMLMemento memento = XMLMemento.createWriteRoot(ELEMENT_ROOT);
         synchronized (connections) {
             for (SiteConnection siteConnection : connections) {

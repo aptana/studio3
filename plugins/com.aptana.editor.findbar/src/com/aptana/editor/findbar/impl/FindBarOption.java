@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.findbar.FindBarPlugin;
 
 /**
@@ -122,7 +123,7 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 						ToolItem item = getToolItemFromDecorator();
 						if (item != null)
 						{
-							boolean val = (Boolean) event.getNewValue();
+							boolean val = Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue()));
 							if (val != item.getSelection())
 							{
 								startInternalUpdate();

@@ -7,7 +7,7 @@
             class="com.aptana.editor.css.CSSSourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            extensions="css"
+            extensions="css, jss"
             icon="icons/css.png"
             id="com.aptana.editor.css"
             name="%editor.css.name">
@@ -20,7 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="css"
+            file-extensions="css, jss"
             id="com.aptana.contenttype.css"
             name="%content-type.css.name"
             priority="normal">
@@ -45,8 +45,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.css.parsing.CSSParser"
-            content-type="com.aptana.contenttype.css"
-            language="text/css">
+            content-type="com.aptana.contenttype.css">
       </parser>
    </extension>
    <extension
@@ -61,15 +60,15 @@
    </extension>
    <extension
          point="com.aptana.editor.common.validator">
-      <language
+      <content-type
             name="%validator.language.css.name"
-            type="text/css">
-      </language>
+            id="com.aptana.contenttype.css">
+      </content-type>
       <validator
             class="com.aptana.editor.css.validator.CSSValidator"
-            language="text/css"
-            name="%validator.css.name"
-            type="com.aptana.editor.css.problem">
+            content-type="com.aptana.contenttype.css"
+            marker-type="com.aptana.editor.css.problem"
+            name="%validator.css.name">
       </validator>
    </extension>
    <extension
@@ -77,7 +76,7 @@
       <page
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.css.preferences.CSSPreferencePage"
-            id="com.aptana.editor.html.preferences.CSSPreferencePage"
+            id="com.aptana.editor.css.preferences.CSSPreferencePage"
             name="%page.css.name">
       </page>
    </extension>
@@ -93,10 +92,7 @@
          name="%marker.css.name"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <super
-            type="org.eclipse.core.resources.textmarker">
+            type="com.aptana.core.problem">
       </super>
       <persistent
             value="true">
@@ -110,6 +106,17 @@
       <attribute
             name="arguments">
       </attribute>
+   </extension>
+   <extension
+         point="com.aptana.editor.common.textHovers">
+      <hover
+            class="com.aptana.editor.css.text.CSSTextHover"
+            id="com.aptana.editor.css.hover"
+            label="%hover.label">
+         <contentType
+               type="com.aptana.contenttype.css">
+         </contentType>
+      </hover>
    </extension>
 
 </plugin>

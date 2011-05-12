@@ -120,13 +120,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final Set<String> TO_REMOVE = new HashSet<String>();
 	static
 	{
-		TO_REMOVE.add("org.eclipse.ui.PasteAction"); //$NON-NLS-1$
-		TO_REMOVE.add("org.eclipse.ui.CopyAction"); //$NON-NLS-1$
-		TO_REMOVE.add("org.eclipse.ui.MoveResourceAction"); //$NON-NLS-1$
 		TO_REMOVE.add("import"); //$NON-NLS-1$
 		TO_REMOVE.add("export"); //$NON-NLS-1$
-		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.run.submenu"); //$NON-NLS-1$
-		//		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.debug.submenu"); //$NON-NLS-1$
 		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.profile.submenu"); //$NON-NLS-1$
 		TO_REMOVE.add("compareWithMenu"); //$NON-NLS-1$
 		TO_REMOVE.add("replaceWithMenu"); //$NON-NLS-1$
@@ -307,7 +302,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			projectNameMenuItem.setSelection(false);
 			Image image = null;
 			// Visually mark closed/open projects
-			if (!iProject.isOpen())
+			if (iProject.isOpen())
 			{
 				image = PlatformUI.getWorkbench().getSharedImages()
 						.getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);

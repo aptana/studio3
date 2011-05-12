@@ -269,8 +269,15 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 					}
 					sub.worked(1);
 
-					IQuery<IInstallableUnit> query = QueryUtil.createIUQuery(featureID + FEATURE_IU_SUFFIX,
-							VersionRange.emptyRange);
+					IQuery<IInstallableUnit> query;
+					if (featureID == null)
+					{
+						query = QueryUtil.createIUQuery(null, VersionRange.emptyRange);
+					}
+					else
+					{
+						query = QueryUtil.createIUQuery(featureID + FEATURE_IU_SUFFIX, VersionRange.emptyRange);
+					}
 					IQueryResult<IInstallableUnit> roots = repo.query(query, monitor);
 
 					if (roots.isEmpty())

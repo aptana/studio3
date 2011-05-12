@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -182,7 +183,10 @@ public class CorePlugin extends Plugin
 	 */
 	public static void logInfo(String string)
 	{
-		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		if (Platform.inDebugMode())
+		{
+			getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		}
 	}
 
 	/**
@@ -292,7 +296,8 @@ public class CorePlugin extends Plugin
 	private boolean inMigrationMode()
 	{
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, false, null);
+				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
+				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
 	}
 
 	private void addProjectListeners()
@@ -328,7 +333,7 @@ public class CorePlugin extends Plugin
 									if (delta.getKind() == IResourceDelta.ADDED
 											|| (delta.getKind() == IResourceDelta.CHANGED
 													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-														.isAccessible()))
+													.isAccessible()))
 									{
 										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 										{
@@ -405,8 +410,7 @@ public class CorePlugin extends Plugin
 		 */
 		private void hookAll()
 		{
-			// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.PRE_CLOSE);
 
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
@@ -455,7 +459,7 @@ public class CorePlugin extends Plugin
 			}
 			try
 			{
-				if (newProject != null && newProject.exists() && newProject.getLocation() != null)
+				if (newProject != null && newProject.exists() && newProject.getLocation() != null && (fWatchers == null || !fWatchers.containsKey(newProject)))
 				{
 					int watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
 							new FileDeltaRefreshAdapter());
@@ -494,6 +498,12 @@ public class CorePlugin extends Plugin
 
 		public void resourceChanged(IResourceChangeEvent event)
 		{
+			if (IResourceChangeEvent.PRE_DELETE == event.getType() || IResourceChangeEvent.PRE_CLOSE == event.getType())
+			{
+				IResource project = event.getResource();
+				unhookFilewatcher(project.getProject());
+				return;
+			}
 			IResourceDelta delta = event.getDelta();
 			if (delta == null)
 			{
@@ -523,14 +533,6 @@ public class CorePlugin extends Plugin
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
 							{
 								hookFilewatcher(resource.getProject());
-							}
-							// a project was removed or closed
-							else if (delta.getKind() == IResourceDelta.REMOVED
-									|| (delta.getKind() == IResourceDelta.CHANGED
-											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-												.isAccessible()))
-							{
-								unhookFilewatcher(resource.getProject());
 							}
 						}
 						return false;

@@ -9,18 +9,26 @@ package com.aptana.editor.json.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.json.JSONEditor;
 import com.aptana.editor.json.JSONPlugin;
 
 public class JSONPreferencePage extends CommonEditorPreferencePage
 {
+	private BooleanFieldEditor foldObjects;
+	private BooleanFieldEditor foldArrays;
+	private Composite foldingGroup;
+
 	/**
 	 * JSONPreferencePage
 	 */
-
 	public JSONPreferencePage()
 	{
 		super();
@@ -43,6 +51,48 @@ public class JSONPreferencePage extends CommonEditorPreferencePage
 	protected IPreferenceStore getChainedEditorPreferenceStore()
 	{
 		return JSONEditor.getChainedPreferenceStore();
+	}
+
+	@Override
+	protected Composite createFoldingOptions(Composite parent)
+	{
+		this.foldingGroup = super.createFoldingOptions(parent);
+
+		// Initially fold these elements:
+		Label initialFoldLabel = new Label(foldingGroup, SWT.WRAP);
+		initialFoldLabel.setText(Messages.JSONPreferencePage_initial_fold_options_label);
+
+		// Objects
+		foldObjects = new BooleanFieldEditor(IPreferenceConstants.INITIALLY_FOLD_OBJECTS,
+				Messages.JSONPreferencePage_fold_objects_label, foldingGroup);
+		addField(foldObjects);
+
+		// Arrays
+		foldArrays = new BooleanFieldEditor(IPreferenceConstants.INITIALLY_FOLD_ARRAYS,
+				Messages.JSONPreferencePage_fold_arrays_label, foldingGroup);
+		addField(foldArrays);
+
+		return foldingGroup;
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event)
+	{
+		if (event.getSource() == enableFolding)
+		{
+			Object newValue = event.getNewValue();
+			if (Boolean.TRUE == newValue)
+			{
+				foldObjects.setEnabled(true, foldingGroup);
+				foldArrays.setEnabled(true, foldingGroup);
+			}
+			else
+			{
+				foldObjects.setEnabled(false, foldingGroup);
+				foldArrays.setEnabled(false, foldingGroup);
+			}
+		}
+		super.propertyChange(event);
 	}
 
 }

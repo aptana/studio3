@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.navigator.resources,
  org.eclipse.ui,
  org.eclipse.ui.ide,
+ org.eclipse.compare,
  com.aptana.ui,
  com.aptana.core,
  com.aptana.core.io,
@@ -27,5 +28,6 @@ Export-Package: com.aptana.ide.ui.io,
  com.aptana.ide.ui.io.navigator.actions,
  com.aptana.ide.ui.io.navigator.resources,
  com.aptana.ide.ui.io.preferences,
- com.aptana.ide.ui.io.properties
+ com.aptana.ide.ui.io.properties,
+ com.aptana.ui.io.compare
 Eclipse-ExtensibleAPI: true

@@ -30,12 +30,10 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.xml.internal.text.XMLFoldingComputer;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
-import com.aptana.editor.xml.parsing.IXMLParserConstants;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -98,16 +96,6 @@ public class XMLEditor extends AbstractThemeableEditor
 	protected char[] getPairMatchingCharacters()
 	{
 		return XML_PAIR_MATCHING_CHARS;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(IXMLParserConstants.LANGUAGE);
 	}
 
 	/*

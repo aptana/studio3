@@ -46,8 +46,7 @@ public class TextmateImporterTest extends TestCase
 		assertEquals(new RGB(0, 241, 58), theme.getForegroundAsRGB("string"));
 		assertEquals(new RGB(0, 241, 58), theme.getForegroundAsRGB("meta.verbatim"));
 
-		assertTrue(theme.hasEntry("meta.tag"));
-		assertTrue(theme.hasEntry("meta.tag entity"));
+		assertTrue(theme.hasEntry("meta.tag, meta.tag entity"));
 	}
 
 }

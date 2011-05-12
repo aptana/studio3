@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,8 @@ package org.eclipse.tm.internal.terminal.provisional.api;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
+import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
 /**
  * A contributed connection type to manage a single connection.
@@ -24,14 +26,14 @@ import org.eclipse.core.runtime.IAdaptable;
  * <code>org.eclipse.tm.terminal.terminalConnectors</code> extension point. This
  * class gives access to the static markup of a terminal connector extension as
  * well as providing the lifecycle management for the dynamically loaded
- * {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl} instance, which performs the actual
+ * {@link TerminalConnectorImpl} instance, which performs the actual
  * communications. This pattern allows for lazy initialization, bundle
- * activation and class loading of the actual {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl}
+ * activation and class loading of the actual {@link TerminalConnectorImpl}
  * instance.
  *
  * Clients can get terminal connector instances from the
  * {@link TerminalConnectorExtension} class, or from
- * {@link org.eclipse.tm.internal.terminal.control.ITerminalViewControl#getTerminalConnector()} when running inside an
+ * {@link ITerminalViewControl#getTerminalConnector()} when running inside an
  * active terminal widget.
  *
  * @noimplement This interface is not intended to be implemented by clients.
@@ -43,7 +45,7 @@ import org.eclipse.core.runtime.IAdaptable;
  *         as part of a work in progress. There is no guarantee that this API
  *         will work or that it will remain the same. Please do not use this API
  *         without consulting with the <a
- *         href="http://www.eclipse.org/dsdp/tm/">Target Management</a> team.
+ *         href="http://www.eclipse.org/tm/">Target Management</a> team.
  *         </p>
  */
 public interface ITerminalConnector extends IAdaptable {
@@ -67,7 +69,7 @@ public interface ITerminalConnector extends IAdaptable {
 	boolean isHidden();
 
 	/**
-	 * @return true if the {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl} has been initialized.
+	 * @return true if the {@link TerminalConnectorImpl} has been initialized.
 	 * If there was an initialization error, {@link #getInitializationErrorMessage()}
 	 * returns the error message.
 	 * @since org.eclipse.tm.terminal 2.0

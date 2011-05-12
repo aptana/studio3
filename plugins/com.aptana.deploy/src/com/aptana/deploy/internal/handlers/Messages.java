@@ -14,6 +14,8 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.deploy.internal.handlers.messages"; //$NON-NLS-1$
 
+	public static String DeployHandler_DeployJobTitle;
+
 	public static String DeployHandler_Wizard_Title;
 
 	static

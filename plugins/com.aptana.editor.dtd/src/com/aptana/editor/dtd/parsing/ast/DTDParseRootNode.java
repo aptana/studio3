@@ -9,7 +9,7 @@ package com.aptana.editor.dtd.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import com.aptana.editor.dtd.IDTDConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class DTDParseRootNode extends ParseRootNode
@@ -30,7 +30,7 @@ public class DTDParseRootNode extends ParseRootNode
 	public DTDParseRootNode(Symbol[] children)
 	{
 		super( //
-			DTDParserConstants.LANGUAGE, //
+			IDTDConstants.CONTENT_TYPE_DTD, //
 			children, //
 			(children != null && children.length > 0) ? children[0].getStart() : 0, //
 			(children != null && children.length > 0) ? children[0].getEnd() : 0 //

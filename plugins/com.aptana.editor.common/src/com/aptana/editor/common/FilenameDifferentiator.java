@@ -29,6 +29,7 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -271,10 +272,17 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 			if (window != null)
 			{
-				window.getActivePage().removePartListener(this);
+				IWorkbenchPage page = window.getActivePage();
+				if (page != null)
+				{
+					page.removePartListener(this);
+				}
 			}
 		}
-		baseNames.clear();
-		baseNames = null;
+		if (baseNames != null)
+		{
+			baseNames.clear();
+			baseNames = null;
+		}
 	}
 }

@@ -9,7 +9,7 @@ package com.aptana.editor.css.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 /**
@@ -33,7 +33,7 @@ public class CSSParseRootNode extends ParseRootNode
 	public CSSParseRootNode(Symbol[] children)
 	{
 		super( //
-			ICSSParserConstants.LANGUAGE, //
+			ICSSConstants.CONTENT_TYPE_CSS, //
 			(children != null) ? children : new Symbol[0], //
 			(children != null && children.length > 0) ? children[0].getStart() : 0, //
 			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);

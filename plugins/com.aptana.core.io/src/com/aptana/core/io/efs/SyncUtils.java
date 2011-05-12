@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.PermissionDeniedException;
 
@@ -74,6 +75,7 @@ public final class SyncUtils {
 				int totalWork = (length == -1) ? IProgressMonitor.UNKNOWN : 1 + (int) (length / buffer.length);
 				InputStream in = null;
 				OutputStream out = null;
+				ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(monitor);
 				try {
 					in = source.openInputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					out = destination.openOutputStream(EFS.NONE, subMonitorFor(monitor, 0));
@@ -86,6 +88,7 @@ public final class SyncUtils {
 						try {
 							bytesRead = in.read(buffer);
 						} catch (IOException e) {
+							checkCanceled(monitor);
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Reading, source.toString()), e);
 						}
 						if (bytesRead == -1) {
@@ -95,12 +98,14 @@ public final class SyncUtils {
 						try {
 							out.write(buffer, 0, bytesRead);
 						} catch (IOException e) {
+							checkCanceled(monitor);
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Writing, destination.toString()), e);
 						}
 						subMonitor.worked(1);
 					}
 					subMonitor.done();
 				} finally {
+					interrupter.dispose();
 					safeClose(in);
 					safeClose(out);
 				}

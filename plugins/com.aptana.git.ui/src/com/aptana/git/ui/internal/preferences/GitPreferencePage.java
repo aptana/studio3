@@ -25,15 +25,6 @@ import com.aptana.git.core.model.GitExecutable;
 public class GitPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 
-	private FileFieldEditor fileEditor;
-	private BooleanFieldEditor pullIndicatorEditor;
-	private BooleanFieldEditor autoAttachEditor;
-
-	public GitPreferencePage()
-	{
-		super();
-	}
-
 	public void init(IWorkbench workbench)
 	{
 	}
@@ -42,7 +33,7 @@ public class GitPreferencePage extends FieldEditorPreferencePage implements IWor
 	protected void createFieldEditors()
 	{
 		// Git Executable location
-		fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH,
+		FileFieldEditor fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH,
 				Messages.GitExecutableLocationPage_LocationLabel, true, FileFieldEditor.VALIDATE_ON_KEY_STROKE,
 				getFieldEditorParent())
 		{
@@ -69,16 +60,17 @@ public class GitPreferencePage extends FieldEditorPreferencePage implements IWor
 				return true;
 			}
 		};
-		// Git pull indicator
-		pullIndicatorEditor = new BooleanFieldEditor(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR,
-				Messages.GitExecutableLocationPage_CalculatePullIndicatorLabel, getFieldEditorParent());
 		addField(fileEditor);
-		addField(pullIndicatorEditor);
+
+		// Git pull indicator
+		addField(new BooleanFieldEditor(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR,
+				Messages.GitExecutableLocationPage_CalculatePullIndicatorLabel, getFieldEditorParent()));
 
 		// Auto-attach to projects
-		autoAttachEditor = new BooleanFieldEditor(IPreferenceConstants.AUTO_ATTACH_REPOS,
-				Messages.GitExecutableLocationPage_AutoAttachProjectsLabel, getFieldEditorParent());
-		addField(autoAttachEditor);
+		addField(new BooleanFieldEditor(IPreferenceConstants.AUTO_ATTACH_REPOS,
+				Messages.GitExecutableLocationPage_AutoAttachProjectsLabel, getFieldEditorParent()));
+
+		addField(new BooleanFieldEditor(IPreferenceConstants.IGNORE_NO_GIT, Messages.GitPreferencePage_IgnoreMissingGitLabel, getFieldEditorParent()));
 	}
 
 	@Override

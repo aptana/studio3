@@ -52,7 +52,6 @@ import com.aptana.editor.common.text.reconciler.CommonReconciler;
 /**
  * @since 3.1
  */
-@SuppressWarnings("deprecation")
 public class EditorTestHelper {
 
 	public static final String TEXT_EDITOR_ID= "org.eclipse.ui.DefaultTextEditor";

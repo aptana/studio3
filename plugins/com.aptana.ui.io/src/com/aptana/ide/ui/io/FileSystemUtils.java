@@ -15,7 +15,9 @@ import java.util.List;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
@@ -23,6 +25,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreePath;
 
 import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.ide.ui.io.internal.FetchFileInfoJob;
 import com.aptana.ide.ui.io.internal.FetchFileInfoStatus;
 
@@ -116,5 +119,14 @@ public final class FileSystemUtils {
 			return null;
 		}
 		return null;
+	}
+
+	public static IFileInfo[] childInfos(IFileStore fileStore, int options, IProgressMonitor monitor) throws CoreException {
+		ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(monitor);
+		try {
+			return fileStore.childInfos(options, monitor);
+		} finally {
+			interrupter.dispose();
+		}
 	}
 }

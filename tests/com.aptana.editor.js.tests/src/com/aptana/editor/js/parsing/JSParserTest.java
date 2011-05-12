@@ -7,10 +7,11 @@
  */
 package com.aptana.editor.js.parsing;
 
-import junit.framework.TestCase;
+import java.util.List;
 
-import com.aptana.editor.js.parsing.JSParser;
-import com.aptana.editor.js.parsing.JSScanner;
+import junit.framework.TestCase;
+import beaver.Symbol;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSParserTest extends TestCase
@@ -572,6 +573,56 @@ public class JSParserTest extends TestCase
 	{
 		parseTest("for (var a in obj) {show(a);}" + EOL);
 	}
+
+	// bug and regression tests here
+
+	public void testSDocComment() throws Exception
+	{
+		fScanner.setSource("/**/");
+		fParser.parse(fScanner);
+
+		List<Symbol> comments = fScanner.getMultiLineComments();
+
+		assertEquals(1, comments.size());
+	}
+
+	public void testPlusNegativeNumber() throws Exception
+	{
+		parseTest("var x = 5 + -3" + EOL);
+		parseTest("var x = 5+ -3" + EOL, "var x = 5 + -3" + EOL);
+		parseTest("var x = 5 +-3" + EOL, "var x = 5 + -3" + EOL);
+		parseTest("var x = 5+-3" + EOL, "var x = 5 + -3" + EOL);
+	}
+
+	public void testPlusPositiveNumber() throws Exception
+	{
+		parseTest("var x = 5 + +3" + EOL);
+		parseTest("var x = 5+ +3" + EOL, "var x = 5 + +3" + EOL);
+
+		// NOTE: The following commented tests are currently failing
+		// parseTest("var x = 5 ++3" + EOL, "var x = 5 + +3" + EOL);
+		// parseTest("var x = 5++3" + EOL, "var x = 5 + +3" + EOL);
+	}
+
+	public void testMinusNegativeNumber() throws Exception
+	{
+		parseTest("var x = 5 - -3" + EOL);
+		parseTest("var x = 5- -3" + EOL, "var x = 5 - -3" + EOL);
+
+		// NOTE: The following commented tests are currently failing
+		// parseTest("var x = 5 --3" + EOL, "var x = 5 - -3" + EOL);
+		// parseTest("var x = 5--3" + EOL, "var x = 5 - -3" + EOL);
+	}
+
+	public void testMinusPositiveNumber() throws Exception
+	{
+		parseTest("var x = 5 - +3" + EOL);
+		parseTest("var x = 5- +3" + EOL, "var x = 5 - +3" + EOL);
+		parseTest("var x = 5 -+3" + EOL, "var x = 5 - +3" + EOL);
+		parseTest("var x = 5-+3" + EOL, "var x = 5 - +3" + EOL);
+	}
+
+	// utility methods
 
 	protected void parseTest(String source) throws Exception
 	{

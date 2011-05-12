@@ -19,6 +19,7 @@ public class Messages extends NLS
 
 	public static String NewSampleProjectWizard_CreateOp_Title;
 	public static String NewSampleProjectWizard_CreationProblems;
+	public static String NewSampleProjectWizard_ERR_FailToDisconnect;
 	public static String NewSampleProjectWizard_ERR_OpenIndexFile;
 	public static String NewSampleProjectWizard_InternalError;
 	public static String NewSampleProjectWizard_ProjectPage_Description;

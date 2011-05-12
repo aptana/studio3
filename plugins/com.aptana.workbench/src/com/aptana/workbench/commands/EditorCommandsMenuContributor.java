@@ -197,7 +197,7 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			CollectionsUtil.removeDuplicates(menusFromScopeList);
 			Collections.sort(menusFromScopeList, new Comparator<MenuElement>() {
 				public int compare(MenuElement menuElement1, MenuElement menuElement2) {
-					return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
+					return menuElement1.getDisplayName().compareToIgnoreCase(menuElement2.getDisplayName());
 				}
 			});
 

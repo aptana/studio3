@@ -30,6 +30,9 @@
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
             <contentExtension
+                  pattern="com.aptana.ui.io.navigator.filters.*">
+            </contentExtension>
+            <contentExtension
                   pattern="com.aptana.ui.io.navigator.linkHelper">
             </contentExtension>
          </includes>
@@ -42,6 +45,10 @@
              </actionExtension>
          </includes>
        </viewerActionBinding>
+       <dragAssistant
+             class="com.aptana.ide.ui.io.navigator.resources.FileDragAdapterAssistant"
+             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+       </dragAssistant>
    </extension>
       <extension
          point="org.eclipse.ui.navigator.navigatorContent">
@@ -93,7 +100,10 @@
                   </instanceof>
                   <instanceof
                         value="com.aptana.ide.core.io.LocalRoot">
-                  </instanceof></or>
+                  </instanceof>
+                  <adapt
+                        type="org.eclipse.core.filesystem.IFileStore">
+                  </adapt></or>
             </parentExpression>
          </commonSorter>
          <possibleChildren>
@@ -287,6 +297,23 @@
             id="com.aptana.ide.ui.io.navigator.filters.startsWithDot"
             name="%commonFilter.startsWithDot.name">
       </commonFilter>
+      <commonFilter
+            activeByDefault="true"
+            description="%commonFilter.localshortcuts.description"
+            id="com.aptana.ui.io.navigator.filters.localShortcuts"
+            name="%commonFilter.localshortcuts.name">
+         <filterExpression>
+            <and>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+               </instanceof>
+               <test
+                     property="com.aptana.ide.core.io.connection.category.id"
+                     value="com.aptana.ide.core.io.localShortcuts">
+               </test>
+            </and>
+         </filterExpression>
+      </commonFilter>
    </extension>
    <!-- extension
          point="org.eclipse.ui.navigator.viewer">
@@ -361,6 +388,9 @@
             class="com.aptana.ide.ui.io.actions.FileSystemActionFilter$Factory">
          <adapter
                type="org.eclipse.ui.IActionFilter">
+         </adapter>
+         <adapter
+               type="org.eclipse.core.filesystem.IFileStore">
          </adapter>
       </factory>
       <factory
@@ -646,6 +676,25 @@
             </objectState>
          </visibility>
       </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ui.io.localCategoryContribution"
+            objectClass="com.aptana.ide.core.io.IConnectionPointCategory">
+         <action
+               class="com.aptana.ide.ui.io.actions.NewLocalConnectionAction"
+               enablesFor="1"
+               icon="icons/full/etool16/add.png"
+               id="com.aptana.ide.ui.io.actions.newLocalConnection"
+               label="%action.new.localshortcut.label"
+               menubarPath="group.new">
+         </action>
+         <visibility>
+            <objectState
+                  name="isCategory"
+                  value="com.aptana.ide.core.io.localShortcuts">
+            </objectState>
+         </visibility>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -654,12 +703,6 @@
             class="com.aptana.ide.ui.io.preferences.RemotePreferencePage"
             id="com.aptana.ui.io.preferences.RemotePreferencePage"
             name="%PreferencePage.remote.name">
-      </page>
-      <page
-            category="com.aptana.ui.io.preferences.RemotePreferencePage"
-            class="com.aptana.ide.ui.io.preferences.FTPPreferencePage"
-            id="com.aptana.ui.io.preferences.FTPPreferencePage"
-            name="%PreferencePage.ftp.label">
       </page>
    </extension>
    <extension
@@ -690,6 +733,58 @@
             class="com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory"
             id="com.aptana.ui.io.UniformFileStoreEditorInputFactory">
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.ui.io.compare.CompareWithEachOtherHandler"
+            description="%action.compare.eachother.tooltip"
+            id="com.aptana.ui.io.commands.compareWithEachOther"
+            name="%action.compare.eachother.label">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:com.aptana.ui.io.remoteview?after=additions">
+         <command
+               commandId="com.aptana.ui.ftp.command.add"
+               icon="platform:/plugin/com.aptana.ui.ftp/icons/full/etool16/new_connection.png"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <menu
+               label="%menu.compare.label">
+            <command
+                  commandId="com.aptana.ui.io.commands.compareWithEachOther"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <count
+                           value="2">
+                     </count>
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.filesystem.IFileStore">
+                        </adapt>
+                     </iterate>
+                  </and>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="com.aptana.ui.propertyDialogs">
+      <dialog
+            class="com.aptana.ide.ui.io.internal.LocalConnectionPropertyDialogProvider"
+            id="com.aptana.ui.io.dialogs.localConnection"
+            objectClass="com.aptana.ide.core.io.LocalConnectionPoint">
+      </dialog>
    </extension>
 
 </plugin>

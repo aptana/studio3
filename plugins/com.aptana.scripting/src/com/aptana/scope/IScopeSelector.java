@@ -7,31 +7,13 @@
  */
 package com.aptana.scope;
 
+import java.util.List;
+
 /**
  * IScopeSelector
  */
 public interface IScopeSelector
 {
-	/**
-	 * getMatchFragments
-	 * 
-	 * @return
-	 */
-	int getMatchFragments();
-
-	/**
-	 * getMatchLength
-	 * 
-	 * @return
-	 */
-	int getMatchLength();
-
-	/**
-	 * getMatchOffset
-	 * 
-	 * @return
-	 */
-	int getMatchOffset();
 
 	/**
 	 * matches
@@ -48,4 +30,15 @@ public interface IScopeSelector
 	 * @return
 	 */
 	boolean matches(String[] scopes);
+
+	/**
+	 * Returns a list of integers. This list matches up with the match length for each segment of the scope we matched
+	 * against. We break the scope up by spaces, and for each part there, we have a value at that offset in this list.
+	 * That value is the length of that part that matched. This is used to determine which scope selector is a better
+	 * match. Should _never_ return null. If there are no matches, this should return an empty list. This list should
+	 * not be expected to be mutable. If you need to modify it, create a copy.
+	 * 
+	 * @return
+	 */
+	List<Integer> matchResults();
 }

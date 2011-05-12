@@ -7,8 +7,8 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -18,6 +18,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -32,7 +33,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	/**
 	 * Code Folding.
 	 */
-	private List<Position> fPositions = new ArrayList<Position>();
+	private Map<ProjectionAnnotation, Position> fPositions = new HashMap<ProjectionAnnotation, Position>();
 
 	private IProgressMonitor fMonitor;
 
@@ -94,30 +95,18 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 	}
 
-	protected void calculatePositions(IProgressMonitor monitor)
+	protected void calculatePositions(boolean initialReconcile, IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
 		{
 			return;
 		}
 
-		FileService fileService = fEditor.getFileService();
-		// doing a full parse at the moment
-		fileService.parse();
-		// abort if parse failed
-		if (!fileService.hasValidParseResult())
-		{
-			return;
-		}
-		if (monitor != null && monitor.isCanceled())
-		{
-			return;
-		}
 		// Folding...
 		fPositions.clear();
 		try
 		{
-			fPositions = folder.emitFoldingRegions(monitor);
+			fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
 		}
 		catch (BadLocationException e)
 		{
@@ -126,8 +115,38 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
 		// early because of cancel...
 		if (monitor != null && monitor.isCanceled())
+		{
 			return;
+		}
 
+		updatePositions();
+	}
+
+	// Delete all the positions in the document
+	protected void clearPositions(IProgressMonitor monitor)
+	{
+		if (monitor != null && monitor.isCanceled())
+		{
+			return;
+		}
+		// clear folding positions
+		fPositions.clear();
+	}
+
+	protected boolean parseDocument(IProgressMonitor monitor)
+	{
+		FileService fileService = fEditor.getFileService();
+		// doing a full parse at the moment
+		fileService.parse();
+		// abort if parse failed
+		return fileService.hasValidParseResult();
+	}
+
+	/**
+	 * Update the folding positions in the document
+	 */
+	protected void updatePositions()
+	{
 		Display.getDefault().asyncExec(new Runnable()
 		{
 			public void run()
@@ -135,12 +154,20 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 				fEditor.updateFoldingStructure(fPositions);
 			}
 		});
-
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
-		calculatePositions(fMonitor);
+		parseDocument(fMonitor);
+		if (fEditor.isFoldingEnabled())
+		{
+			calculatePositions(initialReconcile, fMonitor);
+		}
+		else
+		{
+			fPositions.clear();
+			updatePositions();
+		}
 		fEditor.getFileService().validate();
 	}
 }

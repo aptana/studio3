@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="userAgent" name="%extension-point.name" schema="schema/userAgent.exsd"/>
+   <extension-point id="userAgent" name="%extension-point.userAgent.name" schema="schema/userAgent.exsd"/>
    <extension-point id="validator" name="%extension-point.validator.name" schema="schema/validator.exsd"/>
+   <extension-point id="textHovers" name="%extension-point.textHovers.name" schema="schema/textHovers.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
        <command
@@ -447,6 +448,13 @@
       </command>
    </extension>
    <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.editor.common.commands.toggleOutline"
+            icon="icons/full/eview16/outline_co.png">
+      </image>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -454,7 +462,6 @@
                id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.editor.common.commands.toggleOutline"
-                  icon="icons/full/eview16/outline_co.png"
                   style="toggle">
                <visibleWhen>
                   <reference
@@ -564,18 +571,5 @@
             id="com.aptana.editor.common.ValidationPreferencePage"
             name="%page.validation.name">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.ui.ide.FileStoreEditorInput"
-            class="com.aptana.editor.common.internal.FileStoreEditorInputAdapterFactory">
-         <adapter
-               type="org.eclipse.core.resources.IFile">
-         </adapter>
-         <adapter
-               type="com.aptana.core.resources.IUniformResource">
-         </adapter>
-      </factory>
    </extension>
 </plugin>

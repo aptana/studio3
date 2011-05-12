@@ -155,9 +155,11 @@ public class GitUIPlugin extends AbstractUIPlugin
 									.getShell(), Messages.GitUIPlugin_1, null, Messages.GitUIPlugin_2,
 									MessageDialog.WARNING, new String[] { IDialogConstants.SKIP_LABEL,
 											Messages.GitUIPlugin_3, IDialogConstants.BROWSE_LABEL }, IDialogConstants.INTERNAL_ID+1,
-									"Check this if you do not want to be asked again", false);
+									Messages.GitUIPlugin_ToggleMessage, false);
 							switch (dlg.open())
 							{
+								case SWT.DEFAULT:
+									return Status.OK_STATUS;
 								case 5:
 									getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT, dlg.getToggleState());
 									return Status.OK_STATUS;

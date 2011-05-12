@@ -10,18 +10,22 @@ package com.aptana.editor.html.formatter;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.eclipse.jface.text.Region;
+
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterForeignElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLContentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
+import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -29,6 +33,7 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.FormatterCommentNode;
 import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -54,10 +59,30 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	@SuppressWarnings("nls")
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
-	private static final Object RUBY_LANGUAGE = "text/ruby"; //$NON-NLS-1$
-	private static final Object PHP_LANGUAGE = "text/php"; //$NON-NLS-1$
+	private static final Object RUBY_LANGUAGE = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
+	private static final Object PHP_LANGUAGE = "com.aptana.contenttype.php"; //$NON-NLS-1$
 
 	private FormatterDocument document;
+	private FormatterWriter formatterWriter;
+
+	/**
+	 * Constructs a new HTML formatter node builder with a given {@link FormatterWriter} that may be used for region
+	 * exclusions.
+	 * 
+	 * @param writer
+	 *            A {@link FormatterWriter}
+	 */
+	public HTMLFormatterNodeBuilder(FormatterWriter writer)
+	{
+		this.formatterWriter = writer;
+	}
+
+	/**
+	 * Constructs a new HTML formatter node builder.
+	 */
+	public HTMLFormatterNodeBuilder()
+	{
+	}
 
 	/**
 	 * @param parseResult
@@ -97,6 +122,9 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void addNode(IParseNode node)
 	{
+		// Push any spaces before this node as a text node.
+		preAddNode(node);
+		// Push the current node.
 		if (node instanceof HTMLNode)
 		{
 			// DEBUG
@@ -136,6 +164,85 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// it's a node that was generated from a foreign language parser, such as the RHTMLParser
 			pushForeignSpecialNode(node);
 		}
+		// Push any spaces after this node as a text node.
+		postAddNode(node);
+	}
+
+	/**
+	 * Push a text node that will fill in the gap between the given node and the previous one.
+	 * 
+	 * @param node
+	 */
+	private void preAddNode(IParseNode node)
+	{
+		// Check for any existing spaces BEFORE the node and push them in a text node.
+		IParseNode previousNode = node.getPreviousNode();
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT && previousNode != null
+				&& previousNode.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			int previousEnding = 0;
+			if (previousNode.getEndingOffset() > node.getStartingOffset())
+			{
+				// This node is nested inside the previous one, so create a content node for the content between the
+				// name-node end and the current node start.
+				previousEnding = previousNode.getNameNode().getNameRange().getEndingOffset() + 1;
+			}
+			else
+			{
+				// The previous is a sibling of the current node, so create a content node for the content between the
+				// previous end and the current node start.
+				previousEnding = previousNode.getEndingOffset() + 1;
+			}
+			int currentStarting = node.getStartingOffset();
+			if (currentStarting > previousEnding)
+			{
+				// Check for any content in between the nodes
+				String str = document.get(previousEnding, currentStarting);
+				if (str.trim().length() == 0)
+				{
+					FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, null,
+							previousEnding, currentStarting);
+					addChild(contentFormatterNode);
+				}
+			}
+
+		}
+	}
+
+	/**
+	 * Push a text node that will fill any gaps between the given node ending and the end of it's parent node.
+	 * 
+	 * @param node
+	 */
+	private void postAddNode(IParseNode node)
+	{
+		// Check for any existing spaces AFTER the node and push them in a text node.
+		IParseNode parentNode = node.getParent();
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT && parentNode != null
+				&& parentNode.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			int currentEnding = node.getEndingOffset() + 1;
+			INameNode endNode = ((HTMLElementNode) parentNode).getEndNode();
+			if (endNode != null)
+			{
+				IRange endNameRange = endNode.getNameRange();
+				if (!endNameRange.isEmpty() && endNameRange.getStartingOffset() != endNameRange.getEndingOffset())
+				{
+					IRange endNodeRange = endNode.getNameRange();
+					int previousEnding = endNodeRange.getStartingOffset();
+					if (previousEnding > currentEnding)
+					{
+						String str = document.get(currentEnding, previousEnding);
+						if (str.trim().length() == 0)
+						{
+							FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, null,
+									currentEnding, previousEnding);
+							addChild(contentFormatterNode);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -146,7 +253,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void pushForeignSpecialNode(IParseNode node)
 	{
 		int nodeStart = node.getStartingOffset();
-		int nodeEnd = node.getEndingOffset() + 1;
+		int nodeEnd = node.getEndingOffset();
 		nodeEnd = Math.min(document.getLength(), nodeEnd);
 		String text = document.get(nodeStart, nodeEnd);
 		// create a default node by looking at edges
@@ -156,6 +263,10 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(formatterNode);
 			int startSpecial = formatterNode.getBegin()[0].getEndOffset();
 			int endSpecial = formatterNode.getEnd().getStartOffset();
+			if (endSpecial == document.getLength() - 1)
+			{
+				endSpecial++;
+			}
 			// push a special node
 			FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
 			specialNode.setBegin(createTextNode(document, startSpecial, endSpecial));
@@ -164,6 +275,23 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(specialNode, -1);
 			// pop the default node
 			checkedPop(formatterNode, -1);
+			if (formatterWriter != null)
+			{
+				// document.get(startSpecial, endSpecial);
+				int excludeRegionStart = startSpecial + 1;
+				IFormatterTextNode foreignEnd = formatterNode.getEnd();
+				int excludeRegionLength = endSpecial - startSpecial
+						- (foreignEnd.getEndOffset() - foreignEnd.getStartOffset());
+				if (endSpecial == document.getLength())
+				{
+					excludeRegionLength--;
+				}
+				if (excludeRegionLength > excludeRegionStart)
+				{
+					formatterWriter.excludeRegion(new Region(excludeRegionStart, excludeRegionLength),
+							EXCLUDE_STRATEGY.WRITE_AS_IS);
+				}
+			}
 		}
 		else
 		{
@@ -208,13 +336,30 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			return null;
 		}
 		elementNode.setBegin(createTextNode(document, offset, offset + startLength));
-		int end = Math.min(offset + text.length(), document.getLength() - 1);
-		end = getEndWithoutWhiteSpaces(end, document) + 1;
+		int end = offset + text.length();
 		int endBegin = end;
-		String endStr = document.get(endBegin - 2, end);
-		if (endStr.equals("?>") || endStr.equals("%>")) //$NON-NLS-1$ //$NON-NLS-2$
+		if (end == document.getLength())
 		{
-			endBegin -= 2;
+			endBegin = end - 2;
+		}
+		else
+		{
+			int endWithoutWhiteSpace = getEndWithoutWhiteSpaces(end, document);
+			if (end != endWithoutWhiteSpace)
+			{
+				end = endWithoutWhiteSpace + 1;
+			}
+			endBegin = end;
+		}
+
+		String endStr = document.get(endBegin - 2, end);
+		if (endStr.endsWith("?>") || endStr.endsWith("%>")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			endBegin = end - 2;
+		}
+		else
+		{
+			endBegin = end;
 		}
 		elementNode.setEnd(createTextNode(document, endBegin, end));
 		return elementNode;
@@ -270,7 +415,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
 				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
-		if (node.getNodeType() == HTMLNodeTypes.SPECIAL && !IHTMLParserConstants.LANGUAGE.equals(node.getLanguage()))
+		if (node.getNodeType() == HTMLNodeTypes.SPECIAL && !IHTMLConstants.CONTENT_TYPE_HTML.equals(node.getLanguage()))
 		{
 			// Everything under this HTMLSpecialNode should be wrapped with a
 			// FormatterSpecialElementNode, and no need to visit its children.
@@ -295,11 +440,13 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// to one.
 			int textStartOffset = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endNodeStartingOffset - 1, document);
-			if (textStartOffset > 0 && document.charAt(textStartOffset - 1) == ' ')
+			char charAt = document.charAt(textStartOffset - 1);
+			if (textStartOffset > 0 && (charAt == ' ' || charAt == '\t'))
 			{
 				textStartOffset--;
 			}
-			if (textEndOffset < document.getLength() - 1 && document.charAt(textEndOffset + 1) == ' ')
+			charAt = document.charAt(textEndOffset + 1);
+			if (textEndOffset < document.getLength() - 1 && (charAt == ' ' || charAt == '\t'))
 			{
 				textEndOffset++;
 			}
@@ -325,9 +472,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						textEndOffset + 1);
 				formatterNode.addChild(contentFormatterNode);
 				createdContentNode = true;
-
 			}
-
 		}
 
 		if (createdContentNode)
@@ -378,5 +523,4 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		return offset;
 	}
-
 }

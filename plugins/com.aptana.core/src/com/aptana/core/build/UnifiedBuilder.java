@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -17,9 +16,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.index.core.IndexPlugin;
+import com.aptana.core.CorePlugin;
+import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
@@ -38,10 +40,8 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			if (resource != null && resource.exists())
 			{
-				// FIXME We should only be deleting the markers we generate here. Use a base id for all our problem
-				// markers
-				resource.deleteMarkers(IMarker.PROBLEM, false, IResource.DEPTH_INFINITE);
-				resource.deleteMarkers(IMarker.TASK, false, IResource.DEPTH_INFINITE);
+				resource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
+				resource.deleteMarkers(IMarkerConstants.TASK_MARKER, true, IResource.DEPTH_INFINITE);
 			}
 		}
 		catch (CoreException e)
@@ -82,8 +82,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
 	{
+		String projectName = getProject().getName();
+		long startTime = System.nanoTime();
+		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName));
+
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
+			CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName));
 			fullBuild(monitor);
 		}
 		else
@@ -91,13 +96,20 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null)
 			{
+				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta,
+						projectName));
 				fullBuild(monitor);
 			}
 			else
 			{
+				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName));
 				incrementalBuild(delta, monitor);
 			}
 		}
+
+		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
+		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime));
+
 		return null;
 	}
 

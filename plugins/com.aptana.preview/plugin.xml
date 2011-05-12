@@ -2,7 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="previewHandlers" name="%extension-point.previewHandlers.name" schema="schema/previewHandlers.exsd"/>
-   <extension-point id="editors" name="%extension-point.previewableEditors.name" schema="schema/editors.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -13,6 +12,13 @@
       </command>
    </extension>
    <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.preview.commands.showPreview"
+            icon="icons/etool16/preview.png">
+      </image>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -20,7 +26,6 @@
                id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.preview.commands.showPreview"
-                  icon="icons/etool16/preview.png"
                   style="push">
                <visibleWhen>
                   <reference

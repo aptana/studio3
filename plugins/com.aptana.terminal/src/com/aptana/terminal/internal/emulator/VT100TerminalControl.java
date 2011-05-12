@@ -37,7 +37,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	private static final Set<Character> IGNORE_ALT_WITH_KEYS = new HashSet<Character>();
 	
 	static {
-		for (char c : "@#\\|[]{}".toCharArray()) {
+		for (char c : "@#\\|[]{}".toCharArray()) { //$NON-NLS-1$
 			IGNORE_ALT_WITH_KEYS.add(c);
 		}
 	}

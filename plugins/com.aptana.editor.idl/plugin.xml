@@ -30,8 +30,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.idl.parsing.IDLParser"
-            content-type="com.aptana.contenttype.idl"
-            language="text/idl">
+            content-type="com.aptana.contenttype.idl">
       </parser>
    </extension>
 

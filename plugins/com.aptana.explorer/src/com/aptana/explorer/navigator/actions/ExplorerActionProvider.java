@@ -31,13 +31,10 @@ abstract public class ExplorerActionProvider extends DefaultNavigatorActionProvi
 		{
 			IWorkbenchPartSite partSite = ((ICommonViewerWorkbenchSite) site).getSite();
 			String siteId = partSite.getId();
-			if (IExplorerUIConstants.VIEW_ID.equals(siteId))
+			if (IExplorerUIConstants.VIEW_ID.equals(siteId) || IPageLayout.ID_PROJECT_EXPLORER.equals(siteId))
 			{
-				return true;
-			}
-			if (IPageLayout.ID_PROJECT_EXPLORER.equals(siteId))
-			{
-				return getSelectedProject() != null;
+				IProject project = getSelectedProject();
+				return project != null && project.isAccessible();
 			}
 		}
 		return super.isEnabled();

@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
+   <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -139,14 +140,14 @@
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.ui.internal.commands.SendFeedbackCommandHandler"
+            defaultHandler="com.aptana.ui.commands.SendFeedbackCommandHandler"
             description="%SendFeedbackCommand.description"
             id="com.aptana.ui.command.sendfeedback"
             name="%SendFeedbackCommand.label">
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.ui.internal.commands.ReportBugCommandHandler"
+            defaultHandler="com.aptana.ui.commands.ReportBugCommandHandler"
             description="%ReportBugCommand.description"
             id="com.aptana.ui.command.reportbug"
             name="%ReportBugCommand.label">
@@ -170,14 +171,25 @@
             id="com.aptana.ui.command.ShowInFileManager"
             name="%ShowInFileManager.label">
       </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.commands.DiagnosticHandler"
+            description="%runDiagnostic.description"
+            id="com.aptana.ui.command.diagnostic"
+            name="%runDiagnostic.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:help?after=additions">
+            locationURI="menu:help?before=helpEnd">
          <menu
                id="aptanahelp"
                label="%Menu.Help.Aptana.label">
+            <command
+                  commandId="com.aptana.ui.command.diagnostic"
+                  style="push">
+            </command>
                <!--
             <command
                   commandId="com.aptana.ui.command.sendfeedback"
@@ -280,11 +292,37 @@
       </category>
    </extension>
    <extension
+         point="com.aptana.ui.diagnostic">
+      <diagnostic
+            class="com.aptana.ui.EclipseDiagnosticLog"
+            ordinal="100">
+      </diagnostic>
+   </extension>
+   <extension
          point="org.eclipse.ui.importWizards">
       <category
             id="com.aptana.ui.wizards.import.category"
             name="%category.wizards.import.name">
       </category>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="com.aptana.ui.wizards.export.category"
+            name="%category.wizards.export.name">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.ide.FileStoreEditorInput"
+            class="com.aptana.ui.internal.FileStoreEditorInputAdapterFactory">
+         <adapter
+               type="com.aptana.core.resources.IUniformResource">
+         </adapter>
+         <adapter
+               type="org.eclipse.core.resources.IFile">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.internal.actions;
 
 import java.util.ArrayList;
@@ -119,12 +126,15 @@ abstract class AbstractStagingHandler extends AbstractGitHandler
 		{
 			IContainer container = (IContainer) resource;
 			GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
-			List<ChangedFile> files = repo.getChangedFilesForContainer(container);
-			for (ChangedFile file : files)
+			if (repo != null)
 			{
-				if (changedFileIsValid(file))
+				List<ChangedFile> files = repo.getChangedFilesForContainer(container);
+				for (ChangedFile file : files)
 				{
-					return true;
+					if (changedFileIsValid(file))
+					{
+						return true;
+					}
 				}
 			}
 		}

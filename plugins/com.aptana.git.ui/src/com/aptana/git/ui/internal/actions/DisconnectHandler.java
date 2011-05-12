@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.internal.actions;
 
 import java.text.MessageFormat;
@@ -17,11 +24,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.RepositoryProvider;
 
 public class DisconnectHandler extends AbstractGitHandler
 {
+
+	private IJobChangeListener listener;
+
+	public DisconnectHandler()
+	{
+	}
+
+	public DisconnectHandler(IJobChangeListener listener)
+	{
+		this.listener = listener;
+	}
 
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
@@ -71,6 +90,10 @@ public class DisconnectHandler extends AbstractGitHandler
 					return Status.OK_STATUS;
 				}
 			};
+			if (listener != null)
+			{
+				job.addJobChangeListener(listener);
+			}
 			job.schedule();
 		}
 		return null;

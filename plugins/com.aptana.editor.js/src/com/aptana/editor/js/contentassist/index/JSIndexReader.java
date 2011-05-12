@@ -98,9 +98,12 @@ public class JSIndexReader extends IndexReader
 		column++;
 
 		// super types
-		for (String parentType : this.getSubDelimiterPattern().split(columns[column]))
+		if (column < columns.length)
 		{
-			result.addParentType(parentType);
+			for (String parentType : this.getSubDelimiterPattern().split(columns[column]))
+			{
+				result.addParentType(parentType);
+			}
 		}
 		column++;
 

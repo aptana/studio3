@@ -30,8 +30,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.yaml.parsing.YAMLParser"
-            content-type="com.aptana.contenttype.yml"
-            language="text/yaml">
+            content-type="com.aptana.contenttype.yml">
       </parser>
    </extension>
    <extension

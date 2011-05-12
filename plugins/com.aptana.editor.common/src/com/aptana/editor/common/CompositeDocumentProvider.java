@@ -17,8 +17,7 @@ import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 /**
  * @author Max Stepanov
  */
-public class CompositeDocumentProvider extends CommonDocumentProvider
-{
+public class CompositeDocumentProvider extends CommonDocumentProvider {
 
 	private String documentContentType;
 	private IPartitioningConfiguration defaultPartitioningConfiguration;
@@ -31,11 +30,8 @@ public class CompositeDocumentProvider extends CommonDocumentProvider
 	 * @param primaryPartitioningConfiguration
 	 * @param partitionerSwitchStrategy
 	 */
-	protected CompositeDocumentProvider(String documentContentType,
-			IPartitioningConfiguration defaultPartitioningConfiguration,
-			IPartitioningConfiguration primaryPartitioningConfiguration,
-			IPartitionerSwitchStrategy partitionerSwitchStrategy)
-	{
+	protected CompositeDocumentProvider(String documentContentType, IPartitioningConfiguration defaultPartitioningConfiguration,
+			IPartitioningConfiguration primaryPartitioningConfiguration, IPartitionerSwitchStrategy partitionerSwitchStrategy) {
 		super();
 		this.documentContentType = documentContentType;
 		this.defaultPartitioningConfiguration = defaultPartitioningConfiguration;
@@ -44,32 +40,24 @@ public class CompositeDocumentProvider extends CommonDocumentProvider
 	}
 
 	@Override
-	public void connect(Object element) throws CoreException
-	{
+	public void connect(Object element) throws CoreException {
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null)
-		{
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(defaultPartitioningConfiguration
-					.createSubPartitionScanner(), primaryPartitioningConfiguration.createSubPartitionScanner(),
-					partitionerSwitchStrategy);
-			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, TextUtils
-					.combine(new String[][] { CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
-							defaultPartitioningConfiguration.getContentTypes(),
-							primaryPartitioningConfiguration.getContentTypes() }));
+		if (document != null) {
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(defaultPartitioningConfiguration.createSubPartitionScanner(),
+					primaryPartitioningConfiguration.createSubPartitionScanner(), partitionerSwitchStrategy);
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, TextUtils.combine(new String[][] { CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
+					defaultPartitioningConfiguration.getContentTypes(), primaryPartitioningConfiguration.getContentTypes() }));
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfigurations(
-					document,
-					new IPartitioningConfiguration[] { defaultPartitioningConfiguration,
-							primaryPartitioningConfiguration });
+			CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.registerConfigurations(document, new IPartitioningConfiguration[] { defaultPartitioningConfiguration, primaryPartitioningConfiguration });
 		}
 	}
 
-	protected String getDefaultContentType(String filename)
-	{
+	protected String getDefaultContentType(String filename) {
 		return documentContentType;
 	}
 }

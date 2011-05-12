@@ -29,15 +29,16 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
-import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.xml.TagUtil;
 
 @SuppressWarnings("restriction")
@@ -77,10 +78,10 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		FileService fileService = new FileService(IHTMLParserConstants.LANGUAGE, new HTMLParseState());
+		FileService fileService = new FileService(IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
 		IValidationManager validationManager = fileService.getValidationManager();
-		validationManager.addNestedLanguage(ICSSParserConstants.LANGUAGE);
-		validationManager.addNestedLanguage(IJSParserConstants.LANGUAGE);
+		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
+		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
 		return fileService;
 	}
 
@@ -211,5 +212,25 @@ public class HTMLEditor extends AbstractThemeableEditor
 			// no new pair, so don't highlight anything
 			fTagPairOccurrences = null;
 		}
+	}
+
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new HTMLFoldingComputer(this, document);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Object getAdapter(Class adapter)
+	{
+		if (IEditorLinkedResources.class == adapter)
+		{
+			return new HTMLEditorLinkedResources(this);
+		}
+		return super.getAdapter(adapter);
 	}
 }

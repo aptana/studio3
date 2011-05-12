@@ -7,10 +7,8 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,6 +17,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.jruby.RubyRegexp;
 import org.jruby.RubyString;
 import org.jruby.runtime.builtin.IRubyObject;
@@ -44,14 +43,15 @@ public class RubyRegexpFolder implements IFoldingComputer
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
+	public Map<ProjectionAnnotation, Position> emitFoldingRegions(boolean initialReconcile, IProgressMonitor monitor)
+			throws BadLocationException
 	{
 		int lineCount = fDocument.getNumberOfLines();
 		if (lineCount <= 1) // Quick hack fix for minified files. We need at least two lines to have folding!
 		{
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
-		List<Position> newPositions = new ArrayList<Position>(lineCount / 4);
+		Map<ProjectionAnnotation, Position> newPositions = new HashMap<ProjectionAnnotation, Position>(lineCount / 4);
 		Map<Integer, Integer> starts = new HashMap<Integer, Integer>(3);
 		if (monitor != null)
 		{
@@ -120,7 +120,7 @@ public class RubyRegexpFolder implements IFoldingComputer
 							if (posLength > 0)
 							{
 								Position position = new Position(startingOffset, posLength);
-								newPositions.add(position);
+								newPositions.put(new ProjectionAnnotation(), position);
 							}
 						}
 					}

@@ -2,6 +2,7 @@ package com.aptana.editor.yaml.parsing;
 
 import org.yaml.snakeyaml.nodes.NodeTuple;
 
+import com.aptana.editor.yaml.IYAMLConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
@@ -13,7 +14,7 @@ public class NodeTupleNode extends ParseNode
 
 	public NodeTupleNode(NodeTuple tuple, IParseState parseState)
 	{
-		super(IYAMLParserConstants.LANGUAGE);
+		super(IYAMLConstants.CONTENT_TYPE_YAML);
 		int start = YAMLParseRootNode.getStart(tuple.getKeyNode(), parseState);
 		int end = YAMLParseRootNode.getEnd(tuple.getValueNode(), parseState);
 		if (end < start)

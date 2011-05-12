@@ -93,7 +93,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * 
 	 * @param path
 	 */
-	public void loadState(IPath path) {
+	/* package */ void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
 			connections.clear();

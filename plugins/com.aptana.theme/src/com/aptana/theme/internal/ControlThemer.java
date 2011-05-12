@@ -27,6 +27,7 @@ import com.aptana.theme.IControlThemer;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.preferences.IPreferenceConstants;
 
 /**
  * Base class for applying our theme to a Control. More specific subclasses exist for Tables/Trees.
@@ -64,9 +65,22 @@ class ControlThemer implements IControlThemer
 			getControl().setRedraw(false);
 			getControl().setBackground(getBackground());
 			getControl().setForeground(getForeground());
-			getControl().setFont(getFont());
+			if (useEditorFont())
+			{
+				getControl().setFont(getFont());
+			}
+			else
+			{
+				getControl().setFont(null);
+			}
 			getControl().setRedraw(true);
 		}
+	}
+
+	protected boolean useEditorFont()
+	{
+		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_FONT,
+				false, null);
 	}
 
 	public void dispose()
@@ -184,6 +198,11 @@ class ControlThemer implements IControlThemer
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
+					applyTheme();
+				}
+				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_FONT))
+				{
+					// Handle the invasive font setting change
 					applyTheme();
 				}
 			}

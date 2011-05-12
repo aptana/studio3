@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 Wind River Systems, Inc. and others.
+ * Copyright (c) 2003, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,8 @@
  * Michael Scharf (Wind River) - [237398] Terminal get Invalid Thread Access when the title is set
  * Martin Oberhuber (Wind River) - [240745] Pressing Ctrl+F1 in the Terminal should bring up context help
  * Michael Scharf (Wind River) - [240098] The cursor should not blink when the terminal is disconnected
+ * Anton Leherbauer (Wind River) - [335021] Middle mouse button copy/paste does not work with the terminal
+ * Max Stepanov (Appcelerator) - [339768] Fix ANSI code for PgUp / PgDn
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.emulator;
 
@@ -45,12 +47,16 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -187,16 +193,20 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#copy()
 	 */
 	public void copy() {
-		getCtlText().copy();
+		copy(DND.CLIPBOARD);
+	}
+
+	private void copy(int clipboardType) {
+		Object[] data = new Object[] { getSelection() };
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		fClipboard.setContents(data, types, clipboardType);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#paste()
 	 */
 	public void paste() {
-		TextTransfer textTransfer = TextTransfer.getInstance();
-		String strText = (String) fClipboard.getContents(textTransfer);
-		pasteString(strText);
+		paste(DND.CLIPBOARD);
 // TODO paste in another thread.... to avoid blocking
 //		new Thread() {
 //			public void run() {
@@ -208,6 +218,12 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 //		}.start();
 	}
 
+	private void paste(int clipboardType) {
+		TextTransfer textTransfer = TextTransfer.getInstance();
+		String strText = (String) fClipboard.getContents(textTransfer, clipboardType);
+		pasteString(strText);
+	}
+	
 	/**
 	 * @param strText the text to paste
 	 */
@@ -600,7 +616,14 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 				fTerminalText.setDimensions(lines, columns);
 			}
 		});
-
+		fCtlText.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				// update selection used by middle mouse button paste
+				if (e.button == 1 && getSelection().length() > 0) {
+					copy(DND.SELECTION_CLIPBOARD);
+				}
+			}
+		});
 
 		fDisplay = getCtlText().getDisplay();
 		fClipboard = new Clipboard(fDisplay);

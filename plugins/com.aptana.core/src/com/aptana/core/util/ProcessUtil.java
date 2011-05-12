@@ -127,20 +127,9 @@ public abstract class ProcessUtil
 			readerGobbler.join();
 			errorGobbler.join();
 
-			String read = readerGobbler.getResult();
-			if (exitValue != 0 && (read == null || read.trim().length() == 0))
-			{
-				read = errorGobbler.getResult();
-			}
-			else
-			{
-				if (read != null && read.endsWith("\n")) //$NON-NLS-1$
-				{
-					read = read.substring(0, read.length() - 1);
-				}
-			}
-
-			return new Status(exitValue == 0 ? IStatus.OK : IStatus.ERROR, CorePlugin.PLUGIN_ID, exitValue, read, null);
+			String stdout = readerGobbler.getResult();
+			String stderr = errorGobbler.getResult();
+			return new ProcessStatus(exitValue, stdout, stderr);
 		}
 		catch (InterruptedException e)
 		{
@@ -176,13 +165,12 @@ public abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		catch (CoreException e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			return e.getStatus();
 		}
-		return null;
 	}
 
 	/**

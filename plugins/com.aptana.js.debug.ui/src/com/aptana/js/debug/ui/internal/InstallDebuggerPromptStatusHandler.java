@@ -31,8 +31,8 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
 public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 	
 	private static final String URL_INSTALL_PDM = "http://www.aptana.com/pro/pdm.php"; //$NON-NLS-1$
-	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
-	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger"; //$NON-NLS-1$
+	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://wiki.appcelerator.org/display/tis/Installing+the+JavaScript+debugger"; //$NON-NLS-1$
+	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://wiki.appcelerator.org/display/tis/Installing+the+Internet+Explorer+debugger"; //$NON-NLS-1$
 
 	/**
 	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus,

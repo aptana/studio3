@@ -206,8 +206,8 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		{
 			// Log complete
 			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
-					FormatterMessages.Formatter_formatterError, new DumpContentException("Input:\n" + input //$NON-NLS-1$
-							+ "\n<!----------------------------!>\nOutput:\n" + output))); //$NON-NLS-1$
+					FormatterMessages.Formatter_formatterError, new DumpContentException("\nInput:\n\n" + input //$NON-NLS-1$
+							+ "\n<!----------------------------!> \nOutput:\n " + output))); //$NON-NLS-1$
 		}
 		else
 		{

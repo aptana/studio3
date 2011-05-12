@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.resources.TaskTag;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.tasks.TaskTag;
 
 class TaskTagInputDialog extends StatusDialog
 {

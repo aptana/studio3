@@ -8,10 +8,10 @@
 package com.aptana.editor.svg.outline;
 
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 
 /**
  *	SVGOutlineContentProvider
@@ -23,7 +23,7 @@ public class SVGOutlineContentProvider extends CompositeOutlineContentProvider
 	 */
 	public SVGOutlineContentProvider()
 	{
-		this.addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineContentProvider());
-		this.addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineContentProvider());
+		this.addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
+		this.addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
 	}
 }

@@ -18,9 +18,9 @@ import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -51,7 +51,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * Blank lines constants
 	 */
 	protected static final String[] BLANK_LINES = { HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
-			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS };
+			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
+			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES };
 
 	private String lineSeparator;
 
@@ -128,7 +129,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			// This will happen when dealing with a master formatter that runs with a parser that does not extend from
 			// HTNLParser (like PHPParser).
 			checkinParser(parser, mainContentType);
-			mainContentType = IHTMLParserConstants.LANGUAGE;
+			mainContentType = IHTMLConstants.CONTENT_TYPE_HTML;
 			parser = checkoutParser(mainContentType);
 		}
 		try
@@ -244,12 +245,12 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			spacesCount = countLeftWhitespaceChars(input);
 		}
-		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input);
+		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
+		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder(writer);
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		new HTMLFormatterNodeRewriter().rewrite(root);
 		IFormatterContext context = new HTMLFormatterContext(indentationLevel);
-		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH));
 		writer.setLinesPreserve(getInt(HTMLFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);

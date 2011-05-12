@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -31,6 +31,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 		prefs.put(IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, ".#:\t");
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
@@ -39,8 +40,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*",
 				".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
 				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
-				".*Parse Error.*", ".*-webkit-.*" };
-		prefs.put(ICSSParserConstants.LANGUAGE + ":"
+				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a background.*" };
+		prefs.put(ICSSConstants.CONTENT_TYPE_CSS + ":"
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
 				StringUtil.join("####", filtered));
 	}

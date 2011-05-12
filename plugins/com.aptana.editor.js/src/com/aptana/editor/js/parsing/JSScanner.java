@@ -221,6 +221,8 @@ public class JSScanner extends Scanner
 
 		fSDocComments.clear();
 		fVSDocComments.clear();
+		fSingleLineComments.clear();
+		fMultiLineComments.clear();
 	}
 
 	/**

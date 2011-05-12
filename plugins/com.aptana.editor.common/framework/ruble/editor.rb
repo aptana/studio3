@@ -209,6 +209,12 @@ module Ruble
       doc.nil? ? 0 : doc.getLineOfOffset(caret_offset)
     end
     
+    # Returns a region, whose offset and length can be queried
+    def line_information(line_number)
+      doc = document
+      doc.nil? ? nil : doc.getLineInformation(line_number)
+    end
+    
     def caret_offset
       # Need to convert because there may be folded regions?
       offset = styled_text.nil? ? 0 : styled_text.caret_offset

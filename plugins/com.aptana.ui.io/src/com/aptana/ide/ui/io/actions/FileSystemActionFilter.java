@@ -10,6 +10,7 @@ package com.aptana.ide.ui.io.actions;
 
 import java.io.File;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -66,6 +67,9 @@ public class FileSystemActionFilter implements IActionFilter {
 			if (adapterType == IActionFilter.class) {
 				return new FileSystemActionFilter();
 			}
+			if (adapterType == IFileStore.class) {
+				return ((IAdaptable) adaptableObject).getAdapter(adapterType);
+			}
 			return null;
 		}
 
@@ -73,7 +77,7 @@ public class FileSystemActionFilter implements IActionFilter {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
 		public Class[] getAdapterList() {
-			return new Class[] { IActionFilter.class };
+			return new Class[] { IActionFilter.class, IFileStore.class };
 		}
 	}
 }

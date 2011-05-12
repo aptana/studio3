@@ -190,14 +190,17 @@ class TreeThemer extends ControlThemer
 			}
 			else
 			{
-				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-				if (font == null)
+				if (useEditorFont())
 				{
-					font = JFaceResources.getTextFont();
-				}
-				if (font != null)
-				{
-					cell.setFont(font);
+					Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+					if (font == null)
+					{
+						font = JFaceResources.getTextFont();
+					}
+					if (font != null)
+					{
+						cell.setFont(font);
+					}
 				}
 
 				cell.setForeground(getForeground());
@@ -301,7 +304,7 @@ class TreeThemer extends ControlThemer
 					for (TreeItem item : items)
 					{
 						if (item != null)
-						{						
+						{
 							Rectangle bounds;
 							if (columns == 0)
 							{
@@ -397,6 +400,10 @@ class TreeThemer extends ControlThemer
 		{
 			public void handleEvent(Event event)
 			{
+				if (!useEditorFont())
+				{
+					return;
+				}
 				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 				if (font == null)
 				{
@@ -427,7 +434,7 @@ class TreeThemer extends ControlThemer
 		{
 			public void propertyChange(PropertyChangeEvent event)
 			{
-				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
+				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME) || !useEditorFont())
 				{
 					return;
 				}

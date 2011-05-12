@@ -1157,7 +1157,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
-		return Character.isWhitespace(c) || c == ':';
+		return Character.isWhitespace(c) || c == ':' || c == ';';
 	}
 
 }

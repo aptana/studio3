@@ -9,9 +9,9 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolCollector;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParseRootNode extends ParseRootNode
@@ -36,7 +36,7 @@ public class JSParseRootNode extends ParseRootNode
 	public JSParseRootNode(Symbol[] children)
 	{
 		super( //
-			IJSParserConstants.LANGUAGE, children, //
+			IJSConstants.CONTENT_TYPE_JS, children, //
 			(children != null && children.length > 0) ? children[0].getStart() : 0, //
 			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
 	}

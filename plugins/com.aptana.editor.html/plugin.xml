@@ -53,8 +53,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.html.parsing.HTMLParser"
-            content-type="com.aptana.contenttype.html"
-            language="text/html">
+            content-type="com.aptana.contenttype.html">
       </parser>
    </extension>
    <extension
@@ -66,15 +65,6 @@
             name="%hyperlinkDetector.cssclass.name"
             targetId="com.aptana.editor.html">
       </hyperlinkDetector>
-   </extension>
-   <extension
-         point="com.aptana.preview.editors">
-      <editor
-            targetId="com.aptana.editor.html">
-         <previewDelegate
-               class="com.aptana.editor.html.preview.HTMLEditorPreviewDelegate">
-         </previewDelegate>
-      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
@@ -123,15 +113,15 @@
 
    <extension
          point="com.aptana.editor.common.validator">
-      <language
+      <content-type
             name="%validator.language.html.name"
-            type="text/html">
-      </language>
+            id="com.aptana.contenttype.html">
+      </content-type>
       <validator
             class="com.aptana.editor.html.validator.HTMLTidyValidator"
-            language="text/html"
-            name="%validator.tidy.name"
-            type="com.aptana.editor.html.problem">
+            content-type="com.aptana.contenttype.html"
+            marker-type="com.aptana.editor.html.problem"
+            name="%validator.tidy.name">
       </validator>
    </extension>
    <extension
@@ -146,10 +136,7 @@
          name="%marker.html.name"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <super
-            type="org.eclipse.core.resources.textmarker">
+            type="com.aptana.core.problem">
       </super>
       <persistent
             value="true">

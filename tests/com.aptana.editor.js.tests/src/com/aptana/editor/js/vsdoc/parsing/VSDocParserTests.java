@@ -136,6 +136,16 @@ public class VSDocParserTests extends TestCase
 	}
 
 	/**
+	 * testPara
+	 */
+	public void testPara()
+	{
+		DocumentationBlock block = this.getDocumentationBlock("vsdoc/para.vsdoc");
+
+		assertEquals("This is a summary\nWith a new line of text", block.getText());
+	}
+
+	/**
 	 * testException
 	 */
 	public void testException()

@@ -26,5 +26,6 @@ with (true) /** */
 {
 }
 ==FORMATTED==
-with (true) /** */ {
+with (true) /** */
+{
 }

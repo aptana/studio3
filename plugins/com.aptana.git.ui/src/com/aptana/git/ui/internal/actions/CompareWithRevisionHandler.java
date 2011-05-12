@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.internal.actions;
 
 import java.text.MessageFormat;
@@ -96,6 +103,29 @@ public class CompareWithRevisionHandler extends AbstractCompareRevisionHandler
 		CompareUI.openCompareEditor(in);
 
 		return null;
+	}
+
+	protected boolean calculateEnabled()
+	{
+		Collection<IResource> resources = getSelectedResources();
+		if (resources == null || resources.isEmpty())
+		{
+			return false;
+		}
+		for (IResource blah : resources)
+		{
+			if (blah == null || blah.getType() != IResource.FILE)
+			{
+				continue;
+			}
+			GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
+			if (repo == null)
+			{
+				continue;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

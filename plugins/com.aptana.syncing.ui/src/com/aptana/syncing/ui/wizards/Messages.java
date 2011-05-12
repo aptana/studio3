@@ -13,6 +13,20 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.syncing.ui.wizards.messages"; //$NON-NLS-1$
 
+	public static String ExportConnectionsPage_Description;
+	public static String ExportConnectionsPage_ERR_Directory;
+	public static String ExportConnectionsPage_ERR_EmptyFile;
+	public static String ExportConnectionsPage_LBL_File;
+	public static String ExportConnectionsPage_LBL_Options;
+	public static String ExportConnectionsPage_LBL_OverwriteWithoutWarning;
+	public static String ExportConnectionsPage_Title;
+
+	public static String ExportConnectionsWizard_ERR_FailSaveExportPrefs;
+	public static String ExportConnectionsWizard_Error_Message;
+	public static String ExportConnectionsWizard_Error_Title;
+	public static String ExportConnectionsWizard_Overwrite_Message;
+	public static String ExportConnectionsWizard_Overwrite_Title;
+
 	public static String ImportConnectionsPage_Description;
 	public static String ImportConnectionsPage_ERR_EmptyPath;
 	public static String ImportConnectionsPage_ERR_InvalidDirectory;

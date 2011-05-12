@@ -85,6 +85,29 @@ public class VSDocReader extends MetadataReader
 	}
 
 	/**
+	 * process para element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterPara(String ns, String name, String qname, Attributes attributes)
+	{
+		if (this.isBufferingText())
+		{
+			// grab (normalized) content and add new line before paragraph
+			String text = this.getText() + "&x0A;"; //$NON-NLS-1$
+
+			// restart text buffering
+			this.startTextBuffer();
+
+			// add updated text
+			this.characters(text.toCharArray(), 0, text.length());
+		}
+	}
+
+	/**
 	 * process param element
 	 * 
 	 * @param ns
@@ -238,7 +261,7 @@ public class VSDocReader extends MetadataReader
 	}
 
 	/**
-	 * Exit para element
+	 * Exit param element
 	 * 
 	 * @param ns
 	 * @param name
@@ -316,7 +339,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void exitSummary(String ns, String name, String qname)
 	{
-		this._summary = this.getText();
+		this._summary = this.resolveEntities(this.getText());
 	}
 
 	/**

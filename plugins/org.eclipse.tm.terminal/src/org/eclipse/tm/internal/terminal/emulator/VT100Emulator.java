@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 Wind River Systems, Inc. and others.
+ * Copyright (c) 2003, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@
  * Michael Scharf (Wind River) - [209746] There are cases where some colors not displayed correctly
  * Martin Oberhuber (Wind River) - [168197] Fix Terminal for CDC-1.1/Foundation-1.1
  * Michael Scharf (Wind River) - [262996] get rid of TerminalState.OPENED
+ * Martin Oberhuber (Wind River) - [334969] Fix multi-command SGR sequence
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.emulator;
 
@@ -847,92 +848,107 @@ public class VT100Emulator implements ControlListener {
 			switch (ansiParameter) {
 			case 0:
 				// Reset all graphics modes.
-				text.setStyle(text.getDefaultStyle());
+				style = text.getDefaultStyle();
 				break;
 
 			case 1:
-				text.setStyle(style.setBold(true));
+				style = style.setBold(true);
+				break;
+
+			case 4:
+				style = style.setUnderline(true);
+				break;
+
+			case 5:
+				style = style.setBlink(true);
 				break;
 
 			case 7:
-				text.setStyle(style.setReverse(true));
+				style = style.setReverse(true);
 				break;
 
 			case 10: // Set primary font. Ignored.
 				break;
 
-//			case 22:
-//				// TODO
-//				//currentFontStyle = SWT.NORMAL; // Cancel bold or dim attributes
-//												// only.
-//				break;
+			case 21:
+			case 22:
+				style = style.setBold(false);
+				break;
+
+			case 24:
+				style = style.setUnderline(false);
+				break;
+
+			case 25:
+				style = style.setBlink(false);
+				break;
 
 			case 27:
-				text.setStyle(style.setReverse(false));
+				style = style.setReverse(false);
 				break;
 
 			case 30:
-				text.setStyle(style.setForground("BLACK")); //$NON-NLS-1$
+				style = style.setForground("BLACK"); //$NON-NLS-1$
 				break;
 
 			case 31:
-				text.setStyle(style.setForground("RED"));  //$NON-NLS-1$
+				style = style.setForground("RED");  //$NON-NLS-1$
 				break;
 
 			case 32:
-				text.setStyle(style.setForground("GREEN"));  //$NON-NLS-1$
+				style = style.setForground("GREEN");  //$NON-NLS-1$
 				break;
 
 			case 33:
-				text.setStyle(style.setForground("YELLOW"));  //$NON-NLS-1$
+				style = style.setForground("YELLOW");  //$NON-NLS-1$
 				break;
 
 			case 34:
-				text.setStyle(style.setForground("BLUE")); //$NON-NLS-1$
+				style = style.setForground("BLUE"); //$NON-NLS-1$
 				break;
 
 			case 35:
-				text.setStyle(style.setForground("MAGENTA"));  //$NON-NLS-1$
+				style = style.setForground("MAGENTA");  //$NON-NLS-1$
 				break;
 
 			case 36:
-				text.setStyle(style.setForground("CYAN")); //$NON-NLS-1$
+				style = style.setForground("CYAN"); //$NON-NLS-1$
 				break;
 
 			case 37:
-				text.setStyle(style.setForground("WHITE_FOREGROUND")); //$NON-NLS-1$
+				style = style.setForground("WHITE_FOREGROUND"); //$NON-NLS-1$
 				break;
 
 			case 40:
-				text.setStyle(style.setBackground("BLACK")); //$NON-NLS-1$
+				style = style.setBackground("BLACK"); //$NON-NLS-1$
 				break;
 
 			case 41:
-				text.setStyle(style.setBackground("RED")); //$NON-NLS-1$
+				style = style.setBackground("RED"); //$NON-NLS-1$
 				break;
 
 			case 42:
-				text.setStyle(style.setBackground("GREEN")); //$NON-NLS-1$
+				style = style.setBackground("GREEN"); //$NON-NLS-1$
 				break;
 
 			case 43:
-				text.setStyle(style.setBackground("YELLOW")); //$NON-NLS-1$
+				style = style.setBackground("YELLOW"); //$NON-NLS-1$
 				break;
 
 			case 44:
-				text.setStyle(style.setBackground("BLUE")); //$NON-NLS-1$
+				style = style.setBackground("BLUE"); //$NON-NLS-1$
 				break;
 
 			case 45:
-				text.setStyle(style.setBackground("MAGENTA")); //$NON-NLS-1$
+				style = style.setBackground("MAGENTA"); //$NON-NLS-1$
 				break;
 
 			case 46:
-				text.setStyle(style.setBackground("CYAN")); //$NON-NLS-1$
+				style = style.setBackground("CYAN"); //$NON-NLS-1$
 				break;
 
 			case 47:
-				text.setStyle(style.setBackground("WHITE")); //$NON-NLS-1$
+				style = style.setBackground("WHITE"); //$NON-NLS-1$
 				break;
 
 			default:
@@ -943,6 +959,7 @@ public class VT100Emulator implements ControlListener {
 
 			++parameterIndex;
 		}
+		text.setStyle(style);
 	}
 
 	/**

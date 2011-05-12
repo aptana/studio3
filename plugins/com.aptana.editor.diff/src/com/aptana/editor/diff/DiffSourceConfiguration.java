@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
@@ -24,6 +25,8 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
@@ -236,9 +239,7 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
-	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
@@ -276,6 +277,15 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 		dr = new ThemeingDamagerRepairer(getOneTokenScanner(META_SEPARATOR_DIFF));
 		reconciler.setDamager(dr, SEPARATOR);
 		reconciler.setRepairer(dr, SEPARATOR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 */
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		return new CommonContentAssistProcessor(editor);
 	}
 
 	private ITokenScanner getOneTokenScanner(String token)

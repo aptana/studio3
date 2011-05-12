@@ -25,21 +25,22 @@ public class ValidatorLoader
 
 	private static final String EXTENSION_POINT_ID = CommonEditorPlugin.PLUGIN_ID + ".validator"; //$NON-NLS-1$
 	private static final String ELEMENT_VALIDATOR = "validator"; //$NON-NLS-1$
-	private static final String ELEMENT_LANGUAGE = "language"; //$NON-NLS-1$
+	private static final String ELEMENT_CONTENT_TYPE = "content-type"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
-	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
-	private static final String ATTR_LANGUAGE = "language"; //$NON-NLS-1$
+	private static final String ATTR_ID = "id"; //$NON-NLS-1$
+	private static final String ATTR_CONTENT_TYPE = "content-type"; //$NON-NLS-1$
+	private static final String ATTR_MARKER_TYPE = "marker-type"; //$NON-NLS-1$
 
-	// maps the languages by type
-	private Map<String, ValidatorLanguage> languages;
-	// maps language type to the list of validators that support it
+	// maps the content types by id
+	private Map<String, ValidatorLanguage> contentTypes;
+	// maps content type to the list of validators that support it
 	private Map<String, List<ValidatorReference>> validators;
 
 	private static ValidatorLoader instance;
 
 	private ValidatorLoader()
 	{
-		languages = new HashMap<String, ValidatorLanguage>();
+		contentTypes = new HashMap<String, ValidatorLanguage>();
 		validators = new HashMap<String, List<ValidatorReference>>();
 		readExtensionRegistry();
 	}
@@ -56,13 +57,13 @@ public class ValidatorLoader
 	public List<ValidatorLanguage> getLanguages()
 	{
 		List<ValidatorLanguage> result = new ArrayList<ValidatorLanguage>();
-		result.addAll(languages.values());
+		result.addAll(contentTypes.values());
 		return result;
 	}
 
-	public List<ValidatorReference> getValidators(String languageType)
+	public List<ValidatorReference> getValidators(String contentType)
 	{
-		List<ValidatorReference> list = validators.get(languageType);
+		List<ValidatorReference> list = validators.get(contentType);
 		if (list == null)
 		{
 			return Collections.emptyList();
@@ -85,15 +86,15 @@ public class ValidatorLoader
 	{
 		for (IConfigurationElement element : elements)
 		{
-			if (ELEMENT_LANGUAGE.equals(element.getName()))
+			if (ELEMENT_CONTENT_TYPE.equals(element.getName()))
 			{
-				String type = element.getAttribute(ATTR_TYPE);
-				if (StringUtil.isEmpty(type))
+				String id = element.getAttribute(ATTR_ID);
+				if (StringUtil.isEmpty(id))
 				{
 					continue;
 				}
 				String name = element.getAttribute(ATTR_NAME);
-				languages.put(type, new ValidatorLanguage(type, name));
+				contentTypes.put(id, new ValidatorLanguage(id, name));
 			}
 		}
 	}
@@ -109,23 +110,23 @@ public class ValidatorLoader
 				{
 					continue;
 				}
-				String type = element.getAttribute(ATTR_TYPE);
-				if (StringUtil.isEmpty(type))
+				String markerType = element.getAttribute(ATTR_MARKER_TYPE);
+				if (StringUtil.isEmpty(markerType))
 				{
 					continue;
 				}
-				String languageType = element.getAttribute(ATTR_LANGUAGE);
-				ValidatorLanguage language = languages.get(languageType);
+				String contentType = element.getAttribute(ATTR_CONTENT_TYPE);
+				ValidatorLanguage language = contentTypes.get(contentType);
 				if (language == null)
 				{
 					continue;
 				}
-				ValidatorReference validator = new ValidatorReference(name, type, language, element);
-				List<ValidatorReference> list = validators.get(languageType);
+				ValidatorReference validator = new ValidatorReference(name, markerType, language, element);
+				List<ValidatorReference> list = validators.get(contentType);
 				if (list == null)
 				{
 					list = new ArrayList<ValidatorReference>();
-					validators.put(languageType, list);
+					validators.put(contentType, list);
 				}
 				list.add(validator);
 			}

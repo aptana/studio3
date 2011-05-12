@@ -10,7 +10,7 @@ package com.aptana.samples.ui.views;
 import java.io.File;
 
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorDescriptor;
@@ -21,18 +21,20 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.samples.ui.SamplesUIPlugin;
 
 /**
  * @author Kevin Lindsey
  * @author Michael Xia
  */
 @SuppressWarnings("restriction")
-public class SamplesViewLabelProvider extends LabelProvider
+public class SamplesViewLabelProvider extends ColumnLabelProvider
 {
 	private static final Image IMAGE_FOLDER = PlatformUI.getWorkbench().getSharedImages()
 			.getImage(ISharedImages.IMG_OBJ_FOLDER);
 	private static final Image IMAGE_FILE = PlatformUI.getWorkbench().getSharedImages()
 			.getImage(ISharedImages.IMG_OBJ_FILE);
+	private static final String ICON_REMOTE = "icons/samples_remote.gif"; //$NON-NLS-1$
 
 	private ImageRegistry imageRegistry;
 
@@ -98,6 +100,10 @@ public class SamplesViewLabelProvider extends LabelProvider
 				return image;
 			}
 		}
+		if (element instanceof SamplesReference)
+		{
+			return SamplesUIPlugin.getImage(ICON_REMOTE);
+		}
 		return super.getImage(element);
 	}
 
@@ -124,4 +130,44 @@ public class SamplesViewLabelProvider extends LabelProvider
 		}
 		return super.getText(element);
 	}
+
+	@Override
+	public String getToolTipText(Object element)
+	{
+		String toolTipText;
+
+		if (element instanceof SampleCategory)
+		{
+			return ((SampleCategory) element).getName();
+		}
+		if (element instanceof SamplesReference)
+		{
+			SamplesReference samplesRef = (SamplesReference) element;
+			toolTipText = samplesRef.getDescriptionText();
+			if (toolTipText == null)
+			{
+				toolTipText = samplesRef.getName();
+			}
+			if (toolTipText == null)
+			{
+				toolTipText = samplesRef.getPath();
+			}
+			return toolTipText;
+		}
+		if (element instanceof SampleEntry)
+		{
+			toolTipText = ((SampleEntry) element).getDescription();
+			if (toolTipText != null)
+			{
+				return toolTipText;
+			}
+			File file = ((SampleEntry) element).getFile();
+			if (file != null)
+			{
+				return file.getName();
+			}
+		}
+		return super.getText(element);
+	}
+
 }

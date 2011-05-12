@@ -23,7 +23,7 @@
             viewerId="com.aptana.explorer.view">
          <includes>
             <contentExtension
-                  pattern="org.eclipse.ui.navigator.resourceContent">
+                  pattern="com.aptana.explorer.navigator.resourceContent">
             </contentExtension>
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
@@ -124,6 +124,81 @@
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
+         <!-- this is a copy of org.eclipse.ui.navigator.resourceContent with our own drop adapter
+        		to address the issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=344880
+         -->
+         <navigatorContent
+            name="%resource.extension.name"
+            priority="low"
+            icon="platform:/plugin/org.eclipse.ui.navigator.resources/icons/full/eview16/resource_persp.gif"
+            activeByDefault="true"
+            			contentProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionContentProvider"
+            			labelProvider="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionLabelProvider"
+            id="com.aptana.explorer.navigator.resourceContent">
+         <enablement>
+		         <or>
+		            <instanceof value="org.eclipse.core.resources.IResource" />
+		         </or>
+         </enablement>
+
+        <commonSorter
+        	  class="org.eclipse.ui.internal.navigator.resources.workbench.ResourceExtensionSorter"
+        	  id="com.aptana.explorer.navigator.resources.sorters.defaultSorter">
+           <parentExpression>
+           		 <or>
+           		 	<instanceof value="org.eclipse.core.resources.IResource" />
+           		 </or>
+		   </parentExpression>
+        </commonSorter>
+        <dropAssistant
+              class="com.aptana.explorer.navigator.resources.AppExplorerDropAdapterAssistant"
+              id="com.aptana.explorer.navigator.resources.resourceDropAdapter">
+           <possibleDropTargets>
+              <or>
+                 <adapt type="org.eclipse.core.resources.IProject"/>
+                 <adapt type="org.eclipse.core.resources.IFolder"/>
+                 <adapt type="org.eclipse.core.resources.IFile"/>
+              </or>
+           </possibleDropTargets>
+        </dropAssistant>
+
+        <actionProvider
+              class="org.eclipse.ui.internal.navigator.resources.actions.EditActionProvider"
+              id="com.aptana.explorer.navigator.resources.actions.EditActions">
+           <enablement></enablement>
+        </actionProvider>
+        <actionProvider
+              class="org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider"
+              id="com.aptana.explorer.navigator.resources.actions.RefactorActions">
+           <enablement></enablement>
+        </actionProvider>
+
+	      <!-- Menu Shortcut Actions for Wizards -->
+	      <commonWizard
+	      			type="new"
+	      			wizardId="org.eclipse.ui.wizards.new.folder">
+				<enablement>
+					<or>
+						<adapt type="org.eclipse.core.resources.IFile" />
+						<adapt type="org.eclipse.core.resources.IFolder" />
+						<adapt type="org.eclipse.core.resources.IProject" />
+						<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+					</or>
+		         </enablement>
+		    </commonWizard>
+	        <commonWizard
+	            type="new"
+	            wizardId="org.eclipse.ui.wizards.new.file">
+				<enablement>
+					<or>
+						<adapt type="org.eclipse.core.resources.IFile" />
+						<adapt type="org.eclipse.core.resources.IFolder" />
+						<adapt type="org.eclipse.core.resources.IProject" />
+						<adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+					</or>
+		         </enablement>
+		     </commonWizard>
+      </navigatorContent>
       <commonWizard
             associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
             type="new"
@@ -179,6 +254,17 @@
       </command>
    </extension>
    <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.explorer.commands.toggleAppExplorer"
+            icon="icons/full/cview16/filenav_nav.png">
+      </image>
+      <image
+            commandId="com.aptana.explorer.commands.toggleChangedFilesFilter"
+            icon="icons/full/elcl16/filter.png">
+      </image>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -186,7 +272,6 @@
                id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.explorer.commands.toggleAppExplorer"
-                  icon="icons/full/cview16/filenav_nav.png"
                   style="toggle">
                <visibleWhen>
                   <reference
@@ -195,238 +280,6 @@
                </visibleWhen>
             </command>
          </toolbar>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy">
-         <separator
-               name="group.deploy"
-               visible="true">
-         </separator>
-         <separator
-               name="group.command"
-               visible="true">
-         </separator>
-         <separator
-               name="group.wizard"
-               visible="true">
-         </separator>
-         <separator
-               name="additions">
-         </separator>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
-         <command
-               commandId="com.aptana.deploy.commands.deployApp"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <or>
-                     <test
-                           forcePluginActivation="true"
-                           property="com.aptana.deploy.project.isDeployType"
-                           value="cap">
-                     </test>
-                     <test
-                           property="com.aptana.deploy.project.isDeployType"
-                           value="heroku">
-                     </test>
-                     <test
-                           property="com.aptana.deploy.project.isDeployType"
-                           value="engineyard">
-                     </test>
-                  </or>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
-         <command
-               commandId="com.aptana.deploy.commands.deployApp"
-               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/elcl16/arrow_up_down.png"
-               label="%FTPDeploy.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
-         <dynamic
-               class="com.aptana.explorer.internal.ui.HerokuContributionItem"
-               id="com.aptana.explorer.deploy.heroku">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="heroku">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </dynamic>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.synchronize"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.upload"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.download"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <menu
-               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/obj16/ftp.png"
-               label="Connections">
-            <command
-                  commandId="com.aptana.ide.syncing.ui.commands.newconnection"
-                  style="push">
-            </command>
-            <command
-                  commandId="com.aptana.ide.syncing.ui.commands.connectionmanager"
-                  style="push">
-            </command>
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </menu>
-         <separator
-               name="group.ftp.cloaking"
-               visible="true">
-         </separator>
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.cloak"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.uncloak"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <separator
-               name="group.ftp.settings"
-               visible="true">
-         </separator>
-         <command
-               commandId="com.aptana.deploy.commands.ftp.settings"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
-         <dynamic
-               class="com.aptana.explorer.internal.ui.EngineYardContributionItem"
-               id="com.aptana.explorer.deploy.engineyard">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="engineyard">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </dynamic>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.wizard">
-         <command
-               commandId="com.aptana.deploy.commands.deploywizard"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
-               </iterate>
-            </visibleWhen>
-         </command>
       </menuContribution>
       <menuContribution
             locationURI="popup:com.aptana.explorer.view?before=group.edit">
@@ -446,30 +299,6 @@
                </iterate>
             </visibleWhen>
          </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?before=group.edit">
-         <dynamic
-               class="com.aptana.explorer.internal.ui.DeployPopupContributionItem"
-               id="com.aptana.explorer.deploy.popup">
-            <visibleWhen
-                  checkEnabled="false">
-                <or>
-                  <iterate
-                        ifEmpty="false">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                     </adapt>
-                  </iterate>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                     </adapt>
-                  </with>
-               </or>
-            </visibleWhen>
-         </dynamic>
       </menuContribution>
       <menuContribution
             locationURI="popup:com.aptana.explorer.view?before=additions">
@@ -665,7 +494,6 @@
             locationURI="menu:com.aptana.explorer.gear?endof=group.open">
          <command
                commandId="com.aptana.terminal.commands.openTerminal"
-               icon="icons/full/obj16/terminal.png"
                style="push">
          </command>
       </menuContribution>
@@ -1266,7 +1094,6 @@
             locationURI="menu:com.aptana.explorer.gear?endof=group.filtering">
          <command
                commandId="com.aptana.explorer.commands.toggleChangedFilesFilter"
-               icon="icons/full/elcl16/filter.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1281,15 +1108,6 @@
             </visibleWhen>
          </command>
       </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="com.aptana.deploy.commands.deployApp"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M3+D">
-      </key>
    </extension>
    <extension
          point="org.eclipse.ui.menus">

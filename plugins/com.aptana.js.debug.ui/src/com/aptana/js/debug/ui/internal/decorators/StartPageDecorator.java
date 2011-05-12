@@ -41,9 +41,9 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 		StartPageManager.getDefault().addListener(this);
 	}
 
-	/**
-	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object,
-	 *      org.eclipse.jface.viewers.IDecoration)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object, org.eclipse.jface.viewers.IDecoration)
 	 */
 	public void decorate(Object element, IDecoration decoration) {
 		if (element instanceof IFile) {
@@ -53,30 +53,33 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 		}
 	}
 
-	/**
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
 	 */
 	public void addListener(ILabelProviderListener listener) {
 		listeners.add(listener);
 	}
 
-	/**
-	 * see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 	 */
 	public void dispose() {
 		listeners.clear();
 		StartPageManager.getDefault().removeListener(this);
 	}
 
-	/**
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
-	 *      java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
 	 */
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	/**
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 	 */
 	public void removeListener(ILabelProviderListener listener) {
@@ -85,10 +88,7 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.aptana.js.debug.ui.internal.StartPageManager.IStartPageChangeListener
-	 * #startPageChanged(org.eclipse.core.resources.IResource)
+	 * @see com.aptana.js.debug.ui.internal.StartPageManager.IStartPageChangeListener#startPageChanged(org.eclipse.core.resources.IResource)
 	 */
 	public void startPageChanged(IResource resource) {
 		LabelProviderChangedEvent event;

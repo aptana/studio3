@@ -86,7 +86,8 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T> {
 	}
 
 	private int timeToRelease() {
-		return releaseTime / ((unlocked.size() + locked.size()) ^ 2);
+		int divider = ((unlocked.size() + locked.size()) ^ 2);
+		return releaseTime / (divider > 0 ? divider : 1);
 	}
 
 	private class ConnectionReaper extends Thread {

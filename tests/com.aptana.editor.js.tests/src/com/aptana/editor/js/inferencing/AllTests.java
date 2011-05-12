@@ -24,6 +24,7 @@ public class AllTests
 		suite.addTestSuite(PrimitiveInferencingTests.class);
 		suite.addTestSuite(RecursiveInferencingTests.class);
 		suite.addTestSuite(ScopeTests.class);
+		suite.addTestSuite(InferencingBugs.class);
 		// $JUnit-END$
 		return suite;
 	}

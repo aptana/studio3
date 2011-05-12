@@ -129,4 +129,19 @@ public class HyperlinkDetectorTest extends TestCase
 		assertEquals(8, region.getOffset());
 		assertEquals(136, region.getLength());
 	}
+
+	public void testRenameWithEmptySideLine() throws Exception
+	{
+		HyperlinkDetector detector = new HyperlinkDetector();
+		IHyperlink[] links = detector
+				.detectHyperlinks(" rename plugins/com.aptana.editor.ruby/src/com/aptana/editor/ruby/{ => parsing}/RubyParseState.java (94%)");
+		assertNotNull(links);
+		assertEquals(1, links.length);
+		IRegion region = links[0].getHyperlinkRegion();
+		assertEquals(8, region.getOffset());
+		assertEquals(91, region.getLength());
+		assertEquals("plugins/com.aptana.editor.ruby/src/com/aptana/editor/ruby/parsing/RubyParseState.java",
+				links[0].getHyperlinkText());
+	}
+
 }

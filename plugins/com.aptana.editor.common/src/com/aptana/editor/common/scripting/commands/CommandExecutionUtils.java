@@ -8,6 +8,7 @@
 package com.aptana.editor.common.scripting.commands;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringBufferInputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.BreakIterator;
@@ -154,7 +156,15 @@ public class CommandExecutionUtils
 
 		public InputStream getInputStream()
 		{
-			return new StringBufferInputStream(string);
+			try
+			{
+				// FIXME Use the encoding from the file/document!
+				return new ByteArrayInputStream(string.getBytes("UTF-8"));
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				return new StringBufferInputStream(string);
+			}
 		}
 	}
 
@@ -835,7 +845,7 @@ public class CommandExecutionUtils
 		}
 	}
 
-	private static void showAsTooltip(CommandResult commandResult, ITextViewer textViewer, final int caretOffset)
+	private static void showAsTooltip(CommandResult commandResult, ITextViewer textViewer, int caretOffset)
 	{
 		String output = commandResult.getOutputString();
 		if (output == null || output.trim().length() == 0)
@@ -892,6 +902,8 @@ public class CommandExecutionUtils
 		tooltip.setSize(p.x, p.y);
 
 		StyledText textWidget = textViewer.getTextWidget();
+		caretOffset = textWidget.getCaretOffset();
+
 		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
 		Rectangle bounds = textWidget.getClientArea();
 		// Is caret visible in the client area

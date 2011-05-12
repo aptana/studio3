@@ -38,16 +38,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
-import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.WorkbenchPage;
-import org.eclipse.ui.internal.dialogs.DialogUtil;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
@@ -71,7 +67,11 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  */
 @SuppressWarnings("restriction")
 public class OpenWithMenu extends ContributionItem {
-    private IWorkbenchPage page;
+
+	public static interface Client {
+
+		public void openEditor(IFileStore file, IEditorDescriptor editorDescriptor);
+	}
 
     private IAdaptable file;
 
@@ -85,11 +85,8 @@ public class OpenWithMenu extends ContributionItem {
      */
     public static final String ID = PlatformUI.PLUGIN_ID + ".OpenWithMenu";//$NON-NLS-1$
 
-    /**
-     * Match both the input and id, so that different types of editor can be opened on the same input.
-     */
-    private static final int MATCH_BOTH = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
-    
+    private Client client;
+
     /*
      * Compares the labels from two IEditorDescriptor objects
      */
@@ -110,10 +107,10 @@ public class OpenWithMenu extends ContributionItem {
      *      the menu is selected
      * @param file the selected file
      */
-    public OpenWithMenu(IWorkbenchPage page, IAdaptable file) {
+    public OpenWithMenu(IWorkbenchPage page, IAdaptable file, Client client) {
         super(ID);
-        this.page = page;
         this.file = file;
+        this.client = client;
     }
 
     /**
@@ -354,23 +351,10 @@ public class OpenWithMenu extends ContributionItem {
      */
     protected void openEditor(IEditorDescriptor editorDescriptor, boolean openUsingDescriptor) {
         IFileStore file = getFileResource();
-        if (file == null) {
+        if (file == null || client == null) {
             return;
         }
-        try {
-            if (openUsingDescriptor) {
-                ((WorkbenchPage) page).openEditorFromDescriptor(getEditorInput(file), editorDescriptor, true, null);
-            } else {
-                String editorId = editorDescriptor == null ? IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID
-                        : editorDescriptor.getId();
-                
-                ((WorkbenchPage) page).openEditor(getEditorInput(file), editorId, true, MATCH_BOTH);
-            }
-        } catch (PartInitException e) {
-            DialogUtil.openError(page.getWorkbenchWindow().getShell(),
-                    IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
-                    e.getMessage(), e);
-        }
+        client.openEditor(file, editorDescriptor);
     }
 
     /**
@@ -393,9 +377,5 @@ public class OpenWithMenu extends ContributionItem {
             return ""; //$NON-NLS-1$
         }
         return fileName.substring(index + 1, fileName.length());
-    }
-
-    private static IEditorInput getEditorInput(IFileStore fileStore) {
-        return new FileStoreEditorInput(fileStore);
     }
 }

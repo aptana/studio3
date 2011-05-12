@@ -30,8 +30,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.dtd.parsing.DTDParser"
-            content-type="com.aptana.contenttype.dtd"
-            language="text/dtd">
+            content-type="com.aptana.contenttype.dtd">
       </parser>
    </extension>
 

@@ -111,6 +111,9 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE,
 				Messages.EditorsPreferencePage_Close_Matching_Character_Pairs, group));
 
+		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_WRAP_SELECTION,
+				Messages.EditorsPreferencePage_Wrap_Selection, group));
+
 		// In Studio 2.0, commenting out until requested, or it's determined we have enough available space
 		// addField(new RadioGroupFieldEditor(AbstractTextEditor.PREFERENCE_NAVIGATION_SMART_HOME_END,
 		// Messages.EditorsPreferencePage_HomeEndBehavior, 1, new String[][] {

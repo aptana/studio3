@@ -23,7 +23,8 @@ module JRuby::Compiler
       :classpath => [],
       :javac_options => [],
       :sha1 => false,
-      :handles => false
+      :handles => false,
+      :verbose => false
     }
   end
   module_function :default_options
@@ -35,12 +36,8 @@ module JRuby::Compiler
       opts.banner = "jrubyc [options] (FILE|DIRECTORY)"
       opts.separator ""
 
-      opts.on("-d", "--dir DIR", "Use DIR as the root of the compiled package and filename") do |dir|
+      opts.on("-d", "--dir DIR", "Use DIR as the base path") do |dir|
         options[:basedir] = dir
-      end
-
-      opts.on("-p", "--prefix PREFIX", "Prepend PREFIX to the file path and package. Default is no prefix.") do |pre|
-        options[:prefix] = pre
       end
 
       opts.on("-t", "--target TARGET", "Output files to TARGET directory") do |tgt|
@@ -67,12 +64,12 @@ module JRuby::Compiler
         options[:classpath].concat cp.split(':')
       end
 
-      opts.on("--sha1", "Compile to a class named using the SHA1 hash of the source file") do
-        options[:sha1] = true
-      end
-
       opts.on("--handles", "Also generate all direct handle classes for the source file") do
         options[:handles] = true
+      end
+      
+      opts.on("--verbose", "Log verbose output while compile") do
+        options[:verbose] = true
       end
 
       opts.parse!(argv)
@@ -97,8 +94,8 @@ module JRuby::Compiler
       :javac => javac,
       :javac_options => javac_options,
       :classpath => classpath,
-      :sha1 => false,
-      :handles => false
+      :handles => false,
+      :verbose => false
     )
   end
   module_function :compile_files
@@ -116,16 +113,12 @@ module JRuby::Compiler
     compile_proc = proc do |filename|
       begin
         file = File.open(filename)
-
-        if options[:sha1]
-          pathname = "ruby.jit.FILE_" + Digest::SHA1.hexdigest(File.read(filename)).upcase
-        else
-          pathname = Mangler.mangle_filename_for_classpath(filename, options[:basedir], options[:prefix])
-        end
+        source = file.read
+        
+        pathname = "ruby.jit.FILE_" + Digest::SHA1.hexdigest(source).upcase
+        class_filename = filename.sub(/(\.rb)?$/, '.class')
 
         inspector = org.jruby.compiler.ASTInspector.new
-
-        source = file.read
         node = runtime.parse_file(BAIS.new(source.to_java_bytes), filename, nil)
 
         if options[:java] || options[:javac]
@@ -136,7 +129,7 @@ module JRuby::Compiler
             FileUtils.mkdir_p java_dir
 
             java_src = File.join(java_dir, cls.name + ".java")
-            puts "Generating Java class #{cls.name} to #{java_src}"
+            puts "Generating Java class #{cls.name} to #{java_src}" if options[:verbose]
             
             files << java_src
 
@@ -145,7 +138,7 @@ module JRuby::Compiler
             end
           end
         else
-          puts "Compiling #{filename} to class #{pathname}"
+          puts "Compiling #{filename}" if options[:verbose]
 
           inspector.inspect(node)
 
@@ -157,11 +150,20 @@ module JRuby::Compiler
           compiler = ASTCompiler.new
           compiler.compile_root(node, asmCompiler, inspector)
 
-          target_file = JavaFile.new(options[:target])
-          asmCompiler.write_class(target_file)
+          class_bytes = String.from_java_bytes(asmCompiler.class_byte_array)
+          
+          # prepare target
+          target_file = File.join(options[:target], class_filename)
+          target_dir = File.dirname(target_file)
+          FileUtils.mkdir_p(target_dir)
+          
+          # write class
+          File.open(File.join(options[:target], class_filename), 'wb') do |f|
+            f.write(class_bytes)
+          end
 
           if options[:handles]
-            puts "Generating direct handles for #{filename}"
+            puts "Generating direct handles for #{filename}" if options[:verbose]
 
             asmCompiler.write_invokers(target_file)
           end
@@ -187,10 +189,10 @@ module JRuby::Compiler
       end
 
       if (File.directory?(filename))
-        puts "Compiling all in '#{File.expand_path(filename)}'..."
+        puts "Compiling all in '#{File.expand_path(filename)}'..." if options[:verbose]
         Dir.glob(filename + "/**/*.rb").each { |filename|
           errors += compile_proc[filename]
-	}
+	      }
       else
         if filename =~ /\.java$/
           files << filename
@@ -202,7 +204,7 @@ module JRuby::Compiler
 
     if options[:javac]
       javac_string = JavaGenerator.generate_javac(files, options)
-      puts javac_string
+      puts javac_string if options[:verbose]
       system javac_string
     end
 
