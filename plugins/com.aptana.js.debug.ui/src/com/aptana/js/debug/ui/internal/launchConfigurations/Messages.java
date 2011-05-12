@@ -118,6 +118,8 @@ public final class Messages extends NLS {
 	 */
 	public static String LaunchBrowserSettingsTab_ChooseFile;
 
+	public static String LaunchBrowserSettingsTab_Configure_Label;
+
 	/**
 	 * LaunchBrowserSettingsTab_BrowserExecutableShouldBeSpecified
 	 */
