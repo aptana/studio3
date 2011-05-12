@@ -35,4 +35,22 @@ public class FormatterForeignElementNode extends FormatterBlockWithBeginEndNode
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 */
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	@Override
+	protected boolean isAddingEndNewLine()
+	{
+		return true;
+	}
+
 }

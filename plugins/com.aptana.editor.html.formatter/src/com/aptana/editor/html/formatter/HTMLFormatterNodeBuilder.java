@@ -10,6 +10,8 @@ package com.aptana.editor.html.formatter;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.eclipse.jface.text.Region;
+
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
@@ -21,7 +23,9 @@ import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
+import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -29,6 +33,7 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.FormatterCommentNode;
 import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -58,6 +63,26 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private static final Object PHP_LANGUAGE = "com.aptana.contenttype.php"; //$NON-NLS-1$
 
 	private FormatterDocument document;
+	private FormatterWriter formatterWriter;
+
+	/**
+	 * Constructs a new HTML formatter node builder with a given {@link FormatterWriter} that may be used for region
+	 * exclusions.
+	 * 
+	 * @param writer
+	 *            A {@link FormatterWriter}
+	 */
+	public HTMLFormatterNodeBuilder(FormatterWriter writer)
+	{
+		this.formatterWriter = writer;
+	}
+
+	/**
+	 * Constructs a new HTML formatter node builder.
+	 */
+	public HTMLFormatterNodeBuilder()
+	{
+	}
 
 	/**
 	 * @param parseResult
@@ -238,6 +263,10 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(formatterNode);
 			int startSpecial = formatterNode.getBegin()[0].getEndOffset();
 			int endSpecial = formatterNode.getEnd().getStartOffset();
+			if (endSpecial == document.getLength() - 1)
+			{
+				endSpecial++;
+			}
 			// push a special node
 			FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
 			specialNode.setBegin(createTextNode(document, startSpecial, endSpecial));
@@ -246,6 +275,23 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(specialNode, -1);
 			// pop the default node
 			checkedPop(formatterNode, -1);
+			if (formatterWriter != null)
+			{
+				// document.get(startSpecial, endSpecial);
+				int excludeRegionStart = startSpecial + 1;
+				IFormatterTextNode foreignEnd = formatterNode.getEnd();
+				int excludeRegionLength = endSpecial - startSpecial
+						- (foreignEnd.getEndOffset() - foreignEnd.getStartOffset());
+				if (endSpecial == document.getLength())
+				{
+					excludeRegionLength--;
+				}
+				if (excludeRegionLength > excludeRegionStart)
+				{
+					formatterWriter.excludeRegion(new Region(excludeRegionStart, excludeRegionLength),
+							EXCLUDE_STRATEGY.WRITE_AS_IS);
+				}
+			}
 		}
 		else
 		{
@@ -290,13 +336,30 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			return null;
 		}
 		elementNode.setBegin(createTextNode(document, offset, offset + startLength));
-		int end = Math.min(offset + text.length(), document.getLength() - 1);
-		end = getEndWithoutWhiteSpaces(end, document) + 1;
+		int end = offset + text.length();
 		int endBegin = end;
-		String endStr = document.get(endBegin - 2, end);
-		if (endStr.equals("?>") || endStr.equals("%>")) //$NON-NLS-1$ //$NON-NLS-2$
+		if (end == document.getLength())
 		{
-			endBegin -= 2;
+			endBegin = end - 2;
+		}
+		else
+		{
+			int endWithoutWhiteSpace = getEndWithoutWhiteSpaces(end, document);
+			if (end != endWithoutWhiteSpace)
+			{
+				end = endWithoutWhiteSpace + 1;
+			}
+			endBegin = end;
+		}
+
+		String endStr = document.get(endBegin - 2, end);
+		if (endStr.endsWith("?>") || endStr.endsWith("%>")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			endBegin = end - 2;
+		}
+		else
+		{
+			endBegin = end;
 		}
 		elementNode.setEnd(createTextNode(document, endBegin, end));
 		return elementNode;

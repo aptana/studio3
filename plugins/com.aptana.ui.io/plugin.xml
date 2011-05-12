@@ -704,12 +704,6 @@
             id="com.aptana.ui.io.preferences.RemotePreferencePage"
             name="%PreferencePage.remote.name">
       </page>
-      <page
-            category="com.aptana.ui.io.preferences.RemotePreferencePage"
-            class="com.aptana.ide.ui.io.preferences.FTPPreferencePage"
-            id="com.aptana.ui.io.preferences.FTPPreferencePage"
-            name="%PreferencePage.ftp.label">
-      </page>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.linkHelper">

@@ -245,12 +245,12 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			spacesCount = countLeftWhitespaceChars(input);
 		}
-		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input);
+		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
+		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder(writer);
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		new HTMLFormatterNodeRewriter().rewrite(root);
 		IFormatterContext context = new HTMLFormatterContext(indentationLevel);
-		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH));
 		writer.setLinesPreserve(getInt(HTMLFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);
