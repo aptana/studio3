@@ -8,7 +8,12 @@
 
 package com.aptana.filesystem.ftp.internal;
 
+import org.eclipse.core.runtime.Platform;
+
 import com.aptana.core.util.KeepAliveObjectPool;
+import com.aptana.filesystem.ftp.FTPPlugin;
+import com.aptana.filesystem.ftp.preferences.FTPPreferenceInitializer;
+import com.aptana.filesystem.ftp.preferences.IFTPPreferenceConstants;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -20,7 +25,8 @@ public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
 
 	public FTPClientPool(IPoolConnectionManager manager)
 	{
-		super(7 * 60 * 1000); // 7 minutes
+		super(Platform.getPreferencesService().getInt(FTPPlugin.PLUGIN_ID, IFTPPreferenceConstants.KEEP_ALIVE_TIME,
+				FTPPreferenceInitializer.DEFAULT_KEEP_ALIVE_MINUTES, null) * 60 * 1000);
 		this.manager = manager;
 		start();
 	}

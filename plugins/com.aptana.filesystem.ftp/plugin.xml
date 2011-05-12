@@ -16,5 +16,11 @@
             name="%connectionPointType.name.ftp">
       </connectionPointType>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.filesystem.ftp.preferences.FTPPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>
