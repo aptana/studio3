@@ -32,6 +32,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	private static final int ELEMENT_PROPOSALS_COUNT = 132;
 	private static final int DOCTYPE_PROPOSALS_COUNT = 11;
 	private static final int CLOSE_TAG_PROPOSALS_COUNT = 119;
+	private static final int ENTITY_PROPOSAL_COUNT = 252;
 
 	private HTMLContentAssistProcessor fProcessor;
 	private IDocument fDocument;
@@ -161,6 +162,21 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	public void testCloseTagWithNoUnclosedTagsProposal()
 	{
 		assertCompletionCorrect("</|>", '\t', CLOSE_TAG_PROPOSALS_COUNT, "/ul", "</ul>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testNoSuggestionsInTextAreaBetweenTags()
+	{
+		assertCompletionCorrect("<p>|</p>", '\t', 0, null, "<p></p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testNoSuggestionsInTextAreaWithWhitespaceBetweenTags()
+	{
+		assertCompletionCorrect("<p>\n  |\n</p>", '\t', 0, null, "<p>\n  \n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testOnlySuggestEntityIfPrecededByAmpersand()
+	{
+		assertCompletionCorrect("<p>\n  &|\n</p>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<p>\n  &amp;\n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public void testIMGProposal()
@@ -313,10 +329,13 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
 		assertEquals(proposalCount, proposals.length);
-		ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
+		if (proposalToSelect != null)
+		{
+			ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
 
-		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+			assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
+			((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+		}
 		assertEquals(postCompletion, fDocument.get());
 
 		if (point != null)

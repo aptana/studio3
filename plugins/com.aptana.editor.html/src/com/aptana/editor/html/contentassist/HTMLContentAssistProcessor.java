@@ -667,48 +667,36 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private void addEntityProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
 			int offset)
 	{
-		boolean doIt = false;
 		this.setEntityRange(lexemeProvider, offset);
 		if (this._replaceRange == null)
 		{
-			doIt = true;
-		}
-		else
-		{
-			String text = null;
-			try
-			{
-				text = this._document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
-			}
-			catch (BadLocationException e)
-			{
-				// ignore
-			}
-			if (text != null && text.length() == 0)
-			{
-				text = this._currentLexeme.getText();
-				this._replaceRange = this._currentLexeme;
-			}
-			if (text != null && text.startsWith("&")) //$NON-NLS-1$
-			{
-				doIt = true;
-			}
+			return;
 		}
 
-		if (doIt)
+		String text = null;
+		try
 		{
-			List<EntityElement> entities = this._queryHelper.getEntities();
+			text = this._document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+		if (text == null || !text.startsWith("&")) //$NON-NLS-1$
+		{
+			return;
+		}
 
-			if (entities != null)
+		List<EntityElement> entities = this._queryHelper.getEntities();
+		if (entities != null)
+		{
+			this.setEntityRange(lexemeProvider, offset);
+			Image[] userAgentIcons = this.getAllUserAgentIcons();
+
+			for (EntityElement entity : entities)
 			{
-				this.setEntityRange(lexemeProvider, offset);
-				Image[] userAgentIcons = this.getAllUserAgentIcons();
-
-				for (EntityElement entity : entities)
-				{
-					this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(),
-							userAgentIcons, offset);
-				}
+				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
+						offset);
 			}
 		}
 	}
@@ -1100,15 +1088,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					String elementName = this.getElementName(lexemeProvider, offset);
 					String attributeName = this.getAttributeName(lexemeProvider, offset);
-					IRange activeRange = new Range(this._currentLexeme.getStartingOffset() + 1, this._currentLexeme.getEndingOffset() - 1);
+					IRange activeRange = new Range(this._currentLexeme.getStartingOffset() + 1,
+							this._currentLexeme.getEndingOffset() - 1);
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
-						return new CSSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
+						return new CSSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(
+								viewer, offset, activationChar, autoActivated);
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
-						return new JSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
+						return new JSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(
+								viewer, offset, activationChar, autoActivated);
 					}
 				}
 
@@ -1341,9 +1332,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										String src = document.get(previousPartition.getOffset(),
+												previousPartition.getLength()).trim();
 
-										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>'
+												|| (src.indexOf('<') == -1 && src.indexOf('>') == -1))
 										{
 											result = LocationType.IN_TEXT;
 										}
@@ -1590,7 +1583,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (startingLexeme != null && endingLexeme != null)
 		{
-			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+			if (startingLexeme.equals(endingLexeme))
+			{
+				this._replaceRange = startingLexeme;
+			}
+			else
+			{
+				this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+			}
 		}
 	}
 
