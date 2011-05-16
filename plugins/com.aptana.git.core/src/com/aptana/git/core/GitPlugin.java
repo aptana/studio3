@@ -176,6 +176,15 @@ public class GitPlugin extends Plugin
 
 	public IPath getSSH_ASKPASS()
 	{
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			return null;
+		} else if (Platform.OS_LINUX.equals(Platform.getOS())
+				|| Platform.OS_MACOSX.equals(Platform.getOS())) {
+			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/ssh-askpass.tcl"), null)); //$NON-NLS-1$
+			if (askpassFile.isFile()) {
+				return Path.fromOSString(askpassFile.getAbsolutePath());
+			}
+		}
 		return null;
 	}
 
