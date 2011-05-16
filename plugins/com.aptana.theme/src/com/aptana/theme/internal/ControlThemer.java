@@ -156,26 +156,33 @@ class ControlThemer implements IControlThemer
 		{
 			public void handleEvent(Event event)
 			{
+				GC gc = event.gc;
+				Color oldBackground = gc.getBackground();
 				if ((event.detail & SWT.SELECTED) != 0)
 				{
 					Scrollable scrollable = (Scrollable) event.widget;
 					Rectangle clientArea = scrollable.getClientArea();
-					int clientWidth = clientArea.width;
-
-					GC gc = event.gc;
-					Color oldBackground = gc.getBackground();
 
 					gc.setBackground(getSelection());
-					gc.fillRectangle(clientArea.x, event.y, clientWidth, event.height);
-					gc.setBackground(oldBackground);
+					// The +2 on width is for Linux, since clientArea begins at [-2,-2] and 
+					// without it we don't properly color full width (see broken coloring when scrolling horizontally)
+					gc.fillRectangle(clientArea.x, event.y, clientArea.width + 2, event.height);
 
 					event.detail &= ~SWT.SELECTED;
-					event.detail &= ~SWT.BACKGROUND;
-
-					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
-					// non-focus for Mac)
-					gc.setForeground(getForeground());
 				}
+				else
+				{
+					// Draw normal background color. This seems to only be necessary for some variants of Linux,
+					// and is the correct way to force custom painting of background when setBackground() doesn't work properly.
+					gc.setBackground(getBackground());
+					gc.fillRectangle(event.x, event.y, event.width, event.height);
+				}
+				event.detail &= ~SWT.BACKGROUND;
+
+				gc.setBackground(oldBackground);
+				// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
+				// non-focus for Mac)
+				gc.setForeground(getForeground());
 			}
 		};
 		control.addListener(SWT.EraseItem, selectionOverride);
