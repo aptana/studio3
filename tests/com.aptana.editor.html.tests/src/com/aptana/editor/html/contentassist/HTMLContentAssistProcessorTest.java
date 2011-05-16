@@ -200,6 +200,16 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div |></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testStyleAttributeProposalOnSelfClosingTag()
+	{
+		assertCompletionCorrect("<br |/>", '\t', 8, "style", "<br style=\"\"/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testStyleAttributeProposalOnSelfClosingTagWithTrailingSpaceAfterCursor()
+	{
+		assertCompletionCorrect("<br | />", '\t', 8, "style", "<br style=\"\" />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	public void testStyleAttributeProposalWithPrefix()
 	{
 		assertCompletionCorrect("<div sty|></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -329,10 +339,11 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
 		assertEquals(proposalCount, proposals.length);
+
 		if (proposalToSelect != null)
 		{
 			ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
-
+			assertNotNull("Unable to find proposal you wanted to select: " + proposalToSelect, closeProposal);
 			assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
 			((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
 		}

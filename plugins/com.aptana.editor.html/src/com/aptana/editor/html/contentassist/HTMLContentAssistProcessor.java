@@ -186,6 +186,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case TAG_END:
+				case TAG_SELF_CLOSE:
+				case INLINE_TAG:
 					this._replaceRange = null;
 					break;
 
@@ -1469,6 +1471,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case TAG_END:
+				case TAG_SELF_CLOSE:
 					if (index >= 1)
 					{
 						Lexeme<HTMLTokenType> previous = lexemeProvider.getLexeme(index - 1);
