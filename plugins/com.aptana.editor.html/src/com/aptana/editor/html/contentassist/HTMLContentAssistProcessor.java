@@ -1592,7 +1592,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			else
 			{
-				this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+				this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset());
 			}
 		}
 	}

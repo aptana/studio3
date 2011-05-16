@@ -179,6 +179,12 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<p>\n  &|\n</p>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<p>\n  &amp;\n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testExistingEntityGetsFullyReplaced()
+	{
+		assertCompletionCorrect(
+				"<body>\n  &a|acute;\n</body>", '\t', ENTITY_PROPOSAL_COUNT, "&acirc;", "<body>\n  &acirc;\n</body>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	public void testIMGProposal()
 	{
 		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "img", "<img />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -344,7 +350,8 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		{
 			ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
 			assertNotNull("Unable to find proposal you wanted to select: " + proposalToSelect, closeProposal);
-			assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
+			assertTrue("Selected proposal doesn't validate against document",
+					((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
 			((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
 		}
 		assertEquals(postCompletion, fDocument.get());
