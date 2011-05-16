@@ -13,14 +13,13 @@ import java.util.List;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -151,13 +150,13 @@ public class CListTable extends Composite
 			public void widgetSelected(SelectionEvent e)
 			{
 				IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
-				if (!selection.isEmpty())
+				Object[] elements = selection.toArray();
+				for (Object element : elements)
 				{
-					Object element = selection.getFirstElement();
 					items.remove(element);
-					tableViewer.refresh();
-					updateStates();
 				}
+				tableViewer.refresh();
+				updateStates();
 			}
 		});
 		removeButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/delete.gif")); //$NON-NLS-1$
@@ -200,10 +199,10 @@ public class CListTable extends Composite
 
 	private void createTable(Composite parent)
 	{
-		tableViewer = new TableViewer(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 		tableViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		tableViewer.setContentProvider(new ContentProvider());
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		tableViewer.setLabelProvider(new LabelProvider());
 		tableViewer.setComparator(new ViewerComparator());
 		tableViewer.setInput(items);
@@ -221,25 +220,10 @@ public class CListTable extends Composite
 
 	private void updateStates()
 	{
-		boolean hasSelection = !tableViewer.getSelection().isEmpty();
-		editButton.setEnabled(hasSelection);
+		IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
+		boolean hasSelection = !selection.isEmpty();
+		boolean hasMultiSelections = selection.size() > 1;
+		editButton.setEnabled(hasSelection && !hasMultiSelections);
 		removeButton.setEnabled(hasSelection);
-	}
-
-	public class ContentProvider implements IStructuredContentProvider
-	{
-
-		public void dispose()
-		{
-		}
-
-		public Object[] getElements(Object inputElement)
-		{
-			return items.toArray(new Object[items.size()]);
-		}
-
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
-		{
-		}
 	}
 }
