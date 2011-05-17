@@ -55,7 +55,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.ShellExecutable;
 import com.aptana.core.epl.ReadWriteMonitor;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
@@ -1217,25 +1216,7 @@ public class GitRepository
 	 */
 	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, gitShellEnv(), args);
-	}
-
-	private Map<String, String> gitShellEnv()
-	{
-		// Set up GIT_SSH!
-		Map<String, String> env = new HashMap<String, String>();
-		env.putAll(ShellExecutable.getEnvironment());
-		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
-		if (git_ssh != null)
-		{
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
-		}
-		IPath git_askpass = GitPlugin.getDefault().getGIT_ASKPASS();
-		if (git_askpass != null)
-		{
-			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
-		}
-		return env;
+		return execute(readOrWrite, GitExecutable.getShellEnvironment(), args);
 	}
 
 	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
