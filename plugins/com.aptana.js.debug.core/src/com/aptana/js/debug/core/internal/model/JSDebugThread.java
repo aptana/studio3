@@ -22,7 +22,6 @@ import org.eclipse.debug.core.model.IThread;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.Util;
-import com.aptana.js.debug.core.internal.model.JSDebugElement;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
@@ -32,7 +31,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 
 	protected static final String SUSPENDED = "suspended"; //$NON-NLS-1$
 	private static final String SUSPEND = "suspend"; //$NON-NLS-1$
-	private static final String SUSPEND_V2 = "suspend*{0,number,integer}"; //$NON-NLS-1$
+	private static final String SUSPEND_V2 = "suspend*{0}"; //$NON-NLS-1$
 	private static final String BREAKPOINT = "breakpoint"; //$NON-NLS-1$
 	private static final String KEYWORD = "keyword"; //$NON-NLS-1$
 	private static final String FIRST_LINE = "firstLine"; //$NON-NLS-1$
@@ -40,22 +39,22 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final String WATCHPOINT = "watchpoint"; //$NON-NLS-1$
 	protected static final String RESUMED = "resumed"; //$NON-NLS-1$
 	private static final String STEP_INTO = "stepInto"; //$NON-NLS-1$
-	private static final String STEP_INTO_V2 = "stepInto*{0,number,integer}"; //$NON-NLS-1$
+	private static final String STEP_INTO_V2 = "stepInto*{0}"; //$NON-NLS-1$
 	private static final String STEP_OVER = "stepOver"; //$NON-NLS-1$
-	private static final String STEP_OVER_V2 = "stepOver*{0,number,integer}"; //$NON-NLS-1$
+	private static final String STEP_OVER_V2 = "stepOver*{0}"; //$NON-NLS-1$
 	private static final String RESUME = "resume"; //$NON-NLS-1$
-	private static final String RESUME_V2 = "resume*{0,number,integer}"; //$NON-NLS-1$
+	private static final String RESUME_V2 = "resume*{0}"; //$NON-NLS-1$
 	private static final String ABORT = "abort"; //$NON-NLS-1$
 	private static final String START = "start"; //$NON-NLS-1$
 	private static final String STEP_RETURN = "stepReturn"; //$NON-NLS-1$
-	private static final String STEP_RETURN_V2 = "stepReturn*{0,number,integer}"; //$NON-NLS-1$
+	private static final String STEP_RETURN_V2 = "stepReturn*{0}"; //$NON-NLS-1$
 	private static final String STEP_TO_FRAME = "stepToFrame"; //$NON-NLS-1$
 	private static final String STEP = "step"; //$NON-NLS-1$
 	private static final String FRAMES = "frames"; //$NON-NLS-1$
-	private static final String FRAMES_V2 = "frames*{0,number,integer}"; //$NON-NLS-1$
+	private static final String FRAMES_V2 = "frames*{0}"; //$NON-NLS-1$
 	private static final String SUBARGS_SPLIT = "\\|"; //$NON-NLS-1$
 	private static final String STEP_TO_FRAME_0 = "stepToFrame*{1,number,integer}"; //$NON-NLS-1$
-	private static final String STEP_TO_FRAME_0_V2 = "stepToFrame*{0,number,integer}*{1,number,integer}"; //$NON-NLS-1$
+	private static final String STEP_TO_FRAME_0_V2 = "stepToFrame*{0}*{1,number,integer}"; //$NON-NLS-1$
 
 	private enum State {
 		STARTING,
@@ -68,7 +67,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final IStackFrame[] emptyStack = new IStackFrame[0];
 	private static final IBreakpoint[] emptyBreakpoints = new IBreakpoint[0];
 	
-	private final int threadId;
+	private final String threadId;
 	private final String label;
 	private IStackFrame[] stackFrames = emptyStack;
 	private IBreakpoint[] breakpoints = emptyBreakpoints;
@@ -80,7 +79,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * 
 	 * @param target
 	 */
-	public JSDebugThread(IDebugTarget target, int threadId, String label) {
+	public JSDebugThread(IDebugTarget target, String threadId, String label) {
 		super(target);
 		this.threadId = threadId;
 		this.label = label;
@@ -130,7 +129,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		String name = (label != null) ? label : (threadId == 0) ? Messages.JSDebugThread_main_label : Integer.toString(threadId);
+		String name = (label != null) ? label : (threadId == JSDebugTarget.DEFAULT_THREAD_ID) ? Messages.JSDebugThread_main_label : threadId;
 		return MessageFormat.format(Messages.JSDebugThread_Thread_Label, name,
 				(runningState == State.SUSPENDING
 						? MessageFormat.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
@@ -369,7 +368,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		return runningState == State.SUSPENDED || runningState == State.SUSPENDING;
 	}
 	
-	/* package */ int getThreadId() {
+	/* package */ String getThreadId() {
 		return threadId;
 	}
 	
