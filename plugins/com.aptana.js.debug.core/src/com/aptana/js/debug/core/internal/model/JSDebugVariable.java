@@ -50,7 +50,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 */
 	protected static final int FLAGS_TOPLEVEL = 0x80;
 
-	private final int threadId;
+	private final String threadId;
 	private final String qualifier;
 	private final String name;
 	private IValue value;
@@ -64,7 +64,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @param name
 	 * @param value
 	 */
-	public JSDebugVariable(IDebugTarget target, int threadId, String qualifier, String name, IValue value) {
+	public JSDebugVariable(IDebugTarget target, String threadId, String qualifier, String name, IValue value) {
 		this(target, threadId, qualifier, name, value, 0);
 	}
 
@@ -76,7 +76,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @param name
 	 * @param flags
 	 */
-	public JSDebugVariable(IDebugTarget target, int threadId, String qualifier, String name, int flags) {
+	public JSDebugVariable(IDebugTarget target, String threadId, String qualifier, String name, int flags) {
 		this(target, threadId, qualifier, name, null, flags);
 	}
 
@@ -89,7 +89,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @param value
 	 * @param flags
 	 */
-	public JSDebugVariable(IDebugTarget target, int threadId, String qualifier, String name, IValue value, int flags) {
+	public JSDebugVariable(IDebugTarget target, String threadId, String qualifier, String name, IValue value, int flags) {
 		super(target);
 		this.threadId = threadId;
 		this.qualifier = qualifier;
@@ -233,7 +233,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 		return qualifier;
 	}
 	
-	/* package */ int getThreadId() {
+	/* package */ String getThreadId() {
 		return threadId;
 	}
 

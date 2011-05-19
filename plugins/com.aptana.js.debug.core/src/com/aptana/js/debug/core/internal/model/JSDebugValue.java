@@ -14,14 +14,12 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 
-import com.aptana.js.debug.core.internal.model.JSDebugElement;
-
 /**
  * @author Max Stepanov
  */
 public class JSDebugValue extends JSDebugElement implements IValue {
 	
-	private final int threadId;
+	private final String threadId;
 	private final String qualifier;
 	private final String typeName;
 	private boolean hasVariables;
@@ -37,7 +35,7 @@ public class JSDebugValue extends JSDebugElement implements IValue {
 	 * @param hasVariables
 	 * @param valueString
 	 */
-	public JSDebugValue(IDebugTarget target, int threadId, String qualifier, String typeName, boolean hasVariables, String valueString) {
+	public JSDebugValue(IDebugTarget target, String threadId, String qualifier, String typeName, boolean hasVariables, String valueString) {
 		super(target);
 		this.threadId = threadId;
 		this.qualifier = qualifier;
@@ -88,7 +86,7 @@ public class JSDebugValue extends JSDebugElement implements IValue {
 		return qualifier;
 	}
 
-	/* package */ int getThreadId() {
+	/* package */ String getThreadId() {
 		return threadId;
 	}
 

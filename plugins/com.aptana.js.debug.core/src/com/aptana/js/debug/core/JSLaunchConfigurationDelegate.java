@@ -310,7 +310,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				socket = listenSocket.accept();
 			} catch (IOException e) {
 				BrowserUtil.resetBrowserCache(browserExecutable);
-				if (debug) {
+				if (debug && !monitor.isCanceled()) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
 				}
