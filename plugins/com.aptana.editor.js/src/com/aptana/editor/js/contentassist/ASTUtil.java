@@ -1,10 +1,10 @@
 /**
-Â * Aptana Studio
-Â * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
-Â * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
-Â * Please see the license.html included with this distribution for details.
-Â *Â Any modifications to this file must keep this entire header intact.
-Â */
+  * Aptana Studio
+  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+  * Please see the license.html included with this distribution for details.
+  * Any modifications to this file must keep this entire header intact.
+  */
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
-
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
@@ -32,8 +31,7 @@ import com.aptana.parsing.ast.IParseNode;
  */
 public class ASTUtil
 {
-	private static final boolean SHOW_TYPES = Boolean.valueOf(
-			Platform.getDebugOption("com.aptana.editor.js/show_content_assist_types")).booleanValue(); //$NON-NLS-1$
+	private static final boolean SHOW_TYPES = EclipseUtil.debugOptionActive("com.aptana.editor.js/show_content_assist_types"); //$NON-NLS-1$
 
 	/**
 	 * Prevent instantiation of this class
