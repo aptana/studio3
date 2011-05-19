@@ -58,9 +58,9 @@ public class FileSystemEditActionGroup extends ActionGroup {
     public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = getSelection();
         fCopyAction.selectionChanged(selection);
-        //menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fCopyAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fCopyAction);
         fPasteAction.selectionChanged(selection);
-        //menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fPasteAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fPasteAction);
 
         if (selection != null && !selection.isEmpty()) {
             Object[] elements = selection.toArray();
@@ -83,8 +83,8 @@ public class FileSystemEditActionGroup extends ActionGroup {
             fTextActionHandler = new TextActionHandler(actionBars);
         }
 
-        // fTextActionHandler.setCopyAction(fCopyAction);
-        // fTextActionHandler.setPasteAction(fPasteAction);
+        fTextActionHandler.setCopyAction(fCopyAction);
+        fTextActionHandler.setPasteAction(fPasteAction);
         fTextActionHandler.setDeleteAction(fDeleteAction);
         updateActionBars();
         
@@ -134,13 +134,13 @@ public class FileSystemEditActionGroup extends ActionGroup {
         fPasteAction.setDisabledImageDescriptor(images
                 .getImageDescriptor(ISharedImages.IMG_TOOL_PASTE_DISABLED));
         fPasteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
-        // fPasteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_PASTE);
+        fPasteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_PASTE);
 
         fCopyAction = new FileSystemCopyAction(fShell, fClipboard, fPasteAction);
         fCopyAction.setDisabledImageDescriptor(images
                 .getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
         fCopyAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-        // fCopyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
+        fCopyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
 
         fDeleteAction = new FileSystemDeleteAction(fShell, fTree);
         fDeleteAction.setDisabledImageDescriptor(images
