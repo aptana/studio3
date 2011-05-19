@@ -53,7 +53,7 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 
 	public Color getForeground(Object element)
 	{
-		if (disabled)
+		if (disabled || !invasiveThemesEnabled())
 		{
 			if (wrapped instanceof IColorProvider)
 			{
@@ -61,7 +61,12 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 			}
 			return null;
 		}
-		return ThemePlugin.getDefault().getColorManager().getColor(getThemeManager().getCurrentTheme().getForeground());
+		return getThemeManager().getCurrentTheme().getForegroundColor();
+	}
+
+	protected boolean invasiveThemesEnabled()
+	{
+		return getThemeManager().getCurrentTheme().isInvasive();
 	}
 
 	protected IThemeManager getThemeManager()

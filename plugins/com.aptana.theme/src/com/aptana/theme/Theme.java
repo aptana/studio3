@@ -970,4 +970,24 @@ public class Theme
 		save();
 	}
 
+	/**
+	 * Does the user have invasive themes turned on?
+	 * 
+	 * @return
+	 */
+	public boolean isInvasive()
+	{
+		return ThemePlugin.invasiveThemesEnabled();
+	}
+
+	public Color getForegroundColor()
+	{
+		return getColorManager().getColor(getForeground());
+	}
+
+	protected ColorManager getColorManager()
+	{
+		return ThemePlugin.getDefault().getColorManager();
+	}
+
 }
