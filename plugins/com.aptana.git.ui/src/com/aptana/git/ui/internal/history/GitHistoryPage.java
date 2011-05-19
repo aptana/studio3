@@ -59,6 +59,7 @@ import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 
 public class GitHistoryPage extends HistoryPage
 {
@@ -193,10 +194,20 @@ public class GitHistoryPage extends HistoryPage
 		attachCommitSelectionChanged();
 		hookContextMenu(commentViewer);
 		layout();
+
 		setTheme(false);
 		commentViewer.setText("<html><head></head><body style=\"background-color: " //$NON-NLS-1$
-				+ toHex(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground())
+				+ toHex(getBackground())
 				+ ";\"></body></html>"); //$NON-NLS-1$
+	}
+
+	protected RGB getBackground()
+	{
+		if (ThemePlugin.invasiveThemesEnabled())
+		{
+			return ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
+		}
+		return UIUtils.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
 	}
 
 	public ISelectionProvider getSelectionProvider()
@@ -331,7 +342,7 @@ public class GitHistoryPage extends HistoryPage
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.put("\\{sha\\}", commit.sha()); //$NON-NLS-1$
 		variables.put(
-				"\\{themeBG\\}", toHex(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground())); //$NON-NLS-1$
+				"\\{themeBG\\}", toHex(getBackground())); //$NON-NLS-1$
 		variables.put("\\{date\\}", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
 		variables.put("\\{author\\}", commit.getAuthor()); //$NON-NLS-1$
 		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$

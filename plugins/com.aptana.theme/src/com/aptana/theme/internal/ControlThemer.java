@@ -60,7 +60,7 @@ class ControlThemer implements IControlThemer
 
 	protected void applyTheme()
 	{
-		if (getControl() != null && !getControl().isDisposed())
+		if (invasiveThemesEnabled() && getControl() != null && !getControl().isDisposed())
 		{
 			getControl().setRedraw(false);
 			getControl().setBackground(getBackground());
@@ -77,6 +77,11 @@ class ControlThemer implements IControlThemer
 		}
 	}
 
+	protected boolean invasiveThemesEnabled()
+	{
+		return getCurrentTheme().isInvasive();
+	}
+
 	protected boolean useEditorFont()
 	{
 		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_FONT,
@@ -84,6 +89,12 @@ class ControlThemer implements IControlThemer
 	}
 
 	public void dispose()
+	{
+		unapplyTheme();
+		removeThemeListener();
+	}
+
+	protected void unapplyTheme()
 	{
 		if (control != null && !control.isDisposed())
 		{
@@ -95,8 +106,6 @@ class ControlThemer implements IControlThemer
 
 			control.setRedraw(true);
 		}
-
-		removeThemeListener();
 	}
 
 	protected Font getFont()
@@ -156,6 +165,10 @@ class ControlThemer implements IControlThemer
 		{
 			public void handleEvent(Event event)
 			{
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
 				GC gc = event.gc;
 				Color oldBackground = gc.getBackground();
 				if ((event.detail & SWT.SELECTED) != 0)
@@ -164,7 +177,7 @@ class ControlThemer implements IControlThemer
 					Rectangle clientArea = scrollable.getClientArea();
 
 					gc.setBackground(getSelection());
-					// The +2 on width is for Linux, since clientArea begins at [-2,-2] and 
+					// The +2 on width is for Linux, since clientArea begins at [-2,-2] and
 					// without it we don't properly color full width (see broken coloring when scrolling horizontally)
 					gc.fillRectangle(clientArea.x, event.y, clientArea.width + 2, event.height);
 
@@ -173,7 +186,8 @@ class ControlThemer implements IControlThemer
 				else
 				{
 					// Draw normal background color. This seems to only be necessary for some variants of Linux,
-					// and is the correct way to force custom painting of background when setBackground() doesn't work properly.
+					// and is the correct way to force custom painting of background when setBackground() doesn't work
+					// properly.
 					gc.setBackground(getBackground());
 					gc.fillRectangle(event.x, event.y, event.width, event.height);
 				}
@@ -199,6 +213,7 @@ class ControlThemer implements IControlThemer
 
 	private void addThemeChangeListener()
 	{
+		// TODO Just use one global listener that updates all instances?
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 			public void preferenceChange(PreferenceChangeEvent event)
@@ -211,6 +226,17 @@ class ControlThemer implements IControlThemer
 				{
 					// Handle the invasive font setting change
 					applyTheme();
+				}
+				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+				{
+					if (Boolean.parseBoolean((String) event.getNewValue()))
+					{
+						applyTheme();
+					}
+					else
+					{
+						unapplyTheme();
+					}
 				}
 			}
 		};

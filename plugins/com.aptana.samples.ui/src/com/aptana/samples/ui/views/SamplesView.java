@@ -12,9 +12,6 @@ import java.net.URL;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -51,9 +48,6 @@ import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
 import com.aptana.samples.ui.project.SampleProjectCreator;
-import com.aptana.theme.ColorManager;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -79,8 +73,6 @@ public class SamplesView extends ViewPart
 	private Action viewHelpAction;
 	private Action collapseAllAction;
 	private Action doubleClickAction;
-
-	private IPreferenceChangeListener themeChangeListener;
 
 	@Override
 	public void createPartControl(Composite parent)
@@ -110,7 +102,6 @@ public class SamplesView extends ViewPart
 
 		updateActionState();
 		applyTheme();
-		addListeners();
 	}
 
 	@Override
@@ -121,7 +112,7 @@ public class SamplesView extends ViewPart
 	@Override
 	public void dispose()
 	{
-		removeListeners();
+		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 		super.dispose();
 	}
 
@@ -376,32 +367,9 @@ public class SamplesView extends ViewPart
 		manager.add(collapseAllAction);
 	}
 
-	private void addListeners()
-	{
-		themeChangeListener = new IPreferenceChangeListener()
-		{
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					applyTheme();
-				}
-			}
-		};
-		(new InstanceScope().getNode(ThemePlugin.PLUGIN_ID)).addPreferenceChangeListener(themeChangeListener);
-	}
-
-	private void removeListeners()
-	{
-		(new InstanceScope().getNode(ThemePlugin.PLUGIN_ID)).removePreferenceChangeListener(themeChangeListener);
-	}
-
 	private void applyTheme()
 	{
-		ColorManager colorManager = ThemePlugin.getDefault().getColorManager();
-		Theme currentTheme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		treeViewer.getTree().setBackground(colorManager.getColor(currentTheme.getBackground()));
-		treeViewer.getTree().setForeground(colorManager.getColor(currentTheme.getForeground()));
+		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
 	}
 
 	private void updateActionState()

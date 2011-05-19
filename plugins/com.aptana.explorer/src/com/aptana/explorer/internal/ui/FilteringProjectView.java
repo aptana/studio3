@@ -79,6 +79,7 @@ import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
 import com.aptana.explorer.ui.filter.PathFilter;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
 /**
@@ -445,7 +446,6 @@ public class FilteringProjectView extends GitProjectView
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 					gc.setBackground(getHoverBackgroundColor());
-
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
@@ -1022,7 +1022,11 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlightAgainstBG());
+		if (ThemePlugin.invasiveThemesEnabled())
+		{
+			return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlightAgainstBG());
+		}
+		return UIUtils.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 	}
 
 	protected Theme getActiveTheme()
@@ -1094,12 +1098,13 @@ public class FilteringProjectView extends GitProjectView
 					x = event.width - 7;
 					y = 10;
 				}
-				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still doesn't overlap magnifying glass)
+				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still
+																		// doesn't overlap magnifying glass)
 				{
 					x = 0;
 					y = 15;
 				}
-				
+
 				Color bg = gc.getBackground();
 				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 				gc.fillPolygon(new int[] { x, y, x + width, y, x + (width / 2), y + width - 1 });
@@ -1117,7 +1122,7 @@ public class FilteringProjectView extends GitProjectView
 				if (Platform.getOS().equals(Platform.OS_WIN32))
 				{
 					Rectangle bounds = search.getTextControl().getBounds();
-					 if (e.x >= bounds.width - 20 && e.x <= bounds.width)
+					if (e.x >= bounds.width - 20 && e.x <= bounds.width)
 					{
 						isOnPulldownSection = true;
 						shift = bounds.width - 20;

@@ -17,7 +17,6 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 
-import com.aptana.js.debug.core.internal.model.JSDebugElement;
 import com.aptana.js.debug.core.model.IJSStackFrame;
 
 /**
@@ -315,7 +314,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 		variables = null;
 	}
 	
-	/* package */ int getThreadId() {
+	/* package */ String getThreadId() {
 		return thread.getThreadId();
 	}
 	

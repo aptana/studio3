@@ -202,7 +202,10 @@ class TreeThemer extends ControlThemer
 						cell.setFont(font);
 					}
 				}
-
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
 				cell.setForeground(getForeground());
 			}
 		}
@@ -285,6 +288,10 @@ class TreeThemer extends ControlThemer
 		{
 			public void handleEvent(Event event)
 			{
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
 				GC gc = event.gc;
 				Color oldBackground = gc.getBackground();
 				try
@@ -389,6 +396,10 @@ class TreeThemer extends ControlThemer
 		{
 			public void handleEvent(Event event)
 			{
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
 				GC gc = event.gc;
 				Widget item = event.item;
 				boolean isExpanded = false;
