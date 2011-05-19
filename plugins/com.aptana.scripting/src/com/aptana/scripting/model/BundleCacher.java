@@ -52,7 +52,7 @@ import com.aptana.scripting.ScriptingEngine;
  */
 public class BundleCacher
 {
-
+	
 	/**
 	 * The file where we store our serialized model.
 	 */
@@ -149,11 +149,14 @@ public class BundleCacher
 		OutputStreamWriter writer = null;
 		try
 		{
-			File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
-			writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"); //$NON-NLS-1$
+			if (be.getBundleDirectory().canWrite())
+			{
+				File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
+				writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"); //$NON-NLS-1$
 
-			Yaml yaml = createYAML(be.getBundleDirectory());
-			yaml.dump(be, writer);
+				Yaml yaml = createYAML(be.getBundleDirectory());
+				yaml.dump(be, writer);
+			}
 			return true;
 		}
 		catch (IOException e)

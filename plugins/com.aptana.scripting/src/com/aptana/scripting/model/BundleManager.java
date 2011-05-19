@@ -52,6 +52,8 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+	private static final boolean SHOW_BUNDLE_LOAD_INFO = EclipseUtil.debugOptionActive("com.aptana.scripting/show_bundle_load_info"); //$NON-NLS-1$
+	
 	/**
 	 * System property that holds the OS name
 	 */
@@ -97,14 +99,20 @@ public class BundleManager
 					BundleElement be = null;
 					if (useCache)
 					{
+						showBundleLoadInfo("attempting to read cache: " + bundleDirectory);
+						
 						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
+						showBundleLoadInfo("cache succeeded");
+						
 						addBundle(be);
 					}
 					else
 					{
+						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory);
+						
 						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
 
 						for (File script : bundleScripts)
@@ -551,7 +559,14 @@ public class BundleManager
 		{
 			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				listener.bundlesBecameHidden(entry);
+				try
+				{
+					listener.bundlesBecameHidden(entry);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing a bundle-became-hidden event listener", t);
+				}
 			}
 		}
 	}
@@ -569,7 +584,14 @@ public class BundleManager
 		{
 			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				listener.bundlesBecameVisible(entry);
+				try
+				{
+					listener.bundlesBecameVisible(entry);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing a bundle-became-visible event listener", t);
+				}
 			}
 		}
 	}
@@ -587,7 +609,14 @@ public class BundleManager
 		{
 			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				listener.elementBecameHidden(element);
+				try
+				{
+					listener.elementBecameHidden(element);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing an element-became-hidden event listener", t);
+				}
 			}
 		}
 	}
@@ -605,7 +634,14 @@ public class BundleManager
 		{
 			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				listener.elementBecameVisible(element);
+				try
+				{
+					listener.elementBecameVisible(element);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing an element-became-visible event listener", t);
+				}
 			}
 		}
 	}
@@ -623,7 +659,14 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptLoaded(script);
+				try
+				{
+					listener.scriptLoaded(script);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing a script-loaded event listener", t);
+				}
 			}
 		}
 	}
@@ -641,7 +684,14 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptReloaded(script);
+				try
+				{
+					listener.scriptReloaded(script);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing a script-reloaded event listener", t);
+				}
 			}
 		}
 	}
@@ -659,7 +709,14 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptUnloaded(script);
+				try
+				{
+					listener.scriptUnloaded(script);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError("An error occurred while executing a script-unloaded event listener", t);
+				}
 			}
 		}
 	}
@@ -2011,8 +2068,21 @@ public class BundleManager
 	}
 
 	/**
+	 * Show bundle load info
+	 * 
+	 * @param message
+	 */
+	protected void showBundleLoadInfo(String message)
+	{
+		if (SHOW_BUNDLE_LOAD_INFO)
+		{
+			System.out.println(message);
+		}
+	}
+	
+	/**
 	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads
-	 * everything all scripts associated with a bundle and the bundle.rb script as well
+	 * all scripts associated with a bundle and the bundle.rb script as well
 	 * 
 	 * @param bundleDirectory
 	 *            The directory (and its descendants) to unload
@@ -2029,9 +2099,22 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-
-		for (File script : scripts)
+		
+		List<File> reverseOrder = new ArrayList<File>(scripts);
+		
+		Collections.sort(reverseOrder, new Comparator<File>()
 		{
+			public int compare(File o1, File o2)
+			{
+				// reverse sort
+				return o2.getAbsolutePath().compareToIgnoreCase(o1.getAbsolutePath());
+			}
+		});
+
+		for (File script : reverseOrder)
+		{
+			showBundleLoadInfo("Unload script: " + script.toString());
+			
 			this.unloadScript(script);
 		}
 	}

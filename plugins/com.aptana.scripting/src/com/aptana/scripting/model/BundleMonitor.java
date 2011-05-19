@@ -25,11 +25,15 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.scripting.ScriptingActivator;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
+	private static final boolean SHOW_FILE_EVENTS = EclipseUtil.debugOptionActive("com.aptana.scripting/show_bundle_monitor_file_events"); //$NON-NLS-1$
+	private static final boolean SHOW_RESOURCE_EVENTS = EclipseUtil.debugOptionActive("com.aptana.scripting/show_bundle_monitor_resource_events"); //$NON-NLS-1$
+
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
 	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
@@ -95,6 +99,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				try
 				{
 					this._watchId = FileWatcher.addWatch(userBundlesPath, IJNotify.FILE_ANY, true, this);
+
+					this.showFileEvent("Begin file system monitoring");
 				}
 				catch (JNotifyException e)
 				{
@@ -129,6 +135,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			{
 				FileWatcher.removeWatch(this._watchId);
 				this._watchId = -1;
+
+				this.showFileEvent("End file system monitoring");
 			}
 
 			this._registered = false;
@@ -160,6 +168,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
+			this.showFileEvent("File created: " + rootPath + "," + name);
+
 			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
@@ -175,6 +185,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				// later once its bundle.rb file has been created
 				manager.loadScript(file);
 			}
+		}
+		else
+		{
+			this.showFileEvent("Skipped file created: " + rootPath + "," + name);
 		}
 	}
 
@@ -203,6 +217,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
+			this.showFileEvent("File deleted: " + rootPath + "," + name);
+			
 			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
@@ -219,6 +235,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		else
 		{
+			this.showFileEvent("Skipped file deleted: " + rootPath + "," + name);
+			
 			reloadDependentScripts(new File(rootPath, name));
 		}
 	}
@@ -234,12 +252,16 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
+			this.showFileEvent("File modified: " + rootPath + "," + name);
+			
 			File file = new File(rootPath, name);
 
 			BundleManager.getInstance().reloadScript(file);
 		}
 		else
 		{
+			this.showFileEvent("Skipped file modified: " + rootPath + "," + name);
+			
 			reloadDependentScripts(new File(rootPath, name));
 		}
 		
@@ -257,6 +279,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	synchronized public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
+		this.showFileEvent("File renamed: " + rootPath + "," + oldName + "=>" + newName);
+		
 		this.fileDeletedHelper(rootPath, oldName);
 		this.fileCreatedHelper(rootPath, newName);
 		
@@ -355,6 +379,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				switch (delta.getKind())
 				{
 					case IResourceDelta.ADDED:
+						this.showResourceEvent("Added: " + file);
+
 						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
 						{
 							manager.loadBundle(file.getParentFile());
@@ -366,6 +392,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						break;
 
 					case IResourceDelta.REMOVED:
+						this.showResourceEvent("Removed: " + file);
+						
 						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
 						{
 							// NOTE: we have to both unload all scripts associated with this bundle
@@ -386,6 +414,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 							if (movedFrom != null && movedFrom instanceof IFile)
 							{
+								this.showResourceEvent("Added: " + movedFrom.getLocation().toFile() + "=>" + file);
+
 								manager.unloadScript(movedFrom.getLocation().toFile());
 								manager.loadScript(file);
 							}
@@ -398,16 +428,22 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 							if (movedTo != null && movedTo instanceof IFile)
 							{
+								this.showResourceEvent("Added: " + file + "=>" + movedTo.getLocation().toFile());
+
 								manager.unloadScript(file);
 								manager.loadScript(movedTo.getLocation().toFile());
 							}
 						}
 						else if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
 						{
+							this.showResourceEvent("Reload: " + file);
+
 							manager.reloadScript(file);
 						}
 						else if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
 						{
+							this.showResourceEvent("Reload: " + file);
+
 							manager.reloadScript(file);
 						}
 						break;
@@ -453,7 +489,33 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			ScriptingActivator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
 		}
 	}
-
+	
+	/**
+	 * showFileEvent
+	 * 
+	 * @param message
+	 */
+	protected void showFileEvent(String message)
+	{
+		if (SHOW_FILE_EVENTS)
+		{
+			System.out.println(message);
+		}
+	}
+	
+	/**
+	 * showResourceEvent
+	 * 
+	 * @param message
+	 */
+	protected void showResourceEvent(String message)
+	{
+		if (SHOW_RESOURCE_EVENTS)
+		{
+			System.out.println(message);
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
