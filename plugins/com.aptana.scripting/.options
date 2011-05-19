@@ -1,4 +1,4 @@
 com.aptana.scripting/show_bundle_monitor_file_events = false
 com.aptana.scripting/show_bundle_monitor_resource_events = false
 com.aptana.scripting/show_element_registration = false
-com.aptana.scripting/show_bundle_cache_info = false
+com.aptana.scripting/show_bundle_load_info = false
