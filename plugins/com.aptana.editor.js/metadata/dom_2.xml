@@ -1930,7 +1930,7 @@
                 <description>Background color of a document.</description>
             </property>
             
-            <property name="body" type="Element" access="read-write" visibility="basic">
+            <property name="body" type="HTMLBodyElement" access="read-write" visibility="basic">
                 <availability>
                     <specification name="HTML DOM Level 1"/>
                 </availability>
