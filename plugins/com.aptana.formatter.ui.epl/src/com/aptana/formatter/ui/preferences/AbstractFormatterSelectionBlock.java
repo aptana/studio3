@@ -562,7 +562,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				// Update the preview
 				selectedFormatter = listViewer.getList().getSelectionIndex();
-				if (selectedFormatter > -1)
+				if (selectedFormatter > -1 && selectedFormatter < sourcePreviewViewers.size())
 				{
 					fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
