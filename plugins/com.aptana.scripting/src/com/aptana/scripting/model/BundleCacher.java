@@ -592,7 +592,7 @@ public class BundleCacher
 					if (!pathObj.isAbsolute())
 					{
 						// Prepend the bundle directory.
-						path = bundleDirectory.getAbsolutePath() + File.separator + path;
+						path = new File(bundleDirectory, path).getAbsolutePath();
 					}
 				}
 				return path;
