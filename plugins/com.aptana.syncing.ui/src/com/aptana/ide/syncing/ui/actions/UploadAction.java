@@ -87,17 +87,20 @@ public class UploadAction extends BaseSyncAction
 						List<IFileStore> newFiles = new ArrayList<IFileStore>();
 						for (IFileStore fileStore : fileStores)
 						{
-							List<IFileStore> folders = new ArrayList<IFileStore>();
-							IFileStore parent = fileStore.getParent();
-							while (parent != null && !sourceRoot.equals(parent))
+							if (!fileStore.equals(sourceRoot))
 							{
-								if (!newFiles.contains(parent))
+								List<IFileStore> folders = new ArrayList<IFileStore>();
+								IFileStore parent = fileStore.getParent();
+								while (parent != null && !sourceRoot.equals(parent))
 								{
-									folders.add(0, parent);
+									if (!newFiles.contains(parent))
+									{
+										folders.add(0, parent);
+									}
+									parent = parent.getParent();
 								}
-								parent = parent.getParent();
+								newFiles.addAll(folders);
 							}
-							newFiles.addAll(folders);
 						}
 						newFiles.addAll(Arrays.asList(sourceFiles));
 						sourceFiles = newFiles.toArray(new IFileStore[newFiles.size()]);
