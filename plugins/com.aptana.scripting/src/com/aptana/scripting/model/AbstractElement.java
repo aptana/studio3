@@ -123,7 +123,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			{
 				synchronized (ELEMENTS_BY_PATH)
 				{
-					showRegistration("Register", element);
+					showRegistration("Register", element); //$NON-NLS-1$
 					
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 
@@ -154,7 +154,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			{
 				synchronized (ELEMENTS_BY_PATH)
 				{
-					showRegistration("Unregister", element);
+					showRegistration("Unregister", element); //$NON-NLS-1$
 					
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 
@@ -187,10 +187,10 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			String name = element.getDisplayName();
 			String path = element.getPath();
 			String fullClassName = element.getClass().getName();
-			String[] classParts = fullClassName.split("\\.");
+			String[] classParts = fullClassName.split("\\."); //$NON-NLS-1$
 			String className = classParts[classParts.length - 1];
 			
-			System.out.println(message + ": " + className + ", " + name + ", " + path);
+			System.out.println(message + ": " + className + ", " + name + ", " + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 	

@@ -99,19 +99,19 @@ public class BundleManager
 					BundleElement be = null;
 					if (useCache)
 					{
-						showBundleLoadInfo("attempting to read cache: " + bundleDirectory);
+						showBundleLoadInfo("attempting to read cache: " + bundleDirectory); //$NON-NLS-1$
 						
 						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
-						showBundleLoadInfo("cache succeeded");
+						showBundleLoadInfo("cache succeeded"); //$NON-NLS-1$
 						
 						addBundle(be);
 					}
 					else
 					{
-						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory);
+						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
 						
 						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
 
@@ -565,7 +565,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing a bundle-became-hidden event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Hidden_Event_Error, t);
 				}
 			}
 		}
@@ -590,7 +590,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing a bundle-became-visible event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Visible_Event_Error, t);
 				}
 			}
 		}
@@ -615,7 +615,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing an element-became-hidden event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Hidden_Event_Error, t);
 				}
 			}
 		}
@@ -640,7 +640,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing an element-became-visible event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Visible_Event_Error, t);
 				}
 			}
 		}
@@ -665,7 +665,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing a script-loaded event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Script_Loaded_Event_Error, t);
 				}
 			}
 		}
@@ -690,7 +690,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing a script-reloaded event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Script_Reloaded_Event_Error, t);
 				}
 			}
 		}
@@ -715,7 +715,7 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					ScriptingActivator.logError("An error occurred while executing a script-unloaded event listener", t);
+					ScriptingActivator.logError(Messages.BundleManager_Script_Unloaded_Event_Error, t);
 				}
 			}
 		}
@@ -2113,7 +2113,7 @@ public class BundleManager
 
 		for (File script : reverseOrder)
 		{
-			showBundleLoadInfo("Unload script: " + script.toString());
+			showBundleLoadInfo("Unload script: " + script.toString()); //$NON-NLS-1$
 			
 			this.unloadScript(script);
 		}
