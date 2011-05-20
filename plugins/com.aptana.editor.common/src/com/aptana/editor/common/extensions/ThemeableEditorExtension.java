@@ -90,6 +90,7 @@ public class ThemeableEditorExtension
 
 	public void overrideThemeColors()
 	{
+		// TODO Extract the application of the theme to the sourceviewer/text widget and then re-use it in DisplayView.
 		overrideSelectionColor();
 		overrideCursor();
 		overrideCaretColor();
