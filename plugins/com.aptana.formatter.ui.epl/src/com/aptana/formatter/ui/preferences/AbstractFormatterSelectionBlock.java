@@ -612,8 +612,11 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	public void dispose()
 	{
-		IProfileManager profileManager = getProfileManager();
-		profileManager.removePropertyChangeListener(profileChangeListener);
+		if (profileChangeListener != null)
+		{
+			IProfileManager profileManager = getProfileManager();
+			profileManager.removePropertyChangeListener(profileChangeListener);
+		}
 		super.dispose();
 	}
 
