@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.internal.impl;
+package com.aptana.preview.handlers;
 
 import java.net.MalformedURLException;
 import java.net.URI;
