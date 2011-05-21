@@ -253,6 +253,13 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 				while (ftpClient != null && ftpClient.connected()) {
 					try {
 						ftpClient.keepAlive();
+					} catch (IOException e) {
+						if (ftpClient.connected()) {
+							try {
+								ftpClient.quitImmediately();
+							} catch (Exception exc) {
+							}
+						}
 					} catch (Exception e) {
 						SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_ErrorSendKeepAlive, e));
 					}
