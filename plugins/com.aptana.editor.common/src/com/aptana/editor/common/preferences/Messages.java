@@ -48,6 +48,7 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_Content_Assist_Auto_Display;
 	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
 	public static String EditorsPreferencePage_Content_Assist_Auto_Insert;
+	public static String EditorsPreferencePage_Enable_WordWrap;
 	public static String EditorsPreferencePage_Formatting;
 	public static String EditorsPreferencePage_HomeEndBehavior;
 	public static String EditorsPreferencePage_JumpsStartEnd;
