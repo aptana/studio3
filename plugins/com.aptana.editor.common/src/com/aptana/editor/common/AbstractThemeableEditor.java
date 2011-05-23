@@ -27,6 +27,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Position;
@@ -62,9 +63,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
@@ -456,14 +459,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	@Override
 	public Object getAdapter(Class adapter)
 	{
-		if (SourceViewerConfiguration.class.equals(adapter))
+		if (SourceViewerConfiguration.class == adapter)
 		{
 			return getSourceViewerConfiguration();
-		}
-		// returns our custom adapter for the content outline page
-		if (IContentOutlinePage.class.equals(adapter))
+		} else if (IContentOutlinePage.class == adapter)
 		{
+			// returns our custom adapter for the content outline page
 			return getOutlinePage();
+		} else if (ISourceViewer.class == adapter
+				|| ITextViewer.class == adapter)
+		{
+			return getSourceViewer();
 		}
 
 		if (this.fThemeableEditorFindBarExtension != null)
@@ -616,6 +622,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			resource = input.getAdapter(IUniformResource.class);
 		}
 		getFileService().setResource(resource);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+	 */
+	@Override
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+		super.init(site, input);
+		setEditorContextMenuId(getSite().getId());
 	}
 
 	@Override
