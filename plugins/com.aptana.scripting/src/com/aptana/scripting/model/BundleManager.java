@@ -114,12 +114,33 @@ public class BundleManager
 						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
 						
 						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+						
+						// first script is always bundle.rb, so go ahead
+						// and process that
+						File bundleScript = bundleScripts.get(0);
+						sub.subTask(bundleScript.getAbsolutePath());
+						loadScript(bundleScript, true, bundleLoadPaths);
+						sub.worked(1);
+						
+						// some new scripts may have come in while we were
+						// processing bundle.rb, so recalculate the list of
+						// scripts to process
+						bundleScripts = getBundleScripts(bundleDirectory);
+						
+						if (bundleScripts.size() > 0) {
+							// we've already loaded bundle.rb, so remove it from
+							// the list. Note that at this point we have a
+							// bundle element for this bundle, so any file
+							// events that occur now correctly update the bundle
+							// element
+							bundleScripts.remove(0);
 
-						for (File script : bundleScripts)
-						{
-							sub.subTask(script.getAbsolutePath());
-							loadScript(script, true, bundleLoadPaths);
-							sub.worked(1);
+							// process the rest of the scripts in the bundle
+							for (File script : bundleScripts) {
+								sub.subTask(script.getAbsolutePath());
+								loadScript(script, true, bundleLoadPaths);
+								sub.worked(1);
+							}
 						}
 
 						if (useCache)
@@ -1882,7 +1903,9 @@ public class BundleManager
 
 		if (execute)
 		{
+			this.showBundleLoadInfo("Loading script: " + script + ", fire event=" + fireEvent);
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+			this.showBundleLoadInfo("Loading complete: " + script);
 
 			if (fireEvent)
 			{

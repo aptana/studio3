@@ -70,6 +70,10 @@ public class CSSValidator implements IValidator
 			"border-bottom-right-radius", "border-bottom-left-radius", "border-top-left-radius", "font-family",
 			"font-weight", "font-style", "resize" };
 
+	// other messages that should be filtered automatically
+	@SuppressWarnings("nls")
+	private static final String[] FILTERED_MESSAGES = { "unrecognized media only" };
+
 	public CSSValidator()
 	{
 		loadAptanaCSSProfile();
@@ -260,7 +264,8 @@ public class CSSValidator implements IValidator
 			message = StringEscapeUtils.unescapeHtml(message);
 			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (!manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message))
+			if (!manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message)
+					&& !isFiltered(message))
 			{
 				// there is no info on the line offset or the length of the errored text
 				items.add(manager.addError(message, lineNumber, 0, 0, sourcePath));
@@ -386,6 +391,18 @@ public class CSSValidator implements IValidator
 		for (String property : CSS3_PROPERTIES)
 		{
 			if (message.indexOf(property) > -1)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isFiltered(String message)
+	{
+		for (String filtered : FILTERED_MESSAGES)
+		{
+			if (message.indexOf(filtered) > -1)
 			{
 				return true;
 			}
