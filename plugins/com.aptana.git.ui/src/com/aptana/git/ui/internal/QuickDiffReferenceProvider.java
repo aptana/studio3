@@ -88,7 +88,7 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider
 					{
 						return null;
 					}
-					String src = IOUtil.read(storage.getContents());
+					String src = IOUtil.read(storage.getContents(), "UTF-8"); //$NON-NLS-1$
 					fReference = new Document(src);
 				}
 				return fReference;
