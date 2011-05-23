@@ -415,6 +415,10 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 						returnTypes.add(returnTypeName);
 					}
 				}
+				else if (typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN))
+				{
+					returnTypes.add(JSTypeUtil.getClassType(typeName));
+				}
 				else
 				{
 					returnTypes.add(typeName);
