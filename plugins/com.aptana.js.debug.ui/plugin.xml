@@ -67,35 +67,35 @@
       </objectContribution>
    		<viewerContribution
            id="com.aptana.js.debug.ui.RulerPopupActions"
-           targetID="com.aptana.editor.html">
+           targetID="com.aptana.editor.html.RulerContext">
+        <action
+              class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+              id="com.aptana.js.debug.ui.actions.htmlToggleBreakpointAction"
+              label="%action.label.toggle.html"
+              menubarPath="debug">
+        </action>
          <action
                class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesRulerActionDelegate"
                helpContextId="breakpoint_properties_action_context"
                id="com.aptana.js.debug.ui.actions.htmlBreakpointPropertiesRulerActionDelegate"
                label="%action.label.breakpoint.properties.html"
                menubarPath="debug"/>
-         <action
-               label="%action.label.toggle.html"
-               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
-               menubarPath="debug"
-               id="com.aptana.js.debug.ui.actions.htmlToggleBreakpointAction">
-         </action>
       </viewerContribution>
    		<viewerContribution
            id="com.aptana.js.debug.ui.RulerPopupActions"
-           targetID="com.aptana.editor.js">
+           targetID="com.aptana.editor.js.RulerContext">
+        <action
+              class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+              id="com.aptana.js.debug.ui.actions.jsToggleBreakpointAction"
+              label="%action.label.toggle.js"
+              menubarPath="debug">
+        </action>
          <action
                class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesRulerActionDelegate"
                helpContextId="breakpoint_properties_action_context"
                id="com.aptana.js.debug.ui.actions.jsBreakpointPropertiesRulerActionDelegate"
                label="%action.label.breakpoint.properties.js"
                menubarPath="debug"/>
-         <action
-               label="%action.label.toggle.js"
-               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
-               menubarPath="debug"
-               id="com.aptana.js.debug.ui.actions.jsToggleBreakpointAction">
-         </action>
       </viewerContribution>
      <viewerContribution
            id="com.aptana.js.debug.ui.debugViewerContribution"
