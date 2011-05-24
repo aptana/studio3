@@ -56,6 +56,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -298,6 +299,37 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	private FoldingActionsGroup foldingActionsGroup;
 
+	private ControlListener fWordWrapControlListener = new ControlAdapter()
+	{
+
+		@SuppressWarnings("rawtypes")
+		public void controlResized(ControlEvent e)
+		{
+			IVerticalRuler ruler = getVerticalRuler();
+			if (ruler instanceof CompositeRuler)
+			{
+				Iterator columnIter = ((CompositeRuler) ruler).getDecoratorIterator();
+				while (columnIter.hasNext())
+				{
+					Object column = columnIter.next();
+					if (column instanceof AnnotationRulerColumn)
+					{
+						((AnnotationRulerColumn) column).redraw();
+					}
+				}
+			}
+			if (fLineNumberRulerColumn != null)
+			{
+				fLineNumberRulerColumn.redraw();
+			}
+			IOverviewRuler overviewRuler = getOverviewRuler();
+			if (overviewRuler != null)
+			{
+				overviewRuler.update();
+			}
+		}
+	};
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -362,38 +394,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		if (isWordWrapEnabled())
 		{
-			StyledText textWidget = getSourceViewer().getTextWidget();
-			textWidget.setWordWrap(true);
-			textWidget.addControlListener(new ControlAdapter()
-			{
-
-				@SuppressWarnings("rawtypes")
-				public void controlResized(ControlEvent e)
-				{
-					IVerticalRuler ruler = getVerticalRuler();
-					if (ruler instanceof CompositeRuler)
-					{
-						Iterator columnIter = ((CompositeRuler) ruler).getDecoratorIterator();
-						while (columnIter.hasNext())
-						{
-							Object column = columnIter.next();
-							if (column instanceof AnnotationRulerColumn)
-							{
-								((AnnotationRulerColumn) column).redraw();
-							}
-						}
-					}
-					if (fLineNumberRulerColumn != null)
-					{
-						fLineNumberRulerColumn.redraw();
-					}
-					IOverviewRuler overviewRuler = getOverviewRuler();
-					if (overviewRuler != null)
-					{
-						overviewRuler.update();
-					}
-				}
-			});
+			setWordWrapEnabled(true);
 		}
 	}
 
@@ -1029,6 +1030,25 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return new RubyRegexpFolder(this, document);
+	}
+
+	public boolean getWordWrapEnabled()
+	{
+		return getSourceViewer().getTextWidget().getWordWrap();
+	}
+
+	public void setWordWrapEnabled(boolean enabled)
+	{
+		StyledText textWidget = getSourceViewer().getTextWidget();
+		textWidget.setWordWrap(enabled);
+		if (enabled)
+		{
+			textWidget.addControlListener(fWordWrapControlListener);
+		}
+		else
+		{
+			textWidget.removeControlListener(fWordWrapControlListener);
+		}
 	}
 
 	@Override
