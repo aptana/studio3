@@ -20,24 +20,24 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <or>
+               <and>
+                  <not>
+                     <or>
+                        <reference
+                              definitionId="com.appcelerator.titanium.isMobileProject">
+                        </reference>
+                        <reference
+                              definitionId="com.appcelerator.titanium.isDesktopProject">
+                        </reference>
+                     </or>
+                  </not>
+                  <iterate
+                        ifEmpty="false">
                      <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <test
-                              property="org.eclipse.core.resources.open"
-                              value="open">
-                        </test>
+                           type="org.eclipse.core.resources.IResource">
                      </adapt>
-                     <instanceof
-                           value="org.eclipse.core.resources.IFolder">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.core.resources.IFile">
-                     </instanceof>
-                  </or>
-               </iterate>
+                  </iterate>
+               </and>
             </visibleWhen>
          </command>
       </menuContribution>

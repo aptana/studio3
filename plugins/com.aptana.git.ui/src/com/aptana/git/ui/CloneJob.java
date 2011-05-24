@@ -93,7 +93,7 @@ public class CloneJob extends Job
 			}
 
 			IPath gitPath = GitExecutable.instance().path();
-			Map<String, String> env = GitExecutable.instance().getShellEnvironment();
+			Map<String, String> env = GitExecutable.getShellEnvironment();
 			Process p = null;
 			if (shallowClone)
 			{

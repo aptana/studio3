@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -293,7 +294,7 @@ public class CopyFilesOperation {
 			}
 		}
         try {
-        	sourceStore.copy(destinationStore, EFS.OVERWRITE, monitor);
+        	SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
         } catch (CoreException e) {
 			IOUIPlugin.logError(MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopy, sourceStore,
 					destinationStore), e);

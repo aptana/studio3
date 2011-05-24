@@ -562,7 +562,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				// Update the preview
 				selectedFormatter = listViewer.getList().getSelectionIndex();
-				if (selectedFormatter > -1)
+				if (selectedFormatter > -1 && selectedFormatter < sourcePreviewViewers.size())
 				{
 					fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
@@ -612,8 +612,11 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	public void dispose()
 	{
-		IProfileManager profileManager = getProfileManager();
-		profileManager.removePropertyChangeListener(profileChangeListener);
+		if (profileChangeListener != null)
+		{
+			IProfileManager profileManager = getProfileManager();
+			profileManager.removePropertyChangeListener(profileChangeListener);
+		}
 		super.dispose();
 	}
 

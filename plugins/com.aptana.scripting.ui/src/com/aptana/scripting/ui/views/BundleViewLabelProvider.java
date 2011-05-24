@@ -16,7 +16,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.theme.ColorManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
@@ -71,12 +70,16 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	 */
 	public Color getForeground(Object element)
 	{
-		ThemePlugin plugin = ThemePlugin.getDefault();
-		ColorManager colorManager = plugin.getColorManager();
-		IThemeManager themeManager = plugin.getThemeManager();
-		Theme currentTheme = themeManager.getCurrentTheme();
+		if (getCurrentTheme().isInvasive())
+		{
+			return getCurrentTheme().getForegroundColor();
+		}
+		return null;
+	}
 
-		return colorManager.getColor(currentTheme.getForeground());
+	protected Theme getCurrentTheme()
+	{
+		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
 	/*

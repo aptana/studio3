@@ -144,6 +144,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		createUserAgentCategoryArea(caGroup);
 		createUserAgentButtons(caGroup);
 
+		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
+				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
 		createTextEditorLink(appearanceComposite);
 	}
 
