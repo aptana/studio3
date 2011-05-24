@@ -8,32 +8,49 @@
 package com.aptana.editor.common.internal.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
+import org.eclipse.core.commands.State;
+import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchSite;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.handlers.RegistryToggleState;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class ToggleWordWrapHandler extends AbstractHandler
 {
 
+	private static final String COMMAND_ID = "com.aptana.editor.toggleWordWrapCommand"; //$NON-NLS-1$
+
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(CommonEditorPlugin.PLUGIN_ID);
-		boolean currentSetting = Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.ENABLE_WORD_WRAP, false, null);
-		prefs.putBoolean(IPreferenceConstants.ENABLE_WORD_WRAP, !currentSetting);
-		try
+		// this applies to the specific editor, so no need to modify the global preference
+		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
+		if (editorPart instanceof AbstractThemeableEditor)
 		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
+			AbstractThemeableEditor activeEditor = (AbstractThemeableEditor) editorPart;
+			activeEditor.setWordWrapEnabled(!activeEditor.getWordWrapEnabled());
 		}
 		return null;
+	}
+
+	@Override
+	public void setEnabled(Object evaluationContext)
+	{
+		Object activeSite = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_SITE_NAME);
+		Object activeEditor = ((IEvaluationContext) evaluationContext).getVariable(ISources.ACTIVE_EDITOR_NAME);
+		if (activeSite instanceof IWorkbenchSite && activeEditor instanceof AbstractThemeableEditor)
+		{
+			ICommandService commandService = (ICommandService) ((IWorkbenchSite) activeSite)
+					.getService(ICommandService.class);
+			Command command = commandService.getCommand(COMMAND_ID);
+			State state = command.getState(RegistryToggleState.STATE_ID);
+			state.setValue(((AbstractThemeableEditor) activeEditor).getWordWrapEnabled());
+		}
 	}
 }
