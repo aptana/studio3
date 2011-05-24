@@ -1095,7 +1095,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	public static final int WIDGET_PRIORITY = 20;
 
-	private static final int DEFAULT_AUTO_ACTIVATION_DELAY = 500;
+	private static final int DEFAULT_AUTO_ACTIVATION_DELAY = 0;
 
 	private IInformationControlCreator fInformationControlCreator;
 	private int fAutoActivationDelay = DEFAULT_AUTO_ACTIVATION_DELAY;
@@ -1279,7 +1279,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	private boolean isValidAutoAssistLocation(char c, int keyCode, StyledText styledText)
 	{
-		if (keyCode == SWT.ESC || keyCode == SWT.BS || (keyCode & SWT.KEYCODE_BIT) != 0)
+		if (keyCode == SWT.ESC || keyCode == SWT.BS || keyCode == SWT.DEL || (keyCode & SWT.KEYCODE_BIT) != 0)
 		{
 			return false;
 		}
@@ -1657,11 +1657,6 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		if (fInformationControlCreator != null)
 		{
 			int delay = fAutoActivationDelay;
-			if (delay == 0)
-			{
-				delay = DEFAULT_AUTO_ACTIVATION_DELAY;
-			}
-			delay = Math.round(delay * 1.5f);
 			controller = new AdditionalInfoController(fInformationControlCreator, delay);
 		}
 

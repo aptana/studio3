@@ -28,6 +28,17 @@ public class EclipseUtil
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
 
 	/**
+	 * Determines if the specified debug option is on and set to true
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static boolean debugOptionActive(String option)
+	{
+		return Boolean.valueOf(Platform.getDebugOption(option)).booleanValue();
+	}
+	
+	/**
 	 * Retrieves the bundle version of a plugin.
 	 * 
 	 * @param plugin

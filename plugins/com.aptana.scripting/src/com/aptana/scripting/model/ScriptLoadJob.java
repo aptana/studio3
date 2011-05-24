@@ -7,6 +7,7 @@
  */
 package com.aptana.scripting.model;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -74,39 +75,42 @@ public class ScriptLoadJob extends AbstractScriptRunner
 		Ruby runtime = container.getProvider().getRuntime();
 		Object result = null;
 
-		synchronized (runtime)
+		if (this._filename != null && new File(this._filename).canRead())
 		{
-			// apply load paths
-			this.applyLoadPaths(runtime);
-
-			// compile
-			try
+			synchronized (runtime)
 			{
-				EmbedEvalUnit unit = container.parse(PathType.ABSOLUTE, this._filename);
-
-				// execute
-				result = unit.run();
+				// apply load paths
+				this.applyLoadPaths(runtime);
+	
+				// compile
+				try
+				{
+					EmbedEvalUnit unit = container.parse(PathType.ABSOLUTE, this._filename);
+	
+					// execute
+					result = unit.run();
+				}
+				catch (ParseFailedException e)
+				{
+					String message = MessageFormat.format(Messages.ScriptingEngine_Parse_Error, new Object[] {
+							this._filename, e.getMessage() });
+	
+					ScriptLogger.logError(message);
+				}
+				catch (EvalFailedException e)
+				{
+					String message = MessageFormat.format(Messages.ScriptingEngine_Execution_Error, new Object[] {
+							this._filename, e.getMessage() });
+	
+					ScriptLogger.logError(message);
+				}
+	
+				// register any bundle libraries that were loaded by this script
+				this.registerLibraries(runtime, this._filename);
+	
+				// unapply load paths
+				this.unapplyLoadPaths(runtime);
 			}
-			catch (ParseFailedException e)
-			{
-				String message = MessageFormat.format(Messages.ScriptingEngine_Parse_Error, new Object[] {
-						this._filename, e.getMessage() });
-
-				ScriptLogger.logError(message);
-			}
-			catch (EvalFailedException e)
-			{
-				String message = MessageFormat.format(Messages.ScriptingEngine_Execution_Error, new Object[] {
-						this._filename, e.getMessage() });
-
-				ScriptLogger.logError(message);
-			}
-
-			// register any bundle libraries that were loaded by this script
-			this.registerLibraries(runtime, this._filename);
-
-			// unapply load paths
-			this.unapplyLoadPaths(runtime);
 		}
 
 		// save result

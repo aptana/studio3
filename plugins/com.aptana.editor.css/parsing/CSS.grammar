@@ -168,14 +168,90 @@ Import
 	;
 
 Media
-	=	MEDIA List.l LCURLY RCURLY
+	//=	MEDIA List.l LCURLY RCURLY
+	//	{:
+	//		return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]));
+	//	:}
+	//|	MEDIA List.l LCURLY Statements.s RCURLY
+	//	{:
+	//		return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]), s);
+	//	:}
+	=	MEDIA MediaExprs.m LCURLY RCURLY
 		{:
-			return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]));
+			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+
+			for (Symbol symbol : m)
+			{
+				CSSTextNode text = new CSSTextNode((String) symbol.value);
+
+				text.setLocation(symbol.getStart(), symbol.getEnd());
+				list.add(text);
+			}
+
+			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]));
 		:}
-	|	MEDIA List.l LCURLY Statements.s RCURLY
+	|	MEDIA MediaExprs.m LCURLY Statements.s RCURLY
 		{:
-			return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]), s);
+			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+
+			for (Symbol symbol : m)
+			{
+				CSSTextNode text = new CSSTextNode((String) symbol.value);
+
+				text.setLocation(symbol.getStart(), symbol.getEnd());
+				list.add(text);
+			}
+
+			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]), s);
 		:}
+	;
+
+MediaExprs
+	=	MediaExprs MediaExpr
+	|	MediaExpr
+	;
+
+MediaExpr
+	=	IDENTIFIER
+	|	PROPERTY
+	|	COLOR
+	|	COLON
+	|	RCURLY
+	|	STRING
+	|	LBRACKET
+	|	CLASS
+	|	HASH
+	|	SEMICOLON
+	|	URL
+	|	STAR
+	|	SELECTOR
+	|	COMMA
+	|	NUMBER
+	|	PERCENTAGE
+	|	LENGTH
+	|	EMS
+	|	EXS
+	|	ANGLE
+	|	TIME
+	|	FREQUENCY
+	|	PAGE
+	|	AT_RULE
+	|	CHARSET
+	|	MEDIA
+	|	FONTFACE
+	|	NAMESPACE
+	|	IMPORT
+	|	RBRACKET
+	|	LPAREN
+	|	PLUS
+	|	SLASH
+	|	MINUS
+	|	RPAREN
+	|	IMPORTANT
+	|	GREATER
+	|	EQUAL
+	|	INCLUDES
+	|	DASHMATCH
 	;
 
 Page

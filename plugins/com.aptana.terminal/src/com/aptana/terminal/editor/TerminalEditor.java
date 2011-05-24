@@ -36,6 +36,7 @@ import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCut;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionPaste;
 import org.eclipse.tm.internal.terminal.control.actions.TerminalActionSelectAll;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -43,6 +44,7 @@ import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
@@ -103,6 +105,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		
 		makeActions();
 		hookContextMenu();
+		contributeToActionBars();
 		saveInputState();
 		
 		terminalComposite.getTerminalControl().addMouseListener(new MouseAdapter() {
@@ -287,7 +290,18 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
-	
+
+	/**
+	 * contributeToActionBars
+	 */
+	private void contributeToActionBars() {
+		IActionBars actionBars = getEditorSite().getActionBars();
+		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), fActionEditCopy);
+		actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), fActionEditPaste);
+		actionBars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), fActionEditSelectAll);
+
+	}
+
 	private void updateActions() {
 		fActionEditCut.updateAction(true);
 		fActionEditCopy.updateAction(true);

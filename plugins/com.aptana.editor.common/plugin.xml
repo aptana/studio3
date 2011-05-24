@@ -318,6 +318,12 @@
             id="com.aptana.editor.PreviousEditorCommand"
             name="%command.PreviousEditorNoPrompt">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="com.aptana.editor.common.internal.commands.ToggleWordWrapHandler"
+            id="com.aptana.editor.toggleWordWrapCommand"
+            name="Toggle Word Wrap">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -332,6 +338,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+SHIFT+TAB">
+      </key>
+      <key
+            commandId="com.aptana.editor.toggleWordWrapCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+SHIFT+R">
       </key>
    </extension>
    <extension

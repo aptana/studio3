@@ -106,8 +106,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected boolean invasiveThemesEnabled()
 	{
-		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_THEMES,
-				false, null);
+		return ThemePlugin.invasiveThemesEnabled();
 	}
 
 	@Override

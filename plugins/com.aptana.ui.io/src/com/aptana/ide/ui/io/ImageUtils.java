@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -32,6 +33,7 @@ import org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor;
 
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -167,9 +169,19 @@ public final class ImageUtils {
 	}
 	
 	private static ImageData awtImageIconToSWTImageData(javax.swing.Icon icon, Color backgroundColor) {
-		java.awt.Color bgColor = swtColorToAWTColor(backgroundColor != null ? backgroundColor : ThemePlugin
-				.getDefault().getColorManager()
-				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground()));
+		if (backgroundColor == null)
+		{
+			if (ThemePlugin.invasiveThemesEnabled())
+			{
+				backgroundColor = ThemePlugin.getDefault().getColorManager()
+						.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground());
+			}
+			else
+			{
+				backgroundColor = UIUtils.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+			}
+		}
+		java.awt.Color bgColor = swtColorToAWTColor(backgroundColor);
 
 		java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(icon.getIconWidth(), icon.getIconHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
 		java.awt.Graphics2D imageGraphics = bi.createGraphics();

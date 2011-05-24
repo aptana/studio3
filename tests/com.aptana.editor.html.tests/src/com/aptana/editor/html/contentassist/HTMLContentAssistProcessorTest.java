@@ -32,6 +32,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	private static final int ELEMENT_PROPOSALS_COUNT = 132;
 	private static final int DOCTYPE_PROPOSALS_COUNT = 11;
 	private static final int CLOSE_TAG_PROPOSALS_COUNT = 119;
+	private static final int ENTITY_PROPOSAL_COUNT = 252;
 
 	private HTMLContentAssistProcessor fProcessor;
 	private IDocument fDocument;
@@ -163,6 +164,33 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("</|>", '\t', CLOSE_TAG_PROPOSALS_COUNT, "/ul", "</ul>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testNoSuggestionsInTextAreaBetweenTags()
+	{
+		assertCompletionCorrect("<p>|</p>", '\t', 0, null, "<p></p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testNoSuggestionsInTextAreaWithWhitespaceBetweenTags()
+	{
+		assertCompletionCorrect("<p>\n  |\n</p>", '\t', 0, null, "<p>\n  \n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testOnlySuggestEntityIfPrecededByAmpersand()
+	{
+		assertCompletionCorrect("<p>\n  &|\n</p>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<p>\n  &amp;\n</p>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testEntitySuggestionWithNoSurroundingWhitespace()
+	{
+		assertCompletionCorrect("<div>&|</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testExistingEntityGetsFullyReplaced()
+	{
+		assertCompletionCorrect(
+				"<body>\n  &a|acute;\n</body>", '\t', ENTITY_PROPOSAL_COUNT, "&acirc;", "<body>\n  &acirc;\n</body>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<div>&a|acute;</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	public void testIMGProposal()
 	{
 		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "img", "<img />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -182,6 +210,16 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	public void testStyleAttributeProposalWithNoPrefix()
 	{
 		assertCompletionCorrect("<div |></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testStyleAttributeProposalOnSelfClosingTag()
+	{
+		assertCompletionCorrect("<br |/>", '\t', 8, "style", "<br style=\"\"/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testStyleAttributeProposalOnSelfClosingTagWithTrailingSpaceAfterCursor()
+	{
+		assertCompletionCorrect("<br | />", '\t', 8, "style", "<br style=\"\" />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public void testStyleAttributeProposalWithPrefix()
@@ -313,10 +351,15 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
 		assertEquals(proposalCount, proposals.length);
-		ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
 
-		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+		if (proposalToSelect != null)
+		{
+			ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
+			assertNotNull("Unable to find proposal you wanted to select: " + proposalToSelect, closeProposal);
+			assertTrue("Selected proposal doesn't validate against document",
+					((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
+			((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+		}
 		assertEquals(postCompletion, fDocument.get());
 
 		if (point != null)

@@ -7,9 +7,7 @@
  */
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -38,7 +36,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
@@ -76,8 +73,6 @@ import org.eclipse.ui.internal.dialogs.ImportExportWizard;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
-import org.eclipse.ui.navigator.ICommonFilterDescriptor;
-import org.eclipse.ui.navigator.INavigatorFilterService;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
@@ -104,11 +99,6 @@ import com.aptana.ui.widgets.SearchComposite;
 @SuppressWarnings("restriction")
 public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client, IProjectContext
 {
-
-	/**
-	 * Pref key to track whether we turned off ".*" filename filter that is on by default.
-	 */
-	private static final String TURNED_OFF_DOT_STAR_FILE_FILTER = "turnedOffDotStarFileFilter"; //$NON-NLS-1$
 
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
@@ -366,7 +356,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		pageBook = new PageBook(viewer, SWT.NONE);
 
 		super.createPartControl(pageBook);
-		turnOffDotStarFileFilterOnFirstStartup();
+
 		IProject selectedProject = detectSelectedProject();
 
 		getCommonViewer().setInput(selectedProject);
@@ -497,40 +487,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				.applyTo(importProjectWhenClosedButton);
 
 		return closedProjectButtonsComp;
-	}
-
-	private void turnOffDotStarFileFilterOnFirstStartup()
-	{
-		if (!Platform.getPreferencesService().getBoolean(ExplorerPlugin.PLUGIN_ID, TURNED_OFF_DOT_STAR_FILE_FILTER,
-				false, null))
-		{
-			INavigatorFilterService filterService = getCommonViewer().getNavigatorContentService().getFilterService();
-			ICommonFilterDescriptor[] descs = filterService.getVisibleFilterDescriptors();
-			List<String> ids = new ArrayList<String>();
-			for (ICommonFilterDescriptor desc : descs)
-			{
-				// Remove the .* filter
-				if (!desc.getId().equals("org.eclipse.ui.navigator.resources.filters.startsWithDot")) //$NON-NLS-1$
-				{
-					ids.add(desc.getId());
-				}
-			}
-
-			filterService.setActiveFilterIds(ids.toArray(new String[0]));
-			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
-			getCommonViewer().setFilters(visibleFilters);
-
-			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
-			prefs.putBoolean(TURNED_OFF_DOT_STAR_FILE_FILTER, true);
-			try
-			{
-				prefs.flush();
-			}
-			catch (BackingStoreException e)
-			{
-				// ignore
-			}
-		}
 	}
 
 	@Override

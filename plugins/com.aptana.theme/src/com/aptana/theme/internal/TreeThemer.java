@@ -202,7 +202,10 @@ class TreeThemer extends ControlThemer
 						cell.setFont(font);
 					}
 				}
-
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
 				cell.setForeground(getForeground());
 			}
 		}
@@ -281,25 +284,53 @@ class TreeThemer extends ControlThemer
 	{
 		super.addSelectionColorOverride();
 		final Tree tree = getTree();
-		// This draws from right end of item to full width of tree, needed on windows so selection is full width of view
 		selectionPaintListener = new Listener()
 		{
 			public void handleEvent(Event event)
 			{
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
+				GC gc = event.gc;
+				Color oldBackground = gc.getBackground();
 				try
 				{
+					Rectangle clientArea = tree.getClientArea();
+					
+					// FIX for busted drawing on some variants of Linux, notably OpenSuSE, where
+					// setBackground on the tree doesn't behave. We color background behind items in ControlThemer.addSelectionColorOverride()
+					// This draws from bottom of the last item down to bottom of tree with background color
+					if (!isWindows && !isMacOSX)
+					{
+						gc.setBackground(getBackground());
+						Rectangle itemBounds = new Rectangle(0, 0, 0, 0);
+						if (tree.getItemCount() != 0)
+						{
+							TreeItem lastItem = tree.getItem(tree.getItemCount() - 1);
+							lastItem = getLastItemRecursively(lastItem);
+							itemBounds = lastItem.getBounds();
+						}
+						int bottomY = itemBounds.y + itemBounds.height;
+						// The +2 on width is for Linux, since clientArea begins at [-2,-2] and 
+						// without it we don't properly color full width
+						Rectangle toColor = new Rectangle(clientArea.x, bottomY, clientArea.width + 2, clientArea.height - bottomY);
+						gc.fillRectangle(toColor);
+					}
+					
+					// FIX For Windows, the selection color doesn't extend past bounds of the tree item, so here we
+					// draw from right end of item to full width of tree, so selection bg color is full width of view
+					if (!isWindows)
+					{
+						return;
+					}
 					TreeItem[] items = tree.getSelection();
 					if (items == null || items.length == 0)
 					{
 						return;
 					}
-					Rectangle clientArea = tree.getClientArea();
-					int clientWidth = clientArea.x + clientArea.width;
-
-					GC gc = event.gc;
-					Color oldBackground = gc.getBackground();
-
 					gc.setBackground(getSelection());
+					int clientWidth = clientArea.width + 2;
 					int columns = tree.getColumnCount();
 					for (TreeItem item : items)
 					{
@@ -320,34 +351,55 @@ class TreeThemer extends ControlThemer
 								gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
 							}
 						}
-					}
+					}					
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
+				finally
+				{
 					gc.setBackground(oldBackground);
 
 					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
 					// non-focus for Mac)
 					gc.setForeground(getForeground());
 				}
-				catch (Exception e)
-				{
-					// ignore
-				}
 			}
 		};
 		tree.addListener(SWT.Paint, selectionPaintListener);
 	}
 
+	protected TreeItem getLastItemRecursively(TreeItem lastItem) {
+		if (lastItem == null)
+		{
+			return null;
+		}
+		int itemCount = lastItem.getItemCount();
+		if (itemCount == 0 || !lastItem.getExpanded())
+		{
+			return lastItem;
+		}
+		return getLastItemRecursively(lastItem.getItem(itemCount - 1));
+	}
+
 	private void addCustomTreeControlDrawing()
 	{
 		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
-		if (!isWindows)
+		if (isMacOSX)
 		{
 			return;
 		}
+		// FIXME The native control/arrow still shows through on OpenSuSE 11.4
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()
 		{
 			public void handleEvent(Event event)
 			{
+				if (!invasiveThemesEnabled())
+				{
+					return;
+				}
 				GC gc = event.gc;
 				Widget item = event.item;
 				boolean isExpanded = false;

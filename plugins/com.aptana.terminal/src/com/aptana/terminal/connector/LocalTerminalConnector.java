@@ -10,7 +10,6 @@ package com.aptana.terminal.connector;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -211,7 +210,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			
 			// Hook up standard input:
 			//
-			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, Charset.defaultCharset().name()), 1024);
+			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, ENCODING), 1024);
 			
 			// Hook up standard output:
 			//
