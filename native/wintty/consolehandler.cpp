@@ -724,10 +724,10 @@ static void WriteConsole(void)
 			SHORT state = HIBYTE(key);
 			DWORD dwKeyState = 0;
 			key = LOBYTE(key);
-			if( (key == VK_CANCEL) ) {
+			/*if( (key == VK_CANCEL) ) {
 				::GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
 				continue;
-			}
+			}*/
 			if( (key == VK_BACK) )
 			{
 				ch = ::MapVirtualKey(key, 2/*MAPVK_VK_TO_CHAR*/);
