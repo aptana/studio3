@@ -55,7 +55,7 @@ import com.aptana.webserver.core.preferences.WebServerPreferences;
 public class LocalWebServer {
 
 	private static final int SOCKET_TIMEOUT = 10000;
-	private static final long STARTUP_TIMEOUT = 5000;
+	private static final long STARTUP_TIMEOUT = 10000;
 	private static final long SHUTDOWN_TIMEOUT = 2000;
 	private static final int SOCKET_BUFFER_SIZE = 16*1024;
 	private static final int WORKER_COUNT = 2;
@@ -98,12 +98,24 @@ public class LocalWebServer {
 	}
 	
 	private void testConnection(URL url) throws CoreException {
-		try {
-			URLConnection connection = url.openConnection();
-			connection.connect();
-			connection.getContentType();
-		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Testing WebServer connection failed", e)); //$NON-NLS-1$
+		CoreException exception = null;
+		for (int trial = 0; trial < 3; ++trial) {
+			try {
+				URLConnection connection = url.openConnection();
+				connection.connect();
+				connection.getContentType();
+				return;
+			} catch (IOException e) {
+				exception = new CoreException(new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Testing WebServer connection failed", e)); //$NON-NLS-1$
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				break;
+			}
+		}
+		if (exception != null) {
+			throw exception;
 		}
 	}
 	
