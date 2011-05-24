@@ -70,6 +70,7 @@ public class MergeConflictsHandler extends AbstractGitHandler
 						new GitCommit(repo, ":2"), Path.fromOSString(name)); //$NON-NLS-1$
 				IStorage storage = baseFile.getStorage(new NullProgressMonitor());
 				file.setContents(storage.getContents(), true, true, new NullProgressMonitor());
+				file.setCharset("UTF-8", new NullProgressMonitor()); //$NON-NLS-1$
 			}
 		}
 		catch (CoreException e)

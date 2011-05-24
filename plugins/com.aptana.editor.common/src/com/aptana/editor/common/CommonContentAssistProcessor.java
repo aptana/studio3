@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -175,6 +176,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
 			proposals.toArray(combined);
 			System.arraycopy(others, 0, combined, proposals.size(), others.length);
+			sortProposals(combined);
 			return combined;
 		}
 		finally
@@ -184,6 +186,23 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				stats.endRun();
 			}
 		}
+	}
+
+	/**
+	 * Sorts the completion proposals (by default, by display string)
+	 * 
+	 * @param proposals
+	 */
+	protected void sortProposals(ICompletionProposal[] proposals)
+	{
+		// Sort by display string, ignoring case
+		Arrays.sort(proposals, new Comparator<ICompletionProposal>()
+		{
+			public int compare(ICompletionProposal o1, ICompletionProposal o2)
+			{
+				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+			}
+		});
 	}
 
 	/**

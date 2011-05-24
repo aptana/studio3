@@ -72,7 +72,7 @@
    <extension
          point="com.aptana.preview.previewHandlers">
       <handler
-            class="com.aptana.preview.internal.impl.WebServerPreviewHandler"
+            class="com.aptana.preview.handlers.WebServerPreviewHandler"
             contentType="com.aptana.contenttype.html">
       </handler>
    </extension>

@@ -9,6 +9,7 @@ package com.aptana.index.core;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.mortbay.util.ajax.JSON;
@@ -78,7 +79,7 @@ public abstract class IndexReader
 	{
 		if (item != null && element != null)
 		{
-			this.populateElement(element, item.getWord());
+			this.populateElement(element, item.getWord(), item.getDocuments());
 		}
 
 		return element;
@@ -102,7 +103,7 @@ public abstract class IndexReader
 
 			if (columnIndex < columns.length)
 			{
-				this.populateElement(element, columns[columnIndex]);
+				this.populateElement(element, columns[columnIndex], item.getDocuments());
 			}
 		}
 
@@ -118,7 +119,7 @@ public abstract class IndexReader
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	private <T extends Convertible & IndexDocument> T populateElement(T element, String value)
+	private <T extends Convertible & IndexDocument> T populateElement(T element, String value, Set<String> documents)
 	{
 		if (element != null && value != null)
 		{
@@ -131,7 +132,7 @@ public abstract class IndexReader
 					element.fromJSON((Map) m);
 				}
 
-				for (String document : element.getDocuments())
+				for (String document : documents)
 				{
 					element.addDocument(document);
 				}
