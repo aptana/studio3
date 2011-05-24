@@ -21,6 +21,7 @@ import org.eclipse.ui.internal.OverlayIcon;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
 @SuppressWarnings("restriction")
@@ -47,7 +48,7 @@ public class NaturesLabelProvider extends LabelProvider implements IFontProvider
 		String description = fNatureDescriptions.get(element.toString());
 		if (description == null)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		if (isPrimary(element.toString()))
 		{
