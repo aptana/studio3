@@ -34,10 +34,8 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
-import org.eclipse.jface.text.source.AnnotationRulerColumn;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
 import org.eclipse.jface.text.source.CommonOverviewRuler;
-import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -302,22 +300,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private ControlListener fWordWrapControlListener = new ControlAdapter()
 	{
 
-		@SuppressWarnings("rawtypes")
 		public void controlResized(ControlEvent e)
 		{
-			IVerticalRuler ruler = getVerticalRuler();
-			if (ruler instanceof CompositeRuler)
-			{
-				Iterator columnIter = ((CompositeRuler) ruler).getDecoratorIterator();
-				while (columnIter.hasNext())
-				{
-					Object column = columnIter.next();
-					if (column instanceof AnnotationRulerColumn)
-					{
-						((AnnotationRulerColumn) column).redraw();
-					}
-				}
-			}
 			if (fLineNumberRulerColumn != null)
 			{
 				fLineNumberRulerColumn.redraw();
