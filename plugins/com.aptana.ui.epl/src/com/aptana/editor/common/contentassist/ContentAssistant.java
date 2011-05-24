@@ -1095,7 +1095,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	public static final int WIDGET_PRIORITY = 20;
 
-	private static final int DEFAULT_AUTO_ACTIVATION_DELAY = 200;
+	private static final int DEFAULT_AUTO_ACTIVATION_DELAY = 0;
 
 	private IInformationControlCreator fInformationControlCreator;
 	private int fAutoActivationDelay = DEFAULT_AUTO_ACTIVATION_DELAY;
