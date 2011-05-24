@@ -109,4 +109,9 @@ public interface IPreferenceConstants
 	 */
 	public static final String EDITOR_ENABLE_FOLDING = CommonEditorPlugin.PLUGIN_ID + ".enableFolding"; //$NON-NLS-1$
 
+	/**
+	 * The preference key used to enable and disable word wrap
+	 */
+	public static final String ENABLE_WORD_WRAP = CommonEditorPlugin.PLUGIN_ID + ".enableWordWrap"; //$NON-NLS-1$
+
 }

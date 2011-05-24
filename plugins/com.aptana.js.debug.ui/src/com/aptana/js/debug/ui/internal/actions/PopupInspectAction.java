@@ -13,6 +13,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.GC;
@@ -80,7 +81,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	 */
 	protected void displayResult(final IWatchExpressionResult result) {
 		IWorkbenchPart part = getTargetPart();
-		viewer = (ITextViewer) part.getAdapter(ITextViewer.class);
+		viewer = (ISourceViewer) part.getAdapter(ISourceViewer.class);
 		if (viewer == null) {
 			JSDebugUIPlugin.log("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()"); //$NON-NLS-1$
 		}

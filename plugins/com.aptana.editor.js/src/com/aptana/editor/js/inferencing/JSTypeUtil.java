@@ -275,6 +275,18 @@ public class JSTypeUtil
 		return result;
 	}
 
+	public static String getClassType(String typeName)
+	{
+		String result = null;
+
+		if (typeName != null && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && typeName.endsWith(JSTypeConstants.GENERIC_CLOSE))
+		{
+			result = typeName.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), typeName.length() - 1);
+		}
+
+		return result;
+	}
+
 	/**
 	 * getFunctionSignatureReturnTypeNames
 	 * 
