@@ -165,12 +165,40 @@
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.EditActionProvider"
               id="com.aptana.explorer.navigator.resources.actions.EditActions">
-           <enablement></enablement>
+           <enablement>
+              <with
+                    variable="selection">
+                 <iterate
+                       ifEmpty="false">
+                    <or>
+                       <not>
+                          <test
+                                property="org.eclipse.core.resources.projectNature"
+                                value="org.python.pydev.pythonNature">
+                          </test>
+                       </not>
+                    </or>
+                 </iterate>
+              </with></enablement>
         </actionProvider>
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider"
               id="com.aptana.explorer.navigator.resources.actions.RefactorActions">
-           <enablement></enablement>
+           <enablement>
+              <with
+                    variable="selection">
+                 <iterate
+                       ifEmpty="false">
+                    <or>
+                       <not>
+                          <test
+                                property="org.eclipse.core.resources.projectNature"
+                                value="org.python.pydev.pythonNature">
+                          </test>
+                       </not>
+                    </or>
+                 </iterate>
+              </with></enablement>
         </actionProvider>
 
 	      <!-- Menu Shortcut Actions for Wizards -->
