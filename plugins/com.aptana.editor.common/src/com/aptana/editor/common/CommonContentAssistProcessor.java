@@ -214,15 +214,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					}
 					else
 					{
-						if (o1 instanceof ICommonCompletionProposal && o2 instanceof ICommonCompletionProposal)
-						{
-							return Integer.valueOf(((ICommonCompletionProposal) o1).getRelevance()).compareTo(
-									((ICommonCompletionProposal) o2).getRelevance());
-						}
-						else
-						{
-							return compare;
-						}
+						return compare;
 					}
 				}
 				return compare;
