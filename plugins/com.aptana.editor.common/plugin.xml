@@ -322,7 +322,17 @@
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="com.aptana.editor.common.internal.commands.ToggleWordWrapHandler"
             id="com.aptana.editor.toggleWordWrapCommand"
-            name="Toggle Word Wrap">
+            name="%command.wordwrap.name">
+         <state
+         	id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="persisted"
+                     value="false">
+               </parameter>
+            </class>
+   </state> 
       </command>
    </extension>
    <extension
@@ -443,6 +453,22 @@
                </parameter>
             </command>
          </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="com.aptana.editor.toggleWordWrapCommand"
+               style="toggle">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
