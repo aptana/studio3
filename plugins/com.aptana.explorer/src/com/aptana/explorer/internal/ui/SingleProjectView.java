@@ -7,9 +7,7 @@
  */
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -30,7 +28,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -1083,9 +1080,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		// Remove a whole bunch of the contributed items that we don't want
 		removeMenuItems(menu, TO_REMOVE);
 		// Check for two separators in a row, remove one if you see that...
-		// Check for duplicates as well
 		boolean lastWasSeparator = false;
-		List<String> actionIds = new ArrayList<String>();
 		for (MenuItem menuItem : menu.getItems())
 		{
 			Object data = menuItem.getData();
@@ -1099,19 +1094,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			else
 			{
 				lastWasSeparator = false;
-
-				if (data instanceof ActionContributionItem)
-				{
-					String id = ((ActionContributionItem) data).getId();
-					if (actionIds.contains(id))
-					{
-						menuItem.dispose();
-					}
-					else
-					{
-						actionIds.add(id);
-					}
-				}
 			}
 		}
 	}

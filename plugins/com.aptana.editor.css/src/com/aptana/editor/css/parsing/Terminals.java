@@ -10,8 +10,8 @@ public class Terminals {
 	static public final short PROPERTY = 2;
 	static public final short COLOR = 3;
 	static public final short COLON = 4;
-	static public final short STRING = 5;
-	static public final short RCURLY = 6;
+	static public final short RCURLY = 5;
+	static public final short STRING = 6;
 	static public final short LBRACKET = 7;
 	static public final short CLASS = 8;
 	static public final short HASH = 9;

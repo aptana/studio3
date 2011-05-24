@@ -343,7 +343,7 @@
             commandId="com.aptana.editor.toggleWordWrapCommand"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M3+W">
+            sequence="CTRL+SHIFT+R">
       </key>
    </extension>
    <extension

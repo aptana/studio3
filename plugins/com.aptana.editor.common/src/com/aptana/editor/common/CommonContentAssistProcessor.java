@@ -32,6 +32,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -200,7 +201,23 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			public int compare(ICompletionProposal o1, ICompletionProposal o2)
 			{
-				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+				int compare = o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+				if (compare == 0)
+				{
+					if (o1 instanceof TemplateProposal && !(o2 instanceof TemplateProposal))
+					{
+						return 1;
+					}
+					else if (!(o1 instanceof TemplateProposal) && o2 instanceof TemplateProposal)
+					{
+						return -1;
+					}
+					else
+					{
+						return compare;
+					}
+				}
+				return compare;
 			}
 		});
 	}
