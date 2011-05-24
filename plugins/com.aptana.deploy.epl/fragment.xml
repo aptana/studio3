@@ -20,24 +20,29 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <and>
-                  <not>
-                     <or>
-                        <reference
-                              definitionId="com.appcelerator.titanium.isMobileProject">
-                        </reference>
-                        <reference
-                              definitionId="com.appcelerator.titanium.isDesktopProject">
-                        </reference>
-                     </or>
-                  </not>
+               <with
+                     variable="selection">
                   <iterate
                         ifEmpty="false">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                     </adapt>
+                     <and>
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                        </adapt>
+                        <not>
+                           <or>
+                              <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="com.appcelerator.titanium.desktop.nature">
+                              </test>
+                              <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="com.appcelerator.titanium.mobile.nature">
+                              </test>
+                           </or>
+                        </not>
+                     </and>
                   </iterate>
-               </and>
+               </with>
             </visibleWhen>
          </command>
       </menuContribution>
