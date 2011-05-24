@@ -46,17 +46,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -64,10 +60,6 @@ import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -82,11 +74,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.actions.CloseResourceAction;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.eclipse.ui.internal.OverlayIcon;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.util.ResourceUtil;
@@ -96,11 +85,6 @@ import com.aptana.ui.epl.UIEplPlugin;
 public class ProjectNaturesPage extends PropertyPage implements IWorkbenchPropertyPage, ICheckStateListener,
 		SelectionListener
 {
-	private static final ImageDescriptor APTANA_NATURE_IMAGE = AbstractUIPlugin.imageDescriptorFromPlugin(
-			UIEplPlugin.PLUGIN_ID, "icons/aptana_nature.gif"); //$NON-NLS-1$;
-	private static final ImageDescriptor EMPTY_IMAGE = AbstractUIPlugin.imageDescriptorFromPlugin(
-			UIEplPlugin.PLUGIN_ID, "icons/transparent_16x16.png"); //$NON-NLS-1$;
-
 	private CheckboxTableViewer fTableViewer;
 	private MenuItem fSetPrimaryMenuItem;
 	private Button fMakePrimaryButton;
@@ -114,6 +98,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	private Object[] fInitialCheckedItems;
 	private String fInitialPrimaryNature;
 	private boolean fNaturesModified;
+	private NaturesLabelProvider fLabelProvider;
 
 	public ProjectNaturesPage()
 	{
@@ -145,9 +130,11 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			UIEplPlugin.logError(Messages.ProjectNaturesPage_ERR_RetrieveNatures, e);
 			fCurrentProjectNatures = new String[0];
 		}
+		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
+
 		// assumes the first one in the array is the primary nature
 		fInitialPrimaryNature = fCurrentProjectNatures.length == 0 ? null : fCurrentProjectNatures[0];
-		fPrimaryNature = fInitialPrimaryNature;
+		updatePrimaryNature(fInitialPrimaryNature);
 
 		setDescription(MessageFormat.format(Messages.ProjectNaturesPage_Description, fProject.getName()));
 		Label description = createDescriptionLabel(composite);
@@ -263,7 +250,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			// in case that the item was checked, set it as the primary
 			if (event.getChecked())
 			{
-				fPrimaryNature = event.getElement().toString();
+				updatePrimaryNature(event.getElement().toString());
 				fTableViewer.refresh();
 			}
 		}
@@ -275,11 +262,11 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				// the primary
 				if (checkedElements.length == 0)
 				{
-					fPrimaryNature = null;
+					updatePrimaryNature(null);
 				}
 				else
 				{
-					fPrimaryNature = checkedElements[0].toString();
+					updatePrimaryNature(checkedElements[0].toString());
 				}
 				fTableViewer.refresh();
 			}
@@ -299,7 +286,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				// make the element checked
 				fTableViewer.setChecked(firstElement, true);
 				// make it as primary
-				fPrimaryNature = firstElement.toString();
+				updatePrimaryNature(firstElement.toString());
 				fTableViewer.refresh();
 				updateButtons();
 			}
@@ -476,7 +463,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 
 	private ILabelProvider getLabelProvider()
 	{
-		return new NaturesLabelProvider();
+		return fLabelProvider;
 	}
 
 	private ViewerComparator getViewerComperator()
@@ -523,81 +510,10 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		return !fInitialPrimaryNature.equals(fPrimaryNature);
 	}
 
-	private class NaturesLabelProvider extends LabelProvider implements IFontProvider
+	private void updatePrimaryNature(String nature)
 	{
-
-		@Override
-		public String getText(Object element)
-		{
-			String description = fNatureDescriptions.get(element.toString());
-			if (description == null)
-			{
-				return ""; //$NON-NLS-1$
-			}
-			if (isPrimary(element))
-			{
-				description += Messages.ProjectNaturesPage_LBL_Primary;
-			}
-			return description;
-		}
-
-		@Override
-		public Image getImage(Object element)
-		{
-
-			String nature = element.toString();
-			OverlayIcon oi = null;
-			ImageData id = EMPTY_IMAGE.getImageData();
-
-			try
-			{
-				ImageDescriptor d = IDEWorkbenchPlugin.getDefault().getProjectImageRegistry()
-						.getNatureImage(element.toString());
-				oi = new CenterIcon(EMPTY_IMAGE, d, new Point(id.width, id.height));
-			}
-			catch (Exception e)
-			{
-				oi = new CenterIcon(EMPTY_IMAGE, APTANA_NATURE_IMAGE, new Point(id.width, id.height));
-			}
-
-			if (UIEplPlugin.getDefault().getImageRegistry().get(nature) == null)
-			{
-				if (oi != null)
-				{
-					UIEplPlugin.getDefault().getImageRegistry().put(nature, oi.createImage());
-				}
-			}
-			return UIEplPlugin.getDefault().getImageRegistry().get(nature);
-
-		}
-
-		public Font getFont(Object element)
-		{
-			// make the primary nature bold
-			return isPrimary(element) ? JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT) : null;
-		}
+		fPrimaryNature = nature;
+		fLabelProvider.setPrimaryNature(fPrimaryNature);
 	}
 
-	public class CenterIcon extends OverlayIcon
-	{
-		public CenterIcon(ImageDescriptor base, ImageDescriptor overlay, Point size)
-		{
-			super(base, overlay, size);
-		}
-
-		protected void drawTopRight(ImageDescriptor overlay)
-		{
-			if (overlay == null)
-			{
-				return;
-			}
-			int x = getSize().x / 2;
-			int y = getSize().y / 2;
-			ImageData id = overlay.getImageData();
-			x -= id.width / 2;
-			y -= id.height / 2;
-			drawImage(id, x, y);
-		}
-
-	}
 }

@@ -288,8 +288,8 @@ public class SyncFolder implements ISyncResource
 			{
 				if (!((SyncFolder) resource).isEmpty())
 				{
-					if (resource.getPair() != null && resource.getSyncState() == SyncState.ClientItemOnly
-							|| resource.getSyncState() == SyncState.ServerItemOnly)
+					if (resource.getPair() != null
+							&& (resource.getSyncState() == SyncState.ClientItemOnly || resource.getSyncState() == SyncState.ServerItemOnly))
 					{
 						files.add(resource);
 					}

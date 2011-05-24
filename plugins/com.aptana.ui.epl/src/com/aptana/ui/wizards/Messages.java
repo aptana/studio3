@@ -31,6 +31,9 @@ public final class Messages extends NLS
 	public static String WizardFolderImportPage_SelectFolder;
 	public static String WizardFolderImportPage_ProjectName;
 	public static String WizardFolderImportPage_ErrorInitializingFolderImportWizard;
+	public static String WizardFolderImportPage_make_primary_label;
+	public static String WizardFolderImportPage_set_primary_label;
+	public static String WizardFolderImportPage_project_type_title;
 
 	static
 	{
