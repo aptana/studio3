@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.html.parsing;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +17,8 @@ import com.aptana.editor.html.contentassist.model.EventElement;
 
 public class HTMLUtils
 {
+	private static Map<String, Boolean> JS_ATTRIBUTE_MAP = new HashMap<String, Boolean>();
+
 	/**
 	 * Determine if the specified attribute name indicates an attribute that may contain CSS
 	 * 
@@ -48,13 +52,24 @@ public class HTMLUtils
 		{
 			attributeName = attributeName.toLowerCase();
 
-			for (EventElement event : new HTMLIndexQueryHelper().getEvents(elementName))
+			String key = elementName + ":" + attributeName; //$NON-NLS-1$
+
+			if (JS_ATTRIBUTE_MAP.containsKey(key))
 			{
-				if (event.getName().equals(attributeName))
+				result = JS_ATTRIBUTE_MAP.get(key);
+			}
+			else
+			{
+				for (EventElement event : new HTMLIndexQueryHelper().getEvents(elementName))
 				{
-					result = true;
-					break;
+					if (event.getName().equals(attributeName))
+					{
+						result = true;
+						break;
+					}
 				}
+
+				JS_ATTRIBUTE_MAP.put(key, result);
 			}
 		}
 
@@ -74,9 +89,10 @@ public class HTMLUtils
 		name = name.replaceAll(">\\s*$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		return name.replaceAll("^\\s*<", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/**
 	 * Returns true if the specified tag contents has self-closing tag
+	 * 
 	 * @param tagContents
 	 * @return
 	 */
@@ -84,9 +100,10 @@ public class HTMLUtils
 	{
 		return tagContents.endsWith("/>"); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Returns true if the specified tag contents has JavaScript &lt;script&gt; tag
+	 * 
 	 * @param tagContents
 	 * @return
 	 */
@@ -104,10 +121,11 @@ public class HTMLUtils
 		}
 		return type == null && language == null;
 	}
-	
+
 	private static String getTagAttribute(String tagContents, String attributeName)
 	{
-		Matcher matcher = Pattern.compile(".*\\s+"+attributeName+"=\"([a-zA-Z_/0-9-]+)\".*").matcher(tagContents.toLowerCase()); //$NON-NLS-1$ //$NON-NLS-2$
+		Matcher matcher = Pattern
+				.compile(".*\\s+" + attributeName + "=\"([a-zA-Z_/0-9-]+)\".*").matcher(tagContents.toLowerCase()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (matcher.matches())
 		{
 			return matcher.group(1);

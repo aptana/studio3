@@ -47,7 +47,7 @@ public final class WorkbenchCloseListener implements Listener {
 				event.doit = false;
 				MessageDialogWithToggle dlg = MessageDialogWithToggle.openOkCancelConfirm((Shell) event.widget,
 						Messages.WorkbenchCloseListener_ConfirmDebuggerExit,
-						Messages.WorkbenchCloseListener_AptanaDebuggerIsActive_DoYouWantToExit,
+						Messages.WorkbenchCloseListener_DebuggerIsActive_DoYouWantToExit,
 						Messages.WorkbenchCloseListener_AlwaysExitDebuggerWithoutPrompt, false, null, null);
 				int returnValue = dlg.getReturnCode();
 				if (returnValue != IDialogConstants.OK_ID) {

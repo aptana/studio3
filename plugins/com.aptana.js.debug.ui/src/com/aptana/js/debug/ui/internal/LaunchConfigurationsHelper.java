@@ -256,7 +256,7 @@ public final class LaunchConfigurationsHelper {
 				}
 				MessageDialogWithToggle md = new MessageDialogWithToggle(PlatformUI.getWorkbench()
 						.getActiveWorkbenchWindow().getShell(), Messages.Startup_Notification, null,
-						Messages.Startup_AptanaRequiresFirefox, MessageDialog.INFORMATION, new String[] {
+						Messages.Startup_StudioRequiresFirefox, MessageDialog.INFORMATION, new String[] {
 								IDialogConstants.PROCEED_LABEL, StringUtil.ellipsify(CoreStrings.BROWSE),
 								download ? Messages.Startup_Download : Messages.Startup_CheckAgain }, 0,
 						Messages.Startup_DontAskAgain, false);

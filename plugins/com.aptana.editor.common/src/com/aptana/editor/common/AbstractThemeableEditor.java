@@ -34,10 +34,8 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
-import org.eclipse.jface.text.source.AnnotationRulerColumn;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
 import org.eclipse.jface.text.source.CommonOverviewRuler;
-import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -56,6 +54,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -298,6 +297,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	private FoldingActionsGroup foldingActionsGroup;
 
+	private ControlListener fWordWrapControlListener = new ControlAdapter()
+	{
+
+		public void controlResized(ControlEvent e)
+		{
+			if (fLineNumberRulerColumn != null)
+			{
+				fLineNumberRulerColumn.redraw();
+			}
+			IOverviewRuler overviewRuler = getOverviewRuler();
+			if (overviewRuler != null)
+			{
+				overviewRuler.update();
+			}
+		}
+	};
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -362,38 +378,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		if (isWordWrapEnabled())
 		{
-			StyledText textWidget = getSourceViewer().getTextWidget();
-			textWidget.setWordWrap(true);
-			textWidget.addControlListener(new ControlAdapter()
-			{
-
-				@SuppressWarnings("rawtypes")
-				public void controlResized(ControlEvent e)
-				{
-					IVerticalRuler ruler = getVerticalRuler();
-					if (ruler instanceof CompositeRuler)
-					{
-						Iterator columnIter = ((CompositeRuler) ruler).getDecoratorIterator();
-						while (columnIter.hasNext())
-						{
-							Object column = columnIter.next();
-							if (column instanceof AnnotationRulerColumn)
-							{
-								((AnnotationRulerColumn) column).redraw();
-							}
-						}
-					}
-					if (fLineNumberRulerColumn != null)
-					{
-						fLineNumberRulerColumn.redraw();
-					}
-					IOverviewRuler overviewRuler = getOverviewRuler();
-					if (overviewRuler != null)
-					{
-						overviewRuler.update();
-					}
-				}
-			});
+			setWordWrapEnabled(true);
 		}
 	}
 
@@ -1029,6 +1014,25 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return new RubyRegexpFolder(this, document);
+	}
+
+	public boolean getWordWrapEnabled()
+	{
+		return getSourceViewer().getTextWidget().getWordWrap();
+	}
+
+	public void setWordWrapEnabled(boolean enabled)
+	{
+		StyledText textWidget = getSourceViewer().getTextWidget();
+		textWidget.setWordWrap(enabled);
+		if (enabled)
+		{
+			textWidget.addControlListener(fWordWrapControlListener);
+		}
+		else
+		{
+			textWidget.removeControlListener(fWordWrapControlListener);
+		}
 	}
 
 	@Override

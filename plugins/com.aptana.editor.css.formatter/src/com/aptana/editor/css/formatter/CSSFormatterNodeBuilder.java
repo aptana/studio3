@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.css.formatter;
 
+
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -106,6 +107,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		for (int i = 0; i < medias.length; i++)
 		{
 			CSSTextNode mediaSelectorNode = medias[i];
+
+			// For media nodes that are just syntax, we skip it
+			if (mediaSelectorNode.getText().length() == 1 && mediaSelectorNode.getText().matches("[^a-zA-Z]")) //$NON-NLS-1$
+			{
+				continue;
+			}
+
 			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
 			formatterSelectorNode.setBegin(createTextNode(document,
 					getBeginWithoutWhiteSpaces(mediaSelectorNode.getStartingOffset(), document),
@@ -357,7 +365,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			offset++;
 		}
 
-		if (document.charAt(offset) == ',')
+		// We also account for ':' (mainly for media nodes)
+		if (document.charAt(offset) == ',' || document.charAt(offset) == ':')
 		{
 			return offset;
 		}
