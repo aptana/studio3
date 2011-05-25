@@ -385,31 +385,30 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	private void addPartListener()
 	{
-		IWorkbench workbench = null;
 		try
 		{
-			workbench = PlatformUI.getWorkbench();
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			if (workbench != null)
+			{
+				IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+				IPartService partService;
+				for (IWorkbenchWindow window : windows)
+				{
+					partService = window.getPartService();
+					if (partService != null)
+					{
+						partService.addPartListener(fPartListener);
+					}
+					window.addPerspectiveListener(fPerspectiveListener);
+				}
+
+				// Listen on any future windows
+				PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+			}
 		}
 		catch (Exception e)
 		{
 			// ignore, may be running headless, like in tests
-		}
-		if (workbench != null)
-		{
-			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-			IPartService partService;
-			for (IWorkbenchWindow window : windows)
-			{
-				partService = window.getPartService();
-				if (partService != null)
-				{
-					partService.addPartListener(fPartListener);
-				}
-				window.addPerspectiveListener(fPerspectiveListener);
-			}
-
-			// Listen on any future windows
-			PlatformUI.getWorkbench().addWindowListener(fWindowListener);
 		}
 	}
 
