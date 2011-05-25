@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.css.formatter;
 
-
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -366,7 +365,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		// We also account for ':' (mainly for media nodes)
-		if (document.charAt(offset) == ',' || document.charAt(offset) == ':')
+		if (document.charAt(offset) == ',' || document.charAt(offset) == ':' || document.charAt(offset) == '>')
 		{
 			return offset;
 		}
