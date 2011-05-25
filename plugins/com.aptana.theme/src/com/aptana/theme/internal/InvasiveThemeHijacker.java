@@ -772,8 +772,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected void setHyperlinkValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
-		if (prefs == null)
+		if (prefs == null || theme == null)
+		{
 			return;
+		}
 		if (revertToDefaults)
 		{
 			// Console preferences

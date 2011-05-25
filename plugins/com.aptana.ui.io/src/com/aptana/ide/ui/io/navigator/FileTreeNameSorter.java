@@ -12,6 +12,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
@@ -39,7 +40,10 @@ public class FileTreeNameSorter extends ViewerSorter {
 	    } else if (element instanceof IProject) {
 	    	return 3;
 		} else if (element instanceof IResource) {
-		    return ((IResource) element).getLocation().toFile().isDirectory() ? 3 : 4;
+			IPath path = ((IResource) element).getLocation();
+			if (path != null) {
+				return path.toFile().isDirectory() ? 3 : 4;
+			}
 		} else if (element instanceof IAdaptable) {
 		    IFileInfo fileInfo = FileSystemUtils.getFileInfo(element);
             if (fileInfo != null) {
