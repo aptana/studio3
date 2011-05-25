@@ -59,6 +59,7 @@ import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemeRule;
 import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
 import com.aptana.theme.preferences.IPreferenceConstants;
+import com.aptana.ui.util.UIUtils;
 
 public class ThemeManager implements IThemeManager
 {
@@ -344,26 +345,32 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Force font
-		// FIXME We need to run this in the UI thread(?)
 		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
-		for (String fontId : fontIds)
+		UIUtils.getDisplay().asyncExec(new Runnable()
 		{
-			Font fFont = JFaceResources.getFontRegistry().get(fontId);
-			// Only set new values if they're different from existing!
-			Font existing = JFaceResources.getFont(fontId);
-			String existingString = ""; //$NON-NLS-1$
-			if (!existing.isDisposed())
+
+			public void run()
 			{
-				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+				for (String fontId : fontIds)
+				{
+					Font fFont = JFaceResources.getFontRegistry().get(fontId);
+					// Only set new values if they're different from existing!
+					Font existing = JFaceResources.getFont(fontId);
+					String existingString = ""; //$NON-NLS-1$
+					if (!existing.isDisposed())
+					{
+						existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+					}
+					String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
+					if (!existingString.equals(fdString))
+					{
+						// put in registry...
+						JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
+					}
+				}
 			}
-			String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
-			if (!existingString.equals(fdString))
-			{
-				// put in registry...
-				JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
-			}
-		}
+		});
 	}
 
 	private static String toString(RGB selection)
