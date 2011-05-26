@@ -62,7 +62,9 @@ public class RecentFilesActionController extends AbstractActionController
 				if (editorDescriptor == null || !editorDescriptor.getId().startsWith(PortalUIPlugin.PLUGIN_ID))
 				{
 					if (itemsToShow-- == 0)
+					{
 						break;
+					}
 					files.put(item.getName(), item.getToolTipText());
 				}
 			}
