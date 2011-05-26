@@ -317,6 +317,7 @@ class CommitDialog extends StatusDialog
 		Label messageLabel = new Label(msgComp, SWT.NONE);
 		messageLabel.setText(Messages.CommitDialog_MessageLabel);
 		commitMessage = new Text(msgComp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
+		commitMessage.setText(this.gitRepository.getPrepopulatedCommitMessage());
 		commitMessage.addKeyListener(new KeyListener()
 		{
 

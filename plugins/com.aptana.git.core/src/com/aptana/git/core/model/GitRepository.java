@@ -103,6 +103,10 @@ public class GitRepository
 	 */
 	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	/**
+	 * File hoplding the concatenated commit messages from merge --squash
+	 */
+	private static final String SQUASH_MSG = "SQUASH_MSG"; //$NON-NLS-1$
+	/**
 	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
 	 * repo has changed.
 	 */
@@ -1784,5 +1788,28 @@ public class GitRepository
 			githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
 		}
 		return githubURLs;
+	}
+
+	/**
+	 * If the user has run something like a git merge --squash, it pre-populates the commit message for you with the
+	 * concat of the squashed commits. We should sniff for this and use it when available.
+	 * 
+	 * @return
+	 */
+	public String getPrepopulatedCommitMessage()
+	{
+		try
+		{
+			File squashMsg = gitFile(SQUASH_MSG);
+			if (squashMsg.exists())
+			{
+				return IOUtil.read(new FileInputStream(squashMsg));
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			// ignore
+		}
+		return StringUtil.EMPTY;
 	}
 }
