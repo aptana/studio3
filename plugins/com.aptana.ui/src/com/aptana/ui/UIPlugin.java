@@ -210,24 +210,23 @@ public class UIPlugin extends AbstractUIPlugin
 
 	private void addPerspectiveListener()
 	{
-		IWorkbench workbench = null;
 		try
 		{
-			workbench = PlatformUI.getWorkbench();
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			if (workbench != null)
+			{
+				IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+				for (IWorkbenchWindow window : windows)
+				{
+					window.addPerspectiveListener(perspectiveListener);
+				}
+				// listens on any future windows
+				PlatformUI.getWorkbench().addWindowListener(windowListener);
+			}
 		}
 		catch (Exception e)
 		{
 			// ignore, may be running headless, like in tests
-		}
-		if (workbench != null)
-		{
-			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-			for (IWorkbenchWindow window : windows)
-			{
-				window.addPerspectiveListener(perspectiveListener);
-			}
-			// listens on any future windows
-			PlatformUI.getWorkbench().addWindowListener(windowListener);
 		}
 	}
 
