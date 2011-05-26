@@ -126,6 +126,17 @@
             id="portal.commands"
             name="Command Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.RecentFilesActionController"
+            id="portal.recentFiles"
+            name="Recent Files Actions">
+      </actionController>
+      <browserNotification
+            class="com.aptana.portal.ui.dispatch.browserNotifications.RecentFilesBrowserNotification"
+            id="com.aptana.portal.ui.recentFilesNotification"
+            name="Recent Files Notifier"
+            notificationTarget="*">
+      </browserNotification>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
