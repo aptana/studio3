@@ -14,15 +14,25 @@
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.css">
          </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.jss">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="css, jss"
+            file-extensions="css"
             id="com.aptana.contenttype.css"
             name="%content-type.css.name"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="jss"
+            id="com.aptana.contenttype.jss"
+            name="%content-type.jss.name"
             priority="normal">
       </content-type>
    </extension>
