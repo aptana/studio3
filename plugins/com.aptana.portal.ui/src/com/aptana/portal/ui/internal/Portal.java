@@ -9,6 +9,7 @@ package com.aptana.portal.ui.internal;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 
@@ -111,6 +112,19 @@ public class Portal
 	 */
 	public void openPortal(URL url, final String browserEditorId)
 	{
+		String forcedPortalURL = System.getProperty("portalURL"); //$NON-NLS-1$
+		if (forcedPortalURL != null)
+		{
+			try
+			{
+				URL forcedURL = new URL(forcedPortalURL);
+				url = forcedURL;
+			}
+			catch (MalformedURLException e)
+			{
+				PortalUIPlugin.logError("Malformed URL was passed as forced-portal URL", e); //$NON-NLS-1$
+			}
+		}
 		try
 		{
 			if (url == null)
