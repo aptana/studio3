@@ -25,7 +25,7 @@ import com.aptana.swt.webkitbrowser.WebKitBrowser;
  */
 public final class BrowserWrapper {
 
-	private Object browser;
+	private final Object browser;
 	
 	/**
 	 * 
@@ -143,6 +143,25 @@ public final class BrowserWrapper {
 	 */
 	public String getUrl() {
 		return (String) callMethod("getUrl"); //$NON-NLS-1$
+	}
+
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 * @see org.eclipse.swt.browser.Browser#setUrl(java.lang.String)
+	 */
+	public boolean setUrl (String url) {
+		return (Boolean) callMethod("setUrl", String.class, url); //$NON-NLS-1$
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @see org.eclipse.swt.browser.Browser#setFocus()
+	 */
+	public boolean setFocus () {
+		return (Boolean) callMethod("setFocus"); //$NON-NLS-1$
 	}
 
 }
