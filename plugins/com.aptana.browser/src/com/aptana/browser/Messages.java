@@ -33,6 +33,8 @@ public class Messages extends NLS
 	public static String WebBrowserViewer_TTP_Refresh;
 	public static String WebBrowserViewer_TTP_Stop;
 
+	public static String WebBrowserViewer_WindowShellTitle;
+
 	static
 	{
 		// initialize resource bundle
