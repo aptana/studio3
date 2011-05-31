@@ -10,6 +10,7 @@ package com.aptana.editor.yaml.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.yaml.YAMLPlugin;
@@ -23,6 +24,8 @@ public class YAMLPreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences prefs = new DefaultScope().getNode(YAMLPlugin.PLUGIN_ID);
 		prefs.putBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
+		prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+		prefs.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
 	}
 
 }
