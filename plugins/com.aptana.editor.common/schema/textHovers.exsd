@@ -9,6 +9,8 @@
          [Enter description of this extension point.]
       </documentation>
    </annotation>
+   
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
 
    <element name="extension">
       <annotation>
