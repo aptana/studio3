@@ -81,6 +81,15 @@ public enum JSScopeType implements ITypePredicate
 		this._scope = scope;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.ITypePredicate#getIndex()
+	 */
+	public short getIndex()
+	{
+		return (short) this.ordinal();
+	}
+
 	/**
 	 * getName
 	 * 

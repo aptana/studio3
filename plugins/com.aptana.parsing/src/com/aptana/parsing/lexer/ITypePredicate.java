@@ -9,5 +9,17 @@ package com.aptana.parsing.lexer;
 
 public interface ITypePredicate
 {
+	/**
+	 * Return the short index of a given enumeration value
+	 * 
+	 * @return
+	 */
+	short getIndex();
+
+	/**
+	 * Return true if this is not an UNDEFINED enumaration value
+	 * 
+	 * @return
+	 */
 	boolean isDefined();
 }

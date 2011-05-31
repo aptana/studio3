@@ -156,10 +156,9 @@ public enum JSTokenType implements ITypePredicate
 		return result;
 	}
 
-	/**
-	 * getIndex
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.ITypePredicate#getIndex()
 	 */
 	public short getIndex()
 	{
