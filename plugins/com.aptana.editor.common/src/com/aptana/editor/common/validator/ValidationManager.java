@@ -10,6 +10,7 @@ package com.aptana.editor.common.validator;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -132,7 +133,7 @@ public class ValidationManager implements IValidationManager
 			List<IValidationItem> items = fItemsByType.get(type);
 			if (items == null)
 			{
-				items = new ArrayList<IValidationItem>();
+				items = Collections.synchronizedList(new ArrayList<IValidationItem>());
 				fItemsByType.put(type, items);
 			}
 			items.addAll(newItems);
@@ -166,7 +167,7 @@ public class ValidationManager implements IValidationManager
 			List<IValidationItem> items = itemsByType.get(type);
 			if (items == null)
 			{
-				items = new ArrayList<IValidationItem>();
+				items = Collections.synchronizedList(new ArrayList<IValidationItem>());
 				itemsByType.put(type, items);
 			}
 			items.addAll(newItems);
@@ -341,19 +342,22 @@ public class ValidationManager implements IValidationManager
 				// adds the new ones
 				items = itemsByType.get(markerType);
 				IMarker marker;
-				for (IValidationItem item : items)
+				synchronized (items)
 				{
-					if (isExternal)
+					for (IValidationItem item : items)
 					{
-						marker = MarkerUtils.createMarker(externalResource, null, markerType);
-						// don't persist on external file
-						marker.setAttribute(IMarker.TRANSIENT, true);
+						if (isExternal)
+						{
+							marker = MarkerUtils.createMarker(externalResource, null, markerType);
+							// don't persist on external file
+							marker.setAttribute(IMarker.TRANSIENT, true);
+						}
+						else
+						{
+							marker = workspaceResource.createMarker(markerType);
+						}
+						marker.setAttributes(item.createMarkerAttributes());
 					}
-					else
-					{
-						marker = workspaceResource.createMarker(markerType);
-					}
-					marker.setAttributes(item.createMarkerAttributes());
 				}
 			}
 			catch (CoreException e)
