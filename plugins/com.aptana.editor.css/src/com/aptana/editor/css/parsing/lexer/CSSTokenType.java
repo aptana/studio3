@@ -111,6 +111,15 @@ public enum CSSTokenType implements ITypePredicate
 		this.beaverId = (short) beaverId;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.ITypePredicate#getIndex()
+	 */
+	public short getIndex()
+	{
+		return this.beaverId;
+	}
+
 	/**
 	 * getScope
 	 * 

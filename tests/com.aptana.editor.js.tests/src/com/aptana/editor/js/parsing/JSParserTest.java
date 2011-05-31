@@ -622,6 +622,11 @@ public class JSParserTest extends TestCase
 		parseTest("var x = 5-+3" + EOL, "var x = 5 - +3" + EOL);
 	}
 
+	public void testMissingClosingParenthesis() throws Exception
+	{
+		parseTest("testing(" + EOL, "testing();" + EOL);
+	}
+
 	// utility methods
 
 	protected void parseTest(String source) throws Exception

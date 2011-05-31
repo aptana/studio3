@@ -2091,6 +2091,16 @@ public class BundleManager
 	}
 
 	/**
+	 * Turn on or off bundle caching
+	 * 
+	 * @param value
+	 */
+	public void setUseCache(boolean value)
+	{
+		System.setProperty(USE_BUNDLE_CACHE, Boolean.toString(value));
+	}
+
+	/**
 	 * Show bundle load info
 	 * 
 	 * @param message
@@ -2215,5 +2225,15 @@ public class BundleManager
 
 			ScriptLogger.logError(message);
 		}
+	}
+
+	/**
+	 * Determine if bundle caching is turned on or off
+	 * 
+	 * @return
+	 */
+	public boolean useCache()
+	{
+		return Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
 	}
 }
