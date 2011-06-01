@@ -14,6 +14,7 @@ import com.aptana.editor.html.formatter.HTMLFormatterNodeBuilder;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -53,6 +54,13 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingBeginNewLine()
 	{
+		if (getDocument().getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS))
+		{
+			if (isEmptyContent())
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -62,6 +70,13 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingEndNewLine()
 	{
+		if (getDocument().getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS))
+		{
+			if (isEmptyContent())
+			{
+				return false;
+			}
+		}
 		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
 		if (children == null || children.length == 0)
 		{
@@ -89,5 +104,22 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 			return -1;
 		}
 		return linesAfter;
+	}
+
+	/**
+	 * @return true if the content of this node is empty.
+	 */
+	private boolean isEmptyContent()
+	{
+		if (getBody().size() == 1 && getBody().get(0) instanceof IFormatterTextNode)
+		{
+			IFormatterTextNode contentNode = (IFormatterTextNode) getBody().get(0);
+			String text = contentNode.getText();
+			if (text.trim().length() == 0)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

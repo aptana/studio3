@@ -37,7 +37,8 @@ public interface HTMLFormatterConstants
 
 	// New lines
 	public static final String NEW_LINES_EXCLUDED_TAGS = FORMATTER_ID + ".newline.excluded"; //$NON-NLS-1$
-
+	public static final String NEW_LINES_EXCLUSION_IN_EMPTY_TAGS = FORMATTER_ID + ".newline.exclusion.in.empty.tag"; //$NON-NLS-1$
+	
 	// Empty lines
 	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$
 	public static final String LINES_BEFORE_NON_HTML_ELEMENTS = FORMATTER_ID + ".line.before.non.html"; //$NON-NLS-1$
