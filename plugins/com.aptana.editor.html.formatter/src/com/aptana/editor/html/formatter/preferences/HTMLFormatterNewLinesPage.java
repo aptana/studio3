@@ -51,7 +51,12 @@ public class HTMLFormatterNewLinesPage extends FormatterModifyTabPage
 	@Override
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group group = SWTFactory.createGroup(parent, Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1,
+		Group group = SWTFactory.createGroup(parent, Messages.HTMLFormatterTabPage_newLinesGroupLabel, 1, 1,
+				GridData.FILL_HORIZONTAL);
+		manager.createCheckbox(group, HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS,
+				Messages.HTMLFormatterTabPage_newLinesInEmptyTags);
+
+		group = SWTFactory.createGroup(parent, Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1,
 				GridData.FILL_BOTH);
 		Label exclutionLabel = new Label(group, SWT.WRAP);
 		exclutionLabel.setText(Messages.HTMLFormatterNewLinesPage_exclusionsMessage);

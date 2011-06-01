@@ -91,12 +91,12 @@ public final class ExecutableUtil
 			FileFilter filter, IPath workingDirectory)
 	{
 		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
-		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		String[] paths;
+		if (env != null && env.containsKey(PATH))
 		{
-			String[] paths;
-			if (env != null && env.containsKey(PATH))
+			paths = env.get(PATH).split(ShellExecutable.PATH_SEPARATOR);
+			if (Platform.OS_WIN32.equals(Platform.getOS()))
 			{
-				paths = env.get(PATH).split(ShellExecutable.PATH_SEPARATOR);
 				for (int i = 0; i < paths.length; ++i)
 				{
 					if (paths[i].matches("^/(.)/.*")) { //$NON-NLS-1$
@@ -104,34 +104,21 @@ public final class ExecutableUtil
 					}
 				}
 			}
-			else
-			{
-				String pathENV = System.getenv(PATH);
-				paths = pathENV.split(File.pathSeparator);
-			}
-			// Grab PATH and search it!
-			for (String pathString : paths)
-			{
-				IPath path = Path.fromOSString(pathString).append(executableName);
-				IPath result = findExecutable(path, appendExtension);
-				if (result != null && (filter == null || filter.accept(result.toFile())))
-				{
-					return result;
-				}
-			}
 		}
 		else
 		{
-			// No explicit path. Try it with "which"
-			String whichResult = ProcessUtil.outputForCommand(WHICH_PATH, workingDirectory, env, executableName);
-			if (whichResult != null && whichResult.trim().length() > 0)
+			String pathENV = System.getenv(PATH);
+			paths = pathENV.split(File.pathSeparator);
+		}
+
+		// Grab PATH and search it!
+		for (String pathString : paths)
+		{
+			IPath path = Path.fromOSString(pathString).append(executableName);
+			IPath result = findExecutable(path, appendExtension);
+			if (result != null && (filter == null || filter.accept(result.toFile())))
 			{
-				IPath whichPath = Path.fromOSString(whichResult.trim());
-				if (isExecutable(whichPath) && (filter == null || filter.accept(whichPath.toFile())))
-				{
-					CorePlugin.logInfo(MessageFormat.format("Found executable via 'which': {0}", whichPath)); //$NON-NLS-1$
-					return whichPath;
-				}
+				return result;
 			}
 		}
 
@@ -196,10 +183,16 @@ public final class ExecutableUtil
 			{
 				return (Boolean) m.invoke(file);
 			}
-		} catch (NoSuchMethodException e) {
+		}
+		catch (NoSuchMethodException e)
+		{
 			// ignore, only available on Java 6+
-		} catch (IllegalAccessException e) {
-		} catch (InvocationTargetException e) {
+		}
+		catch (IllegalAccessException e)
+		{
+		}
+		catch (InvocationTargetException e)
+		{
 		}
 
 		// File.canExecute() doesn't exist; do our best to determine if file is executable...

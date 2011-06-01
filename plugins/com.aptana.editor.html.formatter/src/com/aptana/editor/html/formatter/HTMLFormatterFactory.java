@@ -43,8 +43,8 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 			HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, HTMLFormatterConstants.FORMATTER_TAB_CHAR,
 			HTMLFormatterConstants.FORMATTER_TAB_SIZE, HTMLFormatterConstants.WRAP_COMMENTS,
 			HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-			HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
-			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
+			HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS,
+			HTMLFormatterConstants.LINES_AFTER_ELEMENTS, HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
 			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES };
 
 	public PreferenceKey[] getPreferenceKeys()

@@ -390,7 +390,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			activation = fContentAssistSubjectControlAdapter.getCompletionProposalAutoActivationCharacters(
 					ContentAssistant.this, pos);
 
-			if ((contains(activation, e.character) || validAssistLocation) && !fProposalPopup.isActive())
+			if ((contains(activation, e.character) || validAssistLocation) && !isProposalPopupActive())
 			{
 				showStyle = SHOW_PROPOSALS;
 				fProposalPopup.setActivationKey(e.character);
@@ -399,8 +399,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			{
 				activation = fContentAssistSubjectControlAdapter.getContextInformationAutoActivationCharacters(
 						ContentAssistant.this, pos);
-				if ((contains(activation, e.character) || validAssistLocation) && fContextInfoPopup != null
-						&& !fContextInfoPopup.isActive())
+				if ((contains(activation, e.character) || validAssistLocation) && !isContextInfoPopupActive())
 				{
 					showStyle = SHOW_CONTEXT_INFO;
 				}
@@ -1096,6 +1095,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	public static final int WIDGET_PRIORITY = 20;
 
 	private static final int DEFAULT_AUTO_ACTIVATION_DELAY = 0;
+	private static final int DEFAULT_INFO_POPUP_DELAY = 200;
 
 	private IInformationControlCreator fInformationControlCreator;
 	private int fAutoActivationDelay = DEFAULT_AUTO_ACTIVATION_DELAY;
@@ -1289,12 +1289,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		if (processor instanceof ICommonContentAssistProcessor)
 		{
 			ICommonContentAssistProcessor cp = (ICommonContentAssistProcessor) processor;
-			return cp.isValidIdentifier(c, keyCode) && isLeftCharacterWhitespace(cp, styledText, c, keyCode);
-
-			// alternate method--commented out for now, but left in to show how it was called.
-			// return ((ICommonContentAssistProcessor) processor).isValidAutoActivationLocation(c, keyCode,
-			// fContentAssistSubjectControlAdapter.getDocument(),
-			// offset);
+			// are we typing a valid identifier, and the previous "location" (character or lexeme) should pop up CA
+			return cp.isValidIdentifier(c, keyCode) && isAutoActivationLocation(cp, styledText, c, keyCode);
 		}
 		else
 		{
@@ -1309,9 +1305,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * @param keyCode
 	 * @return
 	 */
-	private boolean isLeftCharacterWhitespace(ICommonContentAssistProcessor cp, StyledText styledText, char c,
+	private boolean isAutoActivationLocation(ICommonContentAssistProcessor cp, StyledText styledText, char c,
 			int keyCode)
 	{
+
 		int offset = styledText.getCaretOffset();
 
 		// Are we at beginning of file?
@@ -1324,7 +1321,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 
 		if (line.length() > 0)
 		{
-			return cp.isValidActivationCharacter(line.charAt(0), keyCode);
+			return cp.isValidActivationCharacter(line.charAt(0), keyCode)
+					|| cp.isValidAutoActivationLocation(c, keyCode,
+					fContentAssistSubjectControlAdapter.getDocument(),
+					offset);
 		}
 		else
 		{
@@ -1656,7 +1656,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		AdditionalInfoController controller = null;
 		if (fInformationControlCreator != null)
 		{
-			int delay = fAutoActivationDelay;
+			int delay = DEFAULT_INFO_POPUP_DELAY; // default delay for information popups to the sidepopup
 			controller = new AdditionalInfoController(fInformationControlCreator, delay);
 		}
 
@@ -2577,11 +2577,43 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		return fProposalPopup.hasFocus();
 	}
 
+	/**
+	 * Returns whether proposal popup is active.
+	 * 
+	 * @return <code>true</code> if the proposal popup is active, <code>false</code> otherwise
+	 * @since 3.4
+	 */
+	protected boolean isProposalPopupActive()
+	{
+		return fProposalPopup != null && fProposalPopup.isActive();
+	}
+
+	/**
+	 * Returns whether the context information popup is active.
+	 * 
+	 * @return <code>true</code> if the context information popup is active, <code>false</code> otherwise
+	 * @since 3.4
+	 */
+	protected boolean isContextInfoPopupActive()
+	{
+		return fContextInfoPopup != null && fContextInfoPopup.isActive();
+	}
+
+	/**
+	 * Set the color of the proposal selector
+	 * 
+	 * @param color
+	 */
 	public void setProposalSelectorSelectionColor(Color color)
 	{
 		fProposalSelectorSelectionColor = color;
 	}
 
+	/**
+	 * Get the color of the proposal selector
+	 * 
+	 * @return
+	 */
 	Color getProposalSelectorSelectionColor()
 	{
 		return fProposalSelectorSelectionColor;

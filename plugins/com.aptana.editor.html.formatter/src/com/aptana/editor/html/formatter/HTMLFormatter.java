@@ -272,6 +272,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 				getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 				getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS,
+				getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS));
 		for (int i = 0; i < BLANK_LINES.length; i++)
 		{
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));

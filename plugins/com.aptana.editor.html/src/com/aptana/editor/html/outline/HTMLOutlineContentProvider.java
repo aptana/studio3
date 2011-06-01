@@ -40,6 +40,7 @@ import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.parsing.lexer.Range;
 
 public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
@@ -71,7 +72,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				String attribute = getExternalCSSReference(item);
 				if (attribute != null && attribute.length() > 0)
 				{
-					return getExternalChildren(parentElement, attribute, ICSSConstants.CONTENT_TYPE_CSS);
+					return getExternalChildren(item, attribute, ICSSConstants.CONTENT_TYPE_CSS);
 				}
 			}
 			else
@@ -99,7 +100,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			String attribute = getExternalJSReference(item);
 			if (attribute != null && attribute.length() > 0)
 			{
-				return getExternalChildren(parentElement, attribute, IJSConstants.CONTENT_TYPE_JS);
+				return getExternalChildren(item, attribute, IJSConstants.CONTENT_TYPE_JS);
 			}
 			return getChildren(item.getChild(0));
 		}
@@ -196,7 +197,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return super.hasChildren(element);
 	}
 
-	private Object[] getExternalChildren(final Object parent, final String srcPathOrURL, final String language)
+	private Object[] getExternalChildren(final IParseNode parent, final String srcPathOrURL, final String language)
 	{
 		Object[] cached;
 		synchronized (cache)
@@ -235,6 +236,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					IParseNode node = ParserPoolFactory.parse(language, source);
 					sub.worked(90);
 					elements = getChildren(node);
+					// adjusts the offsets to match the parent node since the children belong to an external file
+					for (Object element : elements)
+					{
+						if (element instanceof CommonOutlineItem)
+						{
+							((CommonOutlineItem) element).setRange(new Range(parent.getStartingOffset(), parent
+									.getEndingOffset()));
+						}
+					}
 
 					// caching result
 					synchronized (cache)
