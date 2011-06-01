@@ -333,6 +333,13 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		LocationType location = this.getInsideLocationType(lexemeProvider, offset);
 
+		// NOTE: The following is a hack to cover CSS in empty attributes in HTML. That's the only time we can both be
+		// inside of a rule while having an empty lexeme list
+		if (location == LocationType.ERROR && lexemeProvider.size() == 0)
+		{
+			location = LocationType.INSIDE_PROPERTY;
+		}
+
 		switch (location)
 		{
 			case INSIDE_PROPERTY:
