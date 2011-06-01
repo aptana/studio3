@@ -31,6 +31,8 @@ public class Messages extends NLS
 	public static String HTMLFormatterModifyDialog_commentsTabName;
 	public static String HTMLFormatterModifyDialog_htmlFormatterTitle;
 	public static String HTMLFormatterModifyDialog_intentationTabName;
+	public static String HTMLFormatterTabPage_newLinesGroupLabel;
+	public static String HTMLFormatterTabPage_newLinesInEmptyTags;
 	public static String HTMLFormatterModifyDialog_newLinesTabName;
 	public static String HTMLFormatterNewLinesPage_exclusionsMessage;
 	static
