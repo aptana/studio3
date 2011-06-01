@@ -9,6 +9,7 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -854,64 +855,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
+		JSTokenType[] types = new JSTokenType[] { JSTokenType.LPAREN, JSTokenType.COMMA };
+		Arrays.sort(types);
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		int index = lexemeProvider.getLexemeFloorIndex(offset);
-		boolean result = false;
-
-		// NOTE: This is not foolproof. Basically, we assume object literals in function invocations will not
-		// have function values. This should be a valid assumption since we only show non-function properties
-		// in object-literal CA. If assumption is true, then we can look for the opening curly or stop when he
-		// hit certain keywords or punctuation. A robust implementation would use the AST.
-		if (index != -1)
+		if (offset > 0)
 		{
-			Lexeme<JSTokenType> currentLexeme = lexemeProvider.getLexeme(index);
-			boolean isIdentifier = (currentLexeme.getType() == JSTokenType.IDENTIFIER);
-			boolean inObjectLiteral = false;
-			index--;
-
-			LOOP: while (index >= 0)
-			{
-				currentLexeme = lexemeProvider.getLexeme(index);
-
-				switch (currentLexeme.getType())
-				{
-					case LCURLY:
-						inObjectLiteral = true;
-						break LOOP;
-
-					// abort on some keywords
-					case BREAK:
-					case CASE:
-					case CONTINUE:
-					case DEFAULT:
-					case DO:
-					case ELSE:
-					case FINALLY:
-					case FUNCTION:
-					case FOR:
-					case IF:
-					case IN:
-					case RETURN:
-					case SWITCH:
-					case THROW:
-					case TRY:
-					case WHILE:
-						// and abort on some punctuation
-					case COLON:
-					case RCURLY:
-					case RPAREN:
-					case SEMICOLON:
-					case VAR:
-						break LOOP;
-				}
-
-				index--;
-			}
-
-			result = (inObjectLiteral == false && isIdentifier);
+			Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
+			return lexeme != null ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
 		}
-
-		return result;
+		return false;
 	}
 
 	/*
@@ -929,6 +881,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
-		return Character.isWhitespace(c) || c == '(' || c == ',';
+		return Character.isWhitespace(c);
 	}
 }

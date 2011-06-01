@@ -8,6 +8,7 @@
 package com.aptana.editor.css.contentassist;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -1136,9 +1137,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
+		CSSTokenType[] types = new CSSTokenType[] { CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
+				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID };
+		Arrays.sort(types);
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		return (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON));
+		if (offset > 0)
+		{
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
+			return lexeme != null ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
+		}
+		return false;
 	}
 
 	/*
@@ -1157,7 +1165,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
-		return Character.isWhitespace(c) || c == ':' || c == ';';
+		return Character.isWhitespace(c);
 	}
-
 }
