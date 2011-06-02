@@ -15,25 +15,29 @@ import com.aptana.portal.ui.internal.Portal;
  * @author Shalom Gibly <sgibly@aptana.com>
  * @author Max Stepanov
  */
-public class PortalBrowserEditor extends AbstractPortalBrowserEditor {
-	
+public class PortalBrowserEditor extends AbstractPortalBrowserEditor
+{
+
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.portal"; //$NON-NLS-1$
 
 	private static final String TITLE_TIP = "Aptana Portal"; //$NON-NLS-1$
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#getTitleToolTip()
 	 */
 	@Override
-	public String getTitleToolTip() {
+	public String getTitleToolTip()
+	{
 		return TITLE_TIP;
 	}
 
 	/**
-	 * Returns the base URL prefix that will be used to verify the location of
-	 * the page and register the dispatcher in case the page is under this path.
+	 * Returns the base URL prefix that will be used to verify the location of the page and register the dispatcher in
+	 * case the page is under this path.
 	 */
-	protected String getBaseURLPrefix() {
+	protected String getBaseURLPrefix()
+	{
 		return Portal.BASE_URL_PREFIX;
 	}
 
