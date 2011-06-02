@@ -26,54 +26,48 @@ import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
-public class HTMLTagScanner extends RuleBasedScanner
-{
+public class HTMLTagScanner extends RuleBasedScanner {
 	/**
 	 * A key word detector.
 	 */
-	static class WordDetector implements IWordDetector
-	{
+	static class WordDetector implements IWordDetector {
 		/*
 		 * (non-Javadoc) Method declared on IWordDetector
 		 */
-		public boolean isWordPart(char c)
-		{
+		public boolean isWordPart(char c) {
 			return Character.isLetterOrDigit(c);
 		}
 
 		/*
 		 * (non-Javadoc) Method declared on IWordDetector
 		 */
-		public boolean isWordStart(char c)
-		{
+		public boolean isWordStart(char c) {
 			return Character.isLetter(c);
 		}
 	}
 
-	// as per the html5 spec, these are elements that define "sections", but we've added
+	// as per the html5 spec, these are elements that define "sections", but
+	// we've added
 	// the <html> tag itself to the list.
 	// see http://dev.w3.org/html5/spec/Overview.html#sections
 	@SuppressWarnings("nls")
-	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address", "nav", "section",
-			"article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4", "h5", "h6" };
+	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address", "nav", "section", "article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4",
+			"h5", "h6" };
 
 	@SuppressWarnings("nls")
-	private static String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form", "frame",
-			"frameset", "iframe", "noframes", "object", "ol", "p", "ul", "applet", "center", "dir", "hr", "menu", "pre" };
+	private static String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form", "frame", "frameset", "iframe", "noframes", "object", "ol", "p", "ul",
+			"applet", "center", "dir", "hr", "menu", "pre" };
 
 	@SuppressWarnings("nls")
-	private static String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big",
-			"br", "button", "caption", "cite", "code", "col", "colgroup", "del", "dfn", "em", "font", "i", "img",
-			"input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup",
-			"option", "param", "q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style",
-			"sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "u", "var",
-			"canvas", "audio", "video" };
+	private static String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big", "br", "button", "caption", "cite", "code", "col", "colgroup",
+			"del", "dfn", "em", "font", "i", "img", "input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup", "option", "param",
+			"q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title",
+			"tr", "tt", "u", "var", "canvas", "audio", "video" };
 
 	/**
 	 * HTMLTagScanner
 	 */
-	public HTMLTagScanner()
-	{
+	public HTMLTagScanner() {
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add rule for double quotes
@@ -86,24 +80,19 @@ public class HTMLTagScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// Attributes
-		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
-		{
+		WordRule wordRule = new ExtendedWordRule(new IWordDetector() {
 
-			public boolean isWordPart(char c)
-			{
+			public boolean isWordPart(char c) {
 				return Character.isLetter(c) || c == '-' || c == ':';
 			}
 
-			public boolean isWordStart(char c)
-			{
+			public boolean isWordStart(char c) {
 				return Character.isLetter(c);
 			}
 
-		}, createToken(HTMLTokenType.ATTRIBUTE), true)
-		{
+		}, createToken(HTMLTokenType.ATTRIBUTE), true) {
 			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
+			protected boolean wordOK(String word, ICharacterScanner scanner) {
 				int c = scanner.read();
 				scanner.unread();
 				return ((char) c) == '=';
@@ -118,18 +107,15 @@ public class HTMLTagScanner extends RuleBasedScanner
 		wordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
 		wordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
 		IToken structureDotAnyToken = createToken(HTMLTokenType.STRUCTURE_TAG);
-		for (String tag : STRUCTURE_DOT_ANY)
-		{
+		for (String tag : STRUCTURE_DOT_ANY) {
 			wordRule.addWord(tag, structureDotAnyToken);
 		}
 		IToken blockDotAnyToken = createToken(HTMLTokenType.BLOCK_TAG);
-		for (String tag : BLOCK_DOT_ANY)
-		{
+		for (String tag : BLOCK_DOT_ANY) {
 			wordRule.addWord(tag, blockDotAnyToken);
 		}
 		IToken inlineAnyToken = createToken(HTMLTokenType.INLINE_TAG);
-		for (String tag : TAG_INLINE_ANY)
-		{
+		for (String tag : TAG_INLINE_ANY) {
 			wordRule.addWord(tag, inlineAnyToken);
 		}
 		rules.add(wordRule);
@@ -151,8 +137,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 	 * @param type
 	 * @return
 	 */
-	protected IToken createToken(HTMLTokenType type)
-	{
+	protected IToken createToken(HTMLTokenType type) {
 		return this.createToken(type.getScope());
 	}
 
@@ -162,8 +147,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 	 * @param string
 	 * @return
 	 */
-	protected IToken createToken(String string)
-	{
+	protected IToken createToken(String string) {
 		return new Token(string);
 	}
 }
