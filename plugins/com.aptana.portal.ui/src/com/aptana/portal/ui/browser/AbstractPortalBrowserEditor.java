@@ -14,7 +14,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
@@ -45,8 +44,9 @@ import com.aptana.portal.ui.internal.BrowserWrapper;
  * @author Max Stepanov
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractPortalBrowserEditor extends EditorPart {
-	
+public abstract class AbstractPortalBrowserEditor extends EditorPart
+{
+
 	private BrowserViewerWrapper browserViewer;
 	private BrowserWrapper browser;
 	private List<BrowserFunctionWrapper> browserFunctions;
@@ -59,10 +59,14 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 	 * 
 	 * @param url
 	 */
-	public void setURL(URL url) {
-		if (url != null) {
+	public void setURL(URL url)
+	{
+		if (url != null)
+		{
 			browser.setUrl(url.toString());
-		} else {
+		}
+		else
+		{
 			PortalUIPlugin.logWarning("Ignoring a null URL that was passed to the Aptana Portal"); //$NON-NLS-1$
 		}
 	}
@@ -72,15 +76,16 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 	 * 
 	 * @param listener
 	 */
-	public void addDisposeListener(DisposeListener listener) {
+	public void addDisposeListener(DisposeListener listener)
+	{
 		browser.addDisposeListener(listener);
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
-		browserViewer = Platform.OS_LINUX.equals(Platform.getOS()) ?
-				BrowserViewerWrapper.createWebkitBrowserViewer(parent, 0) :
-				BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
+	public void createPartControl(Composite parent)
+	{
+		browserViewer = Platform.OS_LINUX.equals(Platform.getOS()) ? BrowserViewerWrapper.createWebkitBrowserViewer(
+				parent, 0) : BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
 		browser = new BrowserWrapper(browserViewer.getBrowser());
 		browser.setJavascriptEnabled(true);
 
@@ -96,10 +101,14 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 		// removed when we have a location change.
 		// The title-listener will place them back in when the TitleEvent is
 		// fired.
-		browser.addProgressListener(new ProgressAdapter() {
-			public void completed(ProgressEvent event) {
-				browser.addLocationListener(new LocationAdapter() {
-					public void changed(LocationEvent event) {
+		browser.addProgressListener(new ProgressAdapter()
+		{
+			public void completed(ProgressEvent event)
+			{
+				browser.addLocationListener(new LocationAdapter()
+				{
+					public void changed(LocationEvent event)
+					{
 						// browser.removeLocationListener(this);
 						refreshBrowserRegistration();
 
@@ -114,37 +123,45 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 		BrowserNotifier.getInstance().registerBrowser(getSite().getId(), browser);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void doSave(IProgressMonitor monitor) {
+	public void doSave(IProgressMonitor monitor)
+	{
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
 	@Override
-	public void doSaveAs() {
+	public void doSaveAs()
+	{
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException
+	{
 		setSite(site);
 		setInput(input);
-		if (input instanceof WebBrowserEditorInput) {
+		if (input instanceof WebBrowserEditorInput)
+		{
 			WebBrowserEditorInput wbei = (WebBrowserEditorInput) input;
 			initialURL = null;
 			if (wbei.getURL() != null)
 				initialURL = wbei.getURL().toExternalForm();
-			if (browser != null) {
+			if (browser != null)
+			{
 				browser.setUrl(initialURL);
 				site.getWorkbenchWindow().getActivePage().activate(this);
 			}
-	
+
 			setPartName(wbei.getName());
 			setTitleToolTip(wbei.getToolTipText());
 			Image oldImage = image;
@@ -157,40 +174,50 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
 	@Override
-	public boolean isDirty() {
+	public boolean isDirty()
+	{
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
 	@Override
-	public boolean isSaveAsAllowed() {
+	public boolean isSaveAsAllowed()
+	{
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void setFocus() {
+	public void setFocus()
+	{
 		browser.setFocus();
 	}
 
-	public boolean isDisposed() {
+	public boolean isDisposed()
+	{
 		return disposed;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
 	@Override
-	public void dispose() {
-		if (image != null && !image.isDisposed()) {
+	public void dispose()
+	{
+		if (image != null && !image.isDisposed())
+		{
 			image.dispose();
 			image = null;
 		}
@@ -199,22 +226,21 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 	}
 
 	/**
-	 * Returns the base URL prefix that will be used to verify the location of
-	 * the page and register the dispatcher in case the page is under this path.
+	 * Returns the base URL prefix that will be used to verify the location of the page and register the dispatcher in
+	 * case the page is under this path.
 	 */
 	protected abstract String getBaseURLPrefix();
 
 	/**
 	 * Register the browser functions into the given browser.
-	 * 
 	 */
-	private synchronized void registerBrowserFunctions() {
+	private synchronized void registerBrowserFunctions()
+	{
 		browserFunctions = new ArrayList<BrowserFunctionWrapper>();
 		// For now, we register a single browser function that dispatch all the
 		// JavaScript requests through the browser-action-controller extensions.
 		BrowserFunctionWrapper dispatcherFunction = browser.createBrowserFunction(
-						IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME,
-						new DispatcherBrowserFunction());
+				IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME, new DispatcherBrowserFunction());
 		browserFunctions.add(dispatcherFunction);
 
 		boolean executionResult = browser
@@ -222,20 +248,18 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 						+ "console.log   = function(msg) {dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); return false;};" //$NON-NLS-1$
 						+ "console.debug = function(msg) {dispatch($H({controller:\"console\", action:\"log\", args:msg.toJSON()}).toJSON()); return false;};"); //$NON-NLS-1$
 		/*
-		 * This custom error handler is needed when the Portal is viewed in the
-		 * Studio internal browser. We also make a call to
-		 * window.onerror=customErrorHandler to hook the window.onerror event to
-		 * this handler. We return false, so the error will also propagate to
-		 * other error handlers, in case registered.
+		 * This custom error handler is needed when the Portal is viewed in the Studio internal browser. We also make a
+		 * call to window.onerror=customErrorHandler to hook the window.onerror event to this handler. We return false,
+		 * so the error will also propagate to other error handlers, in case registered.
 		 */
 		executionResult = browser.execute("function customErrorHandler(desc,page,line) { " + //$NON-NLS-1$
-						"dispatch($H({controller:\"console\", action:\"error\", args:[desc,page,line].toJSON()}).toJSON());"
-						+ //$NON-NLS-1$
-						"return false;};"); //$NON-NLS-1$
+				"dispatch($H({controller:\"console\", action:\"error\", args:[desc,page,line].toJSON()}).toJSON());" //$NON-NLS-1$
+				+ "return false;};"); //$NON-NLS-1$
 		// Make sure that all the Javascript errors are being surfaced out of
 		// the internal browser.
 		executionResult = browser.execute("window.onerror=customErrorHandler;"); //$NON-NLS-1$
-		if (!executionResult) {
+		if (!executionResult)
+		{
 			PortalUIPlugin.logError("Error registering the Portal browser functions", new IllegalStateException()); //$NON-NLS-1$
 		}
 	}
@@ -243,13 +267,12 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 	/**
 	 * Refresh the browser functions by removing them from the given browser and re-installing them if the browser URL
 	 * is legal.
-	 * 
 	 */
-	private synchronized void refreshBrowserRegistration() {
+	private synchronized void refreshBrowserRegistration()
+	{
 		unregisterBrowserFunctions();
 		String url = browser.getUrl();
-		if (url != null
-				&& (url.startsWith(getBaseURLPrefix()) || url.startsWith("file:"))) { //$NON-NLS-1$
+		if (url != null && (url.startsWith(getBaseURLPrefix()) || url.startsWith("file:"))) { //$NON-NLS-1$
 			registerBrowserFunctions();
 		}
 	}
@@ -257,18 +280,23 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart {
 	/**
 	 * Un-register the browser functions.
 	 */
-	private synchronized void unregisterBrowserFunctions() {
-		if (browserFunctions != null) {
-			for (BrowserFunctionWrapper bf : browserFunctions) {
+	private synchronized void unregisterBrowserFunctions()
+	{
+		if (browserFunctions != null)
+		{
+			for (BrowserFunctionWrapper bf : browserFunctions)
+			{
 				bf.dispose();
 			}
 			browserFunctions = null;
 		}
 	}
 
-	private class PortalTitleListener implements TitleListener {
+	private class PortalTitleListener implements TitleListener
+	{
 
-		public void changed(TitleEvent event) {
+		public void changed(TitleEvent event)
+		{
 			// Dispose all BrowserFunctions when the location of the browser is
 			// no longer under
 			// Aptana.com or the local machine.

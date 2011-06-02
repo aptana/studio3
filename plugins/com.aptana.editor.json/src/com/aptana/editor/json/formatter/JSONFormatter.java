@@ -134,10 +134,10 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
-		IParseRootNode parseResult = ParserPoolFactory.parse(this.getMainContentType(), input);
 
 		try
 		{
+			IParseRootNode parseResult = ParserPoolFactory.parse(this.getMainContentType(), input);
 			if (parseResult != null)
 			{
 				String output = format(input, parseResult, indentationLevel, offset, isSelection);

@@ -402,31 +402,44 @@ public class HTMLParser implements IParser
 				if (HTMLUtils.isCSSAttribute(name))
 				{
 					String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-					IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
-					// should always have a rule node
-					if (node.hasChildren())
+					try
 					{
-						IParseNode rule = node.getChild(0);
-						if (rule instanceof CSSRuleNode)
+						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
+						// should always have a rule node
+						if (node.hasChildren())
 						{
-							CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
-							for (CSSDeclarationNode declaration : declarations)
+							IParseNode rule = node.getChild(0);
+							if (rule instanceof CSSRuleNode)
 							{
-								addOffset(declaration, tagSymbol.getStart() + start - (element.getName().length() + 1));
-								element.addCSSStyleNode(declaration);
+								CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
+								for (CSSDeclarationNode declaration : declarations)
+								{
+									addOffset(declaration, tagSymbol.getStart() + start
+											- (element.getName().length() + 1));
+									element.addCSSStyleNode(declaration);
+								}
 							}
 						}
+					}
+					catch (java.lang.Exception e)
+					{
 					}
 				}
 				// checks if we need to process the value as JS
 				else if (HTMLUtils.isJSAttribute(element.getName(), name))
 				{
-					IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
-					IParseNode[] children = node.getChildren();
-					for (IParseNode child : children)
+					try
 					{
-						addOffset(child, tagSymbol.getStart() + start + 1);
-						element.addJSAttributeNode(child);
+						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
+						IParseNode[] children = node.getChildren();
+						for (IParseNode child : children)
+						{
+							addOffset(child, tagSymbol.getStart() + start + 1);
+							element.addJSAttributeNode(child);
+						}
+					}
+					catch (java.lang.Exception e)
+					{
 					}
 				}
 			}

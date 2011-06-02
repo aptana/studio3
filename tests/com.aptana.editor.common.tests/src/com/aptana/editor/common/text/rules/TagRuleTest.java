@@ -91,7 +91,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(0, scanner.getTokenOffset());
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
-	
+
 	public void testTagWithEndBraceInsideMultiLineDoubleQuotedStringContainingEscapes()
 	{
 		IToken successToken = new Token("name");
@@ -115,13 +115,25 @@ public class TagRuleTest extends TestCase
 		assertEquals(0, scanner.getTokenOffset());
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
-	
+
 	public void testTagWithEndBraceInsideMultiLineSingleQuotedStringContainingEscapes()
 	{
 		IToken successToken = new Token("name");
 		TagRule rule = new TagRule("chris", successToken);
 		RuleBasedScanner scanner = new RuleBasedScanner();
 		IDocument document = new Document("<chris attr='>\nvalue\\'>'>");
+		scanner.setRange(document, 0, document.getLength());
+		assertEquals(successToken, rule.evaluate(scanner));
+		assertEquals(0, scanner.getTokenOffset());
+		assertEquals(document.getLength(), scanner.getTokenLength());
+	}
+
+	public void testTagWithEmbeddedTag()
+	{
+		IToken successToken = new Token("name");
+		TagRule rule = new TagRule("chris", successToken);
+		RuleBasedScanner scanner = new RuleBasedScanner();
+		IDocument document = new Document("<chris <? echo $class1;?>>");
 		scanner.setRange(document, 0, document.getLength());
 		assertEquals(successToken, rule.evaluate(scanner));
 		assertEquals(0, scanner.getTokenOffset());

@@ -19,14 +19,17 @@ public class TagRule extends MultiLineRule
 {
 
 	private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
-	private static final IPredicateRule singleQuoteStringRule = new MultiLineRule("'", "'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final IPredicateRule singleQuoteStringRule = new MultiLineRule(
+			"'", "'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final IPredicateRule singleQuoteStringEOLRule = new EndOfLineRule("'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
 
 	private static final IToken doubleQuoteStringTOKEN = new Token("DQS"); //$NON-NLS-1$
-	private static final IPredicateRule doubleQuoteStringRule = new MultiLineRule("\"", "\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final IPredicateRule doubleQuoteStringRule = new MultiLineRule(
+			"\"", "\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
 
 	private boolean fIgnoreCase;
+	private int fEmbeddedStart;
 
 	public TagRule(IToken token)
 	{
@@ -99,7 +102,8 @@ public class TagRule extends MultiLineRule
 	 */
 	protected boolean endSequenceDetected(ICharacterScanner scanner)
 	{
-		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, String.valueOf(fStartSequence));
+		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner,
+				String.valueOf(fStartSequence));
 		int c;
 		while ((c = collectingCharacterScanner.read()) != ICharacterScanner.EOF)
 		{
@@ -121,19 +125,29 @@ public class TagRule extends MultiLineRule
 					token = doubleQuoteStringEOLRule.evaluate(collectingCharacterScanner);
 				}
 			}
+			else if (c == fStartSequence[0])
+			{
+				fEmbeddedStart++;
+			}
 			else if (c == fEndSequence[0])
 			{
-				if (fToken instanceof ExtendedToken) {
-					((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
+				if (fEmbeddedStart == 0)
+				{
+					if (fToken instanceof ExtendedToken)
+					{
+						((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
+					}
+					return true;
 				}
-				return true;
+				fEmbeddedStart--;
 			}
 		}
 		if (scanner instanceof SequenceCharacterScanner && ((SequenceCharacterScanner) scanner).foundSequence())
 		{
 			// this means the EOF came from seeing a switching sequence, so assumes the end is detected and no need to
 			// rewind one character
-			if (fToken instanceof ExtendedToken) {
+			if (fToken instanceof ExtendedToken)
+			{
 				((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
 			}
 			return true;

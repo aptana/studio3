@@ -15,6 +15,7 @@ import org.eclipse.jface.text.Region;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
+import com.aptana.editor.html.formatter.nodes.FormatterExcludedNode;
 import com.aptana.editor.html.formatter.nodes.FormatterForeignElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLContentNode;
@@ -56,6 +57,9 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	@SuppressWarnings("nls")
 	public static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br", "col",
 			"command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"));
+	@SuppressWarnings("nls")
+	// elements that will not be formatted to avoid any content changes in the HTML output.
+	public static final HashSet<String> EXCLUDED_ELEMENTS = new HashSet<String>(Arrays.asList("textarea"));
 	@SuppressWarnings("nls")
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
@@ -153,10 +157,18 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					push(formatterNode);
 					checkedPop(formatterNode, -1);
 				}
+				else if (EXCLUDED_ELEMENTS.contains(name))
+				{
+					FormatterExcludedNode nonFormattedContent = new FormatterExcludedNode(document);
+					nonFormattedContent.setBegin(createTextNode(document, elementNode.getStart(), elementNode.getEnd()));
+					push(nonFormattedContent);
+					checkedPop(nonFormattedContent, -1);
+				}
 				else
 				{
 					pushFormatterNode(elementNode);
 				}
+
 			}
 		}
 		else
