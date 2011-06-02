@@ -268,6 +268,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(HTMLFormatterConstants.WRAP_COMMENTS, getBoolean(HTMLFormatterConstants.WRAP_COMMENTS));
+		document.setBoolean(HTMLFormatterConstants.PLACE_COMMENTS_IN_SEPARATE_LINES,
+				getBoolean(HTMLFormatterConstants.PLACE_COMMENTS_IN_SEPARATE_LINES));
 		document.setSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
 				getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,

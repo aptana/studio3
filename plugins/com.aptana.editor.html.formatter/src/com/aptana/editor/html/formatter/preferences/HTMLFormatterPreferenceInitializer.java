@@ -38,6 +38,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(HTMLFormatterConstants.WRAP_COMMENTS, false);
+		store.putBoolean(HTMLFormatterConstants.PLACE_COMMENTS_IN_SEPARATE_LINES, false);
 		store.putInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		// We add all the 'Void' html tags here as well. They should not trigger an indent increase.
 		store.put(

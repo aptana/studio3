@@ -21,6 +21,7 @@ public class Messages extends NLS
 	public static String HTMLFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String HTMLFormatterBlankLinesPage_existingBlankLinesGroupLabel;
 	public static String HTMLFormatterBlankLinesPage_existingBlankLinesToPreserve;
+	public static String HTMLFormatterCommentsPage_commentsInSeparateLines;
 	public static String HTMLFormatterCommentsPage_enableWrapping;
 	public static String HTMLFormatterCommentsPage_formattingGroupLabel;
 	public static String HTMLFormatterCommentsPage_maxLineWidth;
