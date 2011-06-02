@@ -226,24 +226,30 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
-	public void testDoesntOverwriteExistingGreaterThanIfPHPTagIsClosedButHTMLIsnt()
+	public void testDoesntOverwriteExistingGreaterThanIfPHPTagIsClosedButHTMLIsnt() throws BadLocationException
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
 		closer.verifyKey(event);
 
+		if (event.doit)
+		{
+			document.replace(event.start, event.end - event.start, event.text);
+		}
 		assertEquals("<input type='text' name='foo' <?=$blah?>>", document.get());
-		assertFalse(event.doit);
 	}
 
-	public void testWhatever()
+	public void testWhatever() throws BadLocationException
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah? >");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
 		closer.verifyKey(event);
 
+		if (event.doit)
+		{
+			document.replace(event.start, event.end - event.start, event.text);
+		}
 		assertEquals("<input type='text' name='foo' <?=$blah?> >", document.get());
-		assertFalse(event.doit);
 	}
 
 	public void testWhatever2() throws BadLocationException
