@@ -8,6 +8,7 @@
 package com.aptana.core.util;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.eclipse.core.runtime.Path;
 
@@ -161,6 +162,38 @@ public class FileUtil
 			}
 		}
 		return result && dir.delete();
+	}
+
+	/**
+	 * Comb through the list of command-line arguments, and pull out the items that are files
+	 * 
+	 * @param arguments
+	 * @return
+	 */
+	public static ArrayList<File> gatherFilesFromCommandLineArguments(final String[] arguments)
+	{
+		final ArrayList<File> files = new ArrayList<File>();
+
+		for (int i = 0; i < arguments.length; i++)
+		{
+			// skip the keyring argument as a possible file
+			if ("-keyring".equalsIgnoreCase(arguments[i])) { //$NON-NLS-1$
+				if (arguments.length > i + 1)
+				{
+					i++; // skip the argument for the actual file
+				}
+			}
+			else
+			{
+				File file = new File(arguments[i]);
+				if (file.exists())
+				{
+					files.add(file);
+				}
+			}
+		}
+
+		return files;
 	}
 
 }
