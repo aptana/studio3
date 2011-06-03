@@ -9,6 +9,7 @@ package com.aptana.commandline.launcher;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -55,6 +56,11 @@ public class CommandlineArgumentsHandler
 		if (arguments == null || arguments.length == 0)
 		{
 			return null;
+		}
+
+		if (arguments != null)
+		{
+			CommandlineLauncherPlugin.logInfo("Command-line arguments:" + Arrays.deepToString(arguments)); //$NON-NLS-1$
 		}
 
 		final ArrayList<File> files = gatherFiles(arguments);
