@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
@@ -324,6 +325,29 @@ class TreeThemer extends ControlThemer
 					{
 						return;
 					}
+					
+					// FIX for TISTUD-426: http://jira.appcelerator.org/browse/TISTUD-426
+					// HACK to grab cell editors of tree views (specifically Variables view) and set their control's fg explicitly!
+					if (fTreeViewer != null)
+					{
+						CellEditor[] editors = fTreeViewer.getCellEditors();
+						if (editors != null)
+						{
+							for (CellEditor editor : editors)
+							{
+								if (editor == null)
+								{
+									continue;
+								}
+								Control c = editor.getControl();
+								if (c != null)
+								{
+									c.setForeground(getForeground());
+								}
+							}
+						}
+					}
+					
 					TreeItem[] items = tree.getSelection();
 					if (items == null || items.length == 0)
 					{
@@ -351,7 +375,7 @@ class TreeThemer extends ControlThemer
 								gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
 							}
 						}
-					}					
+					}		
 				}
 				catch (Exception e)
 				{
