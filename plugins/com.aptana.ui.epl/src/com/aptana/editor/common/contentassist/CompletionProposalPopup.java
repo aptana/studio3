@@ -14,7 +14,6 @@ package com.aptana.editor.common.contentassist;
  **********************************************************************************************************************/
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
@@ -1016,8 +1015,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 			fFilteredProposals = proposals;
 			final int newLen = proposals.length;
-
-			Arrays.sort(proposals);
 
 			if (USE_VIRTUAL)
 			{
