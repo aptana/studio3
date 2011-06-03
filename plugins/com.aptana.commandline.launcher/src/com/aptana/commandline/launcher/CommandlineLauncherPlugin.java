@@ -8,6 +8,7 @@
 package com.aptana.commandline.launcher;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
@@ -75,4 +76,28 @@ public class CommandlineLauncherPlugin extends Plugin
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
 	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @param string
+	 */
+	public static void logInfo(String string)
+	{
+		if (Platform.inDebugMode())
+		{
+			getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		}
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @param msg
+	 */
+	public static void logWarning(String msg)
+	{
+		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
+	}
+
 }
