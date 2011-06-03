@@ -23,6 +23,7 @@ import java.util.StringTokenizer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -250,7 +251,11 @@ public final class ShellExecutable
 				}
 				try
 				{
-					result = buildEnvironment(ProcessUtil.outputForProcess(run(envCommand, workingDirectory, null)));
+					IStatus status = ProcessUtil.processResult(run(envCommand, workingDirectory, null));
+					if (status.isOK())
+					{
+						result = buildEnvironment(status.getMessage());
+					}
 				}
 				catch (Exception e)
 				{
@@ -318,7 +323,7 @@ public final class ShellExecutable
 		StringBuffer sb = new StringBuffer();
 		for (String arg : command)
 		{
-			sb.append(arg.replaceAll("\"|\'", "\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(arg.replaceAll("\"|\'| ", "\\\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		shellCommand.add(sb.toString().trim());
 		return shellCommand;

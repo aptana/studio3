@@ -91,6 +91,19 @@ public abstract class ProcessUtil
 		}
 		return result.getMessage();
 	}
+	
+	/**
+	 * reads the stdout and stderr from process, returns an IStatus with the
+	 * exit code, and results. Cast to ProcessStatus to get at each stream's
+	 * output separately.
+	 * 
+	 * @param process
+	 * @return
+	 */
+	public static IStatus processResult(Process process) 
+	{
+		return processData(process, null);
+	}
 
 	private static IStatus processData(Process process, String input)
 	{
