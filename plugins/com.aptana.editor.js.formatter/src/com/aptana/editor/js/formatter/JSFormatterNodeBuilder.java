@@ -472,8 +472,10 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document, hasCommentBefore(blockStart));
 			blockNode.setBegin(createTextNode(document, blockStart, blockStart + 1));
 			push(blockNode);
-			// visit the children under that block node
-			super.visit(node);
+			// visit the children under that block node. We have to skip the first child, which is the switch-condition.
+			// Otherwise, we may have errors due to the fact that the switch-begin already encapsulate it.
+			// Note - This should be changed in the future once we have space-formatting within the switch condition.
+			visitChildren(node, 1);
 			int endingOffset = node.getEndingOffset();
 			// pop the block node
 			checkedPop(blockNode, endingOffset);
@@ -895,6 +897,29 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 			}
 			return offset;
+		}
+
+		/**
+		 * Visit the nodes children with an option to skip some of the first ones.
+		 * 
+		 * @param node
+		 * @param skip
+		 *            The number of children to skip visiting
+		 */
+		private void visitChildren(JSSwitchNode node, int skip)
+		{
+			for (IParseNode child : node)
+			{
+				if (skip > 0)
+				{
+					skip--;
+					continue;
+				}
+				if (child instanceof JSNode)
+				{
+					((JSNode) child).accept(this);
+				}
+			}
 		}
 	}
 }
