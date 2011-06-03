@@ -13,6 +13,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -23,7 +24,8 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
-public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension2,
+public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension,
+		ICompletionProposalExtension2,
 		ICompletionProposalExtension3, Comparable<ICompletionProposal>
 {
 	private String _additionalProposalInformation;
@@ -40,6 +42,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	private int _relevance;
 	private Image[] _userAgentImages;
 	private int _hash;
+	private char[] _triggerChars;
 
 	/**
 	 * CommonCompletionProposal
@@ -277,6 +280,13 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString(), true);
 		boolean validPrefixCaseSensitive = isValidPrefix(getPrefix(document, offset), getDisplayString(), false);
 
+		boolean addedTrigger = false;
+		if (trigger != (char) 0 && this._replacementString != null && this._replacementString.indexOf(trigger) < 0)
+		{
+			this._replacementString += trigger;
+			addedTrigger = true;
+		}
+
 		// It seems plausible this logic could be simplified
 		int shift = 0;
 		if(validPrefix && validPrefixCaseSensitive)
@@ -292,6 +302,11 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 			if (!validPrefix || validPrefix && !validPrefixCaseSensitive)
 			{
 				offset = this._replacementOffset;
+			}
+
+			if (addedTrigger)
+			{
+				this._cursorPosition += 1;
 			}
 
 			try
@@ -442,4 +457,57 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	{
 		_relevance = relevance;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#apply(org.eclipse.jface.text.IDocument,
+	 * char, int)
+	 */
+	public void apply(IDocument document, char trigger, int offset)
+	{
+		// evidently not called anymore
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.contentassist.ICompletionProposalExtension#isValidFor(org.eclipse.jface.text.IDocument,
+	 * int)
+	 */
+	public boolean isValidFor(IDocument document, int offset)
+	{
+		// evidently not called anymore
+		return false;
+	}
+
+	/**
+	 * Sets the defaults set of trigger characters used to trigger insertion/completion of a proposal
+	 * 
+	 * @param chars
+	 *            an array of characters
+	 * @return
+	 */
+	public void setTriggerCharacters(char[] chars)
+	{
+		_triggerChars = chars;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#getTriggerCharacters()
+	 */
+	public char[] getTriggerCharacters()
+	{
+		return _triggerChars;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#getContextInformationPosition()
+	 */
+	public int getContextInformationPosition()
+	{
+		return 0;
+	}
+
 }

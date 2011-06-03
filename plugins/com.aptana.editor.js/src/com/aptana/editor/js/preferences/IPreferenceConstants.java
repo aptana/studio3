@@ -20,12 +20,6 @@ public interface IPreferenceConstants
 	String JS_INDEX_VERSION = "JS_INDEX_VERSION"; //$NON-NLS-1$
 
 	/**
-	 * The value is a string where each character in the string will be used as an auto-activation character in
-	 * JSContentAssistProcessor
-	 */
-	String JS_ACTIVATION_CHARACTERS = "JS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
-
-	/**
 	 * A pref key used to determine if comments are initially folded. Value is a boolean.
 	 */
 	String INITIALLY_FOLD_COMMENTS = "fold_comments"; //$NON-NLS-1$
