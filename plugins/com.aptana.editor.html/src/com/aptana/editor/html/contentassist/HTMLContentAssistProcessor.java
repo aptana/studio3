@@ -1454,8 +1454,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			switch (lexeme.getType())
 			{
-				case CLASS:
-				case ID:
+				case ATTR_CLASS:
+				case ATTR_ID:
+				case ATTR_STYLE:
+				case ATTR_SCRIPT:
 					result = LocationType.IN_ATTRIBUTE_NAME;
 					break;
 
