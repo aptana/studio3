@@ -300,7 +300,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				proposals.add(createProposal("." + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset)); //$NON-NLS-1$
+				String name = "." + entry.getKey(); //$NON-NLS-1$
+				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
+
+				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset)); //$NON-NLS-1$
 			}
 		}
 	}
@@ -323,7 +326,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				proposals.add(createProposal("#" + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset)); //$NON-NLS-1$
+				String name = "#" + entry.getKey(); //$NON-NLS-1$
+				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
+
+				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset));
 			}
 		}
 	}
@@ -420,6 +426,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case ID:
 					this.addIDs(proposals, offset);
 					break;
+
 				case COLON:
 					// If previous is also a colon, it's syntax for pseudo elements. One colon means pseudo classes.
 					Lexeme<CSSTokenType> previous = lexemeProvider.getLexemeFromOffset(this._currentLexeme
@@ -433,6 +440,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this.addPseudoClassProposals(proposals, offset);
 					}
 					break;
+
 				case LPAREN:
 					// Back up one, grab identifier as the pseudo-class name
 					String pseudoClassName = null;
@@ -444,6 +452,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					this.addPseudoClassArguments(pseudoClassName, proposals, offset);
 					break;
+
 				default:
 					this.addAllElementProposals(proposals, offset);
 					break;
@@ -524,6 +533,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
+	/**
+	 * supportsColorValues
+	 * 
+	 * @param property
+	 * @return
+	 */
 	@SuppressWarnings("nls")
 	private boolean supportsColorValues(PropertyElement property)
 	{
@@ -540,14 +555,70 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		return propertyName.endsWith("color");
 	}
 
+	/**
+	 * createProposal
+	 * 
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param offset
+	 * @return
+	 */
 	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
 			int offset)
 	{
-		return createProposal(name, name, image, description, userAgents, offset);
+		return createProposal(name, image, description, userAgents, CSSIndexConstants.CORE, offset);
 	}
 
+	/**
+	 * createProposal
+	 * 
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocatoin
+	 * @param offset
+	 * @return
+	 */
+	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
+	{
+		return createProposal(name, name, image, description, userAgents, fileLocation, offset);
+	}
+
+	/**
+	 * createProposal
+	 * 
+	 * @param displayName
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param offset
+	 * @return
+	 */
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
 			Image[] userAgents, int offset)
+	{
+		return createProposal(displayName, name, image, description, userAgents, CSSIndexConstants.CORE, offset);
+	}
+
+	/**
+	 * createProposal
+	 * 
+	 * @param displayName
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 * @return
+	 */
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		int length = name.length();
 		IContextInformation contextInfo = null;
@@ -562,12 +633,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
 				displayName, contextInfo, description);
-		proposal.setFileLocation(CSSIndexConstants.CORE);
+		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 		proposal.setTriggerCharacters(getProposalTriggerCharacters());
 		return proposal;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonContentAssistProcessor#doComputeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
+	 */
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
@@ -756,9 +833,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							switch (previousLexeme.getType())
 							{
 								case CLASS:
-								case ID:
 									location = LocationType.ERROR;
 									break LOOP;
+
+								case ID:
+									location = LocationType.INSIDE_VALUE;
+									break;
 
 								case LCURLY:
 								case SEMICOLON:
