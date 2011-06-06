@@ -21,6 +21,7 @@ public class AllTests
 		suite.addTestSuite(ContentAssistCoarseLocationTests.class);
 		suite.addTestSuite(HTMLContentAssistProcessorTest.class);
 		suite.addTestSuite(MetadataTests.class);
+		suite.addTestSuite(HTMLNestedLanguageContentAssistTests.class);
 		// $JUnit-END$
 		return suite;
 	}
