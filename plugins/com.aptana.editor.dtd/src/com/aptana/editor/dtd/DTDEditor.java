@@ -32,6 +32,6 @@ public class DTDEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
+		this.setDocumentProvider(DTDPlugin.getDefault().getDTDDocumentProvider());
 	}
 }

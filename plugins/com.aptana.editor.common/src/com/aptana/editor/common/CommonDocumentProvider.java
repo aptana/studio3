@@ -17,38 +17,31 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-public class CommonDocumentProvider extends TextFileDocumentProvider
-{
+public class CommonDocumentProvider extends TextFileDocumentProvider {
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.editors.text.TextFileDocumentProvider#connect(java.lang.Object)
 	 */
 	@Override
-	public void connect(Object element) throws CoreException
-	{
+	public void connect(Object element) throws CoreException {
 		super.connect(element);
 
 		IDocument document = getDocument(element);
 
-		if (document != null)
-		{
+		if (document != null) {
 			String fileName = null;
 
-			if (element instanceof IFileEditorInput)
-			{
+			if (element instanceof IFileEditorInput) {
 				IFileEditorInput input = (IFileEditorInput) element;
 				IFile file = input.getFile();
 
 				fileName = file.getName();
-			}
-			else if (element instanceof IPathEditorInput)
-			{
+			} else if (element instanceof IPathEditorInput) {
 				IPathEditorInput input = (IPathEditorInput) element;
 
 				fileName = input.getPath().lastSegment();
-			}
-			else if (element instanceof IURIEditorInput)
-			{
+			} else if (element instanceof IURIEditorInput) {
 				IURIEditorInput input = (IURIEditorInput) element;
 
 				fileName = new Path(input.getURI().getPath()).lastSegment();
@@ -63,20 +56,16 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 	 * @see org.eclipse.ui.editors.text.TextFileDocumentProvider#disconnect(java.lang.Object)
 	 */
 	@Override
-	public void disconnect(Object element)
-	{
+	public void disconnect(Object element) {
 		FileInfo fileInfo = getFileInfo(element);
 
-		if (fileInfo != null && fileInfo.fCount == 1)
-		{
+		if (fileInfo != null && fileInfo.fCount == 1) {
 			IDocument document = getDocument(element);
 
-			if (document != null)
-			{
+			if (document != null) {
 				IDocumentPartitioner partitioner = document.getDocumentPartitioner();
 
-				if (partitioner != null)
-				{
+				if (partitioner != null) {
 					partitioner.disconnect();
 					document.setDocumentPartitioner(null);
 				}
@@ -92,8 +81,7 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 	 * @param filename
 	 * @return
 	 */
-	protected String getDefaultContentType(String filename)
-	{
+	protected String getDefaultContentType(String filename) {
 		return "source"; //$NON-NLS-1$
 	}
 }

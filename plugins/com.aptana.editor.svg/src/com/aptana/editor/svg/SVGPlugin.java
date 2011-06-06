@@ -7,6 +7,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -15,7 +16,11 @@ import org.osgi.framework.BundleContext;
 public class SVGPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.svg"; //$NON-NLS-1$
+
 	private static SVGPlugin plugin;
+	
+	private IDocumentProvider svgDocumentProvider;
+
 
 	/**
 	 * Returns the shared instance
@@ -136,4 +141,16 @@ public class SVGPlugin extends AbstractUIPlugin
 		plugin = null;
 		super.stop(context);
 	}
+	
+	/**
+	 * Returns SVG document provider
+	 * @return
+	 */
+	public synchronized IDocumentProvider getSVGDocumentProvider() {
+		if (svgDocumentProvider == null) {
+			svgDocumentProvider = new SVGDocumentProvider();
+		}
+		return svgDocumentProvider;
+	}
+
 }

@@ -8,6 +8,7 @@
 package com.aptana.editor.idl;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -21,6 +22,9 @@ public class IDLPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static IDLPlugin plugin;
+	
+	private IDocumentProvider idlDocumentProvider;
+
 
 	/**
 	 * The constructor
@@ -57,6 +61,17 @@ public class IDLPlugin extends AbstractUIPlugin
 	public static IDLPlugin getDefault()
 	{
 		return plugin;
+	}
+
+	/**
+	 * Returns IDL document provider
+	 * @return
+	 */
+	public synchronized IDocumentProvider getIDLDocumentProvider() {
+		if (idlDocumentProvider == null) {
+			idlDocumentProvider = new IDLDocumentProvider();
+		}
+		return idlDocumentProvider;
 	}
 
 }

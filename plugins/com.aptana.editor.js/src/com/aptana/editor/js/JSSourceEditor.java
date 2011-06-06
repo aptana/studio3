@@ -35,7 +35,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new JSDocumentProvider());
+		setDocumentProvider(JSPlugin.getDefault().getJSDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

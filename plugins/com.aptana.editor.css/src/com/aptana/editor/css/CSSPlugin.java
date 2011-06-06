@@ -15,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -24,6 +25,9 @@ public class CSSPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.css"; //$NON-NLS-1$
 	private static CSSPlugin plugin;
+	
+	private IDocumentProvider cssDocumentProvider;
+
 
 	/**
 	 * Returns the shared instance
@@ -123,4 +127,18 @@ public class CSSPlugin extends AbstractUIPlugin
 		plugin = null;
 		super.stop(context);
 	}
+	
+	/**
+	 * Returns CSS document provider
+	 * @return
+	 */
+	public synchronized IDocumentProvider getCSSDocumentProvider()
+	{
+		if (cssDocumentProvider == null)
+		{
+			cssDocumentProvider = new CSSDocumentProvider();
+		}
+		return cssDocumentProvider;
+	}
+
 }

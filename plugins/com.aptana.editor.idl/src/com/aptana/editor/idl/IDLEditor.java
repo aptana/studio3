@@ -32,6 +32,6 @@ public class IDLEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		this.setSourceViewerConfiguration(new IDLSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new IDLDocumentProvider());
+		this.setDocumentProvider(IDLPlugin.getDefault().getIDLDocumentProvider());
 	}
 }

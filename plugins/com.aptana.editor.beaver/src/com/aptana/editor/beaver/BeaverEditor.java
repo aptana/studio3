@@ -10,15 +10,13 @@ package com.aptana.editor.beaver;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 
-public class BeaverEditor extends AbstractThemeableEditor
-{
+public class BeaverEditor extends AbstractThemeableEditor {
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
 	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
+	protected CommonOutlinePage createOutlinePage() {
 		return null;
 	}
 
@@ -26,11 +24,9 @@ public class BeaverEditor extends AbstractThemeableEditor
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
-	protected void initializeEditor()
-	{
+	protected void initializeEditor() {
 		super.initializeEditor();
-
 		this.setSourceViewerConfiguration(new BeaverSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new BeaverDocumentProvider());
+		this.setDocumentProvider(BeaverPlugin.getDefault().getBeaverDocumentProvider());
 	}
 }
