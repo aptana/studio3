@@ -66,10 +66,10 @@ public abstract class ExtendedWordRule extends WordRule {
 					unreadBuffer(scanner);
 					return Token.UNDEFINED;
 				}
-				IToken token = (IToken) fWords.get(buffer);
+				IToken token = getWordToken(word);
 
 				if (token == null) {
-					token = getWordToken(word);
+					token = (IToken) fWords.get(word);
 				}
 				if (token != null) {
 					return token;

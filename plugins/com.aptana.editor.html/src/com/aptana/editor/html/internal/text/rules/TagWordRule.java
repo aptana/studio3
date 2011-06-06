@@ -12,28 +12,14 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.jface.text.rules.WordRule;
+
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
 
 /**
  * @author Max Stepanov
  *
  */
-public class TagWordRule extends WordRule {
-
-	/**
-	 * @param detector
-	 */
-	public TagWordRule(IWordDetector detector) {
-		super(detector);
-	}
-
-	/**
-	 * @param detector
-	 * @param defaultToken
-	 */
-	public TagWordRule(IWordDetector detector, IToken defaultToken) {
-		super(detector, defaultToken);
-	}
+public class TagWordRule extends ExtendedWordRule {
 
 	/**
 	 * @param detector

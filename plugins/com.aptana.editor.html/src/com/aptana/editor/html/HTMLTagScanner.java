@@ -22,6 +22,7 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
@@ -29,6 +30,7 @@ import com.aptana.editor.css.CSSCodeScanner;
 import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
 import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
 import com.aptana.editor.html.internal.text.rules.TagWordRule;
+import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.js.JSCodeScanner;
 
@@ -54,11 +56,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	private static final String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big", "br", "button", "caption", "cite", "code", "col", "colgroup",
 			"del", "dfn", "em", "font", "i", "img", "input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup", "option", "param",
 			"q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title",
-			"tr", "tt", "u", "var", "canvas", "audio", "video" };
-	
-	@SuppressWarnings("nls")
-	private static final String[] SCRIPT_ATTRIBUTES = { "onclick", "onload", "onunload", /* TODO */ };
-	
+			"tr", "tt", "u", "var", "canvas", "audio", "video" };	
 	
 	private final IToken doubleQuotedStringToken = createToken(HTMLTokenType.DOUBLE_QUOTED_STRING);
 	private final IToken singleQuotedStringToken = createToken(HTMLTokenType.SINGLE_QUOTED_STRING);
@@ -70,6 +68,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	private ITokenScanner jsTokenScanner = new JSCodeScanner();
 	
 	private Stack<IToken> tokenHistory = new Stack<IToken>();
+	private String tagName;
 
 	/**
 	 * 
@@ -87,7 +86,14 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// Tags
-		WordRule tagWordRule = new TagWordRule(new TagNameWordDetector(), createToken(HTMLTokenType.META), true);
+		WordRule tagWordRule = new TagWordRule(new TagNameWordDetector(), createToken(HTMLTokenType.META), true) {
+			@Override
+			protected IToken getWordToken(String word) {
+				tagName = word;
+				return null;
+			}
+			
+		};
 		tagWordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
 		tagWordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
 		IToken structureDotAnyToken = createToken(HTMLTokenType.STRUCTURE_TAG);
@@ -104,13 +110,16 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		}
 		rules.add(tagWordRule);
 		
-		WordRule attributeWordRule = new WordRule(new AttributeNameWordDetector(), createToken(HTMLTokenType.ATTRIBUTE), true);
+		WordRule attributeWordRule = new ExtendedWordRule(new AttributeNameWordDetector(), createToken(HTMLTokenType.ATTRIBUTE), true) {
+			@Override
+			protected IToken getWordToken(String word) {
+				return HTMLUtils.isJSAttribute(tagName, word) ? attributeScriptToken : null;
+			}
+			
+		};
 		attributeWordRule.addWord("id", createToken(HTMLTokenType.ATTR_ID)); //$NON-NLS-1$
 		attributeWordRule.addWord("class", createToken(HTMLTokenType.ATTR_CLASS)); //$NON-NLS-1$
 		attributeWordRule.addWord("style", attributeStyleToken); //$NON-NLS-1$
-		for (String attr : SCRIPT_ATTRIBUTES) {
-			attributeWordRule.addWord(attr, attributeScriptToken);
-		}
 		rules.add(attributeWordRule);
 
 		rules.add(new MultiCharacterRule("</", createToken(HTMLTokenType.TAG_START))); //$NON-NLS-1$
@@ -133,6 +142,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	public void setRange(IDocument document, int offset, int length) {
 		super.setRange(document, offset, length);
 		tokenHistory.clear();
+		tagName = null;
 	}
 
 	/* (non-Javadoc)
