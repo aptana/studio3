@@ -325,7 +325,7 @@ public class ValidationManager implements IValidationManager
 					// this is to remove "Aptana Problem" markers
 					if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
 					{
-						MarkerUtils.deleteMarkers(externalResource, IMarkerConstants.PROBLEM_MARKER, true);
+						MarkerUtils.deleteMarkers(externalResource, IMarkerConstants.PROBLEM_MARKER, false);
 					}
 				}
 				else
@@ -334,8 +334,8 @@ public class ValidationManager implements IValidationManager
 					// this is to remove "Aptana Problem" markers
 					if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
 					{
-						workspaceResource
-								.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
+						workspaceResource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, false,
+								IResource.DEPTH_INFINITE);
 					}
 				}
 
