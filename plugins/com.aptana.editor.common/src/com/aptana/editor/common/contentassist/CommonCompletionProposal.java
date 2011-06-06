@@ -281,10 +281,16 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		boolean validPrefixCaseSensitive = isValidPrefix(getPrefix(document, offset), getDisplayString(), false);
 
 		boolean addedTrigger = false;
-		if (trigger != (char) 0 && this._replacementString != null && this._replacementString.indexOf(trigger) < 0)
+		char[] triggers = getTriggerCharacters();
+		if (triggers != null)
 		{
-			this._replacementString += trigger;
-			addedTrigger = true;
+			String str = new String(triggers);
+			if (str.indexOf(trigger) >= 0 && this._replacementString != null
+					&& this._replacementString.indexOf(trigger) < 0)
+			{
+				this._replacementString += trigger;
+				addedTrigger = true;
+			}
 		}
 
 		// It seems plausible this logic could be simplified

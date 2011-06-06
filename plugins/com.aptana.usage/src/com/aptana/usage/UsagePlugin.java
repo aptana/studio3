@@ -22,7 +22,9 @@ public class UsagePlugin extends Plugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.db"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.usage"; //$NON-NLS-1$
+	// this is the incorrect id previously used; DO NOT USE it for future reference
+	public static final String OLD_PLUGIN_ID = "com.aptana.db"; //$NON-NLS-1$
 
 	// The shared instance
 	private static UsagePlugin plugin;
