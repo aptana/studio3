@@ -1310,6 +1310,11 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	{
 
 		int offset = styledText.getCaretOffset();
+		Point selection = styledText.getSelection();
+		if (offset >= selection.x && offset <= selection.y)
+		{
+			offset = selection.x;
+		}
 
 		// Are we at beginning of file?
 		if (offset == 0)
