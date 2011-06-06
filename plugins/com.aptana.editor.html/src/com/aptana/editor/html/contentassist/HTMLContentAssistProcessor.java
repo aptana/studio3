@@ -24,7 +24,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -105,6 +104,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private Lexeme<HTMLTokenType> _currentLexeme;
 	private IRange _replaceRange;
 	private IDocument _document;
+
+	private JSContentAssistProcessor fJSProcessor;
+	private CSSContentAssistProcessor fCSSProcessor;
 
 	/**
 	 * static initializer
@@ -1094,13 +1096,27 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
-						return new CSSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(
-								viewer, offset, activationChar, autoActivated);
+						if (fCSSProcessor == null)
+						{
+							fCSSProcessor = new CSSContentAssistProcessor(this.editor, activeRange);
+						}
+						else
+						{
+							fCSSProcessor.setActiveRange(activeRange);
+						}
+						return fCSSProcessor.computeCompletionProposals(viewer, offset, activationChar, autoActivated);
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
-						return new JSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(
-								viewer, offset, activationChar, autoActivated);
+						if (fJSProcessor == null)
+						{
+							fJSProcessor = new JSContentAssistProcessor(this.editor, activeRange);
+						}
+						else
+						{
+							fJSProcessor.setActiveRange(activeRange);
+						}
+						return fJSProcessor.computeCompletionProposals(viewer, offset, activationChar, autoActivated);
 					}
 				}
 
@@ -1157,6 +1173,24 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result.toArray(new ICompletionProposal[result.size()]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		super.dispose();
+		if (fCSSProcessor != null)
+		{
+			fCSSProcessor.dispose();
+		}
+		if (fJSProcessor != null)
+		{
+			fJSProcessor.dispose();
+		}
 	}
 
 	/**
@@ -1218,23 +1252,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return name;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getCompletionProposalAutoActivationCharacters()
-	{
-		String chars = Platform.getPreferencesService().getString( //
-				HTMLPlugin.PLUGIN_ID, //
-				IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
-				"", //$NON-NLS-1$
-				null //
-				);
-
-		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*
@@ -1625,10 +1642,29 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					// If that's not the case, check if we are actually typing the attribute name
 					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
-					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME);
+					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME)
+							|| (fineLocation == LocationType.IN_ATTRIBUTE_VALUE);
 				}
 			default:
 				return false;
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return ('A' <= keyCode && keyCode <= 'Z') || ('a' <= keyCode && keyCode <= 'z');
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return HTMLPlugin.PLUGIN_ID;
 	}
 }

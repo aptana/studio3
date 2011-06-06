@@ -537,10 +537,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		try
 		{
-			if (getSourceViewer() instanceof CommonSourceViewerConfiguration)
+			SourceViewerConfiguration svc = getSourceViewerConfiguration();
+			if (svc instanceof CommonSourceViewerConfiguration)
 			{
-				((CommonSourceViewerConfiguration) getSourceViewer()).dispose();
+				((CommonSourceViewerConfiguration) svc).dispose();
 			}
+
 			if (fKeyListener != null)
 			{
 				ISourceViewer viewer = this.getSourceViewer();
@@ -552,11 +554,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 				fKeyListener = null;
 			}
+
 			if (fSelectionChangedListener != null)
 			{
 				fSelectionChangedListener.uninstall(getSelectionProvider());
 				fSelectionChangedListener = null;
 			}
+
 			if (fThemeListener != null)
 			{
 				ThemePlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fThemeListener);
@@ -568,16 +572,19 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				fThemeableEditorColorsExtension.dispose();
 				fThemeableEditorColorsExtension = null;
 			}
+
 			if (fThemeableEditorFindBarExtension != null)
 			{
 				fThemeableEditorFindBarExtension.dispose();
 				fThemeableEditorFindBarExtension = null;
 			}
+
 			if (fOutlinePage != null)
 			{
 				fOutlinePage.dispose();
 				fOutlinePage = null;
 			}
+
 			fCommandElementsProvider = null;
 			if (fFileService != null)
 			{

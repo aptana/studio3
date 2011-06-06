@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -43,7 +42,6 @@ import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
-import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
@@ -69,7 +67,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
 	{
 		this(editor);
-
 		this._activeRange = activeRange;
 	}
 
@@ -81,8 +78,17 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public CSSContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		super(editor);
-
 		this._queryHelper = new CSSIndexQueryHelper();
+	}
+
+	/**
+	 * The currently active range
+	 * 
+	 * @param activeRange
+	 */
+	public void setActiveRange(IRange activeRange)
+	{
+		this._activeRange = activeRange;
 	}
 
 	/**
@@ -558,6 +564,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				displayName, contextInfo, description);
 		proposal.setFileLocation(CSSIndexConstants.CORE);
 		proposal.setUserAgentImages(userAgents);
+		proposal.setTriggerCharacters(getProposalTriggerCharacters());
 		return proposal;
 	}
 
@@ -659,23 +666,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			};
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getCompletionProposalAutoActivationCharacters()
-	{
-		String chars = Platform.getPreferencesService().getString( //
-				CSSPlugin.PLUGIN_ID, //
-				IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
-				"", //$NON-NLS-1$
-				null //
-				);
-
-		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*
@@ -1173,5 +1163,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
 		return Character.isWhitespace(c);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return CSSPlugin.PLUGIN_ID;
 	}
 }

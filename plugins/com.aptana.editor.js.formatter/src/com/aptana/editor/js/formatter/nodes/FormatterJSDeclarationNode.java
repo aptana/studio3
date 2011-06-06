@@ -8,6 +8,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
@@ -114,9 +115,19 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	public int getSpacesCountBefore()
 	{
 		// TODO add preferences
-		if (node.getParent().getNodeType() == JSNodeTypes.GROUP)
+		short nodeType = node.getParent().getNodeType();
+		if (nodeType == JSNodeTypes.GROUP)
 		{
 			return 0;
+		}
+		if (nodeType == JSNodeTypes.ARGUMENTS)
+		{
+			// Set to zero only if it's the first argument
+			JSArgumentsNode argumentsNode = (JSArgumentsNode) node.getParent();
+			if (argumentsNode.getChild(0) == node)
+			{
+				return 0;
+			}
 		}
 		return 1;
 	}

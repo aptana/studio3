@@ -22,10 +22,12 @@ js.formatter.formatter.indentation.size=4
 js.formatter.formatter.tabulation.size=4
 js.formatter.formatter.tabulation.char=space
 ==CONTENT==
-/**1*/a/**2*/(/**3*/function/**4*/(/**5*/)/**6*/{/**7*/}/**8*/);//9
+executeFunction(  function() {
+});
+executeFunction(2,    function() {
+});
 ==FORMATTED==
-/**1*/
-a/**2*/(/**3*/function/**4*/(/**5*/)/**6*/
-{
-    /**7*/
-}/**8*/);//9
+executeFunction(function() {
+});
+executeFunction(2, function() {
+});

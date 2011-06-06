@@ -45,4 +45,6 @@ public interface HTMLFormatterConstants
 	public static final String LINES_AFTER_NON_HTML_ELEMENTS = FORMATTER_ID + ".line.after.non.html"; //$NON-NLS-1$
 	public static final String PRESERVED_LINES = FORMATTER_ID + ".line.preserve"; //$NON-NLS-1$
 
+	// Comments
+	public static final String PLACE_COMMENTS_IN_SEPARATE_LINES = FORMATTER_ID + ".comments.in.separate.lines"; //$NON-NLS-1$
 }

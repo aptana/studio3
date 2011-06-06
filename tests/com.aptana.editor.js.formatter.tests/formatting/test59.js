@@ -7483,7 +7483,7 @@ if(typeof dojo == "undefined") {
         if(arguments.length == 1) {
             d._loaders.push(obj);
         } else if(arguments.length > 1) {
-            d._loaders.push( function() {
+            d._loaders.push(function() {
                 obj[functionName]();
             });
         }
@@ -7505,7 +7505,7 @@ if(typeof dojo == "undefined") {
         if(arguments.length == 1) {
             d._unloaders.push(obj);
         } else if(arguments.length > 1) {
-            d._unloaders.push( function() {
+            d._unloaders.push(function() {
                 obj[functionName]();
             });
         }
@@ -8213,7 +8213,7 @@ if(typeof dojo == "undefined") {
         }
 
         if(/(WebKit|khtml)/i.test(navigator.userAgent)) { // sniff
-            dojo._khtmlTimer = setInterval( function() {
+            dojo._khtmlTimer = setInterval(function() {
                 if(/loaded|complete/.test(document.readyState)) {
                     dojo._loadInit(); // call the onload handler
                 }
@@ -8257,7 +8257,7 @@ if(typeof dojo == "undefined") {
                 // Reference: http://support.microsoft.com/default.aspx?scid=kb;en-us;199155
                 var _unloading = true;
                 _handleNodeEvent("onbeforeunload", function() {
-                    _w.setTimeout( function() {
+                    _w.setTimeout(function() {
                         _unloading = false;
                     }, 0);
                 });
@@ -10646,7 +10646,7 @@ if(!dojo._hasResource["dojo._base.html"]) { //_hasResource checks added by build
                 node.style.KhtmlUserSelect = (selectable) ? "auto" : "none";
             } else if(dojo.isIE) {
                 node.unselectable = (selectable) ? "" : "on";
-                dojo.query("*", node).forEach( function(descendant) {
+                dojo.query("*", node).forEach(function(descendant) {
                     descendant.unselectable = (selectable) ? "" : "on";
                 });
             }
@@ -10876,7 +10876,7 @@ if(!dojo._hasResource["dojo._base.html"]) { //_hasResource checks added by build
                     // on IE7 Alpha(Filter opacity=100) makes text look fuzzy so remove it altogether (bug #2661)
                     node.style.cssText = node.style.cssText.replace(/FILTER:[^;]*;/i, "");
                     if(node.nodeName.toLowerCase() == "tr") {
-                        dojo.query("> td", node).forEach( function(i) {
+                        dojo.query("> td", node).forEach(function(i) {
                             i.style.cssText = i.style.cssText.replace(/FILTER:[^;]*;/i, "");
                         });
                     }
@@ -10885,7 +10885,7 @@ if(!dojo._hasResource["dojo._base.html"]) { //_hasResource checks added by build
                     node.style.filter = o;
                 }
                 if(node.nodeName.toLowerCase() == "tr") {
-                    dojo.query("> td", node).forEach( function(i) {
+                    dojo.query("> td", node).forEach(function(i) {
                         i.style.filter = o;
                     });
                 }
@@ -11676,19 +11676,19 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
                 //		if no value is passed, the result is an array of strings. If a value is passed, the return is this NodeList
                 var aa = d._toArray(arguments);
                 aa.unshift(null);
-                var s = this.map( function(i) {
+                var s = this.map(function(i) {
                     aa[0] = i;
                     return d.style.apply(d, aa);
                 });
                 return (arguments.length > 1) ? this : s; // String||dojo.NodeList
             },
             addClass: function(/*String*/ className) {
-                return this.forEach( function(i) {
+                return this.forEach(function(i) {
                     dojo.addClass(i, className);
                 });
             },
             removeClass: function(/*String*/ className) {
-                return this.forEach( function(i) {
+                return this.forEach(function(i) {
                     dojo.removeClass(i, className);
                 });
             },
@@ -11741,7 +11741,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
                 //
                 //		// attach foo.bar() to every odd div's onmouseover
                 //		dojo.query("div:nth-child(odd)").onclick("onmouseover", foo, "bar");
-                this.forEach( function(item) {
+                this.forEach(function(item) {
                     d.connect(item, methodName, objOrFunc, funcName);
                 });
                 return this; // dojo.NodeList
@@ -11754,7 +11754,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
                 //	simpleFilter: single-expression CSS filter
                 //	return: a dojo.NodeList of all of the elements orpahned
                 var orphans = (simpleFilter) ? d._filterQueryResult(this, simpleFilter) : this;
-                orphans.forEach( function(item) {
+                orphans.forEach(function(item) {
                     if(item["parentNode"]) {
                         item.parentNode.removeChild(item);
                     }
@@ -11778,7 +11778,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
                 //			"after"
                 // 		or an offset in the childNodes property
                 var item = this[0];
-                return d.query(queryOrListOrNode).forEach( function(ai) {
+                return d.query(queryOrListOrNode).forEach(function(ai) {
                     d.place(ai, item, (position||"last"));
                 }); // dojo.NodeList
             },
@@ -11793,8 +11793,8 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
 
                 // FIXME: probably slow
                 var ret = new d.NodeList();
-                this.forEach( function(item) {
-                    d.query(queryStr, item).forEach( function(subItem) {
+                this.forEach(function(item) {
+                    d.query(queryStr, item).forEach(function(subItem) {
                         if(typeof subItem != "undefined") {
                             ret.push(subItem);
                         }
@@ -11869,7 +11869,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
                     ta.appendChild(content);
                 }
                 var ct = ((position == "first")||(position == "after")) ? "lastChild" : "firstChild";
-                this.forEach( function(item) {
+                this.forEach(function(item) {
                     var tn = ta.cloneNode(true);
                     while(tn[ct]) {
                         d.place(tn[ct], item, position);
@@ -11880,7 +11880,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
             _anim: function(method, args) {
                 var anims = [];
                 args = args|| {};
-                this.forEach( function(item) {
+                this.forEach(function(item) {
                     var tmpArgs = {
                         node: item
                     };
@@ -13138,9 +13138,9 @@ if(!dojo._hasResource["dojo._base.xhr"]) { //_hasResource checks added by build.
         // FIXME: seems that dojo.query needs negation operators!!
         var ret = {};
         var iq = "input[type!=file][type!=submit][type!=image][type!=reset][type!=button], select, textarea";
-        dojo.query(iq, formNode).filter( function(node) {
+        dojo.query(iq, formNode).filter(function(node) {
             return (!node.disabled);
-        }).forEach( function(item) {
+        }).forEach(function(item) {
             var _in = item.name;
             var type = (item.type||"").toLowerCase();
             if((type == "radio")||(type == "checkbox")) {
@@ -13149,7 +13149,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) { //_hasResource checks added by build.
                 }
             } else if(item.multiple) {
                 var ria = ret[_in] = [];
-                dojo.query("option[selected]", item).forEach( function(opt) {
+                dojo.query("option[selected]", item).forEach(function(opt) {
                     ria.push(opt.value);
                 });
             } else {
@@ -13476,19 +13476,19 @@ if(!dojo._hasResource["dojo._base.xhr"]) { //_hasResource checks added by build.
             //first argument and the ioArgs object as the second argument.
             var ld = args.load;
             if(ld && dojo.isFunction(ld)) {
-                d.addCallback( function(value) {
+                d.addCallback(function(value) {
                     return ld.call(args, value, ioArgs);
                 });
             }
             var err = args.error;
             if(err && dojo.isFunction(err)) {
-                d.addErrback( function(value) {
+                d.addErrback(function(value) {
                     return err.call(args, value, ioArgs);
                 });
             }
             var handle = args.handle;
             if(handle && dojo.isFunction(handle)) {
-                d.addBoth( function(value) {
+                d.addBoth(function(value) {
                     return handle.call(args, value, ioArgs);
                 });
             }

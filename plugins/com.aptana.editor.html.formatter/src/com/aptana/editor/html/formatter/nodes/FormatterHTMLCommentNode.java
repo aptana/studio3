@@ -39,4 +39,24 @@ public class FormatterHTMLCommentNode extends FormatterCommentNode
 	{
 		return HTMLFormatterConstants.WRAP_COMMENTS;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterCommentNode#isAddingEndNewLine()
+	 */
+	@Override
+	public boolean isAddingEndNewLine()
+	{
+		return isAddingBeginNewLine();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterCommentNode#isAddingBeginNewLine()
+	 */
+	@Override
+	public boolean isAddingBeginNewLine()
+	{
+		return getDocument().getBoolean(HTMLFormatterConstants.PLACE_COMMENTS_IN_SEPARATE_LINES);
+	}
 }

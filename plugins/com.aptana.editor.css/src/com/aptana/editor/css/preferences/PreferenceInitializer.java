@@ -32,15 +32,23 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
-		prefs.put(IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, ".#:\t");
+		prefs.put(
+				com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
+				".#:\t"); //$NON-NLS-1$
+		prefs.put(
+				com.aptana.editor.common.contentassist.IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS,
+				"(,"); //$NON-NLS-1$
+		prefs.put(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS, ",.;"); //$NON-NLS-1$
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+
 		String[] filtered = new String[] { ".*Unknown pseudo-element.*", ".*Property _.*", ".*-moz-.*", ".*-o-*",
 				".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*", ".*filter.*",
 				".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*",
 				".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
 				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
 				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a background.*" };
+
 		prefs.put(ICSSConstants.CONTENT_TYPE_CSS + ":"
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
 				StringUtil.join("####", filtered));
