@@ -159,7 +159,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 				return super.nextToken();
 			}
 		}
-		if (Token.WHITESPACE != token) {
+		if (!token.isWhitespace()) {
 			tokenHistory.push(token);
 		}
 		return token;

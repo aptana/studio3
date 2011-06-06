@@ -39,6 +39,7 @@ public class QueuedRuleBasedScanner extends RuleBasedScanner {
 			if (tokenScanner != null) {
 				return tokenScanner.nextToken();
 			} else {
+				// return value then reset to EOF
 				try {
 					return token;
 				} finally {
@@ -50,17 +51,15 @@ public class QueuedRuleBasedScanner extends RuleBasedScanner {
 		public int getTokenOffset() {
 			if (tokenScanner != null) {
 				return tokenScanner.getTokenOffset();
-			} else {
-				return offset;
 			}
+			return offset;
 		}
 
 		public int getTokenLength() {
 			if (tokenScanner != null) {
 				return tokenScanner.getTokenLength();
-			} else {
-				return length;
 			}
+			return length;
 		}
 	}
 	

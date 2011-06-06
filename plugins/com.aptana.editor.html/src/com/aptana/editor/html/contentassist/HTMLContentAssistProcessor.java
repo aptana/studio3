@@ -24,6 +24,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -1096,6 +1097,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
+						if (Platform.inDevelopmentMode()) {
+							System.out.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isCSSAttribute]");
+						}
 						if (fCSSProcessor == null)
 						{
 							fCSSProcessor = new CSSContentAssistProcessor(this.editor, activeRange);
@@ -1108,6 +1112,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
+						if (Platform.inDevelopmentMode()) {
+							System.out.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isJSAttribute]");
+						}
 						if (fJSProcessor == null)
 						{
 							fJSProcessor = new JSContentAssistProcessor(this.editor, activeRange);
