@@ -25,7 +25,6 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -77,7 +76,7 @@ public class ExplorerContextContributor implements ContextContributor
 					if (evaluationService != null)
 					{
 						IEvaluationContext currentState = evaluationService.getCurrentState();
-						IWorkbenchPart part = (IWorkbenchPart) currentState.getVariable(ISources.ACTIVE_PART_NAME);
+						Object part = currentState.getVariable(ISources.ACTIVE_PART_NAME);
 						if (part instanceof IEditorPart)
 						{
 							IEditorInput editorInput = (IEditorInput) currentState
