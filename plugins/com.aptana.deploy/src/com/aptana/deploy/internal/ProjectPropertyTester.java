@@ -26,11 +26,11 @@ public class ProjectPropertyTester extends PropertyTester
 			IContainer container;
 			if (receiver instanceof IContainer)
 			{
-				container = (IContainer) receiver;
+				container = (IContainer) resource;
 			}
 			else
 			{
-				container = ((IResource) receiver).getParent();
+				container = resource.getParent();
 			}
 			if (!container.isAccessible())
 			{
