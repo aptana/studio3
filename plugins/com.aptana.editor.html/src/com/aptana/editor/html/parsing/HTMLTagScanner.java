@@ -10,10 +10,8 @@ package com.aptana.editor.html.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
@@ -21,8 +19,11 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
-import com.aptana.editor.common.text.rules.ExtendedWordRule;
+import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
+import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
+import com.aptana.editor.html.internal.text.rules.TagWordRule;
 
 class HTMLTagScanner extends RuleBasedScanner
 {
@@ -40,66 +41,34 @@ class HTMLTagScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// attribute values
-		IToken token = createToken(TokenType.ATTR_VALUE);
-		rules.add(new MultiLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("'", "'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		IToken attrValueToken = createToken(TokenType.ATTR_VALUE);
+		rules.add(new MultiLineRule("\"", "\"", attrValueToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("'", "'", attrValueToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+
+		IToken otherToken = createToken(TokenType.OTHER);
+		
+		// tag name
+		rules.add(new TagWordRule(new TagNameWordDetector(), otherToken, true));
 
 		// attribute names
-		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
-		{
+		rules.add(new WordRule(new AttributeNameWordDetector(), createToken(TokenType.ATTR_NAME), true));
 
-			public boolean isWordPart(char c)
-			{
-				return Character.isLetter(c) || c == '-' || c == ':';
-			}
+		rules.add(new MultiCharacterRule("</", otherToken)); //$NON-NLS-1$
+		rules.add(new MultiCharacterRule("/>", otherToken)); //$NON-NLS-1$
 
-			public boolean isWordStart(char c)
-			{
-				return Character.isLetter(c);
-			}
-
-		}, createToken(TokenType.ATTR_NAME), true)
-		{
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				int c = scanner.read();
-				scanner.unread();
-				return ((char) c) == '=';
-			}
-		};
-		rules.add(wordRule);
-
-		token = createToken(TokenType.OTHER);
-		// tag name
-		rules.add(new WordRule(new WordDetector(), token, true));
 		// special characters
 		CharacterMapRule rule = new CharacterMapRule();
-		rule.add('<', token);
-		rule.add('>', token);
-		rule.add('=', token);
+		rule.add('<', otherToken);
+		rule.add('>', otherToken);
+		rule.add('=', otherToken);
 		rules.add(rule);
 		
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(token);
+		setDefaultReturnToken(otherToken);
 	}
 
 	protected IToken createToken(Object data)
 	{
 		return new Token(data);
-	}
-
-	private static class WordDetector implements IWordDetector
-	{
-
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetterOrDigit(c);
-		}
-
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
-		}
 	}
 }
