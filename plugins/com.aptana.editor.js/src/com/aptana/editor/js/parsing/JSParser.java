@@ -234,6 +234,10 @@ public class JSParser extends Parser implements IParser {
 				{
 					((JSNode) node.getFirstChild()).setDocumentation(block);
 				}
+				else if (node instanceof JSIdentifierNode && node.getParent() instanceof JSNameValuePairNode && node.getNextSibling() instanceof JSFunctionNode)
+				{
+					((JSNode) node.getNextSibling()).setDocumentation(block);
+				}
 				else
 				{
 					IParseNode statement = ((JSNode) node).getContainingStatementNode();
