@@ -90,10 +90,16 @@ public class PingStartup implements IStartup
 		List<String> keyValues = new ArrayList<String>();
 
 		// builds the key/value pairs
-		if (!Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_HAS_RUN,
-				false, new IScopeContext[] { new ConfigurationScope() }))
+		boolean hasRun = Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID,
+				IPreferenceConstants.P_IDE_HAS_RUN, false, new IScopeContext[] { new ConfigurationScope() });
+		if (!hasRun)
 		{
-			EventLogger.getInstance().logEvent("first_run"); //$NON-NLS-1$
+			hasRun = Platform.getPreferencesService().getBoolean(UsagePlugin.OLD_PLUGIN_ID,
+					IPreferenceConstants.P_IDE_HAS_RUN, false, new IScopeContext[] { new ConfigurationScope() });
+			if (!hasRun)
+			{
+				EventLogger.getInstance().logEvent("first_run"); //$NON-NLS-1$
+			}
 		}
 		add(keyValues, "id", getApplicationId()); //$NON-NLS-1$
 		add(keyValues, "version", UsagePlugin.getPluginVersion()); //$NON-NLS-1$
@@ -143,6 +149,26 @@ public class PingStartup implements IStartup
 	{
 		String id = Platform.getPreferencesService().getString(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_ID,
 				null, null);
+		if (id == null)
+		{
+			// see if there is an old id we could migrate
+			id = Platform.getPreferencesService().getString(UsagePlugin.OLD_PLUGIN_ID, IPreferenceConstants.P_IDE_ID,
+					null, null);
+			if (id != null)
+			{
+				IEclipsePreferences prefs = (new ConfigurationScope()).getNode(UsagePlugin.PLUGIN_ID);
+				prefs.put(IPreferenceConstants.P_IDE_ID, id);
+				prefs.putBoolean(IPreferenceConstants.P_IDE_HAS_RUN, true);
+				try
+				{
+					prefs.flush();
+				}
+				catch (BackingStoreException e)
+				{
+					// ignores
+				}
+			}
+		}
 		if (id == null)
 		{
 			id = UUID.randomUUID().toString();
@@ -352,7 +378,7 @@ public class PingStartup implements IStartup
 			output = new DataOutputStream(connection.getOutputStream());
 			output.write(gzippedData);
 			output.flush();
-			
+
 			// Get the response
 			input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			StringBuffer sb = new StringBuffer();
@@ -362,9 +388,9 @@ public class PingStartup implements IStartup
 			{
 				sb.append(line);
 			}
-			
+
 			// NOTE: Leave sysout here so we can use this during debugging
-			//System.out.println(sb.toString());
+			// System.out.println(sb.toString());
 
 			return true;
 		}
