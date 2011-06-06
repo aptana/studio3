@@ -10,7 +10,6 @@ package com.aptana.editor.common;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -35,9 +34,7 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
-import org.eclipse.jface.text.source.CommonOverviewRuler;
 import org.eclipse.jface.text.source.IOverviewRuler;
-import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
@@ -71,7 +68,6 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
-import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
@@ -1062,28 +1058,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			return fLineNumberRulerColumn;
 		}
 		return super.createLineNumberRulerColumn();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	protected IOverviewRuler createOverviewRuler(ISharedTextColors sharedColors)
-	{
-		if (isWordWrapEnabled())
-		{
-			IOverviewRuler ruler = new CommonOverviewRuler(getAnnotationAccess(), VERTICAL_RULER_WIDTH, sharedColors);
-			Iterator<AnnotationPreference> e = EditorsPlugin.getDefault().getMarkerAnnotationPreferences()
-					.getAnnotationPreferences().iterator();
-			while (e.hasNext())
-			{
-				AnnotationPreference preference = e.next();
-				if (preference.contributesToHeader())
-				{
-					ruler.addHeaderAnnotationType(preference.getAnnotationType());
-				}
-			}
-			return ruler;
-		}
-		return super.createOverviewRuler(sharedColors);
 	}
 
 	private boolean isWordWrapEnabled()
