@@ -833,9 +833,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							switch (previousLexeme.getType())
 							{
 								case CLASS:
-								case ID:
 									location = LocationType.ERROR;
 									break LOOP;
+
+								case ID:
+									location = LocationType.INSIDE_VALUE;
+									break;
 
 								case LCURLY:
 								case SEMICOLON:
