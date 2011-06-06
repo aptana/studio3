@@ -7,20 +7,29 @@
  */
 package com.aptana.explorer;
 
+import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.services.IEvaluationService;
 import org.jruby.Ruby;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
@@ -31,6 +40,7 @@ import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ContextContributor;
 import com.aptana.scripting.model.WorkingDirectoryType;
+import com.aptana.ui.util.UIUtils;
 
 public class ExplorerContextContributor implements ContextContributor
 {
@@ -52,7 +62,6 @@ public class ExplorerContextContributor implements ContextContributor
 	 */
 	private IProject getActiveProject()
 	{
-		// First try and get the active project for the instance of the App Explorer open in the active window
 		final IProject[] projects = new IProject[1];
 		try
 		{
@@ -61,12 +70,60 @@ public class ExplorerContextContributor implements ContextContributor
 
 				public void run()
 				{
-					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					if (window == null)
+					// Grab the active project given the context. Check active view or editor, then grab project
+					// from it, falling back to App Explorer's active project.
+					IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
+							IEvaluationService.class);
+					if (evaluationService != null)
+					{
+						IEvaluationContext currentState = evaluationService.getCurrentState();
+						IWorkbenchPart part = (IWorkbenchPart) currentState.getVariable(ISources.ACTIVE_PART_NAME);
+						if (part instanceof IEditorPart)
+						{
+							IEditorInput editorInput = (IEditorInput) currentState
+									.getVariable(ISources.ACTIVE_EDITOR_INPUT_NAME);
+							if (editorInput instanceof IFileEditorInput)
+							{
+								IFile file = ((IFileEditorInput) editorInput).getFile();
+								if (file != null)
+								{
+									projects[0] = file.getProject();
+									if (projects[0] != null)
+									{
+										return;
+									}
+								}
+							}
+						}
+
+						Object selection = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+						if (selection instanceof IStructuredSelection)
+						{
+							Object selectedObject = ((IStructuredSelection) selection).getFirstElement();
+							IResource resource = null;
+							if (selectedObject instanceof IResource)
+							{
+								resource = (IResource) selectedObject;
+							}
+							else if (selectedObject instanceof IAdaptable)
+							{
+								IAdaptable adaptable = (IAdaptable) selectedObject;
+								resource = (IResource) adaptable.getAdapter(IResource.class);
+							}
+							if (resource != null)
+							{
+								projects[0] = resource.getProject();
+							}
+						}
+					}
+					if (projects[0] != null)
 					{
 						return;
 					}
-					IWorkbenchPage page = window.getActivePage();
+
+					// Fallback and try to get the active project for the instance of the App Explorer open in the
+					// active window
+					IWorkbenchPage page = UIUtils.getActivePage();
 					if (page == null)
 					{
 						return;
@@ -157,28 +214,66 @@ public class ExplorerContextContributor implements ContextContributor
 
 	private void addSelectedFiles(CommandContext context)
 	{
-		CommonNavigator nav = getAppExplorer();
-		if (nav == null)
-			return;
+		final IStructuredSelection[] structuredSelection = new IStructuredSelection[1];
 
-		StringBuilder builder = new StringBuilder();
-		ISelection sel = nav.getCommonViewer().getSelection();
-		if (sel instanceof IStructuredSelection)
+		// First try to get the current selection from evaluation context, so we get selection from active view...
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 		{
-			IStructuredSelection struct = (IStructuredSelection) sel;
-			for (Object selected : struct.toArray())
+
+			public void run()
 			{
-				// TODO Should we handle IAdaptables that can be adapted to IResources?
-				if (selected instanceof IResource)
+				// Grab the active project given the context. Check active view or editor, then grab project
+				// from it, falling back to App Explorer's active project.
+				IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
+						IEvaluationService.class);
+				if (evaluationService != null)
 				{
-					IPath location = ((IResource) selected).getLocation();
-					if (location != null)
+					IEvaluationContext currentState = evaluationService.getCurrentState();
+					ISelection sel = (ISelection) currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+					if (sel instanceof IStructuredSelection)
 					{
-						builder.append("'").append(location.toOSString()).append("' "); //$NON-NLS-1$ //$NON-NLS-2$
+						structuredSelection[0] = (IStructuredSelection) sel;
 					}
 				}
 			}
+		});
+
+		// We failed to get selection from active view, may have been an editor active, fall back to selection in App
+		// Explorer.
+		if (structuredSelection[0] == null)
+		{
+			CommonNavigator nav = getAppExplorer();
+			if (nav == null)
+			{
+				return;
+			}
+			ISelection sel = nav.getCommonViewer().getSelection();
+			if (sel instanceof IStructuredSelection)
+			{
+				structuredSelection[0] = (IStructuredSelection) sel;
+			}
 		}
+
+		if (structuredSelection[0] == null)
+		{
+			return;
+		}
+
+		StringBuilder builder = new StringBuilder();
+		IStructuredSelection struct = structuredSelection[0];
+		for (Object selected : struct.toArray())
+		{
+			// TODO Should we handle IAdaptables that can be adapted to IResources?
+			if (selected instanceof IResource)
+			{
+				IPath location = ((IResource) selected).getLocation();
+				if (location != null)
+				{
+					builder.append("'").append(location.toOSString()).append("' "); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+
 		if (builder.length() > 0)
 		{
 			builder.deleteCharAt(builder.length() - 1);
