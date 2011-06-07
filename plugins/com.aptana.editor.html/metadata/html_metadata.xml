@@ -742,6 +742,7 @@ San Diego, CA 92122
         <browser platform="Mozilla" version="3.5+"/>
         <browser platform="Opera" version="10.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
+        <browser platform="Chrome" version="10.0+"/>
       </browsers>
       <description>Specifies an audio player</description>
       <event-refs>
@@ -1526,9 +1527,11 @@ This sentence is on the second line.
         <specification name="W3C" version="HTML 5"/>
       </availability>
       <browsers>
-        <browser platform="Mozilla" version="3.7+"/>
-        <browser platform="Opera" version="7.0+"/>
-        <browser platform="Safari" version="4.0.5+"/>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a scriptable bitmap canvas</description>
       <event-refs>
@@ -1873,6 +1876,92 @@ This sentence is on the second line.
         <reference name="HTMLElement"/>
       </references>
       <remarks>Use the &amp;lt;cite&amp;gt;&amp;lt;/cite&amp;gt; tag to define style rules for a citation.</remarks>
+    </element>
+    <element name="clipPath" related-class="HTMLElement" display-name="Clipping Path">
+      <attribute-refs>
+        <attribute-ref name="accesskey"/>
+        <attribute-ref name="class"/>
+        <attribute-ref name="contenteditable"/>
+        <attribute-ref name="contextmenu"/>
+        <attribute-ref name="dir"/>
+        <attribute-ref name="draggable"/>
+        <attribute-ref name="hidden"/>
+        <attribute-ref name="height"/>
+        <attribute-ref name="id"/>
+        <attribute-ref name="lang"/>
+        <attribute-ref name="spellcheck"/>
+        <attribute-ref name="style"/>
+        <attribute-ref name="tabindex"/>
+        <attribute-ref name="title"/>
+        <attribute-ref name="width"/>
+      </attribute-refs>
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies the clipping path</description>
+      <event-refs>
+        <event-ref name="onabort"/>
+        <event-ref name="onblur"/>
+        <event-ref name="oncanplay"/>
+        <event-ref name="oncanplaythrough"/>
+        <event-ref name="onchange"/>
+        <event-ref name="onclick"/>
+        <event-ref name="oncontextmenu"/>
+        <event-ref name="ondblclick"/>
+        <event-ref name="ondrag"/>
+        <event-ref name="ondragend"/>
+        <event-ref name="ondragenter"/>
+        <event-ref name="ondragleave"/>
+        <event-ref name="ondragover"/>
+        <event-ref name="ondragstart"/>
+        <event-ref name="ondrop"/>
+        <event-ref name="ondurationchange"/>
+        <event-ref name="onemptied"/>
+        <event-ref name="onended"/>
+        <event-ref name="onerror"/>
+        <event-ref name="onfocus"/>
+        <event-ref name="onformchange"/>
+        <event-ref name="onforminput"/>
+        <event-ref name="oninput"/>
+        <event-ref name="oninvalid"/>
+        <event-ref name="onkeydown"/>
+        <event-ref name="onkeypress"/>
+        <event-ref name="onkeyup"/>
+        <event-ref name="onload"/>
+        <event-ref name="onloadeddata"/>
+        <event-ref name="onloadedmetadata"/>
+        <event-ref name="onmousedown"/>
+        <event-ref name="onmousemove"/>
+        <event-ref name="onmouseout"/>
+        <event-ref name="onmouseover"/>
+        <event-ref name="onmouseup"/>
+        <event-ref name="onmousewheel"/>
+        <event-ref name="onpause"/>
+        <event-ref name="onplay"/>
+        <event-ref name="onplaying"/>
+        <event-ref name="onprogress"/>
+        <event-ref name="onratechange"/>
+        <event-ref name="onreadystatechange"/>
+        <event-ref name="onscroll"/>
+        <event-ref name="onseeked"/>
+        <event-ref name="onseeking"/>
+        <event-ref name="onselect"/>
+        <event-ref name="onshow"/>
+        <event-ref name="onstalled"/>
+        <event-ref name="onsubmit"/>
+        <event-ref name="onsuspend"/>
+        <event-ref name="ontimeupdate"/>
+        <event-ref name="onvolumechange"/>
+        <event-ref name="onwaiting"/>
+      </event-refs>
+      <remarks></remarks>
     </element>
     <element name="code" related-class="HTMLElement" display-name="Code">
       <attribute-refs>
@@ -5173,6 +5262,7 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
         <attribute-ref name="align"/>
         <attribute-ref name="alt"/>
         <attribute-ref name="autocomplete"/>
+        <attribute-ref name="autofocus"/>
         <attribute-ref name="checked"/>
         <attribute-ref name="class"/>
         <attribute-ref name="dir"/>
@@ -5183,13 +5273,21 @@ Sorry, your browser does not support inline frames. ;/iframe&amp;gt;
         <attribute-ref name="id"/>
         <attribute-ref name="lang"/>
         <attribute-ref name="language"/>
+        <attribute-ref name="list"/>
         <attribute-ref name="loop"/>
         <attribute-ref name="lowsrc"/>
+        <attribute-ref name="max"/>
         <attribute-ref name="maxlength"/>
+        <attribute-ref name="min"/>
+        <attribute-ref name="multiple"/>
         <attribute-ref name="name"/>
+        <attribute-ref name="pattern"/>
+        <attribute-ref name="placeholder"/>
         <attribute-ref name="readonly"/>
+        <attribute-ref name="required"/>
         <attribute-ref name="size"/>
         <attribute-ref name="src"/>
+        <attribute-ref name="step"/>
         <attribute-ref name="style"/>
         <attribute-ref name="tabindex"/>
         <attribute-ref name="title"/>
@@ -10594,6 +10692,7 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <browser platform="Mozilla" version="3.5+"/>
         <browser platform="Opera" version="10.5+"/>
         <browser platform="Safari" version="4.0.5+"/>
+        <browser platform="Chrome" version="10.0+"/>
       </browsers>
       <description>Specifies an element used for playing videos or movies.</description>
       <event-refs>
@@ -11027,10 +11126,12 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <hint>[url, url, ...]</hint>
     </attribute>
     <attribute name="autocomplete" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
-        <browser platform="IE" version="5.0+"/>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.0+"/>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
       </browsers>
       <description>Specifies whether form autocompletion, which automatically completes the fields on a form after the user has typed enough letters, is on or off.</description>
       <values>
@@ -11040,8 +11141,10 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
     </attribute>
     <attribute name="autofocus" type="String">
       <browsers>
-        <browser platform="Opera" version="9.0+"/>
-        <browser platform="Safari" version="4.0.5+"/>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Makes the input field focused on page load</description>
       <hint>[disabled]</hint>
@@ -12083,6 +12186,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <description>Left margin for the body of the document.</description>
       <hint>[margin-width]. Example values: 10px, 5%, etc.</hint>
     </attribute>
+    <attribute name="list" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="4.0+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Refers to a datalist containing predefined options for the input field.</description>
+      <hint></hint>
+    </attribute>
     <attribute name="link" type="String" element="body">
       <browsers>
         <browser platform="IE" version="4.0+"/>
@@ -12165,11 +12280,16 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <hint>[number-of-pixels]</hint>
     </attribute>
     <attribute name="max" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
-        <browser platform="Opera" version="9.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the upper bound of the range.</description>
-      <hint>[value]</hint>
+      <hint></hint>
     </attribute>
     <attribute name="maxlength" type="String">
       <availability>
@@ -12245,11 +12365,16 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
       <hint>[http-method]</hint>
     </attribute>
     <attribute name="min" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
       <browsers>
-        <browser platform="Opera" version="9.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the lower bound of the range.</description>
-      <hint>[value]</hint>
+      <hint></hint>
     </attribute>
     <attribute name="multiple" type="String">
       <availability>
@@ -12420,6 +12545,32 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="foreground" description="Set the palette to foreground."/>
       </values>
     </attribute>
+    <attribute name="pattern" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifes a pattern or format for the field's value.</description>
+      <hint></hint>
+    </attribute>
+    <attribute name="placeholder" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies a hint to help users fill out the input field.</description>
+      <hint></hint>
+    </attribute>
     <attribute name="pluginspage" type="String">
       <browsers>
         <browser platform="Netscape" version="4.0+"/>
@@ -12534,6 +12685,19 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="stylesheet" description="Linked document is a stylesheet."/>
         <value name="subsection" description="Linked document is a subsection."/>
       </values>
+    </attribute>
+    <attribute name="required" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Indicates that the input field's value is required in order to submit the form.</description>
+      <hint></hint>
     </attribute>
     <attribute name="rev" type="String">
       <availability>
@@ -12784,6 +12948,18 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
         <value name="6" description="6"/>
         <value name="7" description="7"/>
       </values>
+    </attribute>
+    <attribute name="step" type="String">
+      <availability>
+        <specification name="W3C" version="HTML 5"/>
+      </availability>
+      <browsers>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies the legal number intervals for the input field.</description>
+      <hint></hint>
     </attribute>
     <attribute name="span" type="Number">
       <availability>
