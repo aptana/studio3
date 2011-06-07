@@ -6,13 +6,13 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.html;
+package com.aptana.editor.html.internal.text.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 
-/* package */ class DocTypeRule extends MultiLineRule {
+public class DocTypeRule extends MultiLineRule {
 	
     private int fEmbeddedStart= 0;
 
@@ -40,8 +40,6 @@ import org.eclipse.jface.text.rules.MultiLineRule;
             	fEmbeddedStart--;
             }
         }
-        
-        scanner.unread();
-        return false;
+        return true;
     }
 }
