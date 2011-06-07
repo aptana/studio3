@@ -141,7 +141,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 	public void testElementWhichIsClosedProposal6()
 	{
-		assertCompletionCorrect("<b><a></|</b>", '\t', ELEMENT_PROPOSALS_COUNT + 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<b><a></|</b>", '\t', 1, "/a", "<b><a></a></b>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public void testSuggestOnlyUnclosedTagForCloseTagWithNoElementName()
