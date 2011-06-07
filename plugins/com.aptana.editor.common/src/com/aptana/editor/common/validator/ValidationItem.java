@@ -66,8 +66,12 @@ public class ValidationItem implements IValidationItem
 	{
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.put(IMarker.SEVERITY, getSeverity());
-		attributes.put(IMarker.CHAR_START, getOffset());
-		attributes.put(IMarker.CHAR_END, getOffset() + getLength());
+		int length = getLength();
+		if (length > 0)
+		{
+			attributes.put(IMarker.CHAR_START, getOffset());
+			attributes.put(IMarker.CHAR_END, getOffset() + length);
+		}
 		attributes.put(IMarker.MESSAGE, getMessage());
 		attributes.put(IMarker.LINE_NUMBER, getLineNumber());
 

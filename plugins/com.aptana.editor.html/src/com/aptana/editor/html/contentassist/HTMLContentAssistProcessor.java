@@ -1340,7 +1340,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						case IN_OPEN_TAG:
 							lastLexeme = lexemeProvider.getLastLexeme();
 
-							if (lastLexeme != null && lastLexeme.getEndingOffset() == offset - 1)
+							if (lastLexeme != null
+									&& (lastLexeme.getType() == HTMLTokenType.TAG_END || lastLexeme.getType() == HTMLTokenType.TAG_SELF_CLOSE)
+									&& lastLexeme.getEndingOffset() == offset - 1)
 							{
 								result = LocationType.IN_TEXT;
 							}
