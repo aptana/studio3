@@ -5,144 +5,181 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+
 package com.aptana.editor.html;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
-import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.MultiCharacterRule;
+import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.css.CSSCodeScanner;
+import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
+import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
+import com.aptana.editor.html.internal.text.rules.TagWordRule;
+import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.js.JSCodeScanner;
 
-public class HTMLTagScanner extends RuleBasedScanner
-{
-	/**
-	 * A key word detector.
-	 */
-	static class WordDetector implements IWordDetector
-	{
-		/*
-		 * (non-Javadoc) Method declared on IWordDetector
-		 */
-		public boolean isWordPart(char c)
-		{
-			return Character.isLetterOrDigit(c);
-		}
+/**
+ * @author Max Stepanov
+ *
+ */
+public class HTMLTagScanner extends QueuedRuleBasedScanner {
 
-		/*
-		 * (non-Javadoc) Method declared on IWordDetector
-		 */
-		public boolean isWordStart(char c)
-		{
-			return Character.isLetter(c);
-		}
-	}
-
-	// as per the html5 spec, these are elements that define "sections", but we've added
+	// as per the html5 spec, these are elements that define "sections", but
+	// we've added
 	// the <html> tag itself to the list.
 	// see http://dev.w3.org/html5/spec/Overview.html#sections
 	@SuppressWarnings("nls")
-	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address", "nav", "section",
-			"article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4", "h5", "h6" };
+	private static final String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address", "nav", "section", "article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4",
+			"h5", "h6" };
 
 	@SuppressWarnings("nls")
-	private static String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form", "frame",
-			"frameset", "iframe", "noframes", "object", "ol", "p", "ul", "applet", "center", "dir", "hr", "menu", "pre" };
+	private static final String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form", "frame", "frameset", "iframe", "noframes", "object", "ol", "p", "ul",
+			"applet", "center", "dir", "hr", "menu", "pre" };
 
 	@SuppressWarnings("nls")
-	private static String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big",
-			"br", "button", "caption", "cite", "code", "col", "colgroup", "del", "dfn", "em", "font", "i", "img",
-			"input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup",
-			"option", "param", "q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style",
-			"sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "u", "var",
-			"canvas", "audio", "video" };
+	private static final String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big", "br", "button", "caption", "cite", "code", "col", "colgroup",
+			"del", "dfn", "em", "font", "i", "img", "input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup", "option", "param",
+			"q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title",
+			"tr", "tt", "u", "var", "canvas", "audio", "video" };	
+	
+	private final IToken doubleQuotedStringToken = createToken(HTMLTokenType.DOUBLE_QUOTED_STRING);
+	private final IToken singleQuotedStringToken = createToken(HTMLTokenType.SINGLE_QUOTED_STRING);
+	private final IToken attributeStyleToken = createToken(HTMLTokenType.ATTR_STYLE);
+	private final IToken attributeScriptToken = createToken(HTMLTokenType.ATTR_SCRIPT);
+	private final IToken equalToken = createToken(HTMLTokenType.EQUAL);
+	
+	private ITokenScanner cssTokenScanner = new CSSCodeScanner();
+	private ITokenScanner jsTokenScanner = new JSCodeScanner();
+	
+	private Stack<IToken> tokenHistory = new Stack<IToken>();
+	private String tagName;
 
 	/**
-	 * HTMLTagScanner
+	 * 
 	 */
-	public HTMLTagScanner()
-	{
+	public HTMLTagScanner() {
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add rule for double quotes
-		rules.add(new MultiLineRule("\"", "\"", createToken(HTMLTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("\"", "\"", doubleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add a rule for single quotes
-		rules.add(new MultiLineRule("'", "'", createToken(HTMLTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("'", "'", singleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		// Attributes
-		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
-		{
-
-			public boolean isWordPart(char c)
-			{
-				return Character.isLetter(c) || c == '-' || c == ':';
-			}
-
-			public boolean isWordStart(char c)
-			{
-				return Character.isLetter(c);
-			}
-
-		}, createToken(HTMLTokenType.ATTRIBUTE), true)
-		{
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				int c = scanner.read();
-				scanner.unread();
-				return ((char) c) == '=';
-			}
-		};
-		wordRule.addWord("id", createToken(HTMLTokenType.ID)); //$NON-NLS-1$
-		wordRule.addWord("class", createToken(HTMLTokenType.CLASS)); //$NON-NLS-1$
-		rules.add(wordRule);
-
 		// Tags
-		wordRule = new WordRule(new WordDetector(), createToken(HTMLTokenType.META), true);
-		wordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
-		wordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
+		WordRule tagWordRule = new TagWordRule(new TagNameWordDetector(), createToken(HTMLTokenType.META), true) {
+			@Override
+			protected IToken getWordToken(String word) {
+				tagName = word;
+				return null;
+			}
+			
+		};
+		tagWordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
+		tagWordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
 		IToken structureDotAnyToken = createToken(HTMLTokenType.STRUCTURE_TAG);
-		for (String tag : STRUCTURE_DOT_ANY)
-		{
-			wordRule.addWord(tag, structureDotAnyToken);
+		for (String tag : STRUCTURE_DOT_ANY) {
+			tagWordRule.addWord(tag, structureDotAnyToken);
 		}
 		IToken blockDotAnyToken = createToken(HTMLTokenType.BLOCK_TAG);
-		for (String tag : BLOCK_DOT_ANY)
-		{
-			wordRule.addWord(tag, blockDotAnyToken);
+		for (String tag : BLOCK_DOT_ANY) {
+			tagWordRule.addWord(tag, blockDotAnyToken);
 		}
 		IToken inlineAnyToken = createToken(HTMLTokenType.INLINE_TAG);
-		for (String tag : TAG_INLINE_ANY)
-		{
-			wordRule.addWord(tag, inlineAnyToken);
+		for (String tag : TAG_INLINE_ANY) {
+			tagWordRule.addWord(tag, inlineAnyToken);
 		}
-		rules.add(wordRule);
+		rules.add(tagWordRule);
+		
+		WordRule attributeWordRule = new ExtendedWordRule(new AttributeNameWordDetector(), createToken(HTMLTokenType.ATTRIBUTE), true) {
+			@Override
+			protected IToken getWordToken(String word) {
+				return HTMLUtils.isJSAttribute(tagName, word) ? attributeScriptToken : null;
+			}
+			
+		};
+		attributeWordRule.addWord("id", createToken(HTMLTokenType.ATTR_ID)); //$NON-NLS-1$
+		attributeWordRule.addWord("class", createToken(HTMLTokenType.ATTR_CLASS)); //$NON-NLS-1$
+		attributeWordRule.addWord("style", attributeStyleToken); //$NON-NLS-1$
+		rules.add(attributeWordRule);
 
-		CharacterMapRule rule = new CharacterMapRule();
-		rule.add('>', createToken(HTMLTokenType.TAG_END));
-		rule.add('=', createToken(HTMLTokenType.EQUAL));
-		rules.add(rule);
-		// FIXME Use a word/extend word rule here to avoid slow regexp rule?
-		rules.add(new RegexpRule("<(/)?", createToken(HTMLTokenType.TAG_START), true)); //$NON-NLS-1$
+		rules.add(new MultiCharacterRule("</", createToken(HTMLTokenType.TAG_START))); //$NON-NLS-1$
+		rules.add(new MultiCharacterRule("/>", createToken(HTMLTokenType.TAG_SELF_CLOSE))); //$NON-NLS-1$
 
+		CharacterMapRule charsRule = new CharacterMapRule();
+		charsRule.add('<', createToken(HTMLTokenType.TAG_START));
+		charsRule.add('>', createToken(HTMLTokenType.TAG_END));
+		charsRule.add('=', equalToken);
+		rules.add(charsRule);
+		
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(createToken(HTMLTokenType.TEXT));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.DelegatingRuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
+	 */
+	@Override
+	public void setRange(IDocument document, int offset, int length) {
+		super.setRange(document, offset, length);
+		tokenHistory.clear();
+		tagName = null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.DelegatingRuleBasedScanner#nextToken()
+	 */
+	@Override
+	public IToken nextToken() {
+		IToken token = super.nextToken();
+		if (doubleQuotedStringToken == token || singleQuotedStringToken == token) {
+			IToken attributeToken = getAttributeToken();
+			ITokenScanner tokenScanner = null;
+			if (attributeScriptToken == attributeToken) {
+				tokenScanner = jsTokenScanner;
+			} else if (attributeStyleToken == attributeToken) {
+				tokenScanner = cssTokenScanner;
+			}
+			tokenHistory.clear();
+			int offset = getTokenOffset();
+			int length = getTokenLength() - 2;
+			if (tokenScanner != null && length > 0) {
+				queueToken(token, offset, 1);
+				queueDelegate(tokenScanner, offset+1, length);
+				queueToken(token, offset+length+1, 1);
+				return super.nextToken();
+			}
+		}
+		if (!token.isWhitespace()) {
+			tokenHistory.push(token);
+		}
+		return token;
+	}
+	
+	private IToken getAttributeToken() {
+		if (tokenHistory.size() < 2 || equalToken != tokenHistory.pop()) {
+			return null;
+		}
+		return tokenHistory.pop();
 	}
 
 	/**
@@ -151,9 +188,8 @@ public class HTMLTagScanner extends RuleBasedScanner
 	 * @param type
 	 * @return
 	 */
-	protected IToken createToken(HTMLTokenType type)
-	{
-		return this.createToken(type.getScope());
+	protected IToken createToken(HTMLTokenType type) {
+		return createToken(type.getScope());
 	}
 
 	/**
@@ -162,8 +198,8 @@ public class HTMLTagScanner extends RuleBasedScanner
 	 * @param string
 	 * @return
 	 */
-	protected IToken createToken(String string)
-	{
+	protected IToken createToken(String string) {
 		return new Token(string);
 	}
+
 }

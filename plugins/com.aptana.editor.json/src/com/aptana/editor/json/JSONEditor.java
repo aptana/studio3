@@ -50,7 +50,7 @@ public class JSONEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new JSONDocumentProvider());
+		this.setDocumentProvider(JSONPlugin.getDefault().getJSONDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

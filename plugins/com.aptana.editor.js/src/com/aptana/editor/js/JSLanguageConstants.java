@@ -79,7 +79,7 @@ public class JSLanguageConstants
 	
 	@SuppressWarnings("nls")
 	public static final String[] SUPPORT_CLASSES = new String[] { "Anchor", "Applet", "Area", "Array", "Boolean",
-			"Button", "Checkbox", "Date", "document", "event", "FileUpload", "Form", "Frame", "Function", "Hidden",
+			"Button", "Checkbox", "Date", "document", "Error", "event", "FileUpload", "Form", "Frame", "Function", "Hidden",
 			"History", "Image", "JavaArray", "JavaClass", "JavaObject", "JavaPackage", "java", "Layer", "Link",
 			"Location", "Math", "MimeType", "Number", "navigator", "netscape", "Object", "Option", "Packages",
 			"Password", "Plugin", "Radio", "RegExp", "Reset", "Select", "String", "Style", "Submit", "screen", "sun",

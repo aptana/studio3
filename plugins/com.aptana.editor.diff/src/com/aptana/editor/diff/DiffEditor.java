@@ -21,6 +21,6 @@ public class DiffEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		setSourceViewerConfiguration(new DiffSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new DiffDocumentProvider());
+		setDocumentProvider(Activator.getDefault().getDiffDocumentProvider());
 	}
 }

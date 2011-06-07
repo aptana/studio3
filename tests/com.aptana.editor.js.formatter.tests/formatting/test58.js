@@ -1638,7 +1638,7 @@ jQuery.fn.extend({
 		// Otherwise, remember the function for later
 		else
 			// Add the function to the wait list
-			jQuery.readyList.push( function() { return f.apply(this, [jQuery]) } );
+			jQuery.readyList.push(function() { return f.apply(this, [jQuery]) } );
 	
 		return this;
 	}
@@ -2592,7 +2592,7 @@ if(typeof window.jQuery == "undefined") {
         /** @id jQuery.index */
         index: function( obj ) {
             var pos = -1;
-            this.each( function(i) {
+            this.each(function(i) {
                 if ( this == obj )
                     pos = i;
             });
@@ -2612,7 +2612,7 @@ if(typeof window.jQuery == "undefined") {
                 }
 
             // Check to see if we're setting style values
-            return this.each( function(index) {
+            return this.each(function(index) {
                 // Set all the styles
                 for ( var prop in obj )
                     jQuery.attr(
@@ -2646,7 +2646,7 @@ if(typeof window.jQuery == "undefined") {
             var a, args = arguments;
 
             // Wrap each of the matched elements individually
-            return this.each( function() {
+            return this.each(function() {
                 if ( !a )
                     a = jQuery.clean(args, this.ownerDocument);
 
@@ -2704,7 +2704,7 @@ if(typeof window.jQuery == "undefined") {
         clone: function(deep) {
             // Need to remove events on the element and its descendants
             var $this = this.add(this.find("*"));
-            $this.each( function() {
+            $this.each(function() {
                 this._$events = {};
                 for (var type in this.$events)
                     this._$events[type] = jQuery.extend({},this.$events[type]);
@@ -2714,7 +2714,7 @@ if(typeof window.jQuery == "undefined") {
                 return a.cloneNode( deep != undefined ? deep : true );
             }) );
             // Add the events back to the original and its descendants
-            $this.each( function() {
+            $this.each(function() {
                 var events = this._$events;
                 for (var type in events)
                     for (var handler in events[type])
@@ -2776,7 +2776,7 @@ if(typeof window.jQuery == "undefined") {
         domManip: function(args, table, dir, fn) {
             var clone = this.length > 1, a;
 
-            return this.each( function() {
+            return this.each(function() {
                 if ( !a ) {
                     a = jQuery.clean(args, this.ownerDocument);
                     if ( dir < 0 )
@@ -3247,7 +3247,7 @@ else if (document.defaultView && document.defaultView.getComputedStyle) {
     }, function(i,n) {
         jQuery.fn[ i ] = function() {
             var a = arguments;
-            return this.each( function() {
+            return this.each(function() {
                 for ( var j = 0, al = a.length; j < al; j++ )
                     jQuery(a[j])[n]( this );
             });
@@ -3985,13 +3985,13 @@ else if ( m[1] == "@" ) {
 
         /** @id jQuery.bind */
         bind: function( type, data, fn ) {
-            return type == "unload" ? this.one(type, data, fn) : this.each( function() {
+            return type == "unload" ? this.one(type, data, fn) : this.each(function() {
                 jQuery.event.add( this, type, fn || data, fn && data );
             });
         },
         /** @id jQuery.one */
         one: function( type, data, fn ) {
-            return this.each( function() {
+            return this.each(function() {
                 jQuery.event.add( this, type, function(event) {
                     jQuery(this).unbind(event);
                     return (fn || data).apply( this, arguments);
@@ -4000,13 +4000,13 @@ else if ( m[1] == "@" ) {
         },
         /** @id jQuery.unbind */
         unbind: function( type, fn ) {
-            return this.each( function() {
+            return this.each(function() {
                 jQuery.event.remove( this, type, fn );
             });
         },
         /** @id jQuery.trigger */
         trigger: function( type, data ) {
-            return this.each( function() {
+            return this.each(function() {
                 jQuery.event.trigger( type, data, this );
             });
         },
@@ -4015,7 +4015,7 @@ else if ( m[1] == "@" ) {
             // Save reference to arguments for access in closure
             var a = arguments;
 
-            return this.click( function(e) {
+            return this.click(function(e) {
                 // Figure out which function to execute
                 this.lastToggle = 0 == this.lastToggle ? 1 : 0;
 
@@ -4064,7 +4064,7 @@ else if ( m[1] == "@" ) {
             // Otherwise, remember the function for later
             else
                 // Add the function to the wait list
-                jQuery.readyList.push( function() {
+                jQuery.readyList.push(function() {
                     return f.apply(this, [jQuery])
                 } );
             return this;
@@ -4100,7 +4100,7 @@ else if ( m[1] == "@" ) {
 
                 // Remove script element used by IE hack
                 if( !window.frames.length ) // don't remove if frames are present (#1187)
-                    jQuery(window).load( function() {
+                    jQuery(window).load(function() {
                         jQuery("#__ie_init").remove();
                     });
             }
@@ -4147,7 +4147,7 @@ else if ( m[1] == "@" ) {
             // If Safari  is used
         } else if ( jQuery.browser.safari )
             // Continually check to see if the document.readyState is valid
-            jQuery.safariTimer = setInterval( function() {
+            jQuery.safariTimer = setInterval(function() {
                 // loaded and complete are both valid states
                 if ( document.readyState == "loaded" ||
                 document.readyState == "complete" ) {
@@ -4235,7 +4235,7 @@ else if ( m[1] == "@" ) {
         },
         /** @id jQuery.evalScripts */
         evalScripts: function() {
-            return this.find("script").each( function() {
+            return this.find("script").each(function() {
                 if ( this.src )
                     jQuery.getScript( this.src );
                 else
@@ -4436,7 +4436,7 @@ else if ( m[1] == "@" ) {
 
             // Timeout checker
             if ( s.timeout > 0 )
-                setTimeout( function() {
+                setTimeout(function() {
                     // Check to see if the request is still happening
                     if ( xml ) {
                         // Cancel the request
@@ -4569,7 +4569,7 @@ else if ( m[1] == "@" ) {
                 opacity: "show"
             }, speed, callback) :
 
-            this.filter(":hidden").each( function() {
+            this.filter(":hidden").each(function() {
                 this.style.display = this.oldblock ? this.oldblock : "";
                 if ( jQuery.css(this,"display") == "none" )
                     this.style.display = "block";
@@ -4584,7 +4584,7 @@ else if ( m[1] == "@" ) {
                 opacity: "hide"
             }, speed, callback) :
 
-            this.filter(":visible").each( function() {
+            this.filter(":visible").each(function() {
                 this.oldblock = this.oldblock || jQuery.css(this,"display");
                 if ( this.oldblock == "none" )
                     this.oldblock = "block";
@@ -4602,7 +4602,7 @@ else if ( m[1] == "@" ) {
                 width: "toggle",
                 opacity: "toggle"
             }, fn, fn2) :
-            this.each( function() {
+            this.each(function() {
                 jQuery(this)[ jQuery(this).is(":hidden") ? "show" : "hide" ]();
             });
         },
@@ -4644,7 +4644,7 @@ else if ( m[1] == "@" ) {
         },
         /** @id jQuery.animate */
         animate: function( prop, speed, easing, callback ) {
-            return this.queue( function() {
+            return this.queue(function() {
                 var hidden = jQuery(this).is(":hidden"),
                 opt = jQuery.speed(speed, easing, callback),
                 self = this;
@@ -4682,7 +4682,7 @@ else if ( m[1] == "@" ) {
                 type = "fx";
             }
 
-            return this.each( function() {
+            return this.each(function() {
                 if ( !this.queue )
                     this.queue = {};
 
@@ -4789,11 +4789,11 @@ else if ( m[1] == "@" ) {
                 z.now = from;
                 z.a();
 
-                jQuery.timers.push( function() {
+                jQuery.timers.push(function() {
                     return z.step(from, to);
                 });
                 if ( jQuery.timers.length == 1 ) {
-                    var timer = setInterval( function() {
+                    var timer = setInterval(function() {
                         var timers = jQuery.timers;
 
                         for ( var i = 0; i < timers.length; i++ )

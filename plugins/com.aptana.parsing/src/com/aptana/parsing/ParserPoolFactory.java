@@ -167,7 +167,7 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source)
+	public static IParseRootNode parse(String contentTypeId, String source) throws Exception
 	{
 		ParseState parseState = new ParseState();
 
@@ -183,7 +183,7 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, IParseState parseState)
+	public static IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception
 	{
 		if (contentTypeId == null)
 		{
@@ -202,11 +202,6 @@ public class ParserPoolFactory
 				try
 				{
 					result = parser.parse(parseState);
-				}
-				catch (Exception e)
-				{
-					// just like in FileService ... "not logging the parsing error here since
-					// the source could be in an intermediate state of being edited by the user"
 				}
 				finally
 				{

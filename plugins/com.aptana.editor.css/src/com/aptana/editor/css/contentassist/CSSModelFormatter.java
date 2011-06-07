@@ -9,6 +9,7 @@ package com.aptana.editor.css.contentassist;
 
 import java.util.List;
 
+import com.aptana.core.util.URIUtil;
 import com.aptana.editor.css.contentassist.model.ICSSMetadataElement;
 import com.aptana.editor.css.contentassist.model.UserAgentElement;
 
@@ -64,5 +65,34 @@ public class CSSModelFormatter
 		}
 		
 		return buffer.toString();
+	}
+
+	/**
+	 * getDocumentDisplayName
+	 * 
+	 * @param document
+	 * @return
+	 */
+	public static String getDocumentDisplayName(String document)
+	{
+		String result = null;
+
+		if (document != null)
+		{
+			int index = document.lastIndexOf('/');
+
+			if (index != -1)
+			{
+				result = document.substring(index + 1);
+			}
+			else
+			{
+				result = document;
+			}
+
+			result = URIUtil.decodeURI(result);
+		}
+
+		return result;
 	}
 }

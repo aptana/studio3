@@ -62,7 +62,7 @@ public class XMLEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new XMLDocumentProvider());
+		setDocumentProvider(XMLPlugin.getDefault().getXMLDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

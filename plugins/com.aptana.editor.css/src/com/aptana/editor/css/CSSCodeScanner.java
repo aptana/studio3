@@ -30,8 +30,6 @@ import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
 import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
 import com.aptana.editor.css.internal.text.rules.SpecialCharacterWordDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Chris Williams
@@ -459,13 +457,4 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		return PROPERTY_NAMES;
 	}
 
-	/**
-	 * getThemeManager
-	 * 
-	 * @return
-	 */
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
-	}
 }

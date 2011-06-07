@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -326,11 +327,16 @@ public class CSSValidator implements IValidator
 		ac.setProfile(APTANA_PROFILE);
 		try
 		{
-			parser.parseStyleElement(ac, new ByteArrayInputStream(source.getBytes()), null, null, path.toURL(), 0);
+			parser.parseStyleElement(ac,
+					new ByteArrayInputStream(source.getBytes("UTF-8")), null, null, path.toURL(), 0); //$NON-NLS-1$
 		}
 		catch (MalformedURLException e)
 		{
 			CSSPlugin.logError(MessageFormat.format(Messages.CSSValidator_ERR_InvalidPath, path), e);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			CSSPlugin.logError(e.getLocalizedMessage(), e);
 		}
 
 		StyleSheet stylesheet = parser.getStyleSheet();

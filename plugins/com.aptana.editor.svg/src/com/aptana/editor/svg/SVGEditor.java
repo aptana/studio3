@@ -14,21 +14,17 @@ import com.aptana.editor.svg.outline.SVGOutlineContentProvider;
 import com.aptana.editor.svg.outline.SVGOutlineLabelProvider;
 import com.aptana.editor.xml.XMLEditor;
 
-public class SVGEditor extends XMLEditor
-{
+public class SVGEditor extends XMLEditor {
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.xml.XMLEditor#createOutlinePage()
 	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
+	protected CommonOutlinePage createOutlinePage() {
 		CommonOutlinePage outline = super.createOutlinePage();
-
 		outline.setContentProvider(new SVGOutlineContentProvider());
 		outline.setLabelProvider(new SVGOutlineLabelProvider());
-
 		return outline;
 	}
 
@@ -37,21 +33,19 @@ public class SVGEditor extends XMLEditor
 	 * @see com.aptana.editor.xml.XMLEditor#getOutlinePreferenceStore()
 	 */
 	@Override
-	protected IPreferenceStore getOutlinePreferenceStore()
-	{
+	protected IPreferenceStore getOutlinePreferenceStore() {
 		return SVGPlugin.getDefault().getPreferenceStore();
 	}
+
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.xml.XMLEditor#initializeEditor()
 	 */
 	@Override
-	protected void initializeEditor()
-	{
+	protected void initializeEditor() {
 		super.initializeEditor();
-
 		setSourceViewerConfiguration(new SVGSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new SVGDocumentProvider());
+		setDocumentProvider(SVGPlugin.getDefault().getSVGDocumentProvider());
 	}
 }

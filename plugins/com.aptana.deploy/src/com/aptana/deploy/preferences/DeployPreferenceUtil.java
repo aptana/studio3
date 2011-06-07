@@ -62,6 +62,10 @@ public class DeployPreferenceUtil
 
 	public static String getDeployEndpoint(IContainer container)
 	{
+		if (container == null)
+		{
+			return null;
+		}
 		return Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
 				MessageFormat.format("{0}:{1}", //$NON-NLS-1$
 						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()),
@@ -70,6 +74,10 @@ public class DeployPreferenceUtil
 
 	public static String getDeployProviderId(IContainer container)
 	{
+		if (container == null)
+		{
+			return null;
+		}
 		String id = null;
 		try
 		{

@@ -89,7 +89,7 @@ public class HTMLTidyValidator implements IValidator
 		tidy.setErrout(out);
 		try
 		{
-			tidy.parse(new ByteArrayInputStream(source.getBytes()), null);
+			tidy.parse(new ByteArrayInputStream(source.getBytes("UTF-8")), null); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{

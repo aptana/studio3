@@ -19,8 +19,10 @@ public enum HTMLTokenType implements ITypePredicate
 	DOUBLE_QUOTED_STRING("string.quoted.double.html"), //$NON-NLS-1$
 	SINGLE_QUOTED_STRING("string.quoted.single.html"), //$NON-NLS-1$
 	ATTRIBUTE("entity.other.attribute-name.html"), //$NON-NLS-1$
-	ID("entity.other.attribute-name.id.html"), //$NON-NLS-1$
-	CLASS("entity.other.attribute-name.class.html"), //$NON-NLS-1$
+	ATTR_ID("entity.other.attribute-name.id.html"), //$NON-NLS-1$
+	ATTR_CLASS("entity.other.attribute-name.class.html"), //$NON-NLS-1$
+	ATTR_STYLE("entity.other.attribute-name.style.html"), //$NON-NLS-1$
+	ATTR_SCRIPT("entity.other.attribute-name.script.html"), //$NON-NLS-1$
 	META("meta.tag.other.html"), //$NON-NLS-1$
 	SCRIPT("entity.name.tag.script.html"), //$NON-NLS-1$
 	STYLE("entity.name.tag.style.html"), //$NON-NLS-1$
@@ -35,7 +37,7 @@ public enum HTMLTokenType implements ITypePredicate
 
 	private static final Map<String, HTMLTokenType> NAME_MAP;
 	private String _scope;
-	private int _index;
+	private short _index;
 
 	/**
 	 * static
@@ -43,7 +45,7 @@ public enum HTMLTokenType implements ITypePredicate
 	static
 	{
 		NAME_MAP = new HashMap<String, HTMLTokenType>();
-		int index = 0;
+		short index = 0;
 
 		for (HTMLTokenType type : EnumSet.allOf(HTMLTokenType.class))
 		{
@@ -73,12 +75,11 @@ public enum HTMLTokenType implements ITypePredicate
 		this._scope = scope;
 	}
 
-	/**
-	 * getIndex
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.lexer.ITypePredicate#getIndex()
 	 */
-	public int getIndex()
+	public short getIndex()
 	{
 		return this._index;
 	}

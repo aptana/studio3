@@ -9,6 +9,8 @@
          [Enter description of this extension point.]
       </documentation>
    </annotation>
+   
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
 
    <element name="extension">
       <annotation>
@@ -84,8 +86,26 @@
    </element>
 
    <element name="enablement">
+      <annotation>
+         <documentation>
+            A core Expression that controls the enablement of the given element.
+         </documentation>
+      </annotation>
       <complexType>
-         <choice>
+         <choice minOccurs="0" maxOccurs="1">
+            <element ref="not"/>
+            <element ref="or"/>
+            <element ref="and"/>
+            <element ref="instanceof"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="equals"/>
+            <element ref="count"/>
+            <element ref="with"/>
+            <element ref="resolve"/>
+            <element ref="adapt"/>
+            <element ref="iterate"/>
+            <element ref="reference"/>
          </choice>
       </complexType>
    </element>

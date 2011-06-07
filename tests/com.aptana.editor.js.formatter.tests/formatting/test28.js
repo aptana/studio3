@@ -26,6 +26,6 @@ ready(function(){
     //Code for example A
 });
 ==FORMATTED==
-ready( function() {
+ready(function() {
     //Code for example A
 });

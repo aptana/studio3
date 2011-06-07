@@ -31,6 +31,8 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
@@ -568,6 +570,16 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
 					previewPane.layout();
 					updatePreview();
+				}
+			}
+		});
+		listViewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+			public void doubleClick(DoubleClickEvent event)
+			{
+				if (listViewer.getList().getSelectionIndex() > -1)
+				{
+					editButtonPressed();
 				}
 			}
 		});

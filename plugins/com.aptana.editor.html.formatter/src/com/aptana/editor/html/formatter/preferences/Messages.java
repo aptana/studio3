@@ -21,6 +21,7 @@ public class Messages extends NLS
 	public static String HTMLFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String HTMLFormatterBlankLinesPage_existingBlankLinesGroupLabel;
 	public static String HTMLFormatterBlankLinesPage_existingBlankLinesToPreserve;
+	public static String HTMLFormatterCommentsPage_commentsInSeparateLines;
 	public static String HTMLFormatterCommentsPage_enableWrapping;
 	public static String HTMLFormatterCommentsPage_formattingGroupLabel;
 	public static String HTMLFormatterCommentsPage_maxLineWidth;
@@ -31,6 +32,8 @@ public class Messages extends NLS
 	public static String HTMLFormatterModifyDialog_commentsTabName;
 	public static String HTMLFormatterModifyDialog_htmlFormatterTitle;
 	public static String HTMLFormatterModifyDialog_intentationTabName;
+	public static String HTMLFormatterTabPage_newLinesGroupLabel;
+	public static String HTMLFormatterTabPage_newLinesInEmptyTags;
 	public static String HTMLFormatterModifyDialog_newLinesTabName;
 	public static String HTMLFormatterNewLinesPage_exclusionsMessage;
 	static
