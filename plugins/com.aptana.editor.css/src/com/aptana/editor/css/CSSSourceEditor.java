@@ -49,7 +49,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 
-		setDocumentProvider(new CSSDocumentProvider());
+		setDocumentProvider(CSSPlugin.getDefault().getCSSDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

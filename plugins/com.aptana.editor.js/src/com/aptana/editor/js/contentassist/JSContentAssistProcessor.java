@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -47,7 +46,6 @@ import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
-import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -80,7 +78,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * JSIndexContentAssitProcessor
+	 * JSIndexContentAssistProcessor
 	 * 
 	 * @param editor
 	 */
@@ -89,6 +87,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		super(editor);
 
 		this._indexHelper = new JSIndexQueryHelper();
+	}
+
+	/**
+	 * The currently active range
+	 * 
+	 * @param activeRange
+	 */
+	public void setActiveRange(IRange activeRange)
+	{
+		this._activeRange = activeRange;
 	}
 
 	/**
@@ -254,6 +262,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
+		proposal.setTriggerCharacters(getProposalTriggerCharacters());
 
 		// add the proposal to the list
 		proposals.add(proposal);
@@ -573,33 +582,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getCompletionProposalAutoActivationCharacters()
-	{
-		String chars = Platform.getPreferencesService().getString( //
-				JSPlugin.PLUGIN_ID, //
-				IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
-				"", //$NON-NLS-1$
-				null //
-				);
-
-		return (chars != null) ? chars.toCharArray() : null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getContextInformationAutoActivationCharacters()
-	{
-		return new char[] { '(', ',' };
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationValidator()
 	 */
 	@Override
@@ -882,5 +864,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
 		return Character.isWhitespace(c);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return JSPlugin.PLUGIN_ID;
 	}
 }

@@ -9,15 +9,15 @@ package com.aptana.editor.html.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.html.HTMLEditor;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.ui.preferences.AptanaPreferencePage;
 
 public class HTMLPreferencePage extends CommonEditorPreferencePage
 {
@@ -41,13 +41,24 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	{
 		super.createFieldEditors();
 
-		Composite group = AptanaPreferencePage.createGroup(getFieldEditorParent(),
-				Messages.HTMLPreferencePage_ContentAssistLabel);
-		FieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS,
-				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, group);
+	}
+
+	@Override
+	protected Composite createContentAssistOptions(Composite parent)
+	{
+		Composite caOptions = super.createContentAssistOptions(parent);
+
+		final Composite fieldEditorGroup = new Composite(parent, SWT.NONE);
+		fieldEditorGroup.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
+
+		BooleanFieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS,
+				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, fieldEditorGroup);
 
 		addField(closingTag);
+
+		return caOptions;
 	}
+
 
 	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()

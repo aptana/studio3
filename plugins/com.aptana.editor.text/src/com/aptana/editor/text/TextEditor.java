@@ -9,19 +9,17 @@ package com.aptana.editor.text;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class TextEditor extends AbstractThemeableEditor
-{
+public class TextEditor extends AbstractThemeableEditor {
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-	protected void initializeEditor()
-	{
+	protected void initializeEditor() {
 		super.initializeEditor();
-
 		setSourceViewerConfiguration(new TextSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new TextDocumentProvider());
+		setDocumentProvider(TextEditorPlugin.getDefault().getTextDocumentProvider());
 	}
 
 }

@@ -19,8 +19,10 @@ public enum HTMLTokenType implements ITypePredicate
 	DOUBLE_QUOTED_STRING("string.quoted.double.html"), //$NON-NLS-1$
 	SINGLE_QUOTED_STRING("string.quoted.single.html"), //$NON-NLS-1$
 	ATTRIBUTE("entity.other.attribute-name.html"), //$NON-NLS-1$
-	ID("entity.other.attribute-name.id.html"), //$NON-NLS-1$
-	CLASS("entity.other.attribute-name.class.html"), //$NON-NLS-1$
+	ATTR_ID("entity.other.attribute-name.id.html"), //$NON-NLS-1$
+	ATTR_CLASS("entity.other.attribute-name.class.html"), //$NON-NLS-1$
+	ATTR_STYLE("entity.other.attribute-name.style.html"), //$NON-NLS-1$
+	ATTR_SCRIPT("entity.other.attribute-name.script.html"), //$NON-NLS-1$
 	META("meta.tag.other.html"), //$NON-NLS-1$
 	SCRIPT("entity.name.tag.script.html"), //$NON-NLS-1$
 	STYLE("entity.name.tag.style.html"), //$NON-NLS-1$

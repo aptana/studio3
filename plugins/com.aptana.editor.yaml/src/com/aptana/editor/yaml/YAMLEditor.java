@@ -29,7 +29,7 @@ public class YAMLEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new YAMLSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new YAMLDocumentProvider());
+		setDocumentProvider(YAMLPlugin.getDefault().getYAMLDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

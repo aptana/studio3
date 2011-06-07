@@ -66,7 +66,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 
 		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new HTMLDocumentProvider());
+		setDocumentProvider(HTMLPlugin.getDefault().getHTMLDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

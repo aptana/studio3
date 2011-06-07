@@ -17,7 +17,7 @@ import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 /**
  * @author Max Stepanov
  */
-public class CompositeDocumentProvider extends CommonDocumentProvider {
+public abstract class CompositeDocumentProvider extends CommonDocumentProvider {
 
 	private String documentContentType;
 	private IPartitioningConfiguration defaultPartitioningConfiguration;

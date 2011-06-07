@@ -7,31 +7,48 @@
  */
 package com.aptana.editor.diff;
 
-import org.osgi.framework.BundleActivator;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
-public class Activator implements BundleActivator {
+public class Activator extends AbstractUIPlugin {
 
-	private static BundleContext context;
+	public static final String PLUGIN_ID = "com.aptana.editor.diff"; //$NON-NLS-1$
+	private static Activator plugin;
+	
+	private IDocumentProvider diffDocumentProvider;
 
-	static BundleContext getContext() {
-		return context;
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
+
+	/**
+	 * Returns Diff document provider
+	 * @return
 	 */
-	public void stop(BundleContext bundleContext) throws Exception {
-		Activator.context = null;
+	public synchronized IDocumentProvider getDiffDocumentProvider() {
+		if (diffDocumentProvider == null) {
+			diffDocumentProvider = new DiffDocumentProvider();
+		}
+		return diffDocumentProvider;
 	}
 
 }

@@ -12,11 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSLabelledNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
@@ -284,11 +286,39 @@ public class JSSymbolCollector extends JSTreeWalker
 		this.setScopeRange(body);
 
 		// add parameters
-		for (IParseNode parameter : node.getParameters())
+		boolean processed = false;
+		IParseNode params = node.getParameters();
+
+		if (node.getParent() instanceof JSGroupNode)
 		{
-			if (parameter instanceof JSNode)
+			IParseNode args = node.getParent().getParent().getLastChild();
+
+			if (args instanceof JSArgumentsNode && params.getChildCount() == args.getChildCount())
 			{
-				this.addPropertyValue(parameter.getText(), (JSNode) parameter);
+				for (int i = 0; i < params.getChildCount(); i++)
+				{
+					IParseNode identifier = params.getChild(i);
+					IParseNode value = args.getChild(i);
+
+					if (value instanceof JSNode)
+					{
+						this.addPropertyValue(identifier.getText(), (JSNode) value);
+					}
+				}
+
+				processed = true;
+			}
+		}
+
+		// default behavior
+		if (processed == false)
+		{
+			for (IParseNode parameter : node.getParameters())
+			{
+				if (parameter instanceof JSNode)
+				{
+					this.addPropertyValue(parameter.getText(), (JSNode) parameter);
+				}
 			}
 		}
 
