@@ -57,9 +57,10 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_STYLE = PREFIX + "style"; //$NON-NLS-1$
 	public final static String HTML_SVG = PREFIX + "svg"; //$NON-NLS-1$
 	public final static String HTML_TAG = PREFIX + "tag"; //$NON-NLS-1$
+	public final static String HTML_TAG_CLOSE = PREFIX + "tag_close"; //$NON-NLS-1$
 
 	protected static final String[] CONTENT_TYPES = new String[] { DEFAULT, HTML_COMMENT, CDATA, HTML_DOCTYPE,
-			HTML_SCRIPT, HTML_STYLE, HTML_SVG, HTML_TAG };
+			HTML_SCRIPT, HTML_STYLE, HTML_SVG, HTML_TAG, HTML_TAG_CLOSE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IHTMLConstants.CONTENT_TYPE_HTML },
 			{ IHTMLConstants.CONTENT_TYPE_HTML, IJSConstants.CONTENT_TYPE_JS },
@@ -74,7 +75,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new TagRule("script", new ExtendedToken(HTML_SCRIPT), true), //$NON-NLS-1$
 			new TagRule("style", new ExtendedToken(HTML_STYLE), true), //$NON-NLS-1$
 			new TagRule("svg", new ExtendedToken(HTML_SVG), true), //$NON-NLS-1$
-			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
+			new TagRule("/", new Token(HTML_TAG_CLOSE)), //$NON-NLS-1$
 			new TagRule(new Token(HTML_TAG)) };
 
 	private HTMLScanner htmlScanner;
@@ -99,6 +100,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		// Partitions
 		c.addTranslation(new QualifiedContentType(HTML_COMMENT), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_TAG), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_TAG_CLOSE), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_SCRIPT), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_STYLE), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_SVG), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
@@ -202,6 +204,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
+
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG_CLOSE);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG_CLOSE);
 
 		dr = new ThemeingDamagerRepairer(getHTMLCommentScanner());
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_COMMENT);

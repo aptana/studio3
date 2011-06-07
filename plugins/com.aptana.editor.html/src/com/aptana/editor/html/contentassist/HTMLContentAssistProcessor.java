@@ -122,6 +122,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, LocationType.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, LocationType.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_TAG, LocationType.IN_OPEN_TAG);
+		locationMap.put(HTMLSourceConfiguration.HTML_TAG_CLOSE, LocationType.IN_CLOSE_TAG);
 
 		locationMap.put(JSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
 		locationMap.put(CSSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
@@ -1338,6 +1339,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					switch (result)
 					{
 						case IN_OPEN_TAG:
+						case IN_CLOSE_TAG:
 							lastLexeme = lexemeProvider.getLastLexeme();
 
 							if (lastLexeme != null
@@ -1368,10 +1370,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 											result = LocationType.IN_TEXT;
 										}
 									}
-								}
-								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
-								{
-									result = LocationType.IN_CLOSE_TAG;
 								}
 							}
 							break;

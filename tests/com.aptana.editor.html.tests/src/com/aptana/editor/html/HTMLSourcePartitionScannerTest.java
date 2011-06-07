@@ -128,7 +128,7 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 218); // <p>'T'ext
 		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 221); // <p>Tex't'</p>
 		// Close p tag
-		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 222); // Text'<'/p>
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 222); // Text'<'/p>
 	}
 
 	public void testHTML5()
