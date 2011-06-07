@@ -272,7 +272,7 @@ public class FineLocationTests extends TestCase
 		this.fineLocationTests(
 			source,
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 6, 23),
-			new LocationTypeRange(LocationType.ERROR, 24)
+			new LocationTypeRange(LocationType.INSIDE_VALUE, 24)
 		);
 	}
 }
