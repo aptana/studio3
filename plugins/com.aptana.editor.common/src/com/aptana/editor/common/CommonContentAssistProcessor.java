@@ -248,7 +248,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param offset
 	 * @return
 	 */
-	private Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
+	protected Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
 	{
 		PerformanceStats stats = null;
 		try
