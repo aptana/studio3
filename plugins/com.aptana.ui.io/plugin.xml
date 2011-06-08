@@ -160,9 +160,15 @@
             id="com.aptana.ide.ui.io.navigator.actions.FileSystemNewActions">
          <enablement>
             <or>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof>
+               <and>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <test
+                        property="com.aptana.ide.ui.io.navigator.file.isLocal"
+                        value="true">
+                  </test>
+               </and>
                <instanceof
                      value="com.aptana.ide.core.io.LocalRoot">
                </instanceof>
