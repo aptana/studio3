@@ -1384,48 +1384,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								lastLexeme = lexemeProvider.getLastLexeme();
 
-								if ("<".equals(firstLexeme.getText())) //$NON-NLS-1$
+								if ("<".equals(firstLexeme.getText()) && lastLexeme.getType() == HTMLTokenType.META && lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$ //$NON-NLS-2$
 								{
-									switch (lastLexeme.getType())
-									{
-										case TAG_END:
-										case TAG_SELF_CLOSE:
-											if (offset <= lastLexeme.getStartingOffset())
-											{
-												result = LocationType.IN_OPEN_TAG;
-											}
-											break;
-										case META:
-											if (lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$
-											{
-												result = LocationType.IN_DOCTYPE;
-											}
-											else
-											{
-												result = LocationType.IN_OPEN_TAG;
-											}
-											break;
-										default:
-											result = LocationType.IN_OPEN_TAG;
-											break;
-									}
-								}
-								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
-								{
-									switch (lastLexeme.getType())
-									{
-										case TAG_END:
-										case TAG_SELF_CLOSE:
-											if (offset <= lastLexeme.getStartingOffset())
-											{
-												result = LocationType.IN_CLOSE_TAG;
-											}
-											break;
-
-										default:
-											result = LocationType.IN_CLOSE_TAG;
-											break;
-									}
+									result = LocationType.IN_DOCTYPE;
 								}
 							}
 							break;
