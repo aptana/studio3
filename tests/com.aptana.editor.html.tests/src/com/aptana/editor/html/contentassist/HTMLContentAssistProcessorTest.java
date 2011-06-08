@@ -62,55 +62,104 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "a", "<a></a>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	public void testDOCTYPEProposal()
+	public void testDOCTYPEProposal1()
 	{
-		Point p = new Point(10, 0);
-		assertCompletionCorrect("<!|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertCompletionCorrect("<!D|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertCompletionCorrect("<!D| html>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE html>", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertCompletionCorrect("<|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertCompletionCorrect("<!|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertCompletionCorrect("<!D|OCTYP >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertCompletionCorrect("<!D|OCTYPE >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<!|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	public void testDOCTYPEValueReplacement()
+	public void testDOCTYPEProposal2()
+	{
+		assertCompletionCorrect("<!D|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEProposal3()
+	{
+		assertCompletionCorrect(
+				"<!D| html>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE html>", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEProposal4()
+	{
+		assertCompletionCorrect("<|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEProposal5()
+	{
+		assertCompletionCorrect("<!|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEProposal6()
+	{
+		assertCompletionCorrect(
+				"<!D|OCTYP >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEProposal7()
+	{
+		assertCompletionCorrect(
+				"<!D|OCTYPE >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", new Point(10, 0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEValueReplacement1()
 	{
 		assertCompletionCorrect("<!DOCTYPE |html>", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDOCTYPEValueReplacement2()
+	{
 		assertCompletionCorrect(
 				"<!DOCTYPE |html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n	\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">", //$NON-NLS-1$
 				'\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public void testCloseTagProposal()
+	public void testCloseTagProposal1()
 	{
-		String document = "<a>Test <b>Item</b>"; //$NON-NLS-1$
-		IDocument fDocument = createDocument(document, false);
-
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
+		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
 
 		// Should be no unclosed tags at this point
-		fProcessor.doComputeCompletionProposals(viewer, 0, trigger, false);
+		fProcessor.doComputeCompletionProposals(viewer, 0, '\t', false);
 		assertEquals(0, fProcessor.getUnclosedTagNames(0).size());
+	}
 
-		fProcessor.doComputeCompletionProposals(viewer, 1, trigger, false);
+	public void testCloseTagProposal2()
+	{
+		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
+
+		fProcessor.doComputeCompletionProposals(viewer, 1, '\t', false);
 		assertEquals(0, fProcessor.getUnclosedTagNames(1).size());
+	}
 
-		fProcessor.doComputeCompletionProposals(viewer, 2, trigger, false);
+	public void testCloseTagProposal3()
+	{
+		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
+
+		fProcessor.doComputeCompletionProposals(viewer, 2, '\t', false);
 		assertEquals(0, fProcessor.getUnclosedTagNames(2).size());
+	}
 
-		fProcessor.doComputeCompletionProposals(viewer, 3, trigger, false);
+	public void testCloseTagProposal4()
+	{
+		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
+
+		fProcessor.doComputeCompletionProposals(viewer, 3, '\t', false);
 		assertEquals(1, fProcessor.getUnclosedTagNames(3).size());
+	}
 
+	public void testCloseTagProposal5()
+	{
+		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
 		// show unclosed tag once we get past the '>'
-		fProcessor.doComputeCompletionProposals(viewer, 4, trigger, false);
+		fProcessor.doComputeCompletionProposals(viewer, 4, '\t', false);
 		assertEquals(1, fProcessor.getUnclosedTagNames(4).size());
 	}
 
-	public void testABBRProposal()
+	public void testABBRProposal1()
 	{
 		assertCompletionCorrect("<a|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testABBRProposal2()
+	{
 		assertCompletionCorrect("<A|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
@@ -184,10 +233,14 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div>&|</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	public void testExistingEntityGetsFullyReplaced()
+	public void testExistingEntityGetsFullyReplaced1()
 	{
 		assertCompletionCorrect(
 				"<body>\n  &a|acute;\n</body>", '\t', ENTITY_PROPOSAL_COUNT, "&acirc;", "<body>\n  &acirc;\n</body>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testExistingEntityGetsFullyReplaced2()
+	{
 		assertCompletionCorrect("<div>&a|acute;</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
@@ -232,9 +285,13 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div sty|=\"\"></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	public void testDontOverwriteTagEnd()
+	public void testDontOverwriteTagEnd1()
 	{
 		assertCompletionCorrect("<div dir=\"|></div>", '\t', 2, "ltr", "<div dir=\"ltr></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	public void testDontOverwriteTagEnd2()
+	{
 		assertCompletionCorrect("<br dir=\"|/>", '\t', 2, "ltr", "<br dir=\"ltr/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
