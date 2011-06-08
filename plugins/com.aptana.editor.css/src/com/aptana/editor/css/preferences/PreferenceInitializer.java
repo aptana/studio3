@@ -38,7 +38,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.put(
 				com.aptana.editor.common.contentassist.IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS,
 				"(,"); //$NON-NLS-1$
-		prefs.put(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS, ",.;"); //$NON-NLS-1$
+		prefs.put(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS, ""); //$NON-NLS-1$
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 

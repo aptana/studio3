@@ -29,11 +29,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -437,19 +439,23 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						baseStore = publicDir;
 					}
 				}
-				baseStore = baseStore.getChild(valuePrefix);
 			}
 			else
 			{
 				baseStore = editorStore.getParent();
-				baseStore = baseStore.getChild(valuePrefix);
 			}
 
 			// replace from last slash on...
 			int lastSlash = valuePrefix.lastIndexOf('/');
 			if (lastSlash != -1)
 			{
+				IFileStore possibleChild = baseStore.getChild(valuePrefix.substring(0, lastSlash));
+				if (possibleChild.fetchInfo().exists())
+				{
+					baseStore = possibleChild;
+				}
 				offset += lastSlash + 1;
+				valuePrefix = valuePrefix.substring(lastSlash + 1);
 			}
 			this._replaceRange = new Range(offset, this._currentLexeme.getEndingOffset() - 1);
 
@@ -469,13 +475,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
+				if (valuePrefix != null && valuePrefix.length() > 0 && !name.startsWith(valuePrefix))
+				{
+					continue;
+				}
 
 				// Grab images based on whether it's a dir or not. For files can we determine if it matches some
 				// content type and grab the icon for that?
 				Image image = null;
 				IFileInfo info = f.fetchInfo();
+				boolean isDir = false;
 				if (info.isDirectory())
 				{
+					isDir = true;
+					name = name + '/';
 					image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 				}
 				else
@@ -490,9 +503,49 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
 					}
 				}
-				CommonCompletionProposal cp = createProposal(name, name, image, null, userAgentIcons, null, offset,
-						name.length());
-				proposals.add(cp);
+
+				// build proposal
+				int replaceOffset = offset;
+				int replaceLength = 0;
+				if (this._replaceRange != null)
+				{
+					replaceOffset = this._replaceRange.getStartingOffset();
+					replaceLength = this._replaceRange.getLength();
+				}
+				final boolean isDirectory = isDir;
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, replaceOffset, replaceLength,
+						name.length(), image, name, null, null)
+				{
+					@Override
+					public void apply(final ITextViewer viewer, char trigger, int stateMask, int offset)
+					{
+						super.apply(viewer, trigger, stateMask, offset);
+						// HACK pop CA back up if user selected a folder, but do it on a delay so that the folder
+						// proposal insertion can finish properly (like updating selection/offset)
+						if (viewer instanceof ITextOperationTarget && isDirectory)
+						{
+							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+							{
+								public void run()
+								{
+									if (((ITextOperationTarget) viewer)
+											.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS))
+									{
+										((ITextOperationTarget) viewer)
+												.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+									}
+								}
+							});
+						}
+					}
+				};
+				if (isDirectory)
+				{
+					proposal.setTriggerCharacters(new char[] { '/' });
+				}
+				proposal.setUserAgentImages(userAgentIcons);
+
+				proposals.add(proposal);
 
 			}
 		}
@@ -1097,8 +1150,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
-						if (Platform.inDevelopmentMode()) {
-							System.out.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isCSSAttribute]");
+						if (Platform.inDevelopmentMode())
+						{
+							System.out
+									.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isCSSAttribute]");
 						}
 						if (fCSSProcessor == null)
 						{
@@ -1112,8 +1167,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
-						if (Platform.inDevelopmentMode()) {
-							System.out.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isJSAttribute]");
+						if (Platform.inDevelopmentMode())
+						{
+							System.out
+									.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isJSAttribute]");
 						}
 						if (fJSProcessor == null)
 						{
