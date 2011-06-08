@@ -1332,7 +1332,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				result = locationMap.get(type);
 
 				Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme();
-				Lexeme<HTMLTokenType> lastLexeme;
+				Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
 
 				if (firstLexeme != null)
 				{
@@ -1340,50 +1340,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						case IN_OPEN_TAG:
 						case IN_CLOSE_TAG:
-							lastLexeme = lexemeProvider.getLastLexeme();
-
-							if (lastLexeme != null
-									&& (lastLexeme.getType() == HTMLTokenType.TAG_END || lastLexeme.getType() == HTMLTokenType.TAG_SELF_CLOSE)
-									&& lastLexeme.getEndingOffset() == offset - 1)
+							if (offset <= firstLexeme.getStartingOffset())
 							{
 								result = LocationType.IN_TEXT;
 							}
-							else
+							else if (lastLexeme.getEndingOffset() < offset
+									&& (lastLexeme.getType() == HTMLTokenType.TAG_END || lastLexeme.getType() == HTMLTokenType.TAG_SELF_CLOSE))
 							{
-								if (firstLexeme.getStartingOffset() == offset)
-								{
-									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes?
-									// We should report in open tag still!
-									if (offset == 0)
-									{
-										result = LocationType.IN_TEXT;
-									}
-									else
-									{
-										/*
-										 * XXX: Kevin, I don't think checking partition text is the best way to do this.
-										 * It seems everything outside of IN_OPEN_TAG/IN_CLOSE_TAG boundaries is TEXT.
-										 * XXX: Max, I didn't write this code
-										 */
-										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(),
-												previousPartition.getLength()).trim();
-
-										if (src.length() == 0 || src.charAt(src.length() - 1) == '>'
-												|| (src.indexOf('<') == -1 && src.indexOf('>') == -1))
-										{
-											result = LocationType.IN_TEXT;
-										}
-									}
-								}
+								result = LocationType.IN_TEXT;
 							}
 							break;
 
 						case IN_TEXT:
 							if (firstLexeme.getStartingOffset() < offset) // && offset <= lastLexeme.getEndingOffset())
 							{
-								lastLexeme = lexemeProvider.getLastLexeme();
-
 								if ("<".equals(firstLexeme.getText()) && lastLexeme.getType() == HTMLTokenType.META && lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$ //$NON-NLS-2$
 								{
 									result = LocationType.IN_DOCTYPE;
