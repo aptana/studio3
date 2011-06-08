@@ -1360,8 +1360,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									}
 									else
 									{
-										/* XXX: Kevin, I don't think checking partition text is the best way to do this.
-										 * It seems everything outside of IN_OPEN_TAG/IN_CLOSE_TAG boundaries is TEXT. 
+										/*
+										 * XXX: Kevin, I don't think checking partition text is the best way to do this.
+										 * It seems everything outside of IN_OPEN_TAG/IN_CLOSE_TAG boundaries is TEXT.
+										 * XXX: Max, I didn't write this code
 										 */
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
 										String src = document.get(previousPartition.getOffset(),
