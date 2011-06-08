@@ -40,7 +40,7 @@ public class TagWordRule extends ExtendedWordRule {
 			int c = scanner.read();
 			if (c == '<') {
 				return super.evaluate(scanner);
-			} else if (c == '!' && scanner.getColumn() > 1) {
+			} else if ((c == '!' || c == '/') && scanner.getColumn() > 1) {
 				scanner.unread();
 				scanner.unread();
 				c = scanner.read();
