@@ -1168,7 +1168,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			try
 			{
 				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
-				if (LocationType.IN_CLOSE_TAG.equals(location))
+
+				if (location == LocationType.IN_CLOSE_TAG)
 				{
 					text = "/" + text; // proposals have "/" at the front //$NON-NLS-1$
 				}
@@ -1329,35 +1330,42 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (locationMap.containsKey(type))
 			{
+				// assume partition cleanly maps to a location type
 				result = locationMap.get(type);
 
+				// If the partition isn't empty, then we'll have at least one lexeme which we can use for any partion to
+				// location mappings we need to fix up
 				Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme();
-				Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
 
 				if (firstLexeme != null)
 				{
+					Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
+					HTMLTokenType lastLexemeType = lastLexeme.getType();
+
 					switch (result)
 					{
 						case IN_OPEN_TAG:
 						case IN_CLOSE_TAG:
 							if (offset <= firstLexeme.getStartingOffset())
 							{
+								// if we're before the open/close tag, then we're in text
 								result = LocationType.IN_TEXT;
 							}
 							else if (lastLexeme.getEndingOffset() < offset
-									&& (lastLexeme.getType() == HTMLTokenType.TAG_END || lastLexeme.getType() == HTMLTokenType.TAG_SELF_CLOSE))
+									&& (lastLexemeType == HTMLTokenType.TAG_END || lastLexemeType == HTMLTokenType.TAG_SELF_CLOSE))
 							{
+								// if we after a tag end, then we're in text
 								result = LocationType.IN_TEXT;
 							}
 							break;
 
 						case IN_TEXT:
-							if (firstLexeme.getStartingOffset() < offset) // && offset <= lastLexeme.getEndingOffset())
+							// special case to support <!DOCTYPE
+							if (firstLexeme.getType() == HTMLTokenType.TAG_START
+									&& lastLexemeType == HTMLTokenType.META
+									&& lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$
 							{
-								if ("<".equals(firstLexeme.getText()) && lastLexeme.getType() == HTMLTokenType.META && lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$ //$NON-NLS-2$
-								{
-									result = LocationType.IN_DOCTYPE;
-								}
+								result = LocationType.IN_DOCTYPE;
 							}
 							break;
 
@@ -1373,6 +1381,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
+			// ignore
 		}
 
 		return result;
