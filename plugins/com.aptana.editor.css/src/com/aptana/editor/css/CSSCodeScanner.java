@@ -180,12 +180,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		// keywords that start with @
 		wordRule = new WordRule(new AtWordDetector(), createToken(CSSTokenType.AT_RULE));
-		wordRule.addWord(KEYWORD_CHARSET, createToken(CSSTokenType.CHARSET));
-		wordRule.addWord(KEYWORD_IMPORT, createToken(CSSTokenType.IMPORT));
-		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
-		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
-		wordRule.addWord(KEYWORD_FONTFACE, createToken(CSSTokenType.FONTFACE));
-		wordRule.addWord(KEYWORD_NAMESPACE, createToken(CSSTokenType.NAMESPACE));
+		addAtWords(wordRule);
 		rules.add(wordRule);
 
 		// !important
@@ -265,6 +260,16 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(new SingleCharacterRule('-', createToken(CSSTokenType.MINUS)));
 
 		return rules;
+	}
+
+	protected void addAtWords(WordRule wordRule)
+	{
+		wordRule.addWord(KEYWORD_CHARSET, createToken(CSSTokenType.CHARSET));
+		wordRule.addWord(KEYWORD_IMPORT, createToken(CSSTokenType.IMPORT));
+		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
+		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
+		wordRule.addWord(KEYWORD_FONTFACE, createToken(CSSTokenType.FONTFACE));
+		wordRule.addWord(KEYWORD_NAMESPACE, createToken(CSSTokenType.NAMESPACE));
 	}
 
 	private ExtendedWordRule createVendorPropertyRules()
