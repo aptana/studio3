@@ -455,7 +455,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				int col1Width = width - currentSize;
 
 				// 1st column can't be smaller than a default size;
-				col1Width = col1Width < MIN_PROPOSAL_COLUMN_WIDTH ? MIN_PROPOSAL_COLUMN_WIDTH : col1Width;
+				col1Width = Math.max(col1Width, MIN_PROPOSAL_COLUMN_WIDTH);
 				column1.setWidth(col1Width);
 			}
 		});
@@ -1138,8 +1138,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 			int locWidth = getStringWidth(longestLoc);
 
-			objWidth = objWidth > MAX_PROPOSAL_COLUMN_WIDTH ? MAX_PROPOSAL_COLUMN_WIDTH : objWidth;
-			locWidth = locWidth > MAX_LOCATION_COLUMN_WIDTH ? MAX_LOCATION_COLUMN_WIDTH : locWidth;
+			objWidth = Math.min(objWidth, MAX_PROPOSAL_COLUMN_WIDTH);
+			locWidth = Math.min(locWidth, MAX_LOCATION_COLUMN_WIDTH);
 
 			if (!isFilteredSubset)
 			{
