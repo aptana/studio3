@@ -32,9 +32,9 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 public class HTMLContentAssistProcessorTest extends LocationTestCase
 {
 
-	private static final int ELEMENT_PROPOSALS_COUNT = 133;
+	private static final int ELEMENT_PROPOSALS_COUNT = 132;
 	private static final int DOCTYPE_PROPOSALS_COUNT = 11;
-	private static final int CLOSE_TAG_PROPOSALS_COUNT = 120;
+	private static final int CLOSE_TAG_PROPOSALS_COUNT = 119;
 	private static final int ENTITY_PROPOSAL_COUNT = 252;
 
 	private HTMLContentAssistProcessor fProcessor;
