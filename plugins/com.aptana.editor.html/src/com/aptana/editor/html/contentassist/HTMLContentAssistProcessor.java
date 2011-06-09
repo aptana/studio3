@@ -24,7 +24,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -1146,16 +1145,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					String elementName = this.getElementName(lexemeProvider, offset);
 					String attributeName = this.getAttributeName(lexemeProvider, offset);
-					IRange activeRange = new Range(this._currentLexeme.getStartingOffset() + 1,
-							this._currentLexeme.getEndingOffset() - 1);
+					IRange activeRange = this.getAttributeValueRange(lexemeProvider, offset);
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
-						if (Platform.inDevelopmentMode())
-						{
-							System.out
-									.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isCSSAttribute]");
-						}
 						if (fCSSProcessor == null)
 						{
 							fCSSProcessor = new CSSContentAssistProcessor(this.editor, activeRange);
@@ -1168,11 +1161,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
-						if (Platform.inDevelopmentMode())
-						{
-							System.out
-									.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isJSAttribute]");
-						}
 						if (fJSProcessor == null)
 						{
 							fJSProcessor = new JSContentAssistProcessor(this.editor, activeRange);
@@ -1365,6 +1353,57 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result;
+	}
+
+	/**
+	 * getAttributeValueRange
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	private IRange getAttributeValueRange(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	{
+		int startingOffset = -1;
+		int endingOffset = -1;
+
+		for (int i = lexemeProvider.getLexemeFloorIndex(offset); i >= 0; i--)
+		{
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
+
+			// NOTE: we have to check the offset since it's possible to get the right-hand side quote here
+			if (lexeme.getStartingOffset() < offset)
+			{
+				HTMLTokenType type = lexeme.getType();
+
+				if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+				{
+					startingOffset = lexeme.getStartingOffset() + 1;
+					break;
+				}
+			}
+		}
+
+		for (int i = lexemeProvider.getLexemeCeilingIndex(offset); i < lexemeProvider.size(); i++)
+		{
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
+			HTMLTokenType type = lexeme.getType();
+
+			if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+			{
+				endingOffset = lexeme.getEndingOffset() - 1;
+				break;
+			}
+		}
+
+		if (startingOffset != -1 && endingOffset != -1 && startingOffset <= endingOffset)
+		{
+			return new Range(startingOffset, endingOffset);
+		}
+		else
+		{
+			return Range.EMPTY;
+		}
 	}
 
 	/**

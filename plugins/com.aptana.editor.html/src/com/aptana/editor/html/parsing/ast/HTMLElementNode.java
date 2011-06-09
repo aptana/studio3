@@ -95,6 +95,42 @@ public class HTMLElementNode extends HTMLNode
 		return fNameNode;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getNodeAtOffset(int)
+	 */
+	@Override
+	public IParseNode getNodeAtOffset(int offset)
+	{
+		IParseNode result = super.getNodeAtOffset(offset);
+
+		if (result == this)
+		{
+			for (IParseNode node : fJSAttributeNodes)
+			{
+				if (node.contains(offset))
+				{
+					result = node.getNodeAtOffset(offset);
+					break;
+				}
+			}
+		}
+
+		if (result == this)
+		{
+			for (IParseNode node : fCSSStyleNodes)
+			{
+				if (node.contains(offset))
+				{
+					result = node.getNodeAtOffset(offset);
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
 	@Override
 	public String getText()
 	{
