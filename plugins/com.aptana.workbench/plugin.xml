@@ -35,7 +35,7 @@
       <menuContribution
             locationURI="menu:com.aptana.file.template.menu?after=additions">
          <dynamic
-               class="com.aptana.workbench.commands.NewFileTemplateMenuContributor"
+               class="com.aptana.ide.ui.io.navigator.actions.NewFileTemplateMenuContributor"
                id="com.aptana.file.template.dynamic">
          </dynamic>
       </menuContribution>
@@ -44,7 +44,7 @@
          <menu
                label="%menu.new.template.label">
             <dynamic
-                  class="com.aptana.workbench.commands.NewFileTemplateMenuContributor"
+                  class="com.aptana.ide.ui.io.navigator.actions.NewFileTemplateMenuContributor"
                   id="com.aptana.file.template.popup.dynamic">
             </dynamic>
          </menu>
