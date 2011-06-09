@@ -358,7 +358,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fPeerCharacterCloser.install();
 		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(
 				IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
-		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(
+		fPeerCharacterCloser.setAutoWrapEnabled(getPreferenceStore().getBoolean(
 				IPreferenceConstants.EDITOR_WRAP_SELECTION));
 
 		fCursorChangeListened = true;
