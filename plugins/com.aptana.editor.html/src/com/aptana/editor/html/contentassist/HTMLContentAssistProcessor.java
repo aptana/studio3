@@ -1119,7 +1119,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// tokenize the current document
 		this._document = viewer.getDocument();
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset > 0 ? offset - 1 : offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -1382,7 +1382,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		try
 		{
-			ITypedRegion partition = document.getPartition(offset);
+			ITypedRegion partition = document.getPartition(offset > 0 ? offset - 1 : offset);
 			String type = partition.getType();
 
 			if (locationMap.containsKey(type))
@@ -1547,7 +1547,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				case SINGLE_QUOTED_STRING:
 				case DOUBLE_QUOTED_STRING:
-					if (lexeme.getEndingOffset() < offset)
+					if (lexeme.getEndingOffset() < offset && lexeme.getLength() > 1)
 					{
 						result = LocationType.IN_ATTRIBUTE_NAME;
 						this._replaceRange = null;

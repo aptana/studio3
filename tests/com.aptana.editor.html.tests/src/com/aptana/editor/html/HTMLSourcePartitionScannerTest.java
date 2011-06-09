@@ -149,12 +149,16 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 		// Inlined CSS
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 36); // style>'h'tml
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53); // '}'
+		// /style tag
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 54); // '<'/style
 		// script tag
 		assertContentType(HTMLSourceConfiguration.HTML_SCRIPT, source, 63); // '<'script>
 		assertContentType(HTMLSourceConfiguration.HTML_SCRIPT, source, 70); // <script'>'
 		// Inlined JS
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 71); // <script>'v'
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 82); // ';'</script>
+		// /script tag
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 83); // '<'/script
 	}
 
 	public void testLowercaseDoctype()
@@ -170,4 +174,81 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 		// DOCTYPE
 		assertContentType(HTMLSourceConfiguration.HTML_DOCTYPE, source, 0);
 	}
+	
+	public void testIncompleteTag1()
+	{
+		String source = "<html> <";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
+		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 6);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 7);
+	}
+
+	public void testIncompleteTag2()
+	{
+		String source = "<html> </";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
+		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 6);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 7);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 8);
+	}
+
+	public void testIncompleteTag3()
+	{
+		String source = "<html> <>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
+		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 6);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 7);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 8);
+	}
+
+	public void testIncompleteTag4()
+	{
+		String source = "<html> </>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
+		assertContentType(HTMLSourceConfiguration.DEFAULT, source, 6);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 7);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 8);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 9);
+	}
+
+	public void testIncompleteTag5()
+	{
+		String source = "<</html>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 1);
+	}
+
+	public void testIncompleteTag6()
+	{
+		String source = "</<html>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 0);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 1);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 2);
+	}
+
+	public void testIncompleteTag7()
+	{
+		String source = "<></html>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 0);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 1);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 2);
+	}
+
+	public void testIncompleteTag8()
+	{
+		String source = "</><html>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 0);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 1);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG_CLOSE, source, 2);
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 3);
+	}
+
 }
