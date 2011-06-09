@@ -91,6 +91,9 @@ public class TagRule extends MultiLineRule {
 				}
 			} else if ((c == fEndSequence[0] && sequenceDetected(collectingCharacterScanner, fEndSequence, fBreaksOnEOF))
 					|| c == fStartSequence[0]) {
+				if (c == fStartSequence[0]) {
+					collectingCharacterScanner.unread();
+				}
 				if (fToken instanceof ExtendedToken) {
 					((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
 				}
