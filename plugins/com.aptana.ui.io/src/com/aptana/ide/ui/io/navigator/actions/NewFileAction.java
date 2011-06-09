@@ -8,6 +8,7 @@
 package com.aptana.ide.ui.io.navigator.actions;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.eclipse.core.filesystem.EFS;
@@ -15,8 +16,10 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -29,6 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.util.IOUtil;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -42,11 +46,18 @@ public class NewFileAction extends BaseSelectionListenerAction
 
 	private IAdaptable fSelectedElement;
 	private IWorkbenchWindow fWindow;
+	private String fInitialFilename;
 
 	public NewFileAction(IWorkbenchWindow window)
 	{
+		this(window, ""); //$NON-NLS-1$
+	}
+
+	public NewFileAction(IWorkbenchWindow window, String initialName)
+	{
 		super(Messages.NewFileAction_Text);
 		fWindow = window;
+		fInitialFilename = initialName;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 		setToolTipText(Messages.NewFileAction_ToolTip);
 	}
@@ -59,7 +70,7 @@ public class NewFileAction extends BaseSelectionListenerAction
 		}
 
 		InputDialog input = new InputDialog(fWindow.getShell(), Messages.NewFileAction_InputTitle,
-				Messages.NewFileAction_InputMessage, "", null); //$NON-NLS-1$
+				Messages.NewFileAction_InputMessage, fInitialFilename, null);
 		if (input.open() == Window.OK)
 		{
 			createFile(input.getValue());
@@ -82,16 +93,25 @@ public class NewFileAction extends BaseSelectionListenerAction
 		return super.updateSelection(selection) && fSelectedElement != null;
 	}
 
-	private void createFile(final String filename)
+	protected InputStream getInitialContents(IPath filePath)
+	{
+		return null;
+	}
+
+	protected IFileStore getSelectedDirectory()
 	{
 		final IFileStore fileStore = Utils.getFileStore(fSelectedElement);
 		boolean selectionIsDirectory = Utils.isDirectory(fSelectedElement);
-		IFileStore parentStore = fileStore;
 		if (!selectionIsDirectory && fileStore.getParent() != null)
 		{
-			parentStore = fileStore.getParent();
+			return fileStore.getParent();
 		}
+		return fileStore;
+	}
 
+	private void createFile(final String filename)
+	{
+		final IFileStore parentStore = getSelectedDirectory();
 		final IFileStore newFile = parentStore.getChild(filename);
 		if (Utils.exists(newFile))
 		{
@@ -102,9 +122,8 @@ public class NewFileAction extends BaseSelectionListenerAction
 			}
 		}
 
-		final IFileStore parentFolder = parentStore;
 		// run the file creation in a job
-		Job job = new Job(Messages.NewFolderAction_JobTitle)
+		Job job = new Job(Messages.NewFileAction_JobTitle)
 		{
 
 			@Override
@@ -112,8 +131,30 @@ public class NewFileAction extends BaseSelectionListenerAction
 			{
 				try
 				{
-					// creates an empty file
 					OutputStream out = newFile.openOutputStream(EFS.NONE, monitor);
+					InputStream in = getInitialContents(Path.fromOSString(newFile.toString()));
+					if (in != null)
+					{
+						// creates the initial contents
+						try
+						{
+							IOUtil.pipe(in, out);
+						}
+						catch (IOException e)
+						{
+							IOUIPlugin.logError(e);
+						}
+						finally
+						{
+							try
+							{
+								in.close();
+							}
+							catch (IOException e)
+							{
+							}
+						}
+					}
 					try
 					{
 						out.close();
@@ -135,7 +176,16 @@ public class NewFileAction extends BaseSelectionListenerAction
 					EditorUtils.openFileInEditor(newFile, null);
 
 					// refreshes the parent folder
-					IOUIPlugin.refreshNavigatorView(parentFolder);
+					final IFileStore fileStore = Utils.getFileStore(fSelectedElement);
+					boolean selectionIsDirectory = Utils.isDirectory(fSelectedElement);
+					if (selectionIsDirectory)
+					{
+						IOUIPlugin.refreshNavigatorView(fSelectedElement);
+					}
+					else
+					{
+						IOUIPlugin.refreshNavigatorView(fileStore.getParent());
+					}
 				}
 				catch (CoreException e)
 				{

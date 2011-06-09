@@ -5,8 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.workbench.commands;
+package com.aptana.ide.ui.io.navigator.actions;
 
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -26,7 +31,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IEvaluationService;
+import org.jruby.embed.io.ReaderInputStream;
 
+import com.aptana.editor.common.internal.scripting.NewFileWizard;
 import com.aptana.editor.common.internal.scripting.NewTemplateFileWizard;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
@@ -59,21 +66,6 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 	@Override
 	public void fill(Menu menu, int index)
 	{
-		// finds the current selection
-		IStructuredSelection selection = null;
-		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
-				IEvaluationService.class);
-		if (evaluationService != null)
-		{
-			IEvaluationContext currentState = evaluationService.getCurrentState();
-			Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-			if (variable instanceof IStructuredSelection)
-			{
-				selection = (IStructuredSelection) variable;
-			}
-		}
-		final IStructuredSelection currentSelection = (selection == null) ? StructuredSelection.EMPTY : selection;
-
 		// constructs the menus
 		Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
 		Set<String> bundles = templatesByBundle.keySet();
@@ -99,14 +91,70 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
+						IStructuredSelection selection = getActiveSelection();
+						if (!selection.isEmpty())
+						{
+							Object element = selection.getFirstElement();
+							if (element instanceof IAdaptable)
+							{
+								IFileStore fileStore = (IFileStore) ((IAdaptable) element).getAdapter(IFileStore.class);
+								if (fileStore != null)
+								{
+									// this is a non-workspace selection
+									String filetype = template.getFiletype();
+									// strips the leading * before . if there is one
+									int index = filetype.lastIndexOf("."); //$NON-NLS-1$
+									if (index > -1)
+									{
+										filetype = filetype.substring(index);
+									}
+									NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(),
+											"new_file" + filetype) //$NON-NLS-1$
+									{
+
+										@Override
+										protected InputStream getInitialContents(IPath path)
+										{
+											String templateContent = NewFileWizard.getTemplateContent(template, path);
+											if (templateContent != null)
+											{
+												return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+											}
+											return super.getInitialContents(path);
+										}
+									};
+									action.updateSelection(selection);
+									action.run();
+									return;
+								}
+							}
+						}
+
 						NewTemplateFileWizard wizard = new NewTemplateFileWizard(template);
-						wizard.init(PlatformUI.getWorkbench(), currentSelection);
+						wizard.init(PlatformUI.getWorkbench(), selection);
 						WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 						dialog.open();
 					}
 				});
 			}
 		}
+	}
+
+	private static IStructuredSelection getActiveSelection()
+	{
+		IStructuredSelection selection = null;
+		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
+				IEvaluationService.class);
+		if (evaluationService != null)
+		{
+			IEvaluationContext currentState = evaluationService.getCurrentState();
+			Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			if (variable instanceof IStructuredSelection)
+			{
+				selection = (IStructuredSelection) variable;
+			}
+		}
+		return (selection == null) ? StructuredSelection.EMPTY : selection;
 	}
 
 	private Map<String, List<TemplateElement>> getNewFileTemplates()
