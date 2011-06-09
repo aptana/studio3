@@ -129,6 +129,8 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		charsRule.add('<', createToken(HTMLTokenType.TAG_START));
 		charsRule.add('>', createToken(HTMLTokenType.TAG_END));
 		charsRule.add('=', equalToken);
+		charsRule.add('"', doubleQuotedStringToken);
+		charsRule.add('\'', singleQuotedStringToken);
 		rules.add(charsRule);
 		
 		setRules(rules.toArray(new IRule[rules.size()]));
