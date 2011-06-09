@@ -20526,6 +20526,16 @@ li {
         <value name="tri-state" description="Contents are selected via three-state selection model."/>
       </values>
     </property>
+    <property name="-webkit-box-reflect" type="String">
+      <browsers>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Allows reflections of text or boxes, with even the hover effect being reflected, and does not affect layout.</description>
+      <remarks>Webkit only.</remarks>
+      <values>
+      </values>
+    </property>
     <property name="-o-link" type="String">
       <browsers>
         <browser platform="Opera" version="7.0+"/>
@@ -20618,7 +20628,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand property combines six of the animation properties into a single property.</description>
       <example></example>
@@ -20632,7 +20643,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies when the animation will start. It allows an animation to begin execution some time after it is applied.</description>
       <example></example>
@@ -20644,7 +20656,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies whether or not the animation should play in reverse on alternate cycles.</description>
       <example></example>
@@ -20660,7 +20673,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the length of time that an animation takes to complete one cycle.</description>
       <example></example>
@@ -20674,7 +20688,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the number of times an animation cycle is played. The default value is one, meaning the animation will play from beginning to end once. A value of ‘infinite’  will cause the animation to repeat forever. Non-integer numbers will cause the animation to end part-way through a cycle.</description>
       <example></example>
@@ -20688,11 +20703,27 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a list of animations that apply. Each name is used to select the keyframe at-rule that provides the property values for the animation.</description>
       <example></example>
       <hint>[none | IDENT]</hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="animation-timing-function" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies how the animation will progress over one cycle of its duration.</description>
+      <example></example>
+      <hint></hint>
       <remarks></remarks>
       <values>
       </values>
@@ -20702,9 +20733,10 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
-      <description>Specifies how the animation will progress over one cycle of its duration.</description>
+      <description>Defines whether the animation is running or paused.</description>
       <example></example>
       <hint></hint>
       <remarks></remarks>
@@ -20750,6 +20782,24 @@ li {
         <value name="behind" description="Same as 180deg."/>
         <value name="leftwards" description="Subtracts 20deg from the current angle."/>
         <value name="rightwards" description="Adds 20deg to the current angle."/>
+      </values>
+    </property>
+    <property name="backface-visibility" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Determines whether or not the "back" side of a transformed element is visible when facing the viewer.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
       </values>
     </property>
     <property allow-multiple-values="true" name="background" type="String">
@@ -20964,7 +21014,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the size of the background images.</description>
       <example></example>
@@ -21262,6 +21316,112 @@ li {
       <description>Specifies the color for the borders for an element. Specify either a color name or RGB color code.</description>
       <hint>[color | "transparent"]. Example values: Red, #FF0000 (#RRGGBB color code for "red"), etc.</hint>
     </property>
+    <property name="border-image" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies image to be used in place of the border styles.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-source" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies an image to use instead of the border styles given by the border-style properties and as an additional background layer for the element.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-slice" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Represents the inward offsets from the top, right, bottom, and left edges of the image respectively, dividing it into nine regions: four corners, four edges and a middle.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-width" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies offsets that are used to divide the border image area into nine parts.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-outset" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies the amount by which the border image area extends beyond the border box on the top, right, bottom, and left sides respectively.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-repeat" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies how the images for the sides and the middle part of the border image are scaled and tiled.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+        <value name="stretch" description="The image is stretched to fill the area."/>
+        <value name="repeat" description="The image is tiled (repeated) to fill the area."/>
+        <value name="round" description="The image is tiled (repeated) to fill the area. If it does not fill the area with a whole number of tiles, the image is rescaled so that it does."/>
+        <value name="space" description="The image is tiled (repeated) to fill the area. If it does not fill the area with a whole number of tiles, the extra space is distributed around the tiles."/>
+      </values>
+    </property>
     <property allow-multiple-values="true" name="border-left" type="String">
       <availability>
         <specification name="W3C" version="CSS2"/>
@@ -21382,7 +21542,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <browser platform="Opera" version="10.5+"/>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="4.0+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>The two length or percentage values of the element properties define the radii of a quarter ellipse that defines the shape of the corner of the outer border edge</description>
       <example></example>
@@ -21858,6 +22022,24 @@ li {
         <value name="justify" description="The space is divided evenly in-between each child, with none of the extra space placed before the first child or after the last child. If there is only one child, treat the pack value as if it were start."/>
       </values>
     </property>
+    <property name="box-shadow" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="1.0+"/>
+		<browser platform="Opera" version="7.0+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies one or more drop-shadows to the box</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="box-sizing" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
@@ -21982,7 +22164,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes the number of columns of a multicol element. </description>
       <example></example>
@@ -21998,7 +22184,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes how content will be filled in a column. </description>
       <example></example>
@@ -22014,7 +22204,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the gap between columns.</description>
       <example></example>
@@ -22030,7 +22224,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand for setting ‘column-rule-width’, ‘column-rule-style’, and ‘column-rule-color’ at the same place in the style sheet.</description>
       <example></example>
@@ -22044,7 +22242,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property sets the color of the column rule.</description>
       <example></example>
@@ -22058,7 +22260,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Sets the style of the rule between columns of an element.</description>
       <example></example>
@@ -22072,7 +22278,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Sets the width of the rule between columns. Negative values are not allowed.</description>
       <example></example>
@@ -22086,7 +22296,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes how many columns an element spans across.</description>
       <example></example>
@@ -22102,7 +22316,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes the width of columns in multicol elements.</description>
       <example></example>
@@ -22118,7 +22336,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand property for setting ‘column-width’ and ‘column-count’.</description>
       <example></example>
@@ -25602,6 +25824,7 @@ li {
         <browser platform="Opera" version="7.0+"/>
         <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
+		<browser platform="IE" version="9.0+"/>
       </browsers>
       <description>Specifies the transparency of an element. Specify a value between 0.0-1.0.</description>
       <example>
@@ -26110,6 +26333,42 @@ li {
       </browsers>
       <description>Specifies the number of seconds or milliseconds to pause before an element before playing audio content.</description>
       <hint>[length-of-pause]</hint>
+    </property>
+    <property name="perspective" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Applies the same transform as the perspective(&lt;number&gt;) transform function, except that it applies only to the positioned or transformed children of the element, not to the transform on the element itself.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="perspective-origin" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Establishes the origin for the perspective property</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
     </property>
     <property name="phonemes" type="String">
       <availability>
@@ -26897,8 +27156,10 @@ li {
         <specification name="W3C" version="CSS2"/>
       </availability>
       <browsers>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.1+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+		<browser platform="Opera" version="11.1+"/>
       </browsers>
       <description>Defines the horizontal depth, vertical depth, blur, and color for a drop-shadow for text content in the element.</description>
       <example>To specify a blue 5 pixel drop-shadow with a 5 pixel blur, use the following syntax:  &lt;code&gt;H1 {text-shadow: 5px 5px 5px blue;}&lt;/code&gt;.</example>
@@ -26978,12 +27239,69 @@ li {
         <value name="auto" description="Top position to be determined by the window or parent element."/>
       </values>
     </property>
+    <property name="transform" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Used to apply a 2D or 3D transformation to an element.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="transform-origin" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Establishes the origin of transformation for an element.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="transform-style" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Defines how nested elements are rendered in 3D space.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="transition" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand property combines the four properties of transition into a single property. </description>
       <example></example>
@@ -26997,7 +27315,10 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Defines when the transition will start. It allows a transition to begin execution some period of time from when it is applied.</description>
       <example></example>
@@ -27011,7 +27332,10 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Defines the length of time that a transition takes.</description>
       <example></example>
@@ -27025,13 +27349,39 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the name of the CSS property to which the transition is applied.</description>
       <example></example>
       <hint>none | all | [ &lt;IDENT&gt; ] [ ‘,’ &lt;IDENT&gt; ]*</hint>
       <remarks></remarks>
       <values>
+      </values>
+    </property>
+    <property name="transition-timing-function" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Describes how the intermediate values used during a transition will be calculated. </description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+        <value name="ease" description="The ease function is equivalent to cubic-bezier(0.25, 0.1, 0.25, 1.0)."/>
+        <value name="linear" description="The linear function is equivalent to cubic-bezier(0.0, 0.0, 1.0, 1.0)."/>
+        <value name="ease-in" description="The ease-in function is equivalent to cubic-bezier(0.42, 0, 1.0, 1.0)."/>
+        <value name="ease-out" description="The ease-out function is equivalent to cubic-bezier(0, 0, 0.58, 1.0)."/>
+        <value name="ease-in-out" description="The ease-in-out function is equivalent to cubic-bezier(0.42, 0, 0.58, 1.0)"/>
+        <value name="cubic-bezier" description="Specifies a cubic-bezier curve."/>
       </values>
     </property>
     <property name="unicode-bidi" type="String">
