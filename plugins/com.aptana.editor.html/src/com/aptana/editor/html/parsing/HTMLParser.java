@@ -431,10 +431,10 @@ public class HTMLParser implements IParser
 					try
 					{
 						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
+						addOffset(node, tagSymbol.getStart() + start + 1);
 						IParseNode[] children = node.getChildren();
 						for (IParseNode child : children)
 						{
-							addOffset(child, tagSymbol.getStart() + start + 1);
 							element.addJSAttributeNode(child);
 						}
 					}
