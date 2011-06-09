@@ -1547,7 +1547,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				case SINGLE_QUOTED_STRING:
 				case DOUBLE_QUOTED_STRING:
-					if (lexeme.getEndingOffset() < offset)
+					if (lexeme.getEndingOffset() < offset && lexeme.getLength() > 1)
 					{
 						result = LocationType.IN_ATTRIBUTE_NAME;
 						this._replaceRange = null;
