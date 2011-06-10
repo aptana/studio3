@@ -124,13 +124,14 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
-		formatterBlockNode
-				.setEnd(createTextNode(document, mediaNode.getEndingOffset(), mediaNode.getEndingOffset() + 1));
+
 		push(formatterBlockNode);
 
 		// Recursively add this node's children
 		addNodes(mediaNode.getStatements());
 
+		formatterBlockNode
+				.setEnd(createTextNode(document, mediaNode.getEndingOffset(), mediaNode.getEndingOffset() + 1));
 		checkedPop(formatterBlockNode, -1);
 
 	}
