@@ -22,8 +22,8 @@ import com.aptana.editor.js.JSSourceConfiguration;
 /**
  * SVGSubPartitionerScanner
  */
-public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner
-{
+public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner {
+	
 	private static final int TYPE_JS = 1;
 	private static final int TYPE_CSS = 2;
 
@@ -33,54 +33,43 @@ public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner
 	/**
 	 * SVGSubPartitionerScanner
 	 */
-	public SVGSubPartitionerScanner()
-	{
+	public SVGSubPartitionerScanner() {
 		super( //
-			new ISubPartitionScanner[] { //
-				new SubPartitionScanner(SVGSourceConfiguration.getDefault().getPartitioningRules(), SVGSourceConfiguration.CONTENT_TYPES, new Token(SVGSourceConfiguration.DEFAULT)), //
-				JSSourceConfiguration.getDefault().createSubPartitionScanner(), //
-				CSSSourceConfiguration.getDefault().createSubPartitionScanner() //
-			}, //
-			new IPartitionScannerSwitchStrategy[] { //
+				new ISubPartitionScanner[] { //
+						new SubPartitionScanner(SVGSourceConfiguration.getDefault().getPartitioningRules(), SVGSourceConfiguration.CONTENT_TYPES, new Token(
+								SVGSourceConfiguration.DEFAULT)), //
+						JSSourceConfiguration.getDefault().createSubPartitionScanner(), //
+						CSSSourceConfiguration.getDefault().createSubPartitionScanner() //
+				}, //
+				new IPartitionScannerSwitchStrategy[] { //
 				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES), //
-				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES) //
-			} //
+						new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES) //
+				}
 		);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
+	 * @see com.aptana.editor.common.text.rules.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
 	@Override
-	public void setLastToken(IToken token)
-	{
-		if (!(token.getData() instanceof String))
-		{
+	public void setLastToken(IToken token) {
+		if (!(token.getData() instanceof String)) {
 			current = TYPE_DEFAULT;
 			return;
 		}
 
 		String contentType = (String) token.getData();
 
-		if (SVGSourceConfiguration.SCRIPT.equals(contentType))
-		{
+		if (SVGSourceConfiguration.SCRIPT.equals(contentType)) {
 			current = TYPE_JS;
-		}
-		else if (SVGSourceConfiguration.STYLE.equals(contentType))
-		{
+		} else if (SVGSourceConfiguration.STYLE.equals(contentType)) {
 			current = TYPE_CSS;
-		}
-		else if (SVGSourceConfiguration.DEFAULT.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
-		{
+		} else if (SVGSourceConfiguration.DEFAULT.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
-		}
-		else
-		{
-			for (int i = 0; i < subPartitionScanners.length; ++i)
-			{
-				if (subPartitionScanners[i].hasContentType(contentType))
-				{
+		} else {
+			for (int i = 0; i < subPartitionScanners.length; ++i) {
+				if (subPartitionScanners[i].hasContentType(contentType)) {
 					current = i;
 					break;
 				}
