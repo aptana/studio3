@@ -188,7 +188,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 					token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
 					if (!token.isUndefined()) {
 						fContentType = null;
-						currentPartitionScanner.setLastToken(currentPartitionScanner.foundSequence(false) ? token : null);
+						currentPartitionScanner.setLastToken(token);
 						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
@@ -237,7 +237,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 					IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
 					if (!token.isUndefined()) {
-						currentPartitionScanner.setLastToken(currentPartitionScanner.foundSequence(false) ? token : null);
+						currentPartitionScanner.setLastToken(token);
 						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}

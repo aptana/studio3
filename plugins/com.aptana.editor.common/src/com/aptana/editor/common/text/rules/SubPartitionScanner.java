@@ -80,14 +80,6 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 		return characterScanner.foundSequence();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.text.rules.ISubPartitionScanner#foundSequence(boolean)
-	 */
-	public boolean foundSequence(boolean reset) {
-		return characterScanner.foundSequence(reset);
-	}
-
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.ISubPartitionScanner#doResetRules()
 	 */
