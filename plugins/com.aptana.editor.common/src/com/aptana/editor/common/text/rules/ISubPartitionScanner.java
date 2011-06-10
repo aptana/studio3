@@ -29,6 +29,7 @@ public interface ISubPartitionScanner {
 	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy);
 	public ICharacterScanner getCharacterScanner();
 	public boolean foundSequence();
+	public boolean foundSequence(boolean reset);
 	public boolean doResetRules();
 	
 	public boolean hasContentType(String contentType);

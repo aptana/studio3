@@ -40,6 +40,13 @@ public class NullSubPartitionScanner implements ISubPartitionScanner {
 	 * @see com.aptana.editor.common.ISubPartitionScanner#foundSequence()
 	 */
 	public boolean foundSequence() {
+		return foundSequence(true);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.ISubPartitionScanner#foundSequence(boolean)
+	 */
+	public boolean foundSequence(boolean reset) {
 		return false;
 	}
 

@@ -80,6 +80,13 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	}
 
 	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.ISubPartitionScanner#foundSequence(boolean)
+	 */
+	public boolean foundSequence(boolean reset) {
+		return parentSequenceCharacterScanner.foundSequence(reset);
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.ISubPartitionScanner#doResetRules()
 	 */
 	public boolean doResetRules() {
