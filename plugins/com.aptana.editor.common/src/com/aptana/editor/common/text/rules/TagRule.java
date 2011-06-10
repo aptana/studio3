@@ -25,8 +25,7 @@ public class TagRule extends MultiLineRule {
 	private static final IPredicateRule doubleQuoteStringRule = new MultiLineRule("\"", "\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
 
-	private boolean fIgnoreCase;
-	private int fEmbeddedStart;
+	private final boolean fIgnoreCase;
 
 	public TagRule(IToken token) {
 		this("", token); //$NON-NLS-1$
@@ -51,7 +50,6 @@ public class TagRule extends MultiLineRule {
 	 */
 	@Override
 	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
-		boolean detected = true;
 		for (int i = 1; i < sequence.length; ++i) {
 			int c = scanner.read();
 			if (c == ICharacterScanner.EOF && eofAllowed) {
@@ -65,23 +63,10 @@ public class TagRule extends MultiLineRule {
 				for (int j = i - 1; j > 0; --j) {
 					scanner.unread();
 				}
-				detected = false;
-				break;
-			}
-		}
-
-		if (!detected) {
-			return detected;
-		}
-		if ((sequence.length == 1 && sequence[0] == '<') || (sequence.length == 2 && sequence[0] == '<' && sequence[1] == '/')) {
-			int nextChar = scanner.read();
-			if (nextChar == ICharacterScanner.EOF) {
 				return false;
 			}
-			scanner.unread();
-			return Character.isJavaIdentifierStart(nextChar);
 		}
-		return detected;
+		return true;
 	}
 
 	/*
@@ -104,16 +89,15 @@ public class TagRule extends MultiLineRule {
 				if (token.isUndefined()) {
 					token = doubleQuoteStringEOLRule.evaluate(collectingCharacterScanner);
 				}
-			} else if (c == fStartSequence[0]) {
-				fEmbeddedStart++;
-			} else if (c == fEndSequence[0]) {
-				if (fEmbeddedStart == 0) {
-					if (fToken instanceof ExtendedToken) {
-						((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
-					}
-					return true;
+			} else if ((c == fEndSequence[0] && sequenceDetected(collectingCharacterScanner, fEndSequence, fBreaksOnEOF))
+					|| c == fStartSequence[0]) {
+				if (c == fStartSequence[0]) {
+					collectingCharacterScanner.unread();
 				}
-				fEmbeddedStart--;
+				if (fToken instanceof ExtendedToken) {
+					((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
+				}
+				return true;
 			}
 		}
 		if (scanner instanceof SequenceCharacterScanner && ((SequenceCharacterScanner) scanner).foundSequence()) {

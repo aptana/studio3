@@ -405,6 +405,7 @@ public class HTMLParser implements IParser
 					try
 					{
 						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
+						addOffset(node, tagSymbol.getStart() + start - (element.getName().length() + 1));
 						// should always have a rule node
 						if (node.hasChildren())
 						{
@@ -414,8 +415,6 @@ public class HTMLParser implements IParser
 								CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
 								for (CSSDeclarationNode declaration : declarations)
 								{
-									addOffset(declaration, tagSymbol.getStart() + start
-											- (element.getName().length() + 1));
 									element.addCSSStyleNode(declaration);
 								}
 							}
@@ -431,10 +430,10 @@ public class HTMLParser implements IParser
 					try
 					{
 						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
+						addOffset(node, tagSymbol.getStart() + start + 1);
 						IParseNode[] children = node.getChildren();
 						for (IParseNode child : children)
 						{
-							addOffset(child, tagSymbol.getStart() + start + 1);
 							element.addJSAttributeNode(child);
 						}
 					}

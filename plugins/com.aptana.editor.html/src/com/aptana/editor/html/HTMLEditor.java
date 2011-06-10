@@ -54,6 +54,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	static
 	{
 		tagPartitions.add(HTMLSourceConfiguration.HTML_TAG);
+		tagPartitions.add(HTMLSourceConfiguration.HTML_TAG_CLOSE);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_SCRIPT);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_STYLE);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_SVG);

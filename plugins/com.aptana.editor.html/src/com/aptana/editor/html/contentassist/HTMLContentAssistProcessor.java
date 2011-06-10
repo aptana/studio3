@@ -24,7 +24,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -124,6 +123,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		locationMap.put(HTMLSourceConfiguration.HTML_SCRIPT, LocationType.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_STYLE, LocationType.IN_OPEN_TAG);
 		locationMap.put(HTMLSourceConfiguration.HTML_TAG, LocationType.IN_OPEN_TAG);
+		locationMap.put(HTMLSourceConfiguration.HTML_TAG_CLOSE, LocationType.IN_CLOSE_TAG);
 
 		locationMap.put(JSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
 		locationMap.put(CSSSourceConfiguration.DEFAULT, LocationType.IN_TEXT);
@@ -1118,7 +1118,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// tokenize the current document
 		this._document = viewer.getDocument();
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset > 0 ? offset - 1 : offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -1145,16 +1145,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					String elementName = this.getElementName(lexemeProvider, offset);
 					String attributeName = this.getAttributeName(lexemeProvider, offset);
-					IRange activeRange = new Range(this._currentLexeme.getStartingOffset() + 1,
-							this._currentLexeme.getEndingOffset() - 1);
+					IRange activeRange = this.getAttributeValueRange(lexemeProvider, offset);
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
-						if (Platform.inDevelopmentMode())
-						{
-							System.out
-									.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isCSSAttribute]");
-						}
 						if (fCSSProcessor == null)
 						{
 							fCSSProcessor = new CSSContentAssistProcessor(this.editor, activeRange);
@@ -1167,11 +1161,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
-						if (Platform.inDevelopmentMode())
-						{
-							System.out
-									.println("XXX: should this still be called ? [com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.doComputeCompletionProposals,isJSAttribute]");
-						}
 						if (fJSProcessor == null)
 						{
 							fJSProcessor = new JSContentAssistProcessor(this.editor, activeRange);
@@ -1224,7 +1213,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			try
 			{
 				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
-				if (LocationType.IN_CLOSE_TAG.equals(location))
+
+				if (location == LocationType.IN_CLOSE_TAG)
 				{
 					text = "/" + text; // proposals have "/" at the front //$NON-NLS-1$
 				}
@@ -1366,6 +1356,57 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * getAttributeValueRange
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	private IRange getAttributeValueRange(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	{
+		int startingOffset = -1;
+		int endingOffset = -1;
+
+		for (int i = lexemeProvider.getLexemeFloorIndex(offset); i >= 0; i--)
+		{
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
+
+			// NOTE: we have to check the offset since it's possible to get the right-hand side quote here
+			if (lexeme.getStartingOffset() < offset)
+			{
+				HTMLTokenType type = lexeme.getType();
+
+				if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+				{
+					startingOffset = lexeme.getStartingOffset() + 1;
+					break;
+				}
+			}
+		}
+
+		for (int i = lexemeProvider.getLexemeCeilingIndex(offset); i < lexemeProvider.size(); i++)
+		{
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
+			HTMLTokenType type = lexeme.getType();
+
+			if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+			{
+				endingOffset = lexeme.getEndingOffset() - 1;
+				break;
+			}
+		}
+
+		if (startingOffset != -1 && endingOffset != -1 && startingOffset <= endingOffset)
+		{
+			return new Range(startingOffset, endingOffset);
+		}
+		else
+		{
+			return Range.EMPTY;
+		}
+	}
+
+	/**
 	 * This method looks at the partition that contains the specified offset and from that partition type determines if
 	 * the offset is: 1. Within an open tag 2. Within a close tag 3. Within a text area If the partition type is
 	 * unrecognized, the ERROR location will be returned.
@@ -1380,107 +1421,47 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		try
 		{
-			ITypedRegion partition = document.getPartition(offset);
+			ITypedRegion partition = document.getPartition(offset > 0 ? offset - 1 : offset);
 			String type = partition.getType();
 
 			if (locationMap.containsKey(type))
 			{
+				// assume partition cleanly maps to a location type
 				result = locationMap.get(type);
 
+				// If the partition isn't empty, then we'll have at least one lexeme which we can use for any partion to
+				// location mappings we need to fix up
 				Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme();
-				Lexeme<HTMLTokenType> lastLexeme;
 
 				if (firstLexeme != null)
 				{
+					Lexeme<HTMLTokenType> lastLexeme = lexemeProvider.getLastLexeme();
+					HTMLTokenType lastLexemeType = lastLexeme.getType();
+
 					switch (result)
 					{
 						case IN_OPEN_TAG:
-							lastLexeme = lexemeProvider.getLastLexeme();
-
-							if (lastLexeme != null
-									&& (lastLexeme.getType() == HTMLTokenType.TAG_END || lastLexeme.getType() == HTMLTokenType.TAG_SELF_CLOSE)
-									&& lastLexeme.getEndingOffset() == offset - 1)
+						case IN_CLOSE_TAG:
+							if (offset <= firstLexeme.getStartingOffset())
 							{
+								// if we're before the open/close tag, then we're in text
 								result = LocationType.IN_TEXT;
 							}
-							else
+							else if (lastLexeme.getEndingOffset() < offset
+									&& (lastLexemeType == HTMLTokenType.TAG_END || lastLexemeType == HTMLTokenType.TAG_SELF_CLOSE))
 							{
-								if (firstLexeme.getStartingOffset() == offset)
-								{
-									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes?
-									// We should report in open tag still!
-									if (offset == 0)
-									{
-										result = LocationType.IN_TEXT;
-									}
-									else
-									{
-										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(),
-												previousPartition.getLength()).trim();
-
-										if (src.length() == 0 || src.charAt(src.length() - 1) == '>'
-												|| (src.indexOf('<') == -1 && src.indexOf('>') == -1))
-										{
-											result = LocationType.IN_TEXT;
-										}
-									}
-								}
-								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
-								{
-									result = LocationType.IN_CLOSE_TAG;
-								}
+								// if we after a tag end, then we're in text
+								result = LocationType.IN_TEXT;
 							}
 							break;
 
 						case IN_TEXT:
-							if (firstLexeme.getStartingOffset() < offset) // && offset <= lastLexeme.getEndingOffset())
+							// special case to support <!DOCTYPE
+							if (firstLexeme.getType() == HTMLTokenType.TAG_START
+									&& lastLexemeType == HTMLTokenType.META
+									&& lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$
 							{
-								lastLexeme = lexemeProvider.getLastLexeme();
-
-								if ("<".equals(firstLexeme.getText())) //$NON-NLS-1$
-								{
-									switch (lastLexeme.getType())
-									{
-										case TAG_END:
-										case TAG_SELF_CLOSE:
-											if (offset <= lastLexeme.getStartingOffset())
-											{
-												result = LocationType.IN_OPEN_TAG;
-											}
-											break;
-										case META:
-											if (lastLexeme.getText().equalsIgnoreCase("DOCTYPE")) //$NON-NLS-1$
-											{
-												result = LocationType.IN_DOCTYPE;
-											}
-											else
-											{
-												result = LocationType.IN_OPEN_TAG;
-											}
-											break;
-										default:
-											result = LocationType.IN_OPEN_TAG;
-											break;
-									}
-								}
-								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
-								{
-									switch (lastLexeme.getType())
-									{
-										case TAG_END:
-										case TAG_SELF_CLOSE:
-											if (offset <= lastLexeme.getStartingOffset())
-											{
-												result = LocationType.IN_CLOSE_TAG;
-											}
-											break;
-
-										default:
-											result = LocationType.IN_CLOSE_TAG;
-											break;
-									}
-								}
+								result = LocationType.IN_DOCTYPE;
 							}
 							break;
 
@@ -1496,6 +1477,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
+			// ignore
 		}
 
 		return result;
@@ -1604,7 +1586,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				case SINGLE_QUOTED_STRING:
 				case DOUBLE_QUOTED_STRING:
-					if (lexeme.getEndingOffset() < offset)
+					if (lexeme.getEndingOffset() < offset && lexeme.getLength() > 1)
 					{
 						result = LocationType.IN_ATTRIBUTE_NAME;
 						this._replaceRange = null;
