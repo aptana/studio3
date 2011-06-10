@@ -51,37 +51,10 @@ js.formatter.brace.position.function.declaration=same.line
 js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
-function test(){
-
-
-    
-    if (true) //
-{
-    
-    }
-    else //
- {
-    
-    }
-    i = 3;
-    while (i < 4) //test
- 				{
-        i++;
-    }
-}
+var //test
+j //test2
+= //test3
+3 //test4
+/ //test5
+2; //test6
 ==FORMATTED==
-function test() {
-
-    if(true) //
-    {
-
-    } else //
-    {
-
-    }
-    i = 3;
-    while(i < 4) //test
-    {
-        i++;
-    }
-}
