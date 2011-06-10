@@ -16,6 +16,11 @@ import org.eclipse.jface.text.rules.IToken;
 
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 
+/**
+ * 
+ * @author Max Stepanov
+ *
+ */
 public interface ISubPartitionScanner {
 
 	public Collection<IPredicateRule> getRules();
@@ -29,5 +34,6 @@ public interface ISubPartitionScanner {
 	public boolean hasContentType(String contentType);
 	
 	public void setLastToken(IToken token);
+	public IToken getLastToken();
 	
 }

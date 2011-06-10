@@ -29,6 +29,7 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	protected SequenceCharacterScanner[] sequenceCharacterScanners;
 	protected SequenceCharacterScanner parentSequenceCharacterScanner;
 	protected int current = 0;
+	private IToken lastToken;
 	
 	/**
 	 * 
@@ -105,6 +106,14 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	 * @see com.aptana.editor.common.ISubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
 	public void setLastToken(IToken token) {
+		lastToken = token;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.ISubPartitionScanner#getLastToken()
+	 */
+	public final IToken getLastToken() {
+		return lastToken;
 	}
 
 }

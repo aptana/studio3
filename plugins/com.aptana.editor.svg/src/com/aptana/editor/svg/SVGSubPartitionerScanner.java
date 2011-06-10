@@ -54,6 +54,10 @@ public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner {
 	 */
 	@Override
 	public void setLastToken(IToken token) {
+		super.setLastToken(token);
+		if (token == null) {
+			return;
+		}
 		if (!(token.getData() instanceof String)) {
 			current = TYPE_DEFAULT;
 			return;
@@ -63,8 +67,10 @@ public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner {
 
 		if (SVGSourceConfiguration.SCRIPT.equals(contentType)) {
 			current = TYPE_JS;
+			super.setLastToken(null);
 		} else if (SVGSourceConfiguration.STYLE.equals(contentType)) {
 			current = TYPE_CSS;
+			super.setLastToken(null);
 		} else if (SVGSourceConfiguration.DEFAULT.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
 		} else {

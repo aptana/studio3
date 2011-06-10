@@ -92,7 +92,6 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 				tagName = word;
 				return null;
 			}
-			
 		};
 		tagWordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
 		tagWordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
