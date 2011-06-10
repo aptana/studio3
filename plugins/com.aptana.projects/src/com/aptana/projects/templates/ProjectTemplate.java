@@ -28,6 +28,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private String description;
 	private String name;
 	private URL iconPath;
+	private boolean isReplacingParameters;
 
 	/**
 	 * Constructs a new ProjectTemplate
@@ -35,14 +36,17 @@ public class ProjectTemplate implements IProjectTemplate
 	 * @param path
 	 * @param type
 	 * @param name
+	 * @param isReplacingParameters
 	 * @param description
 	 * @param iconPath
 	 */
-	public ProjectTemplate(String path, TemplateType type, String name, String description, URL iconPath)
+	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters, String description,
+			URL iconPath)
 	{
 		this.type = type;
 		this.path = path;
 		this.name = name;
+		this.isReplacingParameters = isReplacingParameters;
 		this.description = description;
 		this.iconPath = iconPath;
 	}
@@ -100,4 +104,14 @@ public class ProjectTemplate implements IProjectTemplate
 	{
 		return iconPath;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#isReplacingParameters()
+	 */
+	public boolean isReplacingParameters()
+	{
+		return isReplacingParameters;
+	}
+
 }

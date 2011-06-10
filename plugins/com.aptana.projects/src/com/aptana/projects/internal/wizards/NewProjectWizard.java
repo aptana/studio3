@@ -78,6 +78,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.ProjectsPlugin;
@@ -358,13 +359,14 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	public static void extractZip(IProjectTemplate template, IProject project, Set<IPath> preExistingResources)
 	{
 		extractZip(new File(template.getDirectory(), template.getLocation()), project, !preExistingResources.isEmpty(),
-				preExistingResources);
+				preExistingResources, template.isReplacingParameters());
 	}
 
 	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
 	{
 		Set<IPath> emptySet = Collections.emptySet();
-		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite, emptySet);
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite, emptySet,
+				template.isReplacingParameters());
 	}
 
 	/**
@@ -378,9 +380,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 * @param preExistingResources
 	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
 	 *            empty list, the function will prompt on any overwritten file.
+	 * @param isReplacingParameters
 	 */
 	public static void extractZip(final File zipPath, final IProject project, boolean promptForOverwrite,
-			Set<IPath> preExistingResources)
+			Set<IPath> preExistingResources, final boolean isReplacingParameters)
 	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
 		if (zipPath.exists())
@@ -424,20 +427,24 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								{
 									// The file exists right now, but was not in the pre-existing resources we check
 									// against, so we just need to set it with the new content.
-									newFile.setContents(getInputStream(zipFile, entry, newFile, project), true, true,
-											null);
+									newFile.setContents(
+											getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
+											true, true, null);
 								}
 							}
 							else
 							{
-								newFile.setContents(getInputStream(zipFile, entry, newFile, project), true, true, null);
+								newFile.setContents(
+										getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
+										true, null);
 							}
 						}
 						else
 						{
 							try
 							{
-								newFile.create(getInputStream(zipFile, entry, newFile, project), true, null);
+								newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
+										true, null);
 							}
 							catch (CoreException re)
 							{
@@ -446,8 +453,9 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								{
 									IResourceStatus rs = (IResourceStatus) re.getStatus();
 									IFile newVariantFile = project.getParent().getFile(rs.getPath());
-									newVariantFile.setContents(getInputStream(zipFile, entry, newVariantFile, project),
-											true, true, null);
+									newVariantFile.setContents(
+											getInputStream(zipFile, entry, newVariantFile, project,
+													isReplacingParameters), true, true, null);
 								}
 								else
 								{
@@ -478,8 +486,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 									{
 										IFile iFile = (IFile) file;
 										iFile.setContents(
-												getInputStream(finalZipFile, conflicts.get(file), iFile, project),
-												true, true, null);
+												getInputStream(finalZipFile, conflicts.get(file), iFile, project,
+														isReplacingParameters), true, true, null);
 									}
 								}
 								catch (Exception e)
@@ -532,18 +540,38 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 *            An {@link IFile} reference.
 	 * @param project
 	 *            An {@link IProject} reference.
+	 * @param isReplacingParameters
 	 * @return An input stream for the content.
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	private static InputStream getInputStream(ZipFile zipFile, ZipEntry entry, IFile file, IProject project)
-			throws IOException, CoreException
+	private static InputStream getInputStream(ZipFile zipFile, ZipEntry entry, IFile file, IProject project,
+			boolean isReplacingParameters) throws IOException, CoreException
 	{
 		if (!isSupportedFile(file))
 		{
 			return zipFile.getInputStream(entry);
 		}
-		String content = applyTemplateVariables(new InputStreamReader(zipFile.getInputStream(entry)), file, project);
+		String content = null;
+		if (isReplacingParameters)
+		{
+			try
+			{
+				// read and do template substitution
+				content = applyTemplateVariables(new InputStreamReader(zipFile.getInputStream(entry)), file, project);
+			}
+			catch (Exception e)
+			{
+				ProjectsPlugin.logError(
+						"Error applying a template. Trying to write the file as is, without template evaluation.", e); //$NON-NLS-1$
+			}
+		}
+		if (content == null)
+		{
+			// In case we should not evaluate template tags, or had a previous error, read without template
+			// substitution.
+			content = IOUtil.read(zipFile.getInputStream(entry));
+		}
 		return new ByteArrayInputStream(content.getBytes());
 	}
 
@@ -603,7 +631,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		catch (Exception e)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID,
-					Messages.NewProjectWizard_templateVariableApplyError, e));
+					Messages.NewProjectWizard_templateVariableApplyError));
 		}
 		finally
 		{
