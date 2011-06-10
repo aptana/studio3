@@ -55,7 +55,8 @@ public class NodeTypes
 	public enum TypeOperator
 	{
 		ASSIGNMENT("="), //$NON-NLS-1$
-		DOT("."), //$NON-NLS-1$
+		DOT_CONCATENATION("."), //$NON-NLS-1$
+		PLUS_CONCATENATION("+"), //$NON-NLS-1$
 		GREATER_THAN(">"), //$NON-NLS-1$
 		LESS_THAN("<"), //$NON-NLS-1$
 		GREATER_THAN_OR_EQUAL(">="), //$NON-NLS-1$
@@ -80,12 +81,19 @@ public class NodeTypes
 		AND("&&"), //$NON-NLS-1$
 		AND_LITERAL("and"), //$NON-NLS-1$
 		XOR("^"), //$NON-NLS-1$
+		XOR_EQUAL("^="), //$NON-NLS-1$
 		XOR_LITERAL("xor"), //$NON-NLS-1$
 		BINARY_OR("|"), //$NON-NLS-1$
 		BINARY_AND("&"), //$NON-NLS-1$
 		OR_EQUAL("|="), //$NON-NLS-1$
 		AND_EQUAL("&="), //$NON-NLS-1$
 		EQUAL("=="), //$NON-NLS-1$
+		SHIFT_RIGHT(">>"), //$NON-NLS-1$
+		SHIFT_LEFT("<<"), //$NON-NLS-1$
+		SHIFT_RIGHT_ASSIGN(">>="), //$NON-NLS-1$
+		SHIFT_LEFT_ASSIGN("<<="), //$NON-NLS-1$
+		SHIFT_RIGHT_ZERO_FILL(">>>"), //$NON-NLS-1$
+		SHIFT_RIGHT_ZERO_FILL_ASSIGN(">>>="), //$NON-NLS-1$
 		IDENTICAL("==="), //$NON-NLS-1$
 		TILDE("~"), //$NON-NLS-1$
 		NOT("!"), //$NON-NLS-1$
@@ -96,7 +104,13 @@ public class NodeTypes
 		STATIC_INVOCATION("::"), //$NON-NLS-1$
 		KEY_VALUE("=>"), //$NON-NLS-1$
 		CONDITIONAL("?"), //$NON-NLS-1$
-		CONDITIONAL_COLON(":"); //$NON-NLS-1$
+		CONDITIONAL_COLON(":"), //$NON-NLS-1$
+		KEY_VALUE_COLON(":"), //$NON-NLS-1$
+		TYPEOF("typeof"), //$NON-NLS-1$
+		IN("in"), //$NON-NLS-1$
+		DELETE("delete"), //$NON-NLS-1$
+		VOID("void"), //$NON-NLS-1$
+		INSTANCOF("instanceof"); //$NON-NLS-1$
 
 		String name;
 
