@@ -21,6 +21,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.BreakingMultiLineRule;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
@@ -57,7 +58,10 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 			"del", "dfn", "em", "font", "i", "img", "input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup", "option", "param",
 			"q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title",
 			"tr", "tt", "u", "var", "canvas", "audio", "video" };	
-	
+
+	@SuppressWarnings("nls")
+	private static final String[] QUOTED_STRING_BREAKS = { "/>", ">" };
+
 	private final IToken doubleQuotedStringToken = createToken(HTMLTokenType.DOUBLE_QUOTED_STRING);
 	private final IToken singleQuotedStringToken = createToken(HTMLTokenType.SINGLE_QUOTED_STRING);
 	private final IToken attributeStyleToken = createToken(HTMLTokenType.ATTR_STYLE);
@@ -78,9 +82,11 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 
 		// Add rule for double quotes
 		rules.add(new MultiLineRule("\"", "\"", doubleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new BreakingMultiLineRule("\"", "\"", QUOTED_STRING_BREAKS, doubleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add a rule for single quotes
 		rules.add(new MultiLineRule("'", "'", singleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new BreakingMultiLineRule("'", "'", QUOTED_STRING_BREAKS, singleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
@@ -128,8 +134,6 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		charsRule.add('<', createToken(HTMLTokenType.TAG_START));
 		charsRule.add('>', createToken(HTMLTokenType.TAG_END));
 		charsRule.add('=', equalToken);
-		charsRule.add('"', doubleQuotedStringToken);
-		charsRule.add('\'', singleQuotedStringToken);
 		rules.add(charsRule);
 		
 		setRules(rules.toArray(new IRule[rules.size()]));
