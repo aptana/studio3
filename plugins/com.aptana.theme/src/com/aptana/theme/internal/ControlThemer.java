@@ -182,18 +182,28 @@ class ControlThemer implements IControlThemer
 					gc.fillRectangle(clientArea.x, event.y, clientArea.width + 2, event.height);
 
 					event.detail &= ~SWT.SELECTED;
+					event.detail &= ~SWT.BACKGROUND;
+
+					gc.setBackground(oldBackground);
 				}
 				else
 				{
 					// Draw normal background color. This seems to only be necessary for some variants of Linux,
 					// and is the correct way to force custom painting of background when setBackground() doesn't work
 					// properly.
-					gc.setBackground(getBackground());
-					gc.fillRectangle(event.x, event.y, event.width, event.height);
+					if (!isWindows && !isMacOSX)
+					{
+						Color controlBG = control.getBackground();
+						if (controlBG.getRGB().equals(oldBackground.getRGB()))
+						{						
+							gc.setBackground(getBackground());
+							gc.fillRectangle(event.x, event.y, event.width, event.height);
+							event.detail &= ~SWT.BACKGROUND;
+							gc.setBackground(oldBackground);
+						}
+					}
 				}
-				event.detail &= ~SWT.BACKGROUND;
-
-				gc.setBackground(oldBackground);
+				
 				// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
 				// non-focus for Mac)
 				gc.setForeground(getForeground());
