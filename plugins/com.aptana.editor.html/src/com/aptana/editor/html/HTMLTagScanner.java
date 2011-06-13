@@ -29,6 +29,7 @@ import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.css.CSSCodeScanner;
 import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
+import com.aptana.editor.html.internal.text.rules.BrokenStringRule;
 import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
 import com.aptana.editor.html.internal.text.rules.TagWordRule;
 import com.aptana.editor.html.parsing.HTMLUtils;
@@ -73,6 +74,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	
 	private Stack<IToken> tokenHistory = new Stack<IToken>();
 	private String tagName;
+	private boolean hasTokens;
 
 	/**
 	 * 
@@ -148,6 +150,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		super.setRange(document, offset, length);
 		tokenHistory.clear();
 		tagName = null;
+		hasTokens = false;
 	}
 
 	/* (non-Javadoc)
@@ -155,7 +158,15 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	 */
 	@Override
 	public IToken nextToken() {
-		IToken token = super.nextToken();
+		IToken token;
+		if (!hasTokens) {
+			hasTokens = true;
+			token = findBrokenToken();
+			if (!token.isUndefined()) {
+				return token;
+			}
+		}
+		token = super.nextToken();
 		if (doubleQuotedStringToken == token || singleQuotedStringToken == token) {
 			IToken attributeToken = getAttributeToken();
 			ITokenScanner tokenScanner = null;
@@ -180,6 +191,12 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		return token;
 	}
 	
+	private IToken findBrokenToken() {
+		fTokenOffset = fOffset;
+		fColumn = UNDEFINED;
+		return new BrokenStringRule(singleQuotedStringToken, doubleQuotedStringToken).evaluate(this);
+	}
+
 	private IToken getAttributeToken() {
 		if (tokenHistory.size() < 2 || equalToken != tokenHistory.pop()) {
 			return null;
