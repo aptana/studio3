@@ -40,7 +40,7 @@ public class HTMLTidyValidator implements IValidator
 			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
 			"source>", "summary>", "time>", "video>", "wbr>" };
 	@SuppressWarnings("nls")
-	private static final String[] FILTERED = { "lacks \"type\" attribute" };
+	private static final String[] FILTERED = { "lacks \"type\" attribute", "replacing illegal character code" };
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
