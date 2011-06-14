@@ -708,7 +708,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				TableItem item = selection[0];
 				ThemeRule rule = (ThemeRule) item.getData();
 				int index = table.indexOf(item);
-				getTheme().updateRule(index, rule.setScopeSelector(new ScopeSelector(fScopeText.getText())));
+				ThemeRule newRule = rule.setScopeSelector(new ScopeSelector(fScopeText.getText()));
+				getTheme().updateRule(index, newRule);
+				item.setData(newRule);
 			}
 		});
 
