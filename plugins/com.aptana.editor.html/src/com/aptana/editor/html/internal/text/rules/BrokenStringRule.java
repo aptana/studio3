@@ -34,10 +34,9 @@ public class BrokenStringRule implements IRule {
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
 	public IToken evaluate(ICharacterScanner scanner) {
-		int readCount = 0;
+		int readCount = 1;
 		int c;
 		while ((c = scanner.read()) != ICharacterScanner.EOF) {
-			++readCount;
 			if (c == '\'') {
 				return singleQuoteToken;
 			} else if (c == '"') {
@@ -47,6 +46,7 @@ public class BrokenStringRule implements IRule {
 			} else if (c == '<' && readCount == 1) {
 				break;
 			}
+			++readCount;
 		}
 		while (0 < readCount--) {
 			scanner.unread();
