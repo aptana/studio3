@@ -44,7 +44,8 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		
 	private IExtendedPartitioner partitioner;
 	
-	private boolean hasSwitch = false;
+	private boolean hasSwitch;
+	private boolean hasResume;
 	
 	private DefaultTokenState defaultTokenState;
 		
@@ -94,6 +95,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	@Override
 	public void setPartialRange(IDocument document, int offset, int length, String contentType, int partitionOffset) {
 		defaultTokenState = null;
+		hasResume = false;
 		currentPartitionScanner = defaultPartitionScanner;
 		currentPartitionScanner.setLastToken(new Token(contentType));
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
@@ -171,9 +173,12 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		fColumn = UNDEFINED;
 		boolean resume = (fPartitionOffset > -1 && fPartitionOffset < fOffset);
 		fTokenOffset = resume ? fPartitionOffset : fOffset;
+		if (hasResume) {
+			resume = true;
+			hasResume = false;
+		}
 		
 		IToken token;
-
 		boolean doResetRules;
 		do {
 			doResetRules = false;
@@ -217,6 +222,11 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				IToken token = (switchRules[i][toPrimary ? 0 : 1].evaluate(this));
 				if (!token.isUndefined()) {
 					currentPartitionScanner = toPrimary ? primaryPartitionScanner : defaultPartitionScanner;
+					IToken lastToken = currentPartitionScanner.getLastToken();
+					if (lastToken != null && lastToken.getData() instanceof String) {
+						fContentType = (String) lastToken.getData();
+						hasResume = true;
+					}
 					return returnToken(token);
 				}
 			}
@@ -244,6 +254,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (read() == EOF) {
 			return returnToken(Token.EOF);
 		}
+		currentPartitionScanner.setLastToken(null);
 		return getDefaultToken();
 	}
 	
@@ -266,8 +277,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		return token;
 	}
 	
-	private void trace(String string)
-	{
+	private void trace(String string) {
 		CommonEditorPlugin.trace(string);		
 	}
 

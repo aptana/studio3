@@ -21,6 +21,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.BreakingMultiLineRule;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
@@ -28,6 +29,7 @@ import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.css.CSSCodeScanner;
 import com.aptana.editor.html.internal.text.rules.AttributeNameWordDetector;
+import com.aptana.editor.html.internal.text.rules.BrokenStringRule;
 import com.aptana.editor.html.internal.text.rules.TagNameWordDetector;
 import com.aptana.editor.html.internal.text.rules.TagWordRule;
 import com.aptana.editor.html.parsing.HTMLUtils;
@@ -57,7 +59,10 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 			"del", "dfn", "em", "font", "i", "img", "input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup", "option", "param",
 			"q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title",
 			"tr", "tt", "u", "var", "canvas", "audio", "video" };	
-	
+
+	@SuppressWarnings("nls")
+	private static final String[] QUOTED_STRING_BREAKS = { "/>", ">" };
+
 	private final IToken doubleQuotedStringToken = createToken(HTMLTokenType.DOUBLE_QUOTED_STRING);
 	private final IToken singleQuotedStringToken = createToken(HTMLTokenType.SINGLE_QUOTED_STRING);
 	private final IToken attributeStyleToken = createToken(HTMLTokenType.ATTR_STYLE);
@@ -69,6 +74,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	
 	private Stack<IToken> tokenHistory = new Stack<IToken>();
 	private String tagName;
+	private boolean hasTokens;
 
 	/**
 	 * 
@@ -78,9 +84,11 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 
 		// Add rule for double quotes
 		rules.add(new MultiLineRule("\"", "\"", doubleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new BreakingMultiLineRule("\"", "\"", QUOTED_STRING_BREAKS, doubleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add a rule for single quotes
 		rules.add(new MultiLineRule("'", "'", singleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new BreakingMultiLineRule("'", "'", QUOTED_STRING_BREAKS, singleQuotedStringToken, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
@@ -92,7 +100,6 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 				tagName = word;
 				return null;
 			}
-			
 		};
 		tagWordRule.addWord("script", createToken(HTMLTokenType.SCRIPT)); //$NON-NLS-1$
 		tagWordRule.addWord("style", createToken(HTMLTokenType.STYLE)); //$NON-NLS-1$
@@ -129,8 +136,6 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		charsRule.add('<', createToken(HTMLTokenType.TAG_START));
 		charsRule.add('>', createToken(HTMLTokenType.TAG_END));
 		charsRule.add('=', equalToken);
-		charsRule.add('"', doubleQuotedStringToken);
-		charsRule.add('\'', singleQuotedStringToken);
 		rules.add(charsRule);
 		
 		setRules(rules.toArray(new IRule[rules.size()]));
@@ -145,6 +150,7 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		super.setRange(document, offset, length);
 		tokenHistory.clear();
 		tagName = null;
+		hasTokens = false;
 	}
 
 	/* (non-Javadoc)
@@ -152,7 +158,15 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 	 */
 	@Override
 	public IToken nextToken() {
-		IToken token = super.nextToken();
+		IToken token;
+		if (!hasTokens) {
+			hasTokens = true;
+			token = findBrokenToken();
+			if (!token.isUndefined()) {
+				return token;
+			}
+		}
+		token = super.nextToken();
 		if (doubleQuotedStringToken == token || singleQuotedStringToken == token) {
 			IToken attributeToken = getAttributeToken();
 			ITokenScanner tokenScanner = null;
@@ -177,6 +191,12 @@ public class HTMLTagScanner extends QueuedRuleBasedScanner {
 		return token;
 	}
 	
+	private IToken findBrokenToken() {
+		fTokenOffset = fOffset;
+		fColumn = UNDEFINED;
+		return new BrokenStringRule(singleQuotedStringToken, doubleQuotedStringToken).evaluate(this);
+	}
+
 	private IToken getAttributeToken() {
 		if (tokenHistory.size() < 2 || equalToken != tokenHistory.pop()) {
 			return null;

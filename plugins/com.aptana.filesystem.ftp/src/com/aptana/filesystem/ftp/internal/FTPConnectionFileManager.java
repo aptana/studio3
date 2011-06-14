@@ -343,6 +343,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				if (rootFiles != null) {
 					for (FTPFile ftpFile : rootFiles) {
 						if (ftpFile.isFile()
+								&& ftpFile.getName() != null
 								&& !ftpFile.getName().startsWith(".ht") //$NON-NLS-1$
 								&& !(ftpFile.lastModified().getHours() == 0
 										&& ftpFile.lastModified().getMinutes() == 0
@@ -356,6 +357,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					FTPFile[] ftpFiles = listFiles(basePath, monitor);
 					for (FTPFile ftpFile : ftpFiles) {
 						if (ftpFile.isFile()
+								&& ftpFile.getName() != null
 								&& !ftpFile.getName().startsWith(".ht") //$NON-NLS-1$
 								&& !(ftpFile.lastModified().getHours() == 0
 										&& ftpFile.lastModified().getMinutes() == 0
@@ -630,16 +632,17 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					if (serverTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
 						ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverTimeZoneShift));
 					}
-					if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
-						if (Path.ROOT.equals(path) && ".".equals(ftpFile.getName())) { //$NON-NLS-1$
+					String fileName = ftpFile.getName();
+					if (fileName == null || ".".equals(fileName) || "..".equals(fileName)) { //$NON-NLS-1$ //$NON-NLS-2$
+						if (Path.ROOT.equals(path) && ".".equals(fileName)) { //$NON-NLS-1$
 							ftpFile.setName(path.toPortableString());
 							ftpFileCache.put(path, ftpFile);
 							result = ftpFile;
 						}
 						continue;
 					}
-					ftpFileCache.put(dirPath.append(ftpFile.getName()), ftpFile);
-					if (name != null && name.equalsIgnoreCase(ftpFile.getName())) {
+					ftpFileCache.put(dirPath.append(fileName), ftpFile);
+					if (name != null && name.equalsIgnoreCase(fileName)) {
 						result = ftpFile;
 					}
 				}
@@ -689,7 +692,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			monitor.beginTask(Messages.FTPConnectionFileManager_gethering_file_details, ftpFiles.length);
 			List<ExtendedFileInfo> list = new ArrayList<ExtendedFileInfo>();
 			for (FTPFile ftpFile : ftpFiles) {
-				if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
+				String fileName = ftpFile.getName();
+				if (fileName == null || ".".equals(fileName) || "..".equals(fileName)) { //$NON-NLS-1$ //$NON-NLS-2$
 					monitor.worked(1);
 					continue;
 				}
@@ -703,7 +707,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 							changeCurrentDir(path);
 							Policy.checkCanceled(monitor);
 							try {
-								Date lastModifiedLocalTZ = ftpClient.modtime(ftpFile.getName());
+								Date lastModifiedLocalTZ = ftpClient.modtime(fileName);
 								if (lastModifiedLocalTZ != null) {
 									ftpFile.setLastModified(lastModifiedLocalTZ);
 								}
@@ -712,7 +716,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 						}
 					}
 				}
-				IPath filePath = path.append(ftpFile.getName());
+				IPath filePath = path.append(fileName);
 				ftpFileCache.put(filePath, ftpFile);
 				
 				ExtendedFileInfo fileInfo = createFileInfo(ftpFile);
@@ -741,10 +745,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			List<String> list = new ArrayList<String>();
 			for (FTPFile ftpFile : ftpFiles) {
 				String name = ftpFile.getName();
-				if (".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (name == null || ".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
-				ftpFileCache.put(path.append(ftpFile.getName()), ftpFile);
+				ftpFileCache.put(path.append(name), ftpFile);
 				list.add(name);
 			}
 			return list.toArray(new String[list.size()]);
@@ -1092,7 +1096,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		FTPFile[] ftpFiles = fileFactory.parse(data);
 		for (FTPFile ftpFile : ftpFiles) {
 			String name = ftpFile.getName();
-			if (name.indexOf('/') != -1) {
+			if (name != null && name.indexOf('/') != -1) {
 				ftpFile.setName(Path.fromPortableString(name).lastSegment());
 			}
 		}
@@ -1175,7 +1179,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			List<String> dirs = new ArrayList<String>();
 			for (FTPFile ftpFile: ftpFiles) {
 				String name = ftpFile.getName();
-				if (".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (name == null || ".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
 				if (ftpFile.isDir()) {
