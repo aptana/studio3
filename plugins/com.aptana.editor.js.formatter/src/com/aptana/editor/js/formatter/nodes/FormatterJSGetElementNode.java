@@ -67,19 +67,4 @@ public class FormatterJSGetElementNode extends FormatterBlockWithBeginNode
 	{
 		return !isAddingBeginNewLine();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
-	 */
-	// @Override
-	// public int getSpacesCountBefore()
-	// {
-	// short nodeType = getNode.getParent().getNodeType();
-	// if (nodeType == JSNodeTypes.RETURN || nodeType == JSNodeTypes.THROW)
-	// {
-	// return 1;
-	// }
-	// return super.getSpacesCountBefore();
-	// }
 }

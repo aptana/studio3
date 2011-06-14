@@ -24,7 +24,7 @@ public class FormatterJSPunctuationNode extends FormatterJSTextNode
 	private boolean forceLineTermination;
 
 	/**
-	 * Constructs a new FormatterPHPCommaNode.
+	 * Constructs a new FormatterJSPunctuationNode.
 	 * 
 	 * @param document
 	 * @param nodeType
@@ -37,7 +37,7 @@ public class FormatterJSPunctuationNode extends FormatterJSTextNode
 	}
 
 	/**
-	 * Constructs a new FormatterPHPCommaNode.
+	 * Constructs a new FormatterJSPunctuationNode.
 	 * 
 	 * @param document
 	 * @param nodeType
@@ -53,7 +53,7 @@ public class FormatterJSPunctuationNode extends FormatterJSTextNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.php.formatter.nodes.FormatterPHPTextNode#getSpacesCountBefore()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSTextNode#getSpacesCountBefore()
 	 */
 	@Override
 	public int getSpacesCountBefore()
@@ -77,7 +77,7 @@ public class FormatterJSPunctuationNode extends FormatterJSTextNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountAfter()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSTextNode#getSpacesCountAfter()
 	 */
 	@Override
 	public int getSpacesCountAfter()

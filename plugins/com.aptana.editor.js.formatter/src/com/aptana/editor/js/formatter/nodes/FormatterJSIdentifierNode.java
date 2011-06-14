@@ -35,25 +35,6 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSTextNode#shouldConsumePreviousWhiteSpaces()
-	 */
-	@Override
-	public boolean shouldConsumePreviousWhiteSpaces()
-	{
-		// IParseNode parent = node.getParent();
-		// short parentType = parent.getNodeType();
-		// boolean isFirstChild = (parent.getChild(0) == node);
-		// switch (parentType)
-		// {
-		// case JSNodeTypes.ASSIGN:
-		// case JSNodeTypes.CONDITIONAL:
-		// return !isFirstChild;
-		// }
-		return super.shouldConsumePreviousWhiteSpaces();
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
 	@Override

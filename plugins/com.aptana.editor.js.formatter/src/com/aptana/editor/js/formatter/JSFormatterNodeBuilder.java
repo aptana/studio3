@@ -1285,7 +1285,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					right.accept(this);
 				}
 				// add a separator if needed
-				if (i + 1 < leftNodes.size())
+				if (i + 1 < leftSize)
 				{
 					int startIndex = left.getEnd() + 1;
 					String text = document.get(startIndex, leftNodes.get(i + 1).getStart());
