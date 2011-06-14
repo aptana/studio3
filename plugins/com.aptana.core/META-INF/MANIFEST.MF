@@ -7,7 +7,6 @@ Bundle-Activator: com.aptana.core.CorePlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.core.filesystem,
  com.aptana.filewatcher,
  com.aptana.index.core,
  org.eclipse.core.expressions,
