@@ -63,6 +63,8 @@ public class CorePlugin extends Plugin
 	private Job addBuilderJob;
 	private Job addFilewatcherJob;
 
+	public static final boolean DEBUG = Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug")).booleanValue(); //$NON-NLS-1$
+
 	/**
 	 * The constructor
 	 */
@@ -142,6 +144,34 @@ public class CorePlugin extends Plugin
 		return plugin;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.Plugin#isDebugging()
+	 */
+	@Override
+	public boolean isDebugging()
+	{
+		if (DEBUG)
+			return true;
+
+		return super.isDebugging();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.Plugin#isDebugging()
+	 */
+	public boolean isDebugging(String scope)
+	{
+		if (scope != null)
+		{
+			if (Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug/" + scope)).booleanValue()) //$NON-NLS-1$
+				return true;
+		}
+
+		return isDebugging();
+	}
+
 	public static void log(Throwable e)
 	{
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
@@ -183,7 +213,20 @@ public class CorePlugin extends Plugin
 	 */
 	public static void logInfo(String string)
 	{
-		if (Platform.inDebugMode())
+		if (CorePlugin.getDefault().isDebugging())
+		{
+			getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		}
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @param string
+	 */
+	public static void logInfo(String string, String scope)
+	{
+		if (CorePlugin.getDefault().isDebugging(scope))
 		{
 			getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
 		}

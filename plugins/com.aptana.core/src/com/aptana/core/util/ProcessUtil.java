@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -19,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.IDebugScopes;
 
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
@@ -249,10 +251,16 @@ public abstract class ProcessUtil
 		{
 			processBuilder.directory(workingDirectory.toFile());
 		}
+
+		TreeMap<String, String> map = null;
 		if (environment != null && !environment.isEmpty())
 		{
+			map = new TreeMap<String, String>(environment);
 			processBuilder.environment().putAll(environment);
 		}
+		CorePlugin.logInfo(
+				StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] {
+						StringUtil.join("\" \"", command), workingDirectory, map }), IDebugScopes.SHELL); //$NON-NLS-1$
 		return processBuilder.start();
 	}
 
