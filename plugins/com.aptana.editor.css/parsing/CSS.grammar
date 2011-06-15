@@ -16,7 +16,7 @@
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
 %terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
-%terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
+%terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, IMPORTANT, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
 %typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, GREATER = "String";
@@ -168,14 +168,6 @@ Import
 	;
 
 Media
-	//=	MEDIA List.l LCURLY RCURLY
-	//	{:
-	//		return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]));
-	//	:}
-	//|	MEDIA List.l LCURLY Statements.s RCURLY
-	//	{:
-	//		return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]), s);
-	//	:}
 	=	MEDIA MediaExprs.m LCURLY RCURLY
 		{:
 			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
@@ -596,4 +588,6 @@ AttributeValueOperator
 	=	EQUAL
 	|	INCLUDES
 	|	DASHMATCH
+	|	BEGINS_WITH
+	|	ENDS_WITH
 	;

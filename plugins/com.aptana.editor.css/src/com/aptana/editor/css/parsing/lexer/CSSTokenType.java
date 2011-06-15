@@ -40,7 +40,7 @@ public enum CSSTokenType implements ITypePredicate
 	ELEMENT("entity.name.tag.css", Terminals.IDENTIFIER), //$NON-NLS-1$
 	FONT("support.constant.font-name.css", Terminals.IDENTIFIER), //$NON-NLS-1$
 	VALUE("support.constant.property-value.css", Terminals.IDENTIFIER), //$NON-NLS-1$
-	
+
 	// Stuff for the parser only:
 	EOF("", Terminals.EOF), //$NON-NLS-1$
 	LBRACKET("punctuation.bracket.css", Terminals.LBRACKET), //$NON-NLS-1$
@@ -68,10 +68,12 @@ public enum CSSTokenType implements ITypePredicate
 	EQUAL("punctuation.equal.css", Terminals.EQUAL), //$NON-NLS-1$
 	INCLUDES("keyword.control.at-rule.include.css", Terminals.INCLUDES), //$NON-NLS-1$
 	DASHMATCH(".css", Terminals.DASHMATCH), //$NON-NLS-1$
-	
+	BEGINS_WITH(".css", Terminals.BEGINS_WITH), //$NON-NLS-1$
+	ENDS_WITH(".css", Terminals.ENDS_WITH), //$NON-NLS-1$
+
 	UNDEFINED("undefined.css", -1), //$NON-NLS-1$
-	COMMENT("comment.block.css", 42); //$NON-NLS-1$
-	
+	COMMENT("comment.block.css", 1024); //$NON-NLS-1$
+
 	private static final Map<String, CSSTokenType> NAME_MAP;
 	private String _scope;
 	private short beaverId;
