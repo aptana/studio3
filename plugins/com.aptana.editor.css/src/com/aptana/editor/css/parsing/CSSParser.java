@@ -19,35 +19,35 @@ import com.aptana.parsing.IParseState;
 public class CSSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pDLcTu5KKKFVkI5pKF4G59G2I04E3nY4Ww8GcXWu8Ys50KmOgz83KGUk#zzmwXWoWML50" +
-		"H6ogeYAXO4SK2AA9SpynENfRiWoJoX$s#i$VEdNFBtDaoW2S28p0Iep0QOp0Mup0U4p0Hap" +
-		"0PKp0Dqp43Cp4Bip47Sp4FLs8#5c0X5c4nbc0gbc8PbcC5Lc8LLYCNQx0MwueLyT8YHHo2R" +
-		"9H4Nmp0WuX5Cmn5DNJ2C9H3EBo8m4Mu69SW4ZvSZdiG1G#IqHYfYCP094bt3D9UAMY1mOZ3" +
-		"DQYBQr4FyKX08ggY5DQZe$6eW8P8GYja8HEDw54BTxaydi3ZU0IbKHbFuM4yIO$czBKzqkK" +
-		"q#Xb65AumZ6WyYXpqD$RXUCpOOr0TTw04okD6t8pBH8A#AgBDgI6J7Bvfw17qxUdq3NfMH4" +
-		"l3k0wtQCziN6zwfwBUJyygPtYgxfO9qTsshkvceomUmbN1N9NmZCbL7xVgNBtG6trG1xLnE" +
-		"mBem5ntkdBTxSeLXljSkHJpDiFiobuEvTeLCzh5j7VkQVAJo7#0$6xSkMVHtRLpcYaJ7Cok" +
-		"I97nG6YcxbSIPw$MMWgrrYvcNY$KPVT2NQeNnPcfZwPwHacmVqse1RG4fR9aQ0jqrshoILQ" +
-		"M1hIeCTX5FzeOlOLX#RMcAWVQuGQZTS5DMbDept5dOmVkXSKt9ypLtn9yIqjoxqhnxIhD9w" +
-		"Kid#jot95exce5VXCgyecen9skpEUgAdjLZKzrB6gmobh5YXXHf8YrkUP8imj#ZkBPYKJka" +
-		"iNzIMMFqjYLTFOcawmencniQl0nOWJVx2hQoqUlM5SDoNoNcz3FzcYfFS9D3JxM4ENoi5VN" +
-		"WZFswYfftxog4Ln$13MRuMD#jNxRteHFacqlnxpEzUVxAcbpmjcHVD$AmPW5UvVVzKZ3iBW" +
-		"ovHbWfNRl52UUdjupFC$MtIXNTmDSQromkofNZCdbPmILozulzQOqv9iIwQfIvVA6oDNKbK" +
-		"inBSCCC4eyrwwOFXVJhiQlMJQ$6LdDMLl1dREPCGvcWCmOVeD3CzKzWhDUhVcq5fePBhpiN" +
-		"cXDzQ8OCxeNQeQIDjK$F$j7oL52leMQOcQnQygIHOxjKOV$eUGytR0QQOsvU4#srv2lQNZp" +
-		"rgOhyVBvsv2ZFmly8mCxS$IdwzpWbKgqCdeNegFHJngvEeHFJPqHE6IFhVB6FeGuRcoZZMs" +
-		"JaRjfwqJPrSntAqfz1VAkS#XR66C4vS1YnZXev15YFsDCCFKSDVOJr8yPc#c1rPgeOEQNKg" +
-		"zcx7xUUXezmSotfNxArZqcfpMNM6Ncfn8R7VNCvrnYY3ftgS#9qVTHRsDYTI0wX#3lANpjr" +
-		"jR2E1SQUDLWtIN#XryMqRu8l0oY6x7N7bjL77CjZOnp#rdJYGLc$kJvhzEQJQmypnYvffu3" +
-		"3jis8ykOkLp7#ewSEnvEqs#xyTziR3kefnhzCFLO1t$uMUggxtXdgXTX7UsAm6bJ6ET20gy" +
-		"Djf1$vPJyBIVbB$bJJiXnEQQjV#ZxxyHln6RP95Dail7ubJYgjTU9rsIzhDEZjRA6zzMoN9" +
-		"R9S1acGsM839P1Cb06I7$9aNxIrqJO8gjad8oLCJ9Q9ifAMI6vCaasIbvDhnBRjVOAyRBMN" +
-		"jBt5$Lz6$62rfudjX9BPR4ia8KoJ#PmD5jcoKoP8TCrPvg#JzNtNj9JUiXScI$PqaTwoo8P" +
-		"9IDbX3mdI#GV#KMEo4zoM7wK7#Hx#Kw#bM$aa7mjNycNSb2#a0FokUoNp#HJ#KJsoLxvM3w" +
-		"I3sMFV23lotlohhmZk#LjsILloPloXkoK7V8pamxZcT4YmBEEHvztaWf12l$dgHhXF9ieU7" +
-		"cMz10MptiNDj9OTnfhJcFDQJmPDU2u0SVfbEcK6PGPb9cKcLfQF7se4t0OOV54eU0n2EDPH" +
-		"26SiFWD3ICyXALHpo2HzaJAU7qYjNWMyn2MHXprECg0XiV0SY1Cdo8RwXEknREEZUO6ZGgW" +
-		"gGC9nKHT1vevKFi$s9JLLW==");
+		"U9pDLtTy5KKG$kubBs8U8Y0c0J4968eGGWJI24a8BLGLx2YAO47iXLuIUk#zzqxeA8XOKC6" +
+		"6g22Ys10BOa4HGHGTlztRl7Tm3vF8Frn#tytSx7mpixDxzpQ09mIZCGPZCGxZCG4JCGcJCG" +
+		"LJCGtJCHEpC1jpC1VpC1yBi11NOH4MOmcMOXcMOmPMO2LMOJNoiGPhiGxhiG4RYnNniY957" +
+		"8vSb48U1gCBgg8PHY0E7J4I4GY55s6u12LmASBXGndSYqXua8B6I4CKXY1Pkc6ePgMYEOOX" +
+		"0RMHYEjG1tLH3qceZDBOX0w6KG4DaOoMo4OM6f5nBUvsCPx0utW4PH6Bf$0mdYGZXroRaI7" +
+		"$O83nYCGeun65Hp4GWupzIZncx36eWZjH4kLn8sx1vI9#RZKyOtnKRCNjZJxeYtxehomocT" +
+		"nAJgwVMH4z3JCTlHnPMw2LF#kjPp5LTwy8qjtMhkxceXmUmjN#ND5eQsBUWTjqhboqDv5Kt" +
+		"GymrpMkN7UvSeNW7bSkvNcxyRoVlHo1hjepokLfhrmw$PFf$o3zd#RATKDtryhPdZqSdbsH" +
+		"AXDbmdayrHoI0RJHMYgr6roU1RrGbzqBTQbU56UaFfhg4IM1McX2BLvBK2fBfhQeEkgZEjf" +
+		"fImFjKrFxrD3z1FTuWGnOhjSyu2RSRBJEwAGrvN4Vry3YEnFYwcn9lf#bk6gb#LwLvHufnx" +
+		"qRmRM8udfMuDUW8lT2DDSubdknCbSwZlkvAlTkTRutnOaOLgI8jTZxSDDxDUyahaGALyLYH" +
+		"zBPYmns98jlOpQz8XcpgQd1nuXXtCsLDCj7LbLN3MbyTvkHPpDQQKQegS776Y9T37jsBJbY" +
+		"povQSmkgXd$#OOnhU$YONytVjblSFxOzWdcTymzmGza9sqTP5DVkH0skkRB4akizYnlekcM" +
+		"OiQmWa3NSRu$WZ9tCytKtqjNT1CurqTzTbQkW1uqOGUKAH58#IQugLQwm8BcyhbpAqpAUEU" +
+		"GayLbv#boUTZMnPqNsSU#tSAsSxHdZy4oWPmp$WdkgUnY$pLwj#RGMt3DKUDczq9hgHJ56T" +
+		"2$K22LjwliIp#yF9P#I7HR5ZEVRwzMMnW4VVYziRcs$35ZI58zQcZsJWARpUka1RCxJ7oN#" +
+		"5WCxbLuOUAKHBOtUcUXWzDD6RWd2gQvd3HosdwtonZwKE61iDOsjeAPTj7Max6h6knMbldF" +
+		"oRdFeknbZ9EMWOiOuQkG9uYHZZ37rJ3Io1B7VwCUDR4DKCBnbrAEDlIvllOoUQSRRKZzbR6" +
+		"UCd4UiDkFJY4sEUXPmh4cGElSG#KO$Gf$s9bOdelD$pEzOuJsmjXRcSx61LnNM7Vu$U5b4k" +
+		"oBuDI2w4FliPol6CPPZPBoRPt4zhVb6px$mULgpY1KN66EhgVUWmxRTo39cR4jW38SAYUSZ" +
+		"TXXzh#6SffvYTBK$gpdY3JjFd4mYpkXnnPXFsoBuj2vgl8i1l3RRGlwMl#HFEIr$o2avAR$" +
+		"B2MtzJT#F4xyIpyfccIfJ3ECNufZMNYDUbGsoNZ#jaxMyvyiAMIuZPBWCaw4oH0RB81ae0o" +
+		"HFSgM$YV2Sh9RnCax6oXYP9AjafQoHoR99Dfhn7SGhMdkPU4bhB#hxTdr$WTYcjUU9hSGoM" +
+		"I8BPP7CbxbycYEpPPRCb1dQPxg#JzFttj9BUaeFwIxpP87qaxxIHnRBQ1ab8sMBB9KpyhFy" +
+		"A3$8KVbUZiXtygry8r$BOVbA3icNyeLyBf$9ft9GFf6FvO1y9FlbGzadU#K3UL$Uaptohko" +
+		"MT#HjUKlUb3Tab#oKr#Kd9bR$3ra4UFBnwDDFQY6epr$tT8rGVXiKl3nPUWYBPyAB6nciEu" +
+		"CrPx3c39wJClcSoUSioYpAXfGDARCfixLKvrbr7WuXB7tMIEDSROJmRA4GIbWyhuGG7iBIg" +
+		"6UGGdiAPP8#CreycNa8IoEHUY9bWeR7m78WXF3o16ffn1kqC6Xo3d8SI2ucwZZGF0Xg$Gj1" +
+		"XjJL");
 
 	// suppress the error printouts
 	private static class CSSEvents extends Events
@@ -709,6 +709,8 @@ public class CSSParser extends Parser implements IParser {
 			case 133: // AttributeValueOperator = EQUAL
 			case 134: // AttributeValueOperator = INCLUDES
 			case 135: // AttributeValueOperator = DASHMATCH
+			case 136: // AttributeValueOperator = BEGINS_WITH
+			case 137: // AttributeValueOperator = ENDS_WITH
 			{
 				return _symbols[offset + 1];
 			}

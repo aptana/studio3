@@ -32,7 +32,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -65,6 +64,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
@@ -79,6 +79,7 @@ import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.ProjectsPlugin;
@@ -89,6 +90,9 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ProjectTemplateElement;
 import com.aptana.scripting.model.filters.IModelFilter;
 
+/**
+ * New Web Project Wizard class.
+ */
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
 
@@ -99,12 +103,26 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 
 	private static final String IMAGE = "icons/web_project_wiz.png"; //$NON-NLS-1$
 
-	private WizardNewProjectCreationPage mainPage;
-	private ProjectTemplateSelectionPage templatesPage;
-	private IProject newProject;
-	private IConfigurationElement configElement;
+	protected WizardNewProjectCreationPage mainPage;
+	protected ProjectTemplateSelectionPage templatesPage;
+	protected WizardNewProjectReferencePage referencePage;
 
+	protected IProject newProject;
+	protected IConfigurationElement configElement;
+
+	/**
+	 * Constructs a new Web Project Wizard.
+	 */
 	public NewProjectWizard()
+	{
+		initDialogSettings();
+	}
+
+	/**
+	 * Initialize the wizard's dialog-settings.<br>
+	 * Subclasses should override to provide specific initialization.
+	 */
+	protected void initDialogSettings()
 	{
 		IDialogSettings workbenchSettings = ProjectsPlugin.getDefault().getDialogSettings();
 		IDialogSettings section = workbenchSettings.getSection("BasicNewProjectResourceWizard");//$NON-NLS-1$
@@ -115,6 +133,12 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		setDialogSettings(section);
 	}
 
+	/**
+	 * Add pages to the wizard.<br>
+	 * By default, we don't add the reference page to the base Web Project (subclasses may override).
+	 * 
+	 * @see org.eclipse.jface.wizard.Wizard#addPages()
+	 */
 	@Override
 	public void addPages()
 	{
@@ -124,52 +148,11 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
-
 		List<IProjectTemplate> templates = getProjectTemplates(new TemplateType[] { TemplateType.WEB, TemplateType.ALL });
 		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
 		}
-	}
-
-	/**
-	 * Returns a list of {@link IProjectTemplate} that match the any of the given types.<br>
-	 * Templates are loaded from the Rubles and from the "projectTemplates" extension point.
-	 * 
-	 * @param templateTypes
-	 *            The Types to match to.
-	 * @return A list of ProjectTemplateElement
-	 */
-	public static List<IProjectTemplate> getProjectTemplates(final TemplateType[] templateTypes)
-	{
-		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
-		{
-			public boolean include(AbstractElement element)
-			{
-				boolean result = false;
-
-				if (element instanceof ProjectTemplateElement)
-				{
-					ProjectTemplateElement template = (ProjectTemplateElement) element;
-					TemplateType type = template.getType();
-					for (TemplateType t : templateTypes)
-					{
-						if (type == t)
-						{
-							result = true;
-							break;
-						}
-					}
-				}
-				return result;
-			}
-		});
-		ProjectTemplatesManager manager = new ProjectTemplatesManager();
-		for (TemplateType t : templateTypes)
-		{
-			templates.addAll(manager.getTemplatesForType(t));
-		}
-		return templates;
 	}
 
 	@Override
@@ -188,12 +171,23 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement
+	 * , java.lang.String, java.lang.Object)
+	 */
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
 			throws CoreException
 	{
 		configElement = config;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#init(org.eclipse.ui.IWorkbench,
+	 * org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection)
 	{
@@ -202,6 +196,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		setWindowTitle(Messages.NewProjectWizard_Title);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#initializeDefaultPageImageDescriptor()
+	 */
 	@Override
 	protected void initializeDefaultPageImageDescriptor()
 	{
@@ -243,14 +241,26 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			location = mainPage.getLocationURI();
 		}
 
+		// Project description creation
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
 		description.setLocationURI(location);
-		description.setNatureIds(new String[] { WebProjectNature.ID });
-		// Add Unified Builder
-		ICommand command = description.newCommand();
-		command.setBuilderName(UnifiedBuilder.ID);
-		description.setBuildSpec(new ICommand[] { command });
+		// Set the natures
+		description.setNatureIds(getProjectNatures());
+		// Set the builders
+		for (String builder : getProjectBuilders())
+		{
+			ResourceUtil.addBuilder(description, builder);
+		}
+		// Update the referenced project in case it was initialized.
+		if (referencePage != null)
+		{
+			IProject[] refProjects = referencePage.getReferencedProjects();
+			if (refProjects.length > 0)
+			{
+				description.setReferencedProjects(refProjects);
+			}
+		}
 
 		boolean fromGit = false;
 		if (templatesPage != null)
@@ -287,15 +297,51 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		return newProject;
 	}
 
-	private void doBasicCreateProject(IProject project, final IProjectDescription description) throws CoreException
+	/**
+	 * Returns the project nature-id's.
+	 * 
+	 * @return The natures to be set to the project.
+	 */
+	protected String[] getProjectNatures()
+	{
+		return new String[] { WebProjectNature.ID };
+	}
+
+	/**
+	 * Returns the project builder-id's.
+	 * 
+	 * @return The builders to be set to the project.
+	 */
+	protected String[] getProjectBuilders()
+	{
+		return new String[] { UnifiedBuilder.ID };
+	}
+
+	/**
+	 * Returns a description string for the project creation operation.
+	 * 
+	 * @return a description string
+	 */
+	protected String getProjectCreationDescription()
+	{
+		return Messages.NewProjectWizard_CreateOp_Title;
+	}
+
+	/**
+	 * Perform a basic project creation.
+	 * 
+	 * @param project
+	 * @param description
+	 * @throws CoreException
+	 */
+	protected void doBasicCreateProject(IProject project, final IProjectDescription description) throws CoreException
 	{
 		// create the new project operation
 		IRunnableWithProgress op = new IRunnableWithProgress()
 		{
 			public void run(IProgressMonitor monitor) throws InvocationTargetException
 			{
-				CreateProjectOperation op = new CreateProjectOperation(description,
-						Messages.NewProjectWizard_CreateOp_Title);
+				CreateProjectOperation op = new CreateProjectOperation(description, getProjectCreationDescription());
 				try
 				{
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
@@ -348,6 +394,46 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
 		}
+	}
+
+	/**
+	 * Returns a list of {@link IProjectTemplate} that match the any of the given types.<br>
+	 * Templates are loaded from the Rubles and from the "projectTemplates" extension point.
+	 * 
+	 * @param templateTypes
+	 *            The Types to match to.
+	 * @return A list of ProjectTemplateElement
+	 */
+	public static List<IProjectTemplate> getProjectTemplates(final TemplateType[] templateTypes)
+	{
+		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		{
+			public boolean include(AbstractElement element)
+			{
+				boolean result = false;
+
+				if (element instanceof ProjectTemplateElement)
+				{
+					ProjectTemplateElement template = (ProjectTemplateElement) element;
+					TemplateType type = template.getType();
+					for (TemplateType t : templateTypes)
+					{
+						if (type == t)
+						{
+							result = true;
+							break;
+						}
+					}
+				}
+				return result;
+			}
+		});
+		ProjectTemplatesManager manager = new ProjectTemplatesManager();
+		for (TemplateType t : templateTypes)
+		{
+			templates.addAll(manager.getTemplatesForType(t));
+		}
+		return templates;
 	}
 
 	/**
