@@ -47,4 +47,6 @@ public class Terminals {
 	static public final short EQUAL = 39;
 	static public final short INCLUDES = 40;
 	static public final short DASHMATCH = 41;
+	static public final short BEGINS_WITH = 42;
+	static public final short ENDS_WITH = 43;
 }

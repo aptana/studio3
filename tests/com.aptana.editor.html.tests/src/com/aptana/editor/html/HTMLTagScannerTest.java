@@ -211,7 +211,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.separator.key-value.html"), 13, 1);
 		assertToken(getToken("string.quoted.single.html"), 14, 1);
 		assertToken(getToken("support.class.js"), 15, 8);
-		assertToken(getToken(null/*"operator.dot.js"*/), 23, 1);
+		assertToken(getToken("meta.delimiter.method.period.js"), 23, 1);
 		assertToken(getToken("source.js"), 24, 4);
 		assertToken(getToken("string.quoted.single.html"), 28, 1);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 29, 1);

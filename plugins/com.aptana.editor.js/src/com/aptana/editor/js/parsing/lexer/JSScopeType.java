@@ -42,6 +42,18 @@ public enum JSScopeType implements ITypePredicate
 	CURLY_BRACE("meta.brace.curly.js"), //$NON-NLS-1$
 	COMMA("meta.delimiter.object.comma.js"), //$NON-NLS-1$
 	NUMBER("constant.numeric.js"), //$NON-NLS-1$
+	// Left Paren in function declaration
+	LEFT_PAREN("punctuation.definition.parameters.begin.js"), //$NON-NLS-1$
+	// Right Paren in function declaration
+	RIGHT_PAREN("punctuation.definition.parameters.end.js"), //$NON-NLS-1$
+	// periods outside numbers (should be only for method calls, probably)
+	PERIOD("meta.delimiter.method.period.js"), //$NON-NLS-1$
+	// 'function' in function declaration
+	FUNCTION_KEYWORD("storage.type.function.js"), //$NON-NLS-1$
+	// The name of a function in the function decl
+	FUNCTION_NAME("entity.name.function.js"), //$NON-NLS-1$
+	// Parameter/argument in function decl
+	FUNCTION_PARAMETER("variable.parameter.function.js"), //$NON-NLS-1$
 	DOT("operator.dot.js"); //$NON-NLS-1$
 
 	private static final Map<String, JSScopeType> NAME_MAP;

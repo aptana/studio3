@@ -376,7 +376,7 @@ public class CorePlugin extends Plugin
 									if (delta.getKind() == IResourceDelta.ADDED
 											|| (delta.getKind() == IResourceDelta.CHANGED
 													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-													.isAccessible()))
+														.isAccessible()))
 									{
 										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 										{
@@ -432,10 +432,12 @@ public class CorePlugin extends Plugin
 	{
 
 		private Map<IProject, Integer> fWatchers;
+		private FileDeltaRefreshAdapter fAdapter;
 		private boolean hooked;
 
 		ResourceListener()
 		{
+			fAdapter = new FileDeltaRefreshAdapter();
 			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
@@ -453,7 +455,11 @@ public class CorePlugin extends Plugin
 		 */
 		private void hookAll()
 		{
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.PRE_CLOSE);
+			ResourcesPlugin.getWorkspace()
+					.addResourceChangeListener(
+							this,
+							IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE
+									| IResourceChangeEvent.PRE_CLOSE);
 
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
@@ -502,10 +508,11 @@ public class CorePlugin extends Plugin
 			}
 			try
 			{
-				if (newProject != null && newProject.exists() && newProject.getLocation() != null && (fWatchers == null || !fWatchers.containsKey(newProject)))
+				if (newProject != null && newProject.exists() && newProject.getLocation() != null
+						&& (fWatchers == null || !fWatchers.containsKey(newProject)))
 				{
 					int watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
-							new FileDeltaRefreshAdapter());
+							fAdapter);
 					if (fWatchers == null)
 					{
 						fWatchers = new HashMap<IProject, Integer>();

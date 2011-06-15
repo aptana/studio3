@@ -44,6 +44,10 @@ public class SyncingConsole extends MessageConsole
 	{
 		super(name, imageDescriptor);
 		_consoleStream = this.newMessageStream();
+
+		Map<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
+		themeConsoleStreamToColor.put(_consoleStream, ConsoleThemer.CONSOLE_OUTPUT);
+		setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, themeConsoleStreamToColor);
 	}
 
 	/**
@@ -77,10 +81,6 @@ public class SyncingConsole extends MessageConsole
 	private static void initConsole()
 	{
 		_console = new SyncingConsole(Messages.SyncingConsole_AptanaSyncingConsole, null);
-		Map<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
-		themeConsoleStreamToColor.put(_console.newMessageStream(), ConsoleThemer.CONSOLE_OUTPUT);
-
-		_console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, themeConsoleStreamToColor);
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { _console });
 	}
 

@@ -16,8 +16,12 @@ import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 import com.aptana.editor.common.PartitionScannerSwitchStrategy;
 
 /**
+ * A rule for detecting patterns which begin with a given
+ * sequence and may end with a given sequence thereby spanning
+ * multiple lines. In addition, the rule ends on the provided break sequences
+ * as if if would a end-of-file.
+ * 
  * @author Max Stepanov
- *
  */
 public class BreakingMultiLineRule extends MultiLineRule {
 

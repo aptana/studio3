@@ -374,7 +374,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPagePlusDeclaration() throws Exception
 	{
-		parseTest("@page {testing: +10;}" + EOL, "@page {testing: 10;}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: +10;}" + EOL, "@page {testing: +10;}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -844,6 +844,16 @@ public class CSSParserTest extends TestCase
 	public void testCommentBug() throws Exception
 	{
 		parseTest("body {\n\tbackground: red;\n}\n\n/**\n * \n */", "body {background: red;}" + EOL);
+	}
+
+	public void testStartsWithBug() throws Exception
+	{
+		parseTest("a[href ^= 'javascript:'] {}" + EOL);
+	}
+
+	public void testEndsWithBug() throws Exception
+	{
+		parseTest("a[href $= 'http://abc.com'] {}" + EOL);
 	}
 
 	protected void parseTest(String source) throws Exception
