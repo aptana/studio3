@@ -20,6 +20,7 @@ import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.navigator.resources.ResourceDragAdapterAssistant;
 
 import com.aptana.ide.ui.io.FileSystemUtils;
@@ -27,54 +28,77 @@ import com.aptana.ide.ui.io.FileSystemUtils;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class FileDragAdapterAssistant extends ResourceDragAdapterAssistant {
+public class FileDragAdapterAssistant extends ResourceDragAdapterAssistant
+{
 
-    @Override
-    public boolean setDragData(DragSourceEvent anEvent, IStructuredSelection aSelection) {
-        boolean result = super.setDragData(anEvent, aSelection);
-        if (result) {
-            return true;
-        }
+	private static final Transfer[] SUPPORTED_TRANSFERS = new Transfer[] { FileTransfer.getInstance() };
 
-        IFileStore[] fileStores = getSelectedFiles(aSelection);
-        if (fileStores.length > 0) {
-            if (LocalSelectionTransfer.getTransfer().isSupportedType(anEvent.dataType)) {
-                anEvent.data = fileStores;
-                return true;
-            }
+	@Override
+	public Transfer[] getSupportedTransferTypes()
+	{
+		return SUPPORTED_TRANSFERS;
+	}
 
-            if (FileTransfer.getInstance().isSupportedType(anEvent.dataType)) {
-                List<String> filenames = new ArrayList<String>();
-                File file;
-                for (IFileStore fileStore : fileStores) {
-                    try {
-                        file = fileStore.toLocalFile(EFS.NONE, null);
-                        if (file != null) {
-                            filenames.add(file.getAbsolutePath());
-                        }
-                    } catch (CoreException e) {
-                    }
-                }
-                if (filenames.isEmpty()) {
-                    return false;
-                }
-                anEvent.data = filenames.toArray(new String[filenames.size()]);
-                return true;
-            }
-        }
-        return false;
-    }
+	@Override
+	public boolean setDragData(DragSourceEvent anEvent, IStructuredSelection aSelection)
+	{
+		boolean result = super.setDragData(anEvent, aSelection);
+		if (result)
+		{
+			return true;
+		}
 
-    private IFileStore[] getSelectedFiles(IStructuredSelection aSelection) {
-        Set<IFileStore> files = new LinkedHashSet<IFileStore>();
-        IFileStore file;
-        Object[] selectedElements = aSelection.toArray();
-        for (Object selected : selectedElements) {
-            file = FileSystemUtils.getFileStore(selected);
-            if (file != null) {
-                files.add(file);
-            }
-        }
-        return files.toArray(new IFileStore[files.size()]);
-    }
+		IFileStore[] fileStores = getSelectedFiles(aSelection);
+		if (fileStores.length > 0)
+		{
+			if (LocalSelectionTransfer.getTransfer().isSupportedType(anEvent.dataType))
+			{
+				anEvent.data = fileStores;
+				return true;
+			}
+
+			if (FileTransfer.getInstance().isSupportedType(anEvent.dataType))
+			{
+				List<String> filenames = new ArrayList<String>();
+				File file;
+				for (IFileStore fileStore : fileStores)
+				{
+					try
+					{
+						file = fileStore.toLocalFile(EFS.NONE, null);
+						if (file != null)
+						{
+							filenames.add(file.getAbsolutePath());
+						}
+					}
+					catch (CoreException e)
+					{
+					}
+				}
+				if (filenames.isEmpty())
+				{
+					return false;
+				}
+				anEvent.data = filenames.toArray(new String[filenames.size()]);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private IFileStore[] getSelectedFiles(IStructuredSelection aSelection)
+	{
+		Set<IFileStore> files = new LinkedHashSet<IFileStore>();
+		IFileStore file;
+		Object[] selectedElements = aSelection.toArray();
+		for (Object selected : selectedElements)
+		{
+			file = FileSystemUtils.getFileStore(selected);
+			if (file != null)
+			{
+				files.add(file);
+			}
+		}
+		return files.toArray(new IFileStore[files.size()]);
+	}
 }
