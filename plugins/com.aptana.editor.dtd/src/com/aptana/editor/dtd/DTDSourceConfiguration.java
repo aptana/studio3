@@ -25,29 +25,36 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
+import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 public class DTDSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 	
 	public static final String PREFIX = "__dtd__"; //$NON-NLS-1$
 	public static final String DEFAULT = "__dtd" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public static final String DTD_COMMENT = PREFIX + "comment"; //$NON-NLS-1$
-	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
-	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public final static String PI = PREFIX + "pi"; //$NON-NLS-1$
+	public static final String COMMENT = PREFIX + "comment"; //$NON-NLS-1$
+	public static final String TAG = PREFIX + "tag"; //$NON-NLS-1$
+	public static final String SECTION = PREFIX + "section"; //$NON-NLS-1$
 
-	// TODO: add other content types
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, DTD_COMMENT, STRING_DOUBLE, STRING_SINGLE };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, PI, COMMENT, TAG, SECTION };
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IDTDConstants.CONTENT_TYPE_DTD } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!--", "-->", new Token(DTD_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<?", "?>", new Token(PI)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<!--", "-->", getToken(COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<![", "[", getToken(SECTION)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiCharacterRule("]]>", getToken(SECTION)), //$NON-NLS-1$
+			new TagRule("!", getToken(TAG)), //$NON-NLS-1$
 	};
 	private DTDSourceScanner dtdScanner;
+	private DTDSourceScanner tagScanner;
+	private DTDSourceScanner piScanner;
+	private CommentScanner commentScanner;
 
 	private static DTDSourceConfiguration instance;
 
@@ -64,9 +71,12 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			c.addTranslation(new QualifiedContentType(IDTDConstants.CONTENT_TYPE_DTD), new QualifiedContentType("source.dtd")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(DTD_COMMENT), new QualifiedContentType("comment.block.multiline.dtd")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.dtd")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.dtd")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(PI), new QualifiedContentType("meta.tag.preprocessor.xml")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(COMMENT), new QualifiedContentType("comment.block.multiline.dtd")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(TAG), new QualifiedContentType("tag.dtd")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(SECTION), new QualifiedContentType("section.dtd")); //$NON-NLS-1$
+			//c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.dtd")); //$NON-NLS-1$
+			//c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.dtd")); //$NON-NLS-1$
 
 			instance = new DTDSourceConfiguration();
 		}
@@ -99,19 +109,6 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 			return IDTDConstants.CONTENT_TYPE_DTD;
 		}
 		return null;
-	}
-
-	/*
-	 * getDTDScanner
-	 * 
-	 * @return
-	 */
-	private ITokenScanner getDTDScanner() {
-		if (dtdScanner == null) {
-			dtdScanner = new DTDSourceScanner();
-		}
-
-		return dtdScanner;
 	}
 
 	/*
@@ -152,17 +149,21 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		NonRuleBasedDamagerRepairer commentDR = new NonRuleBasedDamagerRepairer(this.getToken("comment.block.dtd")); //$NON-NLS-1$
-		reconciler.setDamager(commentDR, DTD_COMMENT);
-		reconciler.setRepairer(commentDR, DTD_COMMENT);
+		dr = new ThemeingDamagerRepairer(getPIScanner());
+		reconciler.setDamager(dr, PI);
+		reconciler.setRepairer(dr, PI);
 
-		NonRuleBasedDamagerRepairer singleQuotedStringDR = new NonRuleBasedDamagerRepairer(this.getToken("string.quoted.single.dtd")); //$NON-NLS-1$
-		reconciler.setDamager(singleQuotedStringDR, STRING_SINGLE);
-		reconciler.setRepairer(singleQuotedStringDR, STRING_SINGLE);
+		dr = new ThemeingDamagerRepairer(getDTDScanner());
+		reconciler.setDamager(dr, SECTION);
+		reconciler.setRepairer(dr, SECTION);
 
-		NonRuleBasedDamagerRepairer doubleQuotedStringDR = new NonRuleBasedDamagerRepairer(this.getToken("string.quoted.double.dtd")); //$NON-NLS-1$
-		reconciler.setDamager(doubleQuotedStringDR, STRING_DOUBLE);
-		reconciler.setRepairer(doubleQuotedStringDR, STRING_DOUBLE);
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
+		reconciler.setDamager(dr, COMMENT);
+		reconciler.setRepairer(dr, COMMENT);
+
+		dr = new ThemeingDamagerRepairer(getDTDTagScanner());
+		reconciler.setDamager(dr, TAG);
+		reconciler.setRepairer(dr, TAG);
 	}
 
 	/*
@@ -170,7 +171,39 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
 	 */
 	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
-		return new CommonContentAssistProcessor(editor);
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || DEFAULT.equals(contentType)) {
+			return new CommonContentAssistProcessor(editor);
+		}
+		return null;
+	}
+
+	private ITokenScanner getDTDScanner() {
+		if (dtdScanner == null) {
+			dtdScanner = new DTDSourceScanner();
+		}
+		return dtdScanner;
+	}
+
+	private ITokenScanner getDTDTagScanner() {
+		if (tagScanner == null) {
+			tagScanner = new DTDSourceScanner();
+		}
+		return tagScanner;
+	}
+
+	private ITokenScanner getCommentScanner() {
+		if (commentScanner == null) {
+			commentScanner = new CommentScanner(getToken("comment.block.dtd")); //$NON-NLS-1$
+		}
+		return commentScanner;
+	}
+
+	private ITokenScanner getPIScanner() {
+		if (piScanner == null) {
+			piScanner = new DTDSourceScanner();
+			piScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
+		}
+		return piScanner;
 	}
 
 }
