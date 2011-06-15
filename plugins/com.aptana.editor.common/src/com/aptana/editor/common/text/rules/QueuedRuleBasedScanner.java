@@ -18,70 +18,87 @@ import org.eclipse.jface.text.rules.Token;
 
 /**
  * @author Max Stepanov
- *
  */
-public class QueuedRuleBasedScanner extends RuleBasedScanner {
+public class QueuedRuleBasedScanner extends RuleBasedScanner
+{
 
-	private static class Entry {
+	protected static class Entry
+	{
 		private final ITokenScanner tokenScanner;
 		private IToken token;
 		private final int offset;
 		private final int length;
 
-		public Entry(ITokenScanner tokenScanner, IToken token, int offset, int length) {
+		public Entry(ITokenScanner tokenScanner, IToken token, int offset, int length)
+		{
 			this.tokenScanner = tokenScanner;
 			this.token = token;
 			this.offset = offset;
 			this.length = length;
 		}
-		
-		public IToken nextToken() {
-			if (tokenScanner != null) {
+
+		public IToken nextToken()
+		{
+			if (tokenScanner != null)
+			{
 				return tokenScanner.nextToken();
-			} else {
-				// return value then reset to EOF
-				try {
-					return token;
-				} finally {
-					token = Token.EOF;
-				}
+			}
+
+			// return value then reset to EOF
+			try
+			{
+				return token;
+			}
+			finally
+			{
+				token = Token.EOF;
 			}
 		}
-		
-		public int getTokenOffset() {
-			if (tokenScanner != null) {
+
+		public int getTokenOffset()
+		{
+			if (tokenScanner != null)
+			{
 				return tokenScanner.getTokenOffset();
 			}
 			return offset;
 		}
 
-		public int getTokenLength() {
-			if (tokenScanner != null) {
+		public int getTokenLength()
+		{
+			if (tokenScanner != null)
+			{
 				return tokenScanner.getTokenLength();
 			}
 			return length;
 		}
 	}
-	
-	private final Queue<Entry> queue = new LinkedList<Entry>();
 
-	public void queueToken(IToken token, int offset, int length) {
+	protected final Queue<Entry> queue = new LinkedList<Entry>();
+
+	public void queueToken(IToken token, int offset, int length)
+	{
 		queue.add(new Entry(null, token, offset, length));
 	}
 
-	public void queueDelegate(ITokenScanner tokenScanner, int offset, int length) {
+	public void queueDelegate(ITokenScanner tokenScanner, int offset, int length)
+	{
 		tokenScanner.setRange(fDocument, offset, length);
 		queue.add(new Entry(tokenScanner, null, offset, length));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#nextToken()
 	 */
 	@Override
-	public IToken nextToken() {
-		while (!queue.isEmpty()) {
+	public IToken nextToken()
+	{
+		while (!queue.isEmpty())
+		{
 			IToken token = queue.element().nextToken();
-			if (token != Token.EOF) {
+			if (token != Token.EOF)
+			{
 				return token;
 			}
 			queue.remove();
@@ -89,23 +106,29 @@ public class QueuedRuleBasedScanner extends RuleBasedScanner {
 		return super.nextToken();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenOffset()
 	 */
 	@Override
-	public int getTokenOffset() {
-		if (!queue.isEmpty()) {
+	public int getTokenOffset()
+	{
+		if (!queue.isEmpty())
+		{
 			return queue.element().getTokenOffset();
 		}
 		return super.getTokenOffset();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenLength()
 	 */
 	@Override
-	public int getTokenLength() {
-		if (!queue.isEmpty()) {
+	public int getTokenLength()
+	{
+		if (!queue.isEmpty())
+		{
 			return queue.element().getTokenLength();
 		}
 		return super.getTokenLength();
