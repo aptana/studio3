@@ -24,8 +24,8 @@ import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
 
 /**
+ * @author Kevin Lindsey
  * @author Max Stepanov
- *
  */
 public class DTDTagScanner extends RuleBasedScanner {
 
@@ -39,43 +39,43 @@ public class DTDTagScanner extends RuleBasedScanner {
 
 		// TODO: This should require Name directly after the opening <? and it
 		// should reject <?xml
-		rules.add(new MultiLineRule("<?", "?>", createToken(DTDTokenType.PI), '\0', true));
+		rules.add(new MultiLineRule("<?", "?>", createToken(DTDTokenType.PI), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
 
-		// NOTE: There is no String, but we're using this to generalize pubid, att value, entity value
-		rules.add(new MultiLineRule("\"", "\"", createToken(DTDTokenType.STRING), '\0', true));
-		rules.add(new MultiLineRule("'", "'", createToken(DTDTokenType.STRING), '\0', true));
-
+		// NOTE: There is no String, but we're using this to generalize pubid,
+		// att value, entity value
+		rules.add(new MultiLineRule("\"", "\"", new Token("string.quoted.double.dtd"), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("'", "'", new Token("string.quoted.single.dtd"), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		WordRule operatorRule = new WordRule(new DTDOperatorWordDetector(), Token.UNDEFINED);
-		operatorRule.addWord("<![", createToken(DTDTokenType.SECTION_START));
-		operatorRule.addWord("]]>", createToken(DTDTokenType.SECTION_END));
+		operatorRule.addWord("<![", createToken(DTDTokenType.SECTION_START)); //$NON-NLS-1$
+		operatorRule.addWord("]]>", createToken(DTDTokenType.SECTION_END)); //$NON-NLS-1$
 		rules.add(operatorRule);
 
 		WordRule wordRule = new WordRule(new DTDWordDetector(), Token.UNDEFINED);
-		wordRule.addWord("<!ATTLIST", createToken(DTDTokenType.ATTLIST));
-		wordRule.addWord("<!ELEMENT", createToken(DTDTokenType.ELEMENT));
-		wordRule.addWord("<!ENTITY", createToken(DTDTokenType.ENTITY));
-		wordRule.addWord("<!NOTATION", createToken(DTDTokenType.NOTATION));
-		wordRule.addWord("#FIXED", createToken(DTDTokenType.FIXED));
-		wordRule.addWord("#IMPLIED", createToken(DTDTokenType.IMPLIED));
-		wordRule.addWord("#PCDATA", createToken(DTDTokenType.PCDATA));
-		wordRule.addWord("#REQUIRED", createToken(DTDTokenType.REQUIRED));
-		wordRule.addWord("ANY", createToken(DTDTokenType.ANY));
-		wordRule.addWord("CDATA", createToken(DTDTokenType.CDATA_TYPE));
-		wordRule.addWord("EMPTY", createToken(DTDTokenType.EMPTY));
-		wordRule.addWord("ENTITY", createToken(DTDTokenType.ENTITY_TYPE));
-		wordRule.addWord("ENTITIES", createToken(DTDTokenType.ENTITIES_TYPE));
-		wordRule.addWord("ID", createToken(DTDTokenType.ID_TYPE));
-		wordRule.addWord("IDREF", createToken(DTDTokenType.IDREF_TYPE));
-		wordRule.addWord("IDREFS", createToken(DTDTokenType.IDREFS_TYPE));
-		wordRule.addWord("IGNORE", createToken(DTDTokenType.IGNORE));
-		wordRule.addWord("INCLUDE", createToken(DTDTokenType.INCLUDE));
-		wordRule.addWord("NDATA", createToken(DTDTokenType.NDATA));
-		wordRule.addWord("NMTOKEN", createToken(DTDTokenType.NMTOKEN_TYPE));
-		wordRule.addWord("NMTOKENS", createToken(DTDTokenType.NMTOKENS_TYPE));
-		wordRule.addWord("NOTATION", createToken(DTDTokenType.NOTATION_TYPE));
-		wordRule.addWord("PUBLIC", createToken(DTDTokenType.PUBLIC));
-		wordRule.addWord("SYSTEM", createToken(DTDTokenType.SYSTEM));
+		wordRule.addWord("<!ATTLIST", createToken(DTDTokenType.ATTLIST)); //$NON-NLS-1$
+		wordRule.addWord("<!ELEMENT", createToken(DTDTokenType.ELEMENT)); //$NON-NLS-1$
+		wordRule.addWord("<!ENTITY", createToken(DTDTokenType.ENTITY)); //$NON-NLS-1$
+		wordRule.addWord("<!NOTATION", createToken(DTDTokenType.NOTATION)); //$NON-NLS-1$
+		wordRule.addWord("#FIXED", createToken(DTDTokenType.FIXED)); //$NON-NLS-1$
+		wordRule.addWord("#IMPLIED", createToken(DTDTokenType.IMPLIED)); //$NON-NLS-1$
+		wordRule.addWord("#PCDATA", createToken(DTDTokenType.PCDATA)); //$NON-NLS-1$
+		wordRule.addWord("#REQUIRED", createToken(DTDTokenType.REQUIRED)); //$NON-NLS-1$
+		wordRule.addWord("ANY", createToken(DTDTokenType.ANY)); //$NON-NLS-1$
+		wordRule.addWord("CDATA", createToken(DTDTokenType.CDATA_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("EMPTY", createToken(DTDTokenType.EMPTY)); //$NON-NLS-1$
+		wordRule.addWord("ENTITY", createToken(DTDTokenType.ENTITY_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("ENTITIES", createToken(DTDTokenType.ENTITIES_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("ID", createToken(DTDTokenType.ID_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("IDREF", createToken(DTDTokenType.IDREF_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("IDREFS", createToken(DTDTokenType.IDREFS_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("IGNORE", createToken(DTDTokenType.IGNORE)); //$NON-NLS-1$
+		wordRule.addWord("INCLUDE", createToken(DTDTokenType.INCLUDE)); //$NON-NLS-1$
+		wordRule.addWord("NDATA", createToken(DTDTokenType.NDATA)); //$NON-NLS-1$
+		wordRule.addWord("NMTOKEN", createToken(DTDTokenType.NMTOKEN_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("NMTOKENS", createToken(DTDTokenType.NMTOKENS_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("NOTATION", createToken(DTDTokenType.NOTATION_TYPE)); //$NON-NLS-1$
+		wordRule.addWord("PUBLIC", createToken(DTDTokenType.PUBLIC)); //$NON-NLS-1$
+		wordRule.addWord("SYSTEM", createToken(DTDTokenType.SYSTEM)); //$NON-NLS-1$
 		rules.add(wordRule);
 
 		rules.add(new DTDEntityRule('%', createToken(DTDTokenType.PE_REF)));
@@ -98,7 +98,7 @@ public class DTDTagScanner extends RuleBasedScanner {
 		rules.add(new WordRule(new DTDNmtokenWordDetector(), createToken(DTDTokenType.NMTOKEN)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(new Token("text"));
+		setDefaultReturnToken(new Token("text")); //$NON-NLS-1$
 	}
 
 	/**

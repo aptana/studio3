@@ -83,8 +83,6 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 			c.addTranslation(new QualifiedContentType(COMMENT), new QualifiedContentType("comment.block.multiline.dtd")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(TAG), new QualifiedContentType("tag.dtd")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(SECTION), new QualifiedContentType("section.dtd")); //$NON-NLS-1$
-			//c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.dtd")); //$NON-NLS-1$
-			//c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.dtd")); //$NON-NLS-1$
 
 			instance = new DTDSourceConfiguration();
 		}
