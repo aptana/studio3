@@ -28,26 +28,23 @@ import com.aptana.editor.dtd.text.rules.DTDNmtokenDetector;
 import com.aptana.editor.dtd.text.rules.DTDOperatorDetector;
 
 @SuppressWarnings("nls")
-public class DTDSourceScanner extends RuleBasedScanner
-{
+public class DTDSourceScanner extends RuleBasedScanner {
 	/**
 	 * A key word detector.
 	 */
-	static class WordDetector implements IWordDetector
-	{
+	static class WordDetector implements IWordDetector {
+		
 		/*
 		 * (non-Javadoc) Method declared on IWordDetector
 		 */
-		public boolean isWordStart(char c)
-		{
+		public boolean isWordStart(char c) {
 			return Character.isLetter(c) || c == '<' || c == '#';
 		}
 
 		/*
 		 * (non-Javadoc) Method declared on IWordDetector
 		 */
-		public boolean isWordPart(char c)
-		{
+		public boolean isWordPart(char c) {
 			return Character.isLetter(c) || c == '!';
 		}
 	}
@@ -55,8 +52,7 @@ public class DTDSourceScanner extends RuleBasedScanner
 	/**
 	 * DTDScanner
 	 */
-	public DTDSourceScanner()
-	{
+	public DTDSourceScanner() {
 		List<IRule> rules = new ArrayList<IRule>();
 
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
@@ -140,8 +136,7 @@ public class DTDSourceScanner extends RuleBasedScanner
 	 * @param string
 	 * @return
 	 */
-	protected IToken createToken(DTDTokenType type)
-	{
+	protected IToken createToken(DTDTokenType type) {
 		return new Token(type.getScope());
 	}
 }

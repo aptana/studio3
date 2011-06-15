@@ -30,8 +30,8 @@ import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
-public class DTDSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
-{
+public class DTDSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+	
 	public static final String PREFIX = "__dtd__"; //$NON-NLS-1$
 	public static final String DEFAULT = "__dtd" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
 	public static final String DTD_COMMENT = PREFIX + "comment"; //$NON-NLS-1$
@@ -42,9 +42,10 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, DTD_COMMENT, STRING_DOUBLE, STRING_SINGLE };
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IDTDConstants.CONTENT_TYPE_DTD } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { new MultiLineRule("<!--", "-->", new Token(DTD_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			new MultiLineRule("<!--", "-->", new Token(DTD_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	private DTDSourceScanner dtdScanner;
 
@@ -52,16 +53,14 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private DTDSourceConfiguration() {
 	}
-	
+
 	/**
 	 * getDefault
 	 * 
 	 * @return
 	 */
-	public static DTDSourceConfiguration getDefault()
-	{
-		if (instance == null)
-		{
+	public static DTDSourceConfiguration getDefault() {
+		if (instance == null) {
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			c.addTranslation(new QualifiedContentType(IDTDConstants.CONTENT_TYPE_DTD), new QualifiedContentType("source.dtd")); //$NON-NLS-1$
@@ -79,8 +78,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner()
-	{
+	public ISubPartitionScanner createSubPartitionScanner() {
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
@@ -88,8 +86,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes()
-	{
+	public String[] getContentTypes() {
 		return CONTENT_TYPES;
 	}
 
@@ -97,25 +94,20 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentContentType(java.lang.String)
 	 */
-	public String getDocumentContentType(String contentType)
-	{
-		if (contentType.startsWith(PREFIX))
-		{
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
 			return IDTDConstants.CONTENT_TYPE_DTD;
 		}
-
 		return null;
 	}
 
-	/**
+	/*
 	 * getDTDScanner
 	 * 
 	 * @return
 	 */
-	private ITokenScanner getDTDScanner()
-	{
-		if (dtdScanner == null)
-		{
+	private ITokenScanner getDTDScanner() {
+		if (dtdScanner == null) {
 			dtdScanner = new DTDSourceScanner();
 		}
 
@@ -126,8 +118,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules()
-	{
+	public IPredicateRule[] getPartitioningRules() {
 		return partitioningRules;
 	}
 
@@ -137,8 +128,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	private IToken getToken(String tokenName)
-	{
+	private IToken getToken(String tokenName) {
 		return new Token(tokenName);
 	}
 
@@ -146,19 +136,15 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes()
-	{
+	public String[][] getTopContentTypes() {
 		return TOP_CONTENT_TYPES;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
-	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
-	{
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getDTDScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -183,8 +169,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
 	 */
-	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
-	{
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
 		return new CommonContentAssistProcessor(editor);
 	}
 
