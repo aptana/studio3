@@ -27,6 +27,7 @@ import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
@@ -132,6 +133,8 @@ public class HTMLParser implements IParser
 			case HTMLTokens.SCRIPT:
 				processScriptTag();
 				break;
+			case HTMLTokens.TEXT:
+				processText();
 		}
 	}
 
@@ -245,7 +248,7 @@ public class HTMLParser implements IParser
 				IParseNode node = ParserPoolFactory.parse(language, text);
 				if (node == null)
 				{
-					node = new HTMLTextNode(text, start, end);
+					node = new HTMLTextNode(start, end);
 				}
 				else
 				{
@@ -442,6 +445,21 @@ public class HTMLParser implements IParser
 					}
 				}
 			}
+		}
+	}
+
+	private void processText()
+	{
+		// checks if the last child of the current node is also a HTML text node. If so, we should unify both to one
+		// node with a larger offset.
+		if (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == HTMLNodeTypes.TEXT)
+		{
+			HTMLTextNode node = (HTMLTextNode) fCurrentElement.getLastChild();
+			node.setLocation(node.getStartingOffset(), fCurrentSymbol.getEnd());
+		}
+		else
+		{
+			fCurrentElement.addChild(new HTMLTextNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()));
 		}
 	}
 

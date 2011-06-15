@@ -35,6 +35,7 @@ import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.parsing.ParserPoolFactory;
@@ -327,7 +328,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		HTMLElementNode element;
 		for (IParseNode node : nodes)
 		{
-			if (node instanceof HTMLCommentNode)
+			if (node instanceof HTMLCommentNode || node instanceof HTMLTextNode)
 			{
 				// ignores comment nodes in outline
 				continue;
