@@ -15,14 +15,16 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
+import com.aptana.editor.dtd.text.rules.DTDTagScanner;
 
-public class DTDSourceScannerTest extends TestCase {
-	private DTDSourceScanner _scanner;
+public class DTDTagScannerTest extends TestCase {
+	
+	private DTDTagScanner scanner;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this._scanner = new DTDSourceScanner() {
+		scanner = new DTDTagScanner() {
 			@Override
 			protected IToken createToken(DTDTokenType type) {
 				return new Token(type);
@@ -32,8 +34,7 @@ public class DTDSourceScannerTest extends TestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
-		this._scanner = null;
-
+		scanner = null;
 		super.tearDown();
 	}
 
@@ -45,69 +46,12 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void typeTests(String source, DTDTokenType... types) {
 		IDocument document = new Document(source);
-
-		this._scanner.setRange(document, 0, source.length());
-
+		scanner.setRange(document, 0, source.length());
 		for (DTDTokenType type : types) {
-			IToken token = this._scanner.nextToken();
+			IToken token = scanner.nextToken();
 			Object data = token.getData();
-
 			assertEquals(type, data);
 		}
-	}
-
-	/**
-	 * testEmptyComment
-	 */
-	public void testEmptyComment() {
-		String source = "<!---->";
-
-		this.typeTests(source, DTDTokenType.COMMENT);
-	}
-
-	/**
-	 * testEmptyComment2
-	 */
-	public void testEmptyComment2() {
-		String source = "<!-- -->";
-
-		this.typeTests(source, DTDTokenType.COMMENT);
-	}
-
-	/**
-	 * testComment
-	 */
-	public void testComment() {
-		String source = "<!-- This is a simple comment -->";
-
-		this.typeTests(source, DTDTokenType.COMMENT);
-	}
-
-	/**
-	 * testPI
-	 */
-	public void testPI() {
-		String source = "<?Test ?>";
-
-		this.typeTests(source, DTDTokenType.PI);
-	}
-
-	/**
-	 * testSectionStart
-	 */
-	public void testSectionStart() {
-		String source = "<![";
-
-		this.typeTests(source, DTDTokenType.SECTION_START);
-	}
-
-	/**
-	 * testSectionEnd
-	 */
-	public void testSectionEnd() {
-		String source = "]]>";
-
-		this.typeTests(source, DTDTokenType.SECTION_END);
 	}
 
 	/**
@@ -115,8 +59,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testAttList() {
 		String source = "<!ATTLIST";
-
-		this.typeTests(source, DTDTokenType.ATTLIST);
+		typeTests(source, DTDTokenType.ATTLIST);
 	}
 
 	/**
@@ -124,8 +67,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testElement() {
 		String source = "<!ELEMENT";
-
-		this.typeTests(source, DTDTokenType.ELEMENT);
+		typeTests(source, DTDTokenType.ELEMENT);
 	}
 
 	/**
@@ -133,8 +75,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testNotation() {
 		String source = "<!NOTATION";
-
-		this.typeTests(source, DTDTokenType.NOTATION);
+		typeTests(source, DTDTokenType.NOTATION);
 	}
 
 	/**
@@ -142,8 +83,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testFixed() {
 		String source = "#FIXED";
-
-		this.typeTests(source, DTDTokenType.FIXED);
+		typeTests(source, DTDTokenType.FIXED);
 	}
 
 	/**
@@ -151,8 +91,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testImplied() {
 		String source = "#IMPLIED";
-
-		this.typeTests(source, DTDTokenType.IMPLIED);
+		typeTests(source, DTDTokenType.IMPLIED);
 	}
 
 	/**
@@ -160,8 +99,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testPCData() {
 		String source = "#PCDATA";
-
-		this.typeTests(source, DTDTokenType.PCDATA);
+		typeTests(source, DTDTokenType.PCDATA);
 	}
 
 	/**
@@ -169,8 +107,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testRequired() {
 		String source = "#REQUIRED";
-
-		this.typeTests(source, DTDTokenType.REQUIRED);
+		typeTests(source, DTDTokenType.REQUIRED);
 	}
 
 	/**
@@ -178,8 +115,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testAny() {
 		String source = "ANY";
-
-		this.typeTests(source, DTDTokenType.ANY);
+		typeTests(source, DTDTokenType.ANY);
 	}
 
 	/**
@@ -187,8 +123,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testCDataType() {
 		String source = "CDATA";
-
-		this.typeTests(source, DTDTokenType.CDATA_TYPE);
+		typeTests(source, DTDTokenType.CDATA_TYPE);
 	}
 
 	/**
@@ -196,8 +131,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testEmpty() {
 		String source = "EMPTY";
-
-		this.typeTests(source, DTDTokenType.EMPTY);
+		typeTests(source, DTDTokenType.EMPTY);
 	}
 
 	/**
@@ -205,8 +139,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testEntityType() {
 		String source = "ENTITY";
-
-		this.typeTests(source, DTDTokenType.ENTITY_TYPE);
+		typeTests(source, DTDTokenType.ENTITY_TYPE);
 	}
 
 	/**
@@ -214,8 +147,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testEntitiesType() {
 		String source = "ENTITIES";
-
-		this.typeTests(source, DTDTokenType.ENTITIES_TYPE);
+		typeTests(source, DTDTokenType.ENTITIES_TYPE);
 	}
 
 	/**
@@ -223,8 +155,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testIDType() {
 		String source = "ID";
-
-		this.typeTests(source, DTDTokenType.ID_TYPE);
+		typeTests(source, DTDTokenType.ID_TYPE);
 	}
 
 	/**
@@ -232,8 +163,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testIDRefType() {
 		String source = "IDREF";
-
-		this.typeTests(source, DTDTokenType.IDREF_TYPE);
+		typeTests(source, DTDTokenType.IDREF_TYPE);
 	}
 
 	/**
@@ -241,8 +171,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testIDRefsType() {
 		String source = "IDREFS";
-
-		this.typeTests(source, DTDTokenType.IDREFS_TYPE);
+		typeTests(source, DTDTokenType.IDREFS_TYPE);
 	}
 
 	/**
@@ -250,8 +179,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testIgnore() {
 		String source = "IGNORE";
-
-		this.typeTests(source, DTDTokenType.IGNORE);
+		typeTests(source, DTDTokenType.IGNORE);
 	}
 
 	/**
@@ -259,8 +187,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testInclude() {
 		String source = "INCLUDE";
-
-		this.typeTests(source, DTDTokenType.INCLUDE);
+		typeTests(source, DTDTokenType.INCLUDE);
 	}
 
 	/**
@@ -268,8 +195,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testNDataType() {
 		String source = "NDATA";
-
-		this.typeTests(source, DTDTokenType.NDATA);
+		typeTests(source, DTDTokenType.NDATA);
 	}
 
 	/**
@@ -277,8 +203,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testNMTokenType() {
 		String source = "NMTOKEN";
-
-		this.typeTests(source, DTDTokenType.NMTOKEN_TYPE);
+		typeTests(source, DTDTokenType.NMTOKEN_TYPE);
 	}
 
 	/**
@@ -286,8 +211,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testNMTokensType() {
 		String source = "NMTOKENS";
-
-		this.typeTests(source, DTDTokenType.NMTOKENS_TYPE);
+		typeTests(source, DTDTokenType.NMTOKENS_TYPE);
 	}
 
 	/**
@@ -295,8 +219,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testNotationType() {
 		String source = "NOTATION";
-
-		this.typeTests(source, DTDTokenType.NOTATION_TYPE);
+		typeTests(source, DTDTokenType.NOTATION_TYPE);
 	}
 
 	/**
@@ -304,8 +227,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testPublicType() {
 		String source = "PUBLIC";
-
-		this.typeTests(source, DTDTokenType.PUBLIC);
+		typeTests(source, DTDTokenType.PUBLIC);
 	}
 
 	/**
@@ -313,8 +235,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testSystemType() {
 		String source = "SYSTEM";
-
-		this.typeTests(source, DTDTokenType.SYSTEM);
+		typeTests(source, DTDTokenType.SYSTEM);
 	}
 
 	/**
@@ -322,8 +243,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testPERef() {
 		String source = "%PERef;";
-
-		this.typeTests(source, DTDTokenType.PE_REF);
+		typeTests(source, DTDTokenType.PE_REF);
 	}
 
 	/**
@@ -331,8 +251,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testGreaterThan() {
 		String source = ">";
-
-		this.typeTests(source, DTDTokenType.GREATER_THAN);
+		typeTests(source, DTDTokenType.GREATER_THAN);
 	}
 
 	/**
@@ -340,8 +259,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testLeftParen() {
 		String source = "(";
-
-		this.typeTests(source, DTDTokenType.LPAREN);
+		typeTests(source, DTDTokenType.LPAREN);
 	}
 
 	/**
@@ -349,8 +267,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testPipe() {
 		String source = "|";
-
-		this.typeTests(source, DTDTokenType.PIPE);
+		typeTests(source, DTDTokenType.PIPE);
 	}
 
 	/**
@@ -358,8 +275,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testRightParen() {
 		String source = ")";
-
-		this.typeTests(source, DTDTokenType.RPAREN);
+		typeTests(source, DTDTokenType.RPAREN);
 	}
 
 	/**
@@ -367,8 +283,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testQuestion() {
 		String source = "?";
-
-		this.typeTests(source, DTDTokenType.QUESTION);
+		typeTests(source, DTDTokenType.QUESTION);
 	}
 
 	/**
@@ -376,8 +291,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testAsterisk() {
 		String source = "*";
-
-		this.typeTests(source, DTDTokenType.STAR);
+		typeTests(source, DTDTokenType.STAR);
 	}
 
 	/**
@@ -385,8 +299,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testPlus() {
 		String source = "+";
-
-		this.typeTests(source, DTDTokenType.PLUS);
+		typeTests(source, DTDTokenType.PLUS);
 	}
 
 	/**
@@ -394,8 +307,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testComma() {
 		String source = ",";
-
-		this.typeTests(source, DTDTokenType.COMMA);
+		typeTests(source, DTDTokenType.COMMA);
 	}
 
 	/**
@@ -403,8 +315,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testPercent() {
 		String source = "%";
-
-		this.typeTests(source, DTDTokenType.PERCENT);
+		typeTests(source, DTDTokenType.PERCENT);
 	}
 
 	/**
@@ -412,8 +323,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testLeftBracket() {
 		String source = "[";
-
-		this.typeTests(source, DTDTokenType.LBRACKET);
+		typeTests(source, DTDTokenType.LBRACKET);
 	}
 
 	/**
@@ -421,8 +331,7 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testName() {
 		String source = "Name";
-
-		this.typeTests(source, DTDTokenType.NAME);
+		typeTests(source, DTDTokenType.NAME);
 	}
 
 	/**
@@ -430,8 +339,23 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testNmtoken() {
 		String source = "200";
+		typeTests(source, DTDTokenType.NMTOKEN);
+	}
 
-		this.typeTests(source, DTDTokenType.NMTOKEN);
+	/**
+	 * testSectionStart
+	 */
+	public void testSectionStart() {
+		String source = "<![";
+		typeTests(source, DTDTokenType.SECTION_START);
+	}
+
+	/**
+	 * testSectionEnd
+	 */
+	public void testSectionEnd() {
+		String source = "]]>";
+		typeTests(source, DTDTokenType.SECTION_END);
 	}
 
 	/**
@@ -439,7 +363,6 @@ public class DTDSourceScannerTest extends TestCase {
 	 */
 	public void testSequence() {
 		String source = "<![%svg-prefw-redecl.module;[%svg-prefw-redecl.mod;]]>";
-
-		this.typeTests(source, DTDTokenType.SECTION_START, DTDTokenType.PE_REF, DTDTokenType.LBRACKET, DTDTokenType.PE_REF, DTDTokenType.SECTION_END);
+		typeTests(source, DTDTokenType.SECTION_START, DTDTokenType.PE_REF, DTDTokenType.LBRACKET, DTDTokenType.PE_REF, DTDTokenType.SECTION_END);
 	}
 }

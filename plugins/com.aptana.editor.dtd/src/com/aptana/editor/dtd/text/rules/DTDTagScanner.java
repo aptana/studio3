@@ -5,14 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+
+package com.aptana.editor.dtd.text.rules;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
@@ -22,59 +22,36 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
-import com.aptana.editor.dtd.text.rules.DTDEntityRule;
-import com.aptana.editor.dtd.text.rules.DTDNameDetector;
-import com.aptana.editor.dtd.text.rules.DTDNmtokenDetector;
-import com.aptana.editor.dtd.text.rules.DTDOperatorDetector;
 
-@SuppressWarnings("nls")
-public class DTDSourceScanner extends RuleBasedScanner {
-	/**
-	 * A key word detector.
-	 */
-	static class WordDetector implements IWordDetector {
-		
-		/*
-		 * (non-Javadoc) Method declared on IWordDetector
-		 */
-		public boolean isWordStart(char c) {
-			return Character.isLetter(c) || c == '<' || c == '#';
-		}
-
-		/*
-		 * (non-Javadoc) Method declared on IWordDetector
-		 */
-		public boolean isWordPart(char c) {
-			return Character.isLetter(c) || c == '!';
-		}
-	}
+/**
+ * @author Max Stepanov
+ *
+ */
+public class DTDTagScanner extends RuleBasedScanner {
 
 	/**
-	 * DTDScanner
+	 * 
 	 */
-	public DTDSourceScanner() {
+	public DTDTagScanner() {
 		List<IRule> rules = new ArrayList<IRule>();
 
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-
-		// Already handled by partitioning, but we need this for the parser
-		rules.add(new MultiLineRule("<!--", "-->", createToken(DTDTokenType.COMMENT), '\0', true));
 
 		// TODO: This should require Name directly after the opening <? and it
 		// should reject <?xml
 		rules.add(new MultiLineRule("<?", "?>", createToken(DTDTokenType.PI), '\0', true));
 
-		// NOTE: There is no String, but we're using this to generalize
-		// pubid, att value, entity value
+		// NOTE: There is no String, but we're using this to generalize pubid, att value, entity value
 		rules.add(new MultiLineRule("\"", "\"", createToken(DTDTokenType.STRING), '\0', true));
 		rules.add(new MultiLineRule("'", "'", createToken(DTDTokenType.STRING), '\0', true));
 
-		WordRule operatorRule = new WordRule(new DTDOperatorDetector(), Token.UNDEFINED);
+
+		WordRule operatorRule = new WordRule(new DTDOperatorWordDetector(), Token.UNDEFINED);
 		operatorRule.addWord("<![", createToken(DTDTokenType.SECTION_START));
 		operatorRule.addWord("]]>", createToken(DTDTokenType.SECTION_END));
 		rules.add(operatorRule);
 
-		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
+		WordRule wordRule = new WordRule(new DTDWordDetector(), Token.UNDEFINED);
 		wordRule.addWord("<!ATTLIST", createToken(DTDTokenType.ATTLIST));
 		wordRule.addWord("<!ELEMENT", createToken(DTDTokenType.ELEMENT));
 		wordRule.addWord("<!ENTITY", createToken(DTDTokenType.ENTITY));
@@ -101,33 +78,27 @@ public class DTDSourceScanner extends RuleBasedScanner {
 		wordRule.addWord("SYSTEM", createToken(DTDTokenType.SYSTEM));
 		rules.add(wordRule);
 
-		// PERef
 		rules.add(new DTDEntityRule('%', createToken(DTDTokenType.PE_REF)));
+		rules.add(new DTDEntityRule('&', createToken(DTDTokenType.PE_REF)));
 
-		CharacterMapRule cmRule = new CharacterMapRule();
-		cmRule.add('>', createToken(DTDTokenType.GREATER_THAN));
-		cmRule.add('(', createToken(DTDTokenType.LPAREN));
-		cmRule.add('|', createToken(DTDTokenType.PIPE));
-		cmRule.add(')', createToken(DTDTokenType.RPAREN));
-		cmRule.add('?', createToken(DTDTokenType.QUESTION));
-		cmRule.add('*', createToken(DTDTokenType.STAR));
-		cmRule.add('+', createToken(DTDTokenType.PLUS));
-		cmRule.add(',', createToken(DTDTokenType.COMMA));
-		cmRule.add('%', createToken(DTDTokenType.PERCENT));
-		cmRule.add('[', createToken(DTDTokenType.LBRACKET));
-		rules.add(cmRule);
+		CharacterMapRule charsRule = new CharacterMapRule();
+		charsRule.add('>', createToken(DTDTokenType.GREATER_THAN));
+		charsRule.add('(', createToken(DTDTokenType.LPAREN));
+		charsRule.add('|', createToken(DTDTokenType.PIPE));
+		charsRule.add(')', createToken(DTDTokenType.RPAREN));
+		charsRule.add('?', createToken(DTDTokenType.QUESTION));
+		charsRule.add('*', createToken(DTDTokenType.STAR));
+		charsRule.add('+', createToken(DTDTokenType.PLUS));
+		charsRule.add(',', createToken(DTDTokenType.COMMA));
+		charsRule.add('%', createToken(DTDTokenType.PERCENT));
+		charsRule.add('[', createToken(DTDTokenType.LBRACKET));
+		rules.add(charsRule);
 
-		// Name
 		rules.add(new WordRule(new DTDNameDetector(), createToken(DTDTokenType.NAME)));
+		rules.add(new WordRule(new DTDNmtokenWordDetector(), createToken(DTDTokenType.NMTOKEN)));
 
-		// Nmtoken
-		rules.add(new WordRule(new DTDNmtokenDetector(), createToken(DTDTokenType.NMTOKEN)));
-
-		// EntityRef
-		// rules.add(new DTDEntityRule('&', createToken(DTDTokenType.PE_REF)));
-
-		this.setRules(rules.toArray(new IRule[rules.size()]));
-		// this.setDefaultReturnToken(this.createToken("text"));
+		setRules(rules.toArray(new IRule[rules.size()]));
+		setDefaultReturnToken(new Token("text"));
 	}
 
 	/**
@@ -139,4 +110,5 @@ public class DTDSourceScanner extends RuleBasedScanner {
 	protected IToken createToken(DTDTokenType type) {
 		return new Token(type.getScope());
 	}
+
 }

@@ -90,6 +90,14 @@ public class DTDSourcePartitionScannerTest extends TestCase {
 
 	public void testPIPartition() {
 		String source = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- comment -->  ";
+		assertContentType(DTDSourceConfiguration.PROLOG, source, 0, 38);
+		assertContentType(DTDSourceConfiguration.DEFAULT, source, 38);
+		assertContentType(DTDSourceConfiguration.COMMENT, source, 39, 16);
+		assertContentType(DTDSourceConfiguration.DEFAULT, source, 55);
+	}
+
+	public void testPIPartition2() {
+		String source = "<?tst version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- comment -->  ";
 		assertContentType(DTDSourceConfiguration.PI, source, 0, 38);
 		assertContentType(DTDSourceConfiguration.DEFAULT, source, 38);
 		assertContentType(DTDSourceConfiguration.COMMENT, source, 39, 16);

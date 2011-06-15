@@ -20,7 +20,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.dtd");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(DTDSourcePartitionScannerTest.class);
-		suite.addTestSuite(DTDSourceScannerTest.class);
+		suite.addTestSuite(DTDTagScannerTest.class);
 		suite.addTestSuite(DTDParserTests.class);
 		//$JUnit-END$
 		return suite;

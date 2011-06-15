@@ -24,12 +24,12 @@ import org.eclipse.jface.text.rules.Token;
 import beaver.Scanner;
 import beaver.Symbol;
 
-import com.aptana.editor.dtd.DTDSourceScanner;
 import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
+import com.aptana.editor.dtd.text.rules.DTDTagScanner;
 
 public class DTDScanner extends Scanner
 {
-	private static class DTDParserScanner extends DTDSourceScanner
+	private static class DTDParserScanner extends DTDTagScanner
 	{
 		protected IToken createToken(DTDTokenType type)
 		{
