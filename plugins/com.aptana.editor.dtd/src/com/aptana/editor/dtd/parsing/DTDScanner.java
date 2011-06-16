@@ -25,11 +25,10 @@ import beaver.Scanner;
 import beaver.Symbol;
 
 import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
-import com.aptana.editor.dtd.text.rules.DTDTagScanner;
 
 public class DTDScanner extends Scanner
 {
-	private static class DTDParserScanner extends DTDTagScanner
+	private static class DTDParserScanner extends DTDSourceScanner
 	{
 		protected IToken createToken(DTDTokenType type)
 		{
