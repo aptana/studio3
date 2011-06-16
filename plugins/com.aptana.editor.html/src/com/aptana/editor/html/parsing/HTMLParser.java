@@ -91,12 +91,11 @@ public class HTMLParser implements IParser
 				startingOffset, //
 				startingOffset + source.length() //
 		);
-
 		try
 		{
 			fCurrentElement = root;
 
-			this.parseAll();
+			this.parseAll(source);
 
 			parseState.setParseResult(root);
 		}
@@ -114,7 +113,7 @@ public class HTMLParser implements IParser
 		return root;
 	}
 
-	protected void processSymbol(Symbol symbol) throws IOException, Exception
+	protected void processSymbol(Symbol symbol, String source) throws IOException, Exception
 	{
 		switch (symbol.getId())
 		{
@@ -134,7 +133,7 @@ public class HTMLParser implements IParser
 				processScriptTag();
 				break;
 			case HTMLTokens.TEXT:
-				processText();
+				processText(source);
 		}
 	}
 
@@ -182,14 +181,14 @@ public class HTMLParser implements IParser
 		return element;
 	}
 
-	private void parseAll() throws IOException, Exception
+	private void parseAll(String source) throws IOException, Exception
 	{
 		advance();
 		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
 		{
 			if (!isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
 			{
-				processSymbol(fCurrentSymbol);
+				processSymbol(fCurrentSymbol, source);
 			}
 			advance();
 		}
@@ -448,14 +447,16 @@ public class HTMLParser implements IParser
 		}
 	}
 
-	private void processText()
+	private void processText(String source)
 	{
 		// checks if the last child of the current node is also a HTML text node. If so, we should unify both to one
 		// node with a larger offset.
 		if (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == HTMLNodeTypes.TEXT)
 		{
 			HTMLTextNode node = (HTMLTextNode) fCurrentElement.getLastChild();
-			node.setLocation(node.getStartingOffset(), fCurrentSymbol.getEnd());
+			int start = node.getStartingOffset(), end = fCurrentSymbol.getEnd();
+			node.setLocation(start, end);
+			node.setText(source.substring(start, end + 1));
 		}
 		else
 		{
