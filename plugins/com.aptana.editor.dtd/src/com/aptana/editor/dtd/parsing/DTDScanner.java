@@ -24,7 +24,6 @@ import org.eclipse.jface.text.rules.Token;
 import beaver.Scanner;
 import beaver.Symbol;
 
-import com.aptana.editor.dtd.DTDSourceScanner;
 import com.aptana.editor.dtd.parsing.lexer.DTDTokenType;
 
 public class DTDScanner extends Scanner

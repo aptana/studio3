@@ -9,7 +9,7 @@ package com.aptana.editor.dtd.text.rules;
 
 import org.eclipse.jface.text.rules.IWordDetector;
 
-public class DTDOperatorDetector implements IWordDetector
+public class DTDOperatorWordDetector implements IWordDetector
 {
 	private int _position;
 
