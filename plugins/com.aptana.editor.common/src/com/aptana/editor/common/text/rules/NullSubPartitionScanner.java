@@ -91,4 +91,11 @@ public class NullSubPartitionScanner implements ISubPartitionScanner {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.ISubPartitionScanner#getResumeToken()
+	 */
+	public IToken getResumeToken() {
+		return null;
+	}
+
 }

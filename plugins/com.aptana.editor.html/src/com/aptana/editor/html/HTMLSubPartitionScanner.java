@@ -27,8 +27,8 @@ import com.aptana.editor.svg.SVGSourceConfiguration;
  * @author Max Stepanov
  * 
  */
-public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
-{
+public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
+	
 	private static final int TYPE_JS = 1;
 	private static final int TYPE_CSS = 2;
 	private static final int TYPE_SVG = 3;
@@ -40,30 +40,32 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 	/**
 	 * HTMLSubPartitionScanner
 	 */
-	public HTMLSubPartitionScanner()
-	{
+	public HTMLSubPartitionScanner() {
 		super( //
-			new ISubPartitionScanner[] { //
+				new ISubPartitionScanner[] { //
 				new SubPartitionScanner( //
-					HTMLSourceConfiguration.getDefault().getPartitioningRules(), //
-					HTMLSourceConfiguration.CONTENT_TYPES, //
-					new Token(HTMLSourceConfiguration.DEFAULT) //
-				), //
-				JSSourceConfiguration.getDefault().createSubPartitionScanner(), //
-				CSSSourceConfiguration.getDefault().createSubPartitionScanner(), //
-				SVGSourceConfiguration.getDefault().createSubPartitionScanner() //
-			}, //
-			new IPartitionScannerSwitchStrategy[] { //
+						HTMLSourceConfiguration.getDefault().getPartitioningRules(), //
+						HTMLSourceConfiguration.CONTENT_TYPES, //
+						new Token(HTMLSourceConfiguration.DEFAULT) //
+						), //
+						JSSourceConfiguration.getDefault().createSubPartitionScanner(), //
+						CSSSourceConfiguration.getDefault().createSubPartitionScanner(), //
+						SVGSourceConfiguration.getDefault().createSubPartitionScanner() //
+				}, //
+				new IPartitionScannerSwitchStrategy[] { //
 				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES), //
-				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES), //
-				new PartitionScannerSwitchStrategy(SVG_SWITCH_SEQUENCES) //
-			} //
+						new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES), //
+						new PartitionScannerSwitchStrategy(SVG_SWITCH_SEQUENCES) //
+				} //
 		);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
+	 * 
+	 * @see
+	 * com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org
+	 * .eclipse.jface.text.rules.IToken)
 	 */
 	@Override
 	public void setLastToken(IToken token) {
@@ -78,17 +80,13 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 
 		String contentType = (String) token.getData();
 
-		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType)
-				|| SVGSourceConfiguration.SCRIPT.equals(contentType)) {
-			if (!(token instanceof ExtendedToken
-					&& ((HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))
-						|| !HTMLUtils.isJavaScriptTag(((ExtendedToken) token).getContents()))
-					)) {
+		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType) || SVGSourceConfiguration.SCRIPT.equals(contentType)) {
+			if (!(token instanceof ExtendedToken && ((HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents())) || !HTMLUtils.isJavaScriptTag(((ExtendedToken) token)
+					.getContents())))) {
 				current = TYPE_JS;
 				super.setLastToken(null);
 			}
-		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType)
-				|| SVGSourceConfiguration.STYLE.equals(contentType)) {
+		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType) || SVGSourceConfiguration.STYLE.equals(contentType)) {
 			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
 				current = TYPE_CSS;
 				super.setLastToken(null);
@@ -98,8 +96,7 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 				current = TYPE_SVG;
 				super.setLastToken(null);
 			}
-		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType)
-				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
+		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
 		} else {
 			for (int i = 0; i < subPartitionScanners.length; ++i) {

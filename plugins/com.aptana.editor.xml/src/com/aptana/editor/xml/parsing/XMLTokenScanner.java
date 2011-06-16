@@ -35,7 +35,7 @@ public class XMLTokenScanner extends RuleBasedScanner
 
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		rules.add(new MultiLineRule("<!--", "-->", createToken(XMLTokenType.COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new DocTypeRule(createToken(XMLTokenType.DOCTYPE)));
+		rules.add(new DocTypeRule(createToken(XMLTokenType.DOCTYPE), false));
 		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(XMLTokenType.CDATA))); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new TagRule("?xml", createToken(XMLTokenType.DECLARATION))); //$NON-NLS-1$
 		rules.add(new TagRule("/", createToken(XMLTokenType.END_TAG))); //$NON-NLS-1$

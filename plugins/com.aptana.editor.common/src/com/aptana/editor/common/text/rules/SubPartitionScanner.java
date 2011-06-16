@@ -106,4 +106,11 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	public IToken getLastToken() {
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.ISubPartitionScanner#getResumeToken()
+	 */
+	public IToken getResumeToken() {
+		return null;
+	}
 }
