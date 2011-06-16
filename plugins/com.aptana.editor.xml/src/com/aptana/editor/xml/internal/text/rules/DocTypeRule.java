@@ -12,6 +12,9 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 
+import com.aptana.editor.common.text.rules.CollectingCharacterScanner;
+import com.aptana.editor.common.text.rules.ExtendedToken;
+
 /**
  * 
  * @author Michael Xia
@@ -31,10 +34,11 @@ public class DocTypeRule extends MultiLineRule {
 	protected boolean endSequenceDetected(ICharacterScanner scanner) {
 		int c;
 		int embeddedDTD = 0;
-		while ((c = scanner.read()) != ICharacterScanner.EOF) {
+		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, String.valueOf(fStartSequence));
+		while ((c = collectingCharacterScanner.read()) != ICharacterScanner.EOF) {
 			if (c == fEscapeCharacter) {
 				// Skip the escaped character.
-				scanner.read();
+				collectingCharacterScanner.read();
 			} else if (c == '[') {
 				if (breakOnDTD) {
 					break;
@@ -42,9 +46,12 @@ public class DocTypeRule extends MultiLineRule {
 				++embeddedDTD;
 			} else if (c == ']') {
 				--embeddedDTD;
-			} else if (c == '>' && embeddedDTD == 0) {
+			} else if (c == '>' && embeddedDTD <= 0) {
 				break;
 			}
+		}
+		if (fToken instanceof ExtendedToken) {
+			((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
 		}
 		return true;
 	}
