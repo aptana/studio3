@@ -144,6 +144,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
+		DTDSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -173,6 +175,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
 	 */
 	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
+		if (contentType.startsWith(DTDSourceConfiguration.PREFIX)) {
+			return DTDSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
+		}
 		return new CommonContentAssistProcessor(editor);
 	}
 
