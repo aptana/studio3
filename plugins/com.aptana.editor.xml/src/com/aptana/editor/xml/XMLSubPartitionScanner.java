@@ -34,19 +34,21 @@ public class XMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	 * HTMLSubPartitionScanner
 	 */
 	public XMLSubPartitionScanner() {
-		super( //
-				new ISubPartitionScanner[] { //
-				new SubPartitionScanner( //
-						XMLSourceConfiguration.getDefault().getPartitioningRules(), //
-						XMLSourceConfiguration.CONTENT_TYPES, //
-						new Token(XMLSourceConfiguration.DEFAULT) //
-						), //
-						DTDSourceConfiguration.getDefault().createSubPartitionScanner(), //
-				}, //
-				new IPartitionScannerSwitchStrategy[] { //
-				new PartitionScannerSwitchStrategy(DTD_SWITCH_SEQUENCES), //
-				} //
+		//formatter:off
+		super(
+				new ISubPartitionScanner[] {
+				new SubPartitionScanner(
+						XMLSourceConfiguration.getDefault().getPartitioningRules(),
+						XMLSourceConfiguration.CONTENT_TYPES,
+						new Token(XMLSourceConfiguration.DEFAULT)
+						),
+						DTDSourceConfiguration.getDefault().createSubPartitionScanner(),
+				},
+				new IPartitionScannerSwitchStrategy[] {
+				new PartitionScannerSwitchStrategy(DTD_SWITCH_SEQUENCES),
+				}
 		);
+		//@formatter:on
 	}
 
 	/*
@@ -67,7 +69,7 @@ public class XMLSubPartitionScanner extends CompositeSubPartitionScanner {
 		String contentType = (String) token.getData();
 
 		if (XMLSourceConfiguration.DOCTYPE.equals(contentType)) {
-			if (token instanceof ExtendedToken && ((ExtendedToken) token).getContents().endsWith("[")) {
+			if (token instanceof ExtendedToken && ((ExtendedToken) token).getContents().endsWith("[")) { //$NON-NLS-1$
 				current = TYPE_DTD;
 				resumeToken = token;
 				super.setLastToken(null);
