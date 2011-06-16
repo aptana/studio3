@@ -34,7 +34,7 @@ public class HTMLTokenScanner extends RuleBasedScanner
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 		// generic whitespace rule
-		rules.add(new WhitespaceRule(new WhitespaceDetector()));
+		rules.add(new WhitespaceRule(new WhitespaceDetector(), createToken(getTokenName(HTMLTokens.TEXT))));
 		// comments
 		rules.add(new PartitionerSwitchingIgnoreRule(new MultiLineRule(
 				"<!--", "-->", createToken(getTokenName(HTMLTokens.COMMENT)), (char) 0, true))); //$NON-NLS-1$ //$NON-NLS-2$
