@@ -54,7 +54,7 @@ public enum CSSTokenType implements ITypePredicate
 	FREQUENCY("keyword.other.unit.css", Terminals.FREQUENCY), //$NON-NLS-1$
 	PAGE("keyword.control.at-rule.page.css", Terminals.PAGE), //$NON-NLS-1$
 	CHARSET("keyword.control.at-rule.charset.css", Terminals.CHARSET), //$NON-NLS-1$
-	MEDIA_KEYWORD("keyword.control.at-rule.import.css", Terminals.MEDIA), //$NON-NLS-1$
+	MEDIA_KEYWORD("keyword.control.at-rule.import.css", Terminals.MEDIA_KEYWORD), //$NON-NLS-1$
 	FONTFACE("keyword.control.at-rule.fontface.css", Terminals.FONTFACE), //$NON-NLS-1$
 	NAMESPACE("keyword.control.at-rule.namespace.css", Terminals.NAMESPACE), //$NON-NLS-1$
 	RBRACKET("punctuation.bracket.css", Terminals.RBRACKET), //$NON-NLS-1$

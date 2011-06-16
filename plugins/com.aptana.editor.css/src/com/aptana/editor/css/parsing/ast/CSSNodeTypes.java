@@ -28,4 +28,5 @@ public class CSSNodeTypes
 	public static final short NAMESPACE = 16;
 	public static final short PAGE_SELECTOR = 17;
 	public static final short TEXT = 18;
+	public static final short AT_RULE = 19;
 }
