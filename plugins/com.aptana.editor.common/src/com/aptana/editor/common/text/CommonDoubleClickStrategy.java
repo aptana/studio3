@@ -130,7 +130,7 @@ public class CommonDoubleClickStrategy implements ITextDoubleClickStrategy
 		return Character.isJavaIdentifierPart(c);
 	}
 
-	private void selectRange(int startPos, int stopPos)
+	protected void selectRange(int startPos, int stopPos)
 	{
 		int offset = startPos + 1;
 		int length = stopPos - offset;
