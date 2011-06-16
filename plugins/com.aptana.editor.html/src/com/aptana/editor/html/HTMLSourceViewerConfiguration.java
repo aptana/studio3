@@ -12,6 +12,7 @@ import java.util.Map;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -24,6 +25,8 @@ import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.SVGSourceConfiguration;
 
 public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration {
+
+	private HTMLDoubleClickStrategy fDoubleClickStrategy;
 
 	/**
 	 * HTMLSourceViewerConfiguration
@@ -74,6 +77,16 @@ public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
 		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, HTMLPlugin.getDefault().getPreferenceStore()) };
+	}
+
+	@Override
+	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
+	{
+		if (fDoubleClickStrategy == null)
+		{
+			fDoubleClickStrategy = new HTMLDoubleClickStrategy();
+		}
+		return fDoubleClickStrategy;
 	}
 
 }

@@ -5,16 +5,17 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+package com.aptana.editor.css;
 
-import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 
-public class DTDPartitionScanner extends SourceConfigurationPartitionScanner {
-	
-	/**
-	 * DTDPartitionScanner
-	 */
-	public DTDPartitionScanner() {
-		super(DTDSourceConfiguration.getDefault());
+public class CSSDoubleClickStrategy extends CommonDoubleClickStrategy
+{
+
+	@Override
+	protected boolean isIdentifierPart(char c)
+	{
+		return super.isIdentifierPart(c) || c == '@' || c == '-';
 	}
+
 }
