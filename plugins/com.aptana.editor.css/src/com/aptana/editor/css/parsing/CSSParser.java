@@ -183,7 +183,7 @@ public class CSSParser extends Parser implements IParser {
 					
 			return new CSSImportNode(s, w.toArray(new CSSTextNode[w.size()]));
 			}
-			case 15: // Media = MEDIA MediaExprs.m LCURLY RCURLY
+			case 15: // Media = MEDIA_KEYWORD MediaExprs.m LCURLY RCURLY
 			{
 					final Symbol _symbol_m = _symbols[offset + 2];
 					final ArrayList _list_m = (ArrayList) _symbol_m.value;
@@ -201,7 +201,7 @@ public class CSSParser extends Parser implements IParser {
 
 			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]));
 			}
-			case 16: // Media = MEDIA MediaExprs.m LCURLY Statements.s RCURLY
+			case 16: // Media = MEDIA_KEYWORD MediaExprs.m LCURLY Statements.s RCURLY
 			{
 					final Symbol _symbol_m = _symbols[offset + 2];
 					final ArrayList _list_m = (ArrayList) _symbol_m.value;
@@ -297,6 +297,24 @@ public class CSSParser extends Parser implements IParser {
 					final String w = (String) _symbol_w.value;
 					
 			return new CSSNamespaceNode(i, w);
+			}
+			case 67: // AtRule = AT_RULE.a STRING.s SEMICOLON
+			{
+					final Symbol _symbol_a = _symbols[offset + 1];
+					final String a = (String) _symbol_a.value;
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final String s = (String) _symbol_s.value;
+					
+			return new CSSAtRuleNode(a, s);
+			}
+			case 68: // AtRule = AT_RULE.a STRING.s LCURLY RCURLY
+			{
+					final Symbol _symbol_a = _symbols[offset + 1];
+					final String a = (String) _symbol_a.value;
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final String s = (String) _symbol_s.value;
+					
+			return new CSSAtRuleNode(a, s);
 			}
 			case 69: // Rule = Selectors.s LCURLY RCURLY
 			{
@@ -660,7 +678,7 @@ public class CSSParser extends Parser implements IParser {
 			case 41: // MediaExpr = PAGE
 			case 42: // MediaExpr = AT_RULE
 			case 43: // MediaExpr = CHARSET
-			case 44: // MediaExpr = MEDIA
+			case 44: // MediaExpr = MEDIA_KEYWORD
 			case 45: // MediaExpr = FONTFACE
 			case 46: // MediaExpr = NAMESPACE
 			case 47: // MediaExpr = IMPORT
@@ -713,14 +731,6 @@ public class CSSParser extends Parser implements IParser {
 			case 137: // AttributeValueOperator = ENDS_WITH
 			{
 				return _symbols[offset + 1];
-			}
-			case 67: // AtRule = AT_RULE STRING SEMICOLON
-			{
-				return _symbols[offset + 3];
-			}
-			case 68: // AtRule = AT_RULE STRING LCURLY RCURLY
-			{
-				return _symbols[offset + 4];
 			}
 			default:
 				throw new IllegalArgumentException("unknown production #" + rule_num);

@@ -118,6 +118,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test media with statement
+	 * 
+	 * @throws Exception
+	 */
+	public void testMediaStatement2() throws Exception
+	{
+		parseTest("@media only screen and ( min-device-width : 320px ) and ( max-device-width : 480px ){body {background-color: #000;}}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test empty page
 	 * 
 	 * @throws Exception
@@ -135,6 +145,16 @@ public class CSSParserTest extends TestCase
 	public void testPagePseudoIdentifier() throws Exception
 	{
 		parseTest("@page :abc123 {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test page with an identifier
+	 * 
+	 * @throws Exception
+	 */
+	public void testPagePseudoIdentifier2() throws Exception
+	{
+		parseTest("@page :abc123 {testing: 10;}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -816,6 +836,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * test single type selector with one property
+	 * 
+	 * @throws Exception
+	 */
+	public void testSimpleSelectorOneProperty2() throws Exception
+	{
+		parseTest("a {testing: 10}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * test single type selector with multiple properties
 	 * 
 	 * @throws Exception
@@ -823,6 +853,16 @@ public class CSSParserTest extends TestCase
 	public void testSimpleSelectorMultipleProperties() throws Exception
 	{
 		parseTest("a {testing: abc123; forward: 10pt;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * test single type selector with multiple properties
+	 * 
+	 * @throws Exception
+	 */
+	public void testSimpleSelectorMultipleProperties2() throws Exception
+	{
+		parseTest("a {testing: abc123; forward: 10pt}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -834,6 +874,26 @@ public class CSSParserTest extends TestCase
 	{
 		parseTest("a {}" + EOL + "b {}" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	/**
+	 * test unknown at-rule
+	 * 
+	 * @throws Exception
+	 */
+	public void testUnknownAtRule() throws Exception
+	{
+		parseTest("@at-rule 'test';" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	// /**
+	// * test unknown at-rule
+	// *
+	// * @throws Exception
+	// */
+	// public void testUnknownAtRule2() throws Exception
+	// {
+	//		parseTest("@at-rule 'test' {}" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
+	// }
 
 	/**
 	 * This case was causing the parser to go into an infinite loop. The scanner would get a bad location exception

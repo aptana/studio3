@@ -31,7 +31,7 @@ public class Terminals {
 	static public final short LCURLY = 23;
 	static public final short AT_RULE = 24;
 	static public final short CHARSET = 25;
-	static public final short MEDIA = 26;
+	static public final short MEDIA_KEYWORD = 26;
 	static public final short FONTFACE = 27;
 	static public final short NAMESPACE = 28;
 	static public final short IMPORT = 29;
