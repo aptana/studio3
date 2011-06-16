@@ -8,7 +8,6 @@
 package com.aptana.editor.css.parsing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -27,25 +26,84 @@ import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.css.internal.text.rules.CSSHexColorRule;
+import com.aptana.editor.css.internal.text.rules.CSSIdentifierRule;
+import com.aptana.editor.css.internal.text.rules.CSSImportantRule;
+import com.aptana.editor.css.internal.text.rules.CSSNumberRule;
 import com.aptana.editor.css.internal.text.rules.EqualOperatorWordDetector;
 import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
-import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 /**
  * CSSTokenScanner
  */
+@SuppressWarnings("nls")
 public class CSSTokenScanner extends RuleBasedScanner
 {
+	/**
+	 * CSSTokenScanner
+	 */
 	public CSSTokenScanner()
 	{
-		initRules();
+		List<IRule> rules = createRules();
+
+		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
 	/**
-	 * initRules
+	 * createAtWordsRule
+	 * 
+	 * @return
 	 */
-	protected void initRules()
+	private WordRule createAtWordsRule()
+	{
+		WordRule atRule = new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE));
+
+		atRule.addWord("@import", createToken(CSSTokenType.IMPORT));
+		atRule.addWord("@page", createToken(CSSTokenType.PAGE));
+		atRule.addWord("@media", createToken(CSSTokenType.MEDIA_KEYWORD));
+		atRule.addWord("@charset", createToken(CSSTokenType.CHARSET));
+		atRule.addWord("@font-face", createToken(CSSTokenType.FONTFACE));
+		atRule.addWord("@namespace", createToken(CSSTokenType.NAMESPACE));
+
+		return atRule;
+	}
+
+	/**
+	 * createPuncturatorsRule
+	 * 
+	 * @return
+	 */
+	protected CharacterMapRule createPunctuatorsRule()
+	{
+		CharacterMapRule punctuatorsRule = new CharacterMapRule();
+
+		punctuatorsRule.add(':', createToken(CSSTokenType.COLON));
+		punctuatorsRule.add(';', createToken(CSSTokenType.SEMICOLON));
+		punctuatorsRule.add('{', createToken(CSSTokenType.LCURLY));
+		punctuatorsRule.add('}', createToken(CSSTokenType.RCURLY));
+		punctuatorsRule.add('(', createToken(CSSTokenType.LPAREN));
+		punctuatorsRule.add(')', createToken(CSSTokenType.RPAREN));
+		punctuatorsRule.add('%', createToken(CSSTokenType.PERCENTAGE)); // ?
+		punctuatorsRule.add('[', createToken(CSSTokenType.LBRACKET));
+		punctuatorsRule.add(']', createToken(CSSTokenType.RBRACKET));
+		punctuatorsRule.add(',', createToken(CSSTokenType.COMMA));
+		punctuatorsRule.add('+', createToken(CSSTokenType.PLUS));
+		punctuatorsRule.add('*', createToken(CSSTokenType.STAR));
+		punctuatorsRule.add('>', createToken(CSSTokenType.GREATER));
+		punctuatorsRule.add('/', createToken(CSSTokenType.SLASH));
+		punctuatorsRule.add('=', createToken(CSSTokenType.EQUAL));
+		punctuatorsRule.add('-', createToken(CSSTokenType.MINUS));
+
+		return punctuatorsRule;
+	}
+
+	/**
+	 * createRules
+	 * 
+	 * @return
+	 */
+	protected List<IRule> createRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 
@@ -53,32 +111,24 @@ public class CSSTokenScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// multi-line comments
-		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true));
 
 		// strings
-		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.addAll(createStringRules());
 
 		// at-keywords
-		WordRule atRule = new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE));
-		atRule.addWord("@import", createToken(CSSTokenType.IMPORT));
-		atRule.addWord("@page", createToken(CSSTokenType.PAGE));
-		atRule.addWord("@media", createToken(CSSTokenType.MEDIA_KEYWORD));
-		atRule.addWord("@charset", createToken(CSSTokenType.CHARSET));
-		atRule.addWord("@font-face", createToken(CSSTokenType.FONTFACE));
-		atRule.addWord("@namespace", createToken(CSSTokenType.NAMESPACE));
-		rules.add(atRule);
+		rules.add(createAtWordsRule());
 
 		// units
 		rules.addAll(createUnitRules());
 
 		// numbers
-		rules.add(createNumberRule());
+		rules.add(new CSSNumberRule(createToken(CSSTokenType.NUMBER)));
 
 		// hex colors
-		// TODO: we need separate scanners for inside and outside of rules. This will erroneouly pick up some ids as
+		// TODO: we need separate scanners for inside and outside of rules. This will erroneously pick up some ids as
 		// well
-		rules.add(createHexColorRule());
+		rules.add(new CSSHexColorRule(createToken(CSSTokenType.RGB)));
 
 		// classes;
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
@@ -87,38 +137,21 @@ public class CSSTokenScanner extends RuleBasedScanner
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
 
 		// !important
-		rules.add(createImportantRule());
+		rules.add(new CSSImportantRule(createToken(CSSTokenType.IMPORTANT)));
 
 		// url
 		// FIXME Don't use a RegexpRule here!
-		rules.add(new RegexpRule("url\\([^)]*\\)", createToken(CSSTokenType.URL), true)); //$NON-NLS-1$
+		rules.add(new RegexpRule("url\\([^)]*\\)", createToken(CSSTokenType.URL), true));
 
 		// TODO: functions
 
 		// TODO: Unicode
 
 		// identifiers
-		rules.add(createIdentifierRule());
+		rules.add(new CSSIdentifierRule(createToken(CSSTokenType.IDENTIFIER)));
 
 		// single character punctuators
-		CharacterMapRule punctuatorRule = new CharacterMapRule();
-		punctuatorRule.add(':', createToken(CSSTokenType.COLON));
-		punctuatorRule.add(';', createToken(CSSTokenType.SEMICOLON));
-		punctuatorRule.add('{', createToken(CSSTokenType.LCURLY));
-		punctuatorRule.add('}', createToken(CSSTokenType.RCURLY));
-		punctuatorRule.add('(', createToken(CSSTokenType.LPAREN));
-		punctuatorRule.add(')', createToken(CSSTokenType.RPAREN));
-		punctuatorRule.add('%', createToken(CSSTokenType.PERCENTAGE)); // ?
-		punctuatorRule.add('[', createToken(CSSTokenType.LBRACKET));
-		punctuatorRule.add(']', createToken(CSSTokenType.RBRACKET));
-		punctuatorRule.add(',', createToken(CSSTokenType.COMMA));
-		punctuatorRule.add('+', createToken(CSSTokenType.PLUS));
-		punctuatorRule.add('*', createToken(CSSTokenType.STAR));
-		punctuatorRule.add('>', createToken(CSSTokenType.GREATER));
-		punctuatorRule.add('/', createToken(CSSTokenType.SLASH));
-		punctuatorRule.add('=', createToken(CSSTokenType.EQUAL));
-		punctuatorRule.add('-', createToken(CSSTokenType.MINUS));
-		rules.add(punctuatorRule);
+		rules.add(createPunctuatorsRule());
 
 		// multi-character punctuators
 		WordRule punctuatorRule2 = new WordRule(new EqualOperatorWordDetector(), Token.UNDEFINED);
@@ -128,148 +161,33 @@ public class CSSTokenScanner extends RuleBasedScanner
 		punctuatorRule2.addWord("$=", createToken(CSSTokenType.ENDS_WITH));
 		rules.add(punctuatorRule2);
 
-		setRules(rules.toArray(new IRule[rules.size()]));
+		return rules;
 	}
 
 	/**
-	 * createImportantRule
+	 * createStringRules
 	 * 
 	 * @return
 	 */
-	protected IRule createImportantRule()
-	{
-		return new ExtendedWordRule(new IWordDetector()
-		{
-
-			public boolean isWordStart(char c)
-			{
-				return c == '!';
-			}
-
-			public boolean isWordPart(char c)
-			{
-				return isWordStart(c) || Character.isLetterOrDigit(c) || Character.isWhitespace(c);
-			}
-		}, createToken(CSSTokenType.IMPORTANT), false)
-		{
-
-			private Pattern pattern;
-
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile("!\\s*important"); //$NON-NLS-1$
-				}
-				return pattern.matcher(word).matches();
-			}
-		};
-	}
-
-	/**
-	 * createNumberRule
-	 * 
-	 * @return
-	 */
-	protected IRule createNumberRule()
-	{
-		return new ExtendedWordRule(new IWordDetector()
-		{
-			public boolean isWordStart(char c)
-			{
-				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
-			}
-
-			public boolean isWordPart(char c)
-			{
-				return c == '.' || Character.isDigit(c);
-			}
-		}, createToken(CSSTokenType.NUMBER), false)
-		{
-			private Pattern pattern;
-
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile("[-+]?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
-				}
-
-				return pattern.matcher(word).matches();
-			}
-		};
-	}
-
-	protected IRule createHexColorRule()
-	{
-		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false)
-		{
-			private final Pattern HEX_COLOR = Pattern.compile("#[0-9a-fA-F]+");
-
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				boolean result = false;
-
-				if (word.length() == 4 || word.length() == 7)
-				{
-					result = HEX_COLOR.matcher(word).matches();
-				}
-
-				return result;
-			}
-		};
-	}
-
-	/**
-	 * createIdentifierRule
-	 * 
-	 * @return
-	 */
-	protected IRule createIdentifierRule()
-	{
-		return new ExtendedWordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER), false)
-		{
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (word == null || word.length() == 0)
-				{
-					return false;
-				}
-				if (word.charAt(0) == '-')
-				{
-					return word.length() > 1;
-				}
-				return true;
-			}
-		};
-	}
-
-	/**
-	 * createUnitRules
-	 * 
-	 * @return
-	 */
-	protected Collection<? extends IRule> createUnitRules()
+	private List<IRule> createStringRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 
-		
-		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab number and then a measurement
-		// XXX: The number and the units have to be connected without intermediate whitespace. Alternately, we could
-		// make the parser changes as suggested but we would need to make sure the validators point out the error
-		// condition
-
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", CSSTokenType.EMS)); //$NON-NLS-1$
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(px|cm|mm|in|pt|pc)", CSSTokenType.LENGTH)); //$NON-NLS-1$
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)%", CSSTokenType.PERCENTAGE)); //$NON-NLS-1$
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(deg|rad|grad)", CSSTokenType.ANGLE)); //$NON-NLS-1$
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)ex", CSSTokenType.EXS)); //$NON-NLS-1$
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)k?[Hh]z", CSSTokenType.FREQUENCY)); //$NON-NLS-1$
-		rules.add(createUnitRule("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)m?s", CSSTokenType.TIME)); //$NON-NLS-1$
+		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\'));
+		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\'));
 
 		return rules;
+	}
+
+	/**
+	 * createToken
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected IToken createToken(CSSTokenType type)
+	{
+		return new Token(type);
 	}
 
 	/**
@@ -283,26 +201,24 @@ public class CSSTokenScanner extends RuleBasedScanner
 	{
 		return new ExtendedWordRule(new IWordDetector()
 		{
+			public boolean isWordPart(char c)
+			{
+				return c == '.' || c == '%' || Character.isLetterOrDigit(c);
+			}
+
 			public boolean isWordStart(char c)
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
-
-			public boolean isWordPart(char c)
-			{
-				return c == '.' || c == '%' ||Character.isLetterOrDigit(c);
-			}
 		}, createToken(tokenType), false)
 		{
-			
 			private Pattern pattern;
 
-			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
 				if (pattern == null)
 				{
-					pattern = Pattern.compile(regex);
+					pattern = Pattern.compile("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(" + regex + ")");
 				}
 
 				return pattern.matcher(word).matches();
@@ -310,8 +226,29 @@ public class CSSTokenScanner extends RuleBasedScanner
 		};
 	}
 
-	protected IToken createToken(CSSTokenType type)
+	/**
+	 * createUnitRules
+	 * 
+	 * @return
+	 */
+	protected List<IRule> createUnitRules()
 	{
-		return new Token(type);
+		List<IRule> rules = new ArrayList<IRule>();
+
+		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab
+		// number and then a measurement
+		// XXX: The number and the units have to be connected without intermediate whitespace. Alternately, we could
+		// make the parser changes as suggested but we would need to make sure the validators point out the error
+		// condition
+
+		rules.add(createUnitRule("em", CSSTokenType.EMS));
+		rules.add(createUnitRule("px|cm|mm|in|pt|pc", CSSTokenType.LENGTH));
+		rules.add(createUnitRule("%", CSSTokenType.PERCENTAGE));
+		rules.add(createUnitRule("deg|rad|grad", CSSTokenType.ANGLE));
+		rules.add(createUnitRule("ex", CSSTokenType.EXS));
+		rules.add(createUnitRule("k?[Hh]z", CSSTokenType.FREQUENCY));
+		rules.add(createUnitRule("m?s", CSSTokenType.TIME));
+
+		return rules;
 	}
 }
