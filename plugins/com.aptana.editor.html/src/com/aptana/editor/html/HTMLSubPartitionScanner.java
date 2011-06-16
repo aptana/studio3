@@ -67,6 +67,10 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 	 */
 	@Override
 	public void setLastToken(IToken token) {
+		super.setLastToken(token);
+		if (token == null) {
+			return;
+		}
 		if (!(token.getData() instanceof String)) {
 			current = TYPE_DEFAULT;
 			return;
@@ -81,15 +85,18 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 						|| !HTMLUtils.isJavaScriptTag(((ExtendedToken) token).getContents()))
 					)) {
 				current = TYPE_JS;
+				super.setLastToken(null);
 			}
 		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType)
 				|| SVGSourceConfiguration.STYLE.equals(contentType)) {
 			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
 				current = TYPE_CSS;
+				super.setLastToken(null);
 			}
 		} else if (HTMLSourceConfiguration.HTML_SVG.equals(contentType)) {
 			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
 				current = TYPE_SVG;
+				super.setLastToken(null);
 			}
 		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType)
 				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {

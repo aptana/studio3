@@ -26,9 +26,9 @@ public class FormatterJSIfNode extends FormatterJSDeclarationNode
 	 * @param hasBlockedChild
 	 * @param node
 	 */
-	public FormatterJSIfNode(IFormatterDocument document, boolean hasBlockedChild, IParseNode node)
+	public FormatterJSIfNode(IFormatterDocument document, boolean hasBlockedChild, IParseNode node, boolean hasCommentBefore)
 	{
-		super(document, hasBlockedChild, node);
+		super(document, hasBlockedChild, node, hasCommentBefore);
 		// Check if this node is located in the 'false' block of a parent 'if'. In that case, we can say for sure that
 		// this 'if' arrives right after an 'else'.
 		if (node.getParent().getNodeType() == JSNodeTypes.IF)
@@ -79,7 +79,7 @@ public class FormatterJSIfNode extends FormatterJSDeclarationNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		if (inElseIf)
+		if (inElseIf && !hasCommentBefore)
 		{
 			return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT);
 		}

@@ -98,4 +98,14 @@ public class CSSPunctuatorTest extends CSSTokensTest
 	{
 		assertToken("=", CSSTokenType.EQUAL, 0, 1); //$NON-NLS-1$
 	}
+
+	public void beginsWith()
+	{
+		assertToken("^=", CSSTokenType.BEGINS_WITH, 0, 2); //$NON-NLS-1$
+	}
+
+	public void endsWith()
+	{
+		assertToken("$=", CSSTokenType.ENDS_WITH, 0, 2); //$NON-NLS-1$
+	}
 }

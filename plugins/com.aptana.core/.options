@@ -1,0 +1,3 @@
+com.aptana.core/debug=true
+com.aptana.core/debug/indexer=true
+com.aptana.core/debug/shell=true

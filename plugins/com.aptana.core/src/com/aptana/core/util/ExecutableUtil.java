@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.IDebugScopes;
 import com.aptana.core.ShellExecutable;
 
 /**
@@ -130,7 +131,9 @@ public final class ExecutableUtil
 				IPath result = findExecutable(location.append(executableName), appendExtension);
 				if (result != null && (filter == null || filter.accept(result.toFile())))
 				{
-					CorePlugin.logInfo(MessageFormat.format("Found executable at common location: {0}", result)); //$NON-NLS-1$
+					CorePlugin
+							.logInfo(
+									MessageFormat.format("Found executable at common location: {0}", result), IDebugScopes.SHELL); //$NON-NLS-1$
 					return result;
 				}
 			}

@@ -460,8 +460,7 @@ public class ThemeManager implements IThemeManager
 			}
 			Properties props = new OrderedProperties();
 			props.load(new ByteArrayInputStream(array));
-			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-			return theme;
+			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (IllegalArgumentException iae)
 		{
@@ -479,7 +478,7 @@ public class ThemeManager implements IThemeManager
 					theme.save();
 					return theme;
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
 					ThemePlugin.logError(e);
 				}
@@ -625,9 +624,16 @@ public class ThemeManager implements IThemeManager
 
 	private void loadTheme(Properties props)
 	{
-		Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-		fThemeMap.put(theme.getName(), theme);
-		fBuiltins.add(theme.getName());
+		try
+		{
+			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+			fThemeMap.put(theme.getName(), theme);
+			fBuiltins.add(theme.getName());
+		}
+		catch (Exception e)
+		{
+			ThemePlugin.logError(e);
+		}
 	}
 
 	public IToken getToken(String scope)

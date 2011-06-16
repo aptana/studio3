@@ -100,7 +100,7 @@ public class TagRule extends MultiLineRule {
 				return true;
 			}
 		}
-		if (scanner instanceof SequenceCharacterScanner && ((SequenceCharacterScanner) scanner).foundSequence()) {
+		if (scanner instanceof SequenceCharacterScanner && ((SequenceCharacterScanner) scanner).foundSequence(false)) {
 			// this means the EOF came from seeing a switching sequence, so
 			// assumes the end is detected and no need to
 			// rewind one character

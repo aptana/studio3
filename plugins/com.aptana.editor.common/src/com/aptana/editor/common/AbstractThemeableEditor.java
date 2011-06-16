@@ -212,29 +212,33 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 						.getContentType(getDocument(), 0);
 				if (contentType != null && contentType.getPartCount() > 0)
 				{
-					String mainContentType = contentType.getParts()[0];
-					// We need to make sure that in case the given content type is actually a nested language in
-					// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
-					if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX))
+					for (String ct : contentType.getParts())
 					{
-						mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
-					}
-					final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
-					if (factory != null)
-					{
-						// The code above might change the content type that is used to
-						// get the formatter, but we still need to save the original content-type so that the
-						// IScriptFormatter instance will handle the any required parsing by calling the right
-						// IParser.
-						factory.setMainContentType(contentType.getParts()[0]);
+						String mainContentType = ct;
+						// We need to make sure that in case the given content type is actually a nested language in
+						// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
+						if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX))
+						{
+							mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
+						}
+						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
+						if (factory != null)
+						{
+							// The code above might change the content type that is used to
+							// get the formatter, but we still need to save the original content-type so that the
+							// IScriptFormatter instance will handle the any required parsing by calling the right
+							// IParser.
+							factory.setMainContentType(contentType.getParts()[0]);
 
-						AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
-						IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
-								IResource.class);
-						context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
-						IProject project = (file != null) ? file.getProject() : null;
-						Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
-						context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
+							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
+							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
+									IResource.class);
+							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+							IProject project = (file != null) ? file.getProject() : null;
+							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
+							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
+							break;
+						}
 					}
 				}
 			}
@@ -443,12 +447,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		if (SourceViewerConfiguration.class == adapter)
 		{
 			return getSourceViewerConfiguration();
-		} else if (IContentOutlinePage.class == adapter)
+		}
+		else if (IContentOutlinePage.class == adapter)
 		{
 			// returns our custom adapter for the content outline page
 			return getOutlinePage();
-		} else if (ISourceViewer.class == adapter
-				|| ITextViewer.class == adapter)
+		}
+		else if (ISourceViewer.class == adapter || ITextViewer.class == adapter)
 		{
 			return getSourceViewer();
 		}
@@ -612,11 +617,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		getFileService().setResource(resource);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException
+	{
 		super.init(site, input);
 		setEditorContextMenuId(getSite().getId());
 	}

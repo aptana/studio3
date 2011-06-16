@@ -97,10 +97,16 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	}
 
 	public boolean foundSequence() {
+		return foundSequence(true);
+	}
+
+	public boolean foundSequence(boolean reset) {
 		try {
 			return found;
 		} finally {
-			found = false;
+			if (reset) {
+				found = false;
+			}
 		}
 	}
 

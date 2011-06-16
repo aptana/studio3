@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
-            base-type="org.eclipse.core.runtime.text"
+            base-type="org.eclipse.core.runtime.xml"
             file-extensions="svg"
             id="com.aptana.contenttype.svg"
             name="%content-type.svg.name"

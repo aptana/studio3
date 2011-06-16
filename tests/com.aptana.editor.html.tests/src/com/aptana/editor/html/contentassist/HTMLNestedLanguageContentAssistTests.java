@@ -23,6 +23,44 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	}
 
 	/**
+	 * testJSMathInAttribute
+	 */
+	public void testJSMathInAttribute()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/js-math-in-attribute.html",
+			"E",
+			"LN10",
+			"LN2",
+			"LOG10E",
+			"LOG2E",
+			"PI",
+			"SQRT1_2",
+			"SQRT2",
+			"abs",
+			"acos",
+			"asin",
+			"atan",
+			"atan2",
+			"ceil",
+			"cos",
+			"exp",
+			"floor",
+			"log",
+			"max",
+			"min",
+			"pow",
+			"random",
+			"round",
+			"sin",
+			"sqrt",
+			"tan"
+		);
+		// @formatter:on
+	}
+
+	/**
 	 * testCSSStyleAttribute
 	 */
 	public void testCSSStyleAttribute()

@@ -78,7 +78,17 @@ public class AbstractFormatterNodeBuilder
 						break;
 					}
 				}
-				pos = Math.max(parentNode.getEndOffset(), pos - (text.length() - rightPos + preservedSpaces) + 1);
+				int newPos = Math
+						.max(parentNode.getEndOffset(), pos - (text.length() - rightPos + preservedSpaces) + 1);
+				if (newPos < pos && preservedSpaces > 0)
+				{
+					if (!Character.isWhitespace(parentNode.getDocument().charAt(newPos)))
+					{
+						newPos = pos;// revert
+					}
+				}
+				pos = newPos;
+
 			}
 			parentNode.addChild(createTextNode(parentNode.getDocument(), parentNode.getEndOffset(), pos));
 

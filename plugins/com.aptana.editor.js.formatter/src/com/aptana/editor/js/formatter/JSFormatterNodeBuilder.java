@@ -7,11 +7,15 @@
  */
 package com.aptana.editor.js.formatter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import beaver.Symbol;
 
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
@@ -20,40 +24,69 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSDefaultLineNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSElseIfNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSElseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionInvocationNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSGetElementNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSGetPropertyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSGroupNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSIdentifierNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSIfNode;
-import com.aptana.editor.js.formatter.nodes.FormatterJSLoopNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSImplicitBlockNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSNameValuePairNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSObjectNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSOperatorNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSParenthesesNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSPunctuationNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSRootNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSSwitchNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSTextNode;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
+import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCaseNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
+import com.aptana.editor.js.parsing.ast.JSCommaNode;
+import com.aptana.editor.js.parsing.ast.JSConditionalNode;
+import com.aptana.editor.js.parsing.ast.JSConstructNode;
 import com.aptana.editor.js.parsing.ast.JSContinueNode;
+import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
+import com.aptana.editor.js.parsing.ast.JSElementsNode;
+import com.aptana.editor.js.parsing.ast.JSEmptyNode;
 import com.aptana.editor.js.parsing.ast.JSErrorNode;
+import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
 import com.aptana.editor.js.parsing.ast.JSForNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSGetElementNode;
+import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSGroupNode;
+import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSNullNode;
+import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSRegexNode;
 import com.aptana.editor.js.parsing.ast.JSReturnNode;
+import com.aptana.editor.js.parsing.ast.JSStatementsNode;
+import com.aptana.editor.js.parsing.ast.JSStringNode;
 import com.aptana.editor.js.parsing.ast.JSSwitchNode;
+import com.aptana.editor.js.parsing.ast.JSThisNode;
+import com.aptana.editor.js.parsing.ast.JSThrowNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
+import com.aptana.editor.js.parsing.ast.JSTrueNode;
 import com.aptana.editor.js.parsing.ast.JSTryNode;
 import com.aptana.editor.js.parsing.ast.JSVarNode;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
@@ -61,6 +94,8 @@ import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.NodeTypes.TypeOperator;
+import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -74,7 +109,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 	private FormatterDocument document;
 	private boolean hasErrors;
-	private Set<Integer> commentEndOffsets;
+	private Set<Integer> singleLinecommentEndOffsets;
+	private Set<Integer> multiLinecommentEndOffsets;
 
 	/**
 	 * @param parseResult
@@ -105,7 +141,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 	private void generateSingleLineCommentEndOffsets(IParseNode[] comments)
 	{
-		commentEndOffsets = new HashSet<Integer>();
+		singleLinecommentEndOffsets = new HashSet<Integer>();
+		multiLinecommentEndOffsets = new HashSet<Integer>();
 		if (comments == null)
 		{
 			return;
@@ -115,26 +152,43 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			short commentType = comment.getNodeType();
 			if (commentType == JSNodeTypes.SINGLE_LINE_COMMENT)
 			{
-				commentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset()));
+				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset()));
 			}
 			else if (commentType == JSNodeTypes.MULTI_LINE_COMMENT || commentType == JSNodeTypes.SDOC_COMMENT
 					|| commentType == JSNodeTypes.VSDOC_COMMENT)
 			{
-				commentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset() + 1));
+				multiLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset() + 1));
 			}
 		}
 	}
 
 	/**
-	 * Returns true if there is a comment right before the given element.<br>
+	 * Returns true if there is a single-line comment right before the given element.<br>
 	 * There should be only whitespaces between the given offset and the comment.
 	 * 
 	 * @param offset
 	 * @return True, if the given offset is right after a comment.
 	 */
-	private boolean hasCommentBefore(int offset)
+	private boolean hasSingleCommentBefore(int offset)
 	{
-		return commentEndOffsets.contains(offset);
+		return singleLinecommentEndOffsets.contains(offset);
+	}
+
+	/**
+	 * Returns true if there is a multi-line comment right before the given element.<br>
+	 * There should be only whitespaces between the given offset and the comment.
+	 * 
+	 * @param offset
+	 * @return True, if the given offset is right after a comment.
+	 */
+	private boolean hasMultiLineCommentBefore(int offset)
+	{
+		return multiLinecommentEndOffsets.contains(offset);
+	}
+
+	private boolean hasAnyCommentBefore(int offset)
+	{
+		return hasSingleCommentBefore(offset) || hasMultiLineCommentBefore(offset);
 	}
 
 	/**
@@ -150,24 +204,45 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSFunctionNode node)
 		{
-			// First, push the function declaration node
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node);
-			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getParameters()
-					.getEndingOffset() + 1));
+			// First, push the 'function' declaration part
+			int startingOffset = node.getStartingOffset();
+			int declarationEnd = startingOffset + 8;
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node,
+					hasAnyCommentBefore(startingOffset));
+			declarationNode.setBegin(createTextNode(document, startingOffset, declarationEnd));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);
 
-			// Then, push the body
-			IParseNode body = node.getBody();
+			// Push the function name, if exists
+			JSNode functionName = (JSNode) node.getName();
+			if (functionName != null && functionName.getNodeType() != JSNodeTypes.EMPTY)
+			{
+				// push the function name
+				visitTextNode(functionName, true, 1);
+				declarationEnd = functionName.getEnd() + 1;
+			}
+
+			// Push any parameters
+			JSNode body = (JSNode) node.getBody();
+			IParseNode functionParameters = node.getParameters();
+			List<JSNode> parameters = asJSNodesList(functionParameters.getChildren());
+			pushParametersInParentheses(functionParameters.getStartingOffset(), functionParameters.getEndingOffset(),
+					parameters, TypePunctuation.COMMA, false);
+
+			// Push the function body
 			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document,
 					FormatterJSDeclarationNode.isPartOfExpression(node.getParent()),
-					hasCommentBefore(body.getStartingOffset()));
+					hasAnyCommentBefore(body.getStartingOffset()));
 			bodyNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 			push(bodyNode);
-			super.visit(node);
+			visitChildren(body);
 			checkedPop(bodyNode, body.getEndingOffset());
-			int end = locateColonOrSemicolonInLine(bodyNode.getEndOffset() + 1, document);
+			int end = body.getEndingOffset() + 1;
 			bodyNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEnd(), false, true);
+			}
 		}
 
 		/*
@@ -183,21 +258,61 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		/*
 		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSFalseNode)
+		 */
+		@Override
+		public void visit(JSFalseNode node)
+		{
+			visitTextNode(node, true, 0);
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEnd(), false, true);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSTrueNode)
+		 */
+		@Override
+		public void visit(JSTrueNode node)
+		{
+			visitTextNode(node, true, 0);
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEnd(), false, true);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSEmptyNode)
+		 */
+		@Override
+		public void visit(JSEmptyNode node)
+		{
+			if (node.getLength() > 0 && node.getChildCount() == 0)
+			{
+				visitTextNode(node.getStartingOffset(), node.getEndingOffset(), false, 0);
+			}
+			super.visit(node);
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see
 		 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
 		 */
 		@Override
 		public void visit(JSPostUnaryOperatorNode node)
 		{
+			JSNode expression = (JSNode) node.getExpression();
+			TypeOperator op = TypeOperator.getTypeOperator(node.getOperator().value.toString());
+			expression.accept(this);
+			pushTypeOperator(op, node.getOperator().getStart(), true);
 			if (node.getSemicolonIncluded())
 			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
-			}
-			else
-			{
-				super.visit(node);
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
 		}
 
@@ -209,15 +324,40 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSPreUnaryOperatorNode node)
 		{
+			JSNode expression = (JSNode) node.getExpression();
+			TypeOperator op = TypeOperator.getTypeOperator(node.getOperator().value.toString());
+			pushTypeOperator(op, node.getOperator().getStart(), true);
+			expression.accept(this);
 			if (node.getSemicolonIncluded())
 			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
-			else
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConditionalNode)
+		 */
+		@Override
+		public void visit(JSConditionalNode node)
+		{
+			JSNode condition = (JSNode) node.getTestExpression();
+			condition.accept(this);
+
+			// push the conditional operator
+			pushTypeOperator(TypeOperator.CONDITIONAL, node.getQuestionMark().getStart(), false);
+			// visit the true part
+			JSNode trueExpression = (JSNode) node.getTrueExpression();
+			trueExpression.accept(this);
+			// push the colon separator
+			pushTypeOperator(TypeOperator.CONDITIONAL_COLON, node.getColon().getStart(), false);
+			// visit the false part
+			JSNode falseExpression = (JSNode) node.getFalseExpression();
+			falseExpression.accept(this);
+			// push any semicolon
+			if (node.getSemicolonIncluded())
 			{
-				super.visit(node);
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
 		}
 
@@ -235,22 +375,25 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			// First, construct the if condition node
-			FormatterJSIfNode conditionNode = new FormatterJSIfNode(document, isCurlyTrueBlock, node);
-			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getRightParenthesis()
-					.getEnd() + 1));
-			push(conditionNode);
-
+			FormatterJSIfNode ifNode = new FormatterJSIfNode(document, isCurlyTrueBlock, node,
+					hasAnyCommentBefore(node.getStartingOffset()));
+			int ifStart = node.getStartingOffset();
+			ifNode.setBegin(createTextNode(document, ifStart, ifStart + 2));
+			push(ifNode);
+			// push the 'if' condition
+			pushNodeInParentheses('(', ')', ifStart + 2, trueBlock.getStartingOffset(), (JSNode) node.getCondition(),
+					false);
 			// Construct the 'true' part of the 'if' and visit its children
 			if (isCurlyTrueBlock)
 			{
-				pushBlockNode(trueBlock, isEmptyFalseBlock);
+				pushBlockNode(trueBlock, false);
 			}
 			else
 			{
-				// Just visit the children
-				trueBlock.accept(this);
+				// Wrap with an empty block node and visit the children
+				wrapInImplicitBlock(trueBlock, false);
 			}
-			checkedPop(conditionNode, trueBlock.getEndingOffset());
+			checkedPop(ifNode, trueBlock.getEndingOffset());
 
 			if (!isEmptyFalseBlock)
 			{
@@ -265,7 +408,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
 				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
 				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf,
-						isCurlyTrueBlock, hasCommentBefore(elseBlockStart));
+						isCurlyTrueBlock, hasAnyCommentBefore(elseBlockStart));
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)
@@ -279,7 +422,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						// Wrap the incoming 'if' with an Else-If node that will allow us later to break it and indent
 						// it.
 						FormatterJSElseIfNode elseIfNode = new FormatterJSElseIfNode(document,
-								hasCommentBefore(falseBlockStart));
+								hasAnyCommentBefore(falseBlockStart));
 						elseIfNode.setBegin(createTextNode(document, falseBlockStart, falseBlockStart));
 						push(elseIfNode);
 						falseBlock.accept(this);
@@ -289,8 +432,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					}
 					else
 					{
-						// Just visit the children
-						falseBlock.accept(this);
+						// Wrap with an empty block node and visit the children
+						wrapInImplicitBlock(falseBlock, false);
 					}
 				}
 				checkedPop(elseNode, falseBlock.getEndingOffset() + 1);
@@ -305,8 +448,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSDoNode node)
 		{
 			// First, push the 'do' declaration node
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node);
 			int startingOffset = node.getStartingOffset();
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node,
+					hasAnyCommentBefore(startingOffset));
 			declarationNode.setBegin(createTextNode(document, startingOffset, startingOffset + 2));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);
@@ -316,13 +460,13 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int blockEnd;
 			boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
 			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document,
-					hasCommentBefore(body.getStartingOffset()));
+					hasAnyCommentBefore(body.getStartingOffset()));
 			if (bodyInBrackets)
 			{
 				doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 				push(doWhileBlock);
-				// visit the body only
-				body.accept(this);
+				// visit the body's children
+				visitChildren(body);
 				blockEnd = body.getEndingOffset();
 				checkedPop(doWhileBlock, blockEnd);
 				doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd + 1));
@@ -353,12 +497,55 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		/*
 		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArrayNode)
+		 */
+		@Override
+		public void visit(JSArrayNode node)
+		{
+			pushNodeInParentheses('[', ']', node.getStartingOffset(), node.getEndingOffset(), node, true);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSElementsNode)
+		 */
+		@Override
+		public void visit(JSElementsNode node)
+		{
+			IParseNode[] children = node.getChildren();
+			List<JSNode> jsChildren = new ArrayList<JSNode>(children.length);
+			for (IParseNode child : children)
+			{
+				jsChildren.add((JSNode) child);
+			}
+			visitNodeLists(jsChildren, null, null, TypePunctuation.COMMA);
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSWhileNode)
 		 */
 		@Override
 		public void visit(JSWhileNode node)
 		{
-			visitCommonLoopBlock(node, node.getRightParenthesis().getStart(), (JSNode) node.getBody());
+			JSNode condition = (JSNode) node.getCondition();
+			JSNode body = (JSNode) node.getBody();
+			// visit the 'while' keyword
+			int declarationEndOffset = node.getStartingOffset() + 4;
+			pushCommonDeclaration(node, declarationEndOffset, null);
+			// visit the elements in the parentheses
+			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
+			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
+			push(parenthesesNode);
+			// visit the 'while' condition
+			condition.accept(this);
+			// close the parentheses node.
+			checkedPop(parenthesesNode, -1);
+			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
+			// in case we have a 'body', visit it.
+			body.accept(this);
 		}
 
 		/*
@@ -368,7 +555,33 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSForNode node)
 		{
-			visitCommonLoopBlock(node, node.getRightParenthesis().getStart(), (JSNode) node.getBody());
+			List<JSNode> initializers = Arrays.asList((JSNode) node.getInitializer());
+			List<JSNode> conditions = Arrays.asList((JSNode) node.getCondition());
+			List<JSNode> updaters = Arrays.asList((JSNode) node.getAdvance());
+			JSNode body = (JSNode) node.getBody();
+			// visit the 'for' keyword
+			int declarationEndOffset = node.getStartingOffset() + 2;
+			pushCommonDeclaration(node, declarationEndOffset, null);
+			// visit the elements in the parentheses
+			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
+			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
+			push(parenthesesNode);
+			// visit the initializers, the conditions and the updaters.
+			// between them, push the semicolons
+			visitNodeLists(initializers, null, null, TypePunctuation.COMMA);
+			int semicolonOffset = locateCharForward(document, ';', declarationEndOffset);
+			pushTypePunctuation(TypePunctuation.FOR_SEMICOLON, semicolonOffset);
+			visitNodeLists(conditions, null, null, TypePunctuation.COMMA);
+			semicolonOffset = locateCharForward(document, ';', semicolonOffset + 1);
+			pushTypePunctuation(TypePunctuation.FOR_SEMICOLON, semicolonOffset);
+			visitNodeLists(updaters, null, null, TypePunctuation.COMMA);
+			// close the parentheses node.
+			checkedPop(parenthesesNode, -1);
+			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
+			// in case we have a 'body', visit it.
+			body.accept(this);
 		}
 
 		/*
@@ -378,7 +591,30 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSForInNode node)
 		{
-			visitCommonLoopBlock(node, node.getRightParenthesis().getStart(), (JSNode) node.getBody());
+			JSNode expression = (JSNode) node.getExpression();
+			JSNode initializer = (JSNode) node.getInitializer();
+			JSNode body = (JSNode) node.getBody();
+			// visit the 'for' keyword
+			int declarationEndOffset = node.getStartingOffset() + 2;
+			pushCommonDeclaration(node, declarationEndOffset, null);
+			// visit the elements in the parentheses
+			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
+			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
+			push(parenthesesNode);
+			// push the expression
+			initializer.accept(this);
+			// add the 'in' node (it's between the initializer and the expression)
+			int inStart = node.getIn().getStart();
+			visitTextNode(inStart, inStart + 2, true, 1, 1, false);
+			// push the expression.
+			expression.accept(this);
+			// close the parentheses node.
+			checkedPop(parenthesesNode, closeParen);
+			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
+			// in case we have a 'body', visit it.
+			body.accept(this);
 		}
 
 		/*
@@ -388,33 +624,42 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSWithNode node)
 		{
-			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
+			JSNode expression = (JSNode) node.getExpression();
+			JSNode body = (JSNode) node.getBody();
+			// visit the 'with' keyword
+			int declarationEndOffset = node.getStartingOffset() + 3;
+			pushCommonDeclaration(node, declarationEndOffset, null);
+			// visit the elements in the parentheses
+			int openParen = locateCharForward(document, '(', node.getLeftParenthesis().getStart());
+			int closeParen = locateCharBackward(document, ')', node.getRightParenthesis().getStart());
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document);
+			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
+			push(parenthesesNode);
+			// push the expression
+			expression.accept(this);
+			// close the parentheses node.
+			checkedPop(parenthesesNode, closeParen);
+			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
+			// in case we have a 'body', visit it.
+			body.accept(this);
 		}
 
-		/**
-		 * @param node
-		 * @param declarationEndOffset
-		 * @param body
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSStatementsNode)
 		 */
-		private void visitCommonLoopBlock(JSNode node, int declarationEndOffset, JSNode body)
+		@Override
+		public void visit(JSStatementsNode node)
 		{
-			pushCommonDeclaration(node, declarationEndOffset, body);
-			short nodeType = body.getNodeType();
-			boolean hasBody = (nodeType != JSNodeTypes.EMPTY);
-			if (hasBody)
-			{
-				boolean hasCurlyBlock = nodeType == JSNodeTypes.STATEMENTS;
-				FormatterJSLoopNode loopNode = new FormatterJSLoopNode(document, hasCurlyBlock,
-						hasCommentBefore(body.getStartingOffset()));
-				int blockLength = hasCurlyBlock ? 1 : 0;
-				int bodyStart = body.getStartingOffset();
-				int bodyEnd = body.getEndingOffset() + 1 - blockLength;
-				loopNode.setBegin(createTextNode(document, bodyStart, bodyStart + blockLength));
-				push(loopNode);
-				body.accept(this);
-				checkedPop(loopNode, bodyEnd);
-				loopNode.setEnd(createTextNode(document, bodyEnd, bodyEnd + blockLength));
-			}
+			// Statements arrive as curly-blocks structures
+			int startingOffset = node.getStartingOffset();
+			FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document, hasAnyCommentBefore(startingOffset));
+			blockNode.setBegin(createTextNode(document, startingOffset, startingOffset + 1));
+			push(blockNode);
+			visitChildren(node);
+			int endingOffset = node.getEndingOffset();
+			checkedPop(blockNode, endingOffset);
+			blockNode.setEnd(createTextNode(document, endingOffset, endingOffset + 1));
 		}
 
 		/*
@@ -424,15 +669,18 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSObjectNode node)
 		{
-			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document, node, hasCommentBefore(node
+			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document, node, hasAnyCommentBefore(node
 					.getLeftBrace().getStart()));
 			objectNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getStartingOffset() + 1));
 			push(objectNode);
-			visitChildren(node);
+			visitNodeLists(asJSNodesList(node.getChildren()), null, null, TypePunctuation.COMMA);
 			int end = node.getEndingOffset();
 			checkedPop(objectNode, end);
-			end = locateColonOrSemicolonInLine(end + 1, document);
-			objectNode.setEnd(createTextNode(document, node.getEndingOffset(), end));
+			objectNode.setEnd(createTextNode(document, end, end + 1));
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
+			}
 		}
 
 		/*
@@ -443,14 +691,20 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSNameValuePairNode node)
 		{
-			FormatterJSDefaultLineNode lineNode = new FormatterJSDefaultLineNode(document);
 			IParseNode name = node.getName();
+			// Create a formatter name-value node, but note that this node only holds the 'name' part for the
+			// formatting. The rest is handled in the same line.
+			FormatterJSNameValuePairNode nameValuePairNode = new FormatterJSNameValuePairNode(document, node,
+					hasAnyCommentBefore(node.getStartingOffset()));
+			nameValuePairNode.setBegin(createTextNode(document, name.getStartingOffset(), name.getEndingOffset() + 1));
+			push(nameValuePairNode);
+			checkedPop(nameValuePairNode, -1);
+			// Push the 'colon'
 			Symbol colon = node.getColon();
-			lineNode.setBegin(createTextNode(document, name.getStartingOffset(), colon.getEnd() + 1));
-			push(lineNode);
-			IParseNode value = node.getValue();
-			visit((JSNode) value);
-			checkedPop(lineNode, value.getEndingOffset());
+			pushTypeOperator(TypeOperator.KEY_VALUE_COLON, colon.getStart(), false);
+			// Push the 'value'
+			JSNode value = (JSNode) node.getValue();
+			value.accept(this);
 		}
 
 		/*
@@ -461,15 +715,16 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSSwitchNode node)
 		{
 			// Push the switch-case declaration node
-			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true, node);
-			switchNode.setBegin(createTextNode(document, node.getStartingOffset(),
-					node.getRightParenthesis().getEnd() + 1));
+			int startingOffset = node.getStartingOffset();
+			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true, node,
+					hasAnyCommentBefore(startingOffset));
+			switchNode.setBegin(createTextNode(document, startingOffset, node.getRightParenthesis().getEnd() + 1));
 			push(switchNode);
 			checkedPop(switchNode, -1);
 
 			// push a switch-case body node
 			int blockStart = node.getLeftBrace().getStart();
-			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document, hasCommentBefore(blockStart));
+			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document, hasAnyCommentBefore(blockStart));
 			blockNode.setBegin(createTextNode(document, blockStart, blockStart + 1));
 			push(blockNode);
 			// visit the children under that block node. We have to skip the first child, which is the switch-condition.
@@ -490,7 +745,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSCaseNode node)
 		{
-			visitCaseOrDefaultNode(node, node.getColon().getStart() + 1);
+			visitCaseOrDefaultNode(node, node.getColon().getStart());
 		}
 
 		/*
@@ -500,7 +755,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSDefaultNode node)
 		{
-			visitCaseOrDefaultNode(node, node.getColon().getStart() + 1);
+			visitCaseOrDefaultNode(node, node.getColon().getStart());
 		}
 
 		/*
@@ -552,20 +807,105 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		/*
 		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSVarNode)
+		 */
+		@Override
+		public void visit(JSVarNode node)
+		{
+			// Visit the 'var' part
+			int startingOffset = node.getStartingOffset();
+			FormatterJSDeclarationNode var = new FormatterJSDeclarationNode(document, false, node,
+					hasAnyCommentBefore(startingOffset));
+			var.setBegin(createTextNode(document, startingOffset, startingOffset + 3));
+			push(var);
+			checkedPop(var, -1);
+			// Visit the right-part of the 'var' expression.
+			if (node.getChildCount() > 1)
+			{
+				// we have a list of variables separated with commas (var a, b, c=3, d;)
+				List<JSNode> jsChildren = asJSNodesList(node.getChildren());
+				visitNodeLists(jsChildren, null, null, TypePunctuation.COMMA);
+			}
+			else
+			{
+				visitChildren(node);
+			}
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEnd(), false, true);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDeclarationNode)
+		 */
+		@Override
+		public void visit(JSDeclarationNode node)
+		{
+			if (node.getEqualSign() != null)
+			{
+				visitLeftRightExpression(node, (JSNode) node.getIdentifier(), (JSNode) node.getValue(),
+						node.getEqualSign().value.toString());
+			}
+			else
+			{
+				pushCommonDeclaration(node, node.getEndingOffset(), null);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSAssignmentNode)
 		 */
 		@Override
 		public void visit(JSAssignmentNode node)
 		{
+			visitLeftRightExpression(node, (JSNode) node.getLeftHandSide(), (JSNode) node.getRightHandSide(),
+					node.getOperator().value.toString());
 			if (node.getSemicolonIncluded())
 			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEnd(), false, true);
 			}
-			else
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSIdentifierNode)
+		 */
+		@Override
+		public void visit(JSIdentifierNode node)
+		{
+			int startingOffset = node.getStartingOffset();
+			FormatterJSIdentifierNode identifierNode = new FormatterJSIdentifierNode(document, node,
+					hasSingleCommentBefore(startingOffset));
+			identifierNode.setBegin(createTextNode(document, startingOffset, node.getEndingOffset() + 1));
+			push(identifierNode);
+			checkedPop(identifierNode, -1);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConstructNode)
+		 */
+		public void visit(JSConstructNode node)
+		{
+			IParseNode expression = node.getExpression();
+			IParseNode argumentsNode = node.getArguments();
+			List<JSNode> arguments = asJSNodesList(argumentsNode.getChildren());
+			// push the 'new' keyword.
+			int start = node.getStartingOffset();
+			visitTextNode(start, start + 3, !hasAnyCommentBefore(start), 0, 0, node.getSemicolonIncluded());
+			// push the expression
+			visitTextNode(expression, true, 1);
+			if (!arguments.isEmpty())
 			{
-				super.visit(node);
+				pushParametersInParentheses(argumentsNode.getStartingOffset(), argumentsNode.getEndingOffset(),
+						arguments, TypePunctuation.COMMA, false);
+			}
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
 		}
 
@@ -577,16 +917,23 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSBinaryArithmeticOperatorNode node)
 		{
+			visitLeftRightExpression(node, (JSNode) node.getLeftHandSide(), (JSNode) node.getRightHandSide(),
+					node.getOperator().value.toString());
 			if (node.getSemicolonIncluded())
 			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
-			else
-			{
-				super.visit(node);
-			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSArgumentsNode)
+		 */
+		@Override
+		public void visit(JSArgumentsNode node)
+		{
+			pushParametersInParentheses(node.getStartingOffset(), node.getEndingOffset() + 1,
+					asJSNodesList(node.getChildren()), TypePunctuation.COMMA, false);
 		}
 
 		/*
@@ -598,15 +945,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSBinaryBooleanOperatorNode node)
 		{
+			visitLeftRightExpression(node, (JSNode) node.getLeftHandSide(), (JSNode) node.getRightHandSide(),
+					node.getOperator().value.toString());
 			if (node.getSemicolonIncluded())
 			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
-			}
-			else
-			{
-				super.visit(node);
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
 		}
 
@@ -620,7 +963,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (node.getSemicolonIncluded())
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
+				int startingOffset = node.getStartingOffset();
+				visitTextNode(startingOffset, startingOffset + 7, true, 0, 0, false);
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());
 			}
 			else
@@ -631,20 +976,41 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		/*
 		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCommaNode)
+		 */
+		@Override
+		public void visit(JSCommaNode node)
+		{
+			// a = s, d, f;
+			visitNodeLists(asJSNodesList(node.getChildren()), null, null, TypePunctuation.COMMA);
+		}
+
+		/*
+		 * (non-Javadoc)
 		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
 		 */
 		@Override
 		public void visit(JSInvokeNode node)
 		{
-			if (node.getSemicolonIncluded())
+			// Push the function's name. Node that the function 'name' may be an expression in a group.
+			JSNode functionName = (JSNode) node.getExpression();
+			short nodeType = functionName.getNodeType();
+			if (nodeType == JSNodeTypes.GROUP || nodeType == JSNodeTypes.FUNCTION)
 			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
+				// inline invocation
+				functionName.accept(this);
 			}
 			else
 			{
-				super.visit(node);
+				pushFunctionInvocationName(node, functionName.getStart(), functionName.getEnd() + 1);
+			}
+			// Push the parenthesis and the parameters (if exist)
+			List<JSNode> parameters = asJSNodesList(node.getArguments().getChildren());
+			pushParametersInParentheses(functionName.getEnd() + 1, node.getEndingOffset(), parameters,
+					TypePunctuation.COMMA, false);
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
 		}
 
@@ -658,8 +1024,42 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (node.getSemicolonIncluded())
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
+				int startingOffset = node.getStartingOffset();
+				if (node.getChildCount() > 0 && node.getChild(0).getNodeType() != JSNodeTypes.EMPTY)
+				{
+					// push the 'return' keyword with a forced space after it.
+					visitTextNode(startingOffset, startingOffset + 6, true, 0, 1, false);
+					visitChildren(node);
+				}
+				else
+				{
+					visitTextNode(startingOffset, startingOffset + 5, true, 0, 0, false);
+				}
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSThrowNode)
+		 */
+		@Override
+		public void visit(JSThrowNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				// push the 'throw' keyword with a forced space after it.
+				int startingOffset = node.getStartingOffset();
+				visitTextNode(startingOffset, startingOffset + 5, true, 0, 1, false);
+				visitChildren(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
 			else
 			{
@@ -677,26 +1077,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (node.getSemicolonIncluded())
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
-				checkedPop(lineNode, lineNode.getEndOffset());
-			}
-			else
-			{
-				super.visit(node);
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSVarNode)
-		 */
-		@Override
-		public void visit(JSVarNode node)
-		{
-			if (node.getSemicolonIncluded())
-			{
-				IFormatterContainerNode lineNode = pushLineNode(node);
-				super.visit(node);
+				int startingOffset = node.getStartingOffset();
+				visitTextNode(startingOffset, startingOffset + 4, true, 0, 0, false);
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());
 			}
 			else
@@ -714,12 +1097,101 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			int beginOffset = node.getLeftParenthesis().getStart();
 			int endOffset = node.getRightParenthesis().getStart();
-			FormatterJSGroupNode groupNode = new FormatterJSGroupNode(document);
+			FormatterJSGroupNode groupNode = new FormatterJSGroupNode(document,
+					hasAnyCommentBefore(node.getStartingOffset()));
 			groupNode.setBegin(createTextNode(document, beginOffset, beginOffset + 1));
 			push(groupNode);
 			visitChildren(node);
 			checkedPop(groupNode, endOffset);
 			groupNode.setEnd(createTextNode(document, endOffset, endOffset + 1));
+			if (node.getSemicolonIncluded())
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGetElementNode)
+		 */
+		@Override
+		public void visit(JSGetElementNode node)
+		{
+			// a[b]
+			JSNode leftHandSide = (JSNode) node.getLeftHandSide();
+			FormatterJSGetElementNode getElementNode = new FormatterJSGetElementNode(document, node,
+					hasAnyCommentBefore(node.getStartingOffset()));
+			getElementNode.setBegin(createTextNode(document, node.getStartingOffset(), leftHandSide.getEndingOffset()));
+			push(getElementNode);
+			checkedPop(getElementNode, -1);
+			int leftBracketOffset = node.getLeftBracket().getStart();
+			int rightBracketOffset = node.getRightBracket().getStart();
+			JSNode rightHandSide = (JSNode) node.getRightHandSide();
+			pushNodeInParentheses('[', ']', leftBracketOffset, rightBracketOffset, rightHandSide, false);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGetPropertyNode)
+		 */
+		@Override
+		public void visit(JSGetPropertyNode node)
+		{
+			// a.b.c
+			FormatterJSGetPropertyNode getElementNode = new FormatterJSGetPropertyNode(document, node,
+					hasAnyCommentBefore(node.getStartingOffset()));
+			getElementNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getEndingOffset() + 1));
+			push(getElementNode);
+			checkedPop(getElementNode, node.getEndingOffset());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNumberNode)
+		 */
+		public void visit(JSNumberNode node)
+		{
+			visitTextNode(node, true, 0);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSStringNode)
+		 */
+		@Override
+		public void visit(JSStringNode node)
+		{
+			visitTextNode(node, true, 0);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNullNode)
+		 */
+		@Override
+		public void visit(JSNullNode node)
+		{
+			visitTextNode(node, true, 0);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSThisNode)
+		 */
+		@Override
+		public void visit(JSThisNode node)
+		{
+			visitTextNode(node, true, 0);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSRegexNode)
+		 */
+		@Override
+		public void visit(JSRegexNode node)
+		{
+			visitTextNode(node, true, 0);
 		}
 
 		/**
@@ -734,6 +1206,231 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			lineNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getStartingOffset()));
 			push(lineNode);
 			return lineNode;
+		}
+
+		/**
+		 * Push a FormatterJSParenthesesNode for the JSNode. <br>
+		 * 
+		 * @param openChar
+		 *            The parentheses open char (e.g. '(', '[' etc.)
+		 * @param closeChar
+		 *            The parentheses close char (e.g. ')', ']' etc.)
+		 * @param declarationEndOffset
+		 * @param expressionEndOffset
+		 * @param node
+		 * @param visitOnlyChildren
+		 *            When true, the visit will be only for the node's children. Otherwise, a call on the node.accept
+		 *            will be made.
+		 */
+		private void pushNodeInParentheses(char openChar, char closeChar, int parenLookupStart, int parenLookupEnd,
+				JSNode node, boolean visitOnlyChildren)
+		{
+			int openParen = locateCharForward(document, openChar, parenLookupStart);
+			int closeParen = locateCharBackward(document, closeChar, parenLookupEnd);
+			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document, false,
+					hasAnyCommentBefore(node.getStartingOffset()));
+			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
+			push(parenthesesNode);
+			if (node != null)
+			{
+				if (visitOnlyChildren)
+				{
+					visitChildren(node);
+				}
+				else
+				{
+					node.accept(this);
+				}
+			}
+			checkedPop(parenthesesNode, -1);
+			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
+		}
+
+		/**
+		 * This method is used to visit and push nodes that are separated with some delimiter, and potentially have
+		 * operators between them.<br>
+		 * For example, {"one" : "1", "two" : "2"}
+		 * 
+		 * @param leftNodes
+		 *            A list of JSNode.
+		 * @param rightNodes
+		 *            A list of JSNode that are pairing with the leftNodes. In case there are no pairs, this list may be
+		 *            null. However, if there are pairs (such as assignments), the size of this group must match the
+		 *            size of the left group.
+		 * @param pairsOperator
+		 *            The operator {@link TypeOperator} that should appear between the left and the right pair, when
+		 *            there are pairs. May be null only when the rightNodes are null.
+		 * @param pairsSeparator
+		 *            A separator that appears between the leftNodes. If there are pairs, the separator appears between
+		 *            one pair to the other (may only be null in case a separator is not needed, e.g. we have only one
+		 *            item/pair)
+		 */
+		private void visitNodeLists(List<? extends JSNode> leftNodes, List<? extends JSNode> rightNodes,
+				TypeOperator pairsOperator, TypePunctuation pairsSeparator)
+		{
+			// push the expressions one at a time, with comma nodes between them.
+			int leftSize = leftNodes.size();
+			for (int i = 0; i < leftSize; i++)
+			{
+				JSNode left = leftNodes.get(i);
+				JSNode right = (rightNodes != null) ? rightNodes.get(i) : null;
+				left.accept(this);
+				if (right != null && pairsOperator != null)
+				{
+					int startIndex = left.getEnd();
+					String text = document.get(startIndex, right.getStart());
+					String typeStr = pairsOperator.toString();
+					startIndex += text.indexOf(typeStr);
+					pushTypeOperator(pairsOperator, startIndex, false);
+					right.accept(this);
+				}
+				// add a separator if needed
+				if (i + 1 < leftSize)
+				{
+					int startIndex = left.getEnd() + 1;
+					String text = document.get(startIndex, leftNodes.get(i + 1).getStart());
+					String separatorStr = pairsSeparator.toString();
+					startIndex += text.indexOf(separatorStr);
+					pushTypePunctuation(pairsSeparator, startIndex);
+				}
+			}
+		}
+
+		/**
+		 * Push an operator node.
+		 * 
+		 * @param operator
+		 * @param startOffset
+		 * @param isUnary
+		 */
+		private void pushTypeOperator(TypeOperator operator, int startOffset, boolean isUnary)
+		{
+			FormatterJSOperatorNode node = new FormatterJSOperatorNode(document, operator, isUnary,
+					hasSingleCommentBefore(startOffset));
+			node.setBegin(createTextNode(document, startOffset, startOffset + operator.toString().length()));
+			push(node);
+			checkedPop(node, -1);
+		}
+
+		/**
+		 * Push a puctuation node.
+		 * 
+		 * @param punctuation
+		 * @param startOffset
+		 */
+		private void pushTypePunctuation(TypePunctuation punctuation, int startOffset)
+		{
+			FormatterJSPunctuationNode node = new FormatterJSPunctuationNode(document, punctuation, false,
+					hasSingleCommentBefore(startOffset));
+			node.setBegin(createTextNode(document, startOffset, startOffset + punctuation.toString().length()));
+			push(node);
+			checkedPop(node, -1);
+		}
+
+		/**
+		 * Push a FormatterPHPParenthesesNode that contains a parameters array. <br>
+		 * Each parameter in the parameters list is expected to be separated from the others with a comma.
+		 * 
+		 * @param declarationEndOffset
+		 * @param expressionEndOffset
+		 * @param parameters
+		 * @param punctuationType
+		 *            A {@link TypePunctuation}. Usually this should be a COMMA, but it can also be something else to
+		 *            provide special formatting styles.
+		 * @param lookForExtraComma
+		 *            Indicate that the parameters list may end with an extra comma that is not included in them. This
+		 *            function will look for that comma if the value is true and will add it as a punctuation node in
+		 *            case it was found.
+		 */
+		private void pushParametersInParentheses(int declarationEndOffset, int expressionEndOffset,
+				List<? extends JSNode> parameters, TypePunctuation punctuationType, boolean lookForExtraComma)
+		{
+			FormatterJSParenthesesNode parenthesesNode = null;
+			int openParen = getNextNonWhiteCharOffset(document, declarationEndOffset);
+			if (document.charAt(openParen) == '(')
+			{
+				parenthesesNode = new FormatterJSParenthesesNode(document);
+				parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
+			}
+			else
+			{
+				parenthesesNode = new FormatterJSParenthesesNode(document, true, hasAnyCommentBefore(openParen));
+				parenthesesNode.setBegin(createTextNode(document, openParen, openParen));
+			}
+			push(parenthesesNode);
+
+			if (parameters != null && parameters.size() > 0)
+			{
+				visitNodeLists(parameters, null, null, punctuationType);
+				if (lookForExtraComma)
+				{
+					// Look ahead to find any extra comma that we may have. If found, push it as a punctuation node.
+					int lastParamEnd = parameters.get(parameters.size() - 1).getEnd();
+					int nextNonWhitespace = getNextNonWhiteCharOffset(document, lastParamEnd);
+					if (document.charAt(nextNonWhitespace) == ',')
+					{
+						pushTypePunctuation(punctuationType, nextNonWhitespace);
+					}
+				}
+			}
+			int closeParenStart = expressionEndOffset;
+			int closeParenEnd = expressionEndOffset;
+			if (!parenthesesNode.isAsWrapper())
+			{
+				closeParenStart = locateCharBackward(document, ')', expressionEndOffset);
+				closeParenEnd = closeParenStart + 1;
+			}
+			if (hasAnyCommentBefore(closeParenStart))
+			{
+				// Make sure that the closing pair will not get pushed up when there is a comment line right before it.
+				parenthesesNode.setNewLineBeforeClosing(true);
+				checkedPop(parenthesesNode, closeParenStart);
+			}
+			else
+			{
+				checkedPop(parenthesesNode, -1);
+			}
+
+			parenthesesNode.setEnd(createTextNode(document, closeParenStart, closeParenEnd));
+		}
+
+		/**
+		 * Locate and push a punctuation char node.
+		 * 
+		 * @param offsetToSearch
+		 *            - The offset that will be used as the start for the search of the semicolon.
+		 * @param ignoreNonWhitespace
+		 *            indicate that a non-whitespace chars that appear before the semicolon will be ignored. If this
+		 *            flag is false, and a non-whitespace appear between the given offset and the semicolon, the method
+		 *            will <b>not</b> push a semicolon node.
+		 * @param isLineTerminating
+		 *            Indicates that this punctuation node is a line terminating one.
+		 */
+		private void findAndPushPunctuationNode(TypePunctuation type, int offsetToSearch, boolean ignoreNonWhitespace,
+				boolean isLineTerminating)
+		{
+			char punctuationType = type.toString().charAt(0);
+			int punctuationOffset = locateCharForward(document, punctuationType, offsetToSearch);
+			if (punctuationOffset != offsetToSearch || document.charAt(punctuationOffset) == punctuationType)
+			{
+				String segment = document.get(offsetToSearch, punctuationOffset);
+				if (!ignoreNonWhitespace && segment.trim().length() > 0)
+				{
+					return;
+				}
+				if (isLineTerminating)
+				{
+					// We need to make sure that the termination only happens when the line does not
+					// have a terminator already.
+					int lineEnd = locateWhitespaceLineEndingOffset(punctuationOffset + 1);
+					isLineTerminating = lineEnd < 0;
+				}
+				FormatterJSPunctuationNode punctuationNode = new FormatterJSPunctuationNode(document, type,
+						isLineTerminating, hasSingleCommentBefore(punctuationOffset));
+				punctuationNode.setBegin(createTextNode(document, punctuationOffset, punctuationOffset + 1));
+				push(punctuationNode);
+				checkedPop(punctuationNode, -1);
+			}
 		}
 
 		/**
@@ -762,17 +1459,24 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 			// push the case/default node till the colon
 			FormatterJSCaseNode caseNode = new FormatterJSCaseNode(document, hasBlockedChild);
-			caseNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset));
+			caseNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset + 1));
 			push(caseNode);
 			if (hasBlockedChild)
 			{
 				// we have a 'case' with a curly-block
 				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document,
-						hasCommentBefore(lastChild.getStartingOffset()));
+						hasAnyCommentBefore(lastChild.getStartingOffset()));
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),
 						lastChild.getStartingOffset() + 1));
 				push(caseBodyNode);
-				visitChildren(lastChild);
+				if (node.getNodeType() == JSNodeTypes.CASE)
+				{
+					visitChildren(lastChild);
+				}
+				else
+				{
+					visitChildren(node);
+				}
 				int endingOffset = lastChild.getEndingOffset();
 				checkedPop(caseBodyNode, endingOffset);
 				int end = locateColonOrSemicolonInLine(endingOffset + 1, document);
@@ -780,7 +1484,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 			else
 			{
-				visitChildren(node);
+				if (node.getNodeType() == JSNodeTypes.CASE)
+				{
+					visitChildren(node, 1);
+				}
+				else
+				{
+					visitChildren(node);
+				}
 			}
 			checkedPop(caseNode, node.getEndingOffset() + 1);
 		}
@@ -793,7 +1504,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		private void pushBlockNode(JSNode block, boolean consumeEndingSemicolon)
 		{
 			FormatterJSBlockNode bodyNode = new FormatterJSBlockNode(document,
-					hasCommentBefore(block.getStartingOffset()));
+					hasAnyCommentBefore(block.getStartingOffset()));
 			bodyNode.setBegin(createTextNode(document, block.getStartingOffset(), block.getStartingOffset() + 1));
 			push(bodyNode);
 			// visit the children
@@ -824,7 +1535,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// Then, push the body (the body might be defined without any brackets, so in those cases the begin and
 				// end would be empty)
 				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document,
-						hasCommentBefore(body.getStartingOffset()));
+						hasAnyCommentBefore(body.getStartingOffset()));
 				boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
 				if (bodyInBrackets)
 				{
@@ -849,24 +1560,156 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 		}
 
+		/**
+		 * Wrap a given node in an implicit block node and visit the node to insert it as a child of that block.
+		 * 
+		 * @param node
+		 *            The node to wrap and visit.
+		 * @param indent
+		 */
+		private void wrapInImplicitBlock(JSNode node, boolean indent)
+		{
+			FormatterJSImplicitBlockNode emptyBlock = new FormatterJSImplicitBlockNode(document, false, indent, 0);
+			int start = node.getStartingOffset();
+			int end = node.getEndingOffset() + 1;
+			emptyBlock.setBegin(createTextNode(document, start, start));
+			push(emptyBlock);
+			node.accept(this);
+			checkedPop(emptyBlock, -1);
+			emptyBlock.setEnd(createTextNode(document, end, end));
+		}
+
 		private void pushCommonDeclaration(JSNode node, int declarationEndOffset, IParseNode body)
 		{
 			// First, push the declaration part
 			// In some cases, the body is empty (like in a 'while' with no body). Those cases get a special treatment.
 			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
-					(body.getNodeType() == JSNodeTypes.STATEMENTS), node);
-			int endDeclarationOffset;
-			if (body.getNodeType() != JSNodeTypes.EMPTY)
+					(body != null && body.getNodeType() == JSNodeTypes.STATEMENTS), node,
+					hasAnyCommentBefore(node.getStartingOffset()));
+			int endDeclarationOffset = declarationEndOffset + 1;
+			if (body != null)
 			{
-				endDeclarationOffset = declarationEndOffset + 1;
-			}
-			else
-			{
-				endDeclarationOffset = body.getEndingOffset() + 1;
+				if (body.getNodeType() != JSNodeTypes.EMPTY)
+				{
+					endDeclarationOffset = declarationEndOffset + 1;
+				}
+				else
+				{
+					endDeclarationOffset = body.getEndingOffset() + 1;
+				}
 			}
 			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), endDeclarationOffset));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);
+		}
+
+		/**
+		 * Visit an expression with left node, right node and an operator in between.<br>
+		 * Note that the left <b>or</b> the right may be null.
+		 * 
+		 * @param parentNode
+		 * @param left
+		 * @param right
+		 * @param operatorString
+		 */
+		private void visitLeftRightExpression(JSNode parentNode, JSNode left, JSNode right, String operatorString)
+		{
+			int leftOffset;
+			int rightOffset;
+			if (left != null)
+			{
+				left.accept(this);
+				leftOffset = left.getEnd();
+			}
+			else
+			{
+				leftOffset = parentNode.getStart();
+			}
+			if (right != null)
+			{
+				rightOffset = right.getStart();
+			}
+			else
+			{
+				rightOffset = parentNode.getEnd();
+			}
+			int operatorOffset = document.get(leftOffset, rightOffset).indexOf(operatorString) + leftOffset;
+			TypeOperator typeOperator = TypeOperator.getTypeOperator(operatorString);
+			pushTypeOperator(typeOperator, operatorOffset, false);
+			if (right != null)
+			{
+				right.accept(this);
+			}
+		}
+
+		/**
+		 * A simple visit and push of a node that pushes a JS text node which consumes any white-spaces before that node
+		 * by request.
+		 * 
+		 * @param node
+		 * @param consumePreviousWhitespaces
+		 * @param spacesCountBefore
+		 * @see #visitTextNode(int, int, boolean, int)
+		 */
+		private void visitTextNode(IParseNode node, boolean consumePreviousWhitespaces, int spacesCountBefore)
+		{
+			visitTextNode(node.getStartingOffset(), node.getEndingOffset() + 1, consumePreviousWhitespaces,
+					spacesCountBefore);
+		}
+
+		/**
+		 * A simple visit and push of a node that pushes a JS text node which consumes any white-spaces before that node
+		 * by request.
+		 * 
+		 * @param startOffset
+		 * @param endOffset
+		 * @param consumePreviousWhitespaces
+		 * @param spacesCountBefore
+		 * @see #visitTextNode(ASTNode, boolean, int)
+		 */
+		private void visitTextNode(int startOffset, int endOffset, boolean consumePreviousWhitespaces,
+				int spacesCountBefore)
+		{
+			visitTextNode(startOffset, endOffset, consumePreviousWhitespaces, spacesCountBefore, 0, false);
+		}
+
+		/**
+		 * A simple visit and push of a node that pushes a JS text node which consumes any white-spaces before that node
+		 * by request.
+		 * 
+		 * @param startOffset
+		 * @param endOffset
+		 * @param consumePreviousWhitespaces
+		 * @param spacesCountBefore
+		 * @param spacesCountAfter
+		 */
+		private void visitTextNode(int startOffset, int endOffset, boolean consumePreviousWhitespaces,
+				int spacesCountBefore, int spacesCountAfter, boolean isAddingBeginLine)
+		{
+			// make sure that every text node we add right after a single line comment will have a new-line char(s)
+			// prefix
+			isAddingBeginLine |= hasSingleCommentBefore(startOffset);
+			FormatterJSTextNode textNode = new FormatterJSTextNode(document, consumePreviousWhitespaces,
+					spacesCountBefore, spacesCountAfter, isAddingBeginLine);
+			textNode.setBegin(createTextNode(document, startOffset, endOffset));
+			push(textNode);
+			checkedPop(textNode, endOffset);
+		}
+
+		/**
+		 * Push the name part of a function invocation.
+		 * 
+		 * @param invocationNode
+		 * @param nameStart
+		 * @param nameEnd
+		 */
+		private void pushFunctionInvocationName(JSNode invocationNode, int nameStart, int nameEnd)
+		{
+			FormatterJSFunctionInvocationNode node = new FormatterJSFunctionInvocationNode(document, invocationNode,
+					hasAnyCommentBefore(invocationNode.getStartingOffset()));
+			node.setBegin(createTextNode(document, nameStart, nameEnd));
+			push(node);
+			checkedPop(node, -1);
 		}
 
 		/**
@@ -900,13 +1743,54 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		/**
+		 * Locate a line ending offset. The line should only contain whitespace characters.
+		 * 
+		 * @return The line ending offset, or -1 in case not found.
+		 */
+		private int locateWhitespaceLineEndingOffset(int start)
+		{
+			int length = document.getLength();
+			for (int offset = start; offset < length; offset++)
+			{
+				char c = document.charAt(offset);
+				if (c == '\n' || c == '\r')
+				{
+					return offset;
+				}
+				if (!Character.isWhitespace(c))
+				{
+					return -1;
+				}
+			}
+			return -1;
+		}
+
+		private List<JSNode> asJSNodesList(IParseNode[] nodes)
+		{
+			List<JSNode> jsChildren = new ArrayList<JSNode>(nodes.length);
+			for (IParseNode child : nodes)
+			{
+				if (child instanceof JSNode)
+				{
+					jsChildren.add((JSNode) child);
+				}
+				else
+				{
+					// we'll have a problem with such a node.
+					JSPlugin.logError("Expected JSFormatter and got " + child.getClass().getName(), null); //$NON-NLS-1$
+				}
+			}
+			return jsChildren;
+		}
+
+		/**
 		 * Visit the nodes children with an option to skip some of the first ones.
 		 * 
 		 * @param node
 		 * @param skip
 		 *            The number of children to skip visiting
 		 */
-		private void visitChildren(JSSwitchNode node, int skip)
+		private void visitChildren(JSNode node, int skip)
 		{
 			for (IParseNode child : node)
 			{

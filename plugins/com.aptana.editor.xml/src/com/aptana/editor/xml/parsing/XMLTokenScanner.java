@@ -21,6 +21,7 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
+import com.aptana.editor.xml.internal.text.rules.DocTypeRule;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 
 public class XMLTokenScanner extends RuleBasedScanner
@@ -34,6 +35,7 @@ public class XMLTokenScanner extends RuleBasedScanner
 
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		rules.add(new MultiLineRule("<!--", "-->", createToken(XMLTokenType.COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new DocTypeRule(createToken(XMLTokenType.DOCTYPE)));
 		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(XMLTokenType.CDATA))); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new TagRule("?xml", createToken(XMLTokenType.DECLARATION))); //$NON-NLS-1$
 		rules.add(new TagRule("/", createToken(XMLTokenType.END_TAG))); //$NON-NLS-1$

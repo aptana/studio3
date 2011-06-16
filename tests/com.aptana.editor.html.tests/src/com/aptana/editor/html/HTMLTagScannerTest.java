@@ -211,7 +211,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.separator.key-value.html"), 13, 1);
 		assertToken(getToken("string.quoted.single.html"), 14, 1);
 		assertToken(getToken("support.class.js"), 15, 8);
-		assertToken(getToken(null/*"operator.dot.js"*/), 23, 1);
+		assertToken(getToken("meta.delimiter.method.period.js"), 23, 1);
 		assertToken(getToken("source.js"), 24, 4);
 		assertToken(getToken("string.quoted.single.html"), 28, 1);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 29, 1);
@@ -330,7 +330,7 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.definition.tag.end.html"), 10, 1);
 	}
 
-	public void testCompleteTagWithIncompleteAttribute()
+	public void testCompleteTagWithIncompleteAttribute1()
 	{
 		String src = "< class='>";
 		IDocument document = new Document(src);
@@ -342,6 +342,48 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
 		assertToken(getToken("string.quoted.single.html"), 8, 1);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 9, 1);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute2()
+	{
+		String src = "< class='/>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 1);
+		assertToken(getToken("punctuation.definition.tag.self_close.html"), 9, 2);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute3()
+	{
+		String src = "< class=' >";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 2);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 10, 1);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute4()
+	{
+		String src = "< class=' />";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 2);
+		assertToken(getToken("punctuation.definition.tag.self_close.html"), 10, 2);
 	}
 
 }

@@ -7,11 +7,11 @@
  */
 package com.aptana.filewatcher;
 
-import org.eclipse.core.runtime.Platform;
-
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
+
+import org.eclipse.core.runtime.Platform;
 
 import com.aptana.filewatcher.poller.PollingNotifier;
 
@@ -19,6 +19,7 @@ public class FileWatcher
 {
 
 	private static IJNotify _instance;
+	private static boolean fgNotify = true;
 
 	private synchronized static IJNotify instance()
 	{
@@ -77,6 +78,21 @@ public class FileWatcher
 	public static boolean removeWatch(int watchId) throws JNotifyException
 	{
 		return instance().removeWatch(watchId);
+	}
+
+	public static synchronized void avoidNotify()
+	{
+		fgNotify = false;
+	}
+
+	public static synchronized void resumeNotify()
+	{
+		fgNotify = true;
+	}
+
+	public static synchronized boolean shouldNotify()
+	{
+		return fgNotify;
 	}
 
 }

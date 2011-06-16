@@ -52,7 +52,7 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new TagRule("?xml", createToken(getTokenName(HTMLTokens.XML_DECL)))); //$NON-NLS-1$
 		// tags
 		rules.add(new TagRule("/", createToken(getTokenName(HTMLTokens.END_TAG)))); //$NON-NLS-1$
-		rules.add(generalTagRule = new TagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
+		rules.add(generalTagRule = new HTMLParserTagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
 
 		// text
 		IToken token = createToken(getTokenName(HTMLTokens.TEXT));
