@@ -118,6 +118,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test media with statement
+	 * 
+	 * @throws Exception
+	 */
+	public void testMediaStatement2() throws Exception
+	{
+		parseTest("@media only screen and ( min-device-width : 320px ) and ( max-device-width : 480px ){body {background-color: #000;}}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test empty page
 	 * 
 	 * @throws Exception
@@ -135,6 +145,16 @@ public class CSSParserTest extends TestCase
 	public void testPagePseudoIdentifier() throws Exception
 	{
 		parseTest("@page :abc123 {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test page with an identifier
+	 * 
+	 * @throws Exception
+	 */
+	public void testPagePseudoIdentifier2() throws Exception
+	{
+		parseTest("@page :abc123 {testing: 10;}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -574,7 +594,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testChildSelector() throws Exception
 	{
-		// parseTest("table > tr {}" + EOL); //$NON-NLS-1$
+		parseTest("table > tr {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -594,7 +614,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testElementPseudoclassFunctionSelector() throws Exception
 	{
-		// parseTest("p:lang(en) {}" + EOL); //$NON-NLS-1$
+		parseTest("p:lang(en) {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -604,7 +624,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testAdjacentSelector() throws Exception
 	{
-		// parseTest("p + p {}" + EOL); //$NON-NLS-1$
+		parseTest("p + p {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -628,13 +648,23 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test attribute id selector
+	 * 
+	 * @throws Exception
+	 */
+	public void testAttributeIdSelector() throws Exception
+	{
+		parseTest("p#abc {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test attribute-value-in-list element selector
 	 * 
 	 * @throws Exception
 	 */
 	public void testAttributeValueInListSelector() throws Exception
 	{
-		// parseTest("p[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
+		parseTest("p[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -644,7 +674,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testAttributeHyphenateInListSelector() throws Exception
 	{
-		// parseTest("p[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
+		parseTest("p[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -704,7 +734,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testUniversalChildSelector() throws Exception
 	{
-		// parseTest("* > tr {}" + EOL); //$NON-NLS-1$
+		parseTest("* > tr {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -725,8 +755,8 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testUniversalPseudoclassFunctionSelector() throws Exception
 	{
-		// parseTest("*:lang(en) {}" + EOL); //$NON-NLS-1$
-		// parseTest(":lang(en) {}" + EOL); //$NON-NLS-1$
+		parseTest("*:lang(en) {}" + EOL); //$NON-NLS-1$
+		parseTest(":lang(en) {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -736,7 +766,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testUniversalAdjacentSelector() throws Exception
 	{
-		// parseTest("* + p {}" + EOL); //$NON-NLS-1$
+		parseTest("* + p {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -768,8 +798,8 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testUniversalAttributeValueInListSelector() throws Exception
 	{
-		// parseTest("*[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
-		// parseTest("[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
+		parseTest("*[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
+		parseTest("[lang ~= \"en\"] {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -779,8 +809,8 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testUniversalAttributeHyphenateInListSelector() throws Exception
 	{
-		// parseTest("*[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
-		// parseTest("[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
+		parseTest("*[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
+		parseTest("[lang |= \"en\"] {}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -816,6 +846,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * test single type selector with one property
+	 * 
+	 * @throws Exception
+	 */
+	public void testSimpleSelectorOneProperty2() throws Exception
+	{
+		parseTest("a {testing: 10}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * test single type selector with multiple properties
 	 * 
 	 * @throws Exception
@@ -823,6 +863,16 @@ public class CSSParserTest extends TestCase
 	public void testSimpleSelectorMultipleProperties() throws Exception
 	{
 		parseTest("a {testing: abc123; forward: 10pt;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * test single type selector with multiple properties
+	 * 
+	 * @throws Exception
+	 */
+	public void testSimpleSelectorMultipleProperties2() throws Exception
+	{
+		parseTest("a {testing: abc123; forward: 10pt}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -836,6 +886,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * test unknown at-rule
+	 * 
+	 * @throws Exception
+	 */
+	public void testUnknownAtRule() throws Exception
+	{
+		parseTest("@at-rule 'test';" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
 	 * This case was causing the parser to go into an infinite loop. The scanner would get a bad location exception
 	 * after the comment and did not return EOF in that case. This caused the parser to loop endlessly
 	 * 
@@ -846,21 +906,54 @@ public class CSSParserTest extends TestCase
 		parseTest("body {\n\tbackground: red;\n}\n\n/**\n * \n */", "body {background: red;}" + EOL);
 	}
 
-	public void testStartsWithBug() throws Exception
+	/**
+	 * test starts-with
+	 * 
+	 * @throws Exception
+	 */
+	public void testStartsWith() throws Exception
 	{
 		parseTest("a[href ^= 'javascript:'] {}" + EOL);
 	}
 
-	public void testEndsWithBug() throws Exception
+	/**
+	 * test ends-with
+	 * 
+	 * @throws Exception
+	 */
+	public void testEndsWith() throws Exception
 	{
 		parseTest("a[href $= 'http://abc.com'] {}" + EOL);
 	}
 
+	/**
+	 * test multiple attribute selectors
+	 * 
+	 * @throws Exception
+	 */
+	public void testMultipleAttributeSelectors() throws Exception
+	{
+		parseTest("a#myId .myClass {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * parseTest
+	 * 
+	 * @param source
+	 * @throws Exception
+	 */
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);
 	}
 
+	/**
+	 * parseTest
+	 * 
+	 * @param source
+	 * @param expected
+	 * @throws Exception
+	 */
 	protected void parseTest(String source, String expected) throws Exception
 	{
 		fScanner.setSource(source);
@@ -868,10 +961,12 @@ public class CSSParserTest extends TestCase
 		IParseNode result = (IParseNode) fParser.parse(fScanner);
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
+
 		for (IParseNode child : children)
 		{
 			text.append(child).append(EOL);
 		}
+
 		assertEquals(expected, text.toString());
 	}
 }

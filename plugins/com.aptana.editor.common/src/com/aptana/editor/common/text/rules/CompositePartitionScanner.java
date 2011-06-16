@@ -178,7 +178,18 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			// don't try to resume
 			return baseNextToken();
 		}
+		IToken token = doResumeContentType();
+		if (token != null) {
+			return token;
+		}
 
+		return baseNextToken();
+	}
+
+	private IToken doResumeContentType() {
+		if (fContentType == null) {
+			return null;
+		}
 		// inside a partition
 		fColumn = UNDEFINED;
 		boolean resume = (fPartitionOffset > -1 && fPartitionOffset < fOffset);
@@ -218,7 +229,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (resume) {
 			fOffset = fPartitionOffset;
 		}
-		return baseNextToken();
+		return null;
 	}
 
 	private IToken baseNextToken() {
@@ -252,6 +263,15 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
+						IToken resumeToken = currentPartitionScanner.getResumeToken();
+						if (resumeToken != null && resumeToken.getData() instanceof String) {
+							fContentType = (String) resumeToken.getData();
+							hasResume = true;
+							token = doResumeContentType();
+							if (token != null) {
+								return token;
+							}
+						}
 						break;
 					}
 					if (hasSwitchingSequence()) {

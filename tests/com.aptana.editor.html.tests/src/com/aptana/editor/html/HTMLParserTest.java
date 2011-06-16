@@ -19,6 +19,8 @@ import com.aptana.parsing.lexer.Range;
 public class HTMLParserTest extends TestCase
 {
 
+	private static final String EOL = "\n";
+
 	private HTMLParser fParser;
 	private HTMLParseState fParseState;
 
@@ -35,35 +37,34 @@ public class HTMLParserTest extends TestCase
 
 	public void testSelfClosing() throws Exception
 	{
-		String source = "<html/>\n";
+		String source = "<html/>";
 		parseTest(source, "<html></html>\n");
 	}
 
 	public void testTags() throws Exception
 	{
-		String source = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n"
-				+ "<html><head></head><body><p>Text</html>\n";
+		String source = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">"
+				+ "<html><head></head><body><p>Text</html>";
 		parseTest(source, "<html><head></head><body><p>Text</p></body></html>\n");
 	}
 
 	public void testEmptyTagInXHTML() throws Exception
 	{
 		String source = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n"
-				+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-				+ "<body><br /><table></table></body>\n";
+				+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" + "<body><br /><table></table></body>";
 		parseTest(source, "<body><br></br><table></table></body>\n");
 	}
 
 	public void testQuotedPair() throws Exception
 	{
-		String source = "<html><head>shouldn't</head><body>can't</body></html>\n";
-		parseTest(source, "<html><head>shouldn</head><body>can</body></html>\n");
+		String source = "<html><head>shouldn't</head><body>can't</body></html>";
+		parseTest(source, source + EOL);
 	}
 
 	public void testAmpersand() throws Exception
 	{
-		String source = "<body><p>Gifts&nbsp; & Wish Lists</p><h3></h3></body>\n";
-		parseTest(source, "<body><p>Gifts</p><h3></h3></body>\n");
+		String source = "<body><p>Gifts&nbsp; & Wish Lists</p><h3></h3></body>";
+		parseTest(source, source + EOL);
 	}
 
 	public void testOutlineAttributes() throws Exception
@@ -91,38 +92,38 @@ public class HTMLParserTest extends TestCase
 
 	public void testStyle() throws Exception
 	{
-		String source = "<html><head><style>html {color: red;}</style></head></html>\n";
-		parseTest(source);
+		String source = "<html><head><style>html {color: red;}</style></head></html>";
+		parseTest(source, source + EOL);
 	}
 
 	public void testScript() throws Exception
 	{
-		String source = "<html><head><script>var one = 1;</script></head></html>\n";
-		parseTest(source);
+		String source = "<html><head><script>var one = 1;</script></head></html>";
+		parseTest(source, source + EOL);
 	}
 
 	public void testHTML5() throws Exception
 	{
-		String source = "<HTML><HEAD><STYLE>html {color: red;}</STYLE><SCRIPT>var one = 1;</SCRIPT></HEAD></HTML>\n";
-		parseTest(source);
+		String source = "<HTML><HEAD><STYLE>html {color: red;}</STYLE><SCRIPT>var one = 1;</SCRIPT></HEAD></HTML>";
+		parseTest(source, source + EOL);
 	}
 
 	public void testComment() throws Exception
 	{
-		String source = "<html><head><!-- this is a comment --></head></html>\n";
-		parseTest(source);
+		String source = "<html><head><!-- this is a comment --></head></html>";
+		parseTest(source, source + EOL);
 	}
 
 	public void testNestedUnclosedTag() throws Exception
 	{
 		String source = "<p><b></b><p>";
-		parseTest(source, "<p><b></b></p>\n<p></p>\n");
+		parseTest(source, "<p><b></b></p>\n<p></p>" + EOL);
 	}
 
 	public void testUnclosedTags() throws Exception
 	{
 		String source = "<body><p><li></body>";
-		parseTest(source, "<body><p><li></li></p></body>\n");
+		parseTest(source, "<body><p><li></li></p></body>" + EOL);
 	}
 
 	public void testCloseTagPosition() throws Exception

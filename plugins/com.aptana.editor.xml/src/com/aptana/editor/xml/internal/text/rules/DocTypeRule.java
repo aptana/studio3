@@ -12,39 +12,46 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 
-public class DocTypeRule extends MultiLineRule
-{
+import com.aptana.editor.common.text.rules.CollectingCharacterScanner;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 
-	private int fEmbeddedStart;
+/**
+ * 
+ * @author Michael Xia
+ * @author Max Stepanov
+ *
+ */
+public class DocTypeRule extends MultiLineRule {
 
-	public DocTypeRule(IToken token)
-	{
+	private final boolean breakOnDTD;
+
+	public DocTypeRule(IToken token, boolean breakOnDTD) {
 		super("<!DOCTYPE", ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+		this.breakOnDTD = breakOnDTD;
 	}
 
 	@Override
-	protected boolean endSequenceDetected(ICharacterScanner scanner)
-	{
+	protected boolean endSequenceDetected(ICharacterScanner scanner) {
 		int c;
-		while ((c = scanner.read()) != ICharacterScanner.EOF)
-		{
-			if (c == fEscapeCharacter)
-			{
+		int embeddedDTD = 0;
+		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, String.valueOf(fStartSequence));
+		while ((c = collectingCharacterScanner.read()) != ICharacterScanner.EOF) {
+			if (c == fEscapeCharacter) {
 				// Skip the escaped character.
-				scanner.read();
-			}
-			else if (c == '<')
-			{
-				fEmbeddedStart++;
-			}
-			else if (c == '>')
-			{
-				if (fEmbeddedStart == 0)
-				{
-					return true;
+				collectingCharacterScanner.read();
+			} else if (c == '[') {
+				if (breakOnDTD) {
+					break;
 				}
-				fEmbeddedStart--;
+				++embeddedDTD;
+			} else if (c == ']') {
+				--embeddedDTD;
+			} else if (c == '>' && embeddedDTD <= 0) {
+				break;
 			}
+		}
+		if (fToken instanceof ExtendedToken) {
+			((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
 		}
 		return true;
 	}

@@ -216,6 +216,8 @@ public class ThemeManager implements IThemeManager
 		{
 			prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		}
+		// TODO Use markup.changed bg color for "decoration color" in Prefs>General>Appearance>Colors and Fonts
+
 		// TODO Move this stuff over to theme change listeners in the XML/HTML/Ruby editor plugins?
 		if (!theme.hasEntry("override.xmlTagPairOccurrenceIndication")) //$NON-NLS-1$
 		{

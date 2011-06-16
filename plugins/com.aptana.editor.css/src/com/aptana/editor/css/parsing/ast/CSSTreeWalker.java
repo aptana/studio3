@@ -11,6 +11,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTreeWalker
 {
+	public void visit(CSSAtRuleNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(CSSAttributeSelectorNode node)
 	{
 		this.visitChildren(node);
