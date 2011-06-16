@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.html;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
@@ -46,6 +47,10 @@ public class HTMLDoubleClickStrategy extends CommonDoubleClickStrategy
 		}
 		catch (BadLocationException x)
 		{
+			if (Platform.inDebugMode())
+			{
+				HTMLPlugin.logError(x.getMessage(), x);
+			}
 		}
 		return false;
 	}
