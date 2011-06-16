@@ -29,19 +29,32 @@ public class HTMLDoubleClickStrategy extends CommonDoubleClickStrategy
 		char current, before, after;
 		try
 		{
-			current = doc.getChar(caretPos);
-			before = doc.getChar(caretPos - 1);
-			after = doc.getChar(caretPos + 1);
-
-			if ((current == '/' || current == '!') && before == '<')
+			// Don't try to match at end of document
+			if (caretPos == doc.getLength())
 			{
-				selectRange(caretPos - 2, caretPos + 1);
-				return true;
+				return false;
 			}
-			else if (current == '<' && (after == '/' || after == '!'))
+
+			current = doc.getChar(caretPos);
+
+			if (caretPos < doc.getLength() - 1)
 			{
-				selectRange(caretPos - 1, caretPos + 2);
-				return true;
+				after = doc.getChar(caretPos + 1);
+				if (current == '<' && (after == '/' || after == '!'))
+				{
+					selectRange(caretPos - 1, caretPos + 2);
+					return true;
+				}
+			}
+
+			if (caretPos > 0)
+			{
+				before = doc.getChar(caretPos - 1);
+				if ((current == '/' || current == '!') && before == '<')
+				{
+					selectRange(caretPos - 2, caretPos + 1);
+					return true;
+				}
 			}
 
 		}
