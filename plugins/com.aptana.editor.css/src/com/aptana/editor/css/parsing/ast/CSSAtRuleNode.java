@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
+import com.aptana.core.util.StringUtil;
+
 public class CSSAtRuleNode extends CSSNode
 {
 	private String fName;
@@ -14,7 +16,19 @@ public class CSSAtRuleNode extends CSSNode
 	private String fText;
 
 	/**
-	 * CSSCharSetNode
+	 * CSSAtRuleNode
+	 * 
+	 * @param encoding
+	 * @param start
+	 * @param end
+	 */
+	public CSSAtRuleNode(String name)
+	{
+		this(name, null);
+	}
+
+	/**
+	 * CSSAtRuleNode
 	 * 
 	 * @param encoding
 	 * @param start
@@ -50,7 +64,13 @@ public class CSSAtRuleNode extends CSSNode
 			StringBuilder buf = new StringBuilder();
 			
 			// TODO: take into acct semicolon vs. block (curly braces)
-			buf.append(fName).append(" ").append(fId).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+			buf.append(fName);
+
+			if (StringUtil.isEmpty(fId) == false)
+			{
+				buf.append(" ").append(fId).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
 			fText = buf.toString();
 		}
 		

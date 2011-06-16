@@ -304,10 +304,6 @@ AtRule
 		{:
 			return new CSSAtRuleNode(a, s);
 		:}
-	|	AT_RULE.a STRING.s LCURLY RCURLY
-		{:
-			return new CSSAtRuleNode(a, s);
-		:}
 	;
 
 // TODO: We probably want some collection nodes, one to hold selectors and one to hold
