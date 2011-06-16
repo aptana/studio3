@@ -10,43 +10,33 @@ package com.aptana.editor.css;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.css.internal.text.rules.AtWordDetector;
+import com.aptana.editor.css.internal.text.rules.CSSHexColorRule;
+import com.aptana.editor.css.internal.text.rules.CSSIdentifierRule;
+import com.aptana.editor.css.internal.text.rules.CSSImportantRule;
+import com.aptana.editor.css.internal.text.rules.CSSNumberRule;
+import com.aptana.editor.css.internal.text.rules.EqualOperatorWordDetector;
 import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
 import com.aptana.editor.css.internal.text.rules.KeywordIdentifierDetector;
-import com.aptana.editor.css.internal.text.rules.SpecialCharacterWordDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 /**
- * @author Chris Williams
+ * CSSCodeScanner
  */
+@SuppressWarnings("nls")
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
-
-	private static final String KEYWORD_IMPORT = "@import"; //$NON-NLS-1$
-	private static final String KEYWORD_PAGE = "@page"; //$NON-NLS-1$
-	private static final String KEYWORD_MEDIA = "@media"; //$NON-NLS-1$
-	private static final String KEYWORD_CHARSET = "@charset"; //$NON-NLS-1$
-	private static final String KEYWORD_FONTFACE = "@font-face"; //$NON-NLS-1$
-	private static final String KEYWORD_NAMESPACE = "@namespace"; //$NON-NLS-1$
-	private static final String WORD_INCLUDES = "~="; //$NON-NLS-1$
-	private static final String WORD_DASHMATCH = "|="; //$NON-NLS-1$
-
-	@SuppressWarnings("nls")
 	private static final String[] DEPRECATED_COLORS = new String[] { "aliceblue", "antiquewhite", "aquamarine",
 			"azure", "beige", "bisque", "blanchedalmond", "blueviolet", "brown", "burlywood", "cadetblue",
 			"chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue",
@@ -66,15 +56,12 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"seagreen", "seashell", "sienna", "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen",
 			"steelblue", "tan", "thistle", "tomato", "turquoise", "violet", "wheat", "whitesmoke", "yellowgreen" };
 
-	@SuppressWarnings("nls")
 	private static final String[] STANDARD_COLORS = { "aqua", "black", "blue", "fuchsia", "gray", "green", "lime",
 			"maroon", "navy", "olive", "orange", "purple", "red", "silver", "teal", "white", "yellow" };
 
-	@SuppressWarnings("nls")
 	private static final String[] MEDIA = { "all", "aural", "braille", "embossed", "handheld", "print", "projection",
 			"screen", "tty", "tv" };
 
-	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col",
 			"colgroup",
@@ -89,10 +76,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var", "header", "nav",
 			"section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
-	@SuppressWarnings("nls")
 	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter" };
 
-	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
 			"background-color", "background-image", "background-origin", "background-position-x",
 			"background-position-y", "background-position", "background-repeat", "background-size", "background",
@@ -122,7 +107,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width",
 			"word-spacing", "z-index" };
 
-	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
 			"baseline", "below", "bidi-override", "blink", "block", "bold", "bolder", "both", "bottom", "break-all",
 			"break-word", "capitalize", "center", "char", "circle", "cjk-ideographic", "col-resize", "collapse",
@@ -143,7 +127,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"upper-roman", "uppercase", "vertical-ideographic", "vertical-text", "visible", "w-resize", "wait",
 			"whitespace", "xx-large", "xx-small", "x-small", "x-large", "zero" };
 
-	@SuppressWarnings("nls")
 	private static final String[] FONT_NAMES = { "arial", "century", "comic", "courier", "garamond", "geneva",
 			"georgia", "helvetica", "impact", "lucida", "monaco", "symbol", "system", "tahoma", "times", "trebuchet",
 			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
@@ -154,9 +137,80 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	public CSSCodeScanner()
 	{
 		List<IRule> rules = createRules();
+
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
+	/**
+	 * addWordsToRule
+	 * 
+	 * @param wordRule
+	 * @param words
+	 * @param tokenType
+	 */
+	private void addWordsToRule(WordRule wordRule, String[] words, CSSTokenType tokenType)
+	{
+		IToken token = createToken(tokenType);
+
+		for (String word : words)
+		{
+			wordRule.addWord(word, token);
+		}
+	}
+
+	/**
+	 * createAtWordsRule
+	 * 
+	 * @return
+	 */
+	protected WordRule createAtWordsRule()
+	{
+		WordRule atRule = new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE));
+
+		atRule.addWord("@import", createToken(CSSTokenType.IMPORT));
+		atRule.addWord("@page", createToken(CSSTokenType.PAGE));
+		atRule.addWord("@media", createToken(CSSTokenType.MEDIA_KEYWORD));
+		atRule.addWord("@charset", createToken(CSSTokenType.CHARSET));
+		atRule.addWord("@font-face", createToken(CSSTokenType.FONTFACE));
+		atRule.addWord("@namespace", createToken(CSSTokenType.NAMESPACE));
+
+		return atRule;
+	}
+
+	/**
+	 * createPunctuatorsRule
+	 * 
+	 * @return
+	 */
+	protected CharacterMapRule createPunctuatorsRule()
+	{
+		CharacterMapRule punctuatorsRule = new CharacterMapRule();
+
+		punctuatorsRule.add(':', createToken(CSSTokenType.COLON));
+		punctuatorsRule.add(';', createToken(CSSTokenType.SEMICOLON));
+		punctuatorsRule.add('{', createToken(CSSTokenType.LCURLY));
+		punctuatorsRule.add('}', createToken(CSSTokenType.RCURLY));
+		punctuatorsRule.add('(', createToken(CSSTokenType.LPAREN));
+		punctuatorsRule.add(')', createToken(CSSTokenType.RPAREN));
+		punctuatorsRule.add('%', createToken(CSSTokenType.PERCENTAGE)); // ?
+		punctuatorsRule.add('[', createToken(CSSTokenType.LBRACKET));
+		punctuatorsRule.add(']', createToken(CSSTokenType.RBRACKET));
+		punctuatorsRule.add(',', createToken(CSSTokenType.COMMA));
+		punctuatorsRule.add('+', createToken(CSSTokenType.PLUS));
+		punctuatorsRule.add('*', createToken(CSSTokenType.STAR));
+		punctuatorsRule.add('>', createToken(CSSTokenType.GREATER));
+		punctuatorsRule.add('/', createToken(CSSTokenType.SLASH));
+		punctuatorsRule.add('=', createToken(CSSTokenType.EQUAL));
+		punctuatorsRule.add('-', createToken(CSSTokenType.MINUS));
+
+		return punctuatorsRule;
+	}
+
+	/**
+	 * createRules
+	 * 
+	 * @return
+	 */
 	protected List<IRule> createRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
@@ -164,9 +218,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		IWordDetector identifierDetector = new KeywordIdentifierDetector();
 		// CSS Properties, values and measurements, HTML tags, media values, functions, color names
-		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
+		WordRule wordRule = new WordRule(new KeywordIdentifierDetector(), Token.UNDEFINED);
 		addWordsToRule(wordRule, getPropertyNames(), CSSTokenType.PROPERTY);
 		addWordsToRule(wordRule, PROPERTY_VALUES, CSSTokenType.VALUE);
 		addWordsToRule(wordRule, HTML_TAGS, CSSTokenType.ELEMENT);
@@ -179,155 +232,50 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
 
 		// keywords that start with @
-		wordRule = new WordRule(new AtWordDetector(), createToken(CSSTokenType.AT_RULE));
-		addAtWords(wordRule);
-		rules.add(wordRule);
+		rules.add(createAtWordsRule());
 
 		// !important
-		rules.add(new ExtendedWordRule(new IWordDetector()
-		{
-
-			public boolean isWordStart(char c)
-			{
-				return c == '!';
-			}
-
-			public boolean isWordPart(char c)
-			{
-				return isWordStart(c) || Character.isLetterOrDigit(c) || Character.isWhitespace(c);
-			}
-		}, createToken(CSSTokenType.IMPORTANT), false)
-		{
-
-			private Pattern pattern;
-
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile("!\\s*important"); //$NON-NLS-1$
-				}
-				return pattern.matcher(word).matches();
-			}
-		});
+		rules.add(new CSSImportantRule(createToken(CSSTokenType.IMPORTANT)));
 
 		// ignore case for font names
-		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
+		wordRule = new WordRule(new KeywordIdentifierDetector(), Token.UNDEFINED, true);
 		addWordsToRule(wordRule, FONT_NAMES, CSSTokenType.FONT);
 		rules.add(wordRule);
 
 		// Browser-specific property names
 		rules.add(createVendorPropertyRules());
 
-		// special character keywords
-		wordRule = new WordRule(new SpecialCharacterWordDetector(), Token.UNDEFINED);
-		wordRule.addWord(WORD_INCLUDES, createToken(CSSTokenType.INCLUDES));
-		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
-		rules.add(wordRule);
+		// multi-character punctuators
+		WordRule punctuatorRule2 = new WordRule(new EqualOperatorWordDetector(), Token.UNDEFINED);
+		punctuatorRule2.addWord("~=", createToken(CSSTokenType.INCLUDES));
+		punctuatorRule2.addWord("|=", createToken(CSSTokenType.DASHMATCH));
+		punctuatorRule2.addWord("^=", createToken(CSSTokenType.BEGINS_WITH));
+		punctuatorRule2.addWord("$=", createToken(CSSTokenType.ENDS_WITH));
+		rules.add(punctuatorRule2);
 
-		rules.add(createPunctuationRules());
+		rules.add(createPunctuatorsRule());
 
 		// rgb values
-		rules.add(createRGBRule());
+		rules.add(new CSSHexColorRule(createToken(CSSTokenType.RGB)));
 
 		// ids
 		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
 
 		rules.addAll(createScannerSpecificRules());
 
-		rules.add(createNumberRule());
+		rules.add(new CSSNumberRule(createToken(CSSTokenType.NUMBER)));
 
 		// identifiers
-		rules.add(new ExtendedWordRule(new KeywordIdentifierDetector(), createToken(CSSTokenType.IDENTIFIER), false)
-		{
-
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (word == null || word.length() == 0)
-				{
-					return false;
-				}
-				if (word.charAt(0) == '-')
-				{
-					return word.length() > 1;
-				}
-				return true;
-			}
-		});
-
-		rules.add(new SingleCharacterRule('-', createToken(CSSTokenType.MINUS)));
+		rules.add(new CSSIdentifierRule(createToken(CSSTokenType.IDENTIFIER)));
 
 		return rules;
 	}
 
-	protected void addAtWords(WordRule wordRule)
-	{
-		wordRule.addWord(KEYWORD_CHARSET, createToken(CSSTokenType.CHARSET));
-		wordRule.addWord(KEYWORD_IMPORT, createToken(CSSTokenType.IMPORT));
-		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
-		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
-		wordRule.addWord(KEYWORD_FONTFACE, createToken(CSSTokenType.FONTFACE));
-		wordRule.addWord(KEYWORD_NAMESPACE, createToken(CSSTokenType.NAMESPACE));
-	}
-
-	private ExtendedWordRule createVendorPropertyRules()
-	{
-		return new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
-		{
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				// Table 1. Vendor Extension Prefixes
-				// Prefix Organisation
-				// -ms- Microsoft
-				// mso- Microsoft Office
-				// -moz- Mozilla Foundation (Gecko-based browsers)
-				// -o- Opera Software
-				// -atsc- Advanced Television Standards Committee
-				// -wap- The WAP Forum
-				// -webkit- Safari (and other WebKit-based browsers)
-				// -khtml-
-
-				return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						|| word.startsWith("-wap-"); //$NON-NLS-1$
-			}
-		};
-	}
-
-	private ExtendedWordRule createRGBRule()
-	{
-		return new ExtendedWordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.RGB), false)
-		{
-
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (word.length() != 4 && word.length() != 7)
-				{
-					return false;
-				}
-				word = word.toLowerCase();
-				for (int i = 1; i < word.length(); i++)
-				{
-					char c = word.charAt(i);
-					if (Character.isDigit(c))
-					{
-						continue;
-					}
-					if ('a' <= c && c <= 'f') // a-f
-					{
-						continue;
-					}
-					return false;
-				}
-				return true;
-			}
-		};
-	}
-
+	/**
+	 * createScannerSpecificRules
+	 * 
+	 * @return
+	 */
 	@SuppressWarnings("nls")
 	protected Collection<? extends IRule> createScannerSpecificRules()
 	{
@@ -355,87 +303,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		return rules;
 	}
 
-	protected IRule createNumberRule()
-	{
-		return new ExtendedWordRule(new IWordDetector()
-		{
-
-			public boolean isWordStart(char c)
-			{
-				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
-			}
-
-			public boolean isWordPart(char c)
-			{
-				return c == '.' || Character.isDigit(c);
-			}
-		}, createToken(CSSTokenType.NUMBER), false)
-		{
-
-			private Pattern pattern;
-
-			@Override
-			protected boolean wordOK(String word, ICharacterScanner scanner)
-			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
-				}
-				return pattern.matcher(word).matches();
-			}
-		};
-	}
-
-	protected CharacterMapRule createPunctuationRules()
-	{
-		CharacterMapRule rule = new CharacterMapRule();
-		// curly braces
-		rule.add('{', createToken(CSSTokenType.LCURLY));
-		rule.add('}', createToken(CSSTokenType.RCURLY));
-		// colon
-		rule.add(':', createToken(CSSTokenType.COLON));
-		// semicolon
-		rule.add(';', createToken(CSSTokenType.SEMICOLON));
-		// %
-		rule.add('%', createToken(CSSTokenType.PERCENTAGE));
-		// comma
-		rule.add(',', createToken(CSSTokenType.COMMA));
-		// parens
-		rule.add('(', createToken(CSSTokenType.LPAREN));
-		rule.add(')', createToken(CSSTokenType.RPAREN));
-		// brackets
-		rule.add('[', createToken(CSSTokenType.LBRACKET));
-		rule.add(']', createToken(CSSTokenType.RBRACKET));
-		// plus
-		rule.add('+', createToken(CSSTokenType.PLUS));
-		// star
-		rule.add('*', createToken(CSSTokenType.STAR));
-		// greater
-		rule.add('>', createToken(CSSTokenType.GREATER));
-		// forward slash
-		rule.add('/', createToken(CSSTokenType.SLASH));
-		// equal
-		rule.add('=', createToken(CSSTokenType.EQUAL));
-		return rule;
-	}
-
-	/**
-	 * addWordsToRule
-	 * 
-	 * @param wordRule
-	 * @param words
-	 * @param tokenType
-	 */
-	private void addWordsToRule(WordRule wordRule, String[] words, CSSTokenType tokenType)
-	{
-		IToken token = createToken(tokenType);
-
-		for (String word : words)
-		{
-			wordRule.addWord(word, token);
-		}
-	}
-
 	/**
 	 * createToken
 	 * 
@@ -447,9 +314,45 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		return createToken(type.getScope());
 	}
 
+	/**
+	 * createToken
+	 * 
+	 * @param scope
+	 * @return
+	 */
 	protected IToken createToken(String scope)
 	{
 		return new Token(scope);
+	}
+
+	/**
+	 * createVendorPropertyRules
+	 * 
+	 * @return
+	 */
+	private ExtendedWordRule createVendorPropertyRules()
+	{
+		return new ExtendedWordRule(new IdentifierWithPrefixDetector('-'), createToken(CSSTokenType.PROPERTY), true)
+		{
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				// Table 1. Vendor Extension Prefixes
+				// Prefix Organisation
+				// -ms- Microsoft
+				// mso- Microsoft Office
+				// -moz- Mozilla Foundation (Gecko-based browsers)
+				// -o- Opera Software
+				// -atsc- Advanced Television Standards Committee
+				// -wap- The WAP Forum
+				// -webkit- Safari (and other WebKit-based browsers)
+				// -khtml-
+
+				return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-")
+						|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-")
+						|| word.startsWith("-wap-");
+			}
+		};
 	}
 
 	/**
@@ -461,5 +364,4 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	{
 		return PROPERTY_NAMES;
 	}
-
 }

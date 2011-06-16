@@ -37,10 +37,6 @@ public class DTDTagScanner extends RuleBasedScanner {
 
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		// TODO: This should require Name directly after the opening <? and it
-		// should reject <?xml
-		rules.add(new MultiLineRule("<?", "?>", createToken(DTDTokenType.PI), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
-
 		// NOTE: There is no String, but we're using this to generalize pubid,
 		// att value, entity value
 		rules.add(new MultiLineRule("\"", "\"", createToken(DTDTokenType.STRING), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -34,6 +34,10 @@ public class DTDSourceScanner extends DTDTagScanner {
 		// Already handled by partitioning, but we need this for the parser
 		rules.add(new MultiLineRule("<!--", "-->", createToken(DTDTokenType.COMMENT), '\0', true));
 
+		// TODO: This should require Name directly after the opening <? and it
+		// should reject <?xml
+		rules.add(new MultiLineRule("<?", "?>", createToken(DTDTokenType.PI), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
+
 		rules.addAll(Arrays.asList(fRules));
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
