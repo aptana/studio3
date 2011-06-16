@@ -57,7 +57,7 @@ public class HTMLParserTest extends TestCase
 	public void testQuotedPair() throws Exception
 	{
 		String source = "<html><head>shouldn't</head><body>can't</body></html>\n";
-		parseTest(source, "<html><head></head><body>can</body></html>\n");
+		parseTest(source, "<html><head>shouldn</head><body>can</body></html>\n");
 	}
 
 	public void testAmpersand() throws Exception
