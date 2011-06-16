@@ -43,7 +43,7 @@ public class HTMLParserTest extends TestCase
 	{
 		String source = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n"
 				+ "<html><head></head><body><p>Text</html>\n";
-		parseTest(source, "<html><head></head><body><p></p></body></html>\n");
+		parseTest(source, "<html><head></head><body><p>Text</p></body></html>\n");
 	}
 
 	public void testEmptyTagInXHTML() throws Exception
@@ -57,13 +57,13 @@ public class HTMLParserTest extends TestCase
 	public void testQuotedPair() throws Exception
 	{
 		String source = "<html><head>shouldn't</head><body>can't</body></html>\n";
-		parseTest(source, "<html><head></head><body></body></html>\n");
+		parseTest(source, "<html><head></head><body>can</body></html>\n");
 	}
 
 	public void testAmpersand() throws Exception
 	{
 		String source = "<body><p>Gifts&nbsp; & Wish Lists</p><h3></h3></body>\n";
-		parseTest(source, "<body><p></p><h3></h3></body>\n");
+		parseTest(source, "<body><p>Gifts</p><h3></h3></body>\n");
 	}
 
 	public void testOutlineAttributes() throws Exception
