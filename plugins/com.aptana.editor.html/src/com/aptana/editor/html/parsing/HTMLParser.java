@@ -63,6 +63,8 @@ public class HTMLParser implements IParser
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
 
+	private boolean previousSymbolSkipped;
+
 	/**
 	 * HTMLParser
 	 */
@@ -186,9 +188,14 @@ public class HTMLParser implements IParser
 		advance();
 		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
 		{
-			if (!isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
+			if (isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
+			{
+				previousSymbolSkipped = true;
+			}
+			else
 			{
 				processSymbol(fCurrentSymbol, source);
+				previousSymbolSkipped = false;
 			}
 			advance();
 		}
@@ -451,7 +458,8 @@ public class HTMLParser implements IParser
 	{
 		// checks if the last child of the current node is also a HTML text node. If so, we should unify both to one
 		// node with a larger offset.
-		if (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == HTMLNodeTypes.TEXT)
+		if (!previousSymbolSkipped
+				&& (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == HTMLNodeTypes.TEXT))
 		{
 			HTMLTextNode node = (HTMLTextNode) fCurrentElement.getLastChild();
 			int start = node.getStartingOffset(), end = fCurrentSymbol.getEnd();
