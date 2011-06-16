@@ -13,16 +13,15 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 
-public class DTDSourceViewerConfiguration extends SimpleSourceViewerConfiguration
-{
+public class DTDSourceViewerConfiguration extends SimpleSourceViewerConfiguration {
+	
 	/**
 	 * DTDSourceViewerConfiguration
 	 * 
 	 * @param preferences
 	 * @param editor
 	 */
-	public DTDSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
-	{
+	public DTDSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
 		super(preferences, editor);
 	}
 
@@ -31,8 +30,7 @@ public class DTDSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
 	 */
 	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration()
-	{
+	public ISourceViewerConfiguration getSourceViewerConfiguration() {
 		return DTDSourceConfiguration.getDefault();
 	}
 }
