@@ -10,8 +10,28 @@ package com.aptana.editor.html.parsing.ast;
 public class HTMLTextNode extends HTMLNode
 {
 
-	public HTMLTextNode(int start, int end)
+	private String fText;
+
+	public HTMLTextNode(String text, int start, int end)
 	{
 		super(HTMLNodeTypes.TEXT, start, end);
+		fText = text;
+	}
+
+	public void setText(String text)
+	{
+		fText = text;
+	}
+
+	@Override
+	public String getText()
+	{
+		return fText;
+	}
+
+	@Override
+	public String toString()
+	{
+		return fText;
 	}
 }

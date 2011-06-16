@@ -248,7 +248,7 @@ public class HTMLParser implements IParser
 				IParseNode node = ParserPoolFactory.parse(language, text);
 				if (node == null)
 				{
-					node = new HTMLTextNode(start, end);
+					node = new HTMLTextNode(text, start, end);
 				}
 				else
 				{
@@ -459,7 +459,8 @@ public class HTMLParser implements IParser
 		}
 		else
 		{
-			fCurrentElement.addChild(new HTMLTextNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()));
+			fCurrentElement.addChild(new HTMLTextNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
+					fCurrentSymbol.getEnd()));
 		}
 	}
 
