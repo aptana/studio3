@@ -12,38 +12,38 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 
-public class DocTypeRule extends MultiLineRule
-{
+/**
+ * 
+ * @author Michael Xia
+ * @author Max Stepanov
+ *
+ */
+public class DocTypeRule extends MultiLineRule {
 
-	private int fEmbeddedStart;
+	private final boolean breakOnDTD;
 
-	public DocTypeRule(IToken token)
-	{
+	public DocTypeRule(IToken token, boolean breakOnDTD) {
 		super("<!DOCTYPE", ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+		this.breakOnDTD = breakOnDTD;
 	}
 
 	@Override
-	protected boolean endSequenceDetected(ICharacterScanner scanner)
-	{
+	protected boolean endSequenceDetected(ICharacterScanner scanner) {
 		int c;
-		while ((c = scanner.read()) != ICharacterScanner.EOF)
-		{
-			if (c == fEscapeCharacter)
-			{
+		int embeddedDTD = 0;
+		while ((c = scanner.read()) != ICharacterScanner.EOF) {
+			if (c == fEscapeCharacter) {
 				// Skip the escaped character.
 				scanner.read();
-			}
-			else if (c == '<')
-			{
-				fEmbeddedStart++;
-			}
-			else if (c == '>')
-			{
-				if (fEmbeddedStart == 0)
-				{
-					return true;
+			} else if (c == '[') {
+				if (breakOnDTD) {
+					break;
 				}
-				fEmbeddedStart--;
+				++embeddedDTD;
+			} else if (c == ']') {
+				--embeddedDTD;
+			} else if (c == '>' && embeddedDTD == 0) {
+				break;
 			}
 		}
 		return true;
