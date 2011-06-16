@@ -69,10 +69,6 @@ class ControlThemer implements IControlThemer
 			{
 				getControl().setFont(getFont());
 			}
-			else
-			{
-				getControl().setFont(null);
-			}
 			getControl().setRedraw(true);
 		}
 	}
@@ -102,8 +98,10 @@ class ControlThemer implements IControlThemer
 
 			control.setBackground(null);
 			control.setForeground(null);
-			control.setFont(null);
-
+			if (useEditorFont())
+			{
+				control.setFont(null);
+			}
 			control.setRedraw(true);
 		}
 	}
@@ -235,7 +233,14 @@ class ControlThemer implements IControlThemer
 				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_FONT))
 				{
 					// Handle the invasive font setting change
-					applyTheme();
+					if (Boolean.parseBoolean((String) event.getNewValue()))
+					{
+						getControl().setFont(getFont());
+					}
+					else
+					{
+						getControl().setFont(null);
+					}
 				}
 				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
 				{
