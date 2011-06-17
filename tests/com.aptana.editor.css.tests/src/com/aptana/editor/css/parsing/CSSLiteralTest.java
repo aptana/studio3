@@ -154,13 +154,6 @@ public class CSSLiteralTest extends CSSTokensTest
 		assertToken("10khz", CSSTokenType.FREQUENCY, 0, 5); //$NON-NLS-1$
 	}
 
-	public void testColor()
-	{
-		assertToken("#808080", CSSTokenType.RGB, 0, 7); //$NON-NLS-1$
-	}
-
-	public void testColorRGB()
-	{
-		assertToken("#abc", CSSTokenType.RGB, 0, 4); //$NON-NLS-1$
-	}
+	// NOTE: Moved color tests to CSSSpecialTokenHandlingTest now that we have special handling when we're inside and
+	// outside of a rule body
 }

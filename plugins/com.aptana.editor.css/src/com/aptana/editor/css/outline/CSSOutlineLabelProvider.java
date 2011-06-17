@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
 import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 
 public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
@@ -32,5 +33,15 @@ public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
 			return DECLARATION_ICON;
 		}
 		return super.getImage(element);
+	}
+
+	@Override
+	public String getText(Object element)
+	{
+		if (element instanceof CSSNode)
+		{
+			return ((CSSNode) element).getText();
+		}
+		return super.getText(element);
 	}
 }

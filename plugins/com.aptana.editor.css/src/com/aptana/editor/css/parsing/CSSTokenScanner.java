@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -40,6 +41,9 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 @SuppressWarnings("nls")
 public class CSSTokenScanner extends RuleBasedScanner
 {
+	private boolean _inMediaRule;
+	private int _curlyBraceCount;
+
 	/**
 	 * CSSTokenScanner
 	 */
@@ -250,5 +254,72 @@ public class CSSTokenScanner extends RuleBasedScanner
 		rules.add(createUnitRule("m?s", CSSTokenType.TIME));
 
 		return rules;
+	}
+
+	/**
+	 * isOutsideRule
+	 * 
+	 * @return
+	 */
+	private boolean isOutsideRule()
+	{
+		return this._curlyBraceCount < (this._inMediaRule ? 2 : 1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#nextToken()
+	 */
+	@Override
+	public IToken nextToken()
+	{
+		IToken token = super.nextToken();
+		Object data = token.getData();
+
+		if (data instanceof CSSTokenType)
+		{
+			switch ((CSSTokenType) data)
+			{
+				case MEDIA_KEYWORD:
+					this._inMediaRule = true;
+					break;
+
+				case LCURLY:
+					this._curlyBraceCount++;
+					break;
+
+				case RCURLY:
+					this._curlyBraceCount--;
+
+					if (this._curlyBraceCount == 0 && this._inMediaRule)
+					{
+						this._inMediaRule = false;
+					}
+					break;
+
+				case RGB:
+					// fixup colors in selectors
+					if (isOutsideRule())
+					{
+						token = createToken(CSSTokenType.ID);
+					}
+					break;
+			}
+		}
+
+		return token;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
+	 */
+	@Override
+	public void setRange(IDocument document, int offset, int length)
+	{
+		super.setRange(document, offset, length);
+
+		this._inMediaRule = false;
+		this._curlyBraceCount = 0;
 	}
 }

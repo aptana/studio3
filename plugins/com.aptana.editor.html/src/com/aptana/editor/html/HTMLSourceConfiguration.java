@@ -68,15 +68,16 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			{ IHTMLConstants.CONTENT_TYPE_HTML, ISVGConstants.CONTENT_TYPE_SVG } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
-			new DocTypeRule(new Token(CDATA)),
+			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", getToken(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
+			new DocTypeRule(getToken(CDATA)),
 			new PartitionerSwitchingIgnoreRule(
-					new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
+					new MultiLineRule("<!--", "-->", getToken(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("script", new ExtendedToken(HTML_SCRIPT), true), //$NON-NLS-1$
 			new TagRule("style", new ExtendedToken(HTML_STYLE), true), //$NON-NLS-1$
 			new TagRule("svg", new ExtendedToken(HTML_SVG), true), //$NON-NLS-1$
-			new TagRule("/", new Token(HTML_TAG_CLOSE)), //$NON-NLS-1$
-			new TagRule(new Token(HTML_TAG)) };
+			new TagRule("/", getToken(HTML_TAG_CLOSE)), //$NON-NLS-1$
+			new TagRule(getToken(HTML_TAG))
+		};
 
 	private HTMLScanner htmlScanner;
 	private HTMLTagScanner tagScanner;

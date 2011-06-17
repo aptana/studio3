@@ -7,39 +7,50 @@
  */
 package com.aptana.editor.xml;
 
-import org.eclipse.jface.text.rules.IPartitionTokenScanner;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
 
-import com.aptana.editor.common.IPartitioningConfiguration;
-import com.aptana.editor.common.SimpleDocumentProvider;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.NullPartitionerSwitchStrategy;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 
-public class XMLDocumentProvider extends SimpleDocumentProvider
-{
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
-	 */
+/**
+ * 
+ * @author Max Stepanov
+ *
+ */
+public class XMLDocumentProvider extends CommonDocumentProvider {
+
 	@Override
-	public IPartitionTokenScanner createPartitionScanner()
-	{
-		return new XMLPartitionScanner();
+	public void connect(Object element) throws CoreException {
+		super.connect(element);
+
+		IDocument document = getDocument(element);
+		if (document != null) {
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration
+					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
+					new NullPartitionerSwitchStrategy());
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, XMLSourceConfiguration
+					.getDefault().getContentTypes());
+			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
+					XMLSourceConfiguration.getDefault());
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
-	protected String getDefaultContentType(String filename)
-	{
+	protected String getDefaultContentType(String filename) {
 		return IXMLConstants.CONTENT_TYPE_XML;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
-	 */
-	@Override
-	public IPartitioningConfiguration getPartitioningConfiguration()
-	{
-		return XMLSourceConfiguration.getDefault();
-	}
 }

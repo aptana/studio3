@@ -10,7 +10,12 @@ package com.aptana.editor.css;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
@@ -37,6 +42,8 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 @SuppressWarnings("nls")
 public class CSSCodeScanner extends BufferedRuleBasedScanner
 {
+	private static final String KEYWORD_MEDIA = "@media";
+
 	private static final String[] DEPRECATED_COLORS = new String[] { "aliceblue", "antiquewhite", "aquamarine",
 			"azure", "beige", "bisque", "blanchedalmond", "blueviolet", "brown", "burlywood", "cadetblue",
 			"chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue",
@@ -102,10 +109,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left", "padding-right", "padding-top",
 			"padding", "page-break-after", "page-break-before", "page-break-inside", "page", "pause-after",
 			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "resize", "richness",
-			"right", "size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "stress",
-			"table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform", "top",
-			"unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width",
-			"word-spacing", "z-index" };
+			"right", "size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "src",
+			"stress", "table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform",
+			"top", "unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows",
+			"width", "word-spacing", "z-index" };
 
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
 			"baseline", "below", "bidi-override", "blink", "block", "bold", "bolder", "both", "bottom", "break-all",
@@ -130,6 +137,14 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	private static final String[] FONT_NAMES = { "arial", "century", "comic", "courier", "garamond", "geneva",
 			"georgia", "helvetica", "impact", "lucida", "monaco", "symbol", "system", "tahoma", "times", "trebuchet",
 			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
+
+	private static final Pattern CURLY_MEDIA_PATTERN = Pattern.compile("([{}]|" + KEYWORD_MEDIA + ")");
+
+	/**
+	 * Keep the level of curlies...
+	 */
+	private int fCurlyState;
+	private boolean fInMedia;
 
 	/**
 	 * CodeScanner
@@ -169,7 +184,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		atRule.addWord("@import", createToken(CSSTokenType.IMPORT));
 		atRule.addWord("@page", createToken(CSSTokenType.PAGE));
-		atRule.addWord("@media", createToken(CSSTokenType.MEDIA_KEYWORD));
+		atRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
 		atRule.addWord("@charset", createToken(CSSTokenType.CHARSET));
 		atRule.addWord("@font-face", createToken(CSSTokenType.FONTFACE));
 		atRule.addWord("@namespace", createToken(CSSTokenType.NAMESPACE));
@@ -276,7 +291,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	protected Collection<? extends IRule> createScannerSpecificRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
@@ -311,7 +325,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 */
 	protected IToken createToken(CSSTokenType type)
 	{
-		return createToken(type.getScope());
+		return new Token(type);
 	}
 
 	/**
@@ -364,4 +378,139 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	{
 		return PROPERTY_NAMES;
 	}
+
+	@Override
+	public IToken nextToken()
+	{
+		// FIXME We're also not generating the meta scopes for properties and selectors!
+		// "meta.property-name.css", "meta.property-value.css", and "meta.selector.css"
+		IToken token = super.nextToken();
+		if (token.isEOF())
+		{
+			return token;
+		}
+		if (CSSTokenType.MEDIA_KEYWORD == token.getData())
+		{
+			this.fInMedia = true;
+			this.fCurlyState = 0;
+		}
+		else if (CSSTokenType.LCURLY == token.getData())
+		{
+			// Use a different punctuation scope if opening @media
+			if (insideMedia() && this.fCurlyState == 0)
+			{
+				token = createToken(CSSTokenType.LCURLY_MEDIA);
+			}
+			this.fCurlyState++;
+		}
+
+		StringBuilder builder = new StringBuilder();
+		if (insideMedia())
+		{
+			builder.append(CSSTokenType.META_MEDIA.getScope()).append(' ');
+		}
+		if (insideRule())
+		{
+			builder.append(CSSTokenType.META_RULE.getScope()).append(' ');
+		}
+
+		if (CSSTokenType.RCURLY == token.getData())
+		{
+			this.fCurlyState--;
+			if (this.fCurlyState <= 0 && insideMedia())
+			{
+				token = createToken(CSSTokenType.RCURLY_MEDIA);
+				this.fInMedia = false;
+			}
+		}
+
+		if (token.isOther())
+		{
+			builder.append(((CSSTokenType) token.getData()).getScope());
+		}
+		else if (token.isWhitespace())
+		{
+			if (builder.length() > 0)
+			{
+				// remove the trailing space
+				builder.deleteCharAt(builder.length() - 1);
+			}
+			else
+			{
+				// return whitespace token unchanged...
+				return token;
+			}
+		}
+		return createToken(builder.toString());
+	}
+
+	@Override
+	public void setRange(IDocument document, int offset, int length)
+	{
+		super.setRange(document, offset, length);
+
+		this.fCurlyState = 0;
+		this.fInMedia = false;
+		if (offset > 0)
+		{
+			String previous = null;
+			try
+			{
+				ITypedRegion[] partitions = fDocument.computePartitioning(0, offset);
+				for (ITypedRegion region : partitions)
+				{
+					// skip strings and comments
+					if (CSSSourceConfiguration.MULTILINE_COMMENT.equals(region.getType())
+							|| CSSSourceConfiguration.STRING.equals(region.getType()))
+					{
+						continue;
+					}
+					previous = fDocument.get(region.getOffset(), region.getLength());
+					// Calculate curly nesting level and whether we're inside media
+					Matcher m = CURLY_MEDIA_PATTERN.matcher(previous);
+					while (m.find())
+					{
+						String found = m.group();
+						if ("{".equals(found))
+						{
+							this.fCurlyState++;
+						}
+						else if ("}".equals(found))
+						{
+							this.fCurlyState--;
+							if (this.fCurlyState <= 0 && insideMedia())
+							{
+								this.fInMedia = false;
+							}
+						}
+						else if (KEYWORD_MEDIA.equals(found))
+						{
+							this.fInMedia = true;
+							this.fCurlyState = 0;
+						}
+					}
+				}
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
+		}
+	}
+
+	private boolean insideRule()
+	{
+		if (insideMedia())
+		{
+			// media adds a curly nesting level!
+			return this.fCurlyState > 1;
+		}
+		return this.fCurlyState > 0;
+	}
+
+	private boolean insideMedia()
+	{
+		return this.fInMedia;
+	}
+
 }

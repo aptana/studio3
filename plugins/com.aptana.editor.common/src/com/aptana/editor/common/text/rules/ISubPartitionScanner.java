@@ -81,4 +81,10 @@ public interface ISubPartitionScanner {
 	 */
 	public IToken getLastToken();
 	
+	/**
+	 * Returns token (if any) to resume after switching partitions
+	 * @return
+	 */
+	public IToken getResumeToken();
+
 }
