@@ -202,7 +202,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		debugSlider.setSelection(getPreferenceStore().getDefaultInt(
 				com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL));
-		categoryViewer.setCheckedElements(null);
+		categoryViewer.setCheckedElements(new Object[0]);
 		super.performDefaults();
 	}
 
@@ -214,7 +214,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	public boolean performOk()
 	{
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL,
+		store.setValue(ICorePreferenceConstants.PREF_DEBUG_LEVEL,
 				getStatusLevel(debugSlider.getSelection()).toString());
 
 		String[] currentOptions = EclipseUtil.getCurrentDebuggableComponents();
@@ -229,11 +229,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 
 		String[] newOptions = al.toArray(new String[al.size()]);
 
-		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", newOptions) //$NON-NLS-1$
-		);
-
-		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", newOptions) //$NON-NLS-1$
-		);
+		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", newOptions)); //$NON-NLS-1$
 
 		EclipseUtil.setBundleDebugOptions(currentOptions, true);
 		EclipseUtil.setPlatformDebugging(toggleComponents.getBooleanValue());

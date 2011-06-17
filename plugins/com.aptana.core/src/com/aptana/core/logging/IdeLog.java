@@ -82,14 +82,12 @@ public final class IdeLog
 		}
 		else
 		{
-			StatusLevel statusPreference = level;
-
-			if (statusPreference.equals(StatusLevel.OFF))
+			if (level.equals(StatusLevel.OFF))
 			{
 				return false;
 			}
 
-			return statusPreference.compareTo(getStatusLevel(debugLevel)) >= 0;
+			return level.compareTo(getStatusLevel(debugLevel)) >= 0;
 		}
 	}
 

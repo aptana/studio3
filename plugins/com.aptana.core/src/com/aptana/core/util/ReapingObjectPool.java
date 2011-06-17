@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 class ConnectionReaper extends Thread
 {
@@ -119,7 +120,8 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		}
 		if (locked != null && locked.size() > 0)
 		{
-			CorePlugin.logWarning(MessageFormat.format(
+			IdeLog.logWarning(CorePlugin.getDefault(),
+					MessageFormat.format(
 					"Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
 		}
 		try

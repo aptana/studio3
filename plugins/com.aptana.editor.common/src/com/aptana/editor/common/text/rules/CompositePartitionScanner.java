@@ -308,7 +308,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	}
 
 	private void trace(String string) {
-		CommonEditorPlugin.trace(string);
+		CommonEditorPlugin.logInfo(string);
 	}
 
 	private boolean hasSwitchingSequence() {
