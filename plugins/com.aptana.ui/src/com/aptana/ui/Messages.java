@@ -31,7 +31,6 @@ public class Messages extends NLS
 
 	public static String AptanaPreferencePage_Auto_Migrate_Projects;
 	public static String AptanaPreferencePage_Auto_Refresh_Projects;
-	public static String AptanaPreferencePage_EnableDebugModeLabel;
 
 	public static String EclipseDiagnosticLog_eclipse_version;
 	public static String EclipseDiagnosticLog_host_os;

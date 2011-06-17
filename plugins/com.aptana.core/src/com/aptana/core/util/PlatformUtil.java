@@ -7,6 +7,7 @@
  */
 package com.aptana.core.util;
 
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,17 +21,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.internal.platform.CoreMacOSX;
 import com.aptana.core.internal.platform.CoreNatives;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("restriction")
 public final class PlatformUtil
 {
 	
@@ -109,8 +110,7 @@ public final class PlatformUtil
 					return list.toArray(new ProcessItem[list.size()]);
 				}
 			} catch (UnsatisfiedLinkError e) {
-				CorePlugin.log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID,
-						Messages.PlatformUtils_CoreLibraryNotFound, e));
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS())) {
 			Process process = null;
@@ -236,8 +236,7 @@ public final class PlatformUtil
 			try {
 				currentPid = CoreNatives.GetCurrentProcessId();
 			} catch (UnsatisfiedLinkError e) {
-				CorePlugin.log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID,
-						Messages.PlatformUtils_CoreLibraryNotFound, e));
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			Process process = null;
@@ -298,8 +297,7 @@ public final class PlatformUtil
 			try {
 				CoreNatives.KillProcess(pid);
 			} catch (UnsatisfiedLinkError e) {
-				CorePlugin.log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID,
-						Messages.PlatformUtils_CoreLibraryNotFound, e));
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			try {
@@ -486,8 +484,8 @@ public final class PlatformUtil
 							}
 						}
 					} catch (IOException e) {
-						CorePlugin.log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, MessageFormat.format(
-								"Reading {0} fails", plist.getAbsolutePath()), e)); //$NON-NLS-1$
+						IdeLog.logError(CorePlugin.getDefault(),
+								MessageFormat.format("Reading {0} fails", plist.getAbsolutePath()), e, null); //$NON-NLS-1$
 					} finally {
 						if (r != null) {
 							try {
@@ -528,4 +526,5 @@ public final class PlatformUtil
 		}
 		return file;
 	}
+
 }

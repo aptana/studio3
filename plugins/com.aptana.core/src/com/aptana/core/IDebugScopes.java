@@ -9,13 +9,18 @@ package com.aptana.core;
 public interface IDebugScopes
 {
 	/**
+	 * Items related to the logging process
+	 */
+	String LOGGER = CorePlugin.PLUGIN_ID + "/debug/logger"; //$NON-NLS-1$
+
+	/**
 	 * Items related to the indexing process
 	 */
-	String INDEXER = "indexer"; //$NON-NLS-1$
+	String INDEXER = CorePlugin.PLUGIN_ID + "/debug/indexer"; //$NON-NLS-1$
 
 	/**
 	 * Items related to running things on hte command line
 	 */
-	String SHELL = "shell"; //$NON-NLS-1$
+	String SHELL = CorePlugin.PLUGIN_ID + "/debug/shell"; //$NON-NLS-1$
 
 }

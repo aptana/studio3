@@ -13,6 +13,21 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.ui.preferences.messages"; //$NON-NLS-1$
 
+	public static String TroubleshootingPreferencePage_DebugSpecificComponents;
+
+	public static String TroubleshootingPreferencePage_LBL_DebuggingOutputLevel;
+	public static String TroubleshootingPreferencePage_LBL_Errors;
+	public static String TroubleshootingPreferencePage_LBL_All;
+	public static String TroubleshootingPreferencePage_LBL_UnknownLoggingLevel;
+	public static String TroubleshootingPreferencePage_LBL_AllDebuggingInformation;
+	public static String TroubleshootingPreferencePage_LBL_ErrorsAndImportant;
+	public static String TroubleshootingPreferencePage_LBL_OnlyError;
+	public static String TroubleshootingPreferencePage_LBL_NoDebuggingOutput;
+
+	public static String TroubleshootingPreferencePage_ShowHiddenProcesses;
+
+	public static String TroubleshootingPreferencePage_TroubleshootingPageHeader;
+
 	public static String GenericRootPage_genericPerferencesPageMessage;
 	public static String GenericRootPage_noAvailablePages;
 	public static String GenericRootPage_preferences;

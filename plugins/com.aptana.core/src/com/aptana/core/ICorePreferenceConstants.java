@@ -35,6 +35,21 @@ public interface ICorePreferenceConstants
 	String PREF_AUTO_REFRESH_PROJECTS = "auto_refresh_projects"; //$NON-NLS-1$
 
 	/**
+	 * The current level of debugging
+	 */
+	String PREF_DEBUG_LEVEL = "pref_debug_level"; //$NON-NLS-1$
+
+	/**
+	 * Are we debugging all components, or jsut some of them
+	 */
+	String PREF_ENABLE_COMPONENT_DEBUGGING = "pref_enable_component_debugging"; //$NON-NLS-1$
+
+	/**
+	 * The list of components to debug
+	 */
+	String PREF_DEBUG_COMPONENT_LIST = "pref_debug_component_list"; //$NON-NLS-1$
+
+	/**
 	 * The preference key for the comma-separated list of task tag names.
 	 */
 	public static final String TASK_TAG_NAMES = "com.aptana.editor.common.taskTagNames"; //$NON-NLS-1$
