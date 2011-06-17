@@ -34,7 +34,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 		prefs.put(
 				com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
-				".#:\t"); //$NON-NLS-1$
+				".#:"); //$NON-NLS-1$
 		prefs.put(
 				com.aptana.editor.common.contentassist.IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS,
 				"(,"); //$NON-NLS-1$

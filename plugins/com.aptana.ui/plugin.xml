@@ -255,6 +255,15 @@
       </page>
    </extension>
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ui.preferences.TroubleshootingPreferencePage"
+            id="com.aptana.ui.TroubleshootingPreferencePage"
+            name="Troubleshooting">
+      </page>
+   </extension>
+   <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.ui.globalActionSet"
