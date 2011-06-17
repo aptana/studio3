@@ -7,9 +7,6 @@
  */
 package com.aptana.editor.css;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -17,6 +14,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.logging.IdeLog;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -78,27 +77,6 @@ public class CSSPlugin extends AbstractUIPlugin
 	}
 
 	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void logError(CoreException e)
-	{
-		getDefault().getLog().log(e.getStatus());
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
-	}
-
-	/**
 	 * The constructor
 	 */
 	public CSSPlugin()
@@ -139,6 +117,30 @@ public class CSSPlugin extends AbstractUIPlugin
 			cssDocumentProvider = new CSSDocumentProvider();
 		}
 		return cssDocumentProvider;
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
 	}
 
 }
