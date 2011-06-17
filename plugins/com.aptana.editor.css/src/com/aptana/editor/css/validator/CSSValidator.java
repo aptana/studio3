@@ -69,7 +69,10 @@ public class CSSValidator implements IValidator
 	private static final String[] CSS3_PROPERTIES = { "behavior", "box-shadow", "column-count", "column-width",
 			"column-gap", "column-rule", "border-radius", "background-clip", "background-origin",
 			"border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
-			"border-top-left-radius", "font-family", "font-weight", "font-style", "resize", };
+			"border-top-left-radius", "font-family", "font-weight", "font-style", "resize", "size", "src" };
+
+	@SuppressWarnings("nls")
+	private static final String[] CSS3_AT_RULES = { "@namespace" };
 
 	// other messages that should be filtered automatically
 	@SuppressWarnings("nls")
@@ -266,7 +269,7 @@ public class CSSValidator implements IValidator
 			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (!manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message)
-					&& !isFiltered(message))
+					&& !containsCSS3AtRule(message) && !isFiltered(message))
 			{
 				// there is no info on the line offset or the length of the errored text
 				items.add(manager.addError(message, lineNumber, 0, 0, sourcePath));
@@ -396,7 +399,19 @@ public class CSSValidator implements IValidator
 	{
 		for (String property : CSS3_PROPERTIES)
 		{
-			if (message.indexOf(property) > -1)
+			if (message.indexOf("Property " + property) > -1) //$NON-NLS-1$
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean containsCSS3AtRule(String message)
+	{
+		for (String rule : CSS3_AT_RULES)
+		{
+			if (message.indexOf(MessageFormat.format("the at-rule {0} is not implemented", rule)) > -1) //$NON-NLS-1$
 			{
 				return true;
 			}

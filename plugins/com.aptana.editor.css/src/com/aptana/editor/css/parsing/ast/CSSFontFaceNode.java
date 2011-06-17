@@ -14,6 +14,8 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSFontFaceNode extends CSSNode
 {
+	private static final String FONTFACE = "@font-face"; //$NON-NLS-1$
+
 	/**
 	 * CSSFontFaceNode
 	 */
@@ -33,7 +35,7 @@ public class CSSFontFaceNode extends CSSNode
 
 		if (declarations != null)
 		{
-			this.setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
+			setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
 		}
 	}
 
@@ -70,8 +72,13 @@ public class CSSFontFaceNode extends CSSNode
 	public CSSDeclarationNode[] getDeclarations()
 	{
 		List<IParseNode> list = Arrays.asList(getChildren());
-
 		return list.toArray(new CSSDeclarationNode[list.size()]);
+	}
+
+	@Override
+	public String getText()
+	{
+		return FONTFACE;
 	}
 
 	/*
@@ -93,12 +100,11 @@ public class CSSFontFaceNode extends CSSNode
 	{
 		StringBuilder text = new StringBuilder();
 
-		text.append("@font-face "); //$NON-NLS-1$
-		text.append("{"); //$NON-NLS-1$
+		text.append(FONTFACE);
+		text.append(" {"); //$NON-NLS-1$
 
 		CSSDeclarationNode[] declarations = getDeclarations();
 		int size = declarations.length;
-
 		for (int i = 0; i < size; ++i)
 		{
 			text.append(declarations[i]);
@@ -108,7 +114,6 @@ public class CSSFontFaceNode extends CSSNode
 				text.append(" "); //$NON-NLS-1$
 			}
 		}
-
 		text.append("}"); //$NON-NLS-1$
 
 		return text.toString();
