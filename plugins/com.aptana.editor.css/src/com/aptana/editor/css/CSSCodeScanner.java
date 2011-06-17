@@ -109,10 +109,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left", "padding-right", "padding-top",
 			"padding", "page-break-after", "page-break-before", "page-break-inside", "page", "pause-after",
 			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "resize", "richness",
-			"right", "size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "stress",
-			"table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform", "top",
-			"unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width",
-			"word-spacing", "z-index" };
+			"right", "size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "src",
+			"stress", "table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform",
+			"top", "unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows",
+			"width", "word-spacing", "z-index" };
 
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
 			"baseline", "below", "bidi-override", "blink", "block", "bold", "bolder", "both", "bottom", "break-all",
@@ -291,7 +291,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	protected Collection<? extends IRule> createScannerSpecificRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
