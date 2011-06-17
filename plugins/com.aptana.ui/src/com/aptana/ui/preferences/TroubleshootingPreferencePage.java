@@ -202,7 +202,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		debugSlider.setSelection(getPreferenceStore().getDefaultInt(
 				com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL));
-		categoryViewer.setCheckedElements(null);
+		categoryViewer.setCheckedElements(new Object[0]);
 		super.performDefaults();
 	}
 
