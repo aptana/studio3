@@ -9,7 +9,6 @@ package com.aptana.core.logging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +16,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
@@ -36,11 +33,12 @@ public final class IdeLog
 
 	private static Map<Plugin, List<IStatus>> earlyMessageCache = new HashMap<Plugin, List<IStatus>>();
 	private static boolean caching = true;
+	private static StatusLevel level = StatusLevel.ERROR;
 
-	public static int OFF = 0;
-	public static int ERROR = 1;
-	public static int WARNING = 2;
-	public static int INFO = 3;
+	public static enum StatusLevel
+	{
+		OFF, ERROR, WARNING, INFO
+	};
 
 	/**
 	 * Flushes any cached logging messages
@@ -48,20 +46,18 @@ public final class IdeLog
 	public static void flushCache()
 	{
 		caching = false;
-		Iterator<Plugin> iter = earlyMessageCache.keySet().iterator();
-		while (iter.hasNext())
+
+		for (Map.Entry<Plugin, List<IStatus>> entry : earlyMessageCache.entrySet())
 		{
-			Plugin plugin = iter.next();
-			List<IStatus> messages = earlyMessageCache.get(plugin);
-			for (int i = 0; i < messages.size(); i++)
+			for (IStatus status : entry.getValue())
 			{
-				Status status = (Status) messages.get(i);
-				if (status.getSeverity() == IStatus.ERROR || isDebugging(plugin, status.getSeverity(), null))
+				if (status.getSeverity() == IStatus.ERROR || isDebugging(entry.getKey(), status.getSeverity(), null))
 				{
-					log(plugin, status.getSeverity(), status.getMessage(), null, status.getException());
+					log(entry.getKey(), status.getSeverity(), status.getMessage(), null, status.getException());
 				}
 			}
 		}
+
 		earlyMessageCache.clear();
 	}
 
@@ -71,18 +67,6 @@ public final class IdeLog
 	private IdeLog()
 	{
 
-	}
-
-	/**
-	 * Logs an error
-	 * 
-	 * @param plugin
-	 * @param message
-	 *            The message to log
-	 */
-	public static void logError(Plugin plugin, String message, String scope)
-	{
-		log(plugin, IStatus.ERROR, message, scope, null);
 	}
 
 	/**
@@ -96,20 +80,16 @@ public final class IdeLog
 		{
 			return true;
 		}
-		else if (CorePlugin.getDefault() != null)
+		else
 		{
-			int statusPreference = getSeverityPreference();
+			StatusLevel statusPreference = level;
 
-			if (statusPreference == OFF)
+			if (statusPreference.equals(StatusLevel.OFF))
 			{
 				return false;
 			}
 
-			return statusPreference >= getStatusLevel(debugLevel);
-		}
-		else
-		{
-			return false;
+			return statusPreference.compareTo(getStatusLevel(debugLevel)) >= 0;
 		}
 	}
 
@@ -118,21 +98,37 @@ public final class IdeLog
 	 * 
 	 * @return
 	 */
-	public static int getSeverityPreference()
+	public static StatusLevel getCurrentSeverity()
 	{
-		return Platform.getPreferencesService().getInt(CorePlugin.PLUGIN_ID, ICorePreferenceConstants.PREF_DEBUG_LEVEL,
-				OFF, null);
+		return level;
 	}
 
 	/**
-	 * Gets the current severity preference
+	 * Sets the current severity preference
+	 */
+	public static void setCurrentSeverity(StatusLevel severity)
+	{
+		level = severity;
+	}
+
+	/**
+	 * Returns the current severity preference
 	 * 
 	 * @return
 	 */
-	public static void setSeverityPreference(int severity)
+	public static StatusLevel getSeverityPreference()
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
-		prefs.putInt(ICorePreferenceConstants.PREF_DEBUG_LEVEL, severity);
+		try
+		{
+			return Enum.valueOf(
+					StatusLevel.class,
+					Platform.getPreferencesService().getString(CorePlugin.PLUGIN_ID,
+							ICorePreferenceConstants.PREF_DEBUG_LEVEL, StatusLevel.ERROR.toString(), null));
+		}
+		catch (IllegalArgumentException ex)
+		{
+			return StatusLevel.ERROR;
+		}
 	}
 
 	/**
@@ -174,25 +170,25 @@ public final class IdeLog
 	 * @param status
 	 * @return
 	 */
-	private static int getStatusLevel(int status)
+	private static StatusLevel getStatusLevel(int status)
 	{
 		switch (status)
 		{
 			case IStatus.INFO:
 			{
-				return INFO;
+				return StatusLevel.INFO;
 			}
 			case IStatus.WARNING:
 			{
-				return WARNING;
+				return StatusLevel.WARNING;
 			}
 			case IStatus.ERROR:
 			{
-				return ERROR;
+				return StatusLevel.ERROR;
 			}
 			default:
 			{
-				return OFF;
+				return StatusLevel.OFF;
 			}
 		}
 	}
@@ -202,9 +198,33 @@ public final class IdeLog
 	 * 
 	 * @param plugin
 	 * @param message
+	 *            The message to log
+	 */
+	public static void logError(Plugin plugin, String message, Throwable th)
+	{
+		log(plugin, IStatus.ERROR, message, null, th);
+	}
+
+	/**
+	 * Logs an error
+	 * 
+	 * @param plugin
+	 * @param message
+	 *            The message to log
+	 */
+	public static void logError(Plugin plugin, String message, String scope)
+	{
+		log(plugin, IStatus.ERROR, message, scope, null);
+	}
+
+	/**
+	 * Logs an error
+	 * 
+	 * @param plugin
+	 * @param message
 	 * @param th
 	 */
-	public static void logError(Plugin plugin, String message, String scope, Throwable th)
+	public static void logError(Plugin plugin, String message, Throwable th, String scope)
 	{
 		if (isDebugging(plugin, IStatus.ERROR, scope))
 		{
@@ -221,18 +241,11 @@ public final class IdeLog
 	 * 
 	 * @param plugin
 	 * @param message
-	 * @param th
+	 *            The message to log
 	 */
-	public static void logWarning(Plugin plugin, String message, String scope, Throwable th)
+	public static void logWarning(Plugin plugin, String message)
 	{
-		if (isDebugging(plugin, IStatus.WARNING, scope))
-		{
-			log(plugin, IStatus.WARNING, message, scope, th);
-		}
-		else
-		{
-			logTrace(plugin, IStatus.INFO, message, scope, th);
-		}
+		logWarning(plugin, message, null, null);
 	}
 
 	/**
@@ -244,14 +257,38 @@ public final class IdeLog
 	 */
 	public static void logWarning(Plugin plugin, String message, String scope)
 	{
+		logWarning(plugin, message, null, scope);
+	}
+
+	/**
+	 * Logs a warning
+	 * 
+	 * @param plugin
+	 * @param message
+	 * @param th
+	 */
+	public static void logWarning(Plugin plugin, String message, Throwable th, String scope)
+	{
 		if (isDebugging(plugin, IStatus.WARNING, scope))
 		{
-			log(plugin, IStatus.WARNING, message, scope, null);
+			log(plugin, IStatus.WARNING, message, scope, th);
 		}
 		else
 		{
-			logTrace(plugin, IStatus.INFO, message, scope, null);
+			logTrace(plugin, IStatus.INFO, message, scope, th);
 		}
+	}
+
+
+	/**
+	 * Logs an error
+	 * 
+	 * @param plugin
+	 * @param message
+	 */
+	public static void logInfo(Plugin plugin, String message)
+	{
+		logInfo(plugin, message, null, null);
 	}
 
 	/**
@@ -262,14 +299,7 @@ public final class IdeLog
 	 */
 	public static void logInfo(Plugin plugin, String message, String scope)
 	{
-		if (isDebugging(plugin, IStatus.INFO, scope))
-		{
-			log(plugin, IStatus.INFO, message, scope, null);
-		}
-		else
-		{
-			logTrace(plugin, IStatus.INFO, message, scope, null);
-		}
+		logInfo(plugin, message, null, scope);
 	}
 
 	/**
@@ -279,7 +309,7 @@ public final class IdeLog
 	 * @param message
 	 * @param th
 	 */
-	public static void logInfo(Plugin plugin, String message, String scope, Throwable th)
+	public static void logInfo(Plugin plugin, String message, Throwable th, String scope)
 	{
 		if (isDebugging(plugin, IStatus.INFO, scope))
 		{
@@ -331,6 +361,17 @@ public final class IdeLog
 			}
 		}
 
+	}
+
+	/**
+	 * Logs an item to the current plugin's log
+	 * 
+	 * @param plugin
+	 * @param status
+	 */
+	public static void log(Plugin plugin, IStatus status)
+	{
+		log(plugin, status, null);
 	}
 
 	/**

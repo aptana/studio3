@@ -9,8 +9,8 @@ package com.aptana.ui.preferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -36,7 +36,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
-import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.logging.IdeLog.StatusLevel;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.SWTUtils;
 
@@ -50,6 +52,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	private Scale debugSlider;
 	private BooleanFieldEditor toggleComponents;
 	private CheckboxTableViewer categoryViewer;
+
 	/**
 	 * GeneralPreferencePage
 	 */
@@ -86,9 +89,10 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		debugSlider.setIncrement(1);
 		debugSlider.setMinimum(1);
 		debugSlider.setMaximum(3);
+		debugSlider.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-		debugSlider
-				.setSelection(getPreferenceStore().getInt(com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL));
+		debugSlider.setSelection(parseStatusLevel(getPreferenceStore().getString(
+				com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL)));
 		Label more = new Label(debugComp, SWT.LEFT);
 		more.setText(Messages.TroubleshootingPreferencePage_LBL_All);
 
@@ -99,7 +103,6 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 
 		debugSlider.addSelectionListener(new SelectionListener()
 		{
-
 			public void widgetDefaultSelected(SelectionEvent selectionevent)
 			{
 				currentValue.setText(getValueLabel(debugSlider.getSelection()));
@@ -112,15 +115,17 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 
 		});
 
+		toggleComponents = new BooleanFieldEditor(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS,
+				Messages.TroubleshootingPreferencePage_ShowHiddenProcesses, SWT.DEFAULT, group);
+		addField(toggleComponents);
+
 		toggleComponents = new BooleanFieldEditor(ICorePreferenceConstants.PREF_ENABLE_COMPONENT_DEBUGGING,
 				Messages.TroubleshootingPreferencePage_DebugSpecificComponents, SWT.DEFAULT, group);
 		addField(toggleComponents);
 
-		
 		Composite composite = new Composite(group, SWT.NONE);
 		composite.setLayout(GridLayoutFactory.fillDefaults().margins(0, 5).create());
-		composite.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).hint(400, 300).grab(true, true)
-				.create());
+		composite.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).hint(400, 300).grab(true, true).create());
 
 		Table table = new Table(composite, SWT.CHECK | SWT.BORDER | SWT.SINGLE);
 		table.setFont(group.getFont());
@@ -133,12 +138,12 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		categoryViewer.setLabelProvider(categoryLabelProvider);
 		categoryViewer.setSorter(new ViewerSorter());
 
-		Hashtable<String, String> tItems = PlatformUtil.getTraceableItems();
+		Map<String, String> tItems = EclipseUtil.getTraceableItems();
 		String items[] = tItems.keySet().toArray(new String[0]);
 		Arrays.sort(items);
 
 		categoryViewer.setInput(items);
-		categoryViewer.setCheckedElements(PlatformUtil.getCurrentDebuggableComponents());
+		categoryViewer.setCheckedElements(EclipseUtil.getCurrentDebuggableComponents());
 		categoryViewer.getTable().setEnabled(false);
 
 		if (getPreferenceStore().getBoolean(ICorePreferenceConstants.PREF_ENABLE_COMPONENT_DEBUGGING))
@@ -154,7 +159,8 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	 */
 	public void propertyChange(PropertyChangeEvent event)
 	{
-		if(event.getSource().equals(toggleComponents)) {
+		if (event.getSource().equals(toggleComponents))
+		{
 			categoryViewer.getTable().setEnabled(Boolean.parseBoolean(event.getNewValue().toString()));
 		}
 	}
@@ -208,10 +214,11 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	public boolean performOk()
 	{
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL, debugSlider.getSelection());
+		store.setValue(com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL,
+				getStatusLevel(debugSlider.getSelection()).toString());
 
-		String[] currentOptions = PlatformUtil.getCurrentDebuggableComponents();
-		PlatformUtil.setBundleDebugOptions(currentOptions, false);
+		String[] currentOptions = EclipseUtil.getCurrentDebuggableComponents();
+		EclipseUtil.setBundleDebugOptions(currentOptions, false);
 
 		List<String> al = new ArrayList<String>();
 		Object[] elements = categoryViewer.getCheckedElements();
@@ -225,13 +232,81 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", newOptions) //$NON-NLS-1$
 		);
 
-		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST,
- StringUtil.join(",", newOptions) //$NON-NLS-1$
+		store.setValue(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", newOptions) //$NON-NLS-1$
 		);
 
-		PlatformUtil.setBundleDebugOptions(currentOptions, true);
-		PlatformUtil.setPlatformDebugging(toggleComponents.getBooleanValue());
+		EclipseUtil.setBundleDebugOptions(currentOptions, true);
+		EclipseUtil.setPlatformDebugging(toggleComponents.getBooleanValue());
 
 		return super.performOk();
 	}
+
+	/**
+	 * Converts the IStatus level into something we get.
+	 * 
+	 * @param status
+	 * @return
+	 */
+	private static StatusLevel getStatusLevel(int status)
+	{
+		switch (status)
+		{
+			case 3:
+			{
+				return StatusLevel.INFO;
+			}
+			case 2:
+			{
+				return StatusLevel.WARNING;
+			}
+			case 1:
+			{
+				return StatusLevel.ERROR;
+			}
+			default:
+			{
+				return StatusLevel.OFF;
+			}
+		}
+	}
+
+	/**
+	 * Converts the String level into something we get.
+	 * 
+	 * @param status
+	 * @return
+	 */
+	private static int parseStatusLevel(String status)
+	{
+		IdeLog.StatusLevel newStatus = IdeLog.StatusLevel.ERROR;
+		try
+		{
+			newStatus = Enum.valueOf(IdeLog.StatusLevel.class, status);
+		}
+		catch (IllegalArgumentException e)
+		{
+			// can safely ignore
+		}
+
+		switch (newStatus)
+		{
+			case INFO:
+			{
+				return 3;
+			}
+			case WARNING:
+			{
+				return 2;
+			}
+			case ERROR:
+			{
+				return 1;
+			}
+			default:
+			{
+				return 0;
+			}
+		}
+	}
+
 }
