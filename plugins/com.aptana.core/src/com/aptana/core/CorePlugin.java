@@ -567,8 +567,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	{
 		if (ICorePreferenceConstants.PREF_DEBUG_LEVEL.equals(event.getKey()))
 		{
-			IdeLog.setCurrentSeverity(IdeLog.StatusLevel.valueOf(IdeLog.StatusLevel.class, event.getNewValue()
-					.toString()));
+			IdeLog.setCurrentSeverity(IdeLog.getCurrentSeverity());
 		}
 	}
 
