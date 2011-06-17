@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
@@ -258,7 +259,8 @@ public abstract class ProcessUtil
 			map = new TreeMap<String, String>(environment);
 			processBuilder.environment().putAll(environment);
 		}
-		CorePlugin.logInfo(
+		IdeLog.logInfo(
+				CorePlugin.getDefault(),
 				StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] {
 						StringUtil.join("\" \"", command), workingDirectory, map }), IDebugScopes.SHELL); //$NON-NLS-1$
 		return processBuilder.start();

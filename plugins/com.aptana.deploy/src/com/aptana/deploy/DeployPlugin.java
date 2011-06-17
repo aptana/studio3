@@ -7,13 +7,13 @@
  */
 package com.aptana.deploy;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.logging.IdeLog;
 
 public class DeployPlugin extends AbstractUIPlugin
 {
@@ -63,28 +63,6 @@ public class DeployPlugin extends AbstractUIPlugin
 		return instance;
 	}
 
-	public static void logError(String message, Exception e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
-	}
-
-	public static void logError(Exception e)
-	{
-		if (e instanceof CoreException)
-		{
-			logError((CoreException) e);
-		}
-		else
-		{
-			logError(e.getMessage(), e);
-		}
-	}
-
-	public static void logError(CoreException e)
-	{
-		getDefault().getLog().log(e.getStatus());
-	}
-
 	public static Image getImage(String string)
 	{
 		if (getDefault().getImageRegistry().get(string) == null)
@@ -94,5 +72,73 @@ public class DeployPlugin extends AbstractUIPlugin
 				getDefault().getImageRegistry().put(string, id);
 		}
 		return getDefault().getImageRegistry().get(string);
+	}
+
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
+	{
+		IdeLog.log(getDefault(), status);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message, Throwable e)
+	{
+		IdeLog.logWarning(getDefault(), message, e, null);
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		IdeLog.logInfo(getDefault(), message, null);
 	}
 }

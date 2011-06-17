@@ -14,6 +14,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.logging.IdeLog;
+
 public class RedHatPlugin extends AbstractUIPlugin
 {
 
@@ -48,11 +50,6 @@ public class RedHatPlugin extends AbstractUIPlugin
 		return PLUGIN_ID;
 	}
 
-	public static void logError(Throwable t)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginIdentifier(), t.getMessage(), t));
-	}
-
 	private static RedHatPlugin getDefault()
 	{
 		return instance;
@@ -73,6 +70,30 @@ public class RedHatPlugin extends AbstractUIPlugin
 	public static void logError(String string, CoreException e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginIdentifier(), string, e));
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
 	}
 
 }

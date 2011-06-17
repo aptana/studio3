@@ -58,7 +58,7 @@ public class CapistranoDeployWizard extends AbstractDeployWizard
 		}
 		catch (Exception e)
 		{
-			CapistranoPlugin.logError(e);
+			CapistranoPlugin.logError(e.getLocalizedMessage(), e);
 		}
 
 		return true;

@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexFilesOfProjectJob;
@@ -85,12 +86,14 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
-		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName),
+		IdeLog.logInfo(CorePlugin.getDefault(),
+				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName),
 				IDebugScopes.INDEXER);
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
-			CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName),
+			IdeLog.logInfo(CorePlugin.getDefault(),
+					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName),
 					IDebugScopes.INDEXER);
 			fullBuild(monitor);
 		}
@@ -99,21 +102,24 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null)
 			{
-				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta,
+				IdeLog.logInfo(CorePlugin.getDefault(),
+						StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta,
  projectName),
 						IDebugScopes.INDEXER);
 				fullBuild(monitor);
 			}
 			else
 			{
-				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
+				IdeLog.logInfo(CorePlugin.getDefault(),
+						StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
 						IDebugScopes.INDEXER);
 				incrementalBuild(delta, monitor);
 			}
 		}
 
 		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
-		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime),
+		IdeLog.logInfo(CorePlugin.getDefault(),
+				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime),
 				IDebugScopes.INDEXER);
 
 		return null;

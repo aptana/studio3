@@ -185,87 +185,6 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		return plugin;
 	}
 
-	/**
-	 * Log a particular status
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param message
-	 */
-	public static void logWarning(String message)
-	{
-		IdeLog.logWarning(getDefault(), message);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @param message
-	 * @param scope
-	 */
-	public static void logInfo(String message, String scope)
-	{
-		IdeLog.logInfo(getDefault(), message, scope);
-	}
-
-	/**
-	 * trace
-	 * 
-	 * @param string
-	 */
-	public static void trace(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
-	}
-
 	private IStatus updateProjectNatures(IProject[] projects, IProgressMonitor monitor)
 	{
 		MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
@@ -652,4 +571,61 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 					.toString()));
 		}
 	}
+
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
+	{
+		IdeLog.log(getDefault(), status);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message, Throwable e)
+	{
+		IdeLog.logWarning(getDefault(), message, e, null);
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		IdeLog.logInfo(getDefault(), message, null);
+	}
+
 }
