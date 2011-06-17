@@ -133,15 +133,17 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		IdeLog.StatusLevel currentSeverity = IdeLog.getSeverityPreference();
 		IdeLog.setCurrentSeverity(currentSeverity);
 
-		String[] components = EclipseUtil.getCurrentDebuggableComponents();
-		EclipseUtil.setBundleDebugOptions(components, true);
-
 		// If we are currently in debug mode, don't change the default settings
 		if (!Platform.inDebugMode())
 		{
 			Boolean checked = Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 					ICorePreferenceConstants.PREF_ENABLE_COMPONENT_DEBUGGING, false, null);
 			EclipseUtil.setPlatformDebugging(checked);
+			if (checked)
+			{
+				String[] components = EclipseUtil.getCurrentDebuggableComponents();
+				EclipseUtil.setBundleDebugOptions(components, true);
+			}
 		}
 	}
 
@@ -567,7 +569,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	{
 		if (ICorePreferenceConstants.PREF_DEBUG_LEVEL.equals(event.getKey()))
 		{
-			IdeLog.setCurrentSeverity(IdeLog.getCurrentSeverity());
+			IdeLog.setCurrentSeverity(IdeLog.getSeverityPreference());
 		}
 	}
 
