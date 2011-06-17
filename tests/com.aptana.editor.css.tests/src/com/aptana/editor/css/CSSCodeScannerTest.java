@@ -9,6 +9,8 @@ package com.aptana.editor.css;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
@@ -91,15 +93,15 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 
 		assertToken(getToken("entity.name.tag.css"), 0, 5);
 		assertToken(Token.WHITESPACE, 5, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 6, 1);
-		assertToken(Token.WHITESPACE, 7, 1);
-		assertToken(getToken("support.type.property-name.css"), 8, 4);
-		assertToken(getToken("punctuation.separator.key-value.css"), 12, 1);
-		assertToken(Token.WHITESPACE, 13, 1);
-		assertToken(getToken("support.constant.property-value.css"), 14, 10);
-		assertToken(getToken("punctuation.terminator.rule.css"), 24, 1);
-		assertToken(Token.WHITESPACE, 25, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 6, 1);
+		assertToken(getToken("meta.property-list.css"), 7, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 8, 4);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 12, 1);
+		assertToken(getToken("meta.property-list.css"), 13, 1);
+		assertToken(getToken("meta.property-list.css support.constant.property-value.css"), 14, 10);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 24, 1);
+		assertToken(getToken("meta.property-list.css"), 25, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 26, 1);
 	}
 
 	public void testCSSEmTag()
@@ -116,13 +118,13 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("entity.name.tag.css"), 18, 8);
 		assertToken(getToken("entity.other.attribute-name.class.css"), 26, 5);
 		assertToken(Token.WHITESPACE, 31, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 32, 1);
-		assertToken(getToken("support.type.property-name.css"), 33, 6);
-		assertToken(getToken("punctuation.separator.key-value.css"), 39, 1);
-		assertToken(getToken("constant.numeric.css"), 40, 2);
-		assertToken(getToken("keyword.other.unit.css"), 42, 2); // "em"
-		assertToken(getToken("punctuation.terminator.rule.css"), 44, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 45, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 32, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 33, 6);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 39, 1);
+		assertToken(getToken("meta.property-list.css constant.numeric.css"), 40, 2);
+		assertToken(getToken("meta.property-list.css keyword.other.unit.css"), 42, 2); // "em"
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 44, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 45, 1);
 	}
 
 	public void testBasicTokenizing()
@@ -133,155 +135,333 @@ public class CSSCodeScannerTest extends AbstractTokenScannerTestCase
 
 		assertToken(getToken("entity.name.tag.css"), 0, 4);
 		assertToken(Token.WHITESPACE, 4, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 5, 1);
-		assertToken(Token.WHITESPACE, 6, 1);
-		assertToken(getToken("support.type.property-name.css"), 7, 5);
-		assertToken(getToken("punctuation.separator.key-value.css"), 12, 1);
-		assertToken(Token.WHITESPACE, 13, 1);
-		assertToken(getToken("support.constant.color.w3c-standard-color-name.css"), 14, 3);
-		assertToken(getToken("punctuation.terminator.rule.css"), 17, 1);
-		assertToken(Token.WHITESPACE, 18, 1);
-		assertToken(getToken("support.type.property-name.css"), 19, 16);
-		assertToken(getToken("punctuation.separator.key-value.css"), 35, 1);
-		assertToken(Token.WHITESPACE, 36, 1);
-		assertToken(getToken("constant.other.color.rgb-value.css"), 37, 4);
-		assertToken(getToken("punctuation.terminator.rule.css"), 41, 1);
-		assertToken(Token.WHITESPACE, 42, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 43, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 5, 1);
+		assertToken(getToken("meta.property-list.css"), 6, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 7, 5);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 12, 1);
+		assertToken(getToken("meta.property-list.css"), 13, 1);
+		assertToken(getToken("meta.property-list.css support.constant.color.w3c-standard-color-name.css"), 14, 3);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 17, 1);
+		assertToken(getToken("meta.property-list.css"), 18, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 19, 16);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 35, 1);
+		assertToken(getToken("meta.property-list.css"), 36, 1);
+		assertToken(getToken("meta.property-list.css constant.other.color.rgb-value.css"), 37, 4);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 41, 1);
+		assertToken(getToken("meta.property-list.css"), 42, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 43, 1);
 	}
 
 	public void testBasicTokenizing2()
 	{
-		String src = "body {\n" + "  background-image: url();\n" + "  background-position-x: left;\n"
-				+ "  background-position-y: top;\n" + "  background-repeat: repeat-x;\n"
-				+ "  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;\n" + "}\n" + "\n" + ".main {\n"
-				+ "  border: 1px dotted #222222;\n" + "  margin: 5px;\n" + "}\n" + "\n" + ".header {\n"
-				+ "  background-color: #FFFFFF;\n" + "  color: #444444;\n" + "  font-size: xx-large;\n" + "}\n" + "\n"
-				+ ".menu {\n" + "  border-top: 2px solid #FC7F22;\n" + "  background-color: #3B3B3B;\n"
-				+ "  color: #FFFFFF;\n" + "  text-align: right;\n" + "  vertical-align: right;\n"
-				+ "  font-size: small;\n" + "}\n" + "\n" + ".menu a {\n" + "  color: #DDDDDD;\n"
-				+ "  text-decoration: none;\n" + "}\n";
+		String src = "body {\n" + // 1
+				"  background-image: url();\n" + // 2
+				"  background-position-x: left;\n" + // 3
+				"  background-position-y: top;\n" + // 4
+				"  background-repeat: repeat-x;\n" + // 5
+				"  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;\n" + // 6
+				"}\n" + // 7
+				"\n" + // 8
+				".main {\n" + // 9
+				"  border: 1px dotted #222222;\n" + // 10
+				"  margin: 5px;\n" + // 11
+				"}\n" + // 12
+				"\n" + // 13
+				".header {\n" + // 14
+				"  background-color: #FFFFFF;\n" + // 15
+				"  color: #444444;\n" + // 16
+				"  font-size: xx-large;\n" + // 17
+				"}\n" + // 18
+				"\n" + // 19
+				".menu {\n" + // 20
+				"  border-top: 2px solid #FC7F22;\n" + // 21
+				"  background-color: #3B3B3B;\n" + // 22
+				"  color: #FFFFFF;\n" + // 23
+				"  text-align: right;\n" + // 24
+				"  vertical-align: right;\n" + // 25
+				"  font-size: small;\n" + // 26
+				"}\n" + // 27
+				"\n" + // 28
+				".menu a {\n" + // 29
+				"  color: #DDDDDD;\n" + // 30
+				"  text-decoration: none;\n" + // 31
+				"}\n"; // 32
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 		// line 1
 		assertToken(getToken("entity.name.tag.css"), 0, 4);
 		assertToken(Token.WHITESPACE, 4, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 5, 1);
-		assertToken(Token.WHITESPACE, 6, 3);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 5, 1);
+		assertToken(getToken("meta.property-list.css"), 6, 3);
 		// line 2
-		assertToken(getToken("support.type.property-name.css"), 9, 16);
-		assertToken(getToken("punctuation.separator.key-value.css"), 25, 1);
-		assertToken(Token.WHITESPACE, 26, 1);
-		assertToken(getToken("support.function.misc.css"), 27, 3);
-		assertToken(getToken("punctuation.section.function.css"), 30, 1);
-		assertToken(getToken("punctuation.section.function.css"), 31, 1);
-		assertToken(getToken("punctuation.terminator.rule.css"), 32, 1);
-		assertToken(Token.WHITESPACE, 33, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 9, 16);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 25, 1);
+		assertToken(getToken("meta.property-list.css"), 26, 1);
+		assertToken(getToken("meta.property-list.css support.function.misc.css"), 27, 3);
+		assertToken(getToken("meta.property-list.css punctuation.section.function.css"), 30, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.function.css"), 31, 1);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 32, 1);
+		assertToken(getToken("meta.property-list.css"), 33, 3);
 		// line 3
-		assertToken(getToken("support.type.property-name.css"), 36, 21);
-		assertToken(getToken("punctuation.separator.key-value.css"), 57, 1);
-		assertToken(Token.WHITESPACE, 58, 1);
-		assertToken(getToken("support.constant.property-value.css"), 59, 4);
-		assertToken(getToken("punctuation.terminator.rule.css"), 63, 1);
-		assertToken(Token.WHITESPACE, 64, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 36, 21);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 57, 1);
+		assertToken(getToken("meta.property-list.css"), 58, 1);
+		assertToken(getToken("meta.property-list.css support.constant.property-value.css"), 59, 4);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 63, 1);
+		assertToken(getToken("meta.property-list.css"), 64, 3);
 		// line 4
-		assertToken(getToken("support.type.property-name.css"), 67, 21);
-		assertToken(getToken("punctuation.separator.key-value.css"), 88, 1);
-		assertToken(Token.WHITESPACE, 89, 1);
-		assertToken(getToken("support.constant.property-value.css"), 90, 3);
-		assertToken(getToken("punctuation.terminator.rule.css"), 93, 1);
-		assertToken(Token.WHITESPACE, 94, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 67, 21);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 88, 1);
+		assertToken(getToken("meta.property-list.css"), 89, 1);
+		assertToken(getToken("meta.property-list.css support.constant.property-value.css"), 90, 3);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 93, 1);
+		assertToken(getToken("meta.property-list.css"), 94, 3);
 		// line 5
-		assertToken(getToken("support.type.property-name.css"), 97, 17);
-		assertToken(getToken("punctuation.separator.key-value.css"), 114, 1);
-		assertToken(Token.WHITESPACE, 115, 1);
-		assertToken(getToken("support.constant.property-value.css"), 116, 8);
-		assertToken(getToken("punctuation.terminator.rule.css"), 124, 1);
-		assertToken(Token.WHITESPACE, 125, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 97, 17);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 114, 1);
+		assertToken(getToken("meta.property-list.css"), 115, 1);
+		assertToken(getToken("meta.property-list.css support.constant.property-value.css"), 116, 8);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 124, 1);
+		assertToken(getToken("meta.property-list.css"), 125, 3);
 		// line 6
-		assertToken(getToken("support.type.property-name.css"), 128, 11);
-		assertToken(getToken("punctuation.separator.key-value.css"), 139, 1);
-		assertToken(Token.WHITESPACE, 140, 1);
-		assertToken(getToken("support.constant.font-name.css"), 141, 7);
-		assertToken(getToken("punctuation.separator.css"), 148, 1);
-		assertToken(Token.WHITESPACE, 149, 1);
-		assertToken(getToken("support.constant.font-name.css"), 150, 6);
-		assertToken(getToken("punctuation.separator.css"), 156, 1);
-		assertToken(Token.WHITESPACE, 157, 1);
-		assertToken(getToken("support.constant.font-name.css"), 158, 5);
-		assertToken(getToken("punctuation.separator.css"), 163, 1);
-		assertToken(Token.WHITESPACE, 164, 1);
-		assertToken(getToken("support.constant.font-name.css"), 165, 9);
-		assertToken(getToken("punctuation.separator.css"), 174, 1);
-		assertToken(Token.WHITESPACE, 175, 1);
-		assertToken(getToken("support.constant.font-name.css"), 176, 10);
-		assertToken(getToken("punctuation.terminator.rule.css"), 186, 1);
-		assertToken(Token.WHITESPACE, 187, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 128, 11);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 139, 1);
+		assertToken(getToken("meta.property-list.css"), 140, 1);
+		assertToken(getToken("meta.property-list.css support.constant.font-name.css"), 141, 7);
+		assertToken(getToken("meta.property-list.css punctuation.separator.css"), 148, 1);
+		assertToken(getToken("meta.property-list.css"), 149, 1);
+		assertToken(getToken("meta.property-list.css support.constant.font-name.css"), 150, 6);
+		assertToken(getToken("meta.property-list.css punctuation.separator.css"), 156, 1);
+		assertToken(getToken("meta.property-list.css"), 157, 1);
+		assertToken(getToken("meta.property-list.css support.constant.font-name.css"), 158, 5);
+		assertToken(getToken("meta.property-list.css punctuation.separator.css"), 163, 1);
+		assertToken(getToken("meta.property-list.css"), 164, 1);
+		assertToken(getToken("meta.property-list.css support.constant.font-name.css"), 165, 9);
+		assertToken(getToken("meta.property-list.css punctuation.separator.css"), 174, 1);
+		assertToken(getToken("meta.property-list.css"), 175, 1);
+		assertToken(getToken("meta.property-list.css support.constant.font-name.css"), 176, 10);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 186, 1);
+		assertToken(getToken("meta.property-list.css"), 187, 1);
 		// line 7
-		assertToken(getToken("punctuation.section.property-list.css"), 188, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 188, 1);
 		assertToken(Token.WHITESPACE, 189, 2);
 		// line 9
 		assertToken(getToken("entity.other.attribute-name.class.css"), 191, 5);
 		assertToken(Token.WHITESPACE, 196, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 197, 1);
-		assertToken(Token.WHITESPACE, 198, 3);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 197, 1);
+		assertToken(getToken("meta.property-list.css"), 198, 3);
 		// line 10 border: 1px dotted #222222;
-		assertToken(getToken("support.type.property-name.css"), 201, 6);
-		assertToken(getToken("punctuation.separator.key-value.css"), 207, 1);
-		assertToken(Token.WHITESPACE, 208, 1);
-		assertToken(getToken("constant.numeric.css"), 209, 1);
-		assertToken(getToken("keyword.other.unit.css"), 210, 2);
-		assertToken(Token.WHITESPACE, 212, 1);
-		assertToken(getToken("support.constant.property-value.css"), 213, 6);
-		assertToken(Token.WHITESPACE, 219, 1);
-		assertToken(getToken("constant.other.color.rgb-value.css"), 220, 7);
-		assertToken(getToken("punctuation.terminator.rule.css"), 227, 1);
-		assertToken(Token.WHITESPACE, 228, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 201, 6);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 207, 1);
+		assertToken(getToken("meta.property-list.css"), 208, 1);
+		assertToken(getToken("meta.property-list.css constant.numeric.css"), 209, 1);
+		assertToken(getToken("meta.property-list.css keyword.other.unit.css"), 210, 2);
+		assertToken(getToken("meta.property-list.css"), 212, 1);
+		assertToken(getToken("meta.property-list.css support.constant.property-value.css"), 213, 6);
+		assertToken(getToken("meta.property-list.css"), 219, 1);
+		assertToken(getToken("meta.property-list.css constant.other.color.rgb-value.css"), 220, 7);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 227, 1);
+		assertToken(getToken("meta.property-list.css"), 228, 3);
 		// line 11 margin: 5px;
-		assertToken(getToken("support.type.property-name.css"), 231, 6);
-		assertToken(getToken("punctuation.separator.key-value.css"), 237, 1);
-		assertToken(Token.WHITESPACE, 238, 1);
-		assertToken(getToken("constant.numeric.css"), 239, 1);
-		assertToken(getToken("keyword.other.unit.css"), 240, 2);
-		assertToken(getToken("punctuation.terminator.rule.css"), 242, 1);
-		assertToken(Token.WHITESPACE, 243, 1);
-		// line 11
-		assertToken(getToken("punctuation.section.property-list.css"), 244, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 231, 6);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 237, 1);
+		assertToken(getToken("meta.property-list.css"), 238, 1);
+		assertToken(getToken("meta.property-list.css constant.numeric.css"), 239, 1);
+		assertToken(getToken("meta.property-list.css keyword.other.unit.css"), 240, 2);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 242, 1);
+		assertToken(getToken("meta.property-list.css"), 243, 1);
+		// line 12
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 244, 1);
 		assertToken(Token.WHITESPACE, 245, 2);
 		// line 13 .header {
 		assertToken(getToken("entity.other.attribute-name.class.css"), 247, 7);
 		assertToken(Token.WHITESPACE, 254, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 255, 1);
-		assertToken(Token.WHITESPACE, 256, 3);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 255, 1);
+		assertToken(getToken("meta.property-list.css"), 256, 3);
 		// line 14 background-color: #FFFFFF;
-		assertToken(getToken("support.type.property-name.css"), 259, 16);
-		assertToken(getToken("punctuation.separator.key-value.css"), 275, 1);
-		assertToken(Token.WHITESPACE, 276, 1);
-		assertToken(getToken("constant.other.color.rgb-value.css"), 277, 7);
-		assertToken(getToken("punctuation.terminator.rule.css"), 284, 1);
-		assertToken(Token.WHITESPACE, 285, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 259, 16);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 275, 1);
+		assertToken(getToken("meta.property-list.css"), 276, 1);
+		assertToken(getToken("meta.property-list.css constant.other.color.rgb-value.css"), 277, 7);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 284, 1);
+		assertToken(getToken("meta.property-list.css"), 285, 3);
 		// line 15 color: #444444;
-		assertToken(getToken("support.type.property-name.css"), 288, 5);
-		assertToken(getToken("punctuation.separator.key-value.css"), 293, 1);
-		assertToken(Token.WHITESPACE, 294, 1);
-		assertToken(getToken("constant.other.color.rgb-value.css"), 295, 7);
-		assertToken(getToken("punctuation.terminator.rule.css"), 302, 1);
-		assertToken(Token.WHITESPACE, 303, 3);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 288, 5);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 293, 1);
+		assertToken(getToken("meta.property-list.css"), 294, 1);
+		assertToken(getToken("meta.property-list.css constant.other.color.rgb-value.css"), 295, 7);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 302, 1);
+		assertToken(getToken("meta.property-list.css"), 303, 3);
 		// line 16 font-size: xx-large;
-		assertToken(getToken("support.type.property-name.css"), 306, 9);
-		assertToken(getToken("punctuation.separator.key-value.css"), 315, 1);
-		assertToken(Token.WHITESPACE, 316, 1);
-		assertToken(getToken("support.constant.property-value.css"), 317, 8);
-		assertToken(getToken("punctuation.terminator.rule.css"), 325, 1);
-		assertToken(Token.WHITESPACE, 326, 1);
-		// line 17
-		assertToken(getToken("punctuation.section.property-list.css"), 327, 1);
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 306, 9);
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 315, 1);
+		assertToken(getToken("meta.property-list.css"), 316, 1);
+		assertToken(getToken("meta.property-list.css support.constant.property-value.css"), 317, 8);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 325, 1);
+		assertToken(getToken("meta.property-list.css"), 326, 1);
+		// line 17 }
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 327, 1);
 		assertToken(Token.WHITESPACE, 328, 2);
 		// line 19 .menu {
 		assertToken(getToken("entity.other.attribute-name.class.css"), 330, 5);
 		assertToken(Token.WHITESPACE, 335, 1);
-		assertToken(getToken("punctuation.section.property-list.css"), 336, 1);
-		assertToken(Token.WHITESPACE, 337, 3);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 336, 1);
+		assertToken(getToken("meta.property-list.css"), 337, 3);
 		// line 20
+	}
+
+	public void testMediaWithRules()
+	{
+		String src = "@media screen {\n" + //
+				"  * { font-family: sans-serif }\n" + //
+				"}\n" + //
+				"body { } "; //
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("meta.at-rule.media.css keyword.control.at-rule.media.css"), 0, 6); // @media
+		assertToken(getToken("meta.at-rule.media.css"), 6, 1);
+		assertToken(getToken("meta.at-rule.media.css support.constant.media.css"), 7, 6); // screen
+		assertToken(getToken("meta.at-rule.media.css"), 13, 1);
+		assertToken(getToken("meta.at-rule.media.css punctuation.section.at-rule.media.css"), 14, 1); // {
+		assertToken(getToken("meta.at-rule.media.css"), 15, 3);
+		assertToken(getToken("meta.at-rule.media.css entity.name.tag.wildcard.css"), 18, 1); // *
+		assertToken(getToken("meta.at-rule.media.css"), 19, 1);
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css punctuation.section.property-list.css"),
+				20, 1); // {
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css"), 21, 1);
+		// font-family
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css support.type.property-name.css"), 22, 11);
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css punctuation.separator.key-value.css"), 33,
+				1);
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css"), 34, 1);
+		// sans-serif
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css support.constant.font-name.css"), 35, 10);
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css"), 45, 1);
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css punctuation.section.property-list.css"),
+				46, 1); // }
+		assertToken(getToken("meta.at-rule.media.css"), 47, 1);
+		assertToken(getToken("meta.at-rule.media.css punctuation.section.at-rule.media.css"), 48, 1); // }
+		assertToken(Token.WHITESPACE, 49, 1);
+		// body
+		assertToken(getToken("entity.name.tag.css"), 50, 4);
+		assertToken(Token.WHITESPACE, 54, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 55, 1); // {
+		assertToken(getToken("meta.property-list.css"), 56, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 57, 1); // }
+		assertToken(Token.WHITESPACE, 58, 1);
+	}
+
+	public void testCurliesInStringsBeforePartition()
+	{
+		String src = "@import 'ch{.css';\n" + //
+				" body { } "; //
+		IDocument document = new Document(src);
+		partition(document); // Partition first, as we rely on them to determine how to skip strings/comments
+		scanner.setRange(document, 17, src.length() - 17);
+
+		assertToken(getToken("punctuation.terminator.rule.css"), 17, 1); // ;
+		assertToken(Token.WHITESPACE, 18, 2);
+		// body
+		assertToken(getToken("entity.name.tag.css"), 20, 4);
+		assertToken(Token.WHITESPACE, 24, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 25, 1); // {
+		assertToken(getToken("meta.property-list.css"), 26, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 27, 1); // }
+		assertToken(Token.WHITESPACE, 28, 1);
+	}
+
+	public void testCurliesInCommentBeforePartition()
+	{
+		String src = "/*         {   */;\n" + //
+				" body { } "; //
+		IDocument document = new Document(src);
+		partition(document); // Partition first, as we rely on them to determine how to skip strings/comments
+		scanner.setRange(document, 17, src.length() - 17);
+
+		assertToken(getToken("punctuation.terminator.rule.css"), 17, 1); // ;
+		assertToken(Token.WHITESPACE, 18, 2);
+		// body
+		assertToken(getToken("entity.name.tag.css"), 20, 4);
+		assertToken(Token.WHITESPACE, 24, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 25, 1); // {
+		assertToken(getToken("meta.property-list.css"), 26, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 27, 1); // }
+		assertToken(Token.WHITESPACE, 28, 1);
+	}
+
+	public void testMediaSplitAcrossPartitions()
+	{
+		String src = "@media screen {\n" + // 1
+				"  /*   */\n" + // 2
+				"  body {}\n" + // 3
+				"}\n"; // 4
+		IDocument document = new Document(src);
+		partition(document); // Partition first, as we rely on them to determine how to skip strings/comments
+		scanner.setRange(document, 25, src.length() - 25);
+
+		assertToken(getToken("meta.at-rule.media.css"), 25, 3);
+		// body
+		assertToken(getToken("meta.at-rule.media.css entity.name.tag.css"), 28, 4);
+		assertToken(getToken("meta.at-rule.media.css"), 32, 1);
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css punctuation.section.property-list.css"),
+				33, 1); // {
+		assertToken(getToken("meta.at-rule.media.css meta.property-list.css punctuation.section.property-list.css"),
+				34, 1); // }
+		assertToken(getToken("meta.at-rule.media.css"), 35, 1);
+		assertToken(getToken("meta.at-rule.media.css punctuation.section.at-rule.media.css"), 36, 1); // }
+		assertToken(Token.WHITESPACE, 37, 1);
+	}
+
+	public void testPropertyListSplitAcrossPartitions()
+	{
+		String src = "body {\n" + // 1
+				"  /*   */\n" + // 2
+				"  color: red;\n" + // 3
+				"}\n"; // 4
+		IDocument document = new Document(src);
+		partition(document); // Partition first, as we rely on them to determine how to skip strings/comments
+		scanner.setRange(document, 16, src.length() - 16);
+
+		assertToken(getToken("meta.property-list.css"), 16, 3);
+		// color
+		assertToken(getToken("meta.property-list.css support.type.property-name.css"), 19, 5);
+		// :
+		assertToken(getToken("meta.property-list.css punctuation.separator.key-value.css"), 24, 1);
+		assertToken(getToken("meta.property-list.css"), 25, 1);
+		// red
+		assertToken(getToken("meta.property-list.css support.constant.color.w3c-standard-color-name.css"), 26, 3);
+		assertToken(getToken("meta.property-list.css punctuation.terminator.rule.css"), 29, 1);
+		assertToken(getToken("meta.property-list.css"), 30, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 31, 1); // }
+		assertToken(Token.WHITESPACE, 32, 1);
+	}
+
+	public void testMediaClosedBeforePartitionSplit()
+	{
+		String src = "@media screen {\n" + // 1
+				"}\n" + // 2
+				"/* */\n" + // 3
+				"body {}\n"; // 4
+		IDocument document = new Document(src);
+		partition(document); // Partition first, as we rely on them to determine how to skip strings/comments
+		scanner.setRange(document, 24, src.length() - 24);
+
+		// body
+		assertToken(getToken("entity.name.tag.css"), 24, 4);
+		assertToken(Token.WHITESPACE, 28, 1);
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 29, 1); // {
+		assertToken(getToken("meta.property-list.css punctuation.section.property-list.css"), 30, 1); // }
+		assertToken(Token.WHITESPACE, 31, 1);
+	}
+
+	// FIXME We don't retain the meta scopes in non-default partitions, i.e. comments/strings!
+
+	protected void partition(IDocument document)
+	{
+		IDocumentPartitioner partitioner = new FastPartitioner(new CSSSourcePartitionScanner(),
+				CSSSourceConfiguration.CONTENT_TYPES);
+		partitioner.connect(document);
+		document.setDocumentPartitioner(partitioner);
 	}
 }

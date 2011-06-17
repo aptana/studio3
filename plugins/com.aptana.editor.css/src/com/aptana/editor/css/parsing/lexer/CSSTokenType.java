@@ -35,7 +35,7 @@ public enum CSSTokenType implements ITypePredicate
 	SINGLE_QUOTED_STRING("string.quoted.single.css", Terminals.STRING), //$NON-NLS-1$
 	COMMA("punctuation.separator.css", Terminals.COMMA), //$NON-NLS-1$
 	SLASH("punctuation.slash.css", Terminals.SLASH), //$NON-NLS-1$
-	STAR("punctuation.asterisk.css", Terminals.STAR), //$NON-NLS-1$
+	STAR("entity.name.tag.wildcard.css", Terminals.STAR), //$NON-NLS-1$
 	PERCENTAGE("keyword.other.unit.css", Terminals.PERCENTAGE), //$NON-NLS-1$
 	ELEMENT("entity.name.tag.css", Terminals.IDENTIFIER), //$NON-NLS-1$
 	FONT("support.constant.font-name.css", Terminals.IDENTIFIER), //$NON-NLS-1$
@@ -54,7 +54,7 @@ public enum CSSTokenType implements ITypePredicate
 	FREQUENCY("keyword.other.unit.css", Terminals.FREQUENCY), //$NON-NLS-1$
 	PAGE("keyword.control.at-rule.page.css", Terminals.PAGE), //$NON-NLS-1$
 	CHARSET("keyword.control.at-rule.charset.css", Terminals.CHARSET), //$NON-NLS-1$
-	MEDIA_KEYWORD("keyword.control.at-rule.import.css", Terminals.MEDIA_KEYWORD), //$NON-NLS-1$
+	MEDIA_KEYWORD("keyword.control.at-rule.media.css", Terminals.MEDIA_KEYWORD), //$NON-NLS-1$
 	FONTFACE("keyword.control.at-rule.fontface.css", Terminals.FONTFACE), //$NON-NLS-1$
 	NAMESPACE("keyword.control.at-rule.namespace.css", Terminals.NAMESPACE), //$NON-NLS-1$
 	RBRACKET("punctuation.bracket.css", Terminals.RBRACKET), //$NON-NLS-1$
@@ -70,6 +70,12 @@ public enum CSSTokenType implements ITypePredicate
 	DASHMATCH(".css", Terminals.DASHMATCH), //$NON-NLS-1$
 	BEGINS_WITH(".css", Terminals.BEGINS_WITH), //$NON-NLS-1$
 	ENDS_WITH(".css", Terminals.ENDS_WITH), //$NON-NLS-1$
+
+	// stuff used internally for special scopes in CSSCodeScanner...
+	LCURLY_MEDIA("punctuation.section.at-rule.media.css", Terminals.LCURLY), //$NON-NLS-1$
+	RCURLY_MEDIA("punctuation.section.at-rule.media.css", Terminals.RCURLY), //$NON-NLS-1$
+	META_MEDIA("meta.at-rule.media.css", Terminals.MEDIA_KEYWORD), //$NON-NLS-1$
+	META_RULE("meta.property-list.css", Terminals.AT_RULE), //$NON-NLS-1$
 
 	UNDEFINED("undefined.css", -1), //$NON-NLS-1$
 	COMMENT("comment.block.css", 1024); //$NON-NLS-1$
