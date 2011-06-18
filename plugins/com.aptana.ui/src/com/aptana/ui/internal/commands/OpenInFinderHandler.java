@@ -16,8 +16,10 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -59,22 +61,27 @@ public class OpenInFinderHandler extends AbstractHandler
 				for (Object selected : selectedFiles)
 				{
 					IResource resource = null;
-					if (selected instanceof IResource)
-					{
-						resource = (IResource) selected;
-					}
-					else if (selected instanceof IAdaptable)
+					if (selected instanceof IAdaptable)
 					{
 						resource = (IResource) ((IAdaptable) selected).getAdapter(IResource.class);
-					}
-					if (resource != null)
-					{
-						open(resource.getLocationURI());
-					}
-					else if (selected instanceof IFileStore)
-					{
-						IFileStore fileStore = (IFileStore) selected;
-						open(fileStore.toURI());
+						if (resource != null)
+						{
+							open(resource.getLocationURI());
+						}
+						else
+						{
+							IFileStore fileStore = (IFileStore) ((IAdaptable) selected).getAdapter(IFileStore.class);
+							try
+							{
+								if (fileStore != null && fileStore.toLocalFile(EFS.NONE, null) != null)
+								{
+									open(fileStore.toURI());
+								}
+							}
+							catch (CoreException e)
+							{
+							}
+						}
 					}
 				}
 			}

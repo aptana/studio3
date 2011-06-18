@@ -515,6 +515,11 @@
                class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                id="com.aptana.editor.common.open.in.file.manager">
          </dynamic>
+         <command
+               commandId="com.aptana.terminal.commands.openTerminal"
+               label="%command.terminal.label"
+               style="push">
+         </command>
       </menuContribution>
       <menuContribution
             locationURI="menu:file?before=new.ext">
