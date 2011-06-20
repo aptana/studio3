@@ -76,7 +76,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new TagRule("style", new ExtendedToken(HTML_STYLE), true), //$NON-NLS-1$
 			new TagRule("svg", new ExtendedToken(HTML_SVG), true), //$NON-NLS-1$
 			new TagRule("/", getToken(HTML_TAG_CLOSE)), //$NON-NLS-1$
-			new TagRule(getToken(HTML_TAG))
+			new TagRule(new ExtendedToken(HTML_TAG))
 		};
 
 	private HTMLScanner htmlScanner;
