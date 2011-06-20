@@ -548,29 +548,44 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 */
 		@SuppressWarnings("deprecation")
 		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
+			Object info = null;
+			if (activeTextHover instanceof ITextHoverExtension2) {
+				info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
+			} else if (activeTextHover != null) {
+				info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
+			}
+			if (info != null) {
+				return info;
+			}
+			return super.getHoverInfo(textViewer, hoverRegion);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.text.DefaultTextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
+		 */
+		@Override
+		public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
 			activeTextHover = null;
 			try {
-				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), hoverRegion.getOffset());
+				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), offset);
 				EvaluationContext context = new EvaluationContext(null, textViewer);
 				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
 				for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers()) {
 					if (descriptor.isEnabledFor(contentType, context)) {
 						ITextHover textHover = descriptor.createTextHover();
-						Object info = null;
-						if (textHover instanceof ITextHoverExtension2) {
-							info = ((ITextHoverExtension2) textHover).getHoverInfo2(textViewer, hoverRegion);
-						} else if (textHover != null) {
-							info = textHover.getHoverInfo(textViewer, hoverRegion);
+						IRegion region = null;
+						if (textHover != null) {
+							region = textHover.getHoverRegion(textViewer, offset);
 						}
-						if (info != null) {
+						if (region != null) {
 							activeTextHover = textHover;
-							return info;
+							return region;
 						}
 					}
 				}
 			} catch (BadLocationException e) {
 			}
-			return super.getHoverInfo(textViewer, hoverRegion);
+			return super.getHoverRegion(textViewer, offset);
 		}
 
 		/*
