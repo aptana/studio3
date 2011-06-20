@@ -101,10 +101,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region)
 	{
 		String contentTypeString = ""; //$NON-NLS-1$
-		IDocument document = viewer.getDocument();
 		try
 		{
-			contentTypeString = getDocumentScopeManager().getScopeAtOffset(document,
+			contentTypeString = getDocumentScopeManager().getScopeAtOffset(viewer,
 					region.getOffset() + region.getLength());
 		}
 		catch (BadLocationException e)
