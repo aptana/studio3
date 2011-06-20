@@ -36,7 +36,7 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 		{
 			reponame = reponame.substring(0, reponame.length() - 4);
 		}
-		url = MessageFormat.format("git://github.com/{0}/{1}.git", username, reponame); //$NON-NLS-1$
+		url = MessageFormat.format("git@github.com:{0}/{1}.git", username, reponame); //$NON-NLS-1$
 
 		AddRemoteDialog dialog = new AddRemoteDialog(getShell(), repo, name, url);
 		if (dialog.open() == Window.OK)
