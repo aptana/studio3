@@ -14,6 +14,7 @@ import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.css.parsing.ast.CSSCommentNode;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSTermListNode;
@@ -103,7 +104,7 @@ public class CSSOutlineContentProvider extends CommonOutlineContentProvider
 				}
 			}
 			else if (!(node instanceof CSSCommentNode) && !(node instanceof CSSTermNode)
-					&& !(node instanceof CSSTermListNode))
+					&& !(node instanceof CSSTermListNode) && !(node instanceof CSSFunctionNode))
 			{
 				items.add(getOutlineItem(node));
 			}
