@@ -127,10 +127,10 @@ public class CSSPageNode extends CSSNode
 		text.append(PAGE);
 		if (fPageSelector != null)
 		{
-			text.append(" :").append(fPageSelector).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+			text.append(" :").append(fPageSelector); //$NON-NLS-1$
 		}
 
-		text.append("{"); //$NON-NLS-1$
+		text.append(" {"); //$NON-NLS-1$
 		CSSDeclarationNode[] declarations = getDeclarations();
 		int size = declarations.length;
 		for (int i = 0; i < size; ++i)

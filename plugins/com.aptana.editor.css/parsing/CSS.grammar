@@ -514,10 +514,6 @@ AttributeSelector
 		{:
 			return new CSSAttributeSelectorNode(f);
 		:}
-	|	COLOR.c // this catches a case when a hash looks like a color
-		{:
-			return new CSSAttributeSelectorNode(c);
-		:}
 	|	HASH.h
 		{:
 			return new CSSAttributeSelectorNode(h);

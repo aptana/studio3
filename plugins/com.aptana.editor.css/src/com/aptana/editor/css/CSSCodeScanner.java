@@ -426,7 +426,26 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		if (token.isOther())
 		{
-			builder.append(((CSSTokenType) token.getData()).getScope());
+			Object data = token.getData();
+			if (data != null)
+			{
+				if (data instanceof CSSTokenType)
+				{
+					builder.append(((CSSTokenType) data).getScope());
+				}
+				else if (data instanceof String)
+				{
+					builder.append((String) data);
+				}
+			}
+			else
+			{
+				if (builder.length() > 0)
+				{
+					// remove the trailing space
+					builder.deleteCharAt(builder.length() - 1);
+				}
+			}
 		}
 		else if (token.isWhitespace())
 		{

@@ -90,7 +90,7 @@ public class OpenTerminalHandler extends AbstractHandler
 		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
 		if (editorPart != null)
 		{
-			IEditorInput input = ((IEditorPart) editorPart).getEditorInput();
+			IEditorInput input = editorPart.getEditorInput();
 			if (input instanceof IFileEditorInput)
 			{
 				IFileEditorInput fileInput = (IFileEditorInput) input;
@@ -144,7 +144,12 @@ public class OpenTerminalHandler extends AbstractHandler
 			}
 		}
 
-		return openUserWorkingDirectory();
+		if (!openUserWorkingDirectory())
+		{
+			// User has no specific directory set, just open with a null working dir...
+			TerminalView.openView(null, Messages.OpenTerminalHandler_LBL_Terminal, null);
+		}
+		return null;
 	}
 
 	private boolean openUserWorkingDirectory()
