@@ -46,6 +46,8 @@ public class FormatterExcludedNode extends FormatterBlockWithBeginNode
 		int endOffset = getEndOffset();
 		IRegion excludedRegion = new Region(startOffset, endOffset - startOffset);
 		visitor.excludeRegion(excludedRegion, EXCLUDE_STRATEGY.WRITE_AS_IS);
+		visitor.writeIndent(context);
 		super.accept(context, visitor);
+		visitor.ensureLineStarted(context);
 	}
 }

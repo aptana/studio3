@@ -36,6 +36,9 @@ public class Messages extends NLS
 	public static String HTMLFormatterTabPage_newLinesInEmptyTags;
 	public static String HTMLFormatterModifyDialog_newLinesTabName;
 	public static String HTMLFormatterNewLinesPage_exclusionsMessage;
+	public static String HTMLFormatterModifyDialog_spacesTabName;
+	public static String HTMLFormatterWhitespacesPage_spacesElementsGroupTitle;
+	public static String HTMLFormatterWhitespacesPage_trimSpaces;
 	static
 	{
 		// initialize resource bundle

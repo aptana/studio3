@@ -58,8 +58,14 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	public static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br", "col",
 			"command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"));
 	@SuppressWarnings("nls")
-	// elements that will not be formatted to avoid any content changes in the HTML output.
-	public static final HashSet<String> EXCLUDED_ELEMENTS = new HashSet<String>(Arrays.asList("textarea"));
+	// elements that will not format their internal content at all, to keep any whitespace characters intact.
+	public static final HashSet<String> EXCLUDED_ELEMENTS = new HashSet<String>(Arrays.asList("textarea", "pre"));
+	@SuppressWarnings("nls")
+	// elements that may contains text that can force us to preserve one white-space character after formatting.
+	public static final HashSet<String> SPACE_SENSITIVE_ELEMENTS = new HashSet<String>(Arrays.asList("a", "abbr",
+			"acronym", "b", "bdo", "big", "cite", "code", "del", "dfn", "em", "font", "i", "ins", "kbd", "label", "q",
+			"s", "samp", "small", "span", "strike", "strong", "sub", "sup", "tt", "u", "var"));
+
 	@SuppressWarnings("nls")
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
@@ -126,8 +132,6 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void addNode(IParseNode node)
 	{
-		// Push any spaces before this node as a text node.
-		preAddNode(node);
 		// Push the current node.
 		if (node instanceof HTMLNode)
 		{
@@ -136,7 +140,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// + elementNode.getEndingOffset() + "]");
 
 			HTMLNode htmlNode = (HTMLNode) node;
-			if (htmlNode.getNodeType() == HTMLNodeTypes.COMMENT)
+			short nodeType = htmlNode.getNodeType();
+			if (nodeType == HTMLNodeTypes.COMMENT)
 			{
 				// We got a HTMLCommentNode
 				FormatterCommentNode commentNode = new FormatterHTMLCommentNode(document, htmlNode.getStartingOffset(),
@@ -144,7 +149,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// We just need to add a child here. We cannot 'push', since the comment node is not a container node.
 				addChild(commentNode);
 			}
-			else if (htmlNode.getNodeType() == HTMLNodeTypes.ELEMENT || htmlNode.getNodeType() == HTMLNodeTypes.SPECIAL)
+			else if (nodeType == HTMLNodeTypes.ELEMENT || nodeType == HTMLNodeTypes.SPECIAL)
 			{
 				// Check if we need to create a formatter node with a begin and end node, or just begin node.
 				HTMLElementNode elementNode = (HTMLElementNode) node;
@@ -160,7 +165,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				else if (EXCLUDED_ELEMENTS.contains(name))
 				{
 					FormatterExcludedNode nonFormattedContent = new FormatterExcludedNode(document);
-					nonFormattedContent.setBegin(createTextNode(document, elementNode.getStart(), elementNode.getEnd()));
+					nonFormattedContent.setBegin(createTextNode(document, elementNode.getStart(),
+							elementNode.getEnd() + 1));
 					push(nonFormattedContent);
 					checkedPop(nonFormattedContent, -1);
 				}
@@ -168,92 +174,18 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				{
 					pushFormatterNode(elementNode);
 				}
-
+			}
+			else if (nodeType == HTMLNodeTypes.TEXT)
+			{
+				FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, htmlNode.getParent(),
+						htmlNode.getPreviousSibling(), htmlNode.getStart(), htmlNode.getEnd() + 1);
+				addChild(contentFormatterNode);
 			}
 		}
 		else
 		{
 			// it's a node that was generated from a foreign language parser, such as the RHTMLParser
 			pushForeignSpecialNode(node);
-		}
-		// Push any spaces after this node as a text node.
-		postAddNode(node);
-	}
-
-	/**
-	 * Push a text node that will fill in the gap between the given node and the previous one.
-	 * 
-	 * @param node
-	 */
-	private void preAddNode(IParseNode node)
-	{
-		// Check for any existing spaces BEFORE the node and push them in a text node.
-		IParseNode previousNode = node.getPreviousNode();
-		if (node.getNodeType() == HTMLNodeTypes.ELEMENT && previousNode != null
-				&& previousNode.getNodeType() == HTMLNodeTypes.ELEMENT)
-		{
-			int previousEnding = 0;
-			if (previousNode.getEndingOffset() > node.getStartingOffset())
-			{
-				// This node is nested inside the previous one, so create a content node for the content between the
-				// name-node end and the current node start.
-				previousEnding = previousNode.getNameNode().getNameRange().getEndingOffset() + 1;
-			}
-			else
-			{
-				// The previous is a sibling of the current node, so create a content node for the content between the
-				// previous end and the current node start.
-				previousEnding = previousNode.getEndingOffset() + 1;
-			}
-			int currentStarting = node.getStartingOffset();
-			if (currentStarting > previousEnding)
-			{
-				// Check for any content in between the nodes
-				String str = document.get(previousEnding, currentStarting);
-				if (str.trim().length() == 0)
-				{
-					FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, null,
-							previousEnding, currentStarting);
-					addChild(contentFormatterNode);
-				}
-			}
-
-		}
-	}
-
-	/**
-	 * Push a text node that will fill any gaps between the given node ending and the end of it's parent node.
-	 * 
-	 * @param node
-	 */
-	private void postAddNode(IParseNode node)
-	{
-		// Check for any existing spaces AFTER the node and push them in a text node.
-		IParseNode parentNode = node.getParent();
-		if (node.getNodeType() == HTMLNodeTypes.ELEMENT && parentNode != null
-				&& parentNode.getNodeType() == HTMLNodeTypes.ELEMENT)
-		{
-			int currentEnding = node.getEndingOffset() + 1;
-			INameNode endNode = ((HTMLElementNode) parentNode).getEndNode();
-			if (endNode != null)
-			{
-				IRange endNameRange = endNode.getNameRange();
-				if (!endNameRange.isEmpty() && endNameRange.getStartingOffset() != endNameRange.getEndingOffset())
-				{
-					IRange endNodeRange = endNode.getNameRange();
-					int previousEnding = endNodeRange.getStartingOffset();
-					if (previousEnding > currentEnding)
-					{
-						String str = document.get(currentEnding, previousEnding);
-						if (str.trim().length() == 0)
-						{
-							FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, null,
-									currentEnding, previousEnding);
-							addChild(contentFormatterNode);
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -480,8 +412,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						textEndOffset = endOffset - 1;
 					}
 				}
-				FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, type, textStartOffset,
-						textEndOffset + 1);
+				FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, node,
+						node.getPreviousSibling(), textStartOffset, textEndOffset + 1);
 				formatterNode.addChild(contentFormatterNode);
 				createdContentNode = true;
 			}
