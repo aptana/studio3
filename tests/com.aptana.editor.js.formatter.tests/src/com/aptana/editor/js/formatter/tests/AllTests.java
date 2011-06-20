@@ -17,7 +17,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.js.formatter.tests");
 		// $JUnit-BEGIN$
-		suite.addTestSuite(FormattingTests.class);
+		suite.addTest(new FormattingTests().suite());
 		// $JUnit-END$
 		return suite;
 	}

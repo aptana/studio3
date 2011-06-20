@@ -1,9 +1,6 @@
 package com.aptana.editor.xml.formatter.tests;
 
 import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
-import com.aptana.editor.common.formatting.FormatterTestFile;
-import com.aptana.formatter.IScriptFormatterFactory;
-import com.aptana.formatter.ScriptFormatterManager;
 
 public class FormattingTests extends AbstractFormatterTestCase
 {
@@ -18,64 +15,79 @@ public class FormattingTests extends AbstractFormatterTestCase
 	private static boolean OVERWRITE_MODE = false;
 
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.xml.formatterFactory"; //$NON-NLS-1$
-	private static String FORMATTER_ID = "com.aptana.editor.xml.formatter.tests"; //$NON-NLS-1$
+	private static String TEST_BUNDLE_ID = "com.aptana.editor.xml.formatter.tests"; //$NON-NLS-1$
 	private static String FILE_TYPE = "xml"; //$NON-NLS-1$
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#getTestBundleId()
+	 */
 	@Override
-	protected void setUp() throws Exception
+	protected String getTestBundleId()
 	{
-		factory = (IScriptFormatterFactory) ScriptFormatterManager.getInstance().getContributionById(
-				FORMATTER_FACTORY_ID);
-
-		super.setUp();
+		return TEST_BUNDLE_ID;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#getFormatterId()
+	 */
 	@Override
-	protected boolean compareWithWhiteSpace(String formattedText, String expectedResult)
+	protected String getFormatterId()
 	{
-		return expectedResult.equals(formattedText);
+		return FORMATTER_FACTORY_ID;
 	}
 
-	public void testFilesInFormattingFolder() throws Exception
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#getFileType()
+	 */
+	@Override
+	protected String getFileType()
 	{
-
-		String[] files = getFiles(FORMATTING_FOLDER, FILE_TYPE, FORMATTER_ID);
-
-		for (String filename : files)
-		{
-
-			FormatterTestFile file = new FormatterTestFile(factory, FORMATTER_ID, filename, FORMATTING_FOLDER);
-
-			if (INITIALIZE_MODE)
-			{
-				file.generateFormattedContent(OVERWRITE_MODE);
-			}
-
-			formatterTest(file, filename, FILE_TYPE);
-		}
-
-		// Tests that are not working no longer have the xml extension
-
-		// Notes on Tests:
-
-		/*
-		 * We currently indent attributes of a tag with the same indentation as the whole tag. (Studio 1.5 does this
-		 * differently) If we want to change this, we would need to modify how the writer writes the indentation. test2,
-		 * test4, test5, test6, test7, test8, test15 , test19
-		 */
-
-		/*
-		 * Test 12: Spaces inside tags need to work
-		 */
-
-		/*
-		 * Test 16: This doesn't pass since we don't handle invalid xml.
-		 */
-
-		/*
-		 * Test 17, 18: This does not work since comments aren't working yet in xml.
-		 */
-
+		return FILE_TYPE;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#isOverriteMode()
+	 */
+	@Override
+	protected boolean isOverriteMode()
+	{
+		return OVERWRITE_MODE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.formatting.AbstractFormatterTestCase#isInitializeMode()
+	 */
+	@Override
+	protected boolean isInitializeMode()
+	{
+		return INITIALIZE_MODE;
+	}
+
+	// Tests that are not working no longer have the xml extension
+
+	// Notes on Tests:
+
+	/*
+	 * We currently indent attributes of a tag with the same indentation as the whole tag. (Studio 1.5 does this
+	 * differently) If we want to change this, we would need to modify how the writer writes the indentation. test2,
+	 * test4, test5, test6, test7, test8, test15 , test19
+	 */
+
+	/*
+	 * Test 12: Spaces inside tags need to work
+	 */
+
+	/*
+	 * Test 16: This doesn't pass since we don't handle invalid xml.
+	 */
+
+	/*
+	 * Test 17, 18: This does not work since comments aren't working yet in xml.
+	 */
 
 }
