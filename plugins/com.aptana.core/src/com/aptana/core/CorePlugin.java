@@ -133,15 +133,17 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		IdeLog.StatusLevel currentSeverity = IdeLog.getSeverityPreference();
 		IdeLog.setCurrentSeverity(currentSeverity);
 
-		String[] components = EclipseUtil.getCurrentDebuggableComponents();
-		EclipseUtil.setBundleDebugOptions(components, true);
-
 		// If we are currently in debug mode, don't change the default settings
 		if (!Platform.inDebugMode())
 		{
 			Boolean checked = Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 					ICorePreferenceConstants.PREF_ENABLE_COMPONENT_DEBUGGING, false, null);
 			EclipseUtil.setPlatformDebugging(checked);
+			if (checked)
+			{
+				String[] components = EclipseUtil.getCurrentDebuggableComponents();
+				EclipseUtil.setBundleDebugOptions(components, true);
+			}
 		}
 	}
 
@@ -183,87 +185,6 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	public static CorePlugin getDefault()
 	{
 		return plugin;
-	}
-
-	/**
-	 * Log a particular status
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param message
-	 */
-	public static void logWarning(String message)
-	{
-		IdeLog.logWarning(getDefault(), message);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @param message
-	 * @param scope
-	 */
-	public static void logInfo(String message, String scope)
-	{
-		IdeLog.logInfo(getDefault(), message, scope);
-	}
-
-	/**
-	 * trace
-	 * 
-	 * @param string
-	 */
-	public static void trace(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 
 	private IStatus updateProjectNatures(IProject[] projects, IProgressMonitor monitor)
@@ -648,8 +569,64 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	{
 		if (ICorePreferenceConstants.PREF_DEBUG_LEVEL.equals(event.getKey()))
 		{
-			IdeLog.setCurrentSeverity(IdeLog.StatusLevel.valueOf(IdeLog.StatusLevel.class, event.getNewValue()
-					.toString()));
+			IdeLog.setCurrentSeverity(IdeLog.getSeverityPreference());
 		}
 	}
+
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
+	{
+		IdeLog.log(getDefault(), status);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message, Throwable e)
+	{
+		IdeLog.logWarning(getDefault(), message, e, null);
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		IdeLog.logInfo(getDefault(), message, null);
+	}
+
 }

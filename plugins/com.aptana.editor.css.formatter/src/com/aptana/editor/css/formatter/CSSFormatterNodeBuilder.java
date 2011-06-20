@@ -192,23 +192,29 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		CSSPageSelectorNode selector = pageNode.getSelector();
 		CSSDeclarationNode[] declarations = pageNode.getDeclarations();
-		int blockStartOffset = getBlockStartOffset(selector.getEndingOffset() + 1, document);
+		int blockStartOffset = getBlockStartOffset(pageNode.getStartingOffset() + 1, document);
 
-		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
-		formatterSelectorNode.setBegin(createTextNode(document,
-				getBeginWithoutWhiteSpaces(pageNode.getStartingOffset(), document),
-				getSelectorNodeEnd(pageNode.getStartingOffset() + 5, document) + 1));
-		push(formatterSelectorNode);
-		checkedPop(formatterSelectorNode, -1);
+		if (selector != null)
+		{
+			blockStartOffset = getBlockStartOffset(selector.getEndingOffset() + 1, document);
 
-		formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
-		// we do startingOffset - 1 to account for the ':'
-		formatterSelectorNode.setBegin(createTextNode(document,
-				getBeginWithoutWhiteSpaces(selector.getStartingOffset() - 1, document),
-				getSelectorNodeEnd(selector.getEndingOffset() + 1, document) + 1));
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
+			formatterSelectorNode.setBegin(createTextNode(document,
+					getBeginWithoutWhiteSpaces(pageNode.getStartingOffset(), document),
+					getSelectorNodeEnd(pageNode.getStartingOffset() + 5, document) + 1));
+			push(formatterSelectorNode);
+			checkedPop(formatterSelectorNode, -1);
 
-		push(formatterSelectorNode);
-		checkedPop(formatterSelectorNode, -1);
+			formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+			// we do startingOffset - 1 to account for the ':'
+			formatterSelectorNode.setBegin(createTextNode(document,
+					getBeginWithoutWhiteSpaces(selector.getStartingOffset() - 1, document),
+					getSelectorNodeEnd(selector.getEndingOffset() + 1, document) + 1));
+
+			push(formatterSelectorNode);
+			checkedPop(formatterSelectorNode, -1);
+		}
+
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
@@ -365,8 +371,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			offset++;
 		}
 
-		// We also account for ':' (mainly for media nodes)
-		if (document.charAt(offset) == ',' || document.charAt(offset) == ':' || document.charAt(offset) == '>')
+		if (document.charAt(offset) == ',' || document.charAt(offset) == '>')
 		{
 			return offset;
 		}

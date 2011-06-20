@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -164,7 +165,7 @@ public final class ShellExecutable
 			{
 				return path;
 			}
-			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$
+			IdeLog.logWarning(CorePlugin.getDefault(), "Shell executable path preference point to an invalid location"); //$NON-NLS-1$
 		}
 		return null;
 	}

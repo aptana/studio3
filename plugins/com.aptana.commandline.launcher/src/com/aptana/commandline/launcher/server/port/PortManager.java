@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 
 import com.aptana.commandline.launcher.CommandlineLauncherPlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * This class manages the file used to record the Command line server port.
@@ -63,7 +64,7 @@ public class PortManager
 		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logInfo(e.getLocalizedMessage(), e);
+			IdeLog.logInfo(CommandlineLauncherPlugin.getDefault(), e.getLocalizedMessage(), e, null);
 		}
 		finally
 		{
@@ -130,7 +131,7 @@ public class PortManager
 		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logInfo(e.getLocalizedMessage(), e);
+			IdeLog.logInfo(CommandlineLauncherPlugin.getDefault(), e.getLocalizedMessage(), e, null);
 			return;
 		}
 		finally
