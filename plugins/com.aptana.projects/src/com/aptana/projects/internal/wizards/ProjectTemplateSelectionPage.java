@@ -125,6 +125,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 		Dialog.applyDialogFont(main);
 		setControl(main);
+
+		updatePageControls();
 	}
 
 	public void widgetSelected(SelectionEvent e)
@@ -166,7 +168,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		fUseTemplateButton.setText(Messages.ProjectTemplateSelectionPage_UseTemplate_TXT);
 		fUseTemplateButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		fUseTemplateButton.addSelectionListener(this);
-		fUseTemplateButton.setSelection(true);
 	}
 
 	/**
@@ -181,10 +182,15 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		if (enabled)
 		{
 			setDescription(Messages.ProjectTemplateSelectionPage_Description);
+			if (fTemplates.length > 0)
+			{
+				fTemplateSelectionViewer.setSelection(new StructuredSelection(fTemplates[0]));
+			}
 		}
 		else
 		{
 			setDescription(""); //$NON-NLS-1$
+			fTemplateSelectionViewer.setSelection(null);
 		}
 	}
 
