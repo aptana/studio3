@@ -46,11 +46,11 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	{
 		if (command.length == 0 && command.text != null)
 		{
-			if (shouldAutoIndent() && isLineDelimiter(document, command.text) && !autoIndent(document, command))
+			if (isLineDelimiter(document, command.text) && !autoIndent(document, command))
 			{
 				autoIndentAfterNewLine(document, command);
 			}
-			else if (shouldAutoDedent() && !isLineDelimiter(document, command.text))
+			else if (!isLineDelimiter(document, command.text))
 			{
 				autoDedent(document, command);
 			}
@@ -158,7 +158,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	 */
 	protected boolean autoIndent(IDocument d, DocumentCommand c)
 	{
-		if (c.offset <= 0 || d.getLength() == 0)
+		if (c.offset <= 0 || d.getLength() == 0 || !shouldAutoIndent())
 			return false;
 
 		String newline = c.text;
