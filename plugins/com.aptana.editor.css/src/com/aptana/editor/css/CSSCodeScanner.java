@@ -426,10 +426,17 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		if (token.isOther())
 		{
-			CSSTokenType data = (CSSTokenType) token.getData();
+			Object data = token.getData();
 			if (data != null)
 			{
-				builder.append(data.getScope());
+				if (data instanceof CSSTokenType)
+				{
+					builder.append(((CSSTokenType) data).getScope());
+				}
+				else if (data instanceof String)
+				{
+					builder.append((String) data);
+				}
 			}
 			else
 			{
