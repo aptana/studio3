@@ -20,6 +20,7 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_CaretLabel;
 	public static String ThemePreferencePage_DeleteThemeMsg;
 	public static String ThemePreferencePage_DeleteThemeTitle;
+	public static String ThemePreferencePage_DuplicateScopeSelectorRules;
 	public static String ThemePreferencePage_FontName;
 	public static String ThemePreferencePage_FontNameLabel;
 	public static String ThemePreferencePage_FontStyleColumnLabel;
