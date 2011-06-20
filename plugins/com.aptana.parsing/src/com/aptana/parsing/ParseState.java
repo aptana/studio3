@@ -7,6 +7,9 @@
  */
 package com.aptana.parsing;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -21,6 +24,7 @@ public class ParseState implements IParseState
 	private int fRemovedLength;
 
 	private IRange[] fSkippedRanges;
+	private Map<String, Object> fProperties;
 
 	// represents the root node of the parsing result
 	private IParseNode fParseResult;
@@ -29,6 +33,7 @@ public class ParseState implements IParseState
 	{
 		fSource = NO_CHARS;
 		fInsertedText = NO_CHARS;
+		fProperties = new HashMap<String, Object>();
 	}
 
 	public void clearEditState()
@@ -66,6 +71,11 @@ public class ParseState implements IParseState
 	public IRange[] getSkippedRanges()
 	{
 		return fSkippedRanges;
+	}
+
+	public Map<String, Object> getProperties()
+	{
+		return fProperties;
 	}
 
 	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
@@ -109,5 +119,10 @@ public class ParseState implements IParseState
 		}
 
 		return text.toString();
+	}
+
+	protected void addProperty(String key, Object value)
+	{
+		fProperties.put(key, value);
 	}
 }
