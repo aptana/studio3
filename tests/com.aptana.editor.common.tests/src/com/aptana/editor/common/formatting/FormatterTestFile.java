@@ -39,7 +39,7 @@ public class FormatterTestFile
 	protected StringBuilder formattedContent = new StringBuilder();
 	protected HashMap<String, String> prefs;
 	protected String formatting_folder;
-	protected String formatterId;
+	protected String testBundleId;
 	protected IScriptFormatter formatter;
 	protected String filename;
 
@@ -48,10 +48,10 @@ public class FormatterTestFile
 		PREFS, CONTENT, FORMATTED, INVALID
 	}
 
-	public FormatterTestFile(IScriptFormatterFactory factory, String formatterId, String filename,
+	public FormatterTestFile(IScriptFormatterFactory factory, String testBundleId, String filename,
 			String formattingFolder)
 	{
-		this.formatterId = formatterId;
+		this.testBundleId = testBundleId;
 		this.formatting_folder = formattingFolder;
 		this.filename = formattingFolder + "/" + filename; //$NON-NLS-1$
 		prefs = new HashMap<String, String>();
@@ -69,7 +69,7 @@ public class FormatterTestFile
 	private void parseFile() throws IOException
 	{
 
-		InputStream stream = FileLocator.openStream(Platform.getBundle(formatterId), Path.fromPortableString(filename),
+		InputStream stream = FileLocator.openStream(Platform.getBundle(testBundleId), Path.fromPortableString(filename),
 				false);
 
 		String contentStr = IOUtil.read(stream);
@@ -127,7 +127,7 @@ public class FormatterTestFile
 	 */
 	public void generateFormattedContent(boolean overwriteFormattedBlock) throws IOException
 	{
-		URL fileURL = FileLocator.find(Platform.getBundle(formatterId), Path.fromPortableString(filename), null);
+		URL fileURL = FileLocator.find(Platform.getBundle(testBundleId), Path.fromPortableString(filename), null);
 		String file = FileLocator.toFileURL(fileURL).getFile();
 		// Read all the content till we hit the word "==FORMATTED==", or till the end of the file.
 		StringBuilder fileContentBuilder = new StringBuilder();

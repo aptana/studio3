@@ -448,7 +448,12 @@ public final class IdeLog
 	public static void log(Plugin plugin, int severity, String message, String scope, Throwable th)
 	{
 		String tempMessage = buildMessage(plugin, severity, message, scope, th);
-		Status logStatus = new Status(severity, plugin.getBundle().getSymbolicName(), IStatus.OK, tempMessage, th);
+		String symbolicName = CorePlugin.PLUGIN_ID;
+		if (plugin != null && plugin.getBundle() != null)
+		{
+			symbolicName = plugin.getBundle().getSymbolicName();
+		}
+		Status logStatus = new Status(severity, symbolicName, IStatus.OK, tempMessage, th);
 		log(plugin, logStatus, scope);
 	}
 

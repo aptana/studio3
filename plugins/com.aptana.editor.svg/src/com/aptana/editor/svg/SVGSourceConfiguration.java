@@ -28,6 +28,7 @@ import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -74,14 +75,14 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new MultiLineRule("<!DOCTYPE", ">", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("<!--", "-->", new Token(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
-		new TagRule("script", new Token(SCRIPT)), //$NON-NLS-1$
-		new TagRule("style", new Token(STYLE)), //$NON-NLS-1$
-		new TagRule("/", new Token(TAG)), //$NON-NLS-1$
-		new TagRule(new Token(TAG)) //
+		new MultiLineRule("<!DOCTYPE", ">", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("<?", "?>", getToken(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("<!--", "-->", getToken(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("<![CDATA[", "]]>", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
+		new TagRule("script", new ExtendedToken(SCRIPT)), //$NON-NLS-1$
+		new TagRule("style", new ExtendedToken(STYLE)), //$NON-NLS-1$
+		new TagRule("/", getToken(TAG)), //$NON-NLS-1$
+		new TagRule(new ExtendedToken(TAG)) //
 	};
 
 	private static SVGSourceConfiguration instance;

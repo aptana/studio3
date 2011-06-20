@@ -99,7 +99,7 @@ public class FormatterHTMLContentNode extends FormatterTextNode
 							|| !tagsWithoutNewLine.contains(previousSiblingTagName);
 				}
 			}
-			else if (isSpaceSensitive)
+			else
 			{
 				lookForNewline = false;
 			}

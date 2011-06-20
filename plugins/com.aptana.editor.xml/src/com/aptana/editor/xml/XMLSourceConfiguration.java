@@ -61,7 +61,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		new MultiLineRule("<![CDATA[", "]]>", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
 		new DocTypeRule(new ExtendedToken(DOCTYPE), true),
 		new TagRule("/", getToken(TAG)), //$NON-NLS-1$
-		new TagRule(getToken(TAG)), //
+		new TagRule(new ExtendedToken(TAG)), //
 	};
 
 	private XMLScanner xmlScanner;
