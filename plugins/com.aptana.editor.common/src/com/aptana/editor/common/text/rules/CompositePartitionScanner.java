@@ -207,7 +207,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				token = rule.getSuccessToken();
 				if (fContentType.equals(token.getData())) {
 					token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
-					if (!token.isUndefined()) {
+					if (!token.isUndefined() && fOffset != fTokenOffset) {
 						fContentType = null;
 						currentPartitionScanner.setLastToken(token);
 						currentPartitionScanner.doResetRules();
