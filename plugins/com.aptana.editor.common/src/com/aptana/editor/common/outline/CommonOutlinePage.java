@@ -420,7 +420,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	public void setContentProvider(CommonOutlineContentProvider provider)
+	public void setContentProvider(ITreeContentProvider provider)
 	{
 		fContentProvider = provider;
 		if (!isDisposed())
