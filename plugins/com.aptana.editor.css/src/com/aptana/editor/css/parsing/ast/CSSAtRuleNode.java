@@ -37,7 +37,7 @@ public class CSSAtRuleNode extends CSSNode
 	public CSSAtRuleNode(String name, String id)
 	{
 		super(CSSNodeTypes.AT_RULE);
-		
+
 		fName = name;
 		fId = id;
 	}
@@ -52,6 +52,26 @@ public class CSSAtRuleNode extends CSSNode
 		walker.visit(this);
 	}
 
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public String getName()
+	{
+		return this.fName;
+	}
+
+	/**
+	 * getRuleId
+	 * 
+	 * @return
+	 */
+	public String getRuleId()
+	{
+		return this.fId;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#toString()
@@ -62,7 +82,7 @@ public class CSSAtRuleNode extends CSSNode
 		if (fText == null)
 		{
 			StringBuilder buf = new StringBuilder();
-			
+
 			// TODO: take into acct semicolon vs. block (curly braces)
 			buf.append(fName);
 
@@ -73,7 +93,7 @@ public class CSSAtRuleNode extends CSSNode
 
 			fText = buf.toString();
 		}
-		
+
 		return fText;
 	}
 }
