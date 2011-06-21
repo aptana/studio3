@@ -69,24 +69,70 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void addNode(IParseNode node)
 	{
 		CSSNode cssNode = (CSSNode) node;
+		short type = cssNode.getNodeType();
 
-		if (cssNode.getNodeType() == CSSNodeTypes.RULE)
+		if (type == CSSNodeTypes.RULE)
 		{
 			pushFormatterRuleNode((CSSRuleNode) cssNode);
 		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.PAGE)
+		else if (type == CSSNodeTypes.PAGE)
 		{
 			pushFormatterPageNode((CSSPageNode) cssNode);
 		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.FONTFACE)
+		else if (type == CSSNodeTypes.FONTFACE)
 		{
 			pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
 		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.MEDIA)
+		else if (type == CSSNodeTypes.MEDIA)
 		{
 			pushFormatterMediaNode((CSSMediaNode) cssNode);
 		}
+		else if (type == CSSNodeTypes.AT_RULE)
+		{
+			pushAtRuleNode((CSSAtRuleNode) cssNode);
+		}
 
+	}
+
+	// This is a temporary fix for custom at-rules. When the parser adds support to return the ruleID, this will need to
+	// be changed
+	private void pushAtRuleNode(CSSAtRuleNode atRuleNode)
+	{
+
+		int length = document.getLength();
+		int selectorStartingOffset = atRuleNode.getStartingOffset();
+		int selectEndingOffset = atRuleNode.getEndingOffset();
+
+		// Locate first white space after the @rule
+		while (selectorStartingOffset < length)
+		{
+			if (Character.isWhitespace(document.charAt(selectorStartingOffset)))
+			{
+				break;
+			}
+			selectorStartingOffset++;
+		}
+		// Find the starting offset for the selector
+		selectorStartingOffset = getBeginWithoutWhiteSpaces(selectorStartingOffset, document);
+
+		// Find the end offset for the selector
+		while (selectEndingOffset >= selectorStartingOffset)
+		{
+			if (!Character.isWhitespace(document.charAt(selectEndingOffset - 1)))
+			{
+				break;
+			}
+			selectEndingOffset--;
+		}
+
+		// We use a selector node for now, we may want to create a new formatter node type for rule id
+		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+		formatterSelectorNode.setBegin(createTextNode(document,
+				getBeginWithoutWhiteSpaces(selectorStartingOffset, document),
+				getSelectorNodeEnd(selectEndingOffset + 1, document) + 1));
+		push(formatterSelectorNode);
+
+		checkedPop(formatterSelectorNode, -1);
 	}
 
 	/**
@@ -214,7 +260,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(formatterSelectorNode);
 			checkedPop(formatterSelectorNode, -1);
 		}
-
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
@@ -348,7 +393,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		int length = document.getLength();
 		while (offset < length)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n'))
+			if (!Character.isWhitespace(document.charAt(offset)))
 			{
 				break;
 			}
@@ -379,8 +424,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		offset = original;
 		while (offset > 0)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n')
-					&& (document.charAt(offset) != '{'))
+			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '{'))
 			{
 				break;
 			}
