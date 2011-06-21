@@ -1081,6 +1081,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					result = LocationType.INSIDE_RULE;
 					break LOOP;
 
+				case MINUS:
 				case IDENTIFIER:
 					if (lexeme.getText().charAt(0) == '-')
 					{
