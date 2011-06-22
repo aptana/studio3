@@ -37,12 +37,14 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
@@ -52,8 +54,6 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
-	private static final boolean SHOW_BUNDLE_LOAD_INFO = EclipseUtil.debugOptionActive("com.aptana.scripting/show_bundle_load_info"); //$NON-NLS-1$
-	
 	/**
 	 * System property that holds the OS name
 	 */
@@ -2107,10 +2107,7 @@ public class BundleManager
 	 */
 	protected void showBundleLoadInfo(String message)
 	{
-		if (SHOW_BUNDLE_LOAD_INFO)
-		{
-			System.out.println(message);
-		}
+		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_LOAD_INFO);
 	}
 	
 	/**
