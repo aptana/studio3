@@ -1,9 +1,14 @@
-/**
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the Eclipse Public License (EPL).
- * Please see the license.txt included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+/*******************************************************************************
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *     Appcelerator, Inc. - API improvemnets
+ *******************************************************************************/
 package com.aptana.editor.epl;
 
 
@@ -149,5 +154,9 @@ public final class BufferedDocumentScanner implements ICharacterScanner {
      */
     public final char[][] getLegalLineDelimiters() {
         return fDelimiters;
+    }
+    
+    public final int getOffset() {
+    	return fBufferOffset + fOffset;
     }
 }
