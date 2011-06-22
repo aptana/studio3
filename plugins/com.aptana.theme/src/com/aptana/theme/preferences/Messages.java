@@ -35,6 +35,7 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_ItalicButtonLabel;
 	public static String ThemePreferencePage_LineHighlightLabel;
 	public static String ThemePreferencePage_NewThemeDefaultName;
+	public static String ThemePreferencePage_NewThemeDefaultName_2;
 	public static String ThemePreferencePage_NewThemeMsg;
 	public static String ThemePreferencePage_NewThemeTitle;
 	public static String ThemePreferencePage_RemoveTokenLabel;
