@@ -12,12 +12,14 @@ import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSSyntaxNode;
 import com.aptana.editor.css.parsing.ast.*;
 
 /**
@@ -69,24 +71,76 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void addNode(IParseNode node)
 	{
 		CSSNode cssNode = (CSSNode) node;
+		short type = cssNode.getNodeType();
 
-		if (cssNode.getNodeType() == CSSNodeTypes.RULE)
+		switch (type)
 		{
-			pushFormatterRuleNode((CSSRuleNode) cssNode);
-		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.PAGE)
-		{
-			pushFormatterPageNode((CSSPageNode) cssNode);
-		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.FONTFACE)
-		{
-			pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
-		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.MEDIA)
-		{
-			pushFormatterMediaNode((CSSMediaNode) cssNode);
+			case CSSNodeTypes.RULE:
+				pushFormatterRuleNode((CSSRuleNode) cssNode);
+				break;
+			case CSSNodeTypes.PAGE:
+				pushFormatterPageNode((CSSPageNode) cssNode);
+				break;
+			case CSSNodeTypes.FONTFACE:
+				pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
+				break;
+			case CSSNodeTypes.MEDIA:
+				pushFormatterMediaNode((CSSMediaNode) cssNode);
+				break;
+			case CSSNodeTypes.AT_RULE:
+			case CSSNodeTypes.IMPORT:
+				// Custom at-rule and import nodes currently fall under the same formatting case. This may need to
+				// change once
+				// the parser returns the url part as a textnode
+				pushAtRuleNode(cssNode);
+				break;
+			default:
+				break;
 		}
 
+	}
+
+	// This is a temporary fix for custom at-rules. When the parser adds support to return the ruleID, this will need to
+	// be changed
+	private void pushAtRuleNode(CSSNode atRuleNode)
+	{
+
+		int length = document.getLength();
+		int selectorStartingOffset = atRuleNode.getStartingOffset();
+		int selectEndingOffset = atRuleNode.getEndingOffset();
+
+		// Locate first white space after the @rule
+		while (selectorStartingOffset < length)
+		{
+			if (Character.isWhitespace(document.charAt(selectorStartingOffset)))
+			{
+				break;
+			}
+			selectorStartingOffset++;
+		}
+		// Find the starting offset for the selector
+		selectorStartingOffset = getBeginWithoutWhiteSpaces(selectorStartingOffset, document);
+
+		// Find the end offset for the selector
+		while (selectEndingOffset >= selectorStartingOffset)
+		{
+			if (!Character.isWhitespace(document.charAt(selectEndingOffset - 1)))
+			{
+				break;
+			}
+			selectEndingOffset--;
+		}
+
+		// We use a selector node for now, we may want to create a new formatter node type for rule id
+		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+		formatterSelectorNode.setBegin(createTextNode(document,
+				getBeginWithoutWhiteSpaces(selectorStartingOffset, document),
+				getSelectorNodeEnd(selectEndingOffset, document)));
+		push(formatterSelectorNode);
+
+		findAndPushPunctuationNode(TypePunctuation.SEMICOLON, selectEndingOffset);
+
+		checkedPop(formatterSelectorNode, -1);
 	}
 
 	/**
@@ -215,7 +269,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(formatterSelectorNode, -1);
 		}
 
-
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
 		formatterBlockNode.setEnd(createTextNode(document, pageNode.getEndingOffset(), pageNode.getEndingOffset() + 1));
@@ -324,6 +377,25 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 	}
 
+	/**
+	 * Locate and push a syntax node.
+	 * 
+	 * @param offsetToSearch
+	 *            - The offset that will be used as the start for the search of the syntax characters.
+	 */
+	private void findAndPushPunctuationNode(TypePunctuation type, int offsetToSearch)
+	{
+		char punctuationType = type.toString().charAt(0);
+		int punctuationOffset = locateCharForward(document, punctuationType, offsetToSearch);
+		if (punctuationOffset != offsetToSearch || document.charAt(punctuationOffset) == punctuationType)
+		{
+			FormatterCSSSyntaxNode syntaxNode = new FormatterCSSSyntaxNode(document);
+			syntaxNode.setBegin(createTextNode(document, punctuationOffset, punctuationOffset + 1));
+			push(syntaxNode);
+			checkedPop(syntaxNode, -1);
+		}
+	}
+
 	private int getBlockStartOffset(int offset, FormatterDocument document)
 	{
 		int length = document.getLength();
@@ -348,7 +420,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		int length = document.getLength();
 		while (offset < length)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n'))
+			if (!Character.isWhitespace(document.charAt(offset)))
 			{
 				break;
 			}
@@ -379,8 +451,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		offset = original;
 		while (offset > 0)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n')
-					&& (document.charAt(offset) != '{'))
+			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '{'))
 			{
 				break;
 			}
