@@ -21,7 +21,9 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
@@ -29,7 +31,6 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.xml.internal.text.XMLFoldingComputer;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
@@ -50,10 +51,6 @@ public class XMLEditor extends AbstractThemeableEditor
 		tagPartitions.add(XMLSourceConfiguration.TAG);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
 	@Override
 	protected void initializeEditor()
 	{
@@ -98,24 +95,18 @@ public class XMLEditor extends AbstractThemeableEditor
 		return XML_PAIR_MATCHING_CHARS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-		outline.setContentProvider(new XMLOutlineContentProvider());
-		outline.setLabelProvider(new XMLOutlineLabelProvider());
-
-		return outline;
+		return new XMLOutlineContentProvider();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
-	 */
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new XMLOutlineLabelProvider();
+	}
+
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{

@@ -44,9 +44,11 @@ import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
@@ -75,6 +77,7 @@ import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
@@ -86,6 +89,8 @@ import com.aptana.editor.common.internal.AbstractFoldingEditor;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
+import com.aptana.editor.common.outline.CommonOutlineContentProvider;
+import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -478,9 +483,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return fOutlinePage;
 	}
 
+	public ITreeContentProvider getOutlineContentProvider()
+	{
+		return new CommonOutlineContentProvider();
+	}
+
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new CommonOutlineLabelProvider();
+	}
+
 	protected CommonOutlinePage createOutlinePage()
 	{
-		return new CommonOutlinePage(this, getOutlinePreferenceStore());
+		CommonOutlinePage outline = new CommonOutlinePage(this, getOutlinePreferenceStore());
+		outline.setContentProvider(getOutlineContentProvider());
+		outline.setLabelProvider(getOutlineLabelProvider());
+
+		return outline;
 	}
 
 	@Override
@@ -755,15 +774,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
 			{
 				// disables listening to cursor change so we don't get into the loop of setting selections between
-				// editor
-				// and outline
+				// editor and outline
 				fCursorChangeListened = false;
 				setSelectedElement(element);
 			}
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -782,7 +800,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -805,7 +823,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -869,7 +887,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return raw;
 	}
@@ -898,7 +916,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -924,7 +942,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}

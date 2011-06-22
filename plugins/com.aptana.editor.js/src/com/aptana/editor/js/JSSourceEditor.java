@@ -9,12 +9,13 @@ package com.aptana.editor.js;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
@@ -23,10 +24,7 @@ import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
+
 	@Override
 	protected void initializeEditor()
 	{
@@ -44,24 +42,18 @@ public class JSSourceEditor extends AbstractThemeableEditor
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-		outline.setContentProvider(new JSOutlineContentProvider());
-		outline.setLabelProvider(new JSOutlineLabelProvider());
-
-		return outline;
+		return new JSOutlineContentProvider();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
-	 */
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new JSOutlineLabelProvider();
+	}
+
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
