@@ -12,12 +12,14 @@ import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSSyntaxNode;
 import com.aptana.editor.css.parsing.ast.*;
 
 /**
@@ -87,16 +89,18 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			pushFormatterMediaNode((CSSMediaNode) cssNode);
 		}
-		else if (type == CSSNodeTypes.AT_RULE)
+		// Custom at-rule and import nodes currently fall under the same formatting case. This may need to change once
+		// the parser returns the url part as a textnode
+		else if (type == CSSNodeTypes.AT_RULE || type == CSSNodeTypes.IMPORT)
 		{
-			pushAtRuleNode((CSSAtRuleNode) cssNode);
+			pushAtRuleNode(cssNode);
 		}
 
 	}
 
 	// This is a temporary fix for custom at-rules. When the parser adds support to return the ruleID, this will need to
 	// be changed
-	private void pushAtRuleNode(CSSAtRuleNode atRuleNode)
+	private void pushAtRuleNode(CSSNode atRuleNode)
 	{
 
 		int length = document.getLength();
@@ -129,8 +133,10 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
 		formatterSelectorNode.setBegin(createTextNode(document,
 				getBeginWithoutWhiteSpaces(selectorStartingOffset, document),
-				getSelectorNodeEnd(selectEndingOffset + 1, document) + 1));
+				getSelectorNodeEnd(selectEndingOffset, document)));
 		push(formatterSelectorNode);
+
+		findAndPushPunctuationNode(TypePunctuation.SEMICOLON, selectEndingOffset);
 
 		checkedPop(formatterSelectorNode, -1);
 	}
@@ -366,6 +372,25 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(formatterSelectorNode);
 
 			checkedPop(formatterSelectorNode, -1);
+		}
+	}
+
+	/**
+	 * Locate and push a syntax node.
+	 * 
+	 * @param offsetToSearch
+	 *            - The offset that will be used as the start for the search of the syntax characters.
+	 */
+	private void findAndPushPunctuationNode(TypePunctuation type, int offsetToSearch)
+	{
+		char punctuationType = type.toString().charAt(0);
+		int punctuationOffset = locateCharForward(document, punctuationType, offsetToSearch);
+		if (punctuationOffset != offsetToSearch || document.charAt(punctuationOffset) == punctuationType)
+		{
+			FormatterCSSSyntaxNode syntaxNode = new FormatterCSSSyntaxNode(document);
+			syntaxNode.setBegin(createTextNode(document, punctuationOffset, punctuationOffset + 1));
+			push(syntaxNode);
+			checkedPop(syntaxNode, -1);
 		}
 	}
 
