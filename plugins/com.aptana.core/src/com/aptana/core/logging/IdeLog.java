@@ -141,9 +141,42 @@ public final class IdeLog
 	{
 		if (scope != null)
 		{
-			return EclipseUtil.debugOptionActive(scope);
+			return EclipseUtil.isDebugOptionEnabled(scope);
 		}
 		return true;
+	}
+
+	/**
+	 * Are we currently outputting items of INFO severity and this scope? Use this method if you want to check before
+	 * actually composing a message.
+	 * 
+	 * @return
+	 */
+	public static boolean isErrorEnabled(Plugin plugin, String scope)
+	{
+		return isOutputEnabled(plugin, StatusLevel.ERROR, scope);
+	}
+
+	/**
+	 * Are we currently outputting items of INFO severity and this scope? Use this method if you want to check before
+	 * actually composing a message.
+	 * 
+	 * @return
+	 */
+	public static boolean isWarningEnabled(Plugin plugin, String scope)
+	{
+		return isOutputEnabled(plugin, StatusLevel.WARNING, scope);
+	}
+
+	/**
+	 * Are we currently outputting items of INFO severity and this scope? Use this method if you want to check before
+	 * actually composing a message.
+	 * 
+	 * @return
+	 */
+	public static boolean isInfoEnabled(Plugin plugin, String scope)
+	{
+		return isOutputEnabled(plugin, StatusLevel.INFO, scope);
 	}
 
 	/**
@@ -278,9 +311,8 @@ public final class IdeLog
 		}
 	}
 
-
 	/**
-	 * Logs an error
+	 * Logs an informational message
 	 * 
 	 * @param plugin
 	 * @param message
@@ -291,7 +323,7 @@ public final class IdeLog
 	}
 
 	/**
-	 * Logs an error
+	 * Logs an informational message
 	 * 
 	 * @param plugin
 	 * @param message
@@ -302,7 +334,7 @@ public final class IdeLog
 	}
 
 	/**
-	 * Logs an error
+	 * Logs an informational message
 	 * 
 	 * @param plugin
 	 * @param message

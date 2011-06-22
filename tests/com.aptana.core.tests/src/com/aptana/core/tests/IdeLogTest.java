@@ -7,9 +7,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.osgi.service.debug.DebugOptions;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import org.eclipse.core.runtime.Plugin;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
@@ -78,39 +76,61 @@ public class IdeLogTest extends TestCase
 		
 		IdeLog.StatusLevel currentSeverityPref = IdeLog.getCurrentSeverity();
 
+		Plugin plugin = CorePlugin.getDefault();
+		
 		// We should no messages logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.OFF);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertFalse(IdeLog.isErrorEnabled(plugin, null));
+		assertFalse(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[OFF] should find 0 messages. Found " + StringUtil.join(",", listener.getMessages()), 0,
 				listener.getMessageCount());
 
 		// We should see errors logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.ERROR);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, null));
+		assertFalse(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[OFF] should find 1 messages. Found " + StringUtil.join(",", listener.getMessages()), 1,
 				listener.getMessageCount());
 
 		// We should see errors and warnings logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.WARNING);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, null));
+		assertTrue(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[OFF] should find 2 messages. Found " + StringUtil.join(",", listener.getMessages()), 2,
 				listener.getMessageCount());
 
 		// We should see errors, warnings, and infos logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, null));
+		assertTrue(IdeLog.isWarningEnabled(plugin, null));
+		assertTrue(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[OFF] should find 3 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
 				listener.getMessageCount());
 
@@ -133,39 +153,61 @@ public class IdeLogTest extends TestCase
 
 		IdeLog.StatusLevel currentSeverityPref = IdeLog.getCurrentSeverity();
 
+		Plugin plugin = CorePlugin.getDefault();
+
 		// We should no messages logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.OFF);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertFalse(IdeLog.isErrorEnabled(plugin, null));
+		assertFalse(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[OFF] should find 0 messages. Found " + StringUtil.join(",", listener.getMessages()), 0,
 				listener.getMessageCount());
 
 		// We should see errors logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.ERROR);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, null));
+		assertFalse(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[ERROR] should find 1 message. Found " + StringUtil.join(",", listener.getMessages()), 1,
 				listener.getMessageCount());
 
 		// We should see errors and warnings logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.WARNING);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, null));
+		assertTrue(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[WARNING] should find 2 messages. Found " + StringUtil.join(",", listener.getMessages()), 2,
 				listener.getMessageCount());
 
 		// We should see errors, warnings, and infos logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, null));
+		assertTrue(IdeLog.isWarningEnabled(plugin, null));
+		assertTrue(IdeLog.isInfoEnabled(plugin, null));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
 		assertEquals("[INFO] should find 3 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
 				listener.getMessageCount());
 
@@ -187,13 +229,20 @@ public class IdeLogTest extends TestCase
 
 		IdeLog.StatusLevel currentSeverityPref = IdeLog.getCurrentSeverity();
 
+		Plugin plugin = CorePlugin.getDefault();
+
 		// We should see all messages logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
 		listener.reset();
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null,
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, IDebugScopes.INDEXER));
+		assertTrue(IdeLog.isWarningEnabled(plugin, null));
+		assertTrue(IdeLog.isInfoEnabled(plugin, IDebugScopes.SHELL));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null,
 				IDebugScopes.INDEXER);
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
 		assertEquals("Debugging off should find 3 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
 				listener.getMessageCount());
 
@@ -219,26 +268,28 @@ public class IdeLogTest extends TestCase
 		if (!isDebugging)
 		{
 			// turn on debugging
-			EclipseUtil.setPlatformDebugging(false);
+			EclipseUtil.setPlatformDebugging(true);
 		}
 
 		IdeLog.StatusLevel currentSeverityPref = IdeLog.getCurrentSeverity();
 
-		BundleContext context = CorePlugin.getDefault().getContext();
-		ServiceReference sRef = context.getServiceReference(DebugOptions.class.getName());
-		DebugOptions options = (DebugOptions) context.getService(sRef);
+		CorePlugin plugin = CorePlugin.getDefault();
 
-		options.setOption(IDebugScopes.INDEXER, Boolean.toString(true));
-		options.setOption(IDebugScopes.SHELL, Boolean.toString(false));
+		EclipseUtil.setBundleDebugOptions(new String[] { IDebugScopes.SHELL }, false);
+		EclipseUtil.setBundleDebugOptions(new String[] { IDebugScopes.INDEXER }, true);
 
 		// We should see all messages logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
 		listener.reset();
-		IdeLog.logWarning(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
-		IdeLog.logError(CorePlugin.getDefault(), getCustomMesssage(IdeLog.StatusLevel.ERROR), null,
-				IDebugScopes.INDEXER);
-		assertEquals("Debugging off should find 2 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
+
+		assertTrue(IdeLog.isErrorEnabled(plugin, IDebugScopes.INDEXER));
+		assertTrue(IdeLog.isWarningEnabled(plugin, null));
+		assertFalse(IdeLog.isInfoEnabled(plugin, IDebugScopes.SHELL));
+
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, IDebugScopes.INDEXER);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
+		assertEquals("Debugging off should find 2 messages. Found " + StringUtil.join(",", listener.getMessages()), 2,
 				listener.getMessageCount());
 
 		IdeLog.setCurrentSeverity(currentSeverityPref);

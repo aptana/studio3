@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptingActivator;
