@@ -51,7 +51,8 @@ public final class IdeLog
 		{
 			for (IStatus status : entry.getValue())
 			{
-				if (status.getSeverity() == IStatus.ERROR || isDebugging(entry.getKey(), status.getSeverity(), null))
+				StatusLevel severity = getStatusLevel(status.getSeverity());
+				if (status.getSeverity() == IStatus.ERROR || isOutputEnabled(entry.getKey(), severity, null))
 				{
 					log(entry.getKey(), status.getSeverity(), status.getMessage(), null, status.getException());
 				}
@@ -74,7 +75,7 @@ public final class IdeLog
 	 * 
 	 * @return - true if debugging
 	 */
-	public static boolean isInDebugMode(int debugLevel)
+	public static boolean isSeverityEnabled(StatusLevel debugLevel)
 	{
 		if (caching)
 		{
@@ -87,7 +88,7 @@ public final class IdeLog
 				return false;
 			}
 
-			return level.compareTo(getStatusLevel(debugLevel)) >= 0;
+			return level.compareTo(debugLevel) >= 0;
 		}
 	}
 
@@ -146,14 +147,14 @@ public final class IdeLog
 	}
 
 	/**
-	 * Are we debugging? a) we have debugging preference level met (i.e. logging INFO and listening to INFO) b) Plugin
-	 * is debugging, and we
+	 * Are we currently outputting items of this severity and this scope? Use this method if you want to check before
+	 * actually composing an error message.
 	 * 
 	 * @return
 	 */
-	public static boolean isDebugging(Plugin plugin, int severity, String scope)
+	public static boolean isOutputEnabled(Plugin plugin, StatusLevel severity, String scope)
 	{
-		boolean inSeverity = isInDebugMode(severity);
+		boolean inSeverity = isSeverityEnabled(severity);
 		if (!inSeverity)
 		{
 			return false;
@@ -224,7 +225,7 @@ public final class IdeLog
 	 */
 	public static void logError(Plugin plugin, String message, Throwable th, String scope)
 	{
-		if (isDebugging(plugin, IStatus.ERROR, scope))
+		if (isOutputEnabled(plugin, StatusLevel.ERROR, scope))
 		{
 			log(plugin, IStatus.ERROR, message, scope, th);
 		}
@@ -267,7 +268,7 @@ public final class IdeLog
 	 */
 	public static void logWarning(Plugin plugin, String message, Throwable th, String scope)
 	{
-		if (isDebugging(plugin, IStatus.WARNING, scope))
+		if (isOutputEnabled(plugin, StatusLevel.WARNING, scope))
 		{
 			log(plugin, IStatus.WARNING, message, scope, th);
 		}
@@ -309,7 +310,7 @@ public final class IdeLog
 	 */
 	public static void logInfo(Plugin plugin, String message, Throwable th, String scope)
 	{
-		if (isDebugging(plugin, IStatus.INFO, scope))
+		if (isOutputEnabled(plugin, StatusLevel.INFO, scope))
 		{
 			log(plugin, IStatus.INFO, message, scope, th);
 		}
@@ -331,7 +332,8 @@ public final class IdeLog
 	{
 		if (isScopeEnabled(IDebugScopes.LOGGER))
 		{
-			boolean inSeverity = isInDebugMode(severity);
+			StatusLevel newSeverity = getStatusLevel(severity);
+			boolean inSeverity = isSeverityEnabled(newSeverity);
 
 			String cause = StringUtil.EMPTY;
 			if (!inSeverity)
@@ -420,7 +422,7 @@ public final class IdeLog
 		{
 			plugin.getLog().log(status);
 		}
-		if (status.getSeverity() == IStatus.ERROR && isDebugging(plugin, IStatus.ERROR, scope))
+		if (status.getSeverity() == IStatus.ERROR && isOutputEnabled(plugin, StatusLevel.ERROR, scope))
 		{
 			// dump the error to stderr so the devteam knows it happened
 			// TODO: we should create a debug-mode flag that sets a custom
