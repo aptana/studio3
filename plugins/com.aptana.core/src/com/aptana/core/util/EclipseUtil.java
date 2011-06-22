@@ -62,6 +62,17 @@ public class EclipseUtil
 	}
 
 	/**
+	 * Returns specified application/platform option. If not specified, returns null.
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static String getPlatformOption(String option)
+	{
+		return System.getProperty(option);
+	}
+
+	/**
 	 * Is the current plugin actually loaded (needed for unit testing)
 	 * 
 	 * @param plugin
