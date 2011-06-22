@@ -73,27 +73,29 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		CSSNode cssNode = (CSSNode) node;
 		short type = cssNode.getNodeType();
 
-		if (type == CSSNodeTypes.RULE)
+		switch (type)
 		{
-			pushFormatterRuleNode((CSSRuleNode) cssNode);
-		}
-		else if (type == CSSNodeTypes.PAGE)
-		{
-			pushFormatterPageNode((CSSPageNode) cssNode);
-		}
-		else if (type == CSSNodeTypes.FONTFACE)
-		{
-			pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
-		}
-		else if (type == CSSNodeTypes.MEDIA)
-		{
-			pushFormatterMediaNode((CSSMediaNode) cssNode);
-		}
-		// Custom at-rule and import nodes currently fall under the same formatting case. This may need to change once
-		// the parser returns the url part as a textnode
-		else if (type == CSSNodeTypes.AT_RULE || type == CSSNodeTypes.IMPORT)
-		{
-			pushAtRuleNode(cssNode);
+			case CSSNodeTypes.RULE:
+				pushFormatterRuleNode((CSSRuleNode) cssNode);
+				break;
+			case CSSNodeTypes.PAGE:
+				pushFormatterPageNode((CSSPageNode) cssNode);
+				break;
+			case CSSNodeTypes.FONTFACE:
+				pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
+				break;
+			case CSSNodeTypes.MEDIA:
+				pushFormatterMediaNode((CSSMediaNode) cssNode);
+				break;
+			case CSSNodeTypes.AT_RULE:
+			case CSSNodeTypes.IMPORT:
+				// Custom at-rule and import nodes currently fall under the same formatting case. This may need to
+				// change once
+				// the parser returns the url part as a textnode
+				pushAtRuleNode(cssNode);
+				break;
+			default:
+				break;
 		}
 
 	}
