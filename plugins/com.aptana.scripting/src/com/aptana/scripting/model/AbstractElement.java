@@ -16,13 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scripting.IDebugScopes;
+import com.aptana.scripting.ScriptingActivator;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {
-	private static final boolean SHOW_REGISTRATION = EclipseUtil.debugOptionActive("com.aptana.scripting/show_element_registration"); //$NON-NLS-1$
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 
 	private String _path;
@@ -182,7 +183,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	private static void showRegistration(String message, AbstractElement element)
 	{
-		if (SHOW_REGISTRATION)
+		if (IdeLog.isScopeEnabled(IDebugScopes.SHOW_ELEMENT_REGISTRATION))
 		{
 			String name = element.getDisplayName();
 			String path = element.getPath();
@@ -190,7 +191,8 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			String[] classParts = fullClassName.split("\\."); //$NON-NLS-1$
 			String className = classParts[classParts.length - 1];
 			
-			System.out.println(message + ": " + className + ", " + name + ", " + path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			IdeLog.logInfo(ScriptingActivator.getDefault(),
+					message + ": " + className + ", " + name + ", " + path, IDebugScopes.SHOW_ELEMENT_REGISTRATION); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 	
