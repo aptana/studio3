@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -104,7 +105,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	private Composite fMainControl;
 	private Text fSearchBox;
 	private TreeViewer fTreeViewer;
-	private CommonOutlineContentProvider fContentProvider;
+	private ITreeContentProvider fContentProvider;
 	private ILabelProvider fLabelProvider;
 
 	private PatternFilter fFilter;
@@ -401,7 +402,14 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	public Object getOutlineItem(IParseNode node)
 	{
-		return fContentProvider.getOutlineItem(node);
+		if (fContentProvider instanceof CommonOutlineContentProvider)
+		{
+			return ((CommonOutlineContentProvider) fContentProvider).getOutlineItem(node);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	public void refresh()
@@ -412,7 +420,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	public void setContentProvider(CommonOutlineContentProvider provider)
+	public void setContentProvider(ITreeContentProvider provider)
 	{
 		fContentProvider = provider;
 		if (!isDisposed())

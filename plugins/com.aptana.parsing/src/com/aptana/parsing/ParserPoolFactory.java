@@ -153,6 +153,11 @@ public class ParserPoolFactory
 				else
 				{
 					contentType = contentType.getBaseType();
+
+					if (contentType == null)
+					{
+						break;
+					}
 				}
 			}
 		}

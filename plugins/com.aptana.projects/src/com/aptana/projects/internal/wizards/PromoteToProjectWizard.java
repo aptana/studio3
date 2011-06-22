@@ -38,13 +38,7 @@ public class PromoteToProjectWizard extends BasicNewResourceWizard implements IE
 
 	public PromoteToProjectWizard()
 	{
-		IDialogSettings workbenchSettings = ProjectsPlugin.getDefault().getDialogSettings();
-		IDialogSettings section = workbenchSettings.getSection("BasicNewProjectResourceWizard");//$NON-NLS-1$
-		if (section == null)
-		{
-			section = workbenchSettings.addNewSection("BasicNewProjectResourceWizard");//$NON-NLS-1$
-		}
-		setDialogSettings(section);
+		this(""); //$NON-NLS-1$
 	}
 
 	/**
@@ -54,22 +48,14 @@ public class PromoteToProjectWizard extends BasicNewResourceWizard implements IE
 	 */
 	public PromoteToProjectWizard(String initialDirectoryPath)
 	{
-		this();
 		this.initialDirectoryPath = initialDirectoryPath;
-	}
-
-	/**
-	 * Set an initial directory path.
-	 * 
-	 * @param initialDirecotyPath
-	 */
-	public void setInitialDirectoryPath(String initialDirectoryPath)
-	{
-		this.initialDirectoryPath = initialDirectoryPath;
-		if (mainPage != null)
+		IDialogSettings workbenchSettings = ProjectsPlugin.getDefault().getDialogSettings();
+		IDialogSettings section = workbenchSettings.getSection("PromoteToProjectWizard");//$NON-NLS-1$
+		if (section == null)
 		{
-			mainPage.setDirectoryPath(initialDirectoryPath);
+			section = workbenchSettings.addNewSection("PromoteToProjectWizard");//$NON-NLS-1$
 		}
+		setDialogSettings(section);
 	}
 
 	@Override
@@ -79,8 +65,8 @@ public class PromoteToProjectWizard extends BasicNewResourceWizard implements IE
 
 		mainPage = new WizardFolderImportPage();
 		mainPage.setDirectoryPath(initialDirectoryPath);
-		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
-		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
+		mainPage.setTitle(Messages.PromoteToProjectWizard_PageTitle);
+		mainPage.setDescription(Messages.PromoteToProjectWizard_PageDescription);
 		addPage(mainPage);
 	}
 
@@ -108,7 +94,7 @@ public class PromoteToProjectWizard extends BasicNewResourceWizard implements IE
 	{
 		super.init(workbench, currentSelection);
 		setNeedsProgressMonitor(true);
-		setWindowTitle(Messages.NewProjectWizard_Title);
+		setWindowTitle(Messages.PromoteToProjectWizard_WindowTitle);
 	}
 
 	@Override

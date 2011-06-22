@@ -25,6 +25,8 @@ public class HTMLElementNode extends HTMLNode
 
 	private static final String ID = "id"; //$NON-NLS-1$
 	private static final String CLASS = "class"; //$NON-NLS-1$
+	private static final String SRC = "src"; //$NON-NLS-1$
+	private static final String HREF = "href"; //$NON-NLS-1$
 
 	private INameNode fNameNode;
 	private INameNode fEndNode;
@@ -144,6 +146,11 @@ public class HTMLElementNode extends HTMLNode
 		{
 			text.append(".").append(getCSSClass()); //$NON-NLS-1$
 		}
+		String src = getSource();
+		if (src != null)
+		{
+			text.append(" ").append(src); //$NON-NLS-1$
+		}
 		return text.toString();
 	}
 
@@ -233,6 +240,16 @@ public class HTMLElementNode extends HTMLNode
 			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		return text.toString();
+	}
+
+	private String getSource()
+	{
+		String source = fAttributes.get(SRC);
+		if (source == null)
+		{
+			source = fAttributes.get(HREF);
+		}
+		return source;
 	}
 
 	private static String getTagName(String tag)

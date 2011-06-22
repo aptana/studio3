@@ -90,6 +90,16 @@ public class CSSSimpleSelectorNode extends CSSNode
 		return list.toArray(new CSSAttributeSelectorNode[list.size()]);
 	}
 
+	/**
+	 * getTypeSelector
+	 * 
+	 * @return
+	 */
+	public String getTypeSelector()
+	{
+		return fTypeSelector;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#hashCode()

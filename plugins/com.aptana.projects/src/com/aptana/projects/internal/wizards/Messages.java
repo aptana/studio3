@@ -18,16 +18,13 @@ public class Messages extends NLS
 	public static String NewProjectWizard_ERR_FailToDisconnect;
 	public static String NewProjectWizard_ERR_OpeningIndex;
 	public static String NewProjectWizard_ERR_UnzipFile;
-
 	public static String NewProjectWizard_filesOverwriteMessage;
 	public static String NewProjectWizard_InternalError;
 	public static String NewProjectWizard_ProjectPage_Description;
 	public static String NewProjectWizard_ProjectPage_Title;
-
 	public static String NewProjectWizard_templateVariableApplyError;
 	public static String NewProjectWizard_Title;
 	public static String NewProjectWizard_Warning_DirectoryExists;
-
 	public static String NewProjectWizard_ZipFailure;
 
 	public static String OverwriteFilesSelectionDialog_overwriteFilesTitle;
@@ -36,6 +33,10 @@ public class Messages extends NLS
 	public static String ProjectTemplateSelectionPage_Description;
 	public static String ProjectTemplateSelectionPage_Title;
 	public static String ProjectTemplateSelectionPage_UseTemplate_TXT;
+
+	public static String PromoteToProjectWizard_PageDescription;
+	public static String PromoteToProjectWizard_PageTitle;
+	public static String PromoteToProjectWizard_WindowTitle;
 
 	static
 	{
