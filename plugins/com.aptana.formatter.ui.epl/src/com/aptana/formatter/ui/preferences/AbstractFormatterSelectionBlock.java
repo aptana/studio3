@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -104,6 +106,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private StackLayout previewStackLayout;
 	private IProfileManager profileManager;
 	private IPropertyChangeListener profileChangeListener;
+	private boolean useProjectSpecific;
 
 	private static List<IScriptFormatterFactory> TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 
@@ -137,6 +140,11 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		factories = TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 		sourcePreviewViewers = new ArrayList<SourceViewer>();
+
+		// Override the super preferences lookup order.
+		// All the changes to the formatter settings should go to the instance scope (no project scope here). Only the
+		// selected profile will be picked from the project scope and then the instance scope when requested.
+		fLookupOrder = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
 	}
 
 	protected IProfileManager getProfileManager()
@@ -146,6 +154,28 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			profileManager = ProfileManager.getInstance();
 		}
 		return profileManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.preferences.OptionsConfigurationBlock#hasProjectSpecificOptions(org.eclipse.core.resources
+	 * .IProject)
+	 */
+	public boolean hasProjectSpecificOptions(IProject project)
+	{
+		if (project != null)
+		{
+			ProjectScope projectScope = new ProjectScope(project);
+			return getProfileManager().getActiveProfileKey().getStoredValue(projectScope) != null;
+		}
+		return false;
+	}
+
+	public void useProjectSpecificSettings(boolean enable)
+	{
+		useProjectSpecific = enable;
+		super.useProjectSpecificSettings(enable);
 	}
 
 	/**
@@ -170,6 +200,24 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				FormatterPlugin.logError(e);
 			}
 		}
+		IProfile selected = manager.getSelected(fProject);
+		IScopeContext scope = null;
+		PreferenceKey activeProfileKey = manager.getActiveProfileKey();
+		if (fProject != null)
+		{
+			scope = new ProjectScope(fProject);
+			if (!useProjectSpecific)
+			{
+				selected = null;
+			}
+
+		}
+		else
+		{
+			scope = new InstanceScope();
+		}
+		activeProfileKey.setStoredValue(scope, selected != null ? selected.getID() : null);
+		activeProfileKey.flush(scope);
 		return super.saveValues();
 	}
 
@@ -179,7 +227,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	protected void applyPreferences()
 	{
 		IProfileManager manager = getProfileManager();
-		IProfile profile = manager.getSelected();
+		IProfile profile = manager.getSelected(fProject);
 		Map<String, String> settings = new HashMap<String, String>();
 		if (profile != null)
 		{
@@ -271,7 +319,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			protected void doDelete()
 			{
 				IProfileManager profileManager = getProfileManager();
-				IProfile selected = profileManager.getSelected();
+				IProfile selected = profileManager.getSelected(fProject);
 				if (MessageDialog.openQuestion(
 						fComposite.getShell(),
 						FormatterMessages.AbstractFormatterSelectionBlock_confirmRemoveLabel,
@@ -368,7 +416,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				if (defaultProfile != null)
 				{
 					Map<String, String> defaultSettings = defaultProfile.getSettings();
-					Map<String, String> activeSettings = manager.getSelected().getSettings();
+					Map<String, String> activeSettings = manager.getSelected(fProject).getSettings();
 					IScopeContext context = new InstanceScope();
 					for (PreferenceKey key : preferenceKeys)
 					{
@@ -384,7 +432,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 							activeSettings.remove(name);
 						}
 					}
-					manager.getSelected().setSettings(activeSettings);
+					manager.getSelected(fProject).setSettings(activeSettings);
 					manager.markDirty();
 					// Apply the preferences. This will update the preview as well.
 					applyPreferences();
@@ -392,7 +440,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 		IProfileManager profileManager = getProfileManager();
-		fDefaultButton.setEnabled(!profileManager.getSelected().isBuiltInProfile());
+		fDefaultButton.setEnabled(!profileManager.getSelected(fProject).isBuiltInProfile());
 
 		configurePreview(fComposite, numColumns);
 		updateButtons();
@@ -409,7 +457,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	protected void createNewProfile(Shell shell)
 	{
 		final CreateProfileDialog p = new CreateProfileDialog(shell, getProfileManager(),
-				profileManager.getProfileVersioner());
+				profileManager.getProfileVersioner(), fProject);
 		if (p.open() != Window.OK)
 		{
 			return;
@@ -456,12 +504,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		final IProfileManager profileManager = getProfileManager();
 		if (profileManager.containsName(profile.getName()))
 		{
-			final AlreadyExistsDialog aeDialog = new AlreadyExistsDialog(group.getShell(), profile, profileManager);
+			final AlreadyExistsDialog aeDialog = new AlreadyExistsDialog(group.getShell(), profile, profileManager,
+					fProject);
 			if (aeDialog.open() != Window.OK)
 				return;
 		}
 		((IProfile.ICustomProfile) profile).setVersion(versioner.getCurrentVersion());
-		profileManager.addProfile(profile);
+		profileManager.addProfile(fProject, profile);
 		updateComboFromProfiles();
 		applyPreferences();
 	}
@@ -473,9 +522,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	{
 		IProfileManager manager = getProfileManager();
 		IProfileStore store = manager.getProfileStore();
-		IProfile activeProfile = manager.getSelected();
-		IProfile selected = manager.create(ProfileKind.TEMPORARY, activeProfile.getName(), activeProfile.getSettings(),
-				activeProfile.getVersion());
+		IProfile activeProfile = manager.getSelected(fProject);
+		IProfile selected = manager.create(fProject, ProfileKind.TEMPORARY, activeProfile.getName(),
+				activeProfile.getSettings(), activeProfile.getVersion());
 
 		final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
 		dialog.setText(FormatterMessages.FormatterModifyDialog_exportProfile);
@@ -650,7 +699,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	protected final void updateSelection()
 	{
 		IProfile selected = getProfileManager().getSortedProfiles().get(fProfileCombo.getSelectionIndex());
-		getProfileManager().setSelected(selected);
+		getProfileManager().setSelected(fProject, selected);
 		updateButtons();
 		applyPreferences();
 		updatePreview();
@@ -668,14 +717,14 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			final IFormatterModifyDialog dialog = factory.createDialog(createDialogOwner(factory));
 			if (dialog != null)
 			{
-				IProfile profile = manager.getSelected();
+				IProfile profile = manager.getSelected(fProject);
 				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(),
 						profile.getName());
 				dialog.setProfileManager(manager, title);
 				dialog.setPreferences(profile.getSettings());
 				if (dialog.open() == Window.OK)
 				{
-					profile = manager.getSelected();
+					profile = manager.getSelected(fProject);
 					updateComboFromProfiles();
 					final Map<String, String> newSettings = dialog.getPreferences();
 					if (!profile.getSettings().equals(newSettings))
@@ -696,7 +745,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			fProfileCombo.removeAll();
 
 			List<IProfile> profiles = getProfileManager().getSortedProfiles();
-			IProfile selected = getProfileManager().getSelected();
+			IProfile selected = getProfileManager().getSelected(fProject);
 			int selection = 0, index = 0;
 			for (IProfile profile : profiles)
 			{
@@ -714,7 +763,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	{
 		if (fDeleteButton != null && !fDeleteButton.isDisposed())
 		{
-			IProfile selected = getProfileManager().getSelected();
+			IProfile selected = getProfileManager().getSelected(fProject);
 			fDeleteButton.setEnabled(!selected.isBuiltInProfile());
 		}
 	}

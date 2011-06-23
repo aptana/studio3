@@ -11,6 +11,7 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -25,4 +26,10 @@ public interface IFormatterModifyDialogOwner
 
 	IDialogSettings getDialogSettings();
 
+	/**
+	 * Returns a project reference in case the owner dialog is for a project-specific setting.
+	 * 
+	 * @return An {@link IProject}, or null.
+	 */
+	IProject getProject();
 }

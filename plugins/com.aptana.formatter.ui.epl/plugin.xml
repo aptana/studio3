@@ -20,4 +20,20 @@
             label="%keyword.label.beautifier">
       </keyword>
    </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.aptana.formatter.ui.preferences.CommonFomatterPreferencePage"
+            id="com.aptana.formatter.propertyPage"
+            name="%codeFormatter.page.name">
+         <keywordReference
+               id="com.aptana.formatter.keyword.beautifier">
+         </keywordReference>
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
 </plugin>
