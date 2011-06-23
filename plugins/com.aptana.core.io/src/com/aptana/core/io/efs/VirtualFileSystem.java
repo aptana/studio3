@@ -18,58 +18,66 @@ import org.eclipse.core.filesystem.provider.FileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.io.vfs.IConnectionFileManager;
 import com.aptana.core.io.vfs.VirtualConnectionManager;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
-public class VirtualFileSystem extends FileSystem {
+public class VirtualFileSystem extends FileSystem
+{
 
 	public static final String SCHEME_VIRTUAL = "aptanavfs"; //$NON-NLS-1$
-	
+
 	private static VirtualFileSystem instance;
 
 	/**
-	 * The attributes of this file system. The initial value of -1 is used
-	 * to indicate that the attributes have not yet been computed.
+	 * The attributes of this file system. The initial value of -1 is used to indicate that the attributes have not yet
+	 * been computed.
 	 */
 	private int attributes = -1;
 
 	/**
 	 * 
 	 */
-	public VirtualFileSystem() {
+	public VirtualFileSystem()
+	{
 		super();
 		setInstance(this);
 	}
-	
-	private static void setInstance(VirtualFileSystem object) {
+
+	private static void setInstance(VirtualFileSystem object)
+	{
 		instance = object;
 	}
 
-	public static IFileSystem getInstance() {
-		if (instance == null) {
-			try {
+	public static IFileSystem getInstance()
+	{
+		if (instance == null)
+		{
+			try
+			{
 				EFS.getFileSystem(SCHEME_VIRTUAL);
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 				throw new Error(e);
 			}
 		}
 		return instance;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#attributes()
 	 */
 	@Override
-	public int attributes() {
+	public int attributes()
+	{
 		if (attributes != -1)
 			return attributes;
 		attributes = 0;
@@ -79,64 +87,83 @@ public class VirtualFileSystem extends FileSystem {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#canDelete()
 	 */
 	@Override
-	public boolean canDelete() {
+	public boolean canDelete()
+	{
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#canWrite()
 	 */
 	@Override
-	public boolean canWrite() {
+	public boolean canWrite()
+	{
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileSystem#fetchFileTree(org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.provider.FileSystem#fetchFileTree(org.eclipse.core.filesystem.IFileStore,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public IFileTree fetchFileTree(IFileStore root, IProgressMonitor monitor) {
-		if (root instanceof VirtualFile) {
-			try {
+	public IFileTree fetchFileTree(IFileStore root, IProgressMonitor monitor)
+	{
+		if (root instanceof VirtualFile)
+		{
+			try
+			{
 				return ((VirtualFile) root).fetchFileTree(null, monitor);
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 				// TODO: this exception could be thrown after 3.6M1
 				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=280944
-				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.VirtualFileSystem_ERR_FetchFileTree, e));
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.VirtualFileSystem_ERR_FetchFileTree, e, null);
 			}
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#isCaseSensitive()
 	 */
 	@Override
-	public boolean isCaseSensitive() {
+	public boolean isCaseSensitive()
+	{
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#getStore(org.eclipse.core.runtime.IPath)
 	 */
 	@Override
-	public IFileStore getStore(IPath path) {
+	public IFileStore getStore(IPath path)
+	{
 		return EFS.getNullFileSystem().getStore(path);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#getStore(java.net.URI)
 	 */
 	@Override
-	public IFileStore getStore(URI uri) {
-		if (SCHEME_VIRTUAL.equals(uri.getScheme())) {
+	public IFileStore getStore(URI uri)
+	{
+		if (SCHEME_VIRTUAL.equals(uri.getScheme()))
+		{
 			URI rootURI = VirtualConnectionManager.getVirtualRootURI(uri);
 			IConnectionFileManager fileManager = VirtualConnectionManager.getInstance().getVirtualFileManager(rootURI);
-			if (fileManager != null) {
+			if (fileManager != null)
+			{
 				return new VirtualFile(fileManager, rootURI, new Path(uri.getPath()));
 			}
 		}

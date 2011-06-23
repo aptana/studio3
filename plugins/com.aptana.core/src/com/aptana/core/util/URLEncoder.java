@@ -15,10 +15,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.StringTokenizer;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
@@ -38,7 +36,7 @@ public final class URLEncoder
 	 * 
 	 * @param url
 	 * @return
-	 * @throws MalformedURLException 
+	 * @throws MalformedURLException
 	 */
 	public static URL encode(URL url) throws MalformedURLException
 	{
@@ -47,17 +45,9 @@ public final class URLEncoder
 			String auth = url.getAuthority();
 			String host = url.getHost();
 			int port = url.getPort();
-			if ( auth == null || auth.length() == 0
-				|| (auth.equals(host) && port == -1)
-				|| (auth.equals(host+":"+port))) { //$NON-NLS-1$
-				URI uri = new URI(
-						url.getProtocol(),
-						null,
-						host,
-						port,
-						url.getPath(),
-						url.getQuery(),
-						url.getRef());
+			if (auth == null || auth.length() == 0 || (auth.equals(host) && port == -1)
+					|| (auth.equals(host + ":" + port))) { //$NON-NLS-1$
+				URI uri = new URI(url.getProtocol(), null, host, port, url.getPath(), url.getQuery(), url.getRef());
 				url = uri.toURL();
 			}
 		}
@@ -84,12 +74,14 @@ public final class URLEncoder
 				sb.append(encodeSegment(segment));
 			}
 		}
-		if (query != null && query.length() > 0) {
+		if (query != null && query.length() > 0)
+		{
 			sb.append('?').append(query);
 		}
-		if (fragment != null && fragment.length() > 0) {
+		if (fragment != null && fragment.length() > 0)
+		{
 			sb.append('?').append(encodeSegment(fragment));
-		}		
+		}
 		return sb.toString();
 	}
 
@@ -115,11 +107,10 @@ public final class URLEncoder
 				try
 				{
 					byte[] bytes = Character.toString(ch).getBytes("UTF8"); //$NON-NLS-1$
-					for(int j = 0; j < bytes.length; ++j)
+					for (int j = 0; j < bytes.length; ++j)
 					{
-						sb.append('%')
-						.append(Integer.toHexString( (bytes[j] >> 4) & 0x0F ))
-						.append(Integer.toHexString( bytes[j] & 0x0F ));
+						sb.append('%').append(Integer.toHexString((bytes[j] >> 4) & 0x0F))
+								.append(Integer.toHexString(bytes[j] & 0x0F));
 					}
 				}
 				catch (UnsupportedEncodingException e)
@@ -130,7 +121,8 @@ public final class URLEncoder
 		return sb.toString();
 	}
 
-	private static void logError(String errorMessage, Throwable e) {
-		CorePlugin.log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.OK, errorMessage, e));
+	private static void logError(String errorMessage, Throwable e)
+	{
+		IdeLog.logError(CorePlugin.getDefault(), errorMessage, e);
 	}
 }

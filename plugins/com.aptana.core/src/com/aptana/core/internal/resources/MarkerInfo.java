@@ -10,66 +10,81 @@ package com.aptana.core.internal.resources;
 import java.util.Map;
 
 import com.aptana.core.CorePlugin;
-
+import com.aptana.core.logging.IdeLog;
 
 /**
  *
  */
 @SuppressWarnings({ "restriction", "rawtypes", "unchecked" })
-public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
+public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo
+{
 
 	/** UNDEFINED_ID */
 	protected static final long UNDEFINED_ID = org.eclipse.core.internal.resources.MarkerInfo.UNDEFINED_ID;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttributes(java.util.Map, Boolean)
-	 */
-	public void setAttributes(Map map, Boolean validate) {
+	public void setAttributes(Map map, Boolean validate)
+	{
 		Class superClass = getClass().getSuperclass();
-		try {
-			try {
+		try
+		{
+			try
+			{
 				superClass.getMethod("setAttributes", Map.class).invoke(this, map); //$NON-NLS-1$
 				return;
-			} catch (NoSuchMethodException e) {
+			}
+			catch (NoSuchMethodException e)
+			{
 			}
 			superClass.getMethod("setAttributes", Map.class, boolean.class).invoke(this, map, validate); //$NON-NLS-1$
-		} catch (Exception e) {
-			CorePlugin.log(e);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttribute(java.lang.String, java.lang.Object, Boolean)
-	 */
-	public void setAttribute(String attributeName, Object value, Boolean validate) {
+	public void setAttribute(String attributeName, Object value, Boolean validate)
+	{
 		Class superClass = getClass().getSuperclass();
-		try {
-			try {
+		try
+		{
+			try
+			{
 				superClass.getMethod("setAttribute", String.class, Object.class).invoke(this, attributeName, value); //$NON-NLS-1$
 				return;
-			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttribute", String.class, Object.class, boolean.class).invoke(this, attributeName, value, validate); //$NON-NLS-1$
-		} catch (Exception e) {
-			CorePlugin.log(e);
+			catch (NoSuchMethodException e)
+			{
+			}
+			superClass
+					.getMethod("setAttribute", String.class, Object.class, boolean.class).invoke(this, attributeName, value, validate); //$NON-NLS-1$
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.resources.MarkerInfo#setAttributes(java.lang.String[], java.lang.Object[], Boolean)
-	 */
-	public void setAttributes(String[] attributeNames, Object[] values, Boolean validate) {
+	public void setAttributes(String[] attributeNames, Object[] values, Boolean validate)
+	{
 		Class superClass = getClass().getSuperclass();
-		try {
-			try {
-				superClass.getMethod("setAttributes", String[].class, Object[].class).invoke(this, attributeNames, values); //$NON-NLS-1$
+		try
+		{
+			try
+			{
+				superClass
+						.getMethod("setAttributes", String[].class, Object[].class).invoke(this, attributeNames, values); //$NON-NLS-1$
 				return;
-			} catch (NoSuchMethodException e) {
 			}
-			superClass.getMethod("setAttributes", String[].class, Object[].class, boolean.class).invoke(this, attributeNames, values, validate); //$NON-NLS-1$
-		} catch (Exception e) {
-			CorePlugin.log(e);
+			catch (NoSuchMethodException e)
+			{
+			}
+			superClass
+					.getMethod("setAttributes", String[].class, Object[].class, boolean.class).invoke(this, attributeNames, values, validate); //$NON-NLS-1$
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 	}
-
 }

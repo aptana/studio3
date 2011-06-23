@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A base class that should be used for all {@link IConfigurationProcessor} implementations.
@@ -226,7 +227,7 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 		}
 		catch (CoreException e)
 		{
-			ConfigurationsPlugin.logError(e);
+			IdeLog.logError(ConfigurationsPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return null;

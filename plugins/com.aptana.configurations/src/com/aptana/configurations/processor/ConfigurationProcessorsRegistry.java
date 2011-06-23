@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -104,8 +105,8 @@ public class ConfigurationProcessorsRegistry
 		Set<ProcessorFactory> factories = delegators.get(processorID);
 		if (factories != null)
 		{
-			Set<IConfigurationProcessorDelegate> delegatorsSet = new HashSet<IConfigurationProcessorDelegate>(factories
-					.size());
+			Set<IConfigurationProcessorDelegate> delegatorsSet = new HashSet<IConfigurationProcessorDelegate>(
+					factories.size());
 			for (ProcessorFactory factory : factories)
 			{
 				IConfigurationProcessorDelegate delegate = factory.createProcessorDelegate();
@@ -162,7 +163,8 @@ public class ConfigurationProcessorsRegistry
 				}
 				catch (Throwable e)
 				{
-					ConfigurationsPlugin.logError("Failed creating a configuration processor extension", e); //$NON-NLS-1$
+					IdeLog.logError(ConfigurationsPlugin.getDefault(),
+							"Failed creating a configuration processor extension", e); //$NON-NLS-1$
 				}
 			}
 			else
@@ -182,7 +184,8 @@ public class ConfigurationProcessorsRegistry
 				}
 				catch (Throwable e)
 				{
-					ConfigurationsPlugin.logError("Failed creating a configuration processor extension", e); //$NON-NLS-1$
+					IdeLog.logError(ConfigurationsPlugin.getDefault(),
+							"Failed creating a configuration processor extension", e); //$NON-NLS-1$
 				}
 			}
 		}
@@ -213,7 +216,8 @@ public class ConfigurationProcessorsRegistry
 			}
 			catch (Throwable t)
 			{
-				ConfigurationsPlugin.logError("Failed creating a configuration processor delegate extension", t); //$NON-NLS-1$
+				IdeLog.logError(ConfigurationsPlugin.getDefault(),
+						"Failed creating a configuration processor delegate extension", t); //$NON-NLS-1$
 			}
 			return null;
 		}
@@ -240,7 +244,8 @@ public class ConfigurationProcessorsRegistry
 			}
 			catch (Throwable t)
 			{
-				ConfigurationsPlugin.logError("Failed creating a configuration processor extension", t); //$NON-NLS-1$
+				IdeLog.logError(ConfigurationsPlugin.getDefault(),
+						"Failed creating a configuration processor extension", t); //$NON-NLS-1$
 			}
 			return null;
 		}
