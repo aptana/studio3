@@ -56,7 +56,7 @@ public class EclipseUtil
 	 * @param option
 	 * @return
 	 */
-	public static boolean isPlatformOptionEnabled(String option)
+	public static boolean isSystemPropertyEnabled(String option)
 	{
 		return System.getProperty(option) != null;
 	}
@@ -67,7 +67,7 @@ public class EclipseUtil
 	 * @param option
 	 * @return
 	 */
-	public static String getPlatformOption(String option)
+	public static String getSystemProperty(String option)
 	{
 		return System.getProperty(option);
 	}
