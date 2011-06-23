@@ -783,9 +783,17 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			// Subtract the scrollbar width from the total column width
 			// if a vertical scrollbar will be required
-			Point vBarSize = fProposalTable.getVerticalBar().getSize();
-			width -= vBarSize.x;
+			if (fProposalTable.getVerticalBar() != null)
+			{
+				Point vBarSize = fProposalTable.getVerticalBar().getSize();
+				width -= vBarSize.x;
+			}
 		}
+
+		// We subtract an extra 2 pixels because it seems this calculation overestimates
+		// the table width a tiny bit. This might be a calculatable value.
+		width -= 2;
+
 		return width;
 	}
 
