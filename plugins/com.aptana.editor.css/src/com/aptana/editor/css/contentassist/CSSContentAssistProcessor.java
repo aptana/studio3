@@ -303,7 +303,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String name = "." + entry.getKey(); //$NON-NLS-1$
 				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
 
-				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset)); //$NON-NLS-1$
+				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset));
 			}
 		}
 	}

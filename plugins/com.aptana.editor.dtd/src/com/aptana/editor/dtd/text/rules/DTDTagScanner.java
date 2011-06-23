@@ -39,8 +39,8 @@ public class DTDTagScanner extends RuleBasedScanner {
 
 		// NOTE: There is no String, but we're using this to generalize pubid,
 		// att value, entity value
-		rules.add(new MultiLineRule("\"", "\"", createToken(DTDTokenType.STRING), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new MultiLineRule("'", "'", createToken(DTDTokenType.STRING), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("\"", "\"", createToken(DTDTokenType.STRING), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("'", "'", createToken(DTDTokenType.STRING), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		WordRule operatorRule = new WordRule(new DTDOperatorWordDetector(), Token.UNDEFINED);
 		operatorRule.addWord("<![", createToken(DTDTokenType.SECTION_START)); //$NON-NLS-1$
