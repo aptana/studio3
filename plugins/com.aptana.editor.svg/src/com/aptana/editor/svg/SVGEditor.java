@@ -8,42 +8,37 @@
 package com.aptana.editor.svg;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.svg.outline.SVGOutlineContentProvider;
 import com.aptana.editor.svg.outline.SVGOutlineLabelProvider;
 import com.aptana.editor.xml.XMLEditor;
 
-public class SVGEditor extends XMLEditor {
+public class SVGEditor extends XMLEditor
+{
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.xml.XMLEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage() {
-		CommonOutlinePage outline = super.createOutlinePage();
-		outline.setContentProvider(new SVGOutlineContentProvider());
-		outline.setLabelProvider(new SVGOutlineLabelProvider());
-		return outline;
+	public ITreeContentProvider getOutlineContentProvider()
+	{
+		return new SVGOutlineContentProvider();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.xml.XMLEditor#getOutlinePreferenceStore()
-	 */
 	@Override
-	protected IPreferenceStore getOutlinePreferenceStore() {
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new SVGOutlineLabelProvider();
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
 		return SVGPlugin.getDefault().getPreferenceStore();
 	}
 
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.xml.XMLEditor#initializeEditor()
-	 */
 	@Override
-	protected void initializeEditor() {
+	protected void initializeEditor()
+	{
 		super.initializeEditor();
 		setSourceViewerConfiguration(new SVGSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(SVGPlugin.getDefault().getSVGDocumentProvider());

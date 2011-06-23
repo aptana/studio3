@@ -1254,8 +1254,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			// Pop a dialog to ask for new name
 			InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_NewThemeTitle,
-					Messages.ThemePreferencePage_NewThemeMsg, MessageFormat.format(
-							Messages.ThemePreferencePage_NewThemeDefaultName, fSelectedTheme), this);
+					Messages.ThemePreferencePage_NewThemeMsg, getUniqueNewThemeName(fSelectedTheme.getName()), this);
 			if (dialog.open() == Window.OK)
 			{
 				Theme newTheme = getTheme().copy(dialog.getValue());
@@ -1392,6 +1391,17 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			ThemeRule token = (ThemeRule) item.getData();
 			fScopeText.setText(token.getScopeSelector().toString());
 		}
+	}
+
+	private String getUniqueNewThemeName(String themeName)
+	{
+		String newName = MessageFormat.format(Messages.ThemePreferencePage_NewThemeDefaultName, themeName);
+		int index = 2;
+		while (getThemeManager().getTheme(newName) != null)
+		{
+			newName = MessageFormat.format(Messages.ThemePreferencePage_NewThemeDefaultName_2, index++, themeName);
+		}
+		return newName;
 	}
 
 	private void setTheme(String text)

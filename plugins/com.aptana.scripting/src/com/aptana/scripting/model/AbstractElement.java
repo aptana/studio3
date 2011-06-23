@@ -183,7 +183,8 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	private static void showRegistration(String message, AbstractElement element)
 	{
-		if (IdeLog.isScopeEnabled(IDebugScopes.SHOW_ELEMENT_REGISTRATION))
+		if (IdeLog.isOutputEnabled(ScriptingActivator.getDefault(), IdeLog.StatusLevel.INFO,
+				IDebugScopes.SHOW_ELEMENT_REGISTRATION))
 		{
 			String name = element.getDisplayName();
 			String path = element.getPath();

@@ -31,7 +31,6 @@ import com.aptana.core.logging.IdeLog;
 /**
  * @author Max Stepanov
  */
-@SuppressWarnings("restriction")
 public final class PlatformUtil
 {
 	

@@ -45,9 +45,31 @@ public class EclipseUtil
 	 * @param option
 	 * @return
 	 */
-	public static boolean debugOptionActive(String option)
+	public static boolean isDebugOptionEnabled(String option)
 	{
-		return Boolean.valueOf(Platform.getDebugOption(option)).booleanValue();
+		return Boolean.valueOf(Platform.getDebugOption(option));
+	}
+
+	/**
+	 * Determines if the specified application/platform option has been enabled
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static boolean isPlatformOptionEnabled(String option)
+	{
+		return System.getProperty(option) != null;
+	}
+
+	/**
+	 * Returns specified application/platform option. If not specified, returns null.
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static String getPlatformOption(String option)
+	{
+		return System.getProperty(option);
 	}
 
 	/**

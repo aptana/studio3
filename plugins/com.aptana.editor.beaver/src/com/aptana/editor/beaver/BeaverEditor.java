@@ -7,32 +7,28 @@
  */
 package com.aptana.editor.beaver;
 
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+
 import com.aptana.editor.beaver.outline.BeaverOutlineContentProvider;
 import com.aptana.editor.beaver.outline.BeaverOutlineLabelProvider;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 
 public class BeaverEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-
-		outline.setContentProvider(new BeaverOutlineContentProvider());
-		outline.setLabelProvider(new BeaverOutlineLabelProvider());
-
-		return outline;
+		return new BeaverOutlineContentProvider();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new BeaverOutlineLabelProvider();
+	}
+
+	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();

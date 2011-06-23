@@ -56,6 +56,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.parsing.ast.IParseNode;
@@ -368,7 +369,7 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				// the editor when this code throws errors and will impact them severely
 				catch (Throwable e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 
 				return Status.OK_STATUS;
@@ -554,10 +555,9 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.heightHint = tree.getItemHeight() * 12;
 		tree.setLayoutData(gd);
-//		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, tree.getItemHeight() * 12).applyTo(tree);
 
-		result.setLabelProvider(_editor.getOutlinePage().getTreeViewer().getLabelProvider());
-		result.setContentProvider(_editor.getOutlinePage().getTreeViewer().getContentProvider());
+		result.setLabelProvider(_editor.getOutlineLabelProvider());
+		result.setContentProvider(_editor.getOutlineContentProvider());
 		result.setInput(this._editor);
 
 		result.setComparer(new IElementComparer()
