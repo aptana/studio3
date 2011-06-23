@@ -1062,7 +1062,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		if (view instanceof ConsoleView)
 		{
 			IPage currentPage = ((ConsoleView) view).getCurrentPage();
-			hookTheme(currentPage.getControl(), false);
+			if (currentPage != null)
+			{
+				hookTheme(currentPage.getControl(), false);
+			}
 		}
 	}
 
@@ -1114,8 +1117,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		{
 			IViewReference viewRef = (IViewReference) partRef;
 			String id = viewRef.getId();
-			if ("org.eclipse.ui.console.ConsoleView".equals(id) || "org.eclipse.jdt.ui.TypeHierarchy".equals(id)
-					|| "org.eclipse.jdt.callhierarchy.view".equals(id))
+			if ("org.eclipse.ui.console.ConsoleView".equals(id) || "org.eclipse.jdt.ui.TypeHierarchy".equals(id) //$NON-NLS-1$ //$NON-NLS-2$
+					|| "org.eclipse.jdt.callhierarchy.view".equals(id)) //$NON-NLS-1$
 			{
 				final IViewPart part = viewRef.getView(false);
 				Display.getCurrent().asyncExec(new Runnable()
