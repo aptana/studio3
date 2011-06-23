@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -92,7 +93,7 @@ public abstract class FormatterModifyDialog extends StatusDialog implements IFor
 	public void setProfileManager(IProfileManager manager, String title)
 	{
 		this.manager = manager;
-		this.profile = manager.getSelected();
+		this.profile = manager.getSelected(dialogOwner.getProject());
 		setTitle(title);
 	}
 
@@ -333,8 +334,9 @@ public abstract class FormatterModifyDialog extends StatusDialog implements IFor
 		super.okPressed();
 		if (!profile.getName().equals(fProfileNameField.getText()))
 		{
-			profile = manager.rename(profile, fProfileNameField.getText());
-			manager.setSelected(profile);
+			IProject project = dialogOwner.getProject();
+			profile = manager.rename(project, profile, fProfileNameField.getText());
+			manager.setSelected(project, profile);
 		}
 	}
 
@@ -342,8 +344,8 @@ public abstract class FormatterModifyDialog extends StatusDialog implements IFor
 	{
 		// IProfileStore store = formatterFactory.getProfileStore();
 		IProfileStore store = ProfileManager.getInstance().getProfileStore();
-		IProfile selected = manager.create(ProfileKind.TEMPORARY, fProfileNameField.getText(), getPreferences(),
-				profile.getVersion());
+		IProfile selected = manager.create(dialogOwner.getProject(), ProfileKind.TEMPORARY,
+				fProfileNameField.getText(), getPreferences(), profile.getVersion());
 
 		final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
 		dialog.setText(FormatterMessages.FormatterModifyDialog_exportProfile);

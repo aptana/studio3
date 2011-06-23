@@ -14,6 +14,7 @@ package com.aptana.formatter.preferences.profile;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 import com.aptana.formatter.preferences.PreferenceKey;
@@ -72,25 +73,34 @@ public interface IProfileManager
 	/**
 	 * Get the currently selected profile.
 	 * 
+	 * @param project
+	 *            A project reference that may have specific profile settings. May be null to ask for the workspace
+	 *            setting.
 	 * @return The currently selected profile.
 	 */
-	public IProfile getSelected();
+	public IProfile getSelected(IProject project);
 
 	/**
 	 * Set the selected profile. The profile must already be contained in this profile manager.
 	 * 
+	 * @param project
+	 *            The project that is being set with a project-specific setting (can be null to indicate a workspace
+	 *            setting)
 	 * @param profile
 	 *            The profile to select
 	 */
-	public void setSelected(IProfile profile);
+	public void setSelected(IProject project, IProfile profile);
 
 	/**
 	 * Add a new custom profile to this profile manager.
 	 * 
+	 * @param project
+	 *            Will be set as the selected profile for the given project. In case null, the workspace will be set
+	 *            with the given profile.
 	 * @param profile
 	 *            The profile to add
 	 */
-	public void addProfile(IProfile profile);
+	public void addProfile(IProject project, IProfile profile);
 
 	/**
 	 * Delete passed profile from this profile manager. The next profile in the list is selected.
@@ -102,21 +112,26 @@ public interface IProfileManager
 	/**
 	 * Rename profile to specified newName and return result profile
 	 * 
+	 * @param project
+	 *            A project that is currently assigned with this profile (may be null)
 	 * @param profile
 	 *            profile to rename
 	 * @param newName
 	 *            new profile name
 	 * @return profile with specified name
 	 */
-	public IProfile rename(IProfile profile, String newName);
+	public IProfile rename(IProject project, IProfile profile, String newName);
 
 	/**
+	 * @param project
+	 * @param kind
 	 * @param profileName
 	 * @param settings
 	 * @param version
 	 * @return
 	 */
-	public IProfile create(ProfileKind kind, String profileName, Map<String, String> settings, int version);
+	public IProfile create(IProject project, ProfileKind kind, String profileName, Map<String, String> settings,
+			int version);
 
 	public void markDirty();
 
