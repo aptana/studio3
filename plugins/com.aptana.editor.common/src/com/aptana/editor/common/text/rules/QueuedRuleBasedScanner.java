@@ -11,6 +11,7 @@ package com.aptana.editor.common.text.rules;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
@@ -84,6 +85,15 @@ public abstract class QueuedRuleBasedScanner extends RuleBasedScanner {
 	public void queueDelegate(ITokenScanner tokenScanner, int offset, int length) {
 		tokenScanner.setRange(fDocument, offset, length);
 		queue.add(new Entry(tokenScanner, null, offset, length));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
+	 */
+	@Override
+	public void setRange(IDocument document, int offset, int length) {
+		queue.clear();
+		super.setRange(document, offset, length);
 	}
 
 	/*
