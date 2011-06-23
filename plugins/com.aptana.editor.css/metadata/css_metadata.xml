@@ -20546,6 +20546,1367 @@ li {
         <value name="next" description="Use the next value of -o-link."/>
       </values>
     </property>
+	<property name="-webkit-animation" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Combines common animation properties into a single property</description>
+	</property>
+	<property name="-webkit-animation-delay" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines when an animation starts</description>
+		<values>
+			<value name="now" description="Animation begins immediately. (0 is default value)"/>
+		</values>
+	</property>
+	<property name="-webkit-animation-direction" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Determines whether the animation should play in reverse on alternate iterations</description>
+		<values>
+			<value name="normal" description="Play each iteration of the animation in the forward direction (default)"/>
+			<value name="alternate" description="Play even-numbered iterations of the animation in the forward direction and odd-numbered iterations in the reverse direction."/>
+		</values>
+	</property>
+	<property name="-webkit-animation-duration" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Specifies the length of time that an animation takes to complete one iteration</description>
+		<values>
+			<value name="time" description="The duration of the animation"/>
+		</values>
+	</property>
+	<property name="-webkit-animation-fill-mode" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="5.0"/>
+		</browsers>
+		<description>Specifies whether the effects of an animation are apparent before the animation starts and after it ends</description>
+		<values>
+			<value name="none" description="The effects of the animation are apparent only during the defined duration of the animation"/>
+			<value name="forward" description="The animation's final keyframe contiues to apply after the final iteration of the animation completes"/>
+			<value name="backwards" description="The animation's initial keyframe is applied as soon as the animation style is applied to an element."/>
+			<value name="both" description="The animation’s initial keyframe is applied as soon as the animation style is applied to an element, and the animation’s final keyframe continues to apply after the final iteration of the animation completes. (Default)"/>
+		</values>
+	</property>
+	<property name="-webkit-animation-iteration-count" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Specifies the number of times an animation iterates</description>
+		<values>
+			<value name="infinite" description="Repeats the animation forever (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-animation-name" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Specifies the name of an animation</description>
+	</property>
+	<property name="-webkit-animation-play-state" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Determines whether the animation is running or paused</description>
+		<values>
+			<value name="running" description="Plays the animation (default)"/>
+			<value name="paused" description="Pauses the animation"/>
+		</values>
+	</property>
+	<property name="-webkit-animation-timing-function" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines how an animation progresses between keyframes</description>
+		<values>
+			<value name="ease" description="Equivalent to cubic-bezier(0.25, 0.1, 0.25, 1.0). (default)"/>
+			<value name="linear" description="Equivalent to cubic-bezier(0.0, 0.0, 1.0, 1.0)."/>
+			<value name="ease-in" description="Equivalent to cubic-bezier(0.42, 0, 1.0, 1.0)."/>
+			<value name="ease-out" description="Equivalent to cubic-bezier(0, 0, 0.58, 1.0)."/>
+			<value name="ease-in-out" description="Equivalent to cubic-bezier(0.42, 0, 0.58, 1.0)."/>
+		</values>
+	</property>
+	<property name="-webkit-appearance" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Changes the appearance of buttons and other controls to resemble native controls</description>
+		<values>
+			<value name="caps-lock-indicator" description="The indicator that appears in a password field when Caps Lock is active. Available in Safari 4.0 and later."/>
+			<value name="button" description=""/>
+			<value name="caret" description=""/>
+			<value name="checkbox" description=""/>
+			<value name="default-button" description=""/>
+			<value name="listbox" description=""/>
+			<value name="listitem" description=""/>
+			<value name="media-fullscreen-button" description=""/>
+			<value name="media-mute-button" description=""/>
+			<value name="media-play-button" description=""/>
+			<value name="media-seek-back-button" description=""/>
+			<value name="media-seek-forward-button" description=""/>
+			<value name="media-slider" description=""/>
+			<value name="media-sliderthumb" description=""/>
+			<value name="menulist" description=""/>
+			<value name="menulist-button" description=""/>
+			<value name="menulist-text" description=""/>
+			<value name="menulist-textfield" description=""/>
+			<value name="none" description=""/>
+			<value name="push-button" description=""/>
+			<value name="radio" description=""/>
+			<value name="searchfield" description=""/>
+			<value name="searchfield-cancel-button" description=""/>
+			<value name="searchfield-decoration" description=""/>
+			<value name="searchfield-results-button" description=""/>
+			<value name="searchfield-results-decoration" description=""/>
+			<value name="slider-horizontal" description=""/>
+			<value name="slider-vertical" description=""/>
+			<value name="sliderthumb-horizontal" description=""/>
+			<value name="sliderthumb-vertical" description=""/>
+			<value name="square-button" description=""/>
+			<value name="textarea" description=""/>
+			<value name="textfield" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-backface-visibility" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>Determines whether or not a transformed element is visible when it is not facing the screen</description>
+		<values>
+			<value name="visible" description="The element is always visible even when it is not facing the screen. (default)"/>
+			<value name="hidden" description="The element is invisible if it is not facing the screen."/>
+		</values>
+	</property>
+	<property name="-webkit-background-clip" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the clipping behavior of the background of a box</description>
+		<values>
+			<value name="border" description="The background clips to the border of the box."/>
+			<value name="content" description="The background clips to the content of the box."/>
+			<value name="padding" description="The background clips to the padding of the box."/>
+			<value name="text" description="The background clips to the text of the box."/>
+		</values>
+	</property>
+	<property name="-webkit-background-composite" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Sets a compositing style for background images and colors</description>
+		<values>
+			<value name="border" description="The background extends into the border area"/>
+			<value name="padding" description="The background extends only into the padding area enclosed by the border"/>
+		</values>
+	</property>
+	<property name="-webkit-background-origin" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Determines where the background-position property is anchored</description>
+	</property>
+	<property name="-webkit-background-size" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Overrides the size of a background image</description>
+	</property>
+	<property name="-webkit-border-bottom-left-radius" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that the bottom-left corner of a box be rounded with the specified radius</description>
+	</property>
+	<property name="-webkit-border-bottom-right-radius" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that the bottom-right corner of a box be rounded with the specified radius</description>
+	</property>
+	<property name="-webkit-border-horizontal-spacing" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Defines the spacing between the horizontal portion of an element’s border and the content within</description>
+	</property>
+	<property name="-webkit-border-image" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies an image as the border for a box</description>
+		<values>
+			<value name="repeat" description="The image is tiled."/>
+			<value name="round" description="The image is stretched before it is tiled to prevent partial tiles."/>
+			<value name="stretch" description="The image is stretched to the size of the border."/>
+		</values>
+	</property>
+	<property name="-webkit-border-radius" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that the corners of a box be rounded with the specified radius</description>
+	</property>
+	<property name="-webkit-border-top-left-radius" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that the top-left corner of a box be rounded with the specified radius</description>
+	</property>
+	<property name="-webkit-border-top-right-radius" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that the top-right corner of a box be rounded with the specified radius</description>
+	</property>
+	<property name="-webkit-border-vertical-spacing" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Defines the spacing between the vertical portion of an element’s border and the content within</description>
+	</property>
+	<property name="-webkit-box-align" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the alignment of nested elements within an outer flexible box element</description>
+		<values>
+			<value name="baseline" description="Elements are aligned with the baseline of the box."/>
+			<value name="center" description="Elements are aligned with the center of the box."/>
+			<value name="end" description="Elements are aligned with the end of the box."/>
+			<value name="start" description="Elements are aligned with the start of the box."/>
+			<value name="stretch" description="Elements are stretched to fill the box."/>
+		</values>
+	</property>
+	<property name="-webkit-box-direction" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the direction in which child elements of a flexible box element are laid out</description>
+		<values>
+			<value name="normal" description="Elements are laid out in the default direction. (default)"/>
+			<value name="reverse" description="Elements are laid out in the reverse direction."/>
+		</values>
+	</property>
+	<property name="-webkit-box-flex" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies an element’s flexibility</description>
+	</property>
+	<property name="-webkit-box-flex-group" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies groups of dynamically resizing elements that are adjusted to be the same size</description>
+	</property>
+	<property name="-webkit-box-lines" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies whether a flexible box should contain multiple lines of content</description>
+		<values>
+			<value name="multiple" description="The box can contain multiple lines of content."/>
+			<value name="single" description="The box can contain only one line of content."/>
+		</values>
+	</property>
+	<property name="-webkit-box-ordinal-group" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies a rough ordering of elements in a flexible box</description>
+	</property>
+	<property name="-webkit-box-orient" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the layout of elements nested within a flexible box element</description>
+		<values>
+			<value name="block-axis" description="Elements are oriented along the box's axis."/>
+			<value name="horizontal" description="Elements are oriented horizontally."/>
+			<value name="inline-axis" description="Elements are oriented along the inline axis."/>
+			<value name="vertical" description="Elements are oriented vertically."/>
+		</values>
+	</property>
+	<property name="-webkit-box-pack" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies alignment of child elements within the current element in the direction of orientation</description>
+		<values>
+			<value name="center" description="Child elements are aligned to the center of the element."/>
+			<value name="end" description="Child elements are aligned to the end of the element."/>
+			<value name="justify" description="Child elements are justified with both the start and end of the element."/>
+			<value name="start" description="Child elements are aligned to the start of the element."/>
+		</values>
+	</property>
+	<property name="-webkit-box-reflect" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>Defines a reflection of a border box</description>
+		<values>
+			<value name="above" description="The reflection appears above the border box."/>
+			<value name="below" description="The reflection appears below the border box."/>
+			<value name="left" description="The reflection appears to the left of the border box."/>
+			<value name="right" description="The reflection appears to the right of the border box."/>
+		</values>
+	</property>
+	<property name="-webkit-box-shadow" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Applies a drop shadow effect to the border box of an object</description>
+		<values>
+			<value name="none" description="The box has no shadow (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-box-sizing" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that the size of a box be measured according to either its content (default) or its total size including borders</description>
+		<values>
+			<value name="border-box" description="The box size includes borders in addition to content"/>
+			<value name="content-box" description="The box size only includes content (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-column-break-after" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Determines whether a column break can and should occur after an element in a multicolumn flow layout</description>
+		<values>
+			<value name="always" description="A column break is always inserted after the element."/>
+			<value name="auto" description="A right column break is inserted after the element where appropriate. (default)"/>
+			<value name="avoid" description="Column breaks are avoided after the element."/>
+			<value name="left" description="A left column break is inserted after the element."/>
+			<value name="right" description="A right column break is inserted after the element."/>
+		</values>
+	</property>
+	<property name="-webkit-column-break-before" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Determines whether a column break can and should occur before an element in a multicolumn flow layout</description>
+		<values>
+			<value name="always" description="A column break is always inserted after the element."/>
+			<value name="auto" description="A right column break is inserted after the element where appropriate. (default)"/>
+			<value name="avoid" description="Column breaks are avoided after the element."/>
+			<value name="left" description="A left column break is inserted after the element."/>
+			<value name="right" description="A right column break is inserted after the element."/>
+		</values>
+	</property>
+	<property name="-webkit-column-break-inside" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Determines whether a column break should be avoided within the bounds of an element in a multicolumn flow layout</description>
+		<values>
+			<value name="avoid" description="Column breaks are avoided within the element."/>
+			<value name="auto" description="A right column break is inserted after the element where appropriate. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-column-count" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the number of columns desired in a multicolumn flow</description>
+		<values>
+			<value name="auto" description="The element has one column. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-column-gap" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the space between columns in a multicolumn flow</description>
+		<values>
+			<value name="normal" description="Columns in the element have the normal gap width between them. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-column-rule" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the color, style, and width of the column rule</description>
+	</property>
+	<property name="-webkit-column-rule-color" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the color of the column rule</description>
+		<values>
+			<value name="currentcolor" description="The value of the element's color property. (default)"/>
+			<value name="-webkit-activelink" description="The default color of a hyperlink that is being clicked."/>
+			<value name="-webkit-focus-ring-color" description="The color that surrounds a UI element, such as a text field, that has focus."/>
+			<value name="-webkit-link" description="The default color of a hyperlink that has been visited."/>
+			<value name="-webkit-text" description="The default text color."/>
+			<value name="activeborder" description=""/>
+			<value name="activecaption" description=""/>
+			<value name="appworkspace" description=""/>
+			<value name="aqua" description=""/>
+			<value name="background" description=""/>
+			<value name="black" description=""/>
+			<value name="blue" description=""/>
+			<value name="buttonface" description=""/>
+			<value name="buttonhighlight" description=""/>
+			<value name="buttonshadow" description=""/>
+			<value name="buttontext" description=""/>
+			<value name="captiontext" description=""/>
+			<value name="fuchsia" description=""/>
+			<value name="gray" description=""/>
+			<value name="graytext" description=""/>
+			<value name="green" description=""/>
+			<value name="grey" description=""/>
+			<value name="highlight" description=""/>
+			<value name="highlighttext" description=""/>
+			<value name="inactiveborder" description=""/>
+			<value name="inactivecaption" description=""/>
+			<value name="infobackground" description=""/>
+			<value name="infotext" description=""/>
+			<value name="lime" description=""/>
+			<value name="maroon" description=""/>
+			<value name="match" description=""/>
+			<value name="menu" description=""/>
+			<value name="menutext" description=""/>
+			<value name="navy" description=""/>
+			<value name="olive" description=""/>
+			<value name="orange" description=""/>
+			<value name="purple" description=""/>
+			<value name="red" description=""/>
+			<value name="scrollbar" description=""/>
+			<value name="silver" description=""/>
+			<value name="olive" description=""/>
+			<value name="orange" description=""/>
+			<value name="purple" description=""/>
+			<value name="red" description=""/>
+			<value name="scrollbar" description=""/>
+			<value name="silver" description=""/>
+			<value name="teal" description=""/>
+			<value name="threeddarkshadow" description=""/>
+			<value name="threedface" description=""/>
+			<value name="threedhighlight" description=""/>
+			<value name="threedlightshadow" description=""/>
+			<value name="threedshadow" description=""/>
+			<value name="transparent" description=""/>
+			<value name="white" description=""/>
+			<value name="window" description=""/>
+			<value name="windowframe" description=""/>
+			<value name="windowtext" description=""/>
+			<value name="yellow" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-column-rule-style" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the style of the column rule</description>
+		<values>
+			<value name="dashed" description="The column rule has a dashed line style."/>
+			<value name="dotted" description="The column rule has a dotted line style."/>
+			<value name="double" description="The column rule has a double solid line style."/>
+			<value name="groove" description="The column rule has a grooved style."/>
+			<value name="hidden" description="The column rule is hidden."/>
+			<value name="inset" description="The column rule has an inset style."/>
+			<value name="none" description="The column rule has no style."/>
+			<value name="outset" description="The column rule has an outset style."/>
+			<value name="ridge" description="The column rule has a ridged style."/>
+			<value name="solid" description="The column rule has a solid line style."/>
+		</values>
+	</property>
+	<property name="-webkit-column-rule-width" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the width of the column rule</description>
+		<values>
+			<value name="medium" description="The column rule has a medium width."/>
+			<value name="thick" description="The column rule has a thick width."/>
+			<value name="thin" description="The column rule has a thin width."/>
+		</values>
+	</property>
+	<property name="-webkit-column-width" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the width of the column in a multicolumn flow</description>
+		<values>
+			<value name="auto" description="Columns in the element are of normal width. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-columns" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>A composite property that specifies the width and number of columns in a multicolumn flow layout</description>
+	</property>
+	<property name="-webkit-dashboard-region" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the behavior of regions in a Dashboard widget</description>
+		<values>
+			<value name="none" description="No behavior is specified."/>
+		</values>
+	</property>
+	<property name="-webkit-line-break" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies line-breaking rules for CJK (Chinese, Japanese, and Korean) text</description>
+		<values>
+			<value name="after-white-space" description="The line breaks after white space."/>
+			<value name="normal" description="A standard line-breaking rule. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-margin-bottom-collapse" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the behavior of an element’s bottom margin if it is adjacent to an element with a margin. Elements can maintain their respective margins or share a single margin between them</description>
+		<values>
+			<value name="collapse" description="Two adjacent margins are collapsed into a single margin."/>
+			<value name="discard" description="The element’s margin is discarded if it is adjacent to another element with a margin."/>
+			<value name="separate" description="Two adjacent margins remain separate."/>
+		</values>
+	</property>
+	<property name="-webkit-margin-collapse" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the behavior of an element’s vertical margins if it is adjacent to an element with a margin. Elements can maintain their respective margins or share a single margin between them</description>
+	</property>
+	<property name="-webkit-margin-start" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Provides the width of the starting margin</description>
+		<values>
+			<value name="auto" description="The margin is automatically determined. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-margin-top-collapse" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the behavior of an element’s top margin if it is adjacent to an element with a margin. Elements can maintain their respective margins or share a single margin between them</description>
+		<values>
+			<value name="collapse" description="Two adjacent margins are collapsed into a single margin."/>
+			<value name="discard" description="The element’s margin is discarded if it is adjacent to another element with a margin."/>
+			<value name="separate" description="Two adjacent margins remain separate."/>
+		</values>
+	</property>
+	<property name="-webkit-marquee" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Defines properties for showing content as though displayed on an electronic marquee sign</description>
+	</property>
+	<property name="-webkit-marquee-direction" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the direction of motion for a marquee box</description>
+		<values>
+			<value name="ahead" description="The marquee moves from bottom to top."/>
+			<value name="auto" description="The marquee moves in the default direction. (default)"/>
+			<value name="backwards" description="The marquee moves from right to left."/>
+			<value name="down" description="The marquee moves from bottom to top."/>
+			<value name="forwards" description="The marquee moves from left to right."/>
+			<value name="left" description="The marquee moves from right to left."/>
+			<value name="reverse" description="The marquee moves from top to bottom."/>
+			<value name="right" description="The marquee moves from left to right."/>
+			<value name="up" description="The marquee moves from bottom to top."/>
+		</values>
+	</property>
+	<property name="-webkit-marquee-increment" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Defines the distance the marquee moves in each increment</description>
+		<values>
+			<value name="large" description="The marquee moves a large amount in each increment."/>
+			<value name="medium" description="The marquee moves a medium amount in each increment."/>
+			<value name="small" description="The marquee moves a small amount in each increment."/>
+		</values>
+	</property>
+	<property name="-webkit-marquee-repetition" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the number of times a marquee box repeats (or infinite)</description>
+		<values>
+			<value name="infinite" description="The marquee repeats infinitely. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-marquee-speed" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Defines the scroll or slide speed of a marquee box</description>
+		<values>
+			<value name="fast" description="The marquee moves at a fast speed."/>
+			<value name="normal" description="The marquee moves at a normal speed."/>
+			<value name="slow" description="The marquee moves at a slow speed."/>
+		</values>
+	</property>
+	<property name="-webkit-marquee-style" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the style of marquee motion</description>
+		<values>
+			<value name="alternate" description="The marquee shifts back and forth."/>
+			<value name="none" description="The marquee does not move."/>
+			<value name="scroll" description="The marquee loops in its specified direction."/>
+			<value name="slide" description="The marquee moves in its specified direction, but stops either when the entirety of its content has been displayed or the content reaches the opposite border of its box, whichever comes second."/>
+		</values>
+	</property>
+	<property name="-webkit-mask" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines a variety of mask properties within one declaration</description>
+	</property>
+	<property name="-webkit-mask-attachment" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines the scrolling or fixed nature of the image mask</description>
+		<values>
+			<value name="fixed" description="The mask does not move when the page scrolls."/>
+			<value name="scroll" description="The image moves when the page scrolls."/>
+		</values>
+	</property>
+	<property name="-webkit-mask-box-image" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines an image to be used as a mask for a border box</description>
+	</property>
+	<property name="-webkit-mask-clip" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Specifies whether the mask should extend into the border of a box</description>
+	</property>
+	<property name="-webkit-mask-composite" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Sets a compositing style for a mask</description>
+		<values>
+			<value name="border" description="(default)"/>
+		</values>
+	</property>
+	<property name="-webkit-mask-image" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines an image to be used as a mask for an element</description>
+	</property>
+	<property name="-webkit-mask-origin" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Determines where the -webkit-mask-position property is anchored</description>
+		<values>
+			<value name="border" description="The mask's position is anchored at the upper-left corner of the element's border."/>
+			<value name="content" description="The mask's position is anchored at the upper-left corner of the element's content."/>
+			<value name="padding" description="The mask's position is anchored at the upper-left corner of the element's padding."/>
+		</values>
+	</property>
+	<property name="-webkit-mask-position" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines the position of a mask</description>
+		<values>
+			<value name="top" description=""/>
+			<value name="left" description=""/>
+			<value name="center" description=""/>
+			<value name="right" description=""/>
+			<value name="bottom" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-mask-position-x" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines the x-coordinate of the position of a mask</description>
+	</property>
+	<property name="-webkit-mask-position-y" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines the y-coordinate of the position of a mask</description>
+	</property>
+	<property name="-webkit-mask-repeat" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines the repeating qualities of a mask</description>
+	</property>
+	<property name="-webkit-mask-size" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Overrides the size of a mask</description>
+	</property>
+	<property name="-webkit-nbsp-mode" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Defines the behavior of nonbreaking spaces within text</description>
+		<values>
+			<value name="normal" description="Nonbreaking spaces are treated as usual."/>
+			<value name="space" description="Nonbreaking spaces are treated like standard spaces."/>
+		</values>
+	</property>
+	<property name="-webkit-padding-start" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Provides the width of the starting padding</description>
+	</property>
+	<property name="-webkit-perspective" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>Gives depth to a scene, causing elements farther away from the viewer to appear smaller</description>
+		<values>
+			<value name="none" description="No perspective transform is applied. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-perspective-origin" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>Sets the origin of the -webkit-perspective property</description>
+		<values>
+			<value name="top" description="Sets the y-origin to the top of the element’s border box."/>
+			<value name="center" description="Sets the x or y origin to the center of the element’s border box."/>
+			<value name="bottom" description="Sets the y-origin to the bottom of the element’s border box."/>
+			<value name="left" description="Sets the x-origin to the left side of the border box."/>
+			<value name="right" description="Sets the x-origin to the right side of the border box."/>
+		</values>
+	</property>
+	<property name="-webkit-rtl-ordering" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Overrides ordering defaults for right-to-left content</description>
+		<values>
+			<value name="logical" description="Raw content is in mixed order (requiring a bidirectional renderer)."/>
+			<value name="visual" description="Right-to-left content is encoded in reverse order so an entire line of text can be rendered from left to right in a unidirectional fashion."/>
+		</values>
+	</property>
+	<property name="-webkit-tap-highlight-color" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="1.1.1"/>
+		</browsers>
+		<description>Overrides the highlight color shown when the user taps a link or a JavaScript clickable element in Safari on iPhone</description>
+	</property>
+	<property name="-webkit-text-fill-color" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies a fill color for text</description>
+		<values>
+			<value name="currentcolor" description="The value of the element's color property (default)"/>
+			<value name="-webkit-activelink" description="The default color of a hyperlink that is being clicked."/>
+			<value name="-webkit-focus-ring-color" description="The color that surrounds a UI element, such as a text field, that has focus."/>
+			<value name="-webkit-link" description="The default color of a hyperlink that has been visited."/>
+			<value name="-webkit-text" description="The default text color."/>
+			<value name="activeborder" description=""/>
+			<value name="activecaption" description=""/>
+			<value name="appworkspace" description=""/>
+			<value name="aqua" description=""/>
+			<value name="background" description=""/>
+			<value name="black" description=""/>
+			<value name="blue" description=""/>
+			<value name="buttonface" description=""/>
+			<value name="buttonhighlight" description=""/>
+			<value name="buttonshadow" description=""/>
+			<value name="buttontext" description=""/>
+			<value name="captiontext" description=""/>
+			<value name="fuchsia" description=""/>
+			<value name="gray" description=""/>
+			<value name="graytext" description=""/>
+			<value name="green" description=""/>
+			<value name="grey" description=""/>
+			<value name="highlight" description=""/>
+			<value name="highlighttext" description=""/>
+			<value name="inactiveborder" description=""/>
+			<value name="inactivecaption" description=""/>
+			<value name="infobackground" description=""/>
+			<value name="infotext" description=""/>
+			<value name="lime" description=""/>
+			<value name="maroon" description=""/>
+			<value name="match" description=""/>
+			<value name="menu" description=""/>
+			<value name="menutext" description=""/>
+			<value name="navy" description=""/>
+			<value name="olive" description=""/>
+			<value name="orange" description=""/>
+			<value name="purple" description=""/>
+			<value name="red" description=""/>
+			<value name="scrollbar" description=""/>
+			<value name="silver" description=""/>
+			<value name="olive" description=""/>
+			<value name="orange" description=""/>
+			<value name="purple" description=""/>
+			<value name="red" description=""/>
+			<value name="scrollbar" description=""/>
+			<value name="silver" description=""/>
+			<value name="teal" description=""/>
+			<value name="threeddarkshadow" description=""/>
+			<value name="threedface" description=""/>
+			<value name="threedhighlight" description=""/>
+			<value name="threedlightshadow" description=""/>
+			<value name="threedshadow" description=""/>
+			<value name="transparent" description=""/>
+			<value name="white" description=""/>
+			<value name="window" description=""/>
+			<value name="windowframe" description=""/>
+			<value name="windowtext" description=""/>
+			<value name="yellow" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-text-security" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the shape to use in place of letters in a password input field</description>
+		<values>
+			<value name="circle" description="A circle shape."/>
+			<value name="disc" description="A disc shape."/>
+			<value name="none" description="No shape is used."/>
+			<value name="square" description="A square shape."/>
+		</values>
+	</property>
+	<property name="-webkit-text-size-adjust" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="1.0"/>
+		</browsers>
+		<description>Specifies a size adjustment for displaying text content in Safari on iPhone</description>
+		<values>
+			<value name="none" description="The text size is not adjusted. (default)"/>
+			<value name="auto" description="The text size is automatically adjusted."/>
+		</values>
+	</property>
+	<property name="-webkit-text-stroke" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the width and color of the outline (stroke) of text</description>
+	</property>
+	<property name="-webkit-text-stroke-color" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the color of the outline (stroke) of text</description>
+		<values>
+			<value name="currentcolor" description="The value of the element's color property (default)"/>
+			<value name="-webkit-activelink" description="The default color of a hyperlink that is being clicked."/>
+			<value name="-webkit-focus-ring-color" description="The color that surrounds a UI element, such as a text field, that has focus."/>
+			<value name="-webkit-link" description="The default color of a hyperlink that has been visited."/>
+			<value name="-webkit-text" description="The default text color."/>
+			<value name="activeborder" description=""/>
+			<value name="activecaption" description=""/>
+			<value name="appworkspace" description=""/>
+			<value name="aqua" description=""/>
+			<value name="background" description=""/>
+			<value name="black" description=""/>
+			<value name="blue" description=""/>
+			<value name="buttonface" description=""/>
+			<value name="buttonhighlight" description=""/>
+			<value name="buttonshadow" description=""/>
+			<value name="buttontext" description=""/>
+			<value name="captiontext" description=""/>
+			<value name="fuchsia" description=""/>
+			<value name="gray" description=""/>
+			<value name="graytext" description=""/>
+			<value name="green" description=""/>
+			<value name="grey" description=""/>
+			<value name="highlight" description=""/>
+			<value name="highlighttext" description=""/>
+			<value name="inactiveborder" description=""/>
+			<value name="inactivecaption" description=""/>
+			<value name="infobackground" description=""/>
+			<value name="infotext" description=""/>
+			<value name="lime" description=""/>
+			<value name="maroon" description=""/>
+			<value name="match" description=""/>
+			<value name="menu" description=""/>
+			<value name="menutext" description=""/>
+			<value name="navy" description=""/>
+			<value name="olive" description=""/>
+			<value name="orange" description=""/>
+			<value name="purple" description=""/>
+			<value name="red" description=""/>
+			<value name="scrollbar" description=""/>
+			<value name="silver" description=""/>
+			<value name="olive" description=""/>
+			<value name="orange" description=""/>
+			<value name="purple" description=""/>
+			<value name="red" description=""/>
+			<value name="scrollbar" description=""/>
+			<value name="silver" description=""/>
+			<value name="teal" description=""/>
+			<value name="threeddarkshadow" description=""/>
+			<value name="threedface" description=""/>
+			<value name="threedhighlight" description=""/>
+			<value name="threedlightshadow" description=""/>
+			<value name="threedshadow" description=""/>
+			<value name="transparent" description=""/>
+			<value name="white" description=""/>
+			<value name="window" description=""/>
+			<value name="windowframe" description=""/>
+			<value name="windowtext" description=""/>
+			<value name="yellow" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-text-stroke-width" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies the width for the text outline</description>
+		<values>
+			<value name="medium" description="A medium stroke."/>
+			<value name="thick" description="A thick stroke."/>
+			<value name="thin" description="A thin stroke."/>
+		</values>
+	</property>
+	<property name="-webkit-touch-callout" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>Disables the default callout shown when you touch and hold a touch target</description>
+		<values>
+			<value name="none" description=""/>
+			<value name="inherit" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-transform" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>Specifies transformations to be applied to an element</description>
+		<values>
+			<value name="none" description="No transforms are applied (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-transform-origin" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>Sets the origin for the -webkit-transform property</description>
+		<values>
+			<value name="top" description=""/>
+			<value name="left" description=""/>
+			<value name="center" description=""/>
+			<value name="right" description=""/>
+			<value name="bottom" description=""/>
+		</values>
+	</property>
+	<property name="-webkit-transform-origin-x" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>The x coordinate of the origin for transforms applied to an element with respect to its border box</description>
+	</property>
+	<property name="-webkit-transform-origin-y" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>The y coordinate of the origin for transforms applied to an element with respect to its border box</description>
+	</property>
+	<property name="-webkit-transform-origin-z" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>The z coordinate of the origin for transforms applied to an element with respect to its border box</description>
+	</property>
+	<property name="-webkit-transform-style" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="2.0"/>
+		</browsers>
+		<description>Defines how nested, transformed elements are rendered in 3D space</description>
+		<values>
+			<value name="flat" description="Flatten all children of this element into the 2D plane. (default)"/>
+			<value name="preserve-3d" description="Preserve the 3D perspective."/>
+		</values>
+	</property>
+	<property name="-webkit-transition" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>Combines -webkit-transition-delay,-webkit-transition-duration,-webkit-transition-property, and -webkit-transition-timing-function into a single property</description>
+	</property>
+	<property name="-webkit-transition-delay" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="4.0"/>
+		</browsers>
+		<description>Defines when the transition starts</description>
+		<values>
+			<value name="now" description="The transition begins immediately"/>
+		</values>
+	</property>
+	<property name="-webkit-transition-duration" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>Defines how long the transition from the old value to the new value should take</description>
+	</property>
+	<property name="-webkit-transition-property" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>Specifies the name of the CSS property to which the transition is applied</description>
+		<values>
+			<value name="none" description="No transition specified."/>
+			<value name="all" description="The default transition name. (default)"/>
+		</values>
+	</property>
+	<property name="-webkit-transition-timing-function" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.1"/>
+		</browsers>
+		<description>Specifies how the intermediate values used during a transition are calculated</description>
+		<values>
+			<value name="ease" description="Equivalent to cubic-bezier(0.25, 0.1, 0.25, 1.0). (default)"/>
+			<value name="linear" description="Equivalent to cubic-bezier(0.0, 0.0, 1.0, 1.0)."/>
+			<value name="ease-in" description="Equivalent to cubic-bezier(0.42, 0, 1.0, 1.0)."/>
+			<value name="ease-out" description="Equivalent to cubic-bezier(0, 0, 0.58, 1.0)."/>
+			<value name="ease-in-out" description="Equivalent to cubic-bezier(0.42, 0, 0.58, 1.0)."/>
+		</values>
+	</property>
+	<property name="-webkit-user-drag" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Specifies that an entire element should be draggable instead of its contents</description>
+		<values>
+			<value name="auto" description="The default dragging behavior is used. (default)"/>
+			<value name="element" description="The entire element is draggable instead of its contents."/>
+			<value name="none" description="The element cannot be dragged at all."/>
+		</values>
+	</property>
+	<property name="-webkit-user-modify" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Determines whether a user can edit the content of an element</description>
+		<values>
+			<value name="read-only" description="The content is read-only."/>
+			<value name="write-only" description="The content can be read and written."/>
+			<value name="read-write-plaintext-only" description="The content can be read and written, but any rich formatting of pasted text is lost."/>
+		</values>
+	</property>
+	<property name="-webkit-user-select" type="String">
+		<availability>
+			<specification name="W3C" version="CSS3"/>
+		</availability>
+		<browsers>
+			<browser platform="Safari" version="3.0"/>
+		</browsers>
+		<description>Determines whether a user can select the content of an element</description>
+		<values>
+			<value name="auto" description="The user can select content in the element. (default)"/>
+			<value name="none" description="The user cannot select any content."/>
+			<value name="text" description="The user can select text in the element."/>
+		</values>
+	</property>
     <property name="accelerator" type="String">
       <browsers>
         <browser platform="IE" version="5.5+"/>
@@ -20618,7 +21979,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand property combines six of the animation properties into a single property.</description>
       <example></example>
@@ -20632,7 +21994,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies when the animation will start. It allows an animation to begin execution some time after it is applied.</description>
       <example></example>
@@ -20644,7 +22007,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies whether or not the animation should play in reverse on alternate cycles.</description>
       <example></example>
@@ -20660,7 +22024,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the length of time that an animation takes to complete one cycle.</description>
       <example></example>
@@ -20674,7 +22039,8 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the number of times an animation cycle is played. The default value is one, meaning the animation will play from beginning to end once. A value of ‘infinite’  will cause the animation to repeat forever. Non-integer numbers will cause the animation to end part-way through a cycle.</description>
       <example></example>
@@ -20688,11 +22054,27 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a list of animations that apply. Each name is used to select the keyframe at-rule that provides the property values for the animation.</description>
       <example></example>
       <hint>[none | IDENT]</hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="animation-timing-function" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies how the animation will progress over one cycle of its duration.</description>
+      <example></example>
+      <hint></hint>
       <remarks></remarks>
       <values>
       </values>
@@ -20702,9 +22084,10 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
-      <description>Specifies how the animation will progress over one cycle of its duration.</description>
+      <description>Defines whether the animation is running or paused.</description>
       <example></example>
       <hint></hint>
       <remarks></remarks>
@@ -20750,6 +22133,24 @@ li {
         <value name="behind" description="Same as 180deg."/>
         <value name="leftwards" description="Subtracts 20deg from the current angle."/>
         <value name="rightwards" description="Adds 20deg to the current angle."/>
+      </values>
+    </property>
+    <property name="backface-visibility" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Determines whether or not the "back" side of a transformed element is visible when facing the viewer.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
       </values>
     </property>
     <property allow-multiple-values="true" name="background" type="String">
@@ -20964,7 +22365,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the size of the background images.</description>
       <example></example>
@@ -21262,6 +22667,112 @@ li {
       <description>Specifies the color for the borders for an element. Specify either a color name or RGB color code.</description>
       <hint>[color | "transparent"]. Example values: Red, #FF0000 (#RRGGBB color code for "red"), etc.</hint>
     </property>
+    <property name="border-image" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies image to be used in place of the border styles.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-source" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies an image to use instead of the border styles given by the border-style properties and as an additional background layer for the element.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-slice" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Represents the inward offsets from the top, right, bottom, and left edges of the image respectively, dividing it into nine regions: four corners, four edges and a middle.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-width" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies offsets that are used to divide the border image area into nine parts.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-outset" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies the amount by which the border image area extends beyond the border box on the top, right, bottom, and left sides respectively.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="border-image-repeat" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+        <browser platform="Mozilla" version="3.6+"/>
+        <browser platform="Opera" version="11.1+"/>
+        <browser platform="Chrome" version="10.0+"/>
+        <browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies how the images for the sides and the middle part of the border image are scaled and tiled.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+        <value name="stretch" description="The image is stretched to fill the area."/>
+        <value name="repeat" description="The image is tiled (repeated) to fill the area."/>
+        <value name="round" description="The image is tiled (repeated) to fill the area. If it does not fill the area with a whole number of tiles, the image is rescaled so that it does."/>
+        <value name="space" description="The image is tiled (repeated) to fill the area. If it does not fill the area with a whole number of tiles, the extra space is distributed around the tiles."/>
+      </values>
+    </property>
     <property allow-multiple-values="true" name="border-left" type="String">
       <availability>
         <specification name="W3C" version="CSS2"/>
@@ -21382,7 +22893,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <browser platform="Opera" version="10.5+"/>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="4.0+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>The two length or percentage values of the element properties define the radii of a quarter ellipse that defines the shape of the corner of the outer border edge</description>
       <example></example>
@@ -21858,6 +23373,24 @@ li {
         <value name="justify" description="The space is divided evenly in-between each child, with none of the extra space placed before the first child or after the last child. If there is only one child, treat the pack value as if it were start."/>
       </values>
     </property>
+    <property name="box-shadow" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="1.0+"/>
+		<browser platform="Opera" version="7.0+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Specifies one or more drop-shadows to the box</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="box-sizing" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
@@ -21982,7 +23515,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes the number of columns of a multicol element. </description>
       <example></example>
@@ -21998,7 +23535,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes how content will be filled in a column. </description>
       <example></example>
@@ -22014,7 +23555,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the gap between columns.</description>
       <example></example>
@@ -22030,7 +23575,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand for setting ‘column-rule-width’, ‘column-rule-style’, and ‘column-rule-color’ at the same place in the style sheet.</description>
       <example></example>
@@ -22044,7 +23593,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property sets the color of the column rule.</description>
       <example></example>
@@ -22058,7 +23611,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Sets the style of the rule between columns of an element.</description>
       <example></example>
@@ -22072,7 +23629,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Sets the width of the rule between columns. Negative values are not allowed.</description>
       <example></example>
@@ -22086,7 +23647,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes how many columns an element spans across.</description>
       <example></example>
@@ -22102,7 +23667,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>This property describes the width of columns in multicol elements.</description>
       <example></example>
@@ -22118,7 +23687,11 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="IE" version="10.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand property for setting ‘column-width’ and ‘column-count’.</description>
       <example></example>
@@ -25602,6 +27175,7 @@ li {
         <browser platform="Opera" version="7.0+"/>
         <browser platform="Chrome" version="5.0+"/>
         <browser platform="Safari" version="1.2+"/>
+		<browser platform="IE" version="9.0+"/>
       </browsers>
       <description>Specifies the transparency of an element. Specify a value between 0.0-1.0.</description>
       <example>
@@ -26110,6 +27684,42 @@ li {
       </browsers>
       <description>Specifies the number of seconds or milliseconds to pause before an element before playing audio content.</description>
       <hint>[length-of-pause]</hint>
+    </property>
+    <property name="perspective" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Applies the same transform as the perspective(&lt;number&gt;) transform function, except that it applies only to the positioned or transformed children of the element, not to the transform on the element itself.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="perspective-origin" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Establishes the origin for the perspective property</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
     </property>
     <property name="phonemes" type="String">
       <availability>
@@ -26897,8 +28507,10 @@ li {
         <specification name="W3C" version="CSS2"/>
       </availability>
       <browsers>
-        <browser platform="Chrome" version="5.0+"/>
-        <browser platform="Safari" version="1.1+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+		<browser platform="Opera" version="11.1+"/>
       </browsers>
       <description>Defines the horizontal depth, vertical depth, blur, and color for a drop-shadow for text content in the element.</description>
       <example>To specify a blue 5 pixel drop-shadow with a 5 pixel blur, use the following syntax:  &lt;code&gt;H1 {text-shadow: 5px 5px 5px blue;}&lt;/code&gt;.</example>
@@ -26978,12 +28590,69 @@ li {
         <value name="auto" description="Top position to be determined by the window or parent element."/>
       </values>
     </property>
+    <property name="transform" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Used to apply a 2D or 3D transformation to an element.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="transform-origin" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Establishes the origin of transformation for an element.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
+    <property name="transform-style" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="IE" version="9.0+"/>
+		<browser platform="Mozilla" version="3.6+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Defines how nested elements are rendered in 3D space.</description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+      </values>
+    </property>
     <property name="transition" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies a shorthand property combines the four properties of transition into a single property. </description>
       <example></example>
@@ -26997,7 +28666,10 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Defines when the transition will start. It allows a transition to begin execution some period of time from when it is applied.</description>
       <example></example>
@@ -27011,7 +28683,10 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Defines the length of time that a transition takes.</description>
       <example></example>
@@ -27025,13 +28700,39 @@ li {
         <specification name="W3C" version="CSS3"/>
       </availability>
       <browsers>
-        <!-- Not currently supported by any browser -->
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
       </browsers>
       <description>Specifies the name of the CSS property to which the transition is applied.</description>
       <example></example>
       <hint>none | all | [ &lt;IDENT&gt; ] [ ‘,’ &lt;IDENT&gt; ]*</hint>
       <remarks></remarks>
       <values>
+      </values>
+    </property>
+    <property name="transition-timing-function" type="String">
+      <availability>
+        <specification name="W3C" version="CSS3"/>
+      </availability>
+      <browsers>
+		<browser platform="Mozilla" version="4.0+"/>
+		<browser platform="Opera" version="11.1+"/>
+		<browser platform="Chrome" version="10.0+"/>
+		<browser platform="Safari" version="5.0+"/>
+      </browsers>
+      <description>Describes how the intermediate values used during a transition will be calculated. </description>
+      <example></example>
+      <hint></hint>
+      <remarks></remarks>
+      <values>
+        <value name="ease" description="The ease function is equivalent to cubic-bezier(0.25, 0.1, 0.25, 1.0)."/>
+        <value name="linear" description="The linear function is equivalent to cubic-bezier(0.0, 0.0, 1.0, 1.0)."/>
+        <value name="ease-in" description="The ease-in function is equivalent to cubic-bezier(0.42, 0, 1.0, 1.0)."/>
+        <value name="ease-out" description="The ease-out function is equivalent to cubic-bezier(0, 0, 0.58, 1.0)."/>
+        <value name="ease-in-out" description="The ease-in-out function is equivalent to cubic-bezier(0.42, 0, 0.58, 1.0)"/>
+        <value name="cubic-bezier" description="Specifies a cubic-bezier curve."/>
       </values>
     </property>
     <property name="unicode-bidi" type="String">

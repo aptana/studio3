@@ -177,6 +177,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 		IToken token = createToken(JSTokenType.STRING);
 		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new SingleLineRule("<?", "?>", token, '\0')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// regex
 		rules.add(new JSRegExpRule(createToken(JSTokenType.REGEX)));

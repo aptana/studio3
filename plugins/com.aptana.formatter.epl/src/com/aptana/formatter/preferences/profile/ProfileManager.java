@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -59,7 +61,7 @@ public class ProfileManager implements IProfileManager
 	/**
 	 * The currently selected profile.
 	 */
-	private IProfile fSelected;
+	private Map<IProject, IProfile> fSelected;
 	private boolean fDirty = false;
 	private IProfileVersioner versioner;
 	private PreferenceKey[] preferenceKeys;
@@ -124,6 +126,7 @@ public class ProfileManager implements IProfileManager
 		profiles.addAll(getCustomProfiles());
 
 		fProfiles = new HashMap<String, IProfile>();
+		fSelected = new HashMap<IProject, IProfile>();
 		fProfilesByName = new ArrayList<IProfile>();
 		for (final IProfile profile : profiles)
 		{
@@ -134,11 +137,12 @@ public class ProfileManager implements IProfileManager
 		if (!fProfilesByName.isEmpty())
 		{
 			String storedActiveProfile = getActiveProfileKey().getStoredValue(new InstanceScope());
-			fSelected = fProfiles.get(storedActiveProfile);
-			if (fSelected == null)
+			IProfile workspaceSelectedProfile = fProfiles.get(storedActiveProfile);
+			if (workspaceSelectedProfile == null)
 			{
-				fSelected = fProfilesByName.get(0);
+				workspaceSelectedProfile = fProfilesByName.get(0);
 			}
+			fSelected.put(null, workspaceSelectedProfile);
 		}
 		listeners = new ListenerList();
 	}
@@ -296,9 +300,31 @@ public class ProfileManager implements IProfileManager
 		return sortedNames;
 	}
 
-	public IProfile getSelected()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.profile.IProfileManager#getSelected(org.eclipse.core.resources.IProject)
+	 */
+	public IProfile getSelected(IProject project)
 	{
-		return fSelected;
+		IProfile selected = fSelected.get(project);
+		if (selected == null && project != null)
+		{
+			// try to resolve the selected profile
+			PreferenceKey activeProfileKey = getActiveProfileKey();
+			ProjectScope scope = new ProjectScope(project);
+			IProfile profile = findProfile(activeProfileKey.getStoredValue(scope));
+			if (profile != null)
+			{
+				fSelected.put(project, profile);
+				selected = profile;
+			}
+			else
+			{
+				// Return the default workspace setting
+				selected = fSelected.get(null);
+			}
+		}
+		return selected;
 	}
 
 	public void addPropertyChangeListener(IPropertyChangeListener listener)
@@ -311,13 +337,19 @@ public class ProfileManager implements IProfileManager
 		listeners.remove(listener);
 	}
 
-	public void setSelected(IProfile profile)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.profile.IProfileManager#setSelected(org.eclipse.core.resources.IProject,
+	 * com.aptana.formatter.preferences.profile.IProfile)
+	 */
+	public void setSelected(IProject project, IProfile profile)
 	{
 		final IProfile newSelected = fProfiles.get(profile.getID());
-		if (newSelected != null && !newSelected.equals(fSelected))
+		IProfile prevSelected = getSelected(project);
+		if (newSelected != null && !newSelected.equals(prevSelected))
 		{
-			PropertyChangeEvent event = new PropertyChangeEvent(this, PROFILE_SELECTED, fSelected, newSelected);
-			fSelected = newSelected;
+			PropertyChangeEvent event = new PropertyChangeEvent(this, PROFILE_SELECTED, prevSelected, newSelected);
+			fSelected.put(project, newSelected);
 			Object[] allListeners = listeners.getListeners();
 			for (Object listener : allListeners)
 			{
@@ -347,7 +379,7 @@ public class ProfileManager implements IProfileManager
 		return fProfiles.get(profileId);
 	}
 
-	public void addProfile(IProfile profile)
+	public void addProfile(IProject project, IProfile profile)
 	{
 		if (profile instanceof CustomProfile)
 		{
@@ -363,7 +395,7 @@ public class ProfileManager implements IProfileManager
 			fProfiles.put(profile.getID(), profile);
 			fProfilesByName.add(profile);
 			Collections.sort(fProfilesByName);
-			fSelected = newProfile;
+			fSelected.put(project, newProfile);
 			fDirty = true;
 		}
 	}
@@ -382,7 +414,15 @@ public class ProfileManager implements IProfileManager
 
 			if (index >= fProfilesByName.size())
 				index--;
-			fSelected = fProfilesByName.get(index);
+			IProject[] projects = fSelected.keySet().toArray(new IProject[fSelected.size()]);
+			for (IProject key : projects)
+			{
+				if (key != null && profile.equals(fSelected.get(key)))
+				{
+					fSelected.remove(key);
+					break;
+				}
+			}
 
 			fDirty = true;
 
@@ -391,7 +431,7 @@ public class ProfileManager implements IProfileManager
 		return false;
 	}
 
-	public IProfile rename(IProfile profile, String newName)
+	public IProfile rename(IProject project, IProfile profile, String newName)
 	{
 		final String trimmed = newName.trim();
 		if (trimmed.equals(profile.getName()))
@@ -399,7 +439,7 @@ public class ProfileManager implements IProfileManager
 		if (profile.isBuiltInProfile())
 		{
 			CustomProfile newProfile = new CustomProfile(trimmed, profile.getSettings(), profile.getVersion());
-			addProfile(newProfile);
+			addProfile(project, newProfile);
 			fDirty = true;
 			return newProfile;
 		}
@@ -419,12 +459,13 @@ public class ProfileManager implements IProfileManager
 		}
 	}
 
-	public IProfile create(ProfileKind kind, String profileName, Map<String, String> settings, int version)
+	public IProfile create(IProject project, ProfileKind kind, String profileName, Map<String, String> settings,
+			int version)
 	{
 		CustomProfile profile = new CustomProfile(profileName, settings, version);
 		if (kind != ProfileKind.TEMPORARY)
 		{
-			addProfile(profile);
+			addProfile(project, profile);
 		}
 		return profile;
 	}

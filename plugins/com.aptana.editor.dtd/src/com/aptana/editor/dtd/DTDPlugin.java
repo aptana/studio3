@@ -8,6 +8,7 @@
 package com.aptana.editor.dtd;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -21,6 +22,9 @@ public class DTDPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static DTDPlugin plugin;
+	
+	private IDocumentProvider dtdDocumentProvider;
+
 
 	/**
 	 * The constructor
@@ -57,6 +61,17 @@ public class DTDPlugin extends AbstractUIPlugin
 	public static DTDPlugin getDefault()
 	{
 		return plugin;
+	}
+
+	/**
+	 * Returns DTD document provider
+	 * @return
+	 */
+	public synchronized IDocumentProvider getDTDDocumentProvider() {
+		if (dtdDocumentProvider == null) {
+			dtdDocumentProvider = new DTDDocumentProvider();
+		}
+		return dtdDocumentProvider;
 	}
 
 }

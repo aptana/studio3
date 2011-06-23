@@ -7,6 +7,8 @@
  */
 package com.aptana.parsing;
 
+import java.util.Map;
+
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -58,6 +60,13 @@ public interface IParseState
 	 * @return the list of ranges in an array
 	 */
 	public IRange[] getSkippedRanges();
+
+	/**
+	 * Returns language-specific properties related to the parser.
+	 * 
+	 * @return the properties in a map
+	 */
+	public Map<String, Object> getProperties();
 
 	/**
 	 * setEditState

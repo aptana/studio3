@@ -225,4 +225,37 @@ public class ContentAssistCoarseLocationTests extends LocationTestCase
 			new LocationTypeRange(LocationType.IN_TEXT, 14)
 		);
 	}
+
+	public void testUnclosedCloseTagWithNoPrecedingText()
+	{
+		String source = "<div></";
+
+		// @formatter:off
+        this.coarseLocationTests(
+			source,
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, 4),
+			new LocationTypeRange(LocationType.IN_TEXT, 5, 5),
+			new LocationTypeRange(LocationType.IN_CLOSE_TAG, 6, 7)
+        );
+        // @formatter:off
+    }
+
+    /**
+     * Bug 2264
+     */
+    public void testUnclosedCloseTagWithPrecedingText()
+    {
+        String source = "<div>Test</";
+
+        // @formatter:off
+        this.coarseLocationTests(
+			source,
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, 4),
+			new LocationTypeRange(LocationType.IN_TEXT, 5, 9),
+			new LocationTypeRange(LocationType.IN_CLOSE_TAG, 10, 11)
+        );
+        // @formatter:on
+	}
 }

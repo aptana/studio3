@@ -25,15 +25,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptingActivator;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
-	private static final boolean SHOW_FILE_EVENTS = EclipseUtil.debugOptionActive("com.aptana.scripting/show_bundle_monitor_file_events"); //$NON-NLS-1$
-	private static final boolean SHOW_RESOURCE_EVENTS = EclipseUtil.debugOptionActive("com.aptana.scripting/show_bundle_monitor_resource_events"); //$NON-NLS-1$
-
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
 	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
@@ -497,10 +495,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	protected void showFileEvent(String message)
 	{
-		if (SHOW_FILE_EVENTS)
-		{
-			System.out.println(message);
-		}
+		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS);
 	}
 	
 	/**
@@ -510,10 +505,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	protected void showResourceEvent(String message)
 	{
-		if (SHOW_RESOURCE_EVENTS)
-		{
-			System.out.println(message);
-		}
+		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_RESOURCE_EVENTS);
 	}
 	
 	/*

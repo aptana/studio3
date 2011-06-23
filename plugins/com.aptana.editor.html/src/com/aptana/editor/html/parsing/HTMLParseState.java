@@ -20,13 +20,12 @@ import com.aptana.parsing.ParseState;
 public class HTMLParseState extends ParseState
 {
 
-	// FIXME This is incorrect. These tags need to be determined at runtime based on the document type!
 	@SuppressWarnings("nls")
 	private static final String[] END_OPTIONAL_TAGS = { "body", "colgroup", "dd", "dt", "area", "html", "li", "option",
 			"p", "tbody", "td", "tfoot", "th", "thead", "tr" };
 	@SuppressWarnings("nls")
 	private static final String[] END_FORBIDDEN_OR_EMPTY_TAGS = { "area", "base", "basefont", "br", "col", "frame",
-			"hr", "img", "input", "isindex", "link", "meta", "param", };
+			"hr", "img", "input", "isindex", "link", "meta", "param" };
 
 	private Type fDocumentType;
 
@@ -63,7 +62,12 @@ public class HTMLParseState extends ParseState
 		String key = tagName.toLowerCase();
 		if (fEndTagInfo.containsKey(key))
 		{
-			return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
+			int info = fEndTagInfo.get(key);
+			int type = info & HTMLTagInfo.END_MASK;
+			if (type == HTMLTagInfo.END_FORBIDDEN || fDocumentType.compareTo(Type.XHTML_1_0_STRICT) < 0)
+			{
+				return type;
+			}
 		}
 		return HTMLTagInfo.END_REQUIRED;
 	}

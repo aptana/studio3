@@ -14,6 +14,8 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSPageNode extends CSSNode
 {
+	private static final String PAGE = "@page"; //$NON-NLS-1$
+
 	private CSSPageSelectorNode fPageSelector;
 
 	/**
@@ -28,7 +30,7 @@ public class CSSPageNode extends CSSNode
 
 		if (declarations != null)
 		{
-			this.setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
+			setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
 		}
 	}
 
@@ -61,9 +63,7 @@ public class CSSPageNode extends CSSNode
 		{
 			return false;
 		}
-
 		CSSPageNode other = (CSSPageNode) obj;
-
 		return toString().equals(other.toString());
 	}
 
@@ -75,7 +75,6 @@ public class CSSPageNode extends CSSNode
 	public CSSDeclarationNode[] getDeclarations()
 	{
 		List<IParseNode> list = Arrays.asList(getChildren());
-
 		return list.toArray(new CSSDeclarationNode[list.size()]);
 	}
 
@@ -87,6 +86,18 @@ public class CSSPageNode extends CSSNode
 	public CSSPageSelectorNode getSelector()
 	{
 		return fPageSelector;
+	}
+
+	@Override
+	public String getText()
+	{
+		StringBuilder text = new StringBuilder();
+		text.append(PAGE);
+		if (fPageSelector != null)
+		{
+			text.append(" :").append(fPageSelector); //$NON-NLS-1$
+		}
+		return text.toString();
 	}
 
 	/*
@@ -113,18 +124,15 @@ public class CSSPageNode extends CSSNode
 	{
 		StringBuilder text = new StringBuilder();
 
-		text.append("@page "); //$NON-NLS-1$
-
+		text.append(PAGE);
 		if (fPageSelector != null)
 		{
-			text.append(":").append(fPageSelector).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+			text.append(" :").append(fPageSelector); //$NON-NLS-1$
 		}
 
-		text.append("{"); //$NON-NLS-1$
-
+		text.append(" {"); //$NON-NLS-1$
 		CSSDeclarationNode[] declarations = getDeclarations();
 		int size = declarations.length;
-
 		for (int i = 0; i < size; ++i)
 		{
 			text.append(declarations[i]);
@@ -134,7 +142,6 @@ public class CSSPageNode extends CSSNode
 				text.append(" "); //$NON-NLS-1$
 			}
 		}
-
 		text.append("}"); //$NON-NLS-1$
 
 		return text.toString();

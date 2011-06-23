@@ -19,17 +19,19 @@ import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 
-public class HTMLDocumentProvider extends CommonDocumentProvider
-{
+/**
+ * 
+ * @author Max Stepanov
+ *
+ */
+public class HTMLDocumentProvider extends CommonDocumentProvider {
 
 	@Override
-	public void connect(Object element) throws CoreException
-	{
+	public void connect(Object element) throws CoreException {
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null)
-		{
+		if (document != null) {
 			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration
 					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
 					new NullPartitionerSwitchStrategy());
@@ -43,8 +45,11 @@ public class HTMLDocumentProvider extends CommonDocumentProvider
 		}
 	}
 
-	protected String getDefaultContentType(String filename)
-	{
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
+	 */
+	protected String getDefaultContentType(String filename) {
 		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 }

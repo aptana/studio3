@@ -58,4 +58,11 @@ public interface IProjectTemplate
 	 * @return The template's icon path as URL (can be null)
 	 */
 	public URL getIconPath();
+
+	/**
+	 * Returns true if the template should evaluate and substitute the template-tags when imported to the workspace.
+	 * 
+	 * @return True, if tags-substitution should occur when importing; False, otherwise.
+	 */
+	public boolean isReplacingParameters();
 }

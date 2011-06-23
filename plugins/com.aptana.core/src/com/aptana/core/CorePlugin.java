@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.internal.preferences.PreferenceInitializer;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -48,7 +49,7 @@ import com.aptana.filewatcher.FileWatcher;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class CorePlugin extends Plugin
+public class CorePlugin extends Plugin implements IPreferenceChangeListener
 {
 
 	// The plug-in ID
@@ -63,6 +64,8 @@ public class CorePlugin extends Plugin
 	private Job addBuilderJob;
 	private Job addFilewatcherJob;
 
+	private BundleContext context;
+
 	/**
 	 * The constructor
 	 */
@@ -76,8 +79,16 @@ public class CorePlugin extends Plugin
 	 */
 	public void start(BundleContext context) throws Exception
 	{
+		this.context = context;
 		super.start(context);
+
 		plugin = this;
+
+		// Perhaps don't enable this if platform is already in -debug mode?
+		//
+		// Place after context & plugin assignments, as this relies on both existing already
+		enableDebugging();
+
 		addFilewatcherJob = new Job(Messages.CorePlugin_Hooking_Filewatchers)
 		{
 			protected IStatus run(IProgressMonitor monitor)
@@ -103,6 +114,37 @@ public class CorePlugin extends Plugin
 			addBuilderJob.setPriority(Job.LONG);
 			addBuilderJob.schedule(250);
 		}
+
+		IdeLog.flushCache();
+	}
+
+	/**
+	 * Enable the debugging options
+	 */
+	private void enableDebugging()
+	{
+		new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+
+		/**
+		 * Returns the current severity preference
+		 * 
+		 * @return
+		 */
+		IdeLog.StatusLevel currentSeverity = IdeLog.getSeverityPreference();
+		IdeLog.setCurrentSeverity(currentSeverity);
+
+		// If we are currently in debug mode, don't change the default settings
+		if (!Platform.inDebugMode())
+		{
+			Boolean checked = Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+					ICorePreferenceConstants.PREF_ENABLE_COMPONENT_DEBUGGING, false, null);
+			EclipseUtil.setPlatformDebugging(checked);
+			if (checked)
+			{
+				String[] components = EclipseUtil.getCurrentDebuggableComponents();
+				EclipseUtil.setBundleDebugOptions(components, true);
+			}
+		}
 	}
 
 	/*
@@ -113,6 +155,9 @@ public class CorePlugin extends Plugin
 	{
 		try
 		{
+			// Don't listen to auto-refresh pref changes anymore
+			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+
 			if (addFilewatcherJob != null)
 			{
 				addFilewatcherJob.cancel();
@@ -140,73 +185,6 @@ public class CorePlugin extends Plugin
 	public static CorePlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void log(Throwable e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
-	}
-
-	public static void log(String msg)
-	{
-		// log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
-	}
-
-	public static void log(String msg, Throwable e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void log(IStatus status)
-	{
-		if (status.getSeverity() > IStatus.INFO)
-		{
-			getDefault().getLog().log(status);
-		}
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @param string
-	 */
-	public static void logInfo(String string)
-	{
-		if (Platform.inDebugMode())
-		{
-			getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
-		}
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param msg
-	 */
-	public static void logWarning(String msg)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
-	}
-
-	/**
-	 * trace
-	 * 
-	 * @param string
-	 */
-	public static void trace(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 
 	private IStatus updateProjectNatures(IProject[] projects, IProgressMonitor monitor)
@@ -333,7 +311,7 @@ public class CorePlugin extends Plugin
 									if (delta.getKind() == IResourceDelta.ADDED
 											|| (delta.getKind() == IResourceDelta.CHANGED
 													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-													.isAccessible()))
+														.isAccessible()))
 									{
 										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 										{
@@ -355,7 +333,9 @@ public class CorePlugin extends Plugin
 					}
 					catch (CoreException e)
 					{
-						log(e.getStatus());
+						IStatus status = new Status(e.getStatus().getSeverity(), CorePlugin.PLUGIN_ID,
+								e.getLocalizedMessage(), e);
+						IdeLog.log(CorePlugin.getDefault(), status);
 					}
 				}
 			};
@@ -389,10 +369,12 @@ public class CorePlugin extends Plugin
 	{
 
 		private Map<IProject, Integer> fWatchers;
+		private FileDeltaRefreshAdapter fAdapter;
 		private boolean hooked;
 
 		ResourceListener()
 		{
+			fAdapter = new FileDeltaRefreshAdapter();
 			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
@@ -410,7 +392,11 @@ public class CorePlugin extends Plugin
 		 */
 		private void hookAll()
 		{
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.PRE_CLOSE);
+			ResourcesPlugin.getWorkspace()
+					.addResourceChangeListener(
+							this,
+							IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE
+									| IResourceChangeEvent.PRE_CLOSE);
 
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
@@ -459,10 +445,11 @@ public class CorePlugin extends Plugin
 			}
 			try
 			{
-				if (newProject != null && newProject.exists() && newProject.getLocation() != null && (fWatchers == null || !fWatchers.containsKey(newProject)))
+				if (newProject != null && newProject.exists() && newProject.getLocation() != null
+						&& (fWatchers == null || !fWatchers.containsKey(newProject)))
 				{
 					int watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
-							new FileDeltaRefreshAdapter());
+							fAdapter);
 					if (fWatchers == null)
 					{
 						fWatchers = new HashMap<IProject, Integer>();
@@ -472,7 +459,7 @@ public class CorePlugin extends Plugin
 			}
 			catch (JNotifyException e)
 			{
-				logError(e.getMessage(), e);
+				IdeLog.logError(getDefault(), e.getMessage(), e, null);
 			}
 		}
 
@@ -492,7 +479,7 @@ public class CorePlugin extends Plugin
 			}
 			catch (JNotifyException e)
 			{
-				logError(e.getMessage(), e);
+				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e, null);
 			}
 		}
 
@@ -541,7 +528,8 @@ public class CorePlugin extends Plugin
 			}
 			catch (CoreException e)
 			{
-				log(e.getStatus());
+				IStatus status = new Status(e.getStatus().getSeverity(), CorePlugin.PLUGIN_ID, e.getLocalizedMessage());
+				IdeLog.log(getDefault(), status);
 			}
 		}
 
@@ -562,6 +550,83 @@ public class CorePlugin extends Plugin
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns the current bundle context
+	 * 
+	 * @return
+	 */
+	public BundleContext getContext()
+	{
+		return context;
+	}
+
+	/**
+	 * Respond to a preference change event
+	 */
+	public void preferenceChange(PreferenceChangeEvent event)
+	{
+		if (ICorePreferenceConstants.PREF_DEBUG_LEVEL.equals(event.getKey()))
+		{
+			IdeLog.setCurrentSeverity(IdeLog.getSeverityPreference());
+		}
+	}
+
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
+	{
+		IdeLog.log(getDefault(), status);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message, Throwable e)
+	{
+		IdeLog.logWarning(getDefault(), message, e, null);
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		IdeLog.logInfo(getDefault(), message, null);
 	}
 
 }

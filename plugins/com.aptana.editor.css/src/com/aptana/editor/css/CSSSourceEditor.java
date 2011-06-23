@@ -9,12 +9,13 @@ package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
@@ -23,24 +24,18 @@ import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 @SuppressWarnings("restriction")
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-		outline.setContentProvider(new CSSOutlineContentProvider());
-		outline.setLabelProvider(new CSSOutlineLabelProvider());
-
-		return outline;
+		return new CSSOutlineContentProvider();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new CSSOutlineLabelProvider();
+	}
+
 	@Override
 	protected void initializeEditor()
 	{
@@ -49,7 +44,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 
-		setDocumentProvider(new CSSDocumentProvider());
+		setDocumentProvider(CSSPlugin.getDefault().getCSSDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()
@@ -58,20 +53,12 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlineElementAt(int)
-	 */
 	@Override
 	protected Object getOutlineElementAt(int caret)
 	{
 		return CSSOutlineContentProvider.getElementAt(getFileService().getParseResult(), caret);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
-	 */
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
@@ -83,5 +70,4 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	{
 		return new CSSFoldingComputer(this, document);
 	}
-
 }

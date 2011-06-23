@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -35,15 +34,14 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.CSSScopeScanner;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
+import com.aptana.editor.css.parsing.CSSTokenScanner;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
-import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
@@ -69,7 +67,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
 	{
 		this(editor);
-
 		this._activeRange = activeRange;
 	}
 
@@ -81,8 +78,17 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public CSSContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		super(editor);
-
 		this._queryHelper = new CSSIndexQueryHelper();
+	}
+
+	/**
+	 * The currently active range
+	 * 
+	 * @param activeRange
+	 */
+	public void setActiveRange(IRange activeRange)
+	{
+		this._activeRange = activeRange;
 	}
 
 	/**
@@ -294,7 +300,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				proposals.add(createProposal("." + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset)); //$NON-NLS-1$
+				String name = "." + entry.getKey(); //$NON-NLS-1$
+				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
+
+				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset));
 			}
 		}
 	}
@@ -317,7 +326,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				proposals.add(createProposal("#" + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset)); //$NON-NLS-1$
+				String name = "#" + entry.getKey(); //$NON-NLS-1$
+				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
+
+				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset));
 			}
 		}
 	}
@@ -414,6 +426,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case ID:
 					this.addIDs(proposals, offset);
 					break;
+
 				case COLON:
 					// If previous is also a colon, it's syntax for pseudo elements. One colon means pseudo classes.
 					Lexeme<CSSTokenType> previous = lexemeProvider.getLexemeFromOffset(this._currentLexeme
@@ -427,6 +440,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this.addPseudoClassProposals(proposals, offset);
 					}
 					break;
+
 				case LPAREN:
 					// Back up one, grab identifier as the pseudo-class name
 					String pseudoClassName = null;
@@ -438,6 +452,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					this.addPseudoClassArguments(pseudoClassName, proposals, offset);
 					break;
+
 				default:
 					this.addAllElementProposals(proposals, offset);
 					break;
@@ -518,6 +533,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
+	/**
+	 * supportsColorValues
+	 * 
+	 * @param property
+	 * @return
+	 */
 	@SuppressWarnings("nls")
 	private boolean supportsColorValues(PropertyElement property)
 	{
@@ -534,14 +555,70 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		return propertyName.endsWith("color");
 	}
 
+	/**
+	 * createProposal
+	 * 
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param offset
+	 * @return
+	 */
 	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
 			int offset)
 	{
-		return createProposal(name, name, image, description, userAgents, offset);
+		return createProposal(name, image, description, userAgents, CSSIndexConstants.CORE, offset);
 	}
 
+	/**
+	 * createProposal
+	 * 
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocatoin
+	 * @param offset
+	 * @return
+	 */
+	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
+	{
+		return createProposal(name, name, image, description, userAgents, fileLocation, offset);
+	}
+
+	/**
+	 * createProposal
+	 * 
+	 * @param displayName
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param offset
+	 * @return
+	 */
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
 			Image[] userAgents, int offset)
+	{
+		return createProposal(displayName, name, image, description, userAgents, CSSIndexConstants.CORE, offset);
+	}
+
+	/**
+	 * createProposal
+	 * 
+	 * @param displayName
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 * @return
+	 */
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		int length = name.length();
 		IContextInformation contextInfo = null;
@@ -556,11 +633,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
 				displayName, contextInfo, description);
-		proposal.setFileLocation(CSSIndexConstants.CORE);
+		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
+		proposal.setTriggerCharacters(getProposalTriggerCharacters());
 		return proposal;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonContentAssistProcessor#doComputeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
+	 */
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
@@ -639,7 +723,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// NOTE: temp until we get proper partitions for CSS inside of HTML
 		if (this._activeRange != null)
 		{
-			return new LexemeProvider<CSSTokenType>(document, this._activeRange, new CSSScopeScanner())
+			return new LexemeProvider<CSSTokenType>(document, this._activeRange, new CSSTokenScanner())
 			{
 				@Override
 				protected CSSTokenType getTypeFromData(Object data)
@@ -650,7 +734,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
-			return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+			return new LexemeProvider<CSSTokenType>(document, offset, new CSSTokenScanner())
 			{
 				@Override
 				protected CSSTokenType getTypeFromData(Object data)
@@ -659,23 +743,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			};
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getCompletionProposalAutoActivationCharacters()
-	{
-		String chars = Platform.getPreferencesService().getString( //
-				CSSPlugin.PLUGIN_ID, //
-				IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
-				"", //$NON-NLS-1$
-				null //
-				);
-
-		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*
@@ -766,9 +833,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							switch (previousLexeme.getType())
 							{
 								case CLASS:
-								case ID:
 									location = LocationType.ERROR;
 									break LOOP;
+
+								case ID:
+									location = LocationType.INSIDE_VALUE;
+									break;
 
 								case LCURLY:
 								case SEMICOLON:
@@ -798,27 +868,38 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case ELEMENT:
 				case IDENTIFIER:
 				case PROPERTY:
-					if (index > 0)
-					{
-						Lexeme<CSSTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+					boolean afterColon = false;
 
-						if (previousLexeme.getType() == CSSTokenType.COLON)
+					COLON_LOOP: for (int i = index - 1; i >= 0; i--)
+					{
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
 						{
-							this._replaceRange = this._currentLexeme = lexeme;
-							location = LocationType.INSIDE_VALUE;
-							break;
+							case COLON:
+								afterColon = true;
+								break COLON_LOOP;
+
+							case SEMICOLON:
+							case LCURLY:
+							case RCURLY:
+								break COLON_LOOP;
 						}
 					}
 
-					if (lexeme.contains(offset) || lexeme.getEndingOffset() == offset - 1)
+					if (afterColon == false)
 					{
-						this._replaceRange = this._currentLexeme = lexeme;
+						if (lexeme.contains(offset) || lexeme.getEndingOffset() == offset - 1)
+						{
+							this._replaceRange = this._currentLexeme = lexeme;
+						}
+						else
+						{
+							this._replaceRange = this._currentLexeme = null;
+						}
+
+						location = LocationType.INSIDE_PROPERTY;
 					}
-					else
-					{
-						this._replaceRange = this._currentLexeme = null;
-					}
-					location = LocationType.INSIDE_PROPERTY;
 					break;
 
 				case SEMICOLON:
@@ -1000,6 +1081,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					result = LocationType.INSIDE_RULE;
 					break LOOP;
 
+				case MINUS:
 				case IDENTIFIER:
 					if (lexeme.getText().charAt(0) == '-')
 					{
@@ -1173,5 +1255,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
 		return Character.isWhitespace(c);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return CSSPlugin.PLUGIN_ID;
 	}
 }

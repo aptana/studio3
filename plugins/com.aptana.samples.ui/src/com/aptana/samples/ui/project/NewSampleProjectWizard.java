@@ -204,7 +204,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				if (rootEntry.getFile().getName().endsWith(".zip")) //$NON-NLS-1$
 				{
 					Set<IPath> emptySet = Collections.emptySet();
-					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true, emptySet);
+					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true, emptySet, false);
 				}
 				else
 				{

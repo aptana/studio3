@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -65,10 +66,13 @@ public class CSSValidator implements IValidator
 
 	// CSS3 properties that the validator doesn't recognize yet and need to be ignored
 	@SuppressWarnings("nls")
-	private static final String[] CSS3_PROPERTIES = { "box-shadow", "column-count", "column-width", "column-gap",
-			"column-rule", "border-radius", "background-clip", "background-origin", "border-top-right-radius",
-			"border-bottom-right-radius", "border-bottom-left-radius", "border-top-left-radius", "font-family",
-			"font-weight", "font-style", "resize" };
+	private static final String[] CSS3_PROPERTIES = { "behavior", "box-shadow", "column-count", "column-width",
+			"column-gap", "column-rule", "border-radius", "background-clip", "background-origin",
+			"border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
+			"border-top-left-radius", "font-family", "font-weight", "font-style", "resize", "size", "src" };
+
+	@SuppressWarnings("nls")
+	private static final String[] CSS3_AT_RULES = { "@namespace" };
 
 	// other messages that should be filtered automatically
 	@SuppressWarnings("nls")
@@ -265,7 +269,7 @@ public class CSSValidator implements IValidator
 			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (!manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message)
-					&& !isFiltered(message))
+					&& !containsCSS3AtRule(message) && !isFiltered(message))
 			{
 				// there is no info on the line offset or the length of the errored text
 				items.add(manager.addError(message, lineNumber, 0, 0, sourcePath));
@@ -326,11 +330,16 @@ public class CSSValidator implements IValidator
 		ac.setProfile(APTANA_PROFILE);
 		try
 		{
-			parser.parseStyleElement(ac, new ByteArrayInputStream(source.getBytes()), null, null, path.toURL(), 0);
+			parser.parseStyleElement(ac,
+					new ByteArrayInputStream(source.getBytes("UTF-8")), null, null, path.toURL(), 0); //$NON-NLS-1$
 		}
 		catch (MalformedURLException e)
 		{
 			CSSPlugin.logError(MessageFormat.format(Messages.CSSValidator_ERR_InvalidPath, path), e);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			CSSPlugin.logError(e.getLocalizedMessage(), e);
 		}
 
 		StyleSheet stylesheet = parser.getStyleSheet();
@@ -390,7 +399,19 @@ public class CSSValidator implements IValidator
 	{
 		for (String property : CSS3_PROPERTIES)
 		{
-			if (message.indexOf(property) > -1)
+			if (message.indexOf("Property " + property) > -1) //$NON-NLS-1$
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean containsCSS3AtRule(String message)
+	{
+		for (String rule : CSS3_AT_RULES)
+		{
+			if (message.indexOf(MessageFormat.format("the at-rule {0} is not implemented", rule)) > -1) //$NON-NLS-1$
 			{
 				return true;
 			}

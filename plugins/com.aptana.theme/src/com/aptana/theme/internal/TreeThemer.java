@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
@@ -73,7 +74,6 @@ class TreeThemer extends ControlThemer
 		addCustomTreeControlDrawing();
 		addMeasureItemListener();
 		addFontListener();
-		overrideLabelProvider();
 	}
 
 	@Override
@@ -84,200 +84,6 @@ class TreeThemer extends ControlThemer
 		{
 			fTreeViewer.refresh(true);
 		}
-	}
-
-	private void overrideLabelProvider()
-	{
-		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
-		if (viewer == null)
-		{
-			return;
-		}
-		ColumnViewer colViewer = viewer.getViewer();
-		if (colViewer == null)
-		{
-			return;
-		}
-		DelegatingCellLabelProvider existing = getExistingDelegator(viewer);
-		if (existing != null)
-		{
-			existing.enable();
-			colViewer.refresh();
-			return;
-		}
-
-		IBaseLabelProvider provider = colViewer.getLabelProvider();
-		if (provider instanceof CellLabelProvider)
-		{
-			// wrap
-			final CellLabelProvider cellProvider = (CellLabelProvider) provider;
-			DelegatingCellLabelProvider duh = new DelegatingCellLabelProvider(cellProvider);
-			viewer.setLabelProvider(duh);
-		}
-		else if (provider instanceof ThemedDelegatingLabelProvider)
-		{
-			// re-enable
-			ThemedDelegatingLabelProvider delegating = (ThemedDelegatingLabelProvider) provider;
-			delegating.enable();
-			colViewer.refresh();
-		}
-		else if (provider instanceof ILabelProvider)
-		{
-			// wrap
-			colViewer.setLabelProvider(new ThemedDelegatingLabelProvider((ILabelProvider) provider));
-		}
-	}
-
-	private DelegatingCellLabelProvider getExistingDelegator(ViewerColumn viewer)
-	{
-		try
-		{
-			Method m = ViewerColumn.class.getDeclaredMethod("getLabelProvider"); //$NON-NLS-1$
-			m.setAccessible(true);
-			CellLabelProvider provider = (CellLabelProvider) m.invoke(viewer);
-			if (provider instanceof DelegatingCellLabelProvider)
-			{
-				return (DelegatingCellLabelProvider) provider;
-			}
-		}
-		catch (Exception e)
-		{
-			ThemePlugin.logError(e);
-		}
-		return null;
-	}
-
-	private class DelegatingCellLabelProvider extends CellLabelProvider implements ILabelProvider
-	{
-
-		private CellLabelProvider cellProvider;
-		private boolean isDisabled;
-
-		DelegatingCellLabelProvider(CellLabelProvider cellProvider)
-		{
-			this.cellProvider = cellProvider;
-			// HACK Very ugly hack because when we set this wrapping label provider, dispose is called on the old one,
-			// which disposes all the images for working sets in JDT but holds onto them!
-			if (cellProvider instanceof DelegatingStyledCellLabelProvider)
-			{
-				DelegatingStyledCellLabelProvider delegating = (DelegatingStyledCellLabelProvider) cellProvider;
-				IStyledLabelProvider styled = delegating.getStyledStringProvider();
-				if (styled.getClass().getName()
-						.equals("org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider")) //$NON-NLS-1$
-				{
-					try
-					{
-						Field f = styled.getClass().getDeclaredField("fWorkingSetImages"); //$NON-NLS-1$
-						f.setAccessible(true);
-						f.set(styled, null);
-					}
-					catch (Exception e)
-					{
-						ThemePlugin.logError(e);
-					}
-				}
-			}
-		}
-
-		@Override
-		public void update(ViewerCell cell)
-		{
-			cellProvider.update(cell);
-			if (isDisabled)
-			{
-				cell.setFont(null);
-				cell.setForeground(null);
-			}
-			else
-			{
-				if (useEditorFont())
-				{
-					Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-					if (font == null)
-					{
-						font = JFaceResources.getTextFont();
-					}
-					if (font != null)
-					{
-						cell.setFont(font);
-					}
-				}
-				if (!invasiveThemesEnabled())
-				{
-					return;
-				}
-				cell.setForeground(getForeground());
-			}
-		}
-
-		public void disable()
-		{
-			isDisabled = true;
-		}
-
-		public void enable()
-		{
-			isDisabled = false;
-		}
-
-		public Image getImage(Object element)
-		{
-			if (cellProvider instanceof ILabelProvider)
-			{
-				return ((ILabelProvider) cellProvider).getImage(element);
-			}
-			return null;
-		}
-
-		public String getText(Object element)
-		{
-			if (cellProvider instanceof ILabelProvider)
-			{
-				return ((ILabelProvider) cellProvider).getText(element);
-			}
-			return null;
-		}
-
-		@Override
-		public String getToolTipText(Object element)
-		{
-			return cellProvider.getToolTipText(element);
-		}
-	}
-
-	private void revertLabelProvider()
-	{
-		if (getTree() == null || getTree().isDisposed())
-		{
-			return;
-		}
-		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
-		if (viewer == null)
-		{
-			return;
-		}
-		DelegatingCellLabelProvider existing = getExistingDelegator(viewer);
-		if (existing != null)
-		{
-			existing.disable();
-		}
-		ColumnViewer colViewer = viewer.getViewer();
-		if (colViewer == null)
-		{
-			return;
-		}
-		IBaseLabelProvider provider = colViewer.getLabelProvider();
-		if (provider instanceof ThemedDelegatingLabelProvider)
-		{
-			ThemedDelegatingLabelProvider delegating = (ThemedDelegatingLabelProvider) provider;
-			delegating.disable();
-		}
-		else if (provider instanceof DelegatingCellLabelProvider)
-		{
-			DelegatingCellLabelProvider delegating = (DelegatingCellLabelProvider) provider;
-			delegating.disable();
-		}
-		colViewer.refresh();
 	}
 
 	protected void addSelectionColorOverride()
@@ -324,6 +130,29 @@ class TreeThemer extends ControlThemer
 					{
 						return;
 					}
+					
+					// FIX for TISTUD-426: http://jira.appcelerator.org/browse/TISTUD-426
+					// HACK to grab cell editors of tree views (specifically Variables view) and set their control's fg explicitly!
+					if (fTreeViewer != null)
+					{
+						CellEditor[] editors = fTreeViewer.getCellEditors();
+						if (editors != null)
+						{
+							for (CellEditor editor : editors)
+							{
+								if (editor == null)
+								{
+									continue;
+								}
+								Control c = editor.getControl();
+								if (c != null)
+								{
+									c.setForeground(getForeground());
+								}
+							}
+						}
+					}
+					
 					TreeItem[] items = tree.getSelection();
 					if (items == null || items.length == 0)
 					{
@@ -351,7 +180,7 @@ class TreeThemer extends ControlThemer
 								gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
 							}
 						}
-					}					
+					}		
 				}
 				catch (Exception e)
 				{
@@ -566,7 +395,6 @@ class TreeThemer extends ControlThemer
 	public void dispose()
 	{
 		super.dispose();
-		revertLabelProvider();
 		removeSelectionOverride();
 		removeCustomTreeControlDrawing();
 		removeMeasureItemListener();

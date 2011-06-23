@@ -9,69 +9,75 @@ package com.aptana.ide.ui.io.navigator.actions;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS {
+public class Messages extends NLS
+{
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.navigator.actions.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.navigator.actions.messages"; //$NON-NLS-1$
 
-    public static String EditorUtils_OpeningEditor;
-    public static String EditorUtils_ERR_SavingRemoteFile;
-    public static String EditorUtils_MSG_RemotelySaving;
-    public static String EditorUtils_OpenFileJob_Title;
-
-    public static String EditorUtils_OverwritePrompt_Message;
-
+	public static String EditorUtils_OpeningEditor;
+	public static String EditorUtils_ERR_SavingRemoteFile;
+	public static String EditorUtils_MSG_RemotelySaving;
+	public static String EditorUtils_OpenFileJob_Title;
+	public static String EditorUtils_OverwritePrompt_Message;
 	public static String EditorUtils_OverwritePrompt_Title;
 
 	public static String FileSystemCopyAction_TTP;
-    public static String FileSystemCopyAction_TXT;
+	public static String FileSystemCopyAction_TXT;
 
-    public static String FileSystemDeleteAction_Confirm_MultipleFiles;
-    public static String FileSystemDeleteAction_Confirm_SingleFile;
-    public static String FileSystemDeleteAction_Confirm_Title;
-    public static String FileSystemDeleteAction_ERR_Delete;
-    public static String FileSystemDeleteAction_JobTitle;
-    public static String FileSystemDeleteAction_SubTask;
-    public static String FileSystemDeleteAction_Task;
-    public static String FileSystemDeleteAction_Text;
+	public static String FileSystemDeleteAction_Confirm_MultipleFiles;
+	public static String FileSystemDeleteAction_Confirm_SingleFile;
+	public static String FileSystemDeleteAction_Confirm_Title;
+	public static String FileSystemDeleteAction_ERR_Delete;
+	public static String FileSystemDeleteAction_JobTitle;
+	public static String FileSystemDeleteAction_SubTask;
+	public static String FileSystemDeleteAction_Task;
+	public static String FileSystemDeleteAction_Text;
 
-    public static String FileSystemNewAction_Text;
+	public static String FileSystemNewAction_Text;
 
-    public static String FileSystemPasteAction_TTP;
-    public static String FileSystemPasteAction_TXT;
+	public static String FileSystemNewFromTemplateAction_Text;
 
-    public static String FileSystemRefreshAction_Text;
-    public static String FileSystemRefreshAction_ToolTip;
+	public static String FileSystemPasteAction_TTP;
+	public static String FileSystemPasteAction_TXT;
 
-    public static String FileSystemRenameAction_ERR_Message;
-    public static String FileSystemRenameAction_ERR_Title;
-    public static String FileSystemRenameAction_InputMessage;
-    public static String FileSystemRenameAction_InputTitle;
-    public static String FileSystemRenameAction_Text;
-    public static String FileSystemRenameAction_ToolTip;
+	public static String FileSystemRefreshAction_Text;
+	public static String FileSystemRefreshAction_ToolTip;
 
-    public static String NewFileAction_InputMessage;
-    public static String NewFileAction_InputTitle;
-    public static String NewFileAction_Text;
-    public static String NewFileAction_ToolTip;
+	public static String FileSystemRenameAction_ERR_Message;
+	public static String FileSystemRenameAction_ERR_Title;
+	public static String FileSystemRenameAction_InputMessage;
+	public static String FileSystemRenameAction_InputTitle;
+	public static String FileSystemRenameAction_Text;
+	public static String FileSystemRenameAction_ToolTip;
 
-    public static String NewFolderAction_InputMessage;
-    public static String NewFolderAction_InputTitle;
-    public static String NewFolderAction_JobTitle;
-    public static String NewFolderAction_Text;
-    public static String NewFolderAction_ToolTip;
-    public static String NewFolderAction_WarningMessage;
-    public static String NewFolderAction_WarningTitle;
+	public static String NewFileAction_Confirm_Message;
+	public static String NewFileAction_Confirm_Title;
+	public static String NewFileAction_InputMessage;
+	public static String NewFileAction_InputTitle;
+	public static String NewFileAction_JobTitle;
+	public static String NewFileAction_Text;
+	public static String NewFileAction_ToolTip;
 
-    public static String OpenActionProvider_LBL_OpenWith;
+	public static String NewFolderAction_InputMessage;
+	public static String NewFolderAction_InputTitle;
+	public static String NewFolderAction_JobTitle;
+	public static String NewFolderAction_Text;
+	public static String NewFolderAction_ToolTip;
+	public static String NewFolderAction_WarningMessage;
+	public static String NewFolderAction_WarningTitle;
 
-    public static String OpenFileAction_ERR_FailedOpenFile;
-    public static String OpenFileAction_Text;
+	public static String OpenActionProvider_LBL_OpenWith;
 
-    static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
+	public static String OpenFileAction_ERR_FailedOpenFile;
+	public static String OpenFileAction_Text;
 
-    private Messages() {
-    }
+	static
+	{
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages()
+	{
+	}
 }

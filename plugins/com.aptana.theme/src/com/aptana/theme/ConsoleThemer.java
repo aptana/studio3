@@ -14,10 +14,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -53,7 +50,6 @@ public class ConsoleThemer
 	public static final String CONSOLE_TRACE = CONSOLE_PROMPT;
 	public static final String CONSOLE_INFO = CONSOLE_INPUT;
 
-	private IPropertyChangeListener fFontChangeListener;
 	private IPreferenceChangeListener fThemeChangeListener;
 
 	private TextConsole fConsole;
@@ -74,7 +70,6 @@ public class ConsoleThemer
 		this.fConsole = textConsole;
 		this.fThemeConsoleStreamToColor = themeConsoleStreamToColor;
 
-		this.listenForFontChanges();
 		this.listenForThemeChanges();
 
 		// apply theme
@@ -116,9 +111,6 @@ public class ConsoleThemer
 					// with a forced redraw, the background will not be drawn
 					fConsole.setBackground(null);
 					fConsole.setBackground(colorManager.getColor(theme.getBackground()));
-
-					// set font
-					fConsole.setFont(JFaceResources.getTextFont());
 
 					// set default stream colors
 					// Note that some colors are repeated because they're used in different scenarios.
@@ -217,29 +209,10 @@ public class ConsoleThemer
 	}
 
 	/**
-	 * listenForFontChanges
-	 */
-	private void listenForFontChanges()
-	{
-		this.fFontChangeListener = new IPropertyChangeListener()
-		{
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				if (event.getProperty().equals(JFaceResources.TEXT_FONT))
-				{
-					applyTheme();
-				}
-			}
-		};
-		JFaceResources.getFontRegistry().addListener(this.fFontChangeListener);
-	}
-
-	/**
 	 * Stop listening changes (and dispose of what's needed).
 	 */
 	public void dispose()
 	{
-		JFaceResources.getFontRegistry().removeListener(this.fFontChangeListener);
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(this.fThemeChangeListener);
 		this.fConsole = null;
 		this.fThemeConsoleStreamToColor = null;

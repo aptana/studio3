@@ -21,7 +21,7 @@ import com.aptana.parsing.ast.IParseNode;
  * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
  * be indented.
  * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * @author Shalom Gibly <sgibly@appcelerator.com>
  */
 public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 {
@@ -61,7 +61,14 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 				return false;
 			}
 		}
-		return true;
+		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		if (set.contains(element))
+		{
+			return false;
+		}
+		// In case the element contains text, we need to make sure that a text without any prefix whitespace does not
+		// break into a new line.
+		return !shouldPreventNewLine();
 	}
 
 	/*
@@ -70,6 +77,10 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingEndNewLine()
 	{
+		if (!isAddingBeginNewLine())
+		{
+			return false;
+		}
 		if (getDocument().getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS))
 		{
 			if (isEmptyContent())
@@ -107,11 +118,33 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	}
 
 	/**
+	 * Returns true in case the node is one of the space-sensitive nodes, and its content prefix does not start with a
+	 * whitespace. In that case, we should prevent any new-line breaking to avoid any visual changes in the way the
+	 * browser renders the content.
+	 * 
+	 * @return True, in case the node should not have any new line; False, otherwise.
+	 */
+	private boolean shouldPreventNewLine()
+	{
+		if (children != null && children.length > 0
+				&& HTMLFormatterNodeBuilder.SPACE_SENSITIVE_ELEMENTS.contains(element))
+		{
+			return !Character.isWhitespace(getDocument().charAt(children[0].getStartingOffset()));
+		}
+		return false;
+	}
+
+	/**
 	 * @return true if the content of this node is empty.
 	 */
 	private boolean isEmptyContent()
 	{
-		if (getBody().size() == 1 && getBody().get(0) instanceof IFormatterTextNode)
+		int bodyElementsCount = getBody().size();
+		if (bodyElementsCount == 0)
+		{
+			return true;
+		}
+		if (bodyElementsCount == 1 && getBody().get(0) instanceof IFormatterTextNode)
 		{
 			IFormatterTextNode contentNode = (IFormatterTextNode) getBody().get(0);
 			String text = contentNode.getText();

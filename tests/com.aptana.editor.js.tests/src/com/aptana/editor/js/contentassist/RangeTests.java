@@ -12,8 +12,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.tests.TextViewer;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
-import com.aptana.editor.js.tests.TextViewer;
 import com.aptana.parsing.lexer.Range;
 
 public class RangeTests extends JSEditorBasedTests

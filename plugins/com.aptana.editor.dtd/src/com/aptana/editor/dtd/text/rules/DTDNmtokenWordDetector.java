@@ -9,7 +9,7 @@ package com.aptana.editor.dtd.text.rules;
 
 import org.eclipse.jface.text.rules.IWordDetector;
 
-public class DTDNmtokenDetector implements IWordDetector
+public class DTDNmtokenWordDetector implements IWordDetector
 {
 	/*
 	 * (non-Javadoc)

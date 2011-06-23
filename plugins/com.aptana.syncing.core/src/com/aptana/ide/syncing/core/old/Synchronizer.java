@@ -36,6 +36,7 @@ import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.filewatcher.FileWatcher;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 
@@ -729,6 +730,9 @@ public class Synchronizer implements ILoggable
 	public boolean downloadAndDelete(VirtualFileSyncPair[] fileList, boolean delete, IProgressMonitor monitor)
 			throws CoreException
 	{
+		FileWatcher.avoidNotify();
+		try
+		{
 		checkFileManagers();
 
 		logBeginDownloading();
@@ -887,6 +891,11 @@ public class Synchronizer implements ILoggable
 		}
 
 		return result;
+		}
+		finally
+		{
+			FileWatcher.resumeNotify();
+		}
 	}
 
 	/**
@@ -937,6 +946,9 @@ public class Synchronizer implements ILoggable
 	public boolean fullSyncAndDelete(VirtualFileSyncPair[] fileList, boolean deleteLocal, boolean deleteRemote,
 			IProgressMonitor monitor)
 	{
+		FileWatcher.avoidNotify();
+		try
+		{
 		logBeginFullSyncing();
 
 		// assume we'll be successful
@@ -1210,6 +1222,11 @@ public class Synchronizer implements ILoggable
 		}
 
 		return result;
+		}
+		finally
+		{
+			FileWatcher.resumeNotify();
+		}
 	}
 
 	/**
@@ -1239,9 +1256,9 @@ public class Synchronizer implements ILoggable
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 */
-	public boolean upload(VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
+	public boolean upload(final VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
 	{
-		return this.uploadAndDelete(fileList, false, monitor);
+		return uploadAndDelete(fileList, false, monitor);
 	}
 
 	/**
@@ -1253,9 +1270,9 @@ public class Synchronizer implements ILoggable
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 */
-	public boolean uploadAndDelete(VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
+	public boolean uploadAndDelete(final VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
 	{
-		return this.uploadAndDelete(fileList, true, monitor);
+		return uploadAndDelete(fileList, true, monitor);
 	}
 
 	/**
@@ -1270,6 +1287,9 @@ public class Synchronizer implements ILoggable
 	public boolean uploadAndDelete(VirtualFileSyncPair[] fileList, boolean delete, IProgressMonitor monitor)
 			throws CoreException
 	{
+		FileWatcher.avoidNotify();
+		try
+		{
 		checkFileManagers();
 		logBeginUploading();
 
@@ -1438,6 +1458,11 @@ public class Synchronizer implements ILoggable
 		}
 
 		return result;
+		}
+		finally
+		{
+			FileWatcher.resumeNotify();
+		}
 	}
 
 	private static void setSyncItemDirection(VirtualFileSyncPair item, boolean upload, boolean full)

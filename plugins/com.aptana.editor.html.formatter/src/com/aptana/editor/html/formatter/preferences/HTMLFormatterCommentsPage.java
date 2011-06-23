@@ -45,6 +45,8 @@ public class HTMLFormatterCommentsPage extends FormatterModifyTabPage
 	{
 		Group commentWrappingGroup = SWTFactory.createGroup(parent,
 				Messages.HTMLFormatterCommentsPage_formattingGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
+		manager.createCheckbox(commentWrappingGroup, HTMLFormatterConstants.PLACE_COMMENTS_IN_SEPARATE_LINES,
+				Messages.HTMLFormatterCommentsPage_commentsInSeparateLines, 2);
 		manager.createCheckbox(commentWrappingGroup, HTMLFormatterConstants.WRAP_COMMENTS,
 				Messages.HTMLFormatterCommentsPage_enableWrapping, 2);
 		manager.createNumber(commentWrappingGroup, HTMLFormatterConstants.WRAP_COMMENTS_LENGTH,

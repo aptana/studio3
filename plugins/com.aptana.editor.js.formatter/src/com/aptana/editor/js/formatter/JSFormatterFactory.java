@@ -7,6 +7,59 @@
  */
 package com.aptana.editor.js.formatter;
 
+import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_ID;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_INDENTATION_SIZE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_CHAR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_SIZE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_BLOCKS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_CASE_BODY;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_FUNCTION_BODY;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_GROUP_BODY;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_SWITCH_BODY;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.NEW_LINES_BEFORE_NAME_VALUE_PAIRS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.PRESERVED_LINES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_CASE_COLON_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_COMMAS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_CONCATENATION_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_CONDITIONAL_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_FOR_SEMICOLON;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_KEY_VALUE_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_POSTFIX_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_PREFIX_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_RELATIONAL_OPERATORS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_SEMICOLON;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_AFTER_UNARY_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_ARITHMETIC_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_ASSIGNMENT_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CASE_COLON_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_COMMAS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CONCATENATION_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_CONDITIONAL_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_FOR_SEMICOLON;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_KEY_VALUE_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_PARENTHESES;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_POSTFIX_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_PREFIX_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_RELATIONAL_OPERATORS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_SEMICOLON;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_UNARY_OPERATOR;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
+
 import java.net.URL;
 import java.util.Map;
 
@@ -33,28 +86,28 @@ import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 public class JSFormatterFactory extends AbstractScriptFormatterFactory
 {
 
-	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(JSFormatterPlugin.PLUGIN_ID,
-			JSFormatterConstants.FORMATTER_ID);
+	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(JSFormatterPlugin.PLUGIN_ID, FORMATTER_ID);
 
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.js"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
 			// TODO - Add more...
-			JSFormatterConstants.FORMATTER_INDENTATION_SIZE, JSFormatterConstants.FORMATTER_TAB_CHAR,
-			JSFormatterConstants.FORMATTER_TAB_SIZE, JSFormatterConstants.WRAP_COMMENTS,
-			JSFormatterConstants.WRAP_COMMENTS_LENGTH, JSFormatterConstants.INDENT_BLOCKS,
-			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
-			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY,
-			JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
-			JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
-			JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION, JSFormatterConstants.PRESERVED_LINES,
-			JSFormatterConstants.BRACE_POSITION_BLOCK, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE,
-			JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
-			JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION };
+			FORMATTER_INDENTATION_SIZE, FORMATTER_TAB_CHAR, FORMATTER_TAB_SIZE, WRAP_COMMENTS, WRAP_COMMENTS_LENGTH,
+			INDENT_BLOCKS, INDENT_CASE_BODY, INDENT_SWITCH_BODY, INDENT_FUNCTION_BODY, INDENT_GROUP_BODY,
+			NEW_LINES_BEFORE_CATCH_STATEMENT, NEW_LINES_BEFORE_DO_WHILE_STATEMENT, NEW_LINES_BEFORE_ELSE_STATEMENT,
+			NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT, NEW_LINES_BEFORE_FINALLY_STATEMENT,
+			NEW_LINES_BEFORE_NAME_VALUE_PAIRS, LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
+			LINES_AFTER_FUNCTION_DECLARATION, PRESERVED_LINES, BRACE_POSITION_BLOCK, BRACE_POSITION_BLOCK_IN_CASE,
+			BRACE_POSITION_BLOCK_IN_SWITCH, BRACE_POSITION_FUNCTION_DECLARATION, SPACES_BEFORE_COMMAS,
+			SPACES_AFTER_COMMAS, SPACES_BEFORE_PARENTHESES, SPACES_AFTER_PARENTHESES, SPACES_BEFORE_UNARY_OPERATOR,
+			SPACES_AFTER_UNARY_OPERATOR, SPACES_BEFORE_KEY_VALUE_OPERATOR, SPACES_AFTER_KEY_VALUE_OPERATOR,
+			SPACES_BEFORE_ASSIGNMENT_OPERATOR, SPACES_AFTER_ASSIGNMENT_OPERATOR, SPACES_BEFORE_RELATIONAL_OPERATORS,
+			SPACES_AFTER_RELATIONAL_OPERATORS, SPACES_BEFORE_CONCATENATION_OPERATOR,
+			SPACES_AFTER_CONCATENATION_OPERATOR, SPACES_BEFORE_CONDITIONAL_OPERATOR, SPACES_AFTER_CONDITIONAL_OPERATOR,
+			SPACES_BEFORE_POSTFIX_OPERATOR, SPACES_AFTER_POSTFIX_OPERATOR, SPACES_BEFORE_PREFIX_OPERATOR,
+			SPACES_AFTER_PREFIX_OPERATOR, SPACES_BEFORE_ARITHMETIC_OPERATOR, SPACES_AFTER_ARITHMETIC_OPERATOR,
+			SPACES_BEFORE_FOR_SEMICOLON, SPACES_AFTER_FOR_SEMICOLON, SPACES_BEFORE_SEMICOLON, SPACES_AFTER_SEMICOLON,
+			SPACES_BEFORE_CASE_COLON_OPERATOR, SPACES_AFTER_CASE_COLON_OPERATOR };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{

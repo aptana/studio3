@@ -528,6 +528,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
+		proposal.setTriggerCharacters(getProposalTriggerCharacters());
 		return proposal;
 	}
 
@@ -764,16 +765,6 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getCompletionProposalAutoActivationCharacters()
-	{
-		return new char[] { '<', '\'', '"', '&' };
-	}
-
 	/**
 	 * getCoreLocation
 	 * 
@@ -979,5 +970,14 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return unclosedElements;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return XMLPlugin.PLUGIN_ID;
 	}
 }

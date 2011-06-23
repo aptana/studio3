@@ -10,6 +10,8 @@ package com.aptana.theme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -103,9 +105,22 @@ public class Theme
 		name = (String) props.remove(THEME_NAME_PROP_KEY);
 		if (name == null)
 		{
-			throw new IllegalStateException("Invalid theme properties!"); //$NON-NLS-1$
+			// Log the properties
+			StringWriter sw = new StringWriter();
+			try
+			{
+				PrintWriter pw = new PrintWriter(sw);
+				props.list(pw);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+			throw new IllegalStateException(
+					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " + sw.toString()); //$NON-NLS-1$
 		}
 		// The general editor colors
+		// FIXME Add fallback rgb colors to use! black on white, etc.
 		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
 		defaultBG = parseHexRGB((String) props.remove(BACKGROUND_PROP_KEY));
 		lineHighlight = parseHexRGBa((String) props.remove(LINE_HIGHLIGHT_PROP_KEY));
@@ -115,12 +130,12 @@ public class Theme
 		Set<Object> propertyNames = props.keySet();
 		for (Object key : propertyNames)
 		{
-			String name = (String) key;
+			String displayName = (String) key;
 			int style = SWT.NORMAL;
 			RGBa foreground = null;
 			RGBa background = null;
-			String value = props.getProperty(name);
-			String scopeSelector = name;
+			String value = props.getProperty(displayName);
+			String scopeSelector = displayName;
 			int selectorIndex = value.indexOf(SELECTOR_DELIMITER);
 			if (selectorIndex != -1)
 			{
@@ -173,8 +188,8 @@ public class Theme
 				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
-			coloringRules.add(new ThemeRule(name, scopeSelector == null ? null : new ScopeSelector(scopeSelector),
-					attribute));
+			coloringRules.add(new ThemeRule(displayName, scopeSelector == null ? null
+					: new ScopeSelector(scopeSelector), attribute));
 		}
 	}
 
@@ -809,11 +824,19 @@ public class Theme
 		{
 			return null;
 		}
-		Properties props = toProps();
-		props.setProperty(THEME_NAME_PROP_KEY, value);
-		Theme newTheme = new Theme(colorManager, props);
-		addTheme(newTheme);
-		return newTheme;
+		try
+		{
+			Properties props = toProps();
+			props.setProperty(THEME_NAME_PROP_KEY, value);
+			Theme newTheme = new Theme(colorManager, props);
+			addTheme(newTheme);
+			return newTheme;
+		}
+		catch (Exception e)
+		{
+			ThemePlugin.logError(e);
+			return null;
+		}
 	}
 
 	protected void addTheme(Theme newTheme)

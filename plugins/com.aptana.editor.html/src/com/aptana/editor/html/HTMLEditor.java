@@ -21,16 +21,18 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IEditorLinkedResources;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.validator.IValidationManager;
@@ -54,6 +56,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	static
 	{
 		tagPartitions.add(HTMLSourceConfiguration.HTML_TAG);
+		tagPartitions.add(HTMLSourceConfiguration.HTML_TAG_CLOSE);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_SCRIPT);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_STYLE);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_SVG);
@@ -66,7 +69,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 
 		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new HTMLDocumentProvider());
+		setDocumentProvider(HTMLPlugin.getDefault().getHTMLDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()
@@ -97,13 +100,15 @@ public class HTMLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-		outline.setContentProvider(new HTMLOutlineContentProvider());
-		outline.setLabelProvider(new HTMLOutlineLabelProvider());
+		return new HTMLOutlineContentProvider();
+	}
 
-		return outline;
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new HTMLOutlineLabelProvider();
 	}
 
 	@Override
@@ -199,7 +204,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 			}
 			catch (BadLocationException e)
 			{
-				HTMLPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 			}
 			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
 			{
@@ -220,7 +225,8 @@ public class HTMLEditor extends AbstractThemeableEditor
 		return new HTMLFoldingComputer(this, document);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")

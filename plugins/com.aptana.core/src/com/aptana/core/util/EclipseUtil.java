@@ -9,20 +9,32 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.eclipse.osgi.service.debug.DebugOptions;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 
+@SuppressWarnings("restriction")
 public class EclipseUtil
 {
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
@@ -33,11 +45,44 @@ public class EclipseUtil
 	 * @param option
 	 * @return
 	 */
-	public static boolean debugOptionActive(String option)
+	public static boolean isDebugOptionEnabled(String option)
 	{
-		return Boolean.valueOf(Platform.getDebugOption(option)).booleanValue();
+		return Boolean.valueOf(Platform.getDebugOption(option));
 	}
-	
+
+	/**
+	 * Determines if the specified application/platform option has been enabled
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static boolean isSystemPropertyEnabled(String option)
+	{
+		return System.getProperty(option) != null;
+	}
+
+	/**
+	 * Returns specified application/platform option. If not specified, returns null.
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static String getSystemProperty(String option)
+	{
+		return System.getProperty(option);
+	}
+
+	/**
+	 * Is the current plugin actually loaded (needed for unit testing)
+	 * 
+	 * @param plugin
+	 * @return boolean
+	 */
+	public static boolean isPluginLoaded(Plugin plugin)
+	{
+		return plugin != null && plugin.getBundle() != null;
+	}
+
 	/**
 	 * Retrieves the bundle version of a plugin.
 	 * 
@@ -169,29 +214,38 @@ public class EclipseUtil
 	 * @param asSplashLauncher
 	 * @return
 	 */
-	public static IPath getApplicationLauncher(boolean asSplashLauncher) {
+	public static IPath getApplicationLauncher(boolean asSplashLauncher)
+	{
 		IPath launcher = null;
 		String cmdline = System.getProperty("eclipse.commands"); //$NON-NLS-1$
-		if (cmdline != null && cmdline.length() > 0) {
+		if (cmdline != null && cmdline.length() > 0)
+		{
 			String[] args = cmdline.split("\n"); //$NON-NLS-1$
-			for (int i = 0; i < args.length; ++i) {
+			for (int i = 0; i < args.length; ++i)
+			{
 				if ("-launcher".equals(args[i]) && (i + 1) < args.length) { //$NON-NLS-1$
 					launcher = Path.fromOSString(args[i + 1]);
 					break;
 				}
 			}
 		}
-		if (launcher == null) {
+		if (launcher == null)
+		{
 			Location location = Platform.getInstallLocation();
-			if (location != null) {
+			if (location != null)
+			{
 				launcher = new Path(location.getURL().getFile());
-				if (launcher.toFile().isDirectory()) {
-					String[] executableFiles = launcher.toFile().list(new FilenameFilter() {
-						public boolean accept(File dir, String name) {
+				if (launcher.toFile().isDirectory())
+				{
+					String[] executableFiles = launcher.toFile().list(new FilenameFilter()
+					{
+						public boolean accept(File dir, String name)
+						{
 							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
 							name = path.removeFileExtension().lastSegment();
 							String ext = path.getFileExtension();
-							if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+							if (Platform.OS_MACOSX.equals(Platform.getOS()))
+							{
 								if (!"app".equals(ext)) { //$NON-NLS-1$
 									return false;
 								}
@@ -202,16 +256,19 @@ public class EclipseUtil
 							return false;
 						}
 					});
-					if (executableFiles.length > 0) {
+					if (executableFiles.length > 0)
+					{
 						launcher = launcher.append(executableFiles[0]);
 					}
 				}
 			}
 		}
-		if (launcher == null || !launcher.toFile().exists()) {
+		if (launcher == null || !launcher.toFile().exists())
+		{
 			return null;
 		}
-		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher) {
+		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher)
+		{
 			launcher = new Path(PlatformUtil.getApplicationExecutable(launcher.toOSString()).getAbsolutePath());
 		}
 		return launcher;
@@ -233,4 +290,144 @@ public class EclipseUtil
 				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, false, null);
 	}
 
+	/**
+	 * Set the debugging state of the platform
+	 */
+	public static void setPlatformDebugging(boolean debugEnabled)
+	{
+		if (debugEnabled)
+		{
+			FrameworkProperties.setProperty("osgi.debug", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else
+		{
+			FrameworkProperties.clearProperty("osgi.debug"); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Returns a list of all possible trace items across all plugins
+	 */
+	public static HashMap<String, String> getTraceableItems()
+	{
+		HashMap<String, String> stringModels = new HashMap<String, String>();
+		BundleContext context = CorePlugin.getDefault().getContext();
+		Bundle[] bundles = context.getBundles();
+		for (Bundle bundle : bundles)
+		{
+			Properties props = getTraceOptions(bundle);
+			for (Object obj : props.keySet())
+			{
+				String key = obj.toString();
+				stringModels.put(key, props.getProperty(key));
+			}
+		}
+		return stringModels;
+	}
+
+	/**
+	 * Returns all the trace options for a particular bundle
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public static Properties getTraceOptions(Bundle bundle)
+	{
+		Path path = new Path(".options"); //$NON-NLS-1$
+		URL fileURL = FileLocator.find(bundle, path, null);
+		if (fileURL != null)
+		{
+			InputStream in;
+			try
+			{
+				in = fileURL.openStream();
+				Properties options = new Properties();
+				options.load(in);
+				return options;
+			}
+			catch (IOException e1)
+			{
+			}
+		}
+
+		return new Properties();
+
+	}
+
+	/**
+	 * Returns a map of all loaded bundle symbolic names mapped to bundles
+	 * 
+	 * @return
+	 */
+	public static Map<String, BundleContext> getCurrentBundleContexts()
+	{
+		BundleContext context = CorePlugin.getDefault().getContext();
+
+		HashMap<String, BundleContext> contexts = new HashMap<String, BundleContext>();
+
+		Bundle[] bundles = context.getBundles();
+		contexts.put(context.getBundle().getSymbolicName(), context);
+		for (int i = 0; i < bundles.length; i++)
+		{
+			Bundle bundle = bundles[i];
+			BundleContext bContext = bundle.getBundleContext();
+			if (bContext == null)
+			{
+				continue;
+			}
+			contexts.put(bundle.getSymbolicName(), bContext);
+		}
+		return contexts;
+	}
+
+	/**
+	 * Set debugging for the specified bundle
+	 * 
+	 * @param currentOptions
+	 * @param debugEnabled
+	 */
+	public static void setBundleDebugOptions(String[] currentOptions, boolean debugEnabled)
+	{
+		Map<String, BundleContext> bundles = getCurrentBundleContexts();
+		for (String key : currentOptions)
+		{
+			String symbolicName = key.substring(0, key.indexOf("/")); //$NON-NLS-1$
+			BundleContext bundleContext = bundles.get(symbolicName);
+			if (bundleContext == null)
+			{
+				continue;
+			}
+			ServiceReference sRef = bundleContext.getServiceReference(DebugOptions.class.getName());
+			DebugOptions options = (DebugOptions) bundleContext.getService(sRef);
+
+			// have to set debug enabled first if re-enabling, or else the internal property list will be null
+			// and the set won't happen
+			if (debugEnabled)
+			{
+				options.setDebugEnabled(debugEnabled);
+				options.setOption(key, Boolean.toString(debugEnabled));
+			}
+			else
+			{
+				options.setOption(key, Boolean.toString(debugEnabled));
+				options.setDebugEnabled(debugEnabled);
+			}
+		}
+	}
+
+	/**
+	 * Gets the list of components currently in debug mode
+	 * 
+	 * @return
+	 */
+	public static String[] getCurrentDebuggableComponents()
+	{
+		String checked = Platform.getPreferencesService().getString(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, null, null);
+		if (checked != null)
+		{
+			return checked.split(","); //$NON-NLS-1$
+		}
+		return new String[0];
+	}
 }

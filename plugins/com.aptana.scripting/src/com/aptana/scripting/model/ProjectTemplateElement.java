@@ -113,6 +113,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
 		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
+		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(this.isReplacingParameters())); //$NON-NLS-1$
 
 		if (this.getDescription() != null)
 		{
@@ -174,5 +175,19 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	public URL getIconPath()
 	{
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#isReplacingParameters()
+	 */
+	public boolean isReplacingParameters()
+	{
+		Object replace = get("replace_parameters"); //$NON-NLS-1$
+		if (replace == null)
+		{
+			return false;
+		}
+		return Boolean.parseBoolean(replace.toString());
 	}
 }

@@ -71,7 +71,7 @@ public class ContentAssistFineLocationTests extends LocationTestCase
 	 */
 	public void testUnclosedOpenTagWithAttribute()
 	{
-		String source = "<body onload=\"init()\"";
+		String source = "<body reload=\"init()\"";
 		
 		this.fineLocationTests(
 			source,

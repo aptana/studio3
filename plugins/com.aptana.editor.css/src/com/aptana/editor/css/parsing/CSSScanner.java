@@ -25,23 +25,34 @@ import com.aptana.parsing.lexer.Range;
 
 public class CSSScanner extends Scanner
 {
-
 	private CSSTokenScanner fTokenScanner;
 	private IDocument fDocument;
-
 	private List<IRange> fComments;
 
+	/**
+	 * CSSScanner
+	 */
 	public CSSScanner()
 	{
 		fTokenScanner = new CSSTokenScanner();
 		fComments = new ArrayList<IRange>();
 	}
 
+	/**
+	 * setSource
+	 * 
+	 * @param text
+	 */
 	public void setSource(String text)
 	{
 		setSource(new Document(text));
 	}
 
+	/**
+	 * setSource
+	 * 
+	 * @param document
+	 */
 	public void setSource(IDocument document)
 	{
 		fDocument = document;
@@ -49,12 +60,20 @@ public class CSSScanner extends Scanner
 		fComments.clear();
 	}
 
+	/**
+	 * getComments
+	 * 
+	 * @return
+	 */
 	public IRange[] getComments()
 	{
 		return fComments.toArray(new IRange[fComments.size()]);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see beaver.Scanner#nextToken()
+	 */
 	public Symbol nextToken() throws IOException, Exception
 	{
 		IToken token = fTokenScanner.nextToken();

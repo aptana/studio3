@@ -22,6 +22,7 @@ public class AllTests
 		suite.addTestSuite(RangeTests.class);
 		suite.addTestSuite(MetadataTests.class);
 		suite.addTestSuite(CSSContentAssistProposalTests.class);
+		suite.addTestSuite(CSSTextHoverTests.class);
 		//$JUnit-END$
 		return suite;
 	}

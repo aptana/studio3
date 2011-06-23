@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.auth.AuthenticationManager;
 import com.aptana.ide.core.io.auth.IAuthenticationManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
@@ -117,11 +118,6 @@ public class CoreIOPlugin extends Plugin
 		return plugin;
 	}
 
-	public static void log(IStatus status)
-	{
-		getDefault().getLog().log(status);
-	}
-
 	/**
 	 * Returns the Connection Manager instance
 	 * 
@@ -197,5 +193,15 @@ public class CoreIOPlugin extends Plugin
 					.getSaveNumber()));
 			getStateLocation().append(savePath).toFile().delete();
 		}
+	}
+
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
+	{
+		IdeLog.log(getDefault(), status);
 	}
 }

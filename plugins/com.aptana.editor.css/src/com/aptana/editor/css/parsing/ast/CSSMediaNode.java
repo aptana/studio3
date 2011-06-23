@@ -8,11 +8,15 @@
 package com.aptana.editor.css.parsing.ast;
 
 import java.util.Arrays;
+import java.util.List;
+
+import com.aptana.parsing.ast.IParseNode;
 
 public class CSSMediaNode extends CSSNode
 {
+	private static final String MEDIA = "@media"; //$NON-NLS-1$
+
 	private CSSTextNode[] fMedias;
-	private CSSNode[] fStatements;
 	private String fText;
 
 	/**
@@ -26,7 +30,7 @@ public class CSSMediaNode extends CSSNode
 		super(CSSNodeTypes.MEDIA);
 
 		fMedias = medias;
-		fStatements = statements;
+		setChildren(statements);
 	}
 
 	/*
@@ -50,10 +54,8 @@ public class CSSMediaNode extends CSSNode
 		{
 			return false;
 		}
-
 		CSSMediaNode other = (CSSMediaNode) obj;
-
-		return Arrays.equals(fMedias, other.fMedias) && Arrays.equals(fStatements, other.fStatements);
+		return toString().equals(other.toString());
 	}
 
 	/**
@@ -73,7 +75,20 @@ public class CSSMediaNode extends CSSNode
 	 */
 	public CSSNode[] getStatements()
 	{
-		return fStatements;
+		List<IParseNode> list = Arrays.asList(getChildren());
+		return list.toArray(new CSSNode[list.size()]);
+	}
+
+	@Override
+	public String getText()
+	{
+		StringBuilder text = new StringBuilder();
+		text.append(MEDIA);
+		for (CSSTextNode media : fMedias)
+		{
+			text.append(" ").append(media); //$NON-NLS-1$
+		}
+		return text.toString();
 	}
 
 	/*
@@ -83,12 +98,7 @@ public class CSSMediaNode extends CSSNode
 	@Override
 	public int hashCode()
 	{
-		int hash = super.hashCode();
-
-		hash = hash * 31 + Arrays.hashCode(fMedias);
-		hash = hash * 31 + Arrays.hashCode(fStatements);
-
-		return hash;
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override
@@ -97,21 +107,18 @@ public class CSSMediaNode extends CSSNode
 		if (fText == null)
 		{
 			StringBuilder text = new StringBuilder();
-
-			text.append("@media"); //$NON-NLS-1$
-
+			text.append(MEDIA);
 			for (CSSTextNode media : fMedias)
 			{
 				text.append(" ").append(media); //$NON-NLS-1$
 			}
 
 			text.append("{"); //$NON-NLS-1$
-
-			for (CSSNode statement : fStatements)
+			CSSNode[] statements = getStatements();
+			for (CSSNode statement : statements)
 			{
 				text.append(statement);
 			}
-
 			text.append("}"); //$NON-NLS-1$
 
 			fText = text.toString();

@@ -23,6 +23,7 @@ import java.util.StringTokenizer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +31,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -163,7 +165,7 @@ public final class ShellExecutable
 			{
 				return path;
 			}
-			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$
+			IdeLog.logWarning(CorePlugin.getDefault(), "Shell executable path preference point to an invalid location"); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -250,7 +252,11 @@ public final class ShellExecutable
 				}
 				try
 				{
-					result = buildEnvironment(ProcessUtil.outputForProcess(run(envCommand, workingDirectory, null)));
+					IStatus status = ProcessUtil.processResult(run(envCommand, workingDirectory, null));
+					if (status.isOK())
+					{
+						result = buildEnvironment(status.getMessage());
+					}
 				}
 				catch (Exception e)
 				{
@@ -318,7 +324,7 @@ public final class ShellExecutable
 		StringBuffer sb = new StringBuffer();
 		for (String arg : command)
 		{
-			sb.append(arg.replaceAll("\"|\'", "\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(arg.replaceAll("\"|\'| ", "\\\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		shellCommand.add(sb.toString().trim());
 		return shellCommand;

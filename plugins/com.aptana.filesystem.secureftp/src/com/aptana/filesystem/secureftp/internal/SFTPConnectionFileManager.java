@@ -442,16 +442,17 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 				}
 				FTPFile[] ftpFiles = listFiles(dirPath, monitor);
 				for (FTPFile ftpFile : ftpFiles) {
-					if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
-						if (Path.ROOT.equals(path) && ".".equals(ftpFile.getName())) { //$NON-NLS-1$
+					String fileName = ftpFile.getName();
+					if (fileName == null || ".".equals(fileName) || "..".equals(fileName)) { //$NON-NLS-1$ //$NON-NLS-2$
+						if (Path.ROOT.equals(path) && ".".equals(fileName)) { //$NON-NLS-1$
 							ftpFile.setName(path.toPortableString());
 							ftpFileCache.put(path, ftpFile);
 							result = ftpFile;
 						}
 						continue;
 					}
-					ftpFileCache.put(dirPath.append(ftpFile.getName()), ftpFile);
-					if (name != null && name.equals(ftpFile.getName())) {
+					ftpFileCache.put(dirPath.append(fileName), ftpFile);
+					if (name != null && name.equals(fileName)) {
 						result = ftpFile;
 					}
 				}
@@ -484,11 +485,12 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			monitor.beginTask(Messages.SFTPConnectionFileManager_GatheringFileDetails, ftpFiles.length);
 			List<ExtendedFileInfo> list = new ArrayList<ExtendedFileInfo>();
 			for (FTPFile ftpFile : ftpFiles) {
-				if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
+				String fileName = ftpFile.getName();
+				if (fileName != null && ".".equals(fileName) || "..".equals(fileName)) { //$NON-NLS-1$ //$NON-NLS-2$
 					monitor.worked(1);
 					continue;
 				}
-				IPath filePath = path.append(ftpFile.getName());
+				IPath filePath = path.append(fileName);
 				ftpFileCache.put(filePath, ftpFile);
 				
 				ExtendedFileInfo fileInfo = createFileInfo(ftpFile);
@@ -665,10 +667,10 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			List<String> list = new ArrayList<String>();
 			for (FTPFile ftpFile : ftpFiles) {
 				String name = ftpFile.getName();
-				if (".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (name == null || ".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
-				ftpFileCache.put(path.append(ftpFile.getName()), ftpFile);
+				ftpFileCache.put(path.append(name), ftpFile);
 				list.add(name);
 			}
 			return list.toArray(new String[list.size()]);
@@ -835,7 +837,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			List<String> dirs = new ArrayList<String>();
 			for (FTPFile ftpFile: ftpFiles) {
 				String name = ftpFile.getName();
-				if (".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (name == null || ".".equals(name) || "..".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
 				if (ftpFile.isDir()) {

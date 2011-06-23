@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -32,13 +33,21 @@ public class SWTUtils
 	private static final String SMALL_FONT = "com.aptana.ui.small_font"; //$NON-NLS-1$
 	private static Color errorColor;
 	private static ModifyListener modifyListener;
-	
+
 	static
 	{
-		ColorRegistry cm = JFaceResources.getColorRegistry();
-		RGB errorRGB = new RGB(255, 255, 180);
-		cm.put("error", errorRGB); //$NON-NLS-1$
-		errorColor = cm.get("error"); //$NON-NLS-1$
+		// runs in SWT thread as JFaceResources.getColorRegistry() could throw exception if not
+		Display.getDefault().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				ColorRegistry cm = JFaceResources.getColorRegistry();
+				RGB errorRGB = new RGB(255, 255, 180);
+				cm.put("error", errorRGB); //$NON-NLS-1$
+				errorColor = cm.get("error"); //$NON-NLS-1$
+			}
+		});
 	}
 
 	/**
@@ -213,7 +222,6 @@ public class SWTUtils
 		combo.setBackground(null);
 		return true;
 	}
-	
 
 	/**
 	 * Tests if the widget value is empty. If so, it adds an error color to the background of the cell;
@@ -227,7 +235,8 @@ public class SWTUtils
 		if (widget.getText() == null || "".equals(widget.getText())) //$NON-NLS-1$
 		{
 			widget.setBackground(errorColor);
-			if(modifyListener == null) {
+			if (modifyListener == null)
+			{
 				modifyListener = new ModifyListener()
 				{
 					public void modifyText(ModifyEvent e)
@@ -248,5 +257,5 @@ public class SWTUtils
 			return false;
 		}
 		return true;
-	}	
+	}
 }

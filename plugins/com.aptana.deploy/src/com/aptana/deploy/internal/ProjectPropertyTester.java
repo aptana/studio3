@@ -10,6 +10,7 @@ package com.aptana.deploy.internal;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -19,16 +20,17 @@ public class ProjectPropertyTester extends PropertyTester
 
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
 	{
-		if (receiver instanceof IResource)
+		IResource resource = getResource(receiver);
+		if (resource != null)
 		{
 			IContainer container;
 			if (receiver instanceof IContainer)
 			{
-				container = (IContainer) receiver;
+				container = (IContainer) resource;
 			}
 			else
 			{
-				container = ((IResource) receiver).getParent();
+				container = resource.getParent();
 			}
 			if (!container.isAccessible())
 			{
@@ -58,5 +60,18 @@ public class ProjectPropertyTester extends PropertyTester
 			}
 		}
 		return false;
+	}
+
+	private static IResource getResource(Object receiver)
+	{
+		if (receiver instanceof IResource)
+		{
+			return (IResource) receiver;
+		}
+		if (receiver instanceof IAdaptable)
+		{
+			return (IResource) ((IAdaptable) receiver).getAdapter(IResource.class);
+		}
+		return null;
 	}
 }
