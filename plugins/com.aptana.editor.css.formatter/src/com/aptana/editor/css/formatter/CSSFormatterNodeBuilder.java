@@ -7,12 +7,14 @@
  */
 package com.aptana.editor.css.formatter;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
@@ -31,6 +33,11 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 
 	private FormatterDocument document;
+
+	@SuppressWarnings("nls")
+	// Syntax that appears on the same line as a selector
+	public static final HashSet<String> SELECTOR_SYNTAX = new HashSet<String>(Arrays.asList(",", ";", ":", ")", "(",
+			">"));
 
 	/**
 	 * @param parseResult
@@ -90,8 +97,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			case CSSNodeTypes.AT_RULE:
 			case CSSNodeTypes.IMPORT:
 				// Custom at-rule and import nodes currently fall under the same formatting case. This may need to
-				// change once
-				// the parser returns the url part as a textnode
+				// change once the parser returns the url part as a textnode
 				pushAtRuleNode(cssNode);
 				break;
 			default:
@@ -138,7 +144,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				getSelectorNodeEnd(selectEndingOffset, document)));
 		push(formatterSelectorNode);
 
-		findAndPushPunctuationNode(TypePunctuation.SEMICOLON, selectEndingOffset);
+		findAndPushSyntaxNode(';', selectEndingOffset);
 
 		checkedPop(formatterSelectorNode, -1);
 	}
@@ -161,9 +167,16 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			CSSTextNode mediaSelectorNode = medias[i];
 
+			String selectorText = mediaSelectorNode.getText();
 			// For media nodes that are just syntax, we skip it
-			if (mediaSelectorNode.getText().length() == 1 && mediaSelectorNode.getText().matches("[^a-zA-Z]")) //$NON-NLS-1$
+			if (selectorText.length() == 1 && selectorText.matches("[^a-zA-Z]")) //$NON-NLS-1$
 			{
+				// push a syntax node if it's part of the list
+				if (SELECTOR_SYNTAX.contains(selectorText))
+				{
+					findAndPushSyntaxNode(selectorText.charAt(0), mediaSelectorNode.getStartingOffset());
+				}
+				// otherwise, we still skip all other syntax
 				continue;
 			}
 
@@ -364,16 +377,25 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 	private void pushFormatterSelectorNodes(CSSSelectorNode[] selectors)
 	{
+
 		for (int i = 0; i < selectors.length; i++)
 		{
 			CSSSelectorNode selectorNode = selectors[i];
 			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0);
+			int selectorEndOffset = getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1;
+
 			formatterSelectorNode.setBegin(createTextNode(document,
-					getBeginWithoutWhiteSpaces(selectorNode.getStartingOffset(), document),
-					getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1));
+					getBeginWithoutWhiteSpaces(selectorNode.getStartingOffset(), document), selectorEndOffset));
 			push(formatterSelectorNode);
 
 			checkedPop(formatterSelectorNode, -1);
+
+			int nextNonWhiteSpaceOffset = getBeginWithoutWhiteSpaces(selectorEndOffset, document);
+
+			if (SELECTOR_SYNTAX.contains(Character.toString(document.charAt(nextNonWhiteSpaceOffset))))
+			{
+				findAndPushSyntaxNode(document.charAt(nextNonWhiteSpaceOffset), nextNonWhiteSpaceOffset);
+			}
 		}
 	}
 
@@ -383,13 +405,12 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param offsetToSearch
 	 *            - The offset that will be used as the start for the search of the syntax characters.
 	 */
-	private void findAndPushPunctuationNode(TypePunctuation type, int offsetToSearch)
+	private void findAndPushSyntaxNode(char punctuationType, int offsetToSearch)
 	{
-		char punctuationType = type.toString().charAt(0);
 		int punctuationOffset = locateCharForward(document, punctuationType, offsetToSearch);
 		if (punctuationOffset != offsetToSearch || document.charAt(punctuationOffset) == punctuationType)
 		{
-			FormatterCSSSyntaxNode syntaxNode = new FormatterCSSSyntaxNode(document);
+			FormatterCSSSyntaxNode syntaxNode = new FormatterCSSSyntaxNode(document, punctuationType);
 			syntaxNode.setBegin(createTextNode(document, punctuationOffset, punctuationOffset + 1));
 			push(syntaxNode);
 			checkedPop(syntaxNode, -1);
@@ -443,15 +464,11 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			offset++;
 		}
 
-		if (document.charAt(offset) == ',' || document.charAt(offset) == '>')
-		{
-			return offset;
-		}
-
 		offset = original;
 		while (offset > 0)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '{'))
+			if (!Character.isWhitespace(document.charAt(offset)) && document.charAt(offset) != '{'
+					&& !SELECTOR_SYNTAX.contains(Character.toString(document.charAt(offset))))
 			{
 				break;
 			}
@@ -459,5 +476,4 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		return offset;
 	}
-
 }
