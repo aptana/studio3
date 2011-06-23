@@ -17,6 +17,8 @@ build/
 *.mode2v3
 native/**/Debug/
 native/**/Release/
+native/**/UpgradeLog*.XML
+native/**/_UpgradeReport_Files/
 tests/com.aptana.scripting.tests/application-bundles/bundleWithCommand/cache.yml
 tests/com.aptana.scripting.tests/application-bundles/bundleWithCommandReference/cache.yml
 tests/com.aptana.scripting.tests/application-bundles/bundleWithMenu/cache.yml

@@ -172,8 +172,8 @@ public final class BrowserUtil {
 		} else if (InternetExplorer.isBrowserExecutable(browserExecutable) && isIEDebuggerAvailable()) {
 			IPath dllPath = JSDebugPlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
 					.append("AptanaDebugger.dll"); //$NON-NLS-1$
-			IPath registeredPath = dllPath.addFileExtension("registered");
-			boolean available = dllPath.toFile().exists() && registeredPath.toFile().exists(); //$NON-NLS-1$
+			IPath registeredPath = dllPath.addFileExtension("registered"); //$NON-NLS-1$
+			boolean available = dllPath.toFile().exists() && registeredPath.toFile().exists();
 
 			if (available) {
 				/* refresh dll file */
