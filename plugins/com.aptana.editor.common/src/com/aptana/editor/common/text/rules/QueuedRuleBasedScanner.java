@@ -19,7 +19,7 @@ import org.eclipse.jface.text.rules.Token;
 /**
  * @author Max Stepanov
  */
-public class QueuedRuleBasedScanner extends RuleBasedScanner {
+public abstract class QueuedRuleBasedScanner extends RuleBasedScanner {
 
 	protected static class Entry {
 		private final ITokenScanner tokenScanner;
