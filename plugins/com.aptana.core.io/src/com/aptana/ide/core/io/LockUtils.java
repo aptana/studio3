@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A utilities class which provides file-locking related functions.
@@ -68,8 +71,8 @@ public class LockUtils
 			}
 			if (lastException != null || fileLock == null)
 			{
-				CoreIOPlugin.log(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-						"Failed to lock " + fileName, lastException)); //$NON-NLS-1$
+				IdeLog.logError(CoreIOPlugin.getDefault(),
+						MessageFormat.format("Failed to lock {0}", fileName), lastException); //$NON-NLS-1$
 				return new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, Messages.LockUtils_failedToLock + fileName
 						+ Messages.LockUtils_seeErrorLog, lastException);
 			}
@@ -148,8 +151,8 @@ public class LockUtils
 		}
 		if (isLocked)
 		{
-			CoreIOPlugin.log(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-					"Failed to write to " + dir, lastException)); //$NON-NLS-1$
+			IdeLog.logError(CoreIOPlugin.getDefault(),
+					MessageFormat.format("Failed to write to {0}", dir), lastException); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, Messages.LockUtils_failedToWrite + dir
 					+ Messages.LockUtils_seeErrorLog, lastException);
 		}

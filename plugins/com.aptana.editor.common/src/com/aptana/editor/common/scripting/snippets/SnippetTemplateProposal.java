@@ -368,17 +368,27 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	{
 		if (useTabs && indent.contains(" ")) //$NON-NLS-1$
 		{
+			int i;
 			String newIndent = ""; //$NON-NLS-1$
-			for (int i = 0; i < indent.length() / getSpaceIndentSize(); i++)
+			int spacesCount = indent.replaceAll("\t", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
+			// Add tabs based on previous number of tabs, and total number of spaces (if they can be converted to the
+			// tab equivalent)
+			for (i = 0; i < (indent.length() - spacesCount) + (spacesCount / getSpaceIndentSize()); i++)
 			{
 				newIndent += '\t';
+			}
+			// Add back remaining spaces
+			for (i = 0; i < spacesCount % getSpaceIndentSize(); i++)
+			{
+				newIndent += ' ';
 			}
 			return newIndent;
 		}
 		if (!useTabs && indent.contains("\t")) //$NON-NLS-1$
 		{
 			String newIndent = ""; //$NON-NLS-1$
-			for (int i = 0; i < indent.length() * getSpaceIndentSize(); i++)
+			int tabCount = indent.replaceAll(" ", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
+			for (int i = 0; i < (indent.length() - tabCount) + (tabCount * getSpaceIndentSize()); i++)
 			{
 				newIndent += " "; //$NON-NLS-1$
 			}

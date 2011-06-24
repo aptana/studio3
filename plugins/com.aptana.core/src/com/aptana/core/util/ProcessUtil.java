@@ -94,16 +94,15 @@ public abstract class ProcessUtil
 		}
 		return result.getMessage();
 	}
-	
+
 	/**
-	 * reads the stdout and stderr from process, returns an IStatus with the
-	 * exit code, and results. Cast to ProcessStatus to get at each stream's
-	 * output separately.
+	 * reads the stdout and stderr from process, returns an IStatus with the exit code, and results. Cast to
+	 * ProcessStatus to get at each stream's output separately.
 	 * 
 	 * @param process
 	 * @return
 	 */
-	public static IStatus processResult(Process process) 
+	public static IStatus processResult(Process process)
 	{
 		return processData(process, null);
 	}
@@ -149,7 +148,7 @@ public abstract class ProcessUtil
 		}
 		catch (InterruptedException e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}

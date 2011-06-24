@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A stream gobbler thread that reads from an InputStream, collects the read text, and allows retrieving it by calling
@@ -91,9 +92,9 @@ public class InputStreamGobbler extends Thread
 				result.deleteCharAt(result.length() - newLineSeparator.length());
 			}
 		}
-		catch (IOException ioe)
+		catch (IOException e)
 		{
-			CorePlugin.logError(ioe.getMessage(), ioe);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{

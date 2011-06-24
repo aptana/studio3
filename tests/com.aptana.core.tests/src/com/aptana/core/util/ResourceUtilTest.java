@@ -76,9 +76,6 @@ public class ResourceUtilTest extends TestCase
 		// get new value
 		desc = testProject.getDescription();
 
-		// make sure we added a builder
-		assertEquals(numCommands + 1, desc.getBuildSpec().length);
-
 		boolean foundBuilder = false;
 		ICommand[] commands = desc.getBuildSpec();
 		for (int i = 0; i < commands.length; i++)

@@ -54,6 +54,7 @@ import com.enterprisedt.net.ftp.ssl.SSLFTPClient.ConfigFlags;
 public class FTPSConnectionFileManager extends FTPConnectionFileManager implements IFTPSConnectionFileManager {
 	
 	private boolean validateCertificate;
+	private boolean noSSLSessionResumption;
 	private String securityMechanism;
 	
 	/* (non-Javadoc)
@@ -65,9 +66,9 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.filesystem.secureftp.IFTPSConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, boolean, java.lang.String, java.lang.String, java.lang.String, boolean)
+	 * @see com.aptana.filesystem.secureftp.IFTPSConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, boolean, java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
 	 */
-	public void init(String host, int port, IPath basePath, String login, char[] password, boolean explicit, boolean passive, String transferType, String encoding, String timezone, boolean validateCertificate) {
+	public void init(String host, int port, IPath basePath, String login, char[] password, boolean explicit, boolean passive, String transferType, String encoding, String timezone, boolean validateCertificate, boolean noSSLSessionResumption) {
 		Assert.isTrue(ftpClient == null, Messages.FTPSConnectionFileManager_ConnectionHasBeenInitiated);
 		try {
 			this.pool = new FTPClientPool(this);
@@ -81,20 +82,21 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			this.transferType = transferType;
 			this.timezone = timezone != null && timezone.length() == 0 ? null : timezone;
 			this.validateCertificate = validateCertificate;
-			initFTPSClient((SSLFTPClient) ftpClient, explicit, passive, encoding, validateCertificate);
+			this.noSSLSessionResumption = noSSLSessionResumption;
+			initFTPSClient((SSLFTPClient) ftpClient, explicit, passive, encoding, validateCertificate, noSSLSessionResumption);
 		} catch (Exception e) {
 			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_ConnectionInitializationFailed, e));
 			ftpClient = null;
 		}
 	}
 
-	protected static void initFTPSClient(SSLFTPClient ftpsClient, boolean explicit, boolean passive, String encoding, boolean validateCertificate) throws IOException, FTPException {
+	protected static void initFTPSClient(SSLFTPClient ftpsClient, boolean explicit, boolean passive, String encoding, boolean validateCertificate, boolean noSSLSessionResumption) throws IOException, FTPException {
 		initFTPClient(ftpsClient, passive, encoding);
 		ftpsClient.setImplicitFTPS(true);
 		ftpsClient.setCustomValidator(new SSLHostValidator());
 		ftpsClient.setValidateServer(validateCertificate);
 		ftpsClient.setImplicitFTPS(!explicit);
-		ftpsClient.setConfigFlags(ConfigFlags.START_WITH_CLEAR_DATA_CHANNELS);
+		ftpsClient.setConfigFlags(ConfigFlags.START_WITH_CLEAR_DATA_CHANNELS | (noSSLSessionResumption ? ConfigFlags.DISABLE_SESSION_RESUMPTION : 0));
 	}
 
 	/* (non-Javadoc)
@@ -286,7 +288,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			return;
 		}
 		SSLFTPClient newFtpsClient = (SSLFTPClient) newFtpClient;
-		initFTPSClient(newFtpsClient, !((SSLFTPClient) ftpClient).isImplicitFTPS(), ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding(), validateCertificate);
+		initFTPSClient(newFtpsClient, !((SSLFTPClient) ftpClient).isImplicitFTPS(), ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding(), validateCertificate, noSSLSessionResumption);
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
 		Policy.checkCanceled(monitor);

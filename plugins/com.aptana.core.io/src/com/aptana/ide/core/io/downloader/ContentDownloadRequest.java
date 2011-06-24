@@ -16,6 +16,7 @@ import org.eclipse.ecf.filetransfer.UserCancelledException;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.downloader.FileReader;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -129,7 +130,7 @@ public class ContentDownloadRequest
 		}
 		catch (URISyntaxException e)
 		{
-			CoreIOPlugin.log(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, e.getMessage(), e));
+			IdeLog.logError(CoreIOPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		try

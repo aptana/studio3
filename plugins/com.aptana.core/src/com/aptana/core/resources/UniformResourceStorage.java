@@ -21,27 +21,27 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
- *
  */
 // TODO: rework using EFS
 public abstract class UniformResourceStorage extends PlatformObject implements IStorage {
 
 	private long timestamp = -1;
 	private long expires = -1;
-	
+
 	/**
 	 * UniformResourceStorage
 	 */
 	protected UniformResourceStorage() {
 		super();
 	}
-	
+
 	/**
 	 * getURI
-	 *
+	 * 
 	 * @return URI
 	 */
 	public abstract URI getURI();
@@ -51,27 +51,31 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	 */
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
-		if ( IUniformResource.class == adapter )
-		{
+		if (IUniformResource.class == adapter) {
 			return new AbstractUniformResource() {
-				/* (non-Javadoc)
-				 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang
+				 * .Class)
 				 */
 				public Object getAdapter(Class adapter) {
-					if ( IStorage.class == adapter )
-					{
+					if (IStorage.class == adapter) {
 						return UniformResourceStorage.this;
 					}
 					return super.getAdapter(adapter);
 				}
 
-				/* (non-Javadoc)
+				/*
+				 * (non-Javadoc)
+				 * 
 				 * @see com.aptana.ide.core.resources.IUniformResource#getURI()
 				 */
 				public URI getURI() {
 					return UniformResourceStorage.this.getURI();
 				}
-			
+
 			};
 		}
 
@@ -82,7 +86,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
-		return obj instanceof UniformResourceStorage && getURI().equals(((UniformResourceStorage)obj).getURI());
+		return obj instanceof UniformResourceStorage && getURI().equals(((UniformResourceStorage) obj).getURI());
 	}
 
 	/**
@@ -97,8 +101,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	 * 
 	 * @return boolean
 	 */
-	public boolean isValid()
-	{
+	public boolean isValid() {
 		if (timestamp == -1) {
 			return false;
 		}
@@ -109,27 +112,26 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 			URLConnection connection = getURI().toURL().openConnection();
 			if (connection instanceof HttpURLConnection) {
 				connection.setIfModifiedSince(timestamp);
-				((HttpURLConnection)connection).setRequestMethod("HEAD"); //$NON-NLS-1$
+				((HttpURLConnection) connection).setRequestMethod("HEAD"); //$NON-NLS-1$
 			}
 			connection.connect();
 			if (connection instanceof HttpURLConnection) {
 				HttpURLConnection httpConnection = (HttpURLConnection) connection;
 				long lastModified = httpConnection.getLastModified();
-				if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED
-						|| (lastModified != 0 && timestamp >= lastModified)) {
+				if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED || (lastModified != 0 && timestamp >= lastModified)) {
 					expires = System.currentTimeMillis();
 					long expiration = connection.getExpiration();
 					long date = connection.getDate();
 					if (expiration != 0 && date != 0 && expiration > date) {
 						expires += (expiration - date);
 					} else {
-						expires += 10*1000; // 10 sec
+						expires += 10 * 1000; // 10 sec
 					}
 					return true;
-				}				
+				}
 			}
 		} catch (IOException e) {
-			CorePlugin.log(e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		return false;
 	}
@@ -147,7 +149,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 			if (expiration != 0 && date != 0 && expiration > date) {
 				expires += (expiration - date);
 			} else {
-				expires += 10*1000; // 10 sec
+				expires += 10 * 1000; // 10 sec
 			}
 			timestamp = connection.getLastModified();
 			return connection.getInputStream();
@@ -155,22 +157,22 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 			throw new CoreException(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.OK, "Open stream error", e)); //$NON-NLS-1$
 		}
 	}
-	
+
 	public boolean exists() {
 		try {
 			URLConnection connection = getURI().toURL().openConnection();
 			if (connection instanceof HttpURLConnection) {
-				((HttpURLConnection)connection).setRequestMethod("HEAD"); //$NON-NLS-1$
+				((HttpURLConnection) connection).setRequestMethod("HEAD"); //$NON-NLS-1$
 			}
 			connection.connect();
 			if (connection instanceof HttpURLConnection) {
 				HttpURLConnection httpConnection = (HttpURLConnection) connection;
 				if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 					return true;
-				}				
+				}
 			}
 		} catch (IOException e) {
-			CorePlugin.log(e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		return false;
 	}
@@ -187,12 +189,10 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	 */
 	public String getName() {
 		String name = getURI().getPath();
-		if(name != null)
-		{
+		if (name != null) {
 			int index = name.lastIndexOf('/');
-			if ( index >= 0 )
-			{
-				name = name.substring(index+1);
+			if (index >= 0) {
+				name = name.substring(index + 1);
 			}
 		}
 		return name;
