@@ -40,6 +40,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 {
 	private AbstractThemeableEditor editor;
 	private ISelectionListener selectionListener;
+	private Annotation[] annotations;
 
 	/**
 	 * CommonOccurrencesUpdater
@@ -294,48 +295,35 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 
 					if (text != null && text.length() > 0)
 					{
-						// validate
-						boolean isValid = true;
+						System.out.println(text);
+						String source = document.get();
+						String regexSource = "\\b" + Pattern.quote(text) + "\\b";
+						Pattern wordPattern = Pattern.compile(regexSource);
+						Matcher matcher = wordPattern.matcher(source);
+						Map<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
 
-						for (int i = 0; i < text.length(); i++)
+						while (matcher.find())
 						{
-							if (Character.isUnicodeIdentifierPart(text.charAt(i)) == false)
-							{
-								isValid = false;
-								break;
-							}
+							int start = matcher.start();
+							int end = matcher.end();
+							Annotation annotation = new Annotation("com.aptana.editor.common.occurrence", false,
+									"some description");
+							Position position = new Position(start, end - start);
+
+							annotationMap.put(annotation, position);
 						}
 
-						// show markers
-						if (isValid)
+						synchronized (getAnnotationModelLock(annotationModel))
 						{
-							System.out.println(text);
-							String source = document.get();
-							String regexSource = "\\b" + Pattern.quote(text) + "\\b";
-							Pattern wordPattern = Pattern.compile(regexSource);
-							Matcher matcher = wordPattern.matcher(source);
-							Map<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
-
-							while (matcher.find())
-							{
-								int start = matcher.start();
-								int end = matcher.end();
-								Annotation annotation = new Annotation("some.type", false, "some description");
-								Position position = new Position(start, end - start);
-
-								annotationMap.put(annotation, position);
-							}
-
-							synchronized (getAnnotationModelLock(annotationModel))
-							{
-								// @formatter:off
+							// @formatter:off
 								((IAnnotationModelExtension) annotationModel).replaceAnnotations(
-									new Annotation[0],
+									annotations,
 									annotationMap
 								);
 								// @formatter:on
-							}
 						}
+
+						annotations = annotationMap.keySet().toArray(new Annotation[annotationMap.keySet().size()]);
 					}
 				}
 			}
