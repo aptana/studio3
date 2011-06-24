@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
@@ -44,7 +45,8 @@ public class CommandElementsProvider implements ICommandElementsProvider
 
 	public void execute(CommandElement commandElement)
 	{
-		CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.KEY_BINDING, textViewer, textEditor);
+		CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.KEY_BINDING,
+				textViewer, textEditor);
 		CommandExecutionUtils.processCommandResult(commandElement, commandResult, textEditor);
 	}
 
@@ -55,7 +57,8 @@ public class CommandElementsProvider implements ICommandElementsProvider
 
 		try
 		{
-			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(textViewer, caretOffset);
+			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(textViewer, caretOffset);
 			IModelFilter filter = new ScopeFilter(contentTypeAtOffset);
 
 			List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
@@ -78,12 +81,13 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return commandElements;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.keybindings.ICommandElementsProvider#getCommandElementsPopupLocation()
 	 */
 	public Point getCommandElementsPopupLocation()
@@ -94,11 +98,10 @@ public class CommandElementsProvider implements ICommandElementsProvider
 			StyledText textWidget = (StyledText) control;
 			int caretOffset = textWidget.getCaretOffset();
 			Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
-			locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
-					+ textWidget.getLineHeight(caretOffset) + 2);
+			locationAtOffset = textWidget.toDisplay(locationAtOffset.x,
+					locationAtOffset.y + textWidget.getLineHeight(caretOffset) + 2);
 			return locationAtOffset;
 		}
 		return null;
 	}
-
 }

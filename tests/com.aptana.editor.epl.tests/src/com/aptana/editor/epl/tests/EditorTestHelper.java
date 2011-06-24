@@ -55,15 +55,10 @@ import com.aptana.editor.common.text.reconciler.CommonReconciler;
 public class EditorTestHelper {
 
 	public static final String TEXT_EDITOR_ID= "org.eclipse.ui.DefaultTextEditor";
-
 	public static final String RESOURCE_PERSPECTIVE_ID= "org.eclipse.ui.resourcePerspective";
-
 	public static final String WEB_PERSPECTIVE_ID= "com.aptana.ui.WebPerspective";
-
 	public static final String OUTLINE_VIEW_ID= "org.eclipse.ui.views.ContentOutline";
-
 	public static final String NAVIGATOR_VIEW_ID= "org.eclipse.ui.views.ResourceNavigator";
-
 	public static final String INTRO_VIEW_ID= "org.eclipse.ui.internal.introview";
 
 	public static IEditorPart openInEditor(IFile file, boolean runEventLoop) throws PartInitException {
@@ -182,7 +177,7 @@ public class EditorTestHelper {
 			}
 			int state= job.getState();
 			if (state == Job.RUNNING || state == Job.WAITING) {
-				Logger.global.finest(job.toString());
+				Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finest(job.toString());
 				return false;
 			}
 		}
@@ -279,7 +274,7 @@ public class EditorTestHelper {
 	}
 	
 	public static boolean joinReconciler(SourceViewer sourceViewer, long minTime, long maxTime, long intervalTime) {
-		Logger.global.entering("EditorTestHelper", "joinReconciler");
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).entering("EditorTestHelper", "joinReconciler");
 		runEventQueue(minTime);
 
 		AbstractReconciler reconciler= getReconciler(sourceViewer);
@@ -298,7 +293,7 @@ public class EditorTestHelper {
 			}
 		};
 		boolean finished= helper.waitForCondition(getActiveDisplay(), maxTime > 0 ? maxTime : Long.MAX_VALUE, intervalTime);
-		Logger.global.exiting("EditorTestHelper", "joinReconciler", new Boolean(finished));
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).exiting("EditorTestHelper", "joinReconciler", new Boolean(finished));
 		return finished;
 	}
 
@@ -352,8 +347,8 @@ public class EditorTestHelper {
 
 	public static void joinBackgroundActivities() throws CoreException {
 		// Join Building
-		Logger.global.entering("EditorTestHelper", "joinBackgroundActivities");
-		Logger.global.finer("join builder");
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).entering("EditorTestHelper", "joinBackgroundActivities");
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finer("join builder");
 		boolean interrupted= true;
 		while (interrupted) {
 			try {
@@ -377,11 +372,11 @@ public class EditorTestHelper {
 //				null);
 		// Join jobs
 		joinJobs(0, 0, 500);
-		Logger.global.exiting("EditorTestHelper", "joinBackgroundActivities");
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).exiting("EditorTestHelper", "joinBackgroundActivities");
 	}
 	
 	public static boolean joinJobs(long minTime, long maxTime, long intervalTime) {
-		Logger.global.entering("EditorTestHelper", "joinJobs");
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).entering("EditorTestHelper", "joinJobs");
 		runEventQueue(minTime);
 
 		DisplayHelper helper= new DisplayHelper() {
@@ -389,8 +384,8 @@ public class EditorTestHelper {
 				return allJobsQuiet();
 			}
 		};
-		boolean quiet= helper.waitForCondition(getActiveDisplay(), maxTime > 0 ? maxTime : Long.MAX_VALUE, intervalTime);
-		Logger.global.exiting("EditorTestHelper", "joinJobs", new Boolean(quiet));
+		boolean quiet = helper.waitForCondition(getActiveDisplay(), maxTime > 0 ? maxTime : Long.MAX_VALUE, intervalTime);
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).exiting("EditorTestHelper", "joinJobs", new Boolean(quiet));
 		return quiet;
 	}
 

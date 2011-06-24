@@ -186,7 +186,7 @@ public final class BrowserUtil {
 
 					// Update dll
 					if (!pathMatch || file.lastModified() != registeredPath.toFile().lastModified()) {
-						if (!dllPath.addFileExtension("noupdate").toFile().exists() && file.delete()) {
+						if (!dllPath.addFileExtension("noupdate").toFile().exists() && file.delete()) { //$NON-NLS-1$
 							extractFile(IE_PLUGIN_ID, EXTENSION_LOCAL_PATH[2], file);
 							pathMatch = false;
 						} else if (!pathMatch) {
@@ -402,8 +402,7 @@ public final class BrowserUtil {
 								dllPath.toOSString() }, -1);
 					}
 					dllPath.addFileExtension("registered").toFile().createNewFile(); //$NON-NLS-1$
-					dllPath.addFileExtension("registered").toFile().setLastModified(file.lastModified());
-
+					dllPath.addFileExtension("registered").toFile().setLastModified(file.lastModified()); //$NON-NLS-1$
 				} catch (IOException e) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.BrowserUtil_InstallError, e));
@@ -455,5 +454,4 @@ public final class BrowserUtil {
 			}
 		}
 	}
-
 }

@@ -45,7 +45,7 @@ public class HerokuPlugin extends AbstractUIPlugin
 		return PLUGIN_ID;
 	}
 
-	private static HerokuPlugin getDefault()
+	public static HerokuPlugin getDefault()
 	{
 		return instance;
 	}

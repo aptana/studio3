@@ -32,7 +32,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
-import com.aptana.deploy.DeployPlugin;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.deploy.capistrano.CapistranoPlugin;
 import com.aptana.terminal.widget.TerminalComposite;
 
 public class CapifyProjectPage extends WizardPage
@@ -141,9 +142,8 @@ public class CapifyProjectPage extends WizardPage
 				}
 				catch (Exception e1)
 				{
-					DeployPlugin.logError(e1);
+					IdeLog.logError(CapistranoPlugin.getDefault(), e1.getMessage(), e1);
 				}
-
 			}
 		});
 

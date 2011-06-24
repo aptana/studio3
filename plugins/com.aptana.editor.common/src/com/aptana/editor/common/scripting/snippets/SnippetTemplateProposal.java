@@ -47,6 +47,7 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
@@ -166,10 +167,10 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					// this may already modify the document
 					templateBuffer = fContext.evaluate(fTemplate);
 				}
-				catch (TemplateException e1)
+				catch (TemplateException e)
 				{
-					CommonEditorPlugin.logWarning(MessageFormat.format(
-							"Error in template {0}. {1}", fTemplate.toString(), e1.getMessage())); //$NON-NLS-1$
+					IdeLog.logWarning(CommonEditorPlugin.getDefault(),
+							MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e.getMessage())); //$NON-NLS-1$
 					fSelectedRegion = fRegion;
 					return;
 				}

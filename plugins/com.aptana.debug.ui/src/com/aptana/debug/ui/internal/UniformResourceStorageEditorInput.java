@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.editors.text.ILocationProvider;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.debug.ui.DebugUiPlugin;
 
@@ -109,7 +110,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -126,7 +127,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				try {
 					loadRemoteFileStorage((UniformResourceStorage) storage, new File(filePath));
 				} catch (CoreException e) {
-					DebugUiPlugin.log(e);
+					IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 		}

@@ -146,8 +146,8 @@ public class TextmateImporter
 		File input = new File(args[0]);
 		try
 		{
-			Properties p = new TextmateImporter().convertToProperties(input);
-			p.store(new FileOutputStream(new File(args[1])), "");
+			Properties p = TextmateImporter.convertToProperties(input);
+			p.store(new FileOutputStream(new File(args[1])), ""); //$NON-NLS-1$
 		}
 		catch (FileNotFoundException e)
 		{

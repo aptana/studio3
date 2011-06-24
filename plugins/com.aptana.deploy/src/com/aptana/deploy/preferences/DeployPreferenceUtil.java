@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
@@ -96,7 +97,7 @@ public class DeployPreferenceUtil
 		}
 		catch (CoreException e)
 		{
-			DeployPlugin.logError(e);
+			IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 		}
 		return id;
 	}
@@ -138,9 +139,9 @@ public class DeployPreferenceUtil
 			container.setPersistentProperty(
 					new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
 		}
-		catch (CoreException e1)
+		catch (CoreException e)
 		{
-			DeployPlugin.logError(e1);
+			IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

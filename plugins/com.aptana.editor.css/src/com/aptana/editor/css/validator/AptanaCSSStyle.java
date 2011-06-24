@@ -17,6 +17,7 @@ import org.w3c.css.properties.css1.CssProperty;
 import org.w3c.css.properties.css3.Css3Style;
 import org.w3c.css.util.Utf8Properties;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSPlugin;
 
 /**
@@ -39,7 +40,7 @@ public class AptanaCSSStyle extends Css3Style
 		}
 		catch (IOException e)
 		{
-			CSSPlugin.logError(Messages.AptanaCSSStyle_ERR_UnableToLoadProperties, e);
+			IdeLog.logError(CSSPlugin.getDefault(), Messages.AptanaCSSStyle_ERR_UnableToLoadProperties, e);
 		}
 	}
 

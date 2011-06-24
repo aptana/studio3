@@ -24,9 +24,11 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FirefoxUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
+import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
  * @author Max Stepanov
@@ -138,7 +140,7 @@ public final class FirebugUtil {
 				}
 			}
 		} catch (IOException e) {
-			DebugCorePlugin.log(MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugPlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
 		} finally {
 			if (reader != null) {
 				try {

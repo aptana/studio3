@@ -23,6 +23,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.internal.preferences.PreferenceInitializer;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.Messages;
 import com.aptana.ui.UIPlugin;
 
@@ -105,7 +106,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		}
 		catch (BackingStoreException e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return super.performOk();

@@ -17,16 +17,15 @@ import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.Assert;
 
-
 /**
- * Helper class for accessing classes and members which cannot
- * be accessed using standard Java access control like private
- * or package visible elements.
- *
+ * Helper class for accessing classes and members which cannot be accessed using standard Java access control like
+ * private or package visible elements.
+ * 
  * @since 3.1
  */
-@SuppressWarnings("rawtypes")
-public class Accessor {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class Accessor
+{
 
 	/** The class to access. */
 	private Class fClass;
@@ -34,39 +33,49 @@ public class Accessor {
 	private Object fInstance;
 
 	/**
-	 * Creates an accessor for the given <code>instance</code> and
-	 * <code>class</code>. Only non-inherited members that particular
-	 * <code>class</code> can be accessed.
-	 *
-	 * @param instance the instance
-	 * @param clazz the class
+	 * Creates an accessor for the given <code>instance</code> and <code>class</code>. Only non-inherited members that
+	 * particular <code>class</code> can be accessed.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param clazz
+	 *            the class
 	 */
-	public Accessor(Object instance, Class clazz) {
+	public Accessor(Object instance, Class clazz)
+	{
 		org.eclipse.core.runtime.Assert.isNotNull(instance);
 		Assert.isNotNull(clazz);
-		fInstance= instance;
-		fClass= clazz;
+		fInstance = instance;
+		fClass = clazz;
 	}
 
 	/**
-	 * Creates an accessor for the given <code>instance</code> and
-	 * <code>class</code>. Only non-inherited members that particular
-	 * <code>class</code> can be accessed.
-	 *
-	 * @param instance the instance
-	 * @param className the name of the class
-	 * @param classLoader the class loader to use i.e. <code>getClass().getClassLoader()</code>
+	 * Creates an accessor for the given <code>instance</code> and <code>class</code>. Only non-inherited members that
+	 * particular <code>class</code> can be accessed.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param className
+	 *            the name of the class
+	 * @param classLoader
+	 *            the class loader to use i.e. <code>getClass().getClassLoader()</code>
 	 */
-	public Accessor(Object instance, String className, ClassLoader classLoader) {
+	public Accessor(Object instance, String className, ClassLoader classLoader)
+	{
 		Assert.isNotNull(instance);
 		Assert.isNotNull(className);
 		Assert.isNotNull(classLoader);
-		fInstance= instance;
-		try {
-			fClass= Class.forName(className, true, classLoader);
-		} catch (ClassNotFoundException e) {
+		fInstance = instance;
+		try
+		{
+			fClass = Class.forName(className, true, classLoader);
+		}
+		catch (ClassNotFoundException e)
+		{
 			fail();
-		} catch (ExceptionInInitializerError e) {
+		}
+		catch (ExceptionInInitializerError e)
+		{
 			fail();
 		}
 	}
@@ -74,54 +83,81 @@ public class Accessor {
 	/**
 	 * Creates an accessor for the given class.
 	 * <p>
-	 * In order to get the type information from the given
-	 * arguments they must all be instanceof Object. Use
-	 * {@link #Accessor(String, ClassLoader, Class[], Object[])} if this
-	 * is not the case.</p>
-	 *
-	 * @param className the name of the class
-	 * @param classLoader the class loader to use i.e. <code>getClass().getClassLoader()</code>
-	 * @param constructorArgs the constructor arguments which must all be instance of Object
+	 * In order to get the type information from the given arguments they must all be instanceof Object. Use
+	 * {@link #Accessor(String, ClassLoader, Class[], Object[])} if this is not the case.
+	 * </p>
+	 * 
+	 * @param className
+	 *            the name of the class
+	 * @param classLoader
+	 *            the class loader to use i.e. <code>getClass().getClassLoader()</code>
+	 * @param constructorArgs
+	 *            the constructor arguments which must all be instance of Object
 	 */
-	public Accessor(String className, ClassLoader classLoader, Object[] constructorArgs) {
+	public Accessor(String className, ClassLoader classLoader, Object[] constructorArgs)
+	{
 		this(className, classLoader, getTypes(constructorArgs), constructorArgs);
 	}
 
 	/**
 	 * Creates an accessor for the given class.
-	 *
-	 * @param className the name of the class
-	 * @param classLoader the class loader to use i.e. <code>getClass().getClassLoader()</code>
-	 * @param constructorTypes the types of the constructor arguments
-	 * @param constructorArgs the constructor arguments
+	 * 
+	 * @param className
+	 *            the name of the class
+	 * @param classLoader
+	 *            the class loader to use i.e. <code>getClass().getClassLoader()</code>
+	 * @param constructorTypes
+	 *            the types of the constructor arguments
+	 * @param constructorArgs
+	 *            the constructor arguments
 	 */
-	public Accessor(String className, ClassLoader classLoader, Class[] constructorTypes, Object[] constructorArgs) {
-		try {
-			fClass= Class.forName(className, true, classLoader);
-		} catch (ClassNotFoundException e) {
-			fail();
-		} catch (ExceptionInInitializerError e) {
+	public Accessor(String className, ClassLoader classLoader, Class[] constructorTypes, Object[] constructorArgs)
+	{
+		try
+		{
+			fClass = Class.forName(className, true, classLoader);
+		}
+		catch (ClassNotFoundException e)
+		{
 			fail();
 		}
-		Constructor constructor= null;
-		try {
-			constructor= fClass.getDeclaredConstructor(constructorTypes);
-		} catch (SecurityException e2) {
+		catch (ExceptionInInitializerError e)
+		{
 			fail();
-		} catch (NoSuchMethodException e2) {
+		}
+		Constructor constructor = null;
+		try
+		{
+			constructor = fClass.getDeclaredConstructor(constructorTypes);
+		}
+		catch (SecurityException e2)
+		{
+			fail();
+		}
+		catch (NoSuchMethodException e2)
+		{
 			fail();
 		}
 		Assert.isNotNull(constructor);
 		constructor.setAccessible(true);
-		try {
-			fInstance= constructor.newInstance(constructorArgs);
-		} catch (IllegalArgumentException e) {
+		try
+		{
+			fInstance = constructor.newInstance(constructorArgs);
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e)
+		{
 			fail();
-		} catch (InstantiationException e) {
+		}
+		catch (InstantiationException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 	}
@@ -131,16 +167,24 @@ public class Accessor {
 	 * <p>
 	 * This constructor is used to access static stuff.
 	 * </p>
-	 *
-	 * @param className the name of the class
-	 * @param classLoader the class loader to use i.e. <code>getClass().getClassLoader()</code>
+	 * 
+	 * @param className
+	 *            the name of the class
+	 * @param classLoader
+	 *            the class loader to use i.e. <code>getClass().getClassLoader()</code>
 	 */
-	public Accessor(String className, ClassLoader classLoader) {
-		try {
-			fClass= Class.forName(className, true, classLoader);
-		} catch (ClassNotFoundException e) {
+	public Accessor(String className, ClassLoader classLoader)
+	{
+		try
+		{
+			fClass = Class.forName(className, true, classLoader);
+		}
+		catch (ClassNotFoundException e)
+		{
 			fail();
-		} catch (ExceptionInInitializerError e) {
+		}
+		catch (ExceptionInInitializerError e)
+		{
 			fail();
 		}
 	}
@@ -148,45 +192,63 @@ public class Accessor {
 	/**
 	 * Invokes the method with the given method name and arguments.
 	 * <p>
-	 * In order to get the type information from the given
-	 * arguments all those arguments must be instance of Object. Use
-	 * {@link #invoke(String, Class[], Object[])} if this
-	 * is not the case.</p>
-	 *
-	 * @param methodName the method name
-	 * @param arguments the method arguments which must all be instance of Object
+	 * In order to get the type information from the given arguments all those arguments must be instance of Object. Use
+	 * {@link #invoke(String, Class[], Object[])} if this is not the case.
+	 * </p>
+	 * 
+	 * @param methodName
+	 *            the method name
+	 * @param arguments
+	 *            the method arguments which must all be instance of Object
 	 * @return the method return value
 	 */
-	public Object invoke(String methodName, Object[] arguments) {
+	public Object invoke(String methodName, Object[] arguments)
+	{
 		return invoke(methodName, getTypes(arguments), arguments);
 	}
 
 	/**
 	 * Invokes the method with the given method name and arguments.
-	 *
-	 * @param methodName the method name
-	 * @param types the argument types
-	 * @param arguments the method arguments
+	 * 
+	 * @param methodName
+	 *            the method name
+	 * @param types
+	 *            the argument types
+	 * @param arguments
+	 *            the method arguments
 	 * @return the method return value
 	 */
-	public Object invoke(String methodName, Class[] types, Object[] arguments) {
-		Method method= null;
-		try {
-			method= fClass.getDeclaredMethod(methodName, types);
-		} catch (SecurityException e) {
+	public Object invoke(String methodName, Class[] types, Object[] arguments)
+	{
+		Method method = null;
+		try
+		{
+			method = fClass.getDeclaredMethod(methodName, types);
+		}
+		catch (SecurityException e)
+		{
 			fail();
-		} catch (NoSuchMethodException ex) {
+		}
+		catch (NoSuchMethodException ex)
+		{
 			fail();
 		}
 		Assert.isNotNull(method);
 		method.setAccessible(true);
-		try {
+		try
+		{
 			return method.invoke(fInstance, arguments);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 		return null;
@@ -194,68 +256,99 @@ public class Accessor {
 
 	/**
 	 * Assigns the given value to the field with the given name.
-	 *
-	 * @param fieldName the field name
-	 * @param value the value to assign to the field
+	 * 
+	 * @param fieldName
+	 *            the field name
+	 * @param value
+	 *            the value to assign to the field
 	 */
-	public void set(String fieldName, Object value) {
-		Field field= getField(fieldName);
-		try {
+	public void set(String fieldName, Object value)
+	{
+		Field field = getField(fieldName);
+		try
+		{
 			field.set(fInstance, value);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 	}
 
 	/**
 	 * Assigns the given value to the field with the given name.
-	 *
-	 * @param fieldName the field name
-	 * @param value the value to assign to the field
+	 * 
+	 * @param fieldName
+	 *            the field name
+	 * @param value
+	 *            the value to assign to the field
 	 */
-	public void set(String fieldName, boolean value) {
-		Field field= getField(fieldName);
-		try {
+	public void set(String fieldName, boolean value)
+	{
+		Field field = getField(fieldName);
+		try
+		{
 			field.setBoolean(fInstance, value);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 	}
 
 	/**
 	 * Assigns the given value to the field with the given name.
-	 *
-	 * @param fieldName the field name
-	 * @param value the value to assign to the field
+	 * 
+	 * @param fieldName
+	 *            the field name
+	 * @param value
+	 *            the value to assign to the field
 	 */
-	public void set(String fieldName, int value) {
-		Field field= getField(fieldName);
-		try {
+	public void set(String fieldName, int value)
+	{
+		Field field = getField(fieldName);
+		try
+		{
 			field.setInt(fInstance, value);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 	}
 
 	/**
 	 * Returns the value of the field with the given name.
-	 *
-	 * @param fieldName the field name
+	 * 
+	 * @param fieldName
+	 *            the field name
 	 * @return the value of the field
 	 */
-	public Object get(String fieldName) {
-		Field field= getField(fieldName);
-		try {
+	public Object get(String fieldName)
+	{
+		Field field = getField(fieldName);
+		try
+		{
 			return field.get(fInstance);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 		// Unreachable code
@@ -264,17 +357,24 @@ public class Accessor {
 
 	/**
 	 * Returns the value of the field with the given name.
-	 *
-	 * @param fieldName the field name
+	 * 
+	 * @param fieldName
+	 *            the field name
 	 * @return the value of the field
 	 */
-	public boolean getBoolean(String fieldName) {
-		Field field= getField(fieldName);
-		try {
+	public boolean getBoolean(String fieldName)
+	{
+		Field field = getField(fieldName);
+		try
+		{
 			return field.getBoolean(fInstance);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 		// Unreachable code
@@ -283,50 +383,66 @@ public class Accessor {
 
 	/**
 	 * Returns the value of the field with the given name.
-	 *
-	 * @param fieldName the field name
+	 * 
+	 * @param fieldName
+	 *            the field name
 	 * @return the value of the field
 	 */
-	public int getInt(String fieldName) {
-		Field field= getField(fieldName);
-		try {
+	public int getInt(String fieldName)
+	{
+		Field field = getField(fieldName);
+		try
+		{
 			return field.getInt(fInstance);
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			fail();
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e)
+		{
 			fail();
 		}
 		// Unreachable code
 		return 0;
 	}
 
-	public Field getField(String fieldName) {
-		Field field= null;
-		try {
-			field= fClass.getDeclaredField(fieldName);
-		} catch (SecurityException e) {
+	public Field getField(String fieldName)
+	{
+		Field field = null;
+		try
+		{
+			field = fClass.getDeclaredField(fieldName);
+		}
+		catch (SecurityException e)
+		{
 			fail();
-		} catch (NoSuchFieldException e) {
+		}
+		catch (NoSuchFieldException e)
+		{
 			fail();
 		}
 		field.setAccessible(true);
 		return field;
 	}
 
-	private static Class[] getTypes(Object[] objects) {
+	private static Class[] getTypes(Object[] objects)
+	{
 		if (objects == null)
 			return null;
 
-		int length= objects.length;
-		Class[] classes= new Class[length];
-		for (int i= 0; i < length; i++) {
+		int length = objects.length;
+		Class[] classes = new Class[length];
+		for (int i = 0; i < length; i++)
+		{
 			Assert.isNotNull(objects[i]);
-			classes[i]= objects[i].getClass();
+			classes[i] = objects[i].getClass();
 		}
 		return classes;
 	}
 
-	private void fail() {
+	private void fail()
+	{
 		Assert.isTrue(false);
 	}
 }

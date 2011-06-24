@@ -12,15 +12,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
- com.aptana.core,
+ com.aptana.core;bundle-version="3.0.3",
  com.aptana.index.core,
+ com.aptana.ui,
  com.aptana.editor.common,
  com.aptana.parsing,
  beaver,
  com.aptana.theme,
  org.mortbay.jetty.util,
  org.mozilla.rhino,
- com.aptana.ui;bundle-version="3.0.0",
  json.simple;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

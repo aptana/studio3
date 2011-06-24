@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.svg.contentassist.index.SVGIndexConstants;
 import com.aptana.editor.svg.preferences.IPreferenceConstants;
@@ -95,7 +96,7 @@ public class SVGMetadataLoader extends Job
 		}
 		catch (IOException e)
 		{
-			SVGPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(SVGPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

@@ -17,6 +17,7 @@ import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
 
@@ -90,7 +91,7 @@ public class RedHatAPI
 		}
 		catch (StorageException e)
 		{
-			RedHatPlugin.logError(e);
+			IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -118,7 +119,7 @@ public class RedHatAPI
 		}
 		catch (Exception e)
 		{
-			RedHatPlugin.logError(e);
+			IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -156,7 +157,8 @@ public class RedHatAPI
 			}
 			if (password == null)
 			{
-				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), Messages.RedHatAPI_PasswordEmptyError);
+				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(),
+						Messages.RedHatAPI_PasswordEmptyError);
 			}
 		}
 		newArgs[0] = LOGIN_SWITCH;
@@ -197,11 +199,9 @@ public class RedHatAPI
 			if (binScript == null)
 			{
 				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), MessageFormat.format(
-						Messages.RedHatAPI_UnableToFindBinScriptsError,
-						scriptName));
+						Messages.RedHatAPI_UnableToFindBinScriptsError, scriptName));
 			}
 		}
 		return Status.OK_STATUS;
 	}
-
 }

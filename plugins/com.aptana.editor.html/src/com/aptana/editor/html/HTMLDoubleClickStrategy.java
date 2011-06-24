@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 
 public class HTMLDoubleClickStrategy extends CommonDoubleClickStrategy
@@ -62,10 +63,9 @@ public class HTMLDoubleClickStrategy extends CommonDoubleClickStrategy
 		{
 			if (Platform.inDebugMode())
 			{
-				HTMLPlugin.logError(x.getMessage(), x);
+				IdeLog.logError(HTMLPlugin.getDefault(), x.getMessage(), x);
 			}
 		}
 		return false;
 	}
-
 }

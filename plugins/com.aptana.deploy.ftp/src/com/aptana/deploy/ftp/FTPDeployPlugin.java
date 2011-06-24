@@ -45,7 +45,7 @@ public class FTPDeployPlugin extends AbstractUIPlugin
 		return PLUGIN_ID;
 	}
 
-	private static FTPDeployPlugin getDefault()
+	public static FTPDeployPlugin getDefault()
 	{
 		return instance;
 	}

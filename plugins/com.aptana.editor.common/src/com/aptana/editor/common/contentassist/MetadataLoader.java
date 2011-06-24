@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.index.core.Index;
@@ -132,7 +133,8 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 				}
 				catch (Throwable t)
 				{
-					CommonEditorPlugin.logError(Messages.MetadataLoader_Error_Loading_Metadata + resource, t);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), Messages.MetadataLoader_Error_Loading_Metadata
+							+ resource, t);
 				}
 				finally
 				{
@@ -204,7 +206,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 		List<String> categories = index.getCategories();
 		return categories == null || categories.isEmpty();
 	};
-	
+
 	/**
 	 * Grab the index containing the metadata.
 	 */

@@ -16,6 +16,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 public class ToggleOutlineHandler extends AbstractHandler
@@ -37,7 +38,8 @@ public class ToggleOutlineHandler extends AbstractHandler
 				}
 				catch (PartInitException e)
 				{
-					CommonEditorPlugin.logError(Messages.ToggleOutlineHandler_ERR_OpeningOutline, e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), Messages.ToggleOutlineHandler_ERR_OpeningOutline,
+							e);
 				}
 			}
 			else

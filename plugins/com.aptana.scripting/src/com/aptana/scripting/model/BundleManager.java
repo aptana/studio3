@@ -1903,9 +1903,9 @@ public class BundleManager
 
 		if (execute)
 		{
-			this.showBundleLoadInfo("Loading script: " + script + ", fire event=" + fireEvent);
+			this.showBundleLoadInfo(MessageFormat.format("Loading script: {0}, fire event={1}", script, fireEvent)); //$NON-NLS-1$
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
-			this.showBundleLoadInfo("Loading complete: " + script);
+			this.showBundleLoadInfo(MessageFormat.format("Loading complete: {0}", script)); //$NON-NLS-1$
 
 			if (fireEvent)
 			{
