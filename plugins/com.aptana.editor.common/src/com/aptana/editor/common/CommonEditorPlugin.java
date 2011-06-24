@@ -17,8 +17,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
@@ -36,7 +41,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
@@ -45,6 +52,9 @@ import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.usage.EventLogger;
 
 /**
@@ -213,7 +223,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			window.addPerspectiveListener(fPerspectiveListener);
 		}
 	};
+
 	private DocumentScopeManager fDocumentScopeManager;
+	private IPreferenceChangeListener fThemeChangeListener;
 
 	/**
 	 * The constructor
@@ -231,6 +243,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 
+		// Update occurrence colors
+		listenForThemeChanges();
+
 		// Activate indexing
 		IndexPlugin.getDefault();
 
@@ -238,6 +253,56 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		differentiator.schedule();
 
 		addPartListener();
+	}
+
+	/**
+	 * Hook up a listener for theme changes, and change the PHP occurrence colors!
+	 */
+	private void listenForThemeChanges()
+	{
+		Job job = new UIJob("Set occurrence colors to theme") //$NON-NLS-1$
+		{
+			private void setOccurrenceColors()
+			{
+				IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+				Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+
+				prefs.put("OccurrenceIndicationColor", StringConverter.asString(theme.getSearchResultColor())); //$NON-NLS-1$
+
+				try
+				{
+					prefs.flush();
+				}
+				catch (BackingStoreException e)
+				{
+					// ignore
+				}
+			}
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				fThemeChangeListener = new IPreferenceChangeListener()
+				{
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+						{
+							setOccurrenceColors();
+						}
+					}
+				};
+
+				setOccurrenceColors();
+
+				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+
+				return Status.OK_STATUS;
+			}
+		};
+
+		job.setSystem(true);
+		job.schedule();
 	}
 
 	/*
@@ -248,6 +313,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		try
 		{
+			if (fThemeChangeListener != null)
+			{
+				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+
+				fThemeChangeListener = null;
+			}
+
 			differentiator.dispose();
 
 			removePartListener();
