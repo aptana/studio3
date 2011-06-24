@@ -41,7 +41,6 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 
 		pref.putInt(CSSFormatterConstants.SPACES_BEFORE_COMMAS, 0);
 		pref.putInt(CSSFormatterConstants.SPACES_AFTER_COMMAS, 1);
-
 		pref.putInt(CSSFormatterConstants.SPACES_BEFORE_SEMICOLON, 0);
 		pref.putInt(CSSFormatterConstants.SPACES_AFTER_SEMICOLON, 0);
 		pref.putInt(CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, 1);

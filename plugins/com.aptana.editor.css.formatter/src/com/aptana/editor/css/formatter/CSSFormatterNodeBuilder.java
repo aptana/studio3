@@ -18,7 +18,8 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationValueNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSyntaxNode;
@@ -138,13 +139,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		// We use a selector node for now, we may want to create a new formatter node type for rule id
-		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false, false);
 		formatterSelectorNode.setBegin(createTextNode(document,
 				getBeginWithoutWhiteSpaces(selectorStartingOffset, document),
-				getSelectorNodeEnd(selectEndingOffset, document)));
+				getEndWithoutWhiteSpaces(selectEndingOffset, document)));
 		push(formatterSelectorNode);
 
-		findAndPushSyntaxNode(';', selectEndingOffset);
+		findAndPushSyntaxNode(';', selectEndingOffset, false);
 
 		checkedPop(formatterSelectorNode, -1);
 	}
@@ -162,6 +163,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		CSSTextNode[] medias = mediaNode.getMedias();
 
 		int blockStartOffset = getBlockStartOffset(medias[medias.length - 1].getEndingOffset() + 1, document);
+		boolean previousNodeIsSyntax = false;
 
 		for (int i = 0; i < medias.length; i++)
 		{
@@ -174,19 +176,23 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// push a syntax node if it's part of the list
 				if (SELECTOR_SYNTAX.contains(selectorText))
 				{
-					findAndPushSyntaxNode(selectorText.charAt(0), mediaSelectorNode.getStartingOffset());
+					findAndPushSyntaxNode(selectorText.charAt(0), mediaSelectorNode.getStartingOffset(), false);
 				}
+
+				previousNodeIsSyntax = true;
 				// otherwise, we still skip all other syntax
 				continue;
 			}
 
-			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false,
+					previousNodeIsSyntax);
 			formatterSelectorNode.setBegin(createTextNode(document,
 					getBeginWithoutWhiteSpaces(mediaSelectorNode.getStartingOffset(), document),
-					getSelectorNodeEnd(mediaSelectorNode.getEndingOffset() + 1, document) + 1));
+					getEndWithoutWhiteSpaces(mediaSelectorNode.getEndingOffset() + 1, document) + 1));
 			push(formatterSelectorNode);
 
 			checkedPop(formatterSelectorNode, -1);
+			previousNodeIsSyntax = false;
 		}
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
@@ -197,9 +203,9 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		// Recursively add this node's children
 		addNodes(mediaNode.getStatements());
 
+		checkedPop(formatterBlockNode, -1);
 		formatterBlockNode
 				.setEnd(createTextNode(document, mediaNode.getEndingOffset(), mediaNode.getEndingOffset() + 1));
-		checkedPop(formatterBlockNode, -1);
 
 	}
 
@@ -218,17 +224,16 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		int blockStartOffset = getBlockStartOffset(faceFontNode.getStartingOffset() + 9, document);
 
 		// create a FormatterCSSSelectorNode for @font-face
-		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
+		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true, false);
 		formatterSelectorNode.setBegin(createTextNode(document,
 				getBeginWithoutWhiteSpaces(faceFontNode.getStartingOffset(), document),
-				getSelectorNodeEnd(faceFontNode.getStartingOffset() + 9, document) + 1));
+				getEndWithoutWhiteSpaces(faceFontNode.getStartingOffset() + 9, document) + 1));
 		push(formatterSelectorNode);
 		checkedPop(formatterSelectorNode, -1);
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
-		formatterBlockNode.setEnd(createTextNode(document, faceFontNode.getEndingOffset(),
-				faceFontNode.getEndingOffset() + 1));
+
 		push(formatterBlockNode);
 
 		// Don't create text nodes when there are no declarations, or only white space
@@ -243,7 +248,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		pushFormatterDeclarationNodes(faceFontNode.getEndingOffset(), declarations, formatterBlockNode);
 
 		checkedPop(formatterBlockNode, -1);
-
+		formatterBlockNode.setEnd(createTextNode(document, faceFontNode.getEndingOffset(),
+				faceFontNode.getEndingOffset() + 1));
 	}
 
 	/**
@@ -265,18 +271,18 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			blockStartOffset = getBlockStartOffset(selector.getEndingOffset() + 1, document);
 
-			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true, false);
 			formatterSelectorNode.setBegin(createTextNode(document,
 					getBeginWithoutWhiteSpaces(pageNode.getStartingOffset(), document),
-					getSelectorNodeEnd(pageNode.getStartingOffset() + 5, document) + 1));
+					getEndWithoutWhiteSpaces(pageNode.getStartingOffset() + 5, document) + 1));
 			push(formatterSelectorNode);
 			checkedPop(formatterSelectorNode, -1);
 
-			formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+			formatterSelectorNode = new FormatterCSSSelectorNode(document, false, false);
 			// we do startingOffset - 1 to account for the ':'
 			formatterSelectorNode.setBegin(createTextNode(document,
 					getBeginWithoutWhiteSpaces(selector.getStartingOffset() - 1, document),
-					getSelectorNodeEnd(selector.getEndingOffset() + 1, document) + 1));
+					getEndWithoutWhiteSpaces(selector.getEndingOffset() + 1, document) + 1));
 
 			push(formatterSelectorNode);
 			checkedPop(formatterSelectorNode, -1);
@@ -284,7 +290,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
-		formatterBlockNode.setEnd(createTextNode(document, pageNode.getEndingOffset(), pageNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
 
 		// Don't create text nodes when there are no declarations, or only white space
@@ -299,6 +304,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		pushFormatterDeclarationNodes(pageNode.getEndingOffset(), declarations, formatterBlockNode);
 
 		checkedPop(formatterBlockNode, -1);
+		formatterBlockNode.setEnd(createTextNode(document, pageNode.getEndingOffset(), pageNode.getEndingOffset() + 1));
 
 	}
 
@@ -324,7 +330,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, isDeclaration);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
-		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
 
 		// Don't create text nodes when there are no declarations, or only white space
@@ -337,8 +342,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		pushFormatterDeclarationNodes(ruleNode.getEndingOffset(), declarations, formatterBlockNode);
-
 		checkedPop(formatterBlockNode, -1);
+		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 
 	}
 
@@ -349,14 +354,27 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 
 			CSSDeclarationNode declarationNode = declarations[i];
-			FormatterBlockWithBeginNode formatterDeclarationNode = new FormatterCSSDeclarationNode(document);
+			CSSExpressionNode expressionNode = declarationNode.getAssignedValue();
 
-			formatterDeclarationNode.setBegin(createTextNode(document, declarationNode.getStartingOffset(),
-					declarationNode.getEndingOffset() + 1));
-			push(formatterDeclarationNode);
+			FormatterBlockWithBeginNode formatterDeclarationPropertyNode = new FormatterCSSDeclarationPropertyNode(
+					document);
+			int propertyEndOffset = getEndWithoutWhiteSpaces(
+					locateCharacterInSameLine(':', declarationNode.getStartingOffset(), document), document);
 
-			checkedPop(formatterDeclarationNode, -1);
+			formatterDeclarationPropertyNode.setBegin(createTextNode(document, declarationNode.getStartingOffset(),
+					propertyEndOffset + 1));
+			push(formatterDeclarationPropertyNode);
+			checkedPop(formatterDeclarationPropertyNode, -1);
 
+			// push the ':'
+			findAndPushSyntaxNode(':', propertyEndOffset, false);
+
+			if (expressionNode != null)
+			{
+				pushDeclarationValueNode(expressionNode);
+			}
+
+			// Create text nodes for comments between declaration
 			if (i + 1 < declarations.length)
 			{
 				if (getBeginWithoutWhiteSpaces(declarations[i].getEndingOffset() + 1, document) < declarations[i + 1]
@@ -375,14 +393,40 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 	}
 
+	private void pushDeclarationValueNode(CSSExpressionNode expressionNode)
+	{
+
+		int semicolonLocation = locateCharacterInSameLine(';', expressionNode.getEndingOffset(), document);
+		boolean endsWithSemicolon = true;
+
+		if (semicolonLocation == expressionNode.getEndingOffset())
+		{
+			endsWithSemicolon = false;
+		}
+
+		FormatterBlockWithBeginNode formatterDeclarationValueNode = new FormatterCSSDeclarationValueNode(document,
+				!endsWithSemicolon);
+
+		formatterDeclarationValueNode.setBegin(createTextNode(document, expressionNode.getStartingOffset(),
+				expressionNode.getEndingOffset() + 1));
+		push(formatterDeclarationValueNode);
+		checkedPop(formatterDeclarationValueNode, -1);
+
+		if (endsWithSemicolon)
+		{
+			findAndPushSyntaxNode(';', semicolonLocation, true);
+		}
+
+	}
+
 	private void pushFormatterSelectorNodes(CSSSelectorNode[] selectors)
 	{
 
 		for (int i = 0; i < selectors.length; i++)
 		{
 			CSSSelectorNode selectorNode = selectors[i];
-			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0);
-			int selectorEndOffset = getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1;
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0, false);
+			int selectorEndOffset = getEndWithoutWhiteSpaces(selectorNode.getEndingOffset() + 1, document) + 1;
 
 			formatterSelectorNode.setBegin(createTextNode(document,
 					getBeginWithoutWhiteSpaces(selectorNode.getStartingOffset(), document), selectorEndOffset));
@@ -394,7 +438,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			if (SELECTOR_SYNTAX.contains(Character.toString(document.charAt(nextNonWhiteSpaceOffset))))
 			{
-				findAndPushSyntaxNode(document.charAt(nextNonWhiteSpaceOffset), nextNonWhiteSpaceOffset);
+				findAndPushSyntaxNode(document.charAt(nextNonWhiteSpaceOffset), nextNonWhiteSpaceOffset, false);
 			}
 		}
 	}
@@ -405,12 +449,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param offsetToSearch
 	 *            - The offset that will be used as the start for the search of the syntax characters.
 	 */
-	private void findAndPushSyntaxNode(char punctuationType, int offsetToSearch)
+	private void findAndPushSyntaxNode(char punctuationType, int offsetToSearch, boolean isEndofDeclarationNode)
 	{
 		int punctuationOffset = locateCharForward(document, punctuationType, offsetToSearch);
 		if (punctuationOffset != offsetToSearch || document.charAt(punctuationOffset) == punctuationType)
 		{
-			FormatterCSSSyntaxNode syntaxNode = new FormatterCSSSyntaxNode(document, punctuationType);
+			FormatterCSSSyntaxNode syntaxNode = new FormatterCSSSyntaxNode(document, punctuationType,
+					isEndofDeclarationNode);
 			syntaxNode.setBegin(createTextNode(document, punctuationOffset, punctuationOffset + 1));
 			push(syntaxNode);
 			checkedPop(syntaxNode, -1);
@@ -432,8 +477,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	}
 
 	/**
-	 * @param i
-	 * @param document2
+	 * @param offset
+	 * @param document
 	 * @return
 	 */
 	private int getBeginWithoutWhiteSpaces(int offset, FormatterDocument document)
@@ -451,20 +496,15 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	}
 
 	/**
-	 * @param startingOffset
-	 * @param document2
+	 * Searchings backwards starting at 'offset' and continues until it finds a non-whitespace char (ignores syntax)
+	 * 
+	 * @param offset
+	 * @param document
 	 * @return
 	 */
-	private int getSelectorNodeEnd(int offset, FormatterDocument document)
+	private int getEndWithoutWhiteSpaces(int offset, FormatterDocument document)
 	{
-		int original = offset;
 
-		while (Character.isWhitespace(document.charAt(offset)))
-		{
-			offset++;
-		}
-
-		offset = original;
 		while (offset > 0)
 		{
 			if (!Character.isWhitespace(document.charAt(offset)) && document.charAt(offset) != '{'
@@ -473,6 +513,30 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				break;
 			}
 			offset--;
+		}
+		return offset;
+	}
+
+	/**
+	 * Scan for given character located at the same line. Return the given offset if non is found.
+	 * 
+	 * @param offset
+	 * @param document
+	 * @return The offset of the character; The given offset if character not found.
+	 */
+	private int locateCharacterInSameLine(char character, int offset, FormatterDocument document)
+	{
+		for (int i = offset; i < document.getLength(); i++)
+		{
+			char c = document.charAt(i);
+			if (c == character)
+			{
+				return i;
+			}
+			if (c == '\n' || c == '\r')
+			{
+				break;
+			}
 		}
 		return offset;
 	}
