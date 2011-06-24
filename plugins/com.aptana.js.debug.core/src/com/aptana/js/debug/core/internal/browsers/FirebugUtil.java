@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IPath;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FirefoxUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
