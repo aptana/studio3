@@ -8,6 +8,7 @@
 package com.aptana.editor.css.formatter.nodes;
 
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
@@ -15,11 +16,13 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 {
 
 	private char syntaxType;
+	private boolean isLastNodeInDeclaration;
 
-	public FormatterCSSSyntaxNode(IFormatterDocument document, char syntaxType)
+	public FormatterCSSSyntaxNode(IFormatterDocument document, char syntaxType, boolean isLastNodeInDeclaration)
 	{
 		super(document);
 		this.syntaxType = syntaxType;
+		this.isLastNodeInDeclaration = isLastNodeInDeclaration;
 
 	}
 
@@ -52,6 +55,10 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 	@Override
 	public int getSpacesCountAfter()
 	{
+		if (isLastNodeInDeclaration)
+		{
+			return super.getSpacesCountBefore();
+		}
 		switch (syntaxType)
 		{
 			case '>':
@@ -68,6 +75,12 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 			default:
 				return super.getSpacesCountBefore();
 		}
+	}
+
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return isLastNodeInDeclaration ? getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION) : super
+				.getBlankLinesAfter(context);
 	}
 
 }
