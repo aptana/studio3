@@ -35,8 +35,7 @@ import com.aptana.core.resources.IUniformResourceChangeListener;
  * @author Max Stepanov
  */
 @SuppressWarnings({ "restriction", "unchecked", "rawtypes" })
-public final class MarkerManager
-{
+public final class MarkerManager {
 
 	private static final MarkerInfo[] NO_MARKER_INFO = new MarkerInfo[0];
 	private static MarkerManager instance;
@@ -54,14 +53,10 @@ public final class MarkerManager
 	 * 
 	 * @return MarkerManager
 	 */
-	public static MarkerManager getInstance()
-	{
-		if (instance == null)
-		{
-			synchronized (MarkerManager.class)
-			{
-				if (instance == null)
-				{
+	public static MarkerManager getInstance() {
+		if (instance == null) {
+			synchronized (MarkerManager.class) {
+				if (instance == null) {
 					instance = new MarkerManager();
 				}
 			}
@@ -69,24 +64,16 @@ public final class MarkerManager
 		return instance;
 	}
 
-	private MarkerManager()
-	{
+	private MarkerManager() {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		try
-		{
-			rootMarker = workspace.getRoot().createMarker(
-					"com.aptana.ide.internal.core.resources.ExternalResourcesMarker"); //$NON-NLS-1$
-		}
-		catch (CoreException e)
-		{
+		try {
+			rootMarker = workspace.getRoot().createMarker("com.aptana.ide.internal.core.resources.ExternalResourcesMarker"); //$NON-NLS-1$
+		} catch (CoreException e) {
 			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
-		if (rootMarker != null)
-		{
-			workspace.addResourceChangeListener(new IResourceChangeListener()
-			{
-				public void resourceChanged(IResourceChangeEvent event)
-				{
+		if (rootMarker != null) {
+			workspace.addResourceChangeListener(new IResourceChangeListener() {
+				public void resourceChanged(IResourceChangeEvent event) {
 					handleResourceChanged();
 				}
 			}, IResourceChangeEvent.PRE_BUILD);
@@ -100,16 +87,13 @@ public final class MarkerManager
 	 * @param id
 	 * @return MarkerInfo
 	 */
-	public MarkerInfo findMarkerInfo(IUniformResource resource, long id)
-	{
+	public MarkerInfo findMarkerInfo(IUniformResource resource, long id) {
 		ResourceInfo info = getResourceInfo(resource);
-		if (info == null)
-		{
+		if (info == null) {
 			return null;
 		}
 		MarkerSet markers = info.getMarkers(false);
-		if (markers == null)
-		{
+		if (markers == null) {
 			return null;
 		}
 		return (MarkerInfo) markers.get(id);
@@ -122,22 +106,18 @@ public final class MarkerManager
 	 * @param marker
 	 * @throws CoreException
 	 */
-	public void add(IUniformResource resource, MarkerInfo marker) throws CoreException
-	{
+	public void add(IUniformResource resource, MarkerInfo marker) throws CoreException {
 		ResourceInfo info = getResourceInfo(resource);
-		if (info == null)
-		{
+		if (info == null) {
 			info = createResourceInfo(resource);
 		}
 		MarkerSet markers = info.getMarkers(true);
-		if (markers == null)
-		{
+		if (markers == null) {
 			markers = new MarkerSet(1);
 		}
 
 		basicAdd(resource, markers, marker);
-		if (!markers.isEmpty())
-		{
+		if (!markers.isEmpty()) {
 			info.setMarkers(markers);
 		}
 
@@ -152,10 +132,8 @@ public final class MarkerManager
 	 * @param info
 	 * @return boolean
 	 */
-	public boolean isPersistent(MarkerInfo info)
-	{
-		if (!cache.isPersistent(info.getType()))
-		{
+	public boolean isPersistent(MarkerInfo info) {
+		if (!cache.isPersistent(info.getType())) {
 			return false;
 		}
 		Object isTransient = info.getAttribute(IMarker.TRANSIENT);
@@ -169,11 +147,9 @@ public final class MarkerManager
 	 * @param id
 	 * @throws CoreException
 	 */
-	public void removeMarker(IUniformResource resource, long id) throws CoreException
-	{
+	public void removeMarker(IUniformResource resource, long id) throws CoreException {
 		MarkerInfo marker = findMarkerInfo(resource, id);
-		if (marker == null)
-		{
+		if (marker == null) {
 			return;
 		}
 		ResourceInfo info = getResourceInfo(resource);
@@ -181,11 +157,9 @@ public final class MarkerManager
 		int size = markers.size();
 		markers.remove(marker);
 		info.setMarkers(markers.size() == 0 ? null : markers);
-		if (markers.size() != size)
-		{
+		if (markers.size() != size) {
 			/* TODO: store persistent marker state */
-			IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.REMOVED, resource,
-					marker) };
+			IMarkerSetElement[] changes = new IMarkerSetElement[] { new MarkerDelta(IResourceDelta.REMOVED, resource, marker) };
 			changedMarkers(resource, changes);
 		}
 	}
@@ -197,33 +171,25 @@ public final class MarkerManager
 	 * @param changes
 	 * @throws CoreException
 	 */
-	public void changedMarkers(IUniformResource resource, IMarkerSetElement[] changes) throws CoreException
-	{
-		if (changes == null || changes.length == 0)
-		{
+	public void changedMarkers(IUniformResource resource, IMarkerSetElement[] changes) throws CoreException {
+		if (changes == null || changes.length == 0) {
 			return;
 		}
 		URI uri = resource.getURI();
-		synchronized (lock)
-		{
-			if (currentDeltas == null)
-			{
+		synchronized (lock) {
+			if (currentDeltas == null) {
 				currentDeltas = new HashMap();
 			}
 			MarkerSet previousChanges = (MarkerSet) currentDeltas.get(uri);
 			MarkerSet result = MarkerDelta.merge(previousChanges, changes);
-			if (result.size() == 0)
-			{
+			if (result.size() == 0) {
 				currentDeltas.remove(uri);
-			}
-			else
-			{
+			} else {
 				currentDeltas.put(uri, result);
 			}
 		}
 
-		if (rootMarker != null)
-		{
+		if (rootMarker != null) {
 			rootMarker.setAttribute("updateId", rootMarker.getAttribute("updateId", 0) + 1); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
@@ -235,8 +201,7 @@ public final class MarkerManager
 	 * @param superType
 	 * @return boolean
 	 */
-	public boolean isSubtype(String type, String superType)
-	{
+	public boolean isSubtype(String type, String superType) {
 		return cache.isSubtype(type, superType);
 	}
 
@@ -248,80 +213,61 @@ public final class MarkerManager
 	 * @param includeSubtypes
 	 * @return MarkerInfo[]
 	 */
-	public MarkerInfo[] findMarkersInfo(IUniformResource resource, String type, boolean includeSubtypes)
-	{
+	public MarkerInfo[] findMarkersInfo(IUniformResource resource, String type, boolean includeSubtypes) {
 		ArrayList result = new ArrayList();
 		ResourceInfo info = getResourceInfo(resource);
-		if (info == null)
-		{
+		if (info == null) {
 			return NO_MARKER_INFO;
 		}
 
 		MarkerSet markers = info.getMarkers(false);
-		if (markers == null)
-		{
+		if (markers == null) {
 			return NO_MARKER_INFO;
 		}
 
 		IMarkerSetElement[] elements = markers.elements();
-		for (int i = 0; i < elements.length; ++i)
-		{
+		for (int i = 0; i < elements.length; ++i) {
 			MarkerInfo marker = (MarkerInfo) elements[i];
-			if (type == null)
-			{
+			if (type == null) {
 				result.add(marker);
-			}
-			else
-			{
-				if (includeSubtypes)
-				{
-					if (isSubtype(marker.getType(), type))
-					{
+			} else {
+				if (includeSubtypes) {
+					if (isSubtype(marker.getType(), type)) {
 						result.add(marker);
 					}
-				}
-				else
-				{
-					if (marker.getType().equals(type))
-					{
+				} else {
+					if (marker.getType().equals(type)) {
 						result.add(marker);
 					}
 				}
 			}
 		}
-		if (result.size() == 0)
-		{
+		if (result.size() == 0) {
 			return NO_MARKER_INFO;
 		}
 		return (MarkerInfo[]) result.toArray(new MarkerInfo[result.size()]);
 	}
 
-	private ResourceInfo getResourceInfo(IUniformResource resource)
-	{
+	private ResourceInfo getResourceInfo(IUniformResource resource) {
 		return (ResourceInfo) resources.get(resource.getURI());
 	}
 
-	private ResourceInfo createResourceInfo(IUniformResource resource)
-	{
+	private ResourceInfo createResourceInfo(IUniformResource resource) {
 		ResourceInfo info = new ResourceInfo();
 		resources.put(resource.getURI(), info);
 		return info;
 	}
 
-	private void basicAdd(IUniformResource resource, MarkerSet markers, MarkerInfo newMarker) throws CoreException
-	{
-		if (newMarker.getId() != MarkerInfo.UNDEFINED_ID)
-		{
-			throw new CoreException(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.OK,
-					Messages.MarkerManager_MarkerIDIsDefined, null));
+	private void basicAdd(IUniformResource resource, MarkerSet markers, MarkerInfo newMarker) throws CoreException {
+		if (newMarker.getId() != MarkerInfo.UNDEFINED_ID) {
+			throw new CoreException(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.OK, Messages.MarkerManager_MarkerIDIsDefined, null));
 		}
 		newMarker.setId(nextMarkerId());
 		markers.add(newMarker);
 		/* TODO: store persistent marker state */
 	}
 
-	private long nextMarkerId()
-	{
+	private long nextMarkerId() {
 		return nextMarkerId++;
 	}
 
@@ -330,8 +276,7 @@ public final class MarkerManager
 	 * 
 	 * @param listener
 	 */
-	public void addResourceChangeListener(IUniformResourceChangeListener listener)
-	{
+	public void addResourceChangeListener(IUniformResourceChangeListener listener) {
 		listeners.add(listener);
 	}
 
@@ -340,42 +285,32 @@ public final class MarkerManager
 	 * 
 	 * @param listener
 	 */
-	public void removeResourceChangeListener(IUniformResourceChangeListener listener)
-	{
+	public void removeResourceChangeListener(IUniformResourceChangeListener listener) {
 		listeners.remove(listener);
 	}
 
-	private void handleResourceChanged()
-	{
-		if (currentDeltas == null)
-		{
+	private void handleResourceChanged() {
+		if (currentDeltas == null) {
 			return;
 		}
 		MarkerSet[] markers;
-		synchronized (lock)
-		{
+		synchronized (lock) {
 			markers = (MarkerSet[]) currentDeltas.values().toArray(new MarkerSet[currentDeltas.size()]);
 			currentDeltas = null;
 		}
 		Object[] list = listeners.getListeners();
-		for (int j = 0; j < markers.length; ++j)
-		{
+		for (int j = 0; j < markers.length; ++j) {
 			IMarkerDelta[] deltas = new IMarkerDelta[markers[j].size()];
 			markers[j].copyInto(deltas);
 			IUniformResource resource = null;
-			if (deltas.length > 0 && deltas[0] instanceof MarkerDelta)
-			{
+			if (deltas.length > 0 && deltas[0] instanceof MarkerDelta) {
 				resource = ((MarkerDelta) deltas[0]).getUniformResource();
 			}
 			UniformResourceChangeEvent event = new UniformResourceChangeEvent(this, resource, deltas);
-			for (int i = 0; i < list.length; ++i)
-			{
-				try
-				{
+			for (int i = 0; i < list.length; ++i) {
+				try {
 					((IUniformResourceChangeListener) list[i]).resourceChanged(event);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 				}
 			}
