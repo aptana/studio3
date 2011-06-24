@@ -187,7 +187,7 @@ public final class ShellExecutable
 		}
 		catch (BackingStoreException e)
 		{
-			CorePlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+			IdeLog.logError(CorePlugin.getDefault(), "Saving preferences failed.", e); //$NON-NLS-1$
 		}
 		shellPath = null;
 		shellEnvironment = null;
@@ -260,7 +260,7 @@ public final class ShellExecutable
 				}
 				catch (Exception e)
 				{
-					CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
+					IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed.", e); //$NON-NLS-1$
 					// failed to generate an env, we'll use JVM env and not cache, see below...
 				}
 			}

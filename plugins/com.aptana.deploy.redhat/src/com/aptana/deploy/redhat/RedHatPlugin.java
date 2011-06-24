@@ -50,7 +50,7 @@ public class RedHatPlugin extends AbstractUIPlugin
 		return PLUGIN_ID;
 	}
 
-	private static RedHatPlugin getDefault()
+	public static RedHatPlugin getDefault()
 	{
 		return instance;
 	}

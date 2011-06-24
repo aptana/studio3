@@ -47,19 +47,19 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.io.vfs.IFileTreeVisitor;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("restriction")
-/* package */ class WorkspaceFile extends FileStore {
-		
+/* package */class WorkspaceFile extends FileStore {
+
 	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-	
+
 	private IResource resource;
 	private final IPath path;
 	private LocalFile localFileStore;
@@ -86,7 +86,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		this.path = path;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
@@ -102,8 +104,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return super.getAdapter(adapter);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#childNames(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException {
@@ -130,8 +135,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return EMPTY_STRING_ARRAY;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#fetchInfo(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#fetchInfo(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
@@ -148,15 +156,20 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return info;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#getChild(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#getChild(java.lang.String)
 	 */
 	@Override
 	public IFileStore getChild(String name) {
 		return new WorkspaceFile(path.append(name));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileStore#getName()
 	 */
 	@Override
@@ -164,7 +177,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return path.lastSegment();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileStore#getParent()
 	 */
 	@Override
@@ -175,8 +190,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return new WorkspaceFile(path.removeLastSegments(1));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#openInputStream(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#openInputStream(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
@@ -188,7 +206,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileStore#toURI()
 	 */
 	@Override
@@ -196,13 +216,17 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		try {
 			return new URI(WorkspaceFileSystem.SCHEME_WORKSPACE, path.toPortableString(), null);
 		} catch (URISyntaxException e) {
-			CoreIOPlugin.log(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, e.getLocalizedMessage(), e));
+			IdeLog.logError(CoreIOPlugin.getDefault(), e.getLocalizedMessage(), e);
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#copy(org.eclipse.core.filesystem.IFileStore, int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#copy(org.eclipse.core.
+	 * filesystem.IFileStore, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void copy(IFileStore destination, int options, IProgressMonitor monitor) throws CoreException {
@@ -214,8 +238,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#delete(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#delete(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void delete(int options, IProgressMonitor monitor) throws CoreException {
@@ -225,15 +252,21 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#getFileStore(org.eclipse.core.runtime.IPath)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#getFileStore(org.eclipse
+	 * .core.runtime.IPath)
 	 */
 	@Override
 	public IFileStore getFileStore(IPath path) {
 		return new WorkspaceFile(this.path.append(path));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileStore#getFileSystem()
 	 */
 	@Override
@@ -241,8 +274,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return WorkspaceFileSystem.getInstance();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#equals(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -252,7 +288,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return path.equals(((WorkspaceFile) obj).path);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileStore#hashCode()
 	 */
 	@Override
@@ -260,8 +298,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return path.hashCode();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#mkdir(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#mkdir(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
@@ -283,8 +324,12 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return this;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#move(org.eclipse.core.filesystem.IFileStore, int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#move(org.eclipse.core.
+	 * filesystem.IFileStore, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void move(IFileStore destination, int options, IProgressMonitor monitor) throws CoreException {
@@ -306,26 +351,28 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			}
 			IResource destinationResource = destinationFile.ensureResource();
 			if (destinationResource == null) {
-			    if (resource instanceof IContainer) {
-			        destinationResource = workspaceRoot.getFolder(destinationFile.path);
-			    } else {
-			        destinationResource = workspaceRoot.getFile(destinationFile.path);
-			    }
+				if (resource instanceof IContainer) {
+					destinationResource = workspaceRoot.getFolder(destinationFile.path);
+				} else {
+					destinationResource = workspaceRoot.getFile(destinationFile.path);
+				}
 			}
 			boolean sourceEqualsDest = resource.equals(destinationResource);
 			boolean overwrite = (options & EFS.OVERWRITE) != 0;
 			if (!sourceEqualsDest && !overwrite && destinationResource.exists()) {
-				Policy.error(EFS.ERROR_EXISTS,  NLS.bind(Messages.fileExists, destinationResource.getFullPath()), new FileNotFoundException(destinationFile.path.toPortableString()));
+				Policy.error(EFS.ERROR_EXISTS, NLS.bind(Messages.fileExists, destinationResource.getFullPath()), new FileNotFoundException(destinationFile.path.toPortableString()));
 			}
 			try {
 				if (destinationResource.exists()) {
 					destinationResource.delete(IResource.FORCE, Policy.subMonitorFor(monitor, 20));
 				}
 			} catch (CoreException e) {
-				Policy.error(EFS.ERROR_DELETE, NLS.bind(Messages.couldnotDelete, toString(), destination.toString()), new FileNotFoundException(destinationFile.path.toPortableString()));
+				Policy.error(EFS.ERROR_DELETE, NLS.bind(Messages.couldnotDelete, toString(), destination.toString()),
+						new FileNotFoundException(destinationFile.path.toPortableString()));
 			}
 			if (!destinationResource.getParent().exists()) {
-				Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, toString(), destination.toString()), new FileNotFoundException(destinationFile.path.toPortableString()));
+				Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, toString(), destination.toString()),
+						new FileNotFoundException(destinationFile.path.toPortableString()));
 			}
 			try {
 				resource.move(destinationResource.getFullPath(), true, Policy.subMonitorFor(monitor, 80));
@@ -337,8 +384,12 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#putInfo(org.eclipse.core.filesystem.IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.filesystem.provider.FileStore#putInfo(org.eclipse.core
+	 * .filesystem.IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
@@ -350,8 +401,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#toLocalFile(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#toLocalFile(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public File toLocalFile(int options, IProgressMonitor monitor) throws CoreException {
 		ensureLocalFileStore();
@@ -361,8 +415,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.filesystem.provider.FileStore#openOutputStream(int, org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileStore#openOutputStream(int,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
@@ -383,22 +440,22 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.filesystem.provider.FileStore#toString()
 	 */
 	@Override
 	public String toString() {
 		return path.toString();
 	}
-	
+
 	private IResource ensureResource() throws CoreException {
 		return ensureResource(null);
 	}
 
 	private IResource ensureResource(Class<? extends IResource> resourceClass) throws CoreException {
-		if (resource != null && (
-				!resource.isSynchronized(IResource.DEPTH_ZERO)
-				|| !resource.exists())) {
+		if (resource != null && (!resource.isSynchronized(IResource.DEPTH_ZERO) || !resource.exists())) {
 			resource = null;
 			localFileStore = null;
 		}
@@ -442,7 +499,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		}
 		return localFileStore;
 	}
-	
+
 	private static void createParentsRecursive(IResource resource, IProgressMonitor monitor) throws CoreException {
 		if (resource == null) {
 			return;
@@ -457,10 +514,10 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			((IFolder) parent).create(IResource.FORCE, true, Policy.subMonitorFor(monitor, 20));
 		}
 	}
-	
+
 	private static void fileNotFoundError(CoreException cause, IPath path) throws CoreException {
 		IStatus status = cause.getStatus();
-		throw new CoreException(new Status(status.getSeverity(), status.getPlugin(), status.getCode(), status.getMessage(), new FileNotFoundException(path.toPortableString())));		
+		throw new CoreException(new Status(status.getSeverity(), status.getPlugin(), status.getCode(), status.getMessage(), new FileNotFoundException(path.toPortableString())));
 	}
 
 	public static IFileStore fromLocalFile(File file) {
@@ -468,7 +525,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		if (file.isDirectory()) {
 			resource = workspaceRoot.getContainerForLocation(Path.fromOSString(file.getAbsolutePath()));
 		} else if (file.isFile()) {
-			resource = workspaceRoot.getFileForLocation(Path.fromOSString(file.getAbsolutePath()));			
+			resource = workspaceRoot.getFileForLocation(Path.fromOSString(file.getAbsolutePath()));
 		}
 		if (resource != null) {
 			return new WorkspaceFile(resource);
@@ -482,9 +539,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			FileTree fileTree = new FileTree(this);
 			buildFileTree(fileTree, this, visitor, new InfiniteProgressMonitor(monitor));
 			return fileTree;
-			} finally {
-				monitor.done();
-			}
+		} finally {
+			monitor.done();
+		}
 	}
 
 	private static void buildFileTree(FileTree fileTree, WorkspaceFile parent, IFileTreeVisitor visitor, IProgressMonitor monitor) throws CoreException {
@@ -508,5 +565,4 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			buildFileTree(fileTree, (WorkspaceFile) store, visitor, monitor);
 		}
 	}
-
 }

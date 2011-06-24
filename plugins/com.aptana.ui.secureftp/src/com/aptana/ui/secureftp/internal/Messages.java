@@ -22,6 +22,8 @@ public class Messages extends NLS
 	public static String FTPSAdvancedOptionsComposite_MethodImplicit;
 	public static String FTPSAdvancedOptionsComposite_ModeActive;
 	public static String FTPSAdvancedOptionsComposite_ModePassive;
+
+	public static String FTPSAdvancedOptionsComposite_NoSSLSessionResumption;
 	public static String FTPSAdvancedOptionsComposite_Port;
 	public static String FTPSAdvancedOptionsComposite_SSLMethod;
 	public static String FTPSAdvancedOptionsComposite_Timezone;

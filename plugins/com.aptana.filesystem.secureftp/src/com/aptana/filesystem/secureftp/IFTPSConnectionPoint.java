@@ -40,4 +40,14 @@ public interface IFTPSConnectionPoint extends IBaseFTPConnectionPoint {
 	 */
 	public void setValidateCertificate(boolean validate);
 
+	/**
+	 * @return the noSSLSessionResumption
+	 */
+	public boolean isNoSSLSessionResumption();
+
+	/**
+	 * @param noSSLSessionResumption the noSSLSessionResumption to set
+	 */
+	public void setNoSSLSessionResumption(boolean noSSLSessionResumption);
+
 }

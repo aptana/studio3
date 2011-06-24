@@ -18,6 +18,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.redhat.RedHatAPI;
 import com.aptana.deploy.redhat.RedHatDeployProvider;
@@ -69,7 +70,7 @@ public class RedHatDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				RedHatPlugin.logError(e);
+				IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return true;

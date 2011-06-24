@@ -21,6 +21,7 @@ import org.mortbay.util.ajax.JSON.Output;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * This class represents a state of a configuration.<br>
@@ -209,7 +210,7 @@ public class ConfigurationStatus implements Convertible
 		catch (BackingStoreException e)
 		{
 			// Log any error while saving
-			ConfigurationsPlugin.logError("Error while saving the configuration status state", e); //$NON-NLS-1$
+			IdeLog.logError(ConfigurationsPlugin.getDefault(), "Error while saving the configuration status state", e); //$NON-NLS-1$
 		}
 	}
 
@@ -234,7 +235,8 @@ public class ConfigurationStatus implements Convertible
 			}
 			catch (Exception e)
 			{
-				ConfigurationsPlugin.logError("Error while loading the configuration status state", e); //$NON-NLS-1$
+				IdeLog.logError(ConfigurationsPlugin.getDefault(),
+						"Error while loading the configuration status state", e); //$NON-NLS-1$
 			}
 		}
 	}

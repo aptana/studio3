@@ -12,6 +12,7 @@ import java.net.URI;
 
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
@@ -141,7 +142,7 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 		}
 		catch (IOException e)
 		{
-			HTMLPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

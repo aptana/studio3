@@ -11,6 +11,7 @@
  *******************************************************************************/
 package com.aptana.formatter.ui.preferences;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
@@ -52,12 +53,14 @@ public class AlreadyExistsDialog extends StatusDialog
 
 	private final IProfile fProfile;
 	private final IProfileManager fProfileManager;
+	private final IProject fProject;
 
-	public AlreadyExistsDialog(Shell parentShell, IProfile profile, IProfileManager profileManager)
+	public AlreadyExistsDialog(Shell parentShell, IProfile profile, IProfileManager profileManager, IProject fProject)
 	{
 		super(parentShell);
 		fProfile = profile;
 		fProfileManager = profileManager;
+		this.fProject = fProject;
 		fOk = new StatusInfo();
 		fDuplicate = new StatusInfo(IStatus.ERROR, FormatterMessages.AlreadyExistsDialog_nameExists);
 		fEmpty = new StatusInfo(IStatus.ERROR, FormatterMessages.AlreadyExistsDialog_nameEmpty);
@@ -212,7 +215,7 @@ public class AlreadyExistsDialog extends StatusDialog
 		if (!getStatus().isOK())
 			return;
 		if (fRenameRadio.getSelection())
-			fProfileManager.rename(fProfile, fNameText.getText().trim());
+			fProfileManager.rename(fProject, fProfile, fNameText.getText().trim());
 		super.okPressed();
 	}
 }

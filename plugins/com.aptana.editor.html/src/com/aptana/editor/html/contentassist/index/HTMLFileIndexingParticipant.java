@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
@@ -289,10 +290,8 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			HTMLPlugin
-					.logError(
-							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
-									file.getName()), e);
+			IdeLog.logError(HTMLPlugin.getDefault(),
+					MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing, file.getName()), e);
 		}
 		finally
 		{

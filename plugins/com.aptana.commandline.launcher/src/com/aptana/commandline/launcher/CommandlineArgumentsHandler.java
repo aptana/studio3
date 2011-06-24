@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.WorkbenchJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.FileUtil;
 
@@ -120,7 +121,7 @@ public class CommandlineArgumentsHandler
 			}
 			catch (CoreException e)
 			{
-				CommandlineLauncherPlugin.logError(e);
+				IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 
@@ -168,7 +169,7 @@ public class CommandlineArgumentsHandler
 		}
 		catch (CoreException e)
 		{
-			CommandlineLauncherPlugin.logError(e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -227,8 +228,7 @@ public class CommandlineArgumentsHandler
 		}
 		catch (PartInitException e)
 		{
-			CommandlineLauncherPlugin.logError(e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
-
 }

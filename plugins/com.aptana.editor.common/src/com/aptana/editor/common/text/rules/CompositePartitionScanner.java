@@ -17,6 +17,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
@@ -309,7 +310,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	}
 
 	private void trace(String string) {
-		CommonEditorPlugin.logInfo(string);
+		IdeLog.logInfo(CommonEditorPlugin.getDefault(), string);
 	}
 
 	private boolean hasSwitchingSequence() {
@@ -345,7 +346,5 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		public boolean hasToken() {
 			return token != null;
 		}
-
 	}
-
 }

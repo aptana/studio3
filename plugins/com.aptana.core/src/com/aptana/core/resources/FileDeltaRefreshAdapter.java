@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.filewatcher.FileWatcher;
 
 public class FileDeltaRefreshAdapter extends JNotifyAdapter
@@ -207,7 +208,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		catch (Throwable e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{

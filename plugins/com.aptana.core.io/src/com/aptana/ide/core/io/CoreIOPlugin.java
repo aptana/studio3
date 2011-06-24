@@ -113,7 +113,7 @@ public class CoreIOPlugin extends Plugin
 	 * 
 	 * @return the shared instance
 	 */
-	private static CoreIOPlugin getDefault()
+	public static CoreIOPlugin getDefault()
 	{
 		return plugin;
 	}

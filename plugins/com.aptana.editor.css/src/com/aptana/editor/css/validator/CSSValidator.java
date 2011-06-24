@@ -33,6 +33,7 @@ import org.w3c.css.properties.PropertiesLoader;
 import org.w3c.css.util.ApplContext;
 import org.w3c.css.util.Utf8Properties;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
@@ -205,7 +206,7 @@ public class CSSValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			CSSPlugin.logError(Messages.CSSValidator_ERR_FailToLoadProfile, e);
+			IdeLog.logError(CSSPlugin.getDefault(), Messages.CSSValidator_ERR_FailToLoadProfile, e);
 		}
 		finally
 		{
@@ -335,11 +336,12 @@ public class CSSValidator implements IValidator
 		}
 		catch (MalformedURLException e)
 		{
-			CSSPlugin.logError(MessageFormat.format(Messages.CSSValidator_ERR_InvalidPath, path), e);
+			IdeLog.logError(CSSPlugin.getDefault(), MessageFormat.format(Messages.CSSValidator_ERR_InvalidPath, path),
+					e);
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			CSSPlugin.logError(e.getLocalizedMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		StyleSheet stylesheet = parser.getStyleSheet();

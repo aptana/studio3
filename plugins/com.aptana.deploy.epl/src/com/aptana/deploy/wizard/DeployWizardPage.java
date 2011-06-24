@@ -405,7 +405,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 			return;
 		}
 
-		List categoriesToExpand = new ArrayList(expandedCategoryPaths.length);
+		List<IWizardCategory> categoriesToExpand = new ArrayList<IWizardCategory>(expandedCategoryPaths.length);
 
 		if (wizardCategories != null)
 		{
@@ -466,16 +466,15 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 	protected void storeExpandedCategories(String setting, TreeViewer viewer)
 	{
 		Object[] expandedElements = viewer.getExpandedElements();
-		List expandedElementPaths = new ArrayList(expandedElements.length);
-		for (int i = 0; i < expandedElements.length; ++i)
+		List<String> expandedElementPaths = new ArrayList<String>(expandedElements.length);
+		for (Object element : expandedElements)
 		{
-			if (expandedElements[i] instanceof IWizardCategory)
+			if (element instanceof IWizardCategory)
 			{
-				expandedElementPaths.add(((IWizardCategory) expandedElements[i]).getPath().toString());
+				expandedElementPaths.add(((IWizardCategory) element).getPath().toString());
 			}
 		}
-		getDialogSettings().put(setting,
-				(String[]) expandedElementPaths.toArray(new String[expandedElementPaths.size()]));
+		getDialogSettings().put(setting, expandedElementPaths.toArray(new String[expandedElementPaths.size()]));
 	}
 
 	/**

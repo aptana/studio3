@@ -21,6 +21,7 @@ import org.jruby.RubyRegexp;
 import org.jruby.RubyString;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.scripting.model.BundleManager;
@@ -60,7 +61,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	private void autoDedent(IDocument d, DocumentCommand c)
 	{
 		if (c.offset <= 0 || d.getLength() == 0 || c.text.length() > 1)
+		{
 			return;
+		}
 
 		try
 		{
@@ -124,7 +127,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return;
@@ -159,7 +162,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	protected boolean autoIndent(IDocument d, DocumentCommand c)
 	{
 		if (c.offset <= 0 || d.getLength() == 0 || !shouldAutoIndent())
+		{
 			return false;
+		}
 
 		String newline = c.text;
 		try
@@ -190,7 +195,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return false;
@@ -349,7 +354,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return getTabWidth();

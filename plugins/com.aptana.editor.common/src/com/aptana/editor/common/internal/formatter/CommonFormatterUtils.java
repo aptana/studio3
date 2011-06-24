@@ -21,6 +21,7 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ExtendedFastPartitioner;
@@ -92,7 +93,8 @@ public class CommonFormatterUtils
 					}
 					catch (Exception e)
 					{
-						CommonEditorPlugin.logError("Error while formatting the file template code", e); //$NON-NLS-1$
+						IdeLog.logError(CommonEditorPlugin.getDefault(),
+								"Error while formatting the file template code", e); //$NON-NLS-1$
 					}
 				}
 			}

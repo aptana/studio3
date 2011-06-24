@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.engineyard.EngineYardPlugin;
 import com.aptana.ui.util.SWTUtils;
 
@@ -112,7 +113,7 @@ public class EngineYardDeployWizardPage extends WizardPage
 						}
 						catch (Exception e)
 						{
-							EngineYardPlugin.logError(e);
+							IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
 						}
 					}
 				});

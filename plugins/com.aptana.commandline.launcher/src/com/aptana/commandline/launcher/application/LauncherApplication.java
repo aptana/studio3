@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,12 +27,12 @@ import org.eclipse.osgi.util.NLS;
 
 import com.aptana.commandline.launcher.CommandlineLauncherPlugin;
 import com.aptana.commandline.launcher.server.port.PortManager;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * This application is used to launch Aptana IDE from a command line.
  * 
  * @author schitale
- *
  */
 public class LauncherApplication implements IApplication
 {
@@ -58,8 +57,9 @@ public class LauncherApplication implements IApplication
 				}
 				else
 				{
-					CommandlineLauncherPlugin.logError(new IllegalStateException(NLS.bind(
-							Messages.LauncherApplication_ApplicationNotFound, productApplicationId)));
+					Exception e = new IllegalStateException(NLS.bind(Messages.LauncherApplication_ApplicationNotFound,
+							productApplicationId));
+					IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 			else
@@ -70,21 +70,21 @@ public class LauncherApplication implements IApplication
 				{
 					final String[] arguments = (String[]) args;
 					if (arguments.length > 0)
-					{						
+					{
 						// Send the command line arguments to the running instance
 						if (!sendArguments(port, arguments))
 						{
-							CommandlineLauncherPlugin.logError(new IllegalStateException(
-									Messages.LauncherApplication_CouldNotSendCommandLineArguments));
+							Exception e = new IllegalStateException(
+									Messages.LauncherApplication_CouldNotSendCommandLineArguments);
+							IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 						}
 					}
 				}
 			}
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
-			// Log any other exception
-			CommandlineLauncherPlugin.logError(ex);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 		}
 		return EXIT_OK;
 	}
@@ -127,7 +127,8 @@ public class LauncherApplication implements IApplication
 		for (String argument : arguments)
 		{
 			File file = new File(argument);
-			if (file.exists()) {
+			if (file.exists())
+			{
 				filesList.add(file.getAbsolutePath());
 			}
 		}
@@ -144,14 +145,9 @@ public class LauncherApplication implements IApplication
 			os = socket.getOutputStream();
 			is = socket.getInputStream();
 		}
-		catch (UnknownHostException e)
-		{
-			CommandlineLauncherPlugin.logError(e);
-			return false;
-		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logError(e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 			return false;
 		}
 
@@ -192,5 +188,4 @@ public class LauncherApplication implements IApplication
 
 		return false;
 	}
-
 }

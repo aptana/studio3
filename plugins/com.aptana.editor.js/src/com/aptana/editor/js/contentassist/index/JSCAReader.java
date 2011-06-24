@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ObjectPool;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.json.Schema;
@@ -70,7 +71,7 @@ public class JSCAReader extends SchemaReader
 			}
 			catch (Throwable t)
 			{
-				JSPlugin.logError(t.getMessage(), t);
+				IdeLog.logError(JSPlugin.getDefault(), t.getMessage(), t);
 			}
 			finally
 			{

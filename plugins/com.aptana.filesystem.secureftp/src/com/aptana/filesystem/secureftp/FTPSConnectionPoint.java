@@ -36,6 +36,7 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 	private static final String ELEMENT_LOGIN = "login"; //$NON-NLS-1$
 	private static final String ELEMENT_EXPLICIT = "explicit"; //$NON-NLS-1$
 	private static final String ELEMENT_VALIDATE_CERTIFICATE = "validateCertificate"; //$NON-NLS-1$
+	private static final String ELEMENT_NO_SSL_SESSION_RESUMPTION = "noSSLSessionResumption"; //$NON-NLS-1$
 	private static final String ELEMENT_PASSIVE = "passive"; //$NON-NLS-1$
 	private static final String ELEMENT_TRANSFER_TYPE = "transferType"; //$NON-NLS-1$
 	private static final String ELEMENT_ENCODING = "encoding"; //$NON-NLS-1$
@@ -48,6 +49,7 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 	private char[] password;
 	private boolean explicit = true;
 	private boolean validateCertificate = true;
+	private boolean noSSLSessionResumption = false;
 	private boolean passiveMode = true;
 	private String transferType = IFTPSConstants.TRANSFER_TYPE_BINARY;
 	private String encoding = IFTPSConstants.ENCODING_DEFAULT;
@@ -98,6 +100,10 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 		if (child != null) {
 			validateCertificate = Boolean.parseBoolean(child.getTextData());
 		}
+		child = memento.getChild(ELEMENT_NO_SSL_SESSION_RESUMPTION);
+		if (child != null) {
+			noSSLSessionResumption = Boolean.parseBoolean(child.getTextData());
+		}
 		child = memento.getChild(ELEMENT_PASSIVE);
 		if (child != null) {
 			passiveMode = Boolean.parseBoolean(child.getTextData());
@@ -134,6 +140,9 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 		}
 		memento.createChild(ELEMENT_EXPLICIT).putTextData(Boolean.toString(explicit));
 		memento.createChild(ELEMENT_VALIDATE_CERTIFICATE).putTextData(Boolean.toString(validateCertificate));
+		if (noSSLSessionResumption) {
+			memento.createChild(ELEMENT_NO_SSL_SESSION_RESUMPTION).putTextData(Boolean.toString(noSSLSessionResumption));
+		}
 		memento.createChild(ELEMENT_PASSIVE).putTextData(Boolean.toString(passiveMode));
 		if (!IFTPSConstants.TRANSFER_TYPE_AUTO.equals(transferType)) {
 			memento.createChild(ELEMENT_TRANSFER_TYPE).putTextData(transferType);
@@ -337,6 +346,24 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 		}
 	}
 
+	/**
+	 * @return the noSSLSessionResumption
+	 */
+	public boolean isNoSSLSessionResumption() {
+		return noSSLSessionResumption;
+	}
+
+	/**
+	 * @param noSSLSessionResumption the noSSLSessionResumption to set
+	 */
+	public void setNoSSLSessionResumption(boolean noSSLSessionResumption) {
+		if (this.noSSLSessionResumption != noSSLSessionResumption) {
+			this.noSSLSessionResumption = noSSLSessionResumption;
+			notifyChanged();
+			resetConnectionFileManager();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -409,7 +436,7 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 			if (context != null) {
 				CoreIOPlugin.setConnectionContext(connectionFileManager, context);
 			}
-			connectionFileManager.init(host, port, path, login, password, explicit, passiveMode, transferType, encoding, timezone, validateCertificate);
+			connectionFileManager.init(host, port, path, login, password, explicit, passiveMode, transferType, encoding, timezone, validateCertificate, noSSLSessionResumption);
 		}
 		return connectionFileManager;
 	}

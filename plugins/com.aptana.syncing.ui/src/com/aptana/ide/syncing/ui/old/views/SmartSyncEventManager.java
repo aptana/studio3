@@ -9,11 +9,12 @@ package com.aptana.ide.syncing.ui.old.views;
 
 import org.eclipse.core.runtime.ListenerList;
 
-import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.old.ISmartSyncListener;
 import com.aptana.ide.syncing.core.old.SmartSyncEvent;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
@@ -67,21 +68,23 @@ public class SmartSyncEventManager
 		event.completedPairs = completedPairs;
 		event.comment = comment;
 		Object[] listens = listeners.getListeners();
-		for (int i = 0; i < listens.length; i++)
+		for (Object listener : listens)
 		{
-			if (listens[i] instanceof ISmartSyncListener)
+			if (listener instanceof ISmartSyncListener)
 			{
 				try
 				{
-					((ISmartSyncListener) listens[i]).smartSyncComplete(event);
+					((ISmartSyncListener) listener).smartSyncComplete(event);
 				}
 				catch (Exception e)
 				{
-					CorePlugin.logError(Messages.SmartSyncEventManager_ERR_ExceptionNotifyingSmartSyncListener, e);
+					IdeLog.logError(SyncingUIPlugin.getDefault(),
+							Messages.SmartSyncEventManager_ERR_ExceptionNotifyingSmartSyncListener, e);
 				}
 				catch (Error e)
 				{
-					CorePlugin.logError(Messages.SmartSyncEventManager_ERR_ErrorNotifyingSmartSyncListener, e);
+					IdeLog.logError(SyncingUIPlugin.getDefault(),
+							Messages.SmartSyncEventManager_ERR_ErrorNotifyingSmartSyncListener, e);
 				}
 			}
 		}

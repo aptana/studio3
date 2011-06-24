@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
@@ -148,7 +149,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			catch (Throwable e)
 			{
-				JSPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 			}
 			finally
 			{

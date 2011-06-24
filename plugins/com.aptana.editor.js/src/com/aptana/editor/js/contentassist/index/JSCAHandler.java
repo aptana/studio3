@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
@@ -471,7 +472,7 @@ public class JSCAHandler implements IContextHandler
 				}
 				else
 				{
-					JSPlugin.logError(Messages.JSCAHandler_Invalid_Type_Name + type, null);
+					IdeLog.logError(JSPlugin.getDefault(), Messages.JSCAHandler_Invalid_Type_Name + type,(Throwable) null);
 				}
 			}
 		}
@@ -586,7 +587,7 @@ public class JSCAHandler implements IContextHandler
 		}
 		else
 		{
-			JSPlugin.logError(message, null);
+			IdeLog.logError(JSPlugin.getDefault(), message, (Throwable) null);
 		}
 	}
 

@@ -15,7 +15,7 @@ import com.aptana.parsing.IParseState;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "CSS.grammar".
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
 public class CSSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
@@ -82,7 +82,7 @@ public class CSSParser extends Parser implements IParser {
 		char[] characters = parseState.getSource();
 
 		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		String source = (characters != null) ? new String(characters) : ""; //$NON-NLS-1$
 
 		// create scanner and send source to it
 		CSSScanner scanner = new CSSScanner();
@@ -709,7 +709,7 @@ public class CSSParser extends Parser implements IParser {
 				return _symbols[offset + 1];
 			}
 			default:
-				throw new IllegalArgumentException("unknown production #" + rule_num);
+				throw new IllegalArgumentException("unknown production #" + rule_num); //$NON-NLS-1$
 		}
 	}
 }

@@ -9,8 +9,9 @@ import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 
 abstract class AttributeOrEventProposal extends CommonCompletionProposal
@@ -63,9 +64,8 @@ abstract class AttributeOrEventProposal extends CommonCompletionProposal
 			}
 			catch (BadLocationException e)
 			{
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 	}
-
 }

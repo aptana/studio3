@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.scripting.model.TemplateElement;
 
@@ -201,7 +202,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 		catch (Exception e)
 		{
 			// logs the exception but allows the page to continue
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		if (templateContent == null)
 		{

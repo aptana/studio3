@@ -140,7 +140,7 @@ public class ThemeManager implements IThemeManager
 									{
 										// Store that the user has overridden this annotation in this theme
 										int index = getCurrentTheme().getTokens().size();
-										getCurrentTheme().addNewRule(index, "Annotation Override - " + prefix,
+										getCurrentTheme().addNewRule(index, "Annotation Override - " + prefix, //$NON-NLS-1$
 												new ScopeSelector(scopeSelector), null);
 									}
 
