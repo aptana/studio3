@@ -6,6 +6,7 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.core.build.messages"; //$NON-NLS-1$
 	public static String UnifiedBuilder_FinishedBuild;
+	public static String UnifiedBuilder_IndexingResourceDelta;
 	public static String UnifiedBuilder_PerformingFullBuildNullDelta;
 	public static String UnifiedBuilder_PerformingFullBuld;
 	public static String UnifiedBuilder_PerformingIncrementalBuild;

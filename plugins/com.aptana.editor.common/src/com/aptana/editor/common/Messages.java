@@ -18,6 +18,8 @@ public class Messages extends NLS
 	private static ResourceBundle fgBundleForConstructedKeys = ResourceBundle.getBundle(BUNDLE_FOR_CONSTRUCTED_KEYS);
 	
 	public static String AbstractThemeableEditor_CursorPositionLabel;
+	public static String CommonOccurrencesUpdater_Mark_Word_Occurrences;
+	public static String CommonOccurrencesUpdater_Word_Occurrence_Description;
 	public static String FileService_FailedToParse;
 	public static String Folding_GroupName;
 	static

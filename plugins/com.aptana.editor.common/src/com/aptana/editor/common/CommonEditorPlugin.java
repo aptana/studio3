@@ -323,7 +323,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			differentiator.dispose();
 
 			removePartListener();
-			
+
 			if (fDocumentScopeManager != null)
 			{
 				fDocumentScopeManager.dispose();

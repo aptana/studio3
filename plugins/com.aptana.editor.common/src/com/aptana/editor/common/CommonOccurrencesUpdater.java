@@ -144,7 +144,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 
 		public FindOccurrencesJob(IDocument document, ITextSelection selection, IAnnotationModel model)
 		{
-			super("Mark word occurrences job");
+			super(Messages.CommonOccurrencesUpdater_Mark_Word_Occurrences);
 
 			this.document = document;
 			this.selection = selection;
@@ -281,7 +281,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	}
 
 	private static final String ANNOTION_ID = "com.aptana.editor.common.occurrence"; //$NON-NLS-1$
-	private static final String ANNOTION_DESCRIPTION = "Word occurrence"; //$NON-NLS-1$
+	private static final String ANNOTION_DESCRIPTION = Messages.CommonOccurrencesUpdater_Word_Occurrence_Description;
 
 	private AbstractThemeableEditor editor;
 	private ISelectionListener selectionListener;
