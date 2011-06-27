@@ -71,6 +71,41 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		return result;
 	}
 
+	private Object getAnnotationModelLock(IAnnotationModel annotationModel)
+	{
+		Object result = annotationModel;
+
+		if (annotationModel instanceof ISynchronizable)
+		{
+			Object lock = ((ISynchronizable) annotationModel).getLockObject();
+
+			if (lock != null)
+			{
+				result = lock;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getDocument
+	 * 
+	 * @return
+	 */
+	protected IDocument getDocument()
+	{
+		ISourceViewer sourceViewer = getSourceViewer();
+		IDocument result = null;
+
+		if (sourceViewer != null)
+		{
+			result = sourceViewer.getDocument();
+		}
+
+		return result;
+	}
+
 	/**
 	 * getDocumentProvider
 	 * 
@@ -104,7 +139,10 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 			{
 				public void selectionChanged(IWorkbenchPart part, ISelection selection)
 				{
-					updateAnnotations(selection);
+					if (part == editor)
+					{
+						updateAnnotations(selection);
+					}
 				}
 			};
 		}
@@ -143,57 +181,59 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	{
 		String result = null;
 
-		int start, end;
-		int offset = selection.getOffset();
-		int length = document.getLength();
-
 		try
 		{
-			start = offset;
+			int offset = selection.getOffset();
+			int length = document.getLength();
+			int start = offset;
 
-			// find starting character
-			while (offset >= 0)
+			// find starting character, if we're on a valid character already
+			if (Character.isUnicodeIdentifierPart(document.getChar(offset)))
 			{
-				char c = document.getChar(offset);
+				while (offset >= 0)
+				{
+					char c = document.getChar(offset);
 
-				if (Character.isUnicodeIdentifierPart(c))
-				{
-					start = offset;
-					offset--;
-				}
-				else
-				{
-					break;
+					if (Character.isUnicodeIdentifierPart(c))
+					{
+						start = offset;
+						offset--;
+					}
+					else
+					{
+						break;
+					}
 				}
 			}
 
-			// find ending character
+			// find ending character, if we're on a valid character already
 			offset = selection.getOffset() + selection.getLength();
 
-			while (offset < length)
+			if (Character.isUnicodeIdentifierPart(document.getChar(offset - 1)))
 			{
-				char c = document.getChar(offset);
+				while (offset < length)
+				{
+					char c = document.getChar(offset);
 
-				if (Character.isUnicodeIdentifierPart(c))
-				{
-					offset++;
-				}
-				else
-				{
-					break;
+					if (Character.isUnicodeIdentifierPart(c))
+					{
+						offset++;
+					}
+					else
+					{
+						break;
+					}
 				}
 			}
 
-			end = offset;
-
 			// grab result
-			result = document.get(start, end - start);
+			result = document.get(start, offset - start);
 		}
 		catch (BadLocationException e)
 		{
 		}
 
-		return result;
+		return (result != null) ? result.trim() : result;
 	}
 
 	/**
@@ -208,6 +248,8 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 			installOccurrencesFinder();
 			updateAnnotations(getSelectionService().getSelection());
 		}
+
+		store.addPropertyChangeListener(this);
 	}
 
 	/**
@@ -255,23 +297,6 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		getSelectionService().removePostSelectionListener(getSelectionListener());
 	}
 
-	private Object getAnnotationModelLock(IAnnotationModel annotationModel)
-	{
-		Object result = annotationModel;
-
-		if (annotationModel instanceof ISynchronizable)
-		{
-			Object lock = ((ISynchronizable) annotationModel).getLockObject();
-
-			if (lock != null)
-			{
-				result = lock;
-			}
-		}
-
-		return result;
-	}
-
 	/**
 	 * updateAnnotations
 	 * 
@@ -282,51 +307,77 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		if (selection instanceof ITextSelection)
 		{
 			ITextSelection textSelection = (ITextSelection) selection;
-			ISourceViewer sourceViewer = getSourceViewer();
+			IDocument document = getDocument();
 
-			if (sourceViewer != null)
+			if (document != null)
 			{
-				IDocument document = sourceViewer.getDocument();
 				IAnnotationModel annotationModel = getAnnotationModel();
 
 				if (annotationModel != null)
 				{
-					String text = getWord(document, textSelection);
+					String word = getWord(document, textSelection);
+					Map<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
 
-					if (text != null && text.length() > 0)
+					if (word != null && word.length() > 0)
 					{
-						System.out.println(text);
+						System.out.println(word);
 						String source = document.get();
-						String regexSource = "\\b" + Pattern.quote(text) + "\\b";
-						Pattern wordPattern = Pattern.compile(regexSource);
+						Pattern wordPattern = createWordPattern(word);
 						Matcher matcher = wordPattern.matcher(source);
-						Map<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
 
 						while (matcher.find())
 						{
 							int start = matcher.start();
-							int end = matcher.end();
-							Annotation annotation = new Annotation("com.aptana.editor.common.occurrence", false,
-									"some description");
-							Position position = new Position(start, end - start);
+							int length = matcher.end() - start;
 
-							annotationMap.put(annotation, position);
-						}
-
-						synchronized (getAnnotationModelLock(annotationModel))
-						{
 							// @formatter:off
-								((IAnnotationModelExtension) annotationModel).replaceAnnotations(
-									annotations,
-									annotationMap
-								);
-								// @formatter:on
+							annotationMap.put(
+								new Annotation("com.aptana.editor.common.occurrence", false, "some description"),
+								new Position(start, length)
+							);
+							// @formatter:on
 						}
+					}
+
+					// NOTE: We always update the annotation model even if we didn't find a word so we can clear the
+					// current occurrences
+					synchronized (getAnnotationModelLock(annotationModel))
+					{
+						// @formatter:off
+						((IAnnotationModelExtension) annotationModel).replaceAnnotations(
+							annotations,
+							new HashMap<Annotation, Position>()
+						);
+						// @formatter:on
 
 						annotations = annotationMap.keySet().toArray(new Annotation[annotationMap.keySet().size()]);
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param text
+	 * @return
+	 */
+	private Pattern createWordPattern(String text)
+	{
+		String regexSource = "";
+
+		if (Character.isUnicodeIdentifierPart(text.charAt(0)))
+		{
+			regexSource += "\\b";
+		}
+
+		regexSource += Pattern.quote(text);
+
+		if (Character.isUnicodeIdentifierPart(text.charAt(text.length() - 1)))
+		{
+			regexSource += "\\b";
+		}
+
+		Pattern wordPattern = Pattern.compile(regexSource);
+		return wordPattern;
 	}
 }
