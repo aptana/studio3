@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;

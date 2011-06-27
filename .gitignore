@@ -8,7 +8,7 @@ CVS/
 *.suo
 *.user
 *.sass-cache
-
+.pmd
 build/
 *.pbxuser
 *.perspective

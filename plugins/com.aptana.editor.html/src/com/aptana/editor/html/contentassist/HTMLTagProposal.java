@@ -16,7 +16,6 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.html.HTMLPlugin;

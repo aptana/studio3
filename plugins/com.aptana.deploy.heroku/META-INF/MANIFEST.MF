@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Heroku Deployment
 Bundle-SymbolicName: com.aptana.deploy.heroku;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.deploy.heroku.HerokuPlugin
 Bundle-Vendor: Appcelerator, Inc.
 Require-Bundle: org.eclipse.core.runtime,
