@@ -37,11 +37,6 @@ public class JSONPreferencePage extends CommonEditorPreferencePage
 	}
 
 	@Override
-	protected void createMarkOccurrenceOptions(Composite parent)
-	{
-	}
-
-	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
 		return new InstanceScope().getNode(JSONPlugin.PLUGIN_ID);

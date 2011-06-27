@@ -383,8 +383,6 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		if (contentBeforeNewline == null || contentAfterNewline == null || contentBeforeNewline.trim().length() == 0
 				|| contentAfterNewline.trim().length() == 0)
 			return false;
-		contentBeforeNewline = contentBeforeNewline.trim();
-		contentAfterNewline = contentAfterNewline.trim();
 		char before = contentBeforeNewline.charAt(contentBeforeNewline.length() - 1);
 		char after = contentAfterNewline.charAt(0);
 		if (before == '[' && after == ']')
