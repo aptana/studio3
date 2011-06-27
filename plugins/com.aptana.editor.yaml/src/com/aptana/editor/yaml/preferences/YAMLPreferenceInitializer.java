@@ -26,6 +26,9 @@ public class YAMLPreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 		prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
 		prefs.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
+
+		// mark occurrences
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 	}
 
 }

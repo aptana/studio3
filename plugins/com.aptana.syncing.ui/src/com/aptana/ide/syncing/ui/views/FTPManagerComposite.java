@@ -559,7 +559,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		}
 	}
 
-	private class SitesLabelProvider extends LabelProvider
+	private static class SitesLabelProvider extends LabelProvider
 	{
 
 		/*

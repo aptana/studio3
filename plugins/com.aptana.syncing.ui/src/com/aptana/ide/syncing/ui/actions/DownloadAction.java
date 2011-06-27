@@ -8,6 +8,9 @@
 package com.aptana.ide.syncing.ui.actions;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
@@ -20,13 +23,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.old.Synchronizer;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -75,7 +78,28 @@ public class DownloadAction extends BaseSyncAction
 					{
 						fileStores[i] = Utils.getFileStore(files[i]);
 					}
-					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fSelectedFromSource, true, monitor);
+					IFileStore[] targetFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
+					// adds the parent directories
+					List<IFileStore> newFiles = new ArrayList<IFileStore>();
+					for (IFileStore fileStore : fileStores)
+					{
+						if (!fileStore.equals(targetRoot))
+						{
+							List<IFileStore> folders = new ArrayList<IFileStore>();
+							IFileStore parent = fileStore.getParent();
+							while (parent != null && !targetRoot.equals(parent))
+							{
+								if (!newFiles.contains(parent))
+								{
+									folders.add(0, parent);
+								}
+								parent = parent.getParent();
+							}
+							newFiles.addAll(folders);
+						}
+					}
+					newFiles.addAll(Arrays.asList(targetFiles));
+					targetFiles = newFiles.toArray(new IFileStore[newFiles.size()]);
 
 					VirtualFileSyncPair[] items = syncer.createSyncItems(new IFileStore[0], targetFiles, monitor);
 
@@ -117,7 +141,8 @@ public class DownloadAction extends BaseSyncAction
 				catch (Exception e)
 				{
 					SyncingUIPlugin.logError(Messages.DownloadAction_ERR_FailToDownload, e);
-					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.DownloadAction_ERR_FailToDownload, e);
+					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID,
+							Messages.DownloadAction_ERR_FailToDownload, e);
 				}
 
 				return Status.OK_STATUS;

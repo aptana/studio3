@@ -424,7 +424,20 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * 
 	 * @param parent
 	 */
-	protected abstract void createMarkOccurrenceOptions(Composite parent);
+	protected void createMarkOccurrenceOptions(Composite parent)
+	{
+		Composite group = AptanaPreferencePage.createGroup(parent, "Mark Occurrences"); //$NON-NLS-1$
+
+		// @formatter:off
+		addField(
+			new BooleanFieldEditor(
+				IPreferenceConstants.EDITOR_MARK_OCCURRENCES,
+				Messages.EditorsPreferencePage_MarkOccurrences,
+				group
+			)
+		);
+		// @formatter:on
+	}
 
 	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
 
