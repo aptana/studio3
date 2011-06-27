@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.w3c.tidy.Tidy;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
@@ -63,7 +64,7 @@ public class HTMLTidyValidator implements IValidator
 			}
 			catch (Exception e)
 			{
-				HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_ParseErrors, e);
+				IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_ParseErrors, e);
 			}
 			finally
 			{
@@ -95,7 +96,7 @@ public class HTMLTidyValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_Tidy, e);
+			IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_Tidy, e);
 		}
 		out.flush();
 

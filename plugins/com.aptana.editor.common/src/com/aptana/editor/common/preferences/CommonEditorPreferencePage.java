@@ -30,6 +30,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
@@ -73,7 +74,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		createFoldingOptions(group);
 
-		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite, Messages.CommonEditorPreferencePage_ContentAssist);
+		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.CommonEditorPreferencePage_ContentAssist);
 		caGroup.setLayout(new GridLayout(1, false));
 		caGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
@@ -241,7 +243,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return super.performOk();
 	}
@@ -263,7 +265,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -334,7 +336,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void setPluginDefaults()
 	{
 		IEclipsePreferences store = getDefaultPluginPreferenceStore();
-
 		if (store == null)
 		{
 			return;
@@ -343,14 +344,13 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
 				getDefaultSpacesForTabs());
 		store.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, getDefaultTabWidth());
-
 		try
 		{
 			store.flush();
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -361,7 +361,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void removePluginDefaults()
 	{
 		IEclipsePreferences store = getDefaultPluginPreferenceStore();
-
 		if (store == null)
 		{
 			return;
@@ -375,7 +374,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

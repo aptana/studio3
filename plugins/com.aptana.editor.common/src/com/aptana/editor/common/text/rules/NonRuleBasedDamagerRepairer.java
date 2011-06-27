@@ -21,6 +21,7 @@ import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.swt.custom.StyleRange;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.theme.ThemePlugin;
 
@@ -153,7 +154,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				}
 				catch (BadLocationException e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 			IToken token = ThemePlugin.getDefault().getThemeManager().getToken(fFullScope);

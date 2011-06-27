@@ -17,6 +17,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
 public class BrowserCommandHandler extends AbstractHandler
@@ -58,7 +59,7 @@ public class BrowserCommandHandler extends AbstractHandler
 		}
 		catch (PartInitException e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return null;
@@ -78,7 +79,7 @@ public class BrowserCommandHandler extends AbstractHandler
 		}
 		catch (MalformedURLException e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 }

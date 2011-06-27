@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 public class ValidatorReference
@@ -59,7 +60,7 @@ public class ValidatorReference
 			}
 			catch (CoreException e)
 			{
-				CommonEditorPlugin.logError(
+				IdeLog.logError(CommonEditorPlugin.getDefault(),
 						MessageFormat.format(Messages.ValidatorReference_ERR_FailToCreateValidator, name), e);
 			}
 		}

@@ -21,6 +21,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.ftp.FTPDeployPlugin;
 import com.aptana.deploy.ftp.FTPDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -84,7 +85,7 @@ public class FTPDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				FTPDeployPlugin.logError(e);
+				IdeLog.logError(FTPDeployPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return true;

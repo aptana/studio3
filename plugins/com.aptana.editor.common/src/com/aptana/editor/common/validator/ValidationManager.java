@@ -31,6 +31,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
@@ -283,7 +284,7 @@ public class ValidationManager implements IValidationManager
 		}
 		catch (CoreException e)
 		{
-			CommonEditorPlugin.logError(Messages.ProjectFileValidationListener_ERR_UpdateMarkers, e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), Messages.ProjectFileValidationListener_ERR_UpdateMarkers, e);
 		}
 	}
 
@@ -362,7 +363,7 @@ public class ValidationManager implements IValidationManager
 			}
 			catch (CoreException e)
 			{
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 	}

@@ -19,6 +19,7 @@ import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
@@ -105,7 +106,6 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 
 		try
 		{
-
 			final ITypedRegion[] partitions = TextUtilities.computePartitioning(document, fPartitioning, offset,
 					Math.min(length, document.getLength()), false);
 
@@ -114,7 +114,6 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 
 			if (partitions.length > 1)
 			{
-
 				if (!fType.equals(partitions[partitions.length - 1].getType()))
 					partitions[partitions.length - 1] = TextUtilities.getPartition(document, fPartitioning,
 							partitions[partitions.length - 1].getOffset(), false);
@@ -180,10 +179,10 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				}
 			}
 		}
-		catch (BadLocationException exception)
+		catch (BadLocationException e)
 		{
 			// Should never happen
-			CommonEditorPlugin.logError(exception);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

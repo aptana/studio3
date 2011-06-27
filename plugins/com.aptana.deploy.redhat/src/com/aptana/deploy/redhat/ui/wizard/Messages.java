@@ -16,6 +16,7 @@ public class Messages extends NLS
 
 	public static String RedHatDeployWizardPage_ApplicationNameLabel;
 	public static String RedHatDeployWizardPage_EmotyApplicationNameError;
+	public static String RedHatDeployWizardPage_LBL_Type;
 	public static String RedHatDeployWizardPage_NoGitRepoNote;
 	public static String RedHatDeployWizardPage_PublishApplicationLabel;
 	public static String RedHatDeployWizardPage_Title;

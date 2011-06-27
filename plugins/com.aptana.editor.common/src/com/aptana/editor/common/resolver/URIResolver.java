@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 
@@ -46,7 +47,9 @@ public class URIResolver implements IPathResolver
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		URI uri = resolveURI(path);
 		if (uri == null)
+		{
 			return null;
+		}
 		sub.worked(5);
 		// get the filesystem that can handle the URI
 		IFileStore store = getFileStore(uri);
@@ -72,14 +75,19 @@ public class URIResolver implements IPathResolver
 	{
 		IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
 		if (fileSystem == null)
+		{
 			return EFS.getNullFileSystem().getStore(uri);
+		}
 		return fileSystem.getStore(uri);
 	}
 
 	public URI resolveURI(String path)
 	{
 		if (path == null)
+		{
 			return null;
+		}
+
 		URI uri;
 		try
 		{
@@ -95,9 +103,12 @@ public class URIResolver implements IPathResolver
 		catch (IllegalArgumentException e)
 		{
 			// fails to parse, try resolving against base URI
-			try {
+			try
+			{
 				uri = baseURI.resolve(path);
-			} catch (IllegalArgumentException e2) {
+			}
+			catch (IllegalArgumentException e2)
+			{
 				// TODO What if it fails here, then what do we do?
 				return null;
 			}
@@ -114,7 +125,7 @@ public class URIResolver implements IPathResolver
 		}
 		catch (CoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return null;

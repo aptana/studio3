@@ -38,6 +38,7 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
@@ -95,7 +96,6 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 		try
 		{
-
 			String scope = getScopeAtOffset(document, offset);
 			this.pairs = getPairs(scope);
 			if (this.pairs == null || this.pairs.size() <= 0 || !isAutoInsertCharacter(event.character))
@@ -189,11 +189,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		catch (BadPositionCategoryException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -630,11 +630,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	 */
 	public void left(LinkedModeModel environment, int flags)
 	{
-
 		final BracketLevel level = fBracketLevelStack.pop();
 
 		if (flags != ILinkedModeListener.EXTERNAL_MODIFICATION)
+		{
 			return;
+		}
 
 		// remove brackets
 		final IDocument document = textViewer.getDocument();
@@ -656,7 +657,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 						}
 						catch (BadLocationException e)
 						{
-							CommonEditorPlugin.logError(e);
+							IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 						}
 					}
 
@@ -669,7 +670,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 						}
 						catch (BadPositionCategoryException e)
 						{
-							CommonEditorPlugin.logError(e);
+							IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 						}
 					}
 				}

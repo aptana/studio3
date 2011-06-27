@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
@@ -53,6 +54,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
@@ -71,7 +73,8 @@ import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
+		ITopContentTypesProvider
 {
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
@@ -298,8 +301,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				}
 				else
 				{
-					CommonEditorPlugin
-							.logWarning("Could not located an expected code formatter for '" + CONTENTTYPE_HTML_PREFIX + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					IdeLog.logWarning(CommonEditorPlugin.getDefault(), MessageFormat.format(
+							"Could not located an expected code formatter for ''{0}''", CONTENTTYPE_HTML_PREFIX)); //$NON-NLS-1$
 				}
 			}
 			String contentType = contentTypeArr[contentTypeArr.length - 1];
@@ -379,7 +382,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
 	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
@@ -411,8 +416,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer
+	 * , java.lang.String)
 	 */
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
@@ -427,7 +435,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
 	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer)
@@ -534,56 +544,74 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2 {
+	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2
+	{
 
 		private ITextHover activeTextHover;
-		
-		public TextHover(ISourceViewer sourceViewer) {
+
+		public TextHover(ISourceViewer sourceViewer)
+		{
 			super(sourceViewer);
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+		 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer,
+		 * org.eclipse.jface.text.IRegion)
 		 */
 		@SuppressWarnings("deprecation")
-		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
+		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
+		{
 			Object info = null;
-			if (activeTextHover instanceof ITextHoverExtension2) {
+			if (activeTextHover instanceof ITextHoverExtension2)
+			{
 				info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
-			} else if (activeTextHover != null) {
+			}
+			else if (activeTextHover != null)
+			{
 				info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
 			}
-			if (info != null) {
+			if (info != null)
+			{
 				return info;
 			}
 			return super.getHoverInfo(textViewer, hoverRegion);
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.jface.text.DefaultTextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
 		 */
 		@Override
-		public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
+		public IRegion getHoverRegion(ITextViewer textViewer, int offset)
+		{
 			activeTextHover = null;
-			try {
-				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), offset);
+			try
+			{
+				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+						.getContentType(textViewer.getDocument(), offset);
 				EvaluationContext context = new EvaluationContext(null, textViewer);
 				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
-				for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers()) {
-					if (descriptor.isEnabledFor(contentType, context)) {
+				for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers())
+				{
+					if (descriptor.isEnabledFor(contentType, context))
+					{
 						ITextHover textHover = descriptor.createTextHover();
 						IRegion region = null;
-						if (textHover != null) {
+						if (textHover != null)
+						{
 							region = textHover.getHoverRegion(textViewer, offset);
 						}
-						if (region != null) {
+						if (region != null)
+						{
 							activeTextHover = textHover;
 							return region;
 						}
 					}
 				}
-			} catch (BadLocationException e) {
+			}
+			catch (BadLocationException e)
+			{
 			}
 			return super.getHoverRegion(textViewer, offset);
 		}
@@ -592,12 +620,16 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
 		 */
-		public IInformationControlCreator getHoverControlCreator() {
-			if (activeTextHover instanceof ITextHoverExtension) {
+		public IInformationControlCreator getHoverControlCreator()
+		{
+			if (activeTextHover instanceof ITextHoverExtension)
+			{
 				return ((ITextHoverExtension) activeTextHover).getHoverControlCreator();
 			}
-			return new IInformationControlCreator() {
-				public IInformationControl createInformationControl(Shell parent) {
+			return new IInformationControlCreator()
+			{
+				public IInformationControl createInformationControl(Shell parent)
+				{
 					return createTextHoverInformationControl(parent, EditorsUI.getTooltipAffordanceString());
 				}
 			};
@@ -608,7 +640,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 * @see org.eclipse.jface.text.DefaultTextHover#isIncluded(org.eclipse.jface.text.source.Annotation)
 		 */
 		@Override
-		protected boolean isIncluded(Annotation annotation) {
+		protected boolean isIncluded(Annotation annotation)
+		{
 			return isShownInText(annotation);
 		}
 	}

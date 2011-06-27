@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
@@ -58,7 +59,6 @@ public class HTMLIndexQueryHelper
 	private List<AttributeElement> getAttribute(String name)
 	{
 		List<AttributeElement> result = Collections.emptyList();
-
 		if (name != null && name.length() > 0)
 		{
 			try
@@ -67,7 +67,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				HTMLPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 
@@ -129,7 +129,6 @@ public class HTMLIndexQueryHelper
 	public List<AttributeElement> getAttributes(ElementElement element)
 	{
 		List<AttributeElement> result = Collections.emptyList();
-
 		if (element != null)
 		{
 			List<AttributeElement> attributes = null;
@@ -140,7 +139,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				HTMLPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 			}
 
 			if (attributes != null && attributes.isEmpty() == false)
@@ -157,7 +156,8 @@ public class HTMLIndexQueryHelper
 
 					// a null or empty owning element name means this attribute is good for any element, otherwise, we
 					// only want this attribute if it is specifically for this element
-					boolean validAttribute = (owningElement == null || owningElement.length() == 0 || owningElement.equals(elementName));
+					boolean validAttribute = (owningElement == null || owningElement.length() == 0 || owningElement
+							.equals(elementName));
 
 					if (validAttribute)
 					{
@@ -175,7 +175,8 @@ public class HTMLIndexQueryHelper
 							boolean previousHasElement = StringUtil.isEmpty(previousAttribute.getName()) == false;
 
 							// xnor element names
-							if ((currentHasElement && previousHasElement) || (!currentHasElement && !previousHasElement))
+							if ((currentHasElement && previousHasElement)
+									|| (!currentHasElement && !previousHasElement))
 							{
 								// either duplicate entry for this element, or dupe for any element
 								// last definition wins
@@ -217,7 +218,6 @@ public class HTMLIndexQueryHelper
 	public ElementElement getElement(String name)
 	{
 		ElementElement result = null;
-
 		if (name != null && name.length() > 0)
 		{
 			try
@@ -231,7 +231,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				HTMLPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 
@@ -246,14 +246,13 @@ public class HTMLIndexQueryHelper
 	public List<ElementElement> getElements()
 	{
 		List<ElementElement> result = Collections.emptyList();
-
 		try
 		{
 			result = this._reader.getElements(getIndex());
 		}
 		catch (IOException e)
 		{
-			HTMLPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -267,14 +266,13 @@ public class HTMLIndexQueryHelper
 	public List<EntityElement> getEntities()
 	{
 		List<EntityElement> result = Collections.emptyList();
-
 		try
 		{
 			result = this._reader.getEntities(getIndex());
 		}
 		catch (IOException e)
 		{
-			HTMLPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -300,7 +298,6 @@ public class HTMLIndexQueryHelper
 	public List<EventElement> getEvents(ElementElement element)
 	{
 		List<EventElement> result = Collections.emptyList();
-
 		if (element != null)
 		{
 			List<String> names = element.getEvents();
@@ -311,7 +308,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				HTMLPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 

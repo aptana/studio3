@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.js.formatter;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 import beaver.Symbol;
 
-import com.aptana.editor.js.JSPlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
@@ -1777,7 +1778,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				else
 				{
 					// we'll have a problem with such a node.
-					JSPlugin.logError("Expected JSFormatter and got " + child.getClass().getName(), null); //$NON-NLS-1$
+					IdeLog.logError(JSFormatterPlugin.getDefault(),
+							MessageFormat.format("Expected JSFormatter and got {0}", child.getClass().getName()), (Throwable) null); //$NON-NLS-1$
 				}
 			}
 			return jsChildren;

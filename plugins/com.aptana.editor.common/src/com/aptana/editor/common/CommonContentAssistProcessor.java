@@ -47,6 +47,7 @@ import org.jruby.RubyHash;
 import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
@@ -309,7 +310,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return proposals;
 	}
@@ -415,7 +416,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							}
 							catch (MalformedURLException e1)
 							{
-								CommonEditorPlugin.logError(e1);
+								IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
 							}
 						}
 						if (imageURL != null)

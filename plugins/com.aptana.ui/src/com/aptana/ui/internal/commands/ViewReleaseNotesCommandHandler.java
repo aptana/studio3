@@ -17,6 +17,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
 /**
@@ -36,7 +37,7 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 		}
 		catch (MalformedURLException e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -57,7 +58,8 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 						IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
 								| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS,
 						"ViewReleaseNotes", //$NON-NLS-1$
-						null, // Set the name to null. That way the browser tab will display the title of page loaded in the browser.
+						null, // Set the name to null. That way the browser tab will display the title of page loaded in
+								// the browser.
 						null).openURL(RELEASE_NOTES_URL);
 			}
 			else
@@ -67,7 +69,7 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 		}
 		catch (PartInitException e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return null;

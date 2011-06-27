@@ -52,18 +52,15 @@ import com.aptana.editor.common.text.reconciler.CommonReconciler;
 /**
  * @since 3.1
  */
+
+@SuppressWarnings("deprecation")
 public class EditorTestHelper {
 
 	public static final String TEXT_EDITOR_ID= "org.eclipse.ui.DefaultTextEditor";
-
 	public static final String RESOURCE_PERSPECTIVE_ID= "org.eclipse.ui.resourcePerspective";
-
 	public static final String WEB_PERSPECTIVE_ID= "com.aptana.ui.WebPerspective";
-
 	public static final String OUTLINE_VIEW_ID= "org.eclipse.ui.views.ContentOutline";
-
 	public static final String NAVIGATOR_VIEW_ID= "org.eclipse.ui.views.ResourceNavigator";
-
 	public static final String INTRO_VIEW_ID= "org.eclipse.ui.internal.introview";
 
 	public static IEditorPart openInEditor(IFile file, boolean runEventLoop) throws PartInitException {

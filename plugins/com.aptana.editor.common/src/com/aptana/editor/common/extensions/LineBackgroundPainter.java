@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.theme.ColorManager;
@@ -137,7 +138,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 				}
 				catch (Exception e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 			drawHighlightLine(fLastLine);
@@ -383,7 +384,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

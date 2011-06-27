@@ -24,6 +24,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IPartitioningConfiguration;
@@ -213,7 +214,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -265,5 +266,4 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	{
 		infos.clear();
 	}
-
 }

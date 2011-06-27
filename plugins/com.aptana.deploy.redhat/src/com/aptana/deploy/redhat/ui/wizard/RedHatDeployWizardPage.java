@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.redhat.RedHatAPI;
 import com.aptana.deploy.redhat.RedHatPlugin;
 
@@ -69,7 +70,7 @@ public class RedHatDeployWizardPage extends WizardPage
 		});
 
 		Label typeLabel = new Label(appSettings, SWT.NONE);
-		typeLabel.setText("Type:");
+		typeLabel.setText(Messages.RedHatDeployWizardPage_LBL_Type);
 
 		typeCombo = new Combo(appSettings, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
 		typeCombo.setLayoutData(new GridData(250, SWT.DEFAULT));
@@ -92,11 +93,11 @@ public class RedHatDeployWizardPage extends WizardPage
 				{
 					return RedHatAPI.RACK_1_1_0;
 				}
-				else if (natureId.contains("php")) //$NON-NLS-1$
+				if (natureId.contains("php")) //$NON-NLS-1$
 				{
 					return RedHatAPI.PHP_5_3_2;
 				}
-				else if (natureId.contains("python")) //$NON-NLS-1$
+				if (natureId.contains("python")) //$NON-NLS-1$
 				{
 					return RedHatAPI.WSGI_3_2_1;
 				}
@@ -104,7 +105,7 @@ public class RedHatDeployWizardPage extends WizardPage
 		}
 		catch (CoreException e)
 		{
-			RedHatPlugin.logError(e);
+			IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
 		}
 		return RedHatAPI.PHP_5_3_2;
 	}

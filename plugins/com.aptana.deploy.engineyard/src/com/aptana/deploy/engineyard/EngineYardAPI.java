@@ -21,6 +21,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.PlatformUtil;
 
 public class EngineYardAPI
@@ -64,7 +65,7 @@ public class EngineYardAPI
 		}
 		catch (Exception e)
 		{
-			EngineYardPlugin.logError(e);
+			IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
 			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(),
 					Messages.EngineYardAPI_CredentialsFile_Invalid);
 		}
@@ -204,7 +205,7 @@ public class EngineYardAPI
 			}
 			catch (IOException e)
 			{
-				EngineYardPlugin.logError(e);
+				IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
 			}
 			finally
 			{

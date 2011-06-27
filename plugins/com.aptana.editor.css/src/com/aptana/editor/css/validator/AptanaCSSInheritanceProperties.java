@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 import org.w3c.css.properties.css1.CssProperty;
 import org.w3c.css.util.Utf8Properties;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSPlugin;
 
 /**
@@ -34,7 +35,7 @@ public class AptanaCSSInheritanceProperties
 		}
 		catch (Exception e)
 		{
-			CSSPlugin.logError(
+			IdeLog.logError(CSSPlugin.getDefault(),
 					MessageFormat.format(Messages.AptanaCSSInheritanceProperties_ERR_FailToLoad, PROPERTIES_FILE), e);
 		}
 	}

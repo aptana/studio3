@@ -10,7 +10,6 @@ package com.aptana.editor.common.internal;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +35,11 @@ import com.aptana.editor.common.IFoldingEditor;
 public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
 {
 
-	private Map<ProjectionAnnotation, Position> oldAnnotations = new HashMap<ProjectionAnnotation, Position>(3);
-
 	/**
 	 * AbstractFoldingEditor
 	 */
 	public AbstractFoldingEditor()
 	{
-		super();
 	}
 
 	public void createPartControl(Composite parent)
@@ -161,18 +157,5 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 			}
 		}
 		super.handleEditorInputChanged();
-	}
-
-	@Override
-	public void dispose()
-	{
-		try
-		{
-			oldAnnotations = null;
-		}
-		finally
-		{
-			super.dispose();
-		}
 	}
 }

@@ -31,6 +31,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
 
@@ -246,7 +247,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			DebugCorePlugin.log(e);
+			IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -298,9 +299,8 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 					breakpoint.delete();
 				}
 			} catch (CoreException e) {
-				DebugCorePlugin.log(e);
+				IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 	}
-
 }

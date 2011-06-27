@@ -159,7 +159,7 @@ public class CommandExecutionUtils
 			try
 			{
 				// FIXME Use the encoding from the file/document!
-				return new ByteArrayInputStream(string.getBytes("UTF-8"));
+				return new ByteArrayInputStream(string.getBytes("UTF-8")); //$NON-NLS-1$
 			}
 			catch (UnsupportedEncodingException e)
 			{

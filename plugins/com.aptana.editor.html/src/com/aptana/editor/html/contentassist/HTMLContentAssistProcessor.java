@@ -40,6 +40,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.IURIMapper;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -551,7 +552,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (CoreException e)
 		{
-			HTMLPlugin.logError(e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return proposals;
