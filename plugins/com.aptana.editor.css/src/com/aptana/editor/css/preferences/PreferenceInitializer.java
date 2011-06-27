@@ -40,6 +40,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				"(,"); //$NON-NLS-1$
 		prefs.put(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS, ""); //$NON-NLS-1$
 
+		// mark occurrences
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 
 		String[] filtered = new String[] { ".*Unknown pseudo-element.*", ".*Property _.*", ".*-moz-.*", ".*-o-*",
