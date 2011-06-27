@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @since 3.1
  */
+@SuppressWarnings("deprecation")
 final class DisplayWaiter
 {
 	/**
@@ -243,7 +244,7 @@ final class DisplayWaiter
 				{
 					// ignore and end the thread - we never interrupt ourselves,
 					// so it must be an external entity that interrupted us
-					Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.FINE, "", e);
+					Logger.global.log(Level.FINE, "", e);
 				}
 				catch (ThreadChangedException e)
 				{
@@ -251,7 +252,7 @@ final class DisplayWaiter
 					// of a wait - we're no longer used
 					// we might have been notified instead of the current thread,
 					// so wake it up
-					Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.FINE, "", e);
+					Logger.global.log(Level.FINE, "", e);
 					synchronized (fMutex)
 					{
 						fMutex.notifyAll();
@@ -317,7 +318,7 @@ final class DisplayWaiter
 				{
 					delta = Math.max(delta, 50); // wait at least 50ms in order to avoid timing out before the display
 													// is going to sleep
-					Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finest("sleeping for " + delta + "ms");
+					Logger.global.finest("sleeping for " + delta + "ms");
 					fMutex.wait(delta);
 					checkThread();
 				}
@@ -329,7 +330,7 @@ final class DisplayWaiter
 			 */
 			private void timedOut()
 			{
-				Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finer("timed out");
+				Logger.global.finer("timed out");
 				fCurrentTimeoutState.setTimedOut(true);
 				fDisplay.wake(); // wake up call!
 				if (fKeepRunningOnTimeout)
@@ -376,13 +377,12 @@ final class DisplayWaiter
 	{
 		if (isState(possibleStates))
 		{
-			Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finer(
-					name(fState) + " > " + name(nextState) + " (" + name(possibleStates) + ")");
+			Logger.global.finer(name(fState) + " > " + name(nextState) + " (" + name(possibleStates) + ")");
 			fState = nextState;
 			return true;
 		}
-		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finest(
-				"noTransition" + name(fState) + " !> " + name(nextState) + " (" + name(possibleStates) + ")");
+		Logger.global.finest("noTransition" + name(fState) + " !> " + name(nextState) + " (" + name(possibleStates)
+				+ ")");
 		return false;
 	}
 
@@ -398,7 +398,7 @@ final class DisplayWaiter
 	private void checkedTransition(int possibleStates, int nextState)
 	{
 		assertStates(possibleStates);
-		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).finer(name(fState) + " > " + name(nextState));
+		Logger.global.finer(name(fState) + " > " + name(nextState));
 		fState = nextState;
 	}
 
