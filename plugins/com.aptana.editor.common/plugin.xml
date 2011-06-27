@@ -334,6 +334,12 @@
             </class>
    </state> 
       </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            description="Toggle mark occurrences"
+            id="com.aptana.editor.common.toggleMarkOccurrences"
+            name="Mark Occurrences">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -642,5 +648,24 @@
             id="com.aptana.editor.common.ValidationPreferencePage"
             name="%page.validation.name">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.editor.common.presentation"
+            label="Common Editor Presentation"
+            visible="false">
+         <action
+               definitionId="com.aptana.editor.common.toggleMarkOccurrences"
+               disabledIcon="icons/full/dtool16/mark_occurrences.gif"
+               icon="icons/full/etool16/mark_occurrences.gif"
+               id="com.aptana.editor.common.toggleMarkOccurrences"
+               label="Mark Occurrences"
+               retarget="true"
+               style="toggle"
+               toolbarPath="org.eclipse.ui.edit.text.actionSet.presentation/Presentation"
+               tooltip="Mark Occurrences">
+         </action>
+      </actionSet>
    </extension>
 </plugin>
