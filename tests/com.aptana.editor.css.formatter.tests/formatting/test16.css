@@ -19,16 +19,28 @@ css.formatter.spaces.after.semicolon=0
 css.formatter.spaces.before.child.combinator=1
 css.formatter.spaces.after.child.combinator=1
 ==CONTENT==
-/*************** #pageName styles **************/
+@import url("import1.css")	;
 
-#pageName {
-    margin: 0px;
-    padding: 0px 0px 0px 10px;
+#wrapper {
+background : url(images/photo-one.jpg);
 }
-==FORMATTED==
-/*************** #pageName styles **************/
 
-#pageName {
-    margin: 0px;
-    padding: 0px 0px 0px 10px;
+@font-face { font-family: Delicious; src: url('Delicious-Roman.otf'); } 
+@font-face { font-family	: Delicious; font-weight: bold; src: url('Delicious-Bold.otf'); }
+==FORMATTED==
+@import url("import1.css");
+
+#wrapper {
+    background: url(images/photo-one.jpg);
+}
+
+@font-face {
+    font-family: Delicious;
+    src: url('Delicious-Roman.otf');
+}
+
+@font-face {
+    font-family: Delicious;
+    font-weight: bold;
+    src: url('Delicious-Bold.otf');
 }

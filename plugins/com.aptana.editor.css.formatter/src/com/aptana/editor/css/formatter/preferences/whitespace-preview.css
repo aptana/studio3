@@ -1,0 +1,19 @@
+
+H2 {
+COLOR: #666666; FONT-FAMILY: courier, monaco, courier new; FONT-SIZE: 12pt
+}
+
+@media only screen and ( min-device-width : 768px) and ( max-device-width : 1024px) {
+	body {
+		background-color: #000;
+	}
+}
+
+H1 {
+    color: white;
+    background: teal;
+    FONT-FAMILY: arial, helvetica, lucida-sans, sans-serif;
+    FONT-SIZE: 18pt;
+    FONT-STYLE: normal;
+    FONT-VARIANT: normal
+}

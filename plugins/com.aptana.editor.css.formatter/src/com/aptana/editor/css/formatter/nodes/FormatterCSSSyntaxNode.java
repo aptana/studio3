@@ -42,7 +42,7 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 			case '(':
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_PARENTHESES);
 			case ':':
-				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_SELECTOR_COLON);
+				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_COLON);
 			case ',':
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_COMMAS);
 			case ';':
@@ -66,7 +66,7 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 			case ')':
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_PARENTHESES);
 			case ':':
-				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_SELECTOR_COLON);
+				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_COLON);
 			case ',':
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_COMMAS);
 			case ';':

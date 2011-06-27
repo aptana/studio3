@@ -47,8 +47,8 @@ public interface CSSFormatterConstants
 	public static final String SPACES_AFTER_COMMAS = FORMATTER_ID + ".spaces.after.commas"; //$NON-NLS-1$
 	public static final String SPACES_BEFORE_PARENTHESES = FORMATTER_ID + ".spaces.before.parentheses"; //$NON-NLS-1$
 	public static final String SPACES_AFTER_PARENTHESES = FORMATTER_ID + ".spaces.after.parentheses"; //$NON-NLS-1$
-	public static final String SPACES_BEFORE_SELECTOR_COLON = FORMATTER_ID + ".spaces.before.selector.colon"; //$NON-NLS-1$
-	public static final String SPACES_AFTER_SELECTOR_COLON = FORMATTER_ID + ".spaces.after.selector.colon"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_COLON = FORMATTER_ID + ".spaces.before.colon"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_COLON = FORMATTER_ID + ".spaces.after.colon"; //$NON-NLS-1$
 	public static final String SPACES_BEFORE_SEMICOLON = FORMATTER_ID + ".spaces.before.semicolon"; //$NON-NLS-1$
 	public static final String SPACES_AFTER_SEMICOLON = FORMATTER_ID + ".spaces.after.semicolon"; //$NON-NLS-1$
 	public static final String SPACES_BEFORE_CHILD_COMBINATOR = FORMATTER_ID + ".spaces.before.child.combinator"; //$NON-NLS-1$

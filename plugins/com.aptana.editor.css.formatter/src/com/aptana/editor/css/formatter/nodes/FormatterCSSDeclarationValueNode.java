@@ -21,11 +21,15 @@ public class FormatterCSSDeclarationValueNode extends FormatterBlockWithBeginNod
 {
 
 	private boolean isLastNodeInDeclaration;
+	private boolean hasSyntaxafter;
 
-	public FormatterCSSDeclarationValueNode(IFormatterDocument document, boolean isLastNodeInDeclaration)
+	public FormatterCSSDeclarationValueNode(IFormatterDocument document, boolean isLastNodeInDeclaration,
+			boolean hasSyntaxafter)
 	{
 		super(document);
 		this.isLastNodeInDeclaration = isLastNodeInDeclaration;
+		// It is possible to have two values next to eachother without any syntax
+		this.hasSyntaxafter = hasSyntaxafter;
 	}
 
 
@@ -39,6 +43,16 @@ public class FormatterCSSDeclarationValueNode extends FormatterBlockWithBeginNod
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		return true;
+	}
+
+	@Override
+	public int getSpacesCountAfter()
+	{
+		if (!hasSyntaxafter && !isLastNodeInDeclaration)
+		{
+			return 1;
+		}
+		return super.getSpacesCountAfter();
 	}
 
 }
