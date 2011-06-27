@@ -388,6 +388,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			setWordWrapEnabled(true);
 		}
 
+		installOccurrencesUpdater();
+	}
+
+	protected void installOccurrencesUpdater()
+	{
 		// Initialize the occurrences annotations marker
 		occurrencesUpdater = new CommonOccurrencesUpdater(this);
 		occurrencesUpdater.initialize(getPreferenceStore());
