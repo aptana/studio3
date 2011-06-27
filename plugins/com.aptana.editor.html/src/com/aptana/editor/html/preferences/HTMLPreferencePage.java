@@ -32,11 +32,6 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	}
 
 	@Override
-	protected void createMarkOccurrenceOptions(Composite parent)
-	{
-	}
-
-	@Override
 	protected void createFieldEditors()
 	{
 		super.createFieldEditors();
