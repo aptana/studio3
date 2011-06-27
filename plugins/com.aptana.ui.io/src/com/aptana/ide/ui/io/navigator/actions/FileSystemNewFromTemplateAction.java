@@ -22,7 +22,7 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 public class FileSystemNewFromTemplateAction extends BaseSelectionListenerAction
 {
 
-	private class MenuCreator implements IMenuCreator
+	private static class MenuCreator implements IMenuCreator
 	{
 
 		private MenuManager dropDownMenuMgr;

@@ -41,7 +41,7 @@ public class CompareWithEachOtherHandler extends AbstractHandler
 
 		CompareConfiguration cc = new CompareConfiguration();
 		// buffered merge mode: don't ask for confirmation when switching between modified resources
-		cc.setProperty(CompareEditor.CONFIRM_SAVE_PROPERTY, new Boolean(false));
+		cc.setProperty(CompareEditor.CONFIRM_SAVE_PROPERTY, Boolean.FALSE);
 
 		FileStoreCompareEditorInput editorInput = new FileStoreCompareEditorInput(cc);
 		editorInput.setLeftFileStore(left);
