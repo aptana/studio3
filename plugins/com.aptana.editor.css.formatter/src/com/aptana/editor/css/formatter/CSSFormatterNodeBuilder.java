@@ -356,6 +356,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			CSSDeclarationNode declarationNode = declarations[i];
 			CSSExpressionNode expressionNode = declarationNode.getAssignedValue();
 
+			// push the property
 			FormatterBlockWithBeginNode formatterDeclarationPropertyNode = new FormatterCSSDeclarationPropertyNode(
 					document);
 			int propertyEndOffset = getEndWithoutWhiteSpaces(
@@ -369,9 +370,17 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// push the ':'
 			findAndPushSyntaxNode(':', propertyEndOffset, false);
 
+			// push the value for the declaration
 			if (expressionNode != null)
 			{
-				pushDeclarationValueNode(expressionNode);
+				if (expressionNode instanceof CSSTermListNode)
+				{
+					pushTermListNode((CSSTermListNode) expressionNode);
+				}
+				else
+				{
+					pushDeclarationValueNode(expressionNode);
+				}
 			}
 
 			// Create text nodes for comments between declaration
@@ -389,23 +398,38 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
 						parentEndOffset));
 			}
-
 		}
 	}
 
 	private void pushDeclarationValueNode(CSSExpressionNode expressionNode)
 	{
 
-		int semicolonLocation = locateCharacterInSameLine(';', expressionNode.getEndingOffset(), document);
-		boolean endsWithSemicolon = true;
+		int expressionEndOffset = expressionNode.getEndingOffset();
+		int semicolonLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, ';', false);
+		int commaLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, ',', false);
+		int newLineLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '\n', false);
 
-		if (semicolonLocation == expressionNode.getEndingOffset())
+		boolean endsWithSemicolon = false;
+		boolean endsWithComma = false;
+		boolean isLastNodeInDeclaration = false;
+
+		if (document.charAt(semicolonLocation) == ';')
 		{
-			endsWithSemicolon = false;
+			endsWithSemicolon = true;
+		}
+
+		if (document.charAt(commaLocation) == ',')
+		{
+			endsWithComma = true;
+		}
+
+		if (document.charAt(newLineLocation) == '\n')
+		{
+			isLastNodeInDeclaration = true;
 		}
 
 		FormatterBlockWithBeginNode formatterDeclarationValueNode = new FormatterCSSDeclarationValueNode(document,
-				!endsWithSemicolon);
+				isLastNodeInDeclaration, endsWithComma || endsWithSemicolon);
 
 		formatterDeclarationValueNode.setBegin(createTextNode(document, expressionNode.getStartingOffset(),
 				expressionNode.getEndingOffset() + 1));
@@ -416,7 +440,28 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			findAndPushSyntaxNode(';', semicolonLocation, true);
 		}
+		else if (endsWithComma)
+		{
+			findAndPushSyntaxNode(',', commaLocation, false);
+		}
 
+	}
+
+	private void pushTermListNode(CSSTermListNode termListNode)
+	{
+		CSSExpressionNode leftExpression = termListNode.getLeftExpression();
+		CSSExpressionNode rightExpression = termListNode.getRightExpression();
+		if (leftExpression instanceof CSSTermListNode)
+		{
+			pushTermListNode((CSSTermListNode) leftExpression);
+			// push the right expression here, as we are moving back up the tree
+			pushDeclarationValueNode(rightExpression);
+		}
+		else
+		{
+			pushDeclarationValueNode(leftExpression);
+			pushDeclarationValueNode(rightExpression);
+		}
 	}
 
 	private void pushFormatterSelectorNodes(CSSSelectorNode[] selectors)

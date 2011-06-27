@@ -41,9 +41,9 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 			CSSFormatterConstants.LINES_AFTER_ELEMENTS, CSSFormatterConstants.PRESERVED_LINES,
 			CSSFormatterConstants.LINES_AFTER_DECLARATION, CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR,
 			CSSFormatterConstants.SPACES_AFTER_COMMAS, CSSFormatterConstants.SPACES_AFTER_PARENTHESES,
-			CSSFormatterConstants.SPACES_AFTER_SELECTOR_COLON, CSSFormatterConstants.SPACES_AFTER_SEMICOLON,
+			CSSFormatterConstants.SPACES_AFTER_COLON, CSSFormatterConstants.SPACES_AFTER_SEMICOLON,
 			CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR, CSSFormatterConstants.SPACES_BEFORE_COMMAS,
-			CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, CSSFormatterConstants.SPACES_BEFORE_SELECTOR_COLON,
+			CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, CSSFormatterConstants.SPACES_BEFORE_COLON,
 			CSSFormatterConstants.SPACES_BEFORE_SEMICOLON };
 
 	public PreferenceKey[] getPreferenceKeys()

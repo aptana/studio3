@@ -49,9 +49,9 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 
 	protected static final String[] SPACES = { CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR,
 			CSSFormatterConstants.SPACES_AFTER_COMMAS, CSSFormatterConstants.SPACES_AFTER_PARENTHESES,
-			CSSFormatterConstants.SPACES_AFTER_SELECTOR_COLON, CSSFormatterConstants.SPACES_AFTER_SEMICOLON,
+			CSSFormatterConstants.SPACES_AFTER_COLON, CSSFormatterConstants.SPACES_AFTER_SEMICOLON,
 			CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR, CSSFormatterConstants.SPACES_BEFORE_COMMAS,
-			CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, CSSFormatterConstants.SPACES_BEFORE_SELECTOR_COLON,
+			CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, CSSFormatterConstants.SPACES_BEFORE_COLON,
 			CSSFormatterConstants.SPACES_BEFORE_SEMICOLON };
 
 	/**

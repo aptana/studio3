@@ -17,7 +17,7 @@ import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
 public class CSSFormatterModifyDialog extends FormatterModifyDialog
 {
 	/**
-	 * Constructs a new HTMLFormatterModifyDialog
+	 * Constructs a new CSSFormatterModifyDialog
 	 * 
 	 * @param dialogOwner
 	 * @param formatterFactory
@@ -33,6 +33,7 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 				this));
 		addTabPage(Messages.CSSFormatterModifyDialog_braces_page_tab_name, new CSSFormatterBracesPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
+		addTabPage(Messages.CSSFormatterModifyDialog_spaces_page_tab_title, new CSSFormatterWhiteSpacesPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_comments_page_tab_name, new CSSFormatterCommentsPage(this));
 	}
 }
