@@ -656,6 +656,7 @@
             label="Common Editor Presentation"
             visible="false">
          <action
+               allowLabelUpdate="true"
                definitionId="com.aptana.editor.common.toggleMarkOccurrences"
                disabledIcon="icons/full/dtool16/mark_occurrences.gif"
                icon="icons/full/etool16/mark_occurrences.gif"

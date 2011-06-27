@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.beaver;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
@@ -26,6 +27,16 @@ public class BeaverEditor extends AbstractThemeableEditor
 	public ILabelProvider getOutlineLabelProvider()
 	{
 		return new BeaverOutlineLabelProvider();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return BeaverPlugin.getDefault().getPreferenceStore();
 	}
 
 	@Override

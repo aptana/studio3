@@ -261,6 +261,8 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 					foldingActions.updateActionBars();
 				}
 			}
+
+			markOccurrencesAction.setEditor(textEditor);
 		}
 	}
 }

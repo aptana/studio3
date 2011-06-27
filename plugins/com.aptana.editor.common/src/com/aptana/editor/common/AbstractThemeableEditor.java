@@ -473,6 +473,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			return getSourceViewer();
 		}
+		else if (IPreferenceStore.class == adapter)
+		{
+			return getPluginPreferenceStore();
+		}
 
 		if (this.fThemeableEditorFindBarExtension != null)
 		{
@@ -512,6 +516,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		return outline;
 	}
+
+	protected abstract IPreferenceStore getPluginPreferenceStore();
 
 	@Override
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)

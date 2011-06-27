@@ -52,6 +52,19 @@ public class ToggleMarkOccurrencesAction extends TextEditorAction implements IPr
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
+	@Override
+	public void run()
+	{
+		if (prefStore != null)
+		{
+			prefStore.setValue(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, isChecked());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.TextEditorAction#setEditor(org.eclipse.ui.texteditor.ITextEditor)
 	 */
 	@Override
@@ -63,8 +76,8 @@ public class ToggleMarkOccurrencesAction extends TextEditorAction implements IPr
 		{
 			if (prefStore == null)
 			{
-				// prefStore = editor.
-				// prefStore.addPropertyChangeListener(this);
+				prefStore = (IPreferenceStore) editor.getAdapter(IPreferenceStore.class);
+				prefStore.addPropertyChangeListener(this);
 			}
 		}
 		else if (prefStore != null)

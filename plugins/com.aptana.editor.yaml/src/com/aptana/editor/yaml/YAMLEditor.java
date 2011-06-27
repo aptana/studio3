@@ -53,6 +53,16 @@ public class YAMLEditor extends AbstractThemeableEditor
 		return YAMLPlugin.getDefault().getPreferenceStore();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return YAMLPlugin.getDefault().getPreferenceStore();
+	}
+
 	@Override
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
