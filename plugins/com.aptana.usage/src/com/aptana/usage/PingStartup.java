@@ -220,9 +220,6 @@ public class PingStartup implements IStartup
 							osName = line.substring(0, index);
 						}
 					}
-					catch (Exception e)
-					{
-					}
 					finally
 					{
 						if (in != null)

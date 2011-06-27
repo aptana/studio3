@@ -227,32 +227,35 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 			// start with an empty map in case we need to delete existing markers later
 			Map<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
 
-			// find a "word" to search using the current selection
-			String word = getWord();
-
-			if (word != null && word.length() > 0)
+			if (editor.isMarkingOccurrences())
 			{
-				String source = document.get();
-				Pattern wordPattern = createWordPattern(word);
-				Matcher matcher = wordPattern.matcher(source);
+				// find a "word" to search using the current selection
+				String word = getWord();
 
-				while (matcher.find())
+				if (word != null && word.length() > 0)
 				{
-					if (monitor.isCanceled())
+					String source = document.get();
+					Pattern wordPattern = createWordPattern(word);
+					Matcher matcher = wordPattern.matcher(source);
+
+					while (matcher.find())
 					{
-						status = Status.CANCEL_STATUS;
-						break;
+						if (monitor.isCanceled())
+						{
+							status = Status.CANCEL_STATUS;
+							break;
+						}
+
+						int start = matcher.start();
+						int length = matcher.end() - start;
+
+						// @formatter:off
+						annotationMap.put(
+							new Annotation(ANNOTION_ID, false, ANNOTION_DESCRIPTION),
+							new Position(start, length)
+						);
+						// @formatter:on
 					}
-
-					int start = matcher.start();
-					int length = matcher.end() - start;
-
-					// @formatter:off
-					annotationMap.put(
-						new Annotation(ANNOTION_ID, false, ANNOTION_DESCRIPTION),
-						new Position(start, length)
-					);
-					// @formatter:on
 				}
 			}
 
@@ -504,6 +507,9 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 			{
 				uninstall();
 			}
+
+			// force update
+			updateAnnotations(editor.getSelectionProvider().getSelection());
 		}
 	}
 
