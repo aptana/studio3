@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -174,7 +175,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 	

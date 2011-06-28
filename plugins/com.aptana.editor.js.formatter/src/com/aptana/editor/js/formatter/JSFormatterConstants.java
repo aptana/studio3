@@ -44,6 +44,7 @@ public interface JSFormatterConstants
 	public static final String NEW_LINES_BEFORE_CATCH_STATEMENT = FORMATTER_ID + ".newline.before.catch"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_FINALLY_STATEMENT = FORMATTER_ID + ".newline.before.finally"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_DO_WHILE_STATEMENT = FORMATTER_ID + ".newline.before.dowhile"; //$NON-NLS-1$
+	public static final String NEW_LINES_BEFORE_NAME_VALUE_PAIRS = FORMATTER_ID + ".newline.before.name.value.pairs"; //$NON-NLS-1$
 
 	// Empty lines
 	public static final String LINES_AFTER_FUNCTION_DECLARATION = FORMATTER_ID + ".line.after.function.declaration"; //$NON-NLS-1$
@@ -57,4 +58,37 @@ public interface JSFormatterConstants
 	public static final String BRACE_POSITION_BLOCK = FORMATTER_ID + ".brace.position.blocks"; //$NON-NLS-1$
 	public static final String BRACE_POSITION_BLOCK_IN_SWITCH = FORMATTER_ID + ".brace.position.switch.block"; //$NON-NLS-1$
 	public static final String BRACE_POSITION_BLOCK_IN_CASE = FORMATTER_ID + ".brace.position.case.block"; //$NON-NLS-1$
+
+	// Spaces
+	public static final String SPACES_BEFORE_COMMAS = FORMATTER_ID + ".spaces.before.commas"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_COMMAS = FORMATTER_ID + ".spaces.after.commas"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_PARENTHESES = FORMATTER_ID + ".spaces.before.parentheses"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_PARENTHESES = FORMATTER_ID + ".spaces.after.parentheses"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_UNARY_OPERATOR = FORMATTER_ID + ".spaces.before.unary.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_UNARY_OPERATOR = FORMATTER_ID + ".spaces.after.unary.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_KEY_VALUE_OPERATOR = FORMATTER_ID + ".spaces.before.key.value.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_KEY_VALUE_OPERATOR = FORMATTER_ID + ".spaces.after.key.value.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_ASSIGNMENT_OPERATOR = FORMATTER_ID + ".spaces.before.assignment.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_ASSIGNMENT_OPERATOR = FORMATTER_ID + ".spaces.after.assignment.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_RELATIONAL_OPERATORS = FORMATTER_ID + ".spaces.before.relational.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_RELATIONAL_OPERATORS = FORMATTER_ID + ".spaces.after.relational.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CONCATENATION_OPERATOR = FORMATTER_ID
+			+ ".spaces.before.concatenation.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_CONCATENATION_OPERATOR = FORMATTER_ID
+			+ ".spaces.after.concatenation.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CONDITIONAL_OPERATOR = FORMATTER_ID
+			+ ".spaces.before.conditional.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_CONDITIONAL_OPERATOR = FORMATTER_ID + ".spaces.after.conditional.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_POSTFIX_OPERATOR = FORMATTER_ID + ".spaces.before.postfix.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_POSTFIX_OPERATOR = FORMATTER_ID + ".spaces.after.postfix.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_PREFIX_OPERATOR = FORMATTER_ID + ".spaces.before.prefix.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_PREFIX_OPERATOR = FORMATTER_ID + ".spaces.after.prefix.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_ARITHMETIC_OPERATOR = FORMATTER_ID + ".spaces.before.arithmetic.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_ARITHMETIC_OPERATOR = FORMATTER_ID + ".spaces.after.arithmetic.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_FOR_SEMICOLON = FORMATTER_ID + ".spaces.before.for.semicolon.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_FOR_SEMICOLON = FORMATTER_ID + ".spaces.after.for.semicolon.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_SEMICOLON = FORMATTER_ID + ".spaces.before.semicolon.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_SEMICOLON = FORMATTER_ID + ".spaces.after.semicolon.operator"; //$NON-NLS-1$
+	public static final String SPACES_BEFORE_CASE_COLON_OPERATOR = FORMATTER_ID + ".spaces.before.case.colon.operator"; //$NON-NLS-1$
+	public static final String SPACES_AFTER_CASE_COLON_OPERATOR = FORMATTER_ID + ".spaces.after.case.colon.operator"; //$NON-NLS-1$
 }

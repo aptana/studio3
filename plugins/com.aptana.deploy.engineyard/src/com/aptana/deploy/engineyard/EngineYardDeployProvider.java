@@ -31,6 +31,11 @@ public class EngineYardDeployProvider implements IDeployProvider
 
 	public boolean handles(IContainer selectedContainer)
 	{
+		if (selectedContainer == null || selectedContainer.getProject() == null)
+		{
+			return false;
+		}
+
 		// Engine Yard gem does not work in Windows
 		if (Platform.getOS().equals(Platform.OS_WIN32))
 		{

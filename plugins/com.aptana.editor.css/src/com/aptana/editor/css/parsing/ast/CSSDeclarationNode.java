@@ -105,6 +105,16 @@ public class CSSDeclarationNode extends CSSNode
 		return (CSSExpressionNode) getChild(0);
 	}
 
+	/**
+	 * getIdentifier
+	 * 
+	 * @return
+	 */
+	public String getIdentifier()
+	{
+		return fIdentifier;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#hashCode()

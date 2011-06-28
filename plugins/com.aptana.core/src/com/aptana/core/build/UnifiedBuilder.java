@@ -2,6 +2,7 @@ package com.aptana.core.build;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.IDebugScopes;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexFilesOfProjectJob;
@@ -84,11 +87,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
-		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName));
+		IdeLog.logInfo(CorePlugin.getDefault(),
+				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName), IDebugScopes.INDEXER);
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
-			CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName));
+			IdeLog.logInfo(CorePlugin.getDefault(),
+					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName), IDebugScopes.INDEXER);
 			fullBuild(monitor);
 		}
 		else
@@ -96,19 +101,23 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null)
 			{
-				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta,
-						projectName));
+				IdeLog.logInfo(CorePlugin.getDefault(),
+						StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
+						IDebugScopes.INDEXER);
 				fullBuild(monitor);
 			}
 			else
 			{
-				CorePlugin.logInfo(StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName));
+				IdeLog.logInfo(CorePlugin.getDefault(),
+						StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
+						IDebugScopes.INDEXER);
 				incrementalBuild(delta, monitor);
 			}
 		}
 
 		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
-		CorePlugin.logInfo(MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime));
+		IdeLog.logInfo(CorePlugin.getDefault(),
+				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime), IDebugScopes.INDEXER);
 
 		return null;
 	}
@@ -123,6 +132,18 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				delta.accept(resourceCollector);
 				sub.worked(1);
+
+				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.INDEXER))
+				{
+					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex.toArray(new IFile[0]);
+					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[0]);
+					IdeLog.logInfo(
+							CorePlugin.getDefault(),
+							StringUtil.format(Messages.UnifiedBuilder_IndexingResourceDelta,
+									new Object[] { Arrays.deepToString(toRemove), Arrays.deepToString(toIndex) }),
+							IDebugScopes.INDEXER);
+				}
+
 				if (!resourceCollector.filesToRemoveFromIndex.isEmpty())
 				{
 					RemoveIndexOfFilesOfProjectJob removeJob = new RemoveIndexOfFilesOfProjectJob(getProject(),

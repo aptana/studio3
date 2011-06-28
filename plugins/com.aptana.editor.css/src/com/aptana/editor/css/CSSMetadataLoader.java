@@ -12,6 +12,7 @@ import java.net.URI;
 
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
@@ -138,7 +139,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 		}
 		catch (IOException e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 

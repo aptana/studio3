@@ -13,6 +13,10 @@ package com.aptana.formatter.preferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ui.preferences.IWorkingCopyManager;
+import org.osgi.service.prefs.BackingStoreException;
+
+import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.epl.FormatterPlugin;
 
 public final class PreferenceKey
 {
@@ -33,6 +37,22 @@ public final class PreferenceKey
 	public String getName()
 	{
 		return fKey;
+	}
+
+	public void flush(IScopeContext context)
+	{
+		IEclipsePreferences node = context.getNode(fQualifier);
+		if (node != null)
+		{
+			try
+			{
+				node.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				IdeLog.logError(FormatterPlugin.getDefault(), "Error flushing a node", e); //$NON-NLS-1$
+			}
+		}
 	}
 
 	private IEclipsePreferences getNode(IScopeContext context, IWorkingCopyManager manager)

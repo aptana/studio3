@@ -320,12 +320,22 @@
                   class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                   id="com.aptana.explorer.open.file.manager">
             </dynamic>
+            <command
+                  commandId="com.aptana.terminal.commands.openTerminal"
+                  label="%command.terminal.label"
+                  style="push">
+            </command>
             <visibleWhen
                   checkEnabled="false">
                <iterate>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
+                  <or>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                     <adapt
+                           type="org.eclipse.core.filesystem.IFileStore">
+                     </adapt>
+                  </or>
                </iterate>
             </visibleWhen>
          </menu>

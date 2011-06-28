@@ -34,6 +34,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.engineyard.EngineYardAPI;
@@ -105,7 +106,7 @@ public class EngineYardDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				EngineYardPlugin.logError(e);
+				IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return true;
@@ -146,9 +147,10 @@ public class EngineYardDeployWizard extends AbstractDeployWizard
 					if (responseCode != HttpURLConnection.HTTP_OK)
 					{
 						// Log an error
-						EngineYardPlugin.logError(
+						IdeLog.logError(
+								EngineYardPlugin.getDefault(),
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
-										builder.toString()), null);
+										builder.toString()), (Throwable) null);
 					}
 					else
 					{
@@ -281,7 +283,7 @@ public class EngineYardDeployWizard extends AbstractDeployWizard
 		}
 		catch (Exception e)
 		{
-			EngineYardPlugin.logError(e);
+			IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 }

@@ -35,6 +35,7 @@ public enum BeaverTokenType
 	PLUS("keyword.operator.beaver"),
 	IDENTIFIER("source.identifier.beaver"),
 	COMMENT("comment.line.double-slash.beaver"),
+	NONASSOC("keyword.operator.beaver"),
 	MULTILINE_COMMENT("");
 
 	private short _index;

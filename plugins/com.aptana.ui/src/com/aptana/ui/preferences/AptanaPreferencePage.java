@@ -23,6 +23,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.internal.preferences.PreferenceInitializer;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.Messages;
 import com.aptana.ui.UIPlugin;
 
@@ -31,7 +32,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 
 	protected static String PAGE_ID = "com.aptana.ui.AptanaPreferencePage"; //$NON-NLS-1$
 
-	private Button debugButton;
 	private Button migrateButton;
 	private Button autoRefreshButton;
 
@@ -69,10 +69,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	{
 		Composite comp = (Composite) super.createContents(parent);
 
-		debugButton = new Button(comp, SWT.CHECK);
-		debugButton.setText(Messages.AptanaPreferencePage_EnableDebugModeLabel);
-		debugButton.setSelection(isInDebugMode());
-
 		migrateButton = new Button(comp, SWT.CHECK);
 		migrateButton.setText(Messages.AptanaPreferencePage_Auto_Migrate_Projects);
 		migrateButton.setSelection(autoMigration());
@@ -82,13 +78,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		autoRefreshButton.setSelection(autoRefresh());
 
 		return comp;
-	}
-
-	private static boolean isInDebugMode()
-	{
-		// Don't use EclipseUtil.isInDebugMode, because that also checks for osgi.debug system property or -debug flag
-		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, PreferenceInitializer.DEFAULT_DEBUG_MODE, null);
 	}
 
 	private static boolean autoMigration()
@@ -109,7 +98,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	public boolean performOk()
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, debugButton.getSelection());
 		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
 		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
 		try
@@ -118,7 +106,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		}
 		catch (BackingStoreException e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return super.performOk();
@@ -127,8 +115,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	@Override
 	protected void performDefaults()
 	{
-		debugButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, PreferenceInitializer.DEFAULT_DEBUG_MODE, null));
 		migrateButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
 				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null));

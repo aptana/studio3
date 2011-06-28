@@ -9,7 +9,7 @@
             id="com.aptana.deploy.projectPropertyTester"
             namespace="com.aptana.deploy.project"
             properties="isDeployable,isDeployType"
-            type="org.eclipse.core.resources.IResource">
+            type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
    </extension>
    <extension
@@ -70,16 +70,21 @@
             locationURI="popup:org.eclipse.ui.popup.any?before=group.edit">
          <dynamic
                class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
-               id="com.aptana.explorer.deploy.popup">
+               id="com.aptana.deploy.popup.studio">
             <visibleWhen
                   checkEnabled="false">
                <or>
-                  <iterate
-                        ifEmpty="false">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                     </adapt>
-                  </iterate>
+                  <with
+                        variable="activePartId">
+                     <or>
+                        <equals
+                              value="com.aptana.explorer.view">
+                        </equals>
+                        <equals
+                              value="org.eclipse.ui.navigator.ProjectExplorer">
+                        </equals>
+                     </or>
+                  </with>
                   <with
                         variable="activeEditorInput">
                      <adapt
@@ -117,6 +122,37 @@
                </and>
             </visibleWhen>
          </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?before=additions">
+         <dynamic
+               class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
+               id="com.aptana.deploy.popup.other">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <with
+                        variable="activePartId">
+                     <not>
+                        <or>
+                           <equals
+                                 value="com.aptana.explorer.view">
+                           </equals>
+                           <equals
+                                 value="org.eclipse.ui.navigator.ProjectExplorer">
+                           </equals>
+                        </or>
+                     </not>
+                  </with>
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                  </iterate>
+               </and>
+            </visibleWhen>
+         </dynamic>
       </menuContribution>
    </extension>
 

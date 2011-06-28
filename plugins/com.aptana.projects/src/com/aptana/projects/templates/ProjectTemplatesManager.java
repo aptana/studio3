@@ -41,6 +41,7 @@ public class ProjectTemplatesManager
 	private static final String ATTR_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+	private static final String ATTR_REPLACE_PARAMETERS = "replaceParameters"; //$NON-NLS-1$
 
 	private Map<TemplateType, List<IProjectTemplate>> projectTemplates;
 
@@ -126,7 +127,9 @@ public class ProjectTemplatesManager
 				iconURL = bundle.getEntry(icon);
 			}
 
-			IProjectTemplate projectTemplate = new ProjectTemplate(path, type, name, description, iconURL);
+			boolean replacingParameters = Boolean.parseBoolean(element.getAttribute(ATTR_REPLACE_PARAMETERS));
+			IProjectTemplate projectTemplate = new ProjectTemplate(path, type, name, replacingParameters, description,
+					iconURL);
 			templates.add(projectTemplate);
 		}
 	}

@@ -8,113 +8,318 @@
 package com.aptana.editor.css.parsing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.editor.css.CSSCodeScanner;
+import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.css.internal.text.rules.CSSHexColorRule;
+import com.aptana.editor.css.internal.text.rules.CSSIdentifierRule;
+import com.aptana.editor.css.internal.text.rules.CSSImportantRule;
+import com.aptana.editor.css.internal.text.rules.CSSNumberRule;
+import com.aptana.editor.css.internal.text.rules.EqualOperatorWordDetector;
+import com.aptana.editor.css.internal.text.rules.IdentifierWithPrefixDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 /**
- * @author Chris Williams
+ * CSSTokenScanner
  */
-public class CSSTokenScanner extends CSSCodeScanner
+@SuppressWarnings("nls")
+public class CSSTokenScanner extends RuleBasedScanner
 {
+	private boolean _inMediaRule;
+	private int _curlyBraceCount;
 
 	/**
-	 * A flag to turn on or off the optimization of eligible regexp rules. Seems to make a measurable difference on
-	 * large files.
+	 * CSSTokenScanner
 	 */
-	private static final boolean OPTIMIZE_REGEXP_RULES = true;
+	public CSSTokenScanner()
+	{
+		List<IRule> rules = createRules();
 
+		setRules(rules.toArray(new IRule[rules.size()]));
+	}
+
+	/**
+	 * createAtWordsRule
+	 * 
+	 * @return
+	 */
+	private WordRule createAtWordsRule()
+	{
+		WordRule atRule = new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE));
+
+		atRule.addWord("@import", createToken(CSSTokenType.IMPORT));
+		atRule.addWord("@page", createToken(CSSTokenType.PAGE));
+		atRule.addWord("@media", createToken(CSSTokenType.MEDIA_KEYWORD));
+		atRule.addWord("@charset", createToken(CSSTokenType.CHARSET));
+		atRule.addWord("@font-face", createToken(CSSTokenType.FONTFACE));
+		atRule.addWord("@namespace", createToken(CSSTokenType.NAMESPACE));
+
+		return atRule;
+	}
+
+	/**
+	 * createPuncturatorsRule
+	 * 
+	 * @return
+	 */
+	protected CharacterMapRule createPunctuatorsRule()
+	{
+		CharacterMapRule punctuatorsRule = new CharacterMapRule();
+
+		punctuatorsRule.add(':', createToken(CSSTokenType.COLON));
+		punctuatorsRule.add(';', createToken(CSSTokenType.SEMICOLON));
+		punctuatorsRule.add('{', createToken(CSSTokenType.LCURLY));
+		punctuatorsRule.add('}', createToken(CSSTokenType.RCURLY));
+		punctuatorsRule.add('(', createToken(CSSTokenType.LPAREN));
+		punctuatorsRule.add(')', createToken(CSSTokenType.RPAREN));
+		punctuatorsRule.add('%', createToken(CSSTokenType.PERCENTAGE)); // ?
+		punctuatorsRule.add('[', createToken(CSSTokenType.LBRACKET));
+		punctuatorsRule.add(']', createToken(CSSTokenType.RBRACKET));
+		punctuatorsRule.add(',', createToken(CSSTokenType.COMMA));
+		punctuatorsRule.add('+', createToken(CSSTokenType.PLUS));
+		punctuatorsRule.add('*', createToken(CSSTokenType.STAR));
+		punctuatorsRule.add('>', createToken(CSSTokenType.GREATER));
+		punctuatorsRule.add('/', createToken(CSSTokenType.SLASH));
+		punctuatorsRule.add('=', createToken(CSSTokenType.EQUAL));
+		punctuatorsRule.add('-', createToken(CSSTokenType.MINUS));
+
+		return punctuatorsRule;
+	}
+
+	/**
+	 * createRules
+	 * 
+	 * @return
+	 */
 	protected List<IRule> createRules()
 	{
-		List<IRule> rules = super.createRules();
-		rules.addAll(1, createCommentAndStringRules());
-		return rules;
-	}
-
-	protected Collection<? extends IRule> createScannerSpecificRules()
-	{
 		List<IRule> rules = new ArrayList<IRule>();
+
+		// Add generic whitespace rule.
+		rules.add(new WhitespaceRule(new WhitespaceDetector()));
+
+		// multi-line comments
+		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true));
+
+		// strings
+		rules.addAll(createStringRules());
+
+		// at-keywords
+		rules.add(createAtWordsRule());
+
+		// units
+		rules.addAll(createUnitRules());
+
+		// numbers
+		rules.add(new CSSNumberRule(createToken(CSSTokenType.NUMBER)));
+
+		// hex colors
+		// TODO: we need separate scanners for inside and outside of rules. This will erroneously pick up some ids as
+		// well
+		rules.add(new CSSHexColorRule(createToken(CSSTokenType.RGB)));
+
+		// classes;
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('.'), createToken(CSSTokenType.CLASS)));
+
+		// ids
+		rules.add(new WordRule(new IdentifierWithPrefixDetector('#'), createToken(CSSTokenType.ID)));
+
+		// !important
+		rules.add(new CSSImportantRule(createToken(CSSTokenType.IMPORTANT)));
+
 		// url
 		// FIXME Don't use a RegexpRule here!
-		rules.add(new RegexpRule("url\\([^\\)]*\\)", createToken(CSSTokenType.URL), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-		
-		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab number and then a measurement
-		// em
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", CSSTokenType.EMS)); //$NON-NLS-1$
-		// length
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(px|cm|mm|in|pt|pc)", CSSTokenType.LENGTH)); //$NON-NLS-1$
-		// percentage
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)%", CSSTokenType.PERCENTAGE)); //$NON-NLS-1$
-		// angle
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(deg|rad|grad)", CSSTokenType.ANGLE)); //$NON-NLS-1$
-		// ex
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)ex", CSSTokenType.EXS)); //$NON-NLS-1$
-		// frequency
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)([Hh]z|k[Hh]z)", CSSTokenType.FREQUENCY)); //$NON-NLS-1$
-		// time
-		rules.add(createMeasurementRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(ms|s)", CSSTokenType.TIME)); //$NON-NLS-1$
+		rules.add(new RegexpRule("url\\([^)]*\\)", createToken(CSSTokenType.URL), true));
+
+		// TODO: functions
+
+		// TODO: Unicode
+
+		// identifiers
+		rules.add(new CSSIdentifierRule(createToken(CSSTokenType.IDENTIFIER)));
+
+		// single character punctuators
+		rules.add(createPunctuatorsRule());
+
+		// multi-character punctuators
+		WordRule punctuatorRule2 = new WordRule(new EqualOperatorWordDetector(), Token.UNDEFINED);
+		punctuatorRule2.addWord("~=", createToken(CSSTokenType.INCLUDES));
+		punctuatorRule2.addWord("|=", createToken(CSSTokenType.DASHMATCH));
+		punctuatorRule2.addWord("^=", createToken(CSSTokenType.BEGINS_WITH));
+		punctuatorRule2.addWord("$=", createToken(CSSTokenType.ENDS_WITH));
+		rules.add(punctuatorRule2);
 
 		return rules;
 	}
 
-	private IRule createMeasurementRule(final String regex, CSSTokenType tokenType)
+	/**
+	 * createStringRules
+	 * 
+	 * @return
+	 */
+	private List<IRule> createStringRules()
+	{
+		List<IRule> rules = new ArrayList<IRule>();
+
+		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\'));
+		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\'));
+
+		return rules;
+	}
+
+	/**
+	 * createToken
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected IToken createToken(CSSTokenType type)
+	{
+		return new Token(type);
+	}
+
+	/**
+	 * createMeasurementRule
+	 * 
+	 * @param regex
+	 * @param tokenType
+	 * @return
+	 */
+	private IRule createUnitRule(final String regex, CSSTokenType tokenType)
 	{
 		return new ExtendedWordRule(new IWordDetector()
 		{
+			public boolean isWordPart(char c)
+			{
+				return c == '.' || c == '%' || Character.isLetterOrDigit(c);
+			}
 
 			public boolean isWordStart(char c)
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
-
-			public boolean isWordPart(char c)
-			{
-				return c == '.' || c == '%' ||Character.isLetterOrDigit(c);
-			}
 		}, createToken(tokenType), false)
 		{
-			
 			private Pattern pattern;
 
-			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
 				if (pattern == null)
 				{
-					pattern = Pattern.compile(regex);
+					pattern = Pattern.compile("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(" + regex + ")");
 				}
+
 				return pattern.matcher(word).matches();
 			}
 		};
 	}
 
-	private List<IRule> createCommentAndStringRules()
+	/**
+	 * createUnitRules
+	 * 
+	 * @return
+	 */
+	protected List<IRule> createUnitRules()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
-		// comments
-		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
-		// quoted strings
-		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab
+		// number and then a measurement
+		// XXX: The number and the units have to be connected without intermediate whitespace. Alternately, we could
+		// make the parser changes as suggested but we would need to make sure the validators point out the error
+		// condition
+
+		rules.add(createUnitRule("em", CSSTokenType.EMS));
+		rules.add(createUnitRule("px|cm|mm|in|pt|pc", CSSTokenType.LENGTH));
+		rules.add(createUnitRule("%", CSSTokenType.PERCENTAGE));
+		rules.add(createUnitRule("deg|rad|grad", CSSTokenType.ANGLE));
+		rules.add(createUnitRule("ex", CSSTokenType.EXS));
+		rules.add(createUnitRule("k?[Hh]z", CSSTokenType.FREQUENCY));
+		rules.add(createUnitRule("m?s", CSSTokenType.TIME));
+
 		return rules;
 	}
 
-	protected IToken createToken(CSSTokenType ctt)
+	/**
+	 * isOutsideRule
+	 * 
+	 * @return
+	 */
+	private boolean isOutsideRule()
 	{
-		return new Token(ctt);
+		return this._curlyBraceCount < (this._inMediaRule ? 2 : 1);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#nextToken()
+	 */
+	@Override
+	public IToken nextToken()
+	{
+		IToken token = super.nextToken();
+		Object data = token.getData();
+
+		if (data instanceof CSSTokenType)
+		{
+			switch ((CSSTokenType) data)
+			{
+				case MEDIA_KEYWORD:
+					this._inMediaRule = true;
+					break;
+
+				case LCURLY:
+					this._curlyBraceCount++;
+					break;
+
+				case RCURLY:
+					this._curlyBraceCount--;
+
+					if (this._curlyBraceCount == 0 && this._inMediaRule)
+					{
+						this._inMediaRule = false;
+					}
+					break;
+
+				case RGB:
+					// fixup colors in selectors
+					if (isOutsideRule())
+					{
+						token = createToken(CSSTokenType.ID);
+					}
+					break;
+			}
+		}
+
+		return token;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
+	 */
+	@Override
+	public void setRange(IDocument document, int offset, int length)
+	{
+		super.setRange(document, offset, length);
+
+		this._inMediaRule = false;
+		this._curlyBraceCount = 0;
+	}
 }

@@ -57,6 +57,16 @@ public abstract class CSSColors
 		return Collections.unmodifiableSet(NAMED_COLORS.keySet());
 	}
 
+	public static RGB hexToRGB(String color)
+	{
+		return toRGB(to6CharHexWithLeadingHash(color));
+	}
+
+	public static RGB namedColorToRGB(String name)
+	{
+		return toRGB(getHexValueForName(name));
+	}
+
 	/**
 	 * Takes in a color name or 3/6 hex digit value (with optional leading hash). and Converts to an RGB object
 	 * containing the corresponding color values.

@@ -47,6 +47,13 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]"); //$NON-NLS-1$
 	private String lineSeparator;
 
+	protected static final String[] SPACES = { CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR,
+			CSSFormatterConstants.SPACES_AFTER_COMMAS, CSSFormatterConstants.SPACES_AFTER_PARENTHESES,
+			CSSFormatterConstants.SPACES_AFTER_COLON, CSSFormatterConstants.SPACES_AFTER_SEMICOLON,
+			CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR, CSSFormatterConstants.SPACES_BEFORE_COMMAS,
+			CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, CSSFormatterConstants.SPACES_BEFORE_COLON,
+			CSSFormatterConstants.SPACES_BEFORE_SEMICOLON };
+
 	/**
 	 * Constructor.
 	 * 
@@ -282,6 +289,11 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
+		// Set the spaces values
+		for (String key : SPACES)
+		{
+			document.setInt(key, getInt(key));
+		}
 		return document;
 	}
 

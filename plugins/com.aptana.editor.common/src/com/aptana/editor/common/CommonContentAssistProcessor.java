@@ -22,6 +22,10 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.PerformanceStats;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.BadLocationException;
@@ -43,10 +47,12 @@ import org.jruby.RubyHash;
 import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
+import com.aptana.editor.common.contentassist.IPreferenceConstants;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
@@ -62,7 +68,8 @@ import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.ContentAssistElement;
 import com.aptana.scripting.model.filters.ScopeFilter;
 
-public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
+public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor,
+		IPreferenceChangeListener
 {
 	/**
 	 * Default image to use for ruble-contributed proposals (that don't override image)
@@ -82,6 +89,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String RUBLE_PERF = PERFORMANCE_EVENT_PREFIX + "/rubles"; //$NON-NLS-1$
 	private static final String SNIPPET_PERF = PERFORMANCE_EVENT_PREFIX + "/snippets"; //$NON-NLS-1$
 
+	private char[] _completionProposalChars = null;
+	private char[] _contextInformationChars = null;
+	private char[] _proposalTriggerChars = null;
+
 	protected final AbstractThemeableEditor editor;
 
 	/**
@@ -92,6 +103,15 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	public CommonContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		this.editor = editor;
+
+		_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
+		_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
+		_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
+
+		if (getPreferenceNodeQualifier() != null)
+		{
+			new InstanceScope().getNode(getPreferenceNodeQualifier()).addPreferenceChangeListener(this);
+		}
 	}
 
 	/**
@@ -229,7 +249,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param offset
 	 * @return
 	 */
-	private Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
+	protected Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
 	{
 		PerformanceStats stats = null;
 		try
@@ -290,7 +310,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return proposals;
 	}
@@ -396,7 +416,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							}
 							catch (MalformedURLException e1)
 							{
-								CommonEditorPlugin.logError(e1);
+								IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
 							}
 						}
 						if (imageURL != null)
@@ -495,7 +515,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return null;
+		return _completionProposalChars;
 	}
 
 	/*
@@ -504,7 +524,35 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	public char[] getContextInformationAutoActivationCharacters()
 	{
-		return null;
+		return _contextInformationChars;
+	}
+
+	/*
+	 * return the characters to insert proposals
+	 */
+	public char[] getProposalTriggerCharacters()
+	{
+		return _proposalTriggerChars;
+	}
+
+	/**
+	 * Retrieves a content assist preference and converts it into a char array
+	 * 
+	 * @param preferenceKey
+	 * @return
+	 */
+	private char[] retrieveCAPreference(String preferenceKey)
+	{
+		String qualifier = getPreferenceNodeQualifier();
+		if (qualifier == null)
+		{
+			return null;
+		}
+
+		String chars = Platform.getPreferencesService().getString(getPreferenceNodeQualifier(), preferenceKey,
+				StringUtil.EMPTY, null);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*
@@ -732,5 +780,47 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
 		return false;
+	}
+
+	/**
+	 * Returns the qualifier for the preference service. Gnerally the plugin ID as that's where the relevant preferences
+	 * are stored.
+	 * 
+	 * @return
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return null;
+	}
+
+	/**
+	 * Respond to preference change events
+	 */
+	public void preferenceChange(PreferenceChangeEvent event)
+	{
+		if (IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS.equals(event.getKey()))
+		{
+			_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
+		}
+		else if (IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS.equals(event.getKey()))
+		{
+			_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
+		}
+		else if (IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS.equals(event.getKey()))
+		{
+			_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
+		}
+
+	}
+
+	/**
+	 * dispose
+	 */
+	public void dispose()
+	{
+		if (getPreferenceNodeQualifier() != null)
+		{
+			new InstanceScope().getNode(getPreferenceNodeQualifier()).removePreferenceChangeListener(this);
+		}
 	}
 }

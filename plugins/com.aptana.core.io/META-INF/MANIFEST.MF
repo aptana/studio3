@@ -2,18 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.core.io;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.ide.core.io.CoreIOPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.filesystem;visibility:=reexport,
+ org.eclipse.core.expressions,
  org.eclipse.equinox.security,
  org.eclipse.ecf,
  org.eclipse.ecf.filetransfer,
- org.eclipse.core.expressions,
- com.aptana.core,
+ com.aptana.core;bundle-version="3.0.3",
  com.aptana.core.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

@@ -7,11 +7,10 @@
  */
 package com.aptana.editor.css.text;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
@@ -24,20 +23,122 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.CSSScopeScanner;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
-import com.aptana.editor.css.parsing.lexer.CSSTokenType;
-import com.aptana.parsing.lexer.Lexeme;
-import com.aptana.theme.ThemePlugin;
+import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
+import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSTermListNode;
+import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
-	private static final String RGB = "rgb"; //$NON-NLS-1$
+	private class RegionInfo
+	{
+		public final IRegion region;
+		public final Object info;
+
+		public RegionInfo(IRegion region, Object info)
+		{
+			this.region = region;
+			this.info = info;
+		}
+	}
+
+	private static final Pattern RGB_CHANNELS = Pattern
+			.compile("rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)"); //$NON-NLS-1$
+
+	private Object info;
+
+	/**
+	 * getAST
+	 * 
+	 * @param textViewer
+	 * @param offset
+	 * @return
+	 */
+	protected IParseNode getAST(ITextViewer textViewer, int offset)
+	{
+		IParseNode ast = null;
+		boolean forceParse = true;
+
+		if (textViewer instanceof IAdaptable)
+		{
+			IAdaptable adaptable = (IAdaptable) textViewer;
+			AbstractThemeableEditor editor = (AbstractThemeableEditor) adaptable
+					.getAdapter(AbstractThemeableEditor.class);
+
+			if (editor != null)
+			{
+				FileService fs = editor.getFileService();
+
+				if (fs != null)
+				{
+					fs.parse();
+
+					// TODO: check for failed parse status and abort?
+					ast = fs.getParseResult();
+
+					// we use this flag to prevent re-parsing of the document if the ast turns out to be null. No sense
+					// in parsing twice to get nothing
+					forceParse = false;
+				}
+			}
+		}
+
+		// if we couldn't get the AST via an editor's file service then parse content directly
+		if (forceParse)
+		{
+			try
+			{
+				IDocument document = textViewer.getDocument();
+
+				ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, document.get());
+			}
+			catch (Exception e)
+			{
+			}
+		}
+
+		return ast;
+	}
+
+	/**
+	 * getFunctionRegionInfo
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private RegionInfo getFunctionRegionInfo(CSSFunctionNode node)
+	{
+		RegionInfo result = null;
+		Matcher m = RGB_CHANNELS.matcher(node.toString());
+
+		if (m.matches())
+		{
+			int red = Integer.parseInt(m.group(1));
+			int green = Integer.parseInt(m.group(2));
+			int blue = Integer.parseInt(m.group(3));
+
+			// @formatter:off
+			result = new RegionInfo(
+				new Region(node.getStartingOffset(), node.getLength()),
+				new RGB(red, green, blue)
+			);
+			// @formatter:on
+		}
+
+		return result;
+	}
 
 	/*
 	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
@@ -71,89 +172,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		if (!isHoverEnabled())
-			return null;
-
-		int offset = hoverRegion.getOffset();
-		LexemeProvider<CSSTokenType> lexemeProvider = getLexemeProvider(textViewer, offset);
-		Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
-		Object result = null;
-
-		if (lexeme != null)
-		{
-			switch (lexeme.getType())
-			{
-				case COLOR:
-				case RGB:
-				{
-					result = parseHexRGB(CSSColors.to6CharHexWithLeadingHash(lexeme.getText()));
-					break;
-				}
-
-				case FUNCTION:
-				{
-					if (RGB.equals(lexeme.getText()))
-					{
-						int start = lexeme.getEndingOffset();
-						List<Lexeme<CSSTokenType>> lexemes = this.getFunctionLexemes(lexemeProvider, start);
-
-						if (lexemes.size() == 8)
-						{
-							Lexeme<CSSTokenType> redLexeme = lexemes.get(2);
-							Lexeme<CSSTokenType> greenLexeme = lexemes.get(4);
-							Lexeme<CSSTokenType> blueLexeme = lexemes.get(6);
-
-							if (isNumber(redLexeme) && isNumber(greenLexeme) && isNumber(blueLexeme))
-							{
-								int red = Integer.parseInt(redLexeme.getText());
-								int green = Integer.parseInt(greenLexeme.getText());
-								int blue = Integer.parseInt(blueLexeme.getText());
-
-								result = new RGB(red, green, blue);
-							}
-						}
-					}
-					break;
-				}
-
-				case ELEMENT:
-				{
-					CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-					ElementElement element = queryHelper.getElement(lexeme.getText());
-
-					if (element != null)
-					{
-						result = element.getDescription();
-					}
-					break;
-				}
-
-				case PROPERTY:
-				{
-					CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-					PropertyElement property = queryHelper.getProperty(lexeme.getText());
-
-					if (property != null)
-					{
-						result = property.getDescription();
-					}
-					break;
-				}
-
-				default:
-					if (Platform.inDevelopmentMode())
-					{
-						System.out.println(lexeme.getType().name());
-					}
-			}
-		}
-
-		return result;
-	}
-
-	private boolean isNumber(Lexeme<CSSTokenType> token)
-	{
-		return (token != null && token.getType() == CSSTokenType.NUMBER);
+		return (this.isHoverEnabled()) ? info : null;
 	}
 
 	/*
@@ -162,133 +181,128 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 */
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset)
 	{
-		// look for the current "word"
-		LexemeProvider<CSSTokenType> lexemeProvider = getLexemeProvider(textViewer, offset);
-		Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+		// assume no hover region
 		IRegion result = null;
 
-		if (lexeme != null)
+		// grab document's parse model
+		IParseNode ast = getAST(textViewer, offset);
+
+		if (ast != null)
 		{
-			switch (lexeme.getType())
+			IParseNode node = ast.getNodeAtOffset(offset);
+
+			if (node instanceof CSSNode)
 			{
-				case COLOR:
-				case PROPERTY:
-					result = new Region(lexeme.getStartingOffset(), lexeme.getLength());
-					break;
+				CSSNode cssNode = (CSSNode) node;
 
-				case FUNCTION:
-					if (RGB.equals(lexeme.getText()))
+				switch (cssNode.getNodeType())
+				{
+					case CSSNodeTypes.TERM:
 					{
-						int start = lexeme.getStartingOffset();
-						List<Lexeme<CSSTokenType>> lexemes = this.getFunctionLexemes(lexemeProvider, start);
-						int end = lexemes.get(lexemes.size() - 1).getEndingOffset();
+						IParseNode parent = cssNode.getParent();
 
-						result = new Region(start, end - start + 1);
+						if (parent instanceof CSSDeclarationNode)
+						{
+							String text = cssNode.getText();
+
+							if (text != null)
+							{
+								if (text.startsWith("#")) //$NON-NLS-1$
+								{
+									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
+									info = CSSColors.hexToRGB(text);
+								}
+								else if (CSSColors.namedColorExists(text))
+								{
+									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
+									info = CSSColors.namedColorToRGB(text);
+								}
+								break;
+							}
+						}
+						else if (parent instanceof CSSTermListNode)
+						{
+							// find owning statement for this expression
+							while (parent instanceof CSSTermListNode)
+							{
+								parent = parent.getParent();
+							}
+
+							if (parent instanceof CSSFunctionNode)
+							{
+								RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
+
+								if (ri != null)
+								{
+									result = ri.region;
+									info = ri.info;
+								}
+							}
+						}
+						break;
 					}
-					break;
+
+					case CSSNodeTypes.DECLARATION:
+					{
+						CSSDeclarationNode decl = (CSSDeclarationNode) cssNode;
+						String propertyName = decl.getIdentifier();
+						int startingOffset = decl.getStartingOffset();
+
+						if (propertyName != null && startingOffset <= offset
+								&& offset < startingOffset + propertyName.length())
+						{
+							CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
+							PropertyElement property = queryHelper.getProperty(propertyName);
+
+							if (property != null)
+							{
+								result = new Region(cssNode.getStartingOffset(), propertyName.length());
+								info = property.getDescription();
+							}
+						}
+						break;
+					}
+
+					case CSSNodeTypes.FUNCTION:
+					{
+						RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) cssNode);
+
+						if (ri != null)
+						{
+							result = ri.region;
+							info = ri.info;
+						}
+						break;
+					}
+
+					case CSSNodeTypes.SIMPLE_SELECTOR:
+					{
+						CSSSimpleSelectorNode simpleSelector = (CSSSimpleSelectorNode) cssNode;
+						String elementName = simpleSelector.getTypeSelector();
+						int startingOffset = simpleSelector.getStartingOffset();
+
+						if (elementName != null && startingOffset <= offset
+								&& offset < startingOffset + elementName.length())
+						{
+							CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
+							ElementElement element = queryHelper.getElement(elementName);
+
+							if (element != null)
+							{
+								result = new Region(cssNode.getStartingOffset(), elementName.length());
+								info = element.getDescription();
+							}
+						}
+						break;
+					}
+				}
 			}
 		}
 
 		if (result == null)
 		{
+			info = null;
 			result = new Region(offset, 0);
-		}
-
-		return result;
-	}
-
-	/**
-	 * getFunctionEndingOffset
-	 * 
-	 * @param lexemeProvider
-	 * @param startingOffset
-	 * @return
-	 */
-	protected List<Lexeme<CSSTokenType>> getFunctionLexemes(LexemeProvider<CSSTokenType> lexemeProvider, int startingOffset)
-	{
-		List<Lexeme<CSSTokenType>> result = new ArrayList<Lexeme<CSSTokenType>>();
-		int index = lexemeProvider.getLexemeIndex(startingOffset);
-
-		for (int i = index; i < lexemeProvider.size(); i++)
-		{
-			Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
-
-			result.add(candidate);
-
-			if (candidate.getType() == CSSTokenType.RPAREN)
-			{
-				break;
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getLexemeProvider
-	 * 
-	 * @param textViewer
-	 * @param offset
-	 * @return
-	 */
-	protected LexemeProvider<CSSTokenType> getLexemeProvider(ITextViewer textViewer, int offset)
-	{
-		IDocument document = textViewer.getDocument();
-
-		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
-		{
-			@Override
-			protected CSSTokenType getTypeFromData(Object data)
-			{
-				return (CSSTokenType) data;
-			}
-		};
-		return lexemeProvider;
-	}
-
-	/**
-	 * parseHexRGB
-	 * 
-	 * @param token
-	 * @return
-	 */
-	private RGB parseHexRGB(String token)
-	{
-		RGB result;
-
-		if (token == null)
-		{
-			result = new RGB(0, 0, 0);
-		}
-		else if (token.length() == 4)
-		{
-			String s = token.substring(1, 2);
-			int r = Integer.parseInt(s + s, 16);
-			s = token.substring(2, 3);
-			int g = Integer.parseInt(s + s, 16);
-			s = token.substring(3, 4);
-			int b = Integer.parseInt(s + s, 16);
-
-			result = new RGB(r, g, b);
-		}
-		else if (token.length() == 7 || token.length() == 9)
-		{
-			String s = token.substring(1, 3);
-			int r = Integer.parseInt(s, 16);
-			s = token.substring(3, 5);
-			int g = Integer.parseInt(s, 16);
-			s = token.substring(5, 7);
-			int b = Integer.parseInt(s, 16);
-
-			result = new RGB(r, g, b);
-		}
-		else
-		{
-			String message = MessageFormat.format(Messages.CSSTextHover_Invalid_RGB_Hex_Value, token);
-
-			ThemePlugin.logError(message, null);
-
-			result = new RGB(0, 0, 0);
 		}
 
 		return result;

@@ -13,141 +13,135 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
+
+import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.NullPartitionerSwitchStrategy;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.dtd.DTDSourceConfiguration;
 
 /**
- * @author Chris
- * @author Sandip
+ * @author Chris Williams
+ * @author Max Stepanov
  */
-public class XMLPartitionScannerTest extends TestCase
-{
+public class XMLPartitionScannerTest extends TestCase {
 
-	private IDocumentPartitioner partitioner;
+	private ExtendedFastPartitioner partitioner;
 
-	private void assertContentType(String contentType, String code, int offset)
-	{
-		assertEquals(MessageFormat.format("Content type doesn't match expectations for: {0}({1})", code.charAt(offset),
-				offset), contentType, getContentType(code, offset));
+	private void assertContentType(String contentType, String code, int offset) {
+		assertEquals(MessageFormat.format("Content type doesn't match expectations for: {0}({1})", code.charAt(offset), offset), contentType, getContentType(code, offset));
+	}
+
+	private void assertContentType(String contentType, String code, int offset, int length) {
+		for (int i = 0; i < length; ++i) {
+			assertContentType(contentType, code, offset+i);
+		}
 	}
 
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		partitioner = null;
 		super.tearDown();
 	}
 
-	private String getContentType(String content, int offset)
-	{
-		if (partitioner == null)
-		{
+	private String getContentType(String content, int offset) {
+		if (partitioner == null) {
 			IDocument document = new Document(content);
-			partitioner = new FastPartitioner(new XMLPartitionScanner(), XMLSourceConfiguration.CONTENT_TYPES);
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(XMLSourceConfiguration.getDefault().createSubPartitionScanner(),
+					new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
+			partitioner = new ExtendedFastPartitioner(partitionScanner, XMLSourceConfiguration.getDefault().getContentTypes());
+			partitionScanner.setPartitioner(partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
 		}
 		return partitioner.getContentType(offset);
 	}
 
-	public void testPartitioningOfPreProcessorSpanningSingleLine()
-	{
+	public void testPreProcessorSpanningSingleLine() {
 		String source = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, source.length());
 	}
 
-	public void testPartitioningOfPreProcessorSpanningMultipleLines()
-	{
+	public void testPreProcessorSpanningMultipleLines() {
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, source.length());
 	}
 
-	public void testPartitioningOfCDataSpanningSingleLine()
-	{
+	public void testCDataSpanningSingleLine() {
 		String source = "<![CDATA[var one = 1;]]>";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.CDATA, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.CDATA, source, 0, source.length());
 	}
 
-	public void testPartitioningOfCDataSpanningMultipleLines()
-	{
+	public void testCDataSpanningMultipleLines() {
 		String source = "<![CDATA[var\n one\n = 1;\n]]>";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.CDATA, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.CDATA, source, 0, source.length());
 	}
 
-	public void testPartitioningOfCommentSpanningSingleLine()
-	{
+	public void testCommentSpanningSingleLine() {
 		String source = "<!-- This is XML comment on one Line -->";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.COMMENT, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.COMMENT, source, 0, source.length());
 	}
 
-	public void testPartitioningOfCommentSpanningMultipleLines()
-	{
+	public void testCommentSpanningMultipleLines() {
 		String source = "<!-- This is XML comment\nspanning multiple lines -->";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.COMMENT, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.COMMENT, source, 0, source.length());
 	}
 
-	public void testPartitioningOfOpeningTag()
-	{
+	public void testOpeningTag() {
 		String source = "<tag>";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.TAG, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.TAG, source, 0, source.length());
 	}
 
-	public void testPartitioningOfClosingTag()
-	{
+	public void testClosingTag() {
 		String source = "</tag>";
-		for (int i = 0; i < source.length(); i++)
-		{
-			assertContentType(XMLSourceConfiguration.TAG, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.TAG, source, 0, source.length());
 	}
 
-	public void testAllPartitionTypes()
-	{
+	public void testAllPartitions() {
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>\n"
-				+ "<xml><head attr='single' name=\"double\"><style><![CDATA[var one =\n 1;]]></style></head><body>\n"
-				+ "<!-- This is an XML comment -->\n" + "<p>Text</p></body></xml>";
+			+ "<xml><head attr='single' name=\"double\"><style><![CDATA[var one =\n 1;]]></style></head><body>\n"
+			+ "<!-- This is an XML comment -->\n" + "<p>Text</p></body></xml>";
 
-		for (int i = 0; i <= 43; i++)
-		{
-			assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, i);
-		}
-		for (int i = 61; i <= 68; i++)
-		{
-			assertContentType(XMLSourceConfiguration.TAG, source, i);
-		}
-		for (int i = 75; i <= 82; i++)
-		{
-			assertContentType(XMLSourceConfiguration.TAG, source, i);
-		}
-		for (int i = 91; i <= 115; i++)
-		{
-			assertContentType(XMLSourceConfiguration.CDATA, source, i);
-		}
-		for (int i = 138; i <= 168; i++)
-		{
-			assertContentType(XMLSourceConfiguration.COMMENT, source, i);
-		}
+		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, 44);
+		assertContentType(XMLSourceConfiguration.DEFAULT, source, 44);
+		assertContentType(XMLSourceConfiguration.TAG, source, 45, 5);
+		assertContentType(XMLSourceConfiguration.TAG, source, 50, 34);
+		assertContentType(XMLSourceConfiguration.TAG, source, 84,7);
+		assertContentType(XMLSourceConfiguration.CDATA, source, 91, 25);
+		assertContentType(XMLSourceConfiguration.TAG, source, 116, 8);
+		assertContentType(XMLSourceConfiguration.TAG, source, 124, 7);
+		assertContentType(XMLSourceConfiguration.TAG, source, 131, 6);
+		assertContentType(XMLSourceConfiguration.DEFAULT, source, 137);
+		assertContentType(XMLSourceConfiguration.COMMENT, source, 138, 31);
+	}
+
+	public void testDocType() {
+		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>\n"
+			+ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+			+ "<html>";
+		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, 44);
+		assertContentType(XMLSourceConfiguration.DEFAULT, source, 44);
+		assertContentType(XMLSourceConfiguration.DOCTYPE, source, 45, 121);
+		assertContentType(XMLSourceConfiguration.DEFAULT, source, 166);
+		assertContentType(XMLSourceConfiguration.TAG, source, 167, 6);
+	}
+
+	public void testDocTypeWithDTD() {
+		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>\n"
+			+ "<!DOCTYPE note [\n"
+			+"<!ELEMENT note    (to+,from?,heading,img,body*)>\n"
+			+"]>\n"
+			+ "<note></note>";
+		assertContentType(XMLSourceConfiguration.PRE_PROCESSOR, source, 0, 44);
+		assertContentType(XMLSourceConfiguration.DEFAULT, source, 44);
+		assertContentType(XMLSourceConfiguration.DOCTYPE, source, 45, 16);
+		assertContentType(DTDSourceConfiguration.DEFAULT, source, 61);
+		assertContentType(DTDSourceConfiguration.TAG, source, 62, 48);
+		assertContentType(DTDSourceConfiguration.DEFAULT, source, 110);
+		assertContentType(XMLSourceConfiguration.DOCTYPE, source, 111, 2);
+		assertContentType(XMLSourceConfiguration.DEFAULT, source, 113);
+		assertContentType(XMLSourceConfiguration.TAG, source, 114, 6);
+		assertContentType(XMLSourceConfiguration.TAG, source, 120, 7);
 	}
 
 }

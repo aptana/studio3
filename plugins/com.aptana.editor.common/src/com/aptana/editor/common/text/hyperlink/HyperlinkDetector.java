@@ -22,6 +22,7 @@ import org.eclipse.jface.text.hyperlink.URLHyperlinkDetector;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.PathResolverProvider;
 import com.aptana.editor.common.resolver.IPathResolver;
@@ -86,7 +87,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 			return null;
 		}
@@ -107,11 +108,13 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		if (ours.isEmpty())
+		{
 			return null;
+		}
 		return ours.toArray(new IHyperlink[ours.size()]);
 	}
 }

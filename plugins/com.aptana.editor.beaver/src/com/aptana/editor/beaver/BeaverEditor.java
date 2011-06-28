@@ -7,30 +7,43 @@
  */
 package com.aptana.editor.beaver;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+
+import com.aptana.editor.beaver.outline.BeaverOutlineContentProvider;
+import com.aptana.editor.beaver.outline.BeaverOutlineLabelProvider;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 
 public class BeaverEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		return null;
+		return new BeaverOutlineContentProvider();
+	}
+
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new BeaverOutlineLabelProvider();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
 	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return BeaverPlugin.getDefault().getPreferenceStore();
+	}
+
+	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
-
 		this.setSourceViewerConfiguration(new BeaverSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new BeaverDocumentProvider());
+		this.setDocumentProvider(BeaverPlugin.getDefault().getBeaverDocumentProvider());
 	}
 }

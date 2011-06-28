@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.CSSColors;
@@ -52,24 +53,32 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		
+
 		try
 		{
 			if (file != null)
 			{
 				sub.subTask(index.getRelativeDocumentPath(file.toURI()).toString());
-	
+
 				removeTasks(file, sub.newChild(10));
-	
+
 				// grab the source of the file we're going to parse
 				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
-				
+
 				// minor optimization when creating a new empty file
 				if (fileContents != null && fileContents.trim().length() > 0)
 				{
-					IParseNode ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, fileContents);
+					IParseNode ast = null;
+					try
+					{
+						ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, fileContents);
+					}
+					catch (Exception e)
+					{
+						// ignores parser exception
+					}
 					sub.worked(50);
-					
+
 					if (ast != null)
 					{
 						this.processParseResults(file, index, ast, sub.newChild(20));
@@ -79,7 +88,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e, null);
 		}
 		finally
 		{

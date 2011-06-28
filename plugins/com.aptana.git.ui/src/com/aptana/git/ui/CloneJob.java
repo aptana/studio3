@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
@@ -97,12 +97,11 @@ public class CloneJob extends Job
 			Process p = null;
 			if (shallowClone)
 			{
-				p = ProcessUtil.run(gitPath.toOSString(), null, env,
-						"clone", "--progress", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				p = ProcessUtil.run(gitPath.toOSString(), null, env, "clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			else
 			{
-				p = ProcessUtil.run(gitPath.toOSString(), null, env, "clone", "--progress", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				p = ProcessUtil.run(gitPath.toOSString(), null, env, "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (p == null)
 			{
@@ -223,10 +222,10 @@ public class CloneJob extends Job
 				String stdout = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
 				this.status = new ProcessStatus(p.exitValue(), stdout, builder.toString());
 			}
-			catch (IOException ioe)
+			catch (IOException e)
 			{
-				CorePlugin.logError(ioe.getMessage(), ioe);
-				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), ioe.getMessage(), ioe);
+				IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
+				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 			}
 			finally
 			{

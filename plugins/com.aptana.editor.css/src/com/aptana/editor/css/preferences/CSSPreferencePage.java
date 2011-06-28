@@ -39,11 +39,6 @@ public class CSSPreferencePage extends CommonEditorPreferencePage
 	}
 
 	@Override
-	protected void createMarkOccurrenceOptions(Composite parent)
-	{
-	}
-
-	@Override
 	protected IPreferenceStore getChainedEditorPreferenceStore()
 	{
 		return CSSSourceEditor.getChainedPreferenceStore();

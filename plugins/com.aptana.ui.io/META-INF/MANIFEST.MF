@@ -18,7 +18,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
  com.aptana.core.io,
  com.aptana.ui.io.epl,
- com.aptana.theme
+ com.aptana.theme,
+ com.aptana.scripting,
+ com.aptana.editor.common,
+ org.jruby
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.ui.io,

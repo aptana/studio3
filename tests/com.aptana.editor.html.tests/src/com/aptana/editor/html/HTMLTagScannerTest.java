@@ -82,4 +82,308 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("string.quoted.double.html"), 16, 8);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
 	}
+
+	public void testWhitespaces()
+	{
+		String src = "<html attribute = \"chris\" >";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 6, 9);
+		assertToken(Token.WHITESPACE, 15, 1);
+		assertToken(getToken("punctuation.separator.key-value.html"), 16, 1);
+		assertToken(Token.WHITESPACE, 17, 1);
+		assertToken(getToken("string.quoted.double.html"), 18, 7);
+		assertToken(Token.WHITESPACE, 25, 1);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 26, 1);
+	}
+
+	public void testSelfClosingWhitespace()
+	{
+		String src = "<html attribute='nchris' />";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 6, 9);
+		assertToken(getToken("punctuation.separator.key-value.html"), 15, 1);
+		assertToken(getToken("string.quoted.single.html"), 16, 8);
+		assertToken(Token.WHITESPACE, 24, 1);
+		assertToken(getToken("punctuation.definition.tag.self_close.html"), 25, 2);
+	}
+
+	public void testSelfClosing()
+	{
+		String src = "<html attribute='nchris'/>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 6, 9);
+		assertToken(getToken("punctuation.separator.key-value.html"), 15, 1);
+		assertToken(getToken("string.quoted.single.html"), 16, 8);
+		assertToken(getToken("punctuation.definition.tag.self_close.html"), 24, 2);
+	}
+
+	public void testNoValueAttribute()
+	{
+		String src = "<html attribute='nchris' selected>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 6, 9);
+		assertToken(getToken("punctuation.separator.key-value.html"), 15, 1);
+		assertToken(getToken("string.quoted.single.html"), 16, 8);
+		assertToken(Token.WHITESPACE, 24, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 25, 8);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 33, 1);
+	}
+
+	public void testEmptyStyleAttribute()
+	{
+		String src = "<html style=''>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.style.html"), 6, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
+		assertToken(getToken("string.quoted.single.html"), 12, 2);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 14, 1);
+	}
+
+	public void testStyleAttribute()
+	{
+		String src = "<html style='color:red'>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.style.html"), 6, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
+		assertToken(getToken("string.quoted.single.html"), 12, 1);
+		assertToken(getToken("support.type.property-name.css"), 13, 5);
+		assertToken(getToken("punctuation.separator.key-value.css"), 18, 1);
+		assertToken(getToken("support.constant.color.w3c-standard-color-name.css"), 19, 3);
+		assertToken(getToken("string.quoted.single.html"), 22, 1);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 23, 1);
+	}
+
+	public void testEmptyScriptAttribute()
+	{
+		String src = "<body onload=''>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.script.html"), 6, 6);
+		assertToken(getToken("punctuation.separator.key-value.html"), 12, 1);
+		assertToken(getToken("string.quoted.single.html"), 13, 2);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 15, 1);
+	}
+
+	public void testScriptAttribute()
+	{
+		String src = "<body onclick='document.body'>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.script.html"), 6, 7);
+		assertToken(getToken("punctuation.separator.key-value.html"), 13, 1);
+		assertToken(getToken("string.quoted.single.html"), 14, 1);
+		assertToken(getToken("support.class.js"), 15, 8);
+		assertToken(getToken("meta.delimiter.method.period.js"), 23, 1);
+		assertToken(getToken("source.js"), 24, 4);
+		assertToken(getToken("string.quoted.single.html"), 28, 1);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 29, 1);
+	}
+
+	public void testIncompleteTag1()
+	{
+		String src = "<";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+	}
+
+	public void testIncompleteTag2()
+	{
+		String src = "<html";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+	}
+
+	public void testIncompleteTagWithAttributeName()
+	{
+		String src = "<body class=";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 6, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
+	}
+
+	public void testIncompleteTagWithIncompleteAttribute()
+	{
+		String src = "<body class='";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 6, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
+		assertToken(getToken("string.quoted.single.html"), 12, 1);
+	}
+
+	public void testIncompleteTagWithAttribute()
+	{
+		String src = "<body class=''";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 6, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
+		assertToken(getToken("string.quoted.single.html"), 12, 2);
+	}
+
+	public void testIncompleteCloseTag1()
+	{
+		String src = "</";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 2);
+	}
+
+	public void testIncompleteCloseTag2()
+	{
+		String src = "</html";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 2);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 2, 4);
+	}
+
+	public void testCompleteTag1()
+	{
+		String src = "<>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 1, 1);
+	}
+
+	public void testCompleteCloseTag1()
+	{
+		String src = "</>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 2);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 2, 1);
+	}
+
+	public void testCompleteTagWithAttribute()
+	{
+		String src = "< class=''>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 2);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 10, 1);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute1()
+	{
+		String src = "< class='>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 1);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 9, 1);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute2()
+	{
+		String src = "< class='/>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 1);
+		assertToken(getToken("punctuation.definition.tag.self_close.html"), 9, 2);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute3()
+	{
+		String src = "< class=' >";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 2);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 10, 1);
+	}
+
+	public void testCompleteTagWithIncompleteAttribute4()
+	{
+		String src = "< class=' />";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(Token.WHITESPACE, 1, 1);
+		assertToken(getToken("entity.other.attribute-name.class.html"), 2, 5);
+		assertToken(getToken("punctuation.separator.key-value.html"), 7, 1);
+		assertToken(getToken("string.quoted.single.html"), 8, 2);
+		assertToken(getToken("punctuation.definition.tag.self_close.html"), 10, 2);
+	}
+
 }

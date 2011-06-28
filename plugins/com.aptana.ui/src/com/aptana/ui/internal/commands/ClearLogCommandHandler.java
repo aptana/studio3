@@ -16,6 +16,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
 /**
@@ -53,7 +54,7 @@ public class ClearLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}

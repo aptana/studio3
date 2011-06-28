@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
@@ -31,6 +32,10 @@ public class DeployPreferenceUtil
 	 */
 	public static DeployType getDeployType(IProject project)
 	{
+		if (project == null)
+		{
+			return DeployType.NONE;
+		}
 		String type = Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
 				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), null, //$NON-NLS-1$
 				null);
@@ -62,14 +67,24 @@ public class DeployPreferenceUtil
 
 	public static String getDeployEndpoint(IContainer container)
 	{
-		return Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", //$NON-NLS-1$
-						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()),
-				null, null);
+		if (container == null)
+		{
+			return null;
+		}
+		return Platform.getPreferencesService().getString(
+				DeployPlugin.getPluginIdentifier(),
+				MessageFormat.format(
+						"{0}:{1}", //$NON-NLS-1$
+						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT,
+						container.getFullPath()), null, null);
 	}
 
 	public static String getDeployProviderId(IContainer container)
 	{
+		if (container == null)
+		{
+			return null;
+		}
 		String id = null;
 		try
 		{
@@ -82,7 +97,7 @@ public class DeployPreferenceUtil
 		}
 		catch (CoreException e)
 		{
-			DeployPlugin.logError(e);
+			IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 		}
 		return id;
 	}
@@ -121,18 +136,20 @@ public class DeployPreferenceUtil
 	{
 		try
 		{
-			container.setPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
+			container.setPersistentProperty(
+					new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
 		}
-		catch (CoreException e1)
+		catch (CoreException e)
 		{
-			DeployPlugin.logError(e1);
+			IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
 	public static void setDeployEndpoint(IContainer container, String endpoint)
 	{
 		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
-		prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()), //$NON-NLS-1$
+		prefs.put(
+				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, container.getFullPath()), //$NON-NLS-1$
 				endpoint);
 		try
 		{

@@ -14,7 +14,7 @@ package com.aptana.editor.xml;
  */
 public interface IXMLConstants {
 
-	public String CONTENT_TYPE_XML = "com.aptana.contenttype.xml"; //$NON-NLS-1$
+	public String CONTENT_TYPE_XML = "org.eclipse.core.runtime.xml"; //$NON-NLS-1$
 	
 	/**
 	 * The annotation type/id used to mark tag pair occurrences.

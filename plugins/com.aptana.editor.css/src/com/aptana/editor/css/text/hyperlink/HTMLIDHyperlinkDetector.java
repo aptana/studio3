@@ -20,6 +20,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
@@ -61,7 +62,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			{
 				return null;
 			}
-			
+
 			IRegion lineRegion = doc.getLineInformationOfOffset(region.getOffset());
 			String line = doc.get(lineRegion.getOffset(), lineRegion.getLength());
 			Matcher m = HTML_ID.matcher(line);
@@ -107,7 +108,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		}
 		catch (Exception e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 		if (hyperlinks.isEmpty())
 		{

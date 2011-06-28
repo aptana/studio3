@@ -23,6 +23,7 @@ public class AllTests
 		suite.addTestSuite(CSSLiteralTest.class);
 		suite.addTestSuite(CSSPunctuatorTest.class);
 		suite.addTestSuite(CSSParserTest.class);
+		suite.addTestSuite(CSSSpecialTokenHandlingTest.class);
 		// $JUnit-END$
 		return suite;
 	}

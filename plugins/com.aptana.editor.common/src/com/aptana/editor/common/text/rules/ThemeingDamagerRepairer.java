@@ -17,6 +17,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.theme.ThemePlugin;
@@ -116,7 +117,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			}
 			catch (BadLocationException e)
 			{
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		lastAttribute = super.getTokenTextAttribute(token);
@@ -157,7 +158,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		super.addRange(presentation, offset, length, attr);
 	}

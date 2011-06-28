@@ -23,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
 /**
@@ -52,7 +53,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -89,7 +90,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 			}
 			catch (PartInitException e)
 			{
-				UIPlugin.log(e);
+				IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 	}

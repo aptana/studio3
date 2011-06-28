@@ -14,6 +14,7 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -29,6 +30,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
@@ -65,6 +67,23 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		appearanceComposite = getFieldEditorParent();
 		createMarkOccurrenceOptions(appearanceComposite);
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
+		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.CommonEditorPreferencePage_Folding);
+		group.setLayout(new GridLayout(1, false));
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		createFoldingOptions(group);
+
+		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.CommonEditorPreferencePage_ContentAssist);
+		caGroup.setLayout(new GridLayout(1, false));
+		caGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		Composite caOptions = createContentAssistOptions(caGroup);
+		if (caOptions.getChildren().length == 1)
+		{
+			caGroup.getParent().setVisible(false);
+		}
 	}
 
 	protected void createTextEditingOptions(Composite parent, String groupName)
@@ -174,13 +193,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		addField(tabSize);
 
 		createAutoIndentOptions(group);
-
-		group = AptanaPreferencePage.createGroup(parent, Messages.CommonEditorPreferencePage_Folding);
-		group.setLayout(new GridLayout(1, false));
-		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
-
-		createFoldingOptions(group);
-
 	}
 
 	private void setTabSpaceCombo()
@@ -231,7 +243,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return super.performOk();
 	}
@@ -253,7 +265,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -280,6 +292,43 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	}
 
 	/**
+	 * Create the Content Assist group and options if there are any for this language/editor.
+	 * 
+	 * @param parent
+	 */
+	protected Composite createContentAssistOptions(Composite parent)
+	{
+		IPreferenceStore s = getChainedEditorPreferenceStore();
+
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.CommonEditorPreferencePage_OnTypingCharacters);
+		label.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
+
+		if (s.contains(com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS))
+		{
+			addField(new StringFieldEditor(
+					com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
+					Messages.CommonEditorPreferencePage_DisplayProposals, parent));
+		}
+
+		if (s.contains(com.aptana.editor.common.contentassist.IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS))
+		{
+			addField(new StringFieldEditor(
+					com.aptana.editor.common.contentassist.IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS,
+					Messages.CommonEditorPreferencePage_DisplayContextualInfo, parent));
+		}
+
+		if (s.contains(com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS))
+		{
+			addField(new StringFieldEditor(
+					com.aptana.editor.common.contentassist.IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS,
+					Messages.CommonEditorPreferencePage_InsertProposal, parent));
+		}
+
+		return parent;
+	}
+
+	/**
 	 * This method re-applies the plugin defaults for the spaces for tabs and tab width preferences from the default
 	 * scope of the plugin preference store. The default values are taken from getDefaultTabWidth() and
 	 * getDefaultSpacesForTabs(). The default scope getDefaultPluginPreferenceStore() is used.
@@ -287,7 +336,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void setPluginDefaults()
 	{
 		IEclipsePreferences store = getDefaultPluginPreferenceStore();
-
 		if (store == null)
 		{
 			return;
@@ -296,14 +344,13 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
 				getDefaultSpacesForTabs());
 		store.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, getDefaultTabWidth());
-
 		try
 		{
 			store.flush();
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -314,7 +361,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void removePluginDefaults()
 	{
 		IEclipsePreferences store = getDefaultPluginPreferenceStore();
-
 		if (store == null)
 		{
 			return;
@@ -328,7 +374,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -378,9 +424,23 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * 
 	 * @param parent
 	 */
-	protected abstract void createMarkOccurrenceOptions(Composite parent);
+	protected void createMarkOccurrenceOptions(Composite parent)
+	{
+		Composite group = AptanaPreferencePage.createGroup(parent, "Mark Occurrences"); //$NON-NLS-1$
+
+		// @formatter:off
+		addField(
+			new BooleanFieldEditor(
+				IPreferenceConstants.EDITOR_MARK_OCCURRENCES,
+				Messages.EditorsPreferencePage_MarkOccurrences,
+				group
+			)
+		);
+		// @formatter:on
+	}
 
 	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
 
 	protected abstract IEclipsePreferences getPluginPreferenceStore();
+
 }

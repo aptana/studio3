@@ -13,13 +13,17 @@ import java.util.Map;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
@@ -37,14 +41,20 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.index.core.IndexPlugin;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.usage.EventLogger;
 
 /**
@@ -213,7 +223,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			window.addPerspectiveListener(fPerspectiveListener);
 		}
 	};
+
 	private DocumentScopeManager fDocumentScopeManager;
+	private IPreferenceChangeListener fThemeChangeListener;
 
 	/**
 	 * The constructor
@@ -231,6 +243,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 
+		// Update occurrence colors
+		listenForThemeChanges();
+
 		// Activate indexing
 		IndexPlugin.getDefault();
 
@@ -238,6 +253,56 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		differentiator.schedule();
 
 		addPartListener();
+	}
+
+	/**
+	 * Hook up a listener for theme changes, and change the PHP occurrence colors!
+	 */
+	private void listenForThemeChanges()
+	{
+		Job job = new UIJob("Set occurrence colors to theme") //$NON-NLS-1$
+		{
+			private void setOccurrenceColors()
+			{
+				IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+				Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+
+				prefs.put("OccurrenceIndicationColor", StringConverter.asString(theme.getSearchResultColor())); //$NON-NLS-1$
+
+				try
+				{
+					prefs.flush();
+				}
+				catch (BackingStoreException e)
+				{
+					// ignore
+				}
+			}
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				fThemeChangeListener = new IPreferenceChangeListener()
+				{
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+						{
+							setOccurrenceColors();
+						}
+					}
+				};
+
+				setOccurrenceColors();
+
+				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+
+				return Status.OK_STATUS;
+			}
+		};
+
+		job.setSystem(true);
+		job.schedule();
 	}
 
 	/*
@@ -248,10 +313,17 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		try
 		{
+			if (fThemeChangeListener != null)
+			{
+				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+
+				fThemeChangeListener = null;
+			}
+
 			differentiator.dispose();
 
 			removePartListener();
-			
+
 			if (fDocumentScopeManager != null)
 			{
 				fDocumentScopeManager.dispose();
@@ -274,40 +346,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static CommonEditorPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void logError(Throwable e)
-	{
-		if (e instanceof CoreException)
-			logError((CoreException) e);
-		else
-			getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
-	}
-
-	public static void logError(CoreException e)
-	{
-		getDefault().getLog().log(e.getStatus());
-	}
-
-	public static void trace(String string)
-	{
-		if (getDefault() != null && getDefault().isDebugging())
-			getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
-	}
-	
-	public static void logError(String string, Throwable t)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, t));
-	}
-
-	public static void logWarning(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
-	}
-
-	public static void logInfo(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
 	}
 
 	public static Image getImage(String path)
@@ -385,31 +423,30 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	private void addPartListener()
 	{
-		IWorkbench workbench = null;
 		try
 		{
-			workbench = PlatformUI.getWorkbench();
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			if (workbench != null)
+			{
+				IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+				IPartService partService;
+				for (IWorkbenchWindow window : windows)
+				{
+					partService = window.getPartService();
+					if (partService != null)
+					{
+						partService.addPartListener(fPartListener);
+					}
+					window.addPerspectiveListener(fPerspectiveListener);
+				}
+
+				// Listen on any future windows
+				PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+			}
 		}
 		catch (Exception e)
 		{
 			// ignore, may be running headless, like in tests
-		}
-		if (workbench != null)
-		{
-			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-			IPartService partService;
-			for (IWorkbenchWindow window : windows)
-			{
-				partService = window.getPartService();
-				if (partService != null)
-				{
-					partService.addPartListener(fPartListener);
-				}
-				window.addPerspectiveListener(fPerspectiveListener);
-			}
-
-			// Listen on any future windows
-			PlatformUI.getWorkbench().addWindowListener(fWindowListener);
 		}
 	}
 
@@ -439,5 +476,85 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 		}
+	}
+
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
+	{
+		IdeLog.log(getDefault(), status);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message)
+	{
+		IdeLog.logWarning(getDefault(), message, null, null);
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message, Throwable e)
+	{
+		IdeLog.logWarning(getDefault(), message, e, null);
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		IdeLog.logInfo(getDefault(), message, null);
 	}
 }

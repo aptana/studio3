@@ -15,8 +15,12 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 
-public class TagRule extends MultiLineRule
-{
+/**
+ * 
+ * @author Max Stepanov
+ *
+ */
+public class TagRule extends MultiLineRule {
 
 	private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
 	private static final IPredicateRule singleQuoteStringRule = new MultiLineRule("'", "'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
@@ -26,119 +30,98 @@ public class TagRule extends MultiLineRule
 	private static final IPredicateRule doubleQuoteStringRule = new MultiLineRule("\"", "\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
 
-	private boolean fIgnoreCase;
+	private final boolean fIgnoreCase;
+	private boolean fResume;
 
-	public TagRule(IToken token)
-	{
+	public TagRule(IToken token) {
 		this("", token); //$NON-NLS-1$
 	}
 
-	public TagRule(String tag, IToken token)
-	{
+	public TagRule(String tag, IToken token) {
 		this(tag, token, false);
 	}
 
-	public TagRule(String tag, IToken token, boolean ignoreCase)
-	{
+	public TagRule(String tag, IToken token, boolean ignoreCase) {
 		this("<" + tag, ">", token, ignoreCase); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	protected TagRule(String startSequence, String endSequence, IToken token, boolean ignoreCase)
-	{
-		super(startSequence, endSequence, token);
+	protected TagRule(String startSequence, String endSequence, IToken token, boolean ignoreCase) {
+		super(startSequence, endSequence, token, (char) 0, true);
 		fIgnoreCase = ignoreCase;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.PatternRule#sequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner, char[], boolean)
+	 */
 	@Override
-	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed)
-	{
-		boolean detected = true;
-		for (int i = 1; i < sequence.length; ++i)
-		{
+	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
+		for (int i = 1; i < sequence.length; ++i) {
 			int c = scanner.read();
-			if (c == ICharacterScanner.EOF && eofAllowed)
-			{
+			if (c == ICharacterScanner.EOF && eofAllowed) {
 				break;
 			}
-			if ((fIgnoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i]))
-					|| (!fIgnoreCase && c != sequence[i]))
-			{
-				// Non-matching character detected, rewind the scanner back to the start.
+			if ((fIgnoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i])) || (!fIgnoreCase && c != sequence[i])) {
+				// Non-matching character detected, rewind the scanner back to
+				// the start.
 				// Do not unread the first character.
 				scanner.unread();
-				for (int j = i - 1; j > 0; --j)
-				{
+				for (int j = i - 1; j > 0; --j) {
 					scanner.unread();
 				}
-				detected = false;
-				break;
-			}
-		}
-
-		if (!detected)
-		{
-			return detected;
-		}
-		if ((sequence.length == 1 && sequence[0] == '<')
-				|| (sequence.length == 2 && sequence[0] == '<' && sequence[1] == '/'))
-		{
-			int nextChar = scanner.read();
-			if (nextChar == ICharacterScanner.EOF)
-			{
 				return false;
 			}
-			scanner.unread();
-			return Character.isJavaIdentifierStart(nextChar);
 		}
-		return detected;
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.PatternRule#doEvaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
+	 */
+	@Override
+	protected IToken doEvaluate(ICharacterScanner scanner, boolean resume) {
+		try {
+			fResume = resume;
+			return super.doEvaluate(scanner, resume);
+		} finally {
+			fResume = false;
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
-	protected boolean endSequenceDetected(ICharacterScanner scanner)
-	{
-		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, String.valueOf(fStartSequence));
+	protected boolean endSequenceDetected(ICharacterScanner scanner) {
+		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, fResume ? "" : String.valueOf(fStartSequence)); //$NON-NLS-1$
+		scanner = fResume && fToken instanceof ExtendedToken ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContents().substring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
 		int c;
-		while ((c = collectingCharacterScanner.read()) != ICharacterScanner.EOF)
-		{
-			if (c == '\'')
-			{
-				collectingCharacterScanner.unread();
-				IToken token = singleQuoteStringRule.evaluate(collectingCharacterScanner);
-				if (token.isUndefined())
-				{
-					token = singleQuoteStringEOLRule.evaluate(collectingCharacterScanner);
+		while ((c = scanner.read()) != ICharacterScanner.EOF) {
+			if (c == '\'') {
+				scanner.unread();
+				IToken token = singleQuoteStringRule.evaluate(scanner);
+				if (token.isUndefined()) {
+					token = singleQuoteStringEOLRule.evaluate(scanner);
 				}
-			}
-			else if (c == '"')
-			{
-				collectingCharacterScanner.unread();
-				IToken token = doubleQuoteStringRule.evaluate(collectingCharacterScanner);
-				if (token.isUndefined())
-				{
-					token = doubleQuoteStringEOLRule.evaluate(collectingCharacterScanner);
+			} else if (c == '"') {
+				scanner.unread();
+				IToken token = doubleQuoteStringRule.evaluate(scanner);
+				if (token.isUndefined()) {
+					token = doubleQuoteStringEOLRule.evaluate(scanner);
 				}
-			}
-			else if (c == fEndSequence[0])
-			{
-				if (fToken instanceof ExtendedToken) {
-					((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
+			} else if ((c == fEndSequence[0] && sequenceDetected(scanner, fEndSequence, fBreaksOnEOF))
+					|| c == fStartSequence[0]) {
+				if (c == fStartSequence[0]) {
+					scanner.unread();
 				}
-				return true;
+				break;
 			}
 		}
-		if (scanner instanceof SequenceCharacterScanner && ((SequenceCharacterScanner) scanner).foundSequence())
-		{
-			// this means the EOF came from seeing a switching sequence, so assumes the end is detected and no need to
-			// rewind one character
-			if (fToken instanceof ExtendedToken) {
-				((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
-			}
-			return true;
+		if (fToken instanceof ExtendedToken) {
+			ExtendedToken extendedToken = (ExtendedToken) fToken;
+			String prefix = fResume ? extendedToken.getContents() : ""; //$NON-NLS-1$
+			extendedToken.setContents(prefix.concat(collectingCharacterScanner.getContents()));
 		}
-		collectingCharacterScanner.unread();
-		return false;
+		return true;
 	}
 }

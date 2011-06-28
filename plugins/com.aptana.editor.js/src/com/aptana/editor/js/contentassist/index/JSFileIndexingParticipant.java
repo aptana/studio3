@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.IJSConstants;
@@ -57,7 +58,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (JaxenException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -148,7 +149,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{

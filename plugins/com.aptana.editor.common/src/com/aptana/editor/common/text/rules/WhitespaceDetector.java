@@ -13,15 +13,14 @@ import org.eclipse.jface.text.rules.IWhitespaceDetector;
 /**
  * @author Max Stepanov
  */
-public class WhitespaceDetector implements IWhitespaceDetector
-{
+public class WhitespaceDetector implements IWhitespaceDetector {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.text.rules.IWhitespaceDetector#isWhitespace(char)
 	 */
-	public boolean isWhitespace(char c)
-	{
+	public boolean isWhitespace(char c) {
 		return Character.isWhitespace(c);
 	}
 

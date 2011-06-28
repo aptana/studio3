@@ -18,10 +18,9 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.io.efs.VirtualFileSystem;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.ConnectionPoint;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -96,8 +95,8 @@ public class VirtualConnectionManager {
 			}
 		}
 		if (connectionPoint == null) {
-			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.VirtualConnectionManager_NoMatchingConnectionForURI, uri.toASCIIString())));
+			IdeLog.logWarning(CoreIOPlugin.getDefault(), MessageFormat.format(
+					Messages.VirtualConnectionManager_NoMatchingConnectionForURI, uri.toASCIIString()));
 		}
 		return connectionPoint;
 	}

@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.deploy.DeployContributionItem;
@@ -90,7 +91,7 @@ public class HerokuContributionItem extends DeployContributionItem
 				}
 				catch (Exception e1)
 				{
-					HerokuPlugin.logError(e1);
+					IdeLog.logError(HerokuPlugin.getDefault(), e1.getMessage(), e1);
 				}
 			}
 		});

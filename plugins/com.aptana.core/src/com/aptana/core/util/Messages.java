@@ -38,6 +38,8 @@ public class Messages extends NLS
 
 	public static String PlatformUtils_CoreLibraryNotFound;
 
+	public static String ProcessUtil_RunningProcess;
+
 	public static String URLEncoder_Cannot_Encode_URL;
 
 }

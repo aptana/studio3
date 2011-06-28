@@ -2,21 +2,22 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.core;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.core.CorePlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.core.filesystem,
- com.aptana.filewatcher,
- com.aptana.index.core,
  org.eclipse.core.expressions,
- org.apache.ant
+ org.apache.ant,
+ org.eclipse.equinox.p2.core,
+ com.aptana.filewatcher,
+ com.aptana.index.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.core,
  com.aptana.core.build,
  com.aptana.core.internal.preferences,
+ com.aptana.core.logging,
  com.aptana.core.projects.templates,
  com.aptana.core.resources,
  com.aptana.core.util

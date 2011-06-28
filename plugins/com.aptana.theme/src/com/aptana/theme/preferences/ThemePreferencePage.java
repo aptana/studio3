@@ -26,6 +26,9 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -81,6 +84,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.FontDialog;
@@ -212,6 +216,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Text fFontText;
 
 	private boolean reorderingRules = false;
+
+	private ControlDecoration fScopeSelectorDecoration;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -694,6 +700,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			fScopeText.add(preset);
 		}
 		table.addSelectionListener(this);
+		fScopeSelectorDecoration = new ControlDecoration(fScopeText, SWT.RIGHT);
 		fScopeText.addModifyListener(new ModifyListener()
 		{
 
@@ -707,8 +714,31 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				}
 				TableItem item = selection[0];
 				ThemeRule rule = (ThemeRule) item.getData();
+
+				String scopeSelectorText = fScopeText.getText();
+				// Validate the value isn't a duplicate!
+				ScopeSelector selector = new ScopeSelector(scopeSelectorText);
+				ThemeRule match = getTheme().getRuleForSelector(selector);
+				if (scopeSelectorText.length() > 0 && match != null && match != rule)
+				{
+					FieldDecoration dec = FieldDecorationRegistry.getDefault().getFieldDecoration(
+							FieldDecorationRegistry.DEC_WARNING);
+					fScopeSelectorDecoration.setImage(dec.getImage());
+					fScopeSelectorDecoration.setDescriptionText(MessageFormat.format(
+							Messages.ThemePreferencePage_DuplicateScopeSelectorRules, match.getName()));
+					fScopeText.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+				}
+				else
+				{
+					fScopeSelectorDecoration.setDescriptionText(null);
+					fScopeSelectorDecoration.setImage(null);
+					fScopeText.setForeground(null);
+				}
+
 				int index = table.indexOf(item);
-				getTheme().updateRule(index, rule.setScopeSelector(new ScopeSelector(fScopeText.getText())));
+				ThemeRule newRule = rule.setScopeSelector(selector);
+				getTheme().updateRule(index, newRule);
+				item.setData(newRule);
 			}
 		});
 
@@ -1224,8 +1254,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			// Pop a dialog to ask for new name
 			InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_NewThemeTitle,
-					Messages.ThemePreferencePage_NewThemeMsg, MessageFormat.format(
-							Messages.ThemePreferencePage_NewThemeDefaultName, fSelectedTheme), this);
+					Messages.ThemePreferencePage_NewThemeMsg, getUniqueNewThemeName(fSelectedTheme.getName()), this);
 			if (dialog.open() == Window.OK)
 			{
 				Theme newTheme = getTheme().copy(dialog.getValue());
@@ -1362,6 +1391,17 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			ThemeRule token = (ThemeRule) item.getData();
 			fScopeText.setText(token.getScopeSelector().toString());
 		}
+	}
+
+	private String getUniqueNewThemeName(String themeName)
+	{
+		String newName = MessageFormat.format(Messages.ThemePreferencePage_NewThemeDefaultName, themeName);
+		int index = 2;
+		while (getThemeManager().getTheme(newName) != null)
+		{
+			newName = MessageFormat.format(Messages.ThemePreferencePage_NewThemeDefaultName_2, index++, themeName);
+		}
+		return newName;
 	}
 
 	private void setTheme(String text)

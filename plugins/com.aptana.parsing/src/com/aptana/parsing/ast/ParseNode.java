@@ -383,7 +383,7 @@ public class ParseNode extends Node implements IParseNode
 			result = this;
 
 			// but check the children in case one of them contains the offset
-			for (IParseNode child : getChildren())
+			for (IParseNode child : this)
 			{
 				if (child.contains(offset))
 				{

@@ -28,6 +28,10 @@ public class CapistranoDeployProvider implements IDeployProvider
 
 	public boolean handles(IContainer selectedContainer)
 	{
+		if (selectedContainer == null || selectedContainer.getProject() == null)
+		{
+			return false;
+		}
 		return selectedContainer.getProject().getFile("Capfile").exists(); //$NON-NLS-1$
 	}
 

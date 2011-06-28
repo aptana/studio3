@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.mortbay.util.ajax.JSON;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -85,7 +86,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -102,14 +103,13 @@ public class JSIndexQueryHelper
 	protected List<FunctionElement> getFunctions(Index index, List<String> typeNames)
 	{
 		List<FunctionElement> result = null;
-
 		try
 		{
 			result = this._reader.getFunctions(index, typeNames);
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -126,14 +126,13 @@ public class JSIndexQueryHelper
 	protected List<FunctionElement> getFunctions(Index index, String typeName)
 	{
 		List<FunctionElement> result = null;
-
 		try
 		{
 			result = this._reader.getFunctions(index, typeName);
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -201,7 +200,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -305,14 +304,13 @@ public class JSIndexQueryHelper
 	protected List<PropertyElement> getProperties(Index index, List<String> typeNames)
 	{
 		List<PropertyElement> result = null;
-
 		try
 		{
 			result = this._reader.getProperties(index, typeNames);
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -329,14 +327,13 @@ public class JSIndexQueryHelper
 	protected List<PropertyElement> getProperties(Index index, String typeName)
 	{
 		List<PropertyElement> result = null;
-
 		try
 		{
 			result = this._reader.getProperties(index, typeName);
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -354,14 +351,13 @@ public class JSIndexQueryHelper
 	protected PropertyElement getProperty(Index index, String typeName, String propertyName)
 	{
 		PropertyElement result = null;
-
 		try
 		{
 			result = this._reader.getProperty(index, typeName, propertyName);
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -378,7 +374,6 @@ public class JSIndexQueryHelper
 	public TypeElement getType(Index index, String typeName, boolean indexMembers)
 	{
 		TypeElement result = this._reader.getType(index, typeName, indexMembers);
-
 		if (result == null)
 		{
 			result = this._reader.getType(getIndex(), typeName, indexMembers);
@@ -442,7 +437,6 @@ public class JSIndexQueryHelper
 	public PropertyElement getTypeMember(Index index, String typeName, String memberName)
 	{
 		PropertyElement result = this.getMember(index, typeName, memberName);
-
 		if (result == null)
 		{
 			result = this.getMember(getIndex(), typeName, memberName);

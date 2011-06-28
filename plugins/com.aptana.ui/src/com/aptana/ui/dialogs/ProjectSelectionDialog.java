@@ -20,11 +20,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
 public class ProjectSelectionDialog extends ElementListSelectionDialog {
 
@@ -33,8 +33,8 @@ public class ProjectSelectionDialog extends ElementListSelectionDialog {
 	 */
 	public ProjectSelectionDialog(Shell parent) {
 		super(parent, WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
-		setTitle("Select project");
-		setMessage("Select a project from the list");
+		setTitle(Messages.ProjectSelectionDialog_Title);
+		setMessage(Messages.ProjectSelectionDialog_Message);
 		final List<Object> list = new ArrayList<Object>();
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceProxyVisitor() {
@@ -49,9 +49,8 @@ public class ProjectSelectionDialog extends ElementListSelectionDialog {
 				}
 			}, 0);
 		} catch (CoreException e) {
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		setElements(list.toArray());
 	}
-
 }

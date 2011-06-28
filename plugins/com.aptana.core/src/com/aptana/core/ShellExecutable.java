@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -164,7 +165,7 @@ public final class ShellExecutable
 			{
 				return path;
 			}
-			CorePlugin.logWarning("Shell executable path preference point to an invalid location"); //$NON-NLS-1$
+			IdeLog.logWarning(CorePlugin.getDefault(), "Shell executable path preference point to an invalid location"); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -186,7 +187,7 @@ public final class ShellExecutable
 		}
 		catch (BackingStoreException e)
 		{
-			CorePlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+			IdeLog.logError(CorePlugin.getDefault(), "Saving preferences failed.", e); //$NON-NLS-1$
 		}
 		shellPath = null;
 		shellEnvironment = null;
@@ -259,7 +260,7 @@ public final class ShellExecutable
 				}
 				catch (Exception e)
 				{
-					CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
+					IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed.", e); //$NON-NLS-1$
 					// failed to generate an env, we'll use JVM env and not cache, see below...
 				}
 			}

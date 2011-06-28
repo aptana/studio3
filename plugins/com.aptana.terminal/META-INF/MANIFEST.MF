@@ -7,6 +7,7 @@ Bundle-Activator: com.aptana.terminal.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
+ org.eclipse.core.filesystem,
  com.aptana.core,
  org.eclipse.debug.core,
  org.eclipse.jface.text,

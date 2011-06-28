@@ -47,6 +47,7 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
@@ -166,10 +167,10 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					// this may already modify the document
 					templateBuffer = fContext.evaluate(fTemplate);
 				}
-				catch (TemplateException e1)
+				catch (TemplateException e)
 				{
-					CommonEditorPlugin.logWarning(MessageFormat.format(
-							"Error in template {0}. {1}", fTemplate.toString(), e1.getMessage())); //$NON-NLS-1$
+					IdeLog.logWarning(CommonEditorPlugin.getDefault(),
+							MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e.getMessage())); //$NON-NLS-1$
 					fSelectedRegion = fRegion;
 					return;
 				}
@@ -368,17 +369,27 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	{
 		if (useTabs && indent.contains(" ")) //$NON-NLS-1$
 		{
+			int i;
 			String newIndent = ""; //$NON-NLS-1$
-			for (int i = 0; i < indent.length() / getSpaceIndentSize(); i++)
+			int spacesCount = indent.replaceAll("\t", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
+			// Add tabs based on previous number of tabs, and total number of spaces (if they can be converted to the
+			// tab equivalent)
+			for (i = 0; i < (indent.length() - spacesCount) + (spacesCount / getSpaceIndentSize()); i++)
 			{
 				newIndent += '\t';
+			}
+			// Add back remaining spaces
+			for (i = 0; i < spacesCount % getSpaceIndentSize(); i++)
+			{
+				newIndent += ' ';
 			}
 			return newIndent;
 		}
 		if (!useTabs && indent.contains("\t")) //$NON-NLS-1$
 		{
 			String newIndent = ""; //$NON-NLS-1$
-			for (int i = 0; i < indent.length() * getSpaceIndentSize(); i++)
+			int tabCount = indent.replaceAll(" ", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
+			for (int i = 0; i < (indent.length() - tabCount) + (tabCount * getSpaceIndentSize()); i++)
 			{
 				newIndent += " "; //$NON-NLS-1$
 			}

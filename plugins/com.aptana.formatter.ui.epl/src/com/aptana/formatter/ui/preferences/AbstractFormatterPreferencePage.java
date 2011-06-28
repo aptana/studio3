@@ -93,7 +93,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			public FormatterModifyDialogOwner(IScriptFormatterFactory formatter)
 			{
 				this.formatter = formatter;
-
 			}
 
 			public ISourceViewer createPreview(Composite composite)
@@ -109,6 +108,15 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			public IDialogSettings getDialogSettings()
 			{
 				return AbstractFormatterPreferencePage.this.getDialogSettings();
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * @see com.aptana.formatter.ui.IFormatterModifyDialogOwner#getProject()
+			 */
+			public IProject getProject()
+			{
+				return fProject;
 			}
 		}
 
@@ -141,10 +149,11 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			fPreviewViewer.setDocument(document);
 			IPartitioningConfiguration partitioningConfiguration = (IPartitioningConfiguration) factory
 					.getPartitioningConfiguration();
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(partitioningConfiguration
-					.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
-			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, partitioningConfiguration
-					.getContentTypes());
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
+					partitioningConfiguration.createSubPartitionScanner(), new NullSubPartitionScanner(),
+					new NullPartitionerSwitchStrategy());
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
+					partitioningConfiguration.getContentTypes());
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
@@ -182,7 +191,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 				IScriptFormatterFactory factory = getSelectedFormatter();
 				IProfileManager manager = getProfileManager();
 				FormatterPreviewUtils.updatePreview(fSelectedPreviewViewer, factory.getPreviewContent(), factory,
-						manager.getSelected().getSettings());
+						manager.getSelected(fProject).getSettings());
 			}
 		}
 
@@ -226,18 +235,6 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			IWorkbenchPreferenceContainer container)
 	{
 		return new FormatterSelectionBlock(newStatusChangedListener, project, container);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ui.preferences.PropertyAndPreferencePage#supportsProjectSpecificOptions()
-	 */
-	@Override
-	protected boolean supportsProjectSpecificOptions()
-	{
-		// For now, we disable any project-specific settings for the code formatter.
-		// TODO - Re-enable this by removing this method if we decide to enable project-specific settings.
-		return false;
 	}
 
 	protected abstract IDialogSettings getDialogSettings();

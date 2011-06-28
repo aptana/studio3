@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A runnable class that is designed to write into the given OutputStream in a thread.
@@ -67,9 +68,9 @@ public class OutputStreamThread extends Thread
 			br.flush();
 
 		}
-		catch (IOException ioe)
+		catch (IOException e)
 		{
-			CorePlugin.logError(ioe.getMessage(), ioe);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{

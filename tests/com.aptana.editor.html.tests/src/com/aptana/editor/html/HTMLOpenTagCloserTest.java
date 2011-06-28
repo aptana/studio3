@@ -9,6 +9,7 @@ package com.aptana.editor.html;
 
 import junit.framework.TestCase;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextViewer;
@@ -215,13 +216,61 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(40, viewer.getSelectedRange().x);
 	}
 
+	public void testOverwritesExistingGreaterThanAtEndOfPHPTag()
+	{
+		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>>");
+		VerifyEvent event = createGreaterThanKeyEvent(39);
+		closer.verifyKey(event);
+
+		assertEquals("<input type='text' name='foo' <?=$blah?>>", document.get());
+		assertFalse(event.doit);
+	}
+
+	public void testDoesntOverwriteExistingGreaterThanIfPHPTagIsClosedButHTMLIsnt() throws BadLocationException
+	{
+		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>");
+		VerifyEvent event = createGreaterThanKeyEvent(39);
+		closer.verifyKey(event);
+
+		if (event.doit)
+		{
+			document.replace(event.start, event.end - event.start, event.text);
+		}
+		assertEquals("<input type='text' name='foo' <?=$blah?>>", document.get());
+	}
+
+	public void testWhatever() throws BadLocationException
+	{
+		IDocument document = setDocument("<input type='text' name='foo' <?=$blah? >");
+		VerifyEvent event = createGreaterThanKeyEvent(39);
+		closer.verifyKey(event);
+
+		if (event.doit)
+		{
+			document.replace(event.start, event.end - event.start, event.text);
+		}
+		assertEquals("<input type='text' name='foo' <?=$blah?> >", document.get());
+	}
+
+	public void testWhatever2() throws BadLocationException
+	{
+		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?");
+		VerifyEvent event = createGreaterThanKeyEvent(39);
+		closer.verifyKey(event);
+
+		assertTrue(event.doit);
+		document.replace(event.start, event.end - event.start, event.text);
+		assertEquals("<input type='text' name='foo' <?=$blah?>", document.get());
+	}
+
 	protected VerifyEvent createGreaterThanKeyEvent(int offset)
 	{
 		Event e = new Event();
 		e.character = '>';
-		e.start = 0;
+		e.text = ">";
+		e.start = offset;
 		e.keyCode = 46;
-		e.end = 0;
+		e.end = offset;
 		e.doit = true;
 		e.widget = viewer.getTextWidget();
 		viewer.setSelectedRange(offset, 0);

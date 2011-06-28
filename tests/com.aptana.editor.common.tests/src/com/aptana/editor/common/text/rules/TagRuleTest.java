@@ -15,8 +15,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.text.rules.TagRule;
-
 public class TagRuleTest extends TestCase
 {
 
@@ -91,7 +89,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(0, scanner.getTokenOffset());
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
-	
+
 	public void testTagWithEndBraceInsideMultiLineDoubleQuotedStringContainingEscapes()
 	{
 		IToken successToken = new Token("name");
@@ -115,7 +113,7 @@ public class TagRuleTest extends TestCase
 		assertEquals(0, scanner.getTokenOffset());
 		assertEquals(document.getLength(), scanner.getTokenLength());
 	}
-	
+
 	public void testTagWithEndBraceInsideMultiLineSingleQuotedStringContainingEscapes()
 	{
 		IToken successToken = new Token("name");

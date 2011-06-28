@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.ITextHover;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 
@@ -77,7 +78,7 @@ public class TextHoverDescriptor {
 				try {
 					descriptors.add(new TextHoverDescriptor(element));
 				} catch (CoreException e) {
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 		}
@@ -106,7 +107,7 @@ public class TextHoverDescriptor {
 			try {
 				return enablementExpression.evaluate(context) != EvaluationResult.FALSE;
 			} catch (CoreException e) {
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				return false;
 			}
 		}
@@ -121,7 +122,7 @@ public class TextHoverDescriptor {
 		try {
 			return (ITextHover) configurationElement.createExecutableExtension(ATT_CLASS);
 		} catch (CoreException e) {
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -134,5 +135,4 @@ public class TextHoverDescriptor {
 		}
 		return false;
 	}
-
 }

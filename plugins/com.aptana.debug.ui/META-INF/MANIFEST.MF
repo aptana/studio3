@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.debug.ui; singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.debug.ui.DebugUiPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor,
- com.aptana.core,
+ com.aptana.core;bundle-version="3.0.3",
  org.eclipse.core.filesystem,
  com.aptana.debug.core,
  com.aptana.ui

@@ -16,18 +16,75 @@ import org.eclipse.jface.text.rules.IToken;
 
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 
+/**
+ * An interface for handling multiple languages via switching partitioning rules.
+ *  
+ * @author Max Stepanov
+ *
+ */
 public interface ISubPartitionScanner {
 
+	/**
+	 * Returns current active set of rules
+	 * @return
+	 */
 	public Collection<IPredicateRule> getRules();
+	
+	/**
+	 * Returns current active default token.
+	 * @return
+	 */
 	public IToken getDefaultToken();
 	
+	/**
+	 * Initializes internal set of character scanners to support partitioner switching basing on the provided strategy.
+	 * @param baseCharacterScanner
+	 * @param switchStrategy
+	 */
 	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy);
+	
+	/**
+	 * Returns current active character scanner
+	 * @return
+	 */
 	public ICharacterScanner getCharacterScanner();
+	
+	/**
+	 * Returns true if the switching sequence has been found.
+	 * Attention: the flag is reset upon reading it.
+	 * @return
+	 */
 	public boolean foundSequence();
+	
+	/**
+	 * Returns true if the swithing sequence had been found and the parent partition scanner should reset its rules and restart the token scanning.
+	 * @return
+	 */
 	public boolean doResetRules();
 	
+	/**
+	 * Returns true if the provided content type is handled by the partition scanner.
+	 * @param contentType
+	 * @return
+	 */
 	public boolean hasContentType(String contentType);
 	
+	/**
+	 * Notify partition scanner about the last found token.
+	 * @param token
+	 */
 	public void setLastToken(IToken token);
 	
+	/**
+	 * Retrieve the last found token for the current active partitioner.
+	 * @return
+	 */
+	public IToken getLastToken();
+	
+	/**
+	 * Returns token (if any) to resume after switching partitions
+	 * @return
+	 */
+	public IToken getResumeToken();
+
 }

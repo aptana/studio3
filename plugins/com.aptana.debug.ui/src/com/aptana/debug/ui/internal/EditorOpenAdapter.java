@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.core.IEditorOpenAdapter;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.debug.ui.SourceDisplayUtil;
@@ -35,7 +36,8 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 					try {
 						SourceDisplayUtil.openInEditor(editorInput, -1);
 					} catch (CoreException e) {
-						DebugUiPlugin.log(e.getStatus());
+						IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+
 					}
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().forceActive();
 				}
@@ -64,7 +66,5 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 		public Class[] getAdapterList() {
 			return new Class[] { IEditorOpenAdapter.class };
 		}
-
 	}
-
 }

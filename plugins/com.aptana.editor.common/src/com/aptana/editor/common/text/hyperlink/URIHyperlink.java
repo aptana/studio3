@@ -23,6 +23,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.CommonEditorPlugin;
 
@@ -58,12 +59,12 @@ public class URIHyperlink extends URLHyperlink
 					return;
 				}
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//				IFileStore store = EFS.getStore(uri);
-//				if (store.getFileSystem() != EFS.getLocalFileSystem())
-//				{
-//					File file = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
-//					uri = file.toURI();
-//				}
+				// IFileStore store = EFS.getStore(uri);
+				// if (store.getFileSystem() != EFS.getLocalFileSystem())
+				// {
+				// File file = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+				// uri = file.toURI();
+				// }
 				IDE.openEditor(page, uri, IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID, true);
 				return;
 			}
@@ -72,9 +73,11 @@ public class URIHyperlink extends URLHyperlink
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			if (wrapped)
+			{
 				super.open();
+			}
 		}
 	}
 
@@ -87,7 +90,9 @@ public class URIHyperlink extends URLHyperlink
 	{
 		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
 		if (uri.getPath() == null || uri.getPath().equals("/") || uri.getPath().trim().equals("")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
 			return null;
+		}
 		IPath path = new Path(uri.getPath());
 		return editorReg.getDefaultEditor(path.lastSegment());
 	}
@@ -96,5 +101,4 @@ public class URIHyperlink extends URLHyperlink
 	{
 		return MessageFormat.format("Open {0} in editor", getURLString()); //$NON-NLS-1$
 	}
-
 }

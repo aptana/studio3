@@ -2,12 +2,13 @@ package com.aptana.editor.yaml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.yaml.internal.text.YAMLFoldingComputer;
 import com.aptana.editor.yaml.outline.YAMLOutlineContentProvider;
@@ -17,10 +18,6 @@ import com.aptana.editor.yaml.outline.YAMLOutlineLabelProvider;
 public class YAMLEditor extends AbstractThemeableEditor
 {
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
 	@Override
 	protected void initializeEditor()
 	{
@@ -29,7 +26,7 @@ public class YAMLEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new YAMLSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new YAMLDocumentProvider());
+		setDocumentProvider(YAMLPlugin.getDefault().getYAMLDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()
@@ -38,26 +35,30 @@ public class YAMLEditor extends AbstractThemeableEditor
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-		outline.setContentProvider(new YAMLOutlineContentProvider());
-		outline.setLabelProvider(new YAMLOutlineLabelProvider());
+		return new YAMLOutlineContentProvider();
+	}
 
-		return outline;
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new YAMLOutlineLabelProvider();
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return YAMLPlugin.getDefault().getPreferenceStore();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
 	 */
 	@Override
-	protected IPreferenceStore getOutlinePreferenceStore()
+	protected IPreferenceStore getPluginPreferenceStore()
 	{
 		return YAMLPlugin.getDefault().getPreferenceStore();
 	}
@@ -67,5 +68,4 @@ public class YAMLEditor extends AbstractThemeableEditor
 	{
 		return new YAMLFoldingComputer(this, document);
 	}
-
 }

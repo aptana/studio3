@@ -27,6 +27,7 @@ import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
@@ -62,6 +63,8 @@ public class HTMLParser implements IParser
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
 
+	private boolean previousSymbolSkipped;
+
 	/**
 	 * HTMLParser
 	 */
@@ -88,14 +91,13 @@ public class HTMLParser implements IParser
 				IHTMLConstants.CONTENT_TYPE_HTML, //
 				new HTMLNode[0], //
 				startingOffset, //
-				startingOffset + source.length() //
+				startingOffset + source.length() - 1 //
 		);
-
 		try
 		{
 			fCurrentElement = root;
 
-			this.parseAll();
+			this.parseAll(source);
 
 			parseState.setParseResult(root);
 		}
@@ -113,7 +115,7 @@ public class HTMLParser implements IParser
 		return root;
 	}
 
-	protected void processSymbol(Symbol symbol) throws IOException, Exception
+	protected void processSymbol(Symbol symbol, String source) throws IOException, Exception
 	{
 		switch (symbol.getId())
 		{
@@ -132,6 +134,8 @@ public class HTMLParser implements IParser
 			case HTMLTokens.SCRIPT:
 				processScriptTag();
 				break;
+			case HTMLTokens.TEXT:
+				processText(source);
 		}
 	}
 
@@ -179,14 +183,19 @@ public class HTMLParser implements IParser
 		return element;
 	}
 
-	private void parseAll() throws IOException, Exception
+	private void parseAll(String source) throws IOException, Exception
 	{
 		advance();
 		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
 		{
-			if (!isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
+			if (isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
 			{
-				processSymbol(fCurrentSymbol);
+				previousSymbolSkipped = true;
+			}
+			else
+			{
+				processSymbol(fCurrentSymbol, source);
+				previousSymbolSkipped = false;
 			}
 			advance();
 		}
@@ -402,34 +411,65 @@ public class HTMLParser implements IParser
 				if (HTMLUtils.isCSSAttribute(name))
 				{
 					String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-					IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
-					// should always have a rule node
-					if (node.hasChildren())
+					try
 					{
-						IParseNode rule = node.getChild(0);
-						if (rule instanceof CSSRuleNode)
+						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
+						addOffset(node, tagSymbol.getStart() + start - (element.getName().length() + 1));
+						// should always have a rule node
+						if (node.hasChildren())
 						{
-							CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
-							for (CSSDeclarationNode declaration : declarations)
+							IParseNode rule = node.getChild(0);
+							if (rule instanceof CSSRuleNode)
 							{
-								addOffset(declaration, tagSymbol.getStart() + start - (element.getName().length() + 1));
-								element.addCSSStyleNode(declaration);
+								CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
+								for (CSSDeclarationNode declaration : declarations)
+								{
+									element.addCSSStyleNode(declaration);
+								}
 							}
 						}
+					}
+					catch (java.lang.Exception e)
+					{
 					}
 				}
 				// checks if we need to process the value as JS
 				else if (HTMLUtils.isJSAttribute(element.getName(), name))
 				{
-					IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
-					IParseNode[] children = node.getChildren();
-					for (IParseNode child : children)
+					try
 					{
-						addOffset(child, tagSymbol.getStart() + start + 1);
-						element.addJSAttributeNode(child);
+						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
+						addOffset(node, tagSymbol.getStart() + start + 1);
+						IParseNode[] children = node.getChildren();
+						for (IParseNode child : children)
+						{
+							element.addJSAttributeNode(child);
+						}
+					}
+					catch (java.lang.Exception e)
+					{
 					}
 				}
 			}
+		}
+	}
+
+	private void processText(String source)
+	{
+		// checks if the last child of the current node is also a HTML text node. If so, we should unify both to one
+		// node with a larger offset.
+		if (!previousSymbolSkipped
+				&& (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == HTMLNodeTypes.TEXT))
+		{
+			HTMLTextNode node = (HTMLTextNode) fCurrentElement.getLastChild();
+			int start = node.getStartingOffset(), end = fCurrentSymbol.getEnd();
+			node.setLocation(start, end);
+			node.setText(source.substring(start, end + 1));
+		}
+		else
+		{
+			fCurrentElement.addChild(new HTMLTextNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
+					fCurrentSymbol.getEnd()));
 		}
 	}
 

@@ -28,9 +28,11 @@ public class FileSystemNewAction extends BaseSelectionListenerAction {
 
         private MenuManager dropDownMenuMgr;
         private NewFolderAction fNewFolderAction;
+        private NewFileAction fNewFileAction;
 
         public MenuCreator() {
             fNewFolderAction = new NewFolderAction(fWindow);
+            fNewFileAction = new NewFileAction(fWindow);
         }
 
         public void dispose() {
@@ -61,12 +63,14 @@ public class FileSystemNewAction extends BaseSelectionListenerAction {
 
         public void selectionChanged(IStructuredSelection selection) {
             fNewFolderAction.selectionChanged(selection);
+            fNewFileAction.selectionChanged(selection);
         }
 
         private void createDropDownMenuMgr() {
             if (dropDownMenuMgr == null) {
                 dropDownMenuMgr = new MenuManager();
                 dropDownMenuMgr.add(fNewFolderAction);
+                dropDownMenuMgr.add(fNewFileAction);
                 dropDownMenuMgr.add(new Separator());
                 // adds the "Other..." action
                 dropDownMenuMgr.add(ActionFactory.NEW.create(fWindow));

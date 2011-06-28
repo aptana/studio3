@@ -48,15 +48,33 @@ public class OpenTagCloser implements VerifyKeyListener
 
 		try
 		{
+			// Special logic for "overtyping" '>' character
 			boolean nextIsLessThan = false;
 			if (offset < document.getLength())
 			{
+				// if char at cursor is '>'...
 				char c = document.getChar(offset);
 				if (c == '>')
 				{
-					nextIsLessThan = true;
-					event.doit = false; // no matter what we'll auto-close or overwrite the existing '>'
-					textViewer.setSelectedRange(offset + 1, 0);
+					char b = document.getChar(offset - 1);
+					if (b != '%' && b != '?')
+					{
+						// And we're not closing an ERB/PHP tag, overwrite the '>'
+						nextIsLessThan = true;
+						event.doit = false;
+						textViewer.setSelectedRange(offset + 1, 0);
+					}
+					else
+					{
+						// And we are closing an ERB/PHP tag, check to see if it's "?|>>", if so overwrite '>'
+						char d = document.getChar(offset + 1);
+						if (d == '>')
+						{
+							nextIsLessThan = true;
+							event.doit = false;
+							textViewer.setSelectedRange(offset + 1, 0);
+						}
+					}
 				}
 			}
 

@@ -16,6 +16,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ui.UIPlugin;
 
 /**
@@ -33,7 +34,7 @@ public final class WorkbenchBrowserUtil {
 		try {
 			launchExternalBrowser(new URL(url));
 		} catch (MalformedURLException e) {
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -45,7 +46,7 @@ public final class WorkbenchBrowserUtil {
 		try {
 			return launchExternalBrowser(new URL(url), browserId);
 		} catch (MalformedURLException e) {
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -54,14 +55,13 @@ public final class WorkbenchBrowserUtil {
 		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
 		if (browserId != null) {
 			try {
-				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null,
-						null);
+				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null, null);
 				if (webBrowser != null) {
 					webBrowser.openURL(url);
 					return webBrowser;
 				}
 			} catch (PartInitException e) {
-				UIPlugin.log(e);
+				IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		try {
@@ -69,7 +69,7 @@ public final class WorkbenchBrowserUtil {
 			webBrowser.openURL(url);
 			return webBrowser;
 		} catch (PartInitException e) {
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -90,7 +90,7 @@ public final class WorkbenchBrowserUtil {
 			}
 			return webBrowser;
 		} catch (Exception e) {
-			UIPlugin.log(e);
+			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}

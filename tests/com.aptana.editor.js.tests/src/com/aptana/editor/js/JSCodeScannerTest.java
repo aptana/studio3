@@ -241,11 +241,9 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("source.js"), 16, 6); // create FIXME Should be entity.name.function.js
 		assertToken(getToken(null), 22, 1); // ':'
 		assertToken(Token.WHITESPACE, 23, 1); // ' '
-		assertToken(getToken("storage.type.js"), 24, 8); // function
-		assertToken(getToken("meta.brace.round.js"), 32, 1); // '(' FIXME Should be
-		// punctuation.definition.parameters.begin.js
-		assertToken(getToken("meta.brace.round.js"), 33, 1);// ')' FIXME Should be
-		// punctuation.definition.parameters.end.js
+		assertToken(getToken("storage.type.function.js"), 24, 8); // function
+		assertToken(getToken("punctuation.definition.parameters.begin.js"), 32, 1);
+		assertToken(getToken("punctuation.definition.parameters.end.js"), 33, 1);
 		assertToken(Token.WHITESPACE, 34, 1); // ' '
 		assertToken(getToken("meta.brace.curly.js"), 35, 1); // {
 		assertToken(Token.WHITESPACE, 36, 5);
@@ -277,7 +275,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.WHITESPACE, 94, 1);
 		assertToken(getToken("meta.brace.round.js"), 95, 1);
 		assertToken(getToken("support.class.js"), 96, 6);
-		assertToken(getToken(null), 102, 1);
+		assertToken(getToken("meta.delimiter.method.period.js"), 102, 1);
 		assertToken(getToken("source.js"), 103, 10);
 		assertToken(getToken("meta.brace.round.js"), 113, 1);
 		assertToken(getToken("source.js"), 114, 10);
@@ -323,4 +321,89 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("constant.numeric.js"), 14, 1);
 		assertToken(getToken("punctuation.terminator.statement.js"), 15, 1);
 	}
+
+	public void testFunctionName()
+	{
+		String src = "function chris() {}";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("storage.type.function.js"), 0, 8);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("entity.name.function.js"), 9, 5);
+		assertToken(getToken("punctuation.definition.parameters.begin.js"), 14, 1);
+		assertToken(getToken("punctuation.definition.parameters.end.js"), 15, 1);
+		assertToken(Token.WHITESPACE, 16, 1);
+		assertToken(getToken("meta.brace.curly.js"), 17, 1);
+		assertToken(getToken("meta.brace.curly.js"), 18, 1);
+	}
+
+	public void testAnonymousFunctionName()
+	{
+		String src = "var eatCakeAnon = function(){};";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("storage.type.js"), 0, 3); // var
+		assertToken(Token.WHITESPACE, 3, 1);
+		assertToken(getToken("entity.name.function.js"), 4, 11); // eatCakeAnon
+		assertToken(Token.WHITESPACE, 15, 1);
+		assertToken(getToken("keyword.operator.js"), 16, 1); // =
+		assertToken(Token.WHITESPACE, 17, 1);
+		assertToken(getToken("storage.type.function.js"), 18, 8);
+		assertToken(getToken("punctuation.definition.parameters.begin.js"), 26, 1);
+		assertToken(getToken("punctuation.definition.parameters.end.js"), 27, 1);
+		assertToken(getToken("meta.brace.curly.js"), 28, 1);
+		assertToken(getToken("meta.brace.curly.js"), 29, 1);
+		assertToken(getToken("punctuation.terminator.statement.js"), 30, 1);
+	}
+
+	public void testFunctionWithArguments()
+	{
+		String src = "function Pet(name, species, hello){}";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("storage.type.function.js"), 0, 8);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("entity.name.function.js"), 9, 3);
+		assertToken(getToken("punctuation.definition.parameters.begin.js"), 12, 1);
+		assertToken(getToken("variable.parameter.function.js"), 13, 4);
+		assertToken(getToken("meta.delimiter.object.comma.js"), 17, 1);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken("variable.parameter.function.js"), 19, 7);
+		assertToken(getToken("meta.delimiter.object.comma.js"), 26, 1);
+		assertToken(Token.WHITESPACE, 27, 1);
+		assertToken(getToken("variable.parameter.function.js"), 28, 5);
+		assertToken(getToken("punctuation.definition.parameters.end.js"), 33, 1);
+		assertToken(getToken("meta.brace.curly.js"), 34, 1);
+		assertToken(getToken("meta.brace.curly.js"), 35, 1);
+	}
+
+	public void testBrokenStuff()
+	{
+		String src = "function sayHello() { alert(this.hello); }";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("storage.type.function.js"), 0, 8);
+		assertToken(Token.WHITESPACE, 8, 1);
+		assertToken(getToken("entity.name.function.js"), 9, 8);
+		assertToken(getToken("punctuation.definition.parameters.begin.js"), 17, 1);
+		assertToken(getToken("punctuation.definition.parameters.end.js"), 18, 1);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken("meta.brace.curly.js"), 20, 1);
+		assertToken(Token.WHITESPACE, 21, 1);
+		assertToken(getToken("source.js"), 22, 5);
+		assertToken(getToken("meta.brace.round.js"), 27, 1);
+		assertToken(getToken("variable.language.js"), 28, 4);
+		assertToken(getToken("meta.delimiter.method.period.js"), 32, 1);
+		assertToken(getToken("source.js"), 33, 5);
+		assertToken(getToken("meta.brace.round.js"), 38, 1);
+		assertToken(getToken("punctuation.terminator.statement.js"), 39, 1);
+		assertToken(Token.WHITESPACE, 40, 1);
+		assertToken(getToken("meta.brace.curly.js"), 41, 1);
+		assertEquals(Token.EOF, scanner.nextToken());
+	}
+
 }

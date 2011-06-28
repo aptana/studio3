@@ -34,6 +34,7 @@ public class Messages extends NLS
 	public static String JSFormatterModifyDialog_commentsTabName;
 	public static String JSFormatterModifyDialog_jsFormatterTitle;
 	public static String JSFormatterModifyDialog_intentationTabName;
+	public static String JSFormatterModifyDialog_whiteSpacesTabName;
 	public static String JSFormatterModifyDialog_bracesTabName;
 
 	public static String JSFormatterModifyDialog_newLinesTabName;
@@ -44,12 +45,27 @@ public class Messages extends NLS
 	public static String JSFormatterNewLinesPage_newLineBeforeFinally;
 	public static String JSFormatterNewLinesPage_newLineBeforeIf;
 	public static String JSFormatterNewLinesPage_newLineBeforeWhileInDo;
+	public static String JSFormatterNewLinesPage_newLineBeforeNameValuePairs;
 
 	public static String JSFormatterIndentationTabPage_statementsWithinBlocks;
 	public static String JSFormatterIndentationTabPage_statementsWithinSwitch;
 	public static String JSFormatterIndentationTabPage_statementsWithinCase;
 	public static String JSFormatterIndentationTabPage_statementsWithinFunctions;
 	public static String JSFormatterIndentationTabPage_statementsWithinJSGroups;
+	public static String JSFormatterWhiteSpacesPage_after;
+	public static String JSFormatterWhiteSpacesPage_before;
+	public static String JSFormatterWhiteSpacesPage_commas;
+	public static String JSFormatterWhiteSpacesPage_parentheses;
+	public static String JSFormatterWhiteSpacesPage_puctuationElementsGroupTitle;
+	public static String JSFormatterWhiteSpacesPage_semicolonsInFor;
+	public static String JSFormatterWhiteSpacesPage_operatorsGroupTitle;
+	public static String JSFormatterWhiteSpacesPage_arithmeticOperators;
+	public static String JSFormatterWhiteSpacesPage_relationalOperators;
+	public static String JSFormatterWhiteSpacesPage_unaryOperators;
+	public static String JSFormatterWhiteSpacesPage_assignments;
+	public static String JSFormatterWhiteSpacesPage_conditionalOperators;
+	public static String JSFormatterWhiteSpacesPage_keyValueOperator;
+
 	static
 	{
 		// initialize resource bundle

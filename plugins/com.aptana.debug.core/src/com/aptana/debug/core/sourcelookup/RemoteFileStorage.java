@@ -13,6 +13,7 @@ import java.net.URI;
 
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.debug.core.DebugCorePlugin;
 
@@ -81,7 +82,7 @@ public class RemoteFileStorage extends UniformResourceStorage {
 					fIn.reset();
 				}
 			} catch (IOException e) {
-				DebugCorePlugin.log(e);
+				IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
 			}
 			return fIn;
 		}

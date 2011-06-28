@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.IDebugScopes;
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * This class is meant as a utility for searching for an executable on the PATH, and/or in a set of common locations.
@@ -31,6 +33,7 @@ public final class ExecutableUtil
 {
 
 	private static final String PATHEXT = "PATHEXT"; //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private static final String WHICH_PATH = "/usr/bin/which"; //$NON-NLS-1$
 	private static final String PATH = "PATH"; //$NON-NLS-1$
 
@@ -130,7 +133,9 @@ public final class ExecutableUtil
 				IPath result = findExecutable(location.append(executableName), appendExtension);
 				if (result != null && (filter == null || filter.accept(result.toFile())))
 				{
-					CorePlugin.logInfo(MessageFormat.format("Found executable at common location: {0}", result)); //$NON-NLS-1$
+					IdeLog.logInfo(
+							CorePlugin.getDefault(),
+							MessageFormat.format("Found executable at common location: {0}", result), IDebugScopes.SHELL); //$NON-NLS-1$
 					return result;
 				}
 			}

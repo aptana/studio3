@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.diff;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class DiffEditor extends AbstractThemeableEditor
@@ -21,6 +23,16 @@ public class DiffEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		setSourceViewerConfiguration(new DiffSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new DiffDocumentProvider());
+		setDocumentProvider(Activator.getDefault().getDiffDocumentProvider());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return Activator.getDefault().getPreferenceStore();
 	}
 }

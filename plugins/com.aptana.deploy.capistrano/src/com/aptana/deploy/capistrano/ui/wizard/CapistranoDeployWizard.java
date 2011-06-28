@@ -20,6 +20,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.capistrano.CapistranoDeployProvider;
 import com.aptana.deploy.capistrano.CapistranoPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -58,7 +59,7 @@ public class CapistranoDeployWizard extends AbstractDeployWizard
 		}
 		catch (Exception e)
 		{
-			CapistranoPlugin.logError(e);
+			IdeLog.logError(CapistranoPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return true;

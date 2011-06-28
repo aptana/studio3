@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -108,7 +109,7 @@ public class DeployProviderRegistry
 			}
 			catch (CoreException e)
 			{
-				DeployPlugin.logError(e);
+				IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return providers;
@@ -135,7 +136,7 @@ public class DeployProviderRegistry
 			}
 			catch (InvalidRegistryObjectException e)
 			{
-				DeployPlugin.logError(e);
+				IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return providersById;
@@ -156,7 +157,7 @@ public class DeployProviderRegistry
 			}
 			catch (CoreException e)
 			{
-				DeployPlugin.logError(e);
+				IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return null;

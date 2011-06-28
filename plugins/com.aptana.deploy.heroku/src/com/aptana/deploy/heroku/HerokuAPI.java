@@ -20,6 +20,7 @@ import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.PlatformUtil;
 
 @SuppressWarnings("restriction")
@@ -123,7 +124,7 @@ public class HerokuAPI
 		}
 		catch (IOException e)
 		{
-			HerokuPlugin.logError(e);
+			IdeLog.logError(HerokuPlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -155,7 +156,7 @@ public class HerokuAPI
 		}
 		catch (Exception e)
 		{
-			HerokuPlugin.logError(e);
+			IdeLog.logError(HerokuPlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{

@@ -12,7 +12,6 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -21,6 +20,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
@@ -72,14 +72,9 @@ public class EditorSearchHyperlink implements IHyperlink
 				target.findAndSelect(0, searchString, true, true, true);
 			}
 		}
-		catch (CoreException e)
-		{
-			CommonEditorPlugin.logError(e);
-		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
-
 }

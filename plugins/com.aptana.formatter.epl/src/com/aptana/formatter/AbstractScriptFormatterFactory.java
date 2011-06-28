@@ -115,13 +115,6 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 				}
 			}
 		}
-
-		final PreferenceKey activeProfileKey = ProfileManager.getInstance().getActiveProfileKey();
-		if (activeProfileKey != null && preferences.containsKey(activeProfileKey.getName()))
-		{
-			final String value = preferences.get(activeProfileKey.getName());
-			delegate.setString(activeProfileKey.getQualifier(), activeProfileKey.getName(), value);
-		}
 	}
 
 	public boolean isValid()

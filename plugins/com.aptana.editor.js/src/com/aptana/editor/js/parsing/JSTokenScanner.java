@@ -165,7 +165,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 			Token.UNDEFINED
 		);
 		// @formatter:on
-		commentWordRule.addWord("/**/", createToken(JSTokenType.MULTILINE_COMMENT));
+		commentWordRule.addWord("/**/", createToken(JSTokenType.MULTILINE_COMMENT)); //$NON-NLS-1$
 		rules.add(commentWordRule);
 
 		// NOTE: We have to try to match sdoc comments before multi-line comments because "/*" will match "/**"
@@ -177,6 +177,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 		IToken token = createToken(JSTokenType.STRING);
 		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new SingleLineRule("<?", "?>", token, '\0')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// regex
 		rules.add(new JSRegExpRule(createToken(JSTokenType.REGEX)));

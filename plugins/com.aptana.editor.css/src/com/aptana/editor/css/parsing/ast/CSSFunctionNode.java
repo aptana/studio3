@@ -64,6 +64,16 @@ public class CSSFunctionNode extends CSSExpressionNode
 		return (CSSExpressionNode) getChild(0);
 	}
 
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public String getName()
+	{
+		return fName;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
