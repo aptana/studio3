@@ -24,7 +24,6 @@ import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
@@ -75,8 +74,9 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			return uri;
 		}
-		IndexPlugin.logError(MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
-				getProject().getRawLocationURI(), getProject().getFullPath()), null);
+		IdeLog.logError(CorePlugin.getDefault(),
+				MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
+						getProject().getRawLocationURI(), getProject().getFullPath()), (Throwable) null);
 		uri = getProject().getRawLocationURI();
 		return uri;
 	}
@@ -160,7 +160,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			}
 			catch (CoreException e)
 			{
-				IndexPlugin.logError(e);
+				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		sub.done();
