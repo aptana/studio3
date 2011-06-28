@@ -138,10 +138,24 @@
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
 	<target name="postBuild">
+		<antcall target="signJars" />
 		<antcall target="gatherLogs" />
 		<antcall target="fix.broken.metadata" />
 		<antcall target="updateSite" />
 		<antcall target="publish" />
+	</target>
+	
+	<target name="signJars">
+        <echo message="Signing plugins and features at: ${p2.repo.dir}" />
+        <signjar 
+            alias="${keystoreAlias}" keystore="${keystore}"
+            storepass="${keystorePass}"
+            preservelastmodified="true">
+          <path>
+            <fileset dir="${p2.repo.dir}/plugins" includes="**/*.jar" />
+            <fileset dir="${p2.repo.dir}/features" includes="**/*.jar" />
+          </path>
+        </signjar>
 	</target>
 	
 	<!-- Workaround for Eclipse bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=271373 -->
