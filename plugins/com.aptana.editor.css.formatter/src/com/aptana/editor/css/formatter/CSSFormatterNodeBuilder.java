@@ -191,10 +191,10 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private int pushFormatterMediaSelectorNodes(CSSTextNode[] medias, int startIndex)
 	{
 		boolean previousNodeIsPunctuation = startIndex > 0;
-		int i = startIndex;
-		for (; i < medias.length; i++)
+		int lastMediaIndex = startIndex;
+		for (; lastMediaIndex < medias.length; lastMediaIndex++)
 		{
-			CSSTextNode mediaSelectorNode = medias[i];
+			CSSTextNode mediaSelectorNode = medias[lastMediaIndex];
 			String selectorText = mediaSelectorNode.getText();
 
 			// For media nodes that are just punctuation, we skip it
@@ -215,21 +215,21 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 					push(parenthesisNode);
 					// push contents inside the parenthesis
-					i = pushFormatterMediaSelectorNodes(medias, i + 1);
+					lastMediaIndex = pushFormatterMediaSelectorNodes(medias, lastMediaIndex + 1);
 
 					checkedPop(parenthesisNode, -1);
-					if (i >= medias.length)
+					if (lastMediaIndex >= medias.length)
 					{
 						break;
 					}
-					mediaSelectorNode = medias[i];
+					mediaSelectorNode = medias[lastMediaIndex];
 					parenthesisNode.setEnd(createTextNode(document, mediaSelectorNode.getStartingOffset(),
 							mediaSelectorNode.getStartingOffset() + 1));
 				}
 				else if (selectorText.charAt(0) == ')')
 				{
 					// This is the end of a parenthesis block
-					return i;
+					return lastMediaIndex;
 				}
 				previousNodeIsPunctuation = true;
 				// otherwise, we still skip all other punctuation
@@ -245,7 +245,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(formatterSelectorNode, -1);
 			previousNodeIsPunctuation = false;
 		}
-		return i;
+		return lastMediaIndex;
 	}
 
 	/**
