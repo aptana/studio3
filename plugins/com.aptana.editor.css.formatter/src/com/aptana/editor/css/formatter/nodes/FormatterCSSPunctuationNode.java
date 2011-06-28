@@ -11,17 +11,19 @@ import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 
-public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
+public class FormatterCSSPunctuationNode extends FormatterBlockWithBeginNode
 {
 
-	private char syntaxType;
+	private TypePunctuation punctuationType;
 	private boolean isLastNodeInDeclaration;
 
-	public FormatterCSSSyntaxNode(IFormatterDocument document, char syntaxType, boolean isLastNodeInDeclaration)
+	public FormatterCSSPunctuationNode(IFormatterDocument document, TypePunctuation punctuationType,
+			boolean isLastNodeInDeclaration)
 	{
 		super(document);
-		this.syntaxType = syntaxType;
+		this.punctuationType = punctuationType;
 		this.isLastNodeInDeclaration = isLastNodeInDeclaration;
 
 	}
@@ -35,17 +37,18 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 	@Override
 	public int getSpacesCountBefore()
 	{
-		switch (syntaxType)
+		switch (punctuationType)
 		{
-			case '>':
+			case CSS_CHILD_COMBINATOR:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR);
-			case '(':
-				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_PARENTHESES);
-			case ':':
+				// case '(':
+				// return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_PARENTHESES);
+			case SELECTOR_COLON:
+			case PROPERTY_COLON:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_COLON);
-			case ',':
+			case COMMA:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_COMMAS);
-			case ';':
+			case SEMICOLON:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_SEMICOLON);
 			default:
 				return super.getSpacesCountBefore();
@@ -59,19 +62,19 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 		{
 			return super.getSpacesCountBefore();
 		}
-		switch (syntaxType)
+		switch (punctuationType)
 		{
-			case '>':
+			case CSS_CHILD_COMBINATOR:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR);
-			case ')':
-				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_PARENTHESES);
-			case ':':
+				// case ')':
+				// return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_PARENTHESES);
+			case SELECTOR_COLON:
+			case PROPERTY_COLON:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_COLON);
-			case ',':
+			case COMMA:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_COMMAS);
-			case ';':
+			case SEMICOLON:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_SEMICOLON);
-			case '(':
 			default:
 				return super.getSpacesCountBefore();
 		}

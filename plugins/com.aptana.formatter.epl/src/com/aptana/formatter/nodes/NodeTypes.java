@@ -24,6 +24,9 @@ public class NodeTypes
 	 */
 	public enum TypePunctuation
 	{
+		CSS_CHILD_COMBINATOR(">"), //$NON-NLS-1$
+		SELECTOR_COLON(":"), //$NON-NLS-1$
+		PROPERTY_COLON(":"), //$NON-NLS-1$
 		CASE_COLON(":"), //$NON-NLS-1$
 		GOTO_COLON(":"), //$NON-NLS-1$
 		SEMICOLON(";"), //$NON-NLS-1$
