@@ -8,6 +8,16 @@ css.formatter.formatter.tabulation.size=4
 css.formatter.line.after.declaration=0
 css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
+css.formatter.spaces.before.commas=0
+css.formatter.spaces.after.commas=1
+css.formatter.spaces.before.parentheses=1
+css.formatter.spaces.after.parentheses=1
+css.formatter.spaces.before.colon=0
+css.formatter.spaces.after.colon=1
+css.formatter.spaces.before.semicolon=0
+css.formatter.spaces.after.semicolon=0
+css.formatter.spaces.before.child.combinator=1
+css.formatter.spaces.after.child.combinator=1
 ==CONTENT==
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and ( min-device-width : 320px) and ( max-device-width : 480px) {
@@ -69,63 +79,63 @@ css.formatter.formatter.tabulation.char=space
 }
 ==FORMATTED==
 /* Smartphones (portrait and landscape) ----------- */
-@media only screen and ( min-device-width : 320px) and ( max-device-width : 480px) {
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
     body {
         background-color: #000;
     }
 }
 
 /* Smartphones (landscape) ----------- */
-@media only screen and ( min-width : 321px) {
+@media only screen and (min-width: 321px) {
     body {
         background-color: #000;
     }
 }
 
 /* Smartphones (portrait) ----------- */
-@media only screen and ( max-width : 320px) {
+@media only screen and (max-width: 320px) {
     body {
         background-color: #000;
     }
 }
 
 /* iPads (portrait and landscape) ----------- */
-@media only screen and ( min-device-width : 768px) and ( max-device-width : 1024px) {
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
     body {
         background-color: #000;
     }
 }
 
 /* iPads (landscape) ----------- */
-@media only screen and ( min-device-width : 768px) and ( max-device-width : 1024px) and ( orientation : landscape) {
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
     body {
         background-color: #000;
     }
 }
 
 /* iPads (portrait) ----------- */
-@media only screen and ( min-device-width : 768px) and ( max-device-width : 1024px) and ( orientation : portrait) {
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
     body {
         background-color: #000;
     }
 }
 
 /* Desktops and laptops ----------- */
-@media only screen and ( min-width : 1224px) {
+@media only screen and (min-width: 1224px) {
     body {
         background-color: #000;
     }
 }
 
 /* Large screens ----------- */
-@media only screen and ( min-width : 1824px) {
+@media only screen and (min-width: 1824px) {
     body {
         background-color: #000;
     }
 }
 
 /* iPhone 4 ----------- */
-@media only screen and ( -webkit-min-device-pixel-ratio : 1.5), only screen and ( min-device-pixel-ratio : 1.5) {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) , only screen and (min-device-pixel-ratio: 1.5) {
     body {
         background-color: #000;
     }

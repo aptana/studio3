@@ -24,6 +24,13 @@ public class Messages extends NLS
 	public static String CSSFormatterModifyDialog_comments_page_tab_name;
 	public static String CSSFormatterModifyDialog_indentation_page_tab_name;
 	public static String CSSFormatterModifyDialog_CSS_formater_title;
+	public static String CSSFormatterModifyDialog_spaces_page_tab_title;
+	public static String CSSFormatterWhiteSpacesPage_after;
+	public static String CSSFormatterWhiteSpacesPage_before;
+	public static String CSSFormatterWhiteSpacesPage_colonLabel;
+	public static String CSSFormatterWhiteSpacesPage_commasLabel;
+	public static String CSSFormatterWhiteSpacesPage_parenthesisLabel;
+	public static String CSSFormatterWhiteSpacesPage_punctuationGroupLabel;
 	static
 	{
 		// initialize resource bundle

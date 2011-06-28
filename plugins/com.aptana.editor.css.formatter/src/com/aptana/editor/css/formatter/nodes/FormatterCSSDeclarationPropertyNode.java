@@ -7,18 +7,22 @@
  */
 package com.aptana.editor.css.formatter.nodes;
 
-import com.aptana.editor.css.formatter.CSSFormatterConstants;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
-public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
+/**
+ * A CSS formatter node for declaration properties.<br>
+ * This node is used for the property name of every declaration (this should be the first node in a declaration
+ * statement)
+ */
+
+public class FormatterCSSDeclarationPropertyNode extends FormatterBlockWithBeginNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterCSSDeclarationNode(IFormatterDocument document)
+	public FormatterCSSDeclarationPropertyNode(IFormatterDocument document)
 	{
 		super(document);
 	}
@@ -39,17 +43,7 @@ public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
 
 	protected boolean isAddingEndNewLine()
 	{
-		return true;
+		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
-	 * )
-	 */
-	protected int getBlankLinesAfter(IFormatterContext context)
-	{
-		return getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION);
-	}
 }

@@ -15,14 +15,16 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 public class FormatterCSSSelectorNode extends FormatterBlockWithBeginNode
 {
 	private boolean firstElement;
+	private boolean hasSyntaxBefore;
 
 	/**
 	 * @param document
 	 */
-	public FormatterCSSSelectorNode(IFormatterDocument document, boolean isFirstElement)
+	public FormatterCSSSelectorNode(IFormatterDocument document, boolean isFirstElement, boolean hasSyntaxBefore)
 	{
 		super(document);
-		firstElement = isFirstElement;
+		this.firstElement = isFirstElement;
+		this.hasSyntaxBefore = hasSyntaxBefore;
 	}
 
 	/*
@@ -69,6 +71,7 @@ public class FormatterCSSSelectorNode extends FormatterBlockWithBeginNode
 	 */
 	public int getSpacesCountBefore()
 	{
-		return 1;
+		// If there is a syntax node before, we let the syntax node decide whether it wants a space after it
+		return hasSyntaxBefore ? 0 : 1;
 	}
 }
