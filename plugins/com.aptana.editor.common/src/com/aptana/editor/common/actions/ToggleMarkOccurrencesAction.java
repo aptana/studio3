@@ -77,7 +77,11 @@ public class ToggleMarkOccurrencesAction extends TextEditorAction implements IPr
 			if (prefStore == null)
 			{
 				prefStore = (IPreferenceStore) editor.getAdapter(IPreferenceStore.class);
-				prefStore.addPropertyChangeListener(this);
+
+				if (prefStore != null)
+				{
+					prefStore.addPropertyChangeListener(this);
+				}
 			}
 		}
 		else if (prefStore != null)
