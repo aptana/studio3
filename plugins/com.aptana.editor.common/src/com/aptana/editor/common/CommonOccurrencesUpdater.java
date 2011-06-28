@@ -205,8 +205,11 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 					}
 				}
 
-				// grab result
-				result = document.get(start, offset - start);
+				// grab result, as long as it is on one line only
+				if (document.getLineOfOffset(start) == document.getLineOfOffset(offset))
+				{
+					result = document.get(start, offset - start);
+				}
 			}
 			catch (BadLocationException e)
 			{
