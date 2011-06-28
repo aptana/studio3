@@ -41,8 +41,6 @@ public class FormatterCSSPunctuationNode extends FormatterBlockWithBeginNode
 		{
 			case CSS_CHILD_COMBINATOR:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR);
-				// case '(':
-				// return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_PARENTHESES);
 			case SELECTOR_COLON:
 			case PROPERTY_COLON:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_BEFORE_COLON);
@@ -66,8 +64,6 @@ public class FormatterCSSPunctuationNode extends FormatterBlockWithBeginNode
 		{
 			case CSS_CHILD_COMBINATOR:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR);
-				// case ')':
-				// return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_PARENTHESES);
 			case SELECTOR_COLON:
 			case PROPERTY_COLON:
 				return getDocument().getInt(CSSFormatterConstants.SPACES_AFTER_COLON);
