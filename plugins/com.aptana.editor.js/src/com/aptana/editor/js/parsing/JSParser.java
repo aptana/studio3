@@ -396,7 +396,7 @@ public class JSParser extends Parser implements IParser {
 			// parse
 			ParseRootNode result = (ParseRootNode) parse(fScanner);
 			int start = parseState.getStartingOffset();
-			int end = start + source.length();
+			int end = start + source.length() - 1;
 			result.setLocation(start, end);
 
 			// store results in the parse state
