@@ -145,23 +145,11 @@
 		<antcall target="publish" />
 	</target>
 	
-	<target name="signJars">
+	<target name="signJars" if="sign.jars">
 		<echo message="Signing plugins and features at: ${p2.repo.dir}" />
 		<p2.process.artifacts repositoryPath="${p2.artifact.repo}">
 			<sign alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePass}" />
 		</p2.process.artifacts>
-
-		<!-- This does sign the JARs, but it ends up making MD5 hashes in p2 repo mismatched!
-        <signjar 
-            alias="${keystoreAlias}" keystore="${keystore}"
-            storepass="${keystorePass}"
-            preservelastmodified="true">
-          <path>
-            <fileset dir="${p2.repo.dir}/plugins" includes="**/*.jar" />
-            <fileset dir="${p2.repo.dir}/features" includes="**/*.jar" />
-          </path>
-        </signjar>
-		-->
 	</target>
 	
 	<!-- Workaround for Eclipse bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=271373 -->
