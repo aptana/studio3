@@ -128,6 +128,16 @@ public class XMLEditor extends AbstractThemeableEditor
 		highlightTagPair(offset);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return XMLPlugin.getDefault().getPreferenceStore();
+	}
+
 	/**
 	 * Given the offset, tries to determine if we're on an HTML close/start tag, and if so it will find the matching
 	 * open/close and highlight the pair.

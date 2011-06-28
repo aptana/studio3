@@ -94,7 +94,7 @@ public class NaturesLabelProvider extends LabelProvider implements IFontProvider
 				: null;
 	}
 
-	private class CenterIcon extends OverlayIcon
+	private static class CenterIcon extends OverlayIcon
 	{
 		public CenterIcon(ImageDescriptor base, ImageDescriptor overlay, Point size)
 		{

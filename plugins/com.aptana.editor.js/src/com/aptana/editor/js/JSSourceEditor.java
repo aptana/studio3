@@ -60,6 +60,16 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		return JSPlugin.getDefault().getPreferenceStore();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return JSPlugin.getDefault().getPreferenceStore();
+	}
+
 	@Override
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{

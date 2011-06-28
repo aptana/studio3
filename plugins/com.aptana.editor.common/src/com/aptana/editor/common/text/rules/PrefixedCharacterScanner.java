@@ -57,10 +57,9 @@ public class PrefixedCharacterScanner implements ICharacterScanner {
 	 * @see org.eclipse.jface.text.rules.ICharacterScanner#unread()
 	 */
 	public void unread() {
-		if (index > prefix.length) {
+		if (--index > prefix.length) {
 			baseCharacterScanner.unread();
 		}
-		--index;
 	}
 
 }

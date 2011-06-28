@@ -7,17 +7,31 @@
  */
 package com.aptana.editor.markdown;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class MarkdownEditor extends AbstractThemeableEditor {
+public class MarkdownEditor extends AbstractThemeableEditor
+{
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-	protected void initializeEditor() {
+	protected void initializeEditor()
+	{
 		super.initializeEditor();
 		setSourceViewerConfiguration(new MarkdownSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(MarkdownEditorPlugin.getDefault().getMarkdownDocumentProvider());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return MarkdownEditorPlugin.getDefault().getPreferenceStore();
 	}
 }

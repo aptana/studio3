@@ -7,12 +7,13 @@
  */
 package com.aptana.editor.dtd;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 
 public class DTDEditor extends AbstractThemeableEditor
 {
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
@@ -33,5 +34,15 @@ public class DTDEditor extends AbstractThemeableEditor
 
 		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(DTDPlugin.getDefault().getDTDDocumentProvider());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return DTDPlugin.getDefault().getPreferenceStore();
 	}
 }

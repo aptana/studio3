@@ -319,6 +319,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 	};
 
+	private CommonOccurrencesUpdater occurrencesUpdater;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -385,6 +387,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			setWordWrapEnabled(true);
 		}
+
+		installOccurrencesUpdater();
+	}
+
+	protected void installOccurrencesUpdater()
+	{
+		// Initialize the occurrences annotations marker
+		occurrencesUpdater = new CommonOccurrencesUpdater(this);
+		occurrencesUpdater.initialize(getPreferenceStore());
 	}
 
 	/*
@@ -462,6 +473,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			return getSourceViewer();
 		}
+		else if (IPreferenceStore.class == adapter)
+		{
+			return getPluginPreferenceStore();
+		}
 
 		if (this.fThemeableEditorFindBarExtension != null)
 		{
@@ -501,6 +516,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		return outline;
 	}
+
+	protected abstract IPreferenceStore getPluginPreferenceStore();
 
 	@Override
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)

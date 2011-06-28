@@ -33,7 +33,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
 
 		// mark occurrences
-		prefs.putBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+		prefs.putBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, false);
 
 		// content assist
 		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,

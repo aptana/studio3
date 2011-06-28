@@ -24,7 +24,6 @@ import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
 @SuppressWarnings("restriction")
 public class JSONEditor extends AbstractThemeableEditor
 {
-
 	@Override
 	public ITreeContentProvider getOutlineContentProvider()
 	{
@@ -57,5 +56,15 @@ public class JSONEditor extends AbstractThemeableEditor
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return new JSONFoldingComputer(this, document);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return JSONPlugin.getDefault().getPreferenceStore();
 	}
 }

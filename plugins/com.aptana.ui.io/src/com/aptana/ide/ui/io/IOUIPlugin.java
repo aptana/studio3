@@ -304,7 +304,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 			if (element == null)
 			{
 				// full refresh
-				System.err.println("FIXME: full refresh for "+viewer.getClass().getSimpleName());
+				System.err.println("FIXME: full refresh for " + viewer.getClass().getSimpleName()); //$NON-NLS-1$
 				viewer.refresh();
 			}
 			else

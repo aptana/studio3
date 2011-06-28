@@ -112,7 +112,7 @@ public class XMLParser implements IParser
 				IXMLConstants.CONTENT_TYPE_XML, //
 				new XMLNode[0], //
 				startingOffset, //
-				startingOffset + source.length() //
+				startingOffset + source.length() - 1 //
 		);
 
 		try

@@ -334,6 +334,12 @@
             </class>
    </state> 
       </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            description="%mark.occurrence.description"
+            id="com.aptana.editor.common.toggleMarkOccurrences"
+            name="%mark.occurrence.command">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -607,6 +613,34 @@
       </type>
    </extension>
    <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="com.aptana.editor.common.occurrence"
+            colorPreferenceKey="OccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            contributesToHeader="false"
+            highlightPreferenceKey="OccurrenceHighlighting"
+            highlightPreferenceValue="true"
+            icon="icons/full/obj16/searchm_obj.gif"
+            isGoToNextNavigationTarget="false"
+            isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
+            isGoToPreviousNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
+            label="%occurrence.marker"
+            overviewRulerPreferenceKey="OccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarAction="true"
+            showInNextPrevDropdownToolbarActionKey="showOccurrenceInNextPrevDropdownToolbarAction"
+            textPreferenceKey="OccurrenceIndication"
+            textPreferenceValue="false"
+            textStylePreferenceKey="OccurrenceTextStyle"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="OccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false">
+      </specification>
+   </extension>
+   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ui.AptanaPreferencePage"
@@ -614,5 +648,34 @@
             id="com.aptana.editor.common.ValidationPreferencePage"
             name="%page.validation.name">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.editor.common.presentation"
+            label="%editor.presentation"
+            visible="false">
+         <action
+               allowLabelUpdate="true"
+               definitionId="com.aptana.editor.common.toggleMarkOccurrences"
+               disabledIcon="icons/full/dtool16/mark_occurrences.gif"
+               icon="icons/full/etool16/mark_occurrences.gif"
+               id="com.aptana.editor.common.toggleMarkOccurrences"
+               label="%presentation.label"
+               retarget="true"
+               style="toggle"
+               toolbarPath="org.eclipse.ui.edit.text.actionSet.presentation/Presentation"
+               tooltip="%presentation.tooltip">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="com.aptana.ui.WebPerspective">
+         <actionSet
+               id="com.aptana.editor.common.presentation">
+         </actionSet>
+      </perspectiveExtension>
    </extension>
 </plugin>

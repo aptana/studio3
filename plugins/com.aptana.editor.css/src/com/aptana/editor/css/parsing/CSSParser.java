@@ -107,7 +107,7 @@ public class CSSParser extends Parser implements IParser {
 			CSSCommentNode commentNode = new CSSCommentNode( //
 				this.getSource(parseState, comment),
 				comment.getStartingOffset(),
-				comment.getEndingOffset()
+				comment.getEndingOffset() - 1
 			);
 
 			commentNodes[i] = commentNode;

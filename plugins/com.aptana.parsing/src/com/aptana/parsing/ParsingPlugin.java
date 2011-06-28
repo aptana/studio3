@@ -7,10 +7,10 @@
  */
 package com.aptana.parsing;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.logging.IdeLog;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -37,7 +37,7 @@ public class ParsingPlugin extends Plugin
 	 */
 	public static void logError(Exception e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+		logError(e.getMessage(), e);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class ParsingPlugin extends Plugin
 	 */
 	public static void logError(String msg, Throwable e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+		IdeLog.logError(getDefault(), msg, e);
 	}
 
 	/**
@@ -58,8 +58,7 @@ public class ParsingPlugin extends Plugin
 	 */
 	public static void logInfo(String message)
 	{
-		// TODO: uncomment when we have verbosity support for logging
-		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+		IdeLog.logInfo(getDefault(), message);
 	}
 
 	/**
@@ -69,8 +68,7 @@ public class ParsingPlugin extends Plugin
 	 */
 	public static void logWarning(String message)
 	{
-		// TODO: uncomment when we have verbosity support for logging
-		// getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+		IdeLog.logWarning(getDefault(), message);
 	}
 
 	/**

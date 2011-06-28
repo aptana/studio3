@@ -2,6 +2,7 @@ package com.aptana.core.build;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,14 +88,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
 		IdeLog.logInfo(CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName),
-				IDebugScopes.INDEXER);
+				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName), IDebugScopes.INDEXER);
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
 			IdeLog.logInfo(CorePlugin.getDefault(),
-					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName),
-					IDebugScopes.INDEXER);
+					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName), IDebugScopes.INDEXER);
 			fullBuild(monitor);
 		}
 		else
@@ -103,8 +102,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			if (delta == null)
 			{
 				IdeLog.logInfo(CorePlugin.getDefault(),
-						StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta,
- projectName),
+						StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
 						IDebugScopes.INDEXER);
 				fullBuild(monitor);
 			}
@@ -119,8 +117,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
 		IdeLog.logInfo(CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime),
-				IDebugScopes.INDEXER);
+				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime), IDebugScopes.INDEXER);
 
 		return null;
 	}
@@ -135,6 +132,18 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				delta.accept(resourceCollector);
 				sub.worked(1);
+
+				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.INDEXER))
+				{
+					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex.toArray(new IFile[0]);
+					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[0]);
+					IdeLog.logInfo(
+							CorePlugin.getDefault(),
+							StringUtil.format(Messages.UnifiedBuilder_IndexingResourceDelta,
+									new Object[] { Arrays.deepToString(toRemove), Arrays.deepToString(toIndex) }),
+							IDebugScopes.INDEXER);
+				}
+
 				if (!resourceCollector.filesToRemoveFromIndex.isEmpty())
 				{
 					RemoveIndexOfFilesOfProjectJob removeJob = new RemoveIndexOfFilesOfProjectJob(getProject(),

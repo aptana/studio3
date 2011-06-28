@@ -65,6 +65,16 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 		return CSSPlugin.getDefault().getPreferenceStore();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return CSSPlugin.getDefault().getPreferenceStore();
+	}
+
 	@Override
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{

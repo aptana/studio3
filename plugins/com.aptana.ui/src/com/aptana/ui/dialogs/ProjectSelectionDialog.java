@@ -26,38 +26,29 @@ import com.aptana.ui.UIPlugin;
 /**
  * @author Max Stepanov
  */
-public class ProjectSelectionDialog extends ElementListSelectionDialog
-{
+public class ProjectSelectionDialog extends ElementListSelectionDialog {
 
 	/**
 	 * @param parent
 	 */
-	public ProjectSelectionDialog(Shell parent)
-	{
+	public ProjectSelectionDialog(Shell parent) {
 		super(parent, WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
-		setTitle("Select project");
-		setMessage("Select a project from the list");
+		setTitle(Messages.ProjectSelectionDialog_Title);
+		setMessage(Messages.ProjectSelectionDialog_Message);
 		final List<Object> list = new ArrayList<Object>();
-		try
-		{
-			ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceProxyVisitor()
-			{
-				public boolean visit(IResourceProxy proxy) throws CoreException
-				{
-					if (proxy.getType() == IResource.ROOT)
-					{
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceProxyVisitor() {
+				public boolean visit(IResourceProxy proxy) throws CoreException {
+					if (proxy.getType() == IResource.ROOT) {
 						return true;
 					}
-					if (proxy.isAccessible())
-					{
+					if (proxy.isAccessible()) {
 						list.add(proxy.requestResource());
 					}
 					return false;
 				}
 			}, 0);
-		}
-		catch (CoreException e)
-		{
+		} catch (CoreException e) {
 			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
 		}
 		setElements(list.toArray());
