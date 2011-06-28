@@ -147,7 +147,7 @@
 	
 	<target name="signJars">
 		<echo message="Signing plugins and features at: ${p2.repo.dir}" />
-		<p2.process.artifacts repositoryPath="${p2.artifact.repo}" ignoreErrors="true" log="${buildlogs}/mirrorlog.txt">
+		<p2.process.artifacts repositoryPath="${p2.artifact.repo}">
 			<sign alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePass}" />
 		</p2.process.artifacts>
 
