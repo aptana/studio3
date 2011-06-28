@@ -14,24 +14,23 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
  * A CSS formatter node for values of a declaration.<br>
- * This node is used to represent a value part of a declaration statemenet.
+ * This node is used to represent a value part of a declaration statement.
  */
 
 public class FormatterCSSDeclarationValueNode extends FormatterBlockWithBeginNode
 {
 
 	private boolean isLastNodeInDeclaration;
-	private boolean hasSyntaxafter;
+	private boolean hasPunctuationAfter;
 
 	public FormatterCSSDeclarationValueNode(IFormatterDocument document, boolean isLastNodeInDeclaration,
-			boolean hasSyntaxafter)
+			boolean hasPunctuationAfter)
 	{
 		super(document);
 		this.isLastNodeInDeclaration = isLastNodeInDeclaration;
-		// It is possible to have two values next to eachother without any syntax
-		this.hasSyntaxafter = hasSyntaxafter;
+		// It is possible to have two values next to eachother without any punctuation
+		this.hasPunctuationAfter = hasPunctuationAfter;
 	}
-
 
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
@@ -48,7 +47,7 @@ public class FormatterCSSDeclarationValueNode extends FormatterBlockWithBeginNod
 	@Override
 	public int getSpacesCountAfter()
 	{
-		if (!hasSyntaxafter && !isLastNodeInDeclaration)
+		if (!hasPunctuationAfter && !isLastNodeInDeclaration)
 		{
 			return 1;
 		}
