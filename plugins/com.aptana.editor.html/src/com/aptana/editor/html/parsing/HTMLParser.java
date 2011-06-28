@@ -91,7 +91,7 @@ public class HTMLParser implements IParser
 				IHTMLConstants.CONTENT_TYPE_HTML, //
 				new HTMLNode[0], //
 				startingOffset, //
-				startingOffset + source.length() //
+				startingOffset + source.length() - 1 //
 		);
 		try
 		{
