@@ -669,4 +669,13 @@
          </action>
       </actionSet>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="com.aptana.ui.WebPerspective">
+         <actionSet
+               id="com.aptana.editor.common.presentation">
+         </actionSet>
+      </perspectiveExtension>
+   </extension>
 </plugin>
