@@ -336,9 +336,9 @@
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            description="Toggle mark occurrences"
+            description="%mark.occurrence.description"
             id="com.aptana.editor.common.toggleMarkOccurrences"
-            name="Mark Occurrences">
+            name="%mark.occurrence.command">
       </command>
    </extension>
    <extension
@@ -626,7 +626,7 @@
             isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
             isGoToPreviousNavigationTarget="false"
             isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
-            label="Occurrences"
+            label="%occurrence.marker"
             overviewRulerPreferenceKey="OccurrenceIndicationInOverviewRuler"
             overviewRulerPreferenceValue="true"
             presentationLayer="4"
@@ -653,7 +653,7 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.editor.common.presentation"
-            label="Common Editor Presentation"
+            label="%editor.presentation"
             visible="false">
          <action
                allowLabelUpdate="true"
@@ -661,11 +661,11 @@
                disabledIcon="icons/full/dtool16/mark_occurrences.gif"
                icon="icons/full/etool16/mark_occurrences.gif"
                id="com.aptana.editor.common.toggleMarkOccurrences"
-               label="Mark Occurrences"
+               label="%presentation.label"
                retarget="true"
                style="toggle"
                toolbarPath="org.eclipse.ui.edit.text.actionSet.presentation/Presentation"
-               tooltip="Mark Occurrences">
+               tooltip="%presentation.tooltip">
          </action>
       </actionSet>
    </extension>
