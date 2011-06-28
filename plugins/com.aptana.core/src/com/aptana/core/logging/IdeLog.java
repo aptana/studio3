@@ -192,8 +192,19 @@ public final class IdeLog
 		{
 			return false;
 		}
+		try
+		{
+			if (!Platform.inDebugMode())
+			{
+				return true;
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore. May happen if we're running unit tests outside IDE
+		}
 
-		return !Platform.inDebugMode() || isScopeEnabled(scope);
+		return isScopeEnabled(scope);
 	}
 
 	/**
