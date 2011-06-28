@@ -151,7 +151,7 @@ public abstract class AbstractInformationControlManager extends
 	@Override
 	protected void presentInformation()
 	{
-		boolean hasContents = ((String) fInformation).trim().length() > 0;
+		boolean hasContents = fInformation != null && ((String) fInformation).trim().length() > 0;
 
 		if (getSubjectArea() != null && hasContents)
 			internalShowInformationControl(getSubjectArea(), fInformation);
