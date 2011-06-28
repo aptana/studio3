@@ -235,12 +235,12 @@ public class IdeLogTest extends TestCase
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
 		listener.reset();
 
-		assertTrue(IdeLog.isErrorEnabled(plugin, IDebugScopes.INDEXER));
+		assertTrue(IdeLog.isErrorEnabled(plugin, IDebugScopes.BUILDER));
 		assertTrue(IdeLog.isWarningEnabled(plugin, null));
 		assertTrue(IdeLog.isInfoEnabled(plugin, IDebugScopes.SHELL));
 
 		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null,
-				IDebugScopes.INDEXER);
+				IDebugScopes.BUILDER);
 		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
 		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
 		assertEquals("Debugging off should find 3 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
@@ -276,17 +276,17 @@ public class IdeLogTest extends TestCase
 		CorePlugin plugin = CorePlugin.getDefault();
 
 		EclipseUtil.setBundleDebugOptions(new String[] { IDebugScopes.SHELL }, false);
-		EclipseUtil.setBundleDebugOptions(new String[] { IDebugScopes.INDEXER }, true);
+		EclipseUtil.setBundleDebugOptions(new String[] { IDebugScopes.BUILDER }, true);
 
 		// We should see all messages logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
 		listener.reset();
 
-		assertTrue(IdeLog.isErrorEnabled(plugin, IDebugScopes.INDEXER));
+		assertTrue(IdeLog.isErrorEnabled(plugin, IDebugScopes.BUILDER));
 		assertTrue(IdeLog.isWarningEnabled(plugin, null));
 		assertFalse(IdeLog.isInfoEnabled(plugin, IDebugScopes.SHELL));
 
-		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, IDebugScopes.INDEXER);
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, IDebugScopes.BUILDER);
 		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
 		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
 		assertEquals("Debugging off should find 2 messages. Found " + StringUtil.join(",", listener.getMessages()), 2,

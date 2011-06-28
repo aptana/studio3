@@ -88,12 +88,12 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
 		IdeLog.logInfo(CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName), IDebugScopes.INDEXER);
+				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName), IDebugScopes.BUILDER);
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
 			IdeLog.logInfo(CorePlugin.getDefault(),
-					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName), IDebugScopes.INDEXER);
+					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName), IDebugScopes.BUILDER);
 			fullBuild(monitor);
 		}
 		else
@@ -103,21 +103,21 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				IdeLog.logInfo(CorePlugin.getDefault(),
 						StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
-						IDebugScopes.INDEXER);
+						IDebugScopes.BUILDER);
 				fullBuild(monitor);
 			}
 			else
 			{
 				IdeLog.logInfo(CorePlugin.getDefault(),
 						StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
-						IDebugScopes.INDEXER);
+						IDebugScopes.BUILDER);
 				incrementalBuild(delta, monitor);
 			}
 		}
 
 		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
 		IdeLog.logInfo(CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime), IDebugScopes.INDEXER);
+				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime), IDebugScopes.BUILDER);
 
 		return null;
 	}
@@ -133,7 +133,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 				delta.accept(resourceCollector);
 				sub.worked(1);
 
-				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.INDEXER))
+				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
 				{
 					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex.toArray(new IFile[0]);
 					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[0]);
@@ -141,7 +141,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 							CorePlugin.getDefault(),
 							StringUtil.format(Messages.UnifiedBuilder_IndexingResourceDelta,
 									new Object[] { Arrays.deepToString(toRemove), Arrays.deepToString(toIndex) }),
-							IDebugScopes.INDEXER);
+							IDebugScopes.BUILDER);
 				}
 
 				if (!resourceCollector.filesToRemoveFromIndex.isEmpty())
