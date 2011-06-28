@@ -55,6 +55,7 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -1071,13 +1072,17 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected void hijackOutline()
 	{
-		IViewReference[] refs = UIUtils.getActivePage().getViewReferences();
-		for (IViewReference ref : refs)
+		IWorkbenchPage page = UIUtils.getActivePage();
+		if (page != null)
 		{
-			if (ref.getId().equals(IPageLayout.ID_OUTLINE))
+			IViewReference[] refs = page.getViewReferences();
+			for (IViewReference ref : refs)
 			{
-				hijackView(ref.getView(false), false);
-				return;
+				if (ref.getId().equals(IPageLayout.ID_OUTLINE))
+				{
+					hijackView(ref.getView(false), false);
+					return;
+				}
 			}
 		}
 	}
@@ -1088,7 +1093,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	public synchronized void earlyStartup()
 	{
 		if (ranEarlyStartup)
+		{
 			return;
+		}
 		ranEarlyStartup = true;
 		if (invasiveThemesEnabled())
 		{
@@ -1107,7 +1114,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.removePreferenceChangeListener(this);
-
 		pageListener = null;
 	}
 
