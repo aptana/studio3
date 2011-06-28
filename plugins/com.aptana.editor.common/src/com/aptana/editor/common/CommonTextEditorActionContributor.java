@@ -180,10 +180,10 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 		inputPositionStatsContributionItem = new StatusLineContributionItem(
 				ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION, true, 24);
 		IContributionItem[] contributionItems = statusLineManager.getItems();
-		for (int i = 0; i < contributionItems.length; i++)
+		for (IContributionItem contributionItem : contributionItems)
 		{
-			IContributionItem contributionItem = contributionItems[i];
 			String id = contributionItem.getId();
+
 			if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(id))
 			{
 				statusLineManager.remove(contributionItem);
