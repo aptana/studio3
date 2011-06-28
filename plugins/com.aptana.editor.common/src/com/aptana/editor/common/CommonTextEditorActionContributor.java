@@ -222,7 +222,7 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 	{
 		super.init(bars, page);
 
-		bars.setGlobalActionHandler("com.aptana.editor.common.toggleMarkOccurrences", markOccurrencesAction);
+		bars.setGlobalActionHandler("com.aptana.editor.common.toggleMarkOccurrences", markOccurrencesAction); //$NON-NLS-1$
 	}
 
 	/*
