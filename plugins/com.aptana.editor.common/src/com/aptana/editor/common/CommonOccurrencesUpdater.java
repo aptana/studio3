@@ -33,6 +33,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
@@ -512,7 +513,15 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 			}
 
 			// force update
-			updateAnnotations(editor.getSelectionProvider().getSelection());
+			if (editor != null)
+			{
+				ISelectionProvider selectionProvider = editor.getSelectionProvider();
+
+				if (selectionProvider != null)
+				{
+					updateAnnotations(selectionProvider.getSelection());
+				}
+			}
 		}
 	}
 
