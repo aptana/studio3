@@ -146,7 +146,12 @@
 	</target>
 	
 	<target name="signJars">
-        <echo message="Signing plugins and features at: ${p2.repo.dir}" />
+		<echo message="Signing plugins and features at: ${p2.repo.dir}" />
+		<p2.process.artifacts repositoryPath="${p2.artifact.repo}" ignoreErrors="true" log="${buildlogs}/mirrorlog.txt">
+			<sign alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePass}" />
+		</p2.process.artifacts>
+
+		<!-- This does sign the JARs, but it ends up making MD5 hashes in p2 repo mismatched!
         <signjar 
             alias="${keystoreAlias}" keystore="${keystore}"
             storepass="${keystorePass}"
@@ -156,6 +161,7 @@
             <fileset dir="${p2.repo.dir}/features" includes="**/*.jar" />
           </path>
         </signjar>
+		-->
 	</target>
 	
 	<!-- Workaround for Eclipse bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=271373 -->

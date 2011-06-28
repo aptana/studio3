@@ -7,15 +7,28 @@
  */
 package com.aptana.editor.css.formatter.nodes;
 
+import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
-public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
+public class FormatterCSSParenthesesNode extends FormatterBlockWithBeginEndNode
 {
 
-	public FormatterCSSSyntaxNode(IFormatterDocument document)
+	public FormatterCSSParenthesesNode(IFormatterDocument document)
 	{
 		super(document);
+	}
+
+	@Override
+	public int getSpacesCountBefore()
+	{
+		return getInt(CSSFormatterConstants.SPACES_BEFORE_PARENTHESES);
+	}
+
+	@Override
+	public int getSpacesCountAfter()
+	{
+		return getInt(CSSFormatterConstants.SPACES_AFTER_PARENTHESES);
 	}
 
 	@Override
@@ -23,7 +36,5 @@ public class FormatterCSSSyntaxNode extends FormatterBlockWithBeginNode
 	{
 		return true;
 	}
-
-	// TODO Have customization for ',' ';' '>'
 
 }
