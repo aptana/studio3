@@ -59,4 +59,9 @@ public interface IJSDebugUIConstants {
 	 * DETAIL_PANE
 	 */
 	String DETAIL_PANE = "DETAIL_PANE"; //$NON-NLS-1$
+
+	/**
+	 * CONSOLE_WARN_COLOR
+	 */
+	String CONSOLE_WARN_COLOR = "CONSOLE_WARN_COLOR"; //$NON-NLS-1$
 }
