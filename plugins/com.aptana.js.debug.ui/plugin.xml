@@ -797,5 +797,13 @@
          </enablement>
       </hover>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.consoleColorProviders">
+      <consoleColorProvider
+            class="com.aptana.js.debug.ui.internal.JSConsoleColorProvider"
+            id="com.aptana.js.debug.ui.consoleColorProvider"
+            processType="javascript">
+      </consoleColorProvider>
+   </extension>
 
 </plugin>

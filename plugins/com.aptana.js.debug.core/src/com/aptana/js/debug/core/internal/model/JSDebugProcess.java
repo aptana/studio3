@@ -8,6 +8,7 @@
 package com.aptana.js.debug.core.internal.model;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -28,6 +29,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.StreamsProxy;
 import com.aptana.js.debug.core.model.xhr.IXHRService;
@@ -47,8 +49,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	private volatile boolean processTerminated;
 	private ProcessMonitorThread processMonitorThread;
 	private IStreamsProxy streamsProxy;
-	private PipedOutputStream out;
-	private PipedOutputStream err;
+	private Map<String, PipedOutputStream> streams = new HashMap<String, PipedOutputStream>();
 	private IDebugTarget debugTarget;
 	private IXHRService xhrService;
 	private Map<String, String> fAttributes;
@@ -91,8 +92,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 		this.killProcessOnTerminate = killProcessOnTerminate;
 		this.label = label;
 		initializeAttributes(attributes);
-		out = new PipedOutputStream();
-		err = new PipedOutputStream();
+		createStreams();
 		launch.addProcess(this);
 		fireCreationEvent();
 		DebugPlugin.getDefault().addDebugEventListener(new DebugEventSetListener());
@@ -109,6 +109,16 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 				processMonitorThread.start();
 			}
 		}
+	}
+
+	protected void createStreams() {
+		createStream(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM);
+		createStream(IJSDebugConstants.ID_STANDARD_ERROR_STREAM);
+		createStream(IJSDebugConstants.ID_WARNING_STREAM);
+	}
+
+	protected final void createStream(String streamIdentifier) {
+		streams.put(streamIdentifier, new PipedOutputStream());
 	}
 
 	/*
@@ -131,7 +141,11 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	public IStreamsProxy getStreamsProxy() {
 		if (streamsProxy == null) {
 			try {
-				streamsProxy = new StreamsProxy(new PipedInputStream(out), new PipedInputStream(err));
+				Map<String, InputStream> inputs = new HashMap<String, InputStream>();
+				for (Entry<String, PipedOutputStream> entry : streams.entrySet()) {
+					inputs.put(entry.getKey(), new PipedInputStream(entry.getValue()));
+				}
+				streamsProxy = new StreamsProxy(inputs);
 			} catch (IOException e) {
 				JSDebugPlugin.log(e);
 			}
@@ -234,12 +248,8 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 		return super.getAdapter(adapter);
 	}
 
-	/* package */ OutputStream getOutputStream() {
-		return out;
-	}
-
-	/* package */ OutputStream getErrorStream() {
-		return err;
+	/* package */ OutputStream getStream(String streamIdentifier) {
+		return streams.get(streamIdentifier);
 	}
 
 	/* package */ void setDebugTarget(IDebugTarget debugTarget) {
@@ -275,7 +285,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	}
 
 	private void initializeAttributes(Map<String, Object> attributes) {
-		setAttribute(IProcess.ATTR_PROCESS_TYPE, "javascript"); //$NON-NLS-1$
+		setAttribute(IProcess.ATTR_PROCESS_TYPE, IJSDebugConstants.PROCESS_TYPE);
 		if (attributes != null) {
 			for (Entry<String, Object> entry : attributes.entrySet()) {
 				setAttribute(entry.getKey(), String.valueOf(entry.getValue()));
@@ -305,16 +315,13 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	}
 
 	private void closeStreams() {
-		try {
-			out.close();
-		} catch (IOException ignore) {
+		for (OutputStream stream : streams.values()) {
+			try {
+				stream.close();
+			} catch (IOException ignore) {
+			}
 		}
-		try {
-			err.close();
-		} catch (IOException ignore) {
-		}
-		out = null;
-		err = null;
+		streams.clear();
 	}
 
 	private IDebugTarget getDebugTarget() {
