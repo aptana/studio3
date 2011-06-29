@@ -227,7 +227,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 		// haven't found any rule for this type of partition
 		fContentType = null;
-		if (resume) {
+		if (resume && fPartitionOffset >= 0) {
 			fOffset = fPartitionOffset;
 			fPartitionOffset = -1;
 		}
