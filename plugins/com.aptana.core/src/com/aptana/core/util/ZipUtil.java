@@ -102,7 +102,7 @@ public final class ZipUtil
 			monitor = new NullProgressMonitor();
 		}
 
-		SubMonitor subMonitor = SubMonitor.convert(monitor, "Extracting...", collection.size()); //$NON-NLS-1$
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ZipUtil_default_extract_label, collection.size());
 		try
 		{
 			/* Create directories first */
@@ -136,7 +136,7 @@ public final class ZipUtil
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
-				subMonitor.setTaskName("Extracting " + name); //$NON-NLS-1$
+				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
 				subMonitor.worked(1);
 				if (!entry.isDirectory() && !file.exists())
 				{
