@@ -83,4 +83,23 @@ public interface IJSDebugConstants {
 	 */
 	int DEBUG_EVENT_URL_OPENED = 0x0002;
 
+	/**
+	 * ID_STANDARD_ERROR_STREAM
+	 */
+	String ID_STANDARD_ERROR_STREAM = "ID_STANDARD_ERROR_STREAM";
+
+	/**
+	 * ID_STANDARD_OUTPUT_STREAM
+	 */
+	String ID_STANDARD_OUTPUT_STREAM = "ID_STANDARD_OUTPUT_STREAM";
+
+	/**
+	 * ID_WARNING_STREAM
+	 */
+	String ID_WARNING_STREAM = "ID_WARNING_STREAM"; //$NON-NLS-1$
+
+	/**
+	 * PROCESS_TYPE
+	 */
+	String PROCESS_TYPE = "javascript"; //$NON-NLS-1$
 }
