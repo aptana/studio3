@@ -361,6 +361,19 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+SHIFT+R">
       </key>
+      <key
+            commandId="com.aptana.editor.common.toggleMarkOccurrences"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+O">
+      </key>
+      <key
+            commandId="com.aptana.editor.common.toggleMarkOccurrences"
+            contextId="com.aptana.editor.context"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="COMMAND+ALT+O">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">

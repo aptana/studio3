@@ -23,7 +23,7 @@ public interface IDebugScopes
 	/**
 	 * Items related to the indexing process
 	 */
-	String INDEXER = CorePlugin.PLUGIN_ID + "/debug/indexer"; //$NON-NLS-1$
+	String BUILDER = CorePlugin.PLUGIN_ID + "/debug/builder"; //$NON-NLS-1$
 
 	/**
 	 * Items related to running things on hte command line

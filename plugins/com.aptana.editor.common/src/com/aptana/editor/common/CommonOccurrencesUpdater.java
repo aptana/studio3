@@ -33,6 +33,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
@@ -205,8 +206,11 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 					}
 				}
 
-				// grab result
-				result = document.get(start, offset - start);
+				// grab result, as long as it is on one line only
+				if (document.getLineOfOffset(start) == document.getLineOfOffset(offset))
+				{
+					result = document.get(start, offset - start);
+				}
 			}
 			catch (BadLocationException e)
 			{
@@ -509,7 +513,15 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 			}
 
 			// force update
-			updateAnnotations(editor.getSelectionProvider().getSelection());
+			if (editor != null)
+			{
+				ISelectionProvider selectionProvider = editor.getSelectionProvider();
+
+				if (selectionProvider != null)
+				{
+					updateAnnotations(selectionProvider.getSelection());
+				}
+			}
 		}
 	}
 
