@@ -101,7 +101,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 		final String filename = getFileName();
 		List<CommandElement> commands = BundleManager.getInstance().getExecutableCommands(new IModelFilter()
 		{
-			@SuppressWarnings("nls")
+
 			public boolean include(AbstractElement element)
 			{
 				if (element instanceof TemplateElement)

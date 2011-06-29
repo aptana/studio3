@@ -65,7 +65,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
-				"Cleaning index for project {0} ({1})",
+				"Cleaning index for project {0} ({1})", //$NON-NLS-1$
 				project.getName(),
 				uri
 			);
