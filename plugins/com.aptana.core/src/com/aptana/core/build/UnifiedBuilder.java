@@ -70,7 +70,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 				uri
 			);
 			// @formatter:on
-			IdeLog.logInfo(CorePlugin.getDefault(), message, null, IDebugScopes.BUILDER);
+			IdeLog.logInfo(CorePlugin.getDefault(), message, IDebugScopes.BUILDER);
 
 			IndexManager.getInstance().removeIndex(uri);
 		}
