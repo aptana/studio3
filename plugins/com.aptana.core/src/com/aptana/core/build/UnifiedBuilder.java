@@ -58,11 +58,21 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		super.clean(monitor);
 		SubMonitor sub = SubMonitor.convert(monitor, 2);
-		removeProblemsAndTasksFor(getProject());
+		IProject project = getProject();
+		removeProblemsAndTasksFor(project);
 		sub.worked(1);
 		URI uri = getURI();
 		if (uri != null)
 		{
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Cleaning index for project {0} ({1})",
+				project.getName(),
+				uri
+			);
+			// @formatter:on
+			IdeLog.logInfo(CorePlugin.getDefault(), message, null, IDebugScopes.BUILDER);
+
 			IndexManager.getInstance().removeIndex(uri);
 		}
 		sub.done();
@@ -87,13 +97,23 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
-		IdeLog.logInfo(CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName), IDebugScopes.BUILDER);
+		// @formatter:off
+		IdeLog.logInfo(
+			CorePlugin.getDefault(),
+			MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName),
+			IDebugScopes.BUILDER
+		);
+		// @formatter:on
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
-			IdeLog.logInfo(CorePlugin.getDefault(),
-					StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName), IDebugScopes.BUILDER);
+			// @formatter:off
+			IdeLog.logInfo(
+				CorePlugin.getDefault(),
+				MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName),
+				IDebugScopes.BUILDER
+			);
+			// @formatter:on
 			fullBuild(monitor);
 		}
 		else
@@ -101,23 +121,36 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null)
 			{
-				IdeLog.logInfo(CorePlugin.getDefault(),
-						StringUtil.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
-						IDebugScopes.BUILDER);
+				// @formatter:off
+				IdeLog.logInfo(
+					CorePlugin.getDefault(),
+					MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
+					IDebugScopes.BUILDER
+				);
+				// @formatter:on
 				fullBuild(monitor);
 			}
 			else
 			{
-				IdeLog.logInfo(CorePlugin.getDefault(),
-						StringUtil.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
-						IDebugScopes.BUILDER);
+				// @formatter:off
+				IdeLog.logInfo(
+					CorePlugin.getDefault(),
+					MessageFormat.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
+					IDebugScopes.BUILDER
+				);
+				// @formatter:on
 				incrementalBuild(delta, monitor);
 			}
 		}
 
 		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
-		IdeLog.logInfo(CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime), IDebugScopes.BUILDER);
+		// @formatter:off
+		IdeLog.logInfo(
+			CorePlugin.getDefault(),
+			MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime),
+			IDebugScopes.BUILDER
+		);
+		// @formatter:on
 
 		return null;
 	}
