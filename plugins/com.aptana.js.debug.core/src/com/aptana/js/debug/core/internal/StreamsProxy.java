@@ -9,18 +9,20 @@ package com.aptana.js.debug.core.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.debug.core.model.IStreamsProxy;
 
+import com.aptana.debug.core.IExtendedStreamsProxy;
+import com.aptana.js.debug.core.IJSDebugConstants;
 
 /**
  * @author Max Stepanov
  */
-public class StreamsProxy implements IStreamsProxy {
-	
-	private final OutputStreamMonitor outMonitor;
-	private final OutputStreamMonitor errMonitor;
+public class StreamsProxy implements IExtendedStreamsProxy {
+
+	private final Map<String, OutputStreamMonitor> monitorMap = new HashMap<String, OutputStreamMonitor>();
 
 	/**
 	 * StreamsProxy
@@ -29,24 +31,52 @@ public class StreamsProxy implements IStreamsProxy {
 	 * @param errIn
 	 */
 	public StreamsProxy(InputStream outIn, InputStream errIn) {
-		outMonitor = new OutputStreamMonitor(outIn, null);
-		errMonitor = new OutputStreamMonitor(errIn, null);
-		outMonitor.startMonitoring();
-		errMonitor.startMonitoring();
+		monitorMap.put(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM, new OutputStreamMonitor(outIn, null));
+		monitorMap.put(IJSDebugConstants.ID_STANDARD_ERROR_STREAM, new OutputStreamMonitor(errIn, null));
+		for (OutputStreamMonitor monitor : monitorMap.values()) {
+			monitor.startMonitoring();
+		}
+	}
+
+	public StreamsProxy(Map<String, InputStream> streams) {
+		for (Map.Entry<String, InputStream> entry : streams.entrySet()) {
+			monitorMap.put(entry.getKey(), new OutputStreamMonitor(entry.getValue(), null));
+		}
+		for (OutputStreamMonitor monitor : monitorMap.values()) {
+			monitor.startMonitoring();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.debug.core.IExtendedStreamsProxy#getStreamMonitor(java.lang
+	 * .String)
+	 */
+	public IStreamMonitor getStreamMonitor(String streamIdentifier) {
+		return monitorMap.get(streamIdentifier);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.debug.core.IExtendedStreamsProxy#getStreamIdentifers()
+	 */
+	public String[] getStreamIdentifers() {
+		return monitorMap.keySet().toArray(new String[monitorMap.size()]);
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
 	 */
 	public IStreamMonitor getErrorStreamMonitor() {
-		return errMonitor;
+		return getStreamMonitor(IJSDebugConstants.ID_STANDARD_ERROR_STREAM);
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
 	 */
 	public IStreamMonitor getOutputStreamMonitor() {
-		return outMonitor;
+		return getStreamMonitor(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM);
 	}
 
 	/*
