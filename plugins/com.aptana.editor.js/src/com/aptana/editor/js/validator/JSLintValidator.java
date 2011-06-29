@@ -25,6 +25,7 @@ import org.mozilla.javascript.ScriptOrFnNode;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.optimizer.Codegen;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StreamUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
@@ -163,7 +164,7 @@ public class JSLintValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			JSPlugin.logError(Messages.JSLintValidator_ERR_FailToGetJSLint, e);
+			IdeLog.logError(JSPlugin.getDefault(), Messages.JSLintValidator_ERR_FailToGetJSLint, e);
 		}
 		finally
 		{

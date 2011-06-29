@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 public class ResourceUtil
 {
@@ -68,15 +69,13 @@ public class ResourceUtil
 			{
 				String message = MessageFormat.format(Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
 						new Object[] { url });
-
-				CorePlugin.logError(message, e);
+				IdeLog.logError(CorePlugin.getDefault(), message, e);
 			}
 			catch (URISyntaxException e)
 			{
 				String message = MessageFormat.format(Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
 						new Object[] { url });
-
-				CorePlugin.logError(message, e);
+				IdeLog.logError(CorePlugin.getDefault(), message, e);
 			}
 		}
 

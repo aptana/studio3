@@ -23,9 +23,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
-		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "</>=&'\""); //$NON-NLS-1$
+		prefs.put(
+				com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
+				"</>=&'\" "); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
+
+		// mark occurrences
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 	}
 }

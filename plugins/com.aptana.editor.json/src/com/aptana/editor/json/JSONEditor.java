@@ -9,12 +9,13 @@ package com.aptana.editor.json;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.json.internal.text.JSONFoldingComputer;
 import com.aptana.editor.json.outline.JSONOutlineContentProvider;
@@ -23,26 +24,18 @@ import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
 @SuppressWarnings("restriction")
 public class JSONEditor extends AbstractThemeableEditor
 {
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public ITreeContentProvider getOutlineContentProvider()
 	{
-		CommonOutlinePage outline = super.createOutlinePage();
-
-		outline.setContentProvider(new JSONOutlineContentProvider());
-		outline.setLabelProvider(new JSONOutlineLabelProvider());
-
-		return outline;
+		return new JSONOutlineContentProvider();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
+	@Override
+	public ILabelProvider getOutlineLabelProvider()
+	{
+		return new JSONOutlineLabelProvider();
+	}
+
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
@@ -50,7 +43,7 @@ public class JSONEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new JSONDocumentProvider());
+		this.setDocumentProvider(JSONPlugin.getDefault().getJSONDocumentProvider());
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()
@@ -63,5 +56,15 @@ public class JSONEditor extends AbstractThemeableEditor
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return new JSONFoldingComputer(this, document);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return JSONPlugin.getDefault().getPreferenceStore();
 	}
 }

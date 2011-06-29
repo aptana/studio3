@@ -113,6 +113,13 @@ This name will be displayed as the option to select in the project wizard.
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="replaceParameters" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  Indicate that template-tags evaluation and substitution will occure when importing the template into the workspace.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -14,9 +14,8 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -34,7 +33,7 @@ public class LocalFileAdapterFactory implements IAdapterFactory {
 			try {
 				return ((LocalFile) adaptableObject).toLocalFile(EFS.NONE, null);
 			} catch (CoreException e) {
-				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, "", e)); //$NON-NLS-1$
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), e.getMessage(), e, null);
 			}
 		}
 		return null;

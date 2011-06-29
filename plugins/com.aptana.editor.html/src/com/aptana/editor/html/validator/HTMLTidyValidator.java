@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.w3c.tidy.Tidy;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
@@ -39,6 +40,8 @@ public class HTMLTidyValidator implements IValidator
 			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
 			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
 			"source>", "summary>", "time>", "video>", "wbr>" };
+	@SuppressWarnings("nls")
+	private static final String[] FILTERED = { "lacks \"type\" attribute", "replacing illegal character code" };
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
@@ -61,7 +64,7 @@ public class HTMLTidyValidator implements IValidator
 			}
 			catch (Exception e)
 			{
-				HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_ParseErrors, e);
+				IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_ParseErrors, e);
 			}
 			finally
 			{
@@ -89,11 +92,11 @@ public class HTMLTidyValidator implements IValidator
 		tidy.setErrout(out);
 		try
 		{
-			tidy.parse(new ByteArrayInputStream(source.getBytes()), null);
+			tidy.parse(new ByteArrayInputStream(source.getBytes("UTF-8")), null); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
-			HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_Tidy, e);
+			IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_Tidy, e);
 		}
 		out.flush();
 
@@ -112,7 +115,7 @@ public class HTMLTidyValidator implements IValidator
 			String message = patchMessage(matcher.group(4));
 
 			if (message != null && !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML)
-					&& !containsHTML5Element(message))
+					&& !containsHTML5Element(message) && !isAutoFiltered(message))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
@@ -141,6 +144,18 @@ public class HTMLTidyValidator implements IValidator
 	private static boolean containsHTML5Element(String message)
 	{
 		for (String element : HTML5_ELEMENTS)
+		{
+			if (message.indexOf(element) > -1)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isAutoFiltered(String message)
+	{
+		for (String element : FILTERED)
 		{
 			if (message.indexOf(element) > -1)
 			{

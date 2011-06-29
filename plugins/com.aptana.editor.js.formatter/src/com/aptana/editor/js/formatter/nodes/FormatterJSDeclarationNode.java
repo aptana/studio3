@@ -8,6 +8,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
@@ -26,6 +27,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 
 	protected boolean hasBlockedChild;
 	protected IParseNode node;
+	protected boolean hasCommentBefore;
 
 	/**
 	 * @param document
@@ -35,11 +37,13 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	 *            can be overwritten by a preference setting.
 	 * @param node
 	 */
-	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild, IParseNode node)
+	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild, IParseNode node,
+			boolean hasCommentBefore)
 	{
 		super(document);
 		this.hasBlockedChild = hasBlockedChild;
 		this.node = node;
+		this.hasCommentBefore = hasCommentBefore;
 	}
 
 	/**
@@ -50,6 +54,10 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
+		if (hasCommentBefore)
+		{
+			return true;
+		}
 		// To change this behavior, it's recommended to create a designated subclass and override this method to return
 		// the value set in the preferences.
 		if (node instanceof JSBinaryOperatorNode)
@@ -68,10 +76,8 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 				return !hasBlockedChild
 						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
 			case JSNodeTypes.FUNCTION:
-				if (isPartOfExpression(node.getParent()))
-				{
-					return false;
-				}
+			case JSNodeTypes.VAR:
+				return !isLoopOrExpressionNode(node.getParent());
 		}
 		return true;
 	}
@@ -114,9 +120,27 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	public int getSpacesCountBefore()
 	{
 		// TODO add preferences
-		if (node.getParent().getNodeType() == JSNodeTypes.GROUP)
+		short parentNodeType = node.getParent().getNodeType();
+		if (parentNodeType == JSNodeTypes.GROUP)
 		{
 			return 0;
+		}
+		if (parentNodeType == JSNodeTypes.ARGUMENTS)
+		{
+			// Set to zero only if it's the first argument
+			JSArgumentsNode argumentsNode = (JSArgumentsNode) node.getParent();
+			if (argumentsNode.getChild(0) == node)
+			{
+				return 0;
+			}
+		}
+		short nodeType = node.getNodeType();
+		if (nodeType == JSNodeTypes.VAR)
+		{
+			if (isLoopOrExpressionNode(node.getParent()))
+			{
+				return 0;
+			}
 		}
 		return 1;
 	}
@@ -139,5 +163,17 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	protected boolean isIndenting()
 	{
 		return !hasBlockedChild;
+	}
+
+	private boolean isLoopOrExpressionNode(IParseNode iParseNode)
+	{
+		switch (iParseNode.getNodeType())
+		{
+			case JSNodeTypes.WHILE:
+			case JSNodeTypes.FOR:
+			case JSNodeTypes.FOR_IN:
+				return true;
+		}
+		return isPartOfExpression(iParseNode);
 	}
 }

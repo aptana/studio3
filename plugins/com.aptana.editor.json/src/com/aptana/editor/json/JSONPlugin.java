@@ -4,6 +4,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -13,6 +14,9 @@ public class JSONPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.json"; //$NON-NLS-1$
 	private static JSONPlugin plugin;
+	
+	private IDocumentProvider jsonDocumentProvider;
+
 
 	/**
 	 * Returns the shared instance
@@ -88,4 +92,18 @@ public class JSONPlugin extends AbstractUIPlugin
 		plugin = null;
 		super.stop(context);
 	}
+	
+	/**
+	 * Returns JSON document provider
+	 * @return
+	 */
+	public synchronized IDocumentProvider getJSONDocumentProvider()
+	{
+		if (jsonDocumentProvider == null)
+		{
+			jsonDocumentProvider = new JSONDocumentProvider();
+		}
+		return jsonDocumentProvider;
+	}
+
 }

@@ -81,6 +81,7 @@ public class BeaverSourceScanner extends RuleBasedScanner
 		keywordRule.addWord("%right", createToken(BeaverTokenType.RIGHT));
 		keywordRule.addWord("%terminals", createToken(BeaverTokenType.TERMINALS));
 		keywordRule.addWord("%typeof", createToken(BeaverTokenType.TYPEOF));
+		keywordRule.addWord("%nonassoc", createToken(BeaverTokenType.NONASSOC));
 		rules.add(keywordRule);
 
 		CharacterMapRule cmRule = new CharacterMapRule();

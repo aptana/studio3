@@ -23,7 +23,7 @@
             viewerId="com.aptana.explorer.view">
          <includes>
             <contentExtension
-                  pattern="com.aptana.explorer.navigator.resourceContent">
+                  pattern="org.eclipse.ui.navigator.resourceContent">
             </contentExtension>
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
@@ -127,6 +127,7 @@
          <!-- this is a copy of org.eclipse.ui.navigator.resourceContent with our own drop adapter
         		to address the issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=344880
          -->
+         <!-- 
          <navigatorContent
             name="%resource.extension.name"
             priority="low"
@@ -165,15 +166,43 @@
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.EditActionProvider"
               id="com.aptana.explorer.navigator.resources.actions.EditActions">
-           <enablement></enablement>
+           <enablement>
+              <with
+                    variable="selection">
+                 <iterate
+                       ifEmpty="false">
+                    <or>
+                       <not>
+                          <test
+                                property="org.eclipse.core.resources.projectNature"
+                                value="org.python.pydev.pythonNature">
+                          </test>
+                       </not>
+                    </or>
+                 </iterate>
+              </with></enablement>
         </actionProvider>
         <actionProvider
               class="org.eclipse.ui.internal.navigator.resources.actions.RefactorActionProvider"
               id="com.aptana.explorer.navigator.resources.actions.RefactorActions">
-           <enablement></enablement>
+           <enablement>
+              <with
+                    variable="selection">
+                 <iterate
+                       ifEmpty="false">
+                    <or>
+                       <not>
+                          <test
+                                property="org.eclipse.core.resources.projectNature"
+                                value="org.python.pydev.pythonNature">
+                          </test>
+                       </not>
+                    </or>
+                 </iterate>
+              </with></enablement>
         </actionProvider>
 
-	      <!-- Menu Shortcut Actions for Wizards -->
+	      Menu Shortcut Actions for Wizards
 	      <commonWizard
 	      			type="new"
 	      			wizardId="org.eclipse.ui.wizards.new.folder">
@@ -199,6 +228,7 @@
 		         </enablement>
 		     </commonWizard>
       </navigatorContent>
+      -->
       <commonWizard
             associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
             type="new"
@@ -290,12 +320,22 @@
                   class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                   id="com.aptana.explorer.open.file.manager">
             </dynamic>
+            <command
+                  commandId="com.aptana.terminal.commands.openTerminal"
+                  label="%command.terminal.label"
+                  style="push">
+            </command>
             <visibleWhen
                   checkEnabled="false">
                <iterate>
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
+                  <or>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                     <adapt
+                           type="org.eclipse.core.filesystem.IFileStore">
+                     </adapt>
+                  </or>
                </iterate>
             </visibleWhen>
          </menu>

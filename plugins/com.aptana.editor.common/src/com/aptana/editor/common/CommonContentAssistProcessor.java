@@ -16,10 +16,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.PerformanceStats;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.BadLocationException;
@@ -30,6 +36,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -40,10 +47,12 @@ import org.jruby.RubyHash;
 import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
+import com.aptana.editor.common.contentassist.IPreferenceConstants;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
@@ -55,12 +64,12 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
-import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.ContentAssistElement;
 import com.aptana.scripting.model.filters.ScopeFilter;
 
-public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
+public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor,
+		IPreferenceChangeListener
 {
 	/**
 	 * Default image to use for ruble-contributed proposals (that don't override image)
@@ -76,6 +85,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String TOOL_TIP = "tool_tip"; //$NON-NLS-1$
 	private static final String LOCATION = "location"; //$NON-NLS-1$
 
+	private static final String PERFORMANCE_EVENT_PREFIX = CommonEditorPlugin.PLUGIN_ID + "/perf/content_assist"; //$NON-NLS-1$
+	private static final String RUBLE_PERF = PERFORMANCE_EVENT_PREFIX + "/rubles"; //$NON-NLS-1$
+	private static final String SNIPPET_PERF = PERFORMANCE_EVENT_PREFIX + "/snippets"; //$NON-NLS-1$
+
+	private char[] _completionProposalChars = null;
+	private char[] _contextInformationChars = null;
+	private char[] _proposalTriggerChars = null;
+
 	protected final AbstractThemeableEditor editor;
 
 	/**
@@ -86,6 +103,15 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	public CommonContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		this.editor = editor;
+
+		_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
+		_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
+		_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
+
+		if (getPreferenceNodeQualifier() != null)
+		{
+			new InstanceScope().getNode(getPreferenceNodeQualifier()).addPreferenceChangeListener(this);
+		}
 	}
 
 	/**
@@ -143,24 +169,77 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
-		List<ICompletionProposal> proposals = addRubleProposals(viewer, offset);
-		proposals.addAll(addSnippetProposals(viewer, offset));
-		ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar, autoActivated);
-		if (proposals.isEmpty())
+		PerformanceStats stats = null;
+		try
 		{
-			return others;
-		}
+			if (PerformanceStats.isEnabled(PERFORMANCE_EVENT_PREFIX))
+			{
+				stats = PerformanceStats.getStats(PERFORMANCE_EVENT_PREFIX, this);
+				stats.startRun();
+			}
 
-		if (others == null || others.length == 0)
+			List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+			proposals.addAll(addRubleProposals(viewer, offset));
+			proposals.addAll(addSnippetProposals(viewer, offset));
+			ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar,
+					autoActivated);
+			if (proposals.isEmpty())
+			{
+				return others;
+			}
+
+			if (others == null || others.length == 0)
+			{
+				return proposals.toArray(new ICompletionProposal[proposals.size()]);
+			}
+
+			// Combine the two, leave selection as is
+			ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
+			proposals.toArray(combined);
+			System.arraycopy(others, 0, combined, proposals.size(), others.length);
+			sortProposals(combined);
+			return combined;
+		}
+		finally
 		{
-			return proposals.toArray(new ICompletionProposal[proposals.size()]);
+			if (stats != null)
+			{
+				stats.endRun();
+			}
 		}
+	}
 
-		// Combine the two, leave selection as is
-		ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
-		proposals.toArray(combined);
-		System.arraycopy(others, 0, combined, proposals.size(), others.length);
-		return combined;
+	/**
+	 * Sorts the completion proposals (by default, by display string)
+	 * 
+	 * @param proposals
+	 */
+	protected void sortProposals(ICompletionProposal[] proposals)
+	{
+		// Sort by display string, ignoring case
+		Arrays.sort(proposals, new Comparator<ICompletionProposal>()
+		{
+			public int compare(ICompletionProposal o1, ICompletionProposal o2)
+			{
+				int compare = o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+				if (compare == 0)
+				{
+					if (o1 instanceof TemplateProposal && !(o2 instanceof TemplateProposal))
+					{
+						return 1;
+					}
+					else if (!(o1 instanceof TemplateProposal) && o2 instanceof TemplateProposal)
+					{
+						return -1;
+					}
+					else
+					{
+						return compare;
+					}
+				}
+				return compare;
+			}
+		});
 	}
 
 	/**
@@ -170,19 +249,39 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param offset
 	 * @return
 	 */
-	private Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
+	protected Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
 	{
-		if (viewer != null && viewer.getSelectionProvider() != null)
+		PerformanceStats stats = null;
+		try
 		{
-			ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
-					offset);
-			if (snippets == null)
+			if (viewer != null && viewer.getSelectionProvider() != null)
 			{
-				return Collections.emptyList();
+				if (PerformanceStats.isEnabled(SNIPPET_PERF))
+				{
+					stats = PerformanceStats.getStats(SNIPPET_PERF, "SnippetsCompletionProcessor"); //$NON-NLS-1$
+					stats.startRun();
+				}
+				ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
+						offset);
+				if (stats != null)
+				{
+					stats.endRun();
+				}
+				if (snippets == null)
+				{
+					return Collections.emptyList();
+				}
+				return Arrays.asList(snippets);
 			}
-			return Arrays.asList(snippets);
+			return Collections.emptyList();
 		}
-		return Collections.emptyList();
+		finally
+		{
+			if (stats != null)
+			{
+
+			}
+		}
 	}
 
 	/**
@@ -203,126 +302,157 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			if (commands != null && commands.size() > 0)
 			{
 				Ruby ruby = Ruby.newInstance();
-
-				for (CommandElement ce : commands)
+				for (ContentAssistElement ce : commands)
 				{
-					CommandContext context = ce.createCommandContext();
-					context.setInputStream(new ByteArrayInputStream(viewer.getDocument().get().getBytes()));
-					CommandResult result = ce.execute(context);
-
-					if (result == null || !result.executedSuccessfully())
-					{
-						continue;
-					}
-					String output = result.getOutputString();
-					if (output == null || output.trim().length() == 0)
-					{
-						continue;
-					}
-					// This assumes that the command is returning an array that is output as a
-					// string I can eval (via inspect)!
-					RubyArray object = (RubyArray) ruby.evalScriptlet(output);
-					RubySymbol insertSymbol = RubySymbol.newSymbol(ruby, INSERT);
-					RubySymbol displaySymbol = RubySymbol.newSymbol(ruby, DISPLAY);
-					RubySymbol imageSymbol = RubySymbol.newSymbol(ruby, IMAGE);
-					RubySymbol tooltipSymbol = RubySymbol.newSymbol(ruby, TOOL_TIP);
-					RubySymbol locationSymbol = RubySymbol.newSymbol(ruby, LOCATION);
-					for (IRubyObject element : object.toJavaArray())
-					{
-						String name;
-						String displayName;
-						String description = null;
-						int length;
-						String location = null;
-						IContextInformation contextInfo = null;
-						int replaceLength = 0;
-						Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
-						if (element instanceof RubyHash)
-						{
-							RubyHash hash = (RubyHash) element;
-							if (!hash.containsKey(insertSymbol))
-							{
-								continue;
-							}
-							name = hash.get(insertSymbol).toString();
-							length = name.length();
-							if (hash.containsKey(displaySymbol))
-							{
-								displayName = hash.get(displaySymbol).toString();
-							}
-							else
-							{
-								displayName = name;
-							}
-							if (hash.containsKey(locationSymbol))
-							{
-								location = hash.get(locationSymbol).toString();
-							}
-							if (hash.containsKey(imageSymbol))
-							{
-								String imagePath = hash.get(imageSymbol).toString();
-								// Turn into image!
-								ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
-								Image fromReg = reg.get(imagePath);
-								if (fromReg == null)
-								{
-									URL imageURL = null;
-									try
-									{
-										imageURL = new URL(imagePath);
-									}
-									catch (MalformedURLException e)
-									{
-										try
-										{
-											imageURL = new File(imagePath).toURI().toURL();
-										}
-										catch (MalformedURLException e1)
-										{
-											CommonEditorPlugin.logError(e1);
-										}
-									}
-									if (imageURL != null)
-									{
-										ImageDescriptor desc = ImageDescriptor.createFromURL(imageURL);
-										reg.put(imagePath, desc);
-										image = reg.get(imagePath);
-									}
-								}
-								else
-								{
-									image = fromReg;
-								}
-							}
-							if (hash.containsKey(tooltipSymbol))
-							{
-								description = hash.get(tooltipSymbol).toString();
-							}
-							// TODO Allow hash to set offset to insert and replace length?
-						}
-						else
-						{
-							// Array of strings
-							name = element.toString();
-							displayName = name;
-							length = name.length();
-						}
-						// build proposal
-						CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength,
-								length, image, displayName, contextInfo, description);
-						if (location != null)
-						{
-							proposal.setFileLocation(location);
-						}
-						// add it to the list
-						proposals.add(proposal);
-					}
+					proposals.addAll(addRubleCAProposals(viewer, offset, ruby, ce));
 				}
 			}
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+		}
+		return proposals;
+	}
+
+	/**
+	 * Do the dirty work of executing the content assist element, and then inserting it's resulting proposals. Executed
+	 * once per contributed content assist. This allows subclasses to manipulate individual elements or skip them if
+	 * necessary.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @param ruby
+	 *            shared Ruby interpreter we're launching the content assist inside.
+	 * @param ce
+	 *            The content assist element contributed by a ruble.
+	 * @return
+	 */
+	protected Collection<? extends ICompletionProposal> addRubleCAProposals(ITextViewer viewer, int offset, Ruby ruby,
+			ContentAssistElement ce)
+	{
+		final boolean recordPerf = PerformanceStats.isEnabled(RUBLE_PERF);
+		PerformanceStats stats = null;
+
+		CommandContext context = ce.createCommandContext();
+		context.setInputStream(new ByteArrayInputStream(viewer.getDocument().get().getBytes()));
+		if (recordPerf)
+		{
+			stats = PerformanceStats.getStats(RUBLE_PERF, ce.getDisplayName());
+			stats.startRun();
+		}
+		CommandResult result = ce.execute(context);
+		if (recordPerf)
+		{
+			stats.endRun();
+		}
+		if (result == null || !result.executedSuccessfully())
+		{
+			return Collections.emptyList();
+		}
+		String output = result.getOutputString();
+		if (output == null || output.trim().length() == 0)
+		{
+			return Collections.emptyList();
+		}
+		// This assumes that the command is returning an array that is output as a
+		// string I can eval (via inspect)!
+		RubyArray object = (RubyArray) ruby.evalScriptlet(output);
+		RubySymbol insertSymbol = RubySymbol.newSymbol(ruby, INSERT);
+		RubySymbol displaySymbol = RubySymbol.newSymbol(ruby, DISPLAY);
+		RubySymbol imageSymbol = RubySymbol.newSymbol(ruby, IMAGE);
+		RubySymbol tooltipSymbol = RubySymbol.newSymbol(ruby, TOOL_TIP);
+		RubySymbol locationSymbol = RubySymbol.newSymbol(ruby, LOCATION);
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		for (IRubyObject element : object.toJavaArray())
+		{
+			String name;
+			String displayName;
+			String description = null;
+			int length;
+			String location = null;
+			IContextInformation contextInfo = null;
+			int replaceLength = 0;
+			Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
+			if (element instanceof RubyHash)
+			{
+				RubyHash hash = (RubyHash) element;
+				if (!hash.containsKey(insertSymbol))
+				{
+					continue;
+				}
+				name = hash.get(insertSymbol).toString();
+				length = name.length();
+				if (hash.containsKey(displaySymbol))
+				{
+					displayName = hash.get(displaySymbol).toString();
+				}
+				else
+				{
+					displayName = name;
+				}
+				if (hash.containsKey(locationSymbol))
+				{
+					location = hash.get(locationSymbol).toString();
+				}
+				if (hash.containsKey(imageSymbol))
+				{
+					String imagePath = hash.get(imageSymbol).toString();
+					// Turn into image!
+					ImageRegistry reg = CommonEditorPlugin.getDefault().getImageRegistry();
+					Image fromReg = reg.get(imagePath);
+					if (fromReg == null)
+					{
+						URL imageURL = null;
+						try
+						{
+							imageURL = new URL(imagePath);
+						}
+						catch (MalformedURLException e)
+						{
+							try
+							{
+								imageURL = new File(imagePath).toURI().toURL();
+							}
+							catch (MalformedURLException e1)
+							{
+								IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+							}
+						}
+						if (imageURL != null)
+						{
+							ImageDescriptor desc = ImageDescriptor.createFromURL(imageURL);
+							reg.put(imagePath, desc);
+							image = reg.get(imagePath);
+						}
+					}
+					else
+					{
+						image = fromReg;
+					}
+				}
+				if (hash.containsKey(tooltipSymbol))
+				{
+					description = hash.get(tooltipSymbol).toString();
+				}
+				// TODO Allow hash to set offset to insert and replace length?
+			}
+			else
+			{
+				// Array of strings
+				name = element.toString();
+				displayName = name;
+				length = name.length();
+			}
+			// build proposal
+			CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length,
+					image, displayName, contextInfo, description);
+			if (location != null)
+			{
+				proposal.setFileLocation(location);
+			}
+			// add it to the list
+			proposals.add(proposal);
 		}
 		return proposals;
 	}
@@ -385,7 +515,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return null;
+		return _completionProposalChars;
 	}
 
 	/*
@@ -394,7 +524,35 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	public char[] getContextInformationAutoActivationCharacters()
 	{
-		return null;
+		return _contextInformationChars;
+	}
+
+	/*
+	 * return the characters to insert proposals
+	 */
+	public char[] getProposalTriggerCharacters()
+	{
+		return _proposalTriggerChars;
+	}
+
+	/**
+	 * Retrieves a content assist preference and converts it into a char array
+	 * 
+	 * @param preferenceKey
+	 * @return
+	 */
+	private char[] retrieveCAPreference(String preferenceKey)
+	{
+		String qualifier = getPreferenceNodeQualifier();
+		if (qualifier == null)
+		{
+			return null;
+		}
+
+		String chars = Platform.getPreferencesService().getString(getPreferenceNodeQualifier(), preferenceKey,
+				StringUtil.EMPTY, null);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*
@@ -403,7 +561,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	public IContextInformationValidator getContextInformationValidator()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -599,7 +756,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
 	 */
 	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
@@ -622,5 +780,47 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
 		return false;
+	}
+
+	/**
+	 * Returns the qualifier for the preference service. Gnerally the plugin ID as that's where the relevant preferences
+	 * are stored.
+	 * 
+	 * @return
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return null;
+	}
+
+	/**
+	 * Respond to preference change events
+	 */
+	public void preferenceChange(PreferenceChangeEvent event)
+	{
+		if (IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS.equals(event.getKey()))
+		{
+			_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
+		}
+		else if (IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS.equals(event.getKey()))
+		{
+			_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
+		}
+		else if (IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS.equals(event.getKey()))
+		{
+			_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
+		}
+
+	}
+
+	/**
+	 * dispose
+	 */
+	public void dispose()
+	{
+		if (getPreferenceNodeQualifier() != null)
+		{
+			new InstanceScope().getNode(getPreferenceNodeQualifier()).removePreferenceChangeListener(this);
+		}
 	}
 }

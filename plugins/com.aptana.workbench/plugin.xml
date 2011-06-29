@@ -35,9 +35,19 @@
       <menuContribution
             locationURI="menu:com.aptana.file.template.menu?after=additions">
          <dynamic
-               class="com.aptana.workbench.commands.NewFileTemplateMenuContributor"
+               class="com.aptana.ide.ui.io.navigator.actions.NewFileTemplateMenuContributor"
                id="com.aptana.file.template.dynamic">
          </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=common.new.menu">
+         <menu
+               label="%menu.new.template.label">
+            <dynamic
+                  class="com.aptana.ide.ui.io.navigator.actions.NewFileTemplateMenuContributor"
+                  id="com.aptana.file.template.popup.dynamic">
+            </dynamic>
+         </menu>
       </menuContribution>
    </extension>
    <extension

@@ -20,6 +20,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
@@ -30,12 +31,12 @@ import com.aptana.index.core.SearchPattern;
 
 public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 {
-	public CSSClassHyperlinkDetector()
-	{
-		super();
-	}
 
 	private static final Pattern CSS_CLASS_PATTERN = Pattern.compile("class=[\"'�]([_a-zA-Z0-9-]+)[\"'�]"); //$NON-NLS-1$
+
+	public CSSClassHyperlinkDetector()
+	{
+	}
 
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks)
 	{
@@ -89,7 +90,7 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		}
 		catch (Exception e)
 		{
-			HTMLPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
 		}
 		if (hyperlinks.isEmpty())
 		{

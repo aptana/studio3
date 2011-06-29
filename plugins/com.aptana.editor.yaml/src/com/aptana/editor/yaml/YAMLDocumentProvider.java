@@ -12,15 +12,13 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.SimpleDocumentProvider;
 
-public class YAMLDocumentProvider extends SimpleDocumentProvider
-{
+public class YAMLDocumentProvider extends SimpleDocumentProvider {
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
 	 */
 	@Override
-	public IPartitionTokenScanner createPartitionScanner()
-	{
+	public IPartitionTokenScanner createPartitionScanner() {
 		return new YAMLSourcePartitionScanner();
 	}
 
@@ -28,8 +26,7 @@ public class YAMLDocumentProvider extends SimpleDocumentProvider
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
-	protected String getDefaultContentType(String filename)
-	{
+	protected String getDefaultContentType(String filename) {
 		return IYAMLConstants.CONTENT_TYPE_YAML;
 	}
 
@@ -38,8 +35,7 @@ public class YAMLDocumentProvider extends SimpleDocumentProvider
 	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
 	 */
 	@Override
-	public IPartitioningConfiguration getPartitioningConfiguration()
-	{
+	public IPartitioningConfiguration getPartitioningConfiguration() {
 		return YAMLSourceConfiguration.getDefault();
 	}
 }

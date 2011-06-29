@@ -9,6 +9,7 @@ package com.aptana.git.internal.core.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,16 @@ public class CommitFileRevision extends FileRevision
 				}
 				IStatus result = commit.repository().execute(GitRepository.ReadWrite.READ,
 						"show", commit.sha() + ":" + path); //$NON-NLS-1$ //$NON-NLS-2$
-				return new ByteArrayInputStream(result.getMessage().getBytes());
+
+				// Encode using UTF-8, otherwise use default character set for platform
+				try
+				{
+					return new ByteArrayInputStream(result.getMessage().getBytes("UTF-8")); //$NON-NLS-1$
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					return new ByteArrayInputStream(result.getMessage().getBytes());
+				}
 			}
 		};
 	}

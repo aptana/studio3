@@ -33,6 +33,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -818,7 +819,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			findBarGridData.exclude = false;
 			composite.layout();
 		}
-		if (wasExcluded)
+		Control focusControl = Display.getCurrent().getFocusControl();
+		if (wasExcluded || focusControl instanceof StyledText)
 		{
 			// Only change the text if it is not activated (otherwise it means it was
 			// already activated and the user was in another control in the find bar and used Ctrl+F, in which case we
@@ -830,7 +832,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			{
 				ITextSelection textSelection = (ITextSelection) selection;
 				String text = textSelection.getText();
-				if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1) { //$NON-NLS-1$ //$NON-NLS-2$
+				if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1 && text.length() > 0) { //$NON-NLS-1$ //$NON-NLS-2$
 					setFindText(text);
 				}
 			}

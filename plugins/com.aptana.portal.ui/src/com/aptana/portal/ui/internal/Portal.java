@@ -37,7 +37,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
-import com.aptana.portal.ui.browser.PortalBrowserEditor;
+import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.usage.PingStartup;
@@ -66,7 +66,7 @@ public class Portal
 	private static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
 
 	private static Portal instance;
-	private PortalBrowserEditor portalBrowser;
+	private AbstractPortalBrowserEditor portalBrowser;
 
 	// Private constructor
 	private Portal()
@@ -143,7 +143,7 @@ public class Portal
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try
 				{
-					portalBrowser = (PortalBrowserEditor) page.openEditor(input, browserEditorId);
+					portalBrowser = (AbstractPortalBrowserEditor) page.openEditor(input, browserEditorId);
 					portalBrowser.addDisposeListener(new PortalDisposeListener());
 				}
 				catch (PartInitException e)

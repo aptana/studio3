@@ -225,7 +225,6 @@
          </menu>
       </menuContribution>
       <menuContribution
-            allPopups="false"
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
          <menu
                id="projectExplorerShowIn"
@@ -234,13 +233,23 @@
                   class="com.aptana.ui.commands.OpenFileManagerContributionItem"
                   id="com.aptana.ui.open.file.manager">
             </dynamic>
+            <command
+                  commandId="com.aptana.terminal.commands.openTerminal"
+                  label="%command.terminal.label"
+                  style="push">
+            </command>
             <visibleWhen
                   checkEnabled="false">
                <iterate
                      ifEmpty="false">
-                  <instanceof
-                        value="org.eclipse.core.resources.IResource">
-                  </instanceof>
+                  <or>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                     </adapt>
+                     <adapt
+                           type="org.eclipse.core.filesystem.IFileStore">
+                     </adapt>
+                  </or>
                </iterate>
             </visibleWhen>
          </menu>
@@ -252,6 +261,15 @@
             class="com.aptana.ui.preferences.AptanaPreferencePage"
             id="com.aptana.ui.AptanaPreferencePage"
             name="%page.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ui.preferences.TroubleshootingPreferencePage"
+            id="com.aptana.ui.TroubleshootingPreferencePage"
+            name="%page.troubleshooting.name">
       </page>
    </extension>
    <extension

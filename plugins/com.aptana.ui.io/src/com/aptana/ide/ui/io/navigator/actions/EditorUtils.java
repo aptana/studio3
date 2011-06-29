@@ -28,6 +28,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
 import com.aptana.ui.util.UIUtils;
@@ -72,11 +73,21 @@ public class EditorUtils
 							IEditorPart editorPart = null;
 							if (page != null)
 							{
-								boolean opened = (page.findEditor(finalEditorInput) != null);
+								String name;
+								if (finalEditorInput instanceof IUniformFileStoreEditorInput)
+								{
+									name = ((IUniformFileStoreEditorInput) finalEditorInput).getFileStore().getName();
+								}
+								else
+								{
+									name = finalEditorInput.getName();
+								}
+								String editorId = editorDescriptor == null ? IDE.getEditorDescriptor(name).getId()
+										: editorDescriptor.getId();
+								int matchFlags = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
+								boolean opened = page.findEditors(finalEditorInput, editorId, matchFlags).length > 0;
 
-								String editorId = editorDescriptor == null ? IDE.getEditorDescriptor(
-										finalEditorInput.getName()).getId() : editorDescriptor.getId();
-								editorPart = page.openEditor(finalEditorInput, editorId);
+								editorPart = page.openEditor(finalEditorInput, editorId, true, matchFlags);
 								if (!opened && editorPart != null)
 								{
 									attachSaveListener(editorPart);

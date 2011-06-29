@@ -12,7 +12,10 @@ import java.net.URI;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -20,7 +23,12 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -32,73 +40,116 @@ import com.aptana.terminal.views.TerminalView;
 
 public class OpenTerminalHandler extends AbstractHandler
 {
+
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		// FIXME Before this would grab user's working dir pref and use that if it had a value no matter the context.
-		// Now we fallback to it if all else fails...
-		IProject project = null;
-		Object input = HandlerUtil.getShowInInput(event);
-		if (input instanceof IFileEditorInput)
+		// checks the current selection first
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection)
 		{
-			IFileEditorInput fileInput = (IFileEditorInput) input;
-			project = fileInput.getFile().getProject();
-		}
-		else if (input instanceof IStorageEditorInput)
-		{
-			IStorageEditorInput fileInput = (IStorageEditorInput) input;
-			try
+			Object selectedObject = ((IStructuredSelection) selection).getFirstElement();
+			if (selectedObject instanceof IAdaptable)
 			{
-				IStorage storage = fileInput.getStorage();
-				if (storage != null)
+				IResource resource = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
+				if (resource != null)
 				{
-					IPath fullPath = storage.getFullPath();
-					if (fullPath != null)
+					IContainer folder;
+					if (resource instanceof IContainer)
 					{
-						IPath parentPath = fullPath.removeLastSegments(1);
+						folder = (IContainer) resource;
+					}
+					else
+					{
+						folder = resource.getParent();
+					}
+					TerminalView.openView(folder.getName(), folder.getName(), folder.getLocation());
+					return true;
+				}
+
+				IFileStore fileStore = (IFileStore) ((IAdaptable) selectedObject).getAdapter(IFileStore.class);
+				try
+				{
+					if (fileStore != null && fileStore.toLocalFile(EFS.NONE, null) != null)
+					{
+						if (!fileStore.fetchInfo().isDirectory())
+						{
+							fileStore = fileStore.getParent();
+						}
+						TerminalView.openView(fileStore.getName(), fileStore.getName(),
+								URIUtil.toPath(fileStore.toURI()));
+						return true;
+					}
+				}
+				catch (CoreException e)
+				{
+				}
+			}
+		}
+
+		// checks the active editor
+		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
+		if (editorPart != null)
+		{
+			IEditorInput input = editorPart.getEditorInput();
+			if (input instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileInput = (IFileEditorInput) input;
+				IContainer folder = fileInput.getFile().getParent();
+				TerminalView.openView(folder.getName(), folder.getName(), folder.getLocation());
+				return true;
+			}
+			if (input instanceof IStorageEditorInput)
+			{
+				IStorageEditorInput fileInput = (IStorageEditorInput) input;
+				try
+				{
+					IStorage storage = fileInput.getStorage();
+					if (storage != null)
+					{
+						IPath fullPath = storage.getFullPath();
+						if (fullPath != null)
+						{
+							IPath parentPath = fullPath.removeLastSegments(1);
+							TerminalView.openView(parentPath.lastSegment(), parentPath.lastSegment(), parentPath);
+							return true;
+						}
+					}
+				}
+				catch (CoreException e)
+				{
+					// ignore
+				}
+			}
+			if (input instanceof IPathEditorInput)
+			{
+				IPath path = ((IPathEditorInput) input).getPath();
+				IPath parentPath = path.removeLastSegments(1);
+				TerminalView.openView(parentPath.lastSegment(), parentPath.lastSegment(), parentPath);
+				return true;
+			}
+			if (input instanceof IURIEditorInput)
+			{
+				IURIEditorInput fileInput = (IURIEditorInput) input;
+				URI uri = fileInput.getURI();
+				if (uri != null)
+				{
+					if ("file".equals(uri.getScheme())) //$NON-NLS-1$
+					{
+						IPath path = Path.fromOSString(uri.getPath());
+						IPath parentPath = path.removeLastSegments(1);
 						TerminalView.openView(parentPath.lastSegment(), parentPath.lastSegment(), parentPath);
 						return true;
 					}
 				}
 			}
-			catch (CoreException e)
-			{
-				// ignore
-			}
 		}
-		else if (input instanceof IURIEditorInput)
+
+		if (!openUserWorkingDirectory())
 		{
-			IURIEditorInput fileInput = (IURIEditorInput) input;
-			URI uri = fileInput.getURI();
-			if (uri != null)
-			{
-				if ("file".equals(uri.getScheme())) //$NON-NLS-1$
-				{
-					IPath path = Path.fromOSString(uri.getPath());
-					IPath parentPath = path.removeLastSegments(1);
-					TerminalView.openView(parentPath.lastSegment(), parentPath.lastSegment(), parentPath);
-					return true;
-				}
-			}
+			// User has no specific directory set, just open with a null working dir...
+			TerminalView.openView(null, Messages.OpenTerminalHandler_LBL_Terminal, null);
 		}
-		else if (input instanceof IProject)
-		{
-			project = (IProject) input;
-		}
-		else if (input instanceof IAdaptable)
-		{
-			IAdaptable adapt = (IAdaptable) input;
-			IResource resource = (IResource) adapt.getAdapter(IResource.class);
-			if (resource != null)
-			{
-				project = resource.getProject();
-			}
-		}
-		if (project != null)
-		{
-			TerminalView.openView(project.getName(), project.getName(), project.getLocation());
-			return true;
-		}
-		return openUserWorkingDirectory();
+		return null;
 	}
 
 	private boolean openUserWorkingDirectory()

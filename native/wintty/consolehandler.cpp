@@ -663,6 +663,7 @@ static void ReadConsoleBuffer()
 }
 
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength);
+static BOOL IsSpecialConsoleApp();
 
 #define ESC	'\x1B'
 #define DLE	'\x10'
@@ -724,7 +725,7 @@ static void WriteConsole(void)
 			SHORT state = HIBYTE(key);
 			DWORD dwKeyState = 0;
 			key = LOBYTE(key);
-			if( (key == VK_CANCEL) ) {
+			if( (key == VK_CANCEL && !IsSpecialConsoleApp()) ) {
 				::GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
 				continue;
 			}
@@ -983,4 +984,21 @@ static void SendProcessList()
 	}
 	OutputChar('p');
 	FlushBuffer();
+}
+
+static BOOL IsSpecialConsoleApp()
+{
+	BOOL bResult = FALSE;
+	DWORD dwProcesses[64];
+	DWORD dwCount = ::GetConsoleProcessList(dwProcesses, sizeof(dwProcesses)/sizeof(dwProcesses[0]));
+	HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcesses[0]);
+	if (hModuleSnap != INVALID_HANDLE_VALUE) {
+		MODULEENTRY32 me32 = {0};
+		me32.dwSize = sizeof(MODULEENTRY32);
+		if (Module32First(hModuleSnap, &me32)) {
+			bResult = wcsstr(me32.szExePath, _T("ssh.exe")) != NULL;
+		}
+		CloseHandle(hModuleSnap);
+	}
+	return bResult;
 }

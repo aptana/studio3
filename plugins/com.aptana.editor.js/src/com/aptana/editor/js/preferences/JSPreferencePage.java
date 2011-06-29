@@ -40,11 +40,6 @@ public class JSPreferencePage extends CommonEditorPreferencePage
 	}
 
 	@Override
-	protected void createMarkOccurrenceOptions(Composite parent)
-	{
-	}
-
-	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
 		return new InstanceScope().getNode(JSPlugin.PLUGIN_ID);

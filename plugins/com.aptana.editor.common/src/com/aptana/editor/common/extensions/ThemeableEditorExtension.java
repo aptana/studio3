@@ -34,6 +34,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.theme.IThemeManager;
@@ -90,6 +91,7 @@ public class ThemeableEditorExtension
 
 	public void overrideThemeColors()
 	{
+		// TODO Extract the application of the theme to the sourceviewer/text widget and then re-use it in DisplayView.
 		overrideSelectionColor();
 		overrideCursor();
 		overrideCaretColor();
@@ -348,8 +350,7 @@ public class ThemeableEditorExtension
 		}
 		catch (BackingStoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
-
 }

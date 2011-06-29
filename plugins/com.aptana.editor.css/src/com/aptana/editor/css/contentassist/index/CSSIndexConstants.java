@@ -12,7 +12,9 @@ public interface CSSIndexConstants
 	// the content format version of the CSS index files
 	// 0.1 - Initial version
 	// 0.11 - Using JSON for element and property content assist model elements
-	public static final double INDEX_VERSION = 0.11;
+	// 0.12 - Updated browser support for css3 properties
+	// 0.13 - Added properties for webkit
+	public static final double INDEX_VERSION = 0.13;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;

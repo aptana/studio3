@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 
 /**
@@ -172,9 +173,8 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
-
 	}
 
 	protected String getBaseName(IWorkbenchPart part)

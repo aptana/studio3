@@ -8,6 +8,16 @@ css.formatter.formatter.tabulation.size=4
 css.formatter.line.after.declaration=0
 css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
+css.formatter.spaces.before.commas=0
+css.formatter.spaces.after.commas=1
+css.formatter.spaces.before.parentheses=1
+css.formatter.spaces.after.parentheses=1
+css.formatter.spaces.before.colon=0
+css.formatter.spaces.after.colon=1
+css.formatter.spaces.before.semicolon=0
+css.formatter.spaces.after.semicolon=0
+css.formatter.spaces.before.child.combinator=1
+css.formatter.spaces.after.child.combinator=1
 ==CONTENT==
 body {
   background-color:#FFFFFF;
@@ -134,7 +144,7 @@ input:before {
   }
 ==FORMATTED==
 body {
-    background-color:#FFFFFF;
+    background-color: #FFFFFF;
     margin: 0px 0px;
 }
 
@@ -156,7 +166,7 @@ a:hover {
 }
 
 a.a10px, a.a10px:link, a.a10px:visited {
-    font-size:10px;
+    font-size: 10px;
     border-bottom: 1px dotted #B4C8E3;
 }
 
@@ -183,8 +193,7 @@ a.afooter:hover {
     font-weight: bold;
     color: #FFFFFF;
     vertical-align: middle;
-    width: 129px;
-    /* WIDTH OF MAINNAV CELLS */
+    width: 129px;  /* WIDTH OF MAINNAV CELLS */
     padding: 0px 0px 0px 10px;
     cursor: hand
 }

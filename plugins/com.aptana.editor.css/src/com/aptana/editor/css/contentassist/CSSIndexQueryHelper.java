@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexReader;
@@ -94,7 +95,6 @@ public class CSSIndexQueryHelper
 			try
 			{
 				List<ElementElement> elements = this._reader.getElements(getIndex(), name);
-
 				if (elements.isEmpty() == false)
 				{
 					result = elements.get(0);
@@ -102,7 +102,7 @@ public class CSSIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				CSSPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 
@@ -117,14 +117,13 @@ public class CSSIndexQueryHelper
 	public List<ElementElement> getElements()
 	{
 		List<ElementElement> result = Collections.emptyList();
-
 		try
 		{
 			result = this._reader.getElements(getIndex());
 		}
 		catch (IOException e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -149,14 +148,13 @@ public class CSSIndexQueryHelper
 	public List<PropertyElement> getProperties()
 	{
 		List<PropertyElement> result = Collections.emptyList();
-
 		try
 		{
 			result = this._reader.getProperties(getIndex());
 		}
 		catch (IOException e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -170,7 +168,6 @@ public class CSSIndexQueryHelper
 	public PropertyElement getProperty(String name)
 	{
 		PropertyElement result = null;
-
 		if (name != null && name.length() > 0)
 		{
 			try
@@ -184,7 +181,7 @@ public class CSSIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				CSSPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 
@@ -199,14 +196,13 @@ public class CSSIndexQueryHelper
 	public List<PseudoClassElement> getPseudoClasses()
 	{
 		List<PseudoClassElement> result = Collections.emptyList();
-
 		try
 		{
 			result = this._reader.getPseudoClasses(getIndex());
 		}
 		catch (IOException e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -220,14 +216,13 @@ public class CSSIndexQueryHelper
 	public List<PseudoElementElement> getPseudoElements()
 	{
 		List<PseudoElementElement> result = Collections.emptyList();
-
 		try
 		{
 			result = this._reader.getPseudoElements(getIndex());
 		}
 		catch (IOException e)
 		{
-			CSSPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;

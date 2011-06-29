@@ -82,6 +82,13 @@
                type="java.io.File">
          </adapter>
       </factory>
+      <factory
+            adaptableType="com.aptana.ide.core.io.LocalRoot"
+            class="com.aptana.ide.core.io.internal.LocalRootAdapterFactory">
+         <adapter
+               type="org.eclipse.core.filesystem.IFileStore">
+         </adapter>
+      </factory>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

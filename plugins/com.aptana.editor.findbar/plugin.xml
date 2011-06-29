@@ -105,6 +105,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+ENTER">
       </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findPrevious"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+NUMPAD_ENTER">
+      </key>
       
       <!-- Find Next -->
       <key
@@ -119,6 +125,12 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ENTER">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="NUMPAD_ENTER">
       </key>
       <key
             commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"

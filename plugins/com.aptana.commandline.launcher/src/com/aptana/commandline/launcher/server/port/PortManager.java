@@ -23,12 +23,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 
 import com.aptana.commandline.launcher.CommandlineLauncherPlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * This class manages the file used to record the Command line server port.
- *
+ * 
  * @author schitale
- *
  */
 public class PortManager
 {
@@ -36,7 +36,7 @@ public class PortManager
 
 	/**
 	 * getRunningInstancePort
-	 *
+	 * 
 	 * @return the port number the command line server is running on, or -1 if there is no server running
 	 */
 	public static int getRunningInstancePort()
@@ -63,7 +63,7 @@ public class PortManager
 		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logInfo(e.getLocalizedMessage(), e);
+			IdeLog.logInfo(CommandlineLauncherPlugin.getDefault(), e.getLocalizedMessage(), e, null);
 		}
 		finally
 		{
@@ -84,14 +84,14 @@ public class PortManager
 
 	/**
 	 * Remove the port file.
-	 *
 	 */
 	public static void doShutdownCleanup()
 	{
 		if (dotAptanaFile != null)
 		{
 			File file = new File(dotAptanaFile);
-			if (file.exists()) {
+			if (file.exists())
+			{
 				file.delete();
 			}
 		}
@@ -99,7 +99,7 @@ public class PortManager
 
 	/**
 	 * Write the current port to the .aptana file.
-	 *
+	 * 
 	 * @param port
 	 */
 	public static void writeCurrentPort(int port)
@@ -130,7 +130,7 @@ public class PortManager
 		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logInfo(e.getLocalizedMessage(), e);
+			IdeLog.logInfo(CommandlineLauncherPlugin.getDefault(), e.getLocalizedMessage(), e, null);
 			return;
 		}
 		finally
@@ -150,9 +150,8 @@ public class PortManager
 	}
 
 	/**
-	 * Return the port number recorded in the .aptana file. Returns
-	 * -1 if the .aptana file does not exist or is corrupt.
-	 *
+	 * Return the port number recorded in the .aptana file. Returns -1 if the .aptana file does not exist or is corrupt.
+	 * 
 	 * @return the port number
 	 */
 	private static int readCurrentPort()
@@ -194,7 +193,7 @@ public class PortManager
 		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logError(e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 			return -1;
 		}
 		finally

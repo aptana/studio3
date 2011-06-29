@@ -13,7 +13,19 @@ import org.eclipse.jface.text.Document;
 
 public class CSSTokensTest extends TestCase
 {
+	class TokenInfo
+	{
+		public final Object data;
+		public final int offset;
+		public final int length;
 
+		public TokenInfo(Object data, int offset, int length)
+		{
+			this.data = data;
+			this.offset = offset;
+			this.length = length;
+		}
+	}
 	private CSSTokenScanner fScanner;
 
 	@Override
@@ -30,15 +42,28 @@ public class CSSTokensTest extends TestCase
 
 	protected void assertToken(String source, Object data, int offset, int length)
 	{
+		assertToken(source, new TokenInfo(data, offset, length));
+	}
+
+	protected void assertToken(String source, TokenInfo... infos)
+	{
 		setSource(source);
-		assertToken(data, offset, length);
+		assertToken(infos);
 	}
 
 	protected void assertToken(Object data, int offset, int length)
 	{
-		assertEquals(data, fScanner.nextToken().getData());
-		assertEquals(offset, fScanner.getTokenOffset());
-		assertEquals(length, fScanner.getTokenLength());
+		assertToken(new TokenInfo(data, offset, length));
+	}
+
+	protected void assertToken(TokenInfo... infos)
+	{
+		for (TokenInfo info : infos)
+		{
+			assertEquals("Checking token type", info.data, fScanner.nextToken().getData());
+			assertEquals("Checking token offset", info.offset, fScanner.getTokenOffset());
+			assertEquals("Checking token length", info.length, fScanner.getTokenLength());
+		}
 	}
 
 	protected void setSource(String source)

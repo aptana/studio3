@@ -12,13 +12,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
@@ -72,7 +71,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 					return password.toCharArray();
 				}
 			} catch (StorageException e) {
-				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedGetSecurePreference, e));
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.AuthenticationManager_FailedGetSecurePreference, e, null);
 			}
 		}
 		if (sessionPasswords.containsKey(authId)) {
@@ -118,16 +117,16 @@ public final class AuthenticationManager implements IAuthenticationManager {
 		try {
 			sessionPasswords.remove(authId);
 			if (password != null) {
+				sessionPasswords.put(authId, password);
 				if (persistent) {
 					node.put(PROP_PASSWORD, String.copyValueOf(password), true);
 				} else {
 					node.removeNode();
 				}
-				sessionPasswords.put(authId, password);
 			}
 			getSecurePreferences().flush();
 		} catch (Exception e) {
-			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedSaveSecurePreference, e));
+			IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.AuthenticationManager_FailedSaveSecurePreference, e, null);
 		}
 	}
 

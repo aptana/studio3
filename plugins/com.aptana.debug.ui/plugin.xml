@@ -8,5 +8,13 @@
             id="com.aptana.debug.ui.commands.Inspect"
             name="%ActionDefinition.inspect.name"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.debug.ui.commands.Inspect"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+I"/>
+   </extension>
 
 </plugin>

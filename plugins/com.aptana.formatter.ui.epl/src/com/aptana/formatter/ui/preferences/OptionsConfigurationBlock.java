@@ -50,8 +50,7 @@ public abstract class OptionsConfigurationBlock
 	private final IStatusChangeListener fContext;
 	protected final IProject fProject; // project or null
 	protected final PreferenceKey[] fAllKeys;
-
-	private IScopeContext[] fLookupOrder;
+	protected IScopeContext[] fLookupOrder;
 
 	private Shell fShell;
 
@@ -270,8 +269,6 @@ public abstract class OptionsConfigurationBlock
 					PreferenceKey curr = fAllKeys[i];
 					String oldSetting = curr.getStoredValue(fLookupOrder, false, fManager);
 					fDisabledProjectSettings.put(curr, oldSetting);
-					// clear project settings
-					curr.setStoredValue(fLookupOrder[0], null, fManager);
 				}
 			}
 		}

@@ -18,6 +18,11 @@ public class HTMLTextNode extends HTMLNode
 		fText = text;
 	}
 
+	public void setText(String text)
+	{
+		fText = text;
+	}
+
 	@Override
 	public String getText()
 	{

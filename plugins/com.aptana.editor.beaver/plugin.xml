@@ -25,5 +25,12 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.beaver.parsing.BeaverParser"
+            content-type="com.aptana.contenttype.beaver">
+      </parser>
+   </extension>
 
 </plugin>

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
@@ -560,7 +561,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				} catch (FileNotFoundException fnfe) {
 					fileInfo.setExists(false);
 				} catch (Exception ignore) {
-					CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.BaseConnectionFileManager_symlink_resolve_failed, e));
+					IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.BaseConnectionFileManager_symlink_resolve_failed, e, null);
 				}
 			}
 		}

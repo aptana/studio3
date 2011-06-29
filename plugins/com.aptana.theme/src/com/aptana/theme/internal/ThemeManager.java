@@ -59,6 +59,7 @@ import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemeRule;
 import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
 import com.aptana.theme.preferences.IPreferenceConstants;
+import com.aptana.ui.util.UIUtils;
 
 public class ThemeManager implements IThemeManager
 {
@@ -139,7 +140,7 @@ public class ThemeManager implements IThemeManager
 									{
 										// Store that the user has overridden this annotation in this theme
 										int index = getCurrentTheme().getTokens().size();
-										getCurrentTheme().addNewRule(index, "Annotation Override - " + prefix,
+										getCurrentTheme().addNewRule(index, "Annotation Override - " + prefix, //$NON-NLS-1$
 												new ScopeSelector(scopeSelector), null);
 									}
 
@@ -215,6 +216,8 @@ public class ThemeManager implements IThemeManager
 		{
 			prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		}
+		// TODO Use markup.changed bg color for "decoration color" in Prefs>General>Appearance>Colors and Fonts
+
 		// TODO Move this stuff over to theme change listeners in the XML/HTML/Ruby editor plugins?
 		if (!theme.hasEntry("override.xmlTagPairOccurrenceIndication")) //$NON-NLS-1$
 		{
@@ -344,26 +347,32 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Force font
-		// FIXME We need to run this in the UI thread(?)
 		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
-		for (String fontId : fontIds)
+		UIUtils.getDisplay().asyncExec(new Runnable()
 		{
-			Font fFont = JFaceResources.getFontRegistry().get(fontId);
-			// Only set new values if they're different from existing!
-			Font existing = JFaceResources.getFont(fontId);
-			String existingString = ""; //$NON-NLS-1$
-			if (!existing.isDisposed())
+
+			public void run()
 			{
-				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+				for (String fontId : fontIds)
+				{
+					Font fFont = JFaceResources.getFontRegistry().get(fontId);
+					// Only set new values if they're different from existing!
+					Font existing = JFaceResources.getFont(fontId);
+					String existingString = ""; //$NON-NLS-1$
+					if (!existing.isDisposed())
+					{
+						existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+					}
+					String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
+					if (!existingString.equals(fdString))
+					{
+						// put in registry...
+						JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
+					}
+				}
 			}
-			String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
-			if (!existingString.equals(fdString))
-			{
-				// put in registry...
-				JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
-			}
-		}
+		});
 	}
 
 	private static String toString(RGB selection)
@@ -453,8 +462,7 @@ public class ThemeManager implements IThemeManager
 			}
 			Properties props = new OrderedProperties();
 			props.load(new ByteArrayInputStream(array));
-			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-			return theme;
+			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (IllegalArgumentException iae)
 		{
@@ -472,7 +480,7 @@ public class ThemeManager implements IThemeManager
 					theme.save();
 					return theme;
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
 					ThemePlugin.logError(e);
 				}
@@ -618,9 +626,16 @@ public class ThemeManager implements IThemeManager
 
 	private void loadTheme(Properties props)
 	{
-		Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-		fThemeMap.put(theme.getName(), theme);
-		fBuiltins.add(theme.getName());
+		try
+		{
+			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+			fThemeMap.put(theme.getName(), theme);
+			fBuiltins.add(theme.getName());
+		}
+		catch (Exception e)
+		{
+			ThemePlugin.logError(e);
+		}
 	}
 
 	public IToken getToken(String scope)

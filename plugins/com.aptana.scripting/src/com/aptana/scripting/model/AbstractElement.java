@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scripting.IDebugScopes;
+import com.aptana.scripting.ScriptingActivator;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {
@@ -121,6 +124,8 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			{
 				synchronized (ELEMENTS_BY_PATH)
 				{
+					showRegistration("Register", element); //$NON-NLS-1$
+					
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 
 					if (elements == null)
@@ -150,6 +155,8 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			{
 				synchronized (ELEMENTS_BY_PATH)
 				{
+					showRegistration("Unregister", element); //$NON-NLS-1$
+					
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 
 					if (elements != null)
@@ -168,6 +175,28 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		}
 	}
 
+	/**
+	 * Show registration event
+	 * 
+	 * @param message
+	 * @param element
+	 */
+	private static void showRegistration(String message, AbstractElement element)
+	{
+		if (IdeLog.isOutputEnabled(ScriptingActivator.getDefault(), IdeLog.StatusLevel.INFO,
+				IDebugScopes.SHOW_ELEMENT_REGISTRATION))
+		{
+			String name = element.getDisplayName();
+			String path = element.getPath();
+			String fullClassName = element.getClass().getName();
+			String[] classParts = fullClassName.split("\\."); //$NON-NLS-1$
+			String className = classParts[classParts.length - 1];
+			
+			IdeLog.logInfo(ScriptingActivator.getDefault(),
+					message + ": " + className + ", " + name + ", " + path, IDebugScopes.SHOW_ELEMENT_REGISTRATION); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+	}
+	
 	/**
 	 * ModelBase
 	 * 

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
@@ -59,11 +60,14 @@ public class CreateProfileDialog extends StatusDialog
 	private IProfile fCreatedProfile;
 
 	private IProfileVersioner versioner;
+	private IProject fProject;
 
-	public CreateProfileDialog(Shell parentShell, IProfileManager profileManager, IProfileVersioner versioner)
+	public CreateProfileDialog(Shell parentShell, IProfileManager profileManager, IProfileVersioner versioner,
+			IProject fProject)
 	{
 		super(parentShell);
 		fProfileManager = profileManager;
+		this.fProject = fProject;
 		fSortedProfiles = fProfileManager.getSortedProfiles();
 		fSortedNames = fProfileManager.getSortedDisplayNames();
 		this.versioner = versioner;
@@ -131,7 +135,7 @@ public class CreateProfileDialog extends StatusDialog
 		gd.horizontalSpan = numColumns;
 
 		fProfileCombo.setItems(fSortedNames);
-		fProfileCombo.setText(fProfileManager.getSelected().getName());
+		fProfileCombo.setText(fProfileManager.getSelected(fProject).getName());
 		updateStatus(fEmpty);
 
 		applyDialogFont(composite);
@@ -171,8 +175,8 @@ public class CreateProfileDialog extends StatusDialog
 				.getSelectionIndex())).getSettings());
 		final String profileName = fNameText.getText();
 
-		fCreatedProfile = fProfileManager.create(ProfileKind.CUSTOM, profileName, baseSettings, versioner
-				.getCurrentVersion());
+		fCreatedProfile = fProfileManager.create(fProject, ProfileKind.CUSTOM, profileName, baseSettings,
+				versioner.getCurrentVersion());
 		super.okPressed();
 	}
 

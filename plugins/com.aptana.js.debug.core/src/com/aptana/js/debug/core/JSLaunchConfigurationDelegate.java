@@ -310,7 +310,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				socket = listenSocket.accept();
 			} catch (IOException e) {
 				BrowserUtil.resetBrowserCache(browserExecutable);
-				if (debug) {
+				if (debug && !monitor.isCanceled()) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
 				}
@@ -327,7 +327,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				JSDebugTarget debugTarget = null;
 				try {
 					JSDebugProcess debugProcess = new JSDebugProcess(launch, browserExecutable, null);
-					DebugConnection controller = DebugConnection.createConnection(socket, new ProtocolLogger("jsdebugger", JSDebugPlugin.PLUGIN_ID));
+					DebugConnection controller = DebugConnection.createConnection(socket, new ProtocolLogger("jsdebugger", JSDebugPlugin.PLUGIN_ID)); //$NON-NLS-1$
 					debugTarget = new JSDebugTarget(launch, debugProcess, urlMapper, controller, debug);
 					monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningPage,
 							launchURL));

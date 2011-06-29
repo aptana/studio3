@@ -10,14 +10,15 @@ package com.aptana.editor.js;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
+import com.aptana.editor.common.text.rules.QueuedRuleBasedScanner;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.js.parsing.lexer.JSScopeType;
 import com.aptana.editor.js.text.rules.JSFunctionCallDetector;
@@ -30,12 +31,23 @@ import com.aptana.editor.js.text.rules.JSOperatorDetector;
  * @author Kevin Lindsey
  * @author cwilliams
  */
-public class JSCodeScanner extends RuleBasedScanner
+public class JSCodeScanner extends QueuedRuleBasedScanner
 {
-	// No opts: 3208ms avg
-	// Regexp opt: 2476ms avg
-	// Regexp + special char opt: 2295ms avg
-	// regexp + special char + word: 160-190ms avg (biggest gain was converting operators from regexp to words)
+	/*
+	 * The last non-whitespace/EOF/undefined token we returned. Used for lookbehinds.
+	 */
+	private IToken lastToken;
+
+	// In case we're doing lookaheads on the current token, we temporarily hold the current token's offset and length in
+	// these vars
+	private Integer fOrigOffset;
+	private Integer fLength;
+
+	/*
+	 * This is a hack to keep track of function declarations so we use special tokens for args and parens. FIXME This
+	 * should really be a stack so we handle nested functions.
+	 */
+	private boolean inFunctionDefinition;
 
 	/**
 	 * CodeScanner
@@ -82,7 +94,7 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Also, we try to make the fastest rules run first rather than have slow regexp rules continually getting
 		// called. We want them called the least so we should try all faster rules first.
 		List<IRule> rules = new ArrayList<IRule>();
-		
+
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
@@ -96,7 +108,8 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Functions where we need period to begin it
 		wordRule = new WordRule(new JSFunctionCallDetector(), Token.UNDEFINED);
 		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_FUNCTION), JSLanguageConstants.SUPPORT_FUNCTIONS);
-		addWordRules(wordRule, createToken(JSScopeType.EVENT_HANDLER_FUNCTION), JSLanguageConstants.EVENT_HANDLER_FUNCTIONS);
+		addWordRules(wordRule, createToken(JSScopeType.EVENT_HANDLER_FUNCTION),
+				JSLanguageConstants.EVENT_HANDLER_FUNCTIONS);
 		addWordRules(wordRule, createToken(JSScopeType.DOM_FUNCTION), JSLanguageConstants.DOM_FUNCTIONS);
 		addWordRules(wordRule, createToken(JSScopeType.FIREBUG_FUNCTION), JSLanguageConstants.FIREBUG_FUNCTIONS);
 		addWordRules(wordRule, createToken(JSScopeType.DOM_CONSTANTS), JSLanguageConstants.DOM_CONSTANTS);
@@ -117,12 +130,14 @@ public class JSCodeScanner extends RuleBasedScanner
 
 		// Add word rule for keywords, types, and constants.
 		wordRule = new WordRule(new JSIdentifierDetector(), createToken(JSScopeType.SOURCE));
+
 		addWordRules(wordRule, createToken(JSScopeType.CONTROL_KEYWORD), JSLanguageConstants.KEYWORD_CONTROL);
 		addWordRules(wordRule, createToken(JSScopeType.CONTROL_KEYWORD), JSLanguageConstants.KEYWORD_CONTROL_FUTURE);
 		addWordRules(wordRule, createToken(JSScopeType.STORAGE_TYPE), JSLanguageConstants.STORAGE_TYPES);
 		addWordRules(wordRule, createToken(JSScopeType.STORAGE_MODIFIER), JSLanguageConstants.STORAGE_MODIFIERS);
 		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_CLASS), JSLanguageConstants.SUPPORT_CLASSES);
 		addWordRules(wordRule, createToken(JSScopeType.SUPPORT_DOM_CONSTANT), JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
+		wordRule.addWord("function", createToken(JSScopeType.FUNCTION_KEYWORD)); //$NON-NLS-1$
 		wordRule.addWord("true", createToken(JSScopeType.TRUE)); //$NON-NLS-1$
 		wordRule.addWord("false", createToken(JSScopeType.FALSE)); //$NON-NLS-1$
 		wordRule.addWord("null", createToken(JSScopeType.NULL)); //$NON-NLS-1$
@@ -137,8 +152,8 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Punctuation
 		CharacterMapRule cmRule = new CharacterMapRule();
 		cmRule.add(';', createToken(JSScopeType.SEMICOLON));
-		cmRule.add('(', createToken(JSScopeType.PARENTHESIS));
-		cmRule.add(')', createToken(JSScopeType.PARENTHESIS));
+		cmRule.add('(', createToken(JSScopeType.LEFT_PAREN));
+		cmRule.add(')', createToken(JSScopeType.RIGHT_PAREN));
 		cmRule.add('[', createToken(JSScopeType.BRACKET));
 		cmRule.add(']', createToken(JSScopeType.BRACKET));
 		cmRule.add('{', createToken(JSScopeType.CURLY_BRACE));
@@ -149,9 +164,156 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Numbers
 		rules.add(new JSNumberRule(createToken(JSScopeType.NUMBER)));
 
+		// Periods outside numbers
+		cmRule = new CharacterMapRule();
+		cmRule.add('.', createToken(JSScopeType.PERIOD));
+		rules.add(cmRule);
+
 		// identifiers
 		rules.add(new WordRule(new JSIdentifierDetector(), createToken(JSScopeType.SOURCE)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
+	}
+
+	@Override
+	public IToken nextToken()
+	{
+		fOrigOffset = null;
+		fLength = null;
+		IToken next = super.nextToken();
+		// for identifier after 'function' give it special entity function name scope
+		if (scopeEquals(lastToken, JSScopeType.FUNCTION_KEYWORD) && scopeEquals(next, JSScopeType.SOURCE))
+		{
+			next = createToken(JSScopeType.FUNCTION_NAME);
+		}
+		// Parens outside function definition have a generic scope for both beginning and end...
+		else if (scopeEquals(next, JSScopeType.LEFT_PAREN)
+				&& !(scopeEquals(lastToken, JSScopeType.FUNCTION_KEYWORD) || scopeEquals(lastToken,
+						JSScopeType.FUNCTION_NAME)))
+		{
+			next = createToken(JSScopeType.PARENTHESIS);
+		}
+		// ')' should be given generic paren scope when outside function definition
+		else if (scopeEquals(next, JSScopeType.RIGHT_PAREN) && !inFunctionDefinition)
+		{
+			next = createToken(JSScopeType.PARENTHESIS);
+		}
+		// hold state that we're declaring a function when we see 'function'
+		else if (scopeEquals(next, JSScopeType.FUNCTION_KEYWORD))
+		{
+			inFunctionDefinition = true;
+		}
+		// get out of function definition when we see '{' or '}'
+		else if (inFunctionDefinition && scopeEquals(next, JSScopeType.CURLY_BRACE))
+		{
+			inFunctionDefinition = false;
+		}
+		// give function parameters/arguments special scopes
+		else if (inFunctionDefinition && scopeEquals(next, JSScopeType.SOURCE))
+		{
+			next = createToken(JSScopeType.FUNCTION_PARAMETER);
+		}
+
+		// HACK Anonymous function name check, look for following "=" and then "function"
+		if (!inFunctionDefinition && scopeEquals(next, JSScopeType.SOURCE))
+		{
+			// Store offset and length since we're going to do lookaheads. But don't assign yet, or it messes up the
+			// getToken...() calls below.
+			int length = getTokenLength();
+			int offset = getTokenOffset();
+
+			// We need to queue up all this stuff at once at the end....
+			List<Entry> entries = new ArrayList<QueuedRuleBasedScanner.Entry>();
+			IToken ahead = super.nextToken();
+			entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
+			// keep going until we hit one of our tokens or EOF
+			while (ahead != null && !ahead.isEOF() && !ahead.isOther())
+			{
+				ahead = super.nextToken();
+				entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
+			}
+			if (scopeEquals(ahead, JSScopeType.OPERATOR))
+			{
+				ahead = super.nextToken();
+				entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
+				// keep going until we hit one of our tokens or EOF
+				while (ahead != null && !ahead.isEOF() && !ahead.isOther())
+				{
+					ahead = super.nextToken();
+					entries.add(new Entry(null, ahead, getTokenOffset(), getTokenLength()));
+				}
+				if (scopeEquals(ahead, JSScopeType.FUNCTION_KEYWORD))
+				{
+					next = createToken(JSScopeType.FUNCTION_NAME);
+				}
+			}
+			for (Entry entry : entries)
+			{
+				queue.add(entry);
+			}
+			fOrigOffset = offset;
+			fLength = length;
+		}
+
+		// for lookbacks, only store last non-whitespace token
+		if (next.isOther())
+		{
+			lastToken = next;
+		}
+		return next;
+	}
+
+	private boolean scopeEquals(IToken next, JSScopeType scopeType)
+	{
+		return scopeEquals(next, scopeType.getScope());
+	}
+
+	@Override
+	public int getTokenLength()
+	{
+		// If we did lookaheads, use the right length from before lookahead...
+		if (fLength != null)
+		{
+			try
+			{
+				return fLength;
+			}
+			finally
+			{
+				fLength = null;
+			}
+		}
+		return super.getTokenLength();
+	}
+
+	@Override
+	public int getTokenOffset()
+	{
+		// If we did lookaheads, use the right offset from before lookahead...
+		if (fOrigOffset != null)
+		{
+			try
+			{
+				return fOrigOffset;
+			}
+			finally
+			{
+				fOrigOffset = null;
+			}
+		}
+		return super.getTokenOffset();
+	}
+
+	private boolean scopeEquals(IToken next, String scope)
+	{
+		return next != null && next.getData() != null && scope.equals(next.getData());
+	}
+
+	@Override
+	public void setRange(IDocument document, int offset, int length)
+	{
+		lastToken = null;
+		inFunctionDefinition = false;
+		super.setRange(document, offset, length);
 	}
 }

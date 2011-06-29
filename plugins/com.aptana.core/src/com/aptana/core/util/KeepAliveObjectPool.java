@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 public abstract class KeepAliveObjectPool<T> implements IObjectPool<T> {
 
@@ -61,7 +62,8 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T> {
 		}
 		unlocked.clear();
 		if (locked.size() > 0) {
-			CorePlugin.logWarning(MessageFormat.format(
+			IdeLog.logWarning(CorePlugin.getDefault(),
+					MessageFormat.format(
 					"Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
 			locked.clear();
 		}

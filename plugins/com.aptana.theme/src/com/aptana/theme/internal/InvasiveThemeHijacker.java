@@ -55,9 +55,11 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.console.ConsoleView;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
@@ -106,8 +108,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected boolean invasiveThemesEnabled()
 	{
-		return Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID, IPreferenceConstants.INVASIVE_THEMES,
-				false, null);
+		return ThemePlugin.invasiveThemesEnabled();
 	}
 
 	@Override
@@ -342,6 +343,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			}
 			return;
 		}
+		else if (view instanceof ConsoleView)
+		{
+			hijackConsole(view);
+			return;
+		}
 		else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView")) //$NON-NLS-1$
 		{
 			hijackSearchView(view, revertToDefaults);
@@ -376,6 +382,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			return;
 		}
 		else if (view.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
+		{
+			hijackCallHierarchy(view, revertToDefaults);
+			return;
+		}
+		else if (view.getClass().getName().endsWith("TypeHierarchyViewPart")) //$NON-NLS-1$
 		{
 			hijackCallHierarchy(view, revertToDefaults);
 			return;
@@ -773,8 +784,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	protected void setHyperlinkValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
-		if (prefs == null)
+		if (prefs == null || theme == null)
+		{
 			return;
+		}
 		if (revertToDefaults)
 		{
 			// Console preferences
@@ -1045,15 +1058,31 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 	}
 
+	protected void hijackConsole(IViewPart view)
+	{
+		if (view instanceof ConsoleView)
+		{
+			IPage currentPage = ((ConsoleView) view).getCurrentPage();
+			if (currentPage != null)
+			{
+				hookTheme(currentPage.getControl(), false);
+			}
+		}
+	}
+
 	protected void hijackOutline()
 	{
-		IViewReference[] refs = UIUtils.getActivePage().getViewReferences();
-		for (IViewReference ref : refs)
+		IWorkbenchPage page = UIUtils.getActivePage();
+		if (page != null)
 		{
-			if (ref.getId().equals(IPageLayout.ID_OUTLINE))
+			IViewReference[] refs = page.getViewReferences();
+			for (IViewReference ref : refs)
 			{
-				hijackView(ref.getView(false), false);
-				return;
+				if (ref.getId().equals(IPageLayout.ID_OUTLINE))
+				{
+					hijackView(ref.getView(false), false);
+					return;
+				}
 			}
 		}
 	}
@@ -1064,7 +1093,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	public synchronized void earlyStartup()
 	{
 		if (ranEarlyStartup)
+		{
 			return;
+		}
 		ranEarlyStartup = true;
 		if (invasiveThemesEnabled())
 		{
@@ -1083,7 +1114,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.removePreferenceChangeListener(this);
-
 		pageListener = null;
 	}
 
@@ -1092,9 +1122,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		if (partRef instanceof IViewReference)
 		{
 			IViewReference viewRef = (IViewReference) partRef;
-			final IViewPart part = viewRef.getView(false);
-			if (part.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
+			String id = viewRef.getId();
+			if ("org.eclipse.ui.console.ConsoleView".equals(id) || "org.eclipse.jdt.ui.TypeHierarchy".equals(id) //$NON-NLS-1$ //$NON-NLS-2$
+					|| "org.eclipse.jdt.callhierarchy.view".equals(id)) //$NON-NLS-1$
 			{
+				final IViewPart part = viewRef.getView(false);
 				Display.getCurrent().asyncExec(new Runnable()
 				{
 					public void run()
@@ -1102,6 +1134,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 						hijackView(part, false);
 					}
 				});
+				return;
 			}
 		}
 		if (partRef instanceof IEditorReference)
@@ -1186,6 +1219,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	public void partVisible(IWorkbenchPartReference partRef)
 	{
+		partActivated(partRef);
 	}
 
 	public void partInputChanged(IWorkbenchPartReference partRef)

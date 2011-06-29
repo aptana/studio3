@@ -27,28 +27,45 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.filewatcher.FileWatcher;
 
 public class FileDeltaRefreshAdapter extends JNotifyAdapter
 {
 	private WorkspaceJob job;
 	private Map<IResource, Integer> toRefresh = new HashMap<IResource, Integer>();
 
-	private void refresh()
+	private synchronized void refresh()
 	{
-		if (job != null)
-		{
-			job.cancel();
-		}
+		// return quickly if there's no work
 		if (toRefresh.isEmpty())
 		{
 			return;
 		}
-		job = new WorkspaceJob("Refresh...") //$NON-NLS-1$
+
+		// lazily init the job
+		if (job == null)
+		{
+			job = createRefreshJob();
+		}
+		// cancel if it's already running
+		job.cancel();
+		job.schedule(200); // give a little delay so we can have a chance to cancel and batch together refreshes!
+	}
+
+	protected WorkspaceJob createRefreshJob()
+	{
+		return new WorkspaceJob("Refresh...") //$NON-NLS-1$
 		{
 
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
 			{
+				if (notificationsFrozen())
+				{
+					schedule(1000);
+					return Status.OK_STATUS;
+				}
 				Map<IResource, Integer> copy;
 				synchronized (toRefresh)
 				{
@@ -66,12 +83,14 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 					{
 						if (resource.getType() == IResource.PROJECT)
 						{
-							// Check to see if this project exists in the new branch! If not, auto-close the project, or
+							// Check to see if this project exists in the new branch! If not, auto-close the
+							// project, or
 							// just not refresh it?
 							IPath path = resource.getLocation();
 							if (path == null || !path.toFile().exists())
 							{
-								// Close the project, this actually causes the .project file to get generated, though!
+								// Close the project, this actually causes the .project file to get generated,
+								// though!
 								try
 								{
 									if (resource.getProject().exists())
@@ -115,7 +134,11 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 				return Status.OK_STATUS;
 			}
 		};
-		job.schedule(200); // give a little delay so we can have a chance to cancel and batch together refreshes!
+	}
+
+	protected boolean notificationsFrozen()
+	{
+		return !FileWatcher.shouldNotify();
 	}
 
 	@Override
@@ -185,7 +208,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		catch (Throwable e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -229,10 +252,12 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 			fileModified(wd, rootPath, oldName);
 		else
 		{
-			if (oldName != null) {
+			if (oldName != null)
+			{
 				fileDeleted(wd, rootPath, oldName);
 			}
-			if (newName != null) {
+			if (newName != null)
+			{
 				fileCreated(wd, rootPath, newName);
 			}
 		}

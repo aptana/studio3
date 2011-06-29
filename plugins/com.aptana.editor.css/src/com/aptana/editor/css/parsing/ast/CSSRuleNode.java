@@ -9,6 +9,8 @@ package com.aptana.editor.css.parsing.ast;
 
 import java.util.List;
 
+import com.aptana.parsing.ast.IParseNode;
+
 public class CSSRuleNode extends CSSNode
 {
 	private static final CSSDeclarationNode[] NO_DECLARATIONS = new CSSDeclarationNode[0];
@@ -128,6 +130,42 @@ public class CSSRuleNode extends CSSNode
 	public CSSDeclarationNode[] getDeclarations()
 	{
 		return fDeclarations;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getNodeAtOffset(int)
+	 */
+	@Override
+	public IParseNode getNodeAtOffset(int offset)
+	{
+		IParseNode result = super.getNodeAtOffset(offset);
+
+		if (result == this)
+		{
+			for (IParseNode selector : fSelectors)
+			{
+				if (selector.contains(offset))
+				{
+					result = selector.getNodeAtOffset(offset);
+					break;
+				}
+			}
+		}
+
+		if (result == this)
+		{
+			for (IParseNode declaration : fDeclarations)
+			{
+				if (declaration.contains(offset))
+				{
+					result = declaration.getNodeAtOffset(offset);
+					break;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

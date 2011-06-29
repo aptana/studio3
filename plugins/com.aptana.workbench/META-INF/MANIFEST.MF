@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.scripting,
  com.aptana.ui,
  org.eclipse.ui.navigator,
- com.aptana.explorer
+ com.aptana.explorer,
+ com.aptana.ui.io
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.workbench.hyperlink

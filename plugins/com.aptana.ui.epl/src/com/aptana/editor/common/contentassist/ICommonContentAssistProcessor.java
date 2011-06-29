@@ -54,4 +54,9 @@ public interface ICommonContentAssistProcessor
 	 */
 	boolean isValidActivationCharacter(char c, int keyCode);
 
+	/**
+	 * Disposes of any unused resources
+	 */
+	void dispose();
+
 }

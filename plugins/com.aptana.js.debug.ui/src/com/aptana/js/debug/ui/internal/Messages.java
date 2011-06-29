@@ -41,9 +41,9 @@ public final class Messages extends NLS {
 	public static String WorkbenchCloseListener_ConfirmDebuggerExit;
 
 	/**
-	 * WorkbenchCloseListener_AptanaDebuggerIsActive_DoYouWantToExit
+	 * WorkbenchCloseListener_DebuggerIsActive_DoYouWantToExit
 	 */
-	public static String WorkbenchCloseListener_AptanaDebuggerIsActive_DoYouWantToExit;
+	public static String WorkbenchCloseListener_DebuggerIsActive_DoYouWantToExit;
 
 	/**
 	 * WorkbenchCloseListener_AlwaysExitDebuggerWithoutPrompt
@@ -56,9 +56,9 @@ public final class Messages extends NLS {
 	public static String Startup_Notification;
 
 	/**
-	 * Startup_AptanaRequiresFirefox
+	 * Startup_StudioRequiresFirefox
 	 */
-	public static String Startup_AptanaRequiresFirefox;
+	public static String Startup_StudioRequiresFirefox;
 
 	/**
 	 * Startup_Download

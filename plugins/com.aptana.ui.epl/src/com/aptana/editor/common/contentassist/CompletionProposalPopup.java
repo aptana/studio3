@@ -14,7 +14,6 @@ package com.aptana.editor.common.contentassist;
  **********************************************************************************************************************/
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
@@ -44,6 +43,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -93,6 +93,21 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * PROPOSAL_ITEM_HEIGHT
 	 */
 	public static final int PROPOSAL_ITEMS_VISIBLE = 7;
+
+	/**
+	 * MAX_PROPOSAL_COLUMN_WIDTH
+	 */
+	public static final int MAX_PROPOSAL_COLUMN_WIDTH = 500;
+
+	/**
+	 * MAX_LOCATION_COLUMN_WIDTH
+	 */
+	public static final int MAX_LOCATION_COLUMN_WIDTH = 200;
+
+	/**
+	 * MIN_PROPOSAL_COLUMN_WIDTH
+	 */
+	public static final int MIN_PROPOSAL_COLUMN_WIDTH = 100;
 
 	/**
 	 * ProposalSelectionListener
@@ -280,7 +295,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	public String showProposals(final boolean autoActivated)
 	{
-
 		if (fKeyListener == null)
 		{
 			fKeyListener = new ProposalSelectionListener();
@@ -328,7 +342,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 					{
 						createPopup();
 					}
-
 				}
 			});
 		}
@@ -420,6 +433,32 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalTable = new Table(fProposalShell, SWT.H_SCROLL | SWT.V_SCROLL);
 		}
+
+		fProposalShell.addControlListener(new ControlAdapter()
+		{
+			public void controlResized(ControlEvent e)
+			{
+				TableColumn[] columns = fProposalTable.getColumns();
+				int currentSize = 0;
+				for (int i = 1; i < columns.length; i++)
+				{
+					currentSize += columns[i].getWidth();
+				}
+
+				Rectangle area = fProposalShell.getClientArea();
+				int width = getTableWidth();
+				TableColumn column1 = fProposalTable.getColumn(0);
+
+				// take up any remaining space for first column
+				fProposalTable.setSize(area.width, area.height);
+
+				int col1Width = width - currentSize;
+
+				// 1st column can't be smaller than a default size;
+				col1Width = Math.max(col1Width, MIN_PROPOSAL_COLUMN_WIDTH);
+				column1.setWidth(col1Width);
+			}
+		});
 
 		// Custom code for our impl!
 		// TODO: grab value from preferences
@@ -697,14 +736,12 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			// this should not happen, but does on win32
 		}
-
-		resizeTable();
 	}
 
 	/**
 	 * Resizes the table to match the internal items
 	 */
-	private void resizeTable()
+	private void resizeTable(int objectColumn, int locationColumn)
 	{
 		// Try/catch is fix for LH where we are strangely getting an ArrayIndexOutOfBounds exception
 		// Not entirely sure how it's happening: https://aptana.lighthouseapp.com/projects/35272/tickets/2017
@@ -712,18 +749,17 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalTable.setRedraw(false);
 			int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
-			fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(false, true)
+			fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(true, true)
 					.create());
-			fProposalTable.getColumn(0).pack();
-			padColumn(fProposalTable.getColumn(0), 30);
 			for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
 			{
 				// User agent images are 16px. Adding a few px for padding
 				fProposalTable.getColumn(j).setWidth(22);
 			}
 			TableColumn lastColumn = fProposalTable.getColumn(fProposalTable.getColumnCount() - 1);
-			lastColumn.pack();
-			padColumn(lastColumn, 20);
+			lastColumn.setWidth(locationColumn);
+
+			fProposalTable.getColumn(0).setWidth(objectColumn);
 			fProposalTable.setRedraw(true);
 			fProposalShell.pack(true);
 		}
@@ -734,17 +770,31 @@ public class CompletionProposalPopup implements IContentAssistListener
 	}
 
 	/**
-	 * Adds a specified amount of padding to the particular column
+	 * Gets the interior width of the CA proposal table
 	 * 
-	 * @param tc
-	 * @param amount
+	 * @return
 	 */
-	private void padColumn(TableColumn tc, int amount)
+	private int getTableWidth()
 	{
-		if (tc != null)
+		Rectangle area = fProposalShell.getClientArea();
+		Point preferredSize = fProposalTable.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		int width = area.width - 2 * fProposalTable.getBorderWidth();
+		if (preferredSize.y > area.height + fProposalTable.getHeaderHeight())
 		{
-			tc.setWidth(tc.getWidth() + amount);
+			// Subtract the scrollbar width from the total column width
+			// if a vertical scrollbar will be required
+			if (fProposalTable.getVerticalBar() != null)
+			{
+				Point vBarSize = fProposalTable.getVerticalBar().getSize();
+				width -= vBarSize.x;
+			}
 		}
+
+		// We subtract an extra 2 pixels because it seems this calculation overestimates
+		// the table width a tiny bit. This might be a calculatable value.
+		width -= 2;
+
+		return width;
 	}
 
 	/**
@@ -1037,8 +1087,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 			fFilteredProposals = proposals;
 			final int newLen = proposals.length;
 
-			Arrays.sort(proposals);
-
 			if (USE_VIRTUAL)
 			{
 				fProposalTable.setItemCount(newLen);
@@ -1071,13 +1119,58 @@ public class CompletionProposalPopup implements IContentAssistListener
 				suggestedIndex = 0;
 			}
 
-			if (!isFilteredSubset)
+			String longestString = StringUtil.EMPTY;
+			String longestLoc = StringUtil.EMPTY;
+
+			for (int i = 0; i < proposals.length; i++)
 			{
-				resizeTable();
+				ICompletionProposal proposal = proposals[i];
+				String entry = proposal.getDisplayString().trim();
+				if (entry.length() > longestString.length())
+				{
+					longestString = entry;
+				}
+				if (proposal instanceof ICommonCompletionProposal)
+				{
+
+					ICommonCompletionProposal prop = (ICommonCompletionProposal) proposal;
+					String loc = prop.getFileLocation();
+					if (loc.length() > longestLoc.length())
+					{
+						longestLoc = loc;
+					}
+				}
 			}
 
+			int objWidth = getStringWidth(longestString);
+
+			int locWidth = getStringWidth(longestLoc);
+
+			objWidth = Math.min(objWidth, MAX_PROPOSAL_COLUMN_WIDTH);
+			locWidth = Math.min(locWidth, MAX_LOCATION_COLUMN_WIDTH);
+
+			if (!isFilteredSubset)
+			{
+				resizeTable(objWidth, locWidth);
+			}
 			modifySelection(defaultIndex, suggestedIndex);
 		}
+	}
+
+	/**
+	 * Returns the width of the string in pixels
+	 * 
+	 * @param string
+	 * @return
+	 */
+	protected int getStringWidth(String string)
+	{
+		String measureString = "M" + string + "MM"; //$NON-NLS-1$ //$NON-NLS-2$
+		GC gc = new GC(fProposalTable.getShell());
+		Point extent = gc.stringExtent(measureString);
+		int width = extent.x;
+		gc.dispose();
+		return width;
 	}
 
 	protected void modifySelection(int defaultIndex, int suggestedIndex)
@@ -1630,7 +1723,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 	private ICompletionProposal[] filterProposals(ICompletionProposal[] proposals, IDocument document, int offset,
 			DocumentEvent event)
 	{
-
 		int length = proposals == null ? 0 : proposals.length;
 		List<ICompletionProposal> filtered = new ArrayList<ICompletionProposal>(length);
 		for (int i = 0; i < length; i++)

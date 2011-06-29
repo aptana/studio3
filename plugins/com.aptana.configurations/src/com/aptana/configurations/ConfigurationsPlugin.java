@@ -9,8 +9,9 @@ package com.aptana.configurations;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.logging.IdeLog;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -61,23 +62,71 @@ public class ConfigurationsPlugin extends Plugin
 		return plugin;
 	}
 
-	public static void logInfo(String string, Throwable e)
+	/**
+	 * Log a particular status
+	 * 
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(IStatus status)
 	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string, e));
+		IdeLog.log(getDefault(), status);
 	}
 
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 * @deprecated Use IdeLog instead
+	 */
+	public static void log(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
 	public static void logError(Throwable e)
 	{
-		logError(e.getLocalizedMessage(), e);
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
 	}
 
-	public static void logError(String string, Throwable e)
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
+		IdeLog.logError(getDefault(), message, e);
 	}
 
-	public static void logWarning(String message)
+	/**
+	 * logWarning
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logWarning(String message, Throwable e)
 	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+		IdeLog.logWarning(getDefault(), message, e, null);
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 */
+	public static void logInfo(String message)
+	{
+		IdeLog.logInfo(getDefault(), message, null);
 	}
 }

@@ -28,6 +28,16 @@ public abstract class FormatterCommentNode extends FormatterTextNode
 
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
+		// Add beginning new-line
+		boolean beginWithNewLine = isAddingBeginNewLine();
+		if (beginWithNewLine && !visitor.endsWithNewLine() && !shouldConsumePreviousWhiteSpaces())
+		{
+			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
+			// a new-line.
+			visitor.writeLineBreak(context);
+		}
+
+		// Write the comment
 		boolean currentCommentState = context.isComment();
 		context.setComment(true);
 		if (getDocument().getBoolean(getWrappingKey()))
@@ -42,6 +52,35 @@ public abstract class FormatterCommentNode extends FormatterTextNode
 			visitor.write(context, getStartOffset(), getEndOffset());
 		}
 		context.setComment(currentCommentState);
+
+		// Add ending new-line
+		boolean endWithNewLine = isAddingEndNewLine();
+		if (endWithNewLine && !visitor.endsWithNewLine())
+		{
+			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
+			// a new-line.
+			visitor.writeLineBreak(context);
+		}
+	}
+
+	/**
+	 * Returns true if the comment should end with a new line; False, otherwise.
+	 * 
+	 * @return false by default
+	 */
+	public boolean isAddingEndNewLine()
+	{
+		return false;
+	}
+
+	/**
+	 * Returns true if the comment should begin with a new line; False, otherwise.
+	 * 
+	 * @return false by default
+	 */
+	public boolean isAddingBeginNewLine()
+	{
+		return false;
 	}
 
 	/**

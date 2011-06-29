@@ -10,16 +10,11 @@ package com.aptana.editor.common.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.internal.editors.text.EditorsPlugin;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.core.ICorePreferenceConstants;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
-@SuppressWarnings("restriction")
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
@@ -38,7 +33,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
 
 		// mark occurrences
-		prefs.putBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+		prefs.putBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, false);
 
 		// content assist
 		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,
@@ -54,11 +49,5 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// enable folding
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
-
-		if (EclipseUtil.isStandalone())
-		{
-			IPreferenceStore store = EditorsPlugin.getDefault().getPreferenceStore();
-			store.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
-		}
 	}
 }

@@ -7,11 +7,11 @@
  */
 package com.aptana.deploy.heroku;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.core.logging.IdeLog;
 
 public class HerokuPlugin extends AbstractUIPlugin
 {
@@ -45,19 +45,9 @@ public class HerokuPlugin extends AbstractUIPlugin
 		return PLUGIN_ID;
 	}
 
-	public static void logError(Throwable t)
-	{
-		logError(t.getMessage(), t);
-	}
-
-	private static HerokuPlugin getDefault()
+	public static HerokuPlugin getDefault()
 	{
 		return instance;
-	}
-
-	public static void logError(String msg, Throwable t)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginIdentifier(), msg, t));
 	}
 
 	public static ImageDescriptor getImageDescriptor(String path)
@@ -70,6 +60,30 @@ public class HerokuPlugin extends AbstractUIPlugin
 		desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
 		getDefault().getImageRegistry().put(path, desc);
 		return desc;
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(Throwable e)
+	{
+		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @deprecated Use IdeLog instead
+	 * @param message
+	 * @param e
+	 */
+	public static void logError(String message, Throwable e)
+	{
+		IdeLog.logError(getDefault(), message, e);
 	}
 
 }

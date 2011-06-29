@@ -23,6 +23,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
 import com.aptana.debug.ui.DebugUiPlugin;
@@ -102,7 +103,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 							try {
 								result[0] = ((UniformResourceStorage) storage).getURI().toURL();
 							} catch (MalformedURLException e) {
-								DebugUiPlugin.log(e);
+								IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
 							}
 						}
 					}

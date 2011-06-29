@@ -13,13 +13,19 @@ package com.aptana.ui.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IProjectNatureDescriptor;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
@@ -36,7 +42,19 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -44,12 +62,17 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -61,16 +84,23 @@ import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+
+import com.aptana.core.util.ResourceUtil;
+import com.aptana.ui.properties.NaturesLabelProvider;
 
 /**
  * The WizardProjectsImportPage is the page that allows the user to import projects from a particular location.
  */
 @SuppressWarnings("restriction")
-public class WizardFolderImportPage extends WizardPage implements IOverwriteQuery
+public class WizardFolderImportPage extends WizardPage implements IOverwriteQuery, ICheckStateListener,
+		SelectionListener
 {
+	private static final String APTANA_WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
+
 	/**
 	 * An internal class for projects
 	 * 
@@ -129,6 +159,14 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	private ModifyListener modifyListener;
 	private HashSet<String> projectsNames;
 
+	private Button fMakePrimaryButton;
+	private MenuItem fSetPrimaryMenuItem;
+
+	private NaturesLabelProvider fLabelProvider;
+	private CheckboxTableViewer fTableViewer;
+	private String fPrimaryNature;
+	private Map<String, String> fNatureDescriptions;
+
 	// private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 
 	// Keep track of the directory that we browsed to last time
@@ -155,6 +193,8 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		super(pageName);
 		setPageComplete(false);
 		setTitle(Messages.WizardFolderImportPage_ExistingFolderAsNewProject);
+		fNatureDescriptions = new HashMap<String, String>();
+
 	}
 
 	/**
@@ -198,6 +238,50 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 			setPageComplete(true);
 		}
 		Dialog.applyDialogFont(workArea);
+
+		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
+		// Initially check off web nature
+		updatePrimaryNature(APTANA_WEB_NATURE);
+
+		Label l = new Label(workArea, SWT.NONE);
+		l.setText(Messages.WizardFolderImportPage_project_type_title);
+
+		// Table for project natures
+
+		Composite tableComposite = new Composite(workArea, SWT.NONE);
+		tableComposite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+		tableComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		fTableViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.TOP | SWT.BORDER);
+		Table table = fTableViewer.getTable();
+		table.setLinesVisible(true);
+		table.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		TableColumn column = new TableColumn(table, SWT.LEFT);
+		column.setWidth(350);
+
+		fTableViewer.setContentProvider(getContentProvider());
+		fTableViewer.setLabelProvider(getLabelProvider());
+		fTableViewer.setComparator(getViewerComperator());
+		fTableViewer.setInput(ResourcesPlugin.getWorkspace());
+		fTableViewer.setCheckedElements(new String[] { fPrimaryNature });
+		fTableViewer.addCheckStateListener(this);
+		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				updateButtons();
+			}
+		});
+		table.setMenu(createMenu(table));
+
+		// Add the buttons
+		Composite buttons = new Composite(tableComposite, SWT.NONE);
+		buttons.setLayout(GridLayoutFactory.fillDefaults().create());
+		buttons.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
+		fMakePrimaryButton = createButton(Messages.WizardFolderImportPage_make_primary_label, buttons);
+		updateButtons();
+
 		setPageComplete(validate());
 	}
 
@@ -395,7 +479,8 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	 */
 	private IProject createExistingProject(final ProjectRecord record)
 	{
-
+		Object[] checkedNatures = fTableViewer.getCheckedElements();
+		final List<String> natureIds = new ArrayList<String>();
 		String projectName = record.getProjectName();
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(projectName);
@@ -421,6 +506,25 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 			record.description.setName(projectName);
 		}
 
+		for (Object nature : checkedNatures)
+		{
+			natureIds.add(nature.toString());
+		}
+		// promotes the primary nature to the front
+		if (fPrimaryNature != null)
+		{
+			natureIds.remove(fPrimaryNature);
+			natureIds.add(0, fPrimaryNature);
+		}
+
+		// if nothing is checked off, we use the default web nature
+		if (natureIds.isEmpty())
+		{
+			natureIds.add(0, APTANA_WEB_NATURE);
+		}
+
+		record.description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
+
 		WorkspaceModifyOperation op = new WorkspaceModifyOperation()
 		{
 			protected void execute(IProgressMonitor monitor) throws CoreException
@@ -432,6 +536,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 					throw new OperationCanceledException();
 				}
 				project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 1000));
+				project.setDescription(record.description, monitor);
+
+				// We close and open the project to apply the natures correctly
+				// project.close(monitor);
+				// project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 1000));
+
 			}
 		};
 		// run the new project creation operation
@@ -634,5 +744,165 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		{
 			setPageComplete(validate());
 		}
+	}
+
+	private void updatePrimaryNature(String nature)
+	{
+		fPrimaryNature = nature;
+		fLabelProvider.setPrimaryNature(fPrimaryNature);
+	}
+
+	/**
+	 * Returns a content provider for the list dialog. The content provider will include all available natures as
+	 * strings.
+	 * 
+	 * @return the content provider that shows the natures (as string children)
+	 */
+	private IStructuredContentProvider getContentProvider()
+	{
+		return new BaseWorkbenchContentProvider()
+		{
+			@Override
+			public Object[] getChildren(Object o)
+			{
+				if (!(o instanceof IWorkspace))
+				{
+					return new Object[0];
+				}
+				Set<String> elements = new HashSet<String>();
+				// collect all available natures in the workspace
+				IProjectNatureDescriptor[] natureDescriptors = ((IWorkspace) o).getNatureDescriptors();
+				String natureId;
+				for (IProjectNatureDescriptor descriptor : natureDescriptors)
+				{
+					natureId = descriptor.getNatureId();
+					if (natureId != null)
+					{
+						if (ResourceUtil.isAptanaNature(natureId))
+						{
+							elements.add(natureId);
+							fNatureDescriptions.put(natureId, descriptor.getLabel());
+						}
+					}
+				}
+				return elements.toArray();
+			}
+		};
+	}
+
+	private ILabelProvider getLabelProvider()
+	{
+		return fLabelProvider;
+	}
+
+	private ViewerComparator getViewerComperator()
+	{
+		return new ViewerComparator(new Comparator<String>()
+		{
+
+			public int compare(String o1, String o2)
+			{
+				// set Aptana natures ahead of others
+				if (ResourceUtil.isAptanaNature(o1))
+				{
+					return ResourceUtil.isAptanaNature(o2) ? o1.compareTo(o2) : -1;
+				}
+				return ResourceUtil.isAptanaNature(o2) ? 1 : o1.compareTo(o2);
+			}
+		});
+	}
+
+	private Button createButton(String text, Composite parent)
+	{
+		Button button = new Button(parent, SWT.PUSH);
+		button.setText(text);
+		button.setLayoutData(GridDataFactory.fillDefaults().create());
+		button.addSelectionListener(this);
+		return button;
+	}
+
+	/**
+	 * Updates the buttons' enablement.
+	 */
+	private void updateButtons()
+	{
+		StructuredSelection selection = (StructuredSelection) fTableViewer.getSelection();
+		fMakePrimaryButton.setEnabled(!selection.isEmpty() && !isPrimary(selection.getFirstElement()));
+	}
+
+	/**
+	 * Returns true if the given element string is set as the primary nature.
+	 * 
+	 * @param element
+	 * @return true if the element is set as the primary nature, false otherwise
+	 */
+	protected boolean isPrimary(Object element)
+	{
+		return fPrimaryNature != null && fPrimaryNature.equals(element);
+	}
+
+	protected Menu createMenu(Table table)
+	{
+		Menu menu = new Menu(table);
+		fSetPrimaryMenuItem = new MenuItem(menu, SWT.PUSH);
+		fSetPrimaryMenuItem.setText(Messages.WizardFolderImportPage_set_primary_label);
+		fSetPrimaryMenuItem.addSelectionListener(this);
+		return menu;
+	}
+
+	public void checkStateChanged(CheckStateChangedEvent event)
+	{
+		// Check if the current checked items are the same as the initial ones.
+		Object[] checkedElements = fTableViewer.getCheckedElements();
+		if (fPrimaryNature == null)
+		{
+			// in case that the item was checked, set it as the primary
+			if (event.getChecked())
+			{
+				updatePrimaryNature(event.getElement().toString());
+				fTableViewer.refresh();
+			}
+		}
+		else
+		{
+			if (!event.getChecked() && isPrimary(event.getElement()))
+			{
+				// find the next available item which is checked and set it to
+				// the primary
+				if (checkedElements.length == 0)
+				{
+					updatePrimaryNature(null);
+				}
+				else
+				{
+					updatePrimaryNature(checkedElements[0].toString());
+				}
+				fTableViewer.refresh();
+			}
+		}
+		updateButtons();
+	}
+
+	public void widgetSelected(SelectionEvent e)
+	{
+		Object source = e.getSource();
+		if (source == fSetPrimaryMenuItem || source == fMakePrimaryButton)
+		{
+			ISelection selection = fTableViewer.getSelection();
+			if (!selection.isEmpty() && selection instanceof StructuredSelection)
+			{
+				Object firstElement = ((StructuredSelection) selection).getFirstElement();
+				// make the element checked
+				fTableViewer.setChecked(firstElement, true);
+				// make it as primary
+				updatePrimaryNature(firstElement.toString());
+				fTableViewer.refresh();
+				updateButtons();
+			}
+		}
+	}
+
+	public void widgetDefaultSelected(SelectionEvent e)
+	{
 	}
 }

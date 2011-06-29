@@ -24,12 +24,16 @@ import com.aptana.formatter.nodes.IFormatterNode;
 public class FormatterJSGroupNode extends FormatterBlockWithBeginEndNode
 {
 
+	private boolean hasCommentBefore;
+
 	/**
 	 * @param document
+	 * @param hasCommentBefore
 	 */
-	public FormatterJSGroupNode(IFormatterDocument document)
+	public FormatterJSGroupNode(IFormatterDocument document, boolean hasCommentBefore)
 	{
 		super(document);
+		this.hasCommentBefore = hasCommentBefore;
 	}
 
 	/*
@@ -69,5 +73,15 @@ public class FormatterJSGroupNode extends FormatterBlockWithBeginEndNode
 	protected boolean isIndenting()
 	{
 		return getDocument().getBoolean(JSFormatterConstants.INDENT_GROUP_BODY);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return !hasCommentBefore;
 	}
 }

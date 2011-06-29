@@ -22,6 +22,7 @@ import java.util.List;
 import com.aptana.commandline.launcher.CommandlineArgumentsHandler;
 import com.aptana.commandline.launcher.CommandlineLauncherPlugin;
 import com.aptana.commandline.launcher.server.port.PortManager;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author schitale
@@ -41,7 +42,7 @@ public class LauncherServer
 		}
 		catch (IOException e)
 		{
-			CommandlineLauncherPlugin.logError(e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -62,7 +63,7 @@ public class LauncherServer
 
 		/**
 		 * CommandLineArgsServer
-		 *
+		 * 
 		 * @param helper
 		 * @throws IOException
 		 */
@@ -76,7 +77,7 @@ public class LauncherServer
 
 		/**
 		 * getPort
-		 *
+		 * 
 		 * @return int
 		 */
 		public int getPort()
@@ -138,7 +139,7 @@ public class LauncherServer
 				}
 				catch (IOException e)
 				{
-					CommandlineLauncherPlugin.logError(e);
+					IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
 				}
 				finally
 				{
@@ -157,5 +158,4 @@ public class LauncherServer
 			}
 		}
 	}
-
 }

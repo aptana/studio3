@@ -2,30 +2,30 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.git.ui;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.git.ui.GitUIPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
+ org.eclipse.core.filesystem,
  org.eclipse.debug.ui,
  org.eclipse.team.core,
+ org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.team.ui,
- org.eclipse.jface.text,
  org.eclipse.compare,
  org.eclipse.ui.browser,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
- com.aptana.core,
+ org.eclipse.ui.console,
+ org.eclipse.ui.externaltools,
+ com.aptana.core;bundle-version="3.0.3",
  com.aptana.git.core,
  com.aptana.theme,
  com.aptana.console,
  com.aptana.ui,
- org.eclipse.ui.externaltools,
- com.aptana.terminal,
- org.eclipse.core.filesystem,
- org.eclipse.ui.console
+ com.aptana.terminal
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

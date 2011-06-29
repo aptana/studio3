@@ -37,29 +37,26 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class FirefoxUtil {
 
 	private static final String VALUE_PATTERN = "^(.[^=]*)=(.*)$"; //$NON-NLS-1$
 	private static final String SECTION_PATTERN = "^\\x5B(.*)\\x5D$"; //$NON-NLS-1$
-	
-	private static final String[] WIN32_PROFILES_LOCATIONS = {
-		"%APPDATA%\\Mozilla\\Firefox\\" //$NON-NLS-1$
+
+	private static final String[] WIN32_PROFILES_LOCATIONS = { "%APPDATA%\\Mozilla\\Firefox\\" //$NON-NLS-1$
 	};
-	private static final String[] LINUX_PROFILES_LOCATIONS = {
-		"~/.mozilla/firefox/" //$NON-NLS-1$
+	private static final String[] LINUX_PROFILES_LOCATIONS = { "~/.mozilla/firefox/" //$NON-NLS-1$
 	};
-	private static final String[] MACOSX_PROFILES_LOCATIONS = {
-		"~/Library/Application Support/Firefox/", //$NON-NLS-1$
-		"~/Library/Mozilla/Firefox/" //$NON-NLS-1$
+	private static final String[] MACOSX_PROFILES_LOCATIONS = { "~/Library/Application Support/Firefox/", //$NON-NLS-1$
+			"~/Library/Mozilla/Firefox/" //$NON-NLS-1$
 	};
 
 	private static final Map<String, String[]> LOCATIONS = new HashMap<String, String[]>();
-	
+
 	static {
 		LOCATIONS.put(Platform.OS_WIN32, WIN32_PROFILES_LOCATIONS);
 		LOCATIONS.put(Platform.OS_LINUX, LINUX_PROFILES_LOCATIONS);
@@ -86,7 +83,7 @@ public final class FirefoxUtil {
 				if (!dir.isDirectory()) {
 					continue;
 				}
-				CorePlugin.log(MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
+				IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
 
 				File[] profiles = readProfiles(dir);
 				if (profiles.length == 0) {
@@ -109,13 +106,12 @@ public final class FirefoxUtil {
 					}
 					sb.append(profiles[j].toString());
 				}
-				CorePlugin.log(MessageFormat.format("Profiles found: {0}", sb.toString())); //$NON-NLS-1$
+				IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Profiles found: {0}", sb.toString())); //$NON-NLS-1$
 				// End of Debug output
 
-				for (int j = 0; j < profiles.length; ++j) {
-					File profile = profiles[j];
+				for (File profile : profiles) {
 					if (profile.isDirectory()) {
-						CorePlugin.log(MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
+						IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
 						return Path.fromOSString(profile.getAbsolutePath());
 					}
 				}
@@ -176,7 +172,7 @@ public final class FirefoxUtil {
 					}
 				}
 			} catch (IOException e) {
-				CorePlugin.log(MessageFormat.format("Reading '{0}' fails", profilesIni.getAbsolutePath()), e); //$NON-NLS-1$
+				IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", profilesIni.getAbsolutePath()), e, null); //$NON-NLS-1$
 			} finally {
 				if (r != null) {
 					try {
@@ -186,7 +182,7 @@ public final class FirefoxUtil {
 				}
 			}
 		}
-		return (File[]) list.toArray(new File[list.size()]);
+		return list.toArray(new File[list.size()]);
 	}
 
 	/**
@@ -208,8 +204,10 @@ public final class FirefoxUtil {
 				if (installRdf.exists()) {
 					rdfInputStream = new FileInputStream(installRdf);
 				}
-			} else if (dir.addFileExtension("xpi").toFile().isFile()) {
-				rdfInputStream = ZipUtil.openEntry(dir.addFileExtension("xpi").toFile(), Path.fromPortableString("install.rdf"));
+			} else if (dir.addFileExtension("xpi").toFile().isFile()) //$NON-NLS-1$
+			{
+				rdfInputStream = ZipUtil.openEntry(dir.addFileExtension("xpi").toFile(), //$NON-NLS-1$
+						Path.fromPortableString("install.rdf")); //$NON-NLS-1$
 			}
 			if (rdfInputStream != null) {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -251,7 +249,7 @@ public final class FirefoxUtil {
 				}
 			}
 		} catch (Exception e) {
-			CorePlugin.log(e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 		}
 		return null;
 	}
@@ -278,7 +276,7 @@ public final class FirefoxUtil {
 				out = new FileOutputStream(file);
 				out.write(linkedPath.getBytes());
 			} catch (IOException e) {
-				CorePlugin.log(e);
+				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 			} finally {
 				if (out != null) {
 					try {
@@ -321,7 +319,7 @@ public final class FirefoxUtil {
 				out.write(buffer, 0, n);
 			}
 		} catch (IOException e) {
-			CorePlugin.log(e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 			if (file != null) {
 				if (!file.delete()) {
 					file.deleteOnExit();
@@ -346,7 +344,7 @@ public final class FirefoxUtil {
 		try {
 			ZipUtil.extract(file, dir);
 		} catch (IOException e) {
-			CorePlugin.log(e);
+			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 			return false;
 		} finally {
 			if (!file.delete()) {
@@ -356,5 +354,4 @@ public final class FirefoxUtil {
 
 		return true;
 	}
-
 }

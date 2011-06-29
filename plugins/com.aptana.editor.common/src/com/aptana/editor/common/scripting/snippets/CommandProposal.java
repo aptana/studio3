@@ -23,6 +23,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.scripting.ScriptingActivator;
@@ -91,7 +92,8 @@ public class CommandProposal extends SnippetTemplateProposal
 					}
 				}
 			}
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.TRIGGER, viewer, textEditor);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.TRIGGER,
+					viewer, textEditor);
 			if (!commandResult.executedSuccessfully() || restorePrefix(commandResult.getOutputType()))
 			{
 				// Undo our wiping of prefix!
@@ -102,7 +104,7 @@ public class CommandProposal extends SnippetTemplateProposal
 				}
 				catch (Exception e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 			CommandExecutionUtils.processCommandResult(commandElement, commandResult, viewer);
@@ -116,7 +118,6 @@ public class CommandProposal extends SnippetTemplateProposal
 			case INSERT_AS_SNIPPET:
 			case INSERT_AS_TEXT:
 				return false;
-
 			default:
 				return true;
 		}
@@ -131,5 +132,4 @@ public class CommandProposal extends SnippetTemplateProposal
 		// Return null for Command Proposal
 		return null;
 	}
-
 }

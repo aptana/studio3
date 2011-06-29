@@ -15,6 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
@@ -38,6 +39,8 @@ import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
@@ -52,7 +55,7 @@ import com.aptana.webserver.core.preferences.WebServerPreferences;
 public class LocalWebServer {
 
 	private static final int SOCKET_TIMEOUT = 10000;
-	private static final long STARTUP_TIMEOUT = 5000;
+	private static final long STARTUP_TIMEOUT = 10000;
 	private static final long SHUTDOWN_TIMEOUT = 2000;
 	private static final int SOCKET_BUFFER_SIZE = 16*1024;
 	private static final int WORKER_COUNT = 2;
@@ -80,6 +83,7 @@ public class LocalWebServer {
 			WebServerCorePlugin.log(e);
 		}
 		startServer(host, port, configuration);
+		testConnection(configuration.getBaseURL());
 	}
 	
 	/**
@@ -91,6 +95,28 @@ public class LocalWebServer {
 	
 	public EFSWebServerConfiguration getConfiguration() {
 		return configuration;
+	}
+	
+	private void testConnection(URL url) throws CoreException {
+		CoreException exception = null;
+		for (int trial = 0; trial < 3; ++trial) {
+			try {
+				URLConnection connection = url.openConnection();
+				connection.connect();
+				connection.getContentType();
+				return;
+			} catch (IOException e) {
+				exception = new CoreException(new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Testing WebServer connection failed", e)); //$NON-NLS-1$
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				break;
+			}
+		}
+		if (exception != null) {
+			throw exception;
+		}
 	}
 	
 	private void startServer(final InetAddress host, final int port, final EFSWebServerConfiguration configuration) {

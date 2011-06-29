@@ -37,12 +37,14 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
@@ -97,21 +99,48 @@ public class BundleManager
 					BundleElement be = null;
 					if (useCache)
 					{
+						showBundleLoadInfo("attempting to read cache: " + bundleDirectory); //$NON-NLS-1$
+						
 						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
+						showBundleLoadInfo("cache succeeded"); //$NON-NLS-1$
+						
 						addBundle(be);
 					}
 					else
 					{
+						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
+						
 						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+						
+						// first script is always bundle.rb, so go ahead
+						// and process that
+						File bundleScript = bundleScripts.get(0);
+						sub.subTask(bundleScript.getAbsolutePath());
+						loadScript(bundleScript, true, bundleLoadPaths);
+						sub.worked(1);
+						
+						// some new scripts may have come in while we were
+						// processing bundle.rb, so recalculate the list of
+						// scripts to process
+						bundleScripts = getBundleScripts(bundleDirectory);
+						
+						if (bundleScripts.size() > 0) {
+							// we've already loaded bundle.rb, so remove it from
+							// the list. Note that at this point we have a
+							// bundle element for this bundle, so any file
+							// events that occur now correctly update the bundle
+							// element
+							bundleScripts.remove(0);
 
-						for (File script : bundleScripts)
-						{
-							sub.subTask(script.getAbsolutePath());
-							loadScript(script, true, bundleLoadPaths);
-							sub.worked(1);
+							// process the rest of the scripts in the bundle
+							for (File script : bundleScripts) {
+								sub.subTask(script.getAbsolutePath());
+								loadScript(script, true, bundleLoadPaths);
+								sub.worked(1);
+							}
 						}
 
 						if (useCache)
@@ -551,7 +580,14 @@ public class BundleManager
 		{
 			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				listener.bundlesBecameHidden(entry);
+				try
+				{
+					listener.bundlesBecameHidden(entry);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Hidden_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -569,7 +605,14 @@ public class BundleManager
 		{
 			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				listener.bundlesBecameVisible(entry);
+				try
+				{
+					listener.bundlesBecameVisible(entry);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Bundle_Became_Visible_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -587,7 +630,14 @@ public class BundleManager
 		{
 			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				listener.elementBecameHidden(element);
+				try
+				{
+					listener.elementBecameHidden(element);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Hidden_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -605,7 +655,14 @@ public class BundleManager
 		{
 			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				listener.elementBecameVisible(element);
+				try
+				{
+					listener.elementBecameVisible(element);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Element_Became_Visible_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -623,7 +680,14 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptLoaded(script);
+				try
+				{
+					listener.scriptLoaded(script);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Script_Loaded_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -641,7 +705,14 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptReloaded(script);
+				try
+				{
+					listener.scriptReloaded(script);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Script_Reloaded_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -659,7 +730,14 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptUnloaded(script);
+				try
+				{
+					listener.scriptUnloaded(script);
+				}
+				catch (Throwable t)
+				{
+					ScriptingActivator.logError(Messages.BundleManager_Script_Unloaded_Event_Error, t);
+				}
 			}
 		}
 	}
@@ -1825,7 +1903,9 @@ public class BundleManager
 
 		if (execute)
 		{
+			this.showBundleLoadInfo(MessageFormat.format("Loading script: {0}, fire event={1}", script, fireEvent)); //$NON-NLS-1$
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+			this.showBundleLoadInfo(MessageFormat.format("Loading complete: {0}", script)); //$NON-NLS-1$
 
 			if (fireEvent)
 			{
@@ -2011,8 +2091,28 @@ public class BundleManager
 	}
 
 	/**
+	 * Turn on or off bundle caching
+	 * 
+	 * @param value
+	 */
+	public void setUseCache(boolean value)
+	{
+		System.setProperty(USE_BUNDLE_CACHE, Boolean.toString(value));
+	}
+
+	/**
+	 * Show bundle load info
+	 * 
+	 * @param message
+	 */
+	protected void showBundleLoadInfo(String message)
+	{
+		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_LOAD_INFO);
+	}
+	
+	/**
 	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads
-	 * everything all scripts associated with a bundle and the bundle.rb script as well
+	 * all scripts associated with a bundle and the bundle.rb script as well
 	 * 
 	 * @param bundleDirectory
 	 *            The directory (and its descendants) to unload
@@ -2029,9 +2129,22 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-
-		for (File script : scripts)
+		
+		List<File> reverseOrder = new ArrayList<File>(scripts);
+		
+		Collections.sort(reverseOrder, new Comparator<File>()
 		{
+			public int compare(File o1, File o2)
+			{
+				// reverse sort
+				return o2.getAbsolutePath().compareToIgnoreCase(o1.getAbsolutePath());
+			}
+		});
+
+		for (File script : reverseOrder)
+		{
+			showBundleLoadInfo("Unload script: " + script.toString()); //$NON-NLS-1$
+			
 			this.unloadScript(script);
 		}
 	}
@@ -2109,5 +2222,15 @@ public class BundleManager
 
 			ScriptLogger.logError(message);
 		}
+	}
+
+	/**
+	 * Determine if bundle caching is turned on or off
+	 * 
+	 * @return
+	 */
+	public boolean useCache()
+	{
+		return Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
 	}
 }

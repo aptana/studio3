@@ -8,6 +8,16 @@ css.formatter.formatter.tabulation.size=4
 css.formatter.line.after.declaration=0
 css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
+css.formatter.spaces.before.commas=0
+css.formatter.spaces.after.commas=1
+css.formatter.spaces.before.parentheses=1
+css.formatter.spaces.after.parentheses=1
+css.formatter.spaces.before.colon=0
+css.formatter.spaces.after.colon=1
+css.formatter.spaces.before.semicolon=0
+css.formatter.spaces.after.semicolon=0
+css.formatter.spaces.before.child.combinator=1
+css.formatter.spaces.after.child.combinator=1
 ==CONTENT==
 H1 {
     color: white;

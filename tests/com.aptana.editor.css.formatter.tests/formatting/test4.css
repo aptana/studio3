@@ -8,6 +8,16 @@ css.formatter.formatter.tabulation.size=4
 css.formatter.line.after.declaration=0
 css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
+css.formatter.spaces.before.commas=0
+css.formatter.spaces.after.commas=1
+css.formatter.spaces.before.parentheses=1
+css.formatter.spaces.after.parentheses=1
+css.formatter.spaces.before.colon=0
+css.formatter.spaces.after.colon=1
+css.formatter.spaces.before.semicolon=0
+css.formatter.spaces.after.semicolon=0
+css.formatter.spaces.before.child.combinator=1
+css.formatter.spaces.after.child.combinator=1
 ==CONTENT==
 @import url("/shared.css");
 
@@ -58,27 +68,27 @@ css.formatter.formatter.tabulation.char=space
 @import url("/shared.css");
 
 #footer {
-    border:1px solid white;
+    border: 1px solid white;
 }
 
 #banner {
     background-color: #636D84;
-    padding-right:40px;
-    padding-top:10px;
-    height:40px;
+    padding-right: 40px;
+    padding-top: 10px;
+    height: 40px;
 }
 
 #search.className .class {
-    padding:1px;
+    padding: 1px;
     margin-left: 10px;
     margin-right: 10px;
-    margin-top:3px;
+    margin-top: 3px;
     FONT-WEIGHT: normal;
     FONT-SIZE: 100%;
     WIDTH: 130px;
     FONT-FAMILY: tahoma, arial, sans-serif;
-    background-color:transparent;
-    border:1px solid white;
+    background-color: transparent;
+    border: 1px solid white;
 }
 
 #search #submit {
@@ -86,18 +96,18 @@ css.formatter.formatter.tabulation.char=space
     FONT-FAMILY: tahoma, arial, sans-serif;
     background-color: #F99432;
     color: #FFFFFF;
-    border-color:1px solid #CCCCCC;
+    border-color: 1px solid #CCCCCC;
 }
 
 #metanav {
-    padding:10px 0px 5px 0px;
-    margin-top:10px;
+    padding: 10px 0px 5px 0px;
+    margin-top: 10px;
 }
 
 #ctextnav {
-    padding:10px 0px 5px 0px;
+    padding: 10px 0px 5px 0px;
 }
 
 #mainnav {
-    margin-top:24px;
+    margin-top: 24px;
 }

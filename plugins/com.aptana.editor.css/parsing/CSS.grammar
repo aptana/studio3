@@ -12,14 +12,14 @@
 %import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.lexer.IRange";
 
-%terminals AT_RULE, CHARSET, IMPORT, MEDIA, PAGE, FONTFACE, NAMESPACE, LPAREN;
+%terminals AT_RULE, CHARSET, IMPORT, MEDIA_KEYWORD, PAGE, FONTFACE, NAMESPACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
 %terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
-%terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
+%terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH, BEGINS_WITH, ENDS_WITH;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, IMPORTANT, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR = "String";
-%typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, GREATER = "String";
+%typeof HASH, CLASS, LBRACKET, RBRACKET, COLON, COMMA, PLUS, GREATER, AT_RULE = "String";
 %typeof Statement = "CSSNode";
 %typeof Declaration = "CSSDeclarationNode";
 %typeof Declarations = "List<CSSDeclarationNode>";
@@ -94,7 +94,7 @@
 			CSSCommentNode commentNode = new CSSCommentNode( //
 				this.getSource(parseState, comment),
 				comment.getStartingOffset(),
-				comment.getEndingOffset()
+				comment.getEndingOffset() - 1
 			);
 
 			commentNodes[i] = commentNode;
@@ -168,14 +168,82 @@ Import
 	;
 
 Media
-	=	MEDIA List.l LCURLY RCURLY
+	=	MEDIA_KEYWORD MediaExprs.m LCURLY RCURLY
 		{:
-			return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]));
+			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+
+			for (Symbol symbol : m)
+			{
+				CSSTextNode text = new CSSTextNode((String) symbol.value);
+
+				text.setLocation(symbol.getStart(), symbol.getEnd());
+				list.add(text);
+			}
+
+			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]));
 		:}
-	|	MEDIA List.l LCURLY Statements.s RCURLY
+	|	MEDIA_KEYWORD MediaExprs.m LCURLY Statements.s RCURLY
 		{:
-			return new CSSMediaNode(l.toArray(new CSSTextNode[l.size()]), s);
+			List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+
+			for (Symbol symbol : m)
+			{
+				CSSTextNode text = new CSSTextNode((String) symbol.value);
+
+				text.setLocation(symbol.getStart(), symbol.getEnd());
+				list.add(text);
+			}
+
+			return new CSSMediaNode(list.toArray(new CSSTextNode[list.size()]), s);
 		:}
+	;
+
+MediaExprs
+	=	MediaExprs MediaExpr
+	|	MediaExpr
+	;
+
+MediaExpr
+	=	IDENTIFIER
+	|	PROPERTY
+	|	COLOR
+	|	COLON
+	|	RCURLY
+	|	STRING
+	|	LBRACKET
+	|	CLASS
+	|	HASH
+	|	SEMICOLON
+	|	URL
+	|	STAR
+	|	SELECTOR
+	|	COMMA
+	|	NUMBER
+	|	PERCENTAGE
+	|	LENGTH
+	|	EMS
+	|	EXS
+	|	ANGLE
+	|	TIME
+	|	FREQUENCY
+	|	PAGE
+	|	AT_RULE
+	|	CHARSET
+	|	MEDIA_KEYWORD
+	|	FONTFACE
+	|	NAMESPACE
+	|	IMPORT
+	|	RBRACKET
+	|	LPAREN
+	|	PLUS
+	|	SLASH
+	|	MINUS
+	|	RPAREN
+	|	IMPORTANT
+	|	GREATER
+	|	EQUAL
+	|	INCLUDES
+	|	DASHMATCH
 	;
 
 Page
@@ -232,8 +300,10 @@ Namespace
 	;
 
 AtRule
-	=	AT_RULE STRING SEMICOLON
-	|	AT_RULE STRING LCURLY RCURLY
+	=	AT_RULE.a STRING.s SEMICOLON
+		{:
+			return new CSSAtRuleNode(a, s);
+		:}
 	;
 
 // TODO: We probably want some collection nodes, one to hold selectors and one to hold
@@ -444,15 +514,6 @@ AttributeSelector
 		{:
 			return new CSSAttributeSelectorNode(f);
 		:}
-	|	COLOR.c // this catches a case when a hash looks like a color
-		{:
-			return new CSSAttributeSelectorNode(c);
-		:}
-	|
-		PROPERTY.p // this catches a case when an attribute looks like a property, most likely indicating a deficiency in our scanner
-		{:
-			return new CSSAttributeSelectorNode(p);
-		:}
 	|	HASH.h
 		{:
 			return new CSSAttributeSelectorNode(h);
@@ -520,4 +581,6 @@ AttributeValueOperator
 	=	EQUAL
 	|	INCLUDES
 	|	DASHMATCH
+	|	BEGINS_WITH
+	|	ENDS_WITH
 	;

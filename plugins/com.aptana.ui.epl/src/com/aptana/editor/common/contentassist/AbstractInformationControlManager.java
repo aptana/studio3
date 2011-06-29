@@ -32,7 +32,7 @@ public abstract class AbstractInformationControlManager extends
 	private int fVerticalOffset;
 
 	/** The information to be presented */
-	private Object fInformation;
+	private String fInformation;
 
 	/** Indicates whether the size constraints should be enforced as minimal control size */
 	private boolean fEnforceAsMinimalSize = false;
@@ -151,11 +151,7 @@ public abstract class AbstractInformationControlManager extends
 	@Override
 	protected void presentInformation()
 	{
-		boolean hasContents = false;
-		if (fInformation instanceof String)
-			hasContents = ((String) fInformation).trim().length() > 0;
-		else
-			hasContents = (fInformation != null);
+		boolean hasContents = fInformation != null && ((String) fInformation).trim().length() > 0;
 
 		if (getSubjectArea() != null && hasContents)
 			internalShowInformationControl(getSubjectArea(), fInformation);
@@ -207,7 +203,7 @@ public abstract class AbstractInformationControlManager extends
 	 * @param information
 	 *            the information
 	 */
-	private void internalShowInformationControl(Rectangle subjectArea, Object information)
+	private void internalShowInformationControl(Rectangle subjectArea, String information)
 	{
 		IInformationControl informationControl = getInformationControl();
 		if (informationControl != null)
@@ -287,20 +283,20 @@ public abstract class AbstractInformationControlManager extends
 			}
 
 			// TableItem[] selection = ((Table) fSubjectControl).getSelection();
-			//			
+			//
 			// if (selection != null)
 			// {
 			// TableItem item = selection[0];
 			// Rectangle parentBounds = fSubjectControl.getParent().getBounds();
 			// Rectangle itemBounds = item.getBounds(0);
-			//	
+			//
 			// fVerticalOffset = parentBounds.y + itemBounds.y;
-			//				
+			//
 			// int parentBottom = parentBounds.y + parentBounds.height;
-			//				
+			//
 			// TODO: replace "size.y" with this info control's height to get this code to work
 			// int bottom = fVerticalOffset + size.y;
-			//				
+			//
 			// if (bottom > parentBottom )
 			// {
 			// fVerticalOffset -= (bottom - parentBottom);

@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 public abstract class IOUtil
 {
@@ -178,7 +179,7 @@ public abstract class IOUtil
 						error //
 						);
 
-				CorePlugin.logError(message, null);
+				IdeLog.logError(CorePlugin.getDefault(), message, (Throwable) null);
 			}
 		}
 		else

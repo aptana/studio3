@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.text;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class TextEditor extends AbstractThemeableEditor
@@ -19,9 +21,17 @@ public class TextEditor extends AbstractThemeableEditor
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
-
 		setSourceViewerConfiguration(new TextSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new TextDocumentProvider());
+		setDocumentProvider(TextEditorPlugin.getDefault().getTextDocumentProvider());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getPluginPreferenceStore()
+	 */
+	@Override
+	protected IPreferenceStore getPluginPreferenceStore()
+	{
+		return TextEditorPlugin.getDefault().getPreferenceStore();
+	}
 }

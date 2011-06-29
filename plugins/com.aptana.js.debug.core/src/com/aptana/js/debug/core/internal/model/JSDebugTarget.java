@@ -92,16 +92,16 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String BREAKPOINT_0_1_2_3 = "breakpoint*{0}*{1}*{2}{3}"; //$NON-NLS-1$
 	private static final String WATCHPOINT_0_1_2 = "watchpoint*{0}*{1}*{2}"; //$NON-NLS-1$
 	private static final String DETAILS_0 = "details*{1}"; //$NON-NLS-1$
-	private static final String DETAILS_0_V2 = "details*{0,number,integer}*{1}"; //$NON-NLS-1$
+	private static final String DETAILS_0_V2 = "details*{0}*{1}"; //$NON-NLS-1$
 	private static final String SET_VALUE_0_1 = "setValue*{1}*{2}"; //$NON-NLS-1$
-	private static final String SET_VALUE_0_1_V2 = "setValue*{0,number,integer}*{1}*{2}"; //$NON-NLS-1$
+	private static final String SET_VALUE_0_1_V2 = "setValue*{0}*{1}*{2}"; //$NON-NLS-1$
 	private static final String EVAL_0 = "eval[{0}]"; //$NON-NLS-1$
 	private static final String EVAL_0_1 = "eval*{1}*{2}"; //$NON-NLS-1$
-	private static final String EVAL_0_1_V2 = "eval*{0,number,integer}*{1}*{2}"; //$NON-NLS-1$
+	private static final String EVAL_0_1_V2 = "eval*{0}*{1}*{2}"; //$NON-NLS-1$
 	private static final String RESULT = "result"; //$NON-NLS-1$
 	private static final String FRAME_0 = "frame[{0,number,integer}]"; //$NON-NLS-1$
 	private static final String VARIABLES_0 = "variables*{1}"; //$NON-NLS-1$
-	private static final String VARIABLES_0_V2 = "variables*{0,number,integer}*{1}"; //$NON-NLS-1$
+	private static final String VARIABLES_0_V2 = "variables*{0}*{1}"; //$NON-NLS-1$
 	private static final String OPEN_URL_0 = "openUrl*{0}"; //$NON-NLS-1$
 	private static final String OPTION_0_1 = "option*{0}*{1}"; //$NON-NLS-1$
 	private static final String ENABLE = "enable"; //$NON-NLS-1$
@@ -130,6 +130,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String LOAD = "load"; //$NON-NLS-1$
 	private static final String EXCEPTION = "exception"; //$NON-NLS-1$
 	private static final String ERR = "err"; //$NON-NLS-1$
+	private static final String WARN = "warn"; //$NON-NLS-1$
 	private static final String TRACE = "trace"; //$NON-NLS-1$
 	private static final String SRC = "src"; //$NON-NLS-1$
 	private static final String BREAKPOINT = "breakpoint"; //$NON-NLS-1$
@@ -158,6 +159,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 
 	private static final int PROTOCOL_VERSION_MIN = 0;
 	private static final int PROTOCOL_VERSION_MAX = 2;
+	
+	protected static final String DEFAULT_THREAD_ID = "0"; //$NON-NLS-1$
 
 	/**
 	 * Step filter bit mask - indicates if step filters are enabled.
@@ -182,10 +185,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private ILaunch launch;
 	private String label;
 	private IProcess process;
-	private OutputStream out;
-	private OutputStream err;
 	private IURIMapper uriMapper;
-	private Map<Integer, JSDebugThread> threads = new HashMap<Integer, JSDebugThread>();
+	private Map<String, JSDebugThread> threads = new HashMap<String, JSDebugThread>();
 	private IFileContentRetriever fileContentRetriever;
 	private XHRService xhrService;
 	private Map<URI, IJSScriptElement> topScriptElements = new HashMap<URI, IJSScriptElement>();
@@ -364,11 +365,18 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try {
 			if (ERR.equals(log) || EXCEPTION.equals(log)) {
+				OutputStream err = ((JSDebugProcess) process).getStream(IJSDebugConstants.ID_STANDARD_ERROR_STREAM);
 				if (err != null) {
 					err.write(text.getBytes());
 				}
-			} else
-			/* out */{
+			} else {
+				if (WARN.equals(log)) {
+					log = IJSDebugConstants.ID_WARNING_STREAM;
+				}
+				OutputStream out = ((JSDebugProcess) process).getStream(log);
+				if (out == null) {
+					out = ((JSDebugProcess) process).getStream(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM);
+				}
 				if (out != null) {
 					out.write(text.getBytes());
 				}
@@ -599,14 +607,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	private void handleThreads(String[] args) {
 		String action = args[1];
-		int threadId = -1;
-		try {
-			threadId = Integer.parseInt(args[2]);
-		} catch (NumberFormatException e) {
-		}
-
+		String threadId = args[2];
 		if (CREATED.equals(action)) {
-			if (threadId >= 0 && !threads.containsKey(threadId)) {
+			if (threadId.length() > 0 && !threads.containsKey(threadId)) {
 				String label = args[3];
 				JSDebugThread thread = new JSDebugThread(this, threadId, label.length() > 0 ? label : null);
 				threads.put(threadId, thread);
@@ -984,8 +987,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			fireCreationEvent();
 
 			if (protocolVersion < 2) {
-				JSDebugThread thread = new JSDebugThread(this, 0, null);
-				threads.put(0, thread);
+				JSDebugThread thread = new JSDebugThread(this, DEFAULT_THREAD_ID, null);
+				threads.put(DEFAULT_THREAD_ID, thread);
 				thread.fireCreationEvent();
 				fireChangeEvent(DebugEvent.CONTENT);
 			}
@@ -1017,11 +1020,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 
 			connection.sendCommandAndWait(ENABLE);
-		}
-
-		if (process instanceof JSDebugProcess) {
-			out = ((JSDebugProcess) process).getOutputStream();
-			err = ((JSDebugProcess) process).getErrorStream();
 		}
 	}
 
@@ -1195,7 +1193,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @return IVariable[]
 	 * @throws DebugException
 	 */
-	protected IVariable[] loadVariables(int threadId, String qualifier) throws DebugException {
+	protected IVariable[] loadVariables(String threadId, String qualifier) throws DebugException {
 		if (!isThreadSuspended(threadId)) {
 			return new IVariable[0];
 		}
@@ -1238,7 +1236,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws DebugException
 	 */
 	protected Object evaluateExpression(String expression, IDebugElement context) throws DebugException {
-		int threadId;
+		String threadId;
 		String qualifier;
 		Object result = null;
 		// TODO: caching ?
@@ -1286,7 +1284,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws DebugException
 	 */
 	protected Object setValue(IVariable variable, IValue newValue) throws DebugException {
-		int threadId;
+		String threadId;
 		String qualifier;
 		String vqualifier;
 		Object result = null;
@@ -1327,7 +1325,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#computeValueDetails(org.eclipse.debug.core.model.IValue)
 	 */
 	public String computeValueDetails(IValue value) throws DebugException {
-		int threadId;
+		String threadId;
 		String qualifier;
 		String result = null;
 		if (value instanceof JSDebugValue) {
@@ -1734,7 +1732,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		return flags;
 	}
 	
-	private boolean isThreadSuspended(int threadId) {
+	private boolean isThreadSuspended(String threadId) {
 		JSDebugThread thread = threads.get(threadId);
 		if (thread != null) {
 			return thread.isSuspended();
@@ -1871,13 +1869,10 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				fireEvent(event);
 				return;
 			} else if (JSDebugThread.SUSPENDED.equals(action) || JSDebugThread.RESUMED.equals(action)) {
-				int threadId = 0;
+				String threadId = DEFAULT_THREAD_ID;
 				if (protocolVersion >= 2) {
-					try {
-						threadId = Integer.parseInt(args[1]);
-						args = Util.removeArrayElement(args, 1);
-					} catch (NumberFormatException e) {
-					}
+					threadId = args[1];
+					args = Util.removeArrayElement(args, 1);
 				}
 				JSDebugThread thread = threads.get(threadId);
 				if (thread != null) {

@@ -55,7 +55,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.ShellExecutable;
 import com.aptana.core.epl.ReadWriteMonitor;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
@@ -103,6 +102,10 @@ public class GitRepository
 	 * The file used
 	 */
 	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
+	/**
+	 * File hoplding the concatenated commit messages from merge --squash
+	 */
+	private static final String SQUASH_MSG = "SQUASH_MSG"; //$NON-NLS-1$
 	/**
 	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
 	 * repo has changed.
@@ -1217,25 +1220,7 @@ public class GitRepository
 	 */
 	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, gitShellEnv(), args);
-	}
-
-	private Map<String, String> gitShellEnv()
-	{
-		// Set up GIT_SSH!
-		Map<String, String> env = new HashMap<String, String>();
-		env.putAll(ShellExecutable.getEnvironment());
-		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
-		if (git_ssh != null)
-		{
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
-		}
-		IPath git_askpass = GitPlugin.getDefault().getGIT_ASKPASS();
-		if (git_askpass != null)
-		{
-			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
-		}
-		return env;
+		return execute(readOrWrite, GitExecutable.getShellEnvironment(), args);
 	}
 
 	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
@@ -1803,5 +1788,28 @@ public class GitRepository
 			githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
 		}
 		return githubURLs;
+	}
+
+	/**
+	 * If the user has run something like a git merge --squash, it pre-populates the commit message for you with the
+	 * concat of the squashed commits. We should sniff for this and use it when available.
+	 * 
+	 * @return
+	 */
+	public String getPrepopulatedCommitMessage()
+	{
+		try
+		{
+			File squashMsg = gitFile(SQUASH_MSG);
+			if (squashMsg.exists())
+			{
+				return IOUtil.read(new FileInputStream(squashMsg));
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			// ignore
+		}
+		return StringUtil.EMPTY;
 	}
 }

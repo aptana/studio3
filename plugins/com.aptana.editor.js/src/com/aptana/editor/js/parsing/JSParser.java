@@ -292,6 +292,10 @@ public class JSParser extends Parser implements IParser {
 				{
 					((JSNode) node.getFirstChild()).setDocumentation(block);
 				}
+				else if (node instanceof JSIdentifierNode && node.getParent() instanceof JSNameValuePairNode && node.getNextSibling() instanceof JSFunctionNode)
+				{
+					((JSNode) node.getNextSibling()).setDocumentation(block);
+				}
 				else
 				{
 					IParseNode statement = ((JSNode) node).getContainingStatementNode();
@@ -392,7 +396,7 @@ public class JSParser extends Parser implements IParser {
 			// parse
 			ParseRootNode result = (ParseRootNode) parse(fScanner);
 			int start = parseState.getStartingOffset();
-			int end = start + source.length();
+			int end = start + source.length() - 1;
 			result.setLocation(start, end);
 
 			// store results in the parse state
@@ -549,7 +553,7 @@ public class JSParser extends Parser implements IParser {
 			// try the strategies, 3) try these after the mapped strategies
 			for (IRecoveryStrategy strategy : this.recoveryStrategies)
 			{
-				if (strategy.recover(this, token, in))
+				if (strategy.recover(this, getLastSymbol(), token, in))
 				{
 					success = true;
 					break;
@@ -569,100 +573,16 @@ public class JSParser extends Parser implements IParser {
 
 		report = new JSEvents();
 
+		// @formatter:off
 		recoveryStrategies = new IRecoveryStrategy[] {
-			new IRecoveryStrategy() {
-				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+			new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";"),
+			new JSInsertionRecoveryStrategy(JSTokenType.RPAREN, ")", JSTokenType.SEMICOLON, ";"),
+			new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.SEMICOLON, ";", JSTokenType.DOT, JSTokenType.NEW),
+			new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.DOT, JSTokenType.NEW),
+			new IRecoveryStrategy()
+			{
+				public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException
 				{
-					boolean result = false;
-
-					Symbol term = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
-					Simulator sim = new Simulator();
-
-					in.alloc(2);
-					in.insert(term, token);
-					in.rewind();
-
-					if (sim.parse(in))
-					{
-						result = true;
-
-						in.rewind();
-
-						report.missingTokenInserted(term);
-					}
-
-					return result;
-				}
-			},
-			new IRecoveryStrategy() {
-				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
-				{
-					Symbol lastSymbol = getLastSymbol();
-					int type = lastSymbol.getId();
-					boolean result = false;
-
-					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
-					{
-						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
-						Symbol term2 = new Symbol(JSTokenType.SEMICOLON.getIndex(), token.getStart(), token.getStart() - 1, ";");
-
-						Simulator sim = new Simulator();
-
-						in.alloc(3);
-						in.insert(token);
-						in.insert(term2);
-						in.insert(term1);
-						in.rewind();
-
-						if (sim.parse(in))
-						{
-							result = true;
-
-							in.rewind();
-
-							report.missingTokenInserted(term1);
-							report.missingTokenInserted(term2);
-						}
-					}
-
-					return result;
-				}
-			},
-			new IRecoveryStrategy() {
-				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
-				{
-					Symbol lastSymbol = getLastSymbol();
-					int type = lastSymbol.getId();
-					boolean result = false;
-
-					if (type == JSTokenType.DOT.getIndex() || type == JSTokenType.NEW.getIndex())
-					{
-						Symbol term1 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
-
-						Simulator sim = new Simulator();
-
-						in.alloc(2);
-						in.insert(token);
-						in.insert(term1);
-						in.rewind();
-
-						if (sim.parse(in))
-						{
-							result = true;
-
-							in.rewind();
-
-							report.missingTokenInserted(term1);
-						}
-					}
-
-					return result;
-				}
-			},
-			new IRecoveryStrategy() {
-				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
-				{
-					Symbol lastSymbol = getLastSymbol();
 					boolean result = false;
 
 					if (top >= 2)
@@ -670,13 +590,13 @@ public class JSParser extends Parser implements IParser {
 						Symbol symbol1 = _symbols[top - 2];
 						Symbol symbol2 = _symbols[top - 1];
 
-						if (lastSymbol.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
+						if (lastToken.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
 						{
-							Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+							Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), currentToken.getStart(), currentToken.getStart() - 1, "");
 							Simulator sim = new Simulator();
 
 							in.alloc(2);
-							in.insert(term, token);
+							in.insert(term, currentToken);
 							in.rewind();
 
 							if (sim.parse(in))
@@ -693,66 +613,10 @@ public class JSParser extends Parser implements IParser {
 					return result;
 				}
 			},
-			new IRecoveryStrategy() {
-				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
-				{
-					int type = token.getId();
-					boolean result = false;
-
-					if (type == JSTokenType.RCURLY.getIndex())
-					{
-						Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
-						Simulator sim = new Simulator();
-
-						in.alloc(2);
-						in.insert(token);
-						in.insert(term);
-
-						if (sim.parse(in))
-						{
-							result = true;
-
-							in.rewind();
-
-							report.missingTokenInserted(term);
-						}
-					}
-
-					return result;
-				}
-			},
-			new IRecoveryStrategy() {
-				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
-				{
-					int type = token.getId();
-					boolean result = false;
-
-					if (type == JSTokenType.RCURLY.getIndex())
-					{
-						Symbol term1 = new Symbol(JSTokenType.COLON.getIndex(), token.getStart(), token.getStart() - 1, ":");
-						Symbol term2 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
-						Simulator sim = new Simulator();
-
-						in.alloc(3);
-						in.insert(token);
-						in.insert(term2);
-						in.insert(term1);
-
-						if (sim.parse(in))
-						{
-							result = true;
-
-							in.rewind();
-
-							report.missingTokenInserted(term1);
-							report.missingTokenInserted(term2);
-						}
-					}
-
-					return result;
-				}
-			}
+			new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.RCURLY),
+			new JSInsertionRecoveryStrategy(JSTokenType.COLON, ":", JSTokenType.IDENTIFIER, "", JSTokenType.RCURLY)
 		};
+		// @formatter:on
 	}
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {
