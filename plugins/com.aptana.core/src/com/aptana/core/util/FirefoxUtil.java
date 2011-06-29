@@ -342,7 +342,7 @@ public final class FirefoxUtil {
 		}
 
 		try {
-			ZipUtil.extract(file, dir);
+			ZipUtil.extract(file, dir, null);
 		} catch (IOException e) {
 			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 			return false;
