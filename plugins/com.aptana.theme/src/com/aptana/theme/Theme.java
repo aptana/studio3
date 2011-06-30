@@ -276,6 +276,16 @@ public class Theme
 		return ta;
 	}
 
+	ThemeRule winningRule(String scope)
+	{
+		IScopeSelector match = findMatch(scope);
+		if (match == null)
+		{
+			return null;
+		}
+		return getRuleForSelector(match);
+	}
+
 	private DelayedTextAttribute getDelayedTextAttribute(String scope)
 	{
 		IScopeSelector match = findMatch(scope);
@@ -347,7 +357,11 @@ public class Theme
 
 	public ThemeRule getRuleForSelector(IScopeSelector match)
 	{
-		for (ThemeRule rule : coloringRules)
+		// See APSTUD-2790. In Textmate the last matching rule wins, so to get that behavior we reverse the rule list
+		// before matching.
+		List<ThemeRule> reversed = new ArrayList<ThemeRule>(coloringRules);
+		Collections.reverse(reversed);
+		for (ThemeRule rule : reversed)
 		{
 			if (rule.isSeparator())
 			{
@@ -381,7 +395,11 @@ public class Theme
 	private IScopeSelector findMatch(String scope)
 	{
 		Collection<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
-		for (ThemeRule rule : coloringRules)
+		// See APSTUD-2790. In Textmate the last matching rule wins, so to get that behavior we reverse the rule list
+		// before matching.
+		List<ThemeRule> reversed = new ArrayList<ThemeRule>(coloringRules);
+		Collections.reverse(reversed);
+		for (ThemeRule rule : reversed)
 		{
 			if (rule.isSeparator())
 			{

@@ -8,6 +8,7 @@
 package com.aptana.scope;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -181,6 +182,20 @@ public class ScopeSelectorTests extends TestCase
 				"text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html"));
 	}
 
+	public void testMatchResults()
+	{
+		ScopeSelector entity = new ScopeSelector("entity");
+		ScopeSelector metaTagEntity = new ScopeSelector("meta.tag entity");
+
+		String scope = "text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html";
+
+		assertTrue(entity.matches(scope));
+		assertEquals(Arrays.asList(0, 0, 0, 6), entity.matchResults());
+
+		assertTrue(metaTagEntity.matches(scope));
+		assertEquals(Arrays.asList(0, 0, 8, 6), metaTagEntity.matchResults());
+	}
+
 	public void testBestMatchExample()
 	{
 		ScopeSelector string = new ScopeSelector(
@@ -207,6 +222,20 @@ public class ScopeSelectorTests extends TestCase
 		selectors.add(string);
 		selectors.add(source);
 		assertEquals(string, ScopeSelector.bestMatch(selectors, "source.php string.quoted"));
+	}
+
+	public void testMatchResultsDeepestElementWins()
+	{
+		ScopeSelector string = new ScopeSelector("string");
+		ScopeSelector source = new ScopeSelector("source.php");
+
+		String scope = "source.php string.quoted";
+
+		assertTrue(string.matches(scope));
+		assertEquals(Arrays.asList(0, 6), string.matchResults());
+
+		assertTrue(source.matches(scope));
+		assertEquals(Arrays.asList(10, 0), source.matchResults());
 	}
 
 	public void testBestMatchLengthOfDeepestElementWins()
@@ -253,6 +282,23 @@ public class ScopeSelectorTests extends TestCase
 		selectors.add(metaTagBlockEntity);
 		assertEquals(metaTagBlockEntity, ScopeSelector.bestMatch(selectors,
 				"text.html.markdown meta.disable-markdown meta.tag.block.any.html entity.name.tag.block.any.html"));
+	}
+
+	public void testAPSTUD2790()
+	{
+		IScopeSelector entityName = new ScopeSelector("entity.name.tag");
+		IScopeSelector doctype = new ScopeSelector(
+				"entity.name.tag.doctype.html, meta.tag.sgml.html, string.quoted.double.doctype.identifiers-and-DTDs.html");
+
+		String scope = "text.html.basic meta.tag.sgml.html meta.tag.sgml.doctype.html entity.name.tag.doctype.html";
+
+		assertTrue(entityName.matches(scope));
+		assertEquals(Arrays.asList(0, 0, 0, 15), entityName.matchResults());
+
+		assertTrue(doctype.matches(scope));
+		assertEquals(Arrays.asList(0, 0, 0, 28), doctype.matchResults());
+
+		assertEquals(doctype, ScopeSelector.bestMatch(Arrays.asList(entityName, doctype), scope));
 	}
 
 }
