@@ -22,7 +22,6 @@ import org.apache.tools.zip.ZipFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -30,14 +29,12 @@ import org.eclipse.core.runtime.SubMonitor;
 /**
  * @author Max Stepanov
  */
-public final class ZipUtil
-{
+public final class ZipUtil {
 
 	/**
 	 * 
 	 */
-	private ZipUtil()
-	{
+	private ZipUtil() {
 	}
 
 	/**
@@ -47,8 +44,7 @@ public final class ZipUtil
 	 * @param destinationPath
 	 * @throws IOException
 	 */
-	public static IStatus extract(File zipFile, File destinationPath, IProgressMonitor monitor) throws IOException
-	{
+	public static IStatus extract(File zipFile, File destinationPath, IProgressMonitor monitor) throws IOException {
 		return extract(new ZipFile(zipFile), destinationPath, monitor);
 	}
 
@@ -59,8 +55,7 @@ public final class ZipUtil
 	 * @param destinationPath
 	 * @throws IOException
 	 */
-	public static IStatus extract(ZipFile zip, File destinationPath, IProgressMonitor monitor) throws IOException
-	{
+	public static IStatus extract(ZipFile zip, File destinationPath, IProgressMonitor monitor) throws IOException {
 		return extract(zip, zip.getEntries(), destinationPath, monitor);
 	}
 
@@ -72,12 +67,10 @@ public final class ZipUtil
 	 * @return
 	 * @throws IOException
 	 */
-	public static InputStream openEntry(File zipFile, IPath path) throws IOException
-	{
+	public static InputStream openEntry(File zipFile, IPath path) throws IOException {
 		ZipFile zip = new ZipFile(zipFile);
 		ZipEntry entry = zip.getEntry(path.makeRelative().toPortableString());
-		if (entry != null)
-		{
+		if (entry != null) {
 			return zip.getInputStream(entry);
 		}
 		return null;
@@ -92,88 +85,61 @@ public final class ZipUtil
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, IProgressMonitor monitor)
-			throws IOException
-	{
+	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, IProgressMonitor monitor) throws IOException {
 		Collection collection = Collections.list(entries);
 
-		if (monitor == null)
-		{
-			monitor = new NullProgressMonitor();
-		}
-
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ZipUtil_default_extract_label, collection.size());
-		try
-		{
+		try {
 			/* Create directories first */
-			for (Object i : collection)
-			{
+			for (Object i : collection) {
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
-				if (entry.isDirectory() && !file.exists())
-				{
+				if (entry.isDirectory() && !file.exists()) {
 					file.mkdirs();
-				}
-				else if (name.indexOf('/') != -1)
-				{
+				} else if (name.indexOf('/') != -1) {
 					File parent = file.getParentFile();
-					if (!parent.exists())
-					{
+					if (!parent.exists()) {
 						parent.mkdirs();
 					}
 				}
-				if (monitor.isCanceled())
-				{
+				if (subMonitor.isCanceled()) {
 					return Status.CANCEL_STATUS;
 				}
 			}
 			byte[] buffer = new byte[0x1000];
 			int n;
 			/* Extract files */
-			for (Object i : collection)
-			{
+			for (Object i : collection) {
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
 				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
 				subMonitor.worked(1);
-				if (!entry.isDirectory() && !file.exists())
-				{
-					if (!file.createNewFile())
-					{
+				if (!entry.isDirectory() && !file.exists()) {
+					if (!file.createNewFile()) {
 						continue;
 					}
 					OutputStream out = new FileOutputStream(file);
 					InputStream in = zip.getInputStream(entry);
-					while ((n = in.read(buffer)) > 0)
-					{
+					while ((n = in.read(buffer)) > 0) {
 						out.write(buffer, 0, n);
 					}
 					in.close();
 					out.close();
-					if (!Platform.OS_WIN32.equals(Platform.getOS()))
-					{
-						try
-						{
-							Runtime.getRuntime()
-									.exec(new String[] {
-											"chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
-						}
-						catch (Exception ignore)
-						{
+					if (!Platform.OS_WIN32.equals(Platform.getOS())) {
+						try {
+							Runtime.getRuntime().exec(new String[] { "chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
+						} catch (Exception ignore) {
 						}
 					}
 				}
-				if (monitor.isCanceled())
-				{
+				if (subMonitor.isCanceled()) {
 					return Status.CANCEL_STATUS;
 				}
 			}
 			return Status.OK_STATUS;
-		}
-		finally
-		{
+		} finally {
 			subMonitor.done();
 		}
 	}
