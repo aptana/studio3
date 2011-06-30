@@ -247,4 +247,46 @@ public class ThemeTest extends TestCase
 		// TODO Keep lightening until we hit white?
 		assertEquals(new RGB(166, 166, 166), theme.lighten(new RGB(128, 128, 128)));
 	}
+
+	public void testAPSTUD2790_Doctype()
+	{
+		// Empty the theme
+		for (ThemeRule entry : theme.getTokens())
+		{
+			theme.remove(entry);
+		}
+
+		theme.addNewRule(0, "Tag name", new ScopeSelector("entity.name.tag"), new DelayedTextAttribute(
+				new RGBa(0, 0, 0)));
+		theme.addNewRule(
+				1,
+				"Doctype",
+				new ScopeSelector(
+						"entity.name.tag.doctype.html, meta.tag.sgml.html, string.quoted.double.doctype.identifiers-and-DTDs.html"),
+				new DelayedTextAttribute(new RGBa(255, 255, 255)));
+
+		ThemeRule rule = theme
+				.winningRule("text.html.basic meta.tag.sgml.html meta.tag.sgml.doctype.html entity.name.tag.doctype.html");
+
+		assertEquals("Doctype", rule.getName());
+	}
+
+	public void testAPSTUD2790_CSSBody()
+	{
+		// Empty the theme
+		for (ThemeRule entry : theme.getTokens())
+		{
+			theme.remove(entry);
+		}
+
+		theme.addNewRule(0, "CSS: Property", new ScopeSelector(
+				"entity.name.tag.css, support.type.property-name.css, meta.property-name.css"),
+				new DelayedTextAttribute(new RGBa(0, 0, 0)));
+		theme.addNewRule(1, "CSS: Tag", new ScopeSelector("entity.name.tag.css"), new DelayedTextAttribute(new RGBa(
+				255, 255, 255)));
+
+		String scope = "source.css entity.name.tag.css";
+		ThemeRule rule = theme.winningRule(scope);
+		assertEquals("CSS: Tag", rule.getName());
+	}
 }

@@ -356,7 +356,7 @@ public final class ShellExecutable
 			throws IOException, CoreException
 	{
 		ProcessBuilder processBuilder = new ProcessBuilder(toShellCommand(command));
-		if (workingDirectory != null)
+		if (workingDirectory != null && workingDirectory.toFile().isDirectory())
 		{
 			processBuilder.directory(workingDirectory.toFile());
 		}
