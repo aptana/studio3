@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.Path;
 	}
 	
 	private static IPath getBundlePath(String path) {
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), Path.fromPortableString(path), null);
+		URL url = FileLocator.find(PortableGitPlugin.getDefault().getBundle(), Path.fromPortableString(path), null);
 		if (url != null) {
 			try {
 				url = FileLocator.toFileURL(url);
@@ -42,7 +42,7 @@ import org.eclipse.core.runtime.Path;
 					return Path.fromOSString(file.getAbsolutePath());
 				}
 			} catch (IOException e) {
-				Activator.log(e);
+				PortableGitPlugin.log(e);
 			}
 		}
 		return null;
@@ -52,12 +52,12 @@ import org.eclipse.core.runtime.Path;
 		IPath zipExecutable = getBundlePath(ZIP_EXECUTABLE);
 		IPath archivePath = getBundlePath(ARCHIVE_PATH);
 		if (zipExecutable == null || archivePath == null) {
-			Activator.log("Something is missing here."); //$NON-NLS-1$
+			PortableGitPlugin.log("Something is missing here."); //$NON-NLS-1$
 			return false;
 		}
 		File destinationFile = destination.toFile();
 		if (!destinationFile.exists() && !destinationFile.mkdirs()) {
-			Activator.log("Failed to create destination directory "+destinationFile.getAbsolutePath()); //$NON-NLS-1$
+			PortableGitPlugin.log("Failed to create destination directory "+destinationFile.getAbsolutePath()); //$NON-NLS-1$
 			return false;
 		}
 		ProcessBuilder processBuilder = new ProcessBuilder(
@@ -79,12 +79,12 @@ import org.eclipse.core.runtime.Path;
 			process.waitFor();
 			return process.exitValue() == 0;
 		} catch (IOException e) {
-			Activator.log(e);
+			PortableGitPlugin.log(e);
 			return false;
 		} catch (InterruptedException e) {
 			return false;
 		} finally {
-			Activator.log(output.toString());
+			PortableGitPlugin.log(output.toString());
 		}
 	}
 

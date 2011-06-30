@@ -55,7 +55,7 @@ import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.internal.IProcessListener;
@@ -104,7 +104,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 			view = (TerminalView) page.showView(TerminalView.ID, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
 			view.initialize(title, workingDirectory);
 		} catch (PartInitException e) {
-			Activator.log("Terminal view creation failed.", e); //$NON-NLS-1$
+			TerminalPlugin.log("Terminal view creation failed.", e); //$NON-NLS-1$
 		}
 		return view;
 	}
@@ -221,7 +221,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
 	public void processCompleted() {
-		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+		IPreferenceStore prefs = TerminalPlugin.getDefault().getPreferenceStore();
 		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
 		if (closeViewOnExit) {
 			close();
@@ -401,7 +401,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
 
 		// open view action
-		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, Activator.getImageDescriptor("/icons/terminal_small_add.png")) { //$NON-NLS-1$
+		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, TerminalPlugin.getImageDescriptor("/icons/terminal_small_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				openView(null, getPartName(), getWorkingDirectory());
@@ -410,7 +410,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		fOpenViewAction.setToolTipText(Messages.TerminalView_Create_Terminal_View_Tooltip);
 
 		// open editor action
-		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal_add.png")) { //$NON-NLS-1$
+		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, TerminalPlugin.getImageDescriptor("/icons/terminal_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				Utils.openTerminalEditor(TerminalEditor.ID, true);

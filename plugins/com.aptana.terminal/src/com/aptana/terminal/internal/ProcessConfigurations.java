@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.IProcessConfiguration;
 
 /**
@@ -24,7 +24,7 @@ import com.aptana.terminal.IProcessConfiguration;
  */
 public final class ProcessConfigurations {
 
-	private static final String EXTENSION_POINT_ID = Activator.PLUGIN_ID + ".processConfigurations"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = TerminalPlugin.PLUGIN_ID + ".processConfigurations"; //$NON-NLS-1$
 	private static final String TAG_CONFIGURATION = "configuration"; //$NON-NLS-1$
 	private static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_NAME = "name"; //$NON-NLS-1$
@@ -81,7 +81,7 @@ public final class ProcessConfigurations {
 				try {
 					configurations.add((IProcessConfiguration) element.createExecutableExtension(ATT_CLASS));
 				} catch (CoreException e) {
-					Activator.log("Process configuration instantiation failed.", e); //$NON-NLS-1$
+					TerminalPlugin.log("Process configuration instantiation failed.", e); //$NON-NLS-1$
 				}
 			}
 		}

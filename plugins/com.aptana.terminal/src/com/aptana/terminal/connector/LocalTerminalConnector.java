@@ -30,7 +30,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnect
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.PlatformUtil.ProcessItem;
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.IProcessConfiguration;
 import com.aptana.terminal.internal.IProcessListener;
 import com.aptana.terminal.internal.ProcessConfigurations;
@@ -121,7 +121,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		try {
 			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
-			Activator.log("Send terminal size failed.", e); //$NON-NLS-1$
+			TerminalPlugin.log("Send terminal size failed.", e); //$NON-NLS-1$
 		}
 	}
 	
@@ -131,7 +131,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			try {
 				streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
 			} catch (IOException e) {
-				Activator.log("Get terminal process list failed.", e); //$NON-NLS-1$
+				TerminalPlugin.log("Get terminal process list failed.", e); //$NON-NLS-1$
 				return null;
 			}
 			synchronized (processList) {
@@ -230,7 +230,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			}
 			return streamsProxy != null;
 		} catch (Exception e) {
-			Activator.log("Starting terminal process failed.", e); //$NON-NLS-1$
+			TerminalPlugin.log("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
 		control.displayTextInTerminal(Messages.LocalTerminalConnector_NoShellErrorMessage);
 		return false;
@@ -302,7 +302,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				}
 			}
 		} else {
-			Activator.log("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
+			TerminalPlugin.log("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
 		}
 	}
 

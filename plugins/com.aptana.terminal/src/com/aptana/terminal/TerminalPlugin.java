@@ -18,18 +18,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class TerminalPlugin extends AbstractUIPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.terminal"; //$NON-NLS-1$
 
-	private static Activator plugin;
+	private static TerminalPlugin plugin;
 
 	/**
 	 * Returns the shared instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static TerminalPlugin getDefault() {
 		return plugin;
 	}
 

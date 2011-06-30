@@ -74,7 +74,7 @@ public class Utils
 					new Object[] { editorId }
 				);
 				
-				Activator.log(message, e);
+				TerminalPlugin.log(message, e);
 			}
 		}
 		

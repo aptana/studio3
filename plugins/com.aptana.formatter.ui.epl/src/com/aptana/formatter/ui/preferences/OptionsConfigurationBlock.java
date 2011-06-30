@@ -34,7 +34,7 @@ import org.eclipse.ui.preferences.WorkingCopyManager;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.formatter.preferences.PreferenceKey;
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 
 /**
@@ -123,19 +123,19 @@ public abstract class OptionsConfigurationBlock
 	{
 		if (key.getStoredValue(fLookupOrder, false, fManager) == null)
 		{
-			Activator.logError("preference option missing: " + key + " (" + this.getClass().getName() + ')'); //$NON-NLS-1$//$NON-NLS-2$
+			FormatterUIEplPlugin.logError("preference option missing: " + key + " (" + this.getClass().getName() + ')'); //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
 
 	private int getRebuildCount()
 	{
-		return fManager.getWorkingCopy(new DefaultScope().getNode(Activator.PLUGIN_ID)).getInt(REBUILD_COUNT_KEY, 0);
+		return fManager.getWorkingCopy(new DefaultScope().getNode(FormatterUIEplPlugin.PLUGIN_ID)).getInt(REBUILD_COUNT_KEY, 0);
 	}
 
 	private void incrementRebuildCount()
 	{
 		fRebuildCount++;
-		fManager.getWorkingCopy(new DefaultScope().getNode(Activator.PLUGIN_ID)).putInt(REBUILD_COUNT_KEY,
+		fManager.getWorkingCopy(new DefaultScope().getNode(FormatterUIEplPlugin.PLUGIN_ID)).putInt(REBUILD_COUNT_KEY,
 				fRebuildCount);
 	}
 
@@ -237,7 +237,7 @@ public abstract class OptionsConfigurationBlock
 			}
 			catch (IllegalStateException e)
 			{
-				if (Activator.DEBUG)
+				if (FormatterUIEplPlugin.DEBUG)
 				{
 					e.printStackTrace();
 				}
@@ -347,7 +347,7 @@ public abstract class OptionsConfigurationBlock
 			}
 			catch (BackingStoreException e)
 			{
-				Activator.logError(e.getMessage(), e);
+				FormatterUIEplPlugin.logError(e.getMessage(), e);
 				return false;
 			}
 			if (doBuild)

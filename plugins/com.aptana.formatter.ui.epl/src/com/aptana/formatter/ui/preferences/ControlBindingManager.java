@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.formatter.preferences.IPreferenceDelegate;
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 import com.aptana.formatter.ui.util.StatusInfo;
 import com.aptana.formatter.ui.util.StatusUtil;
@@ -188,8 +188,8 @@ public class ControlBindingManager
 			if (textControls.containsKey(key))
 			{
 				final RuntimeException error = new IllegalArgumentException("Duplicate control " + key); //$NON-NLS-1$
-				Activator.logError(error.getMessage(), error);
-				if (Activator.DEBUG)
+				FormatterUIEplPlugin.logError(error.getMessage(), error);
+				if (FormatterUIEplPlugin.DEBUG)
 				{
 					throw error;
 				}

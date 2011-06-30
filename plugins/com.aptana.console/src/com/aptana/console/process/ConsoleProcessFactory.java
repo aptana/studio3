@@ -14,7 +14,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.IProcessFactory;
 import org.eclipse.debug.core.model.IProcess;
 
-import com.aptana.console.Activator;
+import com.aptana.console.ConsolePlugin;
 
 /**
  * @author Max Stepanov
@@ -22,7 +22,7 @@ import com.aptana.console.Activator;
  */
 public class ConsoleProcessFactory implements IProcessFactory {
 
-	public static final String ID = Activator.PLUGIN_ID + ".processFactory"; //$NON-NLS-1$
+	public static final String ID = ConsolePlugin.PLUGIN_ID + ".processFactory"; //$NON-NLS-1$
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IProcessFactory#newProcess(org.eclipse.debug.core.ILaunch, java.lang.Process, java.lang.String, java.util.Map)

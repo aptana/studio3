@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.StatusInfo;
 
 /**
@@ -141,7 +141,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 						}
 						catch (CoreException e)
 						{
-							Activator.logError(e);
+							FormatterUIEplPlugin.logError(e);
 							return false;
 						}
 					}
@@ -165,7 +165,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 				updateFilter(((Button) e.widget).getSelection());
 			}
 		});
-		IDialogSettings dialogSettings = Activator.getDefault().getDialogSettings();
+		IDialogSettings dialogSettings = FormatterUIEplPlugin.getDefault().getDialogSettings();
 		boolean doFilter = !dialogSettings.getBoolean(DIALOG_SETTINGS_SHOW_ALL) && !fProjectsWithSpecifics.isEmpty();
 		checkbox.setSelection(doFilter);
 		updateFilter(doFilter);
@@ -191,7 +191,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 		{
 			fTableViewer.removeFilter(fFilter);
 		}
-		Activator.getDefault().getDialogSettings().put(DIALOG_SETTINGS_SHOW_ALL, !selected);
+		FormatterUIEplPlugin.getDefault().getDialogSettings().put(DIALOG_SETTINGS_SHOW_ALL, !selected);
 	}
 
 	private void doSelectionChanged(Object[] objects)

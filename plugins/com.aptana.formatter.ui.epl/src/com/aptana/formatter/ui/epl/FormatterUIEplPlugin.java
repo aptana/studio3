@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class FormatterUIEplPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
@@ -17,12 +17,12 @@ public class Activator extends AbstractUIPlugin
 	public static final int INTERNAL_ERROR = 10001;
 	public static final boolean DEBUG = Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug")).booleanValue(); //$NON-NLS-1$
 	// The shared instance
-	private static Activator plugin;
+	private static FormatterUIEplPlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public FormatterUIEplPlugin()
 	{
 	}
 
@@ -51,14 +51,14 @@ public class Activator extends AbstractUIPlugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static FormatterUIEplPlugin getDefault()
 	{
 		return plugin;
 	}
 
 	public static void log(IStatus status)
 	{
-		Activator.getDefault().getLog().log(status);
+		FormatterUIEplPlugin.getDefault().getLog().log(status);
 	}
 
 	public static void logError(String message)
@@ -73,7 +73,7 @@ public class Activator extends AbstractUIPlugin
 
 	public static void logError(String message, Throwable throwable)
 	{
-		Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, INTERNAL_ERROR, message, throwable));
+		FormatterUIEplPlugin.log(new Status(IStatus.ERROR, FormatterUIEplPlugin.PLUGIN_ID, INTERNAL_ERROR, message, throwable));
 	}
 
 	public static void logError(Throwable t)

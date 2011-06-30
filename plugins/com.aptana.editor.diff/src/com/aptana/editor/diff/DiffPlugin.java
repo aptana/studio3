@@ -11,10 +11,10 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
-public class Activator extends AbstractUIPlugin {
+public class DiffPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "com.aptana.editor.diff"; //$NON-NLS-1$
-	private static Activator plugin;
+	private static DiffPlugin plugin;
 	
 	private IDocumentProvider diffDocumentProvider;
 
@@ -24,7 +24,7 @@ public class Activator extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static DiffPlugin getDefault() {
 		return plugin;
 	}
 

@@ -16,7 +16,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 
 public class TerminalPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -47,6 +47,6 @@ public class TerminalPreferencePage extends FieldEditorPreferencePage implements
 	 * @see org.eclipse.jface.preference.PreferencePage#doGetPreferenceStore()
 	 */
 	protected IPreferenceStore doGetPreferenceStore() {
-		return new ScopedPreferenceStore(new InstanceScope(), Activator.PLUGIN_ID);
+		return new ScopedPreferenceStore(new InstanceScope(), TerminalPlugin.PLUGIN_ID);
 	}
 }

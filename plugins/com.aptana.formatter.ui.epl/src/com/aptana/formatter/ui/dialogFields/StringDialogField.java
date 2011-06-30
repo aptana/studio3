@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.Util;
 
 /**
@@ -37,7 +37,7 @@ public class StringDialogField extends DialogField
 	public StringDialogField()
 	{
 		super();
-		if (Activator.DEBUG)
+		if (FormatterUIEplPlugin.DEBUG)
 		{
 			// TODO Add content assist here
 		}

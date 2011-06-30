@@ -14,18 +14,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin {
+public class BeaverPlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "beaver"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static BeaverPlugin plugin;
 	
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public BeaverPlugin() {
 	}
 
 	/*
@@ -51,7 +51,7 @@ public class Activator extends Plugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static BeaverPlugin getDefault() {
 		return plugin;
 	}
 
