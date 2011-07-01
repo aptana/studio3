@@ -1024,8 +1024,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 		fDocumentEvents.clear();
 
-		if (fKeyListener != null && fContentAssistSubjectControlAdapter.getControl() != null
-				&& !fContentAssistSubjectControlAdapter.getControl().isDisposed())
+		if (fKeyListener != null && Helper.okToUse(fContentAssistSubjectControlAdapter.getControl()))
 		{
 			fContentAssistSubjectControlAdapter.removeKeyListener(fKeyListener);
 			fKeyListener = null;
@@ -1054,7 +1053,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	public boolean isActive()
 	{
-		return fProposalShell != null && !fProposalShell.isDisposed() && fProposalShell.isVisible();
+		return Helper.okToUse(fProposalShell) && fProposalShell.isVisible();
 	}
 
 	/**
@@ -1185,7 +1184,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			this.fProposalTable.deselectAll();
 			this.setScroll(suggestedIndex);
 		}
-		else if (fProposalTable != null)
+		else if (Helper.okToUse(fProposalTable))
 		{
 			if (fLastKeyPressed == '\b' && defaultIndex == -1)
 			{
