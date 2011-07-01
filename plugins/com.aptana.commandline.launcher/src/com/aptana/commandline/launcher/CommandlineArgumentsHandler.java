@@ -8,7 +8,8 @@
 package com.aptana.commandline.launcher;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -52,14 +53,14 @@ public class CommandlineArgumentsHandler
 	 * 
 	 * @param arguments
 	 */
-	public static ArrayList<File> processCommandLineArgs(final String[] arguments)
+	public static List<File> processCommandLineArgs(final String[] arguments)
 	{
 		if (arguments == null || arguments.length == 0)
 		{
-			return null;
+			return Collections.emptyList();
 		}
 
-		final ArrayList<File> files = FileUtil.gatherFilesFromCommandLineArguments(arguments);
+		final List<File> files = FileUtil.gatherFilesFromCommandLineArguments(arguments);
 
 		WorkbenchJob workbenchJob = new WorkbenchJob("Processing command line args.") //$NON-NLS-1$
 		{

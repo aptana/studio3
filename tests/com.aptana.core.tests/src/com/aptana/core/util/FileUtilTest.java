@@ -2,7 +2,7 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -36,7 +36,7 @@ public class FileUtilTest extends TestCase
 	{
 		String[] arguments = { "-os", "macosx", "-ws", "cocoa", "-arch", "x86", "-debug", "-keyring",
 				"/Users/ingo/.eclipse_keyring", "-consoleLog", "-showlocation" };
-		ArrayList<File> files = FileUtil.gatherFilesFromCommandLineArguments(arguments);
+		List<File> files = FileUtil.gatherFilesFromCommandLineArguments(arguments);
 		assertEquals(0, files.size());
 
 		try
@@ -56,5 +56,4 @@ public class FileUtilTest extends TestCase
 			fail("Unable to test parsing of file name from command line");
 		}
 	}
-
 }

@@ -147,7 +147,7 @@ public class ResourceUtil
 	private static String ensureUNCPath(String path)
 	{
 		int len = path.length();
-		StringBuffer result = new StringBuffer(len);
+		StringBuilder result = new StringBuilder(len);
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -156,7 +156,6 @@ public class ResourceUtil
 				result.append('/');
 			}
 		}
-
 		result.append(path);
 
 		return result.toString();

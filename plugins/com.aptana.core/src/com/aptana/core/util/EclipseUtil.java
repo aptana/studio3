@@ -37,7 +37,18 @@ import com.aptana.core.ICorePreferenceConstants;
 @SuppressWarnings("restriction")
 public class EclipseUtil
 {
+
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
+
+	@SuppressWarnings("nls")
+	private static final String[] UNIT_TEST_IDS = { "org.eclipse.pde.junit.runtime.uitestapplication",
+			"org.eclipse.test.coretestapplication", "org.eclipse.test.uitestapplication",
+			"org.eclipse.pde.junit.runtime.legacytestapplication", "org.eclipse.pde.junit.runtime.coretestapplication",
+			"org.eclipse.pde.junit.runtime.coretestapplicationnonmain",
+			"org.eclipse.pde.junit.runtime.nonuithreadtestapplication" };
+	@SuppressWarnings("nls")
+	static final String[] LAUNCHER_NAMES = { "Eclipse", "AptanaStudio3", "Aptana Studio 3", "TitaniumStudio",
+			"Titanium Studio" };
 
 	/**
 	 * Determines if the specified debug option is on and set to true
@@ -58,7 +69,7 @@ public class EclipseUtil
 	 */
 	public static boolean isSystemPropertyEnabled(String option)
 	{
-		return System.getProperty(option) != null;
+		return getSystemProperty(option) != null;
 	}
 
 	/**
@@ -92,17 +103,11 @@ public class EclipseUtil
 	 */
 	public static String getPluginVersion(Plugin plugin)
 	{
-		if (plugin == null)
+		if (!isPluginLoaded(plugin))
 		{
 			return null;
 		}
-
-		Bundle bundle = plugin.getBundle();
-		if (bundle == null)
-		{
-			return null;
-		}
-		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
+		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
 	}
 
 	/**
@@ -135,10 +140,8 @@ public class EclipseUtil
 	public static String getProductVersion()
 	{
 		String version = null;
-
 		try
 		{
-			// this approach fails in "Rational Application Developer 6.0.1"
 			IProduct product = Platform.getProduct();
 			String aboutText = product.getProperty("aboutText"); //$NON-NLS-1$
 
@@ -160,9 +163,8 @@ public class EclipseUtil
 		}
 		catch (Exception e)
 		{
-
+			// ignores
 		}
-
 		return version;
 	}
 
@@ -184,15 +186,15 @@ public class EclipseUtil
 	public static boolean isTesting()
 	{
 		String application = System.getProperty("eclipse.application"); //$NON-NLS-1$
-		if (application != null && (application.equals("org.eclipse.pde.junit.runtime.uitestapplication") //$NON-NLS-1$
-				|| application.equals("org.eclipse.test.coretestapplication") //$NON-NLS-1$
-				|| application.equals("org.eclipse.test.uitestapplication") //$NON-NLS-1$
-				|| application.equals("org.eclipse.pde.junit.runtime.legacytestapplication") //$NON-NLS-1$
-				|| application.equals("org.eclipse.pde.junit.runtime.coretestapplication") //$NON-NLS-1$
-				|| application.equals("org.eclipse.pde.junit.runtime.coretestapplicationnonmain") //$NON-NLS-1$
-		|| application.equals("org.eclipse.pde.junit.runtime.nonuithreadtestapplication"))) //$NON-NLS-1$
+		if (application != null)
 		{
-			return true;
+			for (String id : UNIT_TEST_IDS)
+			{
+				if (id.equals(application))
+				{
+					return true;
+				}
+			}
 		}
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
 		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
@@ -250,8 +252,12 @@ public class EclipseUtil
 									return false;
 								}
 							}
-							if ("Eclipse".equalsIgnoreCase(name) || "AptanaStudio3".equalsIgnoreCase(name) || "Aptana Studio 3".equalsIgnoreCase(name)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								return true;
+							for (String launcherName : LAUNCHER_NAMES)
+							{
+								if (launcherName.equalsIgnoreCase(name))
+								{
+									return true;
+								}
 							}
 							return false;
 						}
@@ -308,9 +314,9 @@ public class EclipseUtil
 	/**
 	 * Returns a list of all possible trace items across all plugins
 	 */
-	public static HashMap<String, String> getTraceableItems()
+	public static Map<String, String> getTraceableItems()
 	{
-		HashMap<String, String> stringModels = new HashMap<String, String>();
+		Map<String, String> stringModels = new HashMap<String, String>();
 		BundleContext context = CorePlugin.getDefault().getContext();
 		Bundle[] bundles = context.getBundles();
 		for (Bundle bundle : bundles)
@@ -361,15 +367,14 @@ public class EclipseUtil
 	 */
 	public static Map<String, BundleContext> getCurrentBundleContexts()
 	{
-		BundleContext context = CorePlugin.getDefault().getContext();
+		Map<String, BundleContext> contexts = new HashMap<String, BundleContext>();
 
-		HashMap<String, BundleContext> contexts = new HashMap<String, BundleContext>();
+		BundleContext context = CorePlugin.getDefault().getContext();
+		contexts.put(context.getBundle().getSymbolicName(), context);
 
 		Bundle[] bundles = context.getBundles();
-		contexts.put(context.getBundle().getSymbolicName(), context);
-		for (int i = 0; i < bundles.length; i++)
+		for (Bundle bundle : bundles)
 		{
-			Bundle bundle = bundles[i];
 			BundleContext bContext = bundle.getBundleContext();
 			if (bContext == null)
 			{
@@ -377,6 +382,7 @@ public class EclipseUtil
 			}
 			contexts.put(bundle.getSymbolicName(), bContext);
 		}
+
 		return contexts;
 	}
 
