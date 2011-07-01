@@ -37,7 +37,7 @@ public class WebServerPreferences {
 	 */
 	public static InetAddress getServerAddress() {
 		IEclipsePreferences node = new DefaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
-		String address = node.get(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, null);
+		String address = node.get(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, null);
 		for(InetAddress i : SocketUtil.getLocalAddresses()) {
 			if(i.getHostAddress().equals(address)) {
 				return i;

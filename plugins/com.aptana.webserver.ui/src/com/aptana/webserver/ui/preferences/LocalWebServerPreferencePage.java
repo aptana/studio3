@@ -41,6 +41,7 @@ public class LocalWebServerPreferencePage extends FieldEditorPreferencePage impl
 	 */
 	public void init(IWorkbench workbench) {
 		setMessage(Messages.LocalWebServerPreferencePage_Message);
+		setDescription("Note: restart required on changes."); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
