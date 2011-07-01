@@ -87,7 +87,6 @@ public class CollectionsUtilTest extends TestCase
 	public void testIsEmptyWithNonEmptyList()
 	{
 		List<String> list = new ArrayList<String>();
-
 		list.add("abc");
 
 		assertFalse(CollectionsUtil.isEmpty(list));

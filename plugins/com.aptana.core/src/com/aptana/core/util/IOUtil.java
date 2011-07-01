@@ -23,9 +23,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
@@ -119,8 +117,10 @@ public abstract class IOUtil
 	private static void log(Exception e)
 	{
 		if (CorePlugin.getDefault() == null)
+		{
 			return;
-		CorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e));
+		}
+		IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
 	}
 
 	/**
@@ -339,5 +339,4 @@ public abstract class IOUtil
 			output.write(buffer, 0, bytes);
 		}
 	}
-
 }

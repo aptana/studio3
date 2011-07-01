@@ -10,30 +10,18 @@ package com.aptana.core.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.core.util.CollectionsUtilTest;
-import com.aptana.core.util.EclipseUtilTest;
-import com.aptana.core.util.FirefoxUtilTest;
-import com.aptana.core.util.IOUtilTest;
-import com.aptana.core.util.ResourceUtilTest;
-import com.aptana.core.util.StringUtilTest;
-import com.aptana.core.util.VersionUtilTest;
+import com.aptana.core.util.AllUtilTests;
 
 public class AllTests
 {
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.core.util.tests");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(CollectionsUtilTest.class);
-		suite.addTestSuite(EclipseUtilTest.class);
-		suite.addTestSuite(FirefoxUtilTest.class);
-		suite.addTestSuite(IOUtilTest.class);
-		suite.addTestSuite(ResourceUtilTest.class);
-		suite.addTestSuite(StringUtilTest.class);
-		suite.addTestSuite(VersionUtilTest.class);
-		//$JUnit-END$
+		TestSuite suite = new TestSuite("Test for com.aptana.core.tests");
+		// $JUnit-BEGIN$
+		suite.addTestSuite(IdeLogTest.class);
+		suite.addTest(AllUtilTests.suite());
+		// $JUnit-END$
 		return suite;
 	}
-
 }

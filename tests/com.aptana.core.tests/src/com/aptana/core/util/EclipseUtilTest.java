@@ -5,20 +5,30 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.core.util;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 
-public class EclipseUtilTest extends TestCase {
+public class EclipseUtilTest extends TestCase
+{
 
-	public void testGetApplicationLauncher() {
+	public void testGetApplicationLauncher()
+	{
 		IPath path = EclipseUtil.getApplicationLauncher();
 		assertNotNull(path);
-		assertTrue("Eclipse".equalsIgnoreCase(path.removeFileExtension().lastSegment())
-				|| "AptanaStudio3".equalsIgnoreCase(path.removeFileExtension().lastSegment())
-				|| "Aptana Studio 3".equalsIgnoreCase(path.removeFileExtension().lastSegment()));
+
+		boolean match = false;
+		String name = path.removeFileExtension().lastSegment();
+		for (String launcherName : EclipseUtil.LAUNCHER_NAMES)
+		{
+			if (launcherName.equalsIgnoreCase(name))
+			{
+				match = true;
+				break;
+			}
+		}
+		assertTrue(match);
 	}
 }
