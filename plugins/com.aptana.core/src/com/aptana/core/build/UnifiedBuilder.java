@@ -97,13 +97,6 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
-		// @formatter:off
-		IdeLog.logInfo(
-			CorePlugin.getDefault(),
-			MessageFormat.format(Messages.UnifiedBuilder_StartingBuild, projectName),
-			IDebugScopes.BUILDER
-		);
-		// @formatter:on
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
