@@ -32,7 +32,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 		assertEquals(">", command.text);
 	}
-	
+
 	public void testDedent() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -58,7 +58,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		}
 		assertEquals("if a.nil?\n  a=1\nelse", document.get());
 	}
-	
+
 	public void testDedentWontPushPastMatchingIndentLevel()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -68,7 +68,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			{
 				return "  ";
 			}
-			
+
 			@Override
 			protected String findCorrectIndentString(IDocument d, int lineNumber, String currentLineIndent)
 					throws BadLocationException
@@ -85,7 +85,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("e", command.text);
 		assertEquals(23, command.offset);
 	}
-	
+
 	public void testDoesntDedentWhenMultipleCharsArePasted() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -187,7 +187,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("\n\t\t", command.text);
 		assertTrue(command.doit);
 	}
-	
+
 	// https://aptana.lighthouseapp.com/projects/35272/tickets/1218
 	public void testStudio3_1218()
 	{
@@ -200,26 +200,84 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			}
 		};
 		IDocument document = new Document("/**\n * \n **/function name() {\n}\n");
-		
+
 		// After end of block comment, don't add a star
 		DocumentCommand command = createNewlineCommand(12);
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n ", command.text);
 		assertTrue(command.doit);
-		
+	}
+
+	public void testStudio3_1218_2()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+			{
+				return false;
+			}
+
+			@Override
+			protected boolean isComment(int offset)
+			{
+				return true;
+			}
+		};
+		IDocument document = new Document("/**\n * \n **/function name() {\n}\n");
+
 		// Inside block comment, add star
-		command = createNewlineCommand(6);
+		DocumentCommand command = createNewlineCommand(6);
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n * ", command.text);
 		assertTrue(command.doit);
-		
+	}
+
+	public void testStudio3_1218_3()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+			{
+				return false;
+			}
+
+			@Override
+			protected boolean isComment(int offset)
+			{
+				return true;
+			}
+		};
+		IDocument document = new Document("/**\n * \n **/function name() {\n}\n");
+
 		// Newline inside end of block comment
-		command = createNewlineCommand(10);
+		DocumentCommand command = createNewlineCommand(10);
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n * ", command.text);
 		assertTrue(command.doit);
-		
-		command = createNewlineCommand(11);
+	}
+
+	public void testStudio3_1218_4()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+			{
+				return false;
+			}
+
+			@Override
+			protected boolean isComment(int offset)
+			{
+				return true;
+			}
+		};
+		IDocument document = new Document("/**\n * \n **/function name() {\n}\n");
+
+		// Newline inside end of block comment
+		DocumentCommand command = createNewlineCommand(11);
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n *", command.text);
 		assertTrue(command.doit);
@@ -227,30 +285,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 
 	public void testAPSTUD2867() throws Exception
 	{
-		RubyRegexpAutoIndentStrategy strategy = new RubyRegexpAutoIndentStrategy("", null, null, null)
-		{
-			// Use CSS ruble's indent regexps
-			@Override
-			protected RubyRegexp getDecreaseIndentRegexp(String scope)
-			{
-				return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(), ByteList.create("(?<!\\*)\\*\\*\\/|^\\s*\\}"));
-			}
-
-			@Override
-			protected RubyRegexp getIncreaseIndentRegexp(String scope)
-			{
-
-				return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(),
-						ByteList.create("\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))"));
-			}
-
-			@Override
-			protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
-			{
-				// just return an empty scope for testing
-				return "";
-			}
-		};
+		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
 		IDocument document = new Document("/* comment */hello");
 
 		// After end of block comment, don't add a star
@@ -263,6 +298,64 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			document.replace(command.offset, command.length, command.text);
 		}
 		assertEquals("/* comment */\nhello", document.get());
+	}
+
+	public void testAPSTUD2868() throws Exception
+	{
+		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected boolean isComment(int offset)
+			{
+				return false;
+			}
+		};
+		IDocument document = new Document(" *");
+
+		// Don't add stars if we're not inside a comment
+		DocumentCommand command = createNewlineCommand(2);
+		strategy.customizeDocumentCommand(document, command);
+		assertTrue(command.doit);
+
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		// No stars added since we're not in a comment, but maintain the one-space indent level
+		assertEquals(" *\n ", document.get());
+	}
+
+	public void testNewlineAtBlockCommentClose() throws Exception
+	{
+		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
+		IDocument document = new Document("/* comment */hello");
+
+		// Don't duplicate the close of the block comment
+		DocumentCommand command = createNewlineCommand(11);
+		strategy.customizeDocumentCommand(document, command);
+		assertTrue(command.doit);
+
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("/* comment \n */hello", document.get());
+	}
+
+	public void testAutoCloseBlockCommentStart() throws Exception
+	{
+		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
+		IDocument document = new Document("/*");
+
+		DocumentCommand command = createNewlineCommand(2);
+		strategy.customizeDocumentCommand(document, command);
+		assertTrue(command.doit);
+		// TODO Ensure that the caret is mid comment...
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("/*\n * \n */", document.get());
 	}
 
 	protected DocumentCommand createNewlineCommand(int offset)
@@ -321,4 +414,33 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		}
 	}
 
+	private static class CSSRubleRubyRegexpAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
+	{
+		CSSRubleRubyRegexpAutoIndentStrategy()
+		{
+			super("", null, null, null);
+		}
+
+		// Use CSS ruble's indent regexps
+		@Override
+		protected RubyRegexp getDecreaseIndentRegexp(String scope)
+		{
+			return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(), ByteList.create("(?<!\\*)\\*\\*\\/|^\\s*\\}"));
+		}
+
+		@Override
+		protected RubyRegexp getIncreaseIndentRegexp(String scope)
+		{
+
+			return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(),
+					ByteList.create("\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))"));
+		}
+
+		@Override
+		protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
+		{
+			// just return an empty scope for testing
+			return "";
+		}
+	}
 }
