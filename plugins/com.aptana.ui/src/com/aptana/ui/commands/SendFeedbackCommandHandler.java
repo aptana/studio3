@@ -11,7 +11,7 @@ public class SendFeedbackCommandHandler extends BrowserCommandHandler
 {
 
 	// the default url for sending feedback
-	private static final String URL = "https://aptanastudio.tenderapp.com/discussion/new"; //$NON-NLS-1$
+	private static final String URL = "https://www.aptana.com/redirect/bugs"; //$NON-NLS-1$
 
 	public SendFeedbackCommandHandler()
 	{
