@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -228,10 +229,24 @@ public class ExplorerContextContributor implements ContextContributor
 				if (evaluationService != null)
 				{
 					IEvaluationContext currentState = evaluationService.getCurrentState();
-					ISelection sel = (ISelection) currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-					if (sel instanceof IStructuredSelection)
+					Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+					if (variable instanceof IStructuredSelection)
 					{
-						structuredSelection[0] = (IStructuredSelection) sel;
+						structuredSelection[0] = (IStructuredSelection) variable;
+					}
+					else
+					{
+						// checks the active editor
+						variable = currentState.getVariable(ISources.ACTIVE_EDITOR_NAME);
+						if (variable instanceof IEditorPart)
+						{
+							IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
+							if (editorInput instanceof IFileEditorInput)
+							{
+								structuredSelection[0] = new StructuredSelection(((IFileEditorInput) editorInput)
+										.getFile());
+							}
+						}
 					}
 				}
 			}
@@ -291,10 +306,8 @@ public class ExplorerContextContributor implements ContextContributor
 			for (IViewReference ref : refs)
 			{
 				if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
-
 				{
 					IViewPart part = ref.getView(false);
-
 					if (part instanceof CommonNavigator)
 					{
 						return (CommonNavigator) part;
