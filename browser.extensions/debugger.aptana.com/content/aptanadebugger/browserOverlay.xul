@@ -30,7 +30,7 @@
             <menuseparator/>
             <menuitem label="&ad.menu.about.label;" oncommand="AptanaDebuggerChrome.cmd_aboutAptana();"/>
             <menuitem label="&ad.menu.website.label;" oncommand="window.open('&ad.menu.website.href;','','');"/>
-            <menuitem label="&ad.menu.forum.label;" oncommand="window.open('&ad.menu.forum.href;','','');"/>
+            <!-- menuitem label="&ad.menu.forum.label;" oncommand="window.open('&ad.menu.forum.href;','','');"/ -->
             <menuitem id="adStatusContextMenuHide" hidden="true" label="&ad.menu.hide.label;" oncommand="AptanaDebuggerChrome.cmd_hideAptana();"/>
         </menupopup>
     </statusbar>
