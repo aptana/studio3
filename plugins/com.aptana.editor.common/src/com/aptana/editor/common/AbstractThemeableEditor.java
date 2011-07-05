@@ -89,8 +89,6 @@ import com.aptana.editor.common.internal.AbstractFoldingEditor;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
-import com.aptana.editor.common.outline.CommonOutlineContentProvider;
-import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -500,20 +498,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	public ITreeContentProvider getOutlineContentProvider()
 	{
-		return new CommonOutlineContentProvider();
+		return null;
 	}
 
 	public ILabelProvider getOutlineLabelProvider()
 	{
-		return new CommonOutlineLabelProvider();
+		return null;
 	}
 
 	protected CommonOutlinePage createOutlinePage()
 	{
+		if (getOutlineContentProvider() == null || getOutlineLabelProvider() == null)
+		{
+			return null;
+		}
 		CommonOutlinePage outline = new CommonOutlinePage(this, getOutlinePreferenceStore());
 		outline.setContentProvider(getOutlineContentProvider());
 		outline.setLabelProvider(getOutlineLabelProvider());
-
 		return outline;
 	}
 
