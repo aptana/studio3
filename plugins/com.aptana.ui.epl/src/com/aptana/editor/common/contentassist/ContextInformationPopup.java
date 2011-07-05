@@ -344,8 +344,7 @@ class ContextInformationPopup implements IContentAssistListener
 		if (validator != null)
 		{
 			int beginOffset = (information instanceof IContextInformationExtension) ? ((IContextInformationExtension) information)
-					.getContextInformationPosition()
-					: offset;
+					.getContextInformationPosition() : offset;
 			if (beginOffset == -1)
 			{
 				beginOffset = offset;
@@ -473,7 +472,7 @@ class ContextInformationPopup implements IContentAssistListener
 	}
 
 	/**
-	 *Returns the error message generated while computing context information.
+	 * Returns the error message generated while computing context information.
 	 * 
 	 * @return the error message
 	 */
@@ -492,11 +491,18 @@ class ContextInformationPopup implements IContentAssistListener
 			return;
 		}
 
+		Color fg = fContentAssistant.getContextInformationPopupForeground();
+
 		Control control = fContentAssistSubjectControlAdapter.getControl();
 		Display display = control.getDisplay();
 
 		fContextInfoPopup = new Shell(control.getShell(), SWT.NO_TRIM | SWT.ON_TOP);
-		fContextInfoPopup.setBackground(display.getSystemColor(SWT.COLOR_BLACK));
+		Color tooltipBorderColor = fg;
+		if (tooltipBorderColor == null)
+		{
+			tooltipBorderColor = display.getSystemColor(SWT.COLOR_BLACK);
+		}
+		fContextInfoPopup.setBackground(tooltipBorderColor);
 
 		fContextInfoText = new StyledText(fContextInfoPopup, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
 
@@ -507,7 +513,7 @@ class ContextInformationPopup implements IContentAssistListener
 		}
 		fContextInfoText.setBackground(c);
 
-		c = fContentAssistant.getContextInformationPopupForeground();
+		c = fg;
 		if (c == null)
 		{
 			c = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
@@ -742,7 +748,7 @@ class ContextInformationPopup implements IContentAssistListener
 	}
 
 	/**
-	 *Returns whether the context selector has the focus.
+	 * Returns whether the context selector has the focus.
 	 * 
 	 * @return <code>true</code> if the context selector has the focus
 	 */

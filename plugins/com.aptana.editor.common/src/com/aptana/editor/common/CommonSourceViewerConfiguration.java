@@ -233,6 +233,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 					assistant.setProposalSelectorBackground(getThemeBackground());
 					assistant.setProposalSelectorForeground(getThemeForeground());
 					assistant.setProposalSelectorSelectionColor(getThemeSelection());
+					assistant.setContextInformationPopupBackground(getThemeBackground());
+					assistant.setContextInformationPopupForeground(getThemeForeground());
 				}
 			}
 		};
