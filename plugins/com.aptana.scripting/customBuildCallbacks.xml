@@ -191,6 +191,11 @@
 			<param name="bundle.dir.name" value="engineyard.ruble" />
 		  	<param name="bundle.branch" value="master" />
 		</antcall>
+		<antcall target="clone-bundle">
+			<param name="bundle.name" value="coffeescript.ruble" />
+			<param name="bundle.dir.name" value="coffeescript.ruble" />
+		  	<param name="bundle.branch" value="development" />
+		</antcall>
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
 		<property name="bundle.root.dir" location="${source.folder1}/.."/>
 		<script language="javascript">

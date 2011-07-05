@@ -215,6 +215,10 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	 */
 	protected boolean traverseInto(IParseNode child)
 	{
+		if (child == null)
+		{
+			return false;
+		}
 		return child.hasChildren();
 	}
 
