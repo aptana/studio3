@@ -139,9 +139,11 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 
 			String line = d.get(info.getOffset(), info.getLength());
 			String trimmedLine = line.trim();
-			String upToOffset = line.substring(0, c.offset - info.getOffset());
+			int lineOffset = c.offset - info.getOffset();
+			String upToOffset = line.substring(0, lineOffset);
+
 			// What we want is to add a star if user hit return inside a comment block
-			if (c1 == '*' && upToOffset.lastIndexOf("*/") <= upToOffset.lastIndexOf("/*")) //$NON-NLS-1$ //$NON-NLS-2$
+			if (c1 == '*' && upToOffset.lastIndexOf("*/") <= upToOffset.lastIndexOf("/*") && isComment(c.offset)) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				buf.append("*"); //$NON-NLS-1$
 				if (d.getChar(c.offset) != '/')
@@ -149,10 +151,22 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 					buf.append(" "); //$NON-NLS-1$
 				}
 			}
-			// Don't do this if the newline comes before the /*!
-			else if (trimmedLine.startsWith("/*") && !upToOffset.endsWith("*/") && line.indexOf("/*") < (c.offset - info.getOffset())) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			// Return after /*
+			else if (upToOffset.trim().startsWith("/*") && !upToOffset.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				buf.append(" * "); //$NON-NLS-1$
+				buf.append(' '); // space to line up asterisk
+
+				String restOfLine = line.substring(lineOffset);
+				// if next char is an asterisk, no need to add an asterisk
+				if (!restOfLine.startsWith("*")) //$NON-NLS-1$
+				{
+					buf.append("* "); //$NON-NLS-1$
+				}
+				// Already closed block comment on this line after we hit return, so don't close it again
+				if (restOfLine.contains("*/")) //$NON-NLS-1$
+				{
+					return buf.toString();
+				}
 				try
 				{
 					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
@@ -165,8 +179,9 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				catch (BadLocationException e)
 				{
 				}
+
 				String toEnd = " */"; //$NON-NLS-1$
-				if (trimmedLine.startsWith("/**")) //$NON-NLS-1$
+				if (upToOffset.trim().startsWith("/**")) //$NON-NLS-1$
 				{
 					toEnd = " */"; //$NON-NLS-1$
 				}
@@ -177,11 +192,26 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				// We want to delete an extra space when closing block comments
 				buf.deleteCharAt(buf.length() - 1);
 			}
+
 		}
 		catch (BadLocationException e)
 		{
 		}
 		return buf.toString();
+	}
+
+	protected boolean isComment(int offset)
+	{
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(fContentType))
+		{
+			return false;
+		}
+		if (fContentType.contains("_comment")) //$NON-NLS-1$
+		{
+			return true;
+		}
+		// TODO Check the scope?
+		return false;
 	}
 
 	/**
