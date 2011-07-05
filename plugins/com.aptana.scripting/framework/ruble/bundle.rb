@@ -165,7 +165,7 @@ module Ruble
     end
 
     def to_env
-      { :TM_BUNDLE_SUPPORT => File.join(File.dirname(path), "lib") }
+      { :TM_BUNDLE_SUPPORT => File.join(File.dirname(path), "lib"), :TM_BUNDLE_PATH => File.dirname(path) }
     end
 
     def to_s
