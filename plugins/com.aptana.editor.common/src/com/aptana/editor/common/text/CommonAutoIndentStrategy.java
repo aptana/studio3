@@ -149,8 +149,8 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 					buf.append(" "); //$NON-NLS-1$
 				}
 			}
-			// FIXME Don't do this if the newline comes before the /*!
-			else if (trimmedLine.startsWith("/*") && !trimmedLine.endsWith("*/") && line.indexOf("/*") < (c.offset - info.getOffset())) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			// Don't do this if the newline comes before the /*!
+			else if (trimmedLine.startsWith("/*") && !upToOffset.endsWith("*/") && line.indexOf("/*") < (c.offset - info.getOffset())) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			{
 				buf.append(" * "); //$NON-NLS-1$
 				try
