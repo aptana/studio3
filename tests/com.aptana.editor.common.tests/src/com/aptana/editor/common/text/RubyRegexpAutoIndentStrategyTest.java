@@ -13,7 +13,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
+import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
+import org.jruby.util.ByteList;
 
 public class RubyRegexpAutoIndentStrategyTest extends TestCase
 {
@@ -31,7 +33,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals(">", command.text);
 	}
 	
-	public void testDedent()
+	public void testDedent() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -49,6 +51,12 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 		assertEquals("e", command.text);
 		assertEquals(19, command.offset);
+
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("if a.nil?\n  a=1\nelse", document.get());
 	}
 	
 	public void testDedentWontPushPastMatchingIndentLevel()
@@ -78,7 +86,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals(23, command.offset);
 	}
 	
-	public void testDoesntDedentWhenMultipleCharsArePasted()
+	public void testDoesntDedentWhenMultipleCharsArePasted() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -96,21 +104,45 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 		assertEquals("se", command.text);
 		assertEquals(20, command.offset);
+
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("if a.nil?\n  a=1\n  else", document.get());
 	}
 
-	public void testIndentAndPushTrailingContentAfterNewlineAndCursorForTagPair()
+	public void testIndentAndPushTrailingContentAfterNewlineAndCursorForTagPair() throws Exception
 	{
-		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy();
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected String getIndentString()
+			{
+				return "\t";
+			}
+		};
 		IDocument document = new Document("\t<div></div>");
 		DocumentCommand command = createNewlineCommand(6);
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n\t\t\n\t", command.text);
 		assertTrue(command.doit);
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("\t<div>\n\t\t\n\t</div>", document.get());
+
 		document = new Document("    <div></div>");
 		command = createNewlineCommand(9);
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n    \t\n    ", command.text);
 		assertTrue(command.doit);
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("    <div>\n    \t\n    </div>", document.get());
 	}
 
 	public void testDoesNotIndentAndPushTrailingContentAfterNewlineAndCursorForTagTag()
@@ -191,6 +223,46 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		strategy.customizeDocumentCommand(document, command);
 		assertEquals("\n *", command.text);
 		assertTrue(command.doit);
+	}
+
+	public void testAPSTUD2867() throws Exception
+	{
+		RubyRegexpAutoIndentStrategy strategy = new RubyRegexpAutoIndentStrategy("", null, null, null)
+		{
+			// Use CSS ruble's indent regexps
+			@Override
+			protected RubyRegexp getDecreaseIndentRegexp(String scope)
+			{
+				return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(), ByteList.create("(?<!\\*)\\*\\*\\/|^\\s*\\}"));
+			}
+
+			@Override
+			protected RubyRegexp getIncreaseIndentRegexp(String scope)
+			{
+
+				return RubyRegexp.newRegexp(Ruby.getGlobalRuntime(),
+						ByteList.create("\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))"));
+			}
+
+			@Override
+			protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
+			{
+				// just return an empty scope for testing
+				return "";
+			}
+		};
+		IDocument document = new Document("/* comment */hello");
+
+		// After end of block comment, don't add a star
+		DocumentCommand command = createNewlineCommand(13);
+		strategy.customizeDocumentCommand(document, command);
+		assertTrue(command.doit);
+
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("/* comment */\nhello", document.get());
 	}
 
 	protected DocumentCommand createNewlineCommand(int offset)
