@@ -43,7 +43,10 @@
    <extension
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
-            class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">
+            class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant"
+            id="com.aptana.editor.html.indexer"
+            name="HTML Indexer"
+            priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.html">
          </contentTypeBinding>
