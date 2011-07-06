@@ -7,14 +7,20 @@
  */
 package com.aptana.editor.svg.outline;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
+import com.aptana.editor.xml.parsing.ast.XMLElementNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
- *	SVGOutlineContentProvider
+ * SVGOutlineContentProvider
  */
 public class SVGOutlineContentProvider extends CompositeOutlineContentProvider
 {
@@ -25,5 +31,19 @@ public class SVGOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		this.addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
 		this.addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
+	}
+
+	@Override
+	protected Object[] filter(IParseNode[] nodes)
+	{
+		List<CommonOutlineItem> items = new ArrayList<CommonOutlineItem>();
+		for (IParseNode node : nodes)
+		{
+			if (node instanceof XMLElementNode)
+			{
+				items.add(getOutlineItem(node));
+			}
+		}
+		return items.toArray(new CommonOutlineItem[items.size()]);
 	}
 }

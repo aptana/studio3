@@ -9,6 +9,7 @@ package com.aptana.editor.svg.outline;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
@@ -33,37 +34,31 @@ public class SVGOutlineLabelProvider extends CompositeOutlineLabelProvider
 		this.addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineLabelProvider());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.outline.CompositeOutlineLabelProvider#getDefaultImage(java.lang.Object)
-	 */
 	@Override
 	protected Image getDefaultImage(Object element)
 	{
+		if (element instanceof CommonOutlineItem)
+		{
+			return getDefaultImage(((CommonOutlineItem) element).getReferenceNode());
+		}
 		if (element instanceof XMLNode)
 		{
 			return ELEMENT;
 		}
-		else
-		{
-			return super.getDefaultImage(element);
-		}
+		return super.getDefaultImage(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.outline.CompositeOutlineLabelProvider#getDefaultText(java.lang.Object)
-	 */
 	@Override
 	protected String getDefaultText(Object element)
 	{
+		if (element instanceof CommonOutlineItem)
+		{
+			return getDefaultText(((CommonOutlineItem) element).getReferenceNode());
+		}
 		if (element instanceof XMLNode)
 		{
 			return ((XMLNode) element).getText();
 		}
-		else
-		{
-			return super.getDefaultText(element);
-		}
+		return super.getDefaultText(element);
 	}
 }
