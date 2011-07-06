@@ -91,7 +91,7 @@ public class CSSParser extends Parser implements IParser {
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 		int start = parseState.getStartingOffset();
-		int end = start + parseState.getSource().length;
+		int end = start + parseState.getSource().length - 1;
 		result.setLocation(start, end);
 
 		// store results in the parse state
@@ -107,7 +107,7 @@ public class CSSParser extends Parser implements IParser {
 			CSSCommentNode commentNode = new CSSCommentNode( //
 				this.getSource(parseState, comment),
 				comment.getStartingOffset(),
-				comment.getEndingOffset() - 1
+				comment.getEndingOffset()
 			);
 
 			commentNodes[i] = commentNode;
