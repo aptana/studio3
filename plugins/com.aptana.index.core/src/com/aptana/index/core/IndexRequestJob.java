@@ -405,7 +405,6 @@ abstract class IndexRequestJob extends Job
 
 		Collections.sort(result, new Comparator<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>>()
 		{
-			@Override
 			public int compare(Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg0, Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg1)
 			{
 				// sort higher first

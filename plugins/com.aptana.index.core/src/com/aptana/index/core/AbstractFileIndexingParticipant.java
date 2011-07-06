@@ -91,7 +91,6 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#getPriority()
 	 */
-	@Override
 	public int getPriority()
 	{
 		return priority;
@@ -209,7 +208,6 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#setPriority(int)
 	 */
-	@Override
 	public void setPriority(int priority)
 	{
 		this.priority = priority;
