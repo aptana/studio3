@@ -10,13 +10,10 @@ package com.aptana.editor.js.contentassist.index;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
@@ -34,36 +31,10 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 {
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
+	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
-
-		for (IFileStore file : files)
-		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-
-			Thread.yield(); // be nice to other threads, let them get in before each file...
-
-			this.indexFileStore(index, file, sub.newChild(100));
-		}
-
-		sub.done();
-	}
-
-	/**
-	 * indexFileStore
-	 * 
-	 * @param index
-	 * @param file
-	 * @param monitor
-	 */
-	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 

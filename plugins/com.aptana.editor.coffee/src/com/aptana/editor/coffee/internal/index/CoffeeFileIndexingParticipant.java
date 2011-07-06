@@ -7,14 +7,11 @@
  */
 package com.aptana.editor.coffee.internal.index;
 
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -34,24 +31,14 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
-
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\r\n|\r|\n"); //$NON-NLS-1$
 
-	public void index(Set<IFileStore> files, final Index index, IProgressMonitor monitor) throws CoreException
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
-		for (final IFileStore store : files)
-		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			Thread.yield(); // be nice to other threads, let them get in before each file...
-			indexFileStore(index, store, sub.newChild(100));
-		}
-	}
-
-	private void indexFileStore(final Index index, IFileStore store, IProgressMonitor monitor)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
+	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void indexFileStore(final Index index, IFileStore store, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		try

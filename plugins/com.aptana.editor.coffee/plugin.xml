@@ -45,7 +45,8 @@
       <fileIndexingParticipant
             class="com.aptana.editor.coffee.internal.index.CoffeeFileIndexingParticipant"
             id="com.aptana.editor.coffee.indexer"
-            name="Coffeescript Indexer">
+            name="Coffeescript Indexer"
+            priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.coffeescript">
          </contentTypeBinding>

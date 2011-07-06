@@ -15,5 +15,28 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IFileStoreIndexingParticipant
 {
+	/**
+	 * Index all file stores into the specified index
+	 * 
+	 * @param resources
+	 * @param index
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	void index(Set<IFileStore> resources, Index index, IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * The priority is used to determine the order in which multiple indexing participants should run when more than one
+	 * indexer is used. Higher numbers run before lower numbers
+	 * 
+	 * @return
+	 */
+	int getPriority();
+
+	/**
+	 * Set the priority of this indexer
+	 * 
+	 * @param priority
+	 */
+	void setPriority(int priority);
 }

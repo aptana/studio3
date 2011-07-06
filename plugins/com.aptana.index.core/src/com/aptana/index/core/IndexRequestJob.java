@@ -10,10 +10,13 @@ package com.aptana.index.core;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -40,6 +43,8 @@ abstract class IndexRequestJob extends Job
 	private static final String FILE_INDEXING_PARTICIPANTS_ID = "fileIndexingParticipants"; //$NON-NLS-1$
 	private static final String TAG_FILE_INDEXING_PARTICIPANT = "fileIndexingParticipant"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
+	private static final int DEFAULT_PRIORITY = 50;
 
 	private static final String INDEX_FILTER_PARTICIPANTS_ID = "indexFilterParticipants"; //$NON-NLS-1$
 	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
@@ -101,12 +106,30 @@ abstract class IndexRequestJob extends Job
 	{
 		try
 		{
-			return (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
+			String priorityString = key.getAttribute(ATTR_PRIORITY);
+			int priority = DEFAULT_PRIORITY;
+
+			try
+			{
+				priority = Integer.parseInt(priorityString);
+			}
+			catch (NumberFormatException e)
+			{
+				// TODO: Adding logging once we fix the circular dependency from aptana.core
+				IndexPlugin.logError(e.getMessage(), e);
+			}
+
+			IFileStoreIndexingParticipant result = (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
+
+			result.setPriority(priority);
+
+			return result;
 		}
 		catch (CoreException e)
 		{
 			IndexPlugin.logError(e);
 		}
+
 		return null;
 	}
 
@@ -300,29 +323,32 @@ abstract class IndexRequestJob extends Job
 			}
 
 			// Now map the indexers to the files they need to/can index
-			Map<IFileStoreIndexingParticipant, Set<IFileStore>> toDo = mapParticipantsToFiles(fileStores);
+			List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> toDo = mapParticipantsToFiles(fileStores);
 			sub.worked(fileStores.size());
 
 			if (!toDo.isEmpty())
 			{
 				// Determine work remaining
 				int sum = 0;
-				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
+				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo)
 				{
 					sum += entry.getValue().size();
 				}
 				sub.setWorkRemaining(sum);
 
 				// Now do the indexing...
-				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo.entrySet())
+				for (Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>> entry : toDo)
 				{
+					IFileStoreIndexingParticipant indexer = entry.getKey();
+					Set<IFileStore> files = entry.getValue();
+
 					if (sub.isCanceled())
 					{
 						throw new CoreException(Status.CANCEL_STATUS);
 					}
 					try
 					{
-						entry.getKey().index(entry.getValue(), index, sub.newChild(entry.getValue().size()));
+						indexer.index(files, index, sub.newChild(files.size()));
 					}
 					catch (CoreException e)
 					{
@@ -344,14 +370,15 @@ abstract class IndexRequestJob extends Job
 	 * @param fileStores
 	 * @return
 	 */
-	protected Map<IFileStoreIndexingParticipant, Set<IFileStore>> mapParticipantsToFiles(Set<IFileStore> fileStores)
+	protected List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> mapParticipantsToFiles(Set<IFileStore> fileStores)
 	{
-		Map<IFileStoreIndexingParticipant, Set<IFileStore>> result = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
-
+		Map<IFileStoreIndexingParticipant, Set<IFileStore>> participantMap = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
 		Map<IConfigurationElement, Set<IContentType>> participants = getFileIndexingParticipants();
+
 		for (Map.Entry<IConfigurationElement, Set<IContentType>> entry : participants.entrySet())
 		{
 			Set<IFileStore> filesForParticipant = new HashSet<IFileStore>();
+
 			for (IFileStore store : fileStores)
 			{
 				if (hasType(store, entry.getValue()))
@@ -359,16 +386,33 @@ abstract class IndexRequestJob extends Job
 					filesForParticipant.add(store);
 				}
 			}
+
 			if (filesForParticipant.isEmpty())
 			{
 				continue;
 			}
+
 			IFileStoreIndexingParticipant participant = createParticipant(entry.getKey());
+
 			if (participant != null)
 			{
-				result.put(participant, filesForParticipant);
+				participantMap.put(participant, filesForParticipant);
 			}
 		}
+
+		List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> result =
+				new ArrayList<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>>(participantMap.entrySet());
+
+		Collections.sort(result, new Comparator<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>>()
+		{
+			@Override
+			public int compare(Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg0, Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg1)
+			{
+				// sort higher first
+				return arg1.getKey().getPriority() - arg0.getKey().getPriority();
+			}
+		});
+
 		return result;
 	}
 }
