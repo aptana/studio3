@@ -133,10 +133,13 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		}
 	}
 
+	/**
+	 * Keys are just a "scalar" ending with a colon ':'
+	 * 
+	 * @author cwilliams
+	 */
 	private static final class YAMLKeyRule extends ExtendedWordRule
 	{
-		private Pattern pattern;
-
 		private YAMLKeyRule(IWordDetector detector, IToken defaultToken, boolean ignoreCase)
 		{
 			super(detector, defaultToken, ignoreCase);
@@ -144,20 +147,11 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 
 		protected boolean wordOK(String word, ICharacterScanner scanner)
 		{
-			if (word.length() < 2 || word.indexOf(':') == -1)
+			if (word.length() < 2 || word.charAt(word.length() - 1) != ':')
 			{
 				return false;
 			}
-			return getPattern().matcher(word).matches();
-		}
-
-		private synchronized Pattern getPattern()
-		{
-			if (pattern == null)
-			{
-				pattern = Pattern.compile("\\s*(?:(-)|(?:(-\\s*)?(((\\w+\\s*)|(<<)):)))\\s*"); //$NON-NLS-1$
-			}
-			return pattern;
+			return true;
 		}
 	}
 
@@ -247,7 +241,8 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 	}
 
 	/**
-	 * Word detector for YAML property keys.
+	 * Word detector for YAML property keys. Just a "scalar" ending with a colon ':' See
+	 * http://www.yaml.org/spec/1.2/spec.html#Characters TODO Disallow unprintable Unicode characters
 	 * 
 	 * @author cwilliams
 	 */
@@ -258,7 +253,22 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		public boolean isWordStart(char c)
 		{
 			stop = false;
-			return c == ' ' || c == '\t' || Character.isLetterOrDigit(c) || c == '<';
+
+			switch (c)
+			{
+				case ',':
+				case ':':
+				case '?':
+				case '[':
+				case ']':
+				case '{':
+				case '}':
+				case '\r':
+				case '\n':
+					return false;
+				default:
+					return true;
+			}
 		}
 
 		public boolean isWordPart(char c)
@@ -268,12 +278,24 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 				stop = false;
 				return false;
 			}
-			if (c == ':')
+
+			switch (c)
 			{
-				stop = true;
-				return true;
+				case ':':
+					stop = true;
+					return true;
+				case ',':
+				case '?':
+				case '[':
+				case ']':
+				case '{':
+				case '}':
+				case '\r':
+				case '\n':
+					return false;
+				default:
+					return true;
 			}
-			return c == ' ' || c == '\t' || Character.isLetterOrDigit(c) || c == '<' || c == '-' || c == '_';
 		}
 
 	}
