@@ -30,6 +30,7 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.old.Synchronizer;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -78,28 +79,37 @@ public class DownloadAction extends BaseSyncAction
 					{
 						fileStores[i] = Utils.getFileStore(files[i]);
 					}
-					IFileStore[] targetFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
-					// adds the parent directories
-					List<IFileStore> newFiles = new ArrayList<IFileStore>();
-					for (IFileStore fileStore : fileStores)
+					IFileStore[] targetFiles;
+					if (!fSelectedFromSource)
 					{
-						if (!fileStore.equals(targetRoot))
+						targetFiles = EFSUtils.getAllFiles(fileStores, true, false, monitor);
+						// adds the parent directories
+						List<IFileStore> newFiles = new ArrayList<IFileStore>();
+						for (IFileStore fileStore : fileStores)
 						{
-							List<IFileStore> folders = new ArrayList<IFileStore>();
-							IFileStore parent = fileStore.getParent();
-							while (parent != null && !targetRoot.equals(parent))
+							if (!fileStore.equals(targetRoot))
 							{
-								if (!newFiles.contains(parent))
+								List<IFileStore> folders = new ArrayList<IFileStore>();
+								IFileStore parent = fileStore.getParent();
+								while (parent != null && !targetRoot.equals(parent))
 								{
-									folders.add(0, parent);
+									if (!newFiles.contains(parent))
+									{
+										folders.add(0, parent);
+									}
+									parent = parent.getParent();
 								}
-								parent = parent.getParent();
+								newFiles.addAll(folders);
 							}
-							newFiles.addAll(folders);
 						}
+						newFiles.addAll(Arrays.asList(targetFiles));
+						targetFiles = newFiles.toArray(new IFileStore[newFiles.size()]);
 					}
-					newFiles.addAll(Arrays.asList(targetFiles));
-					targetFiles = newFiles.toArray(new IFileStore[newFiles.size()]);
+					else
+					{
+						targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fSelectedFromSource, true,
+								monitor);
+					}
 
 					VirtualFileSyncPair[] items = syncer.createSyncItems(new IFileStore[0], targetFiles, monitor);
 
