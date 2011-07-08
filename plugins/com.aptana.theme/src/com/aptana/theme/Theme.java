@@ -1026,6 +1026,11 @@ public class Theme
 		return getColorManager().getColor(getForeground());
 	}
 
+	public Color getBackgroundColor()
+	{
+		return getColorManager().getColor(getBackground());
+	}
+
 	protected ColorManager getColorManager()
 	{
 		return ThemePlugin.getDefault().getColorManager();
