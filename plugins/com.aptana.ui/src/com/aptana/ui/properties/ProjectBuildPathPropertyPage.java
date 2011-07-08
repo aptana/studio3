@@ -11,9 +11,10 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -62,7 +63,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		// labels
-		setDescription("This is the description");
+		setDescription("Project build path for '" + project.getName() + "':");
 		Label description = createDescriptionLabel(composite);
 		description.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
@@ -75,10 +76,16 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		CheckboxTableViewer tableViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.TOP | SWT.BORDER);
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
 		table.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		TableColumn column = new TableColumn(table, SWT.LEFT);
-		column.setWidth(350);
+		TableColumn column1 = new TableColumn(table, SWT.LEFT);
+		column1.setText("Library");
+		column1.setWidth(150);
+
+		TableColumn column2 = new TableColumn(table, SWT.LEFT);
+		column2.setText("Path");
+		column2.setWidth(350);
 
 		tableViewer.setContentProvider(getContentProvider());
 		tableViewer.setLabelProvider(getLabelProvider());
@@ -105,6 +112,8 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	{
 		List<BuildPathEntry> result = new ArrayList<BuildPathEntry>();
 
+		result.add(new BuildPathEntry("JS Library, v1.0", "/Users/klindsey/Documents/testing/test.js"));
+
 		return result;
 	}
 
@@ -124,7 +133,14 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 			@Override
 			public Object[] getChildren(Object element)
 			{
-				return super.getChildren(element);
+				if (element instanceof List<?>)
+				{
+					return ((List<?>) element).toArray();
+				}
+				else
+				{
+					return super.getChildren(element);
+				}
 			}
 		};
 	}
@@ -136,34 +152,48 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 */
 	private IBaseLabelProvider getLabelProvider()
 	{
-		return new LabelProvider()
+		return new ITableLabelProvider()
 		{
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
-			 */
-			@Override
-			public Image getImage(Object element)
+			public void addListener(ILabelProviderListener listener)
 			{
-				return super.getImage(element);
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-			 */
-			@Override
-			public String getText(Object element)
+			public void dispose()
 			{
-				String result;
+			}
+
+			public boolean isLabelProperty(Object element, String property)
+			{
+				return false;
+			}
+
+			public void removeListener(ILabelProviderListener listener)
+			{
+			}
+
+			public Image getColumnImage(Object element, int columnIndex)
+			{
+				return null;
+			}
+
+			public String getColumnText(Object element, int columnIndex)
+			{
+				String result = null;
 
 				if (element instanceof BuildPathEntry)
 				{
-					result = ((BuildPathEntry) element).getDisplayName();
-				}
-				else
-				{
-					result = super.getText(element);
+					BuildPathEntry entry = (BuildPathEntry) element;
+
+					switch (columnIndex)
+					{
+						case 0:
+							result = entry.getDisplayName();
+							break;
+
+						case 1:
+							result = entry.getPath();
+							break;
+					}
 				}
 
 				return result;
