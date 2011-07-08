@@ -343,4 +343,23 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.aptana.ui.properties.ProjectBuildPathPropertyPage"
+            id="com.aptana.editor.common.projectBuildPath"
+            name="Project Build Path">
+            <enabledWhen>
+            <and>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="com.aptana.projects.webnature">
+               </test>
+            </and>
+         </enabledWhen>
+      </page>
+   </extension>
 </plugin>
