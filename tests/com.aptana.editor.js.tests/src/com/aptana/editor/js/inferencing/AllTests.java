@@ -19,12 +19,12 @@ public class AllTests
 		suite.addTestSuite(ConstructorInferencingTests.class);
 		suite.addTestSuite(DocumentationTests.class);
 		suite.addTestSuite(FunctionInferencingTests.class);
+		suite.addTestSuite(InferencingBugs.class);
 		suite.addTestSuite(ObjectInferencingTests.class);
 		suite.addTestSuite(OperatorInferencingTests.class);
 		suite.addTestSuite(PrimitiveInferencingTests.class);
 		suite.addTestSuite(RecursiveInferencingTests.class);
 		suite.addTestSuite(ScopeTests.class);
-		suite.addTestSuite(InferencingBugs.class);
 		// $JUnit-END$
 		return suite;
 	}
