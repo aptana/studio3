@@ -11,8 +11,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.logging.IdeLog;
-
 public class EngineYardPlugin extends AbstractUIPlugin
 {
 
@@ -61,29 +59,4 @@ public class EngineYardPlugin extends AbstractUIPlugin
 		getDefault().getImageRegistry().put(path, desc);
 		return desc;
 	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
 }

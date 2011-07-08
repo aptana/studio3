@@ -65,6 +65,7 @@ import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.scripting.ScriptLogger;
@@ -393,7 +394,7 @@ public class CommandExecutionUtils
 				}
 				catch (BadLocationException e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 		}
@@ -650,7 +651,7 @@ public class CommandExecutionUtils
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -835,13 +836,13 @@ public class CommandExecutionUtils
 			}
 			catch (BadLocationException e)
 			{
-				CommonEditorPlugin.logError(e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 
 		}
 		catch (PartInitException e)
 		{
-			CommonEditorPlugin.logError(e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
 
@@ -948,7 +949,8 @@ public class CommandExecutionUtils
 		}
 		catch (IOException e)
 		{
-			CommonEditorPlugin.logError(Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(),
+					Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
 		}
 		if (tempHmtlFile != null)
 		{
@@ -958,9 +960,9 @@ public class CommandExecutionUtils
 			{
 				pw = new PrintWriter(tempHmtlFile);
 			}
-			catch (FileNotFoundException fne)
+			catch (FileNotFoundException e)
 			{
-				CommonEditorPlugin.logError(fne);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 			if (pw != null)
 			{
@@ -987,11 +989,11 @@ public class CommandExecutionUtils
 				}
 				catch (PartInitException e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 				catch (MalformedURLException e)
 				{
-					CommonEditorPlugin.logError(e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 				}
 			}
 		}
@@ -1095,7 +1097,7 @@ public class CommandExecutionUtils
 			}
 			catch (IOException e)
 			{
-				CommonEditorPlugin.logError("Failed to read output.", e); //$NON-NLS-1$
+				IdeLog.logError(CommonEditorPlugin.getDefault(), "Failed to read output.", e); //$NON-NLS-1$
 			}
 			finally
 			{

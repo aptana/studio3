@@ -401,7 +401,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			catch (IOException e)
 			{
-				logError(e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return store;
@@ -476,85 +476,5 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 		}
-	}
-
-	/**
-	 * Log a particular status
-	 * 
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message)
-	{
-		IdeLog.logWarning(getDefault(), message, null, null);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
 	}
 }
