@@ -368,6 +368,9 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 				return;
 			}
 
+			if (e.character != 0 && (e.stateMask == SWT.ALT))
+				return;
+
 			// Only act on characters that are trigger candidates. This
 			// avoids computing the model selection on every keystroke
 			boolean validAssistLocation = false;
@@ -375,7 +378,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			if (computeAllAutoActivationTriggers().indexOf(e.character) < 0)
 			{
 				StyledText styledText = (StyledText) e.widget;
-				validAssistLocation = isValidAutoAssistLocation(e.character, e.keyCode, styledText);
+				validAssistLocation = isValidAutoAssistLocation(e, styledText);
 				if (!validAssistLocation)
 				{
 					stop();
@@ -1277,9 +1280,18 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * @param offset
 	 * @param document
 	 */
-	private boolean isValidAutoAssistLocation(char c, int keyCode, StyledText styledText)
+	private boolean isValidAutoAssistLocation(KeyEvent e, StyledText styledText)
 	{
-		if (keyCode == SWT.ESC || keyCode == SWT.BS || keyCode == SWT.DEL || (keyCode & SWT.KEYCODE_BIT) != 0)
+		// Don't pop up CA if we pressed a Ctrl or Command character. On Linux, Unicode characters can be inserted with
+		// Ctrl + Shift + u + key sequence, but at this point, all we get is the character, no modifiers.
+		if (e.stateMask == SWT.MOD1)
+		{
+			return false;
+		}
+
+		int keyCode = e.keyCode;
+		if (keyCode == SWT.ESC || keyCode == SWT.BS || keyCode == SWT.DEL || keyCode == SWT.ARROW
+				|| (keyCode & SWT.KEYCODE_BIT) != 0)
 		{
 			return false;
 		}
@@ -1290,7 +1302,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		{
 			ICommonContentAssistProcessor cp = (ICommonContentAssistProcessor) processor;
 			// are we typing a valid identifier, and the previous "location" (character or lexeme) should pop up CA
-			return cp.isValidIdentifier(c, keyCode) && isAutoActivationLocation(cp, styledText, c, keyCode);
+			return cp.isValidIdentifier(e.character, keyCode)
+					&& isAutoActivationLocation(cp, styledText, e.character, keyCode);
 		}
 		else
 		{
