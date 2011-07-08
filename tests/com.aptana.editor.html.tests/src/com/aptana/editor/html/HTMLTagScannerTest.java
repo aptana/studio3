@@ -176,9 +176,9 @@ public class HTMLTagScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("entity.other.attribute-name.style.html"), 6, 5);
 		assertToken(getToken("punctuation.separator.key-value.html"), 11, 1);
 		assertToken(getToken("string.quoted.single.html"), 12, 1);
-		assertToken(getToken("support.type.property-name.css"), 13, 5);
-		assertToken(getToken("punctuation.separator.key-value.css"), 18, 1);
-		assertToken(getToken("support.constant.color.w3c-standard-color-name.css"), 19, 3);
+		assertToken(getToken("meta.property-name.css support.type.property-name.css"), 13, 5);
+		assertToken(getToken("meta.property-value.css punctuation.separator.key-value.css"), 18, 1);
+		assertToken(getToken("meta.property-value.css support.constant.color.w3c-standard-color-name.css"), 19, 3);
 		assertToken(getToken("string.quoted.single.html"), 22, 1);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 23, 1);
 	}

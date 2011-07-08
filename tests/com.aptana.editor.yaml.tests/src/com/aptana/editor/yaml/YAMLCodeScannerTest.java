@@ -32,6 +32,17 @@ public class YAMLCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(new Token("entity.name.tag.yaml"), 0, 12);
 	}
 
+	public void testAPSTUD2889()
+	{
+		String src = "receipt-one: Invoice";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("entity.name.tag.yaml"), 0, 12);
+		assertToken(new Token("string.unquoted.yaml"), 12, 1);
+		assertToken(new Token("string.unquoted.yaml"), 13, 7);
+	}
+
 	public void testIndentedKey()
 	{
 		String src = "  adapter: sqlite3";

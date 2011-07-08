@@ -2,6 +2,7 @@
 %package "com.aptana.editor.js.sdoc.parsing";
 %import "java.util.List";
 %import "com.aptana.editor.js.sdoc.model.*";
+%import "com.aptana.core.util.StringUtil";
 %class "SDocParser";
 %embed {:
 	// suppress parser error reporting and let the custom error recovery mechanism handle it
@@ -72,6 +73,10 @@
 		fScanner.setOffset(0);
 		fScanner.setSource(source);
 		fScanner.queueTypeTokens(0, source.length());
+
+		// NOTE: we need to clear the scanner source since queueTypeTokens doesn't set the offset of one of the inner
+		// scanners resulting in double scanning
+		fScanner.setSource(StringUtil.EMPTY);
 
 		Object result = parse(fScanner, AltGoals.Types);
 
