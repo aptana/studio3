@@ -14,8 +14,8 @@ import java.util.Map;
 
 import org.eclipse.debug.core.model.IStreamMonitor;
 
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.debug.core.IExtendedStreamsProxy;
-import com.aptana.js.debug.core.IJSDebugConstants;
 
 /**
  * @author Max Stepanov
@@ -31,8 +31,8 @@ public class StreamsProxy implements IExtendedStreamsProxy {
 	 * @param errIn
 	 */
 	public StreamsProxy(InputStream outIn, InputStream errIn) {
-		monitorMap.put(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM, new OutputStreamMonitor(outIn, null));
-		monitorMap.put(IJSDebugConstants.ID_STANDARD_ERROR_STREAM, new OutputStreamMonitor(errIn, null));
+		monitorMap.put(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM, new OutputStreamMonitor(outIn, null));
+		monitorMap.put(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM, new OutputStreamMonitor(errIn, null));
 		for (OutputStreamMonitor monitor : monitorMap.values()) {
 			monitor.startMonitoring();
 		}
@@ -69,14 +69,14 @@ public class StreamsProxy implements IExtendedStreamsProxy {
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#getErrorStreamMonitor()
 	 */
 	public IStreamMonitor getErrorStreamMonitor() {
-		return getStreamMonitor(IJSDebugConstants.ID_STANDARD_ERROR_STREAM);
+		return getStreamMonitor(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM);
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStreamsProxy#getOutputStreamMonitor()
 	 */
 	public IStreamMonitor getOutputStreamMonitor() {
-		return getStreamMonitor(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM);
+		return getStreamMonitor(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM);
 	}
 
 	/*
