@@ -35,6 +35,7 @@ public class CoreTests
 		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
 		suite.addTest(com.aptana.plist.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
+//		suite.addTest(com.aptana.deploy.ftp.tests.AllTests.suite());
 //		suite.addTest(com.aptana.syncing.core.tests.AllTests.suite());
 		// $JUnit-END$
 		return suite;
