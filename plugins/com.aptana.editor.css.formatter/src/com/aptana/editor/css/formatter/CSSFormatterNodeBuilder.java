@@ -11,6 +11,25 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationValueNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSParenthesesNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSPunctuationNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSExpressionNode;
+import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
+import com.aptana.editor.css.parsing.ast.CSSMediaNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
+import com.aptana.editor.css.parsing.ast.CSSPageNode;
+import com.aptana.editor.css.parsing.ast.CSSPageSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSRuleNode;
+import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSTermListNode;
+import com.aptana.editor.css.parsing.ast.CSSTextNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -19,14 +38,6 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationValueNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSParenthesesNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSPunctuationNode;
-import com.aptana.editor.css.parsing.ast.*;
 
 /**
  * CSS formatter node builder.<br>
@@ -422,6 +433,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 			}
 
+			// Push a semicolon if the declaration ends with one
+
+			if (document.charAt(declarationNode.getEndingOffset()) == ';')
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, declarationNode.getEndingOffset(), true);
+			}
+
 			// Create text nodes for comments between declaration
 			if (i + 1 < declarations.length)
 			{
@@ -476,11 +494,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		push(formatterDeclarationValueNode);
 		checkedPop(formatterDeclarationValueNode, -1);
 
-		if (endsWithSemicolon)
-		{
-			findAndPushPunctuationNode(TypePunctuation.SEMICOLON, semicolonLocation, true);
-		}
-		else if (endsWithComma)
+		if (endsWithComma)
 		{
 			findAndPushPunctuationNode(TypePunctuation.COMMA, commaLocation, false);
 		}

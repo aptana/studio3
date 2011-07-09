@@ -56,7 +56,7 @@ try /*0*/{
 finally {
 }
 ==FORMATTED==
-try /*0*/
+try/*0*/
 {
 } finally {
 }

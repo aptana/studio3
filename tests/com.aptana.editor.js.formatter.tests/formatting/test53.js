@@ -92,11 +92,11 @@ dojo.require("dojo.io.IframeIO");
 ctr = 0;
 function upload_file_submit() {
     var bindArgs = {
-        formNode : document.getElementById("upload_file"),  //form's id
-        mimetype : "text/plain",  //Enter file type info here
+        formNode : document.getElementById("upload_file"), //form's id
+        mimetype : "text/plain", //Enter file type info here
         content : {
             increment : ctr++,
-            name : "select_file",  //file name in the form
+            name : "select_file", //file name in the form
             post_field : "" // add more fields here .. field will be accessible by $_POST["post_field"]
         },
         handler : function(type, data, evt) {

@@ -90,7 +90,23 @@ public class AbstractFormatterNodeBuilder
 				pos = newPos;
 
 			}
-			parentNode.addChild(createTextNode(parentNode.getDocument(), parentNode.getEndOffset(), pos));
+
+			// Skip spaces and tabs from beginning and end when creating a text node
+			int startOffset = parentNode.getEndOffset();
+			if (startOffset < pos)
+			{
+				while ((parentNode.getDocument().charAt(startOffset) == ' ' || parentNode.getDocument().charAt(
+						startOffset) == '\t')
+						&& (startOffset < pos - 1))
+				{
+					startOffset++;
+				}
+				while ((parentNode.getDocument().charAt(pos - 1) == ' ' || parentNode.getDocument().charAt(pos - 1) == '\t')
+						&& (startOffset < pos - 1))
+					pos--;
+
+			}
+			parentNode.addChild(createTextNode(parentNode.getDocument(), startOffset, pos));
 
 		}
 	}
