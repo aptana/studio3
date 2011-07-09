@@ -32,7 +32,7 @@ public class WorkspaceFileSystem extends FileSystem
 
 	protected static final String SCHEME_WORKSPACE = "workspace"; //$NON-NLS-1$
 
-	private static WorkspaceFileSystem instance;
+	private static IFileSystem instance;
 
 	/**
 	 * 
@@ -54,7 +54,7 @@ public class WorkspaceFileSystem extends FileSystem
 		{
 			try
 			{
-				EFS.getFileSystem(SCHEME_WORKSPACE);
+				instance = EFS.getFileSystem(SCHEME_WORKSPACE);
 			}
 			catch (CoreException e)
 			{
