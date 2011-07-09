@@ -27,8 +27,8 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.deploy.IDeployProvider;
-import com.aptana.deploy.internal.DeployProviderRegistry;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
+import com.aptana.deploy.util.DeployProviderUtil;
 
 public class DeployHandler extends AbstractHandler
 {
@@ -38,8 +38,7 @@ public class DeployHandler extends AbstractHandler
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		final IContainer container = selectedContainer;
-		final DeployProviderRegistry registry = DeployProviderRegistry.getInstance();
-		final IDeployProvider provider = registry.getProvider(container);
+		final IDeployProvider provider = DeployProviderUtil.getDeployProvider(selectedContainer);
 
 		// TODO What if provider is still null? Prompt to choose explicitly? Run wizard?
 		if (provider != null)
@@ -53,7 +52,7 @@ public class DeployHandler extends AbstractHandler
 					provider.deploy(container, monitor);
 					// Store the deployment provider explicitly, since we may have had none explicitly set, but detected
 					// one that works.
-					DeployPreferenceUtil.setDeployType(container, registry.getIdForProvider(provider));
+					DeployPreferenceUtil.setDeployType(container, DeployProviderUtil.getIdForProvider(provider));
 					return Status.OK_STATUS;
 				}
 			};

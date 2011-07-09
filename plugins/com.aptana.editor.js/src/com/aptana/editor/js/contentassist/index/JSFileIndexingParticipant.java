@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
+import beaver.Parser;
+
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
@@ -117,6 +119,10 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					}
 				}
 			}
+		}
+		catch (Parser.Exception e)
+		{
+			// ignore parse errors
 		}
 		catch (Throwable e)
 		{
