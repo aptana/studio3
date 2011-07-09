@@ -19,6 +19,7 @@ public class AllTests
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LocationTests.class);
 		suite.addTestSuite(JSContentAssistProposalTests.class);
+		suite.addTestSuite(RangeTests.class);
 		//$JUnit-END$
 		return suite;
 	}

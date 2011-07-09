@@ -20,12 +20,10 @@ import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.auth.AuthenticationManager;
 import com.aptana.ide.core.io.auth.IAuthenticationManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
@@ -193,15 +191,5 @@ public class CoreIOPlugin extends Plugin
 					.getSaveNumber()));
 			getStateLocation().append(savePath).toFile().delete();
 		}
-	}
-
-	/**
-	 * Log a particular status
-	 * 
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
 	}
 }

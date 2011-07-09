@@ -18,12 +18,12 @@ public class AllTests
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSCodeScannerTest.class);
-		suite.addTestSuite(JSSourcePartitionScannerTest.class);
-		suite.addTestSuite(JSSingleQuotedStringScannerTest.class);
-		suite.addTestSuite(JSDoubleQuotedStringScannerTest.class);
-		suite.addTestSuite(JSRegexScannerTest.class);
 		suite.addTestSuite(JSDocScannerTest.class);
+		suite.addTestSuite(JSDoubleQuotedStringScannerTest.class);
 		suite.addTestSuite(JSEditorTest.class);
+		suite.addTestSuite(JSRegexScannerTest.class);
+		suite.addTestSuite(JSSingleQuotedStringScannerTest.class);
+		suite.addTestSuite(JSSourcePartitionScannerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

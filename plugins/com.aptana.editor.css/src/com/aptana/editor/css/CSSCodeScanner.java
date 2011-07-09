@@ -145,6 +145,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 */
 	private int fCurlyState;
 	private boolean fInMedia;
+	protected boolean fInPropertyValue;
+	protected boolean fInSelector;
 
 	/**
 	 * CodeScanner
@@ -389,12 +391,13 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		{
 			return token;
 		}
-		if (CSSTokenType.MEDIA_KEYWORD == token.getData())
+		Object tokenData = token.getData();
+		if (CSSTokenType.MEDIA_KEYWORD == tokenData)
 		{
 			this.fInMedia = true;
 			this.fCurlyState = 0;
 		}
-		else if (CSSTokenType.LCURLY == token.getData())
+		else if (CSSTokenType.LCURLY == tokenData)
 		{
 			// Use a different punctuation scope if opening @media
 			if (insideMedia() && this.fCurlyState == 0)
@@ -403,18 +406,58 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			}
 			this.fCurlyState++;
 		}
+		else if (CSSTokenType.RCURLY == tokenData)
+		{
+			this.fInPropertyValue = false;
+		}
+		else if (CSSTokenType.PROPERTY == tokenData)
+		{
+			this.fInSelector = false;
+		}
+		else if (CSSTokenType.COLON == tokenData)
+		{
+			this.fInPropertyValue = true;
+		}
+		else if (CSSTokenType.CLASS == tokenData || CSSTokenType.ID == tokenData || CSSTokenType.STAR == tokenData
+				|| CSSTokenType.ELEMENT == tokenData)
+		{
+			this.fInSelector = true;
+		}
 
 		StringBuilder builder = new StringBuilder();
+		// Media META scope
 		if (insideMedia())
 		{
 			builder.append(CSSTokenType.META_MEDIA.getScope()).append(' ');
 		}
+		// Ruleset META scope
 		if (insideRule())
 		{
 			builder.append(CSSTokenType.META_RULE.getScope()).append(' ');
 		}
+		// Selector META scope
+		else if (this.fInSelector)
+		{
+			builder.append(CSSTokenType.META_SELECTOR.getScope()).append(' ');
+		}
+		// Property value META scope
+		if (insidePropertyValue())
+		{
+			builder.append(CSSTokenType.META_PROPERTY_VALUE.getScope()).append(' ');
+		}
 
-		if (CSSTokenType.RCURLY == token.getData())
+		// Constant property value, like "top" or "left", but not inside property value. Assume it's a property name!
+		if (!this.fInPropertyValue && CSSTokenType.VALUE == tokenData)
+		{
+			token = createToken(CSSTokenType.PROPERTY);
+		}
+		// left curly ends selector meta scope
+		else if (CSSTokenType.LCURLY == tokenData)
+		{
+			this.fInSelector = false;
+		}
+		// right curly might end media/rule meta scopes
+		else if (CSSTokenType.RCURLY == tokenData)
 		{
 			this.fCurlyState--;
 			if (this.fCurlyState <= 0 && insideMedia())
@@ -423,19 +466,25 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				this.fInMedia = false;
 			}
 		}
+		// semicolon ends property value meta scope
+		else if (CSSTokenType.SEMICOLON == tokenData)
+		{
+			this.fInPropertyValue = false;
+		}
 
 		if (token.isOther())
 		{
-			Object data = token.getData();
-			if (data != null)
+			// Grab data again, because we may have changed the token above...
+			tokenData = token.getData();
+			if (tokenData != null)
 			{
-				if (data instanceof CSSTokenType)
+				if (tokenData instanceof CSSTokenType)
 				{
-					builder.append(((CSSTokenType) data).getScope());
+					builder.append(((CSSTokenType) tokenData).getScope());
 				}
-				else if (data instanceof String)
+				else if (tokenData instanceof String)
 				{
-					builder.append((String) data);
+					builder.append((String) tokenData);
 				}
 			}
 			else
@@ -463,6 +512,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		return createToken(builder.toString());
 	}
 
+	private boolean insidePropertyValue()
+	{
+		return this.fInPropertyValue;
+	}
+
 	@Override
 	public void setRange(IDocument document, int offset, int length)
 	{
@@ -470,6 +524,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		this.fCurlyState = 0;
 		this.fInMedia = false;
+		this.fInPropertyValue = false;
+		this.fInSelector = false;
 		if (offset > 0)
 		{
 			String previous = null;

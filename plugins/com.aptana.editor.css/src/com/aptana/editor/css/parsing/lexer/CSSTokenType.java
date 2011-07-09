@@ -16,7 +16,7 @@ import com.aptana.parsing.lexer.ITypePredicate;
 
 public enum CSSTokenType implements ITypePredicate
 {
-	PROPERTY("support.type.property-name.css", Terminals.PROPERTY), //$NON-NLS-1$
+	PROPERTY("meta.property-name.css support.type.property-name.css", Terminals.PROPERTY), //$NON-NLS-1$
 	MEDIA("support.constant.media.css", Terminals.IDENTIFIER), //$NON-NLS-1$
 	FUNCTION("support.function.misc.css", Terminals.IDENTIFIER), //$NON-NLS-1$
 	COLOR("support.constant.color.w3c-standard-color-name.css", Terminals.COLOR), //$NON-NLS-1$
@@ -76,6 +76,8 @@ public enum CSSTokenType implements ITypePredicate
 	RCURLY_MEDIA("punctuation.section.at-rule.media.css", Terminals.RCURLY), //$NON-NLS-1$
 	META_MEDIA("meta.at-rule.media.css", Terminals.MEDIA_KEYWORD), //$NON-NLS-1$
 	META_RULE("meta.property-list.css", Terminals.AT_RULE), //$NON-NLS-1$
+	META_SELECTOR("meta.selector.css", Terminals.SELECTOR), //$NON-NLS-1$
+	META_PROPERTY_VALUE("meta.property-value.css", Terminals.PROPERTY), //$NON-NLS-1$
 
 	UNDEFINED("undefined.css", -1), //$NON-NLS-1$
 	COMMENT("comment.block.css", 1024); //$NON-NLS-1$

@@ -1,6 +1,7 @@
 package com.aptana.core.tests;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -8,10 +9,14 @@ import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.logging.IdeLog.StatusLevel;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 
@@ -29,7 +34,7 @@ public class IdeLogTest extends TestCase
 	{
 		// TODO Auto-generated method stub
 		super.setUp();
-		
+
 		listener = new LogListener();
 		CorePlugin.getDefault().getLog().addLogListener(listener);
 	}
@@ -48,7 +53,6 @@ public class IdeLogTest extends TestCase
 		{
 			CorePlugin.getDefault().getLog().removeLogListener(listener);
 		}
-
 	}
 
 	/**
@@ -73,11 +77,11 @@ public class IdeLogTest extends TestCase
 			// Have to turn off platform debugging for a moment
 			EclipseUtil.setPlatformDebugging(false);
 		}
-		
+
 		IdeLog.StatusLevel currentSeverityPref = IdeLog.getCurrentSeverity();
 
 		Plugin plugin = CorePlugin.getDefault();
-		
+
 		// We should no messages logged
 		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.OFF);
 		listener.reset();
@@ -217,7 +221,6 @@ public class IdeLogTest extends TestCase
 
 	public void testScopesDebuggerOff()
 	{
-
 		// If debugging is off, we write out messages independent of scopes
 		// even if debugging is on, this should not affect messages with no scopes attached
 		boolean isDebugging = Platform.inDebugMode();
@@ -239,8 +242,7 @@ public class IdeLogTest extends TestCase
 		assertTrue(IdeLog.isWarningEnabled(plugin, null));
 		assertTrue(IdeLog.isInfoEnabled(plugin, IDebugScopes.SHELL));
 
-		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null,
-				IDebugScopes.BUILDER);
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, IDebugScopes.BUILDER);
 		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
 		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, IDebugScopes.SHELL);
 		assertEquals("Debugging off should find 3 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
@@ -248,12 +250,10 @@ public class IdeLogTest extends TestCase
 
 		IdeLog.setCurrentSeverity(currentSeverityPref);
 		EclipseUtil.setPlatformDebugging(isDebugging);
-
 	}
 
 	public void testScopesDebuggerOn()
 	{
-
 		// If debugging is on, we write out messages is the scope is null or there is a match
 
 		// save current scope setting
@@ -294,20 +294,24 @@ public class IdeLogTest extends TestCase
 
 		IdeLog.setCurrentSeverity(currentSeverityPref);
 		EclipseUtil.setPlatformDebugging(isDebugging);
-
 	}
 
-	class LogListener implements ILogListener
+	public void testPreferenceChange()
 	{
-		ArrayList<String> logMessages = new ArrayList<String>();
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(CorePlugin.PLUGIN_ID);
+		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, StatusLevel.INFO.toString());
+		assertEquals(StatusLevel.INFO, IdeLog.getCurrentSeverity());
+
+		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, StatusLevel.ERROR.toString());
+		assertEquals(StatusLevel.ERROR, IdeLog.getCurrentSeverity());
+	}
+
+	private static class LogListener implements ILogListener
+	{
+		List<String> logMessages = new ArrayList<String>();
 
 		public LogListener()
 		{
-		}
-
-		public boolean foundMessage(String message)
-		{
-			return logMessages.contains(message);
 		}
 
 		public String[] getMessages()
@@ -332,6 +336,5 @@ public class IdeLogTest extends TestCase
 				logMessages.add(status.getMessage());
 			}
 		}
-	};
-
+	}
 }
