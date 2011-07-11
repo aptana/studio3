@@ -28,6 +28,25 @@ public class BuildPathEntry
 		this.path = path;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object arg0)
+	{
+		boolean result = false;
+
+		if (arg0 instanceof BuildPathEntry)
+		{
+			BuildPathEntry other = (BuildPathEntry) arg0;
+
+			result = displayName.equals(other.displayName) && path.equals(other.path);
+		}
+
+		return result;
+	}
+
 	/**
 	 * getDisplayName
 	 * 
@@ -46,6 +65,16 @@ public class BuildPathEntry
 	public String getPath()
 	{
 		return path;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		return displayName.hashCode() * 31 + path.hashCode();
 	}
 
 	/**
@@ -67,4 +96,5 @@ public class BuildPathEntry
 	{
 		selected = value;
 	}
+
 }
