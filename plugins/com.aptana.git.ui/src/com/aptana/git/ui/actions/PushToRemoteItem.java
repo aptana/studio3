@@ -20,17 +20,22 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.actions.RebaseBranchHandler;
+import com.aptana.git.ui.internal.actions.PushToRemoteHandler;
 
-public class RebaseBranchItem extends AbstractDynamicBranchItem
+/**
+ * Item to push current branch to a named remote
+ * 
+ * @author cwilliams
+ */
+public class PushToRemoteItem extends AbstractDynamicBranchItem
 {
 
-	public RebaseBranchItem()
+	public PushToRemoteItem()
 	{
 		super();
 	}
 
-	public RebaseBranchItem(String id)
+	public PushToRemoteItem(String id)
 	{
 		super(id);
 	}
@@ -51,41 +56,40 @@ public class RebaseBranchItem extends AbstractDynamicBranchItem
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
-		for (final String branchName : repo.allBranches())
+		for (final String remote : repo.remotes())
 		{
-			contributions.add(new RebaseBranchContributionItem(repo, branchName));
+			contributions.add(new RemoteContributionItem(repo, remote));
 		}
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 
-	private void rebaseBranch(final GitRepository repo, final String branchName)
+	private void pushToRemote(final GitRepository repo, final String remote)
 	{
-		RebaseBranchHandler.rebaseBranch(repo, branchName);
+		PushToRemoteHandler.pushBranchToRemote(repo, repo.currentBranch(), remote);
 	}
 
-	private class RebaseBranchContributionItem extends ContributionItem
+	private class RemoteContributionItem extends ContributionItem
 	{
 		private GitRepository repo;
-		private String branchName;
+		private String remote;
 
-		RebaseBranchContributionItem(GitRepository repo, String branchName)
+		RemoteContributionItem(GitRepository repo, String remote)
 		{
 			this.repo = repo;
-			this.branchName = branchName;
+			this.remote = remote;
 		}
 
 		@Override
 		public void fill(Menu menu, int index)
 		{
 			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
-			menuItem.setText(branchName);
-			menuItem.setEnabled(!branchName.equals(repo.currentBranch()));
+			menuItem.setText(remote);
 			menuItem.addSelectionListener(new SelectionAdapter()
 			{
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					rebaseBranch(repo, branchName);
+					pushToRemote(repo, remote);
 				}
 			});
 		}

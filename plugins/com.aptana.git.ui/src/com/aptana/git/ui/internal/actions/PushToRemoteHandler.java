@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -28,12 +29,12 @@ import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
 
 /**
- * Runs a "git rebase <branch>" on HEAD. So if you choose master and are on branch 'topic', it'd be rebasing topic on
- * master (or "git rebase master topic)".
+ * Runs a "git push <remote> HEAD" for current branch. So if you choose 'origin' and are on branch 'master', it'd run
+ * "git push origin master".
  * 
  * @author cwilliams
  */
-public class RebaseBranchHandler extends AbstractGitHandler
+public class PushToRemoteHandler extends AbstractGitHandler
 {
 
 	@Override
@@ -45,56 +46,61 @@ public class RebaseBranchHandler extends AbstractGitHandler
 			return null;
 		}
 
-		String currentBranch = repo.currentBranch();
-		List<MenuDialogItem> listOfMaps = new ArrayList<MenuDialogItem>();
-		for (String branch : repo.allBranches())
+		final String currentBranch = repo.currentBranch();
+		List<MenuDialogItem> remotes = new ArrayList<MenuDialogItem>();
+		for (String remote : repo.remotes())
 		{
-			if (branch.equals(currentBranch))
-			{
-				continue;
-			}
-			listOfMaps.add(new MenuDialogItem(branch));
+			remotes.add(new MenuDialogItem(remote));
 		}
-		if (!listOfMaps.isEmpty())
+		if (!remotes.isEmpty())
 		{
 			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
-			dialog.setInput(listOfMaps);
+			dialog.setInput(remotes);
 			if (dialog.open() != -1)
 			{
-				MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
-				rebaseBranch(repo, item.getText());
+				MenuDialogItem item = remotes.get(dialog.getReturnCode());
+				pushBranchToRemote(repo, currentBranch, item.getText());
 			}
 		}
 		return null;
 	}
 
-	public static void rebaseBranch(final GitRepository repo, final String branchName)
+	public static void pushBranchToRemote(final GitRepository repo, final String branchName, final String remoteName)
 	{
-		Job job = new Job(NLS.bind("git rebase {0}", branchName)) //$NON-NLS-1$
+		Job job = new Job(NLS.bind("git push {0} {1}", remoteName, branchName)) //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+				if (subMonitor.isCanceled())
+				{
+					return Status.CANCEL_STATUS;
+				}
 
 				repo.enterWriteProcess();
 				try
 				{
-					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "rebase", //$NON-NLS-1$
-							branchName);
+					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "push", //$NON-NLS-1$
+							remoteName, branchName);
 					while (!launch.isTerminated())
 					{
-						Thread.sleep(50);
+						if (subMonitor.isCanceled())
+						{
+							launch.terminate();
+							return Status.CANCEL_STATUS;
+						}
+						Thread.yield();
 					}
 				}
 				catch (CoreException e)
 				{
-					GitUIPlugin.logError(e);
+					IdeLog.log(GitUIPlugin.getDefault(), e.getStatus());
 					return e.getStatus();
 				}
 				catch (Throwable e)
 				{
-					GitUIPlugin.logError(e.getMessage(), e);
+					IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
 					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
 				}
 				finally
