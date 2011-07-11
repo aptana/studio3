@@ -13,6 +13,7 @@ package com.aptana.formatter.nodes;
 
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
@@ -20,6 +21,7 @@ import com.aptana.formatter.IFormatterDocument;
 public class AbstractFormatterNodeBuilder
 {
 	private final Stack<IFormatterContainerNode> stack = new Stack<IFormatterContainerNode>();
+	private static final Pattern COMMENT_PREFIX = Pattern.compile("^[\\s]*(//|/\\*|#|<!--)(.|\\n|\\r)*"); //$NON-NLS-1$
 
 	protected void start(IFormatterContainerNode root)
 	{
@@ -51,7 +53,10 @@ public class AbstractFormatterNodeBuilder
 
 	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, int pos)
 	{
-		if (parentNode.getEndOffset() < pos)
+		int startOffset = parentNode.getEndOffset();
+		String text = parentNode.getDocument().get(startOffset, pos);
+
+		if (startOffset < pos)
 		{
 			// Check if the node should consume any gaps that we have to previous node end offset.
 			// This way, we can consume all white-spaces in between.
@@ -65,7 +70,6 @@ public class AbstractFormatterNodeBuilder
 				{
 					preservedSpaces = children.get(children.size() - 1).getSpacesCountAfter();
 				}
-				String text = parentNode.getDocument().get(parentNode.getEndOffset(), pos);
 				if (text.trim().length() == 0 && preservedSpaces == 0)
 				{
 					return;
@@ -78,8 +82,7 @@ public class AbstractFormatterNodeBuilder
 						break;
 					}
 				}
-				int newPos = Math
-						.max(parentNode.getEndOffset(), pos - (text.length() - rightPos + preservedSpaces) + 1);
+				int newPos = Math.max(startOffset, pos - (text.length() - rightPos + preservedSpaces) + 1);
 				if (newPos < pos && preservedSpaces > 0)
 				{
 					if (!Character.isWhitespace(parentNode.getDocument().charAt(newPos)))
@@ -88,12 +91,10 @@ public class AbstractFormatterNodeBuilder
 					}
 				}
 				pos = newPos;
-
 			}
 
-			// Skip spaces and tabs from beginning and end when creating a text node
-			int startOffset = parentNode.getEndOffset();
-			if (startOffset < pos)
+			// Skip spaces and tabs if it is a comment
+			if (COMMENT_PREFIX.matcher(text.trim()).matches())
 			{
 				while ((parentNode.getDocument().charAt(startOffset) == ' ' || parentNode.getDocument().charAt(
 						startOffset) == '\t')
@@ -101,13 +102,19 @@ public class AbstractFormatterNodeBuilder
 				{
 					startOffset++;
 				}
-				while ((parentNode.getDocument().charAt(pos - 1) == ' ' || parentNode.getDocument().charAt(pos - 1) == '\t')
-						&& (startOffset < pos - 1))
-					pos--;
 
+				// For block comments, we also skip trailing white spaces
+				if (text.trim().startsWith("/*") && text.trim().endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+				{
+					while ((parentNode.getDocument().charAt(pos - 1) == ' ' || parentNode.getDocument().charAt(pos - 1) == '\t')
+							&& (startOffset < pos - 1))
+					{
+						pos--;
+					}
+				}
 			}
-			parentNode.addChild(createTextNode(parentNode.getDocument(), startOffset, pos));
 
+			parentNode.addChild(createTextNode(parentNode.getDocument(), startOffset, pos));
 		}
 	}
 

@@ -155,7 +155,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false, false);
 		formatterSelectorNode.setBegin(createTextNode(document,
 				getBeginWithoutWhiteSpaces(selectorStartingOffset, document),
-				getEndWithoutWhiteSpaces(selectEndingOffset, document)));
+				getEndWithoutWhiteSpaces(selectEndingOffset, document) + 1));
 		push(formatterSelectorNode);
 
 		findAndPushPunctuationNode(TypePunctuation.SEMICOLON, selectEndingOffset, false);
@@ -433,8 +433,18 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 			}
 
-			// Push a semicolon if the declaration ends with one
+			// TODO Create a special node for !important when we have it in the AST
+			// Right now, we just create a text node for it ( We don't let push() create the text node since it includes
+			// an extra space when creating the text node )
 
+			int importantOffset = locateCharacterInSameLine('!', expressionNode.getEndingOffset(), document);
+			if (importantOffset != expressionNode.getEndingOffset())
+			{
+				formatterBlockNode.addChild(createTextNode(document, importantOffset,
+						getEndWithoutWhiteSpaces(declarationNode.getEndingOffset(), document) + 1));
+			}
+
+			// Push a semicolon if the declaration ends with one
 			if (document.charAt(declarationNode.getEndingOffset()) == ';')
 			{
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, declarationNode.getEndingOffset(), true);
