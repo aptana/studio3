@@ -4,7 +4,7 @@
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
    <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
-   <extension-point id="loadPaths" name="loadPaths" schema="schema/loadPaths.exsd"/>
+   <extension-point id="buildPaths" name="buildPaths" schema="schema/buildPaths.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
