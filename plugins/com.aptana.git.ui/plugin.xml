@@ -83,6 +83,12 @@
             id="com.aptana.git.ui.command.push"
             name="%PushAction_tooltip">
       </command>
+       <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.PushToRemoteHandler"
+            id="com.aptana.git.ui.command.push_to_remote"
+            name="%PushToRemoteAction_tooltip">
+      </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.GithubNetworkHandler"
@@ -237,195 +243,18 @@
       <key
             commandId="com.aptana.git.ui.command.push"
             contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G ARROW_RIGHT">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.add_remote"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G E">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.github.network"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G G">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.pull"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G ARROW_LEFT">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.status"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G S">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.commit"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G C">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.revert"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G R">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.unstage"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G NUMPAD_SUBTRACT">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.stage"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G NUMPAD_ADD">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.create_branch"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G A">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.switch_branch"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G W">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.merge_branch"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G M">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.rebase_branch"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G NUMPAD_DIVIDE">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.squash_merge_branch"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G Q">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.delete_branch"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G D">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.merge_conflicts"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G X">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.compare_with_HEAD"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G .">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.compare_with_revision"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G V">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.blame"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G B">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.disconnect"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G DELETE">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.diff"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G F">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.attach"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G T">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.showInResourceHistory"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G H">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.stash"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G J">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.unstash"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G U">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.ignore"
-            contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M4+G I">
-      </key>
-      <key
-            commandId="com.aptana.git.ui.command.push"
-            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G ARROW_RIGHT">
       </key>
       <key
+            commandId="com.aptana.git.ui.command.push_to_remote"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G P">
+      </key>
+      <key
             commandId="com.aptana.git.ui.command.add_remote"
             contextId="org.eclipse.ui.contexts.window"
-            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G E">
       </key>
@@ -579,6 +408,11 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+Enter">
       </key>
+      <sequenceModifier
+            find="M2+M3"
+            platforms="carbon,cocoa"
+            replace="M1+M4">
+      </sequenceModifier>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -847,6 +681,22 @@
                 </reference>
              </visibleWhen>
          </menu>
+         <menu
+               commandId="com.aptana.git.ui.command.push_to_remote"
+               id="com.aptana.git.ui.actions.PushToRemoteAction"
+               label="%PushToRemoteAction_label"
+               tooltip="%PushToRemoteAction_tooltip">
+            <dynamic
+                  class="com.aptana.git.ui.actions.PushToRemoteItem"
+                  id="com.aptana.git.ui.command.push_to_remote.items">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
+            </visibleWhen>
+         </menu>
       </menuContribution>
       <menuContribution
             allPopups="true"
@@ -974,7 +824,6 @@
                       definitionId="com.aptana.git.ui.hasGitRepository">
                 </reference>
              </visibleWhen>
-             
           </command>
           <command
                 commandId="com.aptana.git.ui.command.add_remote"

@@ -16,6 +16,7 @@ import org.eclipse.debug.ui.console.IConsole;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.Color;
 
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.debug.core.IExtendedStreamsProxy;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -37,8 +38,8 @@ public class JSConsoleColorProvider extends ConsoleColorProvider {
 		if (streamsProxy instanceof IExtendedStreamsProxy) {
 			IExtendedStreamsProxy extendedStreamsProxy = (IExtendedStreamsProxy) streamsProxy;
 			for (String streamIdentifer : extendedStreamsProxy.getStreamIdentifers()) {
-				if (!IJSDebugConstants.ID_STANDARD_ERROR_STREAM.equals(streamIdentifer) &&
-						!IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM.equals(streamIdentifer)) {
+				if (!IDebugCoreConstants.ID_STANDARD_ERROR_STREAM.equals(streamIdentifer) &&
+						!IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM.equals(streamIdentifer)) {
 					console.connect(extendedStreamsProxy.getStreamMonitor(streamIdentifer), streamIdentifer);
 				}
 			}

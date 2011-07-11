@@ -10,6 +10,8 @@ package com.aptana.console;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.console.internal.expressions.ExpressionManager;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -21,6 +23,8 @@ public class ConsolePlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static ConsolePlugin plugin;
 	
+	private ExpressionManager expressionManager;
+
 	/**
 	 * The constructor
 	 */
@@ -54,4 +58,14 @@ public class ConsolePlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	/**
+	 * Returns instance of Expression Manager
+	 * @return
+	 */
+	public ExpressionManager getExpressionManager() {
+		if (expressionManager == null) {
+			expressionManager = new ExpressionManager();
+		}
+		return expressionManager;
+	}
 }

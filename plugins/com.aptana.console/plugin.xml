@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="consoleExpressions" name="%extension-point.name" schema="schema/consoleExpressions.exsd"/>
    <extension
          point="org.eclipse.debug.core.processFactories">
       <processFactory
             class="com.aptana.console.process.ConsoleProcessFactory"
             id="com.aptana.console.processFactory">
       </processFactory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="com.aptana.console.internal.ui.ConsolePageParticipant"
+            id="com.aptana.console.consolePageParticipant">
+         <enablement></enablement>
+      </consolePageParticipant>
    </extension>
 
 </plugin>
