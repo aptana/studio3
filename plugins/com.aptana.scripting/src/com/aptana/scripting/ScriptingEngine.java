@@ -18,8 +18,6 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.jruby.embed.LocalContextScope;
@@ -27,6 +25,8 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.scripting.model.RunType;
 import com.aptana.scripting.model.ScriptLoadJob;
@@ -118,50 +118,40 @@ public class ScriptingEngine
 	{
 		if (this._loadPaths == null)
 		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			List<String> paths = new ArrayList<String>();
+			final List<String> paths = new ArrayList<String>();
 
-			if (registry != null)
-			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, LOADPATH_ID);
-
-				if (extensionPoint != null)
+			// @formatter:off
+			EclipseUtil.processConfigurationElements(
+				ScriptingActivator.PLUGIN_ID,
+				LOADPATH_ID,
+				TAG_LOADPATH,
+				new IConfigurationElementProcessor()
 				{
-					IExtension[] extensions = extensionPoint.getExtensions();
-
-					for (IExtension extension : extensions)
+					public void processElement(IConfigurationElement element)
 					{
-						IConfigurationElement[] elements = extension.getConfigurationElements();
+						String path = element.getAttribute(ATTR_PATH);
 
-						for (IConfigurationElement element : elements)
+						IExtension declaring = element.getDeclaringExtension();
+						String declaringPluginID = declaring.getNamespaceIdentifier();
+						Bundle bundle = Platform.getBundle(declaringPluginID);
+						URL url = bundle.getEntry(path);
+						String urlAsPath = ResourceUtil.resourcePathToString(url);
+
+						if (urlAsPath != null && urlAsPath.length() > 0)
 						{
-							if (element.getName().equals(TAG_LOADPATH))
-							{
-								String path = element.getAttribute(ATTR_PATH);
+							paths.add(urlAsPath);
+						}
+						else
+						{
+							String message = MessageFormat.format(
+									Messages.ScriptingEngine_Unable_To_Convert_Load_Path, declaringPluginID, url);
 
-								IExtension declaring = element.getDeclaringExtension();
-								String declaringPluginID = declaring.getNamespaceIdentifier();
-								Bundle bundle = Platform.getBundle(declaringPluginID);
-								URL url = bundle.getEntry(path);
-								String urlAsPath = ResourceUtil.resourcePathToString(url);
-
-								if (urlAsPath != null && urlAsPath.length() > 0)
-								{
-									paths.add(urlAsPath);
-								}
-								else
-								{
-									String message = MessageFormat.format(
-											Messages.ScriptingEngine_Unable_To_Convert_Load_Path, new Object[] {
-													declaringPluginID, url });
-
-									ScriptingActivator.logError(message, null);
-								}
-							}
+							ScriptingActivator.logError(message, null);
 						}
 					}
 				}
-			}
+			);
+			// @formatter:on
 
 			this._loadPaths = Collections.unmodifiableList(paths);
 		}
@@ -179,31 +169,22 @@ public class ScriptingEngine
 	{
 		if (this._frameworkFiles == null)
 		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			List<String> names = new ArrayList<String>();
+			final List<String> names = new ArrayList<String>();
 
-			if (registry != null)
-			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, FRAMEWORK_FILE_ID);
-
-				if (extensionPoint != null)
+			// @formatter:off
+			EclipseUtil.processConfigurationElements(
+				ScriptingActivator.PLUGIN_ID,
+				FRAMEWORK_FILE_ID,
+				TAG_FILE, 
+				new IConfigurationElementProcessor()
 				{
-					IExtension[] extensions = extensionPoint.getExtensions();
-
-					for (IExtension extension : extensions)
+					public void processElement(IConfigurationElement element)
 					{
-						IConfigurationElement[] elements = extension.getConfigurationElements();
-
-						for (IConfigurationElement element : elements)
-						{
-							if (element.getName().equals(TAG_FILE))
-							{
-								names.add(element.getAttribute(ATTR_NAME));
-							}
-						}
+						names.add(element.getAttribute(ATTR_NAME));
 					}
 				}
-			}
+			);
+			// @formatter:on
 
 			this._frameworkFiles = Collections.unmodifiableList(names);
 		}

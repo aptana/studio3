@@ -17,13 +17,13 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.epl.UIEplPlugin;
@@ -204,54 +204,40 @@ public class UserAgentManager
 	 */
 	private void loadExtension()
 	{
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		
-		if (registry != null)
-		{
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(CommonEditorPlugin.PLUGIN_ID, USERAGENT_ID);
-
-			if (extensionPoint != null)
+		// @formatter:off
+		EclipseUtil.processConfigurationElements(
+			CommonEditorPlugin.PLUGIN_ID,
+			USERAGENT_ID,
+			ELEMENT_USERAGENT,
+			new IConfigurationElementProcessor()
 			{
-				IExtension[] extensions = extensionPoint.getExtensions();
-
-				for (int i = 0; i < extensions.length; i++)
+				public void processElement(IConfigurationElement element)
 				{
-					IExtension extension = extensions[i];
-					IConfigurationElement[] elements = extension.getConfigurationElements();
+					String agentID = element.getAttribute(ATTR_USER_AGENT_ID);
+					String agentName = element.getAttribute(ATTR_USER_AGENT_NAME);
+					String agentIconPath = element.getAttribute(ATTR_ICON);
+					String agentIconDisabledPath = element.getAttribute(ATTR_ICON_DISABLED);
 
-					for (int j = 0; j < elements.length; j++)
+					if (agentID != null)
 					{
-						IConfigurationElement element = elements[j];
-						
-						if (element.getName().equals(ELEMENT_USERAGENT))
+						IExtension ext = element.getDeclaringExtension();
+						String pluginId = ext.getNamespaceIdentifier();
+						Bundle bundle = Platform.getBundle(pluginId);
+
+						if (agentIconPath != null && agentIconDisabledPath != null)
 						{
-							String agentID = element.getAttribute(ATTR_USER_AGENT_ID);
-							String agentName = element.getAttribute(ATTR_USER_AGENT_NAME);
-							String agentIconPath = element.getAttribute(ATTR_ICON);
-							String agentIconDisabledPath = element.getAttribute(ATTR_ICON_DISABLED);
-							
-							if (agentID != null)
+							Image agentIcon = SWTUtils.getImage(bundle, agentIconPath);
+							Image agentIconDisabled = SWTUtils.getImage(bundle, agentIconDisabledPath);
+
+							if (agentIcon != null && agentIconDisabled != null)
 							{
-								IExtension ext = element.getDeclaringExtension();
-								String pluginId = ext.getNamespaceIdentifier();
-								Bundle bundle = Platform.getBundle(pluginId);
-								
-								if (agentIconPath != null && agentIconDisabledPath != null)
-								{
-									
-									Image agentIcon = SWTUtils.getImage(bundle, agentIconPath);
-									Image agentIconDisabled = SWTUtils.getImage(bundle, agentIconDisabledPath);
-									
-									if (agentIcon != null && agentIconDisabled != null)
-									{
-										userAgentsByID.put(agentID, new UserAgent(agentID, agentName, agentIcon, agentIconDisabled));
-									}
-								}
+								userAgentsByID.put(agentID, new UserAgent(agentID, agentName, agentIcon, agentIconDisabled));
 							}
 						}
 					}
 				}
 			}
-		}
+		);
+		// @formatter:on
 	}
 }
