@@ -54,7 +54,8 @@ public class AbstractFormatterNodeBuilder
 	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, int pos)
 	{
 		int startOffset = parentNode.getEndOffset();
-		String text = parentNode.getDocument().get(startOffset, pos);
+		IFormatterDocument document = parentNode.getDocument();
+		String text = document.get(startOffset, pos);
 
 		if (startOffset < pos)
 		{
@@ -85,7 +86,7 @@ public class AbstractFormatterNodeBuilder
 				int newPos = Math.max(startOffset, pos - (text.length() - rightPos + preservedSpaces) + 1);
 				if (newPos < pos && preservedSpaces > 0)
 				{
-					if (!Character.isWhitespace(parentNode.getDocument().charAt(newPos)))
+					if (!Character.isWhitespace(document.charAt(newPos)))
 					{
 						newPos = pos;// revert
 					}
@@ -94,19 +95,20 @@ public class AbstractFormatterNodeBuilder
 			}
 
 			// Skip spaces and tabs if it is a comment
-			if (COMMENT_PREFIX.matcher(text.trim()).matches())
+			String trimmedText = text.trim();
+			if (COMMENT_PREFIX.matcher(trimmedText).matches())
 			{
-				while ((parentNode.getDocument().charAt(startOffset) == ' ' || parentNode.getDocument().charAt(
-						startOffset) == '\t')
+				while ((document.charAt(startOffset) == ' ' || document.charAt(startOffset) == '\t')
 						&& (startOffset < pos - 1))
 				{
 					startOffset++;
 				}
 
 				// For block comments, we also skip trailing white spaces
-				if (text.trim().startsWith("/*") && text.trim().endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+
+				if ((trimmedText.startsWith("/*") && trimmedText.endsWith("*/")) || (trimmedText.startsWith("<!--") && trimmedText.endsWith("-->"))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				{
-					while ((parentNode.getDocument().charAt(pos - 1) == ' ' || parentNode.getDocument().charAt(pos - 1) == '\t')
+					while ((document.charAt(pos - 1) == ' ' || document.charAt(pos - 1) == '\t')
 							&& (startOffset < pos - 1))
 					{
 						pos--;
@@ -114,7 +116,7 @@ public class AbstractFormatterNodeBuilder
 				}
 			}
 
-			parentNode.addChild(createTextNode(parentNode.getDocument(), startOffset, pos));
+			parentNode.addChild(createTextNode(document, startOffset, pos));
 		}
 	}
 
