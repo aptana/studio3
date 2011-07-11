@@ -19,6 +19,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Path;
@@ -435,5 +439,43 @@ public class EclipseUtil
 			return checked.split(","); //$NON-NLS-1$
 		}
 		return new String[0];
+	}
+
+	/**
+	 * Find all elements of a given name for an extension point and delegate processing to an
+	 * IConfigurationElementProcessor.
+	 * 
+	 * @param pluginId
+	 * @param extensionPointId
+	 * @param elementName
+	 * @param processor
+	 */
+	public static void processConfigurationElements(String pluginId, String extensionPointId, String elementName,
+			IConfigurationElementProcessor processor)
+	{
+		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && !StringUtil.isEmpty(elementName)
+				&& processor != null)
+		{
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+			if (registry != null)
+			{
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(pluginId, extensionPointId);
+
+				if (extensionPoint != null)
+				{
+					for (IExtension extension : extensionPoint.getExtensions())
+					{
+						for (IConfigurationElement element : extension.getConfigurationElements())
+						{
+							if (element.getName().equals(elementName))
+							{
+								processor.processElement(element);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
