@@ -65,14 +65,14 @@
          <attribute name="pattern" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Regular expression
                </documentation>
             </annotation>
          </attribute>
          <attribute name="scope" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Theming selector scope
                </documentation>
             </annotation>
          </attribute>
@@ -80,18 +80,23 @@
    </element>
 
    <element name="group">
+      <annotation>
+         <documentation>
+            Capturing group
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Capturing group number
                </documentation>
             </annotation>
          </attribute>
          <attribute name="scope" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Theming selector scope
                </documentation>
             </annotation>
          </attribute>

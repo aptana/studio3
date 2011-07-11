@@ -24,17 +24,17 @@ import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class Expression {
-	
+
 	private boolean enabled = true;
 	private String label;
 	private String expression;
 	private SortedMap<Integer, String> groupScopes;
-	
+
 	private Pattern pattern;
-	
+
 	/**
 	 * @param label
 	 * @param expression
@@ -73,7 +73,7 @@ public final class Expression {
 						}
 						previous = offset + length;
 						if (groupScopes.containsKey(group)) {
-							TextAttribute textAttribute =  getCurrentTheme().getTextAttribute(groupScopes.get(group));
+							TextAttribute textAttribute = getCurrentTheme().getTextAttribute(groupScopes.get(group));
 							result.add(createStyleRange(lineOffset + offset, length, textAttribute));
 						} else {
 							previous = offset;
@@ -88,7 +88,7 @@ public final class Expression {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Calculate line background
 	 * 
@@ -101,7 +101,7 @@ public final class Expression {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @return the enabled
 	 */
@@ -110,7 +110,8 @@ public final class Expression {
 	}
 
 	/**
-	 * @param enabled the enabled to set
+	 * @param enabled
+	 *            the enabled to set
 	 */
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -124,7 +125,8 @@ public final class Expression {
 	}
 
 	/**
-	 * @param label the label to set
+	 * @param label
+	 *            the label to set
 	 */
 	public void setLabel(String label) {
 		this.label = label;
@@ -138,7 +140,8 @@ public final class Expression {
 	}
 
 	/**
-	 * @param expression the expression to set
+	 * @param expression
+	 *            the expression to set
 	 */
 	public void setExpression(String expression) {
 		this.expression = expression;
@@ -153,7 +156,8 @@ public final class Expression {
 	}
 
 	/**
-	 * @param groupScopes the groupScopes to set
+	 * @param groupScopes
+	 *            the groupScopes to set
 	 */
 	public void setGroupScopes(SortedMap<Integer, String> groupScopes) {
 		this.groupScopes = groupScopes;
