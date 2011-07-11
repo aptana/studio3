@@ -160,6 +160,11 @@ public interface IParseNode extends ILexeme, ILanguageNode, Iterable<IParseNode>
 	public boolean hasChildren();
 
 	/**
+	 * @return true if this node should not appear in the outline, false otherwise
+	 */
+	public boolean isFilteredFromOutline();
+
+	/**
 	 * Set a child at a given index, replacing any existing child.
 	 * 
 	 * @param index
