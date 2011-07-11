@@ -1,6 +1,5 @@
 package com.aptana.ui.properties;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -110,11 +109,9 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 
 	private List<BuildPathEntry> getBuildPathEntries(IProject project)
 	{
-		List<BuildPathEntry> result = new ArrayList<BuildPathEntry>();
+		BuildPathManager manager = BuildPathManager.getInstance();
 
-		result.add(new BuildPathEntry("JS Library, v1.0", "/Users/klindsey/Documents/testing/test.js"));
-
-		return result;
+		return manager.getBuildPaths();
 	}
 
 	/**
