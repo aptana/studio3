@@ -425,23 +425,22 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				if (expressionNode instanceof CSSTermListNode)
 				{
-					pushTermListNode((CSSTermListNode) expressionNode);
+					pushTermListNode((CSSTermListNode) expressionNode, i == declarations.length - 1);
 				}
 				else
 				{
-					pushDeclarationValueNode(expressionNode);
+					pushDeclarationValueNode(expressionNode, i == declarations.length - 1);
 				}
-			}
 
-			// TODO Create a special node for !important when we have it in the AST
-			// Right now, we just create a text node for it ( We don't let push() create the text node since it includes
-			// an extra space when creating the text node )
-
-			int importantOffset = locateCharacterInSameLine('!', expressionNode.getEndingOffset(), document);
-			if (importantOffset != expressionNode.getEndingOffset())
-			{
-				formatterBlockNode.addChild(createTextNode(document, importantOffset,
-						getEndWithoutWhiteSpaces(declarationNode.getEndingOffset(), document) + 1));
+				// TODO Create a special node for !important when we have it in the AST
+				// Right now, we just create a text node for it ( We don't let push() create the text node since it
+				// includes an extra space when creating the text node )
+				int importantOffset = locateCharacterInSameLine('!', expressionNode.getEndingOffset(), document);
+				if (importantOffset != expressionNode.getEndingOffset())
+				{
+					formatterBlockNode.addChild(createTextNode(document, importantOffset,
+							getEndWithoutWhiteSpaces(declarationNode.getEndingOffset(), document) + 1));
+				}
 			}
 
 			// Push a semicolon if the declaration ends with one
@@ -468,7 +467,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 	}
 
-	private void pushDeclarationValueNode(CSSExpressionNode expressionNode)
+	private void pushDeclarationValueNode(CSSExpressionNode expressionNode, boolean isLastDeclaration)
 	{
 
 		int expressionEndOffset = expressionNode.getEndingOffset();
@@ -491,7 +490,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			endsWithComma = true;
 		}
 
-		if (document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r')
+		if ((document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r') && isLastDeclaration)
 		{
 			isLastNodeInDeclaration = true;
 		}
@@ -511,20 +510,20 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 	}
 
-	private void pushTermListNode(CSSTermListNode termListNode)
+	private void pushTermListNode(CSSTermListNode termListNode, boolean isLastDeclaration)
 	{
 		CSSExpressionNode leftExpression = termListNode.getLeftExpression();
 		CSSExpressionNode rightExpression = termListNode.getRightExpression();
 		if (leftExpression instanceof CSSTermListNode)
 		{
-			pushTermListNode((CSSTermListNode) leftExpression);
+			pushTermListNode((CSSTermListNode) leftExpression, isLastDeclaration);
 			// push the right expression here, as we are moving back up the tree
-			pushDeclarationValueNode(rightExpression);
+			pushDeclarationValueNode(rightExpression, isLastDeclaration);
 		}
 		else
 		{
-			pushDeclarationValueNode(leftExpression);
-			pushDeclarationValueNode(rightExpression);
+			pushDeclarationValueNode(leftExpression, isLastDeclaration);
+			pushDeclarationValueNode(rightExpression, isLastDeclaration);
 		}
 	}
 

@@ -53,12 +53,14 @@ public class AbstractFormatterNodeBuilder
 
 	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, int pos)
 	{
+
 		int startOffset = parentNode.getEndOffset();
-		IFormatterDocument document = parentNode.getDocument();
-		String text = document.get(startOffset, pos);
 
 		if (startOffset < pos)
 		{
+			IFormatterDocument document = parentNode.getDocument();
+			String text = document.get(startOffset, pos);
+
 			// Check if the node should consume any gaps that we have to previous node end offset.
 			// This way, we can consume all white-spaces in between.
 			// The check take into consideration the value of the previous node's getSpacesCountAfter(), so that we do
