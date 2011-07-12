@@ -1,9 +1,13 @@
 package com.aptana.ui.properties;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -27,8 +31,13 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
+import com.aptana.index.core.RebuildIndexJob;
+
 public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkbenchPropertyPage, ICheckStateListener
 {
+	private IProject project;
+	private CheckboxTableViewer tableViewer;
+
 	/**
 	 * ProjectBuildPathPropertyPage
 	 */
@@ -53,8 +62,11 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	protected Control createContents(Composite parent)
 	{
 		// get project
-		IProject project = (IProject) getElement().getAdapter(IResource.class);
+		project = (IProject) getElement().getAdapter(IResource.class);
+
+		// get entire list and selected items in that list
 		List<BuildPathEntry> entries = getBuildPathEntries(project);
+		List<BuildPathEntry> selectedEntries = getSelectedBuildPathEntries(project);
 
 		// top-level composite
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -72,7 +84,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		tableComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		// table
-		CheckboxTableViewer tableViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.TOP | SWT.BORDER);
+		tableViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.TOP | SWT.BORDER);
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -90,7 +102,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		tableViewer.setLabelProvider(getLabelProvider());
 		// tableViewer.setComparator(getCompartor());
 		tableViewer.setInput(entries);
-		// tableViewer.setCheckedElements(elements);
+		tableViewer.setCheckedElements(selectedEntries.toArray());
 		tableViewer.addCheckStateListener(this);
 		// @formatter:off
 		tableViewer.addSelectionChangedListener(
@@ -102,16 +114,34 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 			}
 		);
 		// @formatter:on
-		// initialCheckedItems = tableViewer.getCheckedElements();
 
 		return composite;
 	}
 
+	/**
+	 * getBuildPathEntries
+	 * 
+	 * @param project
+	 * @return
+	 */
 	private List<BuildPathEntry> getBuildPathEntries(IProject project)
 	{
 		BuildPathManager manager = BuildPathManager.getInstance();
 
 		return manager.getBuildPaths();
+	}
+
+	/**
+	 * getSelectedBuildPathEntries
+	 * 
+	 * @param project
+	 * @return
+	 */
+	private List<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
+	{
+		BuildPathManager manager = BuildPathManager.getInstance();
+
+		return manager.getSelectedBuildPathEntries(project);
 	}
 
 	/**
@@ -188,7 +218,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 							break;
 
 						case 1:
-							result = entry.getPath();
+							result = entry.getPath().toString();
 							break;
 					}
 				}
@@ -196,5 +226,42 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 				return result;
 			}
 		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
+	@Override
+	public boolean performOk()
+	{
+		Object[] items = tableViewer.getCheckedElements();
+		List<BuildPathEntry> entries = new ArrayList<BuildPathEntry>();
+
+		for (Object item : items)
+		{
+			if (item instanceof BuildPathEntry)
+			{
+				entries.add((BuildPathEntry) item);
+			}
+		}
+
+		BuildPathManager manager = BuildPathManager.getInstance();
+
+		// determine if the selection has changed
+		Set<BuildPathEntry> currentEntries = new HashSet<BuildPathEntry>(manager.getSelectedBuildPathEntries(project));
+		Set<BuildPathEntry> newEntries = new HashSet<BuildPathEntry>(entries);
+
+		if (!newEntries.equals(currentEntries))
+		{
+			BuildPathManager.getInstance().setSelectedBuildPathEntries(project, entries);
+
+			// rebuild project index
+			RebuildIndexJob job = new RebuildIndexJob(project.getLocationURI());
+
+			job.run(new NullProgressMonitor());
+		}
+
+		return true;
 	}
 }
