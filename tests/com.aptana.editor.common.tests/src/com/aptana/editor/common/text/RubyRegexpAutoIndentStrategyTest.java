@@ -300,6 +300,23 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("/* comment */\nhello", document.get());
 	}
 
+	public void testAPSTUD2867_2() throws Exception
+	{
+		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
+		IDocument document = new Document("/* comment */hello");
+
+		// After end of block comment, don't add a star
+		DocumentCommand command = createNewlineCommand(18); // at end of input
+		strategy.customizeDocumentCommand(document, command);
+		assertTrue(command.doit);
+
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("/* comment */hello\n", document.get());
+	}
+
 	public void testAPSTUD2868() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy()

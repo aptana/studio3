@@ -80,4 +80,10 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	{
 		return new CSSFoldingComputer(this, document);
 	}
+
+	@Override
+	protected String getContentTypeId()
+	{
+		return ICSSConstants.CONTENT_TYPE_CSS;
+	}
 }

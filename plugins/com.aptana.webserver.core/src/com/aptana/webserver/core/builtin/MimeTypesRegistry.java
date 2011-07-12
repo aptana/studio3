@@ -63,6 +63,7 @@ public class MimeTypesRegistry {
 		map("video/x-la-asf", "lsf", "lsx");
 		map("video/x-ms-asf", "asf", "asr", "asx");
 		map("video/x-msvideo", "avi");
+		map("video/ogg", "ogg");
 		map("video/x-sgi-movie", "movie");
 		map("audio/basic", "au", "snd");
 		map("audio/mid", "mid", "rmi");
