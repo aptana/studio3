@@ -152,7 +152,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 			}
 			// Return after /*
-			else if (upToOffset.trim().startsWith("/*") && !upToOffset.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+			else if (upToOffset.trim().startsWith("/*") && !upToOffset.contains("*/")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				buf.append(' '); // space to line up asterisk
 
