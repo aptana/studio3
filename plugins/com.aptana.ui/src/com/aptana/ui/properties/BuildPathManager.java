@@ -7,11 +7,23 @@
  */
 package com.aptana.ui.properties;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.QualifiedName;
+import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
@@ -23,21 +35,15 @@ import com.aptana.ui.UIPlugin;
  */
 public class BuildPathManager
 {
+	private static final String NAME_AND_PATH_DELIMITER = "\t"; //$NON-NLS-1$
+	private static final String BUILD_PATH_ENTRY_DELIMITER = "\0"; //$NON-NLS-1$
+
 	private static final String BUILD_PATHS_ID = "buildPaths"; //$NON-NLS-1$
 	private static final String ELEMENT_BUILD_PATH = "buildPath"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
 
 	private static BuildPathManager instance;
-
-	private List<BuildPathEntry> buildPaths;
-
-	/**
-	 * Make sure this is a singleton
-	 */
-	private BuildPathManager()
-	{
-	}
 
 	/**
 	 * Return the singleton instance of this class
@@ -56,18 +62,13 @@ public class BuildPathManager
 		return instance;
 	}
 
+	private List<BuildPathEntry> buildPaths;
+
 	/**
-	 * Add a new build path entry to this manager
-	 * 
-	 * @param displayName
-	 * @param path
+	 * Make sure this is a singleton
 	 */
-	public void addBuildPath(String displayName, String path)
+	private BuildPathManager()
 	{
-		if (!StringUtil.isEmpty(displayName) && !StringUtil.isEmpty(path))
-		{
-			addBuildPath(new BuildPathEntry(displayName, path));
-		}
 	}
 
 	/**
@@ -89,30 +90,27 @@ public class BuildPathManager
 	}
 
 	/**
-	 * Remove an existing build path from this manager
+	 * Add a new build path entry to this manager
 	 * 
 	 * @param displayName
 	 * @param path
 	 */
-	public void removeBuildPath(String displayName, String path)
+	public void addBuildPath(String displayName, URI path)
 	{
-		if (!StringUtil.isEmpty(displayName) && !StringUtil.isEmpty(path))
+		if (!StringUtil.isEmpty(displayName) && path != null)
 		{
-			removeBuildPath(new BuildPathEntry(displayName, path));
+			addBuildPath(new BuildPathEntry(displayName, path));
 		}
 	}
 
 	/**
-	 * Remove an existing build path from this manager
+	 * getBuildPathPropertyName
 	 * 
-	 * @param entry
+	 * @return
 	 */
-	public void removeBuildPath(BuildPathEntry entry)
+	protected QualifiedName getBuildPathPropertyName()
 	{
-		if (entry != null && buildPaths != null)
-		{
-			buildPaths.remove(entry);
-		}
+		return new QualifiedName(UIPlugin.PLUGIN_ID, "projectBuildPath");
 	}
 
 	/**
@@ -133,6 +131,56 @@ public class BuildPathManager
 	}
 
 	/**
+	 * getSelectedBuildPathEntries
+	 * 
+	 * @param project
+	 * @return
+	 */
+	public List<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
+	{
+		List<BuildPathEntry> result = new ArrayList<BuildPathEntry>();
+
+		try
+		{
+			String property = project.getPersistentProperty(getBuildPathPropertyName());
+
+			if (property != null)
+			{
+				String[] entries = property.split(BUILD_PATH_ENTRY_DELIMITER);
+
+				for (String entry : entries)
+				{
+					String[] nameAndPath = entry.split(NAME_AND_PATH_DELIMITER);
+
+					if (nameAndPath.length >= 2)
+					{
+						String name = nameAndPath[0];
+
+						try
+						{
+							URI path = new URI(nameAndPath[1]);
+
+							result.add(new BuildPathEntry(name, path));
+						}
+						catch (URISyntaxException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		catch (CoreException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/**
 	 * Process all load path extensions
 	 */
 	private void loadExtension()
@@ -146,13 +194,91 @@ public class BuildPathManager
 			{
 				public void processElement(IConfigurationElement element)
 				{
+					IExtension extension = element.getDeclaringExtension();
+					String pluginId = extension.getNamespaceIdentifier();
+					Bundle bundle = Platform.getBundle(pluginId);
+
 					String name = element.getAttribute(ATTR_NAME);
-					String path = element.getAttribute(ATTR_PATH);
-					
-					addBuildPath(name, path);
+					String resource = element.getAttribute(ATTR_PATH);
+
+					URL url = FileLocator.find(bundle, new Path(resource), null);
+
+					try
+					{
+						url = FileLocator.resolve(url);
+
+						addBuildPath(name, url.toURI());
+					}
+					catch (URISyntaxException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		);
 		// @formatter:on
+	}
+
+	/**
+	 * Remove an existing build path from this manager
+	 * 
+	 * @param entry
+	 */
+	public void removeBuildPath(BuildPathEntry entry)
+	{
+		if (entry != null && buildPaths != null)
+		{
+			buildPaths.remove(entry);
+		}
+	}
+
+	/**
+	 * Remove an existing build path from this manager
+	 * 
+	 * @param displayName
+	 * @param path
+	 */
+	public void removeBuildPath(String displayName, URI path)
+	{
+		if (!StringUtil.isEmpty(displayName) && path != null)
+		{
+			removeBuildPath(new BuildPathEntry(displayName, path));
+		}
+	}
+
+	/**
+	 * setSelectedBuildPathEntries
+	 * 
+	 * @param project
+	 * @param entries
+	 */
+	public void setSelectedBuildPathEntries(IProject project, List<BuildPathEntry> entries)
+	{
+		List<String> nameAndPaths = new ArrayList<String>();
+
+		for (BuildPathEntry entry : entries)
+		{
+			String nameAndPath = entry.getDisplayName() + NAME_AND_PATH_DELIMITER + entry.getPath();
+
+			nameAndPaths.add(nameAndPath);
+		}
+
+		String value = StringUtil.join(BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
+
+		try
+		{
+			project.setPersistentProperty(getBuildPathPropertyName(), value);
+		}
+		catch (CoreException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

@@ -7,6 +7,8 @@
  */
 package com.aptana.ui.properties;
 
+import java.net.URI;
+
 /**
  * BuildPathEntry
  */
@@ -14,7 +16,7 @@ public class BuildPathEntry
 {
 	private boolean selected;
 	private String displayName;
-	private String path;
+	private URI path;
 
 	/**
 	 * BuildPathEntry
@@ -22,7 +24,7 @@ public class BuildPathEntry
 	 * @param displayName
 	 * @param path
 	 */
-	public BuildPathEntry(String displayName, String path)
+	public BuildPathEntry(String displayName, URI path)
 	{
 		this.displayName = displayName;
 		this.path = path;
@@ -62,7 +64,7 @@ public class BuildPathEntry
 	 * 
 	 * @return
 	 */
-	public String getPath()
+	public URI getPath()
 	{
 		return path;
 	}

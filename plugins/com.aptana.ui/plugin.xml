@@ -363,4 +363,12 @@
          </enabledWhen>
       </page>
    </extension>
+   <extension
+         point="com.aptana.index.core.fileContributors">
+      <contributor
+            class="com.aptana.ui.properties.BuildPathIndexContributor"
+            id="com.aptana.ui.properties.buildPathIndexContributor"
+            name="Build Path Index Contributor">
+      </contributor>
+   </extension>
 </plugin>
