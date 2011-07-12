@@ -21,7 +21,7 @@ import com.aptana.formatter.IFormatterDocument;
 public class AbstractFormatterNodeBuilder
 {
 	private final Stack<IFormatterContainerNode> stack = new Stack<IFormatterContainerNode>();
-	private static final Pattern COMMENT_PREFIX = Pattern.compile("^[\\s]*(//|/\\*|#|<!--)(.|\\n|\\r)*"); //$NON-NLS-1$
+	private static final Pattern COMMENT_PREFIX = Pattern.compile("^\\s*(//|/\\*|#|<!--).*", Pattern.DOTALL); //$NON-NLS-1$
 
 	protected void start(IFormatterContainerNode root)
 	{
