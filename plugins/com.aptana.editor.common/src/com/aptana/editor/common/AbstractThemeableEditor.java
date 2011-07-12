@@ -674,16 +674,21 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	protected FileService createFileService()
 	{
+		return new FileService(getContentTypeId());
+	}
+
+	protected String getContentTypeId()
+	{
 		try
 		{
 			IContentType contentType = ((TextFileDocumentProvider) getDocumentProvider())
 					.getContentType(getEditorInput());
-			return new FileService(contentType.getId());
+			return contentType.getId();
 		}
 		catch (Exception e)
 		{
 		}
-		return new FileService(null);
+		return null;
 	}
 
 	@Override

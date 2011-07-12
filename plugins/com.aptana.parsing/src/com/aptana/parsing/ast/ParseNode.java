@@ -50,6 +50,8 @@ public class ParseNode extends Node implements IParseNode
 	private int fChildrenCount;
 	private String fLanguage;
 
+	private boolean fFilteredFromOutline;
+
 	/**
 	 * ParseBaseNode
 	 * 
@@ -522,6 +524,11 @@ public class ParseNode extends Node implements IParseNode
 		return this.getChildCount() > 0;
 	}
 
+	public boolean isFilteredFromOutline()
+	{
+		return fFilteredFromOutline;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -638,13 +645,13 @@ public class ParseNode extends Node implements IParseNode
 			}
 
 			String message = MessageFormat.format( //
-				Messages.ParseNode_Bad_Ending_Offset, //
-				start, //
-				end, //
-				this.getLanguage(), //
-				this.getNodeType(), //
-				source //
-				);
+					Messages.ParseNode_Bad_Ending_Offset, //
+					start, //
+					end, //
+					this.getLanguage(), //
+					this.getNodeType(), //
+					source //
+					);
 
 			ParsingPlugin.logError(message, null);
 
@@ -662,6 +669,11 @@ public class ParseNode extends Node implements IParseNode
 	public void setParent(IParseNode parent)
 	{
 		fParent = parent;
+	}
+
+	public void setFilteredFromOutline(boolean filtered)
+	{
+		fFilteredFromOutline = filtered;
 	}
 
 	/*
