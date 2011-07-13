@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.Action;
@@ -670,6 +671,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
+	}
+
+	@Override
+	public void doSave(IProgressMonitor progressMonitor)
+	{
+		if (getEditorInput() instanceof UntitledFileStorageEditorInput)
+		{
+			// forces to show save as dialog on untitled file
+			performSaveAs(progressMonitor);
+		}
+		else
+		{
+			super.doSave(progressMonitor);
+		}
 	}
 
 	protected FileService createFileService()
