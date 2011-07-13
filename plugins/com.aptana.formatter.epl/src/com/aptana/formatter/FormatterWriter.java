@@ -483,6 +483,24 @@ public class FormatterWriter implements IFormatterWriter
 		excludes.excludeRegion(region, strategy);
 	}
 
+	/**
+	 * Exclude a list of regions.
+	 * 
+	 * @param regions
+	 * @param strategy
+	 * @see #excludeRegion(IRegion, EXCLUDE_STRATEGY)
+	 */
+	public void excludeRegions(List<IRegion> regions, EXCLUDE_STRATEGY strategy)
+	{
+		if (regions != null)
+		{
+			for (IRegion region : regions)
+			{
+				excludes.excludeRegion(region, strategy);
+			}
+		}
+	}
+
 	public void addNewLineCallback(IFormatterCallback callback)
 	{
 		newLineCallbacks.add(callback);

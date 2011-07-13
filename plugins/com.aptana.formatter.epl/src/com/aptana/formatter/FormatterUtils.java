@@ -11,20 +11,31 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.formatter.nodes.IFormatterTextNode;
 
 @SuppressWarnings("restriction")
 public class FormatterUtils
 {
-
 	public static boolean isSpace(char c)
 	{
 		return c == '\t' || c == ' ';
@@ -139,6 +150,110 @@ public class FormatterUtils
 	}
 
 	/**
+	 * Generate OFF-ON regions for the given map of comments, using the on-pattern and the off-pattern.<br>
+	 * The method will traverse the comments map and return a {@link Set} of valid regions that should be skipped in
+	 * case the Off/On was enabled.
+	 * 
+	 * @param commentsMap
+	 *            A {@link LinkedHashMap} of comments, ordered by their appearance in the document. The map key is the
+	 *            start offset of the comment-string that it's mapping to.
+	 * @param onPattern
+	 *            The 'ON' pattern (as defined in the formatter preferences).
+	 * @param offPattern
+	 *            The 'OFF' pattern (as defined in the formatter preferences).
+	 * @param documentEndOffset
+	 *            The end offset of the document.
+	 * @return A {@link List} of {@link IRegion} instances.
+	 */
+	public static List<IRegion> resolveOnOffRegions(LinkedHashMap<Integer, String> commentsMap, Pattern onPattern,
+			Pattern offPattern, int documentEndOffset)
+	{
+		List<IRegion> regions = new ArrayList<IRegion>();
+		boolean isOn = true;
+		int start = -1;
+		int end = -1;
+		int startCommentBeginOffset = -1;
+		for (Integer offset : commentsMap.keySet())
+		{
+			String comment = commentsMap.get(offset);
+			if (isOn)
+			{
+				// Look for an 'OFF' pattern
+				Matcher matcher = offPattern.matcher(comment);
+				if (matcher.find())
+				{
+					start = matcher.start();
+					startCommentBeginOffset = offset;
+					isOn = false;
+				}
+			}
+			else
+			{
+				// Look for an 'ON' pattern
+				Matcher matcher = onPattern.matcher(comment);
+				if (matcher.find())
+				{
+					end = matcher.end();
+					int regionStart = startCommentBeginOffset + start;
+					regions.add(new Region(regionStart, offset + end - regionStart));
+					// reset the values
+					isOn = true;
+					start = -1;
+					end = -1;
+					startCommentBeginOffset = -1;
+				}
+			}
+		}
+		if (start > -1 && end < 0)
+		{
+			// We need to add a region that will go all the way to the end of the document
+			start = startCommentBeginOffset + start;
+			regions.add(new Region(start, documentEndOffset - start));
+		}
+		return regions;
+	}
+
+	/**
+	 * Replace the output OFF/ON formatting regions with the original content from the input.
+	 * 
+	 * @param input
+	 * @param output
+	 * @param inputOffOnRegions
+	 *            A non null list of OFF/ON regions that were found on the input content.
+	 * @param outputOffOnRegions
+	 *            A list of OFF/ON regions that were found on the output content. This list may be null in case of an
+	 *            error.
+	 * @return A new output string that contains the original regions content from the input string between the Off and
+	 *         On formatter tags.
+	 * @throws CoreException
+	 *             In case the given outputOnOffRegions was null, or in case the size of the output-regions does not
+	 *             match the size of the input-regions.
+	 */
+	public static String applyOffOnRegions(String input, String output, List<IRegion> inputOffOnRegions,
+			List<IRegion> outputOffOnRegions) throws CoreException
+	{
+		// Validate the inputs...
+		if (outputOffOnRegions == null || inputOffOnRegions.size() != outputOffOnRegions.size())
+		{
+			IdeLog.logError(FormatterPlugin.getDefault(), outputOffOnRegions == null ? "Output OFF/ON regions was null" //$NON-NLS-1$
+					: "Output OFF/ON regions do not match in size to the input regions", (String) null); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID,
+					"Error applying the formatter ON-OFF regions")); //$NON-NLS-1$
+		}
+		StringBuilder outputBuffer = new StringBuilder(output);
+		for (int i = inputOffOnRegions.size() - 1; i >= 0; i--)
+		{
+			IRegion inputRegion = inputOffOnRegions.get(i);
+			IRegion outputRegion = outputOffOnRegions.get(i);
+			String originalString = input.substring(inputRegion.getOffset(),
+					inputRegion.getOffset() + inputRegion.getLength());
+			outputBuffer.replace(outputRegion.getOffset(), outputRegion.getOffset() + outputRegion.getLength(),
+					originalString);
+		}
+		return outputBuffer.toString();
+	}
+
+	/**
 	 * @param optionalStore
 	 *            - An optional preference store that may contain a searched key (can be null)
 	 * @param defaultStore
@@ -161,5 +276,4 @@ public class FormatterUtils
 		}
 		return prefs;
 	}
-
 }

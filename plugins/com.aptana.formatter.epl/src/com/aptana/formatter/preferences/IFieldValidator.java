@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.formatter.ui.preferences;
+package com.aptana.formatter.preferences;
 
 import org.eclipse.core.runtime.IStatus;
 

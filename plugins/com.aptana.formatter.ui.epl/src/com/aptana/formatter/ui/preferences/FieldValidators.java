@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IStatus;
 
+import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.ui.util.StatusInfo;
 
 public final class FieldValidators
@@ -22,6 +23,7 @@ public final class FieldValidators
 	// Available validators
 	public static final IFieldValidator POSITIVE_NUMBER_VALIDATOR = new PositiveNumberValidator();
 	public static final IFieldValidator PORT_VALIDATOR = new PortValidator();
+	public static final IFieldValidator EMPTY_TEXT_VALIDATOR = new EmptyTextValidator();
 
 	public static class PositiveNumberValidator implements IFieldValidator
 	{
@@ -108,6 +110,19 @@ public final class FieldValidators
 				}
 			}
 
+			return status;
+		}
+	}
+
+	public static class EmptyTextValidator implements IFieldValidator
+	{
+		public IStatus validate(String text)
+		{
+			StatusInfo status = new StatusInfo();
+			if (text.trim().length() == 0)
+			{
+				status.setError(Messages.FieldIsEmpty);
+			}
 			return status;
 		}
 	}

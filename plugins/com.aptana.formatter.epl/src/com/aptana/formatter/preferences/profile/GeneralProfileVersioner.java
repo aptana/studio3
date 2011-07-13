@@ -11,14 +11,14 @@
  *******************************************************************************/
 package com.aptana.formatter.preferences.profile;
 
-
 /**
  * Default implementation of the <code>IProfileVersioner</code>
  */
 public class GeneralProfileVersioner implements IProfileVersioner
 {
 
-	private static final int DEFAULT_VERSION = 1;
+	private static final int FIRST_VERSION = 1;
+	private static final int CURRENT_VERSION = 2;
 	private String formatter;
 
 	public GeneralProfileVersioner(String formatter)
@@ -28,12 +28,12 @@ public class GeneralProfileVersioner implements IProfileVersioner
 
 	public int getCurrentVersion()
 	{
-		return DEFAULT_VERSION;
+		return CURRENT_VERSION;
 	}
 
 	public int getFirstVersion()
 	{
-		return DEFAULT_VERSION;
+		return FIRST_VERSION;
 	}
 
 	public String getFormatterId()
@@ -44,6 +44,6 @@ public class GeneralProfileVersioner implements IProfileVersioner
 	public void update(IProfile profile)
 	{
 		if (profile instanceof CustomProfile)
-			((CustomProfile) profile).setVersion(DEFAULT_VERSION);
+			((CustomProfile) profile).setVersion(CURRENT_VERSION);
 	}
 }
