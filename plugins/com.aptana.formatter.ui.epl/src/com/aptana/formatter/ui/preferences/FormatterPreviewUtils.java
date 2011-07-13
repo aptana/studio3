@@ -14,6 +14,9 @@ package com.aptana.formatter.ui.preferences;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -32,22 +35,26 @@ import com.aptana.formatter.ui.util.Util;
 
 public class FormatterPreviewUtils
 {
-
+	// for substituting strings like {0}, {1}, etc.
+	private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile("\\{\\s*\\d+\\s*\\}"); //$NON-NLS-1$
 	private static final String LINE_SEPARATOR = "\n"; //$NON-NLS-1$
-
 	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
 
-	public static void updatePreview(ISourceViewer viewer, URL previewContent, IScriptFormatterFactory factory,
-			Map<String, String> preferences)
+	public static void updatePreview(ISourceViewer viewer, URL previewContent, String[] substitutions,
+			IScriptFormatterFactory factory, Map<String, String> preferences)
 	{
 		if (previewContent != null)
 		{
-			final String content;
+			String content;
 			try
 			{
 				final String c = new String(Util.getInputStreamAsCharArray(previewContent.openConnection()
 						.getInputStream(), -1, ENCODING));
 				content = Util.concatenate(Util.splitLines(c), LINE_SEPARATOR);
+				if (content != null && substitutions != null && substitutions.length > 0)
+				{
+					content = substitude(content, substitutions);
+				}
 			}
 			catch (IOException e)
 			{
@@ -106,8 +113,37 @@ public class FormatterPreviewUtils
 	private static void disablePreview(ISourceViewer viewer)
 	{
 		viewer.getTextWidget().setEnabled(false);
-		// TODO change background to gray
 		viewer.getDocument().set(Util.EMPTY_STRING);
 	}
 
+	/**
+	 * Do a content substitution by looking at the array size and looking for {0}...{n} strings and replace them with
+	 * the array's content.<br>
+	 * (Note - we use this method and not the NLS.bind() because it does not handle well code blocks existence)
+	 * 
+	 * @param content
+	 * @param substitutions
+	 * @return A string, substituted with the array's content.
+	 */
+	private static String substitude(String content, String[] substitutions)
+	{
+		StringBuilder buffer = new StringBuilder(content);
+		Matcher matcher = SUBSTITUTION_PATTERN.matcher(content);
+		int offset = 0;
+		while (matcher.find())
+		{
+			MatchResult matchResult = matcher.toMatchResult();
+			int beginIndex = matchResult.start();
+			int endIndex = matchResult.end();
+			int index = Integer.parseInt(content.substring(beginIndex + 1, endIndex - 1));
+			if (index >= 0 && index < substitutions.length)
+			{
+				String replacement = substitutions[index];
+				int matchLength = endIndex - beginIndex;
+				buffer.replace(offset + beginIndex, offset + endIndex, replacement);
+				offset += (replacement.length() - matchLength);
+			}
+		}
+		return buffer.toString();
+	}
 }

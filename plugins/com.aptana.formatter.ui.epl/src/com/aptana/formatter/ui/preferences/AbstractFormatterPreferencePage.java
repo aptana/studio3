@@ -190,7 +190,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			{
 				IScriptFormatterFactory factory = getSelectedFormatter();
 				IProfileManager manager = getProfileManager();
-				FormatterPreviewUtils.updatePreview(fSelectedPreviewViewer, factory.getPreviewContent(), factory,
+				FormatterPreviewUtils.updatePreview(fSelectedPreviewViewer, factory.getPreviewContent(), null, factory,
 						manager.getSelected(fProject).getSettings());
 			}
 		}

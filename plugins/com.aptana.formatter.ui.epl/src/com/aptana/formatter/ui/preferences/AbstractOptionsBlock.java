@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.preferences.PreferenceKey;
 import com.aptana.formatter.ui.dialogs.PropToPrefLinkArea;

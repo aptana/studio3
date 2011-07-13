@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
@@ -419,7 +420,7 @@ public class ControlBindingManager
 		}
 	}
 
-	private IStatus validateText(Text text)
+	protected IStatus validateText(Text text)
 	{
 		IFieldValidator validator = validatorManager.getValidator(text);
 		if ((validator != null) && text.isEnabled())

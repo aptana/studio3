@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
@@ -47,7 +48,8 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCheckbox(org.eclipse.swt.widgets.Composite, java.lang.Object, java.lang.String)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCheckbox(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, java.lang.String)
 	 */
 	public Button createCheckbox(Composite parent, Object key, String text)
 	{
@@ -56,7 +58,8 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCheckbox(org.eclipse.swt.widgets.Composite, java.lang.Object, java.lang.String, int)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCheckbox(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, java.lang.String, int)
 	 */
 	public Button createCheckbox(Composite parent, Object key, String text, int hspan)
 	{
@@ -67,7 +70,8 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCombo(org.eclipse.swt.widgets.Composite, java.lang.Object, java.lang.String, java.lang.String[])
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCombo(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, java.lang.String, java.lang.String[])
 	 */
 	public Combo createCombo(Composite parent, Object key, String label, String[] items)
 	{
@@ -80,7 +84,8 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCombo(org.eclipse.swt.widgets.Composite, java.lang.Object, java.lang.String, java.lang.String[], java.lang.String[])
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createCombo(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, java.lang.String, java.lang.String[], java.lang.String[])
 	 */
 	public Combo createCombo(Composite parent, Object key, String label, String[] itemValues, String[] itemLabels)
 	{
@@ -93,7 +98,8 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createNumber(org.eclipse.swt.widgets.Composite, java.lang.Object, java.lang.String)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createNumber(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, java.lang.String)
 	 */
 	public Text createNumber(Composite parent, Object key, String label)
 	{
@@ -106,7 +112,31 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createManagedList(org.eclipse.swt.widgets.Group, java.lang.Object)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createText(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, java.lang.String)
+	 */
+	public Text createText(Composite parent, Object key, String label)
+	{
+		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		bindingManager.bindControl(text, key, FieldValidators.EMPTY_TEXT_VALIDATOR);
+		registerAssociatedLabel(text, labelControl);
+		return text;
+	}
+
+	public Text createText(Composite parent, Object key, String label, IFieldValidator validator)
+	{
+		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		bindingManager.bindControl(text, key, validator);
+		registerAssociatedLabel(text, labelControl);
+		return text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createManagedList(org.eclipse.swt.widgets.Group,
+	 * java.lang.Object)
 	 */
 	public Control createManagedList(Group group, Object key)
 	{
@@ -138,13 +168,19 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 		{
 			label.setEnabled(enabled);
 		}
+		if (control instanceof Text)
+		{
+			IStatus status = bindingManager.validateText((Text) control);
+			bindingManager.updateStatus(status);
+		}
 	}
 
 	private final ListenerList initListeners = new ListenerList();
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#addInitializeListener(com.aptana.formatter.ui.IFormatterControlManager.IInitializeListener)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#addInitializeListener(com.aptana.formatter.ui.
+	 * IFormatterControlManager.IInitializeListener)
 	 */
 	public void addInitializeListener(IInitializeListener listener)
 	{
@@ -153,7 +189,8 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#removeInitializeListener(com.aptana.formatter.ui.IFormatterControlManager.IInitializeListener)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#removeInitializeListener(com.aptana.formatter.ui.
+	 * IFormatterControlManager.IInitializeListener)
 	 */
 	public void removeInitializeListener(IInitializeListener listener)
 	{
