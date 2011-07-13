@@ -58,18 +58,18 @@
 	<target name="clone-bundle">
 		<delete dir="${bundle.dir.name}" failonerror="true"/>
 		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}"></echo>
-		<exec executable="/bin/bash" dir="bundles">
+		<exec executable="/bin/bash" dir="bundles" failonerror="true">
 			<arg value="-c" />
 			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
 		</exec>
 		<!-- Checkout the specified branch -->
 		<echo message="git checkout ${bundle.branch}"></echo>
-		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
+		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}" failonerror="true">
 			<arg value="-c" />
 			<arg value="git checkout ${bundle.branch}" />
 		</exec>
 		<!-- Grab lastmod and append it to file containing all of the lastmods for each packaged ruble -->
-		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}" append="true" output="bundle_timestamps.txt">
+		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}" append="true" output="bundle_timestamps.txt" failonerror="true">
 			<arg value="-c" />
 			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
 		</exec>
