@@ -18,6 +18,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSStackFrame;
@@ -43,7 +44,7 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 	 * @see org.eclipse.jface.text.ITextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
 	 */
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
-		return null; // JavaWordFinder.findWord(textViewer.getDocument(), offset);
+		return findWord(textViewer.getDocument(), offset);
 	}
 
 	/* (non-Javadoc)
@@ -132,6 +133,49 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 			modelPresentation.setAttribute(IDebugModelPresentation.DISPLAY_VARIABLE_TYPE_NAMES, Boolean.TRUE);
 		}
 		return modelPresentation;
+	}
+
+	public static IRegion findWord(IDocument document, int offset) {
+		int start = -2;
+		int end = -1;
+
+		try {
+			int pos = offset;
+			char c;
+
+			while (pos >= 0) {
+				c = document.getChar(pos);
+				if (!Character.isJavaIdentifierPart(c)) {
+					break;
+				}
+				--pos;
+			}
+			start = pos;
+
+			pos = offset;
+			int length = document.getLength();
+
+			while (pos < length) {
+				c = document.getChar(pos);
+				if (!Character.isJavaIdentifierPart(c)) {
+					break;
+				}
+				++pos;
+			}
+			end = pos;
+
+		} catch (BadLocationException ignore) {
+		}
+
+		if (start >= -1 && end > -1) {
+			if (start == offset && end == offset) {
+				return new Region(offset, 0);
+			} else if (start == offset) {
+				return new Region(start, end - start);
+			}
+			return new Region(start + 1, end - start - 1);
+		}
+		return null;
 	}
 
 }

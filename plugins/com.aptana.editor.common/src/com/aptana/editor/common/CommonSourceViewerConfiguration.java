@@ -10,6 +10,7 @@ package com.aptana.editor.common;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -544,35 +545,44 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2
-	{
+	private List<TextHoverDescriptor> getEnabledTextHoverDescriptors(ITextViewer textViewer, int offset) {
+		List<TextHoverDescriptor> result = new ArrayList<TextHoverDescriptor>();
+		try {
+			QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), offset);
+			EvaluationContext context = new EvaluationContext(null, textViewer);
+			context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
+			for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers()) {
+				if (descriptor.isEnabledFor(contentType, context)) {
+					result.add(descriptor);
+				}
+			}
+		} catch (BadLocationException e) {
+		}
+		return result;
+	}
+
+
+	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2 {
 
 		private ITextHover activeTextHover;
 
-		public TextHover(ISourceViewer sourceViewer)
-		{
+		public TextHover(ISourceViewer sourceViewer) {
 			super(sourceViewer);
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer,
-		 * org.eclipse.jface.text.IRegion)
+		 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
 		 */
 		@SuppressWarnings("deprecation")
-		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
-		{
+		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
 			Object info = null;
-			if (activeTextHover instanceof ITextHoverExtension2)
-			{
+			if (activeTextHover instanceof ITextHoverExtension2) {
 				info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
-			}
-			else if (activeTextHover != null)
-			{
+			} else if (activeTextHover != null) {
 				info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
 			}
-			if (info != null)
-			{
+			if (info != null) {
 				return info;
 			}
 			return super.getHoverInfo(textViewer, hoverRegion);
@@ -582,36 +592,30 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.text.DefaultTextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
 		 */
+		@SuppressWarnings("deprecation")
 		@Override
-		public IRegion getHoverRegion(ITextViewer textViewer, int offset)
-		{
+		public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
 			activeTextHover = null;
-			try
-			{
-				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-						.getContentType(textViewer.getDocument(), offset);
-				EvaluationContext context = new EvaluationContext(null, textViewer);
-				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
-				for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers())
-				{
-					if (descriptor.isEnabledFor(contentType, context))
-					{
-						ITextHover textHover = descriptor.createTextHover();
-						IRegion region = null;
-						if (textHover != null)
-						{
-							region = textHover.getHoverRegion(textViewer, offset);
-						}
-						if (region != null)
-						{
-							activeTextHover = textHover;
-							return region;
+			List<TextHoverDescriptor> descriptors = getEnabledTextHoverDescriptors(textViewer, offset);
+			for (TextHoverDescriptor descriptor : descriptors) {
+				ITextHover textHover = descriptor.createTextHover();
+				IRegion region = null;
+				if (textHover != null) {
+					region = textHover.getHoverRegion(textViewer, offset);
+				}
+				if (region != null) {
+					if (descriptors.size() > 1) {
+						if (textHover instanceof ITextHoverExtension2) {
+							if (((ITextHoverExtension2) textHover).getHoverInfo2(textViewer, region) == null) {
+								continue;
+							}
+						} else if (textHover.getHoverInfo(textViewer, region) == null) {
+							continue;
 						}
 					}
+					activeTextHover = textHover;
+					return region;
 				}
-			}
-			catch (BadLocationException e)
-			{
 			}
 			return super.getHoverRegion(textViewer, offset);
 		}
@@ -620,16 +624,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
 		 */
-		public IInformationControlCreator getHoverControlCreator()
-		{
-			if (activeTextHover instanceof ITextHoverExtension)
-			{
+		public IInformationControlCreator getHoverControlCreator() {
+			if (activeTextHover instanceof ITextHoverExtension) {
 				return ((ITextHoverExtension) activeTextHover).getHoverControlCreator();
 			}
-			return new IInformationControlCreator()
-			{
-				public IInformationControl createInformationControl(Shell parent)
-				{
+			return new IInformationControlCreator() {
+				public IInformationControl createInformationControl(Shell parent) {
 					return createTextHoverInformationControl(parent, EditorsUI.getTooltipAffordanceString());
 				}
 			};
@@ -640,8 +640,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 * @see org.eclipse.jface.text.DefaultTextHover#isIncluded(org.eclipse.jface.text.source.Annotation)
 		 */
 		@Override
-		protected boolean isIncluded(Annotation annotation)
-		{
+		protected boolean isIncluded(Annotation annotation) {
 			return isShownInText(annotation);
 		}
 	}
