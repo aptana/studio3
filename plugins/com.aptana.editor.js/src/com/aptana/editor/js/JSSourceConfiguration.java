@@ -57,12 +57,12 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
-			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new EmptyCommentRule(new Token(JS_MULTILINE_COMMENT)),
-			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new EndOfLineRule("//", getToken(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
+			new SingleLineRule("\"", "\"", getToken(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\'", "\'", getToken(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new EmptyCommentRule(getToken(JS_MULTILINE_COMMENT)),
+			new MultiLineRule("/**", "*/", getToken(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("/*", "*/", getToken(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new JSRegExpRule(new Token(JS_REGEXP)) };
 
 	private JSCodeScanner codeScanner;

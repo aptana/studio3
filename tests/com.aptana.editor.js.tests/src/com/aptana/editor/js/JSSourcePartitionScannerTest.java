@@ -79,6 +79,36 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 36);
 	}
 
+	public void testPartitioningOfJSDocSpanningSingleLine()
+	{
+		String source =
+		// 1 2 3 4 5
+		// 012345678901234567890123456789012345678901234567890
+		"/**This is JS comment on one Line */\n";
+
+		assertContentType(JSSourceConfiguration.JS_DOC, source, 0);
+		assertContentType(JSSourceConfiguration.JS_DOC, source, 1);
+		assertContentType(JSSourceConfiguration.JS_DOC, source, 2);
+		assertContentType(JSSourceConfiguration.JS_DOC, source, 33);
+		assertContentType(JSSourceConfiguration.JS_DOC, source, 34);
+		assertContentType(JSSourceConfiguration.JS_DOC, source, 35);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 36);
+	}
+
+	public void testPartitioningOfEmptyComment()
+	{
+		String source =
+		// 1 2 3 4 5
+		// 012345678901234567890123456789012345678901234567890
+		"/**/\n";
+
+		assertContentType(JSSourceConfiguration.JS_MULTILINE_COMMENT, source, 0);
+		assertContentType(JSSourceConfiguration.JS_MULTILINE_COMMENT, source, 1);
+		assertContentType(JSSourceConfiguration.JS_MULTILINE_COMMENT, source, 2);
+		assertContentType(JSSourceConfiguration.JS_MULTILINE_COMMENT, source, 3);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 4);
+	}
+
 	public void testDivisionIsntPickedUpAsRegexp()
 	{
 		String source =
