@@ -11,8 +11,12 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.eclipse.jface.text.IRegion;
 
 import beaver.Symbol;
 
@@ -93,6 +97,7 @@ import com.aptana.editor.js.parsing.ast.JSVarNode;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.NodeTypes.TypeOperator;
@@ -112,6 +117,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private boolean hasErrors;
 	private Set<Integer> singleLinecommentEndOffsets;
 	private Set<Integer> multiLinecommentEndOffsets;
+	private List<IRegion> onOffRegions;
 
 	/**
 	 * @param parseResult
@@ -124,7 +130,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		final IFormatterContainerNode rootNode = new FormatterJSRootNode(document);
 		start(rootNode);
 		JSParseRootNode jsRootNode = (JSParseRootNode) parseResult;
-		generateSingleLineCommentEndOffsets(jsRootNode.getCommentNodes());
+		generateCommentEndOffsets(jsRootNode.getCommentNodes());
 		jsRootNode.accept(new JSFormatterTreeWalker());
 		checkedPop(rootNode, document.getLength());
 		return rootNode;
@@ -140,7 +146,15 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return hasErrors;
 	}
 
-	private void generateSingleLineCommentEndOffsets(IParseNode[] comments)
+	/**
+	 * @return
+	 */
+	public List<IRegion> getOffOnRegions()
+	{
+		return onOffRegions;
+	}
+
+	private void generateCommentEndOffsets(IParseNode[] comments)
 	{
 		singleLinecommentEndOffsets = new HashSet<Integer>();
 		multiLinecommentEndOffsets = new HashSet<Integer>();
@@ -148,18 +162,40 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			return;
 		}
+		boolean onOffEnabled = document.getBoolean(JSFormatterConstants.FORMATTER_OFF_ON_ENABLED);
+		LinkedHashMap<Integer, String> commentsMap = onOffEnabled ? new LinkedHashMap<Integer, String>(comments.length)
+				: null;
 		for (IParseNode comment : comments)
 		{
 			short commentType = comment.getNodeType();
+			int end = comment.getEndingOffset();
 			if (commentType == JSNodeTypes.SINGLE_LINE_COMMENT)
 			{
-				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset()));
+				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end));
 			}
 			else if (commentType == JSNodeTypes.MULTI_LINE_COMMENT || commentType == JSNodeTypes.SDOC_COMMENT
 					|| commentType == JSNodeTypes.VSDOC_COMMENT)
 			{
-				multiLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset() + 1));
+				multiLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end + 1));
 			}
+			// Add to the map of comments when the On-Off is enabled.
+			if (onOffEnabled)
+			{
+				int start = comment.getStartingOffset();
+				// The end offset of a JS multi-line comment should be increased by 1 in order to include the last
+				// closing char. However, for the OFF/ON support it does'nt really matter, since the regex will never
+				// match that ending char, so we can simply use the 'end' offset as is.
+				String commentStr = document.get(start, end);
+				commentsMap.put(start, commentStr);
+			}
+		}
+		// Generate the On-Off regions
+		if (onOffEnabled && !commentsMap.isEmpty())
+		{
+			Pattern onPattern = Pattern.compile(Pattern.quote(document.getString(JSFormatterConstants.FORMATTER_ON)));
+			Pattern offPattern = Pattern.compile(Pattern.quote(document.getString(JSFormatterConstants.FORMATTER_OFF)));
+			onOffRegions = FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
+					document.getLength() - 1);
 		}
 	}
 
@@ -1778,7 +1814,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				else
 				{
 					// we'll have a problem with such a node.
-					IdeLog.logError(JSFormatterPlugin.getDefault(),
+					IdeLog.logError(
+							JSFormatterPlugin.getDefault(),
 							MessageFormat.format("Expected JSFormatter and got {0}", child.getClass().getName()), (Throwable) null); //$NON-NLS-1$
 				}
 			}
