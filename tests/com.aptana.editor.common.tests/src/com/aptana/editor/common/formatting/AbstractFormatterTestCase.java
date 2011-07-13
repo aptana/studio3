@@ -38,7 +38,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	 */
 	public Test suite()
 	{
-		TestSuite suite = new TestSuite("Auto Code Assist Tests");
+		TestSuite suite = new TestSuite("Formatter Tests");
 		String[] files = getFiles();
 		for (final String fileName : files)
 		{

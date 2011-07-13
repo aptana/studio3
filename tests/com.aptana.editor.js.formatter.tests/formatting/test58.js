@@ -4337,7 +4337,7 @@ else if(m[1] == "@") {
                             try {
                                 modRes = xml.getResponseHeader("Last-Modified");
                             } catch(e) {
-                            } // swallow exception thrown by FF if header is not available
+                            }// swallow exception thrown by FF if header is not available
 
                             if(s.ifModified && modRes)
                                 jQuery.lastModified[s.url] = modRes;

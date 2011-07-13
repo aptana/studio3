@@ -77,7 +77,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getContentTypeId()
+	protected String getFileServiceContentTypeId()
 	{
 		return IJSConstants.CONTENT_TYPE_JS;
 	}

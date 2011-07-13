@@ -58,7 +58,7 @@ function test(){ //noformat
 			
 			var i;
 ==FORMATTED==
-function test() { //noformat
+function test() {//noformat
 
     var i;
 }//format

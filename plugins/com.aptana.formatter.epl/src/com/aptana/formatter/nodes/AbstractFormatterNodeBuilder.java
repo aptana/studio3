@@ -13,6 +13,7 @@ package com.aptana.formatter.nodes;
 
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
@@ -20,6 +21,7 @@ import com.aptana.formatter.IFormatterDocument;
 public class AbstractFormatterNodeBuilder
 {
 	private final Stack<IFormatterContainerNode> stack = new Stack<IFormatterContainerNode>();
+	private static final Pattern COMMENT_PREFIX = Pattern.compile("^\\s*(//|/\\*|#|<!--).*", Pattern.DOTALL); //$NON-NLS-1$
 
 	protected void start(IFormatterContainerNode root)
 	{
@@ -51,8 +53,14 @@ public class AbstractFormatterNodeBuilder
 
 	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, int pos)
 	{
-		if (parentNode.getEndOffset() < pos)
+
+		int startOffset = parentNode.getEndOffset();
+
+		if (startOffset < pos)
 		{
+			IFormatterDocument document = parentNode.getDocument();
+			String text = document.get(startOffset, pos);
+
 			// Check if the node should consume any gaps that we have to previous node end offset.
 			// This way, we can consume all white-spaces in between.
 			// The check take into consideration the value of the previous node's getSpacesCountAfter(), so that we do
@@ -65,7 +73,6 @@ public class AbstractFormatterNodeBuilder
 				{
 					preservedSpaces = children.get(children.size() - 1).getSpacesCountAfter();
 				}
-				String text = parentNode.getDocument().get(parentNode.getEndOffset(), pos);
 				if (text.trim().length() == 0 && preservedSpaces == 0)
 				{
 					return;
@@ -78,20 +85,40 @@ public class AbstractFormatterNodeBuilder
 						break;
 					}
 				}
-				int newPos = Math
-						.max(parentNode.getEndOffset(), pos - (text.length() - rightPos + preservedSpaces) + 1);
+				int newPos = Math.max(startOffset, pos - (text.length() - rightPos + preservedSpaces) + 1);
 				if (newPos < pos && preservedSpaces > 0)
 				{
-					if (!Character.isWhitespace(parentNode.getDocument().charAt(newPos)))
+					if (!Character.isWhitespace(document.charAt(newPos)))
 					{
 						newPos = pos;// revert
 					}
 				}
 				pos = newPos;
-
 			}
-			parentNode.addChild(createTextNode(parentNode.getDocument(), parentNode.getEndOffset(), pos));
 
+			// Skip spaces and tabs if it is a comment
+			String trimmedText = text.trim();
+			if (COMMENT_PREFIX.matcher(trimmedText).matches())
+			{
+				while ((document.charAt(startOffset) == ' ' || document.charAt(startOffset) == '\t')
+						&& (startOffset < pos - 1))
+				{
+					startOffset++;
+				}
+
+				// For block comments, we also skip trailing white spaces
+
+				if ((trimmedText.startsWith("/*") && trimmedText.endsWith("*/")) || (trimmedText.startsWith("<!--") && trimmedText.endsWith("-->"))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				{
+					while ((document.charAt(pos - 1) == ' ' || document.charAt(pos - 1) == '\t')
+							&& (startOffset < pos - 1))
+					{
+						pos--;
+					}
+				}
+			}
+
+			parentNode.addChild(createTextNode(document, startOffset, pos));
 		}
 	}
 
