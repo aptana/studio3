@@ -674,10 +674,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	protected FileService createFileService()
 	{
-		return new FileService(getContentTypeId());
+		return new FileService(getFileServiceContentTypeId());
 	}
 
-	protected String getContentTypeId()
+	protected String getFileServiceContentTypeId()
 	{
 		try
 		{

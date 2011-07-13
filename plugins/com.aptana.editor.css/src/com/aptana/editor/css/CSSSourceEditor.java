@@ -82,7 +82,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getContentTypeId()
+	protected String getFileServiceContentTypeId()
 	{
 		return ICSSConstants.CONTENT_TYPE_CSS;
 	}
