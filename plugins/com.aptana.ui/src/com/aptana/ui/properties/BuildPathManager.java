@@ -65,6 +65,7 @@ public class BuildPathManager
 	}
 
 	private List<BuildPathEntry> buildPaths;
+	private List<IBuildPathContributor> contributors;
 
 	/**
 	 * Make sure this is a singleton
@@ -106,6 +107,24 @@ public class BuildPathManager
 	}
 
 	/**
+	 * Add a dynamic file contributor
+	 * 
+	 * @param contributor
+	 */
+	protected void addContributor(IBuildPathContributor contributor)
+	{
+		if (contributor != null)
+		{
+			if (contributors == null)
+			{
+				contributors = new ArrayList<IBuildPathContributor>();
+			}
+
+			contributors.add(contributor);
+		}
+	}
+
+	/**
 	 * getBuildPathPropertyName
 	 * 
 	 * @return
@@ -122,11 +141,48 @@ public class BuildPathManager
 	 */
 	public List<BuildPathEntry> getBuildPaths()
 	{
-		List<BuildPathEntry> result = Collections.emptyList();
+		List<BuildPathEntry> result;
 
 		if (buildPaths != null)
 		{
-			result = buildPaths;
+			result = new ArrayList<BuildPathEntry>(buildPaths);
+
+			result.addAll(getDynamicBuildPaths());
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * getDynamicBuildPaths
+	 * 
+	 * @return
+	 */
+	private List<BuildPathEntry> getDynamicBuildPaths()
+	{
+		List<BuildPathEntry> result;
+
+		if (contributors != null)
+		{
+			result = new ArrayList<BuildPathEntry>();
+
+			for (IBuildPathContributor contributor : contributors)
+			{
+				List<BuildPathEntry> files = contributor.contribute();
+
+				if (files != null)
+				{
+					result.addAll(files);
+				}
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -218,15 +274,8 @@ public class BuildPathManager
 						else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
 						{
 							IBuildPathContributor contributor = (IBuildPathContributor) element.createExecutableExtension(ATTR_CLASS);
-							List<BuildPathEntry> entries = contributor.contribute();
 
-							if (entries != null)
-							{
-								for (BuildPathEntry entry : entries)
-								{
-									addBuildPath(entry);
-								}
-							}
+							addContributor(contributor);
 						}
 					}
 					catch (URISyntaxException e)
