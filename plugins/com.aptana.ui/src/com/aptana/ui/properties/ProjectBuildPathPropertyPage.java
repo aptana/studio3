@@ -10,15 +10,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,7 +31,7 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
 import com.aptana.index.core.RebuildIndexJob;
 
-public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkbenchPropertyPage, ICheckStateListener
+public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkbenchPropertyPage
 {
 	private IProject project;
 	private CheckboxTableViewer tableViewer;
@@ -42,15 +40,6 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 * ProjectBuildPathPropertyPage
 	 */
 	public ProjectBuildPathPropertyPage()
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
-	 */
-	public void checkStateChanged(CheckStateChangedEvent event)
 	{
 	}
 
@@ -92,7 +81,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 
 		TableColumn column1 = new TableColumn(table, SWT.LEFT);
 		column1.setText("Library");
-		column1.setWidth(150);
+		column1.setWidth(165);
 
 		TableColumn column2 = new TableColumn(table, SWT.LEFT);
 		column2.setText("Path");
@@ -100,22 +89,35 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 
 		tableViewer.setContentProvider(getContentProvider());
 		tableViewer.setLabelProvider(getLabelProvider());
-		// tableViewer.setComparator(getCompartor());
+		tableViewer.setComparator(getCompartor());
 		tableViewer.setInput(entries);
 		tableViewer.setCheckedElements(selectedEntries.toArray());
-		tableViewer.addCheckStateListener(this);
-		// @formatter:off
-		tableViewer.addSelectionChangedListener(
-			new ISelectionChangedListener()
-			{
-				public void selectionChanged(SelectionChangedEvent event)
-				{
-				}
-			}
-		);
-		// @formatter:on
 
 		return composite;
+	}
+
+	/**
+	 * @return
+	 */
+	private ViewerComparator getCompartor()
+	{
+		return new ViewerComparator()
+		{
+			public int compare(Viewer viewer, Object e1, Object e2)
+			{
+				int result = 0;
+
+				if (e1 instanceof BuildPathEntry && e2 instanceof BuildPathEntry)
+				{
+					BuildPathEntry bpe1 = (BuildPathEntry) e1;
+					BuildPathEntry bpe2 = (BuildPathEntry) e2;
+
+					result = bpe1.getDisplayName().compareTo(bpe2.getDisplayName());
+				}
+
+				return result;
+			}
+		};
 	}
 
 	/**
@@ -219,6 +221,11 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 
 						case 1:
 							result = entry.getPath().toString();
+
+							if (result != null && result.startsWith("file:"))
+							{
+								result = result.substring(5);
+							}
 							break;
 					}
 				}
