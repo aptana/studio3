@@ -214,14 +214,14 @@ public class FormatterUtils
 	}
 
 	/**
-	 * Replace the output On-Off formatting regions with the original content from the input.
+	 * Replace the output OFF/ON formatting regions with the original content from the input.
 	 * 
 	 * @param input
 	 * @param output
-	 * @param inputOnOffRegions
-	 *            A non null list of On-Off regions that were found on the input content.
-	 * @param outputOnOffRegions
-	 *            A list of On-Off regions that were found on the output content. This list may be null in case of an
+	 * @param inputOffOnRegions
+	 *            A non null list of OFF/ON regions that were found on the input content.
+	 * @param outputOffOnRegions
+	 *            A list of OFF/ON regions that were found on the output content. This list may be null in case of an
 	 *            error.
 	 * @return A new output string that contains the original regions content from the input string between the Off and
 	 *         On formatter tags.
@@ -229,22 +229,22 @@ public class FormatterUtils
 	 *             In case the given outputOnOffRegions was null, or in case the size of the output-regions does not
 	 *             match the size of the input-regions.
 	 */
-	public static String applyOnOffRegions(String input, String output, List<IRegion> inputOnOffRegions,
-			List<IRegion> outputOnOffRegions) throws CoreException
+	public static String applyOffOnRegions(String input, String output, List<IRegion> inputOffOnRegions,
+			List<IRegion> outputOffOnRegions) throws CoreException
 	{
 		// Validate the inputs...
-		if (outputOnOffRegions == null || inputOnOffRegions.size() != outputOnOffRegions.size())
+		if (outputOffOnRegions == null || inputOffOnRegions.size() != outputOffOnRegions.size())
 		{
-			IdeLog.logError(FormatterPlugin.getDefault(), outputOnOffRegions == null ? "Output ON-OFF regions was null" //$NON-NLS-1$
-					: "Outopt ON-OFF regions do not match in size to the input regions", (String) null); //$NON-NLS-1$
+			IdeLog.logError(FormatterPlugin.getDefault(), outputOffOnRegions == null ? "Output OFF/ON regions was null" //$NON-NLS-1$
+					: "Output OFF/ON regions do not match in size to the input regions", (String) null); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID,
 					"Error applying the formatter ON-OFF regions")); //$NON-NLS-1$
 		}
 		StringBuilder outputBuffer = new StringBuilder(output);
-		for (int i = inputOnOffRegions.size() - 1; i >= 0; i--)
+		for (int i = inputOffOnRegions.size() - 1; i >= 0; i--)
 		{
-			IRegion inputRegion = inputOnOffRegions.get(i);
-			IRegion outputRegion = outputOnOffRegions.get(i);
+			IRegion inputRegion = inputOffOnRegions.get(i);
+			IRegion outputRegion = outputOffOnRegions.get(i);
 			String originalString = input.substring(inputRegion.getOffset(),
 					inputRegion.getOffset() + inputRegion.getLength());
 			outputBuffer.replace(outputRegion.getOffset(), outputRegion.getOffset() + outputRegion.getLength(),

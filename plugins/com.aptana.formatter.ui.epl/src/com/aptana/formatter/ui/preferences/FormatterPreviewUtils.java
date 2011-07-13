@@ -53,7 +53,7 @@ public class FormatterPreviewUtils
 				content = Util.concatenate(Util.splitLines(c), LINE_SEPARATOR);
 				if (content != null && substitutions != null && substitutions.length > 0)
 				{
-					content = substitude(content, substitutions);
+					content = substitute(content, substitutions);
 				}
 			}
 			catch (IOException e)
@@ -125,7 +125,7 @@ public class FormatterPreviewUtils
 	 * @param substitutions
 	 * @return A string, substituted with the array's content.
 	 */
-	private static String substitude(String content, String[] substitutions)
+	private static String substitute(String content, String[] substitutions)
 	{
 		StringBuilder buffer = new StringBuilder(content);
 		Matcher matcher = SUBSTITUTION_PATTERN.matcher(content);
