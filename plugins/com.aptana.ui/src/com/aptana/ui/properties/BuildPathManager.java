@@ -40,8 +40,10 @@ public class BuildPathManager
 
 	private static final String BUILD_PATHS_ID = "buildPaths"; //$NON-NLS-1$
 	private static final String ELEMENT_BUILD_PATH = "buildPath"; //$NON-NLS-1$
+	private static final String ELEMENT_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
+	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
 	private static BuildPathManager instance;
 
@@ -189,25 +191,43 @@ public class BuildPathManager
 		EclipseUtil.processConfigurationElements(
 			UIPlugin.PLUGIN_ID,
 			BUILD_PATHS_ID,
-			ELEMENT_BUILD_PATH,
 			new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
 				{
-					IExtension extension = element.getDeclaringExtension();
-					String pluginId = extension.getNamespaceIdentifier();
-					Bundle bundle = Platform.getBundle(pluginId);
-
-					String name = element.getAttribute(ATTR_NAME);
-					String resource = element.getAttribute(ATTR_PATH);
-
-					URL url = FileLocator.find(bundle, new Path(resource), null);
-
 					try
 					{
-						url = FileLocator.resolve(url);
+						if (ELEMENT_BUILD_PATH.equals(element.getName()))
+						{
+							// get extension pt's bundle
+							IExtension extension = element.getDeclaringExtension();
+							String pluginId = extension.getNamespaceIdentifier();
+							Bundle bundle = Platform.getBundle(pluginId);
 
-						addBuildPath(name, url.toURI());
+							// grab the item's display name
+							String name = element.getAttribute(ATTR_NAME);
+
+							// get the item's URI, resolved to a local file
+							String resource = element.getAttribute(ATTR_PATH);
+							URL url = FileLocator.find(bundle, new Path(resource), null);
+							url = FileLocator.resolve(url);
+
+							// add item to master list
+							addBuildPath(name, url.toURI());
+						}
+						else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
+						{
+							IBuildPathContributor contributor = (IBuildPathContributor) element.createExecutableExtension(ATTR_CLASS);
+							List<BuildPathEntry> entries = contributor.contribute();
+
+							if (entries != null)
+							{
+								for (BuildPathEntry entry : entries)
+								{
+									addBuildPath(entry);
+								}
+							}
+						}
 					}
 					catch (URISyntaxException e)
 					{
@@ -219,8 +239,15 @@ public class BuildPathManager
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					catch (CoreException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			}
+			},
+			ELEMENT_BUILD_PATH,
+			ELEMENT_CONTRIBUTOR
 		);
 		// @formatter:on
 	}
