@@ -11,6 +11,54 @@
                class="com.aptana.projects.WebProjectNature">
          </run>
       </runtime>
+      <content-type
+            id="com.aptana.contenttype.beaver">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.coffeescript">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.css">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.diff">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.dtd">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.html">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.idl">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.js">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.jsca">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.jsca">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.jss">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.markdown">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.sdocml">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.svg">
+      </content-type>
+      <content-type
+            id="com.aptana.contenttype.xsl">
+      </content-type>
+      <content-type
+            id="com.aptana.editor.text.content-type.generic">
+      </content-type>
    </extension>
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
