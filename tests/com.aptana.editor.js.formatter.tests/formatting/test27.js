@@ -55,5 +55,5 @@ js.formatter.brace.position.blocks=same.line
 }
 ==FORMATTED==
 /*0*/
-for/*1*/(/*2*/x/*33*/ in  /*4*/ z/*5*/) {
+for/*1*/(/*2*/x/*33*/ in /*4*/ z/*5*/) {
 }

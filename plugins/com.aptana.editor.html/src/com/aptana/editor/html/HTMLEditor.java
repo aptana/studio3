@@ -81,11 +81,17 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		FileService fileService = new FileService(IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
+		FileService fileService = new FileService(getFileServiceContentTypeId(), new HTMLParseState());
 		IValidationManager validationManager = fileService.getValidationManager();
 		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
 		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
 		return fileService;
+	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 
 	/**

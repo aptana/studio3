@@ -53,4 +53,4 @@ js.formatter.brace.position.blocks=same.line
 ==CONTENT==
 new /*1*/x/*2*/(/*3*/a);
 ==FORMATTED==
-new /*1*/ x/*2*/(/*3*/a);
+new/*1*/ x/*2*/(/*3*/a);

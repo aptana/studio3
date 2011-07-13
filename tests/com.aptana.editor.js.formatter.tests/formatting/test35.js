@@ -54,5 +54,5 @@ js.formatter.brace.position.blocks=same.line
 with /*0*/(x) {
 }
 ==FORMATTED==
-with /*0*/(x) {
+with/*0*/(x) {
 }

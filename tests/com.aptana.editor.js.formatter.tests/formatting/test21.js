@@ -54,5 +54,5 @@ js.formatter.brace.position.blocks=same.line
 var test /*1*/ = //2ssdsd
 "test";
 ==FORMATTED==
-var test /*1*/ =  //2ssdsd
+var test/*1*/ = //2ssdsd
 "test";
