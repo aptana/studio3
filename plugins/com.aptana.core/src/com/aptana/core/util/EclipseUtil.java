@@ -447,14 +447,13 @@ public class EclipseUtil
 	 * 
 	 * @param pluginId
 	 * @param extensionPointId
-	 * @param elementName
 	 * @param processor
+	 * @param elementNames
 	 */
-	public static void processConfigurationElements(String pluginId, String extensionPointId, String elementName,
-			IConfigurationElementProcessor processor)
+	public static void processConfigurationElements(String pluginId, String extensionPointId, IConfigurationElementProcessor processor,
+ String... elementNames)
 	{
-		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && !StringUtil.isEmpty(elementName)
-				&& processor != null)
+		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null)
 		{
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 
@@ -468,9 +467,12 @@ public class EclipseUtil
 					{
 						for (IConfigurationElement element : extension.getConfigurationElements())
 						{
-							if (element.getName().equals(elementName))
+							for (String elementName : elementNames)
 							{
-								processor.processElement(element);
+								if (element.getName().equals(elementName))
+								{
+									processor.processElement(element);
+								}
 							}
 						}
 					}

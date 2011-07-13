@@ -124,7 +124,6 @@ public class ScriptingEngine
 			EclipseUtil.processConfigurationElements(
 				ScriptingActivator.PLUGIN_ID,
 				LOADPATH_ID,
-				TAG_LOADPATH,
 				new IConfigurationElementProcessor()
 				{
 					public void processElement(IConfigurationElement element)
@@ -149,7 +148,8 @@ public class ScriptingEngine
 							ScriptingActivator.logError(message, null);
 						}
 					}
-				}
+				},
+				TAG_LOADPATH
 			);
 			// @formatter:on
 
@@ -175,14 +175,14 @@ public class ScriptingEngine
 			EclipseUtil.processConfigurationElements(
 				ScriptingActivator.PLUGIN_ID,
 				FRAMEWORK_FILE_ID,
-				TAG_FILE, 
 				new IConfigurationElementProcessor()
 				{
 					public void processElement(IConfigurationElement element)
 					{
 						names.add(element.getAttribute(ATTR_NAME));
 					}
-				}
+				}, 
+				TAG_FILE
 			);
 			// @formatter:on
 

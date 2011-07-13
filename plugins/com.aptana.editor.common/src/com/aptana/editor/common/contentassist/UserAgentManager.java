@@ -208,7 +208,6 @@ public class UserAgentManager
 		EclipseUtil.processConfigurationElements(
 			CommonEditorPlugin.PLUGIN_ID,
 			USERAGENT_ID,
-			ELEMENT_USERAGENT,
 			new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
@@ -236,7 +235,8 @@ public class UserAgentManager
 						}
 					}
 				}
-			}
+			},
+			ELEMENT_USERAGENT
 		);
 		// @formatter:on
 	}

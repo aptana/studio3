@@ -57,7 +57,6 @@ public class CommandContext
 			EclipseUtil.processConfigurationElements(
 				ScriptingActivator.PLUGIN_ID,
 				CONTEXT_CONTRIBUTOR_ID,
-				TAG_CONTRIBUTOR,
 				new IConfigurationElementProcessor()
 				{
 					public void processElement(IConfigurationElement element)
@@ -78,7 +77,8 @@ public class CommandContext
 							ScriptingActivator.logError(message, e);
 						}
 					}
-				}
+				},
+				TAG_CONTRIBUTOR
 			);
 			// @formatter:on
 

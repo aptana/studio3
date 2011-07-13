@@ -56,7 +56,6 @@ public class ParserPoolFactory
 		EclipseUtil.processConfigurationElements(
 			ParsingPlugin.PLUGIN_ID,
 			"parser", //$NON-NLS-1$
-			"parser", //$NON-NLS-1$
 			new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
@@ -65,7 +64,8 @@ public class ParserPoolFactory
 
 					parsers.put(contentType, element);
 				}
-			}
+			}, //$NON-NLS-1$
+			"parser"
 		);
 		// @formatter:on
 

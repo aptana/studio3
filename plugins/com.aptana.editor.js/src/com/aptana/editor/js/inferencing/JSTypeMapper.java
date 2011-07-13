@@ -102,7 +102,6 @@ public class JSTypeMapper
 		EclipseUtil.processConfigurationElements(
 			JSPlugin.PLUGIN_ID,
 			TYPE_MAPS,
-			TAG_TYPE_MAP,
 			new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
@@ -115,7 +114,8 @@ public class JSTypeMapper
 						addTypeMapping(srcType, dstType);
 					}
 				}
-			}
+			},
+			TAG_TYPE_MAP
 		);
 		// @formatter:on
 	}
