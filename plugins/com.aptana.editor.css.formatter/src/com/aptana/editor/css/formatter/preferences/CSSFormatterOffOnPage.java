@@ -14,7 +14,7 @@ import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.preferences.AbstractFormatterOffOnPage;
 
 /**
- * A formatter On/Off page for XML.
+ * A formatter On/Off page for CSS.
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
