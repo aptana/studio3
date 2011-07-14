@@ -1,4 +1,4 @@
-package com.aptana.ui.properties;
+package com.aptana.ui.preferences;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +30,8 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 
+import com.aptana.buildpath.core.BuildPathEntry;
+import com.aptana.buildpath.core.BuildPathManager;
 import com.aptana.index.core.RebuildIndexJob;
 
 public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkbenchPropertyPage

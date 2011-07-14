@@ -1,4 +1,4 @@
-package com.aptana.ui.properties;
+package com.aptana.buildpath.core;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.index.core.IIndexFileContributor;
-import com.aptana.ui.UIPlugin;
 
 public class BuildPathIndexContributor implements IIndexFileContributor
 {
@@ -48,7 +47,7 @@ public class BuildPathIndexContributor implements IIndexFileContributor
 							}
 							catch (CoreException e)
 							{
-								IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+								IdeLog.logError(BuildPathCorePlugin.getDefault(), e.getMessage(), e);
 							}
 						}
 					}

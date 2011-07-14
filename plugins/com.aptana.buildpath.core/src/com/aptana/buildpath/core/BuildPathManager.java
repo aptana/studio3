@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.properties;
+package com.aptana.buildpath.core;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,7 +31,6 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.UIPlugin;
 
 /**
  * BuildPathManager
@@ -155,7 +154,7 @@ public class BuildPathManager
 	 */
 	protected QualifiedName getBuildPathPropertyName()
 	{
-		return new QualifiedName(UIPlugin.PLUGIN_ID, "projectBuildPath");
+		return new QualifiedName(BuildPathCorePlugin.PLUGIN_ID, "projectBuildPath");
 	}
 
 	/**
@@ -299,7 +298,7 @@ public class BuildPathManager
 	{
 		// @formatter:off
 		EclipseUtil.processConfigurationElements(
-			UIPlugin.PLUGIN_ID,
+			BuildPathCorePlugin.PLUGIN_ID,
 			BUILD_PATHS_ID,
 			new IConfigurationElementProcessor()
 			{

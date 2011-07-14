@@ -4,7 +4,6 @@
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
    <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
-   <extension-point id="buildPaths" name="buildPaths" schema="schema/buildPaths.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -347,7 +346,7 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="com.aptana.ui.properties.ProjectBuildPathPropertyPage"
+            class="com.aptana.ui.preferences.ProjectBuildPathPropertyPage"
             id="com.aptana.editor.common.projectBuildPath"
             name="Project Build Path">
             <enabledWhen>
@@ -362,13 +361,5 @@
             </and>
          </enabledWhen>
       </page>
-   </extension>
-   <extension
-         point="com.aptana.index.core.fileContributors">
-      <contributor
-            class="com.aptana.ui.properties.BuildPathIndexContributor"
-            id="com.aptana.ui.properties.buildPathIndexContributor"
-            name="Build Path Index Contributor">
-      </contributor>
    </extension>
 </plugin>

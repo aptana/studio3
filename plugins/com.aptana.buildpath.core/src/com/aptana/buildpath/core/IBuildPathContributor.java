@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.properties;
+package com.aptana.buildpath.core;
 
 import java.util.List;
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension-point id="buildPaths" name="buildPaths" schema="schema/buildPaths.exsd"/>
+	<extension
+         point="com.aptana.index.core.fileContributors">
+      <contributor
+            class="com.aptana.buildpath.core.BuildPathIndexContributor"
+            id="com.aptana.buildpath.core.buildPathIndexContributor"
+            name="Build Path Index Contributor">
+      </contributor>
+   </extension>
+</plugin>
