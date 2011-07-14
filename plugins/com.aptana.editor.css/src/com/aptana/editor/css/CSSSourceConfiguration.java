@@ -17,7 +17,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -29,7 +28,9 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.EmptyCommentRule;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.ResumableSingleLineRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
@@ -48,9 +49,12 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
 
-	private IToken stringToken = new Token(STRING);
-
-	private IPredicateRule[] partitioningRules;
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(STRING), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(STRING), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new EmptyCommentRule(getToken(MULTILINE_COMMENT)),
+			new MultiLineRule("/*", "*/", getToken(MULTILINE_COMMENT), (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
+	};
 
 	private RuleBasedScanner multilineCommentScanner;
 	private RuleBasedScanner stringScanner;
@@ -74,13 +78,6 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private CSSSourceConfiguration() {
-
-		IToken comment = new Token(MULTILINE_COMMENT);
-
-		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new SingleLineRule("\'", "\'", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new EmptyCommentRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
-		};
 	}
 
 	/*
