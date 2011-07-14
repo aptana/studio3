@@ -56,6 +56,10 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.putInt(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, 1);
 		store.putInt(HTMLFormatterConstants.PRESERVED_LINES, 1);
 
+		store.putBoolean(HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED, false);
+		store.put(HTMLFormatterConstants.FORMATTER_ON, HTMLFormatterConstants.DEFAULT_FORMATTER_ON);
+		store.put(HTMLFormatterConstants.FORMATTER_OFF, HTMLFormatterConstants.DEFAULT_FORMATTER_OFF);
+
 		try
 		{
 			store.flush();

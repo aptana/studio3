@@ -1,0 +1,14 @@
+<!-- Off/On formatter preview... -->
+<?xml version="1.0" encoding="UTF-8?>
+<class_list>
+	<student>
+	    <!-- @formatter:off -->
+		  <name>    Bob    </name>
+		  <grade>     A    </grade>
+		<!-- @formatter:on -->
+	</student>
+	<student>
+		<name>Bill</name>
+		<grade>B+</grade>
+	</student>
+</class_list>

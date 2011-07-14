@@ -301,4 +301,93 @@ public class ScopeSelectorTests extends TestCase
 		assertEquals(doctype, ScopeSelector.bestMatch(Arrays.asList(entityName, doctype), scope));
 	}
 
+	public void testMatchWhenScopeHasSegmentsBetweenScopeSelectorSegments()
+	{
+		ScopeSelector textSourceSelector = new ScopeSelector("text source");
+		assertTrue(
+				"Selector should match, but doesn't",
+				textSourceSelector
+						.matches("text.haml meta.line.ruby.haml source.ruby.embedded.haml comment.line.number-sign.ruby"));
+		assertTrue("Selector should match, but doesn't",
+				textSourceSelector.matches("text.haml meta.line.ruby.haml source.ruby.embedded.haml"));
+	}
+
+	public void testBestMatchWhenScopeHasSegmentsBetweenScopeSelectorSegments()
+	{
+		String scope = "text.haml meta.line.ruby.haml source.ruby.embedded.haml";
+
+		IScopeSelector textSourceSelector = new ScopeSelector("text source");
+		IScopeSelector metaSourceSelector = new ScopeSelector("meta source");
+
+		assertTrue("Selector should match, but doesn't", textSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(4, 0, 6), textSourceSelector.matchResults());
+
+		assertTrue("Selector should match, but doesn't", metaSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(0, 4, 6), metaSourceSelector.matchResults());
+
+		assertEquals(metaSourceSelector,
+				ScopeSelector.bestMatch(Arrays.asList(textSourceSelector, metaSourceSelector), scope));
+	}
+
+	public void testNegativeLookaheadAppliesAsANDToTrailingScopes()
+	{
+		String scope = "text.haml";
+
+		IScopeSelector textMinusMetaSelector = new ScopeSelector("text -meta");
+		IScopeSelector textMinusMetaSourceSelector = new ScopeSelector("text -meta source");
+		IScopeSelector textSourceSelector = new ScopeSelector("text source");
+
+		assertTrue("Selector should match, but doesn't", textMinusMetaSelector.matches(scope));
+		assertEquals(Arrays.asList(4), textMinusMetaSelector.matchResults());
+
+		assertTrue("Selector should match, but doesn't", textMinusMetaSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(4), textMinusMetaSourceSelector.matchResults());
+
+		assertFalse("Selector shouldn't match, but does", textSourceSelector.matches(scope));
+
+		// Last one wins
+		assertEquals(
+				textMinusMetaSourceSelector,
+				ScopeSelector.bestMatch(
+						Arrays.asList(textSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope));
+		assertEquals(
+				textMinusMetaSelector,
+				ScopeSelector.bestMatch(
+						Arrays.asList(textMinusMetaSourceSelector, textSourceSelector, textMinusMetaSelector), scope));
+	}
+
+	public void testAdvancedScenario()
+	{
+		String scope = "text.haml meta.line.ruby.haml source.ruby.embedded.haml comment.line.number-sign.ruby";
+
+		IScopeSelector textSourceSelector = new ScopeSelector("text source");
+		IScopeSelector metaSourceSelector = new ScopeSelector("meta source");
+		IScopeSelector textMinusMetaSelector = new ScopeSelector("text -meta");
+		IScopeSelector textMinusMetaSourceSelector = new ScopeSelector("text -meta source");
+
+		assertTrue("Selector should match, but doesn't", textSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(4, 0, 6, 0), textSourceSelector.matchResults());
+
+		assertTrue("Selector should match, but doesn't", metaSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(0, 4, 6, 0), metaSourceSelector.matchResults());
+
+		assertFalse("Selector shouldn't match, but does", textMinusMetaSelector.matches(scope));
+		assertFalse("Selector shouldn't match, but does", textMinusMetaSourceSelector.matches(scope));
+
+		assertEquals(metaSourceSelector, ScopeSelector.bestMatch(Arrays.asList(textSourceSelector, metaSourceSelector,
+				textMinusMetaSelector, textMinusMetaSourceSelector), scope));
+
+		// Scope 2
+		String scope2 = "text.haml meta.line.ruby.haml";
+
+		assertFalse("Selector shouldn't match, but does", textSourceSelector.matches(scope2));
+		assertFalse("Selector shouldn't match but does", metaSourceSelector.matches(scope2));
+		assertFalse("Selector shouldn't match, but does", textMinusMetaSelector.matches(scope2));
+
+		assertTrue("Selector should match, but doesn't", textMinusMetaSourceSelector.matches(scope2));
+		assertEquals(Arrays.asList(4, 0), textMinusMetaSourceSelector.matchResults());
+
+		assertEquals(textMinusMetaSourceSelector, ScopeSelector.bestMatch(Arrays.asList(textSourceSelector,
+				metaSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope2));
+	}
 }

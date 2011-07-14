@@ -11,7 +11,12 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.DEFAULT_FORMATTER_OFF;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.DEFAULT_FORMATTER_ON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_INDENTATION_SIZE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF_ON_ENABLED;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_ON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_CHAR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_SIZE;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_BLOCKS;
@@ -136,6 +141,9 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.putInt(SPACES_AFTER_SEMICOLON, 1);
 		store.putInt(SPACES_BEFORE_CASE_COLON_OPERATOR, 1);
 		store.putInt(SPACES_AFTER_CASE_COLON_OPERATOR, 1);
+		store.putBoolean(FORMATTER_OFF_ON_ENABLED, false);
+		store.put(FORMATTER_ON, DEFAULT_FORMATTER_ON);
+		store.put(FORMATTER_OFF, DEFAULT_FORMATTER_OFF);
 		try
 		{
 			store.flush();

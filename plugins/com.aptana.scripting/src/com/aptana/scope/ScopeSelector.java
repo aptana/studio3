@@ -43,8 +43,10 @@ public class ScopeSelector implements IScopeSelector
 			return null;
 		}
 
+		List<IScopeSelector> reversed = new ArrayList<IScopeSelector>(selectors);
+		Collections.reverse(reversed);
 		IScopeSelector bestMatch = null;
-		for (IScopeSelector selector : selectors)
+		for (IScopeSelector selector : reversed)
 		{
 			if (selector == null)
 			{

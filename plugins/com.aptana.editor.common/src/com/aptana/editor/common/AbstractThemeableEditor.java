@@ -7,23 +7,36 @@
  */
 package com.aptana.editor.common;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -51,6 +64,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -59,6 +73,7 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -69,14 +84,18 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResource;
@@ -685,6 +704,158 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			super.doSave(progressMonitor);
 		}
+	}
+
+	@Override
+	protected void performSaveAs(IProgressMonitor progressMonitor)
+	{
+		progressMonitor = (progressMonitor == null) ? new NullProgressMonitor() : progressMonitor;
+		IEditorInput input = getEditorInput();
+
+		if (input instanceof UntitledFileStorageEditorInput)
+		{
+			Shell shell = getSite().getShell();
+
+			// checks if user wants to save on the file system or in a workspace project
+			boolean saveToProject = false;
+			boolean byPassDialog = Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+					IPreferenceConstants.REMEMBER_UNTITLED_FILE_SAVE_TYPE, false, null);
+			if (byPassDialog)
+			{
+				// grabs from preferences
+				saveToProject = Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+						IPreferenceConstants.SAVE_UNTITLED_FILE_TO_PROJECT, false, null);
+			}
+			else
+			{
+				// asks the user
+				MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell,
+						Messages.AbstractThemeableEditor_SaveToggleDialog_Title, null,
+						Messages.AbstractThemeableEditor_SaveToggleDialog_Message, MessageDialog.NONE, new String[] {
+								Messages.AbstractThemeableEditor_SaveToggleDialog_LocalFilesystem,
+								Messages.AbstractThemeableEditor_SaveToggleDialog_Project }, 0, null, false);
+				int code = dialog.open();
+				if (code == SWT.DEFAULT)
+				{
+					return;
+				}
+				saveToProject = (code != IDialogConstants.INTERNAL_ID);
+				if (dialog.getToggleState())
+				{
+					// the decision is remembered, so saves it
+					IEclipsePreferences prefs = (new InstanceScope()).getNode(CommonEditorPlugin.PLUGIN_ID);
+					prefs.putBoolean(IPreferenceConstants.REMEMBER_UNTITLED_FILE_SAVE_TYPE, true);
+					prefs.putBoolean(IPreferenceConstants.SAVE_UNTITLED_FILE_TO_PROJECT, saveToProject);
+					try
+					{
+						prefs.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					}
+				}
+			}
+
+			if (!saveToProject)
+			{
+				// saves to local filesystem
+				FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
+				String path = fileDialog.open();
+				if (path == null)
+				{
+					progressMonitor.setCanceled(true);
+					return;
+				}
+
+				// Check whether file exists and if so, confirm overwrite
+				File localFile = new File(path);
+				if (localFile.exists())
+				{
+					if (!MessageDialog.openConfirm(shell, Messages.AbstractThemeableEditor_ConfirmOverwrite_Title,
+							MessageFormat.format(Messages.AbstractThemeableEditor_ConfirmOverwrite_Message, path)))
+					{
+						progressMonitor.setCanceled(true);
+					}
+				}
+
+				IFileStore fileStore;
+				try
+				{
+					fileStore = EFS.getStore(localFile.toURI());
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					MessageDialog.openError(shell, Messages.AbstractThemeableEditor_Error_Title,
+							MessageFormat.format(Messages.AbstractThemeableEditor_Error_Message, path));
+					return;
+				}
+
+				IDocumentProvider provider = getDocumentProvider();
+				if (provider == null)
+				{
+					return;
+				}
+
+				IEditorInput newInput;
+				IFile file = getWorkspaceFile(fileStore);
+				if (file != null)
+				{
+					newInput = new FileEditorInput(file);
+				}
+				else
+				{
+					newInput = new FileStoreEditorInput(fileStore);
+				}
+
+				boolean success = false;
+				try
+				{
+					provider.aboutToChange(newInput);
+					provider.saveDocument(progressMonitor, newInput, provider.getDocument(input), true);
+					success = true;
+				}
+				catch (CoreException e)
+				{
+					IStatus status = e.getStatus();
+					if (status == null || status.getSeverity() != IStatus.CANCEL)
+					{
+						MessageDialog.openError(shell, Messages.AbstractThemeableEditor_Error_Title,
+								MessageFormat.format(Messages.AbstractThemeableEditor_Error_Message, path));
+					}
+				}
+				finally
+				{
+					provider.changed(newInput);
+					if (success)
+					{
+						setInput(newInput);
+					}
+				}
+
+				progressMonitor.setCanceled(!success);
+			}
+			else
+			{
+				super.performSaveAs(progressMonitor);
+			}
+		}
+		else
+		{
+			super.performSaveAs(progressMonitor);
+		}
+	}
+
+	private IFile getWorkspaceFile(IFileStore fileStore)
+	{
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IFile[] files = workspaceRoot.findFilesForLocationURI(fileStore.toURI());
+		if (files != null && files.length > 0)
+		{
+			return files[0];
+		}
+		return null;
 	}
 
 	protected FileService createFileService()

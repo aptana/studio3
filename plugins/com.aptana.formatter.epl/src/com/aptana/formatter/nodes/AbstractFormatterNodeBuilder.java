@@ -11,17 +11,24 @@
  *******************************************************************************/
 package com.aptana.formatter.nodes;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.IRegion;
+
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class AbstractFormatterNodeBuilder
 {
 	private final Stack<IFormatterContainerNode> stack = new Stack<IFormatterContainerNode>();
 	private static final Pattern COMMENT_PREFIX = Pattern.compile("^\\s*(//|/\\*|#|<!--).*", Pattern.DOTALL); //$NON-NLS-1$
+	protected List<IRegion> onOffRegions;
 
 	protected void start(IFormatterContainerNode root)
 	{
@@ -49,6 +56,73 @@ public class AbstractFormatterNodeBuilder
 		}
 		parentNode.addChild(node);
 		return node;
+	}
+
+	/**
+	 * Returns a list of {@link IRegion}s. Each holds an area that is between a formatter-on and formatter-off tags.<br>
+	 * By default, this method returns <code>null</code>. Subclasses should override.
+	 * 
+	 * @return The formatter's OFF/ON regions (the regions to exclude from the formatter).
+	 */
+	public List<IRegion> getOffOnRegions()
+	{
+		return onOffRegions;
+	}
+
+	/**
+	 * Sets the regions to exclude from the formatter (the regions in between the OFF and ON formatter tags)
+	 * 
+	 * @param regions
+	 */
+	protected void setOffOnRegions(List<IRegion> regions)
+	{
+		this.onOffRegions = regions;
+	}
+
+	/**
+	 * A common method that resolves the formatter's Off-On regions.<br>
+	 * In case the given {@link IParseRootNode} has comments, the method will try to collect the 'Off' and 'On' tags and
+	 * set the regions that will be ignored when formatting.<br>
+	 * <br>
+	 * Note: This method is to be used, mainly, when there is no other comments handling.In case the node-builder is
+	 * already traversing the comments, it's recommended to collect the Off/On regions as part of that process to
+	 * improve performance.
+	 * 
+	 * @param parseNode
+	 * @param document
+	 * @param offOnEnablementKey
+	 * @param offPatternKey
+	 * @param onPatternKey
+	 * @return A list of regions that should be excluded from being formatted (may be null).
+	 */
+	protected List<IRegion> resolveOffOnRegions(IParseRootNode parseNode, IFormatterDocument document,
+			String offOnEnablementKey, String offPatternKey, String onPatternKey)
+	{
+		if (!document.getBoolean(offOnEnablementKey))
+		{
+			return null;
+		}
+		IParseNode[] commentNodes = parseNode.getCommentNodes();
+		if (commentNodes == null || commentNodes.length == 0)
+		{
+			return null;
+		}
+		LinkedHashMap<Integer, String> commentsMap = new LinkedHashMap<Integer, String>(commentNodes.length);
+		for (IParseNode comment : commentNodes)
+		{
+			int start = comment.getStartingOffset();
+			int end = comment.getEndingOffset();
+			String commentStr = document.get(start, end);
+			commentsMap.put(start, commentStr);
+		}
+		// Generate the OFF/ON regions
+		if (!commentsMap.isEmpty())
+		{
+			Pattern onPattern = Pattern.compile(Pattern.quote(document.getString(onPatternKey)));
+			Pattern offPattern = Pattern.compile(Pattern.quote(document.getString(offPatternKey)));
+			return FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern, document.getLength() - 1);
+		}
+		return null;
 	}
 
 	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, int pos)

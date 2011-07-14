@@ -7,9 +7,11 @@
  */
 package com.aptana.editor.xml.formatter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
@@ -241,6 +243,15 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		root.accept(context, writer);
 		writer.flush(context);
 		String output = writer.getOutput();
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
+		{
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(XMLFormatterConstants.FORMATTER_OFF), getString(XMLFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
+		}
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
@@ -261,6 +272,12 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
+		// Formatter OFF/ON
+		document.setBoolean(XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+				getBoolean(XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED));
+		document.setString(XMLFormatterConstants.FORMATTER_ON, getString(XMLFormatterConstants.FORMATTER_ON));
+		document.setString(XMLFormatterConstants.FORMATTER_OFF, getString(XMLFormatterConstants.FORMATTER_OFF));
 
 		return document;
 	}

@@ -50,6 +50,10 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		pref.putInt(CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR, 1);
 		pref.putInt(CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR, 1);
 
+		pref.putBoolean(CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED, false);
+		pref.put(CSSFormatterConstants.FORMATTER_ON, CSSFormatterConstants.DEFAULT_FORMATTER_ON);
+		pref.put(CSSFormatterConstants.FORMATTER_OFF, CSSFormatterConstants.DEFAULT_FORMATTER_OFF);
+
 		try
 		{
 			pref.flush();

@@ -12,6 +12,9 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_INDENTATION_SIZE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF_ON_ENABLED;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_ON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_CHAR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_SIZE;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_BLOCKS;
@@ -59,9 +62,11 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
@@ -376,6 +381,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 					FormatterMessages.Formatter_formatterErrorCompletedWithErrors, ERROR_DISPLAY_TIMEOUT, true);
 		}
 		String output = writer.getOutput();
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
+		{
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(JSFormatterConstants.FORMATTER_OFF), getString(JSFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
+		}
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
@@ -396,6 +410,11 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		document.setInt(LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
 				getInt(LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
+		// Formatter OFF/ON
+		document.setBoolean(FORMATTER_OFF_ON_ENABLED, getBoolean(FORMATTER_OFF_ON_ENABLED));
+		document.setString(FORMATTER_ON, getString(FORMATTER_ON));
+		document.setString(FORMATTER_OFF, getString(FORMATTER_OFF));
 
 		// Set the indentation values
 		for (String key : INDENTATIONS)

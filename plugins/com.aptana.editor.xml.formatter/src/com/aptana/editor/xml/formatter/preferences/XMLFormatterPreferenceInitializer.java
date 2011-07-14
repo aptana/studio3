@@ -43,6 +43,10 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		store.putInt(XMLFormatterConstants.LINES_BEFORE_NON_XML_ELEMENTS, 1);
 		store.putInt(XMLFormatterConstants.PRESERVED_LINES, 1);
 
+		store.putBoolean(XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED, false);
+		store.put(XMLFormatterConstants.FORMATTER_ON, XMLFormatterConstants.DEFAULT_FORMATTER_ON);
+		store.put(XMLFormatterConstants.FORMATTER_OFF, XMLFormatterConstants.DEFAULT_FORMATTER_OFF);
+
 		try
 		{
 			store.flush();

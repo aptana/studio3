@@ -35,5 +35,7 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_spaces_page_tab_title, new CSSFormatterWhiteSpacesPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_comments_page_tab_name, new CSSFormatterCommentsPage(this));
+		addTabPage(com.aptana.formatter.ui.preferences.Messages.FormatterModifyDialog_OffOnTags,
+				new CSSFormatterOffOnPage(this));
 	}
 }

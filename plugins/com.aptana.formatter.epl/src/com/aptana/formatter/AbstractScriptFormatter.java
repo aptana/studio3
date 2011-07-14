@@ -16,8 +16,11 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -25,14 +28,19 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.util.DumpContentException;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
@@ -245,6 +253,84 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			return value.toString();
 		}
 		return null;
+	}
+
+	/**
+	 * Parse the output and look for the formatter On-Off regions.<br>
+	 * We do that to compare it later to the original input, and then adjust the formatting result to have the original
+	 * content in those regions.<br>
+	 * We can assume at this point that the formatter On-Off is enabled and valid in the preferences.<br>
+	 * This method is a generic one that retrieves the comments from the {@link IParseRootNode}. A formatter that does
+	 * not provide comment nodes through that mechanism should override this method, or not use it.
+	 * 
+	 * @param output
+	 *            The formatter output
+	 * @param formatterOffPattern
+	 * @param formatterOnPattern
+	 * @return The formatter On-Off regions that we have in the output source.
+	 * @see #getOutputOnOffRegions(String, String, String, IParseState)
+	 */
+	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern)
+	{
+		return getOutputOnOffRegions(output, formatterOffPattern, formatterOnPattern, new ParseState());
+	}
+
+	/**
+	 * Parse the output and look for the formatter On-Off regions.<br>
+	 * We do that to compare it later to the original input, and then adjust the formatting result to have the original
+	 * content in those regions.<br>
+	 * We can assume at this point that the formatter On-Off is enabled and valid in the preferences.<br>
+	 * This method is a generic one that retrieves the comments from the {@link IParseRootNode}. A formatter that does
+	 * not provide comment nodes through that mechanism should override this method, or not use it.
+	 * 
+	 * @param output
+	 *            The formatter output
+	 * @param formatterOffPattern
+	 * @param formatterOnPattern
+	 * @param parseState
+	 *            An {@link IParseState} that will be used when parsing the output.
+	 * @return The formatter On-Off regions that we have in the output source.
+	 */
+	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+			IParseState parseState)
+	{
+		IParser parser = checkoutParser();
+		parseState.setEditState(output, null, 0, 0);
+		List<IRegion> onOffRegions = null;
+		try
+		{
+			IParseRootNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
+			if (parseResult != null)
+			{
+				IParseNode[] commentNodes = parseResult.getCommentNodes();
+				if (commentNodes != null)
+				{
+					LinkedHashMap<Integer, String> commentsMap = new LinkedHashMap<Integer, String>(commentNodes.length);
+					for (IParseNode comment : commentNodes)
+					{
+						int start = comment.getStartingOffset();
+						int end = comment.getEndingOffset();
+						String commentStr = output.substring(start, end);
+						commentsMap.put(start, commentStr);
+					}
+					// Generate the OFF/ON regions
+					if (!commentsMap.isEmpty())
+					{
+						Pattern onPattern = Pattern.compile(Pattern.quote(formatterOnPattern));
+						Pattern offPattern = Pattern.compile(Pattern.quote(formatterOffPattern));
+						onOffRegions = FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
+								output.length() - 1);
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(FormatterPlugin.getDefault(),
+					"Error while computing the formatter's output OFF/ON regions", e); //$NON-NLS-1$
+		}
+		return onOffRegions;
 	}
 
 	/**

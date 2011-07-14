@@ -7,10 +7,12 @@
  */
 package com.aptana.editor.css.formatter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
@@ -255,6 +257,15 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		root.accept(context, writer);
 		writer.flush(context);
 		String output = writer.getOutput();
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
+		{
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(CSSFormatterConstants.FORMATTER_OFF), getString(CSSFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
+		}
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
@@ -288,6 +299,12 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setInt(CSSFormatterConstants.LINES_AFTER_DECLARATION,
 				getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
+		// Formatter OFF/ON
+		document.setBoolean(CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+				getBoolean(CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED));
+		document.setString(CSSFormatterConstants.FORMATTER_ON, getString(CSSFormatterConstants.FORMATTER_ON));
+		document.setString(CSSFormatterConstants.FORMATTER_OFF, getString(CSSFormatterConstants.FORMATTER_OFF));
 
 		// Set the spaces values
 		for (String key : SPACES)
