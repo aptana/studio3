@@ -106,9 +106,4 @@ public class MatchContext
 	{
 		return this.getCurrentStep();
 	}
-
-	public boolean canAdvance()
-	{
-		return _currentIndex < _steps.length - 1;
-	}
 }
