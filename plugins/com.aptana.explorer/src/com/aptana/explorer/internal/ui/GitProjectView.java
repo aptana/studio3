@@ -502,7 +502,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	public void indexChanged(final IndexChangedEvent e)
 	{
-		handleBranchEvent(e.getRepository());
+		// no op
 	}
 
 	public void pulled(final PullEvent e)
