@@ -40,10 +40,6 @@ module Ruble
       @jobj.author = author
     end
 
-	def build_path
-		BuildPathProxy.new(@jobj, @path)
-	end
-
     def copyright
       @jobj.copyright
     end
@@ -89,6 +85,10 @@ module Ruble
     def name
       @jobj.display_name
     end
+
+    def project_build_path
+	  BuildPathProxy.new(@jobj, @path)
+	end
 
     def repository
       @jobj.repository
