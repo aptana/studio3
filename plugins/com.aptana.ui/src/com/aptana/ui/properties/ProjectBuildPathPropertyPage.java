@@ -1,5 +1,6 @@
 package com.aptana.ui.properties;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -143,7 +144,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	{
 		BuildPathManager manager = BuildPathManager.getInstance();
 
-		return manager.getSelectedBuildPathEntries(project);
+		return manager.getBuildPaths(project);
 	}
 
 	/**
@@ -224,7 +225,9 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 
 							if (result != null && result.startsWith("file:"))
 							{
-								result = result.substring(5);
+								File f = new File(entry.getPath());
+
+								result = f.getAbsolutePath();
 							}
 							break;
 					}
@@ -256,12 +259,12 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		BuildPathManager manager = BuildPathManager.getInstance();
 
 		// determine if the selection has changed
-		Set<BuildPathEntry> currentEntries = new HashSet<BuildPathEntry>(manager.getSelectedBuildPathEntries(project));
+		Set<BuildPathEntry> currentEntries = new HashSet<BuildPathEntry>(manager.getBuildPaths(project));
 		Set<BuildPathEntry> newEntries = new HashSet<BuildPathEntry>(entries);
 
 		if (!newEntries.equals(currentEntries))
 		{
-			BuildPathManager.getInstance().setSelectedBuildPathEntries(project, entries);
+			BuildPathManager.getInstance().setBuildPaths(project, entries);
 
 			// rebuild project index
 			RebuildIndexJob job = new RebuildIndexJob(project.getLocationURI());

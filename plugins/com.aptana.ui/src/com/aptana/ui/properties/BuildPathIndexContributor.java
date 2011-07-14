@@ -34,7 +34,7 @@ public class BuildPathIndexContributor implements IIndexFileContributor
 				if (container instanceof IProject)
 				{
 					IProject project = (IProject) container;
-					List<BuildPathEntry> entries = BuildPathManager.getInstance().getSelectedBuildPathEntries(project);
+					List<BuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
 
 					if (entries != null)
 					{

@@ -12,8 +12,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -93,6 +96,27 @@ public class BuildPathManager
 	}
 
 	/**
+	 * addBuildPath
+	 * 
+	 * @param project
+	 * @param entry
+	 */
+	public void addBuildPath(IProject project, BuildPathEntry entry)
+	{
+		if (project != null && entry != null)
+		{
+			Set<BuildPathEntry> buildPaths = new HashSet<BuildPathEntry>(getBuildPaths(project));
+
+			if (!buildPaths.contains(entry))
+			{
+				buildPaths.add(entry);
+
+				setBuildPaths(project, buildPaths);
+			}
+		}
+	}
+
+	/**
 	 * Add a new build path entry to this manager
 	 * 
 	 * @param displayName
@@ -158,43 +182,12 @@ public class BuildPathManager
 	}
 
 	/**
-	 * getDynamicBuildPaths
-	 * 
-	 * @return
-	 */
-	private List<BuildPathEntry> getDynamicBuildPaths()
-	{
-		List<BuildPathEntry> result;
-
-		if (contributors != null)
-		{
-			result = new ArrayList<BuildPathEntry>();
-
-			for (IBuildPathContributor contributor : contributors)
-			{
-				List<BuildPathEntry> files = contributor.contribute();
-
-				if (files != null)
-				{
-					result.addAll(files);
-				}
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
-	}
-
-	/**
-	 * getSelectedBuildPathEntries
+	 * getBuildPaths
 	 * 
 	 * @param project
 	 * @return
 	 */
-	public List<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
+	public List<BuildPathEntry> getBuildPaths(IProject project)
 	{
 		List<BuildPathEntry> result = new ArrayList<BuildPathEntry>();
 
@@ -233,6 +226,67 @@ public class BuildPathManager
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/**
+	 * getDynamicBuildPaths
+	 * 
+	 * @return
+	 */
+	private List<BuildPathEntry> getDynamicBuildPaths()
+	{
+		List<BuildPathEntry> result;
+
+		if (contributors != null)
+		{
+			result = new ArrayList<BuildPathEntry>();
+
+			for (IBuildPathContributor contributor : contributors)
+			{
+				List<BuildPathEntry> files = contributor.contribute();
+
+				if (files != null)
+				{
+					result.addAll(files);
+				}
+			}
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * hasBuildPath
+	 * 
+	 * @param entry
+	 * @return
+	 */
+	public boolean hasBuildPath(BuildPathEntry entry)
+	{
+		return getBuildPaths().contains(entry);
+	}
+
+	/**
+	 * hasBuildPath
+	 * 
+	 * @param project
+	 * @param entry
+	 * @return
+	 */
+	public boolean hasBuildPath(IProject project, BuildPathEntry entry)
+	{
+		boolean result = false;
+
+		if (project != null && entry != null)
+		{
+			getBuildPaths(project).contains(entry);
 		}
 
 		return result;
@@ -315,6 +369,27 @@ public class BuildPathManager
 	}
 
 	/**
+	 * removeBuildPath
+	 * 
+	 * @param project
+	 * @param entry
+	 */
+	public void removeBuildPath(IProject project, BuildPathEntry entry)
+	{
+		if (project != null && entry != null)
+		{
+			Set<BuildPathEntry> entries = new HashSet<BuildPathEntry>(getBuildPaths(project));
+
+			if (entries.contains(entry))
+			{
+				entries.remove(entry);
+
+				setBuildPaths(project, entries);
+			}
+		}
+	}
+
+	/**
 	 * Remove an existing build path from this manager
 	 * 
 	 * @param displayName
@@ -329,12 +404,12 @@ public class BuildPathManager
 	}
 
 	/**
-	 * setSelectedBuildPathEntries
+	 * setBuildPaths
 	 * 
 	 * @param project
 	 * @param entries
 	 */
-	public void setSelectedBuildPathEntries(IProject project, List<BuildPathEntry> entries)
+	public void setBuildPaths(IProject project, Collection<BuildPathEntry> entries)
 	{
 		List<String> nameAndPaths = new ArrayList<String>();
 
