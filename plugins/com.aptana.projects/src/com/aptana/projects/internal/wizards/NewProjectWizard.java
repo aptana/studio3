@@ -63,6 +63,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ContainerGenerator;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.ide.IDE;
@@ -529,6 +530,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 						{
 							try
 							{
+								// makes sure the parent path is created
+								(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
 								newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
 										true, null);
 							}

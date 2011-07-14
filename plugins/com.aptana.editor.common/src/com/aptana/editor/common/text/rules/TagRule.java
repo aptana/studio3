@@ -20,7 +20,7 @@ import org.eclipse.jface.text.rules.Token;
  * @author Max Stepanov
  *
  */
-public class TagRule extends MultiLineRule {
+public class TagRule extends ResumableMultiLineRule {
 
 	private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
 	private static final IPredicateRule singleQuoteStringRule = new MultiLineRule("'", "'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
@@ -31,7 +31,6 @@ public class TagRule extends MultiLineRule {
 	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
 
 	private final boolean fIgnoreCase;
-	private boolean fResume;
 
 	public TagRule(IToken token) {
 		this("", token); //$NON-NLS-1$
@@ -76,25 +75,10 @@ public class TagRule extends MultiLineRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.PatternRule#doEvaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
+	 * @see com.aptana.editor.common.text.rules.ResumableMultiLineRule#doDetectEndSequence(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
 	@Override
-	protected IToken doEvaluate(ICharacterScanner scanner, boolean resume) {
-		try {
-			fResume = resume;
-			return super.doEvaluate(scanner, resume);
-		} finally {
-			fResume = false;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
-	 */
-	protected boolean endSequenceDetected(ICharacterScanner scanner) {
-		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, fResume ? "" : String.valueOf(fStartSequence)); //$NON-NLS-1$
-		scanner = fResume && fToken instanceof ExtendedToken ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContents().substring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
+	protected boolean doDetectEndSequence(ICharacterScanner scanner) {
 		int c;
 		while ((c = scanner.read()) != ICharacterScanner.EOF) {
 			if (c == '\'') {
@@ -117,11 +101,7 @@ public class TagRule extends MultiLineRule {
 				break;
 			}
 		}
-		if (fToken instanceof ExtendedToken) {
-			ExtendedToken extendedToken = (ExtendedToken) fToken;
-			String prefix = fResume ? extendedToken.getContents() : ""; //$NON-NLS-1$
-			extendedToken.setContents(prefix.concat(collectingCharacterScanner.getContents()));
-		}
 		return true;
 	}
+
 }
