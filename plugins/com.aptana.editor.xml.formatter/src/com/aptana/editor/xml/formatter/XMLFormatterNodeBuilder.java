@@ -21,6 +21,7 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 
 /**
@@ -46,6 +47,13 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		IParseNode[] children = parseResult.getChildren();
 		addNodes(children);
 		checkedPop(rootNode, document.getLength());
+		// Collect Off/On tags
+		if (parseResult instanceof IParseRootNode)
+		{
+			setOffOnRegions(resolveOffOnRegions((IParseRootNode) parseResult, document,
+					XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED, XMLFormatterConstants.FORMATTER_OFF,
+					XMLFormatterConstants.FORMATTER_ON));
+		}
 		return rootNode;
 	}
 

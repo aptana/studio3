@@ -37,6 +37,7 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 /**
@@ -66,6 +67,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		IParseNode[] children = parseResult.getChildren();
 		addNodes(children);
 		checkedPop(rootNode, document.getLength());
+		// Collect Off/On tags
+		if (parseResult instanceof IParseRootNode)
+		{
+			setOffOnRegions(resolveOffOnRegions((IParseRootNode) parseResult, document,
+					CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED, CSSFormatterConstants.FORMATTER_OFF,
+					CSSFormatterConstants.FORMATTER_ON));
+		}
 		return rootNode;
 	}
 

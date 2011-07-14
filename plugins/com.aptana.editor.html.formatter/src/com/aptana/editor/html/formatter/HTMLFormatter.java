@@ -7,9 +7,11 @@
  */
 package com.aptana.editor.html.formatter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -256,6 +258,15 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		root.accept(context, writer);
 		writer.flush(context);
 		String output = writer.getOutput();
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
+		{
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(HTMLFormatterConstants.FORMATTER_OFF), getString(HTMLFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
+		}
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
@@ -277,6 +288,13 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		document.setBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS,
 				getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS));
 		document.setBoolean(HTMLFormatterConstants.TRIM_SPACES, getBoolean(HTMLFormatterConstants.TRIM_SPACES));
+
+		// Formatter OFF/ON
+		document.setBoolean(HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+				getBoolean(HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED));
+		document.setString(HTMLFormatterConstants.FORMATTER_ON, getString(HTMLFormatterConstants.FORMATTER_ON));
+		document.setString(HTMLFormatterConstants.FORMATTER_OFF, getString(HTMLFormatterConstants.FORMATTER_OFF));
+
 		for (int i = 0; i < BLANK_LINES.length; i++)
 		{
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));

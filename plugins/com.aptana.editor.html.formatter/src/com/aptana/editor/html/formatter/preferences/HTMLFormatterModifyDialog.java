@@ -36,5 +36,8 @@ public class HTMLFormatterModifyDialog extends FormatterModifyDialog
 		addTabPage(Messages.HTMLFormatterModifyDialog_blankLinesTabName, new HTMLFormatterBlankLinesPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_spacesTabName, new HTMLFormatterWhitespacesPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_commentsTabName, new HTMLFormatterCommentsPage(this));
+		// TODO - Enable the page once the XML parser returns comments.
+		// addTabPage(com.aptana.formatter.ui.preferences.Messages.FormatterModifyDialog_OffOnTags,
+		// new HTMLFormatterOffOnPage(this));
 	}
 }

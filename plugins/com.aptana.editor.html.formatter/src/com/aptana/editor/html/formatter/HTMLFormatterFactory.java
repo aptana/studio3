@@ -47,7 +47,8 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 			HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS, HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
 			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
 			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES,
-			HTMLFormatterConstants.TRIM_SPACES };
+			HTMLFormatterConstants.TRIM_SPACES, HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+			HTMLFormatterConstants.FORMATTER_ON, HTMLFormatterConstants.FORMATTER_OFF };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{

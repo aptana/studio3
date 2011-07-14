@@ -39,7 +39,8 @@ public class XMLFormatterFactory extends AbstractScriptFormatterFactory
 			XMLFormatterConstants.INDENT_EXCLUDED_TAGS, XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 			XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES, XMLFormatterConstants.LINES_AFTER_ELEMENTS,
 			XMLFormatterConstants.LINES_AFTER_NON_XML_ELEMENTS, XMLFormatterConstants.LINES_BEFORE_NON_XML_ELEMENTS,
-			XMLFormatterConstants.PRESERVED_LINES };
+			XMLFormatterConstants.PRESERVED_LINES, XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+			XMLFormatterConstants.FORMATTER_ON, XMLFormatterConstants.FORMATTER_OFF };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{

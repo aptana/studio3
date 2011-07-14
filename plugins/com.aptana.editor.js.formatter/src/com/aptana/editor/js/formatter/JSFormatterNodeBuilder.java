@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.jface.text.IRegion;
-
 import beaver.Symbol;
 
 import com.aptana.core.logging.IdeLog;
@@ -117,7 +115,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private boolean hasErrors;
 	private Set<Integer> singleLinecommentEndOffsets;
 	private Set<Integer> multiLinecommentEndOffsets;
-	private List<IRegion> onOffRegions;
 
 	/**
 	 * @param parseResult
@@ -144,14 +141,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	public boolean hasErrors()
 	{
 		return hasErrors;
-	}
-
-	/**
-	 * @return
-	 */
-	public List<IRegion> getOffOnRegions()
-	{
-		return onOffRegions;
 	}
 
 	private void generateCommentEndOffsets(IParseNode[] comments)
@@ -194,8 +183,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			Pattern onPattern = Pattern.compile(Pattern.quote(document.getString(JSFormatterConstants.FORMATTER_ON)));
 			Pattern offPattern = Pattern.compile(Pattern.quote(document.getString(JSFormatterConstants.FORMATTER_OFF)));
-			onOffRegions = FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
-					document.getLength() - 1);
+			setOffOnRegions(FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
+					document.getLength() - 1));
 		}
 	}
 
