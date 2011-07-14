@@ -395,11 +395,7 @@ public class Theme
 	private IScopeSelector findMatch(String scope)
 	{
 		Collection<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
-		// See APSTUD-2790. In Textmate the last matching rule wins, so to get that behavior we reverse the rule list
-		// before matching.
-		List<ThemeRule> reversed = new ArrayList<ThemeRule>(coloringRules);
-		Collections.reverse(reversed);
-		for (ThemeRule rule : reversed)
+		for (ThemeRule rule : coloringRules)
 		{
 			if (rule.isSeparator())
 			{
