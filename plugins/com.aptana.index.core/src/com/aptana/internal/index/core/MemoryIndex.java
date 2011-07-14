@@ -101,7 +101,8 @@ public class MemoryIndex
 	 * @param results
 	 * @return
 	 */
-	public Map<String, QueryResult> addQueryResults(String[] categories, String key, int matchRules, Map<String, QueryResult> results)
+	public Map<String, QueryResult> addQueryResults(String[] categories, String key, int matchRules,
+			Map<String, QueryResult> results)
 	{
 		if (results == null)
 		{
@@ -120,6 +121,10 @@ public class MemoryIndex
 			for (String category : categories)
 			{
 				Set<String> words = categoriesToWords.get(category);
+				if (words == null)
+				{
+					continue;
+				}
 
 				// When we're looking for exact matches, case sensitive, just ask wordset if it contains key!
 				if (matchRules == (SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE))
@@ -139,23 +144,20 @@ public class MemoryIndex
 				}
 				else
 				{
-					if (words != null)
+					// Otherwise we need to check each word individually
+					for (String word : words)
 					{
-						// Otherwise we need to check each word individually
-						for (String word : words)
+						if (Index.isMatch(key, word, matchRules))
 						{
-							if (Index.isMatch(key, word, matchRules))
+							QueryResult result = results.get(word);
+
+							if (result == null)
 							{
-								QueryResult result = results.get(word);
-
-								if (result == null)
-								{
-									result = new QueryResult(word);
-								}
-
-								result.addDocumentName(entry.getKey());
-								results.put(word, result);
+								result = new QueryResult(word);
 							}
+
+							result.addDocumentName(entry.getKey());
+							results.put(word, result);
 						}
 					}
 				}
@@ -173,15 +175,15 @@ public class MemoryIndex
 	public List<String> getCategories()
 	{
 		Set<String> categories = new HashSet<String>();
-		
-		for (Map<String,Set<String>> value : documentsToTable.values())
+
+		for (Map<String, Set<String>> value : documentsToTable.values())
 		{
 			categories.addAll(value.keySet());
 		}
-		
+
 		return new ArrayList<String>(categories);
 	}
-	
+
 	/**
 	 * getCategoriesForDocument
 	 * 
