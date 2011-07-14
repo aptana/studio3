@@ -268,11 +268,33 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 * @param formatterOffPattern
 	 * @param formatterOnPattern
 	 * @return The formatter On-Off regions that we have in the output source.
+	 * @see #getOutputOnOffRegions(String, String, String, IParseState)
 	 */
 	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern)
 	{
+		return getOutputOnOffRegions(output, formatterOffPattern, formatterOnPattern, new ParseState());
+	}
+
+	/**
+	 * Parse the output and look for the formatter On-Off regions.<br>
+	 * We do that to compare it later to the original input, and then adjust the formatting result to have the original
+	 * content in those regions.<br>
+	 * We can assume at this point that the formatter On-Off is enabled and valid in the preferences.<br>
+	 * This method is a generic one that retrieves the comments from the {@link IParseRootNode}. A formatter that does
+	 * not provide comment nodes through that mechanism should override this method, or not use it.
+	 * 
+	 * @param output
+	 *            The formatter output
+	 * @param formatterOffPattern
+	 * @param formatterOnPattern
+	 * @param parseState
+	 *            An {@link IParseState} that will be used when parsing the output.
+	 * @return The formatter On-Off regions that we have in the output source.
+	 */
+	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+			IParseState parseState)
+	{
 		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
 		parseState.setEditState(output, null, 0, 0);
 		List<IRegion> onOffRegions = null;
 		try

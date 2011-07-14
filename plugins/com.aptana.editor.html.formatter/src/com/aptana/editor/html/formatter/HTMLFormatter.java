@@ -264,7 +264,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
 			// adjust it.
 			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
-					getString(HTMLFormatterConstants.FORMATTER_OFF), getString(HTMLFormatterConstants.FORMATTER_ON));
+					getString(HTMLFormatterConstants.FORMATTER_OFF), getString(HTMLFormatterConstants.FORMATTER_ON),
+					new HTMLParseState());
 			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
 		}
 		if (isSelection)
