@@ -444,6 +444,26 @@ public class BundleEntry
 	}
 
 	/**
+	 * getBuildPaths
+	 * 
+	 * @return
+	 */
+	public List<BuildPathElement> getBuildPaths()
+	{
+		NameBasedProcessor<BuildPathElement> processor = new NameBasedProcessor<BuildPathElement>()
+		{
+			protected List<BuildPathElement> getElements(BundleElement bundle)
+			{
+				return bundle.getBuildPaths();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
 	 * getBundles
 	 * 
 	 * @return

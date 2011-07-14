@@ -14,6 +14,8 @@ import com.aptana.core.util.SourcePrinter;
  */
 public class BuildPathElement extends AbstractBundleElement
 {
+	private String buildPath;
+
 	/**
 	 * @param path
 	 */
@@ -22,7 +24,16 @@ public class BuildPathElement extends AbstractBundleElement
 		super(path);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * @return the buildPath
+	 */
+	public String getBuildPath()
+	{
+		return buildPath;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.AbstractElement#getElementName()
 	 */
 	@Override
@@ -31,7 +42,8 @@ public class BuildPathElement extends AbstractBundleElement
 		return "buildPath";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.AbstractElement#printBody(com.aptana.core.util.SourcePrinter)
 	 */
 	@Override
@@ -40,5 +52,14 @@ public class BuildPathElement extends AbstractBundleElement
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param buildPath
+	 *            the buildPath to set
+	 */
+	public void setBuildPath(String buildPath)
+	{
+		this.buildPath = buildPath;
 	}
 }

@@ -179,6 +179,16 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getBuildPaths
+	 * 
+	 * @return
+	 */
+	public List<BuildPathElement> getBuildPaths()
+	{
+		return getChildrenByType(BuildPathElement.class);
+	}
+
+	/**
 	 * getBundleDirectory
 	 * 
 	 * @return
