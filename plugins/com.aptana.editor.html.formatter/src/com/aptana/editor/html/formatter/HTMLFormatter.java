@@ -56,8 +56,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
 			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES };
 
-	private String lineSeparator;
-
 	/**
 	 * Constructor.
 	 * 
@@ -65,8 +63,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	protected HTMLFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -82,8 +79,15 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		int indent = 0;
 		try
 		{
-			IParseNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseNode parseResult = null;
+			try
+			{
+				parseResult = parser.parse(parseState);
+			}
+			finally
+			{
+				checkinParser(parser);
+			}
 			if (parseResult != null)
 			{
 				final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
@@ -138,8 +142,20 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			IParseState parseState = new HTMLParseState();
 			parseState.setEditState(input, null, 0, 0);
-			IParseNode parseResult = parser.parse(parseState);
-			checkinParser(parser, mainContentType);
+			IParseNode parseResult = null;
+			try
+			{
+				parseResult = parser.parse(parseState);
+			}
+			catch (Exception e)
+			{
+				// In case of a parse error (which is unlikely to HTML parsing), just try to indent the given source.
+				return indent(source, input, offset, length, indentationLevel);
+			}
+			finally
+			{
+				checkinParser(parser, mainContentType);
+			}
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, isSelection);

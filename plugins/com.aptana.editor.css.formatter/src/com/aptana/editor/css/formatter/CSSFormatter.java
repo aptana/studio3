@@ -47,7 +47,6 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 {
 
 	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]"); //$NON-NLS-1$
-	private String lineSeparator;
 
 	protected static final String[] SPACES = { CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR,
 			CSSFormatterConstants.SPACES_AFTER_COMMAS, CSSFormatterConstants.SPACES_AFTER_PARENTHESES,
@@ -63,8 +62,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	protected CSSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -90,8 +88,15 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			String source = document.get();
 			parseState.setEditState(source, null, 0, 0);
 
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = null;
+			try
+			{
+				parseResult = parser.parse(parseState);
+			}
+			finally
+			{
+				checkinParser(parser);
+			}
 			if (parseResult != null)
 			{
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
@@ -132,8 +137,20 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		parseState.setEditState(input, null, 0, 0);
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = null;
+			try
+			{
+				parseResult = parser.parse(parseState);
+			}
+			catch (Exception e)
+			{
+				// In case of a parse error, just try to indent the given source.
+				return indent(source, input, offset, length, indentationLevel);
+			}
+			finally
+			{
+				checkinParser(parser);
+			}
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, offset, isSelection, indentSufix,

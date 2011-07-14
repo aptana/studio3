@@ -138,8 +138,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			SPACES_AFTER_FOR_SEMICOLON, SPACES_BEFORE_SEMICOLON, SPACES_AFTER_SEMICOLON,
 			SPACES_BEFORE_CASE_COLON_OPERATOR, SPACES_AFTER_CASE_COLON_OPERATOR };
 
-	private String lineSeparator;
-
 	/**
 	 * Constructor.
 	 * 
@@ -147,8 +145,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	protected JSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -172,8 +169,16 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			String source = document.get();
 			parseState.setEditState(source, null, 0, 0);
 
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = null;
+			try
+			{
+				parseResult = parser.parse(parseState);
+			}
+			finally
+			{
+				checkinParser(parser);
+			}
+
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
@@ -214,10 +219,28 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
 		parseState.setEditState(input, null, 0, 0);
+		IParseRootNode parseResult = null;
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
+			parseResult = parser.parse(parseState);
+		}
+		catch (Exception e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(e.getMessage()
+					+ " - " + FormatterMessages.Formatter_formatterErrorStatus, //$NON-NLS-1$
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(e);
+			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
+			// indentation level as much as we can.
+			return indent(source, input, offset, length, indentationLevel);
+		}
+		finally
+		{
+			// Make sure that if the parsing fails with an exception, we still check the parser back in.
 			checkinParser(parser);
+		}
+		try
+		{
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,

@@ -39,8 +39,6 @@ import com.aptana.ui.util.StatusLineMessageTimerManager;
  */
 public class JSONFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
-	private String lineSeparator;
-
 	/**
 	 * JSONFormatter
 	 * 
@@ -50,9 +48,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	protected JSONFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
