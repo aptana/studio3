@@ -67,6 +67,9 @@
                <documentation>
                   The name used when this element is being displayed in the UI.
                </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="path" type="string" use="required">
