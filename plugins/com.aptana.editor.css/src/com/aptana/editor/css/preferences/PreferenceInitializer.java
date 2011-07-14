@@ -18,10 +18,7 @@ import com.aptana.editor.css.ICSSConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-	 */
+
 	@SuppressWarnings("nls")
 	@Override
 	public void initializeDefaultPreferences()
@@ -45,10 +42,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 
-		String[] filtered = new String[] { ".*Unknown pseudo-element.*", ".*Property _.*", ".*-moz-.*", ".*-o-*",
-				".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*", ".*filter.*",
-				".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*",
-				".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
+		String[] filtered = new String[] { ".*Unknown pseudo-element.*", "Property\\s*[-_].*doesn't exist.*",
+				".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*",
+				".*filter.*", ".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*",
+				".*scrollbar-.*", ".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
 				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
 				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a background.*" };
 
@@ -56,5 +53,4 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
 				StringUtil.join("####", filtered));
 	}
-
 }

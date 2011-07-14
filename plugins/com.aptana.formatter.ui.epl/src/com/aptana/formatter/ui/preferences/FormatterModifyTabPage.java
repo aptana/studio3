@@ -201,14 +201,25 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 	{
 		if (previewViewer != null)
 		{
-			FormatterPreviewUtils.updatePreview(previewViewer, getPreviewContent(), dialog.getFormatterFactory(),
-					dialog.getPreferences());
+			FormatterPreviewUtils.updatePreview(previewViewer, getPreviewContent(), getSubstitutionStrings(),
+					dialog.getFormatterFactory(), dialog.getPreferences());
 		}
 	}
 
 	protected abstract void createOptions(IFormatterControlManager manager, Composite parent);
 
 	protected URL getPreviewContent()
+	{
+		return null;
+	}
+
+	/**
+	 * Returns an array of substitution strings that will be used to substitute strings in the preview-content that were
+	 * marked with {0}, {1}, etc.
+	 * 
+	 * @return A substitution strings array; Null, in case there is no substitution.
+	 */
+	protected String[] getSubstitutionStrings()
 	{
 		return null;
 	}
@@ -308,9 +319,7 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 		label.setText(text);
 
 		PixelConverter pixelConverter = new PixelConverter(parent);
-		label
-				.setLayoutData(createGridData(numColumns, gridDataStyle, pixelConverter
-						.convertHorizontalDLUsToPixels(150)));
+		label.setLayoutData(createGridData(numColumns, gridDataStyle, pixelConverter.convertHorizontalDLUsToPixels(150)));
 		return label;
 	}
 

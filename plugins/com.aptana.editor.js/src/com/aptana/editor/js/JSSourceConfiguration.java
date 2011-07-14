@@ -18,7 +18,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -30,7 +29,9 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.EmptyCommentRule;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.ResumableSingleLineRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
@@ -57,12 +58,12 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
-			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new EmptyCommentRule(new Token(JS_MULTILINE_COMMENT)),
-			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new EndOfLineRule("//", getToken(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
+			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(STRING_DOUBLE), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(STRING_SINGLE), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new EmptyCommentRule(getToken(JS_MULTILINE_COMMENT)),
+			new MultiLineRule("/**", "*/", getToken(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("/*", "*/", getToken(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new JSRegExpRule(new Token(JS_REGEXP)) };
 
 	private JSCodeScanner codeScanner;

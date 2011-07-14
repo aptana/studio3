@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.formatter.preferences.IFieldValidator;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 
 public interface IFormatterControlManager extends IPreferenceDelegate
@@ -49,6 +50,10 @@ public interface IFormatterControlManager extends IPreferenceDelegate
 	Combo createCombo(Composite parent, Object key, String label, String[] itemValues, String[] itemLabels);
 
 	Text createNumber(Composite parent, Object key, String label);
+
+	Text createText(Composite parent, Object key, String label);
+
+	Text createText(Composite parent, Object key, String label, IFieldValidator validator);
 
 	void enableControl(Control control, boolean enabled);
 

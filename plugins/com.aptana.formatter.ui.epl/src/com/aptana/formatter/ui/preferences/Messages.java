@@ -28,7 +28,9 @@ public class Messages extends NLS
 	public static String PortIsEmpty;
 	public static String PortShouldBeInRange;
 	public static String MinValueInvalid;
-	
+	// Text field validator
+	public static String FieldIsEmpty;
+
 	static
 	{
 		// initialize resource bundle

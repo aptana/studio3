@@ -39,8 +39,11 @@ public class ConsoleStyledTextListener implements LineStyleListener, LineBackgro
 	 * Dispose listener and removed it from lists of listeners
 	 */
 	public void dispose() {
-		control.removeLineStyleListener(this);
-		control.removeLineBackgroundListener(this);
+		if (!control.isDisposed()) {
+			control.removeLineStyleListener(this);
+			control.removeLineBackgroundListener(this);
+		}
+		control = null;
 	}
 
 	/* (non-Javadoc)

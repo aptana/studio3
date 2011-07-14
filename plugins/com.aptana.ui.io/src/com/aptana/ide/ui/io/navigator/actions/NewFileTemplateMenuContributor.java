@@ -91,53 +91,57 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						IStructuredSelection selection = getActiveSelection();
-						if (!selection.isEmpty())
-						{
-							Object element = selection.getFirstElement();
-							if (element instanceof IAdaptable)
-							{
-								IFileStore fileStore = (IFileStore) ((IAdaptable) element).getAdapter(IFileStore.class);
-								if (fileStore != null)
-								{
-									// this is a non-workspace selection
-									String filetype = template.getFiletype();
-									// strips the leading * before . if there is one
-									int index = filetype.lastIndexOf("."); //$NON-NLS-1$
-									if (index > -1)
-									{
-										filetype = filetype.substring(index);
-									}
-									NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(),
-											"new_file" + filetype) //$NON-NLS-1$
-									{
-
-										@Override
-										protected InputStream getInitialContents(IPath path)
-										{
-											String templateContent = NewFileWizard.getTemplateContent(template, path);
-											if (templateContent != null)
-											{
-												return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
-											}
-											return super.getInitialContents(path);
-										}
-									};
-									action.updateSelection(selection);
-									action.run();
-									return;
-								}
-							}
-						}
-
-						NewTemplateFileWizard wizard = new NewTemplateFileWizard(template);
-						wizard.init(PlatformUI.getWorkbench(), selection);
-						WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
-						dialog.open();
+						createNewFileFromTemplate(template);
 					}
 				});
 			}
 		}
+	}
+
+	protected void createNewFileFromTemplate(final TemplateElement template)
+	{
+		IStructuredSelection selection = getActiveSelection();
+		if (!selection.isEmpty())
+		{
+			Object element = selection.getFirstElement();
+			if (element instanceof IAdaptable)
+			{
+				IFileStore fileStore = (IFileStore) ((IAdaptable) element).getAdapter(IFileStore.class);
+				if (fileStore != null)
+				{
+					// this is a non-workspace selection
+					String filetype = template.getFiletype();
+					// strips the leading * before . if there is one
+					int index = filetype.lastIndexOf("."); //$NON-NLS-1$
+					if (index > -1)
+					{
+						filetype = filetype.substring(index);
+					}
+					NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(), "new_file" + filetype) //$NON-NLS-1$
+					{
+
+						@Override
+						protected InputStream getInitialContents(IPath path)
+						{
+							String templateContent = NewFileWizard.getTemplateContent(template, path);
+							if (templateContent != null)
+							{
+								return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+							}
+							return super.getInitialContents(path);
+						}
+					};
+					action.updateSelection(selection);
+					action.run();
+					return;
+				}
+			}
+		}
+
+		NewTemplateFileWizard wizard = new NewTemplateFileWizard(template);
+		wizard.init(PlatformUI.getWorkbench(), selection);
+		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
+		dialog.open();
 	}
 
 	private static IStructuredSelection getActiveSelection()
