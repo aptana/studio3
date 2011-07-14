@@ -40,6 +40,10 @@ module Ruble
       @jobj.author = author
     end
 
+	def build_path
+		BuildPathProxy.new(@jobj, @path)
+	end
+
     def copyright
       @jobj.copyright
     end
@@ -174,6 +178,20 @@ module Ruble
         author: #{author}
       )
       EOS
+    end
+
+    class BuildPathProxy
+      def initialize(jobj, path)
+        @jobj = jobj
+        @path = path
+      end
+
+      def []=(name, path)
+        child = com.aptana.scripting.model.BuildPathElement.new(@path)
+        child.display_name = name
+        child.build_path = path
+        @jobj.add_child child
+      end
     end
 
     class << self
