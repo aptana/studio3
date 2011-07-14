@@ -63,6 +63,7 @@ public class HTMLParser implements IParser
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
 
+	private List<IParseNode> fCommentNodes;
 	private boolean previousSymbolSkipped;
 
 	/**
@@ -70,6 +71,7 @@ public class HTMLParser implements IParser
 	 */
 	public HTMLParser()
 	{
+		fCommentNodes = new ArrayList<IParseNode>();
 	}
 
 	/**
@@ -87,17 +89,19 @@ public class HTMLParser implements IParser
 
 		int startingOffset = parseState.getStartingOffset();
 
-		IParseRootNode root = new ParseRootNode( //
+		ParseRootNode root = new ParseRootNode( //
 				IHTMLConstants.CONTENT_TYPE_HTML, //
 				new HTMLNode[0], //
 				startingOffset, //
 				startingOffset + source.length() - 1 //
 		);
+
 		try
 		{
 			fCurrentElement = root;
 
-			this.parseAll(source);
+			parseAll(source);
+			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
 			parseState.setParseResult(root);
 		}
@@ -110,6 +114,7 @@ public class HTMLParser implements IParser
 			fCurrentElement = null;
 			fCurrentSymbol = null;
 			fParseState = null;
+			fCommentNodes.clear();
 		}
 
 		return root;
@@ -273,6 +278,7 @@ public class HTMLParser implements IParser
 	{
 		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
 				fCurrentSymbol.getEnd());
+		fCommentNodes.add(comment);
 		if (fCurrentElement != null)
 		{
 			fCurrentElement.addChild(comment);

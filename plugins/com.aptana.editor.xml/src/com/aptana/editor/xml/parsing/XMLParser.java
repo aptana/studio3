@@ -8,6 +8,8 @@
 package com.aptana.editor.xml.parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
@@ -34,6 +36,13 @@ public class XMLParser implements IParser
 
 	protected IParseNode fCurrentElement;
 	protected Lexeme<XMLTokenType> fCurrentLexeme;
+
+	private List<IParseNode> fCommentNodes;
+
+	public XMLParser()
+	{
+		fCommentNodes = new ArrayList<IParseNode>();
+	}
 
 	/**
 	 * advance
@@ -108,7 +117,7 @@ public class XMLParser implements IParser
 		int startingOffset = parseState.getStartingOffset();
 
 		// creates the root node
-		IParseRootNode root = new ParseRootNode( //
+		ParseRootNode root = new ParseRootNode( //
 				IXMLConstants.CONTENT_TYPE_XML, //
 				new XMLNode[0], //
 				startingOffset, //
@@ -120,6 +129,7 @@ public class XMLParser implements IParser
 			fCurrentElement = root;
 
 			parseAll(root);
+			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
 			parseState.setParseResult(root);
 		}
@@ -130,6 +140,7 @@ public class XMLParser implements IParser
 			fElementStack = null;
 			fCurrentElement = null;
 			fCurrentLexeme = null;
+			fCommentNodes.clear();
 		}
 
 		return root;
@@ -144,13 +155,12 @@ public class XMLParser implements IParser
 	 */
 	protected void parseAll(IParseNode root) throws IOException, Exception
 	{
-		this.advance();
+		advance();
 
 		while (fCurrentLexeme.getType() != XMLTokenType.EOF)
 		{
 			processStatement();
-
-			this.advance();
+			advance();
 		}
 	}
 
@@ -205,14 +215,15 @@ public class XMLParser implements IParser
 	 */
 	protected void processComment()
 	{
+		XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getText(), fCurrentLexeme.getStartingOffset(),
+				fCurrentLexeme.getEndingOffset());
+		fCommentNodes.add(comment);
 		if (fCurrentElement != null)
 		{
-			XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getText(), fCurrentLexeme.getStartingOffset(),
-					fCurrentLexeme.getEndingOffset());
 			fCurrentElement.addChild(comment);
 		}
 	}
-	
+
 	/**
 	 * processCDATA
 	 */
@@ -274,7 +285,7 @@ public class XMLParser implements IParser
 			case COMMENT:
 				processComment();
 				break;
-				
+
 			case CDATA:
 				processCDATA();
 				break;
