@@ -27,6 +27,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
@@ -53,14 +55,17 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	private final Map<String, String> preferences;
 	private boolean isSlave;
 	private String mainContentType;
+	protected String lineSeparator;
 
 	/**
 	 * @param preferences
+	 * @param lineSeparator
 	 */
-	protected AbstractScriptFormatter(Map<String, String> preferences, String mainContentType)
+	protected AbstractScriptFormatter(Map<String, String> preferences, String mainContentType, String lineSeparator)
 	{
 		this.preferences = preferences;
 		this.mainContentType = mainContentType;
+		this.lineSeparator = lineSeparator;
 	}
 
 	/**
@@ -331,6 +336,77 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 					"Error while computing the formatter's output OFF/ON regions", e); //$NON-NLS-1$
 		}
 		return onOffRegions;
+	}
+
+	/**
+	 * Perform an indentation-only formatting, which does not involve any parsing.<br>
+	 * This method can be called when a parsing error prevents us from applying an accurate formatting. To avoid any
+	 * de-dented code appearing in the source, we just indent the source into the desired location.
+	 * 
+	 * @param completeSource
+	 *            full source module content
+	 * @param toFormat
+	 *            the source to format
+	 * @param offset
+	 *            the offset of the region to format * @param length the length of the region to format
+	 * @param indentationLevel
+	 *            the indent level
+	 * @return A {@link TextEdit} for the indented code.
+	 */
+	protected TextEdit indent(String completeSource, String toFormat, int offset, int length, int indentationLevel)
+	{
+		// Only indent when the source to format is located at the beginning of a line, or when there are only
+		// white-space characters to its left.
+		if (!canIndent(completeSource, offset))
+		{
+			return null;
+		}
+		// push the first line of the code
+		IFormatterIndentGenerator indentGenerator = createIndentGenerator();
+		StringBuilder builder = new StringBuilder();
+		indentGenerator.generateIndent(indentationLevel, builder);
+		int leftWhitespaceChars = countLeftWhitespaceChars(toFormat);
+		// replace the left chars with the indent
+		builder.append(toFormat.substring(leftWhitespaceChars));
+		return new ReplaceEdit(offset, length, builder.toString());
+	}
+
+	/**
+	 * Returns true only when the source to format is located at the beginning of a line, or when there are only
+	 * white-space characters to its left.
+	 * 
+	 * @param completeSource
+	 * @param toFormat
+	 * @param offset
+	 * @return True, when an indentation is permitted; False, otherwise.
+	 */
+	private boolean canIndent(String completeSource, int offset)
+	{
+		// input validation
+		if (StringUtil.isEmpty(completeSource))
+		{
+			return true;
+		}
+		if (offset >= completeSource.length())
+		{
+			return false;
+		}
+		// check for white-spaces
+		for (int i = offset; i >= 0; i--)
+		{
+			char c = completeSource.charAt(i);
+			if (c == ' ' || c == '\t')
+			{
+				continue;
+			}
+			if (c == '\n' || c == '\r')
+			{
+				// we are done
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 
 	/**

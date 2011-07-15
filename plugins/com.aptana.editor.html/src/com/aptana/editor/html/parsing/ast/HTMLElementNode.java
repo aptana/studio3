@@ -36,7 +36,6 @@ public class HTMLElementNode extends HTMLNode
 	private Map<String, String> fAttributes;
 	private List<IParseNode> fCSSStyleNodes;
 	private List<IParseNode> fJSAttributeNodes;
-
 	private boolean fIsSelfClosing;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
