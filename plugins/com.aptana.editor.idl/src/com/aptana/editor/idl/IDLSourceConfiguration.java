@@ -38,12 +38,7 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	public static final String IDL_MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 	public final static String IDL_DOC_COMMENT = PREFIX + "doc_comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { //
-		DEFAULT, //
-		IDL_MULTILINE_COMMENT, //
-		IDL_SINGLELINE_COMMENT, //
-		IDL_DOC_COMMENT //
-	};
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, IDL_MULTILINE_COMMENT, IDL_SINGLELINE_COMMENT, IDL_DOC_COMMENT };
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IIDLConstants.CONTENT_TYPE_IDL } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //

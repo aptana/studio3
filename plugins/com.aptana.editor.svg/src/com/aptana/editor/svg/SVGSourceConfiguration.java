@@ -57,16 +57,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	public final static String SCRIPT = PREFIX + "script"; //$NON-NLS-1$
 	public final static String STYLE = PREFIX + "style"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { //
-		DEFAULT, //
-		COMMENT, //
-		CDATA, //
-		PRE_PROCESSOR, //
-		DOCTYPE, //
-		SCRIPT, //
-		STYLE, //
-		TAG, //
-	};
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COMMENT, CDATA, PRE_PROCESSOR, DOCTYPE, SCRIPT, STYLE, TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { //
 		{ ISVGConstants.CONTENT_TYPE_SVG }, //
@@ -167,13 +158,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public String[] getContentTypes()
 	{
-		return TextUtils.combine( //
-			new String[][] { //
-				CONTENT_TYPES, //
-				JSSourceConfiguration.CONTENT_TYPES, //
-				CSSSourceConfiguration.CONTENT_TYPES //
-			} //
-		);
+		return TextUtils.combine(new String[][] { CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES, CSSSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
