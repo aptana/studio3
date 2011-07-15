@@ -7,8 +7,11 @@
  */
 package com.aptana.editor.html.parsing;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.aptana.editor.html.parsing.HTMLDocumentTypes.Type;
 import com.aptana.parsing.ParseState;
@@ -21,10 +24,10 @@ public class HTMLParseState extends ParseState
 {
 
 	@SuppressWarnings("nls")
-	public static final String[] END_OPTIONAL_TAGS = { "body", "colgroup", "dd", "dt", "area", "html", "li", "option",
+	private static final String[] END_OPTIONAL_TAGS = { "body", "colgroup", "dd", "dt", "area", "html", "li", "option",
 			"p", "tbody", "td", "tfoot", "th", "thead", "tr" };
 	@SuppressWarnings("nls")
-	public static final String[] END_FORBIDDEN_OR_EMPTY_TAGS = { "area", "base", "basefont", "br", "col", "frame",
+	private static final String[] END_FORBIDDEN_OR_EMPTY_TAGS = { "area", "base", "basefont", "br", "col", "frame",
 			"hr", "img", "input", "isindex", "link", "meta", "param" };
 
 	private Type fDocumentType;
@@ -92,5 +95,11 @@ public class HTMLParseState extends ParseState
 	{
 		super.setEditState(source, insertedText, startingOffset, removedLength);
 		fDocumentType = HTMLDocumentTypes.getType(source);
+	}
+	
+	public static boolean isEndForbiddenOrEmptyTag(String name)
+	{
+		Set<String> set = new HashSet<String>(Arrays.asList(END_FORBIDDEN_OR_EMPTY_TAGS));
+		return set.contains(name);
 	}
 }

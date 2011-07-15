@@ -9,6 +9,8 @@ package com.aptana.editor.common.validator;
 
 import java.net.URI;
 
+import com.aptana.parsing.ast.IParseNode;
+
 public interface IValidationManager
 {
 
@@ -65,4 +67,11 @@ public interface IValidationManager
 	 * @return true if the message needs to be ignored, false otherwise
 	 */
 	public boolean isIgnored(String message, String language);
+
+	/**
+	 * Returns the AST for the document.
+	 * 
+	 * @return
+	 */
+	public IParseNode getAST();
 }

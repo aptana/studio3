@@ -14,6 +14,8 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.editor.html.validator.messages"; //$NON-NLS-1$
 
+	public static String HTMLTidyValidator_ast_errors;
+
 	public static String HTMLTidyValidator_ERR_ParseErrors;
 	public static String HTMLTidyValidator_ERR_Tidy;
 

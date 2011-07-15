@@ -15,7 +15,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +49,7 @@ public class HTMLTidyValidator implements IValidator
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED = { "lacks \"type\" attribute", "replacing illegal character code" };
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager, IParseNode rootAST)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = parseWithTidy(source);
@@ -61,7 +60,7 @@ public class HTMLTidyValidator implements IValidator
 			{
 				reader = new BufferedReader(new StringReader(report));
 				String line;
-				addParseErrors(source, rootAST, path, manager, items);
+				addParseErrors(source, path, manager, items);
 				while ((line = reader.readLine()) != null)
 				{
 					if (line.startsWith("line")) //$NON-NLS-1$
@@ -111,11 +110,15 @@ public class HTMLTidyValidator implements IValidator
 		return bout.toString();
 	}
 
-	private static void addParseErrors(String source, IParseNode rootAST, URI path, IValidationManager manager,
-			List<IValidationItem> items) throws BadLocationException
+	private static void addParseErrors(String source, URI path, IValidationManager manager, List<IValidationItem> items)
 	{
-		IParseNode[] children = rootAST.getChildren();
-		List<String> selfClosingTags = Arrays.asList(HTMLParseState.END_FORBIDDEN_OR_EMPTY_TAGS);
+		addParseErrors(source, path, manager, items, manager.getAST());
+	}
+
+	private static void addParseErrors(String source, URI path, IValidationManager manager,
+			List<IValidationItem> items, IParseNode ast)
+	{
+		IParseNode[] children = ast.getChildren();
 		IDocument document = new Document(source);
 		int line, column;
 
@@ -129,22 +132,30 @@ public class HTMLTidyValidator implements IValidator
 		{
 			if (node instanceof HTMLElementNode)
 			{
-				if (((HTMLElementNode) node).isSelfClosing() && !selfClosingTags.contains(node.getNameNode().getName()))
+				if (((HTMLElementNode) node).isSelfClosing()
+						&& !HTMLParseState.isEndForbiddenOrEmptyTag((node.getNameNode().getName())))
 				{
-					line = document.getLineOfOffset(node.getStartingOffset());
-					column = node.getStartingOffset() - document.getLineOffset(line);
-					if (column > 0)
+					try
 					{
-						// Need to add +1 to line since we start from 1 (not 0) in the editor
-						items.add(manager.addError(
-								Messages.HTMLTidyValidator_self_closing_syntax_on_non_void_element_error, line + 1,
-								column, 0, path));
+						line = document.getLineOfOffset(node.getStartingOffset());
+						column = node.getStartingOffset() - document.getLineOffset(line);
+						if (column > 0)
+						{
+							// Need to add +1 to line since we start from 1 (not 0) in the editor
+							items.add(manager.addError(
+									Messages.HTMLTidyValidator_self_closing_syntax_on_non_void_element_error, line + 1,
+									column, 0, path));
+						}
+					}
+					catch (BadLocationException e)
+					{
+						IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ast_errors, e);
 					}
 				}
 			}
 			if (node.hasChildren())
 			{
-				addParseErrors(source, node, path, manager, items);
+				addParseErrors(source, path, manager, items, node);
 			}
 		}
 

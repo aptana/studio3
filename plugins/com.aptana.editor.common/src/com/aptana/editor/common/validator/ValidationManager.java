@@ -129,8 +129,7 @@ public class ValidationManager implements IValidationManager
 			{
 				continue;
 			}
-			List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this,
-					fFileService.getParseResult());
+			List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
 			String type = validatorRef.getMarkerType();
 			List<IValidationItem> items = fItemsByType.get(type);
 			if (items == null)
@@ -190,8 +189,7 @@ public class ValidationManager implements IValidationManager
 				try
 				{
 					String source = fDocument.get(node.getStartingOffset(), node.getLength());
-					List<IValidationItem> newItems = validator.validate(source, fResourceUri, this,
-							fFileService.getParseResult());
+					List<IValidationItem> newItems = validator.validate(source, fResourceUri, this);
 					int lines = fDocument.getLineOfOffset(node.getStartingOffset());
 					for (IValidationItem item : newItems)
 					{
@@ -421,5 +419,10 @@ public class ValidationManager implements IValidationManager
 	private static String getFilterExpressionsPrefKey(String language)
 	{
 		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
+	}
+
+	public IParseNode getAST()
+	{
+		return fFileService.getParseResult();
 	}
 }
