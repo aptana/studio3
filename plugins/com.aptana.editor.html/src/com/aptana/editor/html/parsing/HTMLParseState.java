@@ -7,11 +7,8 @@
  */
 package com.aptana.editor.html.parsing;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import com.aptana.editor.html.parsing.HTMLDocumentTypes.Type;
 import com.aptana.parsing.ParseState;
@@ -99,7 +96,13 @@ public class HTMLParseState extends ParseState
 
 	public static boolean isEndForbiddenOrEmptyTag(String name)
 	{
-		Set<String> set = new HashSet<String>(Arrays.asList(END_FORBIDDEN_OR_EMPTY_TAGS));
-		return set.contains(name);
+		for (String tagName : END_FORBIDDEN_OR_EMPTY_TAGS)
+		{
+			if (tagName.equals(name))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

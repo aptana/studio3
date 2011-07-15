@@ -133,7 +133,7 @@ public class HTMLTidyValidator implements IValidator
 			if (node instanceof HTMLElementNode)
 			{
 				if (((HTMLElementNode) node).isSelfClosing()
-						&& !HTMLParseState.isEndForbiddenOrEmptyTag((node.getNameNode().getName())))
+						&& !HTMLParseState.isEndForbiddenOrEmptyTag((((HTMLElementNode) node).getName())))
 				{
 					try
 					{
