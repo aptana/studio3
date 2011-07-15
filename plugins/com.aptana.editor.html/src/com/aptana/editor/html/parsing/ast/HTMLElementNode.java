@@ -33,8 +33,6 @@ public class HTMLElementNode extends HTMLNode
 	private Map<String, String> fAttributes;
 	private List<IParseNode> fCSSStyleNodes;
 	private List<IParseNode> fJSAttributeNodes;
-	private boolean fSelfClosing;
-
 	private boolean fIsSelfClosing;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
@@ -46,7 +44,6 @@ public class HTMLElementNode extends HTMLNode
 	{
 		super(HTMLNodeTypes.ELEMENT, children, start, end);
 		String tag = tagSymbol.value.toString();
-		fSelfClosing = false;
 		if (tag.length() > 0)
 		{
 			try
@@ -54,7 +51,6 @@ public class HTMLElementNode extends HTMLNode
 				if (tag.endsWith("/>")) //$NON-NLS-1$
 				{
 					// self-closing
-					fSelfClosing = true;
 					tag = getTagName(tag.substring(1, tag.length() - 2));
 					fIsSelfClosing = true;
 				}
@@ -251,11 +247,6 @@ public class HTMLElementNode extends HTMLNode
 			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		return text.toString();
-	}
-
-	public boolean isSelfClosing()
-	{
-		return fSelfClosing;
 	}
 
 	private String getSource()
