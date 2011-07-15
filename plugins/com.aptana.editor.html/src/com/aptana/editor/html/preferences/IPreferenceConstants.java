@@ -10,7 +10,7 @@ package com.aptana.editor.html.preferences;
 /**
  * IPreferenceContants
  */
-public interface IPreferenceContants
+public interface IPreferenceConstants
 {
 	/**
 	 * The value is a double used to indicate the current format being used by the HTML index categories.
@@ -22,4 +22,5 @@ public interface IPreferenceContants
 	 */
 	String HTML_AUTO_CLOSE_TAG_PAIRS = "HTML_AUTO_CLOSE_TAG_PAIRS"; //$NON-NLS-1$
 
+	String HTML_OUTLINE_TAG_ATTRIBUTES = "HTML_OUTLINE_TAG_ATTRIBUTES"; //$NON-NLS-1$
 }

@@ -505,7 +505,7 @@ public class HTMLParser implements IParser
 			fCurrentElement.addChild(element);
 		}
 
-		if (closeTagType != HTMLTagInfo.END_FORBIDDEN)
+		if (closeTagType != HTMLTagInfo.END_FORBIDDEN && !element.isSelfClosing())
 		{
 			fElementStack.push(fCurrentElement);
 			fCurrentElement = element;

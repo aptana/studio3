@@ -34,6 +34,8 @@ public class HTMLElementNode extends HTMLNode
 	private List<IParseNode> fCSSStyleNodes;
 	private List<IParseNode> fJSAttributeNodes;
 
+	private boolean fIsSelfClosing;
+
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
 		this(tagSymbol, new HTMLNode[0], start, end);
@@ -51,6 +53,7 @@ public class HTMLElementNode extends HTMLNode
 				{
 					// self-closing
 					tag = getTagName(tag.substring(1, tag.length() - 2));
+					fIsSelfClosing = true;
 				}
 				else
 				{
@@ -192,6 +195,11 @@ public class HTMLElementNode extends HTMLNode
 	public IParseNode[] getJSAttributeNodes()
 	{
 		return fJSAttributeNodes.toArray(new IParseNode[fJSAttributeNodes.size()]);
+	}
+
+	public boolean isSelfClosing()
+	{
+		return fIsSelfClosing;
 	}
 
 	@Override
