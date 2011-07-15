@@ -62,7 +62,7 @@ import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-import com.aptana.editor.html.preferences.IPreferenceContants;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 import com.aptana.editor.xml.TagUtil;
@@ -648,7 +648,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			// If user doesn't want tags closed for them, then don't do it!
 			boolean addCloseTag = HTMLPlugin.getDefault().getPreferenceStore()
-					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS);
+					.getBoolean(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS);
 
 			HTMLParseState state = null;
 			for (ElementElement element : elements)
