@@ -89,7 +89,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 			}
 
 			String source = document.get();
-			IParseRootNode parseResult = ParserPoolFactory.parse(this.getMainContentType(), source);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 
 			if (parseResult != null)
 			{
@@ -133,7 +133,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 
 		try
 		{
-			IParseRootNode parseResult = ParserPoolFactory.parse(this.getMainContentType(), input);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), input);
 			if (parseResult != null)
 			{
 				String output = format(input, parseResult, indentationLevel, offset, isSelection);

@@ -38,7 +38,9 @@ import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
@@ -72,22 +74,13 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
 			IFormattingContext formattingContext)
 	{
-		IParser parser = checkoutParser();
 		IParseState parseState = new HTMLParseState();
 		String source = document.get();
 		parseState.setEditState(source, null, 0, 0);
 		int indent = 0;
 		try
 		{
-			IParseNode parseResult = null;
-			try
-			{
-				parseResult = parser.parse(parseState);
-			}
-			finally
-			{
-				checkinParser(parser);
-			}
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), parseState);
 			if (parseResult != null)
 			{
 				final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();

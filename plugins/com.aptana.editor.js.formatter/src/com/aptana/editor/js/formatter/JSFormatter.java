@@ -90,6 +90,7 @@ import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -164,21 +165,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			{
 				return super.detectIndentationLevel(document, offset);
 			}
-			IParser parser = checkoutParser();
-			IParseState parseState = new ParseState();
 			String source = document.get();
-			parseState.setEditState(source, null, 0, 0);
-
-			IParseRootNode parseResult = null;
-			try
-			{
-				parseResult = parser.parse(parseState);
-			}
-			finally
-			{
-				checkinParser(parser);
-			}
-
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
@@ -216,13 +204,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		String originalText = source.substring(offset, offset + length);
 		String input = originalText.trim();
 		int inputOffset = offset + countLeftWhitespaceChars(originalText);
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
 		IParseRootNode parseResult = null;
 		try
 		{
-			parseResult = parser.parse(parseState);
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
 		}
 		catch (Exception e)
 		{
@@ -233,11 +218,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
 			// indentation level as much as we can.
 			return indent(source, input, offset, length, indentationLevel);
-		}
-		finally
-		{
-			// Make sure that if the parsing fails with an exception, we still check the parser back in.
-			checkinParser(parser);
 		}
 		try
 		{

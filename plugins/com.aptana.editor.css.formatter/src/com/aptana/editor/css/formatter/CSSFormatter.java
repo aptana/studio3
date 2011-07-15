@@ -34,9 +34,7 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -83,20 +81,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				return super.detectIndentationLevel(document, offset);
 			}
 
-			IParser parser = checkoutParser();
-			IParseState parseState = new ParseState();
 			String source = document.get();
-			parseState.setEditState(source, null, 0, 0);
-
-			IParseRootNode parseResult = null;
-			try
-			{
-				parseResult = parser.parse(parseState);
-			}
-			finally
-			{
-				checkinParser(parser);
-			}
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 			if (parseResult != null)
 			{
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
@@ -132,24 +118,17 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
 		try
 		{
 			IParseRootNode parseResult = null;
 			try
 			{
-				parseResult = parser.parse(parseState);
+				parseResult = ParserPoolFactory.parse(getMainContentType(), input);
 			}
 			catch (Exception e)
 			{
 				// In case of a parse error, just try to indent the given source.
 				return indent(source, input, offset, length, indentationLevel);
-			}
-			finally
-			{
-				checkinParser(parser);
 			}
 			if (parseResult != null)
 			{

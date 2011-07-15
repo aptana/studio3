@@ -383,7 +383,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	private boolean canIndent(String completeSource, int offset)
 	{
 		// input validation
-		if (completeSource == null || completeSource.length() == 0)
+		if (StringUtil.isEmpty(completeSource))
 		{
 			return true;
 		}
