@@ -21,10 +21,10 @@ public class HTMLParseState extends ParseState
 {
 
 	@SuppressWarnings("nls")
-	private static final String[] END_OPTIONAL_TAGS = { "body", "colgroup", "dd", "dt", "area", "html", "li", "option",
+	public static final String[] END_OPTIONAL_TAGS = { "body", "colgroup", "dd", "dt", "area", "html", "li", "option",
 			"p", "tbody", "td", "tfoot", "th", "thead", "tr" };
 	@SuppressWarnings("nls")
-	private static final String[] END_FORBIDDEN_OR_EMPTY_TAGS = { "area", "base", "basefont", "br", "col", "frame",
+	public static final String[] END_FORBIDDEN_OR_EMPTY_TAGS = { "area", "base", "basefont", "br", "col", "frame",
 			"hr", "img", "input", "isindex", "link", "meta", "param" };
 
 	private Type fDocumentType;

@@ -17,6 +17,8 @@ public class Messages extends NLS
 	public static String HTMLTidyValidator_ERR_ParseErrors;
 	public static String HTMLTidyValidator_ERR_Tidy;
 
+	public static String HTMLTidyValidator_self_closing_syntax_on_non_void_element_error;
+
 	static
 	{
 		// initialize resource bundle

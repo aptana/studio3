@@ -40,6 +40,7 @@ import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.parsing.ast.IParseNode;
 
 public class CSSValidator implements IValidator
 {
@@ -84,7 +85,7 @@ public class CSSValidator implements IValidator
 		loadAptanaCSSProfile();
 	}
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager, IParseNode rootAST)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = getReport(source, path);

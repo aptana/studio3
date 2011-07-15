@@ -15,10 +15,14 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.w3c.tidy.Tidy;
 
 import com.aptana.core.logging.IdeLog;
@@ -28,6 +32,9 @@ import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLTidyValidator implements IValidator
 {
@@ -43,7 +50,7 @@ public class HTMLTidyValidator implements IValidator
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED = { "lacks \"type\" attribute", "replacing illegal character code" };
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager, IParseNode rootAST)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = parseWithTidy(source);
@@ -54,11 +61,12 @@ public class HTMLTidyValidator implements IValidator
 			{
 				reader = new BufferedReader(new StringReader(report));
 				String line;
+				addParseErrors(source, rootAST, path, manager, items);
 				while ((line = reader.readLine()) != null)
 				{
 					if (line.startsWith("line")) //$NON-NLS-1$
 					{
-						parseTidyOutput(line, path, manager, items);
+						parseTidyOutput(line, path, manager, items, source);
 					}
 				}
 			}
@@ -103,9 +111,50 @@ public class HTMLTidyValidator implements IValidator
 		return bout.toString();
 	}
 
-	private static void parseTidyOutput(String report, URI path, IValidationManager manager, List<IValidationItem> items)
+	private static void addParseErrors(String source, IParseNode rootAST, URI path, IValidationManager manager,
+			List<IValidationItem> items) throws BadLocationException
+	{
+		IParseNode[] children = rootAST.getChildren();
+		List<String> selfClosingTags = Arrays.asList(HTMLParseState.END_FORBIDDEN_OR_EMPTY_TAGS);
+		IDocument document = new Document(source);
+		int line, column;
+
+		if (children == null || children.length == 0)
+		{
+			return;
+		}
+
+		// Go through the AST and find if there are invalid self closing elements
+		for (IParseNode node : children)
+		{
+			if (node instanceof HTMLElementNode)
+			{
+				if (((HTMLElementNode) node).isSelfClosing() && !selfClosingTags.contains(node.getNameNode().getName()))
+				{
+					line = document.getLineOfOffset(node.getStartingOffset());
+					column = node.getStartingOffset() - document.getLineOffset(line);
+					if (column > 0)
+					{
+						// Need to add +1 to line since we start from 1 (not 0) in the editor
+						items.add(manager.addError(
+								Messages.HTMLTidyValidator_self_closing_syntax_on_non_void_element_error, line + 1,
+								column, 0, path));
+					}
+				}
+			}
+			if (node.hasChildren())
+			{
+				addParseErrors(source, node, path, manager, items);
+			}
+		}
+
+	}
+
+	private static void parseTidyOutput(String report, URI path, IValidationManager manager,
+			List<IValidationItem> items, String source) throws BadLocationException
 	{
 		Matcher matcher = PATTERN.matcher(report);
+		IDocument document = new Document(source);
 
 		while (matcher.find())
 		{
@@ -113,9 +162,21 @@ public class HTMLTidyValidator implements IValidator
 			int column = Integer.parseInt(matcher.group(2));
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
+			boolean hasErrorOnCurrentLine = false;
+
+			// If we already have an error on the same line and offset, we don't add the tidy errors
+			for (IValidationItem item : items)
+			{
+				if (item.getLineNumber() == lineNumber
+						&& item.getOffset() == (column + document.getLineOffset(lineNumber - 1) - 1))
+				{
+					hasErrorOnCurrentLine = true;
+					break;
+				}
+			}
 
 			if (message != null && !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML)
-					&& !containsHTML5Element(message) && !isAutoFiltered(message))
+					&& !containsHTML5Element(message) && !isAutoFiltered(message) && !hasErrorOnCurrentLine)
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{

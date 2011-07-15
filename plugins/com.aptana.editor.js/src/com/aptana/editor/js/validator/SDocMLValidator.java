@@ -16,6 +16,7 @@ import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.sax.IValidatingReaderLogger;
 
 public class SDocMLValidator implements IValidator
@@ -92,7 +93,7 @@ public class SDocMLValidator implements IValidator
 	 * @see com.aptana.editor.common.validator.IValidator#validate(java.lang.String, java.net.URI,
 	 * com.aptana.editor.common.validator.IValidationManager)
 	 */
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager, IParseNode rootAST)
 	{
 		JSMetadataReader reader = new JSMetadataReader();
 		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());

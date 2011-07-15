@@ -32,6 +32,7 @@ import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSLintValidator implements IValidator
 {
@@ -43,7 +44,7 @@ public class JSLintValidator implements IValidator
 	{
 	}
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager, IParseNode rootAST)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		Context context = Context.enter();
