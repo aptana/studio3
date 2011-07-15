@@ -1,6 +1,14 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ui.preferences;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,7 +74,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		// labels
-		setDescription("Project build path for '" + project.getName() + "':");
+		setDescription(MessageFormat.format(Messages.ProjectBuildPathPropertyPage_TableDescription, project.getName()));
 		Label description = createDescriptionLabel(composite);
 		description.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
@@ -83,11 +91,11 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		table.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		TableColumn column1 = new TableColumn(table, SWT.LEFT);
-		column1.setText("Library");
+		column1.setText(Messages.ProjectBuildPathPropertyPage_LibraryColumnLabel);
 		column1.setWidth(165);
 
 		TableColumn column2 = new TableColumn(table, SWT.LEFT);
-		column2.setText("Path");
+		column2.setText(Messages.ProjectBuildPathPropertyPage_PathColumnLabel);
 		column2.setWidth(350);
 
 		tableViewer.setContentProvider(getContentProvider());
@@ -225,7 +233,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 						case 1:
 							result = entry.getPath().toString();
 
-							if (result != null && result.startsWith("file:"))
+							if (result != null && result.startsWith("file:")) //$NON-NLS-1$
 							{
 								File f = new File(entry.getPath());
 

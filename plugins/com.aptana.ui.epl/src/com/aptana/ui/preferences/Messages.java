@@ -14,7 +14,6 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.ui.preferences.messages"; //$NON-NLS-1$
 
 	public static String TroubleshootingPreferencePage_DebugSpecificComponents;
-
 	public static String TroubleshootingPreferencePage_LBL_DebuggingOutputLevel;
 	public static String TroubleshootingPreferencePage_LBL_Errors;
 	public static String TroubleshootingPreferencePage_LBL_All;
@@ -23,9 +22,7 @@ public class Messages extends NLS
 	public static String TroubleshootingPreferencePage_LBL_ErrorsAndImportant;
 	public static String TroubleshootingPreferencePage_LBL_OnlyError;
 	public static String TroubleshootingPreferencePage_LBL_NoDebuggingOutput;
-
 	public static String TroubleshootingPreferencePage_ShowHiddenProcesses;
-
 	public static String TroubleshootingPreferencePage_TroubleshootingPageHeader;
 
 	public static String GenericRootPage_genericPerferencesPageMessage;
@@ -33,10 +30,12 @@ public class Messages extends NLS
 	public static String GenericRootPage_preferences;
 
 	public static String PropertyAndPreferencePage_configureProjectSettings;
-
 	public static String PropertyAndPreferencePage_configureWorkspaceSettings;
-
 	public static String PropertyAndPreferencePage_enableProjectSpecific;
+
+	public static String ProjectBuildPathPropertyPage_TableDescription;
+	public static String ProjectBuildPathPropertyPage_LibraryColumnLabel;
+	public static String ProjectBuildPathPropertyPage_PathColumnLabel;
 
 	static
 	{

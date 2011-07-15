@@ -37,6 +37,7 @@ import com.aptana.core.util.StringUtil;
  */
 public class BuildPathManager
 {
+	private static final String PROJECT_BUILD_PATH_PROPERTY_NAME = "projectBuildPath"; //$NON-NLS-1$
 	private static final String NAME_AND_PATH_DELIMITER = "\t"; //$NON-NLS-1$
 	private static final String BUILD_PATH_ENTRY_DELIMITER = "\0"; //$NON-NLS-1$
 
@@ -154,7 +155,7 @@ public class BuildPathManager
 	 */
 	protected QualifiedName getBuildPathPropertyName()
 	{
-		return new QualifiedName(BuildPathCorePlugin.PLUGIN_ID, "projectBuildPath");
+		return new QualifiedName(BuildPathCorePlugin.PLUGIN_ID, PROJECT_BUILD_PATH_PROPERTY_NAME);
 	}
 
 	/**

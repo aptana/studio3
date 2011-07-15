@@ -348,7 +348,7 @@
       <page
             class="com.aptana.ui.preferences.ProjectBuildPathPropertyPage"
             id="com.aptana.editor.common.projectBuildPath"
-            name="Project Build Path">
+            name="%buildPath.property.page.name">
             <enabledWhen>
             <and>
                <instanceof

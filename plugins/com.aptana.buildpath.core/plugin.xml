@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-	<extension-point id="buildPaths" name="buildPaths" schema="schema/buildPaths.exsd"/>
+	<extension-point id="buildPaths" name="%buildPaths.extensionPoint.name" schema="schema/buildPaths.exsd"/>
 	<extension
          point="com.aptana.index.core.fileContributors">
       <contributor
