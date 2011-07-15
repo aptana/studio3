@@ -8,9 +8,9 @@
 package com.aptana.ide.core.io.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
@@ -21,7 +21,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IEclipsePreferences prefs = (new DefaultScope()).getNode(CoreIOPlugin.PLUGIN_ID);
+        IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(CoreIOPlugin.PLUGIN_ID);
         prefs.putLong(IPreferenceConstants.FILE_PERMISSION, DEFAULT_FILE_PERMISSIONS);
         prefs.putLong(IPreferenceConstants.DIRECTORY_PERMISSION, DEFAULT_DIRECTORY_PERMISSIONS);
         prefs.put(IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS, DEFAULT_CLOAK_EXPRESSIONS);

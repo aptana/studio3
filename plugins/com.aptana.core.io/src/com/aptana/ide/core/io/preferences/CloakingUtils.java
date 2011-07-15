@@ -13,9 +13,9 @@ import java.util.List;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
@@ -138,7 +138,7 @@ public class CloakingUtils {
 
     public static void setCloakedFileTypes(String[] filetypes) {
         String value = StringUtil.join(";", filetypes); //$NON-NLS-1$
-        IEclipsePreferences prefs = (new InstanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
+        IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
         prefs.put(IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS, value);
         try {
             prefs.flush();

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -38,6 +37,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.heroku.HerokuAPI;
 import com.aptana.deploy.heroku.HerokuDeployProvider;
@@ -125,7 +125,7 @@ public class HerokuDeployWizard extends AbstractDeployWizard
 		final boolean publishImmediately = page.publishImmediately();
 
 		// persists the auto-publish setting
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(HerokuPlugin.getPluginIdentifier());
+		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(HerokuPlugin.getPluginIdentifier());
 		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, publishImmediately);
 		try
 		{

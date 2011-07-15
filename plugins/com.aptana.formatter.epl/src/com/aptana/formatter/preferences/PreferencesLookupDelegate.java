@@ -19,7 +19,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+
+import com.aptana.core.util.EclipseUtil;
 
 /**
  * Delegates preferences lookup to the {@link IPreferencesService preference service}
@@ -103,8 +104,8 @@ public class PreferencesLookupDelegate
 	private IScopeContext[] getLookupScopes(IProject project)
 	{
 		List<IScopeContext> list = new ArrayList<IScopeContext>(3);
-		list.add(new InstanceScope());
-		list.add(new DefaultScope());
+		list.add(EclipseUtil.instanceScope());
+		list.add(EclipseUtil.defaultScope());
 
 		if (project != null)
 		{

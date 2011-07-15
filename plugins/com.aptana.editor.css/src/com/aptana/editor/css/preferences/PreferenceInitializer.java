@@ -8,9 +8,9 @@
 package com.aptana.editor.css.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
@@ -23,7 +23,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(CSSPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CSSPlugin.PLUGIN_ID);
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
@@ -40,7 +40,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// mark occurrences
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 
-		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs = EclipseUtil.defaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 
 		String[] filtered = new String[] { ".*Unknown pseudo-element.*", "Property\\s*[-_].*doesn't exist.*",
 				".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*",

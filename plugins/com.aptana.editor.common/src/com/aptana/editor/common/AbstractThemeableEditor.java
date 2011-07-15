@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -99,6 +98,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResource;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.FoldingActionsGroup;
@@ -743,7 +743,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				if (dialog.getToggleState())
 				{
 					// the decision is remembered, so saves it
-					IEclipsePreferences prefs = (new InstanceScope()).getNode(CommonEditorPlugin.PLUGIN_ID);
+					IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CommonEditorPlugin.PLUGIN_ID);
 					prefs.putBoolean(IPreferenceConstants.REMEMBER_UNTITLED_FILE_SAVE_TYPE, true);
 					prefs.putBoolean(IPreferenceConstants.SAVE_UNTITLED_FILE_TO_PROJECT, saveToProject);
 					try

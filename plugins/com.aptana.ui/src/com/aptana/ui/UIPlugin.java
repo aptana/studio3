@@ -60,7 +60,7 @@ public class UIPlugin extends AbstractUIPlugin
 				{
 					resetPerspective(page);
 					// we will only ask once regardless if user chose to update the perspective
-					IEclipsePreferences prefs = (new InstanceScope()).getNode(PLUGIN_ID);
+					IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(PLUGIN_ID);
 					prefs.putInt(IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 					try
 					{
@@ -240,7 +240,7 @@ public class UIPlugin extends AbstractUIPlugin
 				IPreferenceConstants.IDE_HAS_LAUNCHED_BEFORE, false, null);
 		if (!hasStartedBefore)
 		{
-			IEclipsePreferences prefs = (new InstanceScope()).getNode(PLUGIN_ID);
+			IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(PLUGIN_ID);
 			prefs.putInt(IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 			prefs.putBoolean(IPreferenceConstants.IDE_HAS_LAUNCHED_BEFORE, true);
 			try

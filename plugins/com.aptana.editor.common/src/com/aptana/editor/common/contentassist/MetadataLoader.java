@@ -23,12 +23,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.index.core.Index;
 
@@ -227,7 +227,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 */
 	protected void updateVersionPreference()
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(this.getPluginId());
+		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(this.getPluginId());
 
 		prefs.putDouble(this.getIndexVersionKey(), this.getIndexVersion());
 

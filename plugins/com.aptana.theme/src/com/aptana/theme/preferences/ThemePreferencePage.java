@@ -21,7 +21,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -104,6 +103,7 @@ import org.eclipse.ui.internal.themes.ThemeElementHelper;
 import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.DelayedTextAttribute;
@@ -1222,7 +1222,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Object source = e.getSource();
 		if (source == fInvasiveThemeCheckbox)
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 			prefs.putBoolean(IPreferenceConstants.INVASIVE_THEMES, fInvasiveThemeCheckbox.getSelection());
 			try
 			{
@@ -1235,7 +1235,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 		else if (source == fInvasiveFontCheckbox)
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 			prefs.putBoolean(IPreferenceConstants.INVASIVE_FONT, fInvasiveFontCheckbox.getSelection());
 			try
 			{

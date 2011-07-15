@@ -9,9 +9,9 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.util.EclipseUtil;
 
 public class TaskTag
 {
@@ -77,14 +77,14 @@ public class TaskTag
 
 	public static boolean isCaseSensitive()
 	{
-		IScopeContext[] contexts = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+		IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		return Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
 				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
 	}
 
 	public static Collection<TaskTag> getTaskTags()
 	{
-		IScopeContext[] contexts = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+		IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
 				ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
 		String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
