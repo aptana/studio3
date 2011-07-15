@@ -154,4 +154,52 @@
             name="arguments">
       </attribute>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.editor.html.outline.ToggleTextNodesHandler"
+            id="com.aptana.editor.html.outline.toggle_text"
+            name="%command.outline.showtext.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:false"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.editor.html.outline.toggle_text"
+            icon="icons/show_text.png">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.views.ContentOutline">
+         <command
+               commandId="com.aptana.editor.html.outline.toggle_text"
+               label="%command.outline.showtext.label"
+               style="toggle">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="com.aptana.editor.html.isHTMLEditor">
+               </reference>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.editor.html.isHTMLEditor">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="com.aptana.editor.html">
+            </equals>
+         </with>
+      </definition>
+   </extension>
 </plugin>

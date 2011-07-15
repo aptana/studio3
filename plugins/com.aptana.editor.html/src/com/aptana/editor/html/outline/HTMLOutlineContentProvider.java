@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -26,6 +27,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.ICSSConstants;
@@ -36,6 +38,7 @@ import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.parsing.ParserPoolFactory;
@@ -328,10 +331,17 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		HTMLElementNode element;
 		for (IParseNode node : nodes)
 		{
-			if (node instanceof HTMLCommentNode || node instanceof HTMLTextNode)
+			if (node instanceof HTMLCommentNode)
 			{
 				// ignores comment nodes in outline
 				continue;
+			}
+			if (node instanceof HTMLTextNode)
+			{
+				if (!isShowTextNodes() || StringUtil.isEmpty(((HTMLTextNode) node).getText()))
+				{
+					continue;
+				}
 			}
 			if (node instanceof HTMLElementNode)
 			{
@@ -356,5 +366,11 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		this.treeViewer = (TreeViewer) viewer;
 		super.inputChanged(viewer, oldInput, newInput);
+	}
+
+	private static boolean isShowTextNodes()
+	{
+		return Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
+				IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
 	}
 }

@@ -16,6 +16,8 @@ import com.aptana.editor.html.HTMLPlugin;
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
+	public static final String DEFAULT_TAG_ATTRIBUTES_TO_SHOW = "id class src href"; //$NON-NLS-1$
+
 	@Override
 	public void initializeDefaultPreferences()
 	{
@@ -29,6 +31,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
+		prefs.put(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, DEFAULT_TAG_ATTRIBUTES_TO_SHOW);
 
 		// mark occurrences
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
