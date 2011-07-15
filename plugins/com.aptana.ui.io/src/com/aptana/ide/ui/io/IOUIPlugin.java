@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -41,6 +40,7 @@ import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -194,7 +194,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 		addPartListener();
 	}
 
@@ -204,7 +204,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 	public void stop(BundleContext context) throws Exception
 	{
 		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
 		removePartListener();
 		plugin = null;
 		super.stop(context);

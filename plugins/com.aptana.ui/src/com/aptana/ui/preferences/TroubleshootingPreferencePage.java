@@ -60,7 +60,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		super(GRID);
 
-		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(new InstanceScope(),
+		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(EclipseUtil.instanceScope(),
 				CorePlugin.getDefault().getBundle().getSymbolicName());
 		setPreferenceStore(preferenceStore);
 		setDescription(Messages.TroubleshootingPreferencePage_TroubleshootingPageHeader);

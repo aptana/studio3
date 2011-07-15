@@ -174,7 +174,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 
 	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
 		if (revertToDefaults)
 		{
 			prefs.remove("org.eclipse.debug.ui.errorColor"); //$NON-NLS-1$
@@ -538,13 +538,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
-		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
-		setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
+		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
+		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
-		setGitAndMercurialValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
+		setGitAndMercurialValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 
-		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
-		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
+		setGeneralEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
+		setEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
 
 		if (monitor.isCanceled())
 		{
@@ -552,7 +552,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 
 		// PDE
-		IEclipsePreferences pdePrefs = new InstanceScope().getNode("org.eclipse.pde.ui"); //$NON-NLS-1$
+		IEclipsePreferences pdePrefs = EclipseUtil.instanceScope().getNode("org.eclipse.pde.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
 		setPDEEditorValues(theme, pdePrefs, revertToDefaults);
 
@@ -562,7 +562,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 
 		// Ant
-		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui"); //$NON-NLS-1$
+		IEclipsePreferences antPrefs = EclipseUtil.instanceScope().getNode("org.eclipse.ant.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
 		setAntEditorValues(theme, antPrefs, revertToDefaults);
 
@@ -572,11 +572,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 
 		// Now set for JDT...
-		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui"); //$NON-NLS-1$
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.jdt.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// Set prefs for JDT so it's various tokens get colors that match up to our theme!
-		// prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
+		// prefs = EclipseUtil.instanceScope().getNode("org.eclipse.jdt.ui");
 		setToken(prefs, theme, "string.quoted.double.java", "java_string", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		setToken(prefs, theme, "source.java", "java_default", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		setToken(prefs, theme, "keyword", "java_keyword", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1106,13 +1106,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 	public void apply()
 	{
 		earlyStartup();
-		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.addPreferenceChangeListener(this);
 	}
 
 	public void dispose()
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.removePreferenceChangeListener(this);
 		pageListener = null;
 	}

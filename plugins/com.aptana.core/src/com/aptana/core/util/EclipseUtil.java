@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
@@ -403,7 +405,7 @@ public class EclipseUtil
 			{
 				continue;
 			}
-			ServiceReference sRef = bundleContext.getServiceReference(DebugOptions.class.getName());
+			ServiceReference<?> sRef = bundleContext.getServiceReference(DebugOptions.class.getName());
 			DebugOptions options = (DebugOptions) bundleContext.getService(sRef);
 
 			// have to set debug enabled first if re-enabling, or else the internal property list will be null
@@ -436,4 +438,29 @@ public class EclipseUtil
 		}
 		return new String[0];
 	}
+
+	/**
+	 * Wrapper for Eclipse 3.6- to collect all deprecated usages into a single location. Once Eclipse 3.7 is the default
+	 * base platform, we can remove this call.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public static InstanceScope instanceScope()
+	{
+		return new InstanceScope();
+	}
+
+	/**
+	 * Wrapper for Eclipse 3.6- to collect all deprecated usages into a single location. Once Eclipse 3.7 is the default
+	 * base platform, we can remove this call.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public static DefaultScope defaultScope()
+	{
+		return new DefaultScope();
+	}
+
 }

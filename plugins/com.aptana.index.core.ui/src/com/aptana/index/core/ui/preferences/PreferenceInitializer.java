@@ -8,9 +8,9 @@
 package com.aptana.index.core.ui.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.index.core.ui.IndexUiActivator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -22,7 +22,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (new DefaultScope()).getNode(IndexUiActivator.PLUGIN_ID);
+		IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(IndexUiActivator.PLUGIN_ID);
 
 		prefs.put(IPreferenceConstants.FILTERED_INDEX_URIS, IPreferenceConstants.NO_ITEMS);
 	}

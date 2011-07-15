@@ -298,7 +298,7 @@ public class IdeLogTest extends TestCase
 
 	public void testPreferenceChange()
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(CorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CorePlugin.PLUGIN_ID);
 		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, StatusLevel.INFO.toString());
 		assertEquals(StatusLevel.INFO, IdeLog.getCurrentSeverity());
 

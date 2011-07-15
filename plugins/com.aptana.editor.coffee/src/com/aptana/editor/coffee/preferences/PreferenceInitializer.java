@@ -8,10 +8,10 @@
 package com.aptana.editor.coffee.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.coffee.CoffeeScriptEditorPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -23,7 +23,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(CoffeeScriptEditorPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CoffeeScriptEditorPlugin.PLUGIN_ID);
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);

@@ -12,7 +12,6 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -20,6 +19,7 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
@@ -49,7 +49,7 @@ public class ExportConnectionsWizard extends Wizard implements IExportWizard
 		boolean isOverwriting = mainPage.isOverwritingExistingFile();
 
 		// saves the preferences
-		IEclipsePreferences prefs = new InstanceScope().getNode(SyncingUIPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(SyncingUIPlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.EXPORT_INITIAL_PATH, path.toOSString());
 		prefs.putBoolean(IPreferenceConstants.EXPORT_OVEWRITE_FILE_WITHOUT_WARNING, isOverwriting);
 		try

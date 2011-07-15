@@ -65,10 +65,10 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.js.formatter.JSFormatterPlugin;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
@@ -88,7 +88,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences store = new DefaultScope().getNode(JSFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(JSFormatterPlugin.PLUGIN_ID);
 
 		store.put(FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$

@@ -8,9 +8,9 @@
 package com.aptana.editor.json.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
@@ -26,7 +26,7 @@ public class JSONPreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences pref = new DefaultScope().getNode(JSONPlugin.PLUGIN_ID);
+		IEclipsePreferences pref = EclipseUtil.defaultScope().getNode(JSONPlugin.PLUGIN_ID);
 
 		pref.put(IPreferenceConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$

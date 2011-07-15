@@ -9,9 +9,9 @@
 package com.aptana.webserver.core.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -25,7 +25,7 @@ public class WebServerPreferenceInitializer extends AbstractPreferenceInitialize
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = new DefaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
+		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
 		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_ADDRESS);
 		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS,
 				IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[0] + "-" + IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1]); //$NON-NLS-1$
