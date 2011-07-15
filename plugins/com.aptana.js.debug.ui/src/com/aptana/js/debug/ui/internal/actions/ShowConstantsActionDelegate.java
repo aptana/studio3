@@ -8,7 +8,6 @@
 package com.aptana.js.debug.ui.internal.actions;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.IAction;
@@ -22,6 +21,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
@@ -115,7 +115,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 	}
 
 	protected IEclipsePreferences getPreferences() {
-		return new InstanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
+		return EclipseUtil.instanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
 	}
 
 	/*

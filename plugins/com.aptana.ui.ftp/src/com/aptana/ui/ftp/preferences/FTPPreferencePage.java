@@ -9,7 +9,6 @@ package com.aptana.ui.ftp.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
@@ -24,6 +23,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.preferences.FTPPreferenceInitializer;
@@ -59,7 +59,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public boolean performOk()
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
 		prefs.putLong(IPreferenceConstants.FILE_PERMISSION, fFilePermissions.getPermissions());
 		prefs.putLong(IPreferenceConstants.DIRECTORY_PERMISSION, fDirectoryPermissions.getPermissions());
 		try
@@ -70,7 +70,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		{
 		}
 
-		prefs = (new InstanceScope()).getNode(FTPPlugin.PLUGIN_ID);
+		prefs = (EclipseUtil.instanceScope()).getNode(FTPPlugin.PLUGIN_ID);
 		prefs.putInt(IFTPPreferenceConstants.KEEP_ALIVE_TIME, Integer.parseInt(fKeepAliveText.getText()));
 		try
 		{

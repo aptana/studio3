@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.BadLocationException;
@@ -48,6 +47,7 @@ import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
@@ -110,7 +110,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 		if (getPreferenceNodeQualifier() != null)
 		{
-			new InstanceScope().getNode(getPreferenceNodeQualifier()).addPreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(getPreferenceNodeQualifier()).addPreferenceChangeListener(this);
 		}
 	}
 
@@ -820,7 +820,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		if (getPreferenceNodeQualifier() != null)
 		{
-			new InstanceScope().getNode(getPreferenceNodeQualifier()).removePreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(getPreferenceNodeQualifier()).removePreferenceChangeListener(this);
 		}
 	}
 }

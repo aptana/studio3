@@ -8,13 +8,13 @@
 package com.aptana.editor.html.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.html.HTMLEditor;
 import com.aptana.editor.html.HTMLPlugin;
@@ -46,7 +46,7 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 		final Composite fieldEditorGroup = new Composite(parent, SWT.NONE);
 		fieldEditorGroup.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
 
-		BooleanFieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS,
+		BooleanFieldEditor closingTag = new BooleanFieldEditor(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS,
 				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, fieldEditorGroup);
 
 		addField(closingTag);
@@ -58,7 +58,7 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IEclipsePreferences getPluginPreferenceStore()
 	{
-		return new InstanceScope().getNode(HTMLPlugin.PLUGIN_ID);
+		return EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
 	}
 
 	@Override

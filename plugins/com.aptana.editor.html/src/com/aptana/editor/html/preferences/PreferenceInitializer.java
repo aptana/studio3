@@ -8,9 +8,9 @@
 package com.aptana.editor.html.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -19,14 +19,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (new DefaultScope()).getNode(HTMLPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(HTMLPlugin.PLUGIN_ID);
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
-		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
+		prefs.putDouble(IPreferenceConstants.HTML_INDEX_VERSION, 0);
 		prefs.put(
 				com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
 				"</>=&'\" "); //$NON-NLS-1$
-		prefs.putBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
+		prefs.putBoolean(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 

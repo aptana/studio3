@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -39,6 +38,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
@@ -91,7 +91,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 						public void run()
 						{
-							IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+							IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 							// Quick Diff colors
 							prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
 							prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
@@ -111,7 +111,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 				}
 			}
 		};
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 		checkHasGit();
 	}
 
@@ -125,7 +125,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			if (themeChangeListener != null)
 			{
-				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
 			}
 			themeChangeListener = null;
 		}

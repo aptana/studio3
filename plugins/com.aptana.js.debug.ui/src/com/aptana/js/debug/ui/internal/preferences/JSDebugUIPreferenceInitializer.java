@@ -8,7 +8,6 @@
 package com.aptana.js.debug.ui.internal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
@@ -16,6 +15,7 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.RGB;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
@@ -29,7 +29,7 @@ public class JSDebugUIPreferenceInitializer extends AbstractPreferenceInitialize
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = new DefaultScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
+		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
 
 		// default preferences
 		node.putBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, true);
@@ -38,7 +38,7 @@ public class JSDebugUIPreferenceInitializer extends AbstractPreferenceInitialize
 		node.put(IJSDebugUIConstants.CONSOLE_WARN_COLOR, StringConverter.asString(new RGB(255, 215, 0)));
 
 		// override default org.eclipse.debug.ui options
-		node = new DefaultScope().getNode(DebugUIPlugin.getDefault().getBundle().getSymbolicName());
+		node = EclipseUtil.defaultScope().getNode(DebugUIPlugin.getDefault().getBundle().getSymbolicName());
 		if (MessageDialogWithToggle.NEVER.equals(node.get(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, StringUtil.EMPTY))) {
 			node.put(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.PROMPT);
 		}

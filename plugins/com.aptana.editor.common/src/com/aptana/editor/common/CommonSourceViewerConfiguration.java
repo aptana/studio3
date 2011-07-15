@@ -18,7 +18,6 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -56,6 +55,7 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
@@ -110,13 +110,13 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		fDoubleClickStrategy = null;
 		if (fAutoActivationListener != null)
 		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fAutoActivationListener);
 			fAutoActivationListener = null;
 		}
 		if (fThemeChangeListener != null)
 		{
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
 
@@ -218,7 +218,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				setAutoActivationOptions(assistant);
 			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
 
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 		assistant.setContextInformationPopupBackground(getThemeBackground());
@@ -239,7 +239,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				}
 			}
 		};
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
 		return assistant;
 	}

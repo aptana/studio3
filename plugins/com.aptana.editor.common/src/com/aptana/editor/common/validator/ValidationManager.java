@@ -284,7 +284,8 @@ public class ValidationManager implements IValidationManager
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), Messages.ProjectFileValidationListener_ERR_UpdateMarkers, e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), Messages.ProjectFileValidationListener_ERR_UpdateMarkers,
+					e);
 		}
 	}
 
@@ -418,5 +419,10 @@ public class ValidationManager implements IValidationManager
 	private static String getFilterExpressionsPrefKey(String language)
 	{
 		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
+	}
+
+	public IParseNode getAST()
+	{
+		return fFileService.getParseResult();
 	}
 }

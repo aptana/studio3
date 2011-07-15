@@ -22,7 +22,7 @@ import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
-import com.aptana.editor.html.preferences.IPreferenceContants;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
@@ -76,7 +76,7 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 	@Override
 	protected String getIndexVersionKey()
 	{
-		return IPreferenceContants.HTML_INDEX_VERSION;
+		return IPreferenceConstants.HTML_INDEX_VERSION;
 	}
 
 	/*
