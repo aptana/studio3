@@ -405,7 +405,7 @@ public class EclipseUtil
 			{
 				continue;
 			}
-			ServiceReference<?> sRef = bundleContext.getServiceReference(DebugOptions.class.getName());
+			ServiceReference sRef = bundleContext.getServiceReference(DebugOptions.class.getName());
 			DebugOptions options = (DebugOptions) bundleContext.getService(sRef);
 
 			// have to set debug enabled first if re-enabling, or else the internal property list will be null
