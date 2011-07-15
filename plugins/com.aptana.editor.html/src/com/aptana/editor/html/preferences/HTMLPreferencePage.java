@@ -46,7 +46,7 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 		final Composite fieldEditorGroup = new Composite(parent, SWT.NONE);
 		fieldEditorGroup.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
 
-		BooleanFieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS,
+		BooleanFieldEditor closingTag = new BooleanFieldEditor(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS,
 				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, fieldEditorGroup);
 
 		addField(closingTag);
