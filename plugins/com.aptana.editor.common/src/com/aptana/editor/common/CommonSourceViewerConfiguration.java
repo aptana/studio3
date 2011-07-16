@@ -495,22 +495,22 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * )
 	 */
 	@Override
-	public IReconciler getReconciler(ISourceViewer sourceViewer)
-	{
-		if (fTextEditor != null && fTextEditor.isEditable())
-		{
-			fReconcilingStrategy = new CommonCompositeReconcilingStrategy(fTextEditor,
-					getConfiguredDocumentPartitioning(sourceViewer));
-			CommonReconciler reconciler = new CommonReconciler(fTextEditor, fReconcilingStrategy, false);
-
+	public IReconciler getReconciler(ISourceViewer sourceViewer) {
+		if (fTextEditor != null && fTextEditor.isEditable()) {
+			fReconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
+			CommonReconciler reconciler = new CommonReconciler(fReconcilingStrategy);
+			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 			reconciler.setIsIncrementalReconciler(false);
 			reconciler.setIsAllowedToModifyDocument(false);
 			reconciler.setProgressMonitor(new NullProgressMonitor());
 			reconciler.setDelay(500);
-
+			SpellingService spellingService = EditorsUI.getSpellingService();
+			reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
+					new CommonReconcilingStrategy(fTextEditor),
+					new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService)),
+				getSpellingContentTypes(sourceViewer));
 			return reconciler;
 		}
-
 		return null;
 	}
 
