@@ -19,7 +19,7 @@ public class CommonReconciler extends Reconciler {
 
 	private final IReconcilingStrategy defaultStrategy;
 	private BundleChangeReconcileTrigger bundleChangeReconcileTrigger;
-	
+
 	/**
 	 * Used for performance testing purposes so we can see if we've finished our
 	 * first reconcile!

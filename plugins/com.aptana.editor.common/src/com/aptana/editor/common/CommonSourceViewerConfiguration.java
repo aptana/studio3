@@ -383,6 +383,18 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return "\t"; //$NON-NLS-1$
 	}
 
+	private final String[] getSpellingContentTypes(ISourceViewer sourceViewer) {
+		Set<String> set = new HashSet<String>();
+		IContentTypeTranslator contentTypeTranslator = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		String topContentType = getTopContentTypes()[0][0];
+		for (String contentType : getConfiguredContentTypes(sourceViewer)) {
+			if (SpellingPreferences.isSpellingEnabledFor(contentTypeTranslator.translate(new QualifiedContentType(topContentType, contentType)))) {
+				set.add(contentType);
+			}
+		}
+		return set.toArray(new String[set.size()]);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -504,11 +516,15 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			reconciler.setIsAllowedToModifyDocument(false);
 			reconciler.setProgressMonitor(new NullProgressMonitor());
 			reconciler.setDelay(500);
-			SpellingService spellingService = EditorsUI.getSpellingService();
-			reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
-					new CommonReconcilingStrategy(fTextEditor),
-					new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService)),
-				getSpellingContentTypes(sourceViewer));
+			if (EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED)) {
+				SpellingService spellingService = EditorsUI.getSpellingService();
+				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null) {
+					reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
+							fReconcilingStrategy,
+							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService)),
+						getSpellingContentTypes(sourceViewer));
+				}
+			}
 			return reconciler;
 		}
 		return null;

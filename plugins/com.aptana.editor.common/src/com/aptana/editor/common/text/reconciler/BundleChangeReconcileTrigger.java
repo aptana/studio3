@@ -20,6 +20,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.LoadCycleListener;
 
 /**
+ * @author Chris Williams
  * @author Max Stepanov
  *
  */
