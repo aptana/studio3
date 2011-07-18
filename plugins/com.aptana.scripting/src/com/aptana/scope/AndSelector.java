@@ -48,18 +48,15 @@ public class AndSelector extends BinarySelector
 				}
 				while (true)
 				{
-					context.pushCurrentStep();
 					if (this._right.matches(context))
 					{
 						// matched at current step, append match results
 						matchResults.addAll(this._right.matchResults());
 						result = true;
-						context.popCurrentStep();
 						break;
 					}
 					// didn't match at this step, mark down a zero
 					matchResults.add(0);
-					context.popCurrentStep();
 					if (context.canAdvance())
 					{
 						context.advance();
