@@ -24,9 +24,9 @@ import com.aptana.editor.common.IPartitionerSwitchStrategy;
 
 /**
  * @author Max Stepanov
- * 
  */
-public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
+public final class CompositePartitionScanner extends RuleBasedPartitionScanner
+{
 
 	public final static String START_SWITCH_TAG = "__common_start_switch_tag"; //$NON-NLS-1$
 	public final static String END_SWITCH_TAG = "__common_end_switch_tag"; //$NON-NLS-1$
@@ -50,8 +50,9 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	/**
 	 * 
 	 */
-	public CompositePartitionScanner(ISubPartitionScanner defaultPartitionScanner, ISubPartitionScanner primaryPartitionScanner,
-			IPartitionerSwitchStrategy partitionerSwitchStrategy) {
+	public CompositePartitionScanner(ISubPartitionScanner defaultPartitionScanner,
+			ISubPartitionScanner primaryPartitionScanner, IPartitionerSwitchStrategy partitionerSwitchStrategy)
+	{
 		this.defaultPartitionScanner = defaultPartitionScanner;
 		this.primaryPartitionScanner = primaryPartitionScanner;
 
@@ -60,8 +61,10 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 		String[][] pairs = partitionerSwitchStrategy.getSwitchTagPairs();
 		switchRules = new IPredicateRule[pairs.length][];
-		for (int i = 0; i < pairs.length; ++i) {
-			switchRules[i] = new IPredicateRule[] { new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG)), new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG)) };
+		for (int i = 0; i < pairs.length; ++i)
+		{
+			switchRules[i] = new IPredicateRule[] { new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG)),
+					new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG)) };
 		}
 
 		currentPartitionScanner = defaultPartitionScanner;
@@ -72,52 +75,60 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	 * @param partitioner
 	 *            the partitioner to set
 	 */
-	public/* package */void setPartitioner(IExtendedPartitioner partitioner) {
+	public/* package */void setPartitioner(IExtendedPartitioner partitioner)
+	{
 		this.partitioner = partitioner;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.text.rules.RuleBasedPartitionScanner#setPredicateRules
+	 * @see org.eclipse.jface.text.rules.RuleBasedPartitionScanner#setPredicateRules
 	 * (org.eclipse.jface.text.rules.IPredicateRule[])
 	 */
 	@Override
-	public void setPredicateRules(IPredicateRule[] rules) {
+	public void setPredicateRules(IPredicateRule[] rules)
+	{
 		throw new UnsupportedOperationException();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.text.rules.RuleBasedPartitionScanner#setPartialRange
-	 * (org.eclipse.jface.text.IDocument, int, int, java.lang.String, int)
+	 * @see org.eclipse.jface.text.rules.RuleBasedPartitionScanner#setPartialRange (org.eclipse.jface.text.IDocument,
+	 * int, int, java.lang.String, int)
 	 */
 	@Override
-	public void setPartialRange(IDocument document, int offset, int length, String contentType, int partitionOffset) {
+	public void setPartialRange(IDocument document, int offset, int length, String contentType, int partitionOffset)
+	{
 		defaultTokenState = null;
 		hasResume = false;
 		currentPartitionScanner = defaultPartitionScanner;
 		currentPartitionScanner.setLastToken(contentType != null ? new Token(contentType) : null);
-		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null)
+		{
 			TypedPosition partition = partitioner.findClosestPosition(offset);
-			if (partition != null) {
-				if (partition.overlapsWith(offset, length)) {
+			if (partition != null)
+			{
+				if (partition.overlapsWith(offset, length))
+				{
 					partition = partitioner.findClosestPosition(offset - 1);
 				}
 			}
-			if (partition != null) {
+			if (partition != null)
+			{
 				String type = partition.getType();
-				if (primaryPartitionScanner.hasContentType(type)) {
+				if (primaryPartitionScanner.hasContentType(type))
+				{
 					currentPartitionScanner = primaryPartitionScanner;
-				} else if (START_SWITCH_TAG.equals(type)) {
+				}
+				else if (START_SWITCH_TAG.equals(type))
+				{
 					hasSwitch = true;
 				}
 				currentPartitionScanner.setLastToken(new Token(type));
 			}
-		} else if (primaryPartitionScanner.hasContentType(contentType)) {
+		}
+		else if (primaryPartitionScanner.hasContentType(contentType))
+		{
 			currentPartitionScanner = primaryPartitionScanner;
 		}
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
@@ -125,12 +136,13 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenOffset()
 	 */
 	@Override
-	public int getTokenOffset() {
-		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+	public int getTokenOffset()
+	{
+		if (defaultTokenState != null && defaultTokenState.hasToken())
+		{
 			return defaultTokenState.offset;
 		}
 		return super.getTokenOffset();
@@ -138,12 +150,13 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenLength()
 	 */
 	@Override
-	public int getTokenLength() {
-		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+	public int getTokenLength()
+	{
+		if (defaultTokenState != null && defaultTokenState.hasToken())
+		{
 			return defaultTokenState.length;
 		}
 		return super.getTokenLength();
@@ -151,12 +164,13 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getColumn()
 	 */
 	@Override
-	public int getColumn() {
-		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+	public int getColumn()
+	{
+		if (defaultTokenState != null && defaultTokenState.hasToken())
+		{
 			return defaultTokenState.column;
 		}
 		return super.getColumn();
@@ -164,186 +178,237 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedPartitionScanner#nextToken()
 	 */
 	@Override
-	public IToken nextToken() {
-		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+	public IToken nextToken()
+	{
+		if (defaultTokenState != null && defaultTokenState.hasToken())
+		{
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null))
+			{
+				trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+			}
 			return token;
 		}
-		if (fContentType == null || hasSwitch) {
+		if (fContentType == null || hasSwitch)
+		{
 			// don't try to resume
 			return baseNextToken();
 		}
 		IToken token = doResumeContentType();
-		if (token != null) {
+		if (token != null)
+		{
 			return token;
 		}
 
 		return baseNextToken();
 	}
 
-	private IToken doResumeContentType() {
-		if (fContentType == null) {
+	private IToken doResumeContentType()
+	{
+		if (fContentType == null)
+		{
 			return null;
 		}
 		// inside a partition
 		fColumn = UNDEFINED;
 		boolean resume = (fPartitionOffset > -1 && fPartitionOffset < fOffset);
 		fTokenOffset = resume ? fPartitionOffset : fOffset;
-		if (hasResume) {
+		if (hasResume)
+		{
 			resume = true;
 			hasResume = false;
 		}
 
 		IToken token;
 		boolean doResetRules;
-		do {
+		do
+		{
 			doResetRules = false;
-			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
+			for (IPredicateRule rule : currentPartitionScanner.getRules())
+			{
 				token = rule.getSuccessToken();
-				if (fContentType.equals(token.getData())) {
+				if (fContentType.equals(token.getData()))
+				{
 					token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
-					if (!token.isUndefined() && fOffset != fTokenOffset) {
+					if (!token.isUndefined() && fOffset != fTokenOffset)
+					{
 						fContentType = null;
 						currentPartitionScanner.setLastToken(token);
 						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
-					if (doResetRules = currentPartitionScanner.doResetRules()) {
+					if (doResetRules = currentPartitionScanner.doResetRules())
+					{
 						break;
 					}
-					if (hasSwitchingSequence()) {
+					if (hasSwitchingSequence())
+					{
 						fContentType = null;
 						return getDefaultToken();
 					}
 				}
 			}
-		} while (doResetRules);
+		}
+		while (doResetRules);
 
 		// haven't found any rule for this type of partition
 		fContentType = null;
-		if (resume && fPartitionOffset >= 0) {
+		if (resume && fPartitionOffset >= 0)
+		{
 			fOffset = fPartitionOffset;
 			fPartitionOffset = -1;
 		}
 		return null;
 	}
 
-	private IToken baseNextToken() {
+	private IToken baseNextToken()
+	{
 		fTokenOffset = fOffset;
 		fColumn = UNDEFINED;
 
-		if (hasSwitch) {
+		if (hasSwitch)
+		{
 			hasSwitch = false;
 			boolean toPrimary = (currentPartitionScanner == defaultPartitionScanner);
-			for (int i = 0; i < switchRules.length; ++i) {
+			for (int i = 0; i < switchRules.length; ++i)
+			{
 				IToken token = (switchRules[i][toPrimary ? 0 : 1].evaluate(this));
-				if (!token.isUndefined()) {
+				if (!token.isUndefined())
+				{
 					currentPartitionScanner = toPrimary ? primaryPartitionScanner : defaultPartitionScanner;
 					IToken lastToken = currentPartitionScanner.getLastToken();
-					if (lastToken != null && lastToken.getData() instanceof String) {
+					if (lastToken != null && lastToken.getData() instanceof String)
+					{
 						fContentType = (String) lastToken.getData();
 						hasResume = true;
 					}
 					return returnToken(token);
 				}
 			}
-		} else {
+		}
+		else
+		{
 			boolean doResetRules;
-			do {
+			do
+			{
 				doResetRules = false;
-				for (IPredicateRule rule : currentPartitionScanner.getRules()) {
+				for (IPredicateRule rule : currentPartitionScanner.getRules())
+				{
 					IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
-					if (!token.isUndefined()) {
+					if (!token.isUndefined())
+					{
 						currentPartitionScanner.setLastToken(token);
 						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
-					if (doResetRules = currentPartitionScanner.doResetRules()) {
+					if (doResetRules = currentPartitionScanner.doResetRules())
+					{
 						IToken resumeToken = currentPartitionScanner.getResumeToken();
-						if (resumeToken != null && resumeToken.getData() instanceof String) {
+						if (resumeToken != null && resumeToken.getData() instanceof String)
+						{
 							fContentType = (String) resumeToken.getData();
 							hasResume = true;
 							token = doResumeContentType();
-							if (token != null) {
+							if (token != null)
+							{
 								return token;
 							}
 						}
 						break;
 					}
-					if (hasSwitchingSequence()) {
+					if (hasSwitchingSequence())
+					{
 						return getDefaultToken();
 					}
 				}
-			} while (doResetRules);
+			}
+			while (doResetRules);
 		}
 
-		if (read() == EOF) {
+		if (read() == EOF)
+		{
 			return returnToken(Token.EOF);
 		}
 		currentPartitionScanner.setLastToken(null);
 		return getDefaultToken();
 	}
 
-	private IToken getDefaultToken() {
-		if (defaultTokenState == null) {
+	private IToken getDefaultToken()
+	{
+		if (defaultTokenState == null)
+		{
 			defaultTokenState = new DefaultTokenState(currentPartitionScanner.getDefaultToken());
 		}
 		return fDefaultReturnToken;
 	}
 
-	private IToken returnToken(IToken token) {
-		if (defaultTokenState != null) {
-			if (defaultTokenState.saveToken(token)) {
+	private IToken returnToken(IToken token)
+	{
+		if (defaultTokenState != null)
+		{
+			if (defaultTokenState.saveToken(token))
+			{
 				token = defaultTokenState.defaultToken;
-			} else {
+			}
+			else
+			{
 				defaultTokenState = null;
 			}
 		}
-		trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+		if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null))
+		{
+			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+		}
 		return token;
 	}
 
-	private void trace(String string) {
+	private void trace(String string)
+	{
 		IdeLog.logInfo(CommonEditorPlugin.getDefault(), string);
 	}
 
-	private boolean hasSwitchingSequence() {
-		if (currentPartitionScanner.foundSequence()) {
+	private boolean hasSwitchingSequence()
+	{
+		if (currentPartitionScanner.foundSequence())
+		{
 			hasSwitch = true;
 			return true;
 		}
 		return false;
 	}
 
-	private class DefaultTokenState {
+	private class DefaultTokenState
+	{
 		private int offset;
 		private int length;
 		private int column;
 		private IToken defaultToken;
 		private IToken token;
 
-		public DefaultTokenState(IToken defaultToken) {
+		public DefaultTokenState(IToken defaultToken)
+		{
 			this.defaultToken = defaultToken;
 			this.offset = fTokenOffset;
 			this.column = getColumn();
 		}
 
-		public boolean saveToken(IToken token) {
+		public boolean saveToken(IToken token)
+		{
 			length = fTokenOffset - offset;
-			if (length == 0) {
+			if (length == 0)
+			{
 				return false;
 			}
 			this.token = token;
 			return true;
 		}
 
-		public boolean hasToken() {
+		public boolean hasToken()
+		{
 			return token != null;
 		}
 	}
