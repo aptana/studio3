@@ -347,7 +347,7 @@ public class BuildPathManager
 						try
 						{
 							url = FileLocator.resolve(url);
-							
+
 							addBuildPath(name, url.toURI());
 						}
 						catch (URISyntaxException e)
@@ -359,7 +359,7 @@ public class BuildPathManager
 								BUILD_PATHS_ID,
 								pluginId
 							);
-							
+
 							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
 						}
 						catch (IOException e)
@@ -371,7 +371,7 @@ public class BuildPathManager
 								BUILD_PATHS_ID,
 								pluginId
 							);
-							
+
 							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
 						}
 					}
@@ -380,7 +380,7 @@ public class BuildPathManager
 						try
 						{
 							Object contributor = element.createExecutableExtension(ATTR_CLASS);
-							
+
 							if (contributor instanceof IBuildPathContributor)
 							{
 								addContributor((IBuildPathContributor) contributor);
@@ -396,7 +396,7 @@ public class BuildPathManager
 									BUILD_PATHS_ID,
 									pluginId
 								);
-								
+
 								IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
 							}
 						}
@@ -410,7 +410,7 @@ public class BuildPathManager
 								BUILD_PATHS_ID,
 								pluginId
 							);
-							
+
 							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
 						}
 					}
