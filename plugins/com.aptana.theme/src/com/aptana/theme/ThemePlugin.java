@@ -131,7 +131,7 @@ public class ThemePlugin extends AbstractUIPlugin
 	 * 
 	 * @return
 	 */
-	public ColorManager getColorManager()
+	public synchronized ColorManager getColorManager()
 	{
 		if (this.fColorManager == null)
 		{
