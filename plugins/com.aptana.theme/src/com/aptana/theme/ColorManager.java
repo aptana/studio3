@@ -20,18 +20,18 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ColorManager implements ISharedTextColors
 {
-	// TODO Hook an auto dispose like ColorRegistry when display is disposed?
-	protected Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(10);
+	protected Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(7);
 
-	public void dispose()
+	public synchronized void dispose()
 	{
 		for (Color c : this._colorsByRGB.values())
 		{
 			c.dispose();
 		}
+		this._colorsByRGB.clear();
 	}
 
-	public Color getColor(RGB rgb)
+	public synchronized Color getColor(RGB rgb)
 	{
 		Color color = this._colorsByRGB.get(rgb);
 		if (color == null)
