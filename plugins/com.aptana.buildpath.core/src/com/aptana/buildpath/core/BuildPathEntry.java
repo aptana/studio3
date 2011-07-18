@@ -108,6 +108,6 @@ public class BuildPathEntry
 	@Override
 	public String toString()
 	{
-		return displayName + ":" + path.toString();
+		return displayName + ":" + path.toString(); //$NON-NLS-1$
 	}
 }

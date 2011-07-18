@@ -220,7 +220,7 @@ public class BuildPathManager
 						{
 							// @formatter:off
 							String message = MessageFormat.format(
-								"Unable to convert ''{0}'' to a URI when extracting a build path from the {1} persistent property in the ''{2}'' project",
+								Messages.BuildPathManager_UnableToConvertURI,
 								uri,
 								PROJECT_BUILD_PATH_PROPERTY_NAME,
 								project.getName()
@@ -237,7 +237,7 @@ public class BuildPathManager
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
-				"Unable to retrieve the ''{0}'' persistent property from the ''{1}'' project",
+				Messages.BuildPathManager_UnableToRetrievePersistenceProperty,
 				PROJECT_BUILD_PATH_PROPERTY_NAME,
 				project.getName()
 			);
@@ -353,7 +353,7 @@ public class BuildPathManager
 						catch (URISyntaxException e)
 						{
 							String message = MessageFormat.format(
-								"Unable to convert URL ''{0}'' to a URI when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''",
+								Messages.BuildPathManager_UnableToConvertURLToURI,
 								url.toString(),
 								ELEMENT_BUILD_PATH,
 								BUILD_PATHS_ID,
@@ -365,7 +365,7 @@ public class BuildPathManager
 						catch (IOException e)
 						{
 							String message = MessageFormat.format(
-								"FileLocator was unable to resolve URL ''{0}'' when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''",
+								Messages.BuildPathManager_UnableToResolveURL,
 								url.toString(),
 								ELEMENT_BUILD_PATH,
 								BUILD_PATHS_ID,
@@ -390,7 +390,7 @@ public class BuildPathManager
 								IExtension extension = element.getDeclaringExtension();
 								String pluginId = extension.getNamespaceIdentifier();
 								String message = MessageFormat.format(
-									"Build path contributor type ''{0}'' is not an instance of IBuildPathContributor. This error occurred when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''",
+									Messages.BuildPathManager_PathContributorIsWrongType,
 									contributor.getClass().getName(),
 									ELEMENT_CONTRIBUTOR,
 									BUILD_PATHS_ID,
@@ -405,7 +405,7 @@ public class BuildPathManager
 							IExtension extension = element.getDeclaringExtension();
 							String pluginId = extension.getNamespaceIdentifier();
 							String message = MessageFormat.format(
-								"Unable to create a new project build path contributor instance when processing the ''{0}'' element in the ''{1}'' extension in plugin ''{2}''",
+								Messages.BuildPathManager_UnableToCreatePathContributor,
 								ELEMENT_CONTRIBUTOR,
 								BUILD_PATHS_ID,
 								pluginId
@@ -499,7 +499,7 @@ public class BuildPathManager
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Unable to set the ''{0}'' persistence property on project ''{1}'' when saving the project's build path settings",
+					Messages.BuildPathManager_UnableToSetPersistenceProperty,
 					PROJECT_BUILD_PATH_PROPERTY_NAME,
 					project.getName()
 				);
