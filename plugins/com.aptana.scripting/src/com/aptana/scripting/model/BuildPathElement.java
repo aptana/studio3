@@ -52,6 +52,7 @@ public class BuildPathElement extends AbstractBundleElement
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+		printer.printWithIndent("buildPath: ").println(this.getBuildPath()); //$NON-NLS-1$
 	}
 
 	/**
