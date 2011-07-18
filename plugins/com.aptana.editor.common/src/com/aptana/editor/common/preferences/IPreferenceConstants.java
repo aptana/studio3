@@ -125,4 +125,10 @@ public interface IPreferenceConstants
 	 */
 	public static final String SAVE_UNTITLED_FILE_TO_PROJECT = CommonEditorPlugin.PLUGIN_ID
 			+ ".saveUntitledFileToProject"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to list enabled scopes for spelling.
+	 */
+	public static final String ENABLED_SPELLING_SCOPES = CommonEditorPlugin.PLUGIN_ID + ".enabledSpellingScopes"; //$NON-NLS-1$
+
 }

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
@@ -51,6 +50,7 @@ import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.editor.common.spelling.SpellingPreferences;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
@@ -226,6 +226,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	private DocumentScopeManager fDocumentScopeManager;
 	private IPreferenceChangeListener fThemeChangeListener;
+	private SpellingPreferences spellingPreferences;
 
 	/**
 	 * The constructor
@@ -251,6 +252,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
+		spellingPreferences = new SpellingPreferences();
 
 		addPartListener();
 	}
@@ -328,6 +330,10 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				fDocumentScopeManager.dispose();
 			}
+			if (spellingPreferences != null) {
+				spellingPreferences.dispose();
+				spellingPreferences = null;
+			}
 		}
 		finally
 		{
@@ -382,6 +388,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public Image getImageFromImageRegistry(String imageID)
 	{
 		return getImageRegistry().get(imageID);
+	}
+
+	/**
+	 * @return the spellingPreferences
+	 */
+	public SpellingPreferences getSpellingPreferences() {
+		return spellingPreferences;
 	}
 
 	public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry)

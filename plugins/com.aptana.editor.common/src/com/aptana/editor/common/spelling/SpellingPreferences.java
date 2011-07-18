@@ -8,34 +8,87 @@
 
 package com.aptana.editor.common.spelling;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.scope.IScopeSelector;
+import com.aptana.scope.ScopeSelector;
 
 /**
  * @author Max Stepanov
  *
  */
-public final class SpellingPreferences {
-
-	private static final Set<String> spellingContentTypes = new HashSet<String>();
+public final class SpellingPreferences implements IPreferenceChangeListener {
 	
-	static {
-		spellingContentTypes.add("comment.block.php");
-		spellingContentTypes.add("comment.line.number-sign.php");
-		spellingContentTypes.add("comment.line.double-slash.php");
-		spellingContentTypes.add("comment.block.documentation.phpdoc.php");
-	}
-	
+	private static final String PREF_DELEIMITER = ","; //$NON-NLS-1$
+	private List<IScopeSelector> selectors;
+		
 	/**
 	 * 
 	 */
-	private SpellingPreferences() {
+	public SpellingPreferences() {
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 	}
 	
-	public static boolean isSpellingEnabledFor(QualifiedContentType contentType) {
-		return spellingContentTypes.contains(contentType.getLastPart());
+	public void dispose() {
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+	 */
+	public void preferenceChange(PreferenceChangeEvent event) {
+		if (IPreferenceConstants.ENABLED_SPELLING_SCOPES.equals(event.getKey())) {
+			selectors = null;
+		}
+	}
+
+	public boolean isSpellingEnabledFor(QualifiedContentType contentType) {
+		for (IScopeSelector selector : getEnabledSelectors()) {
+			if (selector.matches(contentType.getLastPart())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private List<IScopeSelector> getEnabledSelectors() {
+		if (selectors == null) {
+			selectors = new ArrayList<IScopeSelector>();
+			for (String scope : getEnabledScopes()) {
+				selectors.add(new ScopeSelector(scope));
+			}
+		}
+		return selectors;
+	}
+
+	/**
+	 * Returns 
+	 * @return
+	 */
+	public static Set<String> getEnabledScopes() {
+		Set<String> result = new HashSet<String>();
+		String enabledScopes = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID, IPreferenceConstants.ENABLED_SPELLING_SCOPES, StringUtil.EMPTY,
+				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+		for (String scope : enabledScopes.split(PREF_DELEIMITER)) {
+			scope = scope.trim();
+			if (scope.length() > 0) {
+				result.add(scope);
+			}
+		}
+		return result;
 	}
 
 }
