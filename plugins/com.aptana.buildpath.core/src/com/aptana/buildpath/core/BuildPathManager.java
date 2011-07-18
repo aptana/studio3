@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -67,7 +69,7 @@ public class BuildPathManager
 		return instance;
 	}
 
-	private List<BuildPathEntry> buildPaths;
+	private Set<BuildPathEntry> buildPaths;
 	private List<IBuildPathContributor> contributors;
 
 	/**
@@ -88,7 +90,7 @@ public class BuildPathManager
 		{
 			if (buildPaths == null)
 			{
-				buildPaths = new ArrayList<BuildPathEntry>();
+				buildPaths = new HashSet<BuildPathEntry>();
 			}
 
 			buildPaths.add(entry);
@@ -105,7 +107,7 @@ public class BuildPathManager
 	{
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> buildPaths = new HashSet<BuildPathEntry>(getBuildPaths(project));
+			Set<BuildPathEntry> buildPaths = getBuildPaths(project);
 
 			if (!buildPaths.contains(entry))
 			{
@@ -163,19 +165,19 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	public List<BuildPathEntry> getBuildPaths()
+	public Set<BuildPathEntry> getBuildPaths()
 	{
-		List<BuildPathEntry> result;
+		Set<BuildPathEntry> result;
 
 		if (buildPaths != null)
 		{
-			result = new ArrayList<BuildPathEntry>(buildPaths);
+			result = new HashSet<BuildPathEntry>(buildPaths);
 
 			result.addAll(getDynamicBuildPaths());
 		}
 		else
 		{
-			result = Collections.emptyList();
+			result = Collections.emptySet();
 		}
 
 		return result;
@@ -187,9 +189,9 @@ public class BuildPathManager
 	 * @param project
 	 * @return
 	 */
-	public List<BuildPathEntry> getBuildPaths(IProject project)
+	public Set<BuildPathEntry> getBuildPaths(IProject project)
 	{
-		List<BuildPathEntry> result = new ArrayList<BuildPathEntry>();
+		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
 
 		try
 		{
@@ -206,17 +208,26 @@ public class BuildPathManager
 					if (nameAndPath.length >= 2)
 					{
 						String name = nameAndPath[0];
+						String uri = nameAndPath[1];
 
 						try
 						{
-							URI path = new URI(nameAndPath[1]);
+							URI path = new URI(uri);
 
 							result.add(new BuildPathEntry(name, path));
 						}
 						catch (URISyntaxException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							// @formatter:off
+							String message = MessageFormat.format(
+								"Unable to convert ''{0}'' to a URI when extracting a build path from the {1} persistent property in the ''{2}'' project",
+								uri,
+								PROJECT_BUILD_PATH_PROPERTY_NAME,
+								project.getName()
+							);
+							// @formatter:on
+
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
 						}
 					}
 				}
@@ -224,8 +235,21 @@ public class BuildPathManager
 		}
 		catch (CoreException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Unable to retrieve the ''{0}'' persistent property from the ''{1}'' project",
+				PROJECT_BUILD_PATH_PROPERTY_NAME,
+				project.getName()
+			);
+			// @formatter:on
+
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+		}
+
+		if (!result.isEmpty())
+		{
+			// only include paths that are actually registered
+			result.retainAll(getBuildPaths());
 		}
 
 		return result;
@@ -236,13 +260,13 @@ public class BuildPathManager
 	 * 
 	 * @return
 	 */
-	private List<BuildPathEntry> getDynamicBuildPaths()
+	private Set<BuildPathEntry> getDynamicBuildPaths()
 	{
-		List<BuildPathEntry> result;
+		Set<BuildPathEntry> result;
 
 		if (contributors != null)
 		{
-			result = new ArrayList<BuildPathEntry>();
+			result = new HashSet<BuildPathEntry>();
 
 			for (IBuildPathContributor contributor : contributors)
 			{
@@ -256,7 +280,7 @@ public class BuildPathManager
 		}
 		else
 		{
-			result = Collections.emptyList();
+			result = Collections.emptySet();
 		}
 
 		return result;
@@ -305,47 +329,90 @@ public class BuildPathManager
 			{
 				public void processElement(IConfigurationElement element)
 				{
-					try
+					if (ELEMENT_BUILD_PATH.equals(element.getName()))
 					{
-						if (ELEMENT_BUILD_PATH.equals(element.getName()))
+						// get extension pt's bundle
+						IExtension extension = element.getDeclaringExtension();
+						String pluginId = extension.getNamespaceIdentifier();
+						Bundle bundle = Platform.getBundle(pluginId);
+
+						// grab the item's display name
+						String name = element.getAttribute(ATTR_NAME);
+
+						// get the item's URI, resolved to a local file
+						String resource = element.getAttribute(ATTR_PATH);
+						URL url = FileLocator.find(bundle, new Path(resource), null);
+
+						// add item to master list
+						try
 						{
-							// get extension pt's bundle
-							IExtension extension = element.getDeclaringExtension();
-							String pluginId = extension.getNamespaceIdentifier();
-							Bundle bundle = Platform.getBundle(pluginId);
-
-							// grab the item's display name
-							String name = element.getAttribute(ATTR_NAME);
-
-							// get the item's URI, resolved to a local file
-							String resource = element.getAttribute(ATTR_PATH);
-							URL url = FileLocator.find(bundle, new Path(resource), null);
 							url = FileLocator.resolve(url);
-
-							// add item to master list
+							
 							addBuildPath(name, url.toURI());
 						}
-						else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
+						catch (URISyntaxException e)
 						{
-							IBuildPathContributor contributor = (IBuildPathContributor) element.createExecutableExtension(ATTR_CLASS);
-
-							addContributor(contributor);
+							String message = MessageFormat.format(
+								"Unable to convert URL ''{0}'' to a URI when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''",
+								url.toString(),
+								ELEMENT_BUILD_PATH,
+								BUILD_PATHS_ID,
+								pluginId
+							);
+							
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+						}
+						catch (IOException e)
+						{
+							String message = MessageFormat.format(
+								"FileLocator was unable to resolve URL ''{0}'' when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''",
+								url.toString(),
+								ELEMENT_BUILD_PATH,
+								BUILD_PATHS_ID,
+								pluginId
+							);
+							
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
 						}
 					}
-					catch (URISyntaxException e)
+					else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
 					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					catch (IOException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					catch (CoreException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						try
+						{
+							Object contributor = element.createExecutableExtension(ATTR_CLASS);
+							
+							if (contributor instanceof IBuildPathContributor)
+							{
+								addContributor((IBuildPathContributor) contributor);
+							}
+							else
+							{
+								IExtension extension = element.getDeclaringExtension();
+								String pluginId = extension.getNamespaceIdentifier();
+								String message = MessageFormat.format(
+									"Build path contributor type ''{0}'' is not an instance of IBuildPathContributor. This error occurred when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''",
+									contributor.getClass().getName(),
+									ELEMENT_CONTRIBUTOR,
+									BUILD_PATHS_ID,
+									pluginId
+								);
+								
+								IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
+							}
+						}
+						catch (CoreException e)
+						{
+							IExtension extension = element.getDeclaringExtension();
+							String pluginId = extension.getNamespaceIdentifier();
+							String message = MessageFormat.format(
+								"Unable to create a new project build path contributor instance when processing the ''{0}'' element in the ''{1}'' extension in plugin ''{2}''",
+								ELEMENT_CONTRIBUTOR,
+								BUILD_PATHS_ID,
+								pluginId
+							);
+							
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
+						}
 					}
 				}
 			},
@@ -378,7 +445,7 @@ public class BuildPathManager
 	{
 		if (project != null && entry != null)
 		{
-			Set<BuildPathEntry> entries = new HashSet<BuildPathEntry>(getBuildPaths(project));
+			Set<BuildPathEntry> entries = getBuildPaths(project);
 
 			if (entries.contains(entry))
 			{
@@ -411,25 +478,35 @@ public class BuildPathManager
 	 */
 	public void setBuildPaths(IProject project, Collection<BuildPathEntry> entries)
 	{
-		List<String> nameAndPaths = new ArrayList<String>();
-
-		for (BuildPathEntry entry : entries)
+		if (project != null && entries != null)
 		{
-			String nameAndPath = entry.getDisplayName() + NAME_AND_PATH_DELIMITER + entry.getPath();
+			List<String> nameAndPaths = new ArrayList<String>();
 
-			nameAndPaths.add(nameAndPath);
-		}
+			for (BuildPathEntry entry : entries)
+			{
+				String nameAndPath = entry.getDisplayName() + NAME_AND_PATH_DELIMITER + entry.getPath();
 
-		String value = StringUtil.join(BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
+				nameAndPaths.add(nameAndPath);
+			}
 
-		try
-		{
-			project.setPersistentProperty(getBuildPathPropertyName(), value);
-		}
-		catch (CoreException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String value = StringUtil.join(BUILD_PATH_ENTRY_DELIMITER, nameAndPaths);
+
+			try
+			{
+				project.setPersistentProperty(getBuildPathPropertyName(), value);
+			}
+			catch (CoreException e)
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Unable to set the ''{0}'' persistence property on project ''{1}'' when saving the project's build path settings",
+					PROJECT_BUILD_PATH_PROPERTY_NAME,
+					project.getName()
+				);
+				// @formatter:on
+
+				IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+			}
 		}
 	}
 }

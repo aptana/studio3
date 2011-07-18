@@ -65,8 +65,8 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		project = (IProject) getElement().getAdapter(IResource.class);
 
 		// get entire list and selected items in that list
-		List<BuildPathEntry> entries = getBuildPathEntries(project);
-		List<BuildPathEntry> selectedEntries = getSelectedBuildPathEntries(project);
+		Set<BuildPathEntry> entries = getBuildPathEntries(project);
+		Set<BuildPathEntry> selectedEntries = getSelectedBuildPathEntries(project);
 
 		// top-level composite
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -137,7 +137,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 * @param project
 	 * @return
 	 */
-	private List<BuildPathEntry> getBuildPathEntries(IProject project)
+	private Set<BuildPathEntry> getBuildPathEntries(IProject project)
 	{
 		BuildPathManager manager = BuildPathManager.getInstance();
 
@@ -150,7 +150,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 * @param project
 	 * @return
 	 */
-	private List<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
+	private Set<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
 	{
 		BuildPathManager manager = BuildPathManager.getInstance();
 
@@ -173,9 +173,9 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 			@Override
 			public Object[] getChildren(Object element)
 			{
-				if (element instanceof List<?>)
+				if (element instanceof Set<?>)
 				{
-					return ((List<?>) element).toArray();
+					return ((Set<?>) element).toArray();
 				}
 				else
 				{
@@ -269,7 +269,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 		BuildPathManager manager = BuildPathManager.getInstance();
 
 		// determine if the selection has changed
-		Set<BuildPathEntry> currentEntries = new HashSet<BuildPathEntry>(manager.getBuildPaths(project));
+		Set<BuildPathEntry> currentEntries = manager.getBuildPaths(project);
 		Set<BuildPathEntry> newEntries = new HashSet<BuildPathEntry>(entries);
 
 		if (!newEntries.equals(currentEntries))

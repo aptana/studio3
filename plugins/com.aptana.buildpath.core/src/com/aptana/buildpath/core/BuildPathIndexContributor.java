@@ -2,7 +2,6 @@ package com.aptana.buildpath.core;
 
 import java.net.URI;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -33,7 +32,7 @@ public class BuildPathIndexContributor implements IIndexFileContributor
 				if (container instanceof IProject)
 				{
 					IProject project = (IProject) container;
-					List<BuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
+					Set<BuildPathEntry> entries = BuildPathManager.getInstance().getBuildPaths(project);
 
 					if (entries != null)
 					{
