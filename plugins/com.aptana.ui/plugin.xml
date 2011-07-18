@@ -28,7 +28,7 @@
                visible="true">
          </view>
          <viewShortcut
-               id="com.aptana.explorer.view">
+               id="org.eclipse.ui.navigator.ProjectExplorer">
          </viewShortcut>
          <view
                id="com.aptana.ui.io.remoteview"
