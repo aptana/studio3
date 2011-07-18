@@ -23,10 +23,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
@@ -52,10 +55,43 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	private Map<String, Object[]> cache = new HashMap<String, Object[]>();
 	private TreeViewer treeViewer;
 
+	private boolean showTextNode;
+
+	private IPreferenceChangeListener preferenceListener = new IPreferenceChangeListener()
+	{
+
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES.equals(event.getKey()))
+			{
+				showTextNode = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
+						IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
+			}
+		}
+	};
+
 	public HTMLOutlineContentProvider()
 	{
 		addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
 		addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
+
+		showTextNode = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
+				IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
+		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceListener);
+	}
+
+	@Override
+	public void dispose()
+	{
+		try
+		{
+			EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(preferenceListener);
+		}
+		finally
+		{
+			super.dispose();
+		}
 	}
 
 	@Override
@@ -338,7 +374,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			}
 			if (node instanceof HTMLTextNode)
 			{
-				if (!isShowTextNodes() || StringUtil.isEmpty(((HTMLTextNode) node).getText()))
+				if (!showTextNode || StringUtil.isEmpty(((HTMLTextNode) node).getText()))
 				{
 					continue;
 				}
@@ -366,11 +402,5 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		this.treeViewer = (TreeViewer) viewer;
 		super.inputChanged(viewer, oldInput, newInput);
-	}
-
-	private static boolean isShowTextNodes()
-	{
-		return Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
-				IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
 	}
 }

@@ -434,4 +434,22 @@ public abstract class StringUtil
 
 		return s1.compareToIgnoreCase(s2);
 	}
+
+	/**
+	 * Truncates the string to a particular length if it's longer and appends ... in the end.
+	 * 
+	 * @param text
+	 *            the string to be truncated
+	 * @param length
+	 *            the length to truncate to
+	 * @return the truncated string
+	 */
+	public static String truncate(String text, int length)
+	{
+		if (text.length() <= length)
+		{
+			return text;
+		}
+		return new String(ellipsify(text.substring(0, length)));
+	}
 }
