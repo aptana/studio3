@@ -10,7 +10,9 @@ package com.aptana.buildpath.core;
 import java.net.URI;
 
 /**
- * BuildPathEntry
+ * A BuildPathEntry represents a single item in the Project Build Path preference page for a project. It is comprised of
+ * a display name, used in the UI, and a path, a URI to a resource. It is expected that the URI points to a file type
+ * that can be indexed.
  */
 public class BuildPathEntry
 {
@@ -99,4 +101,13 @@ public class BuildPathEntry
 		selected = value;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return displayName + ":" + path.toString();
+	}
 }
