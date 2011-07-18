@@ -9,7 +9,6 @@ package com.aptana.js.debug.ui.internal.preferences;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -24,6 +23,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -45,7 +45,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 	 */
 	public JSDebugPreferencePage() {
 		super();
-		setPreferenceStore(new ScopedPreferenceStore(new InstanceScope(), JSDebugPlugin.PLUGIN_ID));
+		setPreferenceStore(new ScopedPreferenceStore(EclipseUtil.instanceScope(), JSDebugPlugin.PLUGIN_ID));
 	}
 
 	/**

@@ -90,6 +90,7 @@ import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -138,8 +139,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			SPACES_AFTER_FOR_SEMICOLON, SPACES_BEFORE_SEMICOLON, SPACES_AFTER_SEMICOLON,
 			SPACES_BEFORE_CASE_COLON_OPERATOR, SPACES_AFTER_CASE_COLON_OPERATOR };
 
-	private String lineSeparator;
-
 	/**
 	 * Constructor.
 	 * 
@@ -147,8 +146,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	protected JSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -167,13 +165,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			{
 				return super.detectIndentationLevel(document, offset);
 			}
-			IParser parser = checkoutParser();
-			IParseState parseState = new ParseState();
 			String source = document.get();
-			parseState.setEditState(source, null, 0, 0);
-
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
@@ -211,13 +204,23 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		String originalText = source.substring(offset, offset + length);
 		String input = originalText.trim();
 		int inputOffset = offset + countLeftWhitespaceChars(originalText);
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
+		IParseRootNode parseResult = null;
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+		}
+		catch (Exception e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(e.getMessage()
+					+ " - " + FormatterMessages.Formatter_formatterErrorStatus, //$NON-NLS-1$
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(e);
+			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
+			// indentation level as much as we can.
+			return indent(source, input, offset, length, indentationLevel);
+		}
+		try
+		{
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,

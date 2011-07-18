@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.navigator,
  org.eclipse.ui.console,
  org.eclipse.search,
- com.aptana.core;bundle-version="3.0.3",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.ui.epl,
  com.aptana.buildpath.core,
  com.aptana.index.core

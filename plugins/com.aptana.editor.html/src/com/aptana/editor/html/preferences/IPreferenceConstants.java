@@ -18,9 +18,18 @@ public interface IPreferenceConstants
 	String HTML_INDEX_VERSION = "HTML_INDEX_VERSION"; //$NON-NLS-1$
 
 	/**
-	 * The preference key used to set the option for when we want close tags auto inserted using Content Assist, or HTMLOpenTagCloser.
+	 * The preference key used to set the option for when we want close tags auto inserted using Content Assist, or
+	 * HTMLOpenTagCloser.
 	 */
 	String HTML_AUTO_CLOSE_TAG_PAIRS = "HTML_AUTO_CLOSE_TAG_PAIRS"; //$NON-NLS-1$
 
-	String HTML_OUTLINE_TAG_ATTRIBUTES = "HTML_OUTLINE_TAG_ATTRIBUTES"; //$NON-NLS-1$
+	/**
+	 * The preference key used to define what tag attributes should be displayed in the outline
+	 */
+	String HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW = "HTML_OUTLINE_TAG_ATTRIBUTES"; //$NON-NLS-1$
+
+	/**
+	 * The preference key on if the text nodes should be shown in the outline
+	 */
+	String HTML_OUTLINE_SHOW_TEXT_NODES = "HTML_OUTLINE_SHOW_TEXT_NODES"; //$NON-NLS-1$
 }

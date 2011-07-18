@@ -178,7 +178,7 @@ public class ResourceUtil
 		}
 		else
 		{
-			scope = new InstanceScope();
+			scope = EclipseUtil.instanceScope();
 		}
 
 		IScopeContext[] scopeContext = new IScopeContext[] { scope };

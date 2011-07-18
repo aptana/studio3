@@ -54,7 +54,7 @@ public class CSSImportantRule extends ExtendedWordRule
 	{
 		if (pattern == null)
 		{
-			pattern = Pattern.compile("!\\s*important"); //$NON-NLS-1$
+			pattern = Pattern.compile("!\\s*[Ii]mportant"); //$NON-NLS-1$
 		}
 
 		return pattern.matcher(word).matches();

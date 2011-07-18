@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -82,6 +81,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
 import com.aptana.core.resources.IProjectContext;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
@@ -655,7 +655,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					}
 				}
 			};
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 			setButtonBackgrounds();
 		}
 	}
@@ -773,7 +773,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.put(IPreferenceConstants.ACTIVE_PROJECT, selectedProject.getName());
 			prefs.flush();
 		}
@@ -787,7 +787,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.remove(IPreferenceConstants.ACTIVE_PROJECT);
 			prefs.flush();
 		}
@@ -858,7 +858,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fThemeChangeListener != null)
 		{
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 		}
 		fThemeChangeListener = null;
 	}
@@ -873,7 +873,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fActiveProjectPrefChangeListener != null)
 		{
-			new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fActiveProjectPrefChangeListener);
 		}
 		fActiveProjectPrefChangeListener = null;

@@ -9,7 +9,6 @@ package com.aptana.ui.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -24,6 +23,7 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.Messages;
 import com.aptana.ui.UIPlugin;
 
@@ -97,7 +97,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	@Override
 	public boolean performOk()
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
 		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
 		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
 		try

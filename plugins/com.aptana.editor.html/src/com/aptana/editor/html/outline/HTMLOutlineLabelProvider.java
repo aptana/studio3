@@ -19,6 +19,7 @@ import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 
@@ -66,6 +67,16 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 		if (element instanceof HTMLElementNode)
 		{
 			return ((HTMLElementNode) element).getText();
+		}
+		if (element instanceof HTMLTextNode)
+		{
+			String text = ((HTMLTextNode) element).getText().trim();
+			// limits to show the first 20 characters
+			if (text.length() > 20)
+			{
+				text = text.substring(0, 20) + "..."; //$NON-NLS-1$
+			}
+			return text;
 		}
 		return super.getDefaultText(element);
 	}

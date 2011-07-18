@@ -123,7 +123,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	 */
 	private void enableDebugging()
 	{
-		new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+		EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 
 		/**
 		 * Returns the current severity preference
@@ -156,7 +156,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		try
 		{
 			// Don't listen to auto-refresh pref changes anymore
-			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 
 			if (addFilewatcherJob != null)
 			{
@@ -375,7 +375,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		ResourceListener()
 		{
 			fAdapter = new FileDeltaRefreshAdapter();
-			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
 		public void start()
@@ -418,7 +418,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		public synchronized void dispose()
 		{
 			// Don't listen to auto-refresh pref changes anymore
-			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 			// Now remove all the existing file watchers
 			unhookAll();
 		}

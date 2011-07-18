@@ -8,10 +8,10 @@
 package com.aptana.editor.css.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.editor.css.formatter.CSSFormatterPlugin;
 import com.aptana.formatter.epl.FormatterPlugin;
@@ -27,7 +27,7 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences pref = new DefaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences pref = EclipseUtil.defaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
 
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$

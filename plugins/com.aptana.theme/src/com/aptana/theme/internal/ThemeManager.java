@@ -98,7 +98,7 @@ public class ThemeManager implements IThemeManager
 
 	private ThemeManager()
 	{
-		new InstanceScope().getNode("org.eclipse.ui.editors").addPreferenceChangeListener( //$NON-NLS-1$
+		EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors").addPreferenceChangeListener( //$NON-NLS-1$
 				new IPreferenceChangeListener()
 				{
 
@@ -199,7 +199,7 @@ public class ThemeManager implements IThemeManager
 		fCurrentTheme = theme;
 
 		// Set the find in file search color
-		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
 		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		try
 		{
@@ -211,7 +211,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
-		prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+		prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 		if (!theme.hasEntry("override.searchResultIndication")) //$NON-NLS-1$
 		{
 			prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
@@ -289,7 +289,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Set the bg/fg/selection colors for compare editors
-		prefs = new InstanceScope().getNode("org.eclipse.compare"); //$NON-NLS-1$
+		prefs = EclipseUtil.instanceScope().getNode("org.eclipse.compare"); //$NON-NLS-1$
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
@@ -313,7 +313,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
-		prefs = new InstanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
+		prefs = EclipseUtil.instanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelectionAgainstBG()));
 
@@ -334,7 +334,7 @@ public class ThemeManager implements IThemeManager
 			ThemePlugin.logError(e);
 		}
 
-		prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.ACTIVE_THEME, theme.getName());
 		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		try
@@ -419,7 +419,7 @@ public class ThemeManager implements IThemeManager
 			builder.append(themeName).append(THEME_NAMES_DELIMETER);
 		}
 		builder.deleteCharAt(builder.length() - 1);
-		IEclipsePreferences prefs = new InstanceScope().getNode(ThemePlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
 		prefs.put(THEME_LIST_PREF_KEY, builder.toString());
 		try
 		{

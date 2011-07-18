@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -37,6 +36,7 @@ import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
@@ -121,7 +121,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 				}
 			}
 		};
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	protected IGitRepositoryManager getGitRepositoryManager()
@@ -271,7 +271,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			getGitRepositoryManager().removeListener(this);
 			getGitRepositoryManager().removeListenerFromEachRepository(this);
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fThemeChangeListener);
 			cache.clear();
 			cache = null;

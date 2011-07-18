@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.mortbay.util.ajax.JSON;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
@@ -22,6 +21,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 
 /**
  * This class represents a state of a configuration.<br>
@@ -201,7 +201,7 @@ public class ConfigurationStatus implements Convertible
 	public void store()
 	{
 		// We just store the attributes map as a JSON string
-		IEclipsePreferences prefs = new InstanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
 		prefs.put(PREF_PREFIX + getProcessorId(), JSON.toString(attributes));
 		try
 		{
@@ -221,7 +221,7 @@ public class ConfigurationStatus implements Convertible
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void load()
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ConfigurationsPlugin.PLUGIN_ID);
 		if (prefs != null)
 		{
 			try
