@@ -149,6 +149,7 @@ public class BundleEntry
 		private ChildVisibilityContext<MenuElement> menus;
 		private ChildVisibilityContext<SmartTypingPairsElement> pairs;
 		private ChildVisibilityContext<ProjectTemplateElement> projectTemplates;
+		private ChildVisibilityContext<BuildPathElement> buildPaths;
 
 		/**
 		 * VisibilityContext
@@ -231,6 +232,17 @@ public class BundleEntry
 					}
 				};
 			}
+
+			if (elementClass == null || elementClass == BuildPathElement.class)
+			{
+				buildPaths = new ChildVisibilityContext<BuildPathElement>()
+				{
+					public List<BuildPathElement> getElements()
+					{
+						return getBuildPaths();
+					}
+				};
+			}
 		}
 
 		/**
@@ -280,28 +292,29 @@ public class BundleEntry
 		}
 
 		/**
-		 * fireVisibilityEvents
+		 * fireElementVisibilityEvents
 		 */
-		public void fireVisibilityEvents()
+		public void fireElementVisibilityEvents()
 		{
 			if (preVisibleBundles != null)
 			{
 				fireBundleVisibilityEvents();
 			}
 
-			this.fireVisibilityEvents(commands);
-			this.fireVisibilityEvents(envs);
-			this.fireVisibilityEvents(menus);
-			this.fireVisibilityEvents(pairs);
-			this.fireVisibilityEvents(projectTemplates);
+			this.fireElementVisibilityEvents(commands);
+			this.fireElementVisibilityEvents(envs);
+			this.fireElementVisibilityEvents(menus);
+			this.fireElementVisibilityEvents(pairs);
+			this.fireElementVisibilityEvents(projectTemplates);
+			this.fireElementVisibilityEvents(buildPaths);
 		}
 
 		/**
-		 * fireVisibilityEvents
+		 * fireElementVisibilityEvents
 		 * 
 		 * @param context
 		 */
-		private void fireVisibilityEvents(ChildVisibilityContext<? extends AbstractBundleElement> context)
+		private void fireElementVisibilityEvents(ChildVisibilityContext<? extends AbstractBundleElement> context)
 		{
 			if (context != null)
 			{
@@ -322,28 +335,29 @@ public class BundleEntry
 		}
 
 		/**
-		 * updateContext
+		 * updateElementContext
 		 */
-		public void updateContext()
+		public void updateElementContext()
 		{
 			if (preVisibleBundles != null)
 			{
 				updateBundleContext();
 			}
 
-			this.updateContext(commands);
-			this.updateContext(envs);
-			this.updateContext(menus);
-			this.updateContext(pairs);
-			this.updateContext(projectTemplates);
+			this.updateElementContext(commands);
+			this.updateElementContext(envs);
+			this.updateElementContext(menus);
+			this.updateElementContext(pairs);
+			this.updateElementContext(projectTemplates);
+			this.updateElementContext(buildPaths);
 		}
 
 		/**
-		 * updateContext
+		 * updateElementContext
 		 * 
 		 * @param context
 		 */
-		private void updateContext(ChildVisibilityContext<? extends AbstractBundleElement> context)
+		private void updateElementContext(ChildVisibilityContext<? extends AbstractBundleElement> context)
 		{
 			if (context != null)
 			{
@@ -431,14 +445,14 @@ public class BundleEntry
 					// keep bundles in canonical order
 					Collections.sort(this._bundles, this._comparator);
 
-					context.updateContext();
+					context.updateElementContext();
 				}
 			}
 
 			// fire visibility change events
 			if (context != null)
 			{
-				context.fireVisibilityEvents();
+				context.fireElementVisibilityEvents();
 			}
 		}
 	}
@@ -894,14 +908,14 @@ public class BundleEntry
 
 			if (result = this._bundles.remove(bundle))
 			{
-				context.updateContext();
+				context.updateElementContext();
 			}
 		}
 
 		if (result && context != null)
 		{
 			// fire visibility change events
-			context.fireVisibilityEvents();
+			context.fireElementVisibilityEvents();
 		}
 
 		return result;

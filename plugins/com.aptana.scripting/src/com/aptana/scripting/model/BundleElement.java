@@ -101,14 +101,14 @@ public class BundleElement extends AbstractElement
 
 					if (context != null)
 					{
-						context.updateContext();
+						context.updateElementContext();
 					}
 				}
 			}
 
 			if (context != null)
 			{
-				context.fireVisibilityEvents();
+				context.fireElementVisibilityEvents();
 			}
 
 			element.setOwningBundle(this);
@@ -848,7 +848,7 @@ public class BundleElement extends AbstractElement
 
 			if (removed = this._children.remove(element) && context != null)
 			{
-				context.updateContext();
+				context.updateElementContext();
 			}
 		}
 
@@ -869,7 +869,7 @@ public class BundleElement extends AbstractElement
 
 			if (context != null)
 			{
-				context.fireVisibilityEvents();
+				context.fireElementVisibilityEvents();
 			}
 		}
 	}
