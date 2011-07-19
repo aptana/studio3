@@ -39,8 +39,7 @@ class ControlThemer implements IControlThemer
 
 	protected static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
-	protected static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
+	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
 
 	private Control control;
 
@@ -193,7 +192,7 @@ class ControlThemer implements IControlThemer
 					{
 						Color controlBG = control.getBackground();
 						if (controlBG.getRGB().equals(oldBackground.getRGB()))
-						{						
+						{
 							gc.setBackground(getBackground());
 							gc.fillRectangle(event.x, event.y, event.width, event.height);
 							event.detail &= ~SWT.BACKGROUND;
@@ -201,7 +200,7 @@ class ControlThemer implements IControlThemer
 						}
 					}
 				}
-				
+
 				// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
 				// non-focus for Mac)
 				gc.setForeground(getForeground());
@@ -262,7 +261,8 @@ class ControlThemer implements IControlThemer
 	{
 		if (fThemeChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
 	}
