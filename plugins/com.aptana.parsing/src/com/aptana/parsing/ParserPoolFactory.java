@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.internal.parsing.ParserPool;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -215,8 +216,12 @@ public class ParserPoolFactory
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool, contentTypeId);
-			ParsingPlugin.logInfo(message);
+			if (IdeLog.isInfoEnabled(ParsingPlugin.getDefault(), null))
+			{
+				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
+						contentTypeId);
+				ParsingPlugin.logInfo(message);
+			}
 		}
 
 		return result;

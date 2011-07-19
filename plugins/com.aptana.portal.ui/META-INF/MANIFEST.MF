@@ -29,7 +29,11 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.dispatch.browserFunctions,
  com.aptana.portal.ui.dispatch.browserNotifications,
  com.aptana.portal.ui.dispatch.configurationProcessors,
+ com.aptana.portal.ui.dispatch.configurationProcessors.installer,
  com.aptana.portal.ui.dispatch.processorDelegates,
  com.aptana.portal.ui.internal,
- com.aptana.portal.ui.internal.startup
+ com.aptana.portal.ui.internal.command,
+ com.aptana.portal.ui.internal.startpage,
+ com.aptana.portal.ui.internal.startup,
+ com.aptana.portal.ui.propertyTesters
 Eclipse-ExtensibleAPI: true
