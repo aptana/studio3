@@ -101,14 +101,14 @@ public class BundleElement extends AbstractElement
 
 					if (context != null)
 					{
-						context.updateContext();
+						context.updateElementContext();
 					}
 				}
 			}
 
 			if (context != null)
 			{
-				context.fireVisibilityEvents();
+				context.fireElementVisibilityEvents();
 			}
 
 			element.setOwningBundle(this);
@@ -176,6 +176,16 @@ public class BundleElement extends AbstractElement
 	public String getAuthor()
 	{
 		return this._author;
+	}
+
+	/**
+	 * getBuildPaths
+	 * 
+	 * @return
+	 */
+	public List<BuildPathElement> getBuildPaths()
+	{
+		return getChildrenByType(BuildPathElement.class);
 	}
 
 	/**
@@ -838,7 +848,7 @@ public class BundleElement extends AbstractElement
 
 			if (removed = this._children.remove(element) && context != null)
 			{
-				context.updateContext();
+				context.updateElementContext();
 			}
 		}
 
@@ -859,7 +869,7 @@ public class BundleElement extends AbstractElement
 
 			if (context != null)
 			{
-				context.fireVisibilityEvents();
+				context.fireElementVisibilityEvents();
 			}
 		}
 	}

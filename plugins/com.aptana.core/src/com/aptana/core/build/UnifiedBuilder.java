@@ -63,15 +63,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		URI uri = getURI();
 		if (uri != null)
 		{
-			// @formatter:off
-			String message = MessageFormat.format(
-				"Cleaning index for project {0} ({1})", //$NON-NLS-1$
-				project.getName(),
-				uri
-			);
-			// @formatter:on
-			IdeLog.logInfo(CorePlugin.getDefault(), message, IDebugScopes.BUILDER);
-
+			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Cleaning index for project {0} ({1})", //$NON-NLS-1$
+					project.getName(),
+					uri
+				);
+				// @formatter:on
+				IdeLog.logInfo(CorePlugin.getDefault(), message, IDebugScopes.BUILDER);
+			}
 			IndexManager.getInstance().removeIndex(uri);
 		}
 		sub.done();
@@ -100,13 +102,16 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
-			// @formatter:off
-			IdeLog.logInfo(
-				CorePlugin.getDefault(),
-				MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName),
-				IDebugScopes.BUILDER
-			);
-			// @formatter:on
+			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
+			{
+				// @formatter:off
+				IdeLog.logInfo(
+					CorePlugin.getDefault(),
+					MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName),
+					IDebugScopes.BUILDER
+				);
+				// @formatter:on
+			}
 			fullBuild(monitor);
 		}
 		else

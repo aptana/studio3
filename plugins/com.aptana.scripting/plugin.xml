@@ -76,5 +76,13 @@
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
+   <extension
+         point="com.aptana.buildpath.core.buildPaths">
+      <contributor
+            class="com.aptana.scripting.ScriptingBuildPathContributor"
+            id="com.aptana.scripting.buildPath.contributor"
+            name="Scripting Build Path Contributor">
+      </contributor>
+   </extension>
 
 </plugin>

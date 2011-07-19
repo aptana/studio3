@@ -49,8 +49,12 @@ abstract class IndexRequestJob extends Job
 	private static final String INDEX_FILTER_PARTICIPANTS_ID = "indexFilterParticipants"; //$NON-NLS-1$
 	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
 
+	private static final String FILE_CONTRIBUTORS_ID = "fileContributors"; //$NON-NLS-1$
+	private static final String ELEMENT_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
+
 	private URI containerURI;
 	private List<IIndexFilterParticipant> filterParticipants;
+	private List<IIndexFileContributor> fileContributors;
 
 	/**
 	 * IndexRequestJob
@@ -159,6 +163,74 @@ abstract class IndexRequestJob extends Job
 	protected URI getContainerURI()
 	{
 		return containerURI;
+	}
+
+	/**
+	 * getContributedFiles
+	 * 
+	 * @param container
+	 * @return
+	 */
+	protected Set<IFileStore> getContributedFiles(URI container)
+	{
+		Set<IFileStore> result = new HashSet<IFileStore>();
+
+		for (IIndexFileContributor contributor : this.getFileContributors())
+		{
+			Set<IFileStore> files = contributor.getFiles(container);
+
+			if (files != null && !files.isEmpty())
+			{
+				result.addAll(files);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getFileContributors
+	 * 
+	 * @return
+	 */
+	private List<IIndexFileContributor> getFileContributors()
+	{
+		if (fileContributors == null)
+		{
+			fileContributors = new ArrayList<IIndexFileContributor>();
+
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+			if (registry != null)
+			{
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID);
+
+				if (extensionPoint != null)
+				{
+					for (IExtension extension : extensionPoint.getExtensions())
+					{
+						for (IConfigurationElement element : extension.getConfigurationElements())
+						{
+							if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
+							{
+								try
+								{
+									IIndexFileContributor participant = (IIndexFileContributor) element.createExecutableExtension(ATTR_CLASS);
+
+									fileContributors.add(participant);
+								}
+								catch (CoreException e)
+								{
+									IndexPlugin.logError(e);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return fileContributors;
 	}
 
 	/**
