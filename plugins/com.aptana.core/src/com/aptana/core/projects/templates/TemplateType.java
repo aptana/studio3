@@ -12,5 +12,5 @@ package com.aptana.core.projects.templates;
  */
 public enum TemplateType
 {
-	UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON, TITANIUM_MOBILE, TITANIUM_DESKTOP
+	UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON, TITANIUM_MOBILE, TITANIUM_DESKTOP, RAILS
 }
