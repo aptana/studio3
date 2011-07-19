@@ -51,6 +51,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 
 		// default scopes for spell checking
-		prefs.put(IPreferenceConstants.ENABLED_SPELLING_SCOPES, "comment.block.documentation,comment.line,comment.block");
+		prefs.put(IPreferenceConstants.ENABLED_SPELLING_SCOPES, "comment.block.documentation,comment.line,comment.block"); //$NON-NLS-1$
 	}
 }

@@ -9,6 +9,7 @@
 package com.aptana.editor.common.spelling;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,7 +76,7 @@ public final class SpellingPreferences implements IPreferenceChangeListener {
 	}
 
 	/**
-	 * Returns 
+	 * Returns set of enabled scopes in preferences
 	 * @return
 	 */
 	public static Set<String> getEnabledScopes() {
@@ -89,6 +90,20 @@ public final class SpellingPreferences implements IPreferenceChangeListener {
 			}
 		}
 		return result;
+	}
+
+	public static void setEnabledScopes(Collection<String> scopes) {
+		StringBuilder sb = new StringBuilder();
+		for (String scope : scopes) {
+			scope = scope.trim();
+			if (scope.length() > 0) {
+				sb.append(scope).append(PREF_DELEIMITER);
+			}
+		}
+		if (sb.length() > 0) {
+			sb.setLength(sb.length()-1);
+		}
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).put(IPreferenceConstants.ENABLED_SPELLING_SCOPES, sb.toString());
 	}
 
 }
