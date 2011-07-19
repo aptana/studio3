@@ -36,8 +36,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
  *
  */
 @SuppressWarnings("restriction")
-public class VirtualFile extends FileStore implements IExtendedFileStore
-{
+public class VirtualFile extends FileStore implements IExtendedFileStore {
 
 	private IConnectionFileManager fileManager;
 	private URI baseURI;

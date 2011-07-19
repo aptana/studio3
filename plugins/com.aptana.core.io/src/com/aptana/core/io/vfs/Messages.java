@@ -39,13 +39,11 @@ public class Messages extends NLS // NO_UCD
 	public static String BaseConnectionFileManager_PermissionDenied0;
 	public static String BaseConnectionFileManager_putting_changes;
 
-	static
-	{
+	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages()
-	{
+	private Messages() {
 	}
 }

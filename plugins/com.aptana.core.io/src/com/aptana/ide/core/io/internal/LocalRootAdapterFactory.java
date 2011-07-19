@@ -13,20 +13,17 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import com.aptana.ide.core.io.LocalRoot;
 
 @SuppressWarnings("rawtypes")
-public class LocalRootAdapterFactory implements IAdapterFactory
-{
+public class LocalRootAdapterFactory implements IAdapterFactory {
 
-	public Object getAdapter(Object adaptableObject, Class adapterType)
-	{
-		if (adapterType == IFileStore.class && adaptableObject instanceof LocalRoot)
-		{
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
+		if (adapterType == IFileStore.class
+				&& adaptableObject instanceof LocalRoot) {
 			return ((LocalRoot) adaptableObject).getAdapter(IFileStore.class);
 		}
 		return null;
 	}
 
-	public Class[] getAdapterList()
-	{
+	public Class[] getAdapterList() {
 		return new Class[] { LocalRoot.class };
 	}
 }
