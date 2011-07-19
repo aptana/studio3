@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ====================================================================== 
-     Sep 1, 2009                                                        
+     Sep 1st 2009                                                        
 
-     Builds Eclipse 3.5 compatible portal plugin used in Aptana Studio 3.
+     Studio Core
+     Builds the Studio core features
                    
      cwilliams
-     schitale                                                            
+     schitale                                                               
      ====================================================================== -->
-<project name="portal35" default="build">
+<project name="studio3" default="build">
 	<description>
-		Builds Eclipse 3.5 compatible portal plugin used in Aptana Studio.
+            Builds the Studio Core feature
     </description>
 
 	<property environment="env" />
@@ -28,10 +29,11 @@
 	<!-- ================================= 
           target: build              
          ================================= -->
-	<target name="build" description="Builds the Studio feature" depends="generate.build.properties,get.revision,replace.versions,generate.base">
+	<target name="build" description="Builds the Studio core feature" depends="generate.build.properties,get.revision,replace.versions,generate.base">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
+		<antcall target="categorize" />
 		<antcall target="clean.after" />
 	</target>
 
@@ -51,6 +53,15 @@
 	</target>
 
 	<!-- ================================= 
+         target: categorize              
+        ================================= -->
+	<target name="categorize" description="categorize the update site">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
+			<arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator -nosplash -consolelog -updateSite ${deploy.dir} -site file:${deploy.dir}/site.xml -metadataRepository file:${deploy.dir} -metadataRepositoryName &quot;Aptana Studio 3 Core Update Site&quot; -artifactRepository file:${deploy.dir} -artifactRepositoryName &quot;Aptana Studio 3 Core Artifacts&quot; -publishArtifacts -publishArtifactRepository -compress -reusePack200Files -noDefaultIUs -vmargs -Xmx256m" />
+		</java>
+	</target>
+
+	<!-- ================================= 
 	      target: clean              
 	     ================================= -->
 	<target name="clean" depends="generate.build.properties" description="Clean up temp and build files">
@@ -63,16 +74,13 @@
 			</fileset>
 		</delete>
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="false">
-			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -nosplash clean" />
-		</java>
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
 		<delete dir="${p2.repo.dir}" failonerror="false" />
-		<!-- Do an git checkout of the build directory -->
+		<!-- Do a git clean of the build directory -->
 		<exec executable="/bin/bash" dir="${buildDirectory}">
 			<arg value="-c" />
-			<arg value="${git.executable} checkout -f" />
+			<arg value="${git.executable} clean -f -d -x" />
 		</exec>
 	</target>
 
@@ -99,6 +107,11 @@
 				<include name="plugins/*" />
 			</fileset>
 		</copy>
+		<copy todir="${baseLocation}/dropins">
+			<fileset dir="${portal35.dir}">
+				<include name="plugins/com.aptana.portal.ui.*.jar" />
+			</fileset>
+		</copy>
 
 		<!-- Unjar the features -->
 		<for param="file">
@@ -120,6 +133,10 @@
 			<path>
 				<fileset dir="${baseLocation}/dropins/eclipse/plugins" defaultexcludes="true">
 					<include name="com.aptana.swt.webkitbrowser.macosx.x86_*.jar" />
+					<include name="com.aptana.swt.webkitbrowser.win32.x86_*.jar" />
+					<include name="com.aptana.swt.webkitbrowser.linux.x86_*.jar" />
+					<include name="com.aptana.swt.webkitbrowser.macosx.carbon_*.jar" />
+					<include name="com.aptana.swt.webkitbrowser.macosx.cocoa.ppc_*.jar" />
 				</fileset>
 			</path>
 			<sequential>
@@ -190,7 +207,11 @@
 		<for param="file">
 			<path>
 				<dirset dir="${buildDirectory}" defaultexcludes="true">
-					<include name="plugins/com.aptana.portal.ui.eclipse35" />
+					<include name="plugins/*" />
+					<include name="features/*" />
+					<exclude name="plugins/com.aptana.usage" />
+					<exclude name="plugins/com.aptana.scripting" />
+					<exclude name="${topLevelElementType}s/${topLevelElementId}" />
 				</dirset>
 			</path>
 			<sequential>
@@ -199,13 +220,26 @@
 					<arg value="${git.executable} log --max-count=1 --pretty=format:'%ct' ." />
 				</exec>
 				<echo message="Replacing qualifier for @{file} with ${@{file}.committed.max}" />
-				<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
+				<exec executable="grep" dir="@{file}" outputproperty="@{file}.hasQualifierLine" logerror="false" failifexecutionfails="false" failonerror="false">
+					<arg line="qualifier ./build.properties" />
+				</exec>
+				<if>
+					<equals arg1="${@{file}.hasQualifierLine}" arg2="" />
+					<then>
+						<echo message="no qualifier property, adding one" />
+						<concat append="true" destfile="@{file}/build.properties">qualifier = ${@{file}.committed.max}</concat>
+					</then>
+					<else>
+						<echo message="replacing qualifier value" />
+						<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
+					</else>
+				</if>
 			</sequential>
 		</for>
 	</target>
 
 	<target name="create-artifact-symlink" depends="unlink-symlink">
-		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false"/>
+		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false" />
 	</target>
 	<target name="unlink-symlink" depends="link.check" if="link.exists">
 		<exec executable="unlink">
