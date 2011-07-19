@@ -27,7 +27,7 @@ import com.aptana.scripting.model.LoadCycleListener;
 public class BundleChangeReconcileTrigger implements LoadCycleListener {
 
 	private final CommonReconciler reconciler;
-	
+
 	private final Job job = new Job("Force reconcile on bundle change") { //$NON-NLS-1$
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
@@ -35,9 +35,9 @@ public class BundleChangeReconcileTrigger implements LoadCycleListener {
 			return Status.OK_STATUS;
 		}
 	};
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public BundleChangeReconcileTrigger(CommonReconciler reconciler) {
 		this.reconciler = reconciler;
@@ -47,7 +47,7 @@ public class BundleChangeReconcileTrigger implements LoadCycleListener {
 	public void dispose() {
 		BundleManager.getInstance().removeLoadCycleListener(this);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptLoaded(java.io.File)
 	 */

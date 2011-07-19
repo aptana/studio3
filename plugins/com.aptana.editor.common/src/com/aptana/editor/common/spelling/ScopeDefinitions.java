@@ -27,11 +27,11 @@ public final class ScopeDefinitions {
 		DEFINITIONS.put("string.quoted.double", Messages.ScopeDefinitions_DoubleQuotedString); //$NON-NLS-1$
 		DEFINITIONS.put("string.unquoted", Messages.ScopeDefinitions_UnquotedStringHeredoc); //$NON-NLS-1$
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private ScopeDefinitions() {
 	}
-	
+
 }

@@ -40,12 +40,12 @@ import com.aptana.editor.common.CommonEditorPlugin;
 public class SpellingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private static final String GENERAL_SPELLING_PREF_ID = "org.eclipse.ui.editors.preferencePages.Spelling"; //$NON-NLS-1$
-	
+
 	private CheckboxTableViewer tableViewer;
 	private Link globalPreferencesLink;
 
 	/**
-	 * 
+	 *
 	 */
 	public SpellingPreferencePage() {
 		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
@@ -65,14 +65,14 @@ public class SpellingPreferencePage extends PreferencePage implements IWorkbench
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(GridLayoutFactory.swtDefaults().create());
 		composite.setLayoutData(GridDataFactory.fillDefaults().create());
-		
+
 		globalPreferencesLink = new Link(composite, SWT.NONE);
 		globalPreferencesLink.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).create());
 
 		Label label = new Label(composite, SWT.NONE);
 		label.setText(StringUtil.makeFormLabel(Messages.SpellingPreferencePage_label));
 		label.setLayoutData(GridDataFactory.swtDefaults().indent(SWT.DEFAULT, 5).align(SWT.FILL, SWT.CENTER).create());
-		
+
 		tableViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER);
 		tableViewer.getTable().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		tableViewer.setContentProvider(new ArrayContentProvider());
@@ -81,7 +81,6 @@ public class SpellingPreferencePage extends PreferencePage implements IWorkbench
 			public String getText(Object element) {
 				return ScopeDefinitions.DEFINITIONS.get(element);
 			}
-			
 		});
 		tableViewer.setInput(ScopeDefinitions.DEFINITIONS.keySet());
 		tableViewer.setCheckedElements(SpellingPreferences.getEnabledScopes().toArray());

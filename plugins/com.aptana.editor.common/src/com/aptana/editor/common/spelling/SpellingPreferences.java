@@ -32,17 +32,17 @@ import com.aptana.scope.ScopeSelector;
  *
  */
 public final class SpellingPreferences implements IPreferenceChangeListener {
-	
+
 	private static final String PREF_DELEIMITER = ","; //$NON-NLS-1$
 	private List<IScopeSelector> selectors;
-		
+
 	/**
-	 * 
+	 *
 	 */
 	public SpellingPreferences() {
 		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 	}
-	
+
 	public void dispose() {
 		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 	}

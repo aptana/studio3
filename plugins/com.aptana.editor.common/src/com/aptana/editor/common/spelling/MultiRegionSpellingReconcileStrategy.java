@@ -35,7 +35,7 @@ import org.eclipse.ui.texteditor.spelling.SpellingService;
 public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrategy {
 
 	private IRegion currentRegion;
-	
+
 	/**
 	 * @param viewer
 	 * @param spellingService
@@ -76,7 +76,7 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 
 		/**
 		 * Initializes this collector with the given annotation model.
-		 * 
+		 *
 		 * @param annotationModel
 		 *            the annotation model
 		 */
