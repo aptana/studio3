@@ -28,7 +28,7 @@
                visible="true">
          </view>
          <viewShortcut
-               id="com.aptana.explorer.view">
+               id="org.eclipse.ui.navigator.ProjectExplorer">
          </viewShortcut>
          <view
                id="com.aptana.ui.io.remoteview"
@@ -342,5 +342,24 @@
                type="org.eclipse.core.resources.IFile">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.aptana.ui.preferences.ProjectBuildPathPropertyPage"
+            id="com.aptana.editor.common.projectBuildPath"
+            name="%buildPath.property.page.name">
+            <enabledWhen>
+            <and>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="com.aptana.projects.webnature">
+               </test>
+            </and>
+         </enabledWhen>
+      </page>
    </extension>
 </plugin>

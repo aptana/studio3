@@ -11,11 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 
@@ -100,31 +98,25 @@ public class JSTypeMapper
 	 */
 	protected void loadMappings()
 	{
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-
-		if (registry != null)
-		{
-			IExtensionPoint extensionPoint = registry.getExtensionPoint(JSPlugin.PLUGIN_ID, TYPE_MAPS);
-
-			if (extensionPoint != null)
+		// @formatter:off
+		EclipseUtil.processConfigurationElements(
+			JSPlugin.PLUGIN_ID,
+			TYPE_MAPS,
+			new IConfigurationElementProcessor()
 			{
-				for (IExtension extension : extensionPoint.getExtensions())
+				public void processElement(IConfigurationElement element)
 				{
-					for (IConfigurationElement element : extension.getConfigurationElements())
-					{
-						if (TAG_TYPE_MAP.equals(element.getName()))
-						{
-							String srcType = element.getAttribute(ATTR_SRC_TYPE);
-							String dstType = element.getAttribute(ATTR_DST_TYPE);
+					String srcType = element.getAttribute(ATTR_SRC_TYPE);
+					String dstType = element.getAttribute(ATTR_DST_TYPE);
 
-							if (StringUtil.isEmpty(srcType) == false && StringUtil.isEmpty(dstType) == false)
-							{
-								this.addTypeMapping(srcType, dstType);
-							}
-						}
+					if (StringUtil.isEmpty(srcType) == false && StringUtil.isEmpty(dstType) == false)
+					{
+						addTypeMapping(srcType, dstType);
 					}
 				}
-			}
-		}
+			},
+			TAG_TYPE_MAP
+		);
+		// @formatter:on
 	}
 }

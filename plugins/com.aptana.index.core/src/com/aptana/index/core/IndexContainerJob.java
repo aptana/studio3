@@ -64,6 +64,10 @@ public class IndexContainerJob extends IndexRequestJob
 				return Status.CANCEL_STATUS;
 			}
 
+			// Collect any "special" files contributed for the container URI. Mostly this is to allow files associated
+			// with IProjects to be included in indexing
+			files.addAll(getContributedFiles(getContainerURI()));
+
 			// Checks what's in the index, and if any of the files in there no longer exist, we now remove them...
 			Set<String> documents = index.queryDocumentNames(null);
 			removeDeletedFiles(index, documents, files);

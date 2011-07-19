@@ -144,6 +144,24 @@
             class="com.aptana.portal.ui.PortalPreferenceInitializer">
       </initializer>
    </extension>
+   <!-- Studio Start Page --> 
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.portal.ui.internal.startpage.StartPageBrowserEditor"
+            default="false"
+            icon="icons/obj16/radrails16.png"
+            id="com.aptana.portal.ui.browser.startPage"
+            name="%startPageEditor.name">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.portal.ui.internal.startpage.StartPageStartup">
+      </startup>
+   </extension>
+   
    <!-- Commenting out untill we integrate the Portal (Dev Toolbox) completely.
    <extension
          point="org.eclipse.ui.commands">

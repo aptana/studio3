@@ -92,8 +92,15 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	public void dispose()
 	{
-		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).removePreferenceChangeListener(fPreferenceListener);
-		super.dispose();
+		try
+		{
+			EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fPreferenceListener);
+		}
+		finally
+		{
+			super.dispose();
+		}
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()

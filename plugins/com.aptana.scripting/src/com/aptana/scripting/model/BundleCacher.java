@@ -523,6 +523,7 @@ public class BundleCacher
 			this.yamlConstructors.put(new Tag(SmartTypingPairsElement.class), new ConstructSmartTypingPairsElement());
 			this.yamlConstructors.put(new Tag(ProjectTemplateElement.class), new ConstructProjectTemplateElement());
 			this.yamlConstructors.put(new Tag(EnvironmentElement.class), new ConstructEnvironmentElement());
+			this.yamlConstructors.put(new Tag(BuildPathElement.class), new ConstructBuildPathElement());
 
 			// Tell it that "children" field for MenuElement is a list of MenuElements
 			TypeDescription menuDescription = new TypeDescription(MenuElement.class);
@@ -636,6 +637,20 @@ public class BundleCacher
 						}
 					}
 				}
+			}
+		}
+
+		private class ConstructBuildPathElement extends AbstractBundleElementConstruct
+		{
+			public Object construct(Node node)
+			{
+				node.setType(BuildPathElement.class);
+				String path = getPath(node);
+				BuildPathElement bpe = new BuildPathElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, bpe);
+				bpe.setPath(path);
+				return bpe;
 			}
 		}
 
