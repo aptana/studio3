@@ -72,9 +72,6 @@
 		<delete dir="${coverageDirectory}" failonerror="false" />
 		<delete dir="${testResultsDirectory}" failonerror="false" />
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="false">
-			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/productBuild/productBuild.xml -Dbuilder=${basedir} -nosplash clean" />
-		</java>
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
 		<delete dir="${p2.repo.dir}" failonerror="false" />
@@ -84,7 +81,6 @@
 			<arg value="${git.executable} clean -f -d -x" />
 		</exec>
 		<delete file="build.properties" failonerror="false" />
-		<delete dir="${buildDirectory}/eclipse" failonerror="false" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 

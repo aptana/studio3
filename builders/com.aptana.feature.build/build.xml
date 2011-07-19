@@ -2,15 +2,15 @@
 <!-- ====================================================================== 
      Sep 1st 2009                                                        
 
-     RED Core    
-     Builds the RED core features
+     Studio Core
+     Builds the Studio core features
                    
      cwilliams
      schitale                                                               
      ====================================================================== -->
 <project name="studio3" default="build">
 	<description>
-            Builds the RED Core feature
+            Builds the Studio Core feature
     </description>
 
 	<property environment="env" />
@@ -29,7 +29,7 @@
 	<!-- ================================= 
           target: build              
          ================================= -->
-	<target name="build" description="Builds the Studio feature" depends="generate.build.properties,get.revision,replace.versions,generate.base">
+	<target name="build" description="Builds the Studio core feature" depends="generate.build.properties,get.revision,replace.versions,generate.base">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
@@ -74,9 +74,6 @@
 			</fileset>
 		</delete>
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="false">
-			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -nosplash clean" />
-		</java>
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
 		<delete dir="${p2.repo.dir}" failonerror="false" />
