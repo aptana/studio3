@@ -106,12 +106,10 @@ module Ruble
       editor_part.dirty?
     end
     
-    # FIXME This method only exists in Eclipse 3.5+
     def hide
       Ruble::UI.run("Hide Editor") { Ruble::UI.active_page.hide_editor(editor_reference) }
     end
     
-    # FIXME This method only exists in Eclipse 3.5+
     def show
       Ruble::UI.run("Show Editor") { Ruble::UI.active_page.show_editor(editor_reference) }
     end
