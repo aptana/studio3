@@ -87,8 +87,8 @@ module Ruble
     end
 
     def project_build_path
-	  BuildPathProxy.new(@jobj, @path)
-	end
+      BuildPathProxy.new(@jobj, @path)
+    end
 
     def repository
       @jobj.repository

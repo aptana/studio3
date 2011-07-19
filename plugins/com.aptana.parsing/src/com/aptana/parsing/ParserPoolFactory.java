@@ -64,8 +64,8 @@ public class ParserPoolFactory
 
 					parsers.put(contentType, element);
 				}
-			}, //$NON-NLS-1$
-			"parser"
+			},
+			"parser" //$NON-NLS-1$
 		);
 		// @formatter:on
 

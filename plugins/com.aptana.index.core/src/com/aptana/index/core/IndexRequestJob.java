@@ -177,7 +177,7 @@ abstract class IndexRequestJob extends Job
 
 		for (IIndexFileContributor contributor : this.getFileContributors())
 		{
-			Set<IFileStore> files = contributor.contributeFiles(container);
+			Set<IFileStore> files = contributor.getFiles(container);
 
 			if (files != null && !files.isEmpty())
 			{

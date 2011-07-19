@@ -17,5 +17,5 @@ import org.eclipse.core.filesystem.IFileStore;
  */
 public interface IIndexFileContributor
 {
-	Set<IFileStore> contributeFiles(URI container);
+	Set<IFileStore> getFiles(URI container);
 }

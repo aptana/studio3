@@ -39,7 +39,7 @@ public class BuildPathElement extends AbstractBundleElement
 	@Override
 	protected String getElementName()
 	{
-		return "buildPath";
+		return "buildPath"; //$NON-NLS-1$
 	}
 
 	/*

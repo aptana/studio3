@@ -19,5 +19,5 @@ public interface IBuildPathContributor
 	 * 
 	 * @return
 	 */
-	List<BuildPathEntry> contribute();
+	List<BuildPathEntry> getBuildPathEntries();
 }

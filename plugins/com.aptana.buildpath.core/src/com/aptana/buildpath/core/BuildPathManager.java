@@ -270,7 +270,7 @@ public class BuildPathManager
 
 			for (IBuildPathContributor contributor : contributors)
 			{
-				List<BuildPathEntry> files = contributor.contribute();
+				List<BuildPathEntry> files = contributor.getBuildPathEntries();
 
 				if (files != null)
 				{

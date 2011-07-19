@@ -28,7 +28,7 @@ public class ScriptingBuildPathContributor implements IBuildPathContributor
 	 * (non-Javadoc)
 	 * @see com.aptana.buildpath.core.IBuildPathContributor#contribute()
 	 */
-	public List<BuildPathEntry> contribute()
+	public List<BuildPathEntry> getBuildPathEntries()
 	{
 		BundleManager manager = BundleManager.getInstance();
 		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
