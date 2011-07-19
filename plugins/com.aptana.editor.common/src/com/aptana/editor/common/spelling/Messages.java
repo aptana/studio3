@@ -10,6 +10,8 @@ public class Messages extends NLS {
 	public static String ScopeDefinitions_LineComment;
 	public static String ScopeDefinitions_SingleQiotedString;
 	public static String ScopeDefinitions_UnquotedStringHeredoc;
+	public static String SpellingPreferencePage_DisabledMessage;
+	public static String SpellingPreferencePage_EnabledMessage;
 	public static String SpellingPreferencePage_label;
 	static {
 		// initialize resource bundle

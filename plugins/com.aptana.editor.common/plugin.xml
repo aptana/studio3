@@ -666,6 +666,9 @@
             class="com.aptana.editor.common.spelling.SpellingPreferencePage"
             id="com.aptana.editor.common.spelling"
             name="%page.spelling.name">
+         <keywordReference
+               id="org.eclipse.ui.editors.spelling">
+         </keywordReference>
       </page>
    </extension>
    <extension
