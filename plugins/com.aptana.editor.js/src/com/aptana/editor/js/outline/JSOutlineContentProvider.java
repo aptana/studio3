@@ -31,7 +31,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 
 	private static final String CONTAINER_TYPE = "/"; //$NON-NLS-1$
 	private static final String PROPERTY_TYPE = "."; //$NON-NLS-1$
-	private static final String ANONYMOUS_FUNCTION_PARAM = "(anonymous)"; //$NON-NLS-1$
+	private static final String FUNCTION_LITERAL = "<function>"; //$NON-NLS-1$
 
 	private Map<String, JSOutlineItem> fItemsByScope;
 	private JSOutlineItem fLastAddedItem;
@@ -358,7 +358,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			else
 			{
 				nameNode = node;
-				name = "<literal>"; //$NON-NLS-1$
+				name = FUNCTION_LITERAL;
 			}
 		}
 
@@ -373,7 +373,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		if (item == null)
 		{
 			String text;
-			if (name.endsWith(ANONYMOUS_FUNCTION_PARAM))
+			if (name.endsWith(FUNCTION_LITERAL + ")")) //$NON-NLS-1$
 			{
 				text = name;
 			}
@@ -528,8 +528,8 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					if (node2.getNodeType() == JSNodeTypes.FUNCTION)
 					{
 						processFunction(elements, node2,
-								new Reference(node2, node2, MessageFormat.format("{0}({1}) -> {2}", lhs.getText(), i, //$NON-NLS-1$
-										ANONYMOUS_FUNCTION_PARAM), StringUtil.EMPTY));
+								new Reference(node2, node2, MessageFormat.format("{0}(@{1}:{2})", lhs.getText(), i, //$NON-NLS-1$
+										FUNCTION_LITERAL), StringUtil.EMPTY));
 					}
 				}
 			}
