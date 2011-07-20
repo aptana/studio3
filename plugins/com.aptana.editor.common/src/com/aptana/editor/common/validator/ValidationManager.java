@@ -307,6 +307,11 @@ public class ValidationManager implements IValidationManager
 		if (fResource instanceof IResource)
 		{
 			workspaceResource = (IResource) fResource;
+			if (!workspaceResource.exists())
+			{
+				// no need to update the marker when the resource no longer exists
+				return;
+			}
 		}
 		else if (fResource instanceof IUniformResource)
 		{
