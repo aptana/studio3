@@ -11,9 +11,6 @@ package com.aptana.editor.common;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
-
 /**
  * @author Max Stepanov
  *
@@ -27,11 +24,7 @@ public final class CommonUtil {
 	}
 
 	public static IToken getToken(String tokenName) {
-		return new Token(tokenName); //getThemeManager().getToken(tokenName);
-	}
-
-	private static IThemeManager getThemeManager() {
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(tokenName);
 	}
 
 }
