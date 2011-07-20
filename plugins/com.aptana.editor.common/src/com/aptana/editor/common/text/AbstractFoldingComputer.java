@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
@@ -131,7 +130,6 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 			}
 			if (isFoldable(child))
 			{
-				// FIXME We had hacks for the length for each language before. Do we need hooks to override that here?
 				int start = child.getStartingOffset();
 				boolean add = true;
 				int end = child.getEndingOffset() + 1;
@@ -154,9 +152,9 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 						else
 						{
 							// When we can, use the end of the end line as the end offset, so it looks nicer in the
-							// editor.
-							IRegion endLineRegion = getDocument().getLineInformation(endLine);
-							end = endLineRegion.getOffset() + endLineRegion.getLength() + 1;
+							// editor. Using getLineInformation excludes the line delimiter, so we use the methods that
+							// include it!
+							end = getDocument().getLineOffset(endLine) + getDocument().getLineLength(endLine);
 							if (fLines != null)
 							{
 								fLines.add(line);

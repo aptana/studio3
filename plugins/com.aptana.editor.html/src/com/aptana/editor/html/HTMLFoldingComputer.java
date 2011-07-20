@@ -7,6 +7,7 @@ import com.aptana.editor.common.text.AbstractFoldingComputer;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.parsing.ast.IParseNode;
@@ -30,7 +31,7 @@ public class HTMLFoldingComputer extends AbstractFoldingComputer
 		{
 			return getCSSFoldingComputer().isFoldable(child);
 		}
-		return child instanceof HTMLNode;
+		return child instanceof HTMLNode && !(child instanceof HTMLTextNode);
 	}
 
 	@Override
