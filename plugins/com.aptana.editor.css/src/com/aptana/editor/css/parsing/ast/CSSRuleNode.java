@@ -9,6 +9,7 @@ package com.aptana.editor.css.parsing.ast;
 
 import java.util.List;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CSSRuleNode extends CSSNode
@@ -39,9 +40,8 @@ public class CSSRuleNode extends CSSNode
 		super(CSSNodeTypes.RULE);
 
 		fSelectors = selectors.toArray(new CSSSelectorNode[selectors.size()]);
-		fDeclarations = (declarations != null)
-			? declarations.toArray(new CSSDeclarationNode[declarations.size()])
-			: NO_DECLARATIONS;
+		fDeclarations = (declarations != null) ? declarations.toArray(new CSSDeclarationNode[declarations.size()])
+				: NO_DECLARATIONS;
 	}
 
 	/*
@@ -84,14 +84,12 @@ public class CSSRuleNode extends CSSNode
 		{
 			return false;
 		}
-
 		CSSRuleNode other = (CSSRuleNode) obj;
 
 		if (fDeclarations.length != other.fDeclarations.length)
 		{
 			return false;
 		}
-
 		if (fSelectors.length != other.fSelectors.length)
 		{
 			return false;
@@ -100,9 +98,7 @@ public class CSSRuleNode extends CSSNode
 		for (int i = 0; i < fSelectors.length; i++)
 		{
 			// Can't call equals() on this, because it compares parents, which is this, which results in infinite loop!
-			CSSSelectorNode otherSelector = other.fSelectors[i];
-
-			if (fSelectors[i].getNodeType() != otherSelector.getNodeType())
+			if (fSelectors[i].getNodeType() != other.fSelectors[i].getNodeType())
 			{
 				return false;
 			}
@@ -111,9 +107,7 @@ public class CSSRuleNode extends CSSNode
 		for (int i = 0; i < fDeclarations.length; i++)
 		{
 			// Can't call equals() on this, because it compares parents, which is this, which results in infinite loop!
-			CSSDeclarationNode otherDecl = other.fDeclarations[i];
-
-			if (fDeclarations[i].getNodeType() != otherDecl.getNodeType())
+			if (fDeclarations[i].getNodeType() != other.fDeclarations[i].getNodeType())
 			{
 				return false;
 			}
@@ -208,15 +202,15 @@ public class CSSRuleNode extends CSSNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		CSSSelectorNode[] selectors = getSelectors();
 
+		CSSSelectorNode[] selectors = getSelectors();
+		String combinator;
 		for (CSSSelectorNode selector : selectors)
 		{
-			String combinator = selector.getCombinator();
-
 			text.append(selector);
 
-			if (combinator != null && combinator.length() > 0)
+			combinator = selector.getCombinator();
+			if (!StringUtil.isEmpty(combinator))
 			{
 				if (",".equals(combinator) == false) //$NON-NLS-1$
 				{

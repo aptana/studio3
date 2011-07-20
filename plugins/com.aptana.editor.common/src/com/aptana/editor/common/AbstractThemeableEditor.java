@@ -124,6 +124,7 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
@@ -899,32 +900,31 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return fFileService;
 	}
 
-	public Object computeHighlightedOutlineNode()
+	public Object computeHighlightedOutlineNode(int caretOffset)
+	{
+		return getOutlineElementAt(caretOffset);
+	}
+
+	public int getCaretOffset()
 	{
 		ISourceViewer sourceViewer = getSourceViewer();
 		if (sourceViewer == null)
 		{
-			return null;
+			return -1;
 		}
 		StyledText styledText = sourceViewer.getTextWidget();
 		if (styledText == null)
 		{
-			return null;
+			return -1;
 		}
 
-		int caret = 0;
 		if (sourceViewer instanceof ITextViewerExtension5)
 		{
 			ITextViewerExtension5 extension = (ITextViewerExtension5) sourceViewer;
-			caret = extension.widgetOffset2ModelOffset(styledText.getCaretOffset());
+			return extension.widgetOffset2ModelOffset(styledText.getCaretOffset());
 		}
-		else
-		{
-			int offset = sourceViewer.getVisibleRegion().getOffset();
-			caret = offset + styledText.getCaretOffset();
-		}
-
-		return getOutlineElementAt(caret);
+		int offset = sourceViewer.getVisibleRegion().getOffset();
+		return offset + styledText.getCaretOffset();
 	}
 
 	public void select(IRange element, boolean checkIfOutlineActive)
@@ -972,7 +972,28 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			{
 				if (hasOutlinePageCreated() && isLinkedWithEditor())
 				{
-					getOutlinePage().select(computeHighlightedOutlineNode());
+					final int caretOffset = getCaretOffset();
+					// runs the computation of which node in the outline corresponds to the caret offset in a non-UI
+					// thread
+					Thread thread = new Thread()
+					{
+
+						@Override
+						public void run()
+						{
+							final Object outlineNode = computeHighlightedOutlineNode(caretOffset);
+							UIUtils.getDisplay().asyncExec(new Runnable()
+							{
+
+								public void run()
+								{
+									getOutlinePage().select(outlineNode);
+								}
+
+							});
+						}
+					};
+					thread.start();
 				}
 			}
 			else
