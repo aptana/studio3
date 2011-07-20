@@ -43,7 +43,7 @@ public class CommonEditorPropertySheetPage extends PropertySheetPage
 
 		public void partClosed(IWorkbenchPart part)
 		{
-			removeSelectionListener();
+			removePostSelectionListener();
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part)
@@ -71,7 +71,7 @@ public class CommonEditorPropertySheetPage extends PropertySheetPage
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection)
 	{
-		removeSelectionListener();
+		removePostSelectionListener();
 		if (selection instanceof ITextSelection && part instanceof AbstractTextEditor)
 		{
 			selection = new StructuredSelection(new AdaptableTextSelection(getViewer(), (ITextSelection) selection));
@@ -92,12 +92,12 @@ public class CommonEditorPropertySheetPage extends PropertySheetPage
 		}
 	}
 
-	private void removeSelectionListener()
+	private void removePostSelectionListener()
 	{
 		if (sourcePart != null)
 		{
 			((IPostSelectionProvider) sourcePart.getSelectionProvider())
-					.removeSelectionChangedListener(selectionChangedListener);
+					.removePostSelectionChangedListener(selectionChangedListener);
 			sourcePart = null;
 		}
 	}
@@ -113,7 +113,7 @@ public class CommonEditorPropertySheetPage extends PropertySheetPage
 		{
 			sourcePart.getSite().getPage().removePartListener(partListener);
 		}
-		removeSelectionListener();
+		removePostSelectionListener();
 		super.dispose();
 	}
 
