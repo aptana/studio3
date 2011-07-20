@@ -46,10 +46,10 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IBeaverConstants.CONTENT_TYPE_BEAVER } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new EndOfLineRule("//", new Token(BEAVER_SINGLELINE_COMMENT)), //$NON-NLS-1$
-		new EmptyCommentRule(new Token(BEAVER_MULTILINE_COMMENT)),
-		new MultiLineRule("/*", "*/", new Token(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("{:", ":}", new Token(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
+		new EndOfLineRule("//", getToken(BEAVER_SINGLELINE_COMMENT)), //$NON-NLS-1$
+		new EmptyCommentRule(getToken(BEAVER_MULTILINE_COMMENT)),
+		new MultiLineRule("/*", "*/", getToken(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("{:", ":}", getToken(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	private BeaverSourceScanner beaverScanner;
 

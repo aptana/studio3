@@ -17,6 +17,7 @@ public class CoffeeCodeNode extends CoffeeNode
 {
 
 	public boolean bound;
+	@SuppressWarnings("unused")
 	private String funcGlyph;
 
 	public CoffeeCodeNode(CoffeeParamNode[] params, CoffeeNode block, String funcGlyph)
@@ -32,7 +33,7 @@ public class CoffeeCodeNode extends CoffeeNode
 		}
 		addChild(block);
 		this.funcGlyph = funcGlyph;
-		this.bound = ("boundfunc".equals(funcGlyph));
+		this.bound = ("boundfunc".equals(funcGlyph)); //$NON-NLS-1$
 	}
 
 	public CoffeeCodeNode(CoffeeBlockNode b, String f)
@@ -43,7 +44,7 @@ public class CoffeeCodeNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Code";
+		return "Code"; //$NON-NLS-1$
 	}
 
 	public CoffeeNode getBlock()

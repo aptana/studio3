@@ -20,6 +20,6 @@ public class CoffeeExtendsNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Extends";
+		return "Extends"; //$NON-NLS-1$
 	}
 }

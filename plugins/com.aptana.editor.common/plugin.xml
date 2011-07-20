@@ -668,6 +668,15 @@
             id="com.aptana.editor.common.ValidationPreferencePage"
             name="%page.validation.name">
       </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.spelling.SpellingPreferencePage"
+            id="com.aptana.editor.common.spelling"
+            name="%page.spelling.name">
+         <keywordReference
+               id="org.eclipse.ui.editors.spelling">
+         </keywordReference>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">

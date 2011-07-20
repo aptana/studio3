@@ -53,6 +53,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.spelling.SpellingService;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
@@ -63,30 +64,33 @@ import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
 import com.aptana.editor.common.internal.hover.TextHoverDescriptor;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.spelling.MultiRegionSpellingReconcileStrategy;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
-import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
+import com.aptana.editor.common.text.reconciler.CommonReconcilingStrategy;
+import com.aptana.editor.common.text.reconciler.CompositeReconcilingStrategy;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
-		ITopContentTypesProvider
-{
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider {
+
+	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 0;
+	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
+
+	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
+
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
 	private IReconcilingStrategy fReconcilingStrategy;
-	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 	ArrayList<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
-
-	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 0;
-	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -94,8 +98,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * @param preferenceStore
 	 * @param editor
 	 */
-	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
-	{
+	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
 		super(preferenceStore);
 
 		fTextEditor = editor;
@@ -383,6 +386,18 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return "\t"; //$NON-NLS-1$
 	}
 
+	private final String[] getSpellingContentTypes(ISourceViewer sourceViewer) {
+		Set<String> set = new HashSet<String>();
+		IContentTypeTranslator contentTypeTranslator = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		String topContentType = getTopContentTypes()[0][0];
+		for (String contentType : getConfiguredContentTypes(sourceViewer)) {
+			if (CommonEditorPlugin.getDefault().getSpellingPreferences().isSpellingEnabledFor(contentTypeTranslator.translate(new QualifiedContentType(topContentType, contentType)))) {
+				set.add(contentType);
+			}
+		}
+		return set.toArray(new String[set.size()]);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -495,22 +510,26 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * )
 	 */
 	@Override
-	public IReconciler getReconciler(ISourceViewer sourceViewer)
-	{
-		if (fTextEditor != null && fTextEditor.isEditable())
-		{
-			fReconcilingStrategy = new CommonCompositeReconcilingStrategy(fTextEditor,
-					getConfiguredDocumentPartitioning(sourceViewer));
-			CommonReconciler reconciler = new CommonReconciler(fTextEditor, fReconcilingStrategy, false);
-
+	public IReconciler getReconciler(ISourceViewer sourceViewer) {
+		if (fTextEditor != null && fTextEditor.isEditable()) {
+			fReconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
+			CommonReconciler reconciler = new CommonReconciler(fReconcilingStrategy);
+			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 			reconciler.setIsIncrementalReconciler(false);
 			reconciler.setIsAllowedToModifyDocument(false);
 			reconciler.setProgressMonitor(new NullProgressMonitor());
 			reconciler.setDelay(500);
-
+			if (EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED)) {
+				SpellingService spellingService = EditorsUI.getSpellingService();
+				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null) {
+					reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
+							fReconcilingStrategy,
+							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService)),
+						getSpellingContentTypes(sourceViewer));
+				}
+			}
 			return reconciler;
 		}
-
 		return null;
 	}
 

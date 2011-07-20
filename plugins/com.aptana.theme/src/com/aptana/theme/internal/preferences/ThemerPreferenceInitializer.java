@@ -8,7 +8,6 @@
 package com.aptana.theme.internal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.util.EclipseUtil;

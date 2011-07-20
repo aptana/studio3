@@ -40,6 +40,6 @@ public class CoffeeSwitchNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Switch";
+		return "Switch"; //$NON-NLS-1$
 	}
 }

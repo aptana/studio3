@@ -155,7 +155,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	private void registerAsFirebugEditor() {
 		IPath launcher = EclipseUtil.getApplicationLauncher();
 		if (launcher != null) {
-			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
+			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher, StringUtil.EMPTY);
 		}
 	}
 

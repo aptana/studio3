@@ -26,7 +26,7 @@ public class CoffeeBlockNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Block";
+		return "Block"; //$NON-NLS-1$
 	}
 
 	public static IParseNode wrap(CoffeeNode body)

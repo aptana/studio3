@@ -19,7 +19,7 @@ public class CoffeeSplatNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Splat";
+		return "Splat";	//$NON-NLS-1$
 	}
 
 }

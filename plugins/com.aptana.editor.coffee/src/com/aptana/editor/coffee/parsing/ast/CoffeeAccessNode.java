@@ -34,12 +34,12 @@ public class CoffeeAccessNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		StringBuilder builder = new StringBuilder("Access");
-		if ("soak".equals(string))
+		StringBuilder builder = new StringBuilder("Access"); //$NON-NLS-1$
+		if ("soak".equals(string)) //$NON-NLS-1$
 		{
 			builder.append('?');
 		}
-		builder.append(MessageFormat.format(" \"{0}\"", getChild(0).getText()));
+		builder.append(MessageFormat.format(" \"{0}\"", getChild(0).getText())); //$NON-NLS-1$
 		return builder.toString();
 	}
 

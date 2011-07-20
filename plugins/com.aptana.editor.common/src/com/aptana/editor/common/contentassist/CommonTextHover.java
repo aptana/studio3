@@ -8,7 +8,6 @@
 package com.aptana.editor.common.contentassist;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.text.ITextHover;
 

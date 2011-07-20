@@ -45,7 +45,7 @@ public class CoffeeTryNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Try";
+		return "Try"; //$NON-NLS-1$
 	}
 
 }

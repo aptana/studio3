@@ -68,10 +68,7 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
@@ -416,60 +413,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		// Initialize the occurrences annotations marker
 		occurrencesUpdater = new CommonOccurrencesUpdater(this);
 		occurrencesUpdater.initialize(getPreferenceStore());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus() This is to workaround the Eclipse SWT bug
-	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=303677f
-	 */
-	@Override
-	public void setFocus()
-	{
-		super.setFocus();
-
-		// The above Eclipse SWT bug only occurs on Mac OS Cocoa builds
-		// "cocoa" is hardcoded because Platform.WS_COCOA was added
-		// in Eclipse 3.5
-		if (Platform.OS_MACOSX.equals(Platform.getOS()) && Platform.getWS().equals("cocoa")) //$NON-NLS-1$
-		{
-			final Shell shell = getSite().getShell();
-			if (shell == null)
-			{
-				return;
-			}
-			Display display = shell.getDisplay();
-			if (display == null)
-			{
-				return;
-			}
-			ISourceViewer sv = getSourceViewer();
-			if (sv == null)
-			{
-				return;
-			}
-			if (display.getFocusControl() != sv.getTextWidget())
-			{
-				// Focus did not stick due to the bug above. This is most likely
-				// because of the containing shell is not the active shell.
-				if (shell != display.getActiveShell())
-				{
-					// Queue up a setFocus() when the containing shell activates.
-					shell.addShellListener(new ShellAdapter()
-					{
-						@Override
-						public void shellActivated(ShellEvent e)
-						{
-							// Cleanup
-							shell.removeShellListener(this);
-
-							// Set the focus
-							AbstractThemeableEditor.this.setFocus();
-						}
-					});
-				}
-			}
-		}
 	}
 
 	/*

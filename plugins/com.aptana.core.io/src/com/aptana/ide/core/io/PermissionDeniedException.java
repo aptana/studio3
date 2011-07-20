@@ -7,16 +7,9 @@
  */
 package com.aptana.ide.core.io;
 
-public class PermissionDeniedException extends Exception
-{
-	/*
-	 * Fields
-	 */
-	private static final long serialVersionUID = -443040597160397837L;
+public class PermissionDeniedException extends Exception {
 
-	/*
-	 * Constructors
-	 */
+	private static final long serialVersionUID = -443040597160397837L;
 
 	/**
 	 * Create a new instance of PermissionDeniedException
@@ -26,8 +19,7 @@ public class PermissionDeniedException extends Exception
 	 * @param e
 	 *            The inner exception that caused this exception
 	 */
-	public PermissionDeniedException(String message, Exception e)
-	{
+	public PermissionDeniedException(String message, Exception e) {
 		super(message, e);
 	}
 

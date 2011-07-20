@@ -30,7 +30,7 @@ public class CoffeeCatchNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Catch";
+		return "Catch"; //$NON-NLS-1$
 	}
 
 }

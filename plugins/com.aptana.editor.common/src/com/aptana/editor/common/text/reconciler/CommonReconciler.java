@@ -7,109 +7,113 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.io.File;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.jface.text.reconciler.MonoReconciler;
-import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.jface.text.reconciler.Reconciler;
 
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.LoadCycleListener;
+public class CommonReconciler extends Reconciler {
 
-public class CommonReconciler extends MonoReconciler
-{
-
-	private LoadCycleListener listener;
+	private final IReconcilingStrategy defaultStrategy;
+	private BundleChangeReconcileTrigger bundleChangeReconcileTrigger;
 
 	/**
-	 * Used for performance testing purposes so we can see if we've finished our first reconcile!
+	 * Used for performance testing purposes so we can see if we've finished our
+	 * first reconcile!
 	 */
 	@SuppressWarnings("unused")
 	private boolean fIninitalProcessDone = false;
 
-	public CommonReconciler(ITextEditor editor, IReconcilingStrategy strategy, boolean isIncremental)
-	{
-		super(strategy, isIncremental);
+
+	/**
+	 * 
+	 */
+	public CommonReconciler(IReconcilingStrategy defaultStrategy) {
+		super();
+		this.defaultStrategy = defaultStrategy;
+		setReconcilingStrategy(defaultStrategy, String.valueOf(System.currentTimeMillis()));
 	}
 
+	/**
+	 * 
+	 * @param strategy
+	 * @param contentTypes
+	 */
+	public void setReconcilingStrategy(IReconcilingStrategy strategy, String[] contentTypes) {
+		for (String contentType : contentTypes) {
+			setReconcilingStrategy(strategy, contentType);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.Reconciler#getReconcilingStrategy(java.lang.String)
+	 */
 	@Override
-	public void install(ITextViewer textViewer)
-	{
+	public IReconcilingStrategy getReconcilingStrategy(String contentType) {
+		IReconcilingStrategy strategy = super.getReconcilingStrategy(contentType);
+		if (strategy != null) {
+			return strategy;
+		}
+		return defaultStrategy;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#install(org.eclipse.jface.text.ITextViewer)
+	 */
+	@Override
+	public void install(ITextViewer textViewer) {
 		super.install(textViewer);
+		bundleChangeReconcileTrigger = new BundleChangeReconcileTrigger(this);
+	}
 
-		listener = new LoadCycleListener()
-		{
-
-			private Job job;
-
-			public void scriptUnloaded(File script)
-			{
-				bundleFileChanged(script);
-			}
-
-			private void bundleFileChanged(File script)
-			{
-				if (script == null || !script.getName().equals("bundle.rb")) //$NON-NLS-1$
-					return;
-				// Run in a job on a delay and cancel/reschedule if it already exists and is scheduled... This should
-				// basically only make us run once if we get hit multiple times in a row. We'll still probably run a few
-				// times, but this should cut it down a lot.
-				if (job != null)
-				{
-					job.cancel();
-				}
-				job = new Job("Force reconcile on bundle change") //$NON-NLS-1$
-				{
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						IProgressMonitor oldMonitor = getProgressMonitor();
-						setProgressMonitor(monitor);
-						process(null);
-						setProgressMonitor(oldMonitor);
-						return Status.OK_STATUS;
-					}
-				};
-				job.setSystem(!EclipseUtil.showSystemJobs());
-				job.schedule(750);
-			}
-
-			public void scriptReloaded(File script)
-			{
-				bundleFileChanged(script);
-			}
-
-			public void scriptLoaded(File script)
-			{
-				bundleFileChanged(script);
-			}
-		};
-		BundleManager.getInstance().addLoadCycleListener(listener);
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#uninstall()
+	 */
+	@Override
+	public void uninstall() {
+		if (bundleChangeReconcileTrigger != null) {
+			bundleChangeReconcileTrigger.dispose();
+			bundleChangeReconcileTrigger = null;
+		}
+		super.uninstall();
 	}
 
 	@Override
-	public void uninstall()
-	{
-		try
-		{
-			BundleManager.getInstance().removeLoadCycleListener(listener);
+	protected void initialProcess() {
+		for (ITypedRegion region : computePartitioning(0, getDocument().getLength())) {
+			IReconcilingStrategy strategy = getReconcilingStrategy(region.getType());
+			strategy.reconcile(region);
 		}
-		finally
-		{
-			super.uninstall();
-		}
-	}
-
-	@Override
-	protected void initialProcess()
-	{
-		super.initialProcess();
 		fIninitalProcessDone = true;
+	}
+
+	/**
+	 * Computes and returns the partitioning for the given region of the input document
+	 * of the reconciler's connected text viewer.
+	 *
+	 * @param offset the region offset
+	 * @param length the region length
+	 * @return the computed partitioning
+	 * @since 3.0
+	 */
+	private ITypedRegion[] computePartitioning(int offset, int length) {
+		ITypedRegion[] regions= null;
+		try {
+			regions= TextUtilities.computePartitioning(getDocument(), getDocumentPartitioning(), offset, length, false);
+		} catch (BadLocationException x) {
+			regions= new TypedRegion[0];
+		}
+		return regions;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#forceReconciling()
+	 */
+	@Override
+	protected void forceReconciling() {
+		super.forceReconciling();
 	}
 }

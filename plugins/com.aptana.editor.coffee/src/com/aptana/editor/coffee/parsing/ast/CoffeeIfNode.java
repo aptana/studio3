@@ -10,6 +10,7 @@ package com.aptana.editor.coffee.parsing.ast;
 public class CoffeeIfNode extends CoffeeNode
 {
 
+	@SuppressWarnings("unused")
 	private boolean statement;
 	private boolean isChain;
 	private CoffeeBlockNode elseBody;
@@ -22,7 +23,7 @@ public class CoffeeIfNode extends CoffeeNode
 	public CoffeeIfNode(CoffeeNode condition, CoffeeNode body, String type, boolean statement)
 	{
 		super(CoffeeNodeTypes.IF);
-		if ("unless".equals(type))
+		if ("unless".equals(type)) //$NON-NLS-1$
 		{
 			condition = condition.invert();
 		}
@@ -68,7 +69,7 @@ public class CoffeeIfNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "If";
+		return "If"; //$NON-NLS-1$
 	}
 
 }

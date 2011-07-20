@@ -11,6 +11,9 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
@@ -501,6 +504,73 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		}
 	}
 
+	public void testApstud2959() throws Exception
+	{
+		String document = "<a href=\"http://|\" />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		// Generate some folders/files to use as proposals
+		String tmpDir = System.getProperty("java.io.tmpdir");
+		final File dir = new File(tmpDir, "testApstud2959" + System.currentTimeMillis());
+		dir.mkdirs();
+
+		File folder = new File(dir, "email");
+		folder.mkdirs();
+		try
+		{
+			fProcessor = new HTMLContentAssistProcessor(null)
+			{
+				@Override
+				protected URI getURI()
+				{
+					return new File(dir, "file.html").toURI();
+				}
+			};
+
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+			assertEquals(0, proposals.length);
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dir);
+		}
+	}
+
+	public void testRootFileSystemForHREF() throws Exception
+	{
+		String document = "<a href=\"file://|\" />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		IFileStore root = EFS.getLocalFileSystem().getStore(Path.ROOT);
+		String[] names = root.childNames(EFS.NONE, null);
+		int count = 0;
+		for (String name : names)
+		{
+			if (name.startsWith("."))
+			{
+				continue;
+			}
+			count++;
+		}
+		fProcessor = new HTMLContentAssistProcessor(null)
+		{
+			@Override
+			protected URI getURI()
+			{
+				// Shouldn't be necessary...
+				return new File(System.getProperty("java.io.tmpdir"), "file.html").toURI();
+			}
+		};
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(count, proposals.length);
+
+	}
+
 	public void testLinkHREFFileProposalWithPrefix() throws Exception
 	{
 		String document = "<link rel=\"stylesheet\" href=\"roo|\" />";
@@ -649,6 +719,36 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertTrue(proposals.length > 0);
 		assertNotNull(findProposal("scroll", proposals));
+	}
+
+	public void testRelativeHREFFileProposals() throws Exception
+	{
+		// FIXME I need to set up files on the filesystem and relative to editor to test those!
+
+		String document = "<a href=\"|\"></a>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		final File tmpFile = File.createTempFile("test", ".html");
+		tmpFile.deleteOnExit();
+
+		File sibling = new File(tmpFile.getParentFile(), "sibling.html");
+		sibling.createNewFile();
+		sibling.deleteOnExit();
+
+		fProcessor = new HTMLContentAssistProcessor(null)
+		{
+			@Override
+			protected URI getURI()
+			{
+				return tmpFile.toURI();
+			}
+		};
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
+		assertNotNull(findProposal("sibling.html", proposals));
 	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)

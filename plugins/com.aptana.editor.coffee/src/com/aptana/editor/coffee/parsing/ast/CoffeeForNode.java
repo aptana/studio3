@@ -9,6 +9,7 @@ package com.aptana.editor.coffee.parsing.ast;
 
 import com.aptana.parsing.ast.IParseNode;
 
+@SuppressWarnings("unused")
 public class CoffeeForNode extends CoffeeNode
 {
 
@@ -46,6 +47,6 @@ public class CoffeeForNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "For";
+		return "For"; //$NON-NLS-1$
 	}
 }

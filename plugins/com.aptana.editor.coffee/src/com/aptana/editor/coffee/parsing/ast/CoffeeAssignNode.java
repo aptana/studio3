@@ -37,12 +37,12 @@ public class CoffeeAssignNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Assign";
+		return "Assign"; //$NON-NLS-1$
 	}
 
 	public boolean isObjectProperty()
 	{
-		return "object".equals(compoundAssignmentText);
+		return "object".equals(compoundAssignmentText); //$NON-NLS-1$
 	}
 
 	public boolean isFunctionDeclaration()

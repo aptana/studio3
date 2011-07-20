@@ -63,9 +63,6 @@
 			</fileset>
 		</delete>
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="false">
-			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -nosplash clean" />
-		</java>
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
 		<delete dir="${p2.repo.dir}" failonerror="false" />
@@ -204,10 +201,15 @@
 		</for>
 	</target>
 
-	<target name="create-artifact-symlink">
+	<target name="create-artifact-symlink" depends="unlink-symlink">
+		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false"/>
+	</target>
+	<target name="unlink-symlink" depends="link.check" if="link.exists">
 		<exec executable="unlink">
 			<arg value="${env.WORKSPACE}/build-artifacts" />
 		</exec>
-		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false"/>
+	</target>
+	<target name="link.check">
+		<available file="${env.WORKSPACE}/build-artifacts"  property="link.exists"/>
 	</target>
 </project>

@@ -11,10 +11,9 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
 
-class IndexProjectJob extends IndexContainerJob
+public class IndexProjectJob extends IndexContainerJob
 {
-
-	protected IndexProjectJob(IProject project)
+	public IndexProjectJob(IProject project)
 	{
 		super(MessageFormat.format(Messages.IndexProjectJob_Name, project.getName()), project.getLocationURI());
 	}

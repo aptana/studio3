@@ -12,6 +12,7 @@ import java.util.List;
 public class CoffeeCallNode extends CoffeeNode
 {
 
+	@SuppressWarnings("unused")
 	private String methodName;
 	// Do we check for existence? ('?' trails call)
 	private boolean optFuncExists;
@@ -43,9 +44,9 @@ public class CoffeeCallNode extends CoffeeNode
 	{
 		if (optFuncExists)
 		{
-			return "Call?";
+			return "Call?"; //$NON-NLS-1$
 		}
-		return "Call";
+		return "Call"; //$NON-NLS-1$
 	}
 
 	CoffeeCallNode newInstance()

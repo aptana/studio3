@@ -48,6 +48,6 @@ public class CoffeeWhileNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "While";
+		return "While"; //$NON-NLS-1$
 	}
 }

@@ -22,5 +22,14 @@
             class="com.aptana.filesystem.ftp.preferences.FTPPreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.core.filesystem.filesystems">
+      <filesystem
+            scheme="ftp">
+         <run
+               class="com.aptana.filesystem.ftp.FTPFileSystem">
+         </run>
+      </filesystem>
+   </extension>
 
 </plugin>

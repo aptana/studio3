@@ -24,7 +24,7 @@ public class CoffeeArrNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Arr";
+		return "Arr"; //$NON-NLS-1$
 	}
 
 }
