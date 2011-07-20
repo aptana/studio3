@@ -13,30 +13,31 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.SingleLineRule;
 
 /**
- * This rule is a special case of SingleLineRule. It matches an exact sequence, much like a single-word word-rule
+ * This rule is a special case of SingleLineRule. It matches an exact sequence,
+ * much like a single-word word-rule
  * without the need for creating a special subclass of IWordDetector.
  * 
  * @author Max Stepanov
  */
-public class SingleTagRule extends SingleLineRule
-{
+public class SingleTagRule extends SingleLineRule {
 
 	/**
 	 * @param startSequence
 	 * @param token
 	 */
-	public SingleTagRule(String startSequence, IToken token)
-	{
+	public SingleTagRule(String startSequence, IToken token) {
 		super(startSequence, "", token); //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
+	 * 
+	 * @see
+	 * org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse
+	 * .jface.text.rules.ICharacterScanner)
 	 */
 	@Override
-	protected boolean endSequenceDetected(ICharacterScanner scanner)
-	{
+	protected boolean endSequenceDetected(ICharacterScanner scanner) {
 		return true;
 	}
 

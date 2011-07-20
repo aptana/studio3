@@ -20,33 +20,28 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 /**
  * @author Max Stepanov
  */
-public final class TextUtils
-{
+public final class TextUtils {
 
 	// TODO Move to util plugin
 
 	/**
 	 * 
 	 */
-	private TextUtils()
-	{
+	private TextUtils() {
 	}
 
 	/**
-	 * Combines by flattening the string arrays into a single string array. Does not add duplicate strings!
+	 * Combines by flattening the string arrays into a single string array. Does
+	 * not add duplicate strings!
 	 * 
 	 * @param arrays
 	 * @return
 	 */
-	public static String[] combine(String[][] arrays)
-	{
+	public static String[] combine(String[][] arrays) {
 		List<String> list = new ArrayList<String>();
-		for (String[] array : arrays)
-		{
-			for (String i : array)
-			{
-				if (!list.contains(i))
-				{
+		for (String[] array : arrays) {
+			for (String i : array) {
+				if (!list.contains(i)) {
 					list.add(i);
 				}
 			}
@@ -55,47 +50,42 @@ public final class TextUtils
 	}
 
 	/**
-	 * Flattens each 2d String array into a single 2D array containing them all. {{"1", "2"}, {"3", "4"}} and {{"5",
-	 * "6"}} becomes {"1", "2"}, {"3", "4"}, {"5", "6"}}. Duplicates are retained.
+	 * Flattens each 2d String array into a single 2D array containing them all.
+	 * {{"1", "2"}, {"3", "4"}} and {{"5",
+	 * "6"}} becomes {"1", "2"}, {"3", "4"}, {"5", "6"}}. Duplicates are
+	 * retained.
 	 * 
 	 * @param arraysArray
 	 * @return
 	 */
-	public static String[][] combineArrays(String[][]... arraysArray)
-	{
+	public static String[][] combineArrays(String[][]... arraysArray) {
 		List<String[]> list = new ArrayList<String[]>();
-		for (String[][] arrays : arraysArray)
-		{
-			for (String[] array : arrays)
-			{
+		for (String[][] arrays : arraysArray) {
+			for (String[] array : arrays) {
 				list.add(array);
 			}
 		}
 		String[][] arrays = new String[list.size()][1];
-		for (int i = 0; i < list.size(); i++)
-		{
+		for (int i = 0; i < list.size(); i++) {
 			arrays[i] = list.get(i);
 		}
 
 		return arrays;
 	}
 
-	public static char[][] removeDuplicates(char[][] arrays)
-	{
+	public static char[][] removeDuplicates(char[][] arrays) {
 		List<char[]> list = new ArrayList<char[]>();
 		Set<String> strings = new HashSet<String>();
-		for (char[] i : arrays)
-		{
+		for (char[] i : arrays) {
 			String string = String.valueOf(i);
-			if (!strings.contains(string))
-			{
+			if (!strings.contains(string)) {
 				list.add(i);
 				strings.add(string);
 			}
 		}
 		return list.toArray(new char[list.size()][]);
 	}
-	
+
 	public static char[][] replace(char[][] arrays, char character, char[][] replacements) {
 		List<char[]> list = new ArrayList<char[]>();
 		for (char[] array : arrays) {
@@ -106,11 +96,11 @@ public final class TextUtils
 				}
 			} else {
 				list.add(array);
-			}	
+			}
 		}
 		return list.toArray(new char[list.size()][]);
 	}
-	
+
 	public static char[][] rsort(char[][] arrays) {
 		arrays = arrays.clone();
 		Arrays.sort(arrays, new Comparator<char[]>() {
@@ -124,18 +114,17 @@ public final class TextUtils
 	public static boolean sequenceDetected(ICharacterScanner characterScanner, char[] sequence, boolean ignoreCase) {
 		for (int i = 1; i < sequence.length; ++i) {
 			int c = characterScanner.read();
-			if ((ignoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i]))
-					|| (!ignoreCase && c != sequence[i])) {
+			if ((ignoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i])) || (!ignoreCase && c != sequence[i])) {
 				// Non-matching character detected, rewind the scanner back to the start.
 				// Do not unread the first character.
 				characterScanner.unread();
-				for (int j = i-1; j > 0; --j) {
+				for (int j = i - 1; j > 0; --j) {
 					characterScanner.unread();
 				}
 				return false;
 			}
 		}
-		for (int j = sequence.length-1; j > 0; --j) {
+		for (int j = sequence.length - 1; j > 0; --j) {
 			characterScanner.unread();
 		}
 		return true;
