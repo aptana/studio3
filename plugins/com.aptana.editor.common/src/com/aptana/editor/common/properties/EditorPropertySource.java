@@ -29,34 +29,34 @@ public class EditorPropertySource implements IPropertySource
 		descriptor = new PropertyDescriptor(IEditorPropertyConstants.CONTENT_TYPE_KEY,
 				IEditorPropertyConstants.CONTENT_TYPE_LABEL);
 		descriptor.setAlwaysIncompatible(true);
-		descriptor.setCategory(IEditorPropertyConstants.DEBUG_INFO_CATEGORY);
+		descriptor.setCategory(IEditorPropertyConstants.EDITOR_INFO_CATEGORY);
 		propertyDescriptors[0] = descriptor;
 
 		descriptor = new PropertyDescriptor(IEditorPropertyConstants.SCOPE_KEY, IEditorPropertyConstants.SCOPE_LABEL);
 		descriptor.setAlwaysIncompatible(true);
-		descriptor.setCategory(IEditorPropertyConstants.DEBUG_INFO_CATEGORY);
+		descriptor.setCategory(IEditorPropertyConstants.EDITOR_INFO_CATEGORY);
 		propertyDescriptors[1] = descriptor;
 
 		descriptor = new PropertyDescriptor(IEditorPropertyConstants.TEXT_KEY, IEditorPropertyConstants.TEXT_LABEL);
 		descriptor.setAlwaysIncompatible(true);
-		descriptor.setCategory(IEditorPropertyConstants.DEBUG_INFO_CATEGORY);
+		descriptor.setCategory(IEditorPropertyConstants.EDITOR_INFO_CATEGORY);
 		propertyDescriptors[2] = descriptor;
 
 		descriptor = new PropertyDescriptor(IEditorPropertyConstants.OFFSET_START_KEY,
 				IEditorPropertyConstants.OFFSET_START_LABEL);
 		descriptor.setAlwaysIncompatible(true);
-		descriptor.setCategory(IEditorPropertyConstants.DEBUG_INFO_CATEGORY);
+		descriptor.setCategory(IEditorPropertyConstants.EDITOR_INFO_CATEGORY);
 		propertyDescriptors[3] = descriptor;
 
 		descriptor = new PropertyDescriptor(IEditorPropertyConstants.OFFSET_END_KEY,
 				IEditorPropertyConstants.OFFSET_END_LABEL);
 		descriptor.setAlwaysIncompatible(true);
-		descriptor.setCategory(IEditorPropertyConstants.DEBUG_INFO_CATEGORY);
+		descriptor.setCategory(IEditorPropertyConstants.EDITOR_INFO_CATEGORY);
 		propertyDescriptors[4] = descriptor;
 
 		descriptor = new PropertyDescriptor(IEditorPropertyConstants.LENGTH_KEY, IEditorPropertyConstants.LENGTH_LABEL);
 		descriptor.setAlwaysIncompatible(true);
-		descriptor.setCategory(IEditorPropertyConstants.DEBUG_INFO_CATEGORY);
+		descriptor.setCategory(IEditorPropertyConstants.EDITOR_INFO_CATEGORY);
 		propertyDescriptors[5] = descriptor;
 
 	}

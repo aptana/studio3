@@ -10,7 +10,7 @@ package com.aptana.editor.common.properties;
 public interface IEditorPropertyConstants
 {
 
-	public static final String DEBUG_INFO_CATEGORY = Messages.IEditorPropertyConstants_editor_info;
+	public static final String EDITOR_INFO_CATEGORY = Messages.IEditorPropertyConstants_editor_info;
 
 	public static final String CONTENT_TYPE_LABEL = Messages.IEditorPropertyConstants_content_type;
 
@@ -24,16 +24,16 @@ public interface IEditorPropertyConstants
 
 	public static final String LENGTH_LABEL = Messages.IEditorPropertyConstants_legnth;
 
-	public static final String CONTENT_TYPE_KEY = "com.aptana.debug.ui.content.type"; //$NON-NLS-1$
+	public static final String CONTENT_TYPE_KEY = "com.aptana.editor.common.content.type"; //$NON-NLS-1$
 
-	public static final String SCOPE_KEY = "com.aptana.debug.ui.scope"; //$NON-NLS-1$
+	public static final String SCOPE_KEY = "com.aptana.editor.common.scope"; //$NON-NLS-1$
 
-	public static final String TEXT_KEY = "com.aptana.debug.ui.key"; //$NON-NLS-1$
+	public static final String TEXT_KEY = "com.aptana.editor.common.key"; //$NON-NLS-1$
 
-	public static final String OFFSET_START_KEY = "com.aptana.debug.ui.offset.start"; //$NON-NLS-1$
+	public static final String OFFSET_START_KEY = "com.aptana.editor.common.offset.start"; //$NON-NLS-1$
 
-	public static final String OFFSET_END_KEY = "com.aptana.debug.ui.offset.end"; //$NON-NLS-1$
+	public static final String OFFSET_END_KEY = "com.aptana.editor.common.offset.end"; //$NON-NLS-1$
 
-	public static final String LENGTH_KEY = "com.aptana.debug.ui.length"; //$NON-NLS-1$
+	public static final String LENGTH_KEY = "com.aptana.editor.common.length"; //$NON-NLS-1$
 
 }
