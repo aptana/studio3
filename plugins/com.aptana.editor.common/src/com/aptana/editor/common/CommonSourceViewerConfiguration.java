@@ -107,32 +107,27 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	/**
 	 * dispose
 	 */
-	public void dispose()
-	{
+	public void dispose() {
 		fTextEditor = null;
 		fDoubleClickStrategy = null;
-		if (fAutoActivationListener != null)
-		{
-			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fAutoActivationListener);
+		fReconcilingStrategy = null;
+		if (fAutoActivationListener != null) {
+			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(fAutoActivationListener);
 			fAutoActivationListener = null;
 		}
-		if (fThemeChangeListener != null)
-		{
+		if (fThemeChangeListener != null) {
 			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
 
-		if (fCAProcessors != null)
-		{
-			for (IContentAssistProcessor cap : fCAProcessors)
-			{
+		if (fCAProcessors != null) {
+			for (IContentAssistProcessor cap : fCAProcessors) {
 				// disposes of unused resources, particularly preference change listeners
-				if (cap instanceof ICommonContentAssistProcessor)
-				{
+				if (cap instanceof ICommonContentAssistProcessor) {
 					((ICommonContentAssistProcessor) cap).dispose();
 				}
 			}
+			fCAProcessors = null;
 		}
 	}
 
