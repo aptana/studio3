@@ -83,7 +83,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 0;
 	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
 
-	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
+	public static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
