@@ -11,6 +11,14 @@ module Ruble
       @jobj.filetype = pattern
     end    
     
+    def location=(template_path)
+      invoke do |context|
+        ENV['TM_DATE'] = Time.now.strftime("%Y-%m-%d")
+        raw_contents = IO.read("#{File.dirname(ENV['TM_BUNDLE_SUPPORT'])}/#{template_path}")
+        raw_contents.gsub(/\$\{([^}]*)\}/) {|match| ENV[match[2..-2]] }
+      end
+    end
+	
     def filetype
       @jojb.filetype
     end

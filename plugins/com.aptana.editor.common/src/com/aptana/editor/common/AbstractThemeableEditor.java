@@ -91,6 +91,7 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
@@ -109,6 +110,7 @@ import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.properties.CommonEditorPropertySheetPage;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -447,6 +449,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return adaptable;
 			}
 		}
+
+		if (adapter == IPropertySheetPage.class)
+		{
+			return new CommonEditorPropertySheetPage(getSourceViewer());
+		}
+
 		return super.getAdapter(adapter);
 	}
 

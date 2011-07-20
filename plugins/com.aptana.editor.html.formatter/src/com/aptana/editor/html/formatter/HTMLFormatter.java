@@ -142,6 +142,10 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			}
 			catch (Exception e)
 			{
+				StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+						ERROR_DISPLAY_TIMEOUT, true);
+				FormatterPlugin.logError(e);
+
 				// In case of a parse error (which is unlikely to HTML parsing), just try to indent the given source.
 				return indent(source, input, offset, length, indentationLevel);
 			}
