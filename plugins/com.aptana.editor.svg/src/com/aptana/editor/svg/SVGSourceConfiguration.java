@@ -17,11 +17,11 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
@@ -70,10 +70,10 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 		new MultiLineRule("<?", "?>", getToken(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<!--", "-->", getToken(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<![CDATA[", "]]>", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
-		new TagRule("script", new ExtendedToken(SCRIPT)), //$NON-NLS-1$
-		new TagRule("style", new ExtendedToken(STYLE)), //$NON-NLS-1$
+		new TagRule("script", new ExtendedToken(getToken(SCRIPT))), //$NON-NLS-1$
+		new TagRule("style", new ExtendedToken(getToken(STYLE))), //$NON-NLS-1$
 		new TagRule("/", getToken(TAG)), //$NON-NLS-1$
-		new TagRule(new ExtendedToken(TAG)) //
+		new TagRule(new ExtendedToken(getToken(TAG))) //
 	};
 
 	private static SVGSourceConfiguration instance;
@@ -213,9 +213,9 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	private IToken getToken(String tokenName)
+	private static IToken getToken(String tokenName)
 	{
-		return new Token(tokenName);
+		return CommonUtil.getToken(tokenName);
 	}
 
 	/*

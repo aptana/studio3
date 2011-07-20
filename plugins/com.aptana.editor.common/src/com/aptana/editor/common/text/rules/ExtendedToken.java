@@ -6,6 +6,7 @@
 
 package com.aptana.editor.common.text.rules;
 
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
 /**
@@ -15,7 +16,14 @@ import org.eclipse.jface.text.rules.Token;
 public class ExtendedToken extends Token {
 
 	private String contents;
-	
+
+	/**
+	 * @param data
+	 */
+	public ExtendedToken(IToken token) {
+		this(token.getData());
+	}
+
 	/**
 	 * @param data
 	 */

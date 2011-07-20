@@ -17,11 +17,11 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
@@ -72,11 +72,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new DocTypeRule(getToken(CDATA)),
 			new PartitionerSwitchingIgnoreRule(
 					new MultiLineRule("<!--", "-->", getToken(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
-			new TagRule("script", new ExtendedToken(HTML_SCRIPT), true), //$NON-NLS-1$
-			new TagRule("style", new ExtendedToken(HTML_STYLE), true), //$NON-NLS-1$
-			new TagRule("svg", new ExtendedToken(HTML_SVG), true), //$NON-NLS-1$
+			new TagRule("script", new ExtendedToken(getToken(HTML_SCRIPT)), true), //$NON-NLS-1$
+			new TagRule("style", new ExtendedToken(getToken(HTML_STYLE)), true), //$NON-NLS-1$
+			new TagRule("svg", new ExtendedToken(getToken(HTML_SVG)), true), //$NON-NLS-1$
 			new TagRule("/", getToken(HTML_TAG_CLOSE)), //$NON-NLS-1$
-			new TagRule(new ExtendedToken(HTML_TAG))
+			new TagRule(new ExtendedToken(getToken(HTML_TAG)))
 		};
 
 	private static HTMLSourceConfiguration instance;
@@ -259,8 +259,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return new HTMLDoctypeScanner();
 	}
 
-	private IToken getToken(String tokenName) {
-		return new Token(tokenName);
+	private static IToken getToken(String tokenName) {
+		return CommonUtil.getToken(tokenName);
 	}
 
 }

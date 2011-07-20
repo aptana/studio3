@@ -10,8 +10,8 @@ package com.aptana.editor.json;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.json.text.rules.JSONEscapeSequenceRule;
 
 public class JSONEscapeSequenceScanner extends BufferedRuleBasedScanner
@@ -36,8 +36,8 @@ public class JSONEscapeSequenceScanner extends BufferedRuleBasedScanner
 	 * @param tokenName
 	 * @return
 	 */
-	protected IToken getToken(String tokenName)
+	private static IToken getToken(String tokenName)
 	{
-		return new Token(tokenName);
+		return CommonUtil.getToken(tokenName);
 	}
 }

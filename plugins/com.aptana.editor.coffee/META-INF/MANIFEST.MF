@@ -8,7 +8,7 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  beaver,
  org.eclipse.jface,
- com.aptana.core;bundle-version="3.0.0",
+ com.aptana.core,
  com.aptana.parsing,
  org.eclipse.jface.text,
  org.eclipse.text,

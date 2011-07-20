@@ -15,12 +15,12 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -91,7 +91,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -127,8 +127,8 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	private IToken getToken(String tokenName) {
-		return new Token(tokenName);
+	private static IToken getToken(String tokenName) {
+		return CommonUtil.getToken(tokenName);
 	}
 
 	/*

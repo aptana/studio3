@@ -15,12 +15,12 @@ import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -42,9 +42,9 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IIDLConstants.CONTENT_TYPE_IDL } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new EndOfLineRule("//", new Token(IDL_SINGLELINE_COMMENT)), //$NON-NLS-1$
-		new MultiLineRule("/**", "*/", new Token(IDL_DOC_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("/*", "*/", new Token(IDL_MULTILINE_COMMENT), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
+		new EndOfLineRule("//", getToken(IDL_SINGLELINE_COMMENT)), //$NON-NLS-1$
+		new MultiLineRule("/**", "*/", getToken(IDL_DOC_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("/*", "*/", getToken(IDL_MULTILINE_COMMENT), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
 	private static IDLSourceConfiguration instance;
@@ -80,7 +80,7 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -121,9 +121,9 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	private IToken getToken(String tokenName)
+	private static IToken getToken(String tokenName)
 	{
-		return new Token(tokenName);
+		return CommonUtil.getToken(tokenName);
 	}
 
 	/*
@@ -150,15 +150,15 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		DefaultDamagerRepairer docCommentDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.documentation.idl"))); //$NON-NLS-1$
+		DefaultDamagerRepairer docCommentDR = new ThemeingDamagerRepairer(new CommentScanner(getToken("comment.block.documentation.idl"))); //$NON-NLS-1$
 		reconciler.setDamager(docCommentDR, IDL_DOC_COMMENT);
 		reconciler.setRepairer(docCommentDR, IDL_DOC_COMMENT);
 
-		DefaultDamagerRepairer multilineCommentDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.idl"))); //$NON-NLS-1$
+		DefaultDamagerRepairer multilineCommentDR = new ThemeingDamagerRepairer(new CommentScanner(getToken("comment.block.idl"))); //$NON-NLS-1$
 		reconciler.setDamager(multilineCommentDR, IDL_MULTILINE_COMMENT);
 		reconciler.setRepairer(multilineCommentDR, IDL_MULTILINE_COMMENT);
 
-		DefaultDamagerRepairer singlelineCommentDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.line.double-slash.idl"))); //$NON-NLS-1$
+		DefaultDamagerRepairer singlelineCommentDR = new ThemeingDamagerRepairer(new CommentScanner(getToken("comment.line.double-slash.idl"))); //$NON-NLS-1$
 		reconciler.setDamager(singlelineCommentDR, IDL_SINGLELINE_COMMENT);
 		reconciler.setRepairer(singlelineCommentDR, IDL_SINGLELINE_COMMENT);
 	}

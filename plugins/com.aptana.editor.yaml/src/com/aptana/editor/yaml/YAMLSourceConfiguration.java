@@ -18,12 +18,12 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -83,13 +83,13 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private YAMLSourceConfiguration()
 	{
-		EndOfLineRule directiveRule = new EndOfLineRule("%", new Token(DIRECTIVE)); //$NON-NLS-1$
+		EndOfLineRule directiveRule = new EndOfLineRule("%", getToken(DIRECTIVE)); //$NON-NLS-1$
 		directiveRule.setColumnConstraint(0);
 
-		partitioningRules = new IPredicateRule[] { new SingleLineRule("`", "`", new Token(INTERPOLATED), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new SingleLineRule("'", "'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new EndOfLineRule("#", new Token(COMMENT)), //$NON-NLS-1$
+		partitioningRules = new IPredicateRule[] { new SingleLineRule("`", "`", getToken(INTERPOLATED), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+				new SingleLineRule("'", "'", getToken(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+				new SingleLineRule("\"", "\"", getToken(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+				new EndOfLineRule("#", getToken(COMMENT)), //$NON-NLS-1$
 				directiveRule };
 	}
 
@@ -122,7 +122,7 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -207,6 +207,6 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private IToken getToken(String name)
 	{
-		return new Token(name);
+		return CommonUtil.getToken(name);
 	}
 }

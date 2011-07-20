@@ -13,6 +13,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
@@ -23,6 +24,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -60,14 +62,14 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICoffeeConstants.CONTENT_TYPE_COFFEE } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("###", "###", new Token(COFFEE_BLOCK_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
-			new EndOfLineRule("#", new Token(COFFEE_SINGLELINE_COMMENT)), //$NON-NLS-1$
-			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("`", "`", new Token(COFFEE_COMMAND), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("'''", "'''", new Token(COFFEE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("\"\"\"", "\"\"\"", new Token(COFFEE_DOUBLE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("///", "///", new Token(COFFEE_HEREGEX)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("###", "###", getToken(COFFEE_BLOCK_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
+			new EndOfLineRule("#", getToken(COFFEE_SINGLELINE_COMMENT)), //$NON-NLS-1$
+			new SingleLineRule("\"", "\"", getToken(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\'", "\'", getToken(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("`", "`", getToken(COFFEE_COMMAND), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("'''", "'''", getToken(COFFEE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("\"\"\"", "\"\"\"", getToken(COFFEE_DOUBLE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("///", "///", getToken(COFFEE_HEREGEX)), //$NON-NLS-1$ //$NON-NLS-2$
 			new JSRegExpRule(new Token(COFFEE_REGEXP)) };
 
 	private static CoffeeSourceConfiguration instance;
@@ -145,7 +147,7 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(getPartitioningRules(), CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(getPartitioningRules(), CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -211,18 +213,18 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 	private ITokenScanner getSingleQuotedStringScanner()
 	{
 		RuleBasedScanner scanner = new RuleBasedScanner();
-		scanner.setDefaultReturnToken(new Token(ICoffeeScopeConstants.STRING_SINGLE));
+		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.STRING_SINGLE));
 		return scanner;
 	}
 
 	private ITokenScanner getBlockCommentScanner()
 	{
-		return new CommentScanner(new Token(ICoffeeScopeConstants.COMMENT_BLOCK));
+		return new CommentScanner(getToken(ICoffeeScopeConstants.COMMENT_BLOCK));
 	}
 
 	private ITokenScanner getSingleLineCommentScanner()
 	{
-		return new CommentScanner(new Token(ICoffeeScopeConstants.COMMENT_LINE));
+		return new CommentScanner(getToken(ICoffeeScopeConstants.COMMENT_LINE));
 	}
 
 	private ITokenScanner getCodeScanner()
@@ -235,4 +237,10 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 		// TODO Add CA for coffeescript!
 		return new CommonContentAssistProcessor(editor);
 	}
+
+    private static IToken getToken(String tokenName)
+    {
+        return CommonUtil.getToken(tokenName);
+    }
+
 }

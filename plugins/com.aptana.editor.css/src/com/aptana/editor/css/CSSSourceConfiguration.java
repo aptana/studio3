@@ -17,11 +17,11 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -50,8 +50,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(STRING), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
-			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(STRING), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(getToken(STRING)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(getToken(STRING)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
 			new EmptyCommentRule(getToken(MULTILINE_COMMENT)),
 			new MultiLineRule("/*", "*/", getToken(MULTILINE_COMMENT), (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
@@ -102,7 +102,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -158,7 +158,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		return stringScanner;
 	}
 
-	private IToken getToken(String name) {
-		return new Token(name);
+	private static IToken getToken(String tokenName) {
+		return CommonUtil.getToken(tokenName);
 	}
+
 }
