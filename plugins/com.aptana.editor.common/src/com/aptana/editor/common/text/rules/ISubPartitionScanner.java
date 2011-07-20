@@ -8,8 +8,6 @@
 
 package com.aptana.editor.common.text.rules;
 
-import java.util.Collection;
-
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -28,7 +26,7 @@ public interface ISubPartitionScanner {
 	 * Returns current active set of rules
 	 * @return
 	 */
-	public Collection<IPredicateRule> getRules();
+	public IPredicateRule[] getRules();
 	
 	/**
 	 * Returns current active default token.

@@ -8,11 +8,8 @@
 
 package com.aptana.editor.common.text.rules;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
@@ -31,7 +28,7 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 
 	private static final IToken DEFAULT_TOKEN = new Token(IDocument.DEFAULT_CONTENT_TYPE);
 	
-	private List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
+	private IPredicateRule[] rules;
 	private IToken defaultToken;
 	private Set<String> contentTypes = new HashSet<String>();
 	private SequenceCharacterScanner characterScanner;
@@ -40,7 +37,7 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	 * 
 	 */
 	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes, IToken defaultToken) {
-		this.rules.addAll(Arrays.asList(rules));
+		this.rules = rules;
 		this.contentTypes.addAll(Arrays.asList(contentTypes));
 		this.defaultToken = defaultToken != null ? defaultToken : DEFAULT_TOKEN;
 	}
@@ -55,7 +52,7 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.ISubPartitionScanner#getRules()
 	 */
-	public Collection<IPredicateRule> getRules() {
+	public IPredicateRule[] getRules() {
 		return rules;
 	}
 

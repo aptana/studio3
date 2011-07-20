@@ -8,9 +8,6 @@
 
 package com.aptana.editor.common.text.rules;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -26,6 +23,7 @@ import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 public class NullSubPartitionScanner implements ISubPartitionScanner {
 
 	private static final IToken DEFAULT_TOKEN = new Token(IDocument.DEFAULT_CONTENT_TYPE);
+	private static final IPredicateRule[] EMPTY = new IPredicateRule[0];
 
 	private ICharacterScanner characterScanner;
 	
@@ -60,8 +58,8 @@ public class NullSubPartitionScanner implements ISubPartitionScanner {
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.ISubPartitionScanner#getRules()
 	 */
-	public Collection<IPredicateRule> getRules() {
-		return Collections.emptyList();
+	public IPredicateRule[] getRules() {
+		return EMPTY;
 	}
 
 	/* (non-Javadoc)
