@@ -212,7 +212,6 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		public boolean visit(IResourceDelta delta) throws CoreException
 		{
-			// TODO Collect all the changes and translate them into adding/removing files
 			IResource resource = delta.getResource();
 			if (resource instanceof IFile)
 			{

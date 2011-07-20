@@ -18,7 +18,6 @@ import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -42,7 +41,6 @@ import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.filewatcher.FileWatcher;
 
 /**
@@ -215,31 +213,24 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 				// Look for Studio 1.x and 2.x project natures, attach our new natures where needed
 				IProjectDescription desc = p.getDescription();
+				boolean modified = false;
 				List<String> newNatures = new ArrayList<String>();
 				for (String nature : desc.getNatureIds())
 				{
 					String newNature = oldToNewNatures.get(nature);
 					if (newNature != null)
 					{
+						modified = true;
 						newNatures.add(newNature);
 					}
 					newNatures.add(nature);
 				}
-				desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
-				p.setDescription(desc, sub.newChild(5));
-
-				// Attach builders in case nature was already on project, but before we created the builder
-				String[] natureIds = desc.getNatureIds();
-				for (int i = 0; i < natureIds.length; i++)
+				if (modified)
 				{
-					String natureId = natureIds[i];
-					if (ResourceUtil.isAptanaNature(natureId))
-					{
-						IProjectNature nature = p.getNature(natureId);
-						nature.configure();
-					}
+					desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
+					p.setDescription(desc, sub.newChild(5));
+					status.add(Status.OK_STATUS);
 				}
-				status.add(Status.OK_STATUS);
 				sub.worked(5);
 			}
 			catch (CoreException e)
