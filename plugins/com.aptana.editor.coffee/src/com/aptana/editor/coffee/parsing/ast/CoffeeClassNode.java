@@ -49,7 +49,7 @@ public class CoffeeClassNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Class";
+		return "Class"; //$NON-NLS-1$
 	}
 
 	public String determineName()

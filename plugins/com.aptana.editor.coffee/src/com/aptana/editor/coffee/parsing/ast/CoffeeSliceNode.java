@@ -19,6 +19,6 @@ public class CoffeeSliceNode extends CoffeeIndexNode
 	@Override
 	public String getText()
 	{
-		return "Slice";
+		return "Slice";	//$NON-NLS-1$
 	}
 }

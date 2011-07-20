@@ -16,6 +16,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class CoffeeValueNode extends CoffeeNode
 {
 
+	@SuppressWarnings("unused")
 	private String tag;
 
 	public CoffeeValueNode(CoffeeNode objAssignable)
@@ -52,9 +53,9 @@ public class CoffeeValueNode extends CoffeeNode
 		IParseNode child = getChild(0);
 		if (child instanceof CoffeeLiteralNode)
 		{
-			return MessageFormat.format("Value \"{0}\"", getChild(0).getText());
+			return MessageFormat.format("Value \"{0}\"", getChild(0).getText()); //$NON-NLS-1$
 		}
-		return "Value";
+		return "Value"; //$NON-NLS-1$
 	}
 
 	public CoffeeNode unwrap()

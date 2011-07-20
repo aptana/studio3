@@ -32,6 +32,7 @@ public class CoffeeOpNode extends CoffeeNode
 		INVERSIONS.put("===", "!==");
 	}
 	private String operator;
+	@SuppressWarnings("unused")
 	private boolean postOp;
 	private CoffeeNode first;
 	private CoffeeNode second;

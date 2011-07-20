@@ -19,7 +19,7 @@ public class CoffeeParensNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Parens";
+		return "Parens"; //$NON-NLS-1$
 	}
 
 	public CoffeeNode unwrap()

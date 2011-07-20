@@ -10,6 +10,7 @@ package com.aptana.editor.coffee.parsing.ast;
 public class CoffeeRangeNode extends CoffeeNode
 {
 
+	@SuppressWarnings("unused")
 	private String rangeDots;
 
 	public CoffeeRangeNode(CoffeeNode leftExpr, CoffeeNode rightExpr, String rangeDots)
@@ -29,7 +30,7 @@ public class CoffeeRangeNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Range";
+		return "Range"; //$NON-NLS-1$
 	}
 
 }

@@ -25,6 +25,6 @@ public class CoffeeWhenNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "When";
+		return "When"; //$NON-NLS-1$
 	}
 }

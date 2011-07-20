@@ -295,7 +295,6 @@ public class CoffeeRewriter
 	private void addImplicitBraces()
 	{
 		Stack<CoffeeSymbol> stack = new Stack<CoffeeSymbol>();
-		CoffeeSymbol start = null;
 		// scanTokens
 		for (int i = 0; i < this.fTokens.size();)
 		{
@@ -318,7 +317,6 @@ public class CoffeeRewriter
 			}
 			if (EXPRESSION_END.contains(token.getId()))
 			{
-				start = stack.pop();
 				i++;
 				continue;
 			}

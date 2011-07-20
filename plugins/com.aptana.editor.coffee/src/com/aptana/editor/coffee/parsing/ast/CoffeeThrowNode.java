@@ -19,6 +19,6 @@ public class CoffeeThrowNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Throw";
+		return "Throw"; //$NON-NLS-1$
 	}
 }

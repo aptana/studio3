@@ -12,6 +12,7 @@ import java.util.List;
 public class CoffeeObjNode extends CoffeeNode
 {
 
+	@SuppressWarnings("unused")
 	private String optComma;
 
 	public CoffeeObjNode(String optComma, List<CoffeeNode> assignList)
@@ -27,6 +28,6 @@ public class CoffeeObjNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Obj";
+		return "Obj"; //$NON-NLS-1$
 	}
 }

@@ -14,7 +14,6 @@ package com.aptana.formatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,8 +150,8 @@ public class FormatterUtils
 
 	/**
 	 * Generate OFF-ON regions for the given map of comments, using the on-pattern and the off-pattern.<br>
-	 * The method will traverse the comments map and return a {@link Set} of valid regions that should be skipped in
-	 * case the Off/On was enabled.
+	 * The method will traverse the comments map and return a {@link java.util.Set} of valid regions that should be
+	 * skipped in case the Off/On was enabled.
 	 * 
 	 * @param commentsMap
 	 *            A {@link LinkedHashMap} of comments, ordered by their appearance in the document. The map key is the

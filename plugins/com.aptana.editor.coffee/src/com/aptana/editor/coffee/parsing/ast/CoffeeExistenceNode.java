@@ -19,7 +19,7 @@ public class CoffeeExistenceNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Existence";
+		return "Existence"; //$NON-NLS-1$
 	}
 
 	@Override

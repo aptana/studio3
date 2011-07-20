@@ -27,7 +27,7 @@ public class CoffeeReturnNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "Return";
+		return "Return"; //$NON-NLS-1$
 	}
 
 }

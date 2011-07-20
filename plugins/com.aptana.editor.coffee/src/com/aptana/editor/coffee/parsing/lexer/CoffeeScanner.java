@@ -809,6 +809,7 @@ public class CoffeeScanner extends Scanner
 		return regex.length();
 	}
 
+	@SuppressWarnings("unchecked")
 	private int heregexToken(Matcher match) throws SyntaxError
 	{
 		String heregex = match.group(0);

@@ -14,6 +14,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class CoffeeParamNode extends CoffeeNode
 {
 
+	@SuppressWarnings("unused")
 	private boolean ellipsis;
 
 	public CoffeeParamNode(CoffeeNode var)
@@ -43,8 +44,8 @@ public class CoffeeParamNode extends CoffeeNode
 		IParseNode child = getChild(0);
 		if (child instanceof CoffeeLiteralNode)
 		{
-			return MessageFormat.format("Param \"{0}\"", child.getText());
+			return MessageFormat.format("Param \"{0}\"", child.getText()); //$NON-NLS-1$
 		}
-		return "Param";
+		return "Param"; //$NON-NLS-1$
 	}
 }

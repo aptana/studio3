@@ -27,7 +27,7 @@ public class CoffeeInNode extends CoffeeNode
 	@Override
 	public String getText()
 	{
-		return "In";
+		return "In"; //$NON-NLS-1$
 	}
 
 }

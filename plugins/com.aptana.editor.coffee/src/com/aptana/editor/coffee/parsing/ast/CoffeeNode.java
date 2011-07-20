@@ -104,7 +104,7 @@ public class CoffeeNode extends ParseNode
 
 	public CoffeeNode invert()
 	{
-		return new CoffeeOpNode("!", this);
+		return new CoffeeOpNode("!", this); //$NON-NLS-1$
 	}
 
 	protected boolean isStatement()
