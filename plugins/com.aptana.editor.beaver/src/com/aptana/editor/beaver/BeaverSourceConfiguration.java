@@ -51,7 +51,6 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 		new MultiLineRule("/*", "*/", getToken(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("{:", ":}", getToken(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
-	private BeaverSourceScanner beaverScanner;
 
 	private static BeaverSourceConfiguration instance;
 
@@ -119,12 +118,7 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	 */
 	private ITokenScanner getDTDScanner()
 	{
-		if (beaverScanner == null)
-		{
-			beaverScanner = new BeaverSourceScanner();
-		}
-
-		return beaverScanner;
+		return new BeaverSourceScanner();
 	}
 
 	/*

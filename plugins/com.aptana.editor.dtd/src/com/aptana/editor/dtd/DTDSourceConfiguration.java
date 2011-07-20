@@ -59,10 +59,6 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 			new TagRule("!", getToken(TAG)), //$NON-NLS-1$
 	};
 
-	private DTDTagScanner tagScanner;
-	private DTDTagScanner piScanner;
-	private CommentScanner commentScanner;
-
 	private static DTDSourceConfiguration instance;
 
 	private DTDSourceConfiguration() {
@@ -186,24 +182,16 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private ITokenScanner getDTDTagScanner() {
-		if (tagScanner == null) {
-			tagScanner = new DTDTagScanner();
-		}
-		return tagScanner;
+		return new DTDTagScanner();
 	}
 
 	private ITokenScanner getCommentScanner() {
-		if (commentScanner == null) {
-			commentScanner = new CommentScanner(getToken("comment.block.dtd")); //$NON-NLS-1$
-		}
-		return commentScanner;
+		return new CommentScanner(getToken("comment.block.dtd")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getPIScanner() {
-		if (piScanner == null) {
-			piScanner = new DTDTagScanner();
-			piScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
-		}
+		DTDTagScanner piScanner = new DTDTagScanner();
+		piScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		return piScanner;
 	}
 

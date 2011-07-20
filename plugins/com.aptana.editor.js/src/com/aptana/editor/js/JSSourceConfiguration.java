@@ -17,7 +17,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -65,14 +64,6 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new MultiLineRule("/**", "*/", getToken(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", getToken(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new JSRegExpRule(new Token(JS_REGEXP)) };
-
-	private JSCodeScanner codeScanner;
-	private JSDocScanner docScanner;
-	private JSEscapeSequenceScanner singleQuoteScanner;
-	private JSEscapeSequenceScanner doubleQuoteScanner;
-	private JSEscapeSequenceScanner regexpScanner;
-	private RuleBasedScanner multiLineCommentScanner;
-	private RuleBasedScanner singleLineCommentScanner;
 
 	private static JSSourceConfiguration instance;
 
@@ -190,52 +181,31 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	}
 
 	private ITokenScanner getMultiLineCommentScanner() {
-		if (multiLineCommentScanner == null) {
-			multiLineCommentScanner = new CommentScanner(getToken("comment.block.js")); //$NON-NLS-1$
-		}
-		return multiLineCommentScanner;
+		return new CommentScanner(getToken("comment.block.js")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getSingleLineCommentScanner() {
-		if (singleLineCommentScanner == null) {
-			singleLineCommentScanner = new CommentScanner(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
-		}
-		return singleLineCommentScanner;
+		return new CommentScanner(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getRegexpScanner() {
-		if (regexpScanner == null) {
-			regexpScanner = new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
-		}
-		return regexpScanner;
+		return new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getDoubleQuotedStringScanner() {
-		if (doubleQuoteScanner == null) {
-			doubleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
-		}
-		return doubleQuoteScanner;
+		return new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getSingleQuotedStringScanner() {
-		if (singleQuoteScanner == null) {
-			singleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
-		}
-		return singleQuoteScanner;
+		return new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getJSDocScanner() {
-		if (docScanner == null) {
-			docScanner = new JSDocScanner();
-		}
-		return docScanner;
+		return new JSDocScanner();
 	}
 
 	private ITokenScanner getCodeScanner() {
-		if (codeScanner == null) {
-			codeScanner = new JSCodeScanner();
-		}
-		return codeScanner;
+		return new JSCodeScanner();
 	}
 
 	private IToken getToken(String tokenName) {

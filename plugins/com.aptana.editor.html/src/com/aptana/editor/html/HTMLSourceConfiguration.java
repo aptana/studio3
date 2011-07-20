@@ -79,11 +79,6 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new TagRule(new ExtendedToken(HTML_TAG))
 		};
 
-	private HTMLScanner htmlScanner;
-	private HTMLTagScanner tagScanner;
-	private RuleBasedScanner cdataScanner;
-	private HTMLDoctypeScanner docTypeScanner;
-
 	private static HTMLSourceConfiguration instance;
 
 	static {
@@ -247,32 +242,21 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	}
 
 	private ITokenScanner getHTMLScanner() {
-		if (htmlScanner == null) {
-			htmlScanner = new HTMLScanner();
-		}
-		return htmlScanner;
+		return new HTMLScanner();
 	}
 
 	private ITokenScanner getCDATAScanner() {
-		if (cdataScanner == null) {
-			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		}
+		RuleBasedScanner cdataScanner = new RuleBasedScanner();
+		cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		return cdataScanner;
 	}
 
 	private ITokenScanner getHTMLTagScanner() {
-		if (tagScanner == null) {
-			tagScanner = new HTMLTagScanner();
-		}
-		return tagScanner;
+		return new HTMLTagScanner();
 	}
 
 	private ITokenScanner getDoctypeScanner() {
-		if (docTypeScanner == null) {
-			docTypeScanner = new HTMLDoctypeScanner();
-		}
-		return docTypeScanner;
+		return new HTMLDoctypeScanner();
 	}
 
 	private IToken getToken(String tokenName) {

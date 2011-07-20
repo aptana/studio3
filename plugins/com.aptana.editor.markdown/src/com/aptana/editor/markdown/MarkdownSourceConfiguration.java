@@ -19,7 +19,6 @@ import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -65,9 +64,6 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			UNNUMBERED_LIST, NUMBERED_LIST, SEPARATOR, QUOTE, BLOCK, HTML_TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
-
-	private MarkdownScanner xmlScanner;
-	private RuleBasedScanner headingScanner;
 
 	private static MarkdownSourceConfiguration instance;
 
@@ -315,20 +311,12 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 
 	private ITokenScanner getPreProcessorScanner()
 	{
-		if (headingScanner == null)
-		{
-			headingScanner = new MarkdownHeadingScanner();
-		}
-		return headingScanner;
+		return new MarkdownHeadingScanner();
 	}
 
 	private ITokenScanner getMarkdownScanner()
 	{
-		if (xmlScanner == null)
-		{
-			xmlScanner = new MarkdownScanner();
-		}
-		return xmlScanner;
+		return new MarkdownScanner();
 	}
 
 	private IToken getToken(String tokenName)

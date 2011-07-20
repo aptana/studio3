@@ -48,7 +48,6 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 			new Token(PROPERTY) //
 		) //
 	};
-	private JSONSourceScanner beaverScanner;
 
 	private static JSONSourceConfiguration instance;
 
@@ -111,18 +110,13 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	}
 
 	/**
-	 * getDTDScanner
+	 * getCodeScanner
 	 * 
 	 * @return
 	 */
-	private ITokenScanner getDTDScanner()
+	private ITokenScanner getCodeScanner()
 	{
-		if (beaverScanner == null)
-		{
-			beaverScanner = new JSONSourceScanner();
-		}
-
-		return beaverScanner;
+		return new JSONSourceScanner();
 	}
 
 	/*
@@ -163,7 +157,7 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getDTDScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 

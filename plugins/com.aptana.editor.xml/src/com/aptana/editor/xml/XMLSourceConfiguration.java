@@ -64,12 +64,6 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		new TagRule(new ExtendedToken(TAG)), //
 	};
 
-	private XMLScanner xmlScanner;
-	private RuleBasedScanner cdataScanner;
-	private RuleBasedScanner preProcessorScanner;
-	private XMLTagScanner xmlTagScanner;
-	private CommentScanner commentScanner;
-
 	private static XMLSourceConfiguration instance;
 
 	private XMLSourceConfiguration() {
@@ -182,40 +176,27 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private ITokenScanner getCommentScanner() {
-		if (commentScanner == null) {
-			commentScanner = new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
-		}
-		return commentScanner;
+		return new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getPreProcessorScanner() {
-		if (preProcessorScanner == null) {
-			preProcessorScanner = new XMLTagScanner();
-			preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
-		}
+		XMLTagScanner preProcessorScanner = new XMLTagScanner();
+		preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		return preProcessorScanner;
 	}
 
 	private ITokenScanner getCDATAScanner() {
-		if (cdataScanner == null) {
-			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		}
+		RuleBasedScanner cdataScanner = new RuleBasedScanner();
+		cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		return cdataScanner;
 	}
 
 	private ITokenScanner getXMLScanner() {
-		if (xmlScanner == null) {
-			xmlScanner = new XMLScanner();
-		}
-		return xmlScanner;
+		return new XMLScanner();
 	}
 
 	private ITokenScanner getXMLTagScanner() {
-		if (xmlTagScanner == null) {
-			xmlTagScanner = new XMLTagScanner();
-		}
-		return xmlTagScanner;
+		return  new XMLTagScanner();
 	}
 
 	private IToken getToken(String tokenName) {

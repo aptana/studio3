@@ -56,9 +56,6 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 			new MultiLineRule("/*", "*/", getToken(MULTILINE_COMMENT), (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
-	private RuleBasedScanner multilineCommentScanner;
-	private RuleBasedScanner stringScanner;
-
 	private static CSSSourceConfiguration instance;
 
 	static {
@@ -152,17 +149,12 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private ITokenScanner getCommentScanner() {
-		if (multilineCommentScanner == null) {
-			multilineCommentScanner = new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
-		}
-		return multilineCommentScanner;
+		return new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 	}
 
 	private ITokenScanner getStringScanner() {
-		if (stringScanner == null) {
-			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
-		}
+		RuleBasedScanner stringScanner = new RuleBasedScanner();
+		stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
 		return stringScanner;
 	}
 
