@@ -123,6 +123,11 @@ public class ValidationManager implements IValidationManager
 		}
 
 		List<ValidatorReference> validatorRefs = getValidatorRefs(contentType);
+		if (validatorRefs.isEmpty())
+		{
+			// Skip doing any real work if there are no validators for this file type!
+			return;
+		}
 		for (ValidatorReference validatorRef : validatorRefs)
 		{
 			if (fResourceUri == null)
@@ -302,6 +307,11 @@ public class ValidationManager implements IValidationManager
 		if (fResource instanceof IResource)
 		{
 			workspaceResource = (IResource) fResource;
+			if (!workspaceResource.exists())
+			{
+				// no need to update the marker when the resource no longer exists
+				return;
+			}
 		}
 		else if (fResource instanceof IUniformResource)
 		{
