@@ -317,6 +317,7 @@ public class CoffeeRewriter
 			}
 			if (EXPRESSION_END.contains(token.getId()))
 			{
+				stack.pop();
 				i++;
 				continue;
 			}
