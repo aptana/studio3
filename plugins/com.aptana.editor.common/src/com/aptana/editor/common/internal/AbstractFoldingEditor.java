@@ -66,7 +66,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.Map)
 	 */
-	public void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
+	public synchronized void updateFoldingStructure(Map<ProjectionAnnotation, Position> annotations)
 	{
 		List<Annotation> deletions = new ArrayList<Annotation>();
 		Collection<Position> additions = annotations.values();

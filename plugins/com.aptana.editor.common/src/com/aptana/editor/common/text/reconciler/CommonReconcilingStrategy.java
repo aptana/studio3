@@ -104,10 +104,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		// Folding...
-		fPositions.clear();
+
 		try
 		{
-			fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+			synchronized (fPositions)
+			{
+				fPositions.clear();
+				fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -131,7 +135,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			return;
 		}
 		// clear folding positions
-		fPositions.clear();
+		synchronized (fPositions)
+		{
+			fPositions.clear();
+		}
 	}
 
 	protected boolean parseDocument(IProgressMonitor monitor)
@@ -148,11 +155,16 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
+		final Map<ProjectionAnnotation, Position> copy;
+		synchronized (fPositions)
+		{
+			copy = new HashMap<ProjectionAnnotation, Position>(fPositions);
+		}
 		Display.getDefault().asyncExec(new Runnable()
 		{
 			public void run()
 			{
-				fEditor.updateFoldingStructure(fPositions);
+				fEditor.updateFoldingStructure(copy);
 			}
 		});
 	}
@@ -166,7 +178,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		else
 		{
-			fPositions.clear();
+			synchronized (fPositions)
+			{
+				fPositions.clear();
+			}
 			updatePositions();
 		}
 		fEditor.getFileService().validate();
