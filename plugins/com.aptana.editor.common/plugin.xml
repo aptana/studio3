@@ -255,6 +255,13 @@
                type="com.aptana.scripting.keybindings.ICommandElementsProvider">
          </adapter>
       </factory>
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="com.aptana.editor.common.properties.DebugPropertiesAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
    </extension>
    <extension
          point="com.aptana.scripting.loadPaths">
