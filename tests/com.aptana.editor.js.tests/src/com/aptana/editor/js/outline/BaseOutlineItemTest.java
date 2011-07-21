@@ -22,6 +22,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
@@ -188,7 +189,7 @@ public abstract class BaseOutlineItemTest extends TestCase
 						name = "property";
 				}
 				writer.append("<").append(name);
-				writer.append(" label='").append(label).append("'");
+				writer.append(" label='").append(StringUtil.sanitizeHTML(label)).append("'");
 
 				if (item.getChildrenCount() > 0)
 				{
