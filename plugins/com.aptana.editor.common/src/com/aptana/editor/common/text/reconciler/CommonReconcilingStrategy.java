@@ -19,7 +19,6 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
-import org.eclipse.swt.widgets.Display;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -148,13 +147,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
-		Display.getDefault().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				fEditor.updateFoldingStructure(fPositions);
-			}
-		});
+		fEditor.updateFoldingStructure(fPositions);
 	}
 
 	private void reconcile(boolean initialReconcile)
