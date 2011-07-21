@@ -1272,7 +1272,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int openParen = locateCharForward(document, openChar, parenLookupStart);
 			int closeParen = locateCharBackward(document, closeChar, parenLookupEnd);
 			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document, false,
-					hasAnyCommentBefore(node.getStartingOffset()));
+					hasAnyCommentBefore(openParen));
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			if (node != null)
