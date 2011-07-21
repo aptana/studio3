@@ -80,4 +80,9 @@ public class SimpleItemsTest extends BaseOutlineItemTest
 		testItem(source, "/outline/function", "xyz()", 1);
 		testItem(source, "/outline/function/boolean", "abc");
 	}
+
+	public void testFunctionLiteralInArguments()
+	{
+		testItem("hello(function() {});", "/outline/function", "hello(@0:<function>)");
+	}
 }
