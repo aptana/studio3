@@ -157,9 +157,6 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				FormatterPlugin.logError(e);
 			}
 
-			// In case of a parse error, just try to indent the given source.
-			return indent(source, input, offset, length, indentationLevel);
-
 		}
 		catch (Exception e)
 		{
