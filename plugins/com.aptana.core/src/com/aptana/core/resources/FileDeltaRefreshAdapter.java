@@ -190,7 +190,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 						if (refreshing instanceof IContainer)
 						{
 							IContainer container = (IContainer) refreshing;
-							if (resource.getLocation() != null
+							if (resource.getLocation() != null && container.getLocation() != null
 									&& container.getLocation().isPrefixOf(resource.getLocation()))
 							{
 								// We already have an ancestor in the map. If it's refreshing infinitely don't add this
