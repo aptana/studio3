@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui,
  org.eclipse.ui.forms,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.core.io,
  com.aptana.ui,
  com.aptana.ui.ftp,
@@ -21,3 +21,4 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.syncing.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Eclipse-ExtensibleAPI: true

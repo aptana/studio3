@@ -121,15 +121,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		try
 		{
 			IParseRootNode parseResult = null;
-			try
-			{
-				parseResult = ParserPoolFactory.parse(getMainContentType(), input);
-			}
-			catch (Exception e)
-			{
-				// In case of a parse error, just try to indent the given source.
-				return indent(source, input, offset, length, indentationLevel);
-			}
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, offset, isSelection, indentSufix,
@@ -163,6 +156,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			{
 				FormatterPlugin.logError(e);
 			}
+
 		}
 		catch (Exception e)
 		{

@@ -217,7 +217,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			FormatterPlugin.logError(e);
 			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
 			// indentation level as much as we can.
-			return indent(source, input, offset, length, indentationLevel);
+			return indent(source, input, inputOffset, length - (inputOffset - offset), indentationLevel);
 		}
 		try
 		{

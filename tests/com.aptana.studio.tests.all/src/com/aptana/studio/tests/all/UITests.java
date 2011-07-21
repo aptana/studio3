@@ -20,8 +20,7 @@ public class UITests
 	{
 		TestSuite suite = new TestSuite(UITests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite()); // FIXME I think the way we do passwords causes
-																		// us to have to run in UI!
+		suite.addTest(com.aptana.deploy.ftp.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.coffee.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.AllTests.suite());
@@ -39,6 +38,8 @@ public class UITests
 		suite.addTest(com.aptana.editor.xml.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.yaml.tests.AllTests.suite());
 		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
+		// FIXME I think the way we do passwords causes us to have to run s3 tests in the UI!
+		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite());
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
 		suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite());

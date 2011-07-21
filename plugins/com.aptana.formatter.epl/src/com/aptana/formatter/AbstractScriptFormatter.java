@@ -348,7 +348,9 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 * @param toFormat
 	 *            the source to format
 	 * @param offset
-	 *            the offset of the region to format * @param length the length of the region to format
+	 *            the offset of the region to format
+	 * @param length
+	 *            the length of the region to format
 	 * @param indentationLevel
 	 *            the indent level
 	 * @return A {@link TextEdit} for the indented code.
@@ -357,7 +359,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		// Only indent when the source to format is located at the beginning of a line, or when there are only
 		// white-space characters to its left.
-		if (!canIndent(completeSource, offset))
+		if (!canIndent(completeSource, offset - 1))
 		{
 			return null;
 		}

@@ -1021,7 +1021,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// Push the function's name. Node that the function 'name' may be an expression in a group.
 			JSNode functionName = (JSNode) node.getExpression();
 			short nodeType = functionName.getNodeType();
-			if (nodeType == JSNodeTypes.GROUP || nodeType == JSNodeTypes.FUNCTION)
+			if (nodeType == JSNodeTypes.GROUP || nodeType == JSNodeTypes.FUNCTION
+					|| nodeType == JSNodeTypes.GET_PROPERTY)
 			{
 				// inline invocation
 				functionName.accept(this);
@@ -1104,7 +1105,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
 				int startingOffset = node.getStartingOffset();
-				visitTextNode(startingOffset, startingOffset + 4, true, 0, 0, false);
+				visitTextNode(startingOffset, startingOffset + 5, true, 0, 0, false);
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());
 			}
@@ -1164,11 +1165,28 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSGetPropertyNode node)
 		{
 			// a.b.c
+			int startingOffset = node.getStartingOffset();
 			FormatterJSGetPropertyNode getElementNode = new FormatterJSGetPropertyNode(document, node,
-					hasAnyCommentBefore(node.getStartingOffset()));
-			getElementNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getEndingOffset() + 1));
+					hasAnyCommentBefore(startingOffset));
+			getElementNode.setBegin(createTextNode(document, startingOffset, startingOffset));
 			push(getElementNode);
-			checkedPop(getElementNode, node.getEndingOffset());
+
+			// visit the internals
+			JSNode leftHandSide = (JSNode) node.getLeftHandSide();
+			JSNode rightHandSide = (JSNode) node.getRightHandSide();
+			Symbol operator = node.getOperator();
+			if (leftHandSide != null)
+			{
+				leftHandSide.accept(this);
+			}
+			pushTypePunctuation(TypePunctuation.JS_DOT_PROPERTY, operator.getStart());
+			if (rightHandSide != null)
+			{
+				rightHandSide.accept(this);
+			}
+			int endingOffset = node.getEndingOffset() + 1;
+			getElementNode.setEnd(createTextNode(document, endingOffset, endingOffset));
+			checkedPop(getElementNode, endingOffset);
 		}
 
 		/*
@@ -1487,9 +1505,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			FormatterJSCaseNode caseNode = new FormatterJSCaseNode(document, hasBlockedChild);
 			caseNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset + 1));
 			push(caseNode);
+
 			if (hasBlockedChild)
 			{
 				// we have a 'case' with a curly-block
+				// lastChild == JSNodeTypes.STATEMENTS
 				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document,
 						hasAnyCommentBefore(lastChild.getStartingOffset()));
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),

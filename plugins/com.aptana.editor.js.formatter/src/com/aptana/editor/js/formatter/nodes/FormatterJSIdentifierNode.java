@@ -114,6 +114,7 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 					case JSNodeTypes.LOGICAL_NOT:
 					case JSNodeTypes.BITWISE_NOT:
 					case JSNodeTypes.GROUP:
+					case JSNodeTypes.GET_PROPERTY:
 						return 0;
 					default:
 						return 1;

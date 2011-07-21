@@ -50,7 +50,7 @@ public class CSSDeclarationNode extends CSSNode
 
 		fIdentifier = identifier;
 		fStatus = status;
-		
+
 		this.setChildren(new CSSNode[] { value });
 	}
 
@@ -71,12 +71,7 @@ public class CSSDeclarationNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSDeclarationNode))
-		{
-			return false;
-		}
-
-		if (!super.equals(obj))
+		if (!(obj instanceof CSSDeclarationNode) || !super.equals(obj))
 		{
 			return false;
 		}
@@ -91,8 +86,8 @@ public class CSSDeclarationNode extends CSSNode
 		}
 
 		return fIdentifier.equals(otherDecl.fIdentifier)
-			&& ((fStatus == null && otherDecl.fStatus == null) || (fStatus != null && fStatus.equals(otherDecl.fStatus)))
-			&& fHasSemicolon == otherDecl.fHasSemicolon;
+				&& ((fStatus == null && otherDecl.fStatus == null) || (fStatus != null && fStatus
+						.equals(otherDecl.fStatus))) && fHasSemicolon == otherDecl.fHasSemicolon;
 	}
 
 	/**

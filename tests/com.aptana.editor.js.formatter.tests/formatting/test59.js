@@ -7208,6 +7208,7 @@ if( typeof dojo == "undefined") {
         return obj;
         // Any
     }
+
     dojo.setObject = function(/*String*/name, /*Any*/value, /*Object*/context) {
         // summary:
         //		Set a property from a dot-separated string, such as "A.B.C"
@@ -7224,6 +7225,7 @@ if( typeof dojo == "undefined") {
         return (obj && p ? (obj[p] = value) : undefined);
         // Any
     }
+
     dojo.getObject = function(/*String*/name, /*Boolean*/create, /*Object*/context) {
         // summary:
         //		Get a property from a dot-separated string, such as "A.B.C"
@@ -7241,6 +7243,7 @@ if( typeof dojo == "undefined") {
         return dojo._getProp(name.split("."), create, context);
         // Any
     }
+
     dojo.exists = function(/*String*/name, /*Object*/obj) {
         // summary:
         //		determine if an object supports a given method
@@ -7274,6 +7277,7 @@ if( typeof dojo == "undefined") {
         return dojo.global.eval ? dojo.global.eval(scriptFragment) : eval(scriptFragment);
         // mixed
     }
+
     dojo.deprecated = function(/*String*/behaviour, /*String?*/extra, /*String?*/removal) {
         // summary:
         //		Log a debug message to indicate that a behavior has been
@@ -7290,6 +7294,7 @@ if( typeof dojo == "undefined") {
         }
         console.debug(message);
     }
+
     dojo.experimental = function(/* String */moduleName, /* String? */extra) {
         // summary: Marks code as experimental.
         // description:
@@ -7434,6 +7439,7 @@ if( typeof dojo == "undefined") {
             // Boolean
         }
     }
+
     dojo._loadUri = function(/*String (URL)*/uri, /*Function?*/cb) {
         //	summary:
         //		Loads JavaScript from a URI
@@ -7479,6 +7485,7 @@ if( typeof dojo == "undefined") {
         return Boolean(ok && this._loadedModules[moduleName]);
         // Boolean
     }
+
     dojo.loaded = function() {
         this._loadNotifying = true;
         this._postLoad = true;
@@ -7501,11 +7508,13 @@ if( typeof dojo == "undefined") {
             dojo._callLoaded();
         }
     }
+
     dojo.unloaded = function() {
         var mll = this._unloaders;
         while(mll.length) {(mll.pop())();
         }
     }
+
     dojo.addOnLoad = function(/*Object?*/obj, /*String|Function*/functionName) {
         // summary:
         //		Registers a function to be triggered after the DOM has finished
@@ -7535,6 +7544,7 @@ if( typeof dojo == "undefined") {
             d._callLoaded();
         }
     }
+
     dojo.addOnUnload = function(/*Object?*/obj, /*String|Function?*/functionName) {
         // summary: registers a function to be triggered when the page unloads
         // usage:
@@ -7549,6 +7559,7 @@ if( typeof dojo == "undefined") {
             });
         }
     }
+
     dojo._modulesLoaded = function() {
         if(this._postLoad) {
             return;
@@ -7559,6 +7570,7 @@ if( typeof dojo == "undefined") {
         }
         dojo._callLoaded();
     }
+
     dojo._callLoaded = function() {
         //The "object" check is for IE, and the other opera check fixes an issue
         //in Opera where it could not find the body element in some widget test cases.
@@ -7572,6 +7584,7 @@ if( typeof dojo == "undefined") {
             dojo.loaded();
         }
     }
+
     dojo._getModuleSymbols = function(/*String*/modulename) {
         // summary:
         //		Converts a module name in dotted JS notation to an array
@@ -7594,6 +7607,7 @@ if( typeof dojo == "undefined") {
         return syms;
         // Array
     }
+
     dojo._global_omit_module_check = false;
 
     dojo._loadModule = function(/*String*/moduleName,
@@ -7672,6 +7686,7 @@ if( typeof dojo == "undefined") {
 
         return module;
     }
+
     dojo.require = dojo._loadModule;
 
     dojo.provide = function(/*String*/packageName) {
@@ -7752,6 +7767,7 @@ if( typeof dojo == "undefined") {
             }
         }
     }
+
     dojo.requireIf = function(/*Boolean*/condition, /*String*/resourceName) {
         // summary:
         //		If the condition is true then call dojo.require() for the specified
@@ -7765,6 +7781,7 @@ if( typeof dojo == "undefined") {
             dojo.require.apply(dojo, args);
         }
     }
+
     dojo.requireAfterIf = dojo.requireIf;
 
     dojo.registerModulePath = function(/*String*/module, /*String*/prefix) {
@@ -7780,6 +7797,7 @@ if( typeof dojo == "undefined") {
             value : prefix
         };
     }
+
     dojo.requireLocalization = function(/*String*/moduleName, /*String*/bundleName, /*String?*/locale, /*String?*/availableFlatLocales) {
         // summary:
         //		Declares translated resources and loads them if necessary, in the
@@ -7954,6 +7972,7 @@ if( typeof dojo == "undefined") {
                 this.port = r[7] || n;
             }
         }
+
         dojo._Url.prototype.toString = function() {
             return this.uri;
         };
@@ -8153,6 +8172,7 @@ if( typeof dojo == "undefined") {
                 return http;
                 // XMLHTTPRequest instance
             }
+
             d._isDocumentOk = function(http) {
                 var stat = http.status || 0;
                 return ((stat >= 200) && (stat < 300)) || // allow any 2XX response code
@@ -8300,7 +8320,8 @@ if( typeof dojo == "undefined") {
                     }, 0);
                 });
                 _handleNodeEvent("onunload", function() {
-                    if(_unloading) { dojo.unloaded();
+                    if(_unloading) {
+                        dojo.unloaded();
                     }
                 });
                 try {
@@ -8310,7 +8331,8 @@ if( typeof dojo == "undefined") {
                 }
             } else {
                 // FIXME: dojo.unloaded requires dojo scope, so using anon function wrapper.
-                _handleNodeEvent("onbeforeunload", function() { dojo.unloaded();
+                _handleNodeEvent("onbeforeunload", function() {
+                    dojo.unloaded();
                 });
             }
 
@@ -8350,6 +8372,7 @@ if( typeof dojo == "undefined") {
             // Would like to memoize this, but dojo.doc can change vi dojo.withDoc().
             return dojo.doc.body || dojo.doc.getElementsByTagName("body")[0];
         }
+
         dojo.setContext = function(/*Object*/globalObject, /*DocumentElement*/globalDocument) {
             // summary:
             //		changes the behavior of many core Dojo functions that deal with
@@ -8359,6 +8382,7 @@ if( typeof dojo == "undefined") {
             dojo.global = globalObject;
             dojo.doc = globalDocument;
         };
+
         dojo._fireCallback = function(callback, context, cbArguments) {
             // FIXME: should migrate to using "dojo.isString"!
             if((context) && (( typeof callback == "string") || ( callback instanceof String))) {
@@ -8366,6 +8390,7 @@ if( typeof dojo == "undefined") {
             }
             return ( context ? callback.apply(context, cbArguments || []) : callback());
         }
+
         dojo.withGlobal = function(/*Object*/globalObject,
         /*Function*/callback,
         /*Object?*/thisObject,
@@ -8388,6 +8413,7 @@ if( typeof dojo == "undefined") {
             }
             return rval;
         }
+
         dojo.withDoc = function(/*Object*/documentObject,
         /*Function*/callback,
         /*Object?*/thisObject,
@@ -8446,6 +8472,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return ( typeof it == "string" || it instanceof String);
         // Boolean
     }
+
     dojo.isArray = function(/*anything*/it) {
         // summary: Return true of it is an Array
         return (it && it instanceof Array || typeof it == "array" || (( typeof dojo["NodeList"] != "undefined") && ( it instanceof dojo.NodeList)));
@@ -8475,6 +8502,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return (it === null || typeof it == "object" || dojo.isArray(it) || dojo.isFunction(it));
         // Boolean
     }
+
     dojo.isArrayLike = function(/*anything*/it) {
         // return:
         //		If it walks like a duck and quicks like a duck, return true
@@ -8502,6 +8530,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return false;
         // Boolean
     }
+
     dojo.isAlien = function(/*anything*/it) {
         // summary:
         //		Returns true if it is a built-in function or some other kind of
@@ -8512,6 +8541,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return !dojo.isFunction(it) && /\{\s*\[native code\]\s*\}/.test(String(it));
         // Boolean
     }
+
     dojo._mixin = function(/*Object*/obj, /*Object*/props) {
         // summary:
         //		Adds all properties and methods of props to obj. This addition is
@@ -8537,6 +8567,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return obj;
         // Object
     }
+
     dojo.mixin = function(/*Object*/obj, /*Object...*/props) {
         // summary:	Adds all properties and methods of props to obj.
         for(var i = 1, l = arguments.length; i < l; i++) {
@@ -8545,6 +8576,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return obj;
         // Object
     }
+
     dojo.extend = function(/*Object*/constructor, /*Object...*/props) {
         // summary:
         //		Adds all properties and methods of props to constructor's
@@ -8556,6 +8588,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return constructor;
         // Object
     }
+
     dojo._hitchArgs = function(scope, method /*,...*/
     ) {
         var pre = dojo._toArray(arguments, 2);
@@ -8570,6 +8603,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
             // Any
         } // Function
     }
+
     dojo.hitch = function(/*Object*/scope, /*Function|String*/method /*,...*/
     ) {
         // summary:
@@ -8610,10 +8644,12 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
             });
         }
     }
+
     dojo._delegate = function(obj, props) {
         // boodman/crockford delegation
         function TMP() {
         };
+
 
         TMP.prototype = obj;
         var tmp = new TMP();
@@ -8622,6 +8658,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         }
         return tmp;
     }
+
     dojo.partial = function(/*Function|String*/method /*, ...*/
     ) {
         // summary:
@@ -8632,6 +8669,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         var arr = [null];
         return dojo.hitch.apply(dojo, arr.concat(dojo._toArray(arguments)));
     }
+
     dojo._toArray = function(/*Object*/obj, /*Number?*/offset) {
         // summary:
         //		Converts an array-like object (i.e. arguments, DOMCollection)
@@ -8642,6 +8680,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         }
         return arr;
     }
+
     dojo.clone = function(/*anything*/o) {
         // summary:
         //		Clones objects (including DOM nodes) and all children.
@@ -8671,6 +8710,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         }
         return o;
     }
+
     dojo.trim = function(/*String*/str) {
         // summary: trims whitespaces from both sides of the string
         // description:
@@ -8755,7 +8795,7 @@ if(!dojo._hasResource["dojo._base.declare"]) {//_hasResource checks added by bui
             }
         }
         // prepare values
-        var init = (props||0).constructor, ctor = dd._delegate(superclass), fn;
+        var init = (props || 0).constructor, ctor = dd._delegate(superclass), fn;
         // name methods (experimental)
         for(var i in props) {
             if(dojo.isFunction( fn = props[i]) && (!0[i])) {
@@ -8774,9 +8814,10 @@ if(!dojo._hasResource["dojo._base.declare"]) {//_hasResource checks added by bui
         return dojo.setObject(className, ctor);
         // Function
     }
+
     dojo.mixin(dojo.declare, {
         _delegate : function(base, mixin) {
-            var bp = (base||0).prototype, mp = (mixin||0).prototype;
+            var bp = (base || 0).prototype, mp = (mixin || 0).prototype;
             // fresh constructor, fresh prototype
             var ctor = dojo.declare._makeCtor();
             // cache ancestry
@@ -8795,14 +8836,15 @@ if(!dojo._hasResource["dojo._base.declare"]) {//_hasResource checks added by bui
             // special help for IE
             ctor.prototype.constructor = ctor;
             // name this class for debugging
-            ctor.prototype.declaredClass = (bp||0).declaredClass + '_' + (mp||0).declaredClass;
+            ctor.prototype.declaredClass = (bp || 0).declaredClass + '_' + (mp || 0).declaredClass;
             dojo.setObject(ctor.prototype.declaredClass, ctor);
             // Function
             return ctor;
         },
         _makeCtor : function() {
             // we have to make a function, but don't want to close over anything
-            return function() {this._construct(arguments);
+            return function() {
+                this._construct(arguments);
             }
         },
         _core : {
@@ -8833,13 +8875,16 @@ if(!dojo._hasResource["dojo._base.declare"]) {//_hasResource checks added by bui
                 //		need to provide an optional prototype-settable
                 //		"_explicitSuper" property which disables this
                 // initialize superclass
-                if(ct && ct.apply) {ct.apply(this, a)
+                if(ct && ct.apply) {
+                    ct.apply(this, a)
                 };
                 // initialize mixin
-                if(mct && mct.apply) {mct.apply(this, a)
+                if(mct && mct.apply) {
+                    mct.apply(this, a)
                 };
                 // initialize self
-                if( ii = c.prototype._constructor) {ii.apply(this, args);
+                if( ii = c.prototype._constructor) {
+                    ii.apply(this, args);
                 }
             },
             _findMixin : function(mixin) {
@@ -8895,7 +8940,8 @@ if(!dojo._hasResource["dojo._base.declare"]) {//_hasResource checks added by bui
                 }
                 fn = p && p[name];
                 // FIXME: perhaps we should throw here?
-                if(!fn) {console.debug(mp.declaredClass + ': no inherited "' + name + '" was found (declare.js)');
+                if(!fn) {
+                    console.debug(mp.declaredClass + ': no inherited "' + name + '" was found (declare.js)');
                     return;
                 }
                 // if the function exists, invoke it in our scope
@@ -9068,7 +9114,8 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         var a1 = a[i + 1];
         args.push(dojo.isString(a1) || dojo.isFunction(a1) ? a[i++] : null, a[i++]);
         // absorb any additional arguments
-        for(var l = a.length; i < l; i++) {	args.push(a[i]);
+        for(var l = a.length; i < l; i++) {
+            args.push(a[i]);
         }
         // do the actual work
         return dojo._connect.apply(this, args);
@@ -9080,6 +9127,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         return [obj, event, h, l];
         // Handle
     }
+
     dojo.disconnect = function(/*Handle*/handle) {
         // summary:
         //		Remove a link created by dojo.connect.
@@ -9094,6 +9142,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
             handle[0];
         }
     }
+
     dojo._disconnect = function(obj, event, handle, listener) {
         listener.remove(obj, event, handle);
     }
@@ -9119,6 +9168,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         return [topic, dojo._listener.add(dojo._topics, topic, dojo.hitch(context, method))];
         /*Handle*/
     }
+
     dojo.unsubscribe = function(/*Handle*/handle) {
         // summary:
         //		Remove a topic listener.
@@ -9132,6 +9182,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
             dojo._listener.remove(dojo._topics, handle[0], handle[1]);
         }
     }
+
     dojo.publish = function(/*String*/topic, /*Array*/args) {
         // summary:
         //		Invoke all listener method subscribed to topic.
@@ -9149,6 +9200,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         // throughout the APIs.
         var f = dojo._topics[topic]; (f) && (f.apply(this, args || []));
     }
+
     dojo.connectPublisher = function(/*String*/topic,
     /*Object|null*/obj,
     /*String*/event) {
@@ -9167,7 +9219,8 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         //		I.e. identifies a property obj[event].
         // usage:
         //		dojo.connectPublisher("/ajax/start", dojo, "xhrGet"};
-        var pf = function() { dojo.publish(topic, arguments);
+        var pf = function() {
+            dojo.publish(topic, arguments);
         }
         return (event) ? dojo.connect(obj, event, pf) : dojo.connect(obj, pf);
     };
@@ -9391,6 +9444,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
         this.canceller = canceller;
         this.silentlyCancelled = false;
     };
+
     dojo.extend(dojo.Deferred, {
         /*
          makeCalled: function(){
@@ -9588,19 +9642,17 @@ if(!dojo._hasResource["dojo._base.json"]) {//_hasResource checks added by build.
             return json;
         }
     }
+
     dojo._escapeString = function(/*String*/str) {
         //summary:
         //		Adds escape sequences for non-visual characters, double quote and
         //		backslash and surrounds with double quotes to form a valid string
         //		literal.
         return ('"' + str.replace(/(["\\])/g, '\\$1') + '"'
-        ).replace(/[\f]/g, "\\f"
-        ).replace(/[\b]/g, "\\b"
-        ).replace(/[\n]/g, "\\n"
-        ).replace(/[\t]/g, "\\t"
-        ).replace(/[\r]/g, "\\r");
+        ).replace(/[\f]/g, "\\f").replace(/[\b]/g, "\\b").replace(/[\n]/g, "\\n").replace(/[\t]/g, "\\t").replace(/[\r]/g, "\\r");
         // string
     }
+
     dojo.toJsonIndentStr = "\t";
     dojo.toJson = function(/*Object*/it, /*Boolean?*/prettyPrint, /*String?*/_indentStr) {
         // summary:
@@ -9716,6 +9768,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
             // FIXME: cache the anonymous functions we create here?
             (dojo.isString(cb) ? (new Function("item", "index", "array", cb)) : cb)];
         }
+
         dojo.mixin(dojo, {
             indexOf : function(/*Array*/array,
             /*Object*/value,
@@ -9880,7 +9933,8 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
         // summary:
         //		takes a named string, hex string, array of rgb or rgba values,
         //		an object with r, g, b, and a properties, or another dojo.Color object
-        if(color) { this.setColor(color);
+        if(color) {
+            this.setColor(color);
         }
     };
     // FIXME: there's got to be a more space-efficient way to encode or discover these!!  Use hex?
@@ -9926,7 +9980,8 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
                 d.colorFromArray(color, this);
             } else {
                 this._set(color.r, color.g, color.b, color.a);
-                if(!( color instanceof d.Color)) { this.sanitize();
+                if(!( color instanceof d.Color)) {
+                    this.sanitize();
                 }
             }
             return this;
@@ -9991,12 +10046,14 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
         return t.sanitize();
         // dojo.Color
     };
+
     dojo.colorFromRgb = function(/*String*/color, /*dojo.Color?*/obj) {
         // summary: get rgb(a) array from css-style color declarations
         var m = color.toLowerCase().match(/^rgba?\(([\s\.,0-9]+)\)/);
         return m && dojo.colorFromArray(m[1].split(/\s*,\s*/), obj);
         // dojo.Color
     };
+
     dojo.colorFromHex = function(/*String*/color, /*dojo.Color?*/obj) {
         // summary: converts a hex string with a '#' prefix to a color object.
         //	Supports 12-bit #rgb shorthand.
@@ -10015,6 +10072,7 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
         return t;
         // dojo.Color
     };
+
     dojo.colorFromArray = function(/*Array*/a, /*dojo.Color?*/obj) {
         // summary: builds a color from 1, 2, 3, or 4 element array
         var t = obj || new dojo.Color();
@@ -10025,6 +10083,7 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
         return t.sanitize();
         // dojo.Color
     };
+
     dojo.colorFromString = function(/*String*/str, /*dojo.Color?*/obj) {
         var a = dojo.Color.named[str];
         return a && dojo.colorFromArray(a, obj) || dojo.colorFromRgb(str, obj) || dojo.colorFromHex(str, obj);
@@ -10115,6 +10174,7 @@ if(!dojo._hasResource["dojo._base.event"]) {//_hasResource checks added by build
             //		node to treat as "currentTarget"
             return del._fixEvent(evt, sender);
         }
+
         dojo.stopEvent = function(/*Event*/evt) {
             // summary:
             //		prevents propagation and clobbers the default action of the
@@ -10144,6 +10204,7 @@ if(!dojo._hasResource["dojo._base.event"]) {//_hasResource checks added by build
             // return disconnect package
             return [obj, event, h, lid];
         }
+
         dojo._disconnect = function(obj, event, handle, listener) {
             ([dojo._listener, del, node_listener][listener]).remove(obj, event, handle);
         }
@@ -10446,9 +10507,11 @@ if(!dojo._hasResource["dojo._base.event"]) {//_hasResource checks added by build
             // FIXME: would prefer to use dojo.hitch: dojo.hitch(evt, evt.preventDefault);
             // but it throws an error when preventDefault is invoked on Safari
             // does Event.preventDefault not support "apply" on Safari?
-            faux.preventDefault = function() { evt.preventDefault();
+            faux.preventDefault = function() {
+                evt.preventDefault();
             };
-            faux.stopPropagation = function() { evt.stopPropagation();
+            faux.stopPropagation = function() {
+                evt.stopPropagation();
             };
             return faux;
         }
@@ -10656,7 +10719,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             //		dojo.doc.  Can be used to retreive
             //		node references from other documents.
             if(dojo.isString(id)) {
-                return (doc||dojo.doc).getElementById(id);
+                return (doc || dojo.doc).getElementById(id);
             } else {
                 return id;
                 // DomNode
@@ -10689,6 +10752,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 /* squelch */
             }
         };
+
         dojo.isDescendant = function(/*Node|String*/node, /*Node|String*/ancestor) {
             //	summary:
             //		Returns true if node is a descendant of ancestor
@@ -10709,6 +10773,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             return false;
             // Boolean
         };
+
         dojo.setSelectable = function(/*Node|String*/node, /*Boolean*/selectable) {
             // summary: enable or disable selection on a node
             node = dojo.byId(node);
@@ -10742,6 +10807,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             return true;
             //	boolean
         }
+
         dojo.place = function(/*String|DomNode*/node, /*String|DomNode*/refNode, /*String|Number*/position) {
             //	summary:
             //		attempt to insert node in relation to ref based on position
@@ -11051,6 +11117,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 h : t + px(n, s.paddingBottom)
             };
         }
+
         dojo._getBorderExtents = function(/*DomNode*/n, /*Object*/computedStyle) {
             //	summary:
             //		returns an object with properties useful for noting the border
@@ -11069,6 +11136,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 h : bt + (s.borderBottomStyle != ne ? px(n, s.borderBottomWidth) : 0)
             };
         }
+
         dojo._getPadBorderExtents = function(/*DomNode*/n, /*Object*/computedStyle) {
             //	summary:
             //		returns object with properties useful for box fitting with
@@ -11087,6 +11155,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 h : p.h + b.h
             };
         }
+
         dojo._getMarginExtents = function(n, computedStyle) {
             //	summary:
             //		returns object with properties useful for box fitting with
@@ -11168,6 +11237,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 h : node.offsetHeight + me.h
             };
         }
+
         dojo._getContentBox = function(node, computedStyle) {
             // summary:
             //		returns an object that encodes the width, height, left and top
@@ -11192,6 +11262,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 h : h - pe.h - be.h
             };
         }
+
         dojo._getBorderBox = function(node, computedStyle) {
             var s = computedStyle || gcs(node), pe = dojo._getPadExtents(node, s), cb = dojo._getContentBox(node, s);
             return {
@@ -11244,6 +11315,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 }
             }
         }
+
         dojo._usesBorderBox = function(/*DomNode*/node) {
             //	summary:
             //		True if the node uses border-box layout.
@@ -11257,6 +11329,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             return (dojo.boxModel == "border-box") || (n == "TABLE") || (n == "BUTTON");
             // boolean
         }
+
         dojo._setContentSize = function(/*DomNode*/node, /*Number*/widthPx, /*Number*/heightPx, /*Object*/computedStyle) {
             //	summary:
             //		sets the size of the node's contents, irrespective of margins,
@@ -11273,6 +11346,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             }
             dojo._setBox(node, NaN, NaN, widthPx, heightPx);
         }
+
         dojo._setMarginBox = function(/*DomNode*/node, /*Number?*/leftPx, /*Number?*/topPx,
         /*Number?*/widthPx, /*Number?*/heightPx,
         /*Object*/computedStyle) {
@@ -11323,6 +11397,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             return !b ? dojo._getMarginBox(n, s) : dojo._setMarginBox(n, b.l, b.t, b.w, b.h, s);
             // Object
         }
+
         dojo.contentBox = function(/*DomNode|String*/node, /*Object?*/box) {
             //	summary:
             //		getter/setter for the content-box of node. Returns an object in
@@ -11349,7 +11424,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
         // =============================
 
         var _sumAncestorProperties = function(node, prop) {
-            if(!( node = (node||0).parentNode)) {
+            if(!( node = (node || 0).parentNode)) {
                 return 0
             };
             var val, retVal = 0, _b = dojo.body();
@@ -11371,6 +11446,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             return retVal;
             //	integer
         }
+
         dojo._docScroll = function() {
             var _b = dojo.body();
             var _w = dojo.global;
@@ -11380,11 +11456,13 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 x : (_w.pageXOffset || dojo._fixIeBiDiScrollLeft(de.scrollLeft) || _b.scrollLeft || 0)
             };
         };
+
         dojo._isBodyLtr = function() {
             //FIXME: could check html and body tags directly instead of computed style?  need to ignore case, accept empty values
             return typeof dojo._bodyLtr == "undefined" ? (dojo._bodyLtr = dojo.getComputedStyle(dojo.body()).direction == "ltr") : dojo._bodyLtr;
             // Boolean
         }
+
         dojo._getIeDocumentElementOffset = function() {
             // summary
             // The following values in IE contain an offset:
@@ -11416,6 +11494,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 // Object
             }
         };
+
         dojo._fixIeBiDiScrollLeft = function(/*Integer*/scrollLeft) {
             // In RTL direction, scrollLeft should be a negative value, but IE
             // returns a positive one. All codes using documentElement.scrollLeft
@@ -11429,6 +11508,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             return scrollLeft;
             // Integer
         }
+
         dojo._abs = function(/*HTMLElement*/node, /*Boolean?*/includeScroll) {
             //	summary:
             //		Gets the absolute position of the passed element based on the
@@ -11457,8 +11537,8 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             } else if(ownerDocument["getBoxObjectFor"]) {
                 // mozilla
                 var bo = ownerDocument.getBoxObjectFor(node);
-                ret.x = bo.x -  _sumAncestorProperties(node, "scrollLeft");
-                ret.y = bo.y -  _sumAncestorProperties(node, "scrollTop");
+                ret.x = bo.x - _sumAncestorProperties(node, "scrollLeft");
+                ret.y = bo.y - _sumAncestorProperties(node, "scrollTop");
             } else {
                 if(node["offsetParent"]) {
                     hasScroll = true;
@@ -11539,18 +11619,20 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
         //	summary:
         //		Returns whether or not the specified classes are a portion of the
         //		class list currently applied to the node.
-        return ((" "+node.className+" ").indexOf(" " + classStr + " ") >= 0);
+        return ((" " + node.className + " ").indexOf(" " + classStr + " ") >= 0);
         // Boolean
     };
+
     dojo.addClass = function(/*HTMLElement*/node, /*String*/classStr) {
         //	summary:
         //		Adds the specified classes to the end of the class list on the
         //		passed node.
         var cls = node.className;
-        if((" "+cls+" ").indexOf(" " + classStr + " ") < 0) {
+        if((" " + cls + " ").indexOf(" " + classStr + " ") < 0) {
             node.className = cls + ( cls ? ' ' : '') + classStr;
         }
     };
+
     dojo.removeClass = function(/*HTMLElement*/node, /*String*/classStr) {
         // summary: Removes classes from node.
         var t = dojo.trim((" " + node.className + " ").replace(" " + classStr + " ", " "));
@@ -11558,6 +11640,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             node.className = t;
         }
     };
+
     dojo.toggleClass = function(/*HTMLElement*/node, /*String*/classStr, /*Boolean?*/condition) {
         //	summary:
         //		Adds a class to node if not present, or removes if present.
@@ -11599,7 +11682,8 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
             if((args.length == 1) && ( typeof args[0] == "number")) {
                 this.length = parseInt(args[0]);
             } else if(args.length) {
-                d.forEach(args, function(i) { this.push(i);
+                d.forEach(args, function(i) {
+                    this.push(i);
                 }, this);
             }
         }
@@ -11744,11 +11828,13 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 // String||dojo.NodeList
             },
             addClass : function(/*String*/className) {
-                return this.forEach(function(i) { dojo.addClass(i, className);
+                return this.forEach(function(i) {
+                    dojo.addClass(i, className);
                 });
             },
             removeClass : function(/*String*/className) {
-                return this.forEach(function(i) { dojo.removeClass(i, className);
+                return this.forEach(function(i) {
+                    dojo.removeClass(i, className);
                 });
             },
             // FIXME: toggleClass()? connectPublisher()? connectRunOnce()?
@@ -11840,7 +11926,8 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 //			"after"
                 // 		or an offset in the childNodes property
                 var item = this[0];
-                return d.query(queryOrListOrNode).forEach(function(ai) { d.place(ai, item, (position || "last"));
+                return d.query(queryOrListOrNode).forEach(function(ai) {
+                    d.place(ai, item, (position || "last"));
                 });
                 // dojo.NodeList
             },
@@ -12871,7 +12958,8 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                 var ret = [];
                 var te, x = 0, tret = root.childNodes;
                 while( te = tret[x++]) {
-                    if(te.nodeType == 1) { ret.push(te);
+                    if(te.nodeType == 1) {
+                        ret.push(te);
                     }
                 }
                 return ret;
@@ -13126,7 +13214,8 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
             };
             // dojo.debug(ff);
             for(var x = 0, te; te = nodeList[x]; x++) {
-                if(ff(te)) { tnl.push(te);
+                if(ff(te)) {
+                    tnl.push(te);
                 }
             }
             return tnl;
@@ -13173,11 +13262,11 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
         // FIXME: seems that dojo.query needs negation operators!!
         var ret = {};
         var iq = "input[type!=file][type!=submit][type!=image][type!=reset][type!=button], select, textarea";
-        dojo.query(iq, formNode).filter(function(node){
-        return (!node.disabled);
+        dojo.query(iq, formNode).filter(function(node) {
+            return (!node.disabled);
         }).forEach(function(item) {
             var _in = item.name;
-            var type = (item.type||"").toLowerCase();
+            var type = (item.type || "").toLowerCase();
             if((type == "radio") || (type == "checkbox")) {
                 if(item.checked) {
                     ret[_in] = item.value;
@@ -13196,6 +13285,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
         });
         return ret;
     }
+
     dojo.objectToQuery = function(/*Object*/map) {
         //	summary:
         //		takes a key/value mapping object and returns a string representing
@@ -13236,6 +13326,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
         return ret;
         // string
     }
+
     dojo.formToQuery = function(/*DOMNode||String*/formNode) {
         // summary:
         //		return URL-encoded string representing the form passed as either a
@@ -13243,6 +13334,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
         return dojo.objectToQuery(dojo.formToObject(formNode));
         // string
     }
+
     dojo.formToJson = function(/*DOMNode||String*/formNode) {
         // summary:
         //		return a serialized JSON string from a form node or string
@@ -13250,6 +13342,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
         return dojo.toJson(dojo.formToObject(formNode));
         // string
     }
+
     dojo.queryToObject = function(/*String*/str) {
         // summary:
         //		returns an object representing a de-serialized query section of a
@@ -13618,6 +13711,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             }
 
         }
+
         dojo._ioCancelAll = function() {
             //summary: Cancels all pending IO requests, regardless of IO type
             //(xhr, script, iframe).
@@ -13709,6 +13803,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return dfd;
             //Deferred
         }
+
         dojo._ioAddQueryToUrl = function(/*Object*/ioArgs) {
             //summary: Adds query params discovered by the io deferred construction to the URL.
             //Only use this for operations which are fundamentally GET-type operations.
@@ -13743,6 +13838,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return _doIt("GET", dfd);
             // dojo.Deferred
         }
+
         dojo.xhrPost = function(/*Object*/args) {
             //summary:
             //		Sends an HTTP POST request to the server. See dojo.xhrGet() for
@@ -13750,6 +13846,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return _doIt("POST", _makeXhrDeferred(args));
             // dojo.Deferred
         }
+
         dojo.rawXhrPost = function(/*Object*/args) {
             //	summary:
             //		Sends an HTTP POST request to the server. See dojo.xhrGet in
@@ -13763,6 +13860,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return _doIt("POST", dfd);
             // dojo.Deferred
         }
+
         dojo.xhrPut = function(/*Object*/args) {
             //	summary:
             //		Sends an HTTP PUT request to the server. See dojo.xhrGet() for
@@ -13770,6 +13868,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return _doIt("PUT", _makeXhrDeferred(args));
             // dojo.Deferred
         }
+
         dojo.rawXhrPut = function(/*Object*/args) {
             //	summary:
             //		Sends an HTTP PUT request to the server. See dojo.xhrGet() for
@@ -13786,6 +13885,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return _doIt("PUT", dfd);
             // dojo.Deferred
         }
+
         dojo.xhrDelete = function(/*Object*/args) {
             //	summary:
             //		Sends an HTTP DELETE request to the server. See dojo.xhrGet()
@@ -13795,6 +13895,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             return _doIt("DELETE", dfd);
             // dojo.Deferred
         }
+
         dojo.wrapForm = function(formNode) {
             //summary:
             //		A replacement for FormBind, but not implemented yet.
@@ -13828,6 +13929,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             // Decimal
         }
     }
+
     dojo.declare("dojo._Animation", null, {
         //	summary
         //		a generic animation object that fires callbacks into it's handlers
@@ -13896,7 +13998,8 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
 
             var d = delay || this.delay;
             if(d > 0) {
-                setTimeout(dojo.hitch(this, function() { this.play(null, gotoStart);
+                setTimeout(dojo.hitch(this, function() {
+                    this.play(null, gotoStart);
                 }), d);
                 return this;
                 // dojo._Animation
@@ -13944,7 +14047,8 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             clearTimeout(this._timer);
             this._active = this._paused = true;
             this._percent = pct * 100;
-            if(andPlay) { this.play();
+            if(andPlay) {
+                this.play();
             }
             return this;
             // dojo._Animation
@@ -14035,6 +14139,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
                 }
             }
         }
+
         dojo._fade = function(/*Object*/args) {
             // summary:Returns an animation that will fade the "nodes" from the start to end values passed.
 
@@ -14059,6 +14164,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return anim;
             // dojo._Animation
         }
+
         dojo.fadeIn = function(/*Object*/args) {
             // summary: Returns an animation that will fade node
             // defined in 'args' from its current opacity to fully
@@ -14072,6 +14178,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             }, args));
             // dojo._Animation
         }
+
         dojo.fadeOut = function(/*Object*/args) {
             // summary: Returns an animation that will fade node
             // defined in 'args'  from its current opacity to fully
@@ -14124,6 +14231,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
                 return ret;
             }
         }
+
         dojo.animateProperty = function(/*Object*/args) {
             // summary: Returns an animation that will transition the properties of node
             // defined in 'args' depending how they are defined in 'args.properties'

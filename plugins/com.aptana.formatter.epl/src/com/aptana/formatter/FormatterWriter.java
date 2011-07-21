@@ -111,7 +111,7 @@ public class FormatterWriter implements IFormatterWriter
 	 */
 	public void writeText(IFormatterContext context, String text, boolean removePreviousSpaces)
 	{
-		if (text.length() != 0)
+		if (text.trim().length() != 0)
 		{
 			skipNextNewLine = false;
 		}
