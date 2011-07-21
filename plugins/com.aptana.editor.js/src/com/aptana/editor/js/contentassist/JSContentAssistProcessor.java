@@ -820,6 +820,16 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * Expose replace range field for unit tests
+	 * 
+	 * @return
+	 */
+	IRange getReplaceRange()
+	{
+		return this._replaceRange;
+	}
+
+	/**
 	 * getUserAgentImages
 	 * 
 	 * @param userAgentNames

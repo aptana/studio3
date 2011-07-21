@@ -1,0 +1,1 @@
+var HistoryExample = HistoryFunction({ t });

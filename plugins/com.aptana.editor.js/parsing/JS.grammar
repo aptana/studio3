@@ -51,7 +51,7 @@
 		}
 	}
 
-	private final IRecoveryStrategy[] recoveryStrategies;
+	private final List<IRecoveryStrategy> recoveryStrategies;
 	private JSScanner fScanner;
 
 	/**
@@ -401,48 +401,54 @@
 		report = new JSEvents();
 
 		// @formatter:off
-		recoveryStrategies = new IRecoveryStrategy[] {
-			new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";"),
-			new JSInsertionRecoveryStrategy(JSTokenType.RPAREN, ")", JSTokenType.SEMICOLON, ";"),
-			new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.SEMICOLON, ";", JSTokenType.DOT, JSTokenType.NEW),
-			new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.DOT, JSTokenType.NEW),
-			new IRecoveryStrategy()
+		recoveryStrategies = new ArrayList<IRecoveryStrategy>();
+
+		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.SEMICOLON, ";"));
+		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.RPAREN, ")", JSTokenType.SEMICOLON, ";"));
+		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.SEMICOLON, ";", JSTokenType.DOT, JSTokenType.NEW, JSTokenType.EQUAL));
+		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.DOT, JSTokenType.NEW, JSTokenType.EQUAL));
+		recoveryStrategies.add(new IRecoveryStrategy()
+		{
+			public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException
 			{
-				public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException
+				boolean result = false;
+
+				if (top >= 2)
 				{
-					boolean result = false;
+					Symbol symbol1 = _symbols[top - 2];
+					Symbol symbol2 = _symbols[top - 1];
 
-					if (top >= 2)
+					if (lastToken.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
 					{
-						Symbol symbol1 = _symbols[top - 2];
-						Symbol symbol2 = _symbols[top - 1];
+						Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), currentToken.getStart(), currentToken.getStart() - 1, "");
+						Simulator sim = new Simulator();
 
-						if (lastToken.getId() == JSTokenType.COMMA.getIndex() && symbol2.value instanceof List<?> && symbol1.getId() == JSTokenType.LPAREN.getIndex())
+						in.alloc(2);
+						in.insert(term, currentToken);
+						in.rewind();
+
+						if (sim.parse(in))
 						{
-							Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), currentToken.getStart(), currentToken.getStart() - 1, "");
-							Simulator sim = new Simulator();
+							result = true;
 
-							in.alloc(2);
-							in.insert(term, currentToken);
 							in.rewind();
 
-							if (sim.parse(in))
-							{
-								result = true;
-
-								in.rewind();
-
-								report.missingTokenInserted(term);
-							}
+							report.missingTokenInserted(term);
 						}
 					}
-
-					return result;
 				}
-			},
-			new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.RCURLY),
-			new JSInsertionRecoveryStrategy(JSTokenType.COLON, ":", JSTokenType.IDENTIFIER, "", JSTokenType.RCURLY)
-		};
+
+				return result;
+			}
+		});
+
+		JSInsertionRecoveryStrategy completeProperty = new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "");
+		completeProperty.addCurrentTokenTypes(JSTokenType.RCURLY);
+		recoveryStrategies.add(completeProperty);
+
+		JSInsertionRecoveryStrategy completeProperty2 = new JSInsertionRecoveryStrategy(JSTokenType.COLON, ":", JSTokenType.IDENTIFIER, "");
+		completeProperty2.addCurrentTokenTypes(JSTokenType.RCURLY);
+		recoveryStrategies.add(completeProperty2);
 		// @formatter:on
 :};
 

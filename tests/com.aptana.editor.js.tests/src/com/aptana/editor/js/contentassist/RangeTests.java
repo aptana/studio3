@@ -7,13 +7,18 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.io.IOException;
+
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+
+import beaver.Parser.Exception;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.tests.TextViewer;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
 public class RangeTests extends JSEditorBasedTests
@@ -89,8 +94,29 @@ public class RangeTests extends JSEditorBasedTests
 		}
 	}
 
+	/**
+	 * rangeTest
+	 * 
+	 * @param resource
+	 * @param offset
+	 * @param length
+	 */
+	protected void rangeTest(String resource, int offset, int length)
+	{
+		this.setupTestContext(resource);
+
+		// discard type since we only care about the side-effect that sets the replace range
+		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) this.editor);
+		processor.getLocation(document, offset);
+
+		IRange range = processor.getReplaceRange();
+		assertNotNull(range);
+		assertEquals(offset - length, range.getStartingOffset());
+		assertEquals(length, range.getLength());
+	}
+
 	// @formatter:off
-	
+
 	/**
 	 * testFunctionWithoutArgs
 	 */
@@ -201,5 +227,27 @@ public class RangeTests extends JSEditorBasedTests
 			new OffsetSelection(0, 19, null),
 			new OffsetSelection(20, 21, Range.EMPTY)
 		);
+	}
+
+	/**
+	 * Test fix for APSTUD-3005
+	 * 
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public void testApstud3005() throws IOException, Exception
+	{
+		rangeTest("ranges/apstud-3005.js", 14, 2);
+	}
+
+	/**
+	 * Test fix for APSTUD-3017
+	 * 
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public void testApstud3017() throws IOException, Exception
+	{
+		rangeTest("ranges/apstud-3017.js", 40, 1);
 	}
 }

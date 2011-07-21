@@ -622,9 +622,46 @@ public class JSParserTest extends TestCase
 		parseTest("var x = 5-+3" + EOL, "var x = 5 - +3" + EOL);
 	}
 
+	// begin recovery strategy tests
+
+	public void testMissingSemicolon() throws Exception
+	{
+		parseTest("abc", "abc;" + EOL);
+	}
+
 	public void testMissingClosingParenthesis() throws Exception
 	{
-		parseTest("testing(" + EOL, "testing();" + EOL);
+		parseTest("testing(", "testing();" + EOL);
+	}
+
+	public void testMissingIdentifier() throws Exception
+	{
+		parseTest("var x =", "var x = " + EOL);
+	}
+
+	public void testMissingIdentifier2() throws Exception
+	{
+		parseTest("x.", "x.;" + EOL);
+	}
+
+	public void testMissingArg() throws Exception
+	{
+		parseTest("fun(a,);", "fun(a, );" + EOL);
+	}
+
+	public void testMissingIdentifier3() throws Exception
+	{
+		parseTest("new", "new ;" + EOL);
+	}
+
+	public void testMissingPropertyValue() throws Exception
+	{
+		parseTest("var x = { t };", "var x = {t: };" + EOL);
+	}
+
+	public void testMissingPropertyValue2() throws Exception
+	{
+		parseTest("var x = { t: };", "var x = {t: };" + EOL);
 	}
 
 	// utility methods
