@@ -43,7 +43,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 		this.canModifyEditor = canModifyEditor(textEditor); // Can we cache this value?
 		this.textViewer = viewer;
 		this.contentAssistant = contentAssistant;
-		document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+		document = textEditor != null ? textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()) : null;
 	}
 
 	public void verifyKey(VerifyEvent event) {

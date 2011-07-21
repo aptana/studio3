@@ -40,6 +40,8 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.hyperlink.MultipleHyperlinkPresenter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.source.Annotation;
@@ -69,6 +71,7 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.spelling.MultiRegionSpellingReconcileStrategy;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
+import com.aptana.editor.common.text.reconciler.CommonPresentationReconciler;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
 import com.aptana.editor.common.text.reconciler.CommonReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CompositeReconcilingStrategy;
@@ -83,7 +86,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 0;
 	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
 
-	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
+	public static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
@@ -379,6 +382,16 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 
 		return "\t"; //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+		PresentationReconciler reconciler = new CommonPresentationReconciler();
+		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		return reconciler;
 	}
 
 	private final String[] getSpellingContentTypes(ISourceViewer sourceViewer) {
