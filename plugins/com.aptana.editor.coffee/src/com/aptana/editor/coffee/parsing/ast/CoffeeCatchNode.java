@@ -10,7 +10,7 @@ package com.aptana.editor.coffee.parsing.ast;
 public class CoffeeCatchNode extends CoffeeNode
 {
 
-	public CoffeeCatchNode(CoffeeLiteralNode identifier, CoffeeNode block)
+	public CoffeeCatchNode(CoffeeLiteralNode identifier, CoffeeBlockNode block)
 	{
 		super(CoffeeNodeTypes.CATCH);
 		addChild(identifier);
@@ -22,9 +22,9 @@ public class CoffeeCatchNode extends CoffeeNode
 		return (CoffeeLiteralNode) getChild(0);
 	}
 
-	public CoffeeNode getBlock()
+	public CoffeeBlockNode getBlock()
 	{
-		return (CoffeeNode) getChild(1);
+		return (CoffeeBlockNode) getChild(1);
 	}
 
 	@Override

@@ -9,9 +9,11 @@ package com.aptana.editor.coffee.internal.text;
 
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.editor.coffee.parsing.ast.CoffeeArrNode;
 import com.aptana.editor.coffee.parsing.ast.CoffeeAssignNode;
 import com.aptana.editor.coffee.parsing.ast.CoffeeClassNode;
 import com.aptana.editor.coffee.parsing.ast.CoffeeCodeNode;
+import com.aptana.editor.coffee.parsing.ast.CoffeeIfNode;
 import com.aptana.editor.coffee.parsing.ast.CoffeeObjNode;
 import com.aptana.editor.coffee.parsing.ast.CoffeeValueNode;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -33,10 +35,15 @@ public class CoffeeFoldingComputer extends AbstractFoldingComputer
 		{
 			CoffeeAssignNode assign = (CoffeeAssignNode) child;
 			IParseNode expression = assign.getChild(1);
-			return (expression instanceof CoffeeValueNode && expression.getChild(0) instanceof CoffeeObjNode);
+			if (!(expression instanceof CoffeeValueNode))
+			{
+				return false;
+			}
+			IParseNode expressionFirstChild = expression.getChild(0);
+			return expressionFirstChild instanceof CoffeeObjNode || expressionFirstChild instanceof CoffeeArrNode;
 		}
 
-		return (child instanceof CoffeeClassNode || child instanceof CoffeeCodeNode);
+		return (child instanceof CoffeeClassNode || child instanceof CoffeeCodeNode || child instanceof CoffeeIfNode);
 	}
 
 }
