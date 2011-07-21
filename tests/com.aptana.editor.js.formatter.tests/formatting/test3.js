@@ -56,8 +56,7 @@ function/**test1 */ test(/** test2 */){
     var /**test4*/i;
 }
 ==FORMATTED==
-function/**test1 */ test(/** test2 */
-) {
+function/**test1 */ test(/** test2 */) {
     /** test3 */
     var/**test4*/
     i;

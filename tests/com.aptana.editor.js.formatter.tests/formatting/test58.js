@@ -4057,7 +4057,7 @@ else if(m[1] == "@") {
                     document.removeEventListener("DOMContentLoaded", jQuery.ready, false);
 
                 // Remove script element used by IE hack
-                if(!window.frames.length)
+                if(!window.frames.length)// don't remove if frames are present (#1187)
                     jQuery(window).load(function() {
                         jQuery("#__ie_init").remove();
                     });
