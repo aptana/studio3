@@ -25,9 +25,9 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.widgets.Display;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -101,7 +101,6 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			}
 			return presentation;
 		} catch (BadLocationException e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -135,7 +134,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				presentation[0] = createPresentation(damage, document, monitor);
 			}
 			if (presentation[0] != null) {
-				Display.getDefault().syncExec(new Runnable() {
+				UIUtils.getDisplay().syncExec(new Runnable() {
 					public void run() {
 						if (textViewer != null) {
 							StyledText widget = textViewer.getTextWidget();
