@@ -66,7 +66,7 @@ public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
 					|| element instanceof CSSImportNode)
 			{
 				// removes the leading @
-				text = text.substring(1, text.length());
+				text = text.substring(1);
 			}
 			return text;
 		}
