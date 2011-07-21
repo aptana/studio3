@@ -14,6 +14,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.tests.TextViewer;
 import com.aptana.parsing.lexer.Range;
 
 public class RangeTests extends TestCase
@@ -48,7 +49,7 @@ public class RangeTests extends TestCase
 	protected void rangeTests(String source, OffsetSelection... selections)
 	{
 		IDocument document = TestUtil.createDocument(source);
-		ITextViewer viewer = new TestTextViewer(document);
+		ITextViewer viewer = new TextViewer(document);
 		CSSContentAssistProcessor processor = new CSSContentAssistProcessor(null);
 
 		for (OffsetSelection selection : selections)

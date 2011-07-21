@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.Point;
 public class TextViewer implements ITextViewer
 {
 	private IDocument _document;
+	private Point selectedRange;
 
 	public TextViewer(IDocument document)
 	{
@@ -78,7 +79,7 @@ public class TextViewer implements ITextViewer
 
 	public Point getSelectedRange()
 	{
-		return null;
+		return this.selectedRange;
 	}
 
 	public ISelectionProvider getSelectionProvider()
@@ -184,6 +185,7 @@ public class TextViewer implements ITextViewer
 
 	public void setSelectedRange(int offset, int length)
 	{
+		this.selectedRange = new Point(offset, length);
 	}
 
 	public void setTextColor(Color color)
