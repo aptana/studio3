@@ -9,9 +9,6 @@
 package com.aptana.editor.common.viewer;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -19,9 +16,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextPresentationListener;
-import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.formatter.FormattingContextProperties;
@@ -30,8 +24,6 @@ import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -164,104 +156,4 @@ public class CommonProjectionViewer extends ProjectionViewer implements IAdaptab
 		}
 		super.unconfigure();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.TextViewer#changeTextPresentation(org.eclipse.jface.text.TextPresentation, boolean)
-	 */
-	@Override
-	public void changeTextPresentation(TextPresentation presentation, boolean controlRedraw) {
-		if (presentation == null || !redraws()) {
-			return;
-		}
-		StyledText textWidget = getTextWidget();
-		if (textWidget == null) {
-			return;
-		}
-		/*
-		 * Call registered text presentation listeners
-		 * and let them apply their presentation.
-		 */
-		if (fTextPresentationListeners != null) {
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			ArrayList listeners= new ArrayList(fTextPresentationListeners);
-			for (int i= 0, size= listeners.size(); i < size; i++) {
-				ITextPresentationListener listener= (ITextPresentationListener)listeners.get(i);
-				listener.applyTextPresentation(presentation);
-			}
-		}
-		if (presentation.isEmpty()) {
-			return;
-		}
-		if (controlRedraw) {
-			textWidget.setRedraw(false);
-		}
-		if (fReplaceTextPresentation) {
-			applyTextPresentation(presentation);
-		} else {
-			addPresentation(presentation);
-		}
-		if (controlRedraw) {
-			textWidget.setRedraw(true);
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void applyTextPresentation(TextPresentation presentation) {
-		List list= new ArrayList(presentation.getDenumerableRanges());
-		Iterator e = presentation.getAllStyleRangeIterator();
-		while (e.hasNext()) {
-			StyleRange range= (StyleRange) e.next();
-			range = modelStyleRange2WidgetStyleRange(range);
-			if (range != null)
-				list.add(range);
-		}
-		if (!list.isEmpty()) {
-			StyleRange[] ranges = new StyleRange[list.size()];
-			list.toArray(ranges);
-			getTextWidget().setStyleRanges(ranges);
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addPresentation(TextPresentation presentation) {
-		StyleRange range = presentation.getDefaultStyleRange();
-		if (range != null) {
-			range = modelStyleRange2WidgetStyleRange(range);
-			if (range != null) {
-				getTextWidget().setStyleRange(range);
-			}
-			ArrayList ranges = new ArrayList(presentation.getDenumerableRanges());
-			Iterator e = presentation.getNonDefaultStyleRangeIterator();
-			while (e.hasNext()) {
-				range = (StyleRange) e.next();
-				range = modelStyleRange2WidgetStyleRange(range);
-				if (range != null) {
-					ranges.add(range);
-				}
-			}
-			if (!ranges.isEmpty()) {
-				getTextWidget().replaceStyleRanges(0, 0, (StyleRange[]) ranges.toArray(new StyleRange[ranges.size()]));
-			}
-		} else {
-			IRegion region = modelRange2WidgetRange(presentation.getCoverage());
-			if (region == null) {
-				return;
-			}
-			List list = new ArrayList(presentation.getDenumerableRanges());
-			Iterator e = presentation.getAllStyleRangeIterator();
-			while (e.hasNext()) {
-				range = (StyleRange) e.next();
-				range = modelStyleRange2WidgetStyleRange(range);
-				if (range != null) {
-					list.add(range);
-				}
-			}
-			if (!list.isEmpty()) {
-				StyleRange[] ranges = new StyleRange[list.size()];
-				list.toArray(ranges);
-				getTextWidget().replaceStyleRanges(region.getOffset(), region.getLength(), ranges);
-			}
-		}
-	}
-
 }
