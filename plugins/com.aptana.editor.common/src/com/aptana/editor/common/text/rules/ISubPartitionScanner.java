@@ -24,6 +24,7 @@ public interface ISubPartitionScanner {
 
 	/**
 	 * Returns current active set of rules
+	 * Note: we use array instead of Collection here to reduce memory allocation for iterators in sensitive places.
 	 * @return
 	 */
 	public IPredicateRule[] getRules();
