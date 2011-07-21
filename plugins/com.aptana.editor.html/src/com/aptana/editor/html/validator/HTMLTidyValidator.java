@@ -118,6 +118,10 @@ public class HTMLTidyValidator implements IValidator
 	private static void addParseErrors(String source, URI path, IValidationManager manager,
 			List<IValidationItem> items, IParseNode ast)
 	{
+		if (ast == null)
+		{
+			return;
+		}
 		IParseNode[] children = ast.getChildren();
 		IDocument document = new Document(source);
 		int line, column;
