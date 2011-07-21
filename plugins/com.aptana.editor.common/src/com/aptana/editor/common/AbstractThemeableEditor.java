@@ -8,22 +8,17 @@
 package com.aptana.editor.common;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -37,15 +32,10 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Position;
-import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.text.contentassist.ContentAssistant;
-import org.eclipse.jface.text.formatter.FormattingContextProperties;
-import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -54,7 +44,6 @@ import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
-import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -70,7 +59,6 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -86,6 +74,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.TextOperationAction;
@@ -111,15 +100,9 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.properties.CommonEditorPropertySheetPage;
-import com.aptana.editor.common.scripting.QualifiedContentType;
-import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
-import com.aptana.editor.common.scripting.snippets.SnippetsContentAssistant;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
-import com.aptana.formatter.IScriptFormatterFactory;
-import com.aptana.formatter.ScriptFormatterManager;
-import com.aptana.formatter.preferences.PreferencesLookupDelegate;
-import com.aptana.formatter.ui.ScriptFormattingContextProperties;
+import com.aptana.editor.common.viewer.CommonProjectionViewer;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
@@ -187,122 +170,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			handlePreferenceStoreChanged(event);
 		}
 	}
-
-	private class CommonProjectionViewer extends ProjectionViewer implements IAdaptable {
-		private ExpandSnippetVerifyKeyListener fKeyListener;
-		private ContentAssistant fSnippetContentAssistant;
-
-		public CommonProjectionViewer(Composite parent, IVerticalRuler ruler, IOverviewRuler overviewRuler, boolean showsAnnotationOverview, int styles) {
-			super(parent, ruler, overviewRuler, showsAnnotationOverview, styles);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.text.source.SourceViewer#configure(org.eclipse.jface.text.source.SourceViewerConfiguration)
-		 */
-		@Override
-		public void configure(SourceViewerConfiguration configuration) {
-			super.configure(configuration);
-			fSnippetContentAssistant = new SnippetsContentAssistant();
-			fSnippetContentAssistant.install(this);
-			fKeyListener = new ExpandSnippetVerifyKeyListener(AbstractThemeableEditor.this, this, fSnippetContentAssistant);
-			// add listener to our viewer
-			prependVerifyKeyListener(fKeyListener);
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.text.source.SourceViewer#unconfigure()
-		 */
-		@Override
-		public void unconfigure() {
-			if (fKeyListener != null) {
-				removeVerifyKeyListener(fKeyListener);
-				fKeyListener = null;
-			}
-			if (fSnippetContentAssistant != null) {
-				fSnippetContentAssistant.uninstall();
-				fSnippetContentAssistant = null;
-			}
-			super.unconfigure();
-		}
-
-		protected Layout createLayout() {
-			return new RulerLayout(RULER_EDITOR_GAP);
-		}
-
-		@Override
-		protected void handleDispose() {
-			// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to
-			// report a bug with eclipse to clean this up.
-			try {
-				Field f = TextViewer.class.getDeclaredField("fWidgetCommand"); //$NON-NLS-1$
-				if (f != null) {
-					f.setAccessible(true);
-					f.set(this, null);
-				}
-			} catch (Throwable t) {
-				// ignore
-			} finally {
-				super.handleDispose();
-			}
-		}
-
-		@SuppressWarnings("rawtypes")
-		@Override
-		public IFormattingContext createFormattingContext() {
-			final IFormattingContext context = super.createFormattingContext();
-			try {
-				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(getDocument(), 0);
-				if (contentType != null && contentType.getPartCount() > 0) {
-					for (String ct : contentType.getParts()) {
-						String mainContentType = ct;
-						// We need to make sure that in case the given content type is actually a nested language in
-						// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
-						if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX)) {
-							mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
-						}
-						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
-						if (factory != null) {
-							// The code above might change the content type that is used to
-							// get the formatter, but we still need to save the original content-type so that the
-							// IScriptFormatter instance will handle the any required parsing by calling the right
-							// IParser.
-							factory.setMainContentType(contentType.getParts()[0]);
-
-							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
-							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(IResource.class);
-							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
-							IProject project = (file != null) ? file.getProject() : null;
-							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
-							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
-							break;
-						}
-					}
-				}
-			} catch (BadLocationException e) {
-			}
-			return context;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-		 */
-		@SuppressWarnings("rawtypes")
-		public Object getAdapter(Class adapter)
-		{
-			Object result = null;
-
-			if (adapter == AbstractThemeableEditor.class)
-			{
-				result = AbstractThemeableEditor.this;
-			}
-
-			return result;
-		}
-
-	}
-
-	private static final int RULER_EDITOR_GAP = 5;
 
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
 			'\'', '\'', '"', '"' };
@@ -503,7 +370,19 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		// Need to make it a projection viewer now that we have folding...
 		CommonProjectionViewer viewer = new CommonProjectionViewer(parent, ruler, getOverviewRuler(),
-				isOverviewRulerVisible(), styles);
+				isOverviewRulerVisible(), styles) {
+			@SuppressWarnings("rawtypes")
+			@Override
+			public Object getAdapter(Class adapter)
+			{
+				if (AbstractThemeableEditor.class == adapter || ITextEditor.class == adapter)
+				{
+					return AbstractThemeableEditor.this;
+				}
+				return super.getAdapter(adapter);
+			}
+
+		};
 
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);

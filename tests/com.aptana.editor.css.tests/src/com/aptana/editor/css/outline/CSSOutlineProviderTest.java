@@ -91,7 +91,7 @@ public class CSSOutlineProviderTest extends TestCase
 		assertEquals(1, outlineResult.length);
 
 		assertEquals(astRoot.getChild(0), getNode(outlineResult[0]));
-		assertEquals(CSSPlugin.getImage("icons/at_rule"), fLabelProvider.getImage(outlineResult[0]));
+		assertEquals(CSSPlugin.getImage("icons/at_rule.png"), fLabelProvider.getImage(outlineResult[0]));
 		assertEquals(astRoot.getChild(0).getText().substring(1), fLabelProvider.getText(outlineResult[0]));
 	}
 
