@@ -106,7 +106,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		}
 	}
 
-	private void delayedInclude(int startOffset, int endOffset) {
+	private synchronized void delayedInclude(int startOffset, int endOffset) {
 		if (delayedRegion != null) {
 			int offset = Math.min(delayedRegion.getOffset(), startOffset);
 			int length = Math.max(delayedRegion.getOffset()+delayedRegion.getLength(), endOffset) - offset;
@@ -116,7 +116,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		}
 	}
 
-	private void delayedExclude(int startOffset, int endOffset) {
+	private synchronized void delayedExclude(int startOffset, int endOffset) {
 		if (delayedRegion != null) {
 			if (delayedRegion.getOffset() >= startOffset) {
 				int length = delayedRegion.getLength() - (endOffset-delayedRegion.getOffset());
@@ -149,21 +149,25 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		}
 	}
 
-	private void triggerDelayedCreatePresentation() {
+	private synchronized void triggerDelayedCreatePresentation() {
 		if (job != null) {
 			job.cancel();
 		} else {
-			job = new Job("Delayed Presentation Reconciler") {
+			job = new Job("Delayed Presentation Reconciler") { //$NON-NLS-1$
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					IDocument document = textViewer.getDocument();
-					while (delayedRegion != null && !monitor.isCanceled()) {
-						processDamage(delayedRegion, document, monitor);
+					IRegion damage = delayedRegion;
+					while (damage != null && !monitor.isCanceled()) {
+						processDamage(damage, document, monitor);
 						System.gc();
 						try {
 							Thread.sleep(ITERATION_DELAY);
 						} catch (InterruptedException e) {
 							break;
+						}
+						synchronized (CommonPresentationReconciler.this) {
+							damage = delayedRegion;
 						}
 					}
 					return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
