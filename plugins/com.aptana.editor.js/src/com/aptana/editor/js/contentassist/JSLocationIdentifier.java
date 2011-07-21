@@ -22,6 +22,7 @@ import com.aptana.editor.js.parsing.ast.JSContinueNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
+import com.aptana.editor.js.parsing.ast.JSErrorNode;
 import com.aptana.editor.js.parsing.ast.JSFalseNode;
 import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
@@ -558,6 +559,19 @@ public class JSLocationIdentifier extends JSTreeWalker
 			{
 				this.setType(LocationType.NONE);
 			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSErrorNode)
+	 */
+	@Override
+	public void visit(JSErrorNode node)
+	{
+		if (node.contains(this._offset))
+		{
+			this.setType(LocationType.UNKNOWN);
 		}
 	}
 

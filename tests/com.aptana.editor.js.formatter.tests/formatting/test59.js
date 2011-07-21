@@ -8861,9 +8861,7 @@ if(!dojo._hasResource["dojo._base.declare"]) {//_hasResource checks added by bui
 
                     // allow any first argument w/ a "preamble" property to act as a
                     // class preamble (not exclusive of the prototype preamble)
-                    if
-                    (
-                    /*dojo.isFunction*/( fn = a[0]["preamble"])) {
+                    if(/*dojo.isFunction*/( fn = a[0]["preamble"])) {
                         a = fn.apply(this, a) || a;
                     }
                 }
@@ -13080,8 +13078,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                     // var gtIdx = query.indexOf(">")
 
                     // kind of a lame heuristic, but it works
-                    if
-                    (
+                    if(
                     // a "div div div" style query
                     ((qparts.length > 2) && (query.indexOf(">") == -1)) ||
                     // or something else with moderate complexity. kinda janky

@@ -15,7 +15,7 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Tests for com.aptana.ide.editor.html.outline");
+		TestSuite suite = new TestSuite("Tests for com.aptana.editor.html.outline");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(HTMLOutlineProviderTest.class);
 		// $JUnit-END$

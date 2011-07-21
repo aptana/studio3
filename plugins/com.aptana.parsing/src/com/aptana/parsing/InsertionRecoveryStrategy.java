@@ -39,19 +39,20 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	}
 
 	private List<CandidateToken> candidateTokens = new ArrayList<CandidateToken>();
-	private Set<Short> _requiredTypes = new HashSet<Short>();
+	private Set<Short> lastTypes = new HashSet<Short>();
+	private Set<Short> currentTypes = new HashSet<Short>();
 
 	/**
 	 * InsertionRecoveryStrategy
 	 * 
 	 * @param type
 	 * @param text
-	 * @param requiredTypes
+	 * @param lastTokenTypes
 	 */
-	public InsertionRecoveryStrategy(T type, String text, T... requiredTypes)
+	public InsertionRecoveryStrategy(T type, String text, T... lastTokenTypes)
 	{
-		this.addToken(type, text);
-		this.addRequiredTypes(requiredTypes);
+		addToken(type, text);
+		addLastTokenTypes(lastTokenTypes);
 	}
 
 	/**
@@ -61,25 +62,38 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	 * @param text1
 	 * @param type2
 	 * @param text2
-	 * @param requiredTypes
+	 * @param lastTokenTypes
 	 */
-	public InsertionRecoveryStrategy(T type1, String text1, T type2, String text2, T... requiredTypes)
+	public InsertionRecoveryStrategy(T type1, String text1, T type2, String text2, T... lastTokenTypes)
 	{
-		this.addToken(type1, text1);
-		this.addToken(type2, text2);
-		this.addRequiredTypes(requiredTypes);
+		addToken(type1, text1);
+		addToken(type2, text2);
+		addLastTokenTypes(lastTokenTypes);
 	}
 
 	/**
-	 * addRequiredTypes
+	 * addCurrentTokenTypes
 	 * 
 	 * @param tokenTypes
 	 */
-	public void addRequiredTypes(T... tokenTypes)
+	public void addCurrentTokenTypes(T... tokenTypes)
 	{
 		for (T tokenType : tokenTypes)
 		{
-			this._requiredTypes.add(tokenType.getIndex());
+			currentTypes.add(tokenType.getIndex());
+		}
+	}
+
+	/**
+	 * addLastTokenTypes
+	 * 
+	 * @param tokenTypes
+	 */
+	public void addLastTokenTypes(T... tokenTypes)
+	{
+		for (T tokenType : tokenTypes)
+		{
+			lastTypes.add(tokenType.getIndex());
 		}
 	}
 
@@ -91,7 +105,7 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	 */
 	public void addToken(T tokenType, String text)
 	{
-		this.candidateTokens.add(new CandidateToken(tokenType, text));
+		candidateTokens.add(new CandidateToken(tokenType, text));
 	}
 
 	/*
@@ -103,21 +117,21 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	{
 		boolean result = false;
 
-		if (this.candidateTokens.size() > 0
-				&& (this._requiredTypes.size() == 0 || this._requiredTypes.contains(lastToken.getId())))
+		if (candidateTokens.size() > 0 && (lastTypes.size() == 0 || lastTypes.contains(lastToken.getId()))
+				&& (currentTypes.size() == 0 || currentTypes.contains(currentToken.getId())))
 		{
 			// allocate room for all tokens we're going to try
-			in.alloc(this.candidateTokens.size() + 1);
+			in.alloc(candidateTokens.size() + 1);
 
 			// insert the token that failed
 			in.insert(currentToken);
 
 			// create a list of tokens we want to try
-			List<Symbol> terminals = new ArrayList<Symbol>(this.candidateTokens.size());
+			List<Symbol> terminals = new ArrayList<Symbol>(candidateTokens.size());
 			int tokenStart = currentToken.getStart();
 			int tokenEnd = tokenStart - 1;
 
-			for (CandidateToken candidateToken : this.candidateTokens)
+			for (CandidateToken candidateToken : candidateTokens)
 			{
 				short id = candidateToken.tokenType.getIndex();
 				String text = candidateToken.tokenText;
