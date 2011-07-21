@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.ftp.tests;
+package com.aptana.deploy.ftp;
 
 import java.io.File;
 import java.io.IOException;

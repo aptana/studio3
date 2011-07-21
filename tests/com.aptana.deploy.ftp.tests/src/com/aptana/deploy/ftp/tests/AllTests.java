@@ -7,6 +7,8 @@
  */
 package com.aptana.deploy.ftp.tests;
 
+import com.aptana.deploy.ftp.FTPDeployProviderTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
