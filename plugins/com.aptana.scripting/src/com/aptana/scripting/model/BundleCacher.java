@@ -196,8 +196,8 @@ public class BundleCacher
 				// currently in use by the unit tests
 				serializationSucceeded = Assert.isTrue(be2.toString().equals(be.toString()),
 						StringUtil.format(Messages.BundleCacher_SerializationException, configFile));
+				return true;
 			}
-			return true;
 		}
 		catch (IOException e)
 		{
