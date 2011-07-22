@@ -87,12 +87,14 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 				super.setLastToken(null);
 			}
 		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType) || SVGSourceConfiguration.STYLE.equals(contentType)) {
-			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
+			if (!(token instanceof ExtendedToken && (HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents())
+					|| !HTMLUtils.isTagComplete(((ExtendedToken) token).getContents())))) {
 				current = TYPE_CSS;
 				super.setLastToken(null);
 			}
 		} else if (HTMLSourceConfiguration.HTML_SVG.equals(contentType)) {
-			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
+			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents())
+					|| !HTMLUtils.isTagComplete(((ExtendedToken) token).getContents()))) {
 				current = TYPE_SVG;
 				super.setLastToken(null);
 			}
