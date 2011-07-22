@@ -231,11 +231,6 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			boolean isSelection, String indentSufix, boolean prefixWithNewLine, boolean postfixWithNewLine)
 			throws Exception
 	{
-		int spacesCount = -1;
-		if (isSelection)
-		{
-			spacesCount = countLeftWhitespaceChars(input);
-		}
 		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -256,24 +251,17 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 					getString(CSSFormatterConstants.FORMATTER_OFF), getString(CSSFormatterConstants.FORMATTER_ON));
 			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
 		}
-		if (isSelection)
+		if (output.length() > 0)
 		{
-			output = leftTrim(output, spacesCount);
-		}
-		else
-		{
-			if (output.length() > 0)
+			if (prefixWithNewLine && !output.startsWith(lineSeparator))
 			{
-				if (prefixWithNewLine && !output.startsWith(lineSeparator))
-				{
-					output = lineSeparator + output;
-				}
-				if (postfixWithNewLine && !output.endsWith(lineSeparator))
-				{
-					output += lineSeparator;
-				}
-				output += indentSufix;
+				output = lineSeparator + output;
 			}
+			if (postfixWithNewLine && !output.endsWith(lineSeparator))
+			{
+				output += lineSeparator;
+			}
+			output += indentSufix;
 		}
 		return output;
 	}

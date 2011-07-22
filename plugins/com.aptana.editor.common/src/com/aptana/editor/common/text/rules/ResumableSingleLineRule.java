@@ -83,10 +83,8 @@ public class ResumableSingleLineRule extends SingleLineRule implements IResumabl
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.text.rules.IResumableRule#resetRule()
 	 */
-	public void resetRule()
-	{
-		if (fToken instanceof ExtendedToken)
-		{
+	public void resetRule() {
+		if (fToken instanceof ExtendedToken) {
 			((ExtendedToken) fToken).setContents(StringUtil.EMPTY);
 		}
 	}

@@ -71,10 +71,8 @@ public class ResumableMultiLineRule extends MultiLineRule implements IResumableR
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.text.rules.IResumableRule#resetRule()
 	 */
-	public void resetRule()
-	{
-		if (fToken instanceof ExtendedToken)
-		{
+	public void resetRule() {
+		if (fToken instanceof ExtendedToken) {
 			((ExtendedToken) fToken).setContents(StringUtil.EMPTY);
 		}
 	}

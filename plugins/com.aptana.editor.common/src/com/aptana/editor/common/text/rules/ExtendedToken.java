@@ -52,10 +52,8 @@ public class ExtendedToken extends Token {
 	 * @param beginIndex
 	 * @return
 	 */
-	public String getContentSubstring(int beginIndex)
-	{
-		if (contents != null && contents.length() > beginIndex)
-		{
+	public String getContentSubstring(int beginIndex) {
+		if (contents != null && contents.length() > beginIndex) {
 			return contents.substring(beginIndex);
 		}
 		return StringUtil.EMPTY;

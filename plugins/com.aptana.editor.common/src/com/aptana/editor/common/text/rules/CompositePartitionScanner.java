@@ -125,12 +125,9 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
 	}
 
-	private static void resetRules(IPredicateRule[] rules)
-	{
-		for (IPredicateRule rule : rules)
-		{
-			if (rule instanceof IResumableRule)
-			{
+	private static void resetRules(IPredicateRule[] rules) {
+		for (IPredicateRule rule : rules) {
+			if (rule instanceof IResumableRule) {
 				((IResumableRule) rule).resetRule();
 			}
 		}
