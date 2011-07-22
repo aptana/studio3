@@ -113,7 +113,7 @@ public class CommonReconciler extends Reconciler {
 	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#forceReconciling()
 	 */
 	@Override
-	protected void forceReconciling() {
+	public void forceReconciling() {
 		super.forceReconciling();
 	}
 }

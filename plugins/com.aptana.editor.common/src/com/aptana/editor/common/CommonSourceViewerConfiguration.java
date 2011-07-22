@@ -92,7 +92,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
-	private IReconcilingStrategy fReconcilingStrategy;
+	private CommonReconciler fReconciler;
 	ArrayList<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
 
 	/**
@@ -113,7 +113,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public void dispose() {
 		fTextEditor = null;
 		fDoubleClickStrategy = null;
-		fReconcilingStrategy = null;
+		fReconciler = null;
 		if (fAutoActivationListener != null) {
 			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(fAutoActivationListener);
 			fAutoActivationListener = null;
@@ -520,8 +520,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IReconciler getReconciler(ISourceViewer sourceViewer) {
 		if (fTextEditor != null && fTextEditor.isEditable()) {
-			fReconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
-			CommonReconciler reconciler = new CommonReconciler(fReconcilingStrategy);
+			IReconcilingStrategy reconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
+			CommonReconciler reconciler = new CommonReconciler(reconcilingStrategy);
 			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 			reconciler.setIsIncrementalReconciler(false);
 			reconciler.setIsAllowedToModifyDocument(false);
@@ -531,12 +531,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				SpellingService spellingService = EditorsUI.getSpellingService();
 				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null) {
 					reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
-							fReconcilingStrategy,
+							reconcilingStrategy,
 							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService)),
 						getSpellingContentTypes(sourceViewer));
 				}
 			}
-			return reconciler;
+			return fReconciler = reconciler;
 		}
 		return null;
 	}
@@ -551,9 +551,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	public void forceReconcile()
 	{
-		if (fReconcilingStrategy != null)
+		if (fReconciler != null)
 		{
-			fReconcilingStrategy.reconcile(null);
+			fReconciler.forceReconciling();
 		}
 	}
 

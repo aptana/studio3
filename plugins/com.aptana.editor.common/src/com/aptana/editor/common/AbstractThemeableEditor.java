@@ -9,7 +9,6 @@ package com.aptana.editor.common;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
@@ -35,7 +34,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension5;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -43,7 +41,6 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -741,17 +738,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		else if (property.equals(IPreferenceConstants.EDITOR_ENABLE_FOLDING))
 		{
-			if (isFoldingEnabled())
+			SourceViewerConfiguration config = getSourceViewerConfiguration();
+			if (config instanceof CommonSourceViewerConfiguration)
 			{
-				SourceViewerConfiguration config = getSourceViewerConfiguration();
-				if (config instanceof CommonSourceViewerConfiguration)
-				{
-					((CommonSourceViewerConfiguration) config).forceReconcile();
-				}
-			}
-			else
-			{
-				updateFoldingStructure(new HashMap<ProjectionAnnotation, Position>());
+				((CommonSourceViewerConfiguration) config).forceReconcile();
 			}
 		}
 		else if (IPreferenceConstants.USE_GLOBAL_DEFAULTS.equals(property))
