@@ -4,6 +4,7 @@
 <!-- ===================================================================== -->
 <project name="Build specific targets and properties" default="noDefault">
 
+	<property file="build_local.properties" />
 	<!-- ===================================================================== -->
 	<!-- Default target                                                        -->
 	<!-- ===================================================================== -->
@@ -89,112 +90,112 @@
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="text.ruble" />
 		  	<param name="bundle.dir.name" value="text.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="source.ruble" />
 		  	<param name="bundle.dir.name" value="source.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="math.ruble" />
 		  	<param name="bundle.dir.name" value="math.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="ruby.ruble" />
 		  	<param name="bundle.dir.name" value="ruby.ruble" />
-		  	<param name="bundle.branch" value="development" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="rails.ruble" />
 		  	<param name="bundle.dir.name" value="rails.ruble" />
-		  	<param name="bundle.branch" value="development" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="html.ruble" />
 		  	<param name="bundle.dir.name" value="html.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="css.ruble" />
 		  	<param name="bundle.dir.name" value="css.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="js.ruble" />
 		  	<param name="bundle.dir.name" value="js.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="xml.ruble" />
 		  	<param name="bundle.dir.name" value="xml.ruble" />
-			  	<param name="bundle.branch" value="master" />
+			  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="bundle-dev.ruble" />
 		  	<param name="bundle.dir.name" value="bundle-development.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="haml.ruble" />
 		  	<param name="bundle.dir.name" value="haml.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="sass.ruble" />
 		  	<param name="bundle.dir.name" value="sass.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="json.ruble" />
 		  	<param name="bundle.dir.name" value="json.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="rspec.ruble" />
 		  	<param name="bundle.dir.name" value="rspec.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="cucumber.ruble" />
 		  	<param name="bundle.dir.name" value="cucumber.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="yaml.ruble" />
 		  	<param name="bundle.dir.name" value="yaml.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 			<param name="bundle.name" value="capistrano.ruble" />
 			<param name="bundle.dir.name" value="capistrano.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="heroku.ruble" />
 		  	<param name="bundle.dir.name" value="heroku.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
             <param name="bundle.name" value="shell-script.ruble" />
             <param name="bundle.dir.name" value="shell-script.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
         </antcall>
 		<antcall target="clone-bundle">
 			<param name="bundle.name" value="php.ruble" />
 			<param name="bundle.dir.name" value="php.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 			<param name="bundle.name" value="engineyard.ruble" />
 			<param name="bundle.dir.name" value="engineyard.ruble" />
-		  	<param name="bundle.branch" value="master" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<antcall target="clone-bundle">
 			<param name="bundle.name" value="coffeescript.ruble" />
 			<param name="bundle.dir.name" value="coffeescript.ruble" />
-		  	<param name="bundle.branch" value="development" />
+		  	<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
 		<property name="bundle.root.dir" location="${source.folder1}/.."/>

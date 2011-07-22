@@ -55,5 +55,4 @@ const prefStr = "javascript.options.strict";
 test(/** */);
 ==FORMATTED==
 const prefStr = "javascript.options.strict";
-test(/** */
-);
+test(/** */);

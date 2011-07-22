@@ -7867,8 +7867,7 @@ if( typeof dojo == "undefined") {
         var ore = new RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?$");
         var ire = new RegExp("^((([^:]+:)?([^@]+))@)?([^:]*)(:([0-9]+))?$");
 
-        dojo._Url = function(/*dojo._Url||String...*/
-        ) {
+        dojo._Url = function(/*dojo._Url||String...*/) {
             // summary:
             //		Constructor to create an object representing a URL.
             //		It is marked as private, since we might consider removing
@@ -8589,8 +8588,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         // Object
     }
 
-    dojo._hitchArgs = function(scope, method /*,...*/
-    ) {
+    dojo._hitchArgs = function(scope, method /*,...*/) {
         var pre = dojo._toArray(arguments, 2);
         var named = dojo.isString(method);
         return function() {
@@ -8604,8 +8602,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         } // Function
     }
 
-    dojo.hitch = function(/*Object*/scope, /*Function|String*/method /*,...*/
-    ) {
+    dojo.hitch = function(/*Object*/scope, /*Function|String*/method /*,...*/) {
         // summary:
         //		Returns a function that will only ever execute in the a given scope.
         //		This allows for easy use of object member functions
@@ -8659,8 +8656,7 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         return tmp;
     }
 
-    dojo.partial = function(/*Function|String*/method /*, ...*/
-    ) {
+    dojo.partial = function(/*Function|String*/method /*, ...*/) {
         // summary:
         //		similar to hitch() except that the scope object is left to be
         //		whatever the execution context eventually becomes. This is the
@@ -10883,7 +10879,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
         // IIRC, earlier versions of Opera did in fact use border-box.
         // Opera guys, this is really confusing. Opera being broken in quirks mode is not our fault.
 
-        if(dojo.isIE) {
+        if(dojo.isIE /*|| dojo.isOpera*/) {
             var _dcm = document.compatMode;
             // client code may have to adjust if compatMode varies across iframes
             dojo.boxModel = (_dcm == "BackCompat") || (_dcm == "QuirksMode") || (dojo.isIE < 6) ? "border-box" : "content-box";

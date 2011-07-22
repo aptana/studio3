@@ -21,8 +21,29 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 {
 
 	private boolean asWrapper;
-	private boolean newLineBeforeClosing;
-	private boolean hasCommentBefore;
+	private boolean hasCommentBeforeOpen;
+	private boolean hasCommentBeforeClose;
+
+	/**
+	 * Constructs a new FormatterJSParenthesesNode
+	 * 
+	 * @param document
+	 * @param asWrapper
+	 *            Indicate that these parentheses do not have an open and close brackets, but is acting as a wrapper
+	 *            node for an expression that appears inside it.
+	 * @param hasCommentBeforeOpen
+	 *            Indicate that the open parenthesis has a single-line comment right above it.
+	 * @param hasCommentBeforeClose
+	 *            Indicate that the close parenthesis has a single-line comment right above it.
+	 */
+	public FormatterJSParenthesesNode(IFormatterDocument document, boolean asWrapper, boolean hasCommentBeforeOpen,
+			boolean hasCommentBeforeClose)
+	{
+		this(document);
+		this.asWrapper = asWrapper;
+		this.hasCommentBeforeOpen = hasCommentBeforeOpen;
+		this.hasCommentBeforeClose = hasCommentBeforeClose;
+	}
 
 	/**
 	 * Constructs a new FormatterJSParenthesesNode
@@ -32,11 +53,9 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	 *            Indicate that these parentheses do not have an open and close brackets, but is acting as a wrapper
 	 *            node for an expression that appears inside it.
 	 */
-	public FormatterJSParenthesesNode(IFormatterDocument document, boolean asWrapper, boolean hasCommentBefore)
+	public FormatterJSParenthesesNode(IFormatterDocument document, boolean asWrapper)
 	{
-		this(document);
-		this.asWrapper = asWrapper;
-		this.hasCommentBefore = hasCommentBefore;
+		this(document, asWrapper, false, false);
 	}
 
 	/**
@@ -47,17 +66,6 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	public FormatterJSParenthesesNode(IFormatterDocument document)
 	{
 		super(document);
-	}
-
-	/**
-	 * Force a new line before the closing parentheses.<br>
-	 * The new line will only be inserted when this node is <b>not</b> a wrapper node.
-	 * 
-	 * @param newLineBeforeClosing
-	 */
-	public void setNewLineBeforeClosing(boolean newLineBeforeClosing)
-	{
-		this.newLineBeforeClosing = newLineBeforeClosing;
 	}
 
 	/*
@@ -106,6 +114,24 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 		return asWrapper;
 	}
 
+	/**
+	 * @param hasCommentBeforeOpen
+	 *            Indicate that the open parenthesis has a single-line comment right above it.
+	 */
+	public void setHasCommentBeforeOpen(boolean hasCommentBeforeOpen)
+	{
+		this.hasCommentBeforeOpen = hasCommentBeforeOpen;
+	}
+
+	/**
+	 * @param hasCommentBeforeClose
+	 *            Indicate that the close parenthesis has a single-line comment right above it.
+	 */
+	public void setHasCommentBeforeClose(boolean hasCommentBeforeClose)
+	{
+		this.hasCommentBeforeClose = hasCommentBeforeClose;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
@@ -113,7 +139,7 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return hasCommentBefore;
+		return hasCommentBeforeOpen;
 	}
 
 	/*
@@ -123,6 +149,6 @@ public class FormatterJSParenthesesNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingEndNewLine()
 	{
-		return !asWrapper && newLineBeforeClosing;
+		return hasCommentBeforeClose && !asWrapper;
 	}
 }

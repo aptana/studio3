@@ -367,7 +367,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		// Need to make it a projection viewer now that we have folding...
 		CommonProjectionViewer viewer = new CommonProjectionViewer(parent, ruler, getOverviewRuler(),
-				isOverviewRulerVisible(), styles) {
+				isOverviewRulerVisible(), styles)
+		{
 			@SuppressWarnings("rawtypes")
 			@Override
 			public Object getAdapter(Class adapter)
@@ -411,58 +412,80 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	}
 
 	@Override
-	public void dispose() {
-		try {
+	public void dispose()
+	{
+		try
+		{
 			SourceViewerConfiguration svc = getSourceViewerConfiguration();
-			if (svc instanceof CommonSourceViewerConfiguration) {
+			if (svc instanceof CommonSourceViewerConfiguration)
+			{
 				((CommonSourceViewerConfiguration) svc).dispose();
 			}
-			if (fWordWrapControlListener != null) {
-				getSourceViewer().getTextWidget().removeControlListener(fWordWrapControlListener);
+			if (fWordWrapControlListener != null)
+			{
+				ISourceViewer sourceViewer = getSourceViewer();
+				if (sourceViewer != null)
+				{
+					StyledText textWidget = sourceViewer.getTextWidget();
+					if (textWidget != null && !textWidget.isDisposed())
+					{
+						textWidget.removeControlListener(fWordWrapControlListener);
+					}
+				}
 				fWordWrapControlListener = null;
 			}
 
-			if (occurrencesUpdater != null) {
+			if (occurrencesUpdater != null)
+			{
 				occurrencesUpdater.dispose();
 				occurrencesUpdater = null;
 			}
 
-			if (fSelectionChangedListener != null) {
+			if (fSelectionChangedListener != null)
+			{
 				fSelectionChangedListener.uninstall(getSelectionProvider());
 				fSelectionChangedListener = null;
 			}
 
-			if (fThemeListener != null) {
+			if (fThemeListener != null)
+			{
 				ThemePlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fThemeListener);
 				fThemeListener = null;
 			}
 
-			if (fThemeableEditorColorsExtension != null) {
+			if (fThemeableEditorColorsExtension != null)
+			{
 				fThemeableEditorColorsExtension.dispose();
 				fThemeableEditorColorsExtension = null;
 			}
 
-			if (fThemeableEditorFindBarExtension != null) {
+			if (fThemeableEditorFindBarExtension != null)
+			{
 				fThemeableEditorFindBarExtension.dispose();
 				fThemeableEditorFindBarExtension = null;
 			}
-			if (foldingActionsGroup != null) {
+			if (foldingActionsGroup != null)
+			{
 				foldingActionsGroup.dispose();
 				foldingActionsGroup = null;
 			}
 
-			if (fOutlinePage != null) {
+			if (fOutlinePage != null)
+			{
 				fOutlinePage.dispose();
 				fOutlinePage = null;
 			}
 
 			fCommandElementsProvider = null;
-			if (fFileService != null) {
+			if (fFileService != null)
+			{
 				fFileService.dispose();
 				fFileService = null;
 			}
 			fPeerCharacterCloser = null;
-		} finally {
+		}
+		finally
+		{
 			super.dispose();
 		}
 	}
@@ -1081,26 +1104,35 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return getSourceViewer().getTextWidget().getWordWrap();
 	}
 
-	public void setWordWrapEnabled(boolean enabled) {
+	public void setWordWrapEnabled(boolean enabled)
+	{
 		StyledText textWidget = getSourceViewer().getTextWidget();
 		textWidget.setWordWrap(enabled);
-		if (enabled) {
-			if (fWordWrapControlListener == null) {
-				fWordWrapControlListener = new ControlAdapter() {
+		if (enabled)
+		{
+			if (fWordWrapControlListener == null)
+			{
+				fWordWrapControlListener = new ControlAdapter()
+				{
 
-					public void controlResized(ControlEvent e) {
-						if (fLineNumberRulerColumn != null) {
+					public void controlResized(ControlEvent e)
+					{
+						if (fLineNumberRulerColumn != null)
+						{
 							fLineNumberRulerColumn.redraw();
 						}
 						IOverviewRuler overviewRuler = getOverviewRuler();
-						if (overviewRuler != null) {
+						if (overviewRuler != null)
+						{
 							overviewRuler.update();
 						}
 					}
 				};
 			}
 			textWidget.addControlListener(fWordWrapControlListener);
-		} else {
+		}
+		else
+		{
 			textWidget.removeControlListener(fWordWrapControlListener);
 		}
 	}

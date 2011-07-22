@@ -407,7 +407,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			ifNode.setBegin(createTextNode(document, ifStart, ifStart + 2));
 			push(ifNode);
 			// push the 'if' condition
-			pushNodeInParentheses('(', ')', ifStart + 2, trueBlock.getStartingOffset(), (JSNode) node.getCondition(),
+			pushNodeInParentheses('(', ')', node.getLeftParenthesis().getStart(), node.getRightParenthesis().getEnd() + 1, (JSNode) node.getCondition(),
 					false);
 			// Construct the 'true' part of the 'if' and visit its children
 			if (isCurlyTrueBlock)
@@ -1272,7 +1272,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int openParen = locateCharForward(document, openChar, parenLookupStart);
 			int closeParen = locateCharBackward(document, closeChar, parenLookupEnd);
 			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document, false,
-					hasAnyCommentBefore(openParen));
+					hasSingleCommentBefore(openParen), hasSingleCommentBefore(closeParen));
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			if (node != null)
@@ -1286,7 +1286,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					node.accept(this);
 				}
 			}
-			checkedPop(parenthesesNode, -1);
+			if (hasAnyCommentBefore(closeParen))
+			{
+				checkedPop(parenthesesNode, closeParen);
+			}
+			else
+			{
+				checkedPop(parenthesesNode, -1);
+			}
 			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
 		}
 
@@ -1398,7 +1405,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 			else
 			{
-				parenthesesNode = new FormatterJSParenthesesNode(document, true, hasAnyCommentBefore(openParen));
+				parenthesesNode = new FormatterJSParenthesesNode(document, true);
 				parenthesesNode.setBegin(createTextNode(document, openParen, openParen));
 			}
 			push(parenthesesNode);
@@ -1424,17 +1431,21 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				closeParenStart = locateCharBackward(document, ')', expressionEndOffset);
 				closeParenEnd = closeParenStart + 1;
 			}
-			if (hasAnyCommentBefore(closeParenStart))
+			int popCheckOffset = -1;
+			if (hasSingleCommentBefore(openParen))
 			{
-				// Make sure that the closing pair will not get pushed up when there is a comment line right before it.
-				parenthesesNode.setNewLineBeforeClosing(true);
-				checkedPop(parenthesesNode, closeParenStart);
+				parenthesesNode.setHasCommentBeforeOpen(true);
 			}
-			else
+			if (hasSingleCommentBefore(closeParenStart))
 			{
-				checkedPop(parenthesesNode, -1);
+				parenthesesNode.setHasCommentBeforeClose(true);
+				popCheckOffset = closeParenStart;
 			}
-
+			if (hasMultiLineCommentBefore(closeParenStart))
+			{
+				popCheckOffset = closeParenStart;
+			}
+			checkedPop(parenthesesNode, popCheckOffset);
 			parenthesesNode.setEnd(createTextNode(document, closeParenStart, closeParenEnd));
 		}
 

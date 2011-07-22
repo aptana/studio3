@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -41,7 +42,9 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 
@@ -52,7 +55,7 @@ import com.aptana.scripting.ScriptingEngine;
  */
 public class BundleCacher
 {
-	
+
 	/**
 	 * The file where we store our serialized model.
 	 */
@@ -147,17 +150,19 @@ public class BundleCacher
 
 		// Now write the config file out...
 		OutputStreamWriter writer = null;
+		File configFile = null;
+		Yaml yaml = null;
+
 		try
 		{
 			if (be.getBundleDirectory().canWrite())
 			{
-				File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
+				configFile = new File(be.getBundleDirectory(), CACHE_FILE);
 				writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"); //$NON-NLS-1$
 
-				Yaml yaml = createYAML(be.getBundleDirectory());
+				yaml = createYAML(be.getBundleDirectory());
 				yaml.dump(be, writer);
 			}
-			return true;
 		}
 		catch (IOException e)
 		{
@@ -177,6 +182,49 @@ public class BundleCacher
 				}
 			}
 		}
+
+		InputStreamReader reader = null;
+		boolean serializationSucceeded = false;
+		try
+		{
+			if (be.getBundleDirectory().canRead())
+			{
+				Assert.isNotNull(configFile);
+				reader = new InputStreamReader(new FileInputStream(configFile), "UTF-8"); //$NON-NLS-1$
+				BundleElement be2 = (BundleElement) yaml.load(reader);
+				// It's not the ideal way to test equality, but seems to work correctly. This is the mechanism
+				// currently in use by the unit tests
+				serializationSucceeded = Assert.isTrue(be2.toString().equals(be.toString()),
+						StringUtil.format(Messages.BundleCacher_SerializationException, configFile));
+				return true;
+			}
+		}
+		catch (IOException e)
+		{
+			ScriptingActivator.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			if (reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
+
+			if (!serializationSucceeded && configFile != null)
+			{
+				ScriptLogger.logError(StringUtil.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile,
+						configFile));
+				configFile.delete();
+			}
+		}
+
 		return false;
 	}
 
@@ -331,8 +379,7 @@ public class BundleCacher
 				if (file.lastModified() > lastMod)
 				{
 					// One of the files is newer, don't load cache! This will reload everything from disk and rewrite
-					// the
-					// cache
+					// the cache
 					ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_OutOfDateCacheMsg,
 							file.getPath()));
 					return true;

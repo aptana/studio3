@@ -51,14 +51,8 @@ js.formatter.brace.position.function.declaration=same.line
 js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
-function test(){	
-	z=function (a,b/**test8*/){
-		a(1/**test7*/,2);			
-	}
-}
+if(  /*a*/  8 > 7/*b*/)
+    print('s');
 ==FORMATTED==
-function test() {
-    z = function(a, b/**test8*/) {
-        a(1/**test7*/, 2);
-    }
-}
+if(/*a*/8 > 7/*b*/)
+    print('s');

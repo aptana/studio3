@@ -19,6 +19,10 @@ public class Messages extends NLS
 	public static String BundleCacher_LoadingYAMLError;
 	public static String BundleCacher_OutOfDateCacheMsg;
 
+	public static String BundleCacher_SerializationException;
+
+	public static String BundleCacher_SerializationExceptionDeletingCacheFile;
+
 	public static String BundleEntry_Name_Not_Defined;
 
 	public static String BundleManager_Bundle_Became_Hidden_Event_Error;
