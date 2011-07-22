@@ -99,6 +99,8 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	public void setPartialRange(IDocument document, int offset, int length, String contentType, int partitionOffset) {
 		defaultTokenState = null;
 		hasResume = false;
+		resetRules(defaultPartitionScanner.getRules());
+		resetRules(primaryPartitionScanner.getRules());
 		currentPartitionScanner = defaultPartitionScanner;
 		currentPartitionScanner.setLastToken(contentType != null ? new Token(contentType) : null);
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
@@ -121,6 +123,17 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			currentPartitionScanner = primaryPartitionScanner;
 		}
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
+	}
+
+	private static void resetRules(IPredicateRule[] rules)
+	{
+		for (IPredicateRule rule : rules)
+		{
+			if (rule instanceof IResumableRule)
+			{
+				((IResumableRule) rule).resetRule();
+			}
+		}
 	}
 
 	/*

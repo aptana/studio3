@@ -12,11 +12,13 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 
+import com.aptana.core.util.StringUtil;
+
 /**
  * @author Max Stepanov
  *
  */
-public class ResumableMultiLineRule extends MultiLineRule {
+public class ResumableMultiLineRule extends MultiLineRule implements IResumableRule {
 
 	private boolean fResume;
 
@@ -50,7 +52,7 @@ public class ResumableMultiLineRule extends MultiLineRule {
 	@Override
 	protected boolean endSequenceDetected(ICharacterScanner scanner) {
 		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, fResume ? "" : String.valueOf(fStartSequence)); //$NON-NLS-1$
-		scanner = fResume && fToken instanceof ExtendedToken ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContents().substring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
+		scanner = fResume && fToken instanceof ExtendedToken ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContentSubstring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
 		if (doDetectEndSequence(scanner)) {
 			if (fToken instanceof ExtendedToken) {
 				ExtendedToken extendedToken = (ExtendedToken) fToken;
@@ -64,6 +66,17 @@ public class ResumableMultiLineRule extends MultiLineRule {
 	
 	protected boolean doDetectEndSequence(ICharacterScanner scanner) {
 		return super.endSequenceDetected(scanner);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.IResumableRule#resetRule()
+	 */
+	public void resetRule()
+	{
+		if (fToken instanceof ExtendedToken)
+		{
+			((ExtendedToken) fToken).setContents(StringUtil.EMPTY);
+		}
 	}
 
 }
