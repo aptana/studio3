@@ -361,11 +361,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			boolean isSelection, String indentSufix, boolean prefixWithNewLine, boolean postfixWithNewLine)
 			throws Exception
 	{
-		int spacesCount = -1;
-		if (isSelection)
-		{
-			spacesCount = countLeftWhitespaceChars(input);
-		}
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, inputOffset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -393,14 +388,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 					getString(JSFormatterConstants.FORMATTER_OFF), getString(JSFormatterConstants.FORMATTER_ON));
 			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
 		}
-		if (isSelection)
-		{
-			output = leftTrim(output, spacesCount);
-		}
-		else
-		{
-			output = processNestedOutput(output, lineSeparator, indentSufix, prefixWithNewLine, postfixWithNewLine);
-		}
+		output = processNestedOutput(output, lineSeparator, indentSufix, prefixWithNewLine, postfixWithNewLine);
 		return output;
 	}
 
