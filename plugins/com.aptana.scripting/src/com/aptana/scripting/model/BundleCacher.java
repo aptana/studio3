@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
@@ -131,11 +130,6 @@ public class BundleCacher
 
 	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
-		// Force bundle manager to load the bundle...
-		if (!Platform.isRunning())
-		{
-			BundleManager.getInstance().loadBundle(bundleDirectory);
-		}
 		// grab the bundle model
 		BundleElement be = BundleManager.getInstance().getBundleFromPath(bundleDirectory);
 		cache(be);
@@ -150,15 +144,15 @@ public class BundleCacher
 
 		// Now write the config file out...
 		OutputStreamWriter writer = null;
-		File configFile = null;
+		File cacheFile = null;
 		Yaml yaml = null;
 
 		try
 		{
 			if (be.getBundleDirectory().canWrite())
 			{
-				configFile = new File(be.getBundleDirectory(), CACHE_FILE);
-				writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"); //$NON-NLS-1$
+				cacheFile = new File(be.getBundleDirectory(), CACHE_FILE);
+				writer = new OutputStreamWriter(new FileOutputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
 
 				yaml = createYAML(be.getBundleDirectory());
 				yaml.dump(be, writer);
@@ -189,13 +183,18 @@ public class BundleCacher
 		{
 			if (be.getBundleDirectory().canRead())
 			{
-				Assert.isNotNull(configFile);
-				reader = new InputStreamReader(new FileInputStream(configFile), "UTF-8"); //$NON-NLS-1$
+				Assert.isNotNull(cacheFile);
+				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
 				BundleElement be2 = (BundleElement) yaml.load(reader);
+
+				// invoke blocks don't serialize correctly, so the comparison gets screwy.
+				String beString1 = be.toSource(false);
+				String beString2 = be2.toSource(false);
+
 				// It's not the ideal way to test equality, but seems to work correctly. This is the mechanism
 				// currently in use by the unit tests
-				serializationSucceeded = Assert.isTrue(be2.toString().equals(be.toString()),
-						StringUtil.format(Messages.BundleCacher_SerializationException, configFile));
+				serializationSucceeded = Assert.isTrue(beString2.equals(beString1),
+						StringUtil.format(Messages.BundleCacher_SerializationException, cacheFile));
 				return true;
 			}
 		}
@@ -217,11 +216,11 @@ public class BundleCacher
 				}
 			}
 
-			if (!serializationSucceeded && configFile != null)
+			if (!serializationSucceeded && cacheFile != null)
 			{
 				ScriptLogger.logError(StringUtil.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile,
-						configFile));
-				configFile.delete();
+						cacheFile));
+				cacheFile.delete();
 			}
 		}
 

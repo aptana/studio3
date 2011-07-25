@@ -47,7 +47,7 @@ public class BuildPathElement extends AbstractBundleElement
 	 * @see com.aptana.scripting.model.AbstractElement#printBody(com.aptana.core.util.SourcePrinter)
 	 */
 	@Override
-	protected void printBody(SourcePrinter printer)
+	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
