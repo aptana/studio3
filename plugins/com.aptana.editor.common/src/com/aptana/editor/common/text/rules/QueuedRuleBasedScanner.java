@@ -8,6 +8,7 @@
 
 package com.aptana.editor.common.text.rules;
 
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -60,6 +61,12 @@ public abstract class QueuedRuleBasedScanner extends RuleBasedScanner {
 				return tokenScanner.getTokenLength();
 			}
 			return length;
+		}
+
+		@Override
+		public String toString()
+		{
+			return MessageFormat.format("[{0}, {1}]: {2}", offset, length, token.getData()); //$NON-NLS-1$
 		}
 	}
 
