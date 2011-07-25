@@ -12,13 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.internal.parsing.ParserPool;
 import com.aptana.parsing.ast.IParseRootNode;
 
@@ -169,9 +170,21 @@ public class ParserPoolFactory
 	 */
 	public static IParseRootNode parse(String contentTypeId, String source) throws Exception
 	{
+		return parse(contentTypeId, source, null);
+	}
+	/**
+	 * parse
+	 * 
+	 * @param contentTypeId
+	 * @param source
+	 * @return
+	 */
+	public static IParseRootNode parse(String contentTypeId, String source, IProgressMonitor monitor) throws Exception
+	{
 		ParseState parseState = new ParseState();
 
 		parseState.setEditState(source, null, 0, 0);
+		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);
 	}

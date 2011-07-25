@@ -48,6 +48,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 		{
 			folder = new CoffeeFoldingComputer(null, document)
 			{
+				@Override
 				protected IParseNode getAST()
 				{
 					IParseState parseState = new ParseState();

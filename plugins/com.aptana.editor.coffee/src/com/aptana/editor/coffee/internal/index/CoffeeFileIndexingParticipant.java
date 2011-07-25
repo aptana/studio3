@@ -78,7 +78,7 @@ public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipa
 		SubMonitor sub = SubMonitor.convert(monitor, 70);
 		try
 		{
-			IParseRootNode root = ParserPoolFactory.parse(ICoffeeConstants.CONTENT_TYPE_COFFEE, source);
+			IParseRootNode root = ParserPoolFactory.parse(ICoffeeConstants.CONTENT_TYPE_COFFEE, source, sub.newChild(60));
 			sub.setWorkRemaining(10);
 			detectTasks(store, source, root.getCommentNodes(), sub.newChild(10));
 		}

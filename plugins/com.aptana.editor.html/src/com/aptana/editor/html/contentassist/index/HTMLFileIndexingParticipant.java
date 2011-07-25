@@ -255,10 +255,9 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 				{
 					HTMLParseState parseState = new HTMLParseState();
 					parseState.setEditState(fileContents, null, 0, 0);
+					parseState.setProgressMonitor(sub.newChild(50));
 
 					IParseNode parseNode = ParserPoolFactory.parse(IHTMLConstants.CONTENT_TYPE_HTML, parseState);
-					sub.worked(50);
-
 					walkAST(index, file, fileContents, parseNode, sub.newChild(20));
 				}
 			}

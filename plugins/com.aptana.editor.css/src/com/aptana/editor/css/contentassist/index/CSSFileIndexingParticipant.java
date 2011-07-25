@@ -56,14 +56,12 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					IParseNode ast = null;
 					try
 					{
-						ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, fileContents);
+						ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, fileContents, sub.newChild(50));
 					}
 					catch (Exception e)
 					{
 						// ignores parser exception
 					}
-					sub.worked(50);
-
 					if (ast != null)
 					{
 						this.processParseResults(file, index, ast, sub.newChild(20));

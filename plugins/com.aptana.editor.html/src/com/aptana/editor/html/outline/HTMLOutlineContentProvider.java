@@ -273,8 +273,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
 
-					IParseNode node = ParserPoolFactory.parse(language, source);
-					sub.worked(90);
+					IParseNode node = ParserPoolFactory.parse(language, source, sub.newChild(90));
 					elements = getChildren(node);
 					// adjusts the offsets to match the parent node since the children belong to an external file
 					for (Object element : elements)

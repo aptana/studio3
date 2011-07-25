@@ -9,6 +9,8 @@ package com.aptana.parsing;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -84,4 +86,16 @@ public interface IParseState
 	 * @param result
 	 */
 	public void setParseResult(IParseNode result);
+
+	/**
+	 * Returns parsing progress monitor primarily for cancellation checks.
+	 * @return
+	 */
+	public IProgressMonitor getProgressMonitor();
+
+	/**
+	 * Set parsing progress monitor
+	 * @param monitor
+	 */
+	public void setProgressMonitor(IProgressMonitor monitor);
 }

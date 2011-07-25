@@ -10,6 +10,7 @@ package com.aptana.editor.common.parsing;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.outline.IParseListener;
@@ -99,10 +100,20 @@ public class FileService
 	/**
 	 * Parse.<br>
 	 * This call is just like calling {@link #parse(boolean)} with false.
+	 * @deprecated use FileService.parse(IProgressMonitor monitor)
 	 */
 	public void parse()
 	{
-		parse(false);
+		parse(null);
+	}
+	/**
+	 * Parse.<br>
+	 * This call is just like calling {@link #parse(boolean)} with false.
+	 * @param monitor
+	 */
+	public void parse(IProgressMonitor monitor)
+	{
+		parse(false, monitor);
 	}
 
 	/**
@@ -110,7 +121,7 @@ public class FileService
 	 * 
 	 * @param force
 	 */
-	public synchronized void parse(boolean force)
+	public synchronized void parse(boolean force, IProgressMonitor monitor)
 	{
 		if (contentType != null && fDocument != null)
 		{
@@ -124,6 +135,7 @@ public class FileService
 
 				fLastSourceHash = sourceHash;
 				fParseState.setEditState(source, null, 0, 0);
+				fParseState.setProgressMonitor(monitor);
 
 				try
 				{

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
@@ -33,6 +34,7 @@ public class XMLParser implements IParser
 	private XMLParserScanner fScanner;
 	private XMLAttributeScanner fAttributeScanner;
 	private Stack<IParseNode> fElementStack;
+	private IProgressMonitor fMonitor;
 
 	protected IParseNode fCurrentElement;
 	protected Lexeme<XMLTokenType> fCurrentLexeme;
@@ -106,6 +108,7 @@ public class XMLParser implements IParser
 	 */
 	public IParseRootNode parse(IParseState parseState) throws Exception
 	{
+		fMonitor = parseState.getProgressMonitor();
 		fScanner = new XMLParserScanner();
 		fAttributeScanner = new XMLAttributeScanner();
 		fElementStack = new Stack<IParseNode>();
@@ -135,6 +138,7 @@ public class XMLParser implements IParser
 		}
 		finally
 		{
+			fMonitor = null;
 			fScanner = null;
 			fAttributeScanner = null;
 			fElementStack = null;
@@ -157,7 +161,7 @@ public class XMLParser implements IParser
 	{
 		advance();
 
-		while (fCurrentLexeme.getType() != XMLTokenType.EOF)
+		while (fCurrentLexeme.getType() != XMLTokenType.EOF && !fMonitor.isCanceled())
 		{
 			processStatement();
 			advance();

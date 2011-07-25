@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -62,6 +63,7 @@ public class HTMLParser implements IParser
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
+	private IProgressMonitor fMonitor;
 
 	private List<IParseNode> fCommentNodes;
 	private boolean previousSymbolSkipped;
@@ -79,6 +81,7 @@ public class HTMLParser implements IParser
 	 */
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fMonitor = parseState.getProgressMonitor();
 		fScanner = new HTMLParserScanner();
 		fTagScanner = new HTMLTagScanner();
 		fElementStack = new Stack<IParseNode>();
@@ -108,6 +111,7 @@ public class HTMLParser implements IParser
 		finally
 		{
 			// clear for garbage collection
+			fMonitor = null;
 			fScanner = null;
 			fTagScanner = null;
 			fElementStack = null;
@@ -191,7 +195,7 @@ public class HTMLParser implements IParser
 	private void parseAll(String source) throws IOException, Exception
 	{
 		advance();
-		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
+		while (fCurrentSymbol.getId() != HTMLTokens.EOF && !fMonitor.isCanceled())
 		{
 			if (isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
 			{

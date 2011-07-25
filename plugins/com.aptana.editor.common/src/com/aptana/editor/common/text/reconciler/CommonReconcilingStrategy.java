@@ -137,7 +137,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		FileService fileService = fEditor.getFileService();
 		// doing a full parse at the moment
-		fileService.parse();
+		fileService.parse(monitor);
 		// abort if parse failed
 		return fileService.hasValidParseResult();
 	}

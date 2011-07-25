@@ -10,6 +10,9 @@ package com.aptana.parsing;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -28,6 +31,7 @@ public class ParseState implements IParseState
 
 	// represents the root node of the parsing result
 	private IParseNode fParseResult;
+	private IProgressMonitor fProgressMonitor;
 
 	public ParseState()
 	{
@@ -95,6 +99,23 @@ public class ParseState implements IParseState
 	public void setSkippedRanges(IRange[] ranges)
 	{
 		fSkippedRanges = ranges;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.parsing.IParseState#getProgressMonitor()
+	 */
+	public IProgressMonitor getProgressMonitor()
+	{
+		if (fProgressMonitor == null)
+		{
+			fProgressMonitor = new NullProgressMonitor();
+		}
+		return fProgressMonitor;
+	}
+
+	public void setProgressMonitor(IProgressMonitor monitor)
+	{
+		fProgressMonitor = monitor;
 	}
 
 	public String toString()

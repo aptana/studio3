@@ -110,9 +110,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// minor optimization when creating a new empty file
 				if (source != null && source.trim().length() > 0)
 				{
-					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source);
-					sub.worked(50);
-
+					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source, sub.newChild(50));
 					if (ast != null)
 					{
 						this.processParseResults(file, source, index, ast, sub.newChild(20));
