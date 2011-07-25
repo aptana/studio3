@@ -8,6 +8,7 @@
 package com.aptana.ide.ui.io.navigator.actions;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.text.MessageFormat;
@@ -17,6 +18,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.jruby.embed.io.ReaderInputStream;
@@ -47,16 +49,43 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 	protected void createNewFileFromTemplate(TemplateElement template)
 	{
 		// creates untitled file
-		String filetype = template.getFiletype();
+		String fileExtension = template.getFiletype();
 		// strips the leading * before . if there is one
-		int index = filetype.lastIndexOf("."); //$NON-NLS-1$
+		int index = fileExtension.lastIndexOf("."); //$NON-NLS-1$
 		if (index > -1)
 		{
-			filetype = filetype.substring(index);
+			fileExtension = fileExtension.substring(index + 1);
 		}
+		createUntitledFile(template.getOwningBundle().getDisplayName(), fileExtension,
+				getInitialContents(template, Path.fromOSString(template.getPath())));
+	}
+
+	@Override
+	protected void createNewBlankFile(String editorType, String fileExtension)
+	{
+		createUntitledFile(editorType, fileExtension, new InputStream()
+		{
+
+			@Override
+			public int read() throws IOException
+			{
+				return -1;
+			}
+
+			@Override
+			public int available() throws IOException
+			{
+				return 0;
+			}
+		});
+	}
+
+	private IEditorPart createUntitledFile(String editorType, String fileExtension, InputStream initialContent)
+	{
 		try
 		{
-			File file = File.createTempFile(Messages.NewUntitledFileTemplateMenuContributor_TempSuffix, filetype);
+			File file = File.createTempFile(Messages.NewUntitledFileTemplateMenuContributor_TempSuffix, "." //$NON-NLS-1$
+					+ fileExtension);
 			file.deleteOnExit();
 			IEditorDescriptor editorDescriptor = PlatformUI.getWorkbench().getEditorRegistry()
 					.getDefaultEditor(file.getName());
@@ -65,30 +94,28 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 			IWorkbenchPage page = UIUtils.getActivePage();
 			if (page != null)
 			{
-				String bundleName = template.getOwningBundle().getDisplayName();
 				String editorName;
-				Integer value = countByFileType.get(bundleName);
+				Integer value = countByFileType.get(editorType);
 				if (value == null)
 				{
 					editorName = MessageFormat.format(Messages.NewUntitledFileTemplateMenuContributor_DefaultName,
-							bundleName);
-					countByFileType.put(bundleName, 1);
+							editorType);
+					countByFileType.put(editorType, 1);
 				}
 				else
 				{
 					editorName = MessageFormat.format(Messages.NewUntitledFileTemplateMenuContributor_DefaultName_2,
-							bundleName, value);
-					countByFileType.put(bundleName, ++value);
+							editorType, value);
+					countByFileType.put(editorType, ++value);
 				}
-				page.openEditor(
-						new UntitledFileStorageEditorInput(editorName, getInitialContents(template,
-								Path.fromOSString(file.getAbsolutePath()))), editorId);
+				return page.openEditor(new UntitledFileStorageEditorInput(editorName, initialContent), editorId);
 			}
 		}
 		catch (Exception e)
 		{
 			IdeLog.logError(IOUIPlugin.getDefault(), "Failed to create new file from selected template", e); //$NON-NLS-1$
 		}
+		return null;
 	}
 
 	private InputStream getInitialContents(TemplateElement template, IPath path)
