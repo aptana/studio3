@@ -10,8 +10,6 @@ package com.aptana.editor.js.contentassist;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +22,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -55,6 +54,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
+	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
+
+	private static String[] keywords = new String[] { "break", "case", "catch", "continue", "default", "delete", "do", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+			"else", "eval", "false", "field", "finally", "for", "function", "if", "in", "instanceof", "new", "null", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$
+			"return", "super", "switch", "this", "throw", "true", "try", "typeof", "var", "while", "with" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
+	// private static String[] futureKeywords = new String[]{"abstract", "boolean", "byte", "char", "class", "const",
+	// "debugger", "double", "enum", "export", "extends", "final", "float", "goto", "implements", "import", "int",
+	// "interface", "long", "native", "package", "private", "protected", "public", "short", "static", "super",
+	// "synchronized", "throws", "transient", "volatile" };
 
 	private JSIndexQueryHelper _indexHelper;
 	private IParseNode _targetNode;
@@ -210,6 +218,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			this.addTypeProperties(proposals, type, offset);
 		}
+	}
+
+	/**
+	 * @param prefix
+	 * @param completionProposals
+	 */
+	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
+	{
+		for (int i = 0; i < keywords.length; i++)
+		{
+			String name = keywords[i];
+			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
+			this.addProposal(proposals, name, JS_KEYWORD, description, this.getAllUserAgentIcons(),
+					Messages.JSContentAssistProcessor_KeywordLocation, offset);
+		}
+
 	}
 
 	/**
@@ -444,18 +468,21 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		switch (location)
 		{
 			case IN_PROPERTY_NAME:
+				this.addKeywords(result, offset);
 				this.addProperties(result, offset);
 				break;
 
 			case IN_VARIABLE_NAME:
 			case IN_GLOBAL:
 			case IN_CONSTRUCTOR:
+				this.addKeywords(result, offset);
 				this.addCoreGlobals(result, offset);
 				this.addProjectGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
 				break;
 
 			case IN_OBJECT_LITERAL_PROPERTY:
+				this.addKeywords(result, offset);
 				this.addObjectLiteralProperties(result, viewer, offset);
 				break;
 
@@ -463,16 +490,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 		}
 
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(result);
-
-		// sort by display name
-		Collections.sort(proposals, new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
-			}
-		});
+		ICompletionProposal[] resultList = result.toArray(new ICompletionProposal[result.size()]);
 
 		// select the current proposal based on the range
 		if (this._replaceRange != null)
@@ -480,8 +498,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			try
 			{
 				String prefix = document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
-
-				this.setSelectedProposal(prefix, proposals);
+				setSelectedProposal(prefix, resultList);
 			}
 			catch (BadLocationException e)
 			{
@@ -489,7 +506,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+		return resultList;
 	}
 
 	/**

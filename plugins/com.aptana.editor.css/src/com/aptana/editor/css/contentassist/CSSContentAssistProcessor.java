@@ -701,14 +701,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 
+		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
+
 		// select the current proposal based on the current lexeme
 		if (this._currentLexeme != null)
 		{
-			this.setSelectedProposal(this._currentLexeme.getText(), result);
+			setSelectedProposal(this._currentLexeme.getText(), proposals);
 		}
 
 		// return results
-		return result.toArray(new ICompletionProposal[result.size()]);
+		return proposals;
 	}
 
 	/**

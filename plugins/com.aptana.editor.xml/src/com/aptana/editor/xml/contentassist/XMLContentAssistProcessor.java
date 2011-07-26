@@ -135,8 +135,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (String attribute : element.getAttributes())
 			{
-				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, null, this.getCoreLocation(), offset, attribute.length()
-					+ length));
+				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, null,
+						this.getCoreLocation(), offset, attribute.length() + length));
 			}
 		}
 
@@ -349,8 +349,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 				}
 
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength, cursorPosition, ELEMENT_ICON, element
-					.getName(), null, element.getDescription());
+				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
 
 				proposal.setFileLocation(this.getCoreLocation());
 				proposals.add(proposal);
@@ -366,7 +366,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<XMLTokenType> lexemeProvider,
+			int offset)
 	{
 		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
 
@@ -399,7 +400,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, int offset)
 	{
 		this.addProposal(proposals, name, image, description, userAgents, this.getCoreLocation(), offset);
 	}
@@ -413,8 +415,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param userAgents
 	 * @param offset
 	 */
-	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
 		// add it to the list
@@ -449,8 +451,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		String replaceString = element.getName();
 		int cursorPosition = replaceString.length();
 		int replaceLength = 0;
-		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength, cursorPosition, ELEMENT_ICON, element.getName(),
-			null, element.getDescription());
+		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+				cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
 
 		proposal.setFileLocation(this.getCoreLocation());
 
@@ -492,7 +494,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
+	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
+			String fileLocation, int offset)
 	{
 		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
 	}
@@ -510,8 +513,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param length
 	 * @return
 	 */
-	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description, Image[] userAgents,
-		String fileLocation, int offset, int length)
+	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -525,7 +528,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
+				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 		proposal.setTriggerCharacters(getProposalTriggerCharacters());
@@ -539,7 +543,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		// tokenize the current document
 		this._document = viewer.getDocument();
@@ -580,21 +585,23 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 
+		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
+
 		// select the current proposal based on the current lexeme
 		if (this._replaceRange != null)
 		{
 			try
 			{
 				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
-
-				this.setSelectedProposal(text, result);
+				setSelectedProposal(text, proposals);
 			}
 			catch (BadLocationException e)
 			{
 			}
 		}
 
-		return result.toArray(new ICompletionProposal[result.size()]);
+		// return results
+		return proposals;
 	}
 
 	/**
@@ -683,7 +690,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										String src = document.get(previousPartition.getOffset(),
+												previousPartition.getLength()).trim();
 										if (src.charAt(src.length() - 1) == '>')
 										{
 											result = LocationType.IN_TEXT;
@@ -842,7 +850,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case EQUAL:
-					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME : LocationType.IN_ATTRIBUTE_VALUE;
+					result = (offset <= lexeme.getStartingOffset()) ? LocationType.IN_ATTRIBUTE_NAME
+							: LocationType.IN_ATTRIBUTE_VALUE;
 					break;
 
 				case START_TAG:
@@ -956,7 +965,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 
 					// String elementName = parts[0].toLowerCase();
-					//					
+					//
 					// if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
 					// {
 					// unclosedElements.add(elementName);

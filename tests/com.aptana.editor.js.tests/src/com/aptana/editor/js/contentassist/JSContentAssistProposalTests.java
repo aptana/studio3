@@ -23,6 +23,51 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	}
 
 	/**
+	 * testStringF
+	 */
+	public void testStringFPrefix()
+	{
+		this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "field", "finally", "focus", "for",
+				"forward", "frames", "function", "Function");
+	}
+
+	/**
+	 * testStringFunction
+	 */
+	public void testStringFunction()
+	{
+		this.checkProposals("contentAssist/function.js", true, true, "function", "Function");
+	}
+
+	/**
+	 * testStringFunction
+	 */
+	public void testStringFunctionCaseOrder()
+	{
+		// Commented out for the moment until we resolve an issue with indexing
+		// this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob",
+		// "for",
+		// "forward");
+	}
+
+	/**
+	 * testStringFunction
+	 */
+	public void testStringThis()
+	{
+		this.checkProposals("contentAssist/this.js", true, true, "this", "throw");
+	}
+
+	/**
+	 * testStringD
+	 */
+	public void testStringDPrefix()
+	{
+		this.checkProposals("contentAssist/d-prefix.js", true, true, "default", "defaultStatus", "delete", "do",
+				"document", "Date");
+	}
+
+	/**
 	 * testBug_Math
 	 */
 	public void testBug_Math()

@@ -25,8 +25,7 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
 public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension,
-		ICompletionProposalExtension2,
-		ICompletionProposalExtension3, Comparable<ICompletionProposal>
+		ICompletionProposalExtension2, ICompletionProposalExtension3, Comparable<ICompletionProposal>
 {
 	private String _additionalProposalInformation;
 	private IContextInformation _contextInformation;
@@ -295,11 +294,11 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 
 		// It seems plausible this logic could be simplified
 		int shift = 0;
-		if(validPrefix && validPrefixCaseSensitive)
+		if (validPrefix && validPrefixCaseSensitive)
 		{
 			shift = offset - this._replacementOffset;
 		}
-		
+
 		if (shift < this._replacementString.length())
 		{
 			int length = Math.max(0, this._replacementLength - shift);
@@ -400,20 +399,22 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	{
 		return isValidPrefix(prefix, displayString, true);
 	}
-	
+
 	/**
 	 * Returns true if the proposal is still valid as the user types while the content assist popup is visible.
 	 * 
 	 * @param prefix
 	 * @param displayString
-	 * @param ignoreCase Do we ignore the case of the prefix during comparisons?
+	 * @param ignoreCase
+	 *            Do we ignore the case of the prefix during comparisons?
 	 */
 	protected boolean isValidPrefix(String prefix, String displayString, boolean ignoreCase)
 	{
 		if (prefix == null || displayString == null || prefix.length() > displayString.length())
 			return false;
 		String start = displayString.substring(0, prefix.length());
-		if(ignoreCase) {
+		if (ignoreCase)
+		{
 			return start.equalsIgnoreCase(prefix);
 		}
 		else

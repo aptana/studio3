@@ -31,7 +31,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -183,7 +185,44 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				}
 			}
 		}
+
+		String prefix = extractPrefix(viewer, offset);
+		setSelectedProposal(prefix, completionProposals);
 		return completionProposals;
+	}
+
+	/**
+	 * setSelectedProposal
+	 * 
+	 * @param prefix
+	 * @param proposals
+	 */
+	public void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
+	{
+		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
+		{
+			return;
+		}
+
+		for (ICompletionProposal proposal : proposals)
+		{
+			String displayString = proposal.getDisplayString();
+			if (proposal instanceof SnippetTemplateProposal)
+			{
+				displayString = ((SnippetTemplateProposal) proposal).getActivationString();
+			}
+			int comparison = displayString.compareToIgnoreCase(prefix);
+
+			if (comparison >= 0)
+			{
+				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
+				{
+					// We put template proposals lower in the list, by default (for now), until we
+					// improve their handling
+					((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+				}
+			}
+		}
 	}
 
 	@Override

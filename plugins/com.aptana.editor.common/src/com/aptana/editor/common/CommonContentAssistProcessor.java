@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -35,7 +34,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -50,6 +48,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.CompletionProposalComparator;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.IPreferenceConstants;
@@ -183,21 +182,22 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			proposals.addAll(addSnippetProposals(viewer, offset));
 			ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar,
 					autoActivated);
-			if (proposals.isEmpty())
+
+			// create empty array to simplify logic
+			if (others == null)
 			{
-				return others;
+				others = new ICompletionProposal[0];
 			}
 
-			if (others == null || others.length == 0)
-			{
-				return proposals.toArray(new ICompletionProposal[proposals.size()]);
-			}
-
-			// Combine the two, leave selection as is
+			// Combine the two
 			ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
 			proposals.toArray(combined);
 			System.arraycopy(others, 0, combined, proposals.size(), others.length);
+
+			// sort proposals using default mechanism
 			sortProposals(combined);
+
+			// selection currently is set to first item in list
 			return combined;
 		}
 		finally
@@ -216,30 +216,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected void sortProposals(ICompletionProposal[] proposals)
 	{
-		// Sort by display string, ignoring case
-		Arrays.sort(proposals, new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				int compare = o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
-				if (compare == 0)
-				{
-					if (o1 instanceof TemplateProposal && !(o2 instanceof TemplateProposal))
-					{
-						return 1;
-					}
-					else if (!(o1 instanceof TemplateProposal) && o2 instanceof TemplateProposal)
-					{
-						return -1;
-					}
-					else
-					{
-						return compare;
-					}
-				}
-				return compare;
-			}
-		});
+		// Sort by relevance first, descending, and then alphabetically, ascending
+		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
+				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
 	}
 
 	/**
@@ -700,11 +679,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * @param prefix
 	 * @param proposals
 	 */
-	protected void setSelectedProposal(String prefix, List<ICompletionProposal> proposals)
+	protected void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
 	{
-		ICompletionProposal caseSensitiveProposal = null;
-		ICompletionProposal caseInsensitiveProposal = null;
-
 		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
 		{
 			return;
@@ -719,36 +695,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			{
 				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
 				{
-					caseInsensitiveProposal = proposal;
-
 					if (displayString.startsWith(prefix))
 					{
-						caseSensitiveProposal = proposal;
-						// found a match, so exit loop
-						break;
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
 					}
-				}
-			}
-		}
-
-		if (caseSensitiveProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) caseSensitiveProposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
-		}
-		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) caseInsensitiveProposal)
-					.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
-		}
-		else
-		{
-			if (proposals.size() > 0)
-			{
-				ICompletionProposal proposal = proposals.get(0);
-
-				if (proposal instanceof CommonCompletionProposal)
-				{
-					((CommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_LOW);
+					else
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+					}
 				}
 			}
 		}

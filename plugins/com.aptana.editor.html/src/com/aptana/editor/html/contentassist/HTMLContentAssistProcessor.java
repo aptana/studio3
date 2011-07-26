@@ -1260,6 +1260,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 
+		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
+
 		// select the current proposal based on the current lexeme
 		if (this._replaceRange != null)
 		{
@@ -1272,14 +1274,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					text = "/" + text; // proposals have "/" at the front //$NON-NLS-1$
 				}
 
-				this.setSelectedProposal(text, result);
+				setSelectedProposal(text, proposals);
 			}
 			catch (BadLocationException e)
 			{
 			}
 		}
 
-		return result.toArray(new ICompletionProposal[result.size()]);
+		// return results
+		return proposals;
 	}
 
 	/*
