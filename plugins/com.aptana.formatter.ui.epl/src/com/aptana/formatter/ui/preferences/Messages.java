@@ -21,6 +21,8 @@ public class Messages extends NLS
 	public static String AddRemoveList_inputMessageErrorInfo;
 	public static String AddRemoveList_inputMessageTitle;
 	public static String AddRemoveList_inputMessageText;
+	public static String AddRemoveList_invalidBeginTagChar;
+	public static String AddRemoveList_invalidCharInTag;
 	// Positive number validator
 	public static String PositiveNumberIsEmpty;
 	public static String PositiveNumberIsInvalid;
