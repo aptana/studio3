@@ -366,6 +366,16 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * 
 	 * @return
 	 */
+	public String toSource()
+	{
+		return toSource(true);
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
 	public String toSource(boolean includeBlocks)
 	{
 		SourcePrinter printer = new SourcePrinter();
@@ -413,6 +423,6 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	@Override
 	public String toString()
 	{
-		return toSource(true);
+		return toSource();
 	}
 }
