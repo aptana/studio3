@@ -46,4 +46,10 @@ public class BeaverEditor extends AbstractThemeableEditor
 		this.setSourceViewerConfiguration(new BeaverSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(BeaverPlugin.getDefault().getBeaverDocumentProvider());
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IBeaverConstants.CONTENT_TYPE_BEAVER;
+	}
 }

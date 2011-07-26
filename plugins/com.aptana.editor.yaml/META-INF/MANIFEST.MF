@@ -5,16 +5,18 @@ Bundle-SymbolicName: com.aptana.editor.yaml;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.yaml.YAMLPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
  org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.ui.editors,
- com.aptana.editor.common,
  org.eclipse.ui.views,
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.parsing,
  org.jruby;bundle-version="1.6.0",
  com.aptana.ui;bundle-version="3.0.0",
-  com.aptana.core;bundle-version="3.0.4"
+ com.aptana.editor.common
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

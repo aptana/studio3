@@ -34,4 +34,10 @@ public class TextEditor extends AbstractThemeableEditor
 	{
 		return TextEditorPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return ITextConstants.CONTENT_TYPE;
+	}
 }

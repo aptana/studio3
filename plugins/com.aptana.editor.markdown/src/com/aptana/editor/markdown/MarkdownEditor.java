@@ -34,4 +34,10 @@ public class MarkdownEditor extends AbstractThemeableEditor
 	{
 		return MarkdownEditorPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IMarkdownConstants.CONTENT_TYPE_MARKDOWN;
+	}
 }

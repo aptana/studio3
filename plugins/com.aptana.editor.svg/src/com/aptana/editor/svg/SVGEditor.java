@@ -43,4 +43,9 @@ public class SVGEditor extends XMLEditor
 		setSourceViewerConfiguration(new SVGSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(SVGPlugin.getDefault().getSVGDocumentProvider());
 	}
+
+	protected String getFileServiceContentTypeId()
+	{
+		return ISVGConstants.CONTENT_TYPE_SVG;
+	}
 }
