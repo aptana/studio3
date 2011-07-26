@@ -45,6 +45,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.IDebugScopes;
+import com.aptana.scripting.IScriptingSystemProperties;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
@@ -213,9 +214,6 @@ public class BundleManager
 	// constant to indicated we have no file instances
 	private static final File[] NO_FILES = new File[0];
 
-	// system property used to indicate the desired directory for user rubles
-	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
-
 	// project directory name where project bundles are located
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 
@@ -286,7 +284,7 @@ public class BundleManager
 
 			// get possible user override
 			boolean validUserBundlePath = false;
-			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
+			String userBundlePathOverride = System.getProperty(IScriptingSystemProperties.RUBLE_USER_LOCATION);
 
 			if (userBundlePathOverride != null)
 			{
