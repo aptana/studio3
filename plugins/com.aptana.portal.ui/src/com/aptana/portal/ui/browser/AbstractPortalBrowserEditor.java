@@ -29,6 +29,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -36,6 +37,7 @@ import com.aptana.portal.ui.dispatch.browserFunctions.DispatcherBrowserFunction;
 import com.aptana.portal.ui.internal.BrowserFunctionWrapper;
 import com.aptana.portal.ui.internal.BrowserViewerWrapper;
 import com.aptana.portal.ui.internal.BrowserWrapper;
+import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
 
 /**
  * A portal browser editor.
@@ -46,6 +48,9 @@ import com.aptana.portal.ui.internal.BrowserWrapper;
 @SuppressWarnings("restriction")
 public abstract class AbstractPortalBrowserEditor extends EditorPart
 {
+
+	private static final String BROWSER_SWT = "swt";
+	private static final String BROWSER_CHROMIUM = "chromium";
 
 	private BrowserViewerWrapper browserViewer;
 	private BrowserWrapper browser;
@@ -84,9 +89,7 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	@Override
 	public void createPartControl(Composite parent)
 	{
-		browserViewer = useWebkitBrowser() ?
-				BrowserViewerWrapper.createWebkitBrowserViewer(parent, 0) :
-				BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
+		browserViewer = createBrowserViewer(parent);
 		browser = new BrowserWrapper(browserViewer.getBrowser());
 		browser.setJavascriptEnabled(true);
 
@@ -124,7 +127,32 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		BrowserNotifier.getInstance().registerBrowser(getSite().getId(), browser);
 	}
 
-	private static boolean useWebkitBrowser()
+	private static BrowserViewerWrapper createBrowserViewer(Composite parent)
+	{
+		String browserType = getConfiguredBrowserType();
+		if (BROWSER_CHROMIUM.equals(browserType))
+		{
+			return BrowserViewerWrapper.createWebkitBrowserViewer(parent, 0);
+		} else
+		{
+			return BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
+		}
+	}
+
+	private static String getConfiguredBrowserType()
+	{
+		String browserType = EclipseUtil.getSystemProperty(IStartPageUISystemProperties.PORTAL_BROWSER);
+		if (BROWSER_CHROMIUM.equals(browserType) && !isChromiumWebkitSupported())
+		{
+			browserType = BROWSER_SWT;
+		} else if (browserType == null && isChromiumWebkitSupported())
+		{
+			browserType = BROWSER_CHROMIUM;
+		}
+		return browserType;
+	}
+
+	private static boolean isChromiumWebkitSupported()
 	{
 		if (Platform.ARCH_X86.equals(Platform.getOSArch()))
 		{

@@ -28,4 +28,10 @@ public interface IStartPageUISystemProperties
 	 * The URL of the Studio start page
 	 */
 	public static String START_PAGE_URL = "studio.startPageUrl"; //$NON-NLS-1$
+
+	/**
+	 * The portal browser option
+	 */
+	public static String PORTAL_BROWSER = "studio.portalBrowser"; //$NON-NLS-1$
+
 }
