@@ -35,4 +35,10 @@ public class DiffEditor extends AbstractThemeableEditor
 	{
 		return DiffPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IDiffConstants.CONTENT_TYPE_DIFF;
+	}
 }

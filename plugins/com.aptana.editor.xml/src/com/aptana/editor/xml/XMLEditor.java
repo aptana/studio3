@@ -114,6 +114,12 @@ public class XMLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IXMLConstants.CONTENT_TYPE_XML;
+	}
+
+	@Override
 	protected void selectionChanged()
 	{
 		super.selectionChanged();

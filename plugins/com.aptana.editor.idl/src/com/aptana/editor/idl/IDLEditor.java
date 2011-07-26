@@ -28,4 +28,10 @@ public class IDLEditor extends AbstractThemeableEditor
 	{
 		return IDLPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IIDLConstants.CONTENT_TYPE_IDL;
+	}
 }

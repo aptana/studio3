@@ -68,4 +68,10 @@ public class YAMLEditor extends AbstractThemeableEditor
 	{
 		return new YAMLFoldingComputer(this, document);
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IYAMLConstants.CONTENT_TYPE_YAML;
+	}
 }

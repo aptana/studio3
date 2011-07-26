@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
@@ -28,9 +30,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IFileEditorMapping;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.services.IEvaluationService;
+import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 import org.jruby.embed.io.ReaderInputStream;
 
 import com.aptana.editor.common.internal.scripting.NewFileWizard;
@@ -47,6 +53,10 @@ import com.aptana.ui.util.UIUtils;
  */
 public class NewFileTemplateMenuContributor extends ContributionItem
 {
+
+	private static final String APTANA_EDITOR_PREFIX = "com.aptana.editor."; //$NON-NLS-1$
+
+	private static Map<String, String> aptanaEditors;
 
 	public NewFileTemplateMenuContributor()
 	{
@@ -66,6 +76,36 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 	@Override
 	public void fill(Menu menu, int index)
 	{
+		if (aptanaEditors == null)
+		{
+			// finds the editors we contribute and the file extension each maps to
+			aptanaEditors = new TreeMap<String, String>();
+			IFileEditorMapping[] mappings = PlatformUI.getWorkbench().getEditorRegistry().getFileEditorMappings();
+			IEditorDescriptor[] editors;
+			String extension;
+			for (IFileEditorMapping mapping : mappings)
+			{
+				editors = mapping.getEditors();
+				extension = mapping.getExtension();
+				for (IEditorDescriptor editor : editors)
+				{
+					if (editor.getId().startsWith(APTANA_EDITOR_PREFIX))
+					{
+						String name = editor.getLabel();
+						// grabs the first word as it will be used to link the editor type with the bundle's name
+						// (e.g. HTML Editor -> HTML)
+						name = (new StringTokenizer(name)).nextToken();
+						if (!aptanaEditors.containsKey(name))
+						{
+							aptanaEditors.put(name, extension);
+						}
+					}
+				}
+			}
+		}
+
+		Set<String> editors = new TreeSet<String>(aptanaEditors.keySet());
+
 		// constructs the menus
 		Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
 		Set<String> bundles = templatesByBundle.keySet();
@@ -95,7 +135,57 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 					}
 				});
 			}
+			if (editors.contains(bundle))
+			{
+				// adds a "Blank File" item
+				String fileExtension;
+				if (templates.size() > 0)
+				{
+					fileExtension = templates.get(0).getFiletype();
+					// strips the leading *. if there is one
+					int dotIndex = fileExtension.lastIndexOf("."); //$NON-NLS-1$
+					if (dotIndex > -1)
+					{
+						fileExtension = fileExtension.substring(dotIndex + 1);
+					}
+				}
+				else
+				{
+					fileExtension = aptanaEditors.get(bundle);
+				}
+
+				createBlankFileMenu(bundleMenu, bundle, fileExtension);
+				editors.remove(bundle);
+			}
 		}
+
+		// add a "Blank File" item for the rest of editors we support but do not have any file templates defined
+		for (String name : editors)
+		{
+			MenuItem editorItem = new MenuItem(menu, SWT.CASCADE);
+			editorItem.setText(name);
+
+			Menu editorMenu = new Menu(menu);
+			editorItem.setMenu(editorMenu);
+
+			createBlankFileMenu(editorMenu, name, aptanaEditors.get(name));
+		}
+	}
+
+	private MenuItem createBlankFileMenu(Menu parent, final String editorType, final String fileExtension)
+	{
+		MenuItem item = new MenuItem(parent, SWT.PUSH);
+		item.setText(Messages.NewFileTemplateMenuContributor_LBL_BlankFile);
+		item.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				createNewBlankFile(editorType, fileExtension);
+			}
+		});
+		return item;
 	}
 
 	protected void createNewFileFromTemplate(final TemplateElement template)
@@ -139,6 +229,52 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		}
 
 		NewTemplateFileWizard wizard = new NewTemplateFileWizard(template);
+		wizard.init(PlatformUI.getWorkbench(), selection);
+		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
+		dialog.open();
+	}
+
+	protected void createNewBlankFile(String editorType, String fileExtension)
+	{
+		final String initialFileName = "new_file." + fileExtension; //$NON-NLS-1$
+
+		IStructuredSelection selection = getActiveSelection();
+		if (!selection.isEmpty())
+		{
+			Object element = selection.getFirstElement();
+			if (element instanceof IAdaptable)
+			{
+				IFileStore fileStore = (IFileStore) ((IAdaptable) element).getAdapter(IFileStore.class);
+				if (fileStore != null)
+				{
+					// this is a non-workspace selection
+					NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(), initialFileName)
+					{
+
+						@Override
+						protected InputStream getInitialContents(IPath path)
+						{
+							// blank content
+							return null;
+						}
+					};
+					action.updateSelection(selection);
+					action.run();
+					return;
+				}
+			}
+		}
+
+		BasicNewFileResourceWizard wizard = new BasicNewFileResourceWizard()
+		{
+
+			@Override
+			public void addPages()
+			{
+				super.addPages();
+				((WizardNewFileCreationPage) getPages()[0]).setFileName(initialFileName);
+			}
+		};
 		wizard.init(PlatformUI.getWorkbench(), selection);
 		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 		dialog.open();

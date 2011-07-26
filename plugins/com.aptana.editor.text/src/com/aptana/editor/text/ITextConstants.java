@@ -10,5 +10,7 @@ package com.aptana.editor.text;
 public interface ITextConstants
 {
 
+	public static final String CONTENT_TYPE = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
+
 	public static final String EDITOR_ID = "com.aptana.editor.text"; //$NON-NLS-1$
 }
