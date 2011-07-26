@@ -84,8 +84,9 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	@Override
 	public void createPartControl(Composite parent)
 	{
-		browserViewer = Platform.OS_LINUX.equals(Platform.getOS()) ? BrowserViewerWrapper.createWebkitBrowserViewer(
-				parent, 0) : BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
+		browserViewer = useWebkitBrowser() ?
+				BrowserViewerWrapper.createWebkitBrowserViewer(parent, 0) :
+				BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
 		browser = new BrowserWrapper(browserViewer.getBrowser());
 		browser.setJavascriptEnabled(true);
 
@@ -121,6 +122,18 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		// Browser-Notifier that was
 		// added to do so through the browserInteractions extension point.
 		BrowserNotifier.getInstance().registerBrowser(getSite().getId(), browser);
+	}
+
+	private static boolean useWebkitBrowser()
+	{
+		if (Platform.ARCH_X86.equals(Platform.getOSArch()))
+		{
+			return Platform.OS_WIN32.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()) || Platform.OS_LINUX.equals(Platform.getOS());
+		} else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
+		{
+			return Platform.OS_LINUX.equals(Platform.getOS());
+		}
+		return false;
 	}
 
 	/*
