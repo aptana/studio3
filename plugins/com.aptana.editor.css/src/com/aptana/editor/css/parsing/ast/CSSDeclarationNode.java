@@ -9,10 +9,14 @@ package com.aptana.editor.css.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
+
 public class CSSDeclarationNode extends CSSNode
 {
 	private String fIdentifier;
 	private String fStatus;
+	private IRange fStatusRange;
 	private boolean fHasSemicolon;
 
 	/**
@@ -44,12 +48,17 @@ public class CSSDeclarationNode extends CSSNode
 	 * @param value
 	 * @param status
 	 */
-	public CSSDeclarationNode(String identifier, CSSExpressionNode value, String status)
+	public CSSDeclarationNode(String identifier, CSSExpressionNode value, Symbol status)
 	{
 		super(CSSNodeTypes.DECLARATION);
 
 		fIdentifier = identifier;
-		fStatus = status;
+
+		if (status != null)
+		{
+			fStatus = status.value.toString();
+			fStatusRange = new Range(status.getStart(), status.getEnd());
+		}
 
 		this.setChildren(new CSSNode[] { value });
 	}
@@ -108,6 +117,26 @@ public class CSSDeclarationNode extends CSSNode
 	public String getIdentifier()
 	{
 		return fIdentifier;
+	}
+
+	/**
+	 * getStatus
+	 * 
+	 * @return String or null
+	 */
+	public String getStatus()
+	{
+		return fStatus;
+	}
+
+	/**
+	 * getStatusRange
+	 * 
+	 * @return
+	 */
+	public IRange getStatusRange()
+	{
+		return fStatusRange != null ? fStatusRange : Range.EMPTY;
 	}
 
 	/*
