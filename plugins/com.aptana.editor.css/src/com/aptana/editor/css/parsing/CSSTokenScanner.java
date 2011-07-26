@@ -61,7 +61,7 @@ public class CSSTokenScanner extends RuleBasedScanner
 	 */
 	private WordRule createAtWordsRule()
 	{
-		WordRule atRule = new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE));
+		WordRule atRule = new WordRule(new IdentifierWithPrefixDetector('@'), createToken(CSSTokenType.AT_RULE), true);
 
 		atRule.addWord("@import", createToken(CSSTokenType.IMPORT));
 		atRule.addWord("@page", createToken(CSSTokenType.PAGE));
@@ -145,7 +145,7 @@ public class CSSTokenScanner extends RuleBasedScanner
 
 		// url
 		// FIXME Don't use a RegexpRule here!
-		rules.add(new RegexpRule("url\\([^)]*\\)", createToken(CSSTokenType.URL), true));
+		rules.add(new RegexpRule("[Uu][Rr][Ll]\\([^)]*\\)", createToken(CSSTokenType.URL), true));
 
 		// TODO: functions
 
@@ -214,7 +214,7 @@ public class CSSTokenScanner extends RuleBasedScanner
 			{
 				return c == '-' || c == '+' || c == '.' || Character.isDigit(c);
 			}
-		}, createToken(tokenType), false)
+		}, createToken(tokenType), true)
 		{
 			private Pattern pattern;
 
@@ -222,7 +222,7 @@ public class CSSTokenScanner extends RuleBasedScanner
 			{
 				if (pattern == null)
 				{
-					pattern = Pattern.compile("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(" + regex + ")");
+					pattern = Pattern.compile("[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(" + regex + ")", Pattern.CASE_INSENSITIVE);
 				}
 
 				return pattern.matcher(word).matches();

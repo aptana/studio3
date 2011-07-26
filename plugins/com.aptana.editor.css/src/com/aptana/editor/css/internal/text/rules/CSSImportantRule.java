@@ -42,7 +42,7 @@ public class CSSImportantRule extends ExtendedWordRule
 	 */
 	public CSSImportantRule(IToken token)
 	{
-		super(new ImportantWordDetector(), token, false);
+		super(new ImportantWordDetector(), token, true);
 	}
 
 	/*
@@ -54,7 +54,7 @@ public class CSSImportantRule extends ExtendedWordRule
 	{
 		if (pattern == null)
 		{
-			pattern = Pattern.compile("!\\s*important"); //$NON-NLS-1$
+			pattern = Pattern.compile("!\\s*important", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 		}
 
 		return pattern.matcher(word).matches();
