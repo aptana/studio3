@@ -8,6 +8,7 @@
 package com.aptana.ide.ui.io.navigator.actions;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -24,6 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.jruby.embed.io.ReaderInputStream;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.UntitledFileStorageEditorInput;
 import com.aptana.editor.common.internal.scripting.NewFileWizard;
 import com.aptana.editor.text.ITextConstants;
@@ -82,11 +84,15 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 
 	private IEditorPart createUntitledFile(String editorType, String fileExtension, InputStream initialContent)
 	{
+		FileOutputStream output = null;
 		try
 		{
 			File file = File.createTempFile(Messages.NewUntitledFileTemplateMenuContributor_TempSuffix, "." //$NON-NLS-1$
 					+ fileExtension);
+			output = new FileOutputStream(file);
+			IOUtil.pipe(initialContent, output);
 			file.deleteOnExit();
+
 			IEditorDescriptor editorDescriptor = PlatformUI.getWorkbench().getEditorRegistry()
 					.getDefaultEditor(file.getName());
 			String editorId = (editorDescriptor == null) ? ITextConstants.EDITOR_ID : editorDescriptor.getId();
@@ -108,12 +114,26 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 							editorType, value);
 					countByFileType.put(editorType, ++value);
 				}
-				return page.openEditor(new UntitledFileStorageEditorInput(editorName, initialContent), editorId);
+				return page.openEditor(new UntitledFileStorageEditorInput(file.toURI(), editorName), editorId);
 			}
 		}
 		catch (Exception e)
 		{
 			IdeLog.logError(IOUIPlugin.getDefault(), "Failed to create new file from selected template", e); //$NON-NLS-1$
+		}
+		finally
+		{
+			if (output != null)
+			{
+				try
+				{
+					output.close();
+				}
+				catch (IOException e)
+				{
+					// ignores the exception
+				}
+			}
 		}
 		return null;
 	}

@@ -7,26 +7,24 @@
  */
 package com.aptana.editor.common;
 
-import java.io.InputStream;
+import java.net.URI;
 
-import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
-import org.eclipse.ui.IStorageEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 
 @SuppressWarnings("rawtypes")
-public class UntitledFileStorageEditorInput implements IStorageEditorInput
+public class UntitledFileStorageEditorInput implements IURIEditorInput
 {
 
+	private URI uri;
 	private String name;
-	private InputStream input;
 
-	public UntitledFileStorageEditorInput(String name, InputStream input)
+	public UntitledFileStorageEditorInput(URI uri, String name)
 	{
+		this.uri = uri;
 		this.name = name;
-		this.input = input;
 	}
 
 	public boolean exists()
@@ -56,38 +54,11 @@ public class UntitledFileStorageEditorInput implements IStorageEditorInput
 
 	public Object getAdapter(Class adapter)
 	{
-		return null;
+		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
-	public IStorage getStorage() throws CoreException
+	public URI getURI()
 	{
-		return new IStorage()
-		{
-
-			public Object getAdapter(Class adapter)
-			{
-				return null;
-			}
-
-			public InputStream getContents() throws CoreException
-			{
-				return input;
-			}
-
-			public IPath getFullPath()
-			{
-				return null;
-			}
-
-			public String getName()
-			{
-				return UntitledFileStorageEditorInput.this.getName();
-			}
-
-			public boolean isReadOnly()
-			{
-				return false;
-			}
-		};
+		return uri;
 	}
 }
