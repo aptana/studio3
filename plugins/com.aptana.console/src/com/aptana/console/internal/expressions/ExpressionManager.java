@@ -64,8 +64,7 @@ public final class ExpressionManager {
 				}
 			}
 		}
-		Theme theme = getCurrentTheme();
-		return new StyleRange[] { new StyleRange(lineOffset, lineText.length(), theme.getForegroundColor(), theme.getBackgroundColor()) };
+		return null;
 	}
 
 	/**
@@ -83,7 +82,7 @@ public final class ExpressionManager {
 				}
 			}
 		}
-		return getCurrentTheme().getBackgroundColor();
+		return null;
 	}
 
 	private void readExtensionRegistry() {

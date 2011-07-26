@@ -12,7 +12,9 @@ import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.LineStyleEvent;
 import org.eclipse.swt.custom.LineStyleListener;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 
 import com.aptana.console.ConsolePlugin;
 import com.aptana.console.internal.expressions.ExpressionManager;
@@ -52,7 +54,10 @@ public class ConsoleStyledTextListener implements LineStyleListener, LineBackgro
 	public void lineGetStyle(LineStyleEvent event) {
 		String lineText = event.lineText;
 		if (lineText.length() != 0) {
-			event.styles = expressionManager.calculateStyles(event.lineOffset, lineText);
+			StyleRange[] styles = expressionManager.calculateStyles(event.lineOffset, lineText);
+			if (styles != null) {
+				event.styles = styles;
+			}
 		}
 	}
 
@@ -60,7 +65,10 @@ public class ConsoleStyledTextListener implements LineStyleListener, LineBackgro
 	 * @see org.eclipse.swt.custom.LineBackgroundListener#lineGetBackground(org.eclipse.swt.custom.LineBackgroundEvent)
 	 */
 	public void lineGetBackground(LineBackgroundEvent event) {
-		event.lineBackground = expressionManager.calculateBackground(event.lineText);
+		Color lineBackground = expressionManager.calculateBackground(event.lineText);
+		if (lineBackground != null) {
+			event.lineBackground = lineBackground;
+		}
 	}
 
 }
