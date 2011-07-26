@@ -28,4 +28,10 @@ public class DTDEditor extends AbstractThemeableEditor
 	{
 		return DTDPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IDTDConstants.CONTENT_TYPE_DTD;
+	}
 }

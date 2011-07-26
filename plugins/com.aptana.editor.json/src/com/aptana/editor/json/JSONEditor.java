@@ -67,4 +67,10 @@ public class JSONEditor extends AbstractThemeableEditor
 	{
 		return JSONPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IJSONConstants.CONTENT_TYPE_JSON;
+	}
 }

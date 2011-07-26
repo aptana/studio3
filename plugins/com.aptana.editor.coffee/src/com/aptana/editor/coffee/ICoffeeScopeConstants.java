@@ -47,10 +47,13 @@ public interface ICoffeeScopeConstants
 
 	// Meta
 	String COMMA = "meta.delimiter.object.comma.coffee";
-	String PERIOD = "meta.delimiter.method.period";
+	String PERIOD = "meta.delimiter.method.period.coffee";
 	String BRACKET = "meta.brace.square.coffee";
 	String PAREN = "meta.brace.round.coffee";
 	String CURLY = "meta.brace.curly.coffee";
+	String META_FUNCTION = "meta.function.coffee";
+	String META_INLINE_FUNCTION = "meta.inline.function.coffee";
+	String META_CLASS = "meta.class.coffee";
 
 	// Storage
 	String FUNCTION_STORAGE = "storage.type.function.coffee";
@@ -59,4 +62,7 @@ public interface ICoffeeScopeConstants
 	// Variables
 	String INSTANCE_VARIABLE = "variable.other.readwrite.instance.coffee";
 	String LANGUAGE_VARIABLE = "variable.language.coffee";
+	String ASSIGNMENT_VARIABLE = "variable.assignment.coffee";
+	String PARAMETER_VARIABLE = "variable.parameter.function.coffee";
+
 }

@@ -58,6 +58,8 @@ public class Messages extends NLS
 	public static String NewFileAction_Text;
 	public static String NewFileAction_ToolTip;
 
+	public static String NewFileTemplateMenuContributor_LBL_BlankFile;
+
 	public static String NewFolderAction_InputMessage;
 	public static String NewFolderAction_InputTitle;
 	public static String NewFolderAction_JobTitle;

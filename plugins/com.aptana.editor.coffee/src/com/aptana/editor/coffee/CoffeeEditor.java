@@ -79,4 +79,10 @@ public class CoffeeEditor extends AbstractThemeableEditor
 	{
 		return CoffeeScriptEditorPlugin.getDefault().getPreferenceStore();
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return ICoffeeConstants.CONTENT_TYPE_COFFEE;
+	}
 }

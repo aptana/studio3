@@ -702,7 +702,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		{
 			IContentType contentType = ((TextFileDocumentProvider) getDocumentProvider())
 					.getContentType(getEditorInput());
-			return contentType.getId();
+			if (contentType != null)
+			{
+				return contentType.getId();
+			}
 		}
 		catch (Exception e)
 		{
