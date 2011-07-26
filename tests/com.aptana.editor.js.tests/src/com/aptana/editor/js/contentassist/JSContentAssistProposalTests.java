@@ -27,8 +27,8 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	 */
 	public void testStringFPrefix()
 	{
-		this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "field", "finally", "focus", "for",
-				"forward", "frames", "function", "Function");
+		this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "finally", "focus", "for", "forward",
+				"frames", "function", "Function");
 	}
 
 	/**

@@ -10,14 +10,6 @@ package com.aptana.core.util;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.core.util.CollectionsUtilTest;
-import com.aptana.core.util.EclipseUtilTest;
-import com.aptana.core.util.FirefoxUtilTest;
-import com.aptana.core.util.IOUtilTest;
-import com.aptana.core.util.ResourceUtilTest;
-import com.aptana.core.util.StringUtilTest;
-import com.aptana.core.util.VersionUtilTest;
-
 public class AllUtilTests
 {
 
@@ -25,6 +17,7 @@ public class AllUtilTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.core.util");
 		// $JUnit-BEGIN$
+		suite.addTestSuite(ArrayUtilTest.class);
 		suite.addTestSuite(CollectionsUtilTest.class);
 		suite.addTestSuite(EclipseUtilTest.class);
 		suite.addTestSuite(FileUtilTest.class);

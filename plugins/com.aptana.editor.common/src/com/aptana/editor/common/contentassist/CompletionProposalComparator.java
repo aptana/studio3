@@ -24,10 +24,8 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 				int o2Relevance = ((ICommonCompletionProposal) o2).getRelevance();
 				return Integer.valueOf(o1Relevance).compareTo(o2Relevance);
 			}
-			else
-			{
-				return 0;
-			}
+
+			return 0;
 		}
 	},
 	NameSort
@@ -35,7 +33,8 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 		// sort alphabetically, case sensitive, descending
 		public int compare(ICompletionProposal o1, ICompletionProposal o2)
 		{
-			return -1 * o1.getDisplayString().compareTo(o2.getDisplayString());
+			// note reversal of parameters
+			return o2.getDisplayString().compareTo(o1.getDisplayString());
 		}
 	};
 
@@ -51,7 +50,8 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 		{
 			public int compare(ICompletionProposal o1, ICompletionProposal o2)
 			{
-				return -1 * other.compare(o1, o2);
+				// note reversal of parameters
+				return other.compare(o2, o1);
 			}
 		};
 	}

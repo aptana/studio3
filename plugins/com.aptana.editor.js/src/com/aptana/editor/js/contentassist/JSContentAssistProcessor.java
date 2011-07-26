@@ -22,12 +22,14 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -56,13 +58,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
 
-	private static String[] keywords = new String[] { "break", "case", "catch", "continue", "default", "delete", "do", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-			"else", "eval", "false", "field", "finally", "for", "function", "if", "in", "instanceof", "new", "null", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$
-			"return", "super", "switch", "this", "throw", "true", "try", "typeof", "var", "while", "with" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
-	// private static String[] futureKeywords = new String[]{"abstract", "boolean", "byte", "char", "class", "const",
-	// "debugger", "double", "enum", "export", "extends", "final", "float", "goto", "implements", "import", "int",
-	// "interface", "long", "native", "package", "private", "protected", "public", "short", "static", "super",
-	// "synchronized", "throws", "transient", "volatile" };
+	private static String[] keywords = ArrayUtil.flatten(JSLanguageConstants.KEYWORD_OPERATORS,
+			JSLanguageConstants.GRAMMAR_KEYWORDS, JSLanguageConstants.KEYWORD_CONTROL);
 
 	private JSIndexQueryHelper _indexHelper;
 	private IParseNode _targetNode;
@@ -226,14 +223,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
 	{
-		for (int i = 0; i < keywords.length; i++)
+		for (String name : keywords)
 		{
-			String name = keywords[i];
 			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
 			this.addProposal(proposals, name, JS_KEYWORD, description, this.getAllUserAgentIcons(),
 					Messages.JSContentAssistProcessor_KeywordLocation, offset);
 		}
-
 	}
 
 	/**
@@ -468,7 +463,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		switch (location)
 		{
 			case IN_PROPERTY_NAME:
-				this.addKeywords(result, offset);
 				this.addProperties(result, offset);
 				break;
 
@@ -482,7 +476,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 
 			case IN_OBJECT_LITERAL_PROPERTY:
-				this.addKeywords(result, offset);
 				this.addObjectLiteralProperties(result, viewer, offset);
 				break;
 
