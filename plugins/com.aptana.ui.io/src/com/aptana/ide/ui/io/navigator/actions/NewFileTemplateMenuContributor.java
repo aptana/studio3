@@ -78,30 +78,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 	{
 		if (aptanaEditors == null)
 		{
-			// finds the editors we contribute and the file extension each maps to
-			aptanaEditors = new TreeMap<String, String>();
-			IFileEditorMapping[] mappings = PlatformUI.getWorkbench().getEditorRegistry().getFileEditorMappings();
-			IEditorDescriptor[] editors;
-			String extension;
-			for (IFileEditorMapping mapping : mappings)
-			{
-				editors = mapping.getEditors();
-				extension = mapping.getExtension();
-				for (IEditorDescriptor editor : editors)
-				{
-					if (editor.getId().startsWith(APTANA_EDITOR_PREFIX))
-					{
-						String name = editor.getLabel();
-						// grabs the first word as it will be used to link the editor type with the bundle's name
-						// (e.g. HTML Editor -> HTML)
-						name = (new StringTokenizer(name)).nextToken();
-						if (!aptanaEditors.containsKey(name))
-						{
-							aptanaEditors.put(name, extension);
-						}
-					}
-				}
-			}
+			aptanaEditors = getAptanaEditorFiletypeMap();
 		}
 
 		Set<String> editors = new TreeSet<String>(aptanaEditors.keySet());
@@ -278,6 +255,35 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		wizard.init(PlatformUI.getWorkbench(), selection);
 		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 		dialog.open();
+	}
+
+	private static Map<String, String> getAptanaEditorFiletypeMap()
+	{
+		// finds the editors we contribute and the file extension each maps to
+		Map<String, String> editorMap = new TreeMap<String, String>();
+		IFileEditorMapping[] mappings = PlatformUI.getWorkbench().getEditorRegistry().getFileEditorMappings();
+		IEditorDescriptor[] editors;
+		String extension;
+		for (IFileEditorMapping mapping : mappings)
+		{
+			editors = mapping.getEditors();
+			extension = mapping.getExtension();
+			for (IEditorDescriptor editor : editors)
+			{
+				if (editor.getId().startsWith(APTANA_EDITOR_PREFIX))
+				{
+					String name = editor.getLabel();
+					// grabs the first word as it will be used to link the editor type with the bundle's name
+					// (e.g. HTML Editor -> HTML)
+					name = (new StringTokenizer(name)).nextToken();
+					if (!editorMap.containsKey(name))
+					{
+						editorMap.put(name, extension);
+					}
+				}
+			}
+		}
+		return editorMap;
 	}
 
 	private static IStructuredSelection getActiveSelection()
