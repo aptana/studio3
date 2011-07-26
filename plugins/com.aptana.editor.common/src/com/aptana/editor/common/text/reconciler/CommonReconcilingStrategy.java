@@ -133,15 +133,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fPositions.clear();
 	}
 
-	protected boolean parseDocument(IProgressMonitor monitor)
-	{
-		FileService fileService = fEditor.getFileService();
-		// doing a full parse at the moment
-		fileService.parse(monitor);
-		// abort if parse failed
-		return fileService.hasValidParseResult();
-	}
-
 	/**
 	 * Update the folding positions in the document
 	 */
@@ -152,16 +143,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile)
 	{
-		parseDocument(fMonitor);
-		if (fEditor.isFoldingEnabled())
+		FileService fileService = fEditor.getFileService();
+		// doing a full parse at the moment
+		if (fileService.parse(fMonitor))
 		{
-			calculatePositions(initialReconcile, fMonitor);
+			// only do folding and validation when the source was changed
+			if (fEditor.isFoldingEnabled())
+			{
+				calculatePositions(initialReconcile, fMonitor);
+			}
+			else
+			{
+				fPositions.clear();
+				updatePositions();
+			}
+			fEditor.getFileService().validate();
 		}
-		else
-		{
-			fPositions.clear();
-			updatePositions();
-		}
-		fEditor.getFileService().validate();
 	}
 }

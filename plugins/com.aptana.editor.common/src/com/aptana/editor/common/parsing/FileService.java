@@ -100,61 +100,66 @@ public class FileService
 	/**
 	 * Parse.<br>
 	 * This call is just like calling {@link #parse(boolean)} with false.
+	 * 
 	 * @deprecated use FileService.parse(IProgressMonitor monitor)
 	 */
-	public void parse()
+	public boolean parse()
 	{
-		parse(null);
+		return parse(null);
 	}
+
 	/**
 	 * Parse.<br>
 	 * This call is just like calling {@link #parse(boolean)} with false.
+	 * 
 	 * @param monitor
 	 */
-	public void parse(IProgressMonitor monitor)
+	public boolean parse(IProgressMonitor monitor)
 	{
-		parse(false, monitor);
+		return parse(false, monitor);
 	}
 
 	/**
 	 * Parse, with an option to force a parsing even when the source did not change.
 	 * 
 	 * @param force
+	 * @return true if parsing occurred, false otherwise
 	 */
-	public synchronized void parse(boolean force, IProgressMonitor monitor)
+	public synchronized boolean parse(boolean force, IProgressMonitor monitor)
 	{
 		if (contentType != null && fDocument != null)
 		{
 			String source = fDocument.get();
 			int sourceHash = source.hashCode();
-
-			if (force || sourceHash != fLastSourceHash)
+			if (!force && sourceHash == fLastSourceHash)
 			{
-				// assume failure
-				this.fHasValidParseResult = false;
+				return false;
+			}
 
-				fLastSourceHash = sourceHash;
-				fParseState.setEditState(source, null, 0, 0);
-				fParseState.setProgressMonitor(monitor);
+			// assume failure
+			this.fHasValidParseResult = false;
 
-				try
+			fLastSourceHash = sourceHash;
+			fParseState.setEditState(source, null, 0, 0);
+			fParseState.setProgressMonitor(monitor);
+
+			try
+			{
+				ParserPoolFactory.parse(contentType, fParseState);
+
+				// indicate current parse result is now valid
+				this.fHasValidParseResult = true;
+
+				// fire listeners
+				for (IParseListener listener : listeners)
 				{
-					ParserPoolFactory.parse(contentType, fParseState);
-
-					// indicate current parse result is now valid
-					this.fHasValidParseResult = true;
-
-					// fire listeners
-					for (IParseListener listener : listeners)
-					{
-						listener.parseFinished();
-					}
+					listener.parseFinished();
 				}
-				catch (Exception e)
-				{
-					// not logging the parsing error here since the source could be in an intermediate state of being
-					// edited by the user
-				}
+			}
+			catch (Exception e)
+			{
+				// not logging the parsing error here since the source could be in an intermediate state of being
+				// edited by the user
 			}
 		}
 		else
@@ -162,6 +167,7 @@ public class FileService
 			// indicate failure
 			this.fHasValidParseResult = false;
 		}
+		return true;
 	}
 
 	public void validate()
