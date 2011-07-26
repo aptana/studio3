@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
@@ -41,6 +42,7 @@ import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 @SuppressWarnings("nls")
 public class CSSTokenScanner extends RuleBasedScanner
 {
+	private static Pattern CLASS_IS_NUMBER_PATTERN = Pattern.compile("\\.[0-9]+");
 	private boolean _inMediaRule;
 	private int _curlyBraceCount;
 
@@ -302,6 +304,26 @@ public class CSSTokenScanner extends RuleBasedScanner
 					if (isOutsideRule())
 					{
 						token = createToken(CSSTokenType.ID);
+					}
+					break;
+
+				case CLASS:
+					// potentially fixup a class inside of a ruleset to be a number
+					if (!isOutsideRule())
+					{
+						try
+						{
+							String text = fDocument.get(getTokenOffset(), getTokenLength());
+
+							if (CLASS_IS_NUMBER_PATTERN.matcher(text).matches())
+							{
+								token = createToken(CSSTokenType.NUMBER);
+							}
+						}
+						catch (BadLocationException e)
+						{
+							// ignore
+						}
 					}
 					break;
 			}

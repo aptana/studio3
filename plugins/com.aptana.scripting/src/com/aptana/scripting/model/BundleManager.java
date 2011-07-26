@@ -66,7 +66,7 @@ public class BundleManager
 	 * OS name fragment to use to match against Macs
 	 */
 	private static final String OS_NAME_MAC = "mac"; //$NON-NLS-1$
-	
+
 	/**
 	 * System property to forcibly turn off caching.
 	 */
@@ -74,7 +74,7 @@ public class BundleManager
 
 	private class BundleLoadJob extends Job
 	{
-		
+
 		private File bundleDirectory;
 
 		BundleLoadJob(File bundleDirectory)
@@ -100,34 +100,35 @@ public class BundleManager
 					if (useCache)
 					{
 						showBundleLoadInfo("attempting to read cache: " + bundleDirectory); //$NON-NLS-1$
-						
+
 						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
 						showBundleLoadInfo("cache succeeded"); //$NON-NLS-1$
-						
+
 						addBundle(be);
 					}
 					else
 					{
 						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
-						
+
 						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-						
+
 						// first script is always bundle.rb, so go ahead
 						// and process that
 						File bundleScript = bundleScripts.get(0);
 						sub.subTask(bundleScript.getAbsolutePath());
 						loadScript(bundleScript, true, bundleLoadPaths);
 						sub.worked(1);
-						
+
 						// some new scripts may have come in while we were
 						// processing bundle.rb, so recalculate the list of
 						// scripts to process
 						bundleScripts = getBundleScripts(bundleDirectory);
-						
-						if (bundleScripts.size() > 0) {
+
+						if (bundleScripts.size() > 0)
+						{
 							// we've already loaded bundle.rb, so remove it from
 							// the list. Note that at this point we have a
 							// bundle element for this bundle, so any file
@@ -136,7 +137,8 @@ public class BundleManager
 							bundleScripts.remove(0);
 
 							// process the rest of the scripts in the bundle
-							for (File script : bundleScripts) {
+							for (File script : bundleScripts)
+							{
 								sub.subTask(script.getAbsolutePath());
 								loadScript(script, true, bundleLoadPaths);
 								sub.worked(1);
@@ -145,8 +147,9 @@ public class BundleManager
 
 						if (useCache)
 						{
-							getCacher().cache(bundleDirectory, sub.newChild(1));
+							// getCacher().cache(bundleDirectory, sub.newChild(1));
 						}
+
 					}
 				}
 			}
@@ -1776,6 +1779,19 @@ public class BundleManager
 	 */
 	public void loadBundle(File bundleDirectory)
 	{
+		loadBundle(bundleDirectory, false);
+	}
+
+	/**
+	 * Load the bundle in the specified directory
+	 * 
+	 * @param bundleDirectory
+	 *            The directory containing a bundle and its children
+	 * @param wait
+	 *            Allows us to be synchronous when executing this
+	 */
+	public void loadBundle(File bundleDirectory, boolean wait)
+	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
 		if (EclipseUtil.isTesting() == false && Platform.isRunning())
@@ -1787,11 +1803,23 @@ public class BundleManager
 				counter = 0;
 			}
 
+			job.setPriority(Job.SHORT);
 			job.schedule();
 		}
 		else
 		{
 			job.run(new NullProgressMonitor());
+			if (wait)
+			{
+				try
+				{
+					job.join();
+				}
+				catch (InterruptedException e)
+				{
+					// ignore error
+				}
+			}
 		}
 	}
 
@@ -1968,8 +1996,8 @@ public class BundleManager
 			// get bundle load paths
 			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
 
-			// execute script
-			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
+			// execute script. Load order is important, so we force synchronous execution here
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, false);
 
 			// fire reload event
 			this.fireScriptReloadedEvent(script);
@@ -2109,10 +2137,10 @@ public class BundleManager
 	{
 		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_LOAD_INFO);
 	}
-	
+
 	/**
-	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads
-	 * all scripts associated with a bundle and the bundle.rb script as well
+	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads all
+	 * scripts associated with a bundle and the bundle.rb script as well
 	 * 
 	 * @param bundleDirectory
 	 *            The directory (and its descendants) to unload
@@ -2129,9 +2157,9 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-		
+
 		List<File> reverseOrder = new ArrayList<File>(scripts);
-		
+
 		Collections.sort(reverseOrder, new Comparator<File>()
 		{
 			public int compare(File o1, File o2)
@@ -2144,7 +2172,7 @@ public class BundleManager
 		for (File script : reverseOrder)
 		{
 			showBundleLoadInfo("Unload script: " + script.toString()); //$NON-NLS-1$
-			
+
 			this.unloadScript(script);
 		}
 	}

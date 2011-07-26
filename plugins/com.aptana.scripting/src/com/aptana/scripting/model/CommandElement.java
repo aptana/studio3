@@ -682,7 +682,7 @@ public class CommandElement extends AbstractBundleElement
 	/**
 	 * printBody
 	 */
-	protected void printBody(SourcePrinter printer)
+	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
 		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
 		// output path and scope
@@ -690,13 +690,13 @@ public class CommandElement extends AbstractBundleElement
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
 
 		// output invoke/expansion, if it is defined
-		if (this.getInvoke() != null)
+		if (includeBlocks && this.getInvoke() != null)
 		{
 			printer.printWithIndent("invoke: ").println(this.getInvoke()); //$NON-NLS-1$
 		}
 
 		// output invoke block, if it is defined
-		if (this.getInvokeBlock() != null)
+		if (includeBlocks && this.getInvokeBlock() != null)
 		{
 			// Spit out something repeatable, for now just block type
 			printer.printWithIndent("block: ").println(this.getInvokeBlock().getBlock().type.toString()); //$NON-NLS-1$

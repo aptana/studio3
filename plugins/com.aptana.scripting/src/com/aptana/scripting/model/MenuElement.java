@@ -272,7 +272,7 @@ public class MenuElement extends AbstractBundleElement
 	/**
 	 * printBody
 	 */
-	protected void printBody(SourcePrinter printer)
+	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 
@@ -289,7 +289,7 @@ public class MenuElement extends AbstractBundleElement
 			{
 				for (MenuElement menu : this._children)
 				{
-					menu.toSource(printer);
+					menu.toSource(printer, includeBlocks);
 				}
 			}
 		}

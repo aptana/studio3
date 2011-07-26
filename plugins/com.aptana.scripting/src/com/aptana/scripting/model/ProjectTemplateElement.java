@@ -108,7 +108,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.CommandElement#printBody(com.aptana.core.util.SourcePrinter)
 	 */
-	protected void printBody(SourcePrinter printer)
+	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$

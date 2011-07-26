@@ -789,7 +789,7 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public void printBody(SourcePrinter printer)
+	public void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
 		printer.printWithIndent("bundle_precedence: ").println(this._bundlePrecedence.toString()); //$NON-NLS-1$
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
@@ -801,31 +801,31 @@ public class BundleElement extends AbstractElement
 		// output commands and snippets
 		for (CommandElement command : this.getCommands())
 		{
-			command.toSource(printer);
+			command.toSource(printer, includeBlocks);
 		}
 
 		// output menus
 		for (MenuElement menu : this.getMenus())
 		{
-			menu.toSource(printer);
+			menu.toSource(printer, includeBlocks);
 		}
 
 		// output smart typing pairs
 		for (SmartTypingPairsElement pairs : this.getPairs())
 		{
-			pairs.toSource(printer);
+			pairs.toSource(printer, includeBlocks);
 		}
 
 		// output environment mods
 		for (EnvironmentElement env : this.getEnvs())
 		{
-			env.toSource(printer);
+			env.toSource(printer, includeBlocks);
 		}
 
 		// output environment mods
 		for (ProjectTemplateElement projTemplates : this.getProjectTemplates())
 		{
-			projTemplates.toSource(printer);
+			projTemplates.toSource(printer, includeBlocks);
 		}
 	}
 
