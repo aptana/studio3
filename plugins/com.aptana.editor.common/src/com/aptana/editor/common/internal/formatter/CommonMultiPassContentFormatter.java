@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.TypedPosition;
@@ -103,11 +104,18 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		// By doing so formatters for languages like ERB will do an extra step of collecting the code bits from the
 		// content before formatting it.
 		context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.TRUE);
-
+		// Since this is the slave formatter, there is a chance that the master changed the selection region, so we
+		// check for that and update the length accordingly.
+		IRegion selectionRegion = (IRegion) context.getProperty(FormattingContextProperties.CONTEXT_REGION);
 		try
 		{
+			int updatedMinLength = document.getLength();
+			if (selectionRegion != null)
+			{
+				updatedMinLength = Math.min(updatedMinLength, selectionRegion.getLength());
+			}
 			final ITypedRegion[] partitions = TextUtilities.computePartitioning(document, fPartitioning, offset,
-					Math.min(length, document.getLength()), false);
+					Math.min(length, updatedMinLength), false);
 
 			if (!fType.equals(partitions[0].getType()))
 				partitions[0] = TextUtilities.getPartition(document, fPartitioning, partitions[0].getOffset(), false);

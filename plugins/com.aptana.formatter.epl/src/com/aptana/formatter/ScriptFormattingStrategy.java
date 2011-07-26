@@ -55,7 +55,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		final String formatterId;
 		final boolean isSlave;
 		final boolean isSelection;
-		final IRegion selectedRegion;
+		IRegion selectedRegion;
 		final IFormattingContext context;
 		final boolean canConsumeIndentation;
 
@@ -196,6 +196,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 							if (edit.getLength() > 0)
 							{
 								job.context.setProperty(FormattingContextProperties.CONTEXT_REGION, updatedRegion);
+								job.selectedRegion = updatedRegion;
 							}
 						}
 					}
