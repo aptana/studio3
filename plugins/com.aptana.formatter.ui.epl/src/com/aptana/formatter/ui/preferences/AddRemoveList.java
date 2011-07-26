@@ -185,7 +185,7 @@ public class AddRemoveList implements Listener
 				for (int i = 0; i < length; i++)
 				{
 					char c = newText.charAt(i);
-					if (c != ',' && !Character.isLetterOrDigit(c) && !Character.isSpaceChar(c))
+					if (c != ',' && c != '_' && !Character.isLetterOrDigit(c) && !Character.isSpaceChar(c))
 					{
 						return Messages.AddRemoveList_inputMessageErrorInfo;
 					}
