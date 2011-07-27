@@ -13,10 +13,10 @@ import java.util.List;
 public class ScriptLogger
 {
 	private static ScriptLogger INSTANCE;
-	
+
 	private List<ScriptLogListener> _logListeners;
 	private LogLevel _logLevel;
-	
+
 	/**
 	 * logError
 	 * 
@@ -57,7 +57,7 @@ public class ScriptLogger
 	{
 		getInstance().firePrintEvent(message);
 	}
-	
+
 	/**
 	 * Remove this once either CommandExecutionUtils or Theming has been pulled out of editor.common
 	 * 
@@ -68,7 +68,7 @@ public class ScriptLogger
 	{
 		getInstance().firePrintErrorEvent(message);
 	}
-	
+
 	/**
 	 * trace
 	 * 
@@ -78,7 +78,7 @@ public class ScriptLogger
 	{
 		getInstance().fireTraceEvent(message);
 	}
-	
+
 	/**
 	 * getInstance
 	 * 
@@ -90,18 +90,18 @@ public class ScriptLogger
 		{
 			INSTANCE = new ScriptLogger();
 		}
-		
+
 		return INSTANCE;
 	}
-	
+
 	/**
 	 * ScriptLogger
 	 */
 	private ScriptLogger()
 	{
-		this._logLevel = LogLevel.ERROR;
+		this._logLevel = LogLevel.WARNING;
 	}
-	
+
 	/**
 	 * addLogListener
 	 * 
@@ -115,11 +115,11 @@ public class ScriptLogger
 			{
 				this._logListeners = new ArrayList<ScriptLogListener>();
 			}
-			
+
 			this._logListeners.add(listener);
 		}
 	}
-	
+
 	/**
 	 * fireLogErrorEvent
 	 * 
@@ -135,7 +135,7 @@ public class ScriptLogger
 			}
 		}
 	}
-	
+
 	/**
 	 * fireLogInfoEvent
 	 * 
@@ -151,7 +151,7 @@ public class ScriptLogger
 			}
 		}
 	}
-	
+
 	/**
 	 * fireLogWarningEvent
 	 * 
@@ -167,7 +167,7 @@ public class ScriptLogger
 			}
 		}
 	}
-	
+
 	/**
 	 * firePrintEvent
 	 * 
@@ -184,7 +184,7 @@ public class ScriptLogger
 			}
 		}
 	}
-	
+
 	/**
 	 * firePrintErrorEvent
 	 * 
@@ -201,7 +201,7 @@ public class ScriptLogger
 			}
 		}
 	}
-	
+
 	/**
 	 * fireTraceEvent
 	 * 
@@ -217,7 +217,7 @@ public class ScriptLogger
 			}
 		}
 	}
-	
+
 	/**
 	 * getLogLevel
 	 * 
@@ -227,7 +227,7 @@ public class ScriptLogger
 	{
 		return this._logLevel;
 	}
-	
+
 	/**
 	 * removeLogListener
 	 * 
@@ -240,7 +240,7 @@ public class ScriptLogger
 			this._logListeners.remove(listener);
 		}
 	}
-	
+
 	/**
 	 * setLogLevel
 	 * 
@@ -250,7 +250,7 @@ public class ScriptLogger
 	{
 		this._logLevel = level;
 	}
-	
+
 	/**
 	 * setLogLevel
 	 * 

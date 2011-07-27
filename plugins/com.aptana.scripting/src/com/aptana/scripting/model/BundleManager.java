@@ -862,7 +862,7 @@ public class BundleManager
 			{
 				public boolean accept(File pathname)
 				{
-					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false); //$NON-NLS-1$
+					return (pathname.isDirectory() && !pathname.getName().startsWith(".") && isValidBundleDirectory(pathname)); //$NON-NLS-1$
 				}
 			});
 		}
@@ -1843,19 +1843,30 @@ public class BundleManager
 		{
 			IPath location = project.getLocation();
 
-			if (location == null)
+			if (location != null)
 			{
-				// Log that it was null somehow to track down when this occurs?
-				continue;
-			}
+				File projectDirectory = location.toFile();
+				File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
 
-			File projectDirectory = location.toFile();
-			File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
+				for (File bundle : this.getBundleDirectories(bundlesDirectory))
+				{
+					String message = MessageFormat.format(
+						Messages.BundleManager_ProjectBundlesInBundlesDirectoryIsDeprecated,
+						bundle.getAbsolutePath()
+					);
+					ScriptLogger.logWarning(message);
+					IdeLog.logWarning(ScriptingActivator.getDefault(), message);
 
-			for (File bundle : this.getBundleDirectories(bundlesDirectory))
-			{
-				this.loadBundle(bundle);
+					this.loadBundle(bundle);
+				}
+
+				// Now load from project directly
+				if (isValidBundleDirectory(projectDirectory))
+				{
+					loadBundle(projectDirectory);
+				}
 			}
+			// Log that it was null somehow to track down when this occurs?
 		}
 	}
 
