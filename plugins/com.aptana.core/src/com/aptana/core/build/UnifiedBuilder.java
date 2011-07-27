@@ -163,6 +163,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			{
 				delta.accept(resourceCollector);
 				sub.worked(1);
+				// TODO Pre-filter by removing any files from "to be indexed" that don't have an indexer?
 
 				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
 				{
