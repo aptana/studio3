@@ -11,13 +11,10 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -919,12 +916,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private boolean addUnclosedTagProposals(LocationType fineLocation, List<ICompletionProposal> proposals,
 			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		HTMLParseState state = null;
 		boolean addedProposal = false;
 		// First see if there are any unclosed tags, suggest them first
-		Set<String> unclosedElements = getUnclosedTagNames(offset);
+		List<String> unclosedElements = HTMLTagUtil.getUnclosedTagNames(_document, offset);
 		if (unclosedElements != null && !unclosedElements.isEmpty())
 		{
+			int relevance = ICommonCompletionProposal.RELEVANCE_HIGH - 1;
 			for (String unclosedElement : unclosedElements)
 			{
 				ElementElement element = this._queryHelper.getElement(unclosedElement);
@@ -932,17 +929,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				if (state == null)
-				{
-					state = new HTMLParseState();
-					state.setEditState(_document.get(), null, 0, 0);
-				}
-				if (state.isEmptyTagType(element.getName()))
-				{
-					continue;
-				}
-				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
+				proposals.add(createCloseTagProposal(element, lexemeProvider, offset, relevance));
 				addedProposal = true;
+				relevance -= 1;
 			}
 		}
 		return addedProposal;
@@ -975,7 +964,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
+				proposals.add(createCloseTagProposal(element, lexemeProvider, offset,
+						ICommonCompletionProposal.RELEVANCE_HIGH));
 				addedProposal = true;
 			}
 		}
@@ -983,7 +973,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	private CommonCompletionProposal createCloseTagProposal(ElementElement element,
-			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset, int relevance)
 	{
 		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
@@ -1049,51 +1039,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		proposal.setFileLocation(HTMLIndexConstants.CORE);
 		proposal.setUserAgentImages(userAgentIcons);
+		proposal.setRelevance(relevance);
 		return proposal;
-	}
-
-	protected Set<String> getUnclosedTagNames(int offset)
-	{
-		Set<String> unclosedElements = new HashSet<String>();
-		try
-		{
-			ITypedRegion[] partitions = _document.computePartitioning(0, offset);
-			for (ITypedRegion partition : partitions)
-			{
-				if (partition.getType().equals(HTMLSourceConfiguration.HTML_TAG))
-				{
-					String src = _document.get(partition.getOffset(), partition.getLength());
-					int lessThanIndex = src.indexOf('<');
-
-					// if '<' index outside current string, skip this partition
-					if (lessThanIndex == -1 || lessThanIndex >= src.length() - 1)
-					{
-						continue;
-					}
-
-					// ignore tag containing offset, i.e. if cursor is at '|', <|a>, <a|> will not
-					// include <a> as unclosed tag, but <a>| will.
-					int greaterThanIndex = src.indexOf('>');
-					if (greaterThanIndex == -1)
-					{
-						continue;
-					}
-
-					// get name of element and see if we are closed elsewhere in the document
-					String tagName = TagUtil.getTagName(src);
-					tagName = tagName.toLowerCase();
-					if (!unclosedElements.contains(tagName) && !TagUtil.tagClosed(_document, tagName))
-					{
-						unclosedElements.add(tagName);
-					}
-				}
-			}
-		}
-		catch (BadLocationException e)
-		{
-			// ignore
-		}
-		return unclosedElements;
 	}
 
 	/**
@@ -1251,15 +1198,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 		}
 
-		// sort by display name
-		Collections.sort(result, new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
-			}
-		});
-
 		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
 
 		// select the current proposal based on the current lexeme
@@ -1283,6 +1221,41 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		// return results
 		return proposals;
+	}
+
+	/**
+	 * setSelectedProposal
+	 * 
+	 * @param prefix
+	 * @param proposals
+	 */
+	protected void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
+	{
+		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
+		{
+			return;
+		}
+
+		for (ICompletionProposal proposal : proposals)
+		{
+			String displayString = proposal.getDisplayString();
+			int comparison = displayString.compareToIgnoreCase(prefix);
+
+			if (comparison >= 0)
+			{
+				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
+				{
+					if (displayString.startsWith(prefix))
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
+					}
+					else
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+					}
+				}
+			}
+		}
 	}
 
 	/*
