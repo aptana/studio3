@@ -114,7 +114,8 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 							editorType, value);
 					countByFileType.put(editorType, ++value);
 				}
-				return page.openEditor(new UntitledFileStorageEditorInput(file.toURI(), editorName), editorId);
+				return page.openEditor(new UntitledFileStorageEditorInput(file.toURI(), editorName, initialContent),
+						editorId);
 			}
 		}
 		catch (Exception e)

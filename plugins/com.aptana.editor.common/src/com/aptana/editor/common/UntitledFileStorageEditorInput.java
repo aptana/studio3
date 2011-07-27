@@ -7,24 +7,33 @@
  */
 package com.aptana.editor.common;
 
+import java.io.InputStream;
 import java.net.URI;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
-import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IStorageEditorInput;
+import org.eclipse.ui.editors.text.ILocationProvider;
+import org.eclipse.ui.editors.text.ILocationProviderExtension;
 
 @SuppressWarnings("rawtypes")
-public class UntitledFileStorageEditorInput implements IURIEditorInput
+public class UntitledFileStorageEditorInput implements IStorageEditorInput, ILocationProvider,
+		ILocationProviderExtension
 {
 
 	private URI uri;
 	private String name;
+	private InputStream input;
 
-	public UntitledFileStorageEditorInput(URI uri, String name)
+	public UntitledFileStorageEditorInput(URI uri, String name, InputStream input)
 	{
 		this.uri = uri;
 		this.name = name;
+		this.input = input;
 	}
 
 	public boolean exists()
@@ -54,11 +63,52 @@ public class UntitledFileStorageEditorInput implements IURIEditorInput
 
 	public Object getAdapter(Class adapter)
 	{
-		return Platform.getAdapterManager().getAdapter(this, adapter);
+		if (adapter == ILocationProvider.class)
+		{
+			return this;
+		}
+		return null;
 	}
 
-	public URI getURI()
+	public IStorage getStorage() throws CoreException
+	{
+		return new IStorage()
+		{
+
+			public Object getAdapter(Class adapter)
+			{
+				return null;
+			}
+
+			public InputStream getContents() throws CoreException
+			{
+				return input;
+			}
+
+			public IPath getFullPath()
+			{
+				return null;
+			}
+
+			public String getName()
+			{
+				return UntitledFileStorageEditorInput.this.getName();
+			}
+
+			public boolean isReadOnly()
+			{
+				return false;
+			}
+		};
+	}
+
+	public URI getURI(Object element)
 	{
 		return uri;
+	}
+
+	public IPath getPath(Object element)
+	{
+		return URIUtil.toPath(uri);
 	}
 }
