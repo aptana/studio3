@@ -14,7 +14,7 @@ public interface IValidator
 {
 
 	/**
-	 * Parses the source for errors and warnings and add them to the validation manager.
+	 * Parses the source for errors and warnings and add them to items list.
 	 * 
 	 * @param source
 	 *            the source text
@@ -22,7 +22,8 @@ public interface IValidator
 	 *            the source path
 	 * @param manager
 	 *            the validation manager
-	 * @return a list of validation items
+	 * @param items
+	 *            the list of validations
 	 */
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager);
 }

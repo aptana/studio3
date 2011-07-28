@@ -30,6 +30,7 @@ import com.aptana.core.util.StreamUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 
@@ -51,6 +52,7 @@ public class JSLintValidator implements IValidator
 		try
 		{
 			context.setErrorReporter(reporter);
+			manager.addParseErrors(items);
 			parseWithLint(context, source, path, manager, items);
 		}
 		finally
@@ -97,6 +99,7 @@ public class JSLintValidator implements IValidator
 				NativeObject object;
 				for (int i = 0; i < ids.length; ++i)
 				{
+
 					object = (NativeObject) errorArray.get(Integer.parseInt(ids[i].toString()), scope);
 					if (object != null)
 					{
@@ -104,15 +107,21 @@ public class JSLintValidator implements IValidator
 						String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
 						int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
 
+						// Don't attempt to add errors or warnings if there are already errors on this line
+						if (ValidationManager.hasErrorOnLine(items, line))
+						{
+							continue;
+						}
+
 						if (!manager.isIgnored(reason, IJSConstants.CONTENT_TYPE_JS))
 						{
 							if (i == ids.length - 2 && lastIsError)
 							{
-								items.add(manager.addError(reason, line, character, 0, path));
+								items.add(manager.createError(reason, line, character, 0, path));
 							}
 							else
 							{
-								items.add(manager.addWarning(reason, line, character, 0, path));
+								items.add(manager.createWarning(reason, line, character, 0, path));
 							}
 						}
 					}

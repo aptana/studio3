@@ -7,12 +7,15 @@
  */
 package com.aptana.parsing;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -25,6 +28,8 @@ public class ParseState implements IParseState
 	private char[] fInsertedText;
 	private int fStartingOffset;
 	private int fRemovedLength;
+	private List<IParseError> fErrors;
+
 
 	private IRange[] fSkippedRanges;
 	private Map<String, Object> fProperties;
@@ -38,6 +43,8 @@ public class ParseState implements IParseState
 		fSource = NO_CHARS;
 		fInsertedText = NO_CHARS;
 		fProperties = new HashMap<String, Object>();
+		fErrors = new ArrayList<IParseError>();
+
 	}
 
 	public void clearEditState()
@@ -146,4 +153,20 @@ public class ParseState implements IParseState
 	{
 		fProperties.put(key, value);
 	}
+
+	public List<IParseError> getErrors()
+	{
+		return new ArrayList<IParseError>(fErrors);
+	}
+
+	public void addError(IParseError error)
+	{
+		fErrors.add(error);
+	}
+
+	public void clearErrors()
+	{
+		fErrors.clear();
+	}
+
 }
