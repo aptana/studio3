@@ -16,6 +16,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -77,6 +78,11 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	private StyledString styledActivationString;
 
 	private Styler styler;
+
+	/**
+	 * Cached value for replacement offset.
+	 */
+	private Integer fReplaceOffset;
 
 	public SnippetTemplateProposal(Template template, TemplateContext context, IRegion region, Image image,
 			int relevance)
@@ -303,37 +309,70 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 			openErrorDialog(viewer.getTextWidget().getShell(), e);
 			fSelectedRegion = fRegion;
 		}
-
 	}
 
-	private int getReplaceOffset(IDocument document, Template template)
+	/*
+	 * @see
+	 * org.eclipse.jface.text.contentassist.ICompletionProposalExtension2#validate(org.eclipse.jface.text.IDocument,
+	 * int, org.eclipse.jface.text.DocumentEvent)
+	 */
+	public boolean validate(IDocument document, int offset, DocumentEvent event)
 	{
-		if (template instanceof CommandTemplate)
+		try
 		{
-			try
+			int replaceOffset = getReplaceOffset(document, fTemplate);
+			if (offset >= replaceOffset)
 			{
-				CommandTemplate ct = (CommandTemplate) template;
-				// Need to get correct offset based on prefix chopping!
-				int fullPrefixOffset = getReplaceOffset();
-				String prefix = document.get(fullPrefixOffset, getReplaceEndOffset() - fullPrefixOffset);
-				final String origPrefix = prefix;
-				while (!ct.matches(prefix))
-				{
-					prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
-				}
-				if (prefix.length() == 0)
-				{
-					return fullPrefixOffset;
-				}
-				return fullPrefixOffset + (origPrefix.length() - prefix.length());
-			}
-			catch (BadLocationException e)
-			{
-				// ignore
+				String content = document.get(replaceOffset, offset - replaceOffset);
+				return fTemplate.getName().toLowerCase().startsWith(content.toLowerCase());
 			}
 		}
+		catch (BadLocationException e)
+		{
+			// concurrent modification - ignore
+		}
+		return false;
+	}
 
-		return getReplaceOffset();
+	private synchronized int getReplaceOffset(IDocument document, Template template)
+	{
+		// Cache this value, so we don't need to compute it multiple times...
+		if (fReplaceOffset == null)
+		{
+			if (template instanceof CommandTemplate)
+			{
+				try
+				{
+					CommandTemplate ct = (CommandTemplate) template;
+					// Need to get correct offset based on prefix chopping!
+					int fullPrefixOffset = getReplaceOffset();
+					String prefix = document.get(fullPrefixOffset, getReplaceEndOffset() - fullPrefixOffset);
+					final String origPrefix = prefix;
+					while (!ct.matches(prefix))
+					{
+						prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+					}
+					if (prefix.length() == 0)
+					{
+						fReplaceOffset = fullPrefixOffset;
+					}
+					else
+					{
+						fReplaceOffset = fullPrefixOffset + (origPrefix.length() - prefix.length());
+					}
+				}
+				catch (BadLocationException e)
+				{
+					// ignore
+					fReplaceOffset = getReplaceOffset();
+				}
+			}
+			else
+			{
+				fReplaceOffset = getReplaceOffset();
+			}
+		}
+		return fReplaceOffset;
 	}
 
 	/**
