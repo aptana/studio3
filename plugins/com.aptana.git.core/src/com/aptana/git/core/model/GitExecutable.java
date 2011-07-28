@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
@@ -58,8 +59,8 @@ public class GitExecutable
 			fgExecutable = GitExecutable.find();
 			if (!fgAddedPrefListener)
 			{
-				EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId()).addPreferenceChangeListener(
-						new IEclipsePreferences.IPreferenceChangeListener()
+				EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId())
+						.addPreferenceChangeListener(new IEclipsePreferences.IPreferenceChangeListener()
 						{
 
 							public void preferenceChange(PreferenceChangeEvent event)
@@ -82,8 +83,8 @@ public class GitExecutable
 
 	private static IPath getPreferenceGitPath()
 	{
-		String pref = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH,
-				null);
+		String pref = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID)
+				.get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
 		if (!StringUtil.isEmpty(pref))
 		{
 			IPath path = Path.fromOSString(pref);
@@ -290,8 +291,8 @@ public class GitExecutable
 	}
 
 	/**
-	 * Sets up the environment map in a way that our special GIT_SSH/GIT_ASKPASS env variables are set so that the SSH passphrase/HTTPS prompt
-	 * stuff is hooked up. Use this for clones/pushes/pulls.
+	 * Sets up the environment map in a way that our special GIT_SSH/GIT_ASKPASS env variables are set so that the SSH
+	 * passphrase/HTTPS prompt stuff is hooked up. Use this for clones/pushes/pulls.
 	 * 
 	 * @return
 	 */
@@ -341,5 +342,20 @@ public class GitExecutable
 			filtered.put(entry.getKey(), value);
 		}
 		return filtered;
+	}
+
+	/**
+	 * Returns the version of git pointed at.
+	 * 
+	 * @return
+	 */
+	public Version version()
+	{
+		String versionString = GitExecutable.versionForPath(gitPath);
+		if (versionString == null)
+		{
+			return Version.emptyVersion;
+		}
+		return Version.parseVersion(versionString);
 	}
 }
