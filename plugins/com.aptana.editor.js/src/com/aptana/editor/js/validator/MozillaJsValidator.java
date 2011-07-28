@@ -20,6 +20,7 @@ import org.mozilla.javascript.Parser;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.js.IJSConstants;
 
 public class MozillaJsValidator implements IValidator
@@ -28,6 +29,7 @@ public class MozillaJsValidator implements IValidator
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
+		manager.addParseErrors(items);
 		Context cx = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
 		try
@@ -60,14 +62,20 @@ public class MozillaJsValidator implements IValidator
 			message = error.getMessage();
 			if (!manager.isIgnored(message, IJSConstants.CONTENT_TYPE_JS))
 			{
+				// Don't attempt to add errors or warnings if there are already errors on this line
+				if (ValidationManager.hasErrorOnLine(items, error.getLine()))
+				{
+					continue;
+				}
+
 				severity = error.getSeverity();
 				if (severity == IMarker.SEVERITY_ERROR)
 				{
-					items.add(manager.addError(message, error.getLine(), error.getLineOffset(), 0, path));
+					items.add(manager.createError(message, error.getLine(), error.getLineOffset(), 0, path));
 				}
 				else if (severity == IMarker.SEVERITY_WARNING)
 				{
-					items.add(manager.addWarning(message, error.getLine(), error.getLineOffset(), 0, path));
+					items.add(manager.createWarning(message, error.getLine(), error.getLineOffset(), 0, path));
 				}
 			}
 		}

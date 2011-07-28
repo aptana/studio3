@@ -27,6 +27,7 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 	
+	public static String ParseError_syntax_error_unexpected_token;
 	public static String ParseNode_Bad_Ending_Offset;
 	public static String ParseNodeAttribute_Undefined_Parent;
 	public static String ParseNodeAttribute_Undefined_Name;

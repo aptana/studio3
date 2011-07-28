@@ -17,12 +17,14 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.formatter.preferences.IFieldValidator;
@@ -34,7 +36,6 @@ import com.aptana.formatter.ui.util.Util;
 
 public class FormatterControlManager implements IFormatterControlManager, IStatusChangeListener
 {
-
 	private final IPreferenceDelegate delegate;
 	private final ControlBindingManager bindingManager;
 	private final IStatusChangeListener listener;
@@ -75,7 +76,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	 */
 	public Combo createCombo(Composite parent, Object key, String label, String[] items)
 	{
-		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		final Label labelControl = SWTFactory.createLabel(parent, label);
 		Combo combo = SWTFactory.createCombo(parent, SWT.READ_ONLY | SWT.BORDER, 1, items);
 		bindingManager.bindControl(combo, key);
 		registerAssociatedLabel(combo, labelControl);
@@ -89,7 +90,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	 */
 	public Combo createCombo(Composite parent, Object key, String label, String[] itemValues, String[] itemLabels)
 	{
-		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		final Label labelControl = SWTFactory.createLabel(parent, label);
 		Combo combo = SWTFactory.createCombo(parent, SWT.READ_ONLY | SWT.BORDER, 1, itemLabels);
 		bindingManager.bindControl(combo, key, itemValues);
 		registerAssociatedLabel(combo, labelControl);
@@ -103,11 +104,43 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	 */
 	public Text createNumber(Composite parent, Object key, String label)
 	{
-		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		final Label labelControl = SWTFactory.createLabel(parent, label);
 		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
 		bindingManager.bindControl(text, key, FieldValidators.POSITIVE_NUMBER_VALIDATOR);
 		registerAssociatedLabel(text, labelControl);
 		return text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createSpinner(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, int, int, int)
+	 */
+	public Spinner createSpinner(Composite parent, Object key, int min, int max, int style)
+	{
+		Spinner spinner = SWTFactory.createSpinner(parent, min, max, 1, style);
+		bindingManager.bindControl(spinner, key);
+		return spinner;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createSpinner(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object, int)
+	 */
+	public Spinner createSpinner(Composite parent, Object key, int style)
+	{
+		return createSpinner(parent, key, DEFAULT_SPINNER_MIN, DEFAULT_SPINNER_MAX, style);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createSpinner(org.eclipse.swt.widgets.Composite,
+	 * java.lang.Object)
+	 */
+	public Spinner createSpinner(Composite parent, Object key)
+	{
+		return createSpinner(parent, key, DEFAULT_SPINNER_MIN, DEFAULT_SPINNER_MAX, SWT.NONE);
 	}
 
 	/*
@@ -117,7 +150,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 	 */
 	public Text createText(Composite parent, Object key, String label)
 	{
-		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		final Label labelControl = SWTFactory.createLabel(parent, label);
 		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
 		bindingManager.bindControl(text, key, FieldValidators.EMPTY_TEXT_VALIDATOR);
 		registerAssociatedLabel(text, labelControl);
@@ -126,7 +159,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	public Text createText(Composite parent, Object key, String label, IFieldValidator validator)
 	{
-		final Label labelControl = SWTFactory.createLabel(parent, label, 1);
+		final Label labelControl = SWTFactory.createLabel(parent, label);
 		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
 		bindingManager.bindControl(text, key, validator);
 		registerAssociatedLabel(text, labelControl);
@@ -143,6 +176,31 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 		AddRemoveList list = new AddRemoveList(group);
 		bindingManager.bindControl(list.getList(), key);
 		return list.getControl();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createLabel(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String, int, int)
+	 */
+	public Label createLabel(Composite parent, String text, int hspan, int style)
+	{
+		Label label = new Label(parent, style);
+		label.setText(text);
+		GridData gridData = new GridData();
+		gridData.horizontalSpan = hspan;
+		label.setLayoutData(gridData);
+		return label;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createLabel(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String)
+	 */
+	public Label createLabel(Composite parent, String text)
+	{
+		return createLabel(parent, text, 1, SWT.NONE);
 	}
 
 	private final Map<Control, Label> labelAssociations = new HashMap<Control, Label>();

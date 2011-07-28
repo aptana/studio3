@@ -8,6 +8,7 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
+ org.eclipse.ui.forms,
  com.aptana.formatter.epl,
  com.aptana.formatter.ui.epl,
  com.aptana.parsing,

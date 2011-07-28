@@ -85,67 +85,53 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 
 		// constructs the menus
 		Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
-		Set<String> bundles = templatesByBundle.keySet();
 		List<TemplateElement> templates;
-		// first level shows the bundles which have file templates defined
-		for (String bundle : bundles)
-		{
-			MenuItem bundleItem = new MenuItem(menu, SWT.CASCADE);
-			bundleItem.setText(bundle);
 
-			Menu bundleMenu = new Menu(menu);
-			bundleItem.setMenu(bundleMenu);
-
-			// second level shows the templates for each bundle
-			templates = templatesByBundle.get(bundle);
-			for (final TemplateElement template : templates)
-			{
-				MenuItem templateItem = new MenuItem(bundleMenu, SWT.PUSH);
-				templateItem.setText(template.getDisplayName());
-				templateItem.addSelectionListener(new SelectionAdapter()
-				{
-
-					@Override
-					public void widgetSelected(SelectionEvent e)
-					{
-						createNewFileFromTemplate(template);
-					}
-				});
-			}
-			if (editors.contains(bundle))
-			{
-				// adds a "Blank File" item
-				String fileExtension;
-				if (templates.size() > 0)
-				{
-					fileExtension = templates.get(0).getFiletype();
-					// strips the leading *. if there is one
-					int dotIndex = fileExtension.lastIndexOf("."); //$NON-NLS-1$
-					if (dotIndex > -1)
-					{
-						fileExtension = fileExtension.substring(dotIndex + 1);
-					}
-				}
-				else
-				{
-					fileExtension = aptanaEditors.get(bundle);
-				}
-
-				createBlankFileMenu(bundleMenu, bundle, fileExtension);
-				editors.remove(bundle);
-			}
-		}
-
-		// add a "Blank File" item for the rest of editors we support but do not have any file templates defined
-		for (String name : editors)
+		for (String filetype : editors)
 		{
 			MenuItem editorItem = new MenuItem(menu, SWT.CASCADE);
-			editorItem.setText(name);
+			editorItem.setText(filetype);
 
 			Menu editorMenu = new Menu(menu);
 			editorItem.setMenu(editorMenu);
 
-			createBlankFileMenu(editorMenu, name, aptanaEditors.get(name));
+			templates = templatesByBundle.get(filetype);
+			if (templates != null)
+			{
+				for (final TemplateElement template : templates)
+				{
+					MenuItem templateItem = new MenuItem(editorMenu, SWT.PUSH);
+					templateItem.setText(template.getDisplayName());
+					templateItem.addSelectionListener(new SelectionAdapter()
+					{
+
+						@Override
+						public void widgetSelected(SelectionEvent e)
+						{
+							createNewFileFromTemplate(template);
+						}
+					});
+				}
+			}
+
+			// adds a "Blank File" item
+			String fileExtension;
+			if (templates != null && templates.size() > 0)
+			{
+				fileExtension = templates.get(0).getFiletype();
+				// strips the leading *. if there is one
+				int dotIndex = fileExtension.lastIndexOf("."); //$NON-NLS-1$
+				if (dotIndex > -1)
+				{
+					fileExtension = fileExtension.substring(dotIndex + 1);
+				}
+			}
+			else
+			{
+				fileExtension = aptanaEditors.get(filetype);
+			}
+
+			createBlankFileMenu(editorMenu, filetype, fileExtension);
 		}
 	}
 

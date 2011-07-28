@@ -19,6 +19,7 @@ public class Messages extends NLS
 	public static String IEditorPropertyConstants_offset_start;
 	public static String IEditorPropertyConstants_scope;
 	public static String IEditorPropertyConstants_text;
+	public static String IEditorPropertyConstants_theme_rule;
 	static
 	{
 		// initialize resource bundle

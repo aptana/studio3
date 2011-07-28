@@ -9,12 +9,12 @@ package com.aptana.editor.js.formatter.preferences;
 
 import java.net.URL;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
@@ -48,83 +48,74 @@ public class JSFormatterWhiteSpacesPage extends FormatterModifyTabPage
 	 */
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
+		Group wrappingGroup = SWTFactory.createGroup(parent, Messages.JSFormatterWhiteSpacesPage_spacingSettings, 1, 1,
+				GridData.FILL_HORIZONTAL);
+
 		// Punctuation Group
-		Group punctuationGroup = SWTFactory.createGroup(parent,
-				Messages.JSFormatterWhiteSpacesPage_puctuationElementsGroupTitle, 5, 1, GridData.FILL_HORIZONTAL);
-		// Comma
-		Label label = new Label(punctuationGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_commas);
-		manager.createNumber(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_COMMAS,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(punctuationGroup, JSFormatterConstants.SPACES_AFTER_COMMAS,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		ExpandableComposite expandibleComposite = SWTFactory.createExpandibleComposite(wrappingGroup,
+				Messages.JSFormatterWhiteSpacesPage_puctuationElementsGroupTitle, 3);
+		Composite punctuationGroup = SWTFactory
+				.createComposite(expandibleComposite, 3, 20, 1, GridData.FILL_HORIZONTAL);
+		expandibleComposite.setClient(punctuationGroup);
+
+		SWTFactory.createCenteredLabel(punctuationGroup, StringUtil.EMPTY);
+		SWTFactory.createCenteredLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_before);
+		SWTFactory.createCenteredLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_after);
+
+		// Commas
+		SWTFactory.createLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_commas);
+		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_COMMAS);
+		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_AFTER_COMMAS);
 
 		// Parentheses
-		label = new Label(punctuationGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_parentheses);
-		manager.createNumber(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_PARENTHESES,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(punctuationGroup, JSFormatterConstants.SPACES_AFTER_PARENTHESES,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_parentheses);
+		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_PARENTHESES);
+		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_AFTER_PARENTHESES);
 
 		// Semicolon in 'for' statements
-		label = new Label(punctuationGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_semicolonsInFor);
-		manager.createNumber(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_FOR_SEMICOLON,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(punctuationGroup, JSFormatterConstants.SPACES_AFTER_FOR_SEMICOLON,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(punctuationGroup, Messages.JSFormatterWhiteSpacesPage_semicolonsInFor);
+		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_BEFORE_FOR_SEMICOLON);
+		manager.createSpinner(punctuationGroup, JSFormatterConstants.SPACES_AFTER_FOR_SEMICOLON);
 
 		// Operators Group
-		Group operatorsGroup = SWTFactory.createGroup(parent, Messages.JSFormatterWhiteSpacesPage_operatorsGroupTitle,
-				5, 1, GridData.FILL_HORIZONTAL);
+		expandibleComposite = SWTFactory.createExpandibleComposite(wrappingGroup,
+				Messages.JSFormatterWhiteSpacesPage_operatorsGroupTitle, 3);
+		Composite operatorsGroup = SWTFactory.createComposite(expandibleComposite, 3, 20, 1, GridData.FILL_HORIZONTAL);
+		expandibleComposite.setClient(operatorsGroup);
+
+		SWTFactory.createCenteredLabel(operatorsGroup, StringUtil.EMPTY);
+		SWTFactory.createCenteredLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_before);
+		SWTFactory.createCenteredLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_after);
+
 		// Arithmetic
-		label = new Label(operatorsGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_arithmeticOperators);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_ARITHMETIC_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_arithmeticOperators);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_ARITHMETIC_OPERATOR);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_AFTER_ARITHMETIC_OPERATOR);
 
 		// Relational
-		label = new Label(operatorsGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_relationalOperators);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_RELATIONAL_OPERATORS,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_AFTER_RELATIONAL_OPERATORS,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_relationalOperators);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_RELATIONAL_OPERATORS);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_AFTER_RELATIONAL_OPERATORS);
 
 		// Unary
-		label = new Label(operatorsGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_unaryOperators);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_UNARY_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_AFTER_UNARY_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_unaryOperators);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_UNARY_OPERATOR);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_AFTER_UNARY_OPERATOR);
 
 		// Assignment
-		label = new Label(operatorsGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_assignments);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_ASSIGNMENT_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_assignments);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_ASSIGNMENT_OPERATOR);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_AFTER_ASSIGNMENT_OPERATOR);
 
 		// Conditional
-		label = new Label(operatorsGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_conditionalOperators);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_CONDITIONAL_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_AFTER_CONDITIONAL_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_conditionalOperators);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_CONDITIONAL_OPERATOR);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_AFTER_CONDITIONAL_OPERATOR);
 
 		// Key-Value
-		label = new Label(operatorsGroup, SWT.NONE);
-		label.setText(Messages.JSFormatterWhiteSpacesPage_keyValueOperator);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_KEY_VALUE_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_before);
-		manager.createNumber(operatorsGroup, JSFormatterConstants.SPACES_AFTER_KEY_VALUE_OPERATOR,
-				Messages.JSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(operatorsGroup, Messages.JSFormatterWhiteSpacesPage_keyValueOperator);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_BEFORE_KEY_VALUE_OPERATOR);
+		manager.createSpinner(operatorsGroup, JSFormatterConstants.SPACES_AFTER_KEY_VALUE_OPERATOR);
 	}
 
 	/*

@@ -2,6 +2,7 @@ package com.aptana.editor.css.parsing;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -48,8 +49,10 @@ public class CSSParser extends Parser implements IParser {
 		"EgmrDm6RZPToXuT0VSINTZBiBIQ6kGG7i2PHpVnL6secobfUg3NOIbU#9OtKEvZEuclEpmB" +
 		"0s$GJU3Z21q2K1y5T4w05qT47CKX2crGW==");
 
-	// suppress the error printouts
-	private static class CSSEvents extends Events
+	private IParseState fParseState;
+
+	// Collect the errors into a list of IParseErrors
+	private class CSSEvents extends Events
 	{
 		public void scannerError(Scanner.Exception e)
 		{
@@ -57,6 +60,11 @@ public class CSSParser extends Parser implements IParser {
 
 		public void syntaxError(Symbol token)
 		{
+			if (token == null || fParseState == null)
+			{
+				return;
+			}
+			fParseState.addError(new ParseError(token));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -78,11 +86,14 @@ public class CSSParser extends Parser implements IParser {
 
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fParseState = parseState;
 		// grab source
-		char[] characters = parseState.getSource();
+		char[] characters = fParseState.getSource();
 
 		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		String source = (characters != null) ? new String(characters) : ""; //$NON-NLS-1$
+
+		fParseState.clearErrors();
 
 		// create scanner and send source to it
 		CSSScanner scanner = new CSSScanner();
@@ -90,12 +101,12 @@ public class CSSParser extends Parser implements IParser {
 
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
-		int start = parseState.getStartingOffset();
-		int end = start + parseState.getSource().length - 1;
+		int start = fParseState.getStartingOffset();
+		int end = start + fParseState.getSource().length - 1;
 		result.setLocation(start, end);
 
 		// store results in the parse state
-		parseState.setParseResult(result);
+		fParseState.setParseResult(result);
 
 		// attach comments to parse root node
 		IRange[] comments = scanner.getComments();
@@ -105,15 +116,13 @@ public class CSSParser extends Parser implements IParser {
 		{
 			IRange comment = comments[i];
 			CSSCommentNode commentNode = new CSSCommentNode( //
-				this.getSource(parseState, comment),
-				comment.getStartingOffset(),
-				comment.getEndingOffset()
-			);
+					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
 
 			commentNodes[i] = commentNode;
 		}
 
 		result.setCommentNodes(commentNodes);
+		fParseState = null;
 
 		return result;
 	}
