@@ -7,13 +7,60 @@
  */
 package com.aptana.editor.html;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import junit.framework.TestCase;
 
+import org.eclipse.jface.text.IDocument;
+
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.parsing.lexer.Lexeme;
 
 public class HTMLTagUtilTest extends TestCase
 {
+	private static final Pattern CURSOR = Pattern.compile("\\|");
+
+	/**
+	 * createDocument
+	 * 
+	 * @param partitionType
+	 * @param source
+	 * @return
+	 */
+	protected IDocument createDocument(String source, boolean stripCursor)
+	{
+		return HTMLTestUtil.createDocument(source, stripCursor);
+	}
+
+	protected String findOffsets(String source, ArrayList<Integer> cursorOffsets)
+	{
+		// find offsets
+		int offset = source.indexOf('|');
+
+		while (offset != -1)
+		{
+			// NOTE: we have to account for the deletion of previous offsets
+			cursorOffsets.add(offset - cursorOffsets.size());
+			offset = source.indexOf('|', offset + 1);
+		}
+
+		if (cursorOffsets.isEmpty())
+		{
+			// use last position if we didn't find any cursors
+			cursorOffsets.add(source.length());
+		}
+		else
+		{
+			// clean source
+			source = CURSOR.matcher(source).replaceAll(StringUtil.EMPTY);
+		}
+
+		return source;
+	}
+
 	public void testIsTag()
 	{
 		assertTrue(HTMLTagUtil.isTag(new Lexeme<HTMLTokenType>(HTMLTokenType.BLOCK_TAG, 0, 2, "<a>")));
@@ -21,4 +68,79 @@ public class HTMLTagUtilTest extends TestCase
 		assertTrue(HTMLTagUtil.isTag(new Lexeme<HTMLTokenType>(HTMLTokenType.STRUCTURE_TAG, 0, 2, "<a>")));
 		assertFalse(HTMLTagUtil.isTag(new Lexeme<HTMLTokenType>(HTMLTokenType.ATTRIBUTE, 0, 2, "<a>")));
 	}
+
+	public void testCloseTags1()
+	{
+		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
+
+		// Should be no unclosed tags at this point
+		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 0).size());
+	}
+
+	public void testCloseTags2()
+	{
+		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
+		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 1).size());
+	}
+
+	public void testCloseTags3()
+	{
+		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
+		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 2).size());
+	}
+
+	public void testCloseTags4()
+	{
+		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
+		assertEquals(1, HTMLTagUtil.getUnclosedTagNames(document, 3).size());
+	}
+
+	public void testCloseTags5()
+	{
+		IDocument document = createDocument("<a>Test <b>Item</b>", false); //$NON-NLS-1$
+		// show unclosed tag once we get past the '>'
+		assertEquals(1, HTMLTagUtil.getUnclosedTagNames(document, 4).size());
+	}
+
+	public void testCloseTags6()
+	{
+		IDocument document = createDocument("<a>Test</a> <b>Item</b>", false); //$NON-NLS-1$
+		// show unclosed tag once we get past the '>', but not here, since tag is already closed later
+		assertEquals(0, HTMLTagUtil.getUnclosedTagNames(document, 4).size());
+	}
+
+	public void testCloseTags7()
+	{
+		String doc = "<html><head></head><body><h1>New Web Project Page</h1><div><span><| </body></html>";
+		ArrayList<Integer> offsets = new ArrayList<Integer>();
+		doc = findOffsets(doc, offsets);
+		IDocument document = createDocument(doc, false);
+		List<String> unclosed = HTMLTagUtil.getUnclosedTagNames(document, offsets.get(0));
+		assertEquals(2, unclosed.size());
+		// order is important
+		assertEquals("span,div", StringUtil.join(",", unclosed));
+	}
+
+	public void testCloseTags8()
+	{
+		String doc = "<html><head></head><body><h1>New Web Project Page</h1><div><a><| </a></body></html>";
+		ArrayList<Integer> offsets = new ArrayList<Integer>();
+		doc = findOffsets(doc, offsets);
+		IDocument document = createDocument(doc, false);
+		List<String> unclosed = HTMLTagUtil.getUnclosedTagNames(document, offsets.get(0));
+		assertEquals(0, unclosed.size());
+		// should present nothing
+	}
+
+	public void testCloseTags9()
+	{
+		String doc = "<html><head></head><body><h1>New Web Project Page</h1><div><span><br></span><| </body></html>";
+		ArrayList<Integer> offsets = new ArrayList<Integer>();
+		doc = findOffsets(doc, offsets);
+		IDocument document = createDocument(doc, false);
+		List<String> unclosed = HTMLTagUtil.getUnclosedTagNames(document, offsets.get(0));
+		assertEquals(1, unclosed.size());
+		// should present /div
+	}
+
 }

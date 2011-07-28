@@ -8,6 +8,7 @@
 %import "com.aptana.editor.css.parsing.ast.*";
 %import "com.aptana.parsing.IParseState";
 %import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.ast.IParseRootNode";
 %import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.lexer.IRange";
@@ -35,8 +36,10 @@
 %implements "IParser";
 
 %embed {:
-	// suppress the error printouts
-	private static class CSSEvents extends Events
+	private IParseState fParseState;
+
+	// Collect the errors into a list of IParseErrors
+	private class CSSEvents extends Events
 	{
 		public void scannerError(Scanner.Exception e)
 		{
@@ -44,6 +47,11 @@
 
 		public void syntaxError(Symbol token)
 		{
+			if (token == null)
+			{
+				return;
+			}
+			fParseState.addError(new ParseError(token));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -65,11 +73,14 @@
 
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fParseState = parseState;
 		// grab source
-		char[] characters = parseState.getSource();
+		char[] characters = fParseState.getSource();
 
 		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		String source = (characters != null) ? new String(characters) : ""; //$NON-NLS-1$
+
+		fParseState.clearErrors();
 
 		// create scanner and send source to it
 		CSSScanner scanner = new CSSScanner();
@@ -77,12 +88,12 @@
 
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
-		int start = parseState.getStartingOffset();
-		int end = start + parseState.getSource().length - 1;
+		int start = fParseState.getStartingOffset();
+		int end = start + fParseState.getSource().length - 1;
 		result.setLocation(start, end);
 
 		// store results in the parse state
-		parseState.setParseResult(result);
+		fParseState.setParseResult(result);
 
 		// attach comments to parse root node
 		IRange[] comments = scanner.getComments();
@@ -92,15 +103,13 @@
 		{
 			IRange comment = comments[i];
 			CSSCommentNode commentNode = new CSSCommentNode( //
-				this.getSource(parseState, comment),
-				comment.getStartingOffset(),
-				comment.getEndingOffset()
-			);
+					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
 
 			commentNodes[i] = commentNode;
 		}
 
 		result.setCommentNodes(commentNodes);
+		fParseState = null;
 
 		return result;
 	}

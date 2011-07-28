@@ -10,6 +10,7 @@ package com.aptana.editor.common.scripting.snippets;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
@@ -56,6 +57,47 @@ public class SnippetTemplateProposalTest extends TestCase
 
 		// Now make sure the snippet got applied correctly
 		assertEquals("<div>Yahoo!\n", document.get());
+		context.assertIsSatisfied();
+	}
+
+	public void testAPSTUD2445()
+	{
+		Mockery context = new Mockery()
+		{
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+		// Create the snippet we want to apply
+		SnippetElement se = new SnippetElement("/some/fake/path.rb");
+		se.setDisplayName(".add");
+		se.setExpansion(".add('selector')");
+		SnippetTemplate template = new SnippetTemplate(se, ".add", "source.js");
+
+		// Set up the document we're operating on
+		final IDocument document = new Document("$(selector).add");
+		final ITextViewer viewer = context.mock(ITextViewer.class);
+
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(viewer).getDocument();
+				will(returnValue(document));
+			}
+		});
+
+		// Create snippet proposal, then apply it to the document
+		DocumentSnippetTemplateContext tc = new DocumentSnippetTemplateContext(new SnippetTemplateContextType(
+				"source.js"), document, 0, 15);
+		SnippetTemplateProposal p = new SnippetTemplateProposal(template, tc, new Region(0, 15), null, 0);
+
+		// Make sure the snippet validates
+		DocumentEvent event = new DocumentEvent(document, 15, 0, "");
+		assertTrue("Snippet proposal incorrectly failed validation!", p.validate(document, 15, event));
+
+		// Now make sure the snippet gets applied correctly
+		p.apply(viewer, '\t', 0, 15);
+		assertEquals("$(selector).add('selector')", document.get());
 		context.assertIsSatisfied();
 	}
 }

@@ -29,6 +29,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -52,6 +53,7 @@ public class HTMLTidyValidator implements IValidator
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
+		manager.addParseErrors(items);
 		String report = parseWithTidy(source);
 		if (!StringUtil.isEmpty(report))
 		{
@@ -112,7 +114,7 @@ public class HTMLTidyValidator implements IValidator
 
 	private static void addParseErrors(String source, URI path, IValidationManager manager, List<IValidationItem> items)
 	{
-		addParseErrors(source, path, manager, items, manager.getAST());
+		addParseErrors(source, path, manager, items, manager.getParseState().getParseResult());
 	}
 
 	private static void addParseErrors(String source, URI path, IValidationManager manager,
@@ -146,7 +148,7 @@ public class HTMLTidyValidator implements IValidator
 						if (column > 0)
 						{
 							// Need to add +1 to line since we start from 1 (not 0) in the editor
-							items.add(manager.addError(
+							items.add(manager.createError(
 									Messages.HTMLTidyValidator_self_closing_syntax_on_non_void_element_error, line + 1,
 									column, 0, path));
 						}
@@ -169,7 +171,6 @@ public class HTMLTidyValidator implements IValidator
 			List<IValidationItem> items, String source) throws BadLocationException
 	{
 		Matcher matcher = PATTERN.matcher(report);
-		IDocument document = new Document(source);
 
 		while (matcher.find())
 		{
@@ -177,29 +178,23 @@ public class HTMLTidyValidator implements IValidator
 			int column = Integer.parseInt(matcher.group(2));
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
-			boolean hasErrorOnCurrentLine = false;
 
-			// If we already have an error on the same line and offset, we don't add the tidy errors
-			for (IValidationItem item : items)
+			// Don't attempt to add errors or warnings if there are already errors on this line
+			if (ValidationManager.hasErrorOnLine(items, lineNumber))
 			{
-				if (item.getLineNumber() == lineNumber
-						&& item.getOffset() == (column + document.getLineOffset(lineNumber - 1) - 1))
-				{
-					hasErrorOnCurrentLine = true;
-					break;
-				}
+				continue;
 			}
 
 			if (message != null && !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML)
-					&& !containsHTML5Element(message) && !isAutoFiltered(message) && !hasErrorOnCurrentLine)
+					&& !containsHTML5Element(message) && !isAutoFiltered(message))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
-					items.add(manager.addError(message, lineNumber, column, 0, path));
+					items.add(manager.createError(message, lineNumber, column, 0, path));
 				}
 				else if (type.startsWith("Warning")) //$NON-NLS-1$
 				{
-					items.add(manager.addWarning(message, lineNumber, column, 0, path));
+					items.add(manager.createWarning(message, lineNumber, column, 0, path));
 				}
 			}
 		}

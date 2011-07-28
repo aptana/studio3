@@ -32,21 +32,11 @@ public class SDocMLValidator implements IValidator
 		 * @param manager
 		 * @param path
 		 */
-		public LogCollector(IValidationManager manager, URI path)
+		public LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
 		{
 			this.path = path;
 			this.manager = manager;
-			this.items = new ArrayList<IValidationItem>();
-		}
-
-		/**
-		 * getItems
-		 * 
-		 * @return
-		 */
-		public List<IValidationItem> getItems()
-		{
-			return this.items;
+			this.items = items;
 		}
 
 		/**
@@ -65,7 +55,7 @@ public class SDocMLValidator implements IValidator
 		 */
 		public void logError(String message, int line, int column)
 		{
-			this.addItem(manager.addError(message, line, column, 0, this.path));
+			this.addItem(manager.createError(message, line, column, 0, this.path));
 		}
 
 		/*
@@ -83,7 +73,7 @@ public class SDocMLValidator implements IValidator
 		 */
 		public void logWarning(String message, int line, int column)
 		{
-			this.addItem(manager.addWarning(message, line, column, 0, this.path));
+			this.addItem(manager.createWarning(message, line, column, 0, this.path));
 		}
 	}
 
@@ -94,10 +84,12 @@ public class SDocMLValidator implements IValidator
 	 */
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		JSMetadataReader reader = new JSMetadataReader();
 		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
-		LogCollector collector = new LogCollector(manager, path);
+		LogCollector collector = new LogCollector(manager, path, items);
 
+		manager.addParseErrors(items);
 		reader.setLogger(collector);
 
 		try
@@ -106,9 +98,8 @@ public class SDocMLValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			collector.addItem(manager.addError(e.getMessage(), 0, 0, 0, path));
+			collector.addItem(manager.createError(e.getMessage(), 0, 0, 0, path));
 		}
-
-		return collector.getItems();
+		return items;
 	}
 }

@@ -1702,50 +1702,18 @@ public class BundleManager
 	 */
 	protected boolean isValidBundleDirectory(File bundleDirectory)
 	{
-		String message = null;
 		boolean result = false;
 
-		if (bundleDirectory.exists())
+		if (bundleDirectory.isDirectory() && bundleDirectory.canRead())
 		{
-			if (bundleDirectory.isDirectory())
-			{
-				if (bundleDirectory.canRead())
-				{
-					File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
+			File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
 
-					// NOTE: We verify readability when we try to execute the scripts in the bundle
-					// so, there's no need to do that here.
-					if (bundleFile.exists() && bundleFile.isFile())
-					{
-						result = true;
-					}
-					else
-					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
-								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
-					}
-				}
-				else
-				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-							new Object[] { bundleDirectory.getAbsolutePath() });
-				}
-			}
-			else
+			// NOTE: We verify readability when we try to execute the scripts in the bundle
+			// so, there's no need to do that here.
+			if (bundleFile.isFile())
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-						new Object[] { bundleDirectory.getAbsolutePath() });
+				result = true;
 			}
-		}
-		else
-		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
-					new Object[] { bundleDirectory.getAbsolutePath() });
-		}
-
-		if (result == false && message != null && message.length() > 0)
-		{
-			ScriptLogger.logError(message);
 		}
 
 		return result;
@@ -1851,9 +1819,8 @@ public class BundleManager
 				for (File bundle : this.getBundleDirectories(bundlesDirectory))
 				{
 					String message = MessageFormat.format(
-						Messages.BundleManager_ProjectBundlesInBundlesDirectoryIsDeprecated,
-						bundle.getAbsolutePath()
-					);
+							Messages.BundleManager_ProjectBundlesInBundlesDirectoryIsDeprecated,
+							bundle.getAbsolutePath());
 					ScriptLogger.logWarning(message);
 					IdeLog.logWarning(ScriptingActivator.getDefault(), message);
 

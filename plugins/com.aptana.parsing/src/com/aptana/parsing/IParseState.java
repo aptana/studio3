@@ -7,10 +7,12 @@
  */
 package com.aptana.parsing;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -88,7 +90,27 @@ public interface IParseState
 	public void setParseResult(IParseNode result);
 
 	/**
+	 * Returns a list of the errors found in the document.
+	 * 
+	 * @return an list of IParseError
+	 */
+	public List<IParseError> getErrors();
+
+	/**
+	 * Adds error to the list of errors
+	 * 
+	 * @param error
+	 */
+	public void addError(IParseError error);
+
+	/**
+	 * Clears the list of errors
+	 */
+	public void clearErrors();
+	
+	/**
 	 * Returns parsing progress monitor primarily for cancellation checks.
+	 * 
 	 * @return
 	 */
 	public IProgressMonitor getProgressMonitor();

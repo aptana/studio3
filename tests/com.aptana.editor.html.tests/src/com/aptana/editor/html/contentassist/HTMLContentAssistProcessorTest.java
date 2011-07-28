@@ -118,47 +118,6 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 				'\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public void testCloseTagProposal1()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		// Should be no unclosed tags at this point
-		fProcessor.doComputeCompletionProposals(viewer, 0, '\t', false);
-		assertEquals(0, fProcessor.getUnclosedTagNames(0).size());
-	}
-
-	public void testCloseTagProposal2()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		fProcessor.doComputeCompletionProposals(viewer, 1, '\t', false);
-		assertEquals(0, fProcessor.getUnclosedTagNames(1).size());
-	}
-
-	public void testCloseTagProposal3()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		fProcessor.doComputeCompletionProposals(viewer, 2, '\t', false);
-		assertEquals(0, fProcessor.getUnclosedTagNames(2).size());
-	}
-
-	public void testCloseTagProposal4()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		fProcessor.doComputeCompletionProposals(viewer, 3, '\t', false);
-		assertEquals(1, fProcessor.getUnclosedTagNames(3).size());
-	}
-
-	public void testCloseTagProposal5()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-		// show unclosed tag once we get past the '>'
-		fProcessor.doComputeCompletionProposals(viewer, 4, '\t', false);
-		assertEquals(1, fProcessor.getUnclosedTagNames(4).size());
-	}
-
 	public void testABBRProposal1()
 	{
 		assertCompletionCorrect("<a|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

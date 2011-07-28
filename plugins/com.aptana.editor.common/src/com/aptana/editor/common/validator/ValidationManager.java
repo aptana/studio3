@@ -30,6 +30,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
@@ -39,6 +40,8 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 
 public class ValidationManager implements IValidationManager
@@ -135,6 +138,7 @@ public class ValidationManager implements IValidationManager
 				continue;
 			}
 			List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
+
 			String type = validatorRef.getMarkerType();
 			List<IValidationItem> items = fItemsByType.get(type);
 			if (items == null)
@@ -218,12 +222,12 @@ public class ValidationManager implements IValidationManager
 		}
 	}
 
-	public IValidationItem addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
+	public IValidationItem createError(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
 	{
 		return addItem(IMarker.SEVERITY_ERROR, message, lineNumber, lineOffset, length, sourcePath);
 	}
 
-	public IValidationItem addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
+	public IValidationItem createWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
 	{
 		return addItem(IMarker.SEVERITY_WARNING, message, lineNumber, lineOffset, length, sourcePath);
 	}
@@ -431,8 +435,52 @@ public class ValidationManager implements IValidationManager
 		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
 	}
 
-	public IParseNode getAST()
+	public IParseState getParseState()
 	{
-		return fFileService.getParseResult();
+		return fFileService.getParseState();
+	}
+
+	public void addParseErrors(List<IValidationItem> items)
+	{
+
+		IParseState parseState = getParseState();
+
+		if (parseState == null)
+		{
+			return;
+		}
+
+		for (IParseError parseError : parseState.getErrors())
+		{
+			try
+			{
+				items.add(createError(parseError.getMessage(), fDocument.getLineOfOffset(parseError.getOffset()) + 1,
+						parseError.getOffset(), 0, fResourceUri));
+			}
+			catch (BadLocationException e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(),
+						NLS.bind("Error finding line on given offset : {0}", parseError.getOffset() + 1), e); //$NON-NLS-1$
+			}
+		}
+
+	}
+
+	public static boolean hasErrorOnLine(List<IValidationItem> items, int line)
+	{
+		if (items == null)
+		{
+			return false;
+		}
+
+		for (IValidationItem item : items)
+		{
+			if (item.getLineNumber() == line)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
