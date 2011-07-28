@@ -25,6 +25,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.formatter.preferences.IFieldValidator;
@@ -50,6 +51,7 @@ public class ControlBindingManager
 
 	private IPreferenceDelegate preferenceDelegate;
 	private Map<Button, String> radioControls;
+	private Map<Spinner, Object> spinnerControls;
 	private Map<CListViewer, Object> listControls;
 
 	private Map<Text, Object> textControls;
@@ -74,6 +76,7 @@ public class ControlBindingManager
 		this.comboControls = new HashMap<Combo, Object>();
 		this.textControls = new HashMap<Text, Object>();
 		this.radioControls = new HashMap<Button, String>();
+		this.spinnerControls = new HashMap<Spinner, Object>();
 		this.listControls = new HashMap<CListViewer, Object>();
 
 		this.validatorManager = new ValidatorManager();
@@ -154,6 +157,32 @@ public class ControlBindingManager
 				changeListener.statusChanged(StatusInfo.OK_STATUS);
 			}
 		});
+	}
+
+	/**
+	 * @param spinner
+	 * @param key
+	 */
+	public void bindControl(final Spinner spinner, final Object key)
+	{
+		if (key != null)
+		{
+			spinnerControls.put(spinner, key);
+		}
+		spinner.addSelectionListener(new SelectionListener()
+		{
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+				// do nothing
+			}
+
+			public void widgetSelected(SelectionEvent e)
+			{
+				preferenceDelegate.setString(key, spinner.getText());
+				changeListener.statusChanged(StatusInfo.OK_STATUS);
+			}
+		});
+
 	}
 
 	public void bindControl(final Button button, final Object key, Control[] slaves)
@@ -312,6 +341,7 @@ public class ControlBindingManager
 		initCheckBoxes();
 		initRadioControls();
 		initCombos();
+		initSpinners();
 		initListControls();
 
 		dependencyManager.initialize();
@@ -365,6 +395,18 @@ public class ControlBindingManager
 					combo.select(0);
 				}
 			}
+		}
+	}
+
+	private void initSpinners()
+	{
+		Iterator<Spinner> it = spinnerControls.keySet().iterator();
+		while (it.hasNext())
+		{
+			final Spinner spinner = it.next();
+			final Object key = spinnerControls.get(spinner);
+			String value = preferenceDelegate.getString(key);
+			spinner.setSelection(Integer.parseInt(value));
 		}
 	}
 
