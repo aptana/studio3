@@ -24,6 +24,8 @@ public interface IEditorPropertyConstants
 
 	public static final String LENGTH_LABEL = Messages.IEditorPropertyConstants_legnth;
 
+	public static final String THEME_LABEL = Messages.IEditorPropertyConstants_theme_rule;
+
 	public static final String CONTENT_TYPE_KEY = "com.aptana.editor.common.content.type"; //$NON-NLS-1$
 
 	public static final String SCOPE_KEY = "com.aptana.editor.common.scope"; //$NON-NLS-1$
@@ -36,4 +38,5 @@ public interface IEditorPropertyConstants
 
 	public static final String LENGTH_KEY = "com.aptana.editor.common.length"; //$NON-NLS-1$
 
+	public static final String THEME_KEY = "com.aptana.editor.common.theme"; //$NON-NLS-1$
 }
