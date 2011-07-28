@@ -60,7 +60,7 @@ public class CSSParser extends Parser implements IParser {
 
 		public void syntaxError(Symbol token)
 		{
-			if (token == null)
+			if (token == null || fParseState == null)
 			{
 				return;
 			}
@@ -91,7 +91,7 @@ public class CSSParser extends Parser implements IParser {
 		char[] characters = fParseState.getSource();
 
 		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		String source = (characters != null) ? new String(characters) : ""; //$NON-NLS-1$
 
 		fParseState.clearErrors();
 

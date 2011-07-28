@@ -148,7 +148,7 @@ public class JSParser extends Parser implements IParser {
 
 		public void syntaxError(Symbol token)
 		{
-			if (token == null)
+			if (token == null || fParseState == null )
 			{
 				return;
 			}
