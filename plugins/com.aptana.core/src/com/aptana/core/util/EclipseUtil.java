@@ -56,6 +56,10 @@ public class EclipseUtil
 	static final String[] LAUNCHER_NAMES = { "Eclipse", "AptanaStudio3", "Aptana Studio 3", "TitaniumStudio",
 			"Titanium Studio" };
 
+	private EclipseUtil()
+	{
+	}
+
 	/**
 	 * Determines if the specified debug option is on and set to true
 	 * 
@@ -453,8 +457,8 @@ public class EclipseUtil
 	 * @param processor
 	 * @param elementNames
 	 */
-	public static void processConfigurationElements(String pluginId, String extensionPointId, IConfigurationElementProcessor processor,
- String... elementNames)
+	public static void processConfigurationElements(String pluginId, String extensionPointId,
+			IConfigurationElementProcessor processor, String... elementNames)
 	{
 		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null)
 		{

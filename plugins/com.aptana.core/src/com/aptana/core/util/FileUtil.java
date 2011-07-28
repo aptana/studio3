@@ -31,8 +31,8 @@ public class FileUtil
 
 	/**
 	 * Removes the "middle" part from a path to make it short enough to fit within the specified length, i.e.
-	 * c:/Documents and Settings/username/My Documents/workspace/whatever.txt would become c:/Documents and
-	 * Settings/.../workspace/whatever.txt.
+	 * c:/Documents and Settings/username/My Documents/workspace/whatever.txt would become c:/.../username/My
+	 * Documents/workspace/whatever.txt.
 	 * 
 	 * @param path
 	 *            the path to compress

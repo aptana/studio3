@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.core.util;
 
 import java.io.File;
@@ -8,20 +15,33 @@ import junit.framework.TestCase;
 
 public class FileUtilTest extends TestCase
 {
+
 	public void testIsDirectoryAccessible()
 	{
 	}
 
 	public void testCompressPath()
 	{
+		String path = "c:/Documents and Settings/username/My Documents/workspace/whatever.txt";
+		assertEquals("c:/.../username/My Documents/workspace/whatever.txt", FileUtil.compressPath(path, 50));
 	}
 
 	public void testCompressLeadingPath()
 	{
+		String path = "c:/Documents and Settings/username/My Documents/workspace/whatever.txt";
+		assertEquals(".../username/My Documents/workspace/whatever.txt", FileUtil.compressLeadingPath(path, 50));
 	}
 
 	public void testGetExtension()
 	{
+		String filename = "test.html";
+		assertEquals("html", FileUtil.getExtension(filename));
+	}
+
+	public void testEmptyExtension()
+	{
+		String filename = "test";
+		assertEquals(StringUtil.EMPTY, FileUtil.getExtension(filename));
 	}
 
 	public void testGetRandomFileName()

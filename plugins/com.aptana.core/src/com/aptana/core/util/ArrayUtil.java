@@ -10,6 +10,10 @@ package com.aptana.core.util;
 public class ArrayUtil
 {
 
+	private ArrayUtil()
+	{
+	}
+
 	/**
 	 * Flattens the multiple separate arrays into a single array
 	 * 
@@ -20,7 +24,9 @@ public class ArrayUtil
 	public static <T> T[] flatten(T[]... arrays)
 	{
 		if (arrays == null)
-			throw new IllegalArgumentException("Must have at least one non-null array value");
+		{
+			throw new IllegalArgumentException("Must have at least one non-null array value"); //$NON-NLS-1$
+		}
 
 		int arraySize = 0;
 		for (Object[] arr : arrays)

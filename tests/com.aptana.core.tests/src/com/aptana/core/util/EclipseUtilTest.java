@@ -7,9 +7,17 @@
  */
 package com.aptana.core.util;
 
+import java.util.Map;
+
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.framework.Version;
+
+import com.aptana.core.CorePlugin;
+import com.aptana.core.ICorePreferenceConstants;
 
 public class EclipseUtilTest extends TestCase
 {
@@ -30,5 +38,40 @@ public class EclipseUtilTest extends TestCase
 			}
 		}
 		assertTrue(match);
+	}
+
+	public void testGetProductVersion()
+	{
+		String productVersion = EclipseUtil.getProductVersion();
+		Version version = Platform.getProduct().getDefiningBundle().getVersion();
+
+		assertEquals(version.getMajor() + "." + version.getMinor() + "." + version.getMicro(), productVersion);
+	}
+
+	public void testGetTraceableItems()
+	{
+		Map<String, String> items = EclipseUtil.getTraceableItems();
+
+		assertTrue(items.containsKey("com.aptana.core/debug"));
+		assertTrue(items.containsKey("com.aptana.core/debug/builder"));
+		assertTrue(items.containsKey("com.aptana.core/debug/logger"));
+		assertTrue(items.containsKey("com.aptana.core/debug/shell"));
+	}
+
+	public void testGetCurrentDebuggableComponents()
+	{
+		String[] components = EclipseUtil.getCurrentDebuggableComponents();
+		assertEquals(0, components.length);
+
+		String[] testComponents = new String[] { "com.aptana.core/debug", "com.aptana.rcp/debug" };
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
+		prefs.put(ICorePreferenceConstants.PREF_DEBUG_COMPONENT_LIST, StringUtil.join(",", testComponents));
+
+		components = EclipseUtil.getCurrentDebuggableComponents();
+		assertEquals(testComponents.length, components.length);
+		for (int i = 0; i < testComponents.length; ++i)
+		{
+			assertEquals(testComponents[i], components[i]);
+		}
 	}
 }
