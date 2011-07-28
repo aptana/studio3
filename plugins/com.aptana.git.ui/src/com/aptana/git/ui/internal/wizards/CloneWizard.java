@@ -20,6 +20,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.GitUIPlugin;
@@ -66,12 +67,12 @@ public class CloneWizard extends Wizard implements IImportWizard
 			}
 			else
 			{
-				GitUIPlugin.logError(e);
+				IdeLog.logError(GitUIPlugin.getDefault(), null, e);
 			}
 		}
 		catch (InterruptedException e)
 		{
-			GitUIPlugin.logError(e);
+			IdeLog.logError(GitUIPlugin.getDefault(), null, e);
 		}
 		return true;
 	}

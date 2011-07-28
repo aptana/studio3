@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
@@ -290,8 +291,8 @@ public class GitExecutable
 	}
 
 	/**
-	 * Sets up the environment map in a way that our special GIT_SSH/GIT_ASKPASS env variables are set so that the SSH passphrase/HTTPS prompt
-	 * stuff is hooked up. Use this for clones/pushes/pulls.
+	 * Sets up the environment map in a way that our special GIT_SSH/GIT_ASKPASS env variables are set so that the SSH
+	 * passphrase/HTTPS prompt stuff is hooked up. Use this for clones/pushes/pulls.
 	 * 
 	 * @return
 	 */
@@ -341,5 +342,20 @@ public class GitExecutable
 			filtered.put(entry.getKey(), value);
 		}
 		return filtered;
+	}
+
+	/**
+	 * Returns the version of git pointed at.
+	 * 
+	 * @return
+	 */
+	public Version version()
+	{
+		String versionString = GitExecutable.versionForPath(gitPath);
+		if (versionString == null)
+		{
+			return Version.emptyVersion;
+		}
+		return Version.parseVersion(versionString);
 	}
 }
