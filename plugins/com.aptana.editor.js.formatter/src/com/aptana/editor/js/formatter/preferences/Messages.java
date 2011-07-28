@@ -58,6 +58,7 @@ public class Messages extends NLS
 	public static String JSFormatterWhiteSpacesPage_parentheses;
 	public static String JSFormatterWhiteSpacesPage_puctuationElementsGroupTitle;
 	public static String JSFormatterWhiteSpacesPage_semicolonsInFor;
+	public static String JSFormatterWhiteSpacesPage_spacingSettings;
 	public static String JSFormatterWhiteSpacesPage_operatorsGroupTitle;
 	public static String JSFormatterWhiteSpacesPage_arithmeticOperators;
 	public static String JSFormatterWhiteSpacesPage_relationalOperators;

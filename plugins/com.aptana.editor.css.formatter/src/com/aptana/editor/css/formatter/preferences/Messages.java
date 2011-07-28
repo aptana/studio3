@@ -31,6 +31,7 @@ public class Messages extends NLS
 	public static String CSSFormatterWhiteSpacesPage_commasLabel;
 	public static String CSSFormatterWhiteSpacesPage_parenthesisLabel;
 	public static String CSSFormatterWhiteSpacesPage_punctuationGroupLabel;
+	public static String CSSFormatterWhiteSpacesPage_spacingSettings;
 	static
 	{
 		// initialize resource bundle
