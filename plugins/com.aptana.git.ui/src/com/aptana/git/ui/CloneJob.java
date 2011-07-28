@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -37,6 +38,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.osgi.framework.Version;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
@@ -93,16 +95,27 @@ public class CloneJob extends Job
 			}
 
 			IPath gitPath = GitExecutable.instance().path();
+			Version version = GitExecutable.instance().version();
+			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
+
 			Map<String, String> env = GitExecutable.getShellEnvironment();
-			Process p = null;
+			List<String> args = new ArrayList<String>();
+			args.add("clone"); //$NON-NLS-1$
 			if (shallowClone)
 			{
-				p = ProcessUtil.run(gitPath.toOSString(), null, env, "clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				args.add("--depth"); //$NON-NLS-1$
+				args.add("1"); //$NON-NLS-1$
 			}
-			else
+			// Use --progress switch if git version is 1.7+!
+			if (includeProgress)
 			{
-				p = ProcessUtil.run(gitPath.toOSString(), null, env, "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+				args.add("--progress"); //$NON-NLS-1$
 			}
+			args.add("--"); //$NON-NLS-1$
+			args.add(sourceURI);
+			args.add(dest);
+			// Now run it!
+			Process p = ProcessUtil.run(gitPath.toOSString(), null, env, args.toArray(new String[args.size()]));
 			if (p == null)
 			{
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
@@ -121,13 +134,14 @@ public class CloneJob extends Job
 			}
 
 			subMonitor.setWorkRemaining(100);
-			Collection<File> existingProjects = new ArrayList<File>();
+			Collection<File> existingProjects = null;
 			if (!forceRootAsProject)
 			{
 				// Search the children of the repo for existing projects!
 				existingProjects = collectProjectFilesFromDirectory(new File(dest), null, subMonitor.newChild(25));
 			}
-			if (existingProjects.isEmpty())
+			// If there are no existing projects, or just one, make the repo root the project root.
+			if (existingProjects == null || existingProjects.size() <= 1)
 			{
 				// No projects found. Turn the root of the repo into a project!
 				createExistingProject(new File(dest, IProjectDescription.DESCRIPTION_FILE_NAME),
@@ -149,12 +163,12 @@ public class CloneJob extends Job
 		}
 		catch (CoreException e)
 		{
-			GitUIPlugin.logError(e);
+			IdeLog.log(GitUIPlugin.getDefault(), e.getStatus());
 			return e.getStatus();
 		}
 		catch (Throwable e)
 		{
-			GitUIPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
 			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 		}
 		finally
@@ -220,9 +234,9 @@ public class CloneJob extends Job
 				}
 
 				String stdout = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
-				this.status = new ProcessStatus(p.exitValue(), stdout, builder.toString());
+				this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
 				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
@@ -283,7 +297,7 @@ public class CloneJob extends Job
 			}
 			catch (IOException exception)
 			{
-				GitUIPlugin.logError(exception.getMessage(), exception);
+				IdeLog.logError(GitUIPlugin.getDefault(), exception.getMessage(), exception);
 				StatusManager.getManager()
 						.handle(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(),
 								exception));
@@ -327,7 +341,7 @@ public class CloneJob extends Job
 					}
 					catch (IOException exception)
 					{
-						GitUIPlugin.logError(exception.getMessage(), exception);
+						IdeLog.logError(GitUIPlugin.getDefault(), exception.getMessage(), exception);
 						StatusManager.getManager().handle(
 								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(),
 										exception));
