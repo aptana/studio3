@@ -39,6 +39,7 @@ import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.parsing.lexer.IRange;
 
 /**
  * CSS formatter node builder.<br>
@@ -440,14 +441,12 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					pushDeclarationValueNode(expressionNode, i == declarations.length - 1);
 				}
 
-				// TODO Create a special node for !important when we have it in the AST
-				// Right now, we just create a text node for it ( We don't let push() create the text node since it
-				// includes an extra space when creating the text node )
-				int importantOffset = locateCharacterInSameLine('!', expressionNode.getEndingOffset(), document);
-				if (importantOffset != expressionNode.getEndingOffset())
+				// Push a text node for status nodes: currently it's only !important
+				IRange statusRange = declarationNode.getStatusRange();
+				if (declarationNode.getStatus() != null)
 				{
-					formatterBlockNode.addChild(createTextNode(document, importantOffset,
-							getEndWithoutWhiteSpaces(declarationNode.getEndingOffset(), document) + 1));
+					formatterBlockNode.addChild(createTextNode(document, statusRange.getStartingOffset(),
+							statusRange.getEndingOffset() + 1));
 				}
 			}
 
