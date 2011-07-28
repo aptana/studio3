@@ -18,12 +18,14 @@ public class AllUtilTests
 		TestSuite suite = new TestSuite("Test for com.aptana.core.util");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(ArrayUtilTest.class);
+		suite.addTestSuite(ClassUtilTest.class);
 		suite.addTestSuite(CollectionsUtilTest.class);
 		suite.addTestSuite(EclipseUtilTest.class);
 		suite.addTestSuite(FileUtilTest.class);
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
+		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(VersionUtilTest.class);
 		// $JUnit-END$

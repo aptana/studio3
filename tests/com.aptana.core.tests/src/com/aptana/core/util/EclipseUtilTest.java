@@ -56,8 +56,6 @@ public class EclipseUtilTest extends TestCase
 		assertTrue(items.containsKey("com.aptana.core/debug/builder"));
 		assertTrue(items.containsKey("com.aptana.core/debug/logger"));
 		assertTrue(items.containsKey("com.aptana.core/debug/shell"));
-		assertTrue(items.containsKey("com.aptana.editor.common/perf/content_assist"));
-		assertTrue(items.containsKey("com.aptana.rcp/debug"));
 	}
 
 	public void testGetCurrentDebuggableComponents()

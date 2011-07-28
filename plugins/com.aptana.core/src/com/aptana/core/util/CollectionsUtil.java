@@ -20,6 +20,11 @@ import java.util.Set;
  */
 public class CollectionsUtil
 {
+
+	private CollectionsUtil()
+	{
+	}
+
 	/**
 	 * Given a list of elements of type <T>, remove the duplicates from the list in place
 	 * 

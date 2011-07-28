@@ -21,12 +21,17 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
 
-public abstract class StringUtil
+public class StringUtil
 {
+
 	/**
 	 * EMPTY
 	 */
 	public static final String EMPTY = ""; //$NON-NLS-1$
+
+	private StringUtil()
+	{
+	}
 
 	/**
 	 * characterInstanceCount
@@ -128,7 +133,7 @@ public abstract class StringUtil
 		}
 
 		int length = items.size();
-		String result = ""; //$NON-NLS-1$
+		String result = EMPTY;
 		if (length > 0)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -153,6 +158,10 @@ public abstract class StringUtil
 	 */
 	public static String replace(String str, String pattern, String replace)
 	{
+		if (str == null)
+		{
+			return null;
+		}
 
 		int s = 0;
 		int e = 0;
@@ -176,7 +185,7 @@ public abstract class StringUtil
 	 */
 	public static String makeFormLabel(String message)
 	{
-		return message + ":"; //$NON-NLS-1$
+		return message == null ? null : message + ":"; //$NON-NLS-1$
 	}
 
 	/**
@@ -188,7 +197,7 @@ public abstract class StringUtil
 	 */
 	public static String ellipsify(String message)
 	{
-		return message + "..."; //$NON-NLS-1$
+		return message == null ? null : message + "..."; //$NON-NLS-1$
 	}
 
 	/**
@@ -201,16 +210,22 @@ public abstract class StringUtil
 	 */
 	public static String replaceAll(String template, Map<String, String> variables)
 	{
-		if (variables == null || variables.isEmpty())
+		if (template == null || variables == null || variables.isEmpty())
+		{
 			return template;
+		}
 		for (Map.Entry<String, String> entry : variables.entrySet())
 		{
 			String value = entry.getValue();
 			if (value == null)
+			{
 				value = ""; //$NON-NLS-1$
+			}
 			else
+			{
 				value = value.replace('$', (char) 1); // To avoid illegal group reference issues if the text has
-			// dollars!
+														// dollars!
+			}
 			template = template.replaceAll(entry.getKey(), value).replace((char) 1, '$');
 		}
 		return template;
@@ -400,7 +415,7 @@ public abstract class StringUtil
 	 */
 	public static String quote(String string)
 	{
-		return '\'' + string + '\'';
+		return string == null ? null : '\'' + string + '\'';
 	}
 
 	/**
@@ -446,7 +461,7 @@ public abstract class StringUtil
 	 */
 	public static String truncate(String text, int length)
 	{
-		if (text.length() <= length)
+		if (text == null || text.length() <= length)
 		{
 			return text;
 		}
