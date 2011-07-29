@@ -27,6 +27,7 @@ import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
@@ -356,6 +357,15 @@ public class GitExecutable
 		{
 			return Version.emptyVersion;
 		}
-		return Version.parseVersion(versionString);
+
+		try
+		{
+			return Version.parseVersion(versionString);
+		}
+		catch (IllegalArgumentException ex)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), Messages.GitExecutable_UnableToParseGitVersion, ex);
+			return Version.emptyVersion;
+		}
 	}
 }

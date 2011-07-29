@@ -13,6 +13,8 @@ public class Messages extends NLS // NO_UCD
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.core.model.messages"; //$NON-NLS-1$
 	
+	public static String GitExecutable_UnableToParseGitVersion;
+
 	public static String GitIndex_BinaryDiff_Message; // NO_UCD
 	public static String GitRepositoryManager_UnableToFindGitExecutableError; // NO_UCD
 
