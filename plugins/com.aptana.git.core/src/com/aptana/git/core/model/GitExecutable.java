@@ -72,7 +72,19 @@ public class GitExecutable
 								// reset shell path preferences on Win32
 								if (Platform.OS_WIN32.equals(Platform.getOS()))
 								{
-									ShellExecutable.setPreferenceShellPath(null);
+									String pathString = (String) event.getNewValue();
+									if (pathString != null)
+									{
+										IPath path = Path.fromOSString(pathString);
+										if (path != null && path.toFile().isFile())
+										{
+											path = path.removeLastSegments(1);
+										}
+										if (path.toFile().isDirectory())
+										{
+											ShellExecutable.setPreferenceShellPath(path);
+										}
+									}
 								}
 							}
 						});
