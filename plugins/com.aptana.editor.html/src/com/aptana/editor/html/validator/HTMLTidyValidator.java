@@ -32,9 +32,6 @@ import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
-import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.ast.HTMLElementNode;
-import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLTidyValidator implements IValidator
 {
@@ -62,7 +59,6 @@ public class HTMLTidyValidator implements IValidator
 			{
 				reader = new BufferedReader(new StringReader(report));
 				String line;
-				addParseErrors(source, path, manager, items);
 				while ((line = reader.readLine()) != null)
 				{
 					if (line.startsWith("line")) //$NON-NLS-1$
@@ -112,65 +108,11 @@ public class HTMLTidyValidator implements IValidator
 		return bout.toString();
 	}
 
-	private static void addParseErrors(String source, URI path, IValidationManager manager, List<IValidationItem> items)
-	{
-		addParseErrors(source, path, manager, items, manager.getParseState().getParseResult());
-	}
-
-	private static void addParseErrors(String source, URI path, IValidationManager manager,
-			List<IValidationItem> items, IParseNode ast)
-	{
-		if (ast == null)
-		{
-			return;
-		}
-		IParseNode[] children = ast.getChildren();
-		IDocument document = new Document(source);
-		int line, column;
-
-		if (children == null || children.length == 0)
-		{
-			return;
-		}
-
-		// Go through the AST and find if there are invalid self closing elements
-		for (IParseNode node : children)
-		{
-			if (node instanceof HTMLElementNode)
-			{
-				if (((HTMLElementNode) node).isSelfClosing()
-						&& !HTMLParseState.isEndForbiddenOrEmptyTag((((HTMLElementNode) node).getName())))
-				{
-					try
-					{
-						line = document.getLineOfOffset(node.getStartingOffset());
-						column = node.getStartingOffset() - document.getLineOffset(line);
-						if (column > 0)
-						{
-							// Need to add +1 to line since we start from 1 (not 0) in the editor
-							items.add(manager.createError(
-									Messages.HTMLTidyValidator_self_closing_syntax_on_non_void_element_error, line + 1,
-									column, 0, path));
-						}
-					}
-					catch (BadLocationException e)
-					{
-						IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ast_errors, e);
-					}
-				}
-			}
-			if (node.hasChildren())
-			{
-				addParseErrors(source, path, manager, items, node);
-			}
-		}
-
-	}
-
 	private static void parseTidyOutput(String report, URI path, IValidationManager manager,
 			List<IValidationItem> items, String source) throws BadLocationException
 	{
 		Matcher matcher = PATTERN.matcher(report);
+		IDocument document = new Document(source);
 
 		while (matcher.find())
 		{
@@ -180,7 +122,12 @@ public class HTMLTidyValidator implements IValidator
 			String message = patchMessage(matcher.group(4));
 
 			// Don't attempt to add errors or warnings if there are already errors on this line
-			if (ValidationManager.hasErrorOnLine(items, lineNumber))
+
+			// We also squash errors on the last line, since it is normally a repeat of a parse error. For example
+			// "missing </div>" will appear on the last line, which is normally caught by the parser and displayed on a
+			// different line
+			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber)
+					|| (document.getNumberOfLines() == lineNumber && !items.isEmpty()))
 			{
 				continue;
 			}

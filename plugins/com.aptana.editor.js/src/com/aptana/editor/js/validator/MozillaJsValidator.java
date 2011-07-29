@@ -63,7 +63,7 @@ public class MozillaJsValidator implements IValidator
 			if (!manager.isIgnored(message, IJSConstants.CONTENT_TYPE_JS))
 			{
 				// Don't attempt to add errors or warnings if there are already errors on this line
-				if (ValidationManager.hasErrorOnLine(items, error.getLine()))
+				if (ValidationManager.hasErrorOrWarningOnLine(items, error.getLine()))
 				{
 					continue;
 				}

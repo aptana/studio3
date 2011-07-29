@@ -18,6 +18,7 @@
 %import "com.aptana.parsing.IRecoveryStrategy";
 %import "com.aptana.parsing.ast.IParseNode";
 %import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.ast.IParseError";
 %import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.ast.ParseRootNode";
 
@@ -39,7 +40,7 @@
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(token));
+			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)

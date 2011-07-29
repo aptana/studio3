@@ -36,8 +36,10 @@ import com.aptana.editor.js.IJSConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.ast.ParseError;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;
@@ -87,10 +89,11 @@ public class HTMLParser implements IParser
 		fElementStack = new Stack<IParseNode>();
 
 		fParseState = (HTMLParseState) parseState;
-		String source = new String(parseState.getSource());
+		String source = new String(fParseState.getSource());
 		fScanner.setSource(source);
 
-		int startingOffset = parseState.getStartingOffset();
+		fParseState.clearErrors();
+		int startingOffset = fParseState.getStartingOffset();
 
 		ParseRootNode root = new ParseRootNode( //
 				IHTMLConstants.CONTENT_TYPE_HTML, //
@@ -106,7 +109,7 @@ public class HTMLParser implements IParser
 			parseAll(source);
 			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
-			parseState.setParseResult(root);
+			fParseState.setParseResult(root);
 		}
 		finally
 		{
@@ -189,6 +192,11 @@ public class HTMLParser implements IParser
 		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(),
 				fCurrentSymbol.getEnd());
 		parseAttribute(element, fCurrentSymbol);
+		if (element.isSelfClosing() && !HTMLParseState.isEndForbiddenOrEmptyTag(element.getName()))
+		{
+			fParseState.addError(new ParseError(element.getStartingOffset(),
+					Messages.HTMLParser_self_closing_syntax_on_non_void_element_error, IParseError.Severity.ERROR));
+		}
 		return element;
 	}
 
@@ -214,6 +222,7 @@ public class HTMLParser implements IParser
 		if (fCurrentElement instanceof HTMLElementNode)
 		{
 			elementsToClose.add((HTMLElementNode) fCurrentElement);
+			addMissingEndTagError((HTMLElementNode) fCurrentElement);
 		}
 		IParseNode node;
 		for (int i = fElementStack.size() - 1; i >= 0; --i)
@@ -222,6 +231,7 @@ public class HTMLParser implements IParser
 			if (node instanceof HTMLElementNode)
 			{
 				elementsToClose.add((HTMLElementNode) node);
+				addMissingEndTagError((HTMLElementNode) node);
 			}
 		}
 		int end = fCurrentSymbol.getStart() - 1;
@@ -310,21 +320,24 @@ public class HTMLParser implements IParser
 			// finds the closest opened tag of the same name
 			IParseNode node;
 			int i;
+			boolean hasOpenTag = false;
 			for (i = fElementStack.size() - 1; i >= 0; --i)
 			{
 				node = fElementStack.get(i);
 				if (node instanceof HTMLElementNode && ((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
 				{
+					hasOpenTag = true;
 					break;
 				}
 			}
 
-			if (i >= 0)
+			if (hasOpenTag)
 			{
 				// found the match, so closes it as well as all the open elements above
 				if (fCurrentElement instanceof HTMLElementNode)
 				{
 					elementsToClose.add((HTMLElementNode) fCurrentElement);
+					addMissingEndTagError((HTMLElementNode) fCurrentElement);
 				}
 
 				for (int j = fElementStack.size() - 1; j >= i; --j)
@@ -333,8 +346,19 @@ public class HTMLParser implements IParser
 					if (node instanceof HTMLElementNode)
 					{
 						elementsToClose.add((HTMLElementNode) node);
+
+						// Only add error if it's not the opening tag for the current tagName
+						if (!((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
+						{
+							addMissingEndTagError((HTMLElementNode) node);
+						}
 					}
 				}
+			}
+			else
+			{
+				fParseState.addError(new ParseError(fCurrentSymbol.getStart(), Messages.HTMLParser_unexpected_error
+						+ fCurrentSymbol.value, IParseError.Severity.WARNING));
 			}
 		}
 
@@ -357,6 +381,15 @@ public class HTMLParser implements IParser
 				element.setEndNode(currentStart, currentEnd);
 			}
 			closeElement();
+		}
+	}
+
+	private void addMissingEndTagError(HTMLElementNode node)
+	{
+		if (fParseState.getCloseTagType(node.getName()) != HTMLTagInfo.END_OPTIONAL)
+		{
+			fParseState.addError(new ParseError(node.getEndingOffset(), Messages.HTMLParser_missing_end_tag_error
+					+ node.getName() + ">", IParseError.Severity.WARNING)); //$NON-NLS-1$
 		}
 	}
 

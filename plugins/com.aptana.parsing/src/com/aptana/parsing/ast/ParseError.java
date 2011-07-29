@@ -17,11 +17,25 @@ public class ParseError implements IParseError
 {
 	private Symbol fSymbol;
 	private String fMessage;
+	private final Severity fSeverity;
+	private int fOffset;
 
-	public ParseError(Symbol symbol)
+	public ParseError(Symbol symbol, Severity severity)
 	{
 		fSymbol = symbol;
 		fMessage = buildErrorMessage(symbol);
+		fSeverity = severity;
+		if (fSymbol != null)
+		{
+			fOffset = fSymbol.getStart();
+		}
+	}
+
+	public ParseError(int offset, String message, Severity severity)
+	{
+		fSeverity = severity;
+		fMessage = message;
+		fOffset = offset;
 	}
 
 	/* (non-Javadoc)
@@ -29,7 +43,7 @@ public class ParseError implements IParseError
 	 */
 	public int getOffset()
 	{
-		return fSymbol.getStart();
+		return fOffset;
 	}
 
 	/* (non-Javadoc)
@@ -38,6 +52,11 @@ public class ParseError implements IParseError
 	public String getMessage()
 	{
 		return fMessage;
+	}
+
+	public Severity getSeverity()
+	{
+		return fSeverity;
 	}
 
 	private String buildErrorMessage(Symbol token)
