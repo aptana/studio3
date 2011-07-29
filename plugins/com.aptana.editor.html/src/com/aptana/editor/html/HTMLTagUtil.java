@@ -85,7 +85,7 @@ public class HTMLTagUtil
 
 			for (ITypedRegion partition : partitions)
 			{
-				if (partition.getType().equals(HTMLSourceConfiguration.HTML_TAG))
+				if (partition != null && HTMLSourceConfiguration.HTML_TAG.equals(partition.getType()))
 				{
 					String src = document.get(partition.getOffset(), partition.getLength());
 					int lessThanIndex = src.indexOf('<');

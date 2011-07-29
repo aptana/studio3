@@ -74,9 +74,11 @@
 			<arg value="-c" />
 			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
 		</exec>
+		
 		<echo append="true" file="bundle_timestamps.txt" message="," />
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="bundles/${bundle.dir.name}/.git" quiet="true" />
+		
 	</target>
 
 	<target name="pre.@dot">
