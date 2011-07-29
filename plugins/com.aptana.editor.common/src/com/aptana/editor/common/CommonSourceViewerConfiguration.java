@@ -9,6 +9,8 @@ package com.aptana.editor.common;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -394,7 +396,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return reconciler;
 	}
 
-	private final String[] getSpellingContentTypes(ISourceViewer sourceViewer) {
+	private final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
+	{
 		Set<String> set = new HashSet<String>();
 		IContentTypeTranslator contentTypeTranslator = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		String topContentType = getTopContentTypes()[0][0];
@@ -403,7 +406,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				set.add(contentType);
 			}
 		}
-		return set.toArray(new String[set.size()]);
+		return Collections.unmodifiableCollection(set);
 	}
 
 	/*
@@ -518,8 +521,10 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * )
 	 */
 	@Override
-	public IReconciler getReconciler(ISourceViewer sourceViewer) {
-		if (fTextEditor != null && fTextEditor.isEditable()) {
+	public IReconciler getReconciler(ISourceViewer sourceViewer)
+	{
+		if (fTextEditor != null && fTextEditor.isEditable())
+		{
 			IReconcilingStrategy reconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
 			CommonReconciler reconciler = new CommonReconciler(reconcilingStrategy);
 			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
@@ -527,13 +532,17 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			reconciler.setIsAllowedToModifyDocument(false);
 			reconciler.setProgressMonitor(new NullProgressMonitor());
 			reconciler.setDelay(500);
-			if (EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED)) {
+			if (EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED))
+			{
 				SpellingService spellingService = EditorsUI.getSpellingService();
-				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null) {
+				Collection<String> spellingContentTypes = getSpellingContentTypes(sourceViewer);
+				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null && !spellingContentTypes.isEmpty())
+				{
 					reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
 							reconcilingStrategy,
-							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService)),
-						getSpellingContentTypes(sourceViewer));
+							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService, reconciler.getDocumentPartitioning(), spellingContentTypes)),
+							spellingContentTypes
+						);
 				}
 			}
 			return fReconciler = reconciler;
