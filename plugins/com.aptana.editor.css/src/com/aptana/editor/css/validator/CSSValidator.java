@@ -257,7 +257,7 @@ public class CSSValidator implements IValidator
 			String errorsubtype = map.get("errorsubtype"); //$NON-NLS-1$
 
 			// Don't attempt to add errors if there are already errors on this line
-			if (ValidationManager.hasErrorOnLine(items, lineNumber))
+			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber))
 			{
 				continue;
 			}
@@ -314,7 +314,7 @@ public class CSSValidator implements IValidator
 			String context = map.get("context"); //$NON-NLS-1$
 
 			// Don't attempt to add warnings if there are already errors on this line
-			if (ValidationManager.hasErrorOnLine(items, lineNumber))
+			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber))
 			{
 				continue;
 			}

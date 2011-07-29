@@ -5,18 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.validator;
+package com.aptana.editor.html.parsing;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-
-	private static final String BUNDLE_NAME = "com.aptana.editor.html.validator.messages"; //$NON-NLS-1$
-
-	public static String HTMLTidyValidator_ERR_ParseErrors;
-	public static String HTMLTidyValidator_ERR_Tidy;
-
+	private static final String BUNDLE_NAME = "com.aptana.editor.html.parsing.messages"; //$NON-NLS-1$
+	public static String HTMLParser_missing_end_tag_error;
+	public static String HTMLParser_self_closing_syntax_on_non_void_element_error;
 	static
 	{
 		// initialize resource bundle

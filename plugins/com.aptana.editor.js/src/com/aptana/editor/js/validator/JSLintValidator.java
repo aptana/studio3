@@ -108,7 +108,7 @@ public class JSLintValidator implements IValidator
 						int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
 
 						// Don't attempt to add errors or warnings if there are already errors on this line
-						if (ValidationManager.hasErrorOnLine(items, line))
+						if (ValidationManager.hasErrorOrWarningOnLine(items, line))
 						{
 							continue;
 						}

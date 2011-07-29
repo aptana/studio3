@@ -454,8 +454,19 @@ public class ValidationManager implements IValidationManager
 		{
 			try
 			{
-				items.add(createError(parseError.getMessage(), fDocument.getLineOfOffset(parseError.getOffset()) + 1,
-						parseError.getOffset(), 0, fResourceUri));
+				if (parseError.getSeverity() == IParseError.ERROR)
+				{
+					items.add(createError(parseError.getMessage(),
+							fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
+							fResourceUri));
+				}
+				else
+				{
+					items.add(createWarning(parseError.getMessage(),
+							fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
+							fResourceUri));
+				}
+
 			}
 			catch (BadLocationException e)
 			{
@@ -466,7 +477,7 @@ public class ValidationManager implements IValidationManager
 
 	}
 
-	public static boolean hasErrorOnLine(List<IValidationItem> items, int line)
+	public static boolean hasErrorOrWarningOnLine(List<IValidationItem> items, int line)
 	{
 		if (items == null)
 		{
