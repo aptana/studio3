@@ -1693,6 +1693,24 @@ public class BundleManager
 	}
 
 	/**
+	 * Determine if the specified directory is in the user bundle path
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	protected boolean isUserBundleDirectory(File bundleDirectory)
+	{
+		boolean result = false;
+
+		if (bundleDirectory != null)
+		{
+			result = (getBundlePrecedence(bundleDirectory) == BundlePrecedence.USER);
+		}
+
+		return result;
+	}
+
+	/**
 	 * Determine if the specified directory minimally defines a bundle. In order to return true, the specified directory
 	 * must exist, must be a directory, it must be readable, and it must contain a bundle.rb file
 	 * 
@@ -1828,7 +1846,7 @@ public class BundleManager
 				}
 
 				// Now load from project directly
-				if (isValidBundleDirectory(projectDirectory))
+				if (!isUserBundleDirectory(projectDirectory) && isValidBundleDirectory(projectDirectory))
 				{
 					loadBundle(projectDirectory);
 				}
