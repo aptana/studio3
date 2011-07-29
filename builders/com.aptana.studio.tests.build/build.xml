@@ -23,7 +23,7 @@
 
 	<path id="instrument.classpath">
 		<fileset dir="${baseLocation}/plugins">
-			<include name="com.aptana.*.jar" />
+			<include name="com.aptana.*" />
 		</fileset>
 	</path>
 	<path id="source.path">
