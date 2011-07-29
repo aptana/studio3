@@ -320,16 +320,18 @@ public class HTMLParser implements IParser
 			// finds the closest opened tag of the same name
 			IParseNode node;
 			int i;
+			boolean hasOpenTag = false;
 			for (i = fElementStack.size() - 1; i >= 0; --i)
 			{
 				node = fElementStack.get(i);
 				if (node instanceof HTMLElementNode && ((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
 				{
+					hasOpenTag = true;
 					break;
 				}
 			}
 
-			if (i >= 0)
+			if (hasOpenTag)
 			{
 				// found the match, so closes it as well as all the open elements above
 				if (fCurrentElement instanceof HTMLElementNode)
@@ -347,6 +349,11 @@ public class HTMLParser implements IParser
 						addMissingEndTagError((HTMLElementNode) node);
 					}
 				}
+			}
+			else
+			{
+				fParseState.addError(new ParseError(fCurrentSymbol.getStart(), Messages.HTMLParser_unexpected_error
+						+ fCurrentSymbol.value, IParseError.WARNING));
 			}
 		}
 

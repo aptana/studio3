@@ -13,9 +13,9 @@ package com.aptana.parsing.ast;
 public interface IParseError
 {
 	public static final int WARNING = 1;
-	
+
 	public static final int ERROR = 2;
-	
+
 	/**
 	 * The starting offset where the error is located
 	 * 
@@ -36,5 +36,5 @@ public interface IParseError
 	 * @return the severity of the error
 	 */
 	public int getSeverity();
-	
+
 }
