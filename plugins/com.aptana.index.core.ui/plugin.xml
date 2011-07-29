@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="com.aptana.index.core.ui.indexViewContributors" name="indexViewContributors" schema="schema/indexViewContributors.exsd"/>
    <extension
          point="org.eclipse.equinox.preferences.preferences">
       <initializer
@@ -143,5 +144,17 @@
             properties="isFiltered"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="com.aptana"
+            class="com.aptana.index.core.ui.views.IndexView"
+            icon="icons/index-view.png"
+            id="com.aptana.index.core.ui.view"
+            name="Index View"
+            restorable="true">
+      </view>
    </extension>
 </plugin>

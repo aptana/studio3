@@ -524,4 +524,39 @@ public class JSIndexQueryHelper
 
 		return result;
 	}
+
+	/**
+	 * getTypes
+	 * 
+	 * @return
+	 */
+	public List<TypeElement> getTypes()
+	{
+		return getTypes(getIndex());
+	}
+
+	/**
+	 * getTypes
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<TypeElement> getTypes(Index index)
+	{
+		List<TypeElement> result = Collections.emptyList();
+
+		if (index != null)
+		{
+			try
+			{
+				result = this._reader.getTypes(index, true);
+			}
+			catch (IOException e)
+			{
+				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+			}
+		}
+
+		return result;
+	}
 }

@@ -7,11 +7,12 @@
  */
 package com.aptana.editor.js.inferencing;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -21,10 +22,12 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.BaseElement;
+import com.aptana.editor.js.contentassist.model.ClassElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
@@ -262,7 +265,8 @@ public class JSTypeUtil
 			{
 				result = type.substring(0, type.length() - 2);
 			}
-			else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN) && type.endsWith(JSTypeConstants.GENERIC_CLOSE))
+			else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN)
+					&& type.endsWith(JSTypeConstants.GENERIC_CLOSE))
 			{
 				result = type.substring(JSTypeConstants.GENERIC_ARRAY_OPEN.length(), type.length() - 1);
 			}
@@ -275,13 +279,20 @@ public class JSTypeUtil
 		return result;
 	}
 
+	/**
+	 * getClassType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
 	public static String getClassType(String typeName)
 	{
 		String result = null;
 
-		if (typeName != null && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) && typeName.endsWith(JSTypeConstants.GENERIC_CLOSE))
+		if (isClassType(typeName))
 		{
-			result = typeName.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), typeName.length() - 1);
+			result = typeName.substring(JSTypeConstants.GENERIC_CLASS_OPEN.length(), typeName.length()
+					- JSTypeConstants.GENERIC_CLOSE.length());
 		}
 
 		return result;
@@ -463,9 +474,19 @@ public class JSTypeUtil
 	 */
 	public static String getUniqueTypeName()
 	{
-		UUID uuid = UUID.randomUUID();
+		return JSTypeConstants.DYNAMIC_CLASS_PREFIX + UUID.randomUUID();
+	}
 
-		return MessageFormat.format("{0}{1}", JSTypeConstants.DYNAMIC_CLASS_PREFIX, uuid); //$NON-NLS-1$
+	/**
+	 * isClassType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public static boolean isClassType(String typeName)
+	{
+		return typeName != null && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN)
+				&& typeName.endsWith(JSTypeConstants.GENERIC_CLOSE);
 	}
 
 	/**
@@ -504,6 +525,55 @@ public class JSTypeUtil
 		}
 
 		return result;
+	}
+
+	/**
+	 * Given a list of type elements, return a list of class elements. We divide class members and instance members into
+	 * Class\<Type\> and Type, respectively. A ClassElement recombines these separate items into a single item with
+	 * members tagged appropriately.
+	 * 
+	 * @param types
+	 * @return
+	 */
+	public static List<ClassElement> typesToClasses(List<TypeElement> types)
+	{
+		List<ClassElement> classes = new ArrayList<ClassElement>();
+
+		if (types != null)
+		{
+			Map<String, ClassElement> classesByName = new HashMap<String, ClassElement>();
+
+			for (TypeElement type : types)
+			{
+				String typeName = type.getName();
+				boolean isClassType = isClassType(typeName);
+				String baseName = isClassType ? getClassType(type.getName()) : typeName;
+
+				if (!classesByName.containsKey(baseName))
+				{
+					ClassElement clss = new ClassElement();
+
+					clss.setName(baseName);
+
+					classesByName.put(baseName, clss);
+				}
+
+				ClassElement clss = classesByName.get(baseName);
+
+				if (isClassType)
+				{
+					clss.addClassType(type);
+				}
+				else
+				{
+					clss.addInstanceType(type);
+				}
+			}
+
+			classes = new ArrayList<ClassElement>(classesByName.values());
+		}
+
+		return classes;
 	}
 
 	/**
