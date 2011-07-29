@@ -79,11 +79,6 @@
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="bundles/${bundle.dir.name}/.git" quiet="true" />
 		
-		<copyfile dest="bundles/${bundle.dir.name}/cache.yml.bak" src="bundles/${bundle.dir.name}/cache.yml"/>
-		<replace file="bundles/${bundle.dir.name}/cache.yml.bak" token="CommandElement" failOnNoReplacements="true" value=""></replace>
-		<replace file="bundles/${bundle.dir.name}/cache.yml.bak" token="MenuElement" failOnNoReplacements="true" value=""></replace>
-		<delete file="bundles/${bundle.dir.name}/cache.yml.bak"  />
-		
 	</target>
 
 	<target name="pre.@dot">
