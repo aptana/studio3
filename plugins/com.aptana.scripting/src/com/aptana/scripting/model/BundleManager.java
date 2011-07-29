@@ -148,7 +148,7 @@ public class BundleManager
 
 						if (useCache)
 						{
-							// getCacher().cache(bundleDirectory, sub.newChild(1));
+							getCacher().cache(bundleDirectory, sub.newChild(1));
 						}
 
 					}
