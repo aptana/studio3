@@ -217,9 +217,14 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			{
 				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
 				{
-					// We put template proposals lower in the list, by default (for now), until we
-					// improve their handling
-					((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+					if (displayString.startsWith(prefix))
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
+					}
+					else
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+					}
 				}
 			}
 		}

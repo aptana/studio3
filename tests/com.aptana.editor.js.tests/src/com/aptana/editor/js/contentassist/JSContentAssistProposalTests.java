@@ -7,7 +7,13 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.SnippetElement;
 
 /**
  * JSContentAssistProposalTests
@@ -24,11 +30,28 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 
 	/**
 	 * testStringF
+	 * 
+	 * @throws IOException
 	 */
-	public void testStringFPrefix()
+	public void testStringFPrefix() throws IOException
 	{
+		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
+		bundleFile.deleteOnExit();
+
+		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
+		bundleElement.setDisplayName("Editor Unit Tests");
+
+		File f = File.createTempFile("snippet", "rb");
+		SnippetElement se = createSnippet(f.getAbsolutePath(), "FunctionTemplate", "fun", "source.js");
+		bundleElement.addChild(se);
+		BundleManager.getInstance().addBundle(bundleElement);
+
+		// note template is before true proposal, as we are ordering by trigger prefix
 		this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "finally", "focus", "for", "forward",
-				"frames", "function", "Function");
+				"frames", "function", "FunctionTemplate", "Function");
+
+		BundleManager.getInstance().unloadScript(f);
+
 	}
 
 	/**
@@ -52,10 +75,27 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 
 	/**
 	 * testStringFunction
+	 * 
+	 * @throws IOException
 	 */
-	public void testStringThis()
+	public void testStringThis() throws IOException
 	{
-		this.checkProposals("contentAssist/this.js", true, true, "this", "throw");
+		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
+		bundleFile.deleteOnExit();
+
+		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
+		bundleElement.setDisplayName("Editor Unit Tests");
+
+		File f = File.createTempFile("snippet", "rb");
+		SnippetElement se = createSnippet(f.getAbsolutePath(), "$(this)", "this", "source.js");
+		bundleElement.addChild(se);
+		BundleManager.getInstance().addBundle(bundleElement);
+
+		// note after is before true proposal, as we are ordering by trigger prefix
+		this.checkProposals("contentAssist/this.js", true, true, "this", "throw", "$(this)");
+
+		BundleManager.getInstance().unloadScript(f);
+
 	}
 
 	/**
