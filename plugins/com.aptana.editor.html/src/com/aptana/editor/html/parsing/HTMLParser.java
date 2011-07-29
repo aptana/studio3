@@ -195,7 +195,7 @@ public class HTMLParser implements IParser
 		if (element.isSelfClosing() && !HTMLParseState.isEndForbiddenOrEmptyTag(element.getName()))
 		{
 			fParseState.addError(new ParseError(element.getStartingOffset(),
-					Messages.HTMLParser_self_closing_syntax_on_non_void_element_error, IParseError.ERROR));
+					Messages.HTMLParser_self_closing_syntax_on_non_void_element_error, IParseError.Severity.ERROR));
 		}
 		return element;
 	}
@@ -346,14 +346,19 @@ public class HTMLParser implements IParser
 					if (node instanceof HTMLElementNode)
 					{
 						elementsToClose.add((HTMLElementNode) node);
-						addMissingEndTagError((HTMLElementNode) node);
+
+						// Only add error if it's not the opening tag for the current tagName
+						if (!((HTMLElementNode) node).getName().equalsIgnoreCase(tagName))
+						{
+							addMissingEndTagError((HTMLElementNode) node);
+						}
 					}
 				}
 			}
 			else
 			{
 				fParseState.addError(new ParseError(fCurrentSymbol.getStart(), Messages.HTMLParser_unexpected_error
-						+ fCurrentSymbol.value, IParseError.WARNING));
+						+ fCurrentSymbol.value, IParseError.Severity.WARNING));
 			}
 		}
 
@@ -384,7 +389,7 @@ public class HTMLParser implements IParser
 		if (fParseState.getCloseTagType(node.getName()) != HTMLTagInfo.END_OPTIONAL)
 		{
 			fParseState.addError(new ParseError(node.getEndingOffset(), Messages.HTMLParser_missing_end_tag_error
-					+ node.getName() + ">", IParseError.WARNING)); //$NON-NLS-1$
+					+ node.getName() + ">", IParseError.Severity.WARNING)); //$NON-NLS-1$
 		}
 	}
 

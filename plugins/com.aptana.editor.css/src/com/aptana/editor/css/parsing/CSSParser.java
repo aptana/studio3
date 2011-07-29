@@ -65,7 +65,7 @@ public class CSSParser extends Parser implements IParser {
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(token, IParseError.ERROR));
+			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)

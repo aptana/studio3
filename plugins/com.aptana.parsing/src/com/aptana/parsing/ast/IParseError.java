@@ -12,9 +12,22 @@ package com.aptana.parsing.ast;
  */
 public interface IParseError
 {
-	public static final int WARNING = 1;
+	public enum Severity
+	{
+		WARNING(1), ERROR(2);
 
-	public static final int ERROR = 2;
+		int code;
+
+		Severity(int code)
+		{
+			this.code = code;
+		}
+
+		public int getCode()
+		{
+			return code;
+		}
+	}
 
 	/**
 	 * The starting offset where the error is located
@@ -35,6 +48,6 @@ public interface IParseError
 	 * 
 	 * @return the severity of the error
 	 */
-	public int getSeverity();
+	public Severity getSeverity();
 
 }

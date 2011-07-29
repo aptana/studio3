@@ -17,10 +17,10 @@ public class ParseError implements IParseError
 {
 	private Symbol fSymbol;
 	private String fMessage;
-	private final int fSeverity;
+	private final Severity fSeverity;
 	private int fOffset;
 
-	public ParseError(Symbol symbol, int severity)
+	public ParseError(Symbol symbol, Severity severity)
 	{
 		fSymbol = symbol;
 		fMessage = buildErrorMessage(symbol);
@@ -31,7 +31,7 @@ public class ParseError implements IParseError
 		}
 	}
 
-	public ParseError(int offset, String message, int severity)
+	public ParseError(int offset, String message, Severity severity)
 	{
 		fSeverity = severity;
 		fMessage = message;
@@ -54,7 +54,7 @@ public class ParseError implements IParseError
 		return fMessage;
 	}
 
-	public int getSeverity()
+	public Severity getSeverity()
 	{
 		return fSeverity;
 	}

@@ -454,7 +454,7 @@ public class ValidationManager implements IValidationManager
 		{
 			try
 			{
-				if (parseError.getSeverity() == IParseError.ERROR)
+				if (parseError.getSeverity() == IParseError.Severity.ERROR)
 				{
 					items.add(createError(parseError.getMessage(),
 							fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
