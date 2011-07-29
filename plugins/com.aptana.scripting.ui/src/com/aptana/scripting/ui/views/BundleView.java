@@ -41,6 +41,7 @@ public class BundleView extends ViewPart
 	BundleViewContentProvider _contentProvider;
 	BundleViewLabelProvider _labelProvider;
 	LoadCycleListener _loadCycleListener;
+	Job _refreshJob;
 
 	/**
 	 * BundleView
@@ -227,7 +228,11 @@ public class BundleView extends ViewPart
 	 */
 	public void refresh()
 	{
-		UIJob job = new UIJob("Refresh Bundles View") //$NON-NLS-1$
+		if (_refreshJob != null && _refreshJob.shouldSchedule())
+		{
+			_refreshJob.cancel();
+		}
+		_refreshJob = new UIJob("Refresh Bundles View") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
@@ -236,8 +241,8 @@ public class BundleView extends ViewPart
 				return Status.OK_STATUS;
 			}
 		};
-		job.setPriority(Job.SHORT);
-		job.schedule();
+		_refreshJob.setPriority(Job.SHORT);
+		_refreshJob.schedule();
 	}
 
 	/**
