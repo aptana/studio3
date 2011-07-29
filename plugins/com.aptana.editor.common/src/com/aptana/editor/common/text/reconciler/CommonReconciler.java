@@ -7,17 +7,19 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import org.eclipse.jface.text.BadLocationException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.jface.text.TextUtilities;
-import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.reconciler.Reconciler;
 
 public class CommonReconciler extends Reconciler {
 
 	private final IReconcilingStrategy defaultStrategy;
+	private final Set<IReconcilingStrategy> reconcilingStrategies = new HashSet<IReconcilingStrategy>();
 	private BundleChangeReconcileTrigger bundleChangeReconcileTrigger;
 
 	/**
@@ -37,13 +39,25 @@ public class CommonReconciler extends Reconciler {
 		setReconcilingStrategy(defaultStrategy, String.valueOf(System.currentTimeMillis()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.Reconciler#setReconcilingStrategy(org.eclipse.jface.text.reconciler.IReconcilingStrategy, java.lang.String)
+	 */
+	@Override
+	public void setReconcilingStrategy(IReconcilingStrategy strategy, String contentType)
+	{
+		super.setReconcilingStrategy(strategy, contentType);
+		reconcilingStrategies.add(strategy);
+	}
+
 	/**
 	 * 
 	 * @param strategy
 	 * @param contentTypes
 	 */
-	public void setReconcilingStrategy(IReconcilingStrategy strategy, String[] contentTypes) {
-		for (String contentType : contentTypes) {
+	public void setReconcilingStrategy(IReconcilingStrategy strategy, Collection<String> contentTypes)
+	{
+		for (String contentType : contentTypes)
+		{
 			setReconcilingStrategy(strategy, contentType);
 		}
 	}
@@ -82,31 +96,16 @@ public class CommonReconciler extends Reconciler {
 	}
 
 	@Override
-	protected void initialProcess() {
-		for (ITypedRegion region : computePartitioning(0, getDocument().getLength())) {
-			IReconcilingStrategy strategy = getReconcilingStrategy(region.getType());
-			strategy.reconcile(region);
+	protected void initialProcess()
+	{
+		for (IReconcilingStrategy s : reconcilingStrategies)
+		{
+			if (s instanceof IReconcilingStrategyExtension)
+			{
+				((IReconcilingStrategyExtension) s).initialReconcile();
+			}
 		}
 		fIninitalProcessDone = true;
-	}
-
-	/**
-	 * Computes and returns the partitioning for the given region of the input document
-	 * of the reconciler's connected text viewer.
-	 *
-	 * @param offset the region offset
-	 * @param length the region length
-	 * @return the computed partitioning
-	 * @since 3.0
-	 */
-	private ITypedRegion[] computePartitioning(int offset, int length) {
-		ITypedRegion[] regions= null;
-		try {
-			regions= TextUtilities.computePartitioning(getDocument(), getDocumentPartitioning(), offset, length, false);
-		} catch (BadLocationException x) {
-			regions= new TypedRegion[0];
-		}
-		return regions;
 	}
 
 	/* (non-Javadoc)

@@ -27,6 +27,7 @@ import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
@@ -71,7 +72,19 @@ public class GitExecutable
 								// reset shell path preferences on Win32
 								if (Platform.OS_WIN32.equals(Platform.getOS()))
 								{
-									ShellExecutable.setPreferenceShellPath(null);
+									String pathString = (String) event.getNewValue();
+									if (pathString != null)
+									{
+										IPath path = Path.fromOSString(pathString);
+										if (path != null && path.toFile().isFile())
+										{
+											path = path.removeLastSegments(1);
+										}
+										if (path.toFile().isDirectory())
+										{
+											ShellExecutable.setPreferenceShellPath(path);
+										}
+									}
 								}
 							}
 						});
@@ -356,6 +369,15 @@ public class GitExecutable
 		{
 			return Version.emptyVersion;
 		}
-		return Version.parseVersion(versionString);
+
+		try
+		{
+			return Version.parseVersion(versionString);
+		}
+		catch (IllegalArgumentException ex)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), Messages.GitExecutable_UnableToParseGitVersion, ex);
+			return Version.emptyVersion;
+		}
 	}
 }

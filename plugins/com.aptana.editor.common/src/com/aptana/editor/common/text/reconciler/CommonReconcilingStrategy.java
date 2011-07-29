@@ -29,6 +29,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 {
 
 	private AbstractThemeableEditor fEditor;
+	private boolean fInitialReconcileDone;
 
 	/**
 	 * Code Folding.
@@ -75,7 +76,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	public void initialReconcile()
 	{
+		if (fInitialReconcileDone)
+		{
+			return;
+		}
 		reconcile(true);
+		fInitialReconcileDone = true;
 	}
 
 	public void setProgressMonitor(IProgressMonitor monitor)
