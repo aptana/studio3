@@ -328,9 +328,19 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				|| FILE_PATTERN.matcher(fullProjectPath).matches())
 		{
 			// only return true if the script is part of an existing bundle.
-			File script = delta.getResource().getLocation().toFile();
+			IResource resource = delta.getResource();
 
-			result = this.isScriptInExistingBundle(script);
+			if (resource != null)
+			{
+				IPath location = resource.getLocation();
+
+				if (location != null)
+				{
+					File script = delta.getResource().getLocation().toFile();
+
+					result = this.isScriptInExistingBundle(script);
+				}
+			}
 		}
 
 		return result;
