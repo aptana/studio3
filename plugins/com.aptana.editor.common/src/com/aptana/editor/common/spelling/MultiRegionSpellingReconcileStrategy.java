@@ -9,15 +9,20 @@
 package com.aptana.editor.common.spelling;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISynchronizable;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
@@ -34,14 +39,18 @@ import org.eclipse.ui.texteditor.spelling.SpellingService;
  */
 public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrategy {
 
+	private final String documentPartitioning;
+	private final Collection<String> contentTypes;
 	private IRegion currentRegion;
 
 	/**
 	 * @param viewer
 	 * @param spellingService
 	 */
-	public MultiRegionSpellingReconcileStrategy(ISourceViewer viewer, SpellingService spellingService) {
+	public MultiRegionSpellingReconcileStrategy(ISourceViewer viewer, SpellingService spellingService, String documentPartitioning, Collection<String> contentTypes) {
 		super(viewer, spellingService);
+		this.documentPartitioning = documentPartitioning;
+		this.contentTypes = contentTypes;
 	}
 
 	/* (non-Javadoc)
@@ -50,6 +59,21 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 	@Override
 	protected ISpellingProblemCollector createSpellingProblemCollector() {
 		return new SpellingProblemCollector(getAnnotationModel());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.spelling.SpellingReconcileStrategy#initialReconcile()
+	 */
+	@Override
+	public void initialReconcile()
+	{
+		for (ITypedRegion region : computePartitioning(0, getDocument().getLength()))
+		{
+			if (contentTypes.contains(region.getType()))
+			{
+				reconcile(region);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -63,6 +87,33 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 		} finally {
 			currentRegion = null;
 		}
+	}
+
+	private String getDocumentPartitioning()
+	{
+		return documentPartitioning;
+	}
+
+	/**
+	 * Computes and returns the partitioning for the given region of the input document
+	 * of the reconciler's connected text viewer.
+	 *
+	 * @param offset the region offset
+	 * @param length the region length
+	 * @return the computed partitioning
+	 * @since 3.0
+	 */
+	private ITypedRegion[] computePartitioning(int offset, int length)
+	{
+		ITypedRegion[] regions = null;
+		try
+		{
+			regions = TextUtilities.computePartitioning(getDocument(), getDocumentPartitioning(), offset, length, false);
+		} catch (BadLocationException x)
+		{
+			regions = new TypedRegion[0];
+		}
+		return regions;
 	}
 
 	/**
