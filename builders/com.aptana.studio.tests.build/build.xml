@@ -23,7 +23,7 @@
 
 	<path id="instrument.classpath">
 		<fileset dir="${baseLocation}/plugins">
-			<include name="com.aptana.*.jar" />
+			<include name="com.aptana.*" />
 		</fileset>
 	</path>
 	<path id="source.path">
@@ -216,8 +216,6 @@
 				<xml outfile="${coverageDirectory}/coverage.xml" depth="method" />
 			</report>
 		</emma>
-		<!-- Remove comments as per: http://issues.hudson-ci.org/browse/HUDSON-7586 -->
-		<replaceregexp file="${coverageDirectory}/coverage.xml" match="&lt;!-.*-&gt;" replace="" byline="true" />
 	</target>
 
 	<target name="test" depends="build">
