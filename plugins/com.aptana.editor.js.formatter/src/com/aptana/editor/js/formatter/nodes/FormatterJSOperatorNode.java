@@ -43,7 +43,7 @@ public class FormatterJSOperatorNode extends FormatterJSTextNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return nodeType == TypeOperator.DELETE;
+		return nodeType == TypeOperator.DELETE || nodeType == TypeOperator.VOID;
 	}
 
 	/*

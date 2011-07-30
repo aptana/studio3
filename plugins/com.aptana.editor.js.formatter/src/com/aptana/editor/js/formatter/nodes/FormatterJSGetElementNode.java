@@ -50,7 +50,7 @@ public class FormatterJSGetElementNode extends FormatterBlockWithBeginNode
 			JSNode parent = (JSNode) getNode.getParent();
 			short parentType = parent.getNodeType();
 			if (parentType != JSNodeTypes.RETURN && parentType != JSNodeTypes.THROW && parentType != JSNodeTypes.DELETE
-					&& parent.getSemicolonIncluded() && parent.getChild(0) == getNode)
+					&& parentType != JSNodeTypes.VOID && parent.getSemicolonIncluded() && parent.getChild(0) == getNode)
 			{
 				return true;
 			}
