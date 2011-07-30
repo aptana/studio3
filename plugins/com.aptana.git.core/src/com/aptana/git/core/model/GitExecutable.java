@@ -23,11 +23,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -59,8 +60,8 @@ public class GitExecutable
 			fgExecutable = GitExecutable.find();
 			if (!fgAddedPrefListener)
 			{
-				new InstanceScope().getNode(GitPlugin.getPluginId()).addPreferenceChangeListener(
-						new IEclipsePreferences.IPreferenceChangeListener()
+				EclipseUtil.instanceScope().getNode(GitPlugin.getPluginId())
+						.addPreferenceChangeListener(new IEclipsePreferences.IPreferenceChangeListener()
 						{
 
 							public void preferenceChange(PreferenceChangeEvent event)
@@ -71,7 +72,19 @@ public class GitExecutable
 								// reset shell path preferences on Win32
 								if (Platform.OS_WIN32.equals(Platform.getOS()))
 								{
-									ShellExecutable.setPreferenceShellPath(null);
+									String pathString = (String) event.getNewValue();
+									if (pathString != null)
+									{
+										IPath path = Path.fromOSString(pathString);
+										if (path != null && path.toFile().isFile())
+										{
+											path = path.removeLastSegments(1);
+										}
+										if (path.toFile().isDirectory())
+										{
+											ShellExecutable.setPreferenceShellPath(path);
+										}
+									}
 								}
 							}
 						});
@@ -83,8 +96,8 @@ public class GitExecutable
 
 	private static IPath getPreferenceGitPath()
 	{
-		String pref = new InstanceScope().getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH,
-				null);
+		String pref = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID)
+				.get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
 		if (!StringUtil.isEmpty(pref))
 		{
 			IPath path = Path.fromOSString(pref);
@@ -108,7 +121,7 @@ public class GitExecutable
 
 	public static void setPreferenceGitPath(IPath path)
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(GitPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(GitPlugin.PLUGIN_ID);
 		if (path != null)
 		{
 			prefs.put(IPreferenceConstants.GIT_EXECUTABLE_PATH, path.toOSString());
@@ -356,6 +369,15 @@ public class GitExecutable
 		{
 			return Version.emptyVersion;
 		}
-		return Version.parseVersion(versionString);
+
+		try
+		{
+			return Version.parseVersion(versionString);
+		}
+		catch (IllegalArgumentException ex)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), Messages.GitExecutable_UnableToParseGitVersion, ex);
+			return Version.emptyVersion;
+		}
 	}
 }

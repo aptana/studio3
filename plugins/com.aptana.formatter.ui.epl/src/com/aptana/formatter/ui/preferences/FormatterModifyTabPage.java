@@ -23,8 +23,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -82,7 +80,7 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		scrollContainer.setLayoutData(gridData);
-
+		scrollContainer.setFont(sashForm.getFont());
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
@@ -90,15 +88,10 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 		layout.verticalSpacing = 0;
 		scrollContainer.setLayout(layout);
 
-		ScrolledComposite scroll = new ScrolledComposite(scrollContainer, SWT.V_SCROLL | SWT.H_SCROLL);
+		ScrolledPageContent scroll = new ScrolledPageContent(scrollContainer, SWT.V_SCROLL | SWT.H_SCROLL);
 		scroll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		scroll.setExpandHorizontal(true);
-		scroll.setExpandVertical(true);
 
-		final Composite settingsContainer = new Composite(scroll, SWT.NONE);
-		settingsContainer.setFont(sashForm.getFont());
-
-		scroll.setContent(settingsContainer);
+		final Composite settingsContainer = scroll.getBody();
 
 		settingsContainer.setLayout(new PageLayout(scroll, 400, 400));
 		settingsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -116,14 +109,6 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 		createOptions(manager, settingsPane);
 
 		settingsContainer.setSize(settingsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-		scroll.addControlListener(new ControlAdapter()
-		{
-			public void controlResized(ControlEvent e)
-			{
-				settingsContainer.setSize(settingsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
 
 		Label sashHandle = new Label(scrollContainer, SWT.SEPARATOR | SWT.VERTICAL);
 		gridData = new GridData(SWT.RIGHT, SWT.FILL, false, true);
@@ -201,14 +186,25 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 	{
 		if (previewViewer != null)
 		{
-			FormatterPreviewUtils.updatePreview(previewViewer, getPreviewContent(), dialog.getFormatterFactory(),
-					dialog.getPreferences());
+			FormatterPreviewUtils.updatePreview(previewViewer, getPreviewContent(), getSubstitutionStrings(),
+					dialog.getFormatterFactory(), dialog.getPreferences());
 		}
 	}
 
 	protected abstract void createOptions(IFormatterControlManager manager, Composite parent);
 
 	protected URL getPreviewContent()
+	{
+		return null;
+	}
+
+	/**
+	 * Returns an array of substitution strings that will be used to substitute strings in the preview-content that were
+	 * marked with {0}, {1}, etc.
+	 * 
+	 * @return A substitution strings array; Null, in case there is no substitution.
+	 */
+	protected String[] getSubstitutionStrings()
 	{
 		return null;
 	}
@@ -308,9 +304,7 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 		label.setText(text);
 
 		PixelConverter pixelConverter = new PixelConverter(parent);
-		label
-				.setLayoutData(createGridData(numColumns, gridDataStyle, pixelConverter
-						.convertHorizontalDLUsToPixels(150)));
+		label.setLayoutData(createGridData(numColumns, gridDataStyle, pixelConverter.convertHorizontalDLUsToPixels(150)));
 		return label;
 	}
 

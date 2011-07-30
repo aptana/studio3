@@ -17,19 +17,20 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.EmptyCommentRule;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.ResumableSingleLineRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
@@ -48,12 +49,12 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
 
-	private IToken stringToken = new Token(STRING);
-
-	private IPredicateRule[] partitioningRules;
-
-	private RuleBasedScanner multilineCommentScanner;
-	private RuleBasedScanner stringScanner;
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(getToken(STRING)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(getToken(STRING)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new EmptyCommentRule(getToken(MULTILINE_COMMENT)),
+			new MultiLineRule("/*", "*/", getToken(MULTILINE_COMMENT), (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
+	};
 
 	private static CSSSourceConfiguration instance;
 
@@ -74,13 +75,6 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private CSSSourceConfiguration() {
-
-		IToken comment = new Token(MULTILINE_COMMENT);
-
-		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new SingleLineRule("\'", "\'", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new EmptyCommentRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
-		};
 	}
 
 	/*
@@ -108,7 +102,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -155,21 +149,17 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private ITokenScanner getCommentScanner() {
-		if (multilineCommentScanner == null) {
-			multilineCommentScanner = new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
-		}
-		return multilineCommentScanner;
+		return new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 	}
 
 	private ITokenScanner getStringScanner() {
-		if (stringScanner == null) {
-			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
-		}
+		RuleBasedScanner stringScanner = new RuleBasedScanner();
+		stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
 		return stringScanner;
 	}
 
-	private IToken getToken(String name) {
-		return new Token(name);
+	private static IToken getToken(String tokenName) {
+		return CommonUtil.getToken(tokenName);
 	}
+
 }

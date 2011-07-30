@@ -16,12 +16,12 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -46,12 +46,11 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IBeaverConstants.CONTENT_TYPE_BEAVER } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new EndOfLineRule("//", new Token(BEAVER_SINGLELINE_COMMENT)), //$NON-NLS-1$
-		new EmptyCommentRule(new Token(BEAVER_MULTILINE_COMMENT)),
-		new MultiLineRule("/*", "*/", new Token(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("{:", ":}", new Token(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
+		new EndOfLineRule("//", getToken(BEAVER_SINGLELINE_COMMENT)), //$NON-NLS-1$
+		new EmptyCommentRule(getToken(BEAVER_MULTILINE_COMMENT)),
+		new MultiLineRule("/*", "*/", getToken(BEAVER_MULTILINE_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("{:", ":}", getToken(BEAVER_BLOCK), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
-	private BeaverSourceScanner beaverScanner;
 
 	private static BeaverSourceConfiguration instance;
 
@@ -86,7 +85,7 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -119,12 +118,7 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	 */
 	private ITokenScanner getDTDScanner()
 	{
-		if (beaverScanner == null)
-		{
-			beaverScanner = new BeaverSourceScanner();
-		}
-
-		return beaverScanner;
+		return new BeaverSourceScanner();
 	}
 
 	/*
@@ -142,10 +136,10 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	 * @param tokenName
 	 * @return
 	 */
-	private IToken getToken(String tokenName)
-	{
-		return new Token(tokenName);
-	}
+    private static IToken getToken(String tokenName)
+    {
+        return CommonUtil.getToken(tokenName);
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -171,15 +165,15 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.beaver"))); //$NON-NLS-1$
+		dr = new ThemeingDamagerRepairer(new CommentScanner(getToken("comment.block.beaver"))); //$NON-NLS-1$
 		reconciler.setDamager(dr, BEAVER_MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, BEAVER_MULTILINE_COMMENT);
 
-		dr = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.line.double-slash.beaver"))); //$NON-NLS-1$
+		dr = new ThemeingDamagerRepairer(new CommentScanner(getToken("comment.line.double-slash.beaver"))); //$NON-NLS-1$
 		reconciler.setDamager(dr, BEAVER_SINGLELINE_COMMENT);
 		reconciler.setRepairer(dr, BEAVER_SINGLELINE_COMMENT);
 
-		NonRuleBasedDamagerRepairer blockDR = new NonRuleBasedDamagerRepairer(this.getToken("source.block.beaver")); //$NON-NLS-1$
+		NonRuleBasedDamagerRepairer blockDR = new NonRuleBasedDamagerRepairer(getToken("source.block.beaver")); //$NON-NLS-1$
 		reconciler.setDamager(blockDR, BEAVER_BLOCK);
 		reconciler.setRepairer(blockDR, BEAVER_BLOCK);
 	}

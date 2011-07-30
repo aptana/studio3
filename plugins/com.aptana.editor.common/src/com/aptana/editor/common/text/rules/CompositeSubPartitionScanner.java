@@ -8,8 +8,6 @@
 
 package com.aptana.editor.common.text.rules;
 
-import java.util.Collection;
-
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -55,7 +53,7 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.ISubPartitionScanner#getRules()
 	 */
-	public Collection<IPredicateRule> getRules() {
+	public IPredicateRule[] getRules() {
 		return subPartitionScanners[current].getRules();
 	}
 

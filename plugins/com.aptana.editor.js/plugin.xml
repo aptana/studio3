@@ -50,19 +50,28 @@
    <extension
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
-            class="com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant">
+            class="com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant"
+            id="com.aptana.editor.js.indexer"
+            name="JS Indexer"
+            priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.js">
          </contentTypeBinding>
       </fileIndexingParticipant>
       <fileIndexingParticipant
-            class="com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant">
+            class="com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant"
+            id="com.aptana.editor.sdocml.indexer"
+            name="SDocML Indexer"
+            priority="100">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.sdocml">
          </contentTypeBinding>
       </fileIndexingParticipant>
       <fileIndexingParticipant
-            class="com.aptana.editor.js.contentassist.index.JSCAFileIndexingParticipant">
+            class="com.aptana.editor.js.contentassist.index.JSCAFileIndexingParticipant"
+            id="com.aptana.editor.jsca.indexer"
+            name="JSCA Indexer"
+            priority="100">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.jsca">
          </contentTypeBinding>
@@ -201,11 +210,19 @@
       <hover
             class="com.aptana.editor.js.text.JSTextHover"
             id="com.aptana.editor.js.hover"
-            label="JS Documentation Hover">
+            label="%js.hover.label">
          <contentType
                type="com.aptana.contenttype.js">
          </contentType>
       </hover>
+   </extension>
+   <extension
+         point="com.aptana.index.core.ui.indexViewContributors">
+      <contributor
+            content-provider="com.aptana.editor.js.views.JSIndexViewContentProvider"
+            label-provider="com.aptana.editor.js.views.JSIndexViewLabelProvider"
+            name="%js.index.view.contributors">
+      </contributor>
    </extension>
 
 </plugin>

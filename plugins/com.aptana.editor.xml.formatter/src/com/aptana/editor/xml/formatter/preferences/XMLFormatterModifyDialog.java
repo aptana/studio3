@@ -32,6 +32,8 @@ public class XMLFormatterModifyDialog extends FormatterModifyDialog
 		addTabPage(Messages.XMLFormatterModifyDialog_indentationTabName, new XMLFormatterIndentationPage(this));
 		addTabPage(Messages.XMLFormatterModifyDialog_newLinesTabName, new XMLFormatterNewLinesPage(this));
 		addTabPage(Messages.XMLFormatterModifyDialog_BlankLinesTabName, new XMLFormatterBlankLinesPage(this));
+		addTabPage(com.aptana.formatter.ui.preferences.Messages.FormatterModifyDialog_OffOnTags,
+				new XMLFormatterOffOnPage(this));
 
 		// TODO: Fix issue with comments not wrapping correctly with newlines
 		// Something like: /*

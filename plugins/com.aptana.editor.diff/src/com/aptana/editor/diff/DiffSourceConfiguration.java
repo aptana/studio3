@@ -22,12 +22,12 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.PatternRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -102,18 +102,18 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 	@SuppressWarnings("nls")
 	private DiffSourceConfiguration()
 	{
-		Token changed = new Token(CHANGED);
-		Token deleted = new Token(DELETED);
-		Token inserted = new Token(INSERTED);
-		Token header = new Token(HEADER);
-		Token separator = new Token(SEPARATOR);
-		Token range = new Token(RANGE);
+		IToken changed = getToken(CHANGED);
+		IToken deleted = getToken(DELETED);
+		IToken inserted = getToken(INSERTED);
+		IToken header = getToken(HEADER);
+		IToken separator = getToken(SEPARATOR);
+		IToken range = getToken(RANGE);
 		List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
 
 		PatternRule rule;
 
 		// Index
-		rule = new EndOfLineRule("Index: ", new Token(INDEX));
+		rule = new EndOfLineRule("Index: ", getToken(INDEX));
 		rule.setColumnConstraint(0);
 		rules.add(rule);
 
@@ -221,7 +221,7 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -296,8 +296,9 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 		return multilineCommentScanner;
 	}
 
-	private IToken getToken(String name)
+	private static IToken getToken(String tokenName)
 	{
-		return new Token(name);
+		return CommonUtil.getToken(tokenName);
 	}
+
 }

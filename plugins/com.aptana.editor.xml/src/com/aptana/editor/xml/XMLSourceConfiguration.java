@@ -17,12 +17,12 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
@@ -59,16 +59,10 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		new MultiLineRule("<?", "?>", getToken(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<!--", "-->", getToken(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<![CDATA[", "]]>", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
-		new DocTypeRule(new ExtendedToken(DOCTYPE), true),
+		new DocTypeRule(new ExtendedToken(getToken(DOCTYPE)), true),
 		new TagRule("/", getToken(TAG)), //$NON-NLS-1$
-		new TagRule(new ExtendedToken(TAG)), //
+		new TagRule(new ExtendedToken(getToken(TAG))), //
 	};
-
-	private XMLScanner xmlScanner;
-	private RuleBasedScanner cdataScanner;
-	private RuleBasedScanner preProcessorScanner;
-	private XMLTagScanner xmlTagScanner;
-	private CommentScanner commentScanner;
 
 	private static XMLSourceConfiguration instance;
 
@@ -182,43 +176,32 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private ITokenScanner getCommentScanner() {
-		if (commentScanner == null) {
-			commentScanner = new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
-		}
-		return commentScanner;
+		return new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getPreProcessorScanner() {
-		if (preProcessorScanner == null) {
-			preProcessorScanner = new XMLTagScanner();
-			preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
-		}
+		XMLTagScanner preProcessorScanner = new XMLTagScanner();
+		preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		return preProcessorScanner;
 	}
 
 	private ITokenScanner getCDATAScanner() {
-		if (cdataScanner == null) {
-			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		}
+		RuleBasedScanner cdataScanner = new RuleBasedScanner();
+		cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		return cdataScanner;
 	}
 
 	private ITokenScanner getXMLScanner() {
-		if (xmlScanner == null) {
-			xmlScanner = new XMLScanner();
-		}
-		return xmlScanner;
+		return new XMLScanner();
 	}
 
 	private ITokenScanner getXMLTagScanner() {
-		if (xmlTagScanner == null) {
-			xmlTagScanner = new XMLTagScanner();
-		}
-		return xmlTagScanner;
+		return  new XMLTagScanner();
 	}
 
-	private IToken getToken(String tokenName) {
-		return new Token(tokenName);
+	private static IToken getToken(String tokenName)
+	{
+		return CommonUtil.getToken(tokenName);
 	}
+
 }

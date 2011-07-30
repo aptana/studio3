@@ -14,7 +14,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import com.aptana.preview.Activator;
+import com.aptana.preview.PreviewPlugin;
 
 /**
  * @author Max Stepanov
@@ -51,7 +51,7 @@ public final class PreviewEditorInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
 	 */
 	public ImageDescriptor getImageDescriptor() {
-		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/obj16/preview.png"); //$NON-NLS-1$
+		return PreviewPlugin.imageDescriptorFromPlugin(PreviewPlugin.PLUGIN_ID, "icons/obj16/preview.png"); //$NON-NLS-1$
 	}
 
 	/*

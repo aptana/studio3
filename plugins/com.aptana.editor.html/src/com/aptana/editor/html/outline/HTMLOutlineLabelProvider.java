@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.ICSSConstants;
@@ -19,6 +20,7 @@ import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
+import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 
@@ -66,6 +68,12 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 		if (element instanceof HTMLElementNode)
 		{
 			return ((HTMLElementNode) element).getText();
+		}
+		if (element instanceof HTMLTextNode)
+		{
+			String text = ((HTMLTextNode) element).getText().trim();
+			// limits to show the first 20 characters
+			return StringUtil.truncate(text, 20);
 		}
 		return super.getDefaultText(element);
 	}

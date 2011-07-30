@@ -258,10 +258,13 @@ public abstract class ProcessUtil
 			map = new TreeMap<String, String>(environment);
 			processBuilder.environment().putAll(environment);
 		}
-		IdeLog.logInfo(
-				CorePlugin.getDefault(),
-				StringUtil.format(Messages.ProcessUtil_RunningProcess, new Object[] {
-						StringUtil.join("\" \"", command), workingDirectory, map }), IDebugScopes.SHELL); //$NON-NLS-1$
+		if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL))
+		{
+			IdeLog.logInfo(
+					CorePlugin.getDefault(),
+					StringUtil.format(Messages.ProcessUtil_RunningProcess,
+							new Object[] { StringUtil.join("\" \"", command), workingDirectory, map }), IDebugScopes.SHELL); //$NON-NLS-1$
+		}
 		return processBuilder.start();
 	}
 

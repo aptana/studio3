@@ -8,7 +8,6 @@
 package com.aptana.git.ui.internal.preferences;
 
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -18,6 +17,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
@@ -76,6 +76,6 @@ public class GitPreferencePage extends FieldEditorPreferencePage implements IWor
 	@Override
 	protected IPreferenceStore doGetPreferenceStore()
 	{
-		return new ScopedPreferenceStore(new InstanceScope(), GitPlugin.getPluginId());
+		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), GitPlugin.getPluginId());
 	}
 }

@@ -111,7 +111,7 @@ public class FormatterWriter implements IFormatterWriter
 	 */
 	public void writeText(IFormatterContext context, String text, boolean removePreviousSpaces)
 	{
-		if (text.length() != 0)
+		if (text.trim().length() != 0)
 		{
 			skipNextNewLine = false;
 		}
@@ -481,6 +481,24 @@ public class FormatterWriter implements IFormatterWriter
 	public void excludeRegion(IRegion region, EXCLUDE_STRATEGY strategy)
 	{
 		excludes.excludeRegion(region, strategy);
+	}
+
+	/**
+	 * Exclude a list of regions.
+	 * 
+	 * @param regions
+	 * @param strategy
+	 * @see #excludeRegion(IRegion, EXCLUDE_STRATEGY)
+	 */
+	public void excludeRegions(List<IRegion> regions, EXCLUDE_STRATEGY strategy)
+	{
+		if (regions != null)
+		{
+			for (IRegion region : regions)
+			{
+				excludes.excludeRegion(region, strategy);
+			}
+		}
 	}
 
 	public void addNewLineCallback(IFormatterCallback callback)

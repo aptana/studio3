@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.IProcessConfiguration;
 
 /* package */ abstract class AbstractProcessConfiguration implements IProcessConfiguration {
@@ -27,7 +27,7 @@ import com.aptana.terminal.IProcessConfiguration;
 	 * @see com.aptana.terminal.IProcessConfiguration#getExecutable()
 	 */
 	public File getExecutable() {
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), getExecutablePath(), null);
+		URL url = FileLocator.find(TerminalPlugin.getDefault().getBundle(), getExecutablePath(), null);
 		return ResourceUtil.resourcePathToFile(url);
 	}
 

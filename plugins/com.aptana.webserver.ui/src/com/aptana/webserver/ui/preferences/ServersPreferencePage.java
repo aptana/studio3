@@ -46,7 +46,7 @@ import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.ServerConfigurationManager;
 import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
 import com.aptana.webserver.core.WebServerCorePlugin;
-import com.aptana.webserver.ui.Activator;
+import com.aptana.webserver.ui.WebServerUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -150,7 +150,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 							}
 						}
 					} catch (CoreException e) {
-						Activator.log(e);
+						WebServerUIPlugin.log(e);
 					}
 				}
 			}
@@ -226,7 +226,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+		setPreferenceStore(WebServerUIPlugin.getDefault().getPreferenceStore());
 	}
 
 }

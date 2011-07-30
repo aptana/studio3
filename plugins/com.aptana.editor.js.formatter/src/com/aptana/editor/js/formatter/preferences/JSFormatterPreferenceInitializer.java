@@ -11,7 +11,12 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.DEFAULT_FORMATTER_OFF;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.DEFAULT_FORMATTER_ON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_INDENTATION_SIZE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF_ON_ENABLED;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_ON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_CHAR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_SIZE;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_BLOCKS;
@@ -60,10 +65,10 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.js.formatter.JSFormatterPlugin;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
@@ -83,7 +88,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences store = new DefaultScope().getNode(JSFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(JSFormatterPlugin.PLUGIN_ID);
 
 		store.put(FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
@@ -136,6 +141,9 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.putInt(SPACES_AFTER_SEMICOLON, 1);
 		store.putInt(SPACES_BEFORE_CASE_COLON_OPERATOR, 1);
 		store.putInt(SPACES_AFTER_CASE_COLON_OPERATOR, 1);
+		store.putBoolean(FORMATTER_OFF_ON_ENABLED, false);
+		store.put(FORMATTER_ON, DEFAULT_FORMATTER_ON);
+		store.put(FORMATTER_OFF, DEFAULT_FORMATTER_OFF);
 		try
 		{
 			store.flush();

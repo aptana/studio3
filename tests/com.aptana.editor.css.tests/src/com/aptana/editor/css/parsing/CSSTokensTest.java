@@ -43,6 +43,7 @@ public class CSSTokensTest extends TestCase
 	protected void assertToken(String source, Object data, int offset, int length)
 	{
 		assertToken(source, new TokenInfo(data, offset, length));
+		assertToken(source.toUpperCase(), new TokenInfo(data, offset, length));
 	}
 
 	protected void assertToken(String source, TokenInfo... infos)

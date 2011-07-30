@@ -24,8 +24,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import com.aptana.formatter.ui.preferences.ScrolledPageContent;
@@ -260,10 +263,19 @@ public class SWTFactory
 		return createLabel(parent, text, 0, font, hspan);
 	}
 
+	public static Label createCenteredLabel(Composite parent, String text)
+	{
+		Label l = new Label(parent, SWT.NONE);
+		l.setText(text);
+
+		GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1);
+		l.setLayoutData(gd);
+		return l;
+	}
+
 	public static Label createLabel(Composite parent, String text, int indent, Font font, int hspan)
 	{
 		Label l = new Label(parent, SWT.NONE);
-		l.setFont(font);
 		l.setText(text);
 
 		GridData gd = new GridData();
@@ -286,13 +298,11 @@ public class SWTFactory
 	 *            the parent composite to add this label widget to
 	 * @param text
 	 *            the text for the label
-	 * @param hspan
-	 *            the horizontal span to take up in the parent composite
 	 * @return the new label
 	 */
-	public static Label createLabel(Composite parent, String text, int hspan)
+	public static Label createLabel(Composite parent, String text)
 	{
-		return createLabel(parent, text, 0, hspan);
+		return createLabel(parent, text, 0, 1);
 	}
 
 	/**
@@ -369,6 +379,26 @@ public class SWTFactory
 	}
 
 	/**
+	 * @param parent
+	 * @param min
+	 * @param max
+	 * @param hspan
+	 * @param style
+	 * @return
+	 */
+	public static Spinner createSpinner(Composite parent, int min, int max, int hspan, int style)
+	{
+		Spinner spinner = new Spinner(parent, SWT.BORDER | style);
+		spinner.setMinimum(min);
+		spinner.setMaximum(max);
+
+		GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false, hspan, 1);
+		gd.widthHint = 20;
+		spinner.setLayoutData(gd);
+		return spinner;
+	}
+
+	/**
 	 * Creates a Group widget
 	 * 
 	 * @param parent
@@ -439,8 +469,7 @@ public class SWTFactory
 	 */
 	public static void showPreferencePage(String page_id, String[] page_filters)
 	{
-		PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(), page_id, page_filters, null)
-				.open();
+		PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(), page_id, page_filters, null).open();
 	}
 
 	/**
@@ -448,6 +477,37 @@ public class SWTFactory
 	 * 
 	 * @param parent
 	 *            the parent composite to add this composite to
+	 * @param columns
+	 *            the number of columns within the composite
+	 * @param horizontalSpacing
+	 *            the number of pixels between the right edge of one cell and the left edge of its neighbouring cell to
+	 *            the right.
+	 * @param hspan
+	 *            the horizontal span the composite should take up on the parent
+	 * @param fill
+	 *            the style for how this composite should fill into its parent Can be one of
+	 *            <code>GridData.FILL_HORIZONAL</code>, <code>GridData.FILL_BOTH</code> or
+	 *            <code>GridData.FILL_VERTICAL</code>
+	 * @return the new group
+	 */
+	public static Composite createComposite(Composite parent, int columns, int horizontalSpacing, int hspan, int fill)
+	{
+		Composite g = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(columns, false);
+		layout.horizontalSpacing = horizontalSpacing;
+		g.setLayout(layout);
+		g.setFont(parent.getFont());
+		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, hspan, 1);
+		g.setLayoutData(gd);
+		return g;
+	}
+
+	/**
+	 * Creates a Composite widget
+	 * 
+	 * @param parent
+	 *            the parent composite to add this composite to
+	 * @param font
 	 * @param columns
 	 *            the number of columns within the composite
 	 * @param hspan
@@ -578,31 +638,55 @@ public class SWTFactory
 	}
 
 	/**
-	 * Creates an ExpandibleComposite widget
+	 * Create an expandable widget.
 	 * 
 	 * @param parent
-	 *            the parent to add this widget to
-	 * @param style
-	 *            the style for ExpandibleComposite expanding handle, and layout
 	 * @param label
-	 *            the label for the widget
-	 * @param hspan
-	 *            how many columns to span in the parent
-	 * @param fill
-	 *            the fill style for the widget Can be one of <code>GridData.FILL_HORIZONAL</code>,
-	 *            <code>GridData.FILL_BOTH</code> or <code>GridData.FILL_VERTICAL</code>
-	 * @return a new ExpandibleComposite widget
+	 * @param nColumns
+	 * @return an {@link ExpandableComposite}
 	 */
-	public static ExpandableComposite createExpandibleComposite(Composite parent, int style, String label, int hspan,
-			int fill)
+	public static ExpandableComposite createExpandibleComposite(Composite parent, String label, int nColumns)
 	{
-		ExpandableComposite ex = new ExpandableComposite(parent, SWT.NONE, style);
-		ex.setText(label);
-		ex.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-		GridData gd = new GridData(fill);
-		gd.horizontalSpan = hspan;
-		ex.setLayoutData(gd);
-		return ex;
+		return createExpandibleComposite(parent, label, nColumns, false);
+	}
+
+	/**
+	 * Create an expandable widget.
+	 * 
+	 * @param parent
+	 * @param label
+	 * @param nColumns
+	 * @param expanded
+	 *            Initial expansion state of the composite.
+	 * @return an {@link ExpandableComposite}
+	 */
+	public static ExpandableComposite createExpandibleComposite(Composite parent, String label, int nColumns,
+			boolean expanded)
+	{
+		ExpandableComposite excomposite = new ExpandableComposite(parent, SWT.NONE, ExpandableComposite.TWISTIE
+				| ExpandableComposite.CLIENT_INDENT);
+		excomposite.setText(label);
+		excomposite.setExpanded(expanded);
+		excomposite.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+		excomposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false, nColumns, 1));
+		excomposite.addExpansionListener(new IExpansionListener()
+		{
+			public void expansionStateChanging(ExpansionEvent e)
+			{
+			}
+
+			public void expansionStateChanged(ExpansionEvent e)
+			{
+				ScrolledPageContent scrolledComposite = getParentScrolledComposite((Control) e.getSource());
+				if (scrolledComposite != null)
+				{
+					scrolledComposite.reflow(true);
+					scrolledComposite.layout(true, true);
+				}
+			}
+		});
+		makeScrollableCompositeAware(excomposite);
+		return excomposite;
 	}
 
 	private static ScrolledPageContent getParentScrolledComposite(Control control)
@@ -619,7 +703,7 @@ public class SWTFactory
 		return null;
 	}
 
-	private static void makeScrollableCompositeAware(Control control)
+	public static void makeScrollableCompositeAware(Control control)
 	{
 		ScrolledPageContent parentScrolledComposite = getParentScrolledComposite(control);
 		if (parentScrolledComposite != null)
@@ -627,5 +711,4 @@ public class SWTFactory
 			parentScrolledComposite.adaptChild(control);
 		}
 	}
-
 }

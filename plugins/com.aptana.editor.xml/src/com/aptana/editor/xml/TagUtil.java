@@ -18,7 +18,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 
 /**
- * Utilities for dealing with HTML tags.
+ * Utilities for dealing with tags.
  * 
  * @author Ingo Muschenetz
  */
@@ -152,6 +152,12 @@ public class TagUtil
 			start = 0;
 			length = region.getOffset() - 1;
 		}
+
+		if (length < 0)
+		{
+			return null;
+		}
+
 		List<ITypedRegion> previousPartitions = Arrays.asList(document.computePartitioning(start, length));
 		if (!findClose)
 		{
@@ -238,4 +244,26 @@ public class TagUtil
 		return openTag;
 	}
 
+	/**
+	 * isStartTag
+	 * 
+	 * @param source
+	 * @return boolean
+	 */
+	public static boolean isStartTag(String source)
+	{
+		return source.startsWith("<") && !source.startsWith("</"); //$NON-NLS-1$ //$NON-NLS-2$ 
+	}
+
+	/**
+	 * isEndTag
+	 * 
+	 * @param lexeme
+	 * @return boolean
+	 */
+	public static boolean isEndTag(String source)
+	{
+		// is source ending with /> also an end tag?
+		return source.startsWith("</"); //$NON-NLS-1$ 
+	}
 }

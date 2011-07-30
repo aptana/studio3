@@ -19,14 +19,13 @@ import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -65,9 +64,6 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			UNNUMBERED_LIST, NUMBERED_LIST, SEPARATOR, QUOTE, BLOCK, HTML_TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IMarkdownConstants.CONTENT_TYPE_MARKDOWN } };
-
-	private MarkdownScanner xmlScanner;
-	private RuleBasedScanner headingScanner;
 
 	private static MarkdownSourceConfiguration instance;
 
@@ -123,10 +119,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
 
 		// BlockQuotes
-		rules.add(new HardWrapLineRule(">", null, new Token(QUOTE))); //$NON-NLS-1$
-		rules.add(new HardWrapLineRule(" >", null, new Token(QUOTE))); //$NON-NLS-1$
-		rules.add(new HardWrapLineRule("  >", null, new Token(QUOTE))); //$NON-NLS-1$
-		rules.add(new HardWrapLineRule("   >", null, new Token(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule(">", null, getToken(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule(" >", null, getToken(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule("  >", null, getToken(QUOTE))); //$NON-NLS-1$
+		rules.add(new HardWrapLineRule("   >", null, getToken(QUOTE))); //$NON-NLS-1$
 
 		// Separators
 		final char[] separatorChars = { '*', '-', '_' };
@@ -142,10 +138,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 
 		// Inline HTML, // FIXME This needs to be merged with BlockLevelRule!
-		TagRule tagRule = new TagRule("/", new Token(HTML_TAG)); //$NON-NLS-1$
+		TagRule tagRule = new TagRule("/", getToken(HTML_TAG)); //$NON-NLS-1$
 		tagRule.setColumnConstraint(0);
 		rules.add(tagRule);
-		tagRule = new TagRule(new Token(HTML_TAG));
+		tagRule = new TagRule(getToken(HTML_TAG));
 		tagRule.setColumnConstraint(0);
 		rules.add(tagRule);
 
@@ -160,7 +156,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		// Numbered Lists
 		for (int i = 1; i <= 100; i++)
 		{
-			rules.add(new BlockLevelRule(i + ".", null, new Token(NUMBERED_LIST))); //$NON-NLS-1$
+			rules.add(new BlockLevelRule(i + ".", null, getToken(NUMBERED_LIST))); //$NON-NLS-1$
 		}
 
 		// Headings
@@ -172,10 +168,10 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		}
 
 		// Blocks
-		SingleLineRule rule = new EndOfLineRule("    ", new Token(BLOCK)); //$NON-NLS-1$
+		SingleLineRule rule = new EndOfLineRule("    ", getToken(BLOCK)); //$NON-NLS-1$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
-		rule = new EndOfLineRule("\t", new Token(BLOCK)); //$NON-NLS-1$
+		rule = new EndOfLineRule("\t", getToken(BLOCK)); //$NON-NLS-1$
 		rule.setColumnConstraint(0);
 		rules.add(rule);
 
@@ -201,7 +197,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			string += " ";
 		}
 		string += c;
-		SingleLineRule rule = new SingleLineRule(string, "", new Token(SEPARATOR), (char) 0, true);
+		SingleLineRule rule = new SingleLineRule(string, "", getToken(SEPARATOR), (char) 0, true);
 		rule.setColumnConstraint(0);
 		return rule;
 
@@ -217,7 +213,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 			str += " ";
 		}
 		str += c + " ";
-		return new BlockLevelRule(str, null, new Token(UNNUMBERED_LIST));
+		return new BlockLevelRule(str, null, getToken(UNNUMBERED_LIST));
 	}
 
 	private SingleLineRule createSetexHeadingRule(char c, int level)
@@ -227,7 +223,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		{
 			token = HEADING_2;
 		}
-		SingleLineRule rule = new SingleLineRule("" + c, null, new Token(token)); //$NON-NLS-1$
+		SingleLineRule rule = new SingleLineRule("" + c, null, getToken(token)); //$NON-NLS-1$
 		rule.setColumnConstraint(0);
 		return rule;
 	}
@@ -239,7 +235,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		{
 			header += "#"; //$NON-NLS-1$
 		}
-		SingleLineRule rule = new SingleLineRule(header, header, new Token(HEADING), (char) 0, true);
+		SingleLineRule rule = new SingleLineRule(header, header, getToken(HEADING), (char) 0, true);
 		rule.setColumnConstraint(0);
 		return rule;
 	}
@@ -250,7 +246,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(getPartitioningRules(), CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(getPartitioningRules(), CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -315,24 +311,17 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 
 	private ITokenScanner getPreProcessorScanner()
 	{
-		if (headingScanner == null)
-		{
-			headingScanner = new MarkdownHeadingScanner();
-		}
-		return headingScanner;
+		return new MarkdownHeadingScanner();
 	}
 
 	private ITokenScanner getMarkdownScanner()
 	{
-		if (xmlScanner == null)
-		{
-			xmlScanner = new MarkdownScanner();
-		}
-		return xmlScanner;
+		return new MarkdownScanner();
 	}
 
-	private IToken getToken(String tokenName)
+	private static IToken getToken(String tokenName)
 	{
-		return new Token(tokenName);
+		return CommonUtil.getToken(tokenName);
 	}
+
 }

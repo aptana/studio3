@@ -17,11 +17,9 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.scripting.ScriptingActivator;
 
 public class CommandContext
@@ -53,45 +51,36 @@ public class CommandContext
 	{
 		if (contextContributors == null)
 		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			List<ContextContributor> contributors = new ArrayList<ContextContributor>();
+			final List<ContextContributor> contributors = new ArrayList<ContextContributor>();
 
-			if (registry != null)
-			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, CONTEXT_CONTRIBUTOR_ID);
-
-				if (extensionPoint != null)
+			// @formatter:off
+			EclipseUtil.processConfigurationElements(
+				ScriptingActivator.PLUGIN_ID,
+				CONTEXT_CONTRIBUTOR_ID,
+				new IConfigurationElementProcessor()
 				{
-					IExtension[] extensions = extensionPoint.getExtensions();
-
-					for (IExtension extension : extensions)
+					public void processElement(IConfigurationElement element)
 					{
-						IConfigurationElement[] elements = extension.getConfigurationElements();
-
-						for (IConfigurationElement element : elements)
+						try
 						{
-							if (element.getName().equals(TAG_CONTRIBUTOR))
-							{
-								try
-								{
-									ContextContributor contributor = (ContextContributor) element.createExecutableExtension(ATTR_CLASS);
-									
-									contributors.add(contributor);
-								}
-								catch (CoreException e)
-								{
-									String message = MessageFormat.format(
-										Messages.CommandElement_Error_Creating_Contributor,
-										new Object[] { e.getMessage() }
-									);
-									
-									ScriptingActivator.logError(message, e);
-								}
-							}
+							ContextContributor contributor = (ContextContributor) element.createExecutableExtension(ATTR_CLASS);
+
+							contributors.add(contributor);
+						}
+						catch (CoreException e)
+						{
+							String message = MessageFormat.format(
+								Messages.CommandElement_Error_Creating_Contributor,
+								new Object[] { e.getMessage() }
+							);
+
+							ScriptingActivator.logError(message, e);
 						}
 					}
-				}
-			}
+				},
+				TAG_CONTRIBUTOR
+			);
+			// @formatter:on
 
 			contextContributors = contributors.toArray(new ContextContributor[contributors.size()]);
 		}

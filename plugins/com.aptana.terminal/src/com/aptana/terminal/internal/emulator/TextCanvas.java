@@ -30,7 +30,7 @@ import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
 import org.eclipse.tm.terminal.model.Style;
 
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 
 /**
@@ -40,7 +40,7 @@ import com.aptana.terminal.hyperlink.IHyperlinkDetector;
  */
 public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.TextCanvas {
 
-	private static final String HYPERLINK_DETECTOR_EXT_PT = Activator.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$
+	private static final String HYPERLINK_DETECTOR_EXT_PT = TerminalPlugin.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$
 	
 	private Map<Integer, IHyperlink[]> fLinks = new HashMap<Integer, IHyperlink[]>();
 	private int fLastHash;
@@ -157,7 +157,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 				try {
 					result.add((IHyperlinkDetector) config[i].createExecutableExtension("class")); //$NON-NLS-1$
 				} catch (CoreException e) {
-					Activator.log(e);
+					TerminalPlugin.log(e);
 				}
 			}
 			fDetectors = result.toArray(new IHyperlinkDetector[result.size()]);

@@ -60,6 +60,7 @@ import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
 import com.aptana.js.debug.core.IJSDebugConstants;
@@ -365,7 +366,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try {
 			if (ERR.equals(log) || EXCEPTION.equals(log)) {
-				OutputStream err = ((JSDebugProcess) process).getStream(IJSDebugConstants.ID_STANDARD_ERROR_STREAM);
+				OutputStream err = ((JSDebugProcess) process).getStream(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM);
 				if (err != null) {
 					err.write(text.getBytes());
 				}
@@ -375,7 +376,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				}
 				OutputStream out = ((JSDebugProcess) process).getStream(log);
 				if (out == null) {
-					out = ((JSDebugProcess) process).getStream(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM);
+					out = ((JSDebugProcess) process).getStream(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM);
 				}
 				if (out != null) {
 					out.write(text.getBytes());

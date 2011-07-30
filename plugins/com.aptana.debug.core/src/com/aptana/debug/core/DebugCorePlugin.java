@@ -8,13 +8,11 @@
 package com.aptana.debug.core;
 
 import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.debug.core.DebugPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.core.internal.UniformResourceBreakpointChangeNotifier;
 import com.aptana.debug.core.sourcelookup.RemoteSourceCacheManager;
 
@@ -102,73 +100,5 @@ public class DebugCorePlugin extends Plugin {
 			}
 		}
 		return adapter;
-	}
-
-	/**
-	 * Log a particular status
-	 * 
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void log(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
 	}
 }

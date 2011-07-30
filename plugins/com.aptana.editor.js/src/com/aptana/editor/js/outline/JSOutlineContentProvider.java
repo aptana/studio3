@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
@@ -27,8 +28,10 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSOutlineContentProvider extends CommonOutlineContentProvider
 {
+
 	private static final String CONTAINER_TYPE = "/"; //$NON-NLS-1$
 	private static final String PROPERTY_TYPE = "."; //$NON-NLS-1$
+	private static final String FUNCTION_LITERAL = "<function>"; //$NON-NLS-1$
 
 	private Map<String, JSOutlineItem> fItemsByScope;
 	private JSOutlineItem fLastAddedItem;
@@ -355,7 +358,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			else
 			{
 				nameNode = node;
-				name = "<literal>"; //$NON-NLS-1$
+				name = FUNCTION_LITERAL;
 			}
 		}
 
@@ -369,16 +372,25 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		JSOutlineItem item = fItemsByScope.get(fullpath);
 		if (item == null)
 		{
-			IParseNode parameters = node.getChild(1);
+			String text;
+			if (name.endsWith(FUNCTION_LITERAL + ")")) //$NON-NLS-1$
+			{
+				text = name;
+			}
+			else
+			{
+				String pattern = "{0}({1})"; //$NON-NLS-1$
+				IParseNode parameters = node.getChild(1);
+				String parmsString = parameters.toString();
+				if (parmsString.startsWith("(")) //$NON-NLS-1$
+				{
+					pattern = "{0}{1}"; //$NON-NLS-1$
+				}
+				text = MessageFormat.format(pattern, name, parmsString);
+			}
+
 			IParseNode body = node.getChild(2);
-
-			String pattern = "{0}({1})"; //$NON-NLS-1$
-			String parmsString = parameters.toString();
-			if (parmsString.startsWith("(")) //$NON-NLS-1$
-				pattern = "{0}{1}"; //$NON-NLS-1$
-
-			item = new JSOutlineItem(MessageFormat.format(pattern, name, parmsString), Type.FUNCTION, reference
-					.getNameNode(), body, getChildrenCount(body));
+			item = new JSOutlineItem(text, Type.FUNCTION, reference.getNameNode(), body, getChildrenCount(body));
 			fItemsByScope.put(fullpath, item);
 		}
 		elements.add(item);
@@ -500,6 +512,25 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				else
 				{
 					processNode(elements, node2);
+				}
+			}
+		}
+		else if (lhs.getNodeType() == JSNodeTypes.IDENTIFIER)
+		{
+			IParseNode args = node.getChild(1);
+			if (args.getNodeType() == JSNodeTypes.ARGUMENTS)
+			{
+				int count = args.getChildCount();
+				IParseNode node2;
+				for (int i = 0; i < count; ++i)
+				{
+					node2 = args.getChild(i);
+					if (node2.getNodeType() == JSNodeTypes.FUNCTION)
+					{
+						processFunction(elements, node2,
+								new Reference(node2, node2, MessageFormat.format("{0}(@{1}:{2})", lhs.getText(), i, //$NON-NLS-1$
+										FUNCTION_LITERAL), StringUtil.EMPTY));
+					}
 				}
 			}
 		}
@@ -670,6 +701,21 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 						if (grandchild.getNodeType() == JSNodeTypes.FUNCTION)
 						{
 							result++;
+						}
+						else if (grandchild.getNodeType() == JSNodeTypes.IDENTIFIER && child.getChildCount() > 1)
+						{
+							IParseNode args = child.getChild(1);
+							if (args.getNodeType() == JSNodeTypes.ARGUMENTS)
+							{
+								int count = args.getChildCount();
+								for (int j = 0; j < count; ++j)
+								{
+									if (args.getChild(j).getNodeType() == JSNodeTypes.FUNCTION)
+									{
+										result++;
+									}
+								}
+							}
 						}
 					}
 					break;

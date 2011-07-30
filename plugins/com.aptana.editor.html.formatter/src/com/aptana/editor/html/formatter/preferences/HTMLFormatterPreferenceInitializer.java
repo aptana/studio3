@@ -8,10 +8,10 @@
 package com.aptana.editor.html.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.editor.html.formatter.HTMLFormatterPlugin;
 import com.aptana.formatter.epl.FormatterPlugin;
@@ -33,7 +33,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences store = new DefaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
+		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
@@ -55,6 +55,10 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		store.putInt(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, 1);
 		store.putInt(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, 1);
 		store.putInt(HTMLFormatterConstants.PRESERVED_LINES, 1);
+
+		store.putBoolean(HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED, false);
+		store.put(HTMLFormatterConstants.FORMATTER_ON, HTMLFormatterConstants.DEFAULT_FORMATTER_ON);
+		store.put(HTMLFormatterConstants.FORMATTER_OFF, HTMLFormatterConstants.DEFAULT_FORMATTER_OFF);
 
 		try
 		{

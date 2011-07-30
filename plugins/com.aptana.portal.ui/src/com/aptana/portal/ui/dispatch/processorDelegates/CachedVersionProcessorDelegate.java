@@ -14,14 +14,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.mortbay.util.ajax.JSON;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -78,11 +77,11 @@ public class CachedVersionProcessorDelegate extends BaseVersionProcessor
 		IProject project = PortalUIPlugin.getActiveProject();
 		if (project != null)
 		{
-			contexts = new IScopeContext[] { new ProjectScope(project), new DefaultScope() };
+			contexts = new IScopeContext[] { new ProjectScope(project), EclipseUtil.defaultScope() };
 		}
 		else
 		{
-			contexts = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+			contexts = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		}
 		String versions = service.getString(PortalUIPlugin.PLUGIN_ID, IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME,
 				null, contexts);

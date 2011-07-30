@@ -19,6 +19,7 @@ public class NegativeLookaheadTests extends TestCase
 		IScopeSelector selector = new ScopeSelector("A B - C");
 
 		assertFalse(selector.matches("A B C"));
+		assertTrue(selector.matches("A B"));
 	}
 
 	/**
@@ -51,6 +52,8 @@ public class NegativeLookaheadTests extends TestCase
 		assertTrue(selector.matches("A B"));
 		assertTrue(selector.matches("A B C"));
 		assertFalse(selector.matches("A B C D"));
+		assertFalse(selector.matches("A B C E D"));
+		assertTrue(selector.matches("A B C E"));
 	}
 
 	public void testAS3_894()

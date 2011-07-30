@@ -8,8 +8,11 @@
 package com.aptana.editor.xml.parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
@@ -31,9 +34,17 @@ public class XMLParser implements IParser
 	private XMLParserScanner fScanner;
 	private XMLAttributeScanner fAttributeScanner;
 	private Stack<IParseNode> fElementStack;
+	private IProgressMonitor fMonitor;
 
 	protected IParseNode fCurrentElement;
 	protected Lexeme<XMLTokenType> fCurrentLexeme;
+
+	private List<IParseNode> fCommentNodes;
+
+	public XMLParser()
+	{
+		fCommentNodes = new ArrayList<IParseNode>();
+	}
 
 	/**
 	 * advance
@@ -97,6 +108,7 @@ public class XMLParser implements IParser
 	 */
 	public IParseRootNode parse(IParseState parseState) throws Exception
 	{
+		fMonitor = parseState.getProgressMonitor();
 		fScanner = new XMLParserScanner();
 		fAttributeScanner = new XMLAttributeScanner();
 		fElementStack = new Stack<IParseNode>();
@@ -108,7 +120,7 @@ public class XMLParser implements IParser
 		int startingOffset = parseState.getStartingOffset();
 
 		// creates the root node
-		IParseRootNode root = new ParseRootNode( //
+		ParseRootNode root = new ParseRootNode( //
 				IXMLConstants.CONTENT_TYPE_XML, //
 				new XMLNode[0], //
 				startingOffset, //
@@ -120,16 +132,19 @@ public class XMLParser implements IParser
 			fCurrentElement = root;
 
 			parseAll(root);
+			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
 			parseState.setParseResult(root);
 		}
 		finally
 		{
+			fMonitor = null;
 			fScanner = null;
 			fAttributeScanner = null;
 			fElementStack = null;
 			fCurrentElement = null;
 			fCurrentLexeme = null;
+			fCommentNodes.clear();
 		}
 
 		return root;
@@ -144,13 +159,12 @@ public class XMLParser implements IParser
 	 */
 	protected void parseAll(IParseNode root) throws IOException, Exception
 	{
-		this.advance();
+		advance();
 
-		while (fCurrentLexeme.getType() != XMLTokenType.EOF)
+		while (fCurrentLexeme.getType() != XMLTokenType.EOF && !fMonitor.isCanceled())
 		{
 			processStatement();
-
-			this.advance();
+			advance();
 		}
 	}
 
@@ -205,14 +219,15 @@ public class XMLParser implements IParser
 	 */
 	protected void processComment()
 	{
+		XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getText(), fCurrentLexeme.getStartingOffset(),
+				fCurrentLexeme.getEndingOffset());
+		fCommentNodes.add(comment);
 		if (fCurrentElement != null)
 		{
-			XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getText(), fCurrentLexeme.getStartingOffset(),
-					fCurrentLexeme.getEndingOffset());
 			fCurrentElement.addChild(comment);
 		}
 	}
-	
+
 	/**
 	 * processCDATA
 	 */
@@ -274,7 +289,7 @@ public class XMLParser implements IParser
 			case COMMENT:
 				processComment();
 				break;
-				
+
 			case CDATA:
 				processCDATA();
 				break;

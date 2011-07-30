@@ -7,9 +7,11 @@
  */
 package com.aptana.editor.html.formatter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -36,7 +38,9 @@ import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
@@ -54,8 +58,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
 			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES };
 
-	private String lineSeparator;
-
 	/**
 	 * Constructor.
 	 * 
@@ -63,8 +65,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	protected HTMLFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -73,15 +74,13 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
 			IFormattingContext formattingContext)
 	{
-		IParser parser = checkoutParser();
 		IParseState parseState = new HTMLParseState();
 		String source = document.get();
 		parseState.setEditState(source, null, 0, 0);
 		int indent = 0;
 		try
 		{
-			IParseNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), parseState);
 			if (parseResult != null)
 			{
 				final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
@@ -136,8 +135,24 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			IParseState parseState = new HTMLParseState();
 			parseState.setEditState(input, null, 0, 0);
-			IParseNode parseResult = parser.parse(parseState);
-			checkinParser(parser, mainContentType);
+			IParseNode parseResult = null;
+			try
+			{
+				parseResult = parser.parse(parseState);
+			}
+			catch (Exception e)
+			{
+				StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+						ERROR_DISPLAY_TIMEOUT, true);
+				FormatterPlugin.logError(e);
+
+				// In case of a parse error (which is unlikely to HTML parsing), just try to indent the given source.
+				return indent(source, input, offset, length, indentationLevel);
+			}
+			finally
+			{
+				checkinParser(parser, mainContentType);
+			}
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, isSelection);
@@ -256,6 +271,16 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		root.accept(context, writer);
 		writer.flush(context);
 		String output = writer.getOutput();
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
+		{
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(HTMLFormatterConstants.FORMATTER_OFF), getString(HTMLFormatterConstants.FORMATTER_ON),
+					new HTMLParseState());
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
+		}
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
@@ -277,6 +302,13 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		document.setBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS,
 				getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS));
 		document.setBoolean(HTMLFormatterConstants.TRIM_SPACES, getBoolean(HTMLFormatterConstants.TRIM_SPACES));
+
+		// Formatter OFF/ON
+		document.setBoolean(HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+				getBoolean(HTMLFormatterConstants.FORMATTER_OFF_ON_ENABLED));
+		document.setString(HTMLFormatterConstants.FORMATTER_ON, getString(HTMLFormatterConstants.FORMATTER_ON));
+		document.setString(HTMLFormatterConstants.FORMATTER_OFF, getString(HTMLFormatterConstants.FORMATTER_OFF));
+
 		for (int i = 0; i < BLANK_LINES.length; i++)
 		{
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));

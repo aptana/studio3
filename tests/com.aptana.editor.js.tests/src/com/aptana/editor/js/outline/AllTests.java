@@ -17,9 +17,9 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.outline");
 		// $JUnit-BEGIN$
-		suite.addTestSuite(SimpleItemsTest.class);
-		suite.addTestSuite(InheritanceItemsTest.class);
 		suite.addTestSuite(BlockItemsTest.class);
+		suite.addTestSuite(InheritanceItemsTest.class);
+		suite.addTestSuite(SimpleItemsTest.class);
 		// $JUnit-END$
 		return suite;
 	}

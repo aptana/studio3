@@ -5,14 +5,16 @@ Bundle-SymbolicName: com.aptana.editor.dtd;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.dtd.DTDPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
  org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.ui.editors,
- com.aptana.editor.common,
- com.aptana.parsing,
  beaver,
- com.aptana.theme
+ com.aptana.parsing,
+ com.aptana.theme,
+ com.aptana.editor.common
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.editor.dtd,

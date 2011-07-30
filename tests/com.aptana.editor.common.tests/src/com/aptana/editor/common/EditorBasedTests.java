@@ -12,9 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
@@ -28,6 +26,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -39,6 +38,7 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scripting.model.SnippetElement;
 
 public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> extends TestCase
 {
@@ -58,6 +58,17 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	 */
 	protected void checkProposals(String resource, String... displayNames)
 	{
+		checkProposals(resource, false, false, displayNames);
+	}
+
+	/**
+	 * checkProposals
+	 * 
+	 * @param resource
+	 * @param displayNames
+	 */
+	protected void checkProposals(String resource, boolean enforceOrder, boolean enforceSize, String... displayNames)
+	{
 		this.setupTestContext(resource);
 
 		ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
@@ -66,20 +77,54 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		for (int offset : this.cursorOffsets)
 		{
 			// get proposals
-			ICompletionProposal[] proposals = this.processor.doComputeCompletionProposals(viewer, offset, '\0', false);
+			ICompletionProposal[] proposals = this.processor.computeCompletionProposals(viewer, offset, '\0', false);
 
 			// build a list of display names
-			Set<String> names = new HashSet<String>();
+			ArrayList<String> names = new ArrayList<String>();
 
 			for (ICompletionProposal proposal : proposals)
 			{
-				names.add(proposal.getDisplayString());
+				// we need to check if it is a valid proposal given the context
+				if (proposal instanceof ICompletionProposalExtension2)
+				{
+					ICompletionProposalExtension2 p = (ICompletionProposalExtension2) proposal;
+					if (p.validate(document, offset, null))
+					{
+						names.add(proposal.getDisplayString());
+					}
+				}
+				else
+				{
+					names.add(proposal.getDisplayString());
+				}
 			}
 
-			// verify each specified name is in the resulting proposal list
-			for (String displayName : displayNames)
+			if (enforceOrder || enforceSize)
 			{
-				assertTrue("Did not find " + displayName + " in the proposal list", names.contains(displayName));
+				assertTrue(
+						StringUtil.format(
+								"Length of expected proposal list and actual proposal list did not match.\nExpected: <{0}> Actual: <{1}>",
+								new Object[] { StringUtil.join(", ", displayNames), StringUtil.join(", ", names) }),
+						displayNames.length == names.size());
+			}
+
+			// this only really makes sense with enforce size
+			if (enforceOrder)
+			{
+				for (int i = 0; i < displayNames.length; i++)
+				{
+					String displayName = displayNames[i];
+					assertEquals("Did not find " + displayName + " in the proposal list at the expected spot",
+							displayName, names.get(i));
+				}
+			}
+			else
+			{
+				// verify each specified name is in the resulting proposal list
+				for (String displayName : displayNames)
+				{
+					assertTrue("Did not find " + displayName + " in the proposal list", names.contains(displayName));
+				}
 			}
 		}
 	}
@@ -116,6 +161,25 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		assertTrue(editor instanceof AbstractThemeableEditor);
 
 		return editor;
+	}
+
+	/**
+	 * Create a snippet
+	 * 
+	 * @param path
+	 * @param displayName
+	 * @param trigger
+	 * @param scope
+	 * @return
+	 */
+	protected SnippetElement createSnippet(String path, String displayName, String trigger, String scope)
+	{
+		SnippetElement se = new SnippetElement(path);
+		se.setDisplayName(displayName);
+		se.setTrigger("prefix", new String[] { trigger });
+		se.setScope(scope);
+
+		return se;
 	}
 
 	/**

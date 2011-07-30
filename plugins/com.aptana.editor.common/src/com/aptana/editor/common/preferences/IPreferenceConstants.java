@@ -114,4 +114,21 @@ public interface IPreferenceConstants
 	 */
 	public static final String ENABLE_WORD_WRAP = CommonEditorPlugin.PLUGIN_ID + ".enableWordWrap"; //$NON-NLS-1$
 
+	/**
+	 * The preference key for if to show the dialog of where the untitled file should save to
+	 */
+	public static final String REMEMBER_UNTITLED_FILE_SAVE_TYPE = CommonEditorPlugin.PLUGIN_ID
+			+ ".rememberUntitledFileSaveType"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for if to save the untitled file in local filesystem (false) or project (true)
+	 */
+	public static final String SAVE_UNTITLED_FILE_TO_PROJECT = CommonEditorPlugin.PLUGIN_ID
+			+ ".saveUntitledFileToProject"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to list enabled scopes for spelling.
+	 */
+	public static final String ENABLED_SPELLING_SCOPES = CommonEditorPlugin.PLUGIN_ID + ".enabledSpellingScopes"; //$NON-NLS-1$
+
 }

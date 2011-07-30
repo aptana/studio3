@@ -19,6 +19,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,6 +27,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -37,6 +39,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
+import com.aptana.editor.dtd.text.rules.DTDNameDetector;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.widgets.CListViewer;
 
@@ -45,6 +48,7 @@ import com.aptana.formatter.ui.widgets.CListViewer;
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
+@SuppressWarnings("restriction")
 public class AddRemoveList implements Listener
 {
 	private CListViewer listViewer;
@@ -180,14 +184,26 @@ public class AddRemoveList implements Listener
 		{
 			public String isValid(String newText)
 			{
-				// Only letters, digits, spaces and commas are valid here.
-				int length = newText.length();
-				for (int i = 0; i < length; i++)
+				IWordDetector dtdDetector = new DTDNameDetector();
+				String[] inputWords = newText.split(" |,"); //$NON-NLS-1$
+				for (String word : inputWords)
 				{
-					char c = newText.charAt(i);
-					if (c != ',' && !Character.isLetterOrDigit(c) && !Character.isSpaceChar(c))
+					// Only letters, digits, spaces and commas are valid here.
+					int length = word.length();
+					for (int i = 0; i < length; i++)
 					{
-						return Messages.AddRemoveList_inputMessageErrorInfo;
+						char c = word.charAt(i);
+						if (i == 0)
+						{
+							if (!dtdDetector.isWordStart(c))
+							{
+								return NLS.bind(Messages.AddRemoveList_invalidBeginTagChar, word);
+							}
+						}
+						else if (!dtdDetector.isWordPart(c))
+						{
+							return NLS.bind(Messages.AddRemoveList_invalidCharInTag, word);
+						}
 					}
 				}
 				return null;

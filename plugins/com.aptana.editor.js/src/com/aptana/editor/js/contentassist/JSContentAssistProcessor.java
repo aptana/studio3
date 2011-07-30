@@ -10,8 +10,6 @@ package com.aptana.editor.js.contentassist;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,11 +22,14 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -55,6 +56,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
+	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
+
+	private static String[] keywords = ArrayUtil.flatten(JSLanguageConstants.KEYWORD_OPERATORS,
+			JSLanguageConstants.GRAMMAR_KEYWORDS, JSLanguageConstants.KEYWORD_CONTROL);
 
 	private JSIndexQueryHelper _indexHelper;
 	private IParseNode _targetNode;
@@ -209,6 +214,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		for (String type : types)
 		{
 			this.addTypeProperties(proposals, type, offset);
+		}
+	}
+
+	/**
+	 * @param prefix
+	 * @param completionProposals
+	 */
+	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
+	{
+		for (String name : keywords)
+		{
+			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
+			this.addProposal(proposals, name, JS_KEYWORD, description, this.getAllUserAgentIcons(),
+					Messages.JSContentAssistProcessor_KeywordLocation, offset);
 		}
 	}
 
@@ -450,6 +469,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			case IN_VARIABLE_NAME:
 			case IN_GLOBAL:
 			case IN_CONSTRUCTOR:
+				this.addKeywords(result, offset);
 				this.addCoreGlobals(result, offset);
 				this.addProjectGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
@@ -463,16 +483,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 		}
 
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(result);
-
-		// sort by display name
-		Collections.sort(proposals, new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
-			}
-		});
+		ICompletionProposal[] resultList = result.toArray(new ICompletionProposal[result.size()]);
 
 		// select the current proposal based on the range
 		if (this._replaceRange != null)
@@ -480,8 +491,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			try
 			{
 				String prefix = document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
-
-				this.setSelectedProposal(prefix, proposals);
+				setSelectedProposal(prefix, resultList);
 			}
 			catch (BadLocationException e)
 			{
@@ -489,7 +499,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+		return resultList;
 	}
 
 	/**

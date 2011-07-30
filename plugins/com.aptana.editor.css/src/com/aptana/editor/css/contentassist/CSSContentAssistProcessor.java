@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Display;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.CompletionProposalComparator;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
@@ -701,14 +702,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 
+		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
+
 		// select the current proposal based on the current lexeme
 		if (this._currentLexeme != null)
 		{
-			this.setSelectedProposal(this._currentLexeme.getText(), result);
+			setSelectedProposal(this._currentLexeme.getText(), proposals);
 		}
 
 		// return results
-		return result.toArray(new ICompletionProposal[result.size()]);
+		return proposals;
 	}
 
 	/**
@@ -1265,4 +1268,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return CSSPlugin.PLUGIN_ID;
 	}
+
+	/**
+	 * Sorts the completion proposals (by default, by display string). This inclusion is temporary as the only reason we
+	 * want to interleave proposals in CSS is because the activation characters are poorly constructed.
+	 * 
+	 * @param proposals
+	 */
+	protected void sortProposals(ICompletionProposal[] proposals)
+	{
+		// Sort by relevance first, descending, and then alphabetically, ascending
+		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
+				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
+	}
+
 }

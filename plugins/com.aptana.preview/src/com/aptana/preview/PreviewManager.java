@@ -149,7 +149,7 @@ public final class PreviewManager {
 						try {
 							openPreview(editorPart, editorPart.getEditorInput(), null, false);
 						} catch (CoreException e) {
-							Activator.log(e);
+							PreviewPlugin.log(e);
 						}
 					} else {
 						IEditorInput editorInput = ((IEditorPart) source).getEditorInput();
@@ -224,7 +224,7 @@ public final class PreviewManager {
 
 								}
 							} catch (CoreException e) {
-								Activator.log(e);
+								PreviewPlugin.log(e);
 							}
 						}
 					} else {
@@ -233,7 +233,7 @@ public final class PreviewManager {
 				}
 			}
 		} catch (CoreException e) {
-			Activator.log(e);
+			PreviewPlugin.log(e);
 		}
 	}
 
@@ -250,7 +250,7 @@ public final class PreviewManager {
 		try {
 			openPreview(editorPart, editorInput, null);
 		} catch (CoreException e) {
-			Activator.log(e);
+			PreviewPlugin.log(e);
 		}
 	}
 
@@ -270,7 +270,7 @@ public final class PreviewManager {
 				return previewConfig != null;
 			}
 		} catch (CoreException e) {
-			Activator.log(e);
+			PreviewPlugin.log(e);
 		}
 		return false;
 	}
@@ -414,7 +414,7 @@ public final class PreviewManager {
 					try {
 						openPreview(finalEditorPart, finalEditorPart.getEditorInput(), null, false);
 					} catch (CoreException e) {
-						Activator.log(e);
+						PreviewPlugin.log(e);
 					}
 				}
 			});
@@ -438,7 +438,7 @@ public final class PreviewManager {
 					}
 				}
 			} catch (CoreException e) {
-				Activator.log(e);
+				PreviewPlugin.log(e);
 			}
 		}
 		if (watchPath != null) {
@@ -460,7 +460,7 @@ public final class PreviewManager {
 				});
 				filewatchIds.put(editorPart, watchId);
 			} catch (JNotifyException e) {
-				Activator.log(e);
+				PreviewPlugin.log(e);
 			}
 		}
 	}
@@ -472,7 +472,7 @@ public final class PreviewManager {
 				FileWatcher.removeWatch(id);
 			}
 		} catch (JNotifyException e) {
-			Activator.log(e);
+			PreviewPlugin.log(e);
 		}
 		filewatchIds.remove(editorPart);
 	}

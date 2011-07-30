@@ -23,13 +23,11 @@ public class Messages extends NLS // NO_UCD
 
 	public static String LockUtils_seeErrorLog;
 
-	static
-	{
+	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages()
-	{
+	private Messages() {
 	}
 }

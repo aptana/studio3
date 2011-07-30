@@ -11,15 +11,12 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
@@ -235,32 +232,10 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
+	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
-		for (IFileStore file : files)
-		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			Thread.yield(); // be nice to other threads, let them get in before each file...
-			indexFileStore(index, file, sub.newChild(100));
-		}
-		sub.done();
-	}
-
-	/**
-	 * indexFileStore
-	 * 
-	 * @param index
-	 * @param file
-	 * @param monitor
-	 */
-	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
@@ -280,10 +255,9 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 				{
 					HTMLParseState parseState = new HTMLParseState();
 					parseState.setEditState(fileContents, null, 0, 0);
+					parseState.setProgressMonitor(sub.newChild(50));
 
 					IParseNode parseNode = ParserPoolFactory.parse(IHTMLConstants.CONTENT_TYPE_HTML, parseState);
-					sub.worked(50);
-
 					walkAST(index, file, fileContents, parseNode, sub.newChild(20));
 				}
 			}

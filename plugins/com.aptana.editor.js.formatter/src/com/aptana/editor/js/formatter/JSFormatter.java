@@ -12,6 +12,9 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_INDENTATION_SIZE;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_OFF_ON_ENABLED;
+import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_ON;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_CHAR;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.FORMATTER_TAB_SIZE;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.INDENT_BLOCKS;
@@ -59,9 +62,11 @@ import static com.aptana.editor.js.formatter.JSFormatterConstants.SPACES_BEFORE_
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS;
 import static com.aptana.editor.js.formatter.JSFormatterConstants.WRAP_COMMENTS_LENGTH;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
@@ -85,6 +90,7 @@ import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -133,8 +139,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			SPACES_AFTER_FOR_SEMICOLON, SPACES_BEFORE_SEMICOLON, SPACES_AFTER_SEMICOLON,
 			SPACES_BEFORE_CASE_COLON_OPERATOR, SPACES_AFTER_CASE_COLON_OPERATOR };
 
-	private String lineSeparator;
-
 	/**
 	 * Constructor.
 	 * 
@@ -142,8 +146,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	protected JSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -162,13 +165,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			{
 				return super.detectIndentationLevel(document, offset);
 			}
-			IParser parser = checkoutParser();
-			IParseState parseState = new ParseState();
 			String source = document.get();
-			parseState.setEditState(source, null, 0, 0);
-
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
@@ -206,13 +204,23 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		String originalText = source.substring(offset, offset + length);
 		String input = originalText.trim();
 		int inputOffset = offset + countLeftWhitespaceChars(originalText);
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
+		IParseRootNode parseResult = null;
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+		}
+		catch (Exception e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(e.getMessage()
+					+ " - " + FormatterMessages.Formatter_formatterErrorStatus, //$NON-NLS-1$
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(e);
+			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
+			// indentation level as much as we can.
+			return indent(source, input, inputOffset, length - (inputOffset - offset), indentationLevel);
+		}
+		try
+		{
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,
@@ -353,11 +361,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			boolean isSelection, String indentSufix, boolean prefixWithNewLine, boolean postfixWithNewLine)
 			throws Exception
 	{
-		int spacesCount = -1;
-		if (isSelection)
-		{
-			spacesCount = countLeftWhitespaceChars(input);
-		}
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, inputOffset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -376,14 +379,16 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 					FormatterMessages.Formatter_formatterErrorCompletedWithErrors, ERROR_DISPLAY_TIMEOUT, true);
 		}
 		String output = writer.getOutput();
-		if (isSelection)
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
 		{
-			output = leftTrim(output, spacesCount);
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(JSFormatterConstants.FORMATTER_OFF), getString(JSFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
 		}
-		else
-		{
-			output = processNestedOutput(output, lineSeparator, indentSufix, prefixWithNewLine, postfixWithNewLine);
-		}
+		output = processNestedOutput(output, lineSeparator, indentSufix, prefixWithNewLine, postfixWithNewLine);
 		return output;
 	}
 
@@ -396,6 +401,11 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		document.setInt(LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
 				getInt(LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
+		// Formatter OFF/ON
+		document.setBoolean(FORMATTER_OFF_ON_ENABLED, getBoolean(FORMATTER_OFF_ON_ENABLED));
+		document.setString(FORMATTER_ON, getString(FORMATTER_ON));
+		document.setString(FORMATTER_OFF, getString(FORMATTER_OFF));
 
 		// Set the indentation values
 		for (String key : INDENTATIONS)

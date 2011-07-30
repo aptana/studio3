@@ -13,7 +13,7 @@ package com.aptana.formatter.ui.util;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 
 /**
  * A settable IStatus. Can be an error, warning, info or ok. For error, info and warning states, a message describes the
@@ -168,7 +168,7 @@ public class StatusInfo implements IStatus
 	 */
 	public String getPlugin()
 	{
-		return Activator.PLUGIN_ID;
+		return FormatterUIEplPlugin.PLUGIN_ID;
 	}
 
 	/**

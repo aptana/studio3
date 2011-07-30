@@ -14,7 +14,7 @@ package com.aptana.editor.yaml;
  */
 public interface IYAMLConstants {
 
-	public String CONTENT_TYPE_YAML = "com.aptana.contenttype.yaml"; //$NON-NLS-1$
+	public String CONTENT_TYPE_YAML = "com.aptana.contenttype.yml"; //$NON-NLS-1$
 	
 	public String YAML_SCOPE = "source.yaml"; //$NON-NLS-1$
 	public String YAML_COMMENT_SCOPE = "comment.line.number-sign.yaml"; //$NON-NLS-1$

@@ -25,12 +25,16 @@ import com.aptana.core.build.UnifiedBuilder;
 
 public class ResourceUtilTest extends TestCase
 {
+
+	private static final String WEBNATUREID = "com.aptana.projects.webnature";
+	private static final String RUBYNATUREID = "com.aptana.ruby.core.rubynature";
+	private static final String RAILSNATUREID = "org.radrails.rails.core.railsnature";
+	private static final String PHPNATUREID = "com.aptana.editor.php.phpNature";
+	private static final String TITANIUM_MOBILE_NATURE_ID = "com.appcelerator.titanium.mobile.nature";
+	private static final String TITANIUM_DESKTOP_NATURE_ID = "com.appcelerator.titanium.desktop.nature";
+	private static final String JAVANATUREID = "org.eclipse.jdt.core.javanature";
+
 	private IProject testProject;
-	private String WEBNATUREID = "com.aptana.projects.webnature";
-	private String RUBYNATUREID = "com.aptana.ruby.core.rubynature";
-	private String RAILSNATUREID = "org.radrails.rails.core.railsnature";
-	private String PHPNATUREID = "com.aptana.editor.php.phpNature";
-	private String JAVANATUREID = "org.eclipse.jdt.core.javanature";
 
 	protected void setUp() throws Exception
 	{
@@ -48,29 +52,29 @@ public class ResourceUtilTest extends TestCase
 
 	public void testResourcePathToFile()
 	{
-		//fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 	public void testResourcePathToString()
 	{
-		//fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 	public void testToURI()
 	{
-		//fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 	public void testGetLineSeparatorValue()
 	{
-		//fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 	public void testBuilders() throws CoreException
 	{
 		IProjectDescription desc = testProject.getDescription();
 		int numCommands = desc.getBuildSpec().length;
-				
+
 		ResourceUtil.addBuilder(testProject, UnifiedBuilder.ID);
 
 		// get new value
@@ -78,15 +82,15 @@ public class ResourceUtilTest extends TestCase
 
 		boolean foundBuilder = false;
 		ICommand[] commands = desc.getBuildSpec();
-		for (int i = 0; i < commands.length; i++)
+		for (ICommand command : commands)
 		{
-			ICommand iCommand = commands[i];
-			if (iCommand.getBuilderName().equals(UnifiedBuilder.ID))
+			if (UnifiedBuilder.ID.equals(command.getBuilderName()))
 			{
 				foundBuilder = true;
+				break;
 			}
 		}
-		
+
 		// That there is the builder in question;
 		assertTrue(foundBuilder);
 
@@ -100,32 +104,32 @@ public class ResourceUtilTest extends TestCase
 
 		foundBuilder = false;
 		commands = desc.getBuildSpec();
-		for (int i = 0; i < commands.length; i++)
+		for (ICommand command : commands)
 		{
-			ICommand iCommand = commands[i];
-			if (iCommand.getBuilderName().equals(UnifiedBuilder.ID))
+			if (UnifiedBuilder.ID.equals(command.getBuilderName()))
 			{
 				foundBuilder = true;
+				break;
 			}
 		}
-		
+
 		// That there is _not_ the builder in question;
 		assertFalse(foundBuilder);
 
 		// re-add builder
 		ResourceUtil.addBuilder(testProject, UnifiedBuilder.ID);
-		
+
 		desc = testProject.getDescription();
-		
+
 		// now add two Aptana natures
 		ResourceUtil.addNature(testProject, WEBNATUREID);
-		
+
 		// try to remove the builder. It should not
 		assertFalse(ResourceUtil.removeBuilderIfOrphaned(testProject, UnifiedBuilder.ID));
-		
+
 		// remove a nature. Internally will remove builder if orphaned
 		ResourceUtil.removeNature(testProject, WEBNATUREID);
-		
+
 		// back to original builder length
 		assertEquals(numCommands, testProject.getDescription().getBuildSpec().length);
 	}
@@ -136,24 +140,26 @@ public class ResourceUtilTest extends TestCase
 		assertTrue(ResourceUtil.isAptanaNature(RUBYNATUREID));
 		assertTrue(ResourceUtil.isAptanaNature(RAILSNATUREID));
 		assertTrue(ResourceUtil.isAptanaNature(PHPNATUREID));
+		assertTrue(ResourceUtil.isAptanaNature(TITANIUM_MOBILE_NATURE_ID));
+		assertTrue(ResourceUtil.isAptanaNature(TITANIUM_DESKTOP_NATURE_ID));
 		assertFalse(ResourceUtil.isAptanaNature(JAVANATUREID));
 	}
 
 	public void testNatures() throws CoreException
 	{
 		IProjectDescription desc = testProject.getDescription();
-		
+
 		int numIds = desc.getNatureIds().length;
-		
+
 		ResourceUtil.addNature(desc, WEBNATUREID);
 		ResourceUtil.addNature(desc, RUBYNATUREID);
 		String[] natures = ResourceUtil.getAptanaNatures(desc);
-	
+
 		// make sure we added two ids
 		assertEquals(numIds + 2, desc.getNatureIds().length);
-		
+
 		// That there are two aptana natures
-		assertEquals(2, natures.length);		
+		assertEquals(2, natures.length);
 		assertEquals(WEBNATUREID, natures[0]);
 		assertEquals(RUBYNATUREID, natures[1]);
 
@@ -162,43 +168,46 @@ public class ResourceUtilTest extends TestCase
 
 		// make sure we removed two ids
 		assertEquals(numIds, desc.getNatureIds().length);
-		natures = ResourceUtil.getAptanaNatures(desc);		
-		assertEquals(0, natures.length);		
+		natures = ResourceUtil.getAptanaNatures(desc);
+		assertEquals(0, natures.length);
 	}
-	
+
 	/**
 	 * Creates a project for testing
+	 * 
 	 * @return
 	 * @throws IOException
 	 * @throws InvocationTargetException
 	 * @throws InterruptedException
 	 * @throws CoreException
 	 */
-	private IProject createProject() throws IOException, InvocationTargetException, InterruptedException, CoreException {
-		
+	private IProject createProject() throws IOException, InvocationTargetException, InterruptedException, CoreException
+	{
+
 		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		String projectName = "ResourceUtilTest" + System.currentTimeMillis();
 		File projectFolder = new File(baseTempFile.getParentFile(), projectName);
 		projectFolder.mkdirs();
-		
+
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProjectDescription description = workspace.newProjectDescription(projectName);
-		description.setLocation(new Path(projectFolder.getAbsolutePath()));		
+		description.setLocation(new Path(projectFolder.getAbsolutePath()));
 
-		final IProject project = workspace.getRoot().getProject(projectName);
+		IProject project = workspace.getRoot().getProject(projectName);
 		project.create(description, null);
 		project.open(null);
-		
+
 		return project;
 	}
-	
+
 	/**
 	 * Deletes a project used for testing
+	 * 
 	 * @param project
 	 * @throws CoreException
 	 */
-	private void deleteProject(IProject project) throws CoreException {
+	private void deleteProject(IProject project) throws CoreException
+	{
 		project.delete(true, null);
 	}
-
 }

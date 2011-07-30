@@ -25,6 +25,7 @@ public class NodeTypes
 	public enum TypePunctuation
 	{
 		CSS_CHILD_COMBINATOR(">"), //$NON-NLS-1$
+		JS_DOT_PROPERTY("."), //$NON-NLS-1$
 		SELECTOR_COLON(":"), //$NON-NLS-1$
 		PROPERTY_COLON(":"), //$NON-NLS-1$
 		CASE_COLON(":"), //$NON-NLS-1$
@@ -150,6 +151,52 @@ public class NodeTypes
 		public static TypeOperator getTypeOperator(String operationString)
 		{
 			return OPERATORS_MAP.get(operationString.toLowerCase());
+		}
+	};
+
+	/**
+	 * Supported node types for brackets.<br>
+	 * Brackets are defined enums with left and right strings.
+	 */
+	public enum TypeBracket
+	{
+		CURLY("{", "}"), //$NON-NLS-1$ //$NON-NLS-2$
+		SQUARE("[", "]"), //$NON-NLS-1$ //$NON-NLS-2$
+		PARENTHESIS("(", ")"), //$NON-NLS-1$ //$NON-NLS-2$
+		ARRAY_CURLY("{", "}"), //$NON-NLS-1$ //$NON-NLS-2$
+		ARRAY_SQUARE("[", "]"), //$NON-NLS-1$ //$NON-NLS-2$
+		ARRAY_PARENTHESIS("(", ")"), //$NON-NLS-1$ //$NON-NLS-2$
+		LOOP_PARENTHESIS("(", ")"), //$NON-NLS-1$ //$NON-NLS-2$
+		CONDITIONAL_PARENTHESIS("(", ")"), //$NON-NLS-1$ //$NON-NLS-2$
+		DECLARATION_PARENTHESIS("(", ")"), //$NON-NLS-1$ //$NON-NLS-2$
+		INVOCATION_PARENTHESIS("(", ")"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		String left;
+		String right;
+
+		TypeBracket(String left, String right)
+		{
+			if (left == null || left.length() != 1 || right == null || right.length() != 1)
+			{
+				throw new IllegalArgumentException("Cannot create a TypeBracket with " + left + ", " + right); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			this.left = left;
+			this.right = right;
+		}
+
+		public String getLeft()
+		{
+			return left;
+		}
+
+		public String getRight()
+		{
+			return right;
+		}
+
+		public String toString()
+		{
+			return left + ' ' + right;
 		}
 	};
 }

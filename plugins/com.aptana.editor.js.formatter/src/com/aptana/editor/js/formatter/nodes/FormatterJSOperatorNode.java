@@ -38,6 +38,16 @@ public class FormatterJSOperatorNode extends FormatterJSTextNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSTextNode#isAddingBeginNewLine()
+	 */
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		return nodeType == TypeOperator.DELETE || nodeType == TypeOperator.VOID;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.php.formatter.nodes.FormatterPHPTextNode#getSpacesCountBefore()
 	 */
 	@Override

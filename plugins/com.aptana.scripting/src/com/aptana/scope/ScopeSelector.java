@@ -43,8 +43,10 @@ public class ScopeSelector implements IScopeSelector
 			return null;
 		}
 
+		List<IScopeSelector> reversed = new ArrayList<IScopeSelector>(selectors);
+		Collections.reverse(reversed);
 		IScopeSelector bestMatch = null;
-		for (IScopeSelector selector : selectors)
+		for (IScopeSelector selector : reversed)
 		{
 			if (selector == null)
 			{
@@ -179,17 +181,30 @@ public class ScopeSelector implements IScopeSelector
 				// see if we match at this point within the context
 				if (this._root.matches(context))
 				{
-					matchResults.addAll(this._root.matchResults());
+					// Add match results. If more than one value, we need to replace existing zeros in our list...
+					Collection<Integer> tmpResults = this._root.matchResults();
+					int toRemove = tmpResults.size() - 1;
+					for (int x = 0; x < toRemove; x++)
+					{
+						matchResults.remove(0);
+					}
+					matchResults.addAll(0, tmpResults);
+
+					// Fill with preceding zeros.
+					while (matchResults.size() < context.getLength())
+					{
+						matchResults.add(0, 0);
+					}
 
 					// we matched, so report success and stop looking for a match
 					result = true;
 					break;
 				}
-				matchResults.add(0); // Add a non-match
+				matchResults.add(0, 0); // Add a non-match
 
 				// restore position where we started and move forward one
 				context.popCurrentStep();
-				context.advance();
+				context.backup();
 			}
 		}
 

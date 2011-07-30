@@ -17,15 +17,20 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.ICSSConstants;
@@ -36,6 +41,7 @@ import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.parsing.ParserPoolFactory;
@@ -49,10 +55,43 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	private Map<String, Object[]> cache = new HashMap<String, Object[]>();
 	private TreeViewer treeViewer;
 
+	private boolean showTextNode;
+
+	private IPreferenceChangeListener preferenceListener = new IPreferenceChangeListener()
+	{
+
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES.equals(event.getKey()))
+			{
+				showTextNode = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
+						IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
+			}
+		}
+	};
+
 	public HTMLOutlineContentProvider()
 	{
 		addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
 		addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
+
+		showTextNode = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
+				IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
+		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceListener);
+	}
+
+	@Override
+	public void dispose()
+	{
+		try
+		{
+			EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(preferenceListener);
+		}
+		finally
+		{
+			super.dispose();
+		}
 	}
 
 	@Override
@@ -234,8 +273,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
 
-					IParseNode node = ParserPoolFactory.parse(language, source);
-					sub.worked(90);
+					IParseNode node = ParserPoolFactory.parse(language, source, sub.newChild(90));
 					elements = getChildren(node);
 					// adjusts the offsets to match the parent node since the children belong to an external file
 					for (Object element : elements)
@@ -328,10 +366,17 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		HTMLElementNode element;
 		for (IParseNode node : nodes)
 		{
-			if (node instanceof HTMLCommentNode || node instanceof HTMLTextNode)
+			if (node instanceof HTMLCommentNode)
 			{
 				// ignores comment nodes in outline
 				continue;
+			}
+			if (node instanceof HTMLTextNode)
+			{
+				if (!showTextNode || StringUtil.isEmpty(((HTMLTextNode) node).getText()))
+				{
+					continue;
+				}
 			}
 			if (node instanceof HTMLElementNode)
 			{

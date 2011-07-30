@@ -8,10 +8,10 @@
 package com.aptana.terminal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.terminal.Activator;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.terminal.TerminalPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -27,7 +27,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	 */
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(TerminalPlugin.PLUGIN_ID);
 
 		prefs.putBoolean(IPreferenceConstants.FIRST_RUN, true);
 		prefs.putBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT, true);

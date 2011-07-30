@@ -44,7 +44,8 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 			CSSFormatterConstants.SPACES_AFTER_COLON, CSSFormatterConstants.SPACES_AFTER_SEMICOLON,
 			CSSFormatterConstants.SPACES_BEFORE_CHILD_COMBINATOR, CSSFormatterConstants.SPACES_BEFORE_COMMAS,
 			CSSFormatterConstants.SPACES_BEFORE_PARENTHESES, CSSFormatterConstants.SPACES_BEFORE_COLON,
-			CSSFormatterConstants.SPACES_BEFORE_SEMICOLON };
+			CSSFormatterConstants.SPACES_BEFORE_SEMICOLON, CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+			CSSFormatterConstants.FORMATTER_ON, CSSFormatterConstants.FORMATTER_OFF };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{

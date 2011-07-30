@@ -13,10 +13,10 @@ import java.util.Set;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -55,7 +55,7 @@ public class WebFilesPropertyTester extends PropertyTester {
 	}
 
 	private void loadExtensions() {
-		IEclipsePreferences preferences = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
+		IEclipsePreferences preferences = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
 		String[] files = preferences.get(ICorePreferenceConstants.PREF_WEB_FILES, StringUtil.EMPTY).split(";"); //$NON-NLS-1$
 		extensions = new HashSet<String>();
 		for (String ext : files) {

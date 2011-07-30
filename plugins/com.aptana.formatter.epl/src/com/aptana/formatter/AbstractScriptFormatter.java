@@ -16,23 +16,33 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.util.DumpContentException;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
@@ -45,14 +55,17 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	private final Map<String, String> preferences;
 	private boolean isSlave;
 	private String mainContentType;
+	protected String lineSeparator;
 
 	/**
 	 * @param preferences
+	 * @param lineSeparator
 	 */
-	protected AbstractScriptFormatter(Map<String, String> preferences, String mainContentType)
+	protected AbstractScriptFormatter(Map<String, String> preferences, String mainContentType, String lineSeparator)
 	{
 		this.preferences = preferences;
 		this.mainContentType = mainContentType;
+		this.lineSeparator = lineSeparator;
 	}
 
 	/**
@@ -245,6 +258,157 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			return value.toString();
 		}
 		return null;
+	}
+
+	/**
+	 * Parse the output and look for the formatter On-Off regions.<br>
+	 * We do that to compare it later to the original input, and then adjust the formatting result to have the original
+	 * content in those regions.<br>
+	 * We can assume at this point that the formatter On-Off is enabled and valid in the preferences.<br>
+	 * This method is a generic one that retrieves the comments from the {@link IParseRootNode}. A formatter that does
+	 * not provide comment nodes through that mechanism should override this method, or not use it.
+	 * 
+	 * @param output
+	 *            The formatter output
+	 * @param formatterOffPattern
+	 * @param formatterOnPattern
+	 * @return The formatter On-Off regions that we have in the output source.
+	 * @see #getOutputOnOffRegions(String, String, String, IParseState)
+	 */
+	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern)
+	{
+		return getOutputOnOffRegions(output, formatterOffPattern, formatterOnPattern, new ParseState());
+	}
+
+	/**
+	 * Parse the output and look for the formatter On-Off regions.<br>
+	 * We do that to compare it later to the original input, and then adjust the formatting result to have the original
+	 * content in those regions.<br>
+	 * We can assume at this point that the formatter On-Off is enabled and valid in the preferences.<br>
+	 * This method is a generic one that retrieves the comments from the {@link IParseRootNode}. A formatter that does
+	 * not provide comment nodes through that mechanism should override this method, or not use it.
+	 * 
+	 * @param output
+	 *            The formatter output
+	 * @param formatterOffPattern
+	 * @param formatterOnPattern
+	 * @param parseState
+	 *            An {@link IParseState} that will be used when parsing the output.
+	 * @return The formatter On-Off regions that we have in the output source.
+	 */
+	protected List<IRegion> getOutputOnOffRegions(String output, String formatterOffPattern, String formatterOnPattern,
+			IParseState parseState)
+	{
+		IParser parser = checkoutParser();
+		parseState.setEditState(output, null, 0, 0);
+		List<IRegion> onOffRegions = null;
+		try
+		{
+			IParseRootNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
+			if (parseResult != null)
+			{
+				IParseNode[] commentNodes = parseResult.getCommentNodes();
+				if (commentNodes != null)
+				{
+					LinkedHashMap<Integer, String> commentsMap = new LinkedHashMap<Integer, String>(commentNodes.length);
+					for (IParseNode comment : commentNodes)
+					{
+						int start = comment.getStartingOffset();
+						int end = comment.getEndingOffset();
+						String commentStr = output.substring(start, end);
+						commentsMap.put(start, commentStr);
+					}
+					// Generate the OFF/ON regions
+					if (!commentsMap.isEmpty())
+					{
+						Pattern onPattern = Pattern.compile(Pattern.quote(formatterOnPattern));
+						Pattern offPattern = Pattern.compile(Pattern.quote(formatterOffPattern));
+						onOffRegions = FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
+								output.length() - 1);
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(FormatterPlugin.getDefault(),
+					"Error while computing the formatter's output OFF/ON regions", e); //$NON-NLS-1$
+		}
+		return onOffRegions;
+	}
+
+	/**
+	 * Perform an indentation-only formatting, which does not involve any parsing.<br>
+	 * This method can be called when a parsing error prevents us from applying an accurate formatting. To avoid any
+	 * de-dented code appearing in the source, we just indent the source into the desired location.
+	 * 
+	 * @param completeSource
+	 *            full source module content
+	 * @param toFormat
+	 *            the source to format
+	 * @param offset
+	 *            the offset of the region to format
+	 * @param length
+	 *            the length of the region to format
+	 * @param indentationLevel
+	 *            the indent level
+	 * @return A {@link TextEdit} for the indented code.
+	 */
+	protected TextEdit indent(String completeSource, String toFormat, int offset, int length, int indentationLevel)
+	{
+		// Only indent when the source to format is located at the beginning of a line, or when there are only
+		// white-space characters to its left.
+		if (!canIndent(completeSource, offset - 1))
+		{
+			return null;
+		}
+		// push the first line of the code
+		IFormatterIndentGenerator indentGenerator = createIndentGenerator();
+		StringBuilder builder = new StringBuilder();
+		indentGenerator.generateIndent(indentationLevel, builder);
+		int leftWhitespaceChars = countLeftWhitespaceChars(toFormat);
+		// replace the left chars with the indent
+		builder.append(toFormat.substring(leftWhitespaceChars));
+		return new ReplaceEdit(offset, length, builder.toString());
+	}
+
+	/**
+	 * Returns true only when the source to format is located at the beginning of a line, or when there are only
+	 * white-space characters to its left.
+	 * 
+	 * @param completeSource
+	 * @param toFormat
+	 * @param offset
+	 * @return True, when an indentation is permitted; False, otherwise.
+	 */
+	private boolean canIndent(String completeSource, int offset)
+	{
+		// input validation
+		if (StringUtil.isEmpty(completeSource))
+		{
+			return true;
+		}
+		if (offset >= completeSource.length())
+		{
+			return false;
+		}
+		// check for white-spaces
+		for (int i = offset; i >= 0; i--)
+		{
+			char c = completeSource.charAt(i);
+			if (c == ' ' || c == '\t')
+			{
+				continue;
+			}
+			if (c == '\n' || c == '\r')
+			{
+				// we are done
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 
 	/**

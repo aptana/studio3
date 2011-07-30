@@ -24,7 +24,6 @@ import com.aptana.editor.common.IPartitionerSwitchStrategy;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
@@ -93,12 +92,15 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	 * 
 	 * @see
 	 * org.eclipse.jface.text.rules.RuleBasedPartitionScanner#setPartialRange
-	 * (org.eclipse.jface.text.IDocument, int, int, java.lang.String, int)
+	 * (org.eclipse.jface.text.IDocument,
+	 * int, int, java.lang.String, int)
 	 */
 	@Override
 	public void setPartialRange(IDocument document, int offset, int length, String contentType, int partitionOffset) {
 		defaultTokenState = null;
 		hasResume = false;
+		resetRules(defaultPartitionScanner.getRules());
+		resetRules(primaryPartitionScanner.getRules());
 		currentPartitionScanner = defaultPartitionScanner;
 		currentPartitionScanner.setLastToken(contentType != null ? new Token(contentType) : null);
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
@@ -121,6 +123,14 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			currentPartitionScanner = primaryPartitionScanner;
 		}
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
+	}
+
+	private static void resetRules(IPredicateRule[] rules) {
+		for (IPredicateRule rule : rules) {
+			if (rule instanceof IResumableRule) {
+				((IResumableRule) rule).resetRule();
+			}
+		}
 	}
 
 	/*
@@ -172,7 +182,9 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (defaultTokenState != null && defaultTokenState.hasToken()) {
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null)) {
+				trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+			}
 			return token;
 		}
 		if (fContentType == null || hasSwitch) {
@@ -305,7 +317,9 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				defaultTokenState = null;
 			}
 		}
-		trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+		if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null)) {
+			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
+		}
 		return token;
 	}
 

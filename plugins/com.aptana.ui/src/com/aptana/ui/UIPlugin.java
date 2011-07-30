@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -60,7 +59,7 @@ public class UIPlugin extends AbstractUIPlugin
 				{
 					resetPerspective(page);
 					// we will only ask once regardless if user chose to update the perspective
-					IEclipsePreferences prefs = (new InstanceScope()).getNode(PLUGIN_ID);
+					IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(PLUGIN_ID);
 					prefs.putInt(IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 					try
 					{
@@ -240,7 +239,7 @@ public class UIPlugin extends AbstractUIPlugin
 				IPreferenceConstants.IDE_HAS_LAUNCHED_BEFORE, false, null);
 		if (!hasStartedBefore)
 		{
-			IEclipsePreferences prefs = (new InstanceScope()).getNode(PLUGIN_ID);
+			IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(PLUGIN_ID);
 			prefs.putInt(IPreferenceConstants.PERSPECTIVE_VERSION, WebPerspectiveFactory.VERSION);
 			prefs.putBoolean(IPreferenceConstants.IDE_HAS_LAUNCHED_BEFORE, true);
 			try
@@ -249,98 +248,8 @@ public class UIPlugin extends AbstractUIPlugin
 			}
 			catch (BackingStoreException e)
 			{
-				log(new Status(IStatus.ERROR, PLUGIN_ID, Messages.UIPlugin_ERR_FailToSetPref, e));
+				IdeLog.logError(getDefault(), Messages.UIPlugin_ERR_FailToSetPref, e);
 			}
 		}
-	}
-
-	/**
-	 * Log a particular status
-	 * 
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 */
-	public static void logWarning(String message)
-	{
-		IdeLog.logWarning(getDefault(), message);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param scope
-	 */
-	public static void logInfo(String message, String scope)
-	{
-		IdeLog.logInfo(getDefault(), message, scope);
-	}
-
-	/**
-	 * trace
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param string
-	 */
-	public static void trace(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 }

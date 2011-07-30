@@ -22,7 +22,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.epl.UIEplMessages;
 import com.aptana.ui.util.UIUtils;
 
@@ -43,7 +43,7 @@ public class ExceptionHandler
 	 */
 	public static void log(Throwable t, String message)
 	{
-		Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Activator.INTERNAL_ERROR, message, t));
+		FormatterUIEplPlugin.log(new Status(IStatus.ERROR, FormatterUIEplPlugin.PLUGIN_ID, FormatterUIEplPlugin.INTERNAL_ERROR, message, t));
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ExceptionHandler
 		 * if (!Activator.getDefault().getPreferenceStore().getBoolean(
 		 * PreferenceConstants.RESOURCE_SHOW_ERROR_INVALID_RESOURCE_NAME) && isInvalidResouceName(e)) { return; }
 		 */
-		Activator.logError(e);
+		FormatterUIEplPlugin.logError(e);
 		IStatus status = e.getStatus();
 		if (status != null)
 		{
@@ -180,7 +180,7 @@ public class ExceptionHandler
 		}
 		else
 		{
-			Activator.logError(e);
+			FormatterUIEplPlugin.logError(e);
 			if (e.getMessage() != null && e.getMessage().length() > 0)
 			{
 				displayMessageDialog(e, e.getMessage(), shell, title, message);

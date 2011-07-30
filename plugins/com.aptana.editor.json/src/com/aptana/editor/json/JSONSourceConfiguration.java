@@ -14,12 +14,12 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -43,12 +43,11 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
 		new JSONPropertyRule( //
-			new Token(STRING_SINGLE), //
-			new Token(STRING_DOUBLE), //
-			new Token(PROPERTY) //
+			getToken(STRING_SINGLE), //
+			getToken(STRING_DOUBLE), //
+			getToken(PROPERTY) //
 		) //
 	};
-	private JSONSourceScanner beaverScanner;
 
 	private static JSONSourceConfiguration instance;
 
@@ -84,7 +83,7 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public ISubPartitionScanner createSubPartitionScanner()
 	{
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -111,18 +110,13 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	}
 
 	/**
-	 * getDTDScanner
+	 * getCodeScanner
 	 * 
 	 * @return
 	 */
-	private ITokenScanner getDTDScanner()
+	private ITokenScanner getCodeScanner()
 	{
-		if (beaverScanner == null)
-		{
-			beaverScanner = new JSONSourceScanner();
-		}
-
-		return beaverScanner;
+		return new JSONSourceScanner();
 	}
 
 	/*
@@ -140,10 +134,9 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @param tokenName
 	 * @return
 	 */
-	@SuppressWarnings("unused")
-	private IToken getToken(String tokenName)
+	private static IToken getToken(String tokenName)
 	{
-		return new Token(tokenName);
+		return CommonUtil.getToken(tokenName);
 	}
 
 	/*
@@ -163,7 +156,7 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getDTDScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 

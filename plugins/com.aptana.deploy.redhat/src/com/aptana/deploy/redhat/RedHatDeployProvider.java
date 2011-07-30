@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -39,7 +40,7 @@ public class RedHatDeployProvider implements IDeployProvider
 		}
 		catch (CoreException e)
 		{
-			RedHatPlugin.logError("Unable to deploy project", e); //$NON-NLS-1$
+			IdeLog.logError(RedHatPlugin.getDefault(), "Unable to deploy project", e); //$NON-NLS-1$
 		}
 	}
 
@@ -63,5 +64,4 @@ public class RedHatDeployProvider implements IDeployProvider
 		}
 		return false;
 	}
-
 }

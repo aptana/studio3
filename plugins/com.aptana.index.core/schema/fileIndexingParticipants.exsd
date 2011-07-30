@@ -79,6 +79,13 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="priority" type="string" use="default" value="50">
+            <annotation>
+               <documentation>
+                  This defines at what priority this indexing participant should be used when a mix of indexing participants are going to be used at the same time. A higher value indicates a higher priority meaning that this indexing participant will run before other participants at a lower priority. The order in which indexing participants run is undefined when their priority levels match.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

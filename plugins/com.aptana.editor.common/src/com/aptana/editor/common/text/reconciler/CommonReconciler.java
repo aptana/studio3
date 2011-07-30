@@ -7,109 +7,112 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.jface.text.reconciler.MonoReconciler;
-import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.jface.text.reconciler.Reconciler;
 
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.LoadCycleListener;
+public class CommonReconciler extends Reconciler {
 
-public class CommonReconciler extends MonoReconciler
-{
-
-	private LoadCycleListener listener;
+	private final IReconcilingStrategy defaultStrategy;
+	private final Set<IReconcilingStrategy> reconcilingStrategies = new HashSet<IReconcilingStrategy>();
+	private BundleChangeReconcileTrigger bundleChangeReconcileTrigger;
 
 	/**
-	 * Used for performance testing purposes so we can see if we've finished our first reconcile!
+	 * Used for performance testing purposes so we can see if we've finished our
+	 * first reconcile!
 	 */
 	@SuppressWarnings("unused")
 	private boolean fIninitalProcessDone = false;
 
-	public CommonReconciler(ITextEditor editor, IReconcilingStrategy strategy, boolean isIncremental)
-	{
-		super(strategy, isIncremental);
+
+	/**
+	 * 
+	 */
+	public CommonReconciler(IReconcilingStrategy defaultStrategy) {
+		super();
+		this.defaultStrategy = defaultStrategy;
+		setReconcilingStrategy(defaultStrategy, String.valueOf(System.currentTimeMillis()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.Reconciler#setReconcilingStrategy(org.eclipse.jface.text.reconciler.IReconcilingStrategy, java.lang.String)
+	 */
 	@Override
-	public void install(ITextViewer textViewer)
+	public void setReconcilingStrategy(IReconcilingStrategy strategy, String contentType)
 	{
+		super.setReconcilingStrategy(strategy, contentType);
+		reconcilingStrategies.add(strategy);
+	}
+
+	/**
+	 * 
+	 * @param strategy
+	 * @param contentTypes
+	 */
+	public void setReconcilingStrategy(IReconcilingStrategy strategy, Collection<String> contentTypes)
+	{
+		for (String contentType : contentTypes)
+		{
+			setReconcilingStrategy(strategy, contentType);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.Reconciler#getReconcilingStrategy(java.lang.String)
+	 */
+	@Override
+	public IReconcilingStrategy getReconcilingStrategy(String contentType) {
+		IReconcilingStrategy strategy = super.getReconcilingStrategy(contentType);
+		if (strategy != null) {
+			return strategy;
+		}
+		return defaultStrategy;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#install(org.eclipse.jface.text.ITextViewer)
+	 */
+	@Override
+	public void install(ITextViewer textViewer) {
 		super.install(textViewer);
-
-		listener = new LoadCycleListener()
-		{
-
-			private Job job;
-
-			public void scriptUnloaded(File script)
-			{
-				bundleFileChanged(script);
-			}
-
-			private void bundleFileChanged(File script)
-			{
-				if (script == null || !script.getName().equals("bundle.rb")) //$NON-NLS-1$
-					return;
-				// Run in a job on a delay and cancel/reschedule if it already exists and is scheduled... This should
-				// basically only make us run once if we get hit multiple times in a row. We'll still probably run a few
-				// times, but this should cut it down a lot.
-				if (job != null)
-				{
-					job.cancel();
-				}
-				job = new Job("Force reconcile on bundle change") //$NON-NLS-1$
-				{
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						IProgressMonitor oldMonitor = getProgressMonitor();
-						setProgressMonitor(monitor);
-						process(null);
-						setProgressMonitor(oldMonitor);
-						return Status.OK_STATUS;
-					}
-				};
-				job.setSystem(!EclipseUtil.showSystemJobs());
-				job.schedule(750);
-			}
-
-			public void scriptReloaded(File script)
-			{
-				bundleFileChanged(script);
-			}
-
-			public void scriptLoaded(File script)
-			{
-				bundleFileChanged(script);
-			}
-		};
-		BundleManager.getInstance().addLoadCycleListener(listener);
+		bundleChangeReconcileTrigger = new BundleChangeReconcileTrigger(this);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#uninstall()
+	 */
 	@Override
-	public void uninstall()
-	{
-		try
-		{
-			BundleManager.getInstance().removeLoadCycleListener(listener);
+	public void uninstall() {
+		if (bundleChangeReconcileTrigger != null) {
+			bundleChangeReconcileTrigger.dispose();
+			bundleChangeReconcileTrigger = null;
 		}
-		finally
-		{
-			super.uninstall();
-		}
+		super.uninstall();
 	}
 
 	@Override
 	protected void initialProcess()
 	{
-		super.initialProcess();
+		for (IReconcilingStrategy s : reconcilingStrategies)
+		{
+			if (s instanceof IReconcilingStrategyExtension)
+			{
+				((IReconcilingStrategyExtension) s).initialReconcile();
+			}
+		}
 		fIninitalProcessDone = true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#forceReconciling()
+	 */
+	@Override
+	public void forceReconciling() {
+		super.forceReconciling();
 	}
 }

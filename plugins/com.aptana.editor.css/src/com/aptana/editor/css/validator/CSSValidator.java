@@ -38,6 +38,7 @@ import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 
@@ -88,6 +89,7 @@ public class CSSValidator implements IValidator
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = getReport(source, path);
+		manager.addParseErrors(items);
 		processErrorsInReport(report, path, manager, items);
 		processWarningsInReport(report, path, manager, items);
 		return items;
@@ -253,6 +255,13 @@ public class CSSValidator implements IValidator
 			String property = map.get("property"); //$NON-NLS-1$
 			String skippedstring = map.get("skippedstring"); //$NON-NLS-1$
 			String errorsubtype = map.get("errorsubtype"); //$NON-NLS-1$
+
+			// Don't attempt to add errors if there are already errors on this line
+			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber))
+			{
+				continue;
+			}
+
 			if (message == null)
 			{
 				if (property == null)
@@ -273,7 +282,7 @@ public class CSSValidator implements IValidator
 					&& !containsCSS3AtRule(message) && !isFiltered(message))
 			{
 				// there is no info on the line offset or the length of the errored text
-				items.add(manager.addError(message, lineNumber, 0, 0, sourcePath));
+				items.add(manager.createError(message, lineNumber, 0, 0, sourcePath));
 			}
 		}
 	}
@@ -304,11 +313,17 @@ public class CSSValidator implements IValidator
 			String message = MessageFormat.format("{0} (level {1})", map.get("message"), level); //$NON-NLS-1$ //$NON-NLS-2$
 			String context = map.get("context"); //$NON-NLS-1$
 
+			// Don't attempt to add warnings if there are already errors on this line
+			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber))
+			{
+				continue;
+			}
+
 			String hash = MessageFormat.format("{0}:{1}:{2}:{3}", lineNumber, level, message, context); //$NON-NLS-1$
 			// guards against duplicate warnings
 			if (!last.equals(hash) && !manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS))
 			{
-				items.add(manager.addWarning(message, lineNumber, 0, 0, sourcePath));
+				items.add(manager.createWarning(message, lineNumber, 0, 0, sourcePath));
 			}
 
 			last = hash;

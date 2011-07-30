@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -30,9 +32,11 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IEditorLinkedResources;
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.validator.IValidationManager;
@@ -40,6 +44,7 @@ import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.xml.TagUtil;
 
@@ -62,6 +67,18 @@ public class HTMLEditor extends AbstractThemeableEditor
 		tagPartitions.add(HTMLSourceConfiguration.HTML_SVG);
 	}
 
+	private IPreferenceChangeListener fPreferenceListener = new IPreferenceChangeListener()
+	{
+
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW.equals(event.getKey()))
+			{
+				getOutlinePage().refresh();
+			}
+		}
+	};
+
 	@Override
 	protected void initializeEditor()
 	{
@@ -70,6 +87,20 @@ public class HTMLEditor extends AbstractThemeableEditor
 		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(HTMLPlugin.getDefault().getHTMLDocumentProvider());
+	}
+
+	@Override
+	public void dispose()
+	{
+		try
+		{
+			EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fPreferenceListener);
+		}
+		finally
+		{
+			super.dispose();
+		}
 	}
 
 	public static IPreferenceStore getChainedPreferenceStore()
@@ -81,11 +112,26 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		FileService fileService = new FileService(IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
+		FileService fileService = new FileService(getFileServiceContentTypeId(), new HTMLParseState());
 		IValidationManager validationManager = fileService.getValidationManager();
 		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
 		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
 		return fileService;
+	}
+
+	@Override
+	protected CommonOutlinePage createOutlinePage()
+	{
+		CommonOutlinePage outlinePage = super.createOutlinePage();
+		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(fPreferenceListener);
+
+		return outlinePage;
+	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}
 
 	/**

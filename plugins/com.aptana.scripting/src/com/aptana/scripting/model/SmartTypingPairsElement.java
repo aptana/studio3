@@ -51,7 +51,7 @@ public class SmartTypingPairsElement extends AbstractBundleElement
 	 * @see com.aptana.scripting.model.AbstractElement#printBody(com.aptana.core.util.SourcePrinter)
 	 */
 	@Override
-	protected void printBody(SourcePrinter printer)
+	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
 		// output path, scope and pairs
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$

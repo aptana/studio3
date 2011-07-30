@@ -72,15 +72,15 @@ function test(){
 ==FORMATTED==
 function test() {
 
-    if(true) //
+    if(true)//
     {
 
-    } else //
+    } else//
     {
 
     }
     i = 3;
-    while(i < 4) //test
+    while(i < 4)//test
     {
         i++;
     }

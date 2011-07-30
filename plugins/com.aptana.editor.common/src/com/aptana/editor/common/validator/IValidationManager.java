@@ -8,6 +8,9 @@
 package com.aptana.editor.common.validator;
 
 import java.net.URI;
+import java.util.List;
+
+import com.aptana.parsing.IParseState;
 
 public interface IValidationManager
 {
@@ -27,7 +30,7 @@ public interface IValidationManager
 	 *            the source path
 	 * @return the validation item added
 	 */
-	public IValidationItem addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
+	public IValidationItem createError(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
 
 	/**
 	 * Adds a validation warning.
@@ -44,7 +47,7 @@ public interface IValidationManager
 	 *            the source path
 	 * @return the validation item added
 	 */
-	public IValidationItem addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
+	public IValidationItem createWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
 
 	/**
 	 * Indicates the source contains the specified nested language so those blocks will be validated by its own
@@ -65,4 +68,19 @@ public interface IValidationManager
 	 * @return true if the message needs to be ignored, false otherwise
 	 */
 	public boolean isIgnored(String message, String language);
+
+	/**
+	 * Returns the parse state
+	 * 
+	 * @return
+	 */
+	public IParseState getParseState();
+
+	/**
+	 * Adds parse errors to the given list of validation items
+	 * 
+	 * @param items
+	 */
+	public void addParseErrors(List<IValidationItem> items);
+
 }

@@ -10,29 +10,25 @@ package com.aptana.editor.common;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
 /**
  * SimpleDocumentProvider
  */
-public abstract class SimpleDocumentProvider extends CommonDocumentProvider
-{
+public abstract class SimpleDocumentProvider extends CommonDocumentProvider {
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#connect(java.lang.Object)
 	 */
 	@Override
-	public void connect(Object element) throws CoreException
-	{
+	public void connect(Object element) throws CoreException {
 		super.connect(element);
 
 		IDocument document = this.getDocument(element);
-
-		if (document != null)
-		{
+		if (document != null) {
 			IPartitioningConfiguration configuration = this.getPartitioningConfiguration();
-			IDocumentPartitioner partitioner = new FastPartitioner(this.createPartitionScanner(), configuration.getContentTypes());
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(this.createPartitionScanner(), configuration.getContentTypes());
 
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);

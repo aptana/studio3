@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
-import com.aptana.preview.Activator;
+import com.aptana.preview.PreviewPlugin;
 import com.aptana.preview.IPreviewHandler;
 
 /**
@@ -25,7 +25,7 @@ import com.aptana.preview.IPreviewHandler;
  */
 public final class PreviewHandlers {
 
-	private static final String EXTENSION_POINT_ID = Activator.PLUGIN_ID + ".previewHandlers"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = PreviewPlugin.PLUGIN_ID + ".previewHandlers"; //$NON-NLS-1$
 	private static final String TAG_HANDLER = "handler"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATT_CONTENTTYPE = "contentType"; //$NON-NLS-1$

@@ -14,7 +14,7 @@ import java.net.URI;
 import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.core.IURIMapper;
-import com.aptana.preview.Activator;
+import com.aptana.preview.PreviewPlugin;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.ProjectPreviewUtil;
@@ -51,7 +51,7 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 				}
 			}
 		} catch (MalformedURLException e) {
-			Activator.log(e);
+			PreviewPlugin.log(e);
 		}
 		return null;
 	}

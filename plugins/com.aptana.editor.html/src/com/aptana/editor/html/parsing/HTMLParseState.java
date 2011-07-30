@@ -93,4 +93,16 @@ public class HTMLParseState extends ParseState
 		super.setEditState(source, insertedText, startingOffset, removedLength);
 		fDocumentType = HTMLDocumentTypes.getType(source);
 	}
+
+	public static boolean isEndForbiddenOrEmptyTag(String name)
+	{
+		for (String tagName : END_FORBIDDEN_OR_EMPTY_TAGS)
+		{
+			if (tagName.equals(name))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -50,7 +50,7 @@ import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.EditorPart;
 
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.internal.IProcessListener;
 import com.aptana.terminal.preferences.IPreferenceConstants;
@@ -202,7 +202,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
 	public void processCompleted() {
-		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+		IPreferenceStore prefs = TerminalPlugin.getDefault().getPreferenceStore();
 		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
 		if (closeViewOnExit) {
 			close();
@@ -349,7 +349,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		setInput(input);
 		setPartName(Messages.TerminalEditor_Part_Name);
 		setTitleToolTip(Messages.TerminalEditor_Title_Tool_Tip);
-		setTitleImage(Activator.getImage("icons/terminal.png")); //$NON-NLS-1$
+		setTitleImage(TerminalPlugin.getImage("icons/terminal.png")); //$NON-NLS-1$
 	}
 	
 	/*

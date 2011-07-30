@@ -58,8 +58,7 @@ function test(){
 }
 ==FORMATTED==
 function test() {
-    z = function(a, b/**test8*/
-    ) {
+    z = function(a, b/**test8*/) {
         a(1/**test7*/, 2);
     }
 }

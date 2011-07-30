@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="com.aptana.index.core.ui.indexViewContributors" name="indexViewContributors" schema="schema/indexViewContributors.exsd"/>
    <extension
          point="org.eclipse.equinox.preferences.preferences">
       <initializer
@@ -25,11 +26,6 @@
             categoryId="com.aptana.ui.category"
             id="com.aptana.index.core.ui.commands.include"
             name="%command.include">
-      </command>
-      <command
-            categoryId="com.aptana.ui.category"
-            id="com.aptana.index.core.ui.commands.rebuild"
-            name="%command.rebuild.name">
       </command>
    </extension>
    <extension
@@ -66,9 +62,6 @@
       <menuContribution
             locationURI="popup:indexing.main">
          <command
-               commandId="com.aptana.index.core.ui.commands.rebuild">
-         </command>
-         <command
                commandId="com.aptana.index.core.ui.commands.exclude">
          </command>
          <command
@@ -77,9 +70,6 @@
       </menuContribution>
       <menuContribution
             locationURI="popup:projectexplorer.indexing.main">
-         <command
-               commandId="com.aptana.index.core.ui.commands.rebuild">
-         </command>
          <command
                commandId="com.aptana.index.core.ui.commands.exclude">
          </command>
@@ -144,18 +134,6 @@
             </iterate>
          </enabledWhen>
       </handler>
-      <handler
-            class="com.aptana.index.core.ui.handlers.RebuildHandler"
-            commandId="com.aptana.index.core.ui.commands.rebuild">
-         <enabledWhen>
-            <iterate
-                  ifEmpty="false">
-               <instanceof
-                     value="org.eclipse.core.resources.IProject">
-               </instanceof>
-            </iterate>
-         </enabledWhen>
-      </handler>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -166,5 +144,17 @@
             properties="isFiltered"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="com.aptana"
+            class="com.aptana.index.core.ui.views.IndexView"
+            icon="icons/index-view.png"
+            id="com.aptana.index.core.ui.view"
+            name="Index View"
+            restorable="true">
+      </view>
    </extension>
 </plugin>

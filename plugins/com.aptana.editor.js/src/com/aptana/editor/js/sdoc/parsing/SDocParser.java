@@ -8,6 +8,7 @@ import beaver.ParsingTables;
 import beaver.Scanner;
 import beaver.Symbol;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.sdoc.model.AdvancedTag;
 import com.aptana.editor.js.sdoc.model.AliasTag;
 import com.aptana.editor.js.sdoc.model.ArrayType;
@@ -141,6 +142,10 @@ public class SDocParser extends Parser {
 		fScanner.setOffset(0);
 		fScanner.setSource(source);
 		fScanner.queueTypeTokens(0, source.length());
+
+		// NOTE: we need to clear the scanner source since queueTypeTokens doesn't set the offset of one of the inner
+		// scanners resulting in double scanning
+		fScanner.setSource(StringUtil.EMPTY);
 
 		Object result = parse(fScanner, AltGoals.Types);
 

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
+import java.util.List;
+
 import org.eclipse.jface.text.IRegion;
 
 import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
@@ -55,6 +57,8 @@ public interface IFormatterWriter
 	void disableAppendToPreviousLine();
 
 	void excludeRegion(IRegion region, EXCLUDE_STRATEGY strategy);
+
+	void excludeRegions(List<IRegion> regions, EXCLUDE_STRATEGY strategy);
 
 	void addNewLineCallback(IFormatterCallback callback);
 

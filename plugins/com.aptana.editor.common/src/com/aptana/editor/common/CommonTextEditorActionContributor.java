@@ -44,20 +44,16 @@ import com.aptana.editor.common.actions.ToggleMarkOccurrencesAction;
  * 
  * @author schitale
  */
-public class CommonTextEditorActionContributor extends TextEditorActionContributor
-{
-	private class CommandsMenuContributionItem extends ContributionItem
-	{
+public class CommonTextEditorActionContributor extends TextEditorActionContributor {
+	private class CommandsMenuContributionItem extends ContributionItem {
 		private ITextEditor textEditor;
 		private ToolItem menuToolItem;
 
-		public CommandsMenuContributionItem()
-		{
+		public CommandsMenuContributionItem() {
 		}
 
 		@Override
-		public void fill(Composite parent)
-		{
+		public void fill(Composite parent) {
 			Label sep = new Label(parent, SWT.SEPARATOR);
 			StatusLineLayoutData data = new StatusLineLayoutData();
 			data.heightHint = getHeightHint(parent);
@@ -72,45 +68,35 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 			final Menu menu = new Menu(toolBar);
 
 			menuToolItem = new ToolItem(toolBar, SWT.DROP_DOWN);
-			menuToolItem
-					.setImage(CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND));
-			menuToolItem.addSelectionListener(new SelectionListener()
-			{
+			menuToolItem.setImage(CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND));
+			menuToolItem.addSelectionListener(new SelectionListener() {
 
-				public void widgetDefaultSelected(SelectionEvent e)
-				{
+				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 
-				public void widgetSelected(SelectionEvent e)
-				{
-					if (menu.isDisposed())
-					{
+				public void widgetSelected(SelectionEvent e) {
+					if (menu.isDisposed()) {
 						return;
 					}
 					MenuItem[] items = menu.getItems();
-					for (MenuItem menuItem : items)
-					{
-						if (menuItem.isDisposed())
-						{
+					for (MenuItem menuItem : items) {
+						if (menuItem.isDisposed()) {
 							continue;
 						}
 						menuItem.dispose();
 					}
 
 					IEditorCommandsMenuContributor contributor = getEditorCommandsMenuContributor();
-					if (contributor != null)
-					{
+					if (contributor != null) {
 						contributor.fill(menu, textEditor);
 					}
 					menu.setVisible(true);
 				}
 			});
 
-			menuToolItem.addDisposeListener(new DisposeListener()
-			{
+			menuToolItem.addDisposeListener(new DisposeListener() {
 
-				public void widgetDisposed(DisposeEvent e)
-				{
+				public void widgetDisposed(DisposeEvent e) {
 					menuToolItem = null;
 				}
 			});
@@ -125,8 +111,7 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 		 *            the root control of this label
 		 * @return the height hint
 		 */
-		private int getHeightHint(Composite control)
-		{
+		private int getHeightHint(Composite control) {
 			GC gc = new GC(control);
 			gc.setFont(control.getFont());
 			int height = gc.getFontMetrics().getHeight();
@@ -134,16 +119,13 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 			return height;
 		}
 
-		void setTextEditor(ITextEditor textEditor)
-		{
+		void setTextEditor(ITextEditor textEditor) {
 			this.textEditor = textEditor;
 			updateState();
 		}
 
-		private void updateState()
-		{
-			if (menuToolItem != null && !menuToolItem.isDisposed())
-			{
+		private void updateState() {
+			if (menuToolItem != null && !menuToolItem.isDisposed()) {
 				menuToolItem.setEnabled(textEditor instanceof AbstractThemeableEditor);
 			}
 		}
@@ -156,8 +138,7 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 	/**
 	 * CommonTextEditorActionContributor
 	 */
-	public CommonTextEditorActionContributor()
-	{
+	public CommonTextEditorActionContributor() {
 		// Note that this messages bundle is used when constructing the actions.
 		// Make sure no string are removed unintentionally from the properties file...
 		ResourceBundle resourceBundle = Messages.getBundleForConstructedKeys();
@@ -167,25 +148,20 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.BasicTextEditorActionContributor#contributeToStatusLine(org.eclipse.jface.action.
-	 * IStatusLineManager)
+	 * @see org.eclipse.ui.texteditor.BasicTextEditorActionContributor#contributeToStatusLine(org.eclipse.jface.action.IStatusLineManager)
 	 */
 	@Override
-	public void contributeToStatusLine(IStatusLineManager statusLineManager)
-	{
+	public void contributeToStatusLine(IStatusLineManager statusLineManager) {
 		commandsMenuContributionItem = new CommandsMenuContributionItem();
 		statusLineManager.add(commandsMenuContributionItem);
 		super.contributeToStatusLine(statusLineManager);
 
-		inputPositionStatsContributionItem = new StatusLineContributionItem(
-				ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION, true, 24);
+		inputPositionStatsContributionItem = new StatusLineContributionItem(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION, true, 24);
 		IContributionItem[] contributionItems = statusLineManager.getItems();
-		for (IContributionItem contributionItem : contributionItems)
-		{
+		for (IContributionItem contributionItem : contributionItems) {
 			String id = contributionItem.getId();
 
-			if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(id))
-			{
+			if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(id)) {
 				statusLineManager.remove(contributionItem);
 				statusLineManager.add(inputPositionStatsContributionItem);
 			}
@@ -197,16 +173,11 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 	 * 
 	 * @return
 	 */
-	private IEditorCommandsMenuContributor getEditorCommandsMenuContributor()
-	{
-		IEditorCommandsMenuContributor adapter = (IEditorCommandsMenuContributor) Platform.getAdapterManager()
-				.getAdapter(this, IEditorCommandsMenuContributor.class);
+	private IEditorCommandsMenuContributor getEditorCommandsMenuContributor() {
+		IEditorCommandsMenuContributor adapter = (IEditorCommandsMenuContributor) Platform.getAdapterManager().getAdapter(this, IEditorCommandsMenuContributor.class);
 
-		if (adapter == null
-				&& Platform.getAdapterManager().hasAdapter(this, IEditorCommandsMenuContributor.class.getName()))
-		{
-			adapter = (IEditorCommandsMenuContributor) Platform.getAdapterManager().loadAdapter(this,
-					IEditorCommandsMenuContributor.class.getName());
+		if (adapter == null && Platform.getAdapterManager().hasAdapter(this, IEditorCommandsMenuContributor.class.getName())) {
+			adapter = (IEditorCommandsMenuContributor) Platform.getAdapterManager().loadAdapter(this, IEditorCommandsMenuContributor.class.getName());
 		}
 
 		return adapter;
@@ -214,12 +185,10 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorActionBarContributor#init(org.eclipse.ui.IActionBars,
-	 * org.eclipse.ui.IWorkbenchPage)
+	 * @see org.eclipse.ui.part.EditorActionBarContributor#init(org.eclipse.ui.IActionBars, org.eclipse.ui.IWorkbenchPage)
 	 */
 	@Override
-	public void init(IActionBars bars, IWorkbenchPage page)
-	{
+	public void init(IActionBars bars, IWorkbenchPage page) {
 		super.init(bars, page);
 
 		bars.setGlobalActionHandler("com.aptana.editor.common.toggleMarkOccurrences", markOccurrencesAction); //$NON-NLS-1$
@@ -230,39 +199,40 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 	 * @see org.eclipse.ui.editors.text.TextEditorActionContributor#setActiveEditor(org.eclipse.ui.IEditorPart)
 	 */
 	@Override
-	public void setActiveEditor(IEditorPart part)
-	{
+	public void setActiveEditor(IEditorPart part) {
 		super.setActiveEditor(part);
-
-		if (part instanceof ITextEditor)
-		{
+		if (part instanceof ITextEditor) {
 			ITextEditor textEditor = (ITextEditor) part;
-
-			if (commandsMenuContributionItem != null)
-			{
+			if (commandsMenuContributionItem != null) {
 				commandsMenuContributionItem.setTextEditor(textEditor);
 			}
 
-			if (inputPositionStatsContributionItem != null)
-			{
-				inputPositionStatsContributionItem.setActionHandler(getAction(textEditor,
-						ITextEditorActionConstants.GOTO_LINE));
+			if (inputPositionStatsContributionItem != null) {
+				inputPositionStatsContributionItem.setActionHandler(getAction(textEditor, ITextEditorActionConstants.GOTO_LINE));
 				ITextEditorExtension extension = (ITextEditorExtension) textEditor;
-				extension.setStatusField(inputPositionStatsContributionItem,
-						ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
+				extension.setStatusField(inputPositionStatsContributionItem, ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
 			}
 
-			if (part instanceof AbstractThemeableEditor)
-			{
+			if (part instanceof AbstractThemeableEditor) {
 				FoldingActionsGroup foldingActions = ((AbstractThemeableEditor) part).getFoldingActionsGroup();
-
-				if (foldingActions != null)
-				{
+				if (foldingActions != null) {
 					foldingActions.updateActionBars();
 				}
 			}
-
 			markOccurrencesAction.setEditor(textEditor);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.editors.text.TextEditorActionContributor#dispose()
+	 */
+	@Override
+	public void dispose() {
+		markOccurrencesAction.setEditor(null);
+		if (commandsMenuContributionItem != null) {
+			commandsMenuContributionItem.setTextEditor(null);
+		}
+		super.dispose();
 	}
 }

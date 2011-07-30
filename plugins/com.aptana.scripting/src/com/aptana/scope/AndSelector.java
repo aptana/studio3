@@ -7,6 +7,7 @@
  */
 package com.aptana.scope;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,20 +39,34 @@ public class AndSelector extends BinarySelector
 		{
 			context.pushCurrentStep();
 
-			result = this._left.matches(context) && this._right.matches(context);
-			if (result)
+			if (this._left.matches(context))
 			{
 				matchResults = this._left.matchResults();
 				if (matchResults.isEmpty())
 				{
-					matchResults = this._right.matchResults();
+					matchResults = new ArrayList<Integer>();
 				}
-				else
+				while (true)
 				{
-					matchResults.addAll(this._right.matchResults());
+					if (this._right.matches(context))
+					{
+						// matched at current step, append match results
+						matchResults.addAll(this._right.matchResults());
+						result = true;
+						break;
+					}
+					// didn't match at this step, mark down a zero
+					matchResults.add(0);
+					if (context.canAdvance())
+					{
+						context.advance();
+					}
+					else
+					{
+						break;
+					}
 				}
 			}
-
 			context.popCurrentStep(!result);
 		}
 

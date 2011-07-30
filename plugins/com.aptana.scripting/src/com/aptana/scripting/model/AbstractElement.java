@@ -125,7 +125,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 				synchronized (ELEMENTS_BY_PATH)
 				{
 					showRegistration("Register", element); //$NON-NLS-1$
-					
+
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 
 					if (elements == null)
@@ -156,7 +156,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 				synchronized (ELEMENTS_BY_PATH)
 				{
 					showRegistration("Unregister", element); //$NON-NLS-1$
-					
+
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 
 					if (elements != null)
@@ -191,12 +191,12 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			String fullClassName = element.getClass().getName();
 			String[] classParts = fullClassName.split("\\."); //$NON-NLS-1$
 			String className = classParts[classParts.length - 1];
-			
+
 			IdeLog.logInfo(ScriptingActivator.getDefault(),
 					message + ": " + className + ", " + name + ", " + path, IDebugScopes.SHOW_ELEMENT_REGISTRATION); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
-	
+
 	/**
 	 * ModelBase
 	 * 
@@ -289,7 +289,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * 
 	 * @param printer
 	 */
-	abstract protected void printBody(SourcePrinter printer);
+	abstract protected void printBody(SourcePrinter printer, boolean includeBlocks);
 
 	/**
 	 * put
@@ -368,9 +368,19 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	public String toSource()
 	{
+		return toSource(true);
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource(boolean includeBlocks)
+	{
 		SourcePrinter printer = new SourcePrinter();
 
-		this.toSource(printer);
+		this.toSource(printer, includeBlocks);
 
 		return printer.toString();
 	}
@@ -380,14 +390,14 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * 
 	 * @param printer
 	 */
-	protected void toSource(SourcePrinter printer)
+	protected void toSource(SourcePrinter printer, boolean includeBlocks)
 	{
 		// open element
 		printer.printWithIndent(this.getElementName());
 		printer.print(" \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// emit body
-		this.printBody(printer);
+		this.printBody(printer, includeBlocks);
 
 		// emit custom properties
 		if (this._customProperties != null)

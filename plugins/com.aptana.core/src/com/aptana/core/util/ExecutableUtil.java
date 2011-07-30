@@ -133,9 +133,12 @@ public final class ExecutableUtil
 				IPath result = findExecutable(location.append(executableName), appendExtension);
 				if (result != null && (filter == null || filter.accept(result.toFile())))
 				{
-					IdeLog.logInfo(
-							CorePlugin.getDefault(),
-							MessageFormat.format("Found executable at common location: {0}", result), IDebugScopes.SHELL); //$NON-NLS-1$
+					if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL))
+					{
+						IdeLog.logInfo(
+								CorePlugin.getDefault(),
+								MessageFormat.format("Found executable at common location: {0}", result), IDebugScopes.SHELL); //$NON-NLS-1$
+					}
 					return result;
 				}
 			}

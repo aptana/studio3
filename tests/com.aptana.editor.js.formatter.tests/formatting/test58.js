@@ -2568,7 +2568,7 @@ if( typeof window.jQuery == "undefined") {
 
                 // HANDLE: $(expr)
                 else
-                    return new jQuery( c ).find(a);
+                    return new jQuery(c).find(a);
             }
 
             return this.setArray(
@@ -2643,7 +2643,8 @@ if( typeof window.jQuery == "undefined") {
             // Check to see if we're setting style values
             return this.each(function(index) {
                 // Set all the styles
-                for(var prop in obj )jQuery.attr( type ? this.style : this, prop, jQuery.prop(this, obj[prop], type, index, prop));
+                for(var prop in obj )
+                jQuery.attr( type ? this.style : this, prop, jQuery.prop(this, obj[prop], type, index, prop));
             });
         },
         /** @id jQuery.css */
@@ -2728,9 +2729,9 @@ if( typeof window.jQuery == "undefined") {
             // Need to remove events on the element and its descendants
             var $this = this.add(this.find("*"));
             $this.each(function() {
-            this._$events = {};
-            for (var type in this.$events)
-            this._$events[type] = jQuery.extend({},this.$events[type]);
+                this._$events = {};
+                for(var type in this.$events)
+                this._$events[type] = jQuery.extend({}, this.$events[type]);
             }).unbind();
 
             // Do the clone
@@ -2741,7 +2742,8 @@ if( typeof window.jQuery == "undefined") {
             $this.each(function() {
                 var events = this._$events;
                 for(var type in events)
-                for(var handler in events[type])jQuery.event.add(this, type, events[type][handler], events[type][handler].data);
+                for(var handler in events[type])
+                jQuery.event.add(this, type, events[type][handler], events[type][handler].data);
                 this._$events = null;
             });
             // Return the cloned set
@@ -2765,7 +2767,7 @@ if( typeof window.jQuery == "undefined") {
         },
         /** @id jQuery.is */
         is : function(expr) {
-            return expr ? jQuery.multiFilter(expr,this).length > 0 : false;
+            return expr ? jQuery.multiFilter(expr, this).length > 0 : false;
         },
         /** @id jQuery.val */
         val : function(val) {
@@ -2817,6 +2819,7 @@ if( typeof window.jQuery == "undefined") {
         // Return the modified object
         return target;
     };
+
     jQuery.extend({
 
         /** @id jQuery.$.noConflict */
@@ -2842,7 +2845,8 @@ if( typeof window.jQuery == "undefined") {
         /** @id jQuery.$.each */
         each : function(obj, fn, args) {
             if(obj.length == undefined)
-                for(var i in obj )fn.apply(obj[i], args || [i, obj[i]]);
+                for(var i in obj )
+                fn.apply(obj[i], args || [i, obj[i]]);
             else
                 for(var i = 0, ol = obj.length; i < ol; i++)
                 if(fn.apply(obj[i], args || [i, obj[i]]) === false)
@@ -2870,8 +2874,8 @@ if( typeof window.jQuery == "undefined") {
             },
             // internal only, use removeClass("class")
             remove : function(elem, c) {
-                elem.className = c != undefined ? jQuery.grep( elem.className.split(/\s+/), function(cur){
-                return !jQuery.className.has( c, cur );
+                elem.className = c != undefined ? jQuery.grep(elem.className.split(/\s+/), function(cur) {
+                    return !jQuery.className.has(c, cur);
                 }).join(" ") : "";
             },
             // internal only, use is(".class")
@@ -2896,6 +2900,7 @@ if( typeof window.jQuery == "undefined") {
                     old["padding" + this] = 0;
                     old["border" + this + "Width"] = 0;
                 });
+
                 jQuery.swap(e, old, function() {
                     if(jQuery(e).is(':visible')) {
                         oHeight = e.offsetHeight;
@@ -2942,7 +2947,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
                 if(prop.match(/float/i))
                     prop = "float";
-                prop = prop.replace(/([A-Z])/g,"-$1").toLowerCase();
+                prop = prop.replace(/([A-Z])/g, "-$1").toLowerCase();
                 var cur = document.defaultView.getComputedStyle(elem, null);
 
                 if(cur)
@@ -3059,7 +3064,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                         elem.filter = (elem.filter || "").replace(/alpha\([^)]*\)/, "") + (parseFloat(value).toString() == "NaN" ? "" : "alpha(opacity=" + value * 100 + ")");
                     }
 
-                    return elem.filter ? (parseFloat( elem.filter.match(/opacity=([^)]*)/)[1] ) / 100).toString() : "";
+                    return elem.filter ? (parseFloat(elem.filter.match(/opacity=([^)]*)/)[1]) / 100).toString() : "";
                 }
                 name = name.replace(/-([a-z])/ig, function(z, b) {
                     return b.toUpperCase();
@@ -3078,7 +3083,8 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             // Need to use typeof to fight Safari childNodes crashes
             if( typeof a != "array")
-                for(var i = 0, al = a.length; i < al; i++)r.push(a[i]);
+                for(var i = 0, al = a.length; i < al; i++)
+                r.push(a[i]);
             else
                 r = a.slice(0);
 
@@ -3094,7 +3100,8 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
         merge : function(first, second) {
             // We have to loop this way because IE & Opera overwrite the length
             // expando of getElementsByTagName
-            for(var i = 0; second[i]; i++)first.push(second[i]);
+            for(var i = 0; second[i]; i++)
+            first.push(second[i]);
             return first;
         },
         unique : function(first) {
@@ -3211,6 +3218,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             return this.pushStack(ret);
         };
     });
+
     jQuery.each({
         appendTo : "append",
         prependTo : "prepend",
@@ -3224,6 +3232,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             });
         };
     });
+
     jQuery.each({
         removeAttr : function(key) {
             jQuery.attr(this, key, "");
@@ -3239,22 +3248,25 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             jQuery.className[ jQuery.className.has(this,c) ? "remove" : "add" ](this, c);
         },
         remove : function(a) {
-            if(!a || jQuery.filter( a, [this] ).r.length)
+            if(!a || jQuery.filter(a, [this]).r.length)
                 this.parentNode.removeChild(this);
         },
         empty : function() {
-            while(this.firstChild)this.removeChild(this.firstChild);
+            while(this.firstChild)
+            this.removeChild(this.firstChild);
         }
     }, function(i, n) {
         jQuery.fn[i] = function() {
             return this.each(n, arguments);
         };
     });
+
     jQuery.each(["eq", "lt", "gt", "contains"], function(i, n) {
         jQuery.fn[n] = function(num, fn) {
             return this.filter(":" + n + "(" + num + ")", fn);
         };
     });
+
     jQuery.each(["height", "width"], function(i, n) {
         jQuery.fn[n] = function(h) {
             return h == undefined ? (this.length ? jQuery.css(this[0], n) : null ) : this.css(n, h.constructor == String ? h : h + "px");
@@ -3774,18 +3786,18 @@ else if(m[1] == "@") {
                 }
 
                 if(!type) {
-                    for(type in events )this.remove(element, type);
+                    for(type in events )
+                    this.remove(element, type);
 
                 } else if(events[type]) {
                     // remove the given handler for the given type
                     if(handler)
-                        delete
-                        events[type][handler.guid];
+                        delete events[type][handler.guid];
 
                     // remove all handlers for the given type
                     else
-                        for(handler in element.$events[type] ) delete
-                        events[type][handler];
+                        for(handler in element.$events[type] )
+                        delete events[type][handler];
 
                     // remove generic event handler if no more handlers exist
                     for(ret in events[type] )
@@ -3795,12 +3807,12 @@ else if(m[1] == "@") {
                             element.removeEventListener(type, element.$handle, false);
                         else
                             element.detachEvent("on" + type, element.$handle);
-                        ret = null; delete
-                        events[type];
+                        ret = null;
+                        delete events[type];
 
                         // Remove element from the global event type cache
-                        while(this.global[type] && (( index = jQuery.inArray(element, this.global[type])) >= 0 )) delete
-                        this.global[type][index];
+                        while(this.global[type] && (( index = jQuery.inArray(element, this.global[type])) >= 0 ))
+                        delete this.global[type][index];
                     }
                 }
 
@@ -4044,8 +4056,9 @@ else if(m[1] == "@") {
                     document.removeEventListener("DOMContentLoaded", jQuery.ready, false);
 
                 // Remove script element used by IE hack
-                if(!window.frames.length)
-                    jQuery(window).load(function() { jQuery("#__ie_init").remove();
+                if(!window.frames.length)// don't remove if frames are present (#1187)
+                    jQuery(window).load(function() {
+                        jQuery("#__ie_init").remove();
                     });
             }
         }
@@ -4120,7 +4133,7 @@ else if(m[1] == "@") {
                 var els = global[type], i = els.length;
                 if(i && type != 'unload')
                     do
-                        els[ i - 1] && jQuery.event.remove(els[ i - 1], type);
+                        els[i - 1] && jQuery.event.remove(els[i - 1], type);
                     while (--i);
             }
         });
@@ -4182,11 +4195,11 @@ else if(m[1] == "@") {
         },
         /** @id jQuery.evalScripts */
         evalScripts : function() {
-            return this.find("script").each(function(){
-            if ( this.src )
-            jQuery.getScript( this.src );
-            else
-            jQuery.globalEval( this.text || this.textContent || this.innerHTML || "" );
+            return this.find("script").each(function() {
+                if(this.src)
+                    jQuery.getScript(this.src);
+                else
+                    jQuery.globalEval(this.text || this.textContent || this.innerHTML || "");
             }).end();
         }
     });
@@ -4198,6 +4211,7 @@ else if(m[1] == "@") {
             return this.bind(o, f);
         };
     });
+
     jQuery.extend({
 
         /** @id jQuery.$.get */
@@ -4337,7 +4351,7 @@ else if(m[1] == "@") {
                             try {
                                 modRes = xml.getResponseHeader("Last-Modified");
                             } catch(e) {
-                            } // swallow exception thrown by FF if header is not available
+                            }// swallow exception thrown by FF if header is not available
 
                             if(s.ifModified && modRes)
                                 jQuery.lastModified[s.url] = modRes;
@@ -4391,6 +4405,7 @@ else if(m[1] == "@") {
                             onreadystatechange("timeout");
                     }
                 }, s.timeout);
+
             // Send the data
             try {
                 xml.send(s.data);
@@ -4508,10 +4523,10 @@ else if(m[1] == "@") {
                 height : "show",
                 width : "show",
                 opacity : "show"
-            }, speed, callback) : this.filter(":hidden").each(function(){
-            this.style.display = this.oldblock ? this.oldblock : "";
-            if ( jQuery.css(this,"display") == "none" )
-            this.style.display = "block";
+            }, speed, callback) : this.filter(":hidden").each(function() {
+                this.style.display = this.oldblock ? this.oldblock : "";
+                if(jQuery.css(this, "display") == "none")
+                    this.style.display = "block";
             }).end();
         },
         /** @id jQuery.hide */
@@ -4520,11 +4535,11 @@ else if(m[1] == "@") {
                 height : "hide",
                 width : "hide",
                 opacity : "hide"
-            }, speed, callback) : this.filter(":visible").each(function(){
-            this.oldblock = this.oldblock || jQuery.css(this,"display");
-            if ( this.oldblock == "none" )
-            this.oldblock = "block";
-            this.style.display = "none";
+            }, speed, callback) : this.filter(":visible").each(function() {
+                this.oldblock = this.oldblock || jQuery.css(this, "display");
+                if(this.oldblock == "none")
+                    this.oldblock = "block";
+                this.style.display = "none";
             }).end();
         },
         // Save the old toggle function
@@ -4799,7 +4814,8 @@ else if(m[1] == "@") {
 
                         // Reset the properties, if the item has been hidden or shown
                         if(options.hide || options.show)
-                            for(var p in elem.curAnim )jQuery.attr(y, p, elem.orig[p]);
+                            for(var p in elem.curAnim )
+                            jQuery.attr(y, p, elem.orig[p]);
                     }
 
                     // If a callback was provided, execute it
@@ -4814,7 +4830,7 @@ else if(m[1] == "@") {
                     var p = n / options.duration;
 
                     // Perform the easing function, defaults to swing
-                    z.now = jQuery.easing[options.easing](p, n, firstNum, ( lastNum - firstNum), options.duration);
+                    z.now = jQuery.easing[options.easing](p, n, firstNum, (lastNum - firstNum), options.duration);
 
                     // Perform the next step of the animation
                     z.a();

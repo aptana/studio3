@@ -26,7 +26,8 @@ public interface JSIndexConstants
 	// 0.23 - Fix Window.Math property
 	// 0.24 - Fix String.fromCharCode
 	// 0.25 - Fix document.body type
-	public static final double INDEX_VERSION = 0.25;
+	// 0.26 - Fix parsing of arrays in this format: IDENT LPAREN RPAREN
+	public static final double INDEX_VERSION = 0.26;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
@@ -44,11 +45,14 @@ public interface JSIndexConstants
 	static final String FUNCTION = PREFIX + "function"; //$NON-NLS-1$
 	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
 
-	static final String[] ALL_CATEGORIES = new String[] { //
-	TYPE, //
-		FUNCTION, //
-		PROPERTY //
+	// @formatter:off
+	static final String[] ALL_CATEGORIES = new String[]
+	{
+		TYPE,
+		FUNCTION,
+		PROPERTY
 	};
+	// @formatter:on
 
 	// special values
 	static final String NO_ENTRY = "-1"; //$NON-NLS-1$

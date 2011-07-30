@@ -8,11 +8,10 @@
 package com.aptana.editor.common.contentassist;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.ITextHover;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 
@@ -25,7 +24,7 @@ public abstract class CommonTextHover implements ITextHover
 	 */
 	public Boolean isHoverEnabled()
 	{
-		IScopeContext[] scopes = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+		IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
 				IPreferenceConstants.CONTENT_ASSIST_HOVER, true,
 				scopes);

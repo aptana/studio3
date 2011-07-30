@@ -7,6 +7,7 @@
  */
 package com.aptana.ide.syncing.ui.actions;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -17,8 +18,10 @@ import org.eclipse.swt.widgets.MessageBox;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
+import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ui.util.UIUtils;
 
@@ -37,8 +40,9 @@ public class SynchronizeProjectAction extends BaseSyncAction
 			{
 				try
 				{
-					SmartSyncDialog dialog = new SmartSyncDialog(getShell(), source, dest, source.getRoot(), dest
-							.getRoot(), source.getName(), dest.getName());
+					IFileStore[] fileStores = SyncUtils.getFileStores(files);
+					ConnectionPointSyncPair cpsp = new ConnectionPointSyncPair(source, dest);
+					SmartSyncDialog dialog = new SmartSyncDialog(getShell(), cpsp, fileStores);
 					dialog.open();
 					dialog.setHandler(new SyncEventHandlerAdapter()
 					{

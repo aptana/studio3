@@ -18,13 +18,17 @@
 %import "com.aptana.parsing.IRecoveryStrategy";
 %import "com.aptana.parsing.ast.IParseNode";
 %import "com.aptana.parsing.ast.IParseRootNode";
+%import "com.aptana.parsing.ast.IParseError";
+%import "com.aptana.parsing.ast.ParseError";
 %import "com.aptana.parsing.ast.ParseRootNode";
 
 %implements "IParser";
 
 %embed {:
-	// suppress parser error reporting and let the custom error recovery mechanism handle it
-	private static class JSEvents extends Events
+	private IParseState fParseState;
+
+	// Collect the errors into a list of IParseErrors and let the custom error recovery mechanism handle it
+	private class JSEvents extends Events
 	{
 		public void scannerError(Scanner.Exception e)
 		{
@@ -32,6 +36,11 @@
 
 		public void syntaxError(Symbol token)
 		{
+			if (token == null || fParseState == null )
+			{
+				return;
+			}
+			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -210,8 +219,10 @@
 	 */
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fParseState = parseState;
+
 		// grab source
-		char[] characters = parseState.getSource();
+		char[] characters = fParseState.getSource();
 
 		// make sure we have some source
 		String source = (characters != null) ? new String(characters) : "";
@@ -220,16 +231,18 @@
 		fScanner = new JSScanner();
 		fScanner.setSource(source);
 
+		fParseState.clearErrors();
+
 		try
 		{
 			// parse
 			ParseRootNode result = (ParseRootNode) parse(fScanner);
-			int start = parseState.getStartingOffset();
+			int start = fParseState.getStartingOffset();
 			int end = start + source.length() - 1;
 			result.setLocation(start, end);
 
 			// store results in the parse state
-			parseState.setParseResult(result);
+			fParseState.setParseResult(result);
 
 			// TODO: We probably don't need documentation nodes in all cases. For
 			// example, the outline view probably doesn't rely on them. We should
@@ -276,6 +289,7 @@
 		{
 			// clear scanner for garbage collection
 			fScanner = null;
+			fParseState = null;
 		}
 	}
 

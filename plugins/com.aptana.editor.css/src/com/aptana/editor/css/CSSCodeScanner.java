@@ -145,6 +145,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 */
 	private int fCurlyState;
 	private boolean fInMedia;
+	protected boolean fInPropertyValue;
+	protected boolean fInSelector;
 
 	private boolean fInPropertyValue;
 
@@ -411,6 +413,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		else if (CSSTokenType.RCURLY == tokenData)
 		{
 			this.fInPropertyValue = false;
+		}
+		else if (CSSTokenType.PROPERTY == tokenData)
+		{
+			this.fInSelector = false;
 		}
 		else if (CSSTokenType.COLON == tokenData)
 		{

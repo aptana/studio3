@@ -11,16 +11,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
+
+import beaver.Parser;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
@@ -90,62 +89,38 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IFileIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
+	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
-
-		for (IFileStore file : files)
-		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-
-			Thread.yield(); // be nice to other threads, let them get in before each file...
-
-			this.indexFileStore(index, file, sub.newChild(100));
-		}
-
-		sub.done();
-	}
-
-	/**
-	 * indexFileStore
-	 * 
-	 * @param index
-	 * @param file
-	 * @param monitor
-	 */
-	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		
+
 		try
 		{
 			if (file != null)
 			{
 				sub.subTask(getIndexingMessage(index, file));
-	
+
 				removeTasks(file, sub.newChild(10));
-	
+
 				// grab the source of the file we're going to parse
 				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
-	
+
 				// minor optimization when creating a new empty file
 				if (source != null && source.trim().length() > 0)
 				{
-					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source);
-					sub.worked(50);
-					
+					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source, sub.newChild(50));
 					if (ast != null)
 					{
 						this.processParseResults(file, source, index, ast, sub.newChild(20));
 					}
 				}
 			}
+		}
+		catch (Parser.Exception e)
+		{
+			// ignore parse errors
 		}
 		catch (Throwable e)
 		{

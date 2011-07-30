@@ -7,7 +7,13 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.SnippetElement;
 
 /**
  * JSContentAssistProposalTests
@@ -20,6 +26,85 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	public void testStringCharCodeAt()
 	{
 		this.checkProposals("contentAssist/string-charCodeAt.js", "charCodeAt");
+	}
+
+	/**
+	 * testStringF
+	 * 
+	 * @throws IOException
+	 */
+	public void testStringFPrefix() throws IOException
+	{
+		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
+		bundleFile.deleteOnExit();
+
+		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
+		bundleElement.setDisplayName("Editor Unit Tests");
+
+		File f = File.createTempFile("snippet", "rb");
+		SnippetElement se = createSnippet(f.getAbsolutePath(), "FunctionTemplate", "fun", "source.js");
+		bundleElement.addChild(se);
+		BundleManager.getInstance().addBundle(bundleElement);
+
+		// note template is before true proposal, as we are ordering by trigger prefix
+		this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "finally", "focus", "for", "forward",
+				"frames", "function", "FunctionTemplate", "Function");
+
+		BundleManager.getInstance().unloadScript(f);
+
+	}
+
+	/**
+	 * testStringFunction
+	 */
+	public void testStringFunction()
+	{
+		this.checkProposals("contentAssist/function.js", true, true, "function", "Function");
+	}
+
+	/**
+	 * testStringFunction
+	 */
+	public void testStringFunctionCaseOrder()
+	{
+		// Commented out for the moment until we resolve an issue with indexing
+		// this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob",
+		// "for",
+		// "forward");
+	}
+
+	/**
+	 * testStringFunction
+	 * 
+	 * @throws IOException
+	 */
+	public void testStringThis() throws IOException
+	{
+		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
+		bundleFile.deleteOnExit();
+
+		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
+		bundleElement.setDisplayName("Editor Unit Tests");
+
+		File f = File.createTempFile("snippet", "rb");
+		SnippetElement se = createSnippet(f.getAbsolutePath(), "$(this)", "this", "source.js");
+		bundleElement.addChild(se);
+		BundleManager.getInstance().addBundle(bundleElement);
+
+		// note after is before true proposal, as we are ordering by trigger prefix
+		this.checkProposals("contentAssist/this.js", true, true, "this", "throw", "$(this)");
+
+		BundleManager.getInstance().unloadScript(f);
+
+	}
+
+	/**
+	 * testStringD
+	 */
+	public void testStringDPrefix()
+	{
+		this.checkProposals("contentAssist/d-prefix.js", true, true, "default", "defaultStatus", "delete", "do",
+				"document", "Date");
 	}
 
 	/**

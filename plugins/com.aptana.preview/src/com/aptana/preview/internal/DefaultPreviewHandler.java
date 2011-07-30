@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.content.IContentType;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.io.efs.EFSUtils;
-import com.aptana.preview.Activator;
+import com.aptana.preview.PreviewPlugin;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.SourceConfig;
@@ -82,7 +82,7 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 				}
 				return new PreviewConfig(uri.toURL());
 			} catch (MalformedURLException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e)); //$NON-NLS-1$
+				throw new CoreException(new Status(IStatus.ERROR, PreviewPlugin.PLUGIN_ID, "", e)); //$NON-NLS-1$
 			}
 		}
 		return null;

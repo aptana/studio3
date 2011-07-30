@@ -34,7 +34,7 @@ import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.preferences.IPreferenceConstants;
 import com.aptana.terminal.views.TerminalView;
 
@@ -154,7 +154,7 @@ public class OpenTerminalHandler extends AbstractHandler
 
 	private boolean openUserWorkingDirectory()
 	{
-		String workingDirectoryPref = Platform.getPreferencesService().getString(Activator.PLUGIN_ID,
+		String workingDirectoryPref = Platform.getPreferencesService().getString(TerminalPlugin.PLUGIN_ID,
 				IPreferenceConstants.WORKING_DIRECTORY, null, null);
 		if (!StringUtil.isEmpty(workingDirectoryPref))
 		{

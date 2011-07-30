@@ -19,7 +19,6 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
-import org.eclipse.swt.widgets.Display;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -30,6 +29,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 {
 
 	private AbstractThemeableEditor fEditor;
+	private boolean fInitialReconcileDone;
 
 	/**
 	 * Code Folding.
@@ -76,7 +76,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	public void initialReconcile()
 	{
+		if (fInitialReconcileDone)
+		{
+			return;
+		}
 		reconcile(true);
+		fInitialReconcileDone = true;
 	}
 
 	public void setProgressMonitor(IProgressMonitor monitor)
@@ -110,8 +115,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			synchronized (fPositions)
 			{
 				fPositions.clear();
-				fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
-			}
+			fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+		}
 		}
 		catch (BadLocationException e)
 		{
@@ -137,17 +142,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		// clear folding positions
 		synchronized (fPositions)
 		{
-			fPositions.clear();
-		}
+		fPositions.clear();
 	}
-
-	protected boolean parseDocument(IProgressMonitor monitor)
-	{
-		FileService fileService = fEditor.getFileService();
-		// doing a full parse at the moment
-		fileService.parse();
-		// abort if parse failed
-		return fileService.hasValidParseResult();
 	}
 
 	/**
@@ -155,35 +151,29 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	protected void updatePositions()
 	{
-		final Map<ProjectionAnnotation, Position> copy;
-		synchronized (fPositions)
-		{
-			copy = new HashMap<ProjectionAnnotation, Position>(fPositions);
-		}
-		Display.getDefault().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				fEditor.updateFoldingStructure(copy);
-			}
-		});
+		fEditor.updateFoldingStructure(fPositions);
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
-		parseDocument(fMonitor);
-		if (fEditor.isFoldingEnabled())
+		FileService fileService = fEditor.getFileService();
+		// doing a full parse at the moment
+		if (fileService.parse(fMonitor))
 		{
-			calculatePositions(initialReconcile, fMonitor);
-		}
-		else
-		{
+			// only do folding and validation when the source was changed
+			if (fEditor.isFoldingEnabled())
+			{
+				calculatePositions(initialReconcile, fMonitor);
+			}
+			else
+			{
 			synchronized (fPositions)
 			{
 				fPositions.clear();
 			}
-			updatePositions();
+				updatePositions();
+			}
+			fEditor.getFileService().validate();
 		}
-		fEditor.getFileService().validate();
 	}
 }

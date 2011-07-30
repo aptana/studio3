@@ -9,6 +9,8 @@ package com.aptana.editor.common;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,6 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -41,6 +42,8 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.hyperlink.MultipleHyperlinkPresenter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.source.Annotation;
@@ -54,8 +57,10 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.spelling.SpellingService;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
@@ -63,30 +68,34 @@ import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
 import com.aptana.editor.common.internal.hover.TextHoverDescriptor;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.spelling.MultiRegionSpellingReconcileStrategy;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
-import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
+import com.aptana.editor.common.text.reconciler.CommonPresentationReconciler;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
+import com.aptana.editor.common.text.reconciler.CommonReconcilingStrategy;
+import com.aptana.editor.common.text.reconciler.CompositeReconcilingStrategy;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
-		ITopContentTypesProvider
-{
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider {
+
+	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 0;
+	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
+
+	public static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
+
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
-	private IReconcilingStrategy fReconcilingStrategy;
-	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
+	private CommonReconciler fReconciler;
 	ArrayList<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
-
-	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 0;
-	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -94,8 +103,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * @param preferenceStore
 	 * @param editor
 	 */
-	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
-	{
+	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
 		super(preferenceStore);
 
 		fTextEditor = editor;
@@ -104,32 +112,27 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	/**
 	 * dispose
 	 */
-	public void dispose()
-	{
+	public void dispose() {
 		fTextEditor = null;
 		fDoubleClickStrategy = null;
-		if (fAutoActivationListener != null)
-		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fAutoActivationListener);
+		fReconciler = null;
+		if (fAutoActivationListener != null) {
+			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(fAutoActivationListener);
 			fAutoActivationListener = null;
 		}
-		if (fThemeChangeListener != null)
-		{
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+		if (fThemeChangeListener != null) {
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			fThemeChangeListener = null;
 		}
 
-		if (fCAProcessors != null)
-		{
-			for (IContentAssistProcessor cap : fCAProcessors)
-			{
+		if (fCAProcessors != null) {
+			for (IContentAssistProcessor cap : fCAProcessors) {
 				// disposes of unused resources, particularly preference change listeners
-				if (cap instanceof ICommonContentAssistProcessor)
-				{
+				if (cap instanceof ICommonContentAssistProcessor) {
 					((ICommonContentAssistProcessor) cap).dispose();
 				}
 			}
+			fCAProcessors = null;
 		}
 	}
 
@@ -218,7 +221,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				setAutoActivationOptions(assistant);
 			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
 
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 		assistant.setContextInformationPopupBackground(getThemeBackground());
@@ -234,10 +237,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 					assistant.setProposalSelectorBackground(getThemeBackground());
 					assistant.setProposalSelectorForeground(getThemeForeground());
 					assistant.setProposalSelectorSelectionColor(getThemeSelection());
+					assistant.setContextInformationPopupBackground(getThemeBackground());
+					assistant.setContextInformationPopupForeground(getThemeForeground());
 				}
 			}
 		};
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
 		return assistant;
 	}
@@ -381,6 +386,29 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return "\t"; //$NON-NLS-1$
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+		PresentationReconciler reconciler = new CommonPresentationReconciler();
+		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		return reconciler;
+	}
+
+	private final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
+	{
+		Set<String> set = new HashSet<String>();
+		IContentTypeTranslator contentTypeTranslator = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		String topContentType = getTopContentTypes()[0][0];
+		for (String contentType : getConfiguredContentTypes(sourceViewer)) {
+			if (CommonEditorPlugin.getDefault().getSpellingPreferences().isSpellingEnabledFor(contentTypeTranslator.translate(new QualifiedContentType(topContentType, contentType)))) {
+				set.add(contentType);
+			}
+		}
+		return Collections.unmodifiableCollection(set);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -497,18 +525,28 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	{
 		if (fTextEditor != null && fTextEditor.isEditable())
 		{
-			fReconcilingStrategy = new CommonCompositeReconcilingStrategy(fTextEditor,
-					getConfiguredDocumentPartitioning(sourceViewer));
-			CommonReconciler reconciler = new CommonReconciler(fTextEditor, fReconcilingStrategy, false);
-
+			IReconcilingStrategy reconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
+			CommonReconciler reconciler = new CommonReconciler(reconcilingStrategy);
+			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 			reconciler.setIsIncrementalReconciler(false);
 			reconciler.setIsAllowedToModifyDocument(false);
 			reconciler.setProgressMonitor(new NullProgressMonitor());
 			reconciler.setDelay(500);
-
-			return reconciler;
+			if (EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED))
+			{
+				SpellingService spellingService = EditorsUI.getSpellingService();
+				Collection<String> spellingContentTypes = getSpellingContentTypes(sourceViewer);
+				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null && !spellingContentTypes.isEmpty())
+				{
+					reconciler.setReconcilingStrategy(new CompositeReconcilingStrategy(
+							reconcilingStrategy,
+							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService, reconciler.getDocumentPartitioning(), spellingContentTypes)),
+							spellingContentTypes
+						);
+				}
+			}
+			return fReconciler = reconciler;
 		}
-
 		return null;
 	}
 
@@ -522,9 +560,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	public void forceReconcile()
 	{
-		if (fReconcilingStrategy != null)
+		if (fReconciler != null)
 		{
-			fReconcilingStrategy.reconcile(null);
+			fReconciler.forceReconciling();
 		}
 	}
 

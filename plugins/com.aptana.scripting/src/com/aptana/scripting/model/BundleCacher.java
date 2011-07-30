@@ -14,11 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
@@ -41,7 +41,9 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 
@@ -52,7 +54,7 @@ import com.aptana.scripting.ScriptingEngine;
  */
 public class BundleCacher
 {
-	
+
 	/**
 	 * The file where we store our serialized model.
 	 */
@@ -128,11 +130,6 @@ public class BundleCacher
 
 	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
-		// Force bundle manager to load the bundle...
-		if (!Platform.isRunning())
-		{
-			BundleManager.getInstance().loadBundle(bundleDirectory);
-		}
 		// grab the bundle model
 		BundleElement be = BundleManager.getInstance().getBundleFromPath(bundleDirectory);
 		cache(be);
@@ -147,17 +144,19 @@ public class BundleCacher
 
 		// Now write the config file out...
 		OutputStreamWriter writer = null;
+		File cacheFile = null;
+		Yaml yaml = null;
+
 		try
 		{
 			if (be.getBundleDirectory().canWrite())
 			{
-				File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
-				writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"); //$NON-NLS-1$
+				cacheFile = new File(be.getBundleDirectory(), CACHE_FILE);
+				writer = new OutputStreamWriter(new FileOutputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
 
-				Yaml yaml = createYAML(be.getBundleDirectory());
+				yaml = createYAML(be.getBundleDirectory());
 				yaml.dump(be, writer);
 			}
-			return true;
 		}
 		catch (IOException e)
 		{
@@ -177,6 +176,54 @@ public class BundleCacher
 				}
 			}
 		}
+
+		InputStreamReader reader = null;
+		boolean serializationSucceeded = false;
+		try
+		{
+			if (be.getBundleDirectory().canRead())
+			{
+				Assert.isNotNull(cacheFile);
+				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
+				BundleElement be2 = (BundleElement) yaml.load(reader);
+
+				// invoke blocks don't serialize correctly, so the comparison gets screwy.
+				String beString1 = be.toSource(false);
+				String beString2 = be2.toSource(false);
+
+				// It's not the ideal way to test equality, but seems to work correctly. This is the mechanism
+				// currently in use by the unit tests
+				serializationSucceeded = Assert.isTrue(beString2.equals(beString1),
+						StringUtil.format(Messages.BundleCacher_SerializationException, cacheFile));
+				return true;
+			}
+		}
+		catch (IOException e)
+		{
+			ScriptingActivator.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			if (reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
+
+			if (!serializationSucceeded && cacheFile != null)
+			{
+				ScriptLogger.logError(StringUtil.format(Messages.BundleCacher_SerializationExceptionDeletingCacheFile,
+						cacheFile));
+				cacheFile.delete();
+			}
+		}
+
 		return false;
 	}
 
@@ -331,8 +378,7 @@ public class BundleCacher
 				if (file.lastModified() > lastMod)
 				{
 					// One of the files is newer, don't load cache! This will reload everything from disk and rewrite
-					// the
-					// cache
+					// the cache
 					ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_OutOfDateCacheMsg,
 							file.getPath()));
 					return true;
@@ -523,6 +569,7 @@ public class BundleCacher
 			this.yamlConstructors.put(new Tag(SmartTypingPairsElement.class), new ConstructSmartTypingPairsElement());
 			this.yamlConstructors.put(new Tag(ProjectTemplateElement.class), new ConstructProjectTemplateElement());
 			this.yamlConstructors.put(new Tag(EnvironmentElement.class), new ConstructEnvironmentElement());
+			this.yamlConstructors.put(new Tag(BuildPathElement.class), new ConstructBuildPathElement());
 
 			// Tell it that "children" field for MenuElement is a list of MenuElements
 			TypeDescription menuDescription = new TypeDescription(MenuElement.class);
@@ -636,6 +683,20 @@ public class BundleCacher
 						}
 					}
 				}
+			}
+		}
+
+		private class ConstructBuildPathElement extends AbstractBundleElementConstruct
+		{
+			public Object construct(Node node)
+			{
+				node.setType(BuildPathElement.class);
+				String path = getPath(node);
+				BuildPathElement bpe = new BuildPathElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, bpe);
+				bpe.setPath(path);
+				return bpe;
 			}
 		}
 

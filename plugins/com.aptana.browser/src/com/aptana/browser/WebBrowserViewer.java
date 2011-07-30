@@ -19,6 +19,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
@@ -48,8 +49,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import com.aptana.browser.internal.BrowserBackgroundImage;
 import com.aptana.browser.internal.BrowserSize;
 import com.aptana.browser.internal.BrowserSizeCategory;
-import com.aptana.swt.webkitbrowser.WebKitBrowser;
 import com.aptana.swt.webkitbrowser.OpenWindowEvent;
+import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
@@ -185,7 +186,11 @@ public class WebBrowserViewer extends Composite {
 				WebBrowserViewer browser2 = new WebBrowserViewer(shell2, style);
 				shell2.layout();
 				browser2.newWindow = true;
-				((OpenWindowEvent) event).browser = browser2.browser;
+				if (event instanceof OpenWindowEvent) {
+					((OpenWindowEvent) event).browser = browser2.browser;
+				} else {
+					event.browser = (Browser) browser2.getBrowser();
+				}
 			}
 		});
 		browser.addCloseWindowListener(new CloseWindowListener() {

@@ -126,7 +126,7 @@ public class EarlyStartup implements IStartup
 				addWindowListener();
 				addPerspectiveListeners();
 
-				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+				IPreferenceStore prefs = TerminalPlugin.getDefault().getPreferenceStore();
 				boolean firstRun = prefs.getBoolean(IPreferenceConstants.FIRST_RUN);
 
 				if (firstRun)
@@ -177,7 +177,7 @@ public class EarlyStartup implements IStartup
 				Utils.openTerminalEditor(workbenchWindow, TerminalEditor.ID, true);
 			}
 		} catch (CoreException e) {
-			Activator.log("Skip opening terminal editor", e.getCause()); //$NON-NLS-1$
+			TerminalPlugin.log("Skip opening terminal editor", e.getCause()); //$NON-NLS-1$
 		}
 	}
 }

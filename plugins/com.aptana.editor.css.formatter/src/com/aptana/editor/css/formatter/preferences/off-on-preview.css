@@ -1,0 +1,27 @@
+H1 {
+    color: white;
+    background: teal;
+    FONT-FAMILY: arial, helvetica, lucida-sans, sans-serif;
+    FONT-SIZE: 18pt;
+    FONT-STYLE: normal;
+    FONT-VARIANT: normal
+}
+
+H2 {
+    /*@formatter:off*/
+    COLOR:         #000000;
+    FONT-FAMILY:   verdana, helvetica, lucida-sans, sans-serif;
+    FONT-SIZE:     14pt;
+    FONT-STYLE:    normal;
+    FONT-VARIANT:  normal
+    /*@formatter:on*/
+}
+
+body {
+    COLOR: #000000;
+    FONT-FAMILY: lucida-sans, sans-serif;
+    FONT-SIZE: 10pt;
+    FONT-STYLE: normal;
+    FONT-VARIANT: normal;
+    background-image: url('bkgnd.gif')
+}

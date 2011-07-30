@@ -11,19 +11,17 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -41,6 +39,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -62,7 +61,7 @@ import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-import com.aptana.editor.html.preferences.IPreferenceContants;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 import com.aptana.editor.xml.TagUtil;
@@ -380,26 +379,27 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<ICompletionProposal> addURIPathProposals(int offset)
 	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		this._replaceRange = null;
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+
 		try
 		{
 			String valuePrefix = this._currentLexeme.getText();
 			int length = offset - this._currentLexeme.getStartingOffset();
 			valuePrefix = valuePrefix.substring(0, length);
 
-			URI editorStoreURI = getURI();
-			if (editorStoreURI == null)
-			{
-				return proposals;
-			}
-			IFileStore editorStore = EFS.getStore(editorStoreURI);
-
 			// Strip the quotes off the value prefix!
 			if (valuePrefix.length() > 0 && (valuePrefix.charAt(0) == '"' || valuePrefix.charAt(0) == '\''))
 			{
 				valuePrefix = valuePrefix.substring(1);
 				offset = this._currentLexeme.getStartingOffset() + 1;
+			}
+
+			URI editorStoreURI = getURI();
+			IFileStore editorStore = null;
+			if (editorStoreURI != null)
+			{
+				editorStore = EFS.getStore(editorStoreURI);
 			}
 
 			// Based on prefix we need to choose project root (webroot), some other place, or current file as URI
@@ -441,9 +441,56 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 				}
 			}
+			// Try to handle absolute URIs with schemes...
+			else if (valuePrefix.contains(":/")) //$NON-NLS-1$
+			{
+				if (valuePrefix.endsWith(":/")) //$NON-NLS-1$
+				{
+					// Busted URI, just return empty!
+					return Collections.emptyList();
+				}
+				else if ("file://".equals(valuePrefix)) //$NON-NLS-1$
+				{
+					baseStore = EFS.getLocalFileSystem().getStore(Path.ROOT);
+					offset += valuePrefix.length();
+					valuePrefix = StringUtil.EMPTY;
+				}
+				else
+				{
+					try
+					{
+						URI parsed = null;
+						int lastSlash = valuePrefix.lastIndexOf('/');
+						if (lastSlash != -1 && lastSlash < valuePrefix.length() - 1)
+						{
+							parsed = URI.create(valuePrefix.substring(0, lastSlash));
+						}
+						else
+						{
+							parsed = URI.create(valuePrefix);
+							offset += valuePrefix.length();
+							valuePrefix = StringUtil.EMPTY;
+						}
+						baseStore = EFS.getStore(parsed);
+					}
+					catch (Exception e)
+					{
+						// Busted URI
+						return Collections.emptyList();
+					}
+				}
+			}
+			// Assume relative to file...
 			else
 			{
-				baseStore = editorStore.getParent();
+				if (editorStore != null)
+				{
+					baseStore = editorStore.getParent();
+				}
+			}
+			if (baseStore == null)
+			{
+				return Collections.emptyList();
 			}
 
 			// replace from last slash on...
@@ -451,20 +498,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			if (lastSlash != -1)
 			{
 				IFileStore possibleChild = baseStore.getChild(valuePrefix.substring(0, lastSlash));
-				if (possibleChild.fetchInfo().exists())
+				try
 				{
-					baseStore = possibleChild;
+					if (possibleChild.fetchInfo().exists())
+					{
+						baseStore = possibleChild;
+					}
+				}
+				catch (Exception e)
+				{
+					// ignore
 				}
 				offset += lastSlash + 1;
 				valuePrefix = valuePrefix.substring(lastSlash + 1);
 			}
 			this._replaceRange = new Range(offset, this._currentLexeme.getEndingOffset() - 1);
-
-			// TODO Handle when it's just an absolute URI!
-			// else if ()
-			// {
-			//
-			// }
 
 			// Then we grab the filestore pointing to the parent and ask for the children!
 			Image[] userAgentIcons = this.getAllUserAgentIcons();
@@ -648,7 +696,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			// If user doesn't want tags closed for them, then don't do it!
 			boolean addCloseTag = HTMLPlugin.getDefault().getPreferenceStore()
-					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS);
+					.getBoolean(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS);
 
 			HTMLParseState state = null;
 			for (ElementElement element : elements)
@@ -868,12 +916,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private boolean addUnclosedTagProposals(LocationType fineLocation, List<ICompletionProposal> proposals,
 			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		HTMLParseState state = null;
 		boolean addedProposal = false;
 		// First see if there are any unclosed tags, suggest them first
-		Set<String> unclosedElements = getUnclosedTagNames(offset);
+		List<String> unclosedElements = HTMLTagUtil.getUnclosedTagNames(_document, offset);
 		if (unclosedElements != null && !unclosedElements.isEmpty())
 		{
+			int relevance = ICommonCompletionProposal.RELEVANCE_HIGH - 1;
 			for (String unclosedElement : unclosedElements)
 			{
 				ElementElement element = this._queryHelper.getElement(unclosedElement);
@@ -881,17 +929,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				if (state == null)
-				{
-					state = new HTMLParseState();
-					state.setEditState(_document.get(), null, 0, 0);
-				}
-				if (state.isEmptyTagType(element.getName()))
-				{
-					continue;
-				}
-				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
+				proposals.add(createCloseTagProposal(element, lexemeProvider, offset, relevance));
 				addedProposal = true;
+				relevance -= 1;
 			}
 		}
 		return addedProposal;
@@ -924,7 +964,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
+				proposals.add(createCloseTagProposal(element, lexemeProvider, offset,
+						ICommonCompletionProposal.RELEVANCE_HIGH));
 				addedProposal = true;
 			}
 		}
@@ -932,7 +973,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	private CommonCompletionProposal createCloseTagProposal(ElementElement element,
-			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset, int relevance)
 	{
 		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
@@ -998,51 +1039,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		proposal.setFileLocation(HTMLIndexConstants.CORE);
 		proposal.setUserAgentImages(userAgentIcons);
+		proposal.setRelevance(relevance);
 		return proposal;
-	}
-
-	protected Set<String> getUnclosedTagNames(int offset)
-	{
-		Set<String> unclosedElements = new HashSet<String>();
-		try
-		{
-			ITypedRegion[] partitions = _document.computePartitioning(0, offset);
-			for (ITypedRegion partition : partitions)
-			{
-				if (partition.getType().equals(HTMLSourceConfiguration.HTML_TAG))
-				{
-					String src = _document.get(partition.getOffset(), partition.getLength());
-					int lessThanIndex = src.indexOf('<');
-
-					// if '<' index outside current string, skip this partition
-					if (lessThanIndex == -1 || lessThanIndex >= src.length() - 1)
-					{
-						continue;
-					}
-
-					// ignore tag containing offset, i.e. if cursor is at '|', <|a>, <a|> will not
-					// include <a> as unclosed tag, but <a>| will.
-					int greaterThanIndex = src.indexOf('>');
-					if (greaterThanIndex == -1)
-					{
-						continue;
-					}
-
-					// get name of element and see if we are closed elsewhere in the document
-					String tagName = TagUtil.getTagName(src);
-					tagName = tagName.toLowerCase();
-					if (!unclosedElements.contains(tagName) && !TagUtil.tagClosed(_document, tagName))
-					{
-						unclosedElements.add(tagName);
-					}
-				}
-			}
-		}
-		catch (BadLocationException e)
-		{
-			// ignore
-		}
-		return unclosedElements;
 	}
 
 	/**
@@ -1119,7 +1117,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// tokenize the current document
 		this._document = viewer.getDocument();
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset > 0 ? offset - 1 : offset);
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset > 0 ? offset - 1
+				: offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -1199,14 +1198,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 		}
 
-		// sort by display name
-		Collections.sort(result, new Comparator<ICompletionProposal>()
-		{
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
-			{
-				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
-			}
-		});
+		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
 
 		// select the current proposal based on the current lexeme
 		if (this._replaceRange != null)
@@ -1220,14 +1212,50 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					text = "/" + text; // proposals have "/" at the front //$NON-NLS-1$
 				}
 
-				this.setSelectedProposal(text, result);
+				setSelectedProposal(text, proposals);
 			}
 			catch (BadLocationException e)
 			{
 			}
 		}
 
-		return result.toArray(new ICompletionProposal[result.size()]);
+		// return results
+		return proposals;
+	}
+
+	/**
+	 * setSelectedProposal
+	 * 
+	 * @param prefix
+	 * @param proposals
+	 */
+	protected void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
+	{
+		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
+		{
+			return;
+		}
+
+		for (ICompletionProposal proposal : proposals)
+		{
+			String displayString = proposal.getDisplayString();
+			int comparison = displayString.compareToIgnoreCase(prefix);
+
+			if (comparison >= 0)
+			{
+				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
+				{
+					if (displayString.startsWith(prefix))
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
+					}
+					else
+					{
+						((ICommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
+					}
+				}
+			}
+		}
 	}
 
 	/*

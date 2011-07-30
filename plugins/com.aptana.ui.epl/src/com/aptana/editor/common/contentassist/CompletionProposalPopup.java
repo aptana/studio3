@@ -68,6 +68,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -691,10 +692,26 @@ public class CompletionProposalPopup implements IContentAssistListener
 		TableItem item = (TableItem) event.item;
 		int index = fProposalTable.indexOf(item);
 
+		boolean outputRelevance = IdeLog.isOutputEnabled(UIEplPlugin.getDefault(), IdeLog.StatusLevel.INFO,
+				IUiEplScopes.RELEVANCE);
+
 		if (0 <= index && index < fFilteredProposals.length)
 		{
 			ICompletionProposal current = fFilteredProposals[index];
+
 			String entry = current.getDisplayString().trim();
+
+			if (outputRelevance)
+			{
+				int relevance = 0;
+				if (current instanceof ICommonCompletionProposal)
+				{
+					relevance = ((ICommonCompletionProposal) current).getRelevance();
+				}
+				entry += StringUtil.format(
+						JFaceTextMessages.getString("CompletionProposalPopup.RelevancePercentage"), relevance); //$NON-NLS-1$
+			}
+
 			item.setImage(current.getImage());
 			item.setText(0, entry);
 
@@ -1024,8 +1041,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 		fDocumentEvents.clear();
 
-		if (fKeyListener != null && fContentAssistSubjectControlAdapter.getControl() != null
-				&& !fContentAssistSubjectControlAdapter.getControl().isDisposed())
+		if (fKeyListener != null && Helper.okToUse(fContentAssistSubjectControlAdapter.getControl()))
 		{
 			fContentAssistSubjectControlAdapter.removeKeyListener(fKeyListener);
 			fKeyListener = null;
@@ -1054,7 +1070,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	public boolean isActive()
 	{
-		return fProposalShell != null && !fProposalShell.isDisposed() && fProposalShell.isVisible();
+		return Helper.okToUse(fProposalShell) && fProposalShell.isVisible();
 	}
 
 	/**
@@ -1111,7 +1127,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			// Custom code for modifying selection/size
 			int defaultIndex = -1;
 			int suggestedIndex = -1;
-			
+
 			// select the first proposal
 			if (proposals.length > 0)
 			{
@@ -1185,7 +1201,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			this.fProposalTable.deselectAll();
 			this.setScroll(suggestedIndex);
 		}
-		else if (fProposalTable != null)
+		else if (Helper.okToUse(fProposalTable))
 		{
 			if (fLastKeyPressed == '\b' && defaultIndex == -1)
 			{

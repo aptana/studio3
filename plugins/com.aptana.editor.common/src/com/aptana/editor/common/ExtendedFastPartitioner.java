@@ -8,6 +8,9 @@
 
 package com.aptana.editor.common;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedPosition;
@@ -21,12 +24,26 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
  */
 public class ExtendedFastPartitioner extends FastPartitioner implements IExtendedPartitioner {
 
+	private final Set<String> legalContentTypes;
+
 	/**
 	 * @param scanner
 	 * @param legalContentTypes
 	 */
 	public ExtendedFastPartitioner(IPartitionTokenScanner scanner, String[] legalContentTypes) {
 		super(scanner, legalContentTypes);
+		this.legalContentTypes = new HashSet<String>(legalContentTypes.length);
+		for (String contentType : legalContentTypes) {
+			this.legalContentTypes.add(contentType);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.FastPartitioner#isSupportedContentType(java.lang.String)
+	 */
+	@Override
+	protected boolean isSupportedContentType(String contentType) {
+		return legalContentTypes.contains(contentType);
 	}
 
 	/* (non-Javadoc)

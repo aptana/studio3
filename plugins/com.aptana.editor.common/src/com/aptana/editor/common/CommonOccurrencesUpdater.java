@@ -46,18 +46,15 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 /**
  * CommonOccurrenceUpdater
  */
-public class CommonOccurrencesUpdater implements IPropertyChangeListener
-{
-	private class CancelerJob implements IDocumentListener, ITextInputListener
-	{
+public class CommonOccurrencesUpdater implements IPropertyChangeListener {
+	private class CancelerJob implements IDocumentListener, ITextInputListener {
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.text.IDocumentListener#documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent)
 		 */
-		public void documentAboutToBeChanged(DocumentEvent event)
-		{
-			if (findOccurrencesJob != null)
-			{
+		public void documentAboutToBeChanged(DocumentEvent event) {
+			if (findOccurrencesJob != null) {
 				findOccurrencesJob.cancel();
 			}
 		}
@@ -66,33 +63,25 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.text.IDocumentListener#documentChanged(org.eclipse.jface.text.DocumentEvent)
 		 */
-		public void documentChanged(DocumentEvent event)
-		{
+		public void documentChanged(DocumentEvent event) {
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * @see
-		 * org.eclipse.jface.text.ITextInputListener#inputDocumentAboutToBeChanged(org.eclipse.jface.text.IDocument,
-		 * org.eclipse.jface.text.IDocument)
+		 * @see org.eclipse.jface.text.ITextInputListener#inputDocumentAboutToBeChanged(org.eclipse.jface.text.IDocument, org.eclipse.jface.text.IDocument)
 		 */
-		public void inputDocumentAboutToBeChanged(IDocument oldInput, IDocument newInput)
-		{
-			if (oldInput != null)
-			{
+		public void inputDocumentAboutToBeChanged(IDocument oldInput, IDocument newInput) {
+			if (oldInput != null) {
 				oldInput.removeDocumentListener(this);
 			}
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.eclipse.jface.text.ITextInputListener#inputDocumentChanged(org.eclipse.jface.text.IDocument,
-		 * org.eclipse.jface.text.IDocument)
+		 * @see org.eclipse.jface.text.ITextInputListener#inputDocumentChanged(org.eclipse.jface.text.IDocument, org.eclipse.jface.text.IDocument)
 		 */
-		public void inputDocumentChanged(IDocument oldInput, IDocument newInput)
-		{
-			if (newInput != null)
-			{
+		public void inputDocumentChanged(IDocument oldInput, IDocument newInput) {
+			if (newInput != null) {
 				newInput.addDocumentListener(this);
 			}
 		}
@@ -100,18 +89,15 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		/**
 		 * install
 		 */
-		public void install()
-		{
+		public void install() {
 			ISourceViewer sourceViewer = getSourceViewer();
 			IDocument document = getDocument();
 
-			if (sourceViewer != null)
-			{
+			if (sourceViewer != null) {
 				sourceViewer.addTextInputListener(this);
 			}
 
-			if (document != null)
-			{
+			if (document != null) {
 				document.addDocumentListener(this);
 			}
 		}
@@ -119,32 +105,27 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		/**
 		 * uninstall
 		 */
-		public void uninstall()
-		{
+		public void uninstall() {
 			ISourceViewer sourceViewer = getSourceViewer();
 			IDocument document = getDocument();
 
-			if (sourceViewer != null)
-			{
+			if (sourceViewer != null) {
 				sourceViewer.removeTextInputListener(this);
 			}
 
-			if (document != null)
-			{
+			if (document != null) {
 				document.removeDocumentListener(this);
 			}
 		}
 
 	}
 
-	private class FindOccurrencesJob extends Job
-	{
+	private class FindOccurrencesJob extends Job {
 		private IDocument document;
 		private ITextSelection selection;
 		private IAnnotationModel model;
 
-		public FindOccurrencesJob(IDocument document, ITextSelection selection, IAnnotationModel model)
-		{
+		public FindOccurrencesJob(IDocument document, ITextSelection selection, IAnnotationModel model) {
 			super(Messages.CommonOccurrencesUpdater_Mark_Word_Occurrences);
 
 			this.document = document;
@@ -157,30 +138,23 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		 * 
 		 * @return
 		 */
-		protected String getWord()
-		{
+		protected String getWord() {
 			String result = null;
 
-			try
-			{
+			try {
 				int offset = selection.getOffset();
 				int length = document.getLength();
 				int start = offset;
 
 				// find starting character, if we're on a valid character already
-				if (Character.isUnicodeIdentifierPart(document.getChar(offset)))
-				{
-					while (offset >= 0)
-					{
+				if (Character.isUnicodeIdentifierPart(document.getChar(offset))) {
+					while (offset >= 0) {
 						char c = document.getChar(offset);
 
-						if (Character.isUnicodeIdentifierPart(c))
-						{
+						if (Character.isUnicodeIdentifierPart(c)) {
 							start = offset;
 							offset--;
-						}
-						else
-						{
+						} else {
 							break;
 						}
 					}
@@ -189,31 +163,23 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 				// find ending character, if we're on a valid character already
 				offset = selection.getOffset() + selection.getLength();
 
-				if (Character.isUnicodeIdentifierPart(document.getChar(offset - 1)))
-				{
-					while (offset < length)
-					{
+				if (Character.isUnicodeIdentifierPart(document.getChar(offset - 1))) {
+					while (offset < length) {
 						char c = document.getChar(offset);
 
-						if (Character.isUnicodeIdentifierPart(c))
-						{
+						if (Character.isUnicodeIdentifierPart(c)) {
 							offset++;
-						}
-						else
-						{
+						} else {
 							break;
 						}
 					}
 				}
 
 				// grab result, as long as it is on one line only
-				if (document.getLineOfOffset(start) == document.getLineOfOffset(offset))
-				{
+				if (document.getLineOfOffset(start) == document.getLineOfOffset(offset)) {
 					result = document.get(start, offset - start);
 				}
-			}
-			catch (BadLocationException e)
-			{
+			} catch (BadLocationException e) {
 			}
 
 			return (result != null) ? result.trim() : result;
@@ -224,28 +190,23 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 		 */
 		@Override
-		protected IStatus run(IProgressMonitor monitor)
-		{
+		protected IStatus run(IProgressMonitor monitor) {
 			IStatus status = Status.OK_STATUS;
 
 			// start with an empty map in case we need to delete existing markers later
 			Map<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
 
-			if (editor.isMarkingOccurrences())
-			{
+			if (editor.isMarkingOccurrences()) {
 				// find a "word" to search using the current selection
 				String word = getWord();
 
-				if (word != null && word.length() > 0)
-				{
+				if (word != null && word.length() > 0) {
 					String source = document.get();
 					Pattern wordPattern = createWordPattern(word);
 					Matcher matcher = wordPattern.matcher(source);
 
-					while (matcher.find())
-					{
-						if (monitor.isCanceled())
-						{
+					while (matcher.find()) {
+						if (monitor.isCanceled()) {
 							status = Status.CANCEL_STATUS;
 							break;
 						}
@@ -254,28 +215,19 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 						int length = matcher.end() - start;
 
 						// @formatter:off
-						annotationMap.put(
-							new Annotation(ANNOTION_ID, false, ANNOTION_DESCRIPTION),
-							new Position(start, length)
-						);
+						annotationMap.put(new Annotation(ANNOTION_ID, false, ANNOTION_DESCRIPTION), new Position(start, length));
 						// @formatter:on
 					}
 				}
 			}
 
-			if (status == Status.OK_STATUS)
-			{
+			if (status == Status.OK_STATUS) {
 				// NOTE: We always update the annotation model even if we didn't find a word so we can clear the
 				// current occurrences
-				synchronized (getAnnotationModelLock(model))
-				{
-					if (model instanceof IAnnotationModelExtension)
-					{
+				synchronized (getAnnotationModelLock(model)) {
+					if (model instanceof IAnnotationModelExtension) {
 						// @formatter:off
-						((IAnnotationModelExtension) model).replaceAnnotations(
-							annotations,
-							annotationMap
-						);
+						((IAnnotationModelExtension) model).replaceAnnotations(annotations, annotationMap);
 						// @formatter:on
 					}
 
@@ -292,6 +244,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 
 	private AbstractThemeableEditor editor;
 	private ISelectionListener selectionListener;
+	private IPreferenceStore preferenceStore;
 	private Annotation[] annotations;
 	private FindOccurrencesJob findOccurrencesJob;
 	private CancelerJob cancelerJob;
@@ -301,8 +254,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @param editor
 	 */
-	public CommonOccurrencesUpdater(AbstractThemeableEditor editor)
-	{
+	public CommonOccurrencesUpdater(AbstractThemeableEditor editor) {
 		this.editor = editor;
 	}
 
@@ -312,19 +264,16 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * @param text
 	 * @return
 	 */
-	private Pattern createWordPattern(String text)
-	{
+	private Pattern createWordPattern(String text) {
 		String regexSource = StringUtil.EMPTY;
 
-		if (Character.isUnicodeIdentifierPart(text.charAt(0)))
-		{
+		if (Character.isUnicodeIdentifierPart(text.charAt(0))) {
 			regexSource += "\\b"; //$NON-NLS-1$
 		}
 
 		regexSource += Pattern.quote(text);
 
-		if (Character.isUnicodeIdentifierPart(text.charAt(text.length() - 1)))
-		{
+		if (Character.isUnicodeIdentifierPart(text.charAt(text.length() - 1))) {
 			regexSource += "\\b"; //$NON-NLS-1$
 		}
 
@@ -336,14 +285,12 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected IAnnotationModel getAnnotationModel()
-	{
+	protected IAnnotationModel getAnnotationModel() {
 		IDocumentProvider documentProvider = getDocumentProvider();
 		IEditorInput editorInput = getEditorInput();
 		IAnnotationModel result = null;
 
-		if (documentProvider != null && editorInput != null)
-		{
+		if (documentProvider != null && editorInput != null) {
 			result = documentProvider.getAnnotationModel(editorInput);
 		}
 
@@ -356,16 +303,13 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * @param annotationModel
 	 * @return
 	 */
-	private Object getAnnotationModelLock(IAnnotationModel annotationModel)
-	{
+	private Object getAnnotationModelLock(IAnnotationModel annotationModel) {
 		Object result = annotationModel;
 
-		if (annotationModel instanceof ISynchronizable)
-		{
+		if (annotationModel instanceof ISynchronizable) {
 			Object lock = ((ISynchronizable) annotationModel).getLockObject();
 
-			if (lock != null)
-			{
+			if (lock != null) {
 				result = lock;
 			}
 		}
@@ -378,13 +322,11 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected IDocument getDocument()
-	{
+	protected IDocument getDocument() {
 		ISourceViewer sourceViewer = getSourceViewer();
 		IDocument result = null;
 
-		if (sourceViewer != null)
-		{
+		if (sourceViewer != null) {
 			result = sourceViewer.getDocument();
 		}
 
@@ -396,8 +338,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected IDocumentProvider getDocumentProvider()
-	{
+	protected IDocumentProvider getDocumentProvider() {
 		return editor.getDocumentProvider();
 	}
 
@@ -406,8 +347,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected IEditorInput getEditorInput()
-	{
+	protected IEditorInput getEditorInput() {
 		return editor.getEditorInput();
 	}
 
@@ -416,16 +356,11 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected ISelectionListener getSelectionListener()
-	{
-		if (selectionListener == null)
-		{
-			selectionListener = new ISelectionListener()
-			{
-				public void selectionChanged(IWorkbenchPart part, ISelection selection)
-				{
-					if (part == editor)
-					{
+	protected ISelectionListener getSelectionListener() {
+		if (selectionListener == null) {
+			selectionListener = new ISelectionListener() {
+				public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+					if (part == editor) {
 						updateAnnotations(selection);
 					}
 				}
@@ -440,8 +375,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected ISelectionService getSelectionService()
-	{
+	protected ISelectionService getSelectionService() {
 		return editor.getSite().getWorkbenchWindow().getSelectionService();
 	}
 
@@ -450,8 +384,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @return
 	 */
-	protected ISourceViewer getSourceViewer()
-	{
+	protected ISourceViewer getSourceViewer() {
 		return editor.getISourceViewer();
 	}
 
@@ -460,26 +393,31 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @param store
 	 */
-	public void initialize(IPreferenceStore store)
-	{
-		if (editor.isMarkingOccurrences())
-		{
+	public void initialize(IPreferenceStore store) {
+		preferenceStore = store;
+		if (editor.isMarkingOccurrences()) {
 			install();
 			updateAnnotations(getSelectionService().getSelection());
 		}
 
-		store.addPropertyChangeListener(this);
+		preferenceStore.addPropertyChangeListener(this);
+	}
+
+	public void dispose() {
+		if (preferenceStore != null) {
+			preferenceStore.removePropertyChangeListener(this);
+			preferenceStore = null;
+		}
+		uninstall();
 	}
 
 	/**
 	 * install
 	 */
-	protected void install()
-	{
+	protected void install() {
 		getSelectionService().addPostSelectionListener(getSelectionListener());
 
-		if (cancelerJob == null)
-		{
+		if (cancelerJob == null) {
 			cancelerJob = new CancelerJob();
 			cancelerJob.install();
 		}
@@ -489,36 +427,28 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
-	public void propertyChange(PropertyChangeEvent event)
-	{
+	public void propertyChange(PropertyChangeEvent event) {
 		final String property = event.getProperty();
 
-		if (IPreferenceConstants.EDITOR_MARK_OCCURRENCES.equals(property))
-		{
+		if (IPreferenceConstants.EDITOR_MARK_OCCURRENCES.equals(property)) {
 			boolean newBooleanValue = false;
 			Object newValue = event.getNewValue();
 
-			if (newValue != null)
-			{
+			if (newValue != null) {
 				newBooleanValue = Boolean.valueOf(newValue.toString()).booleanValue();
 			}
 
-			if (newBooleanValue)
-			{
+			if (newBooleanValue) {
 				install();
-			}
-			else
-			{
+			} else {
 				uninstall();
 			}
 
 			// force update
-			if (editor != null)
-			{
+			if (editor != null) {
 				ISelectionProvider selectionProvider = editor.getSelectionProvider();
 
-				if (selectionProvider != null)
-				{
+				if (selectionProvider != null) {
 					updateAnnotations(selectionProvider.getSelection());
 				}
 			}
@@ -528,18 +458,18 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	/**
 	 * uninstall
 	 */
-	protected void uninstall()
-	{
-		getSelectionService().removePostSelectionListener(getSelectionListener());
+	protected void uninstall() {
+		if (selectionListener != null) {
+			getSelectionService().removePostSelectionListener(selectionListener);
+			selectionListener = null;
+		}
 
-		if (findOccurrencesJob != null)
-		{
+		if (findOccurrencesJob != null) {
 			findOccurrencesJob.cancel();
 			findOccurrencesJob = null;
 		}
 
-		if (cancelerJob != null)
-		{
+		if (cancelerJob != null) {
 			cancelerJob.uninstall();
 			cancelerJob = null;
 		}
@@ -550,21 +480,17 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener
 	 * 
 	 * @param selection
 	 */
-	protected void updateAnnotations(ISelection selection)
-	{
-		if (findOccurrencesJob != null)
-		{
+	protected void updateAnnotations(ISelection selection) {
+		if (findOccurrencesJob != null) {
 			findOccurrencesJob.cancel();
 		}
 
-		if (selection instanceof ITextSelection)
-		{
+		if (selection instanceof ITextSelection) {
 			ITextSelection textSelection = (ITextSelection) selection;
 			IDocument document = getDocument();
 			IAnnotationModel annotationModel = getAnnotationModel();
 
-			if (document != null && annotationModel != null)
-			{
+			if (document != null && annotationModel != null) {
 				findOccurrencesJob = new FindOccurrencesJob(document, textSelection, annotationModel);
 				findOccurrencesJob.run(new NullProgressMonitor());
 			}

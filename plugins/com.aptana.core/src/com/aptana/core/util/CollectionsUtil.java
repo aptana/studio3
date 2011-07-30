@@ -20,28 +20,35 @@ import java.util.Set;
  */
 public class CollectionsUtil
 {
+
+	private CollectionsUtil()
+	{
+	}
+
 	/**
 	 * Given a list of elements of type <T>, remove the duplicates from the list in place
 	 * 
 	 * @param <T>
 	 * @param list
 	 */
-	public static <T> void removeDuplicates(final List<T> list)
+	public static <T> void removeDuplicates(List<T> list)
 	{
-		final LinkedHashSet<T> set;
-
-		set = new LinkedHashSet<T>(list);
+		// uses LinkedHashSet to keep the order
+		Set<T> set = new LinkedHashSet<T>(list);
 		list.clear();
 		list.addAll(set);
 	}
 
 	/**
-	 * Given two collections of elements of type <T>, return a collection with the items which
-	 * only appear in one collection or the other
+	 * Given two collections of elements of type <T>, return a collection with the items which only appear in one
+	 * collection or the other
 	 * 
-	 * @param <T> Type
-	 * @param collection1 Collection #1
-	 * @param collection2 Collection #2
+	 * @param <T>
+	 *            Type
+	 * @param collection1
+	 *            Collection #1
+	 * @param collection2
+	 *            Collection #2
 	 * @return Collection with items unique to each list
 	 */
 	public static <T> Collection<T> getNonOverlapping(Collection<T> collection1, Collection<T> collection2)
@@ -52,12 +59,14 @@ public class CollectionsUtil
 	}
 
 	/**
-	 * Given two collections of elements of type <T>, return a collection with the items which
-	 * only appear in both lists
+	 * Given two collections of elements of type <T>, return a collection with the items which only appear in both lists
 	 * 
-	 * @param <T> Type
-	 * @param collection1 Collection #1
-	 * @param collection2 Collection #2
+	 * @param <T>
+	 *            Type
+	 * @param collection1
+	 *            Collection #1
+	 * @param collection2
+	 *            Collection #2
 	 * @return Collection with items common to both lists
 	 */
 	public static <T> Collection<T> intersect(Collection<T> collection1, Collection<T> collection2)
@@ -68,12 +77,14 @@ public class CollectionsUtil
 	}
 
 	/**
-	 * Given two collections of elements of type <T>, return a collection containing the
-	 * items from both lists
+	 * Given two collections of elements of type <T>, return a collection containing the items from both lists
 	 * 
-	 * @param <T> Type
-	 * @param collection1 Collection #1
-	 * @param collection2 Collection #2
+	 * @param <T>
+	 *            Type
+	 * @param collection1
+	 *            Collection #1
+	 * @param collection2
+	 *            Collection #2
 	 * @return Collection with items from both lists
 	 */
 	public static <T> Collection<T> union(Collection<T> collection1, Collection<T> collection2)
@@ -105,13 +116,10 @@ public class CollectionsUtil
 	 */
 	public static <T> List<T> getListValue(List<T> list)
 	{
-		List<T> result = list;
-
-		if (result == null)
+		if (list == null)
 		{
-			result = Collections.emptyList();
+			return Collections.emptyList();
 		}
-
-		return result;
+		return list;
 	}
 }

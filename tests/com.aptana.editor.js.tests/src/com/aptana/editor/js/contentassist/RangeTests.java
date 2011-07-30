@@ -124,7 +124,8 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		this.rangeTests(
 			"ranges/functionWithoutArgs.js",
-			new OffsetSelection(0, 15, null),
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 15, null),
 			new OffsetSelection(16, 17, Range.EMPTY)
 		);
 	}
@@ -136,7 +137,8 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		this.rangeTests(
 			"ranges/functionWithArgs.js",
-			new OffsetSelection(0, 24, null),
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 24, null),
 			new OffsetSelection(25, 26, Range.EMPTY)
 		);
 	}
@@ -149,7 +151,9 @@ public class RangeTests extends JSEditorBasedTests
 		this.rangeTests(
 			"ranges/invokeWithoutParams.js",
 			new OffsetSelection(0, Range.EMPTY),
-			new OffsetSelection(1, 3, new Range(0, 2)),
+			new OffsetSelection(1, new Range(0, 0)),
+			new OffsetSelection(2, new Range(0, 1)),
+			new OffsetSelection(3, new Range(0, 2)),
 			new OffsetSelection(4, 5, Range.EMPTY)
 		);
 	}
@@ -162,13 +166,18 @@ public class RangeTests extends JSEditorBasedTests
 		this.rangeTests(
 			"ranges/invokeWithParams.js",
 			new OffsetSelection(0, Range.EMPTY),
-			new OffsetSelection(1, 3, new Range(0, 2)),
+			new OffsetSelection(1, new Range(0, 0)),
+			new OffsetSelection(2, new Range(0, 1)),
+			new OffsetSelection(3, new Range(0, 2)),
 			new OffsetSelection(4, Range.EMPTY),
 			new OffsetSelection(5, new Range(4)),
 			new OffsetSelection(6, Range.EMPTY),
-			new OffsetSelection(7, 8, new Range(6, 7)),
+			new OffsetSelection(7, new Range(6, 6)),
+			new OffsetSelection(8, new Range(6, 7)),
 			new OffsetSelection(9, 10, Range.EMPTY),
-			new OffsetSelection(11, 13, new Range(10, 12)),
+			new OffsetSelection(11, new Range(10, 10)),
+			new OffsetSelection(12, new Range(10, 11)),
+			new OffsetSelection(13, new Range(10, 12)),
 			new OffsetSelection(14, Range.EMPTY)
 		);
 	}
@@ -180,7 +189,8 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		this.rangeTests(
 			"ranges/ifStatement.js",
-			new OffsetSelection(0, 3, null),
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 3, null),
 			new OffsetSelection(4, Range.EMPTY),
 			new OffsetSelection(5, new Range(4)),
 			new OffsetSelection(6, 7, null),
@@ -197,7 +207,8 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		this.rangeTests(
 			"ranges/whileStatement.js",
-			new OffsetSelection(0, 6, null),
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 6, null),
 			new OffsetSelection(7, Range.EMPTY),
 			new OffsetSelection(8, new Range(7)),
 			new OffsetSelection(9, 10, null),
@@ -212,7 +223,17 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		this.rangeTests(
 			"ranges/forStatement.js",
-			new OffsetSelection(0, 29, null),
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 11, null),
+			new OffsetSelection(12, 13, Range.EMPTY),
+			new OffsetSelection(14, null),
+			new OffsetSelection(15, 16, Range.EMPTY),
+			new OffsetSelection(17, new Range(16, 16)),
+			new OffsetSelection(18, 20, Range.EMPTY),
+			new OffsetSelection(21, 22, null),
+			new OffsetSelection(23, 24, Range.EMPTY),
+			new OffsetSelection(25, new Range(24, 24)),
+			new OffsetSelection(26, 29, null),
 			new OffsetSelection(30, 31, Range.EMPTY)
 		);
 	}
@@ -224,7 +245,13 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		this.rangeTests(
 			"ranges/forInStatement.js",
-			new OffsetSelection(0, 19, null),
+			new OffsetSelection(0, Range.EMPTY),
+			new OffsetSelection(1, 13, null),
+			new OffsetSelection(14, Range.EMPTY),
+			new OffsetSelection(15, new Range(14, 14)),
+			new OffsetSelection(16, new Range(14, 15)),
+			new OffsetSelection(17, new Range(14, 16)),
+			new OffsetSelection(18, 19, null),
 			new OffsetSelection(20, 21, Range.EMPTY)
 		);
 	}

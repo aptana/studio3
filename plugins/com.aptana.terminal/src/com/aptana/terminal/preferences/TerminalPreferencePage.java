@@ -7,7 +7,6 @@
  */
 package com.aptana.terminal.preferences;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -16,7 +15,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import com.aptana.terminal.Activator;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.terminal.TerminalPlugin;
 
 public class TerminalPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -47,6 +47,6 @@ public class TerminalPreferencePage extends FieldEditorPreferencePage implements
 	 * @see org.eclipse.jface.preference.PreferencePage#doGetPreferenceStore()
 	 */
 	protected IPreferenceStore doGetPreferenceStore() {
-		return new ScopedPreferenceStore(new InstanceScope(), Activator.PLUGIN_ID);
+		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), TerminalPlugin.PLUGIN_ID);
 	}
 }

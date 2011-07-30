@@ -45,6 +45,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.IDebugScopes;
+import com.aptana.scripting.IScriptingSystemProperties;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
@@ -66,7 +67,7 @@ public class BundleManager
 	 * OS name fragment to use to match against Macs
 	 */
 	private static final String OS_NAME_MAC = "mac"; //$NON-NLS-1$
-	
+
 	/**
 	 * System property to forcibly turn off caching.
 	 */
@@ -74,7 +75,7 @@ public class BundleManager
 
 	private class BundleLoadJob extends Job
 	{
-		
+
 		private File bundleDirectory;
 
 		BundleLoadJob(File bundleDirectory)
@@ -100,34 +101,35 @@ public class BundleManager
 					if (useCache)
 					{
 						showBundleLoadInfo("attempting to read cache: " + bundleDirectory); //$NON-NLS-1$
-						
+
 						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
 						showBundleLoadInfo("cache succeeded"); //$NON-NLS-1$
-						
+
 						addBundle(be);
 					}
 					else
 					{
 						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
-						
+
 						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-						
+
 						// first script is always bundle.rb, so go ahead
 						// and process that
 						File bundleScript = bundleScripts.get(0);
 						sub.subTask(bundleScript.getAbsolutePath());
 						loadScript(bundleScript, true, bundleLoadPaths);
 						sub.worked(1);
-						
+
 						// some new scripts may have come in while we were
 						// processing bundle.rb, so recalculate the list of
 						// scripts to process
 						bundleScripts = getBundleScripts(bundleDirectory);
-						
-						if (bundleScripts.size() > 0) {
+
+						if (bundleScripts.size() > 0)
+						{
 							// we've already loaded bundle.rb, so remove it from
 							// the list. Note that at this point we have a
 							// bundle element for this bundle, so any file
@@ -136,7 +138,8 @@ public class BundleManager
 							bundleScripts.remove(0);
 
 							// process the rest of the scripts in the bundle
-							for (File script : bundleScripts) {
+							for (File script : bundleScripts)
+							{
 								sub.subTask(script.getAbsolutePath());
 								loadScript(script, true, bundleLoadPaths);
 								sub.worked(1);
@@ -147,6 +150,7 @@ public class BundleManager
 						{
 							getCacher().cache(bundleDirectory, sub.newChild(1));
 						}
+
 					}
 				}
 			}
@@ -209,9 +213,6 @@ public class BundleManager
 
 	// constant to indicated we have no file instances
 	private static final File[] NO_FILES = new File[0];
-
-	// system property used to indicate the desired directory for user rubles
-	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
 
 	// project directory name where project bundles are located
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
@@ -283,7 +284,7 @@ public class BundleManager
 
 			// get possible user override
 			boolean validUserBundlePath = false;
-			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
+			String userBundlePathOverride = System.getProperty(IScriptingSystemProperties.RUBLE_USER_LOCATION);
 
 			if (userBundlePathOverride != null)
 			{
@@ -861,7 +862,7 @@ public class BundleManager
 			{
 				public boolean accept(File pathname)
 				{
-					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false); //$NON-NLS-1$
+					return (pathname.isDirectory() && !pathname.getName().startsWith(".") && isValidBundleDirectory(pathname)); //$NON-NLS-1$
 				}
 			});
 		}
@@ -1692,6 +1693,24 @@ public class BundleManager
 	}
 
 	/**
+	 * Determine if the specified directory is in the user bundle path
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	protected boolean isUserBundleDirectory(File bundleDirectory)
+	{
+		boolean result = false;
+
+		if (bundleDirectory != null)
+		{
+			result = (getBundlePrecedence(bundleDirectory) == BundlePrecedence.USER);
+		}
+
+		return result;
+	}
+
+	/**
 	 * Determine if the specified directory minimally defines a bundle. In order to return true, the specified directory
 	 * must exist, must be a directory, it must be readable, and it must contain a bundle.rb file
 	 * 
@@ -1701,50 +1720,18 @@ public class BundleManager
 	 */
 	protected boolean isValidBundleDirectory(File bundleDirectory)
 	{
-		String message = null;
 		boolean result = false;
 
-		if (bundleDirectory.exists())
+		if (bundleDirectory.isDirectory() && bundleDirectory.canRead())
 		{
-			if (bundleDirectory.isDirectory())
-			{
-				if (bundleDirectory.canRead())
-				{
-					File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
+			File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
 
-					// NOTE: We verify readability when we try to execute the scripts in the bundle
-					// so, there's no need to do that here.
-					if (bundleFile.exists() && bundleFile.isFile())
-					{
-						result = true;
-					}
-					else
-					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
-								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
-					}
-				}
-				else
-				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-							new Object[] { bundleDirectory.getAbsolutePath() });
-				}
-			}
-			else
+			// NOTE: We verify readability when we try to execute the scripts in the bundle
+			// so, there's no need to do that here.
+			if (bundleFile.isFile())
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-						new Object[] { bundleDirectory.getAbsolutePath() });
+				result = true;
 			}
-		}
-		else
-		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
-					new Object[] { bundleDirectory.getAbsolutePath() });
-		}
-
-		if (result == false && message != null && message.length() > 0)
-		{
-			ScriptLogger.logError(message);
 		}
 
 		return result;
@@ -1776,6 +1763,19 @@ public class BundleManager
 	 */
 	public void loadBundle(File bundleDirectory)
 	{
+		loadBundle(bundleDirectory, false);
+	}
+
+	/**
+	 * Load the bundle in the specified directory
+	 * 
+	 * @param bundleDirectory
+	 *            The directory containing a bundle and its children
+	 * @param wait
+	 *            Allows us to be synchronous when executing this
+	 */
+	public void loadBundle(File bundleDirectory, boolean wait)
+	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
 		if (EclipseUtil.isTesting() == false && Platform.isRunning())
@@ -1787,11 +1787,23 @@ public class BundleManager
 				counter = 0;
 			}
 
+			job.setPriority(Job.SHORT);
 			job.schedule();
 		}
 		else
 		{
 			job.run(new NullProgressMonitor());
+			if (wait)
+			{
+				try
+				{
+					job.join();
+				}
+				catch (InterruptedException e)
+				{
+					// ignore error
+				}
+			}
 		}
 	}
 
@@ -1817,19 +1829,29 @@ public class BundleManager
 		{
 			IPath location = project.getLocation();
 
-			if (location == null)
+			if (location != null)
 			{
-				// Log that it was null somehow to track down when this occurs?
-				continue;
-			}
+				File projectDirectory = location.toFile();
+				File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
 
-			File projectDirectory = location.toFile();
-			File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
+				for (File bundle : this.getBundleDirectories(bundlesDirectory))
+				{
+					String message = MessageFormat.format(
+							Messages.BundleManager_ProjectBundlesInBundlesDirectoryIsDeprecated,
+							bundle.getAbsolutePath());
+					ScriptLogger.logWarning(message);
+					IdeLog.logWarning(ScriptingActivator.getDefault(), message);
 
-			for (File bundle : this.getBundleDirectories(bundlesDirectory))
-			{
-				this.loadBundle(bundle);
+					this.loadBundle(bundle);
+				}
+
+				// Now load from project directly
+				if (!isUserBundleDirectory(projectDirectory) && isValidBundleDirectory(projectDirectory))
+				{
+					loadBundle(projectDirectory);
+				}
 			}
+			// Log that it was null somehow to track down when this occurs?
 		}
 	}
 
@@ -1968,8 +1990,8 @@ public class BundleManager
 			// get bundle load paths
 			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
 
-			// execute script
-			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
+			// execute script. Load order is important, so we force synchronous execution here
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, false);
 
 			// fire reload event
 			this.fireScriptReloadedEvent(script);
@@ -2109,10 +2131,10 @@ public class BundleManager
 	{
 		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_LOAD_INFO);
 	}
-	
+
 	/**
-	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads
-	 * all scripts associated with a bundle and the bundle.rb script as well
+	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads all
+	 * scripts associated with a bundle and the bundle.rb script as well
 	 * 
 	 * @param bundleDirectory
 	 *            The directory (and its descendants) to unload
@@ -2129,9 +2151,9 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-		
+
 		List<File> reverseOrder = new ArrayList<File>(scripts);
-		
+
 		Collections.sort(reverseOrder, new Comparator<File>()
 		{
 			public int compare(File o1, File o2)
@@ -2144,7 +2166,7 @@ public class BundleManager
 		for (File script : reverseOrder)
 		{
 			showBundleLoadInfo("Unload script: " + script.toString()); //$NON-NLS-1$
-			
+
 			this.unloadScript(script);
 		}
 	}

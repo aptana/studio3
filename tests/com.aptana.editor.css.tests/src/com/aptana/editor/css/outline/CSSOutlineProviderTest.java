@@ -7,14 +7,14 @@
  */
 package com.aptana.editor.css.outline;
 
+import junit.framework.TestCase;
+
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.CSSParser;
 import com.aptana.editor.css.parsing.CSSScanner;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.parsing.ast.IParseNode;
-
-import junit.framework.TestCase;
 
 public class CSSOutlineProviderTest extends TestCase
 {
@@ -77,7 +77,22 @@ public class CSSOutlineProviderTest extends TestCase
 		assertEquals(rule.getSelectors()[0], getNode(CSSOutlineContentProvider.getElementAt(result, 10)));
 		assertEquals(rule.getSelectors()[1], getNode(CSSOutlineContentProvider.getElementAt(result, 20)));
 		assertEquals(rule.getDeclarations()[0], getNode(CSSOutlineContentProvider.getElementAt(result, 40)));
-		assertEquals(rule.getSelectors()[1], getNode(CSSOutlineContentProvider.getElementAt(result, source.length() - 1)));
+		assertEquals(rule.getSelectors()[1],
+				getNode(CSSOutlineContentProvider.getElementAt(result, source.length() - 1)));
+	}
+
+	public void testAtCharsetRule() throws Exception
+	{
+		String source = "@charset \"utf-8\";";
+		fScanner.setSource(source);
+		IParseNode astRoot = (IParseNode) fParser.parse(fScanner);
+
+		Object[] outlineResult = fContentProvider.getElements(astRoot);
+		assertEquals(1, outlineResult.length);
+
+		assertEquals(astRoot.getChild(0), getNode(outlineResult[0]));
+		assertEquals(CSSPlugin.getImage("icons/at_rule.png"), fLabelProvider.getImage(outlineResult[0]));
+		assertEquals(astRoot.getChild(0).getText().substring(1), fLabelProvider.getText(outlineResult[0]));
 	}
 
 	private static IParseNode getNode(Object element)

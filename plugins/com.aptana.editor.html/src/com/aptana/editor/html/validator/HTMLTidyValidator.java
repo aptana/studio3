@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.w3c.tidy.Tidy;
 
 import com.aptana.core.logging.IdeLog;
@@ -26,6 +29,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 
@@ -46,6 +50,7 @@ public class HTMLTidyValidator implements IValidator
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
+		manager.addParseErrors(items);
 		String report = parseWithTidy(source);
 		if (!StringUtil.isEmpty(report))
 		{
@@ -58,7 +63,7 @@ public class HTMLTidyValidator implements IValidator
 				{
 					if (line.startsWith("line")) //$NON-NLS-1$
 					{
-						parseTidyOutput(line, path, manager, items);
+						parseTidyOutput(line, path, manager, items, source);
 					}
 				}
 			}
@@ -103,9 +108,11 @@ public class HTMLTidyValidator implements IValidator
 		return bout.toString();
 	}
 
-	private static void parseTidyOutput(String report, URI path, IValidationManager manager, List<IValidationItem> items)
+	private static void parseTidyOutput(String report, URI path, IValidationManager manager,
+			List<IValidationItem> items, String source) throws BadLocationException
 	{
 		Matcher matcher = PATTERN.matcher(report);
+		IDocument document = new Document(source);
 
 		while (matcher.find())
 		{
@@ -114,16 +121,27 @@ public class HTMLTidyValidator implements IValidator
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
 
+			// Don't attempt to add errors or warnings if there are already errors on this line
+
+			// We also squash errors on the last line, since it is normally a repeat of a parse error. For example
+			// "missing </div>" will appear on the last line, which is normally caught by the parser and displayed on a
+			// different line
+			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber)
+					|| (document.getNumberOfLines() == lineNumber && !items.isEmpty()))
+			{
+				continue;
+			}
+
 			if (message != null && !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML)
 					&& !containsHTML5Element(message) && !isAutoFiltered(message))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
-					items.add(manager.addError(message, lineNumber, column, 0, path));
+					items.add(manager.createError(message, lineNumber, column, 0, path));
 				}
 				else if (type.startsWith("Warning")) //$NON-NLS-1$
 				{
-					items.add(manager.addWarning(message, lineNumber, column, 0, path));
+					items.add(manager.createWarning(message, lineNumber, column, 0, path));
 				}
 			}
 		}

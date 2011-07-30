@@ -1,0 +1,227 @@
+<project name="Build specific targets and properties" default="noDefault">
+
+	<!-- ===================================================================== -->
+	<!-- Run a given ${target} on all elements being built -->
+	<!-- Add on <ant> task for each top level element being built. -->
+	<!-- ===================================================================== -->
+	<available property="allElementsFile" file="${builder}/allElements.xml" value="${builder}/allElements.xml" />
+	<property name="allElementsFile" location="${eclipse.pdebuild.templates}/headless-build/allElements.xml" />
+
+	<import file="${allElementsFile}" />
+	<target name="allElements">
+		<antcall target="allElementsDelegator" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- ===================================================================== -->
+	<target name="getBaseComponents" depends="checkLocalBase" unless="skipBase">
+		<get src="${eclipseBaseURL}" dest="${buildDirectory}/../temp-base.zip" />
+		<unzip dest="${base}" overwrite="true" src="${buildDirectory}/../temp-base.zip" />
+	</target>
+
+	<target name="checkLocalBase">
+		<available file="${base}" property="skipBase" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Check out map files from correct repository -->
+	<!-- Replace values for mapsCheckoutTag as desired. -->
+	<!-- ===================================================================== -->
+	<target name="getMapFiles" depends="checkLocalMaps" unless="skipMaps">
+		<property name="mapsCheckoutTag" value="HEAD" />
+		<cvs cvsRoot="${mapsRepo}" package="${mapsRoot}" dest="${buildDirectory}/maps" tag="${mapsCheckoutTag}" />
+	</target>
+
+	<target name="checkLocalMaps">
+		<available property="skipMaps" file="${buildDirectory}/maps" />
+	</target>
+
+	<target name="tagMapFiles" if="tagMaps">
+		<cvs dest="${buildDirectory}/maps/${mapsRoot}" command="tag ${mapsTagTag}" />
+	</target>
+
+	<!-- ===================================================================== -->
+
+	<target name="clean" unless="noclean">
+		<antcall target="allElements">
+			<param name="target" value="cleanElement" />
+		</antcall>
+	</target>
+
+	<target name="gatherLogs">
+		<mkdir dir="${buildDirectory}/${buildLabel}/compilelogs" />
+		<antcall target="allElements">
+			<param name="target" value="gatherLogs" />
+		</antcall>
+		<unzip dest="${buildDirectory}/${buildLabel}/compilelogs" overwrite="true">
+			<fileset dir="${buildDirectory}/features">
+				<include name="**/*.log.zip" />
+			</fileset>
+		</unzip>
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before setup -->
+	<!-- ===================================================================== -->
+	<target name="preSetup">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after setup but before starting the build proper -->
+	<!-- ===================================================================== -->
+	<target name="postSetup">
+		<antcall target="getBaseComponents" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before fetching the build elements -->
+	<!-- ===================================================================== -->
+	<target name="preFetch">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after fetching the build elements -->
+	<!-- ===================================================================== -->
+	<target name="postFetch">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before generating the build scripts. -->
+	<!-- ===================================================================== -->
+	<target name="preGenerate">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after generating the build scripts. -->
+	<!-- ===================================================================== -->
+	<target name="postGenerate">
+		<antcall target="clean" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before running the build.xmls for the elements being built. -->
+	<!-- ===================================================================== -->
+	<target name="preProcess">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after running the build.xmls for the elements being built. -->
+	<!-- ===================================================================== -->
+	<target name="postProcess">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before running assemble. -->
+	<!-- ===================================================================== -->
+	<target name="preAssemble">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after  running assemble. -->
+	<!-- ===================================================================== -->
+	<target name="postAssemble">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before running package. -->
+	<!-- ===================================================================== -->
+	<target name="prePackage">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after  running package. -->
+	<!-- ===================================================================== -->
+	<target name="postPackage">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the build is done. -->
+	<!-- ===================================================================== -->
+	<target name="postBuild">
+		<antcall target="signJars" />
+		<antcall target="gatherLogs" />
+		<antcall target="fix.broken.metadata" />
+		<antcall target="updateSite" />
+		<antcall target="publish" />
+	</target>
+	
+	<target name="signJars" if="sign.jars">
+		<echo message="Signing plugins and features at: ${p2.repo.dir}" />
+		<p2.process.artifacts repositoryPath="${p2.artifact.repo}">
+			<sign alias="${keystoreAlias}" keystore="${keystore}" storepass="${keystorePass}" />
+		</p2.process.artifacts>
+	</target>
+	
+	<!-- Workaround for Eclipse bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=271373 -->
+	<target name="fix.broken.metadata">
+		<!-- Unzip the content.jar -->
+		<unzip dest="${p2.repo.dir}" src="${p2.repo.dir}/content.jar" />
+		<delete file="${p2.repo.dir}/content.jar" />
+		<!-- Fix the broken OSGi filter syntax -->
+		<replace summary="yes" file="${p2.repo.dir}/content.xml">
+			<replacetoken><![CDATA[(osgi.arch=x86,x86_64)]]></replacetoken>
+			<replacevalue><![CDATA[(| (osgi.arch=x86)(osgi.arch=x86_64))]]></replacevalue>
+		</replace>
+		<replace summary="yes" file="${p2.repo.dir}/content.xml">
+			<replacetoken><![CDATA[(osgi.os=macosx,win32)]]></replacetoken>
+			<replacevalue><![CDATA[(| (osgi.os=macosx)(osgi.os=win32))]]></replacevalue>
+		</replace>
+		<replace summary="yes" file="${p2.repo.dir}/content.xml">
+			<replacetoken><![CDATA[(osgi.os=aix,hpux,linux,qnx,solaris)]]></replacetoken>
+			<replacevalue><![CDATA[(| (osgi.os=aix)(osgi.os=hpux)(osgi.os=linux)(osgi.os=qnx)(osgi.os=solaris))]]></replacevalue>
+		</replace>
+		<!-- Re-zip content.xml into content.jar -->
+		<zip destfile="${p2.repo.dir}/content.jar">
+			<zipfileset dir="${p2.repo.dir}">
+				<include name="content.xml" />
+			</zipfileset>
+		</zip>
+		<delete file="${p2.repo.dir}/content.xml" />
+	</target>
+
+	<target name="updateSite">
+		<copy file="${builder}/update_site/site.xml" tofile="${p2.repo.dir}/site.xml" />
+		<pathconvert property="version.full">
+			<fileset dir="${p2.repo.dir}/features">
+				<include name="${topLevelElementId}_*.jar" />
+			</fileset>
+			<mapper>
+				<chainedmapper>
+					<flattenmapper />
+					<globmapper from="${topLevelElementId}_*.jar" to="*" casesensitive="yes" />
+				</chainedmapper>
+			</mapper>
+		</pathconvert>
+		<replace token="{version.full}" value="${version.full}" file="${p2.repo.dir}/site.xml" />
+		<zip destfile="${buildDirectory}/${topLevelElementId}-${version.full}.zip">
+			<fileset dir="${p2.repo.dir}" defaultexcludes="false" />
+		</zip>
+		<move file="${buildDirectory}/${topLevelElementId}-${version.full}.zip" todir="${p2.repo.dir}" />
+		<copy file="${builder}/update_site/index.html" tofile="${p2.repo.dir}/index.html" />
+		<replace token="ZIP_FILE" value="${topLevelElementId}-${version.full}.zip" file="${p2.repo.dir}/index.html" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do to test the build results -->
+	<!-- ===================================================================== -->
+	<target name="test">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do to publish the build results -->
+	<!-- ===================================================================== -->
+	<target name="publish">
+		<delete dir="${deploy.dir}" failonerror="false" />
+		<mkdir dir="${deploy.dir}" />
+		<copy todir="${deploy.dir}" failonerror="true">
+			<fileset dir="${p2.repo.dir}" />
+		</copy>
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Default target                                                        -->
+	<!-- ===================================================================== -->
+	<target name="noDefault">
+		<echo message="You must specify a target when invoking this file" />
+	</target>
+</project>

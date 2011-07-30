@@ -307,7 +307,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	}
 
 	@Override
-	protected TreeViewer getTreeViewer()
+	public TreeViewer getTreeViewer()
 	{
 		return fTreeViewer;
 	}

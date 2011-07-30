@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: beaver;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: beaver.Activator
+Bundle-Activator: beaver.BeaverPlugin
 Require-Bundle: org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

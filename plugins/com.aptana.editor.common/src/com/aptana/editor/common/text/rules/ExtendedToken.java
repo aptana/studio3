@@ -6,7 +6,10 @@
 
 package com.aptana.editor.common.text.rules;
 
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
+
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -15,7 +18,14 @@ import org.eclipse.jface.text.rules.Token;
 public class ExtendedToken extends Token {
 
 	private String contents;
-	
+
+	/**
+	 * @param data
+	 */
+	public ExtendedToken(IToken token) {
+		this(token.getData());
+	}
+
 	/**
 	 * @param data
 	 */
@@ -35,6 +45,18 @@ public class ExtendedToken extends Token {
 	 */
 	public void setContents(String contents) {
 		this.contents = contents;
+	}
+
+	/**
+	 * Returns contents substring
+	 * @param beginIndex
+	 * @return
+	 */
+	public String getContentSubstring(int beginIndex) {
+		if (contents != null && contents.length() > beginIndex) {
+			return contents.substring(beginIndex);
+		}
+		return StringUtil.EMPTY;
 	}
 
 }

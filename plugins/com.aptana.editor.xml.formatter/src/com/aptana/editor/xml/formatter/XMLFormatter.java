@@ -7,9 +7,11 @@
  */
 package com.aptana.editor.xml.formatter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
@@ -31,9 +33,7 @@ import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -43,8 +43,6 @@ import com.aptana.ui.util.StatusLineMessageTimerManager;
 public class XMLFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
 
-	private String lineSeparator;
-
 	/**
 	 * Constructor.
 	 * 
@@ -52,8 +50,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	protected XMLFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -74,13 +71,8 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 				return super.detectIndentationLevel(document, offset);
 			}
 
-			IParser parser = checkoutParser();
-			IParseState parseState = new ParseState();
 			String source = document.get();
-			parseState.setEditState(source, null, 0, 0);
-
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 			if (parseResult != null)
 			{
 				final XMLFormatterNodeBuilder builder = new XMLFormatterNodeBuilder();
@@ -116,13 +108,18 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = null;
+			try
+			{
+				parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+			}
+			catch (Exception e)
+			{
+				// In case of a parse error, just try to indent the given source.
+				return indent(source, input, offset, length, indentationLevel);
+			}
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
@@ -241,6 +238,15 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		root.accept(context, writer);
 		writer.flush(context);
 		String output = writer.getOutput();
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
+		{
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(XMLFormatterConstants.FORMATTER_OFF), getString(XMLFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
+		}
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
@@ -261,6 +267,12 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
+		// Formatter OFF/ON
+		document.setBoolean(XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+				getBoolean(XMLFormatterConstants.FORMATTER_OFF_ON_ENABLED));
+		document.setString(XMLFormatterConstants.FORMATTER_ON, getString(XMLFormatterConstants.FORMATTER_ON));
+		document.setString(XMLFormatterConstants.FORMATTER_OFF, getString(XMLFormatterConstants.FORMATTER_OFF));
 
 		return document;
 	}

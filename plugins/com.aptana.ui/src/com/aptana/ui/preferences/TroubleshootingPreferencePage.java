@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -60,7 +59,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		super(GRID);
 
-		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(new InstanceScope(),
+		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(EclipseUtil.instanceScope(),
 				CorePlugin.getDefault().getBundle().getSymbolicName());
 		setPreferenceStore(preferenceStore);
 		setDescription(Messages.TroubleshootingPreferencePage_TroubleshootingPageHeader);

@@ -54,4 +54,10 @@ public interface CSSFormatterConstants
 	public static final String SPACES_BEFORE_CHILD_COMBINATOR = FORMATTER_ID + ".spaces.before.child.combinator"; //$NON-NLS-1$
 	public static final String SPACES_AFTER_CHILD_COMBINATOR = FORMATTER_ID + ".spaces.after.child.combinator"; //$NON-NLS-1$
 
+	// OFF/ON
+	public static final String FORMATTER_OFF_ON_ENABLED = FORMATTER_ID + ".formatter.on.off.enabled"; //$NON-NLS-1$
+	public static final String FORMATTER_ON = FORMATTER_ID + ".formatter.on"; //$NON-NLS-1$
+	public static final String FORMATTER_OFF = FORMATTER_ID + ".formatter.off"; //$NON-NLS-1$
+	public static final String DEFAULT_FORMATTER_OFF = "@formatter:off"; //$NON-NLS-1$
+	public static final String DEFAULT_FORMATTER_ON = "@formatter:on"; //$NON-NLS-1$
 }

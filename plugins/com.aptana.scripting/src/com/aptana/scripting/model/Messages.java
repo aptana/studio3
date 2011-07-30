@@ -19,20 +19,23 @@ public class Messages extends NLS
 	public static String BundleCacher_LoadingYAMLError;
 	public static String BundleCacher_OutOfDateCacheMsg;
 
+	public static String BundleCacher_SerializationException;
+
+	public static String BundleCacher_SerializationExceptionDeletingCacheFile;
+
 	public static String BundleEntry_Name_Not_Defined;
 
 	public static String BundleManager_Bundle_Became_Hidden_Event_Error;
 
 	public static String BundleManager_Bundle_Became_Visible_Event_Error;
 
-	public static String BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST;
-	public static String BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY;
 	public static String BundleManager_Element_Became_Hidden_Event_Error;
 
 	public static String BundleManager_Element_Became_Visible_Event_Error;
 
 	public static String BundleManager_Executed_Null_Script;
-	public static String BundleManager_No_Bundle_File;
+
+	public static String BundleManager_ProjectBundlesInBundlesDirectoryIsDeprecated;
 	public static String BundleManager_Reloaded_Null_Script;
 
 	public static String BundleManager_Script_Loaded_Event_Error;

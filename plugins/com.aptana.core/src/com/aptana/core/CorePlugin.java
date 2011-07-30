@@ -18,7 +18,6 @@ import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -36,14 +35,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.filewatcher.FileWatcher;
 
 /**
@@ -123,7 +120,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	 */
 	private void enableDebugging()
 	{
-		new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+		EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 
 		/**
 		 * Returns the current severity preference
@@ -156,7 +153,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		try
 		{
 			// Don't listen to auto-refresh pref changes anymore
-			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 
 			if (addFilewatcherJob != null)
 			{
@@ -216,31 +213,24 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 				// Look for Studio 1.x and 2.x project natures, attach our new natures where needed
 				IProjectDescription desc = p.getDescription();
+				boolean modified = false;
 				List<String> newNatures = new ArrayList<String>();
 				for (String nature : desc.getNatureIds())
 				{
 					String newNature = oldToNewNatures.get(nature);
 					if (newNature != null)
 					{
+						modified = true;
 						newNatures.add(newNature);
 					}
 					newNatures.add(nature);
 				}
-				desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
-				p.setDescription(desc, sub.newChild(5));
-
-				// Attach builders in case nature was already on project, but before we created the builder
-				String[] natureIds = desc.getNatureIds();
-				for (int i = 0; i < natureIds.length; i++)
+				if (modified)
 				{
-					String natureId = natureIds[i];
-					if (ResourceUtil.isAptanaNature(natureId))
-					{
-						IProjectNature nature = p.getNature(natureId);
-						nature.configure();
-					}
+					desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
+					p.setDescription(desc, sub.newChild(5));
+					status.add(Status.OK_STATUS);
 				}
-				status.add(Status.OK_STATUS);
 				sub.worked(5);
 			}
 			catch (CoreException e)
@@ -375,7 +365,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		ResourceListener()
 		{
 			fAdapter = new FileDeltaRefreshAdapter();
-			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
 		public void start()
@@ -418,7 +408,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		public synchronized void dispose()
 		{
 			// Don't listen to auto-refresh pref changes anymore
-			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 			// Now remove all the existing file watchers
 			unhookAll();
 		}
@@ -572,61 +562,4 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			IdeLog.setCurrentSeverity(IdeLog.getSeverityPreference());
 		}
 	}
-
-	/**
-	 * Log a particular status
-	 * 
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
-	}
-
 }

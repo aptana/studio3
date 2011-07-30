@@ -81,4 +81,14 @@ public interface IDebugCoreConstants {
 	 */
 	String WATCHPOINT_VARIABLE_ACCESSOR = PREFIX + ".watchpointVariableAccessor"; //$NON-NLS-1$
 
+	/**
+	 * ID_STANDARD_ERROR_STREAM
+	 */
+	String ID_STANDARD_ERROR_STREAM = "ID_STANDARD_ERROR_STREAM";
+
+	/**
+	 * ID_STANDARD_OUTPUT_STREAM
+	 */
+	String ID_STANDARD_OUTPUT_STREAM = "ID_STANDARD_OUTPUT_STREAM";
+
 }

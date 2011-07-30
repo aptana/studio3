@@ -21,6 +21,8 @@ public class Messages extends NLS
 	public static String AddRemoveList_inputMessageErrorInfo;
 	public static String AddRemoveList_inputMessageTitle;
 	public static String AddRemoveList_inputMessageText;
+	public static String AddRemoveList_invalidBeginTagChar;
+	public static String AddRemoveList_invalidCharInTag;
 	// Positive number validator
 	public static String PositiveNumberIsEmpty;
 	public static String PositiveNumberIsInvalid;
@@ -28,7 +30,16 @@ public class Messages extends NLS
 	public static String PortIsEmpty;
 	public static String PortShouldBeInRange;
 	public static String MinValueInvalid;
-	
+	// Text field validator
+	public static String FieldIsEmpty;
+
+	// Formatter OFF/ON
+	public static String FormatterModifyDialog_OffOnTags;
+	public static String FormatterOnOffPage_formatterOffOnInfo;
+	public static String FormatterOnOffPage_formatterEnableOffOn;
+	public static String FormatterOnOffPage_formatterOffTag;
+	public static String FormatterOnOffPage_formatterOnTag;
+
 	static
 	{
 		// initialize resource bundle

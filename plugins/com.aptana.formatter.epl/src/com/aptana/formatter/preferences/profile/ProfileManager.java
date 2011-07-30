@@ -25,11 +25,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.IContributedExtension;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
@@ -136,7 +136,7 @@ public class ProfileManager implements IProfileManager
 		Collections.sort(fProfilesByName);
 		if (!fProfilesByName.isEmpty())
 		{
-			String storedActiveProfile = getActiveProfileKey().getStoredValue(new InstanceScope());
+			String storedActiveProfile = getActiveProfileKey().getStoredValue(EclipseUtil.instanceScope());
 			IProfile workspaceSelectedProfile = fProfiles.get(storedActiveProfile);
 			if (workspaceSelectedProfile == null)
 			{
@@ -153,7 +153,7 @@ public class ProfileManager implements IProfileManager
 		PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
 		{
-			DefaultScope scope = new DefaultScope();
+			DefaultScope scope = EclipseUtil.defaultScope();
 			for (PreferenceKey key : keys)
 			{
 				String name = key.getName();
@@ -182,7 +182,7 @@ public class ProfileManager implements IProfileManager
 		final PreferenceKey profilesKey = getProfilesKey();
 		if (profilesKey != null)
 		{
-			final String profilesSource = profilesKey.getStoredValue(new InstanceScope());
+			final String profilesSource = profilesKey.getStoredValue(EclipseUtil.instanceScope());
 			if (profilesSource != null && profilesSource.length() > 0)
 			{
 				final IProfileStore store = getProfileStore();

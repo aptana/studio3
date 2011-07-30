@@ -20,9 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Composite;
@@ -33,8 +31,9 @@ import org.eclipse.ui.preferences.IWorkingCopyManager;
 import org.eclipse.ui.preferences.WorkingCopyManager;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.preferences.PreferenceKey;
-import com.aptana.formatter.ui.epl.Activator;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 
 /**
@@ -81,11 +80,11 @@ public abstract class OptionsConfigurationBlock
 
 		if (fProject != null)
 		{
-			fLookupOrder = new IScopeContext[] { new ProjectScope(fProject), new InstanceScope(), new DefaultScope() };
+			fLookupOrder = new IScopeContext[] { new ProjectScope(fProject), EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		}
 		else
 		{
-			fLookupOrder = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+			fLookupOrder = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		}
 
 		testIfOptionsComplete(allKeys);
@@ -123,19 +122,19 @@ public abstract class OptionsConfigurationBlock
 	{
 		if (key.getStoredValue(fLookupOrder, false, fManager) == null)
 		{
-			Activator.logError("preference option missing: " + key + " (" + this.getClass().getName() + ')'); //$NON-NLS-1$//$NON-NLS-2$
+			FormatterUIEplPlugin.logError("preference option missing: " + key + " (" + this.getClass().getName() + ')'); //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
 
 	private int getRebuildCount()
 	{
-		return fManager.getWorkingCopy(new DefaultScope().getNode(Activator.PLUGIN_ID)).getInt(REBUILD_COUNT_KEY, 0);
+		return fManager.getWorkingCopy(EclipseUtil.defaultScope().getNode(FormatterUIEplPlugin.PLUGIN_ID)).getInt(REBUILD_COUNT_KEY, 0);
 	}
 
 	private void incrementRebuildCount()
 	{
 		fRebuildCount++;
-		fManager.getWorkingCopy(new DefaultScope().getNode(Activator.PLUGIN_ID)).putInt(REBUILD_COUNT_KEY,
+		fManager.getWorkingCopy(EclipseUtil.defaultScope().getNode(FormatterUIEplPlugin.PLUGIN_ID)).putInt(REBUILD_COUNT_KEY,
 				fRebuildCount);
 	}
 
@@ -237,7 +236,7 @@ public abstract class OptionsConfigurationBlock
 			}
 			catch (IllegalStateException e)
 			{
-				if (Activator.DEBUG)
+				if (FormatterUIEplPlugin.DEBUG)
 				{
 					e.printStackTrace();
 				}
@@ -347,7 +346,7 @@ public abstract class OptionsConfigurationBlock
 			}
 			catch (BackingStoreException e)
 			{
-				Activator.logError(e.getMessage(), e);
+				FormatterUIEplPlugin.logError(e.getMessage(), e);
 				return false;
 			}
 			if (doBuild)

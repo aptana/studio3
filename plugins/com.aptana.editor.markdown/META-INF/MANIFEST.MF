@@ -6,8 +6,10 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.markdown.MarkdownEditorPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
  org.eclipse.jface.text,
+ org.eclipse.ui,
  org.eclipse.ui.editors,
  com.aptana.editor.common,
  com.aptana.editor.html

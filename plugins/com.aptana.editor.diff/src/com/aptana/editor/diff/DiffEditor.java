@@ -23,7 +23,7 @@ public class DiffEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		setSourceViewerConfiguration(new DiffSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(Activator.getDefault().getDiffDocumentProvider());
+		setDocumentProvider(DiffPlugin.getDefault().getDiffDocumentProvider());
 	}
 
 	/*
@@ -33,6 +33,12 @@ public class DiffEditor extends AbstractThemeableEditor
 	@Override
 	protected IPreferenceStore getPluginPreferenceStore()
 	{
-		return Activator.getDefault().getPreferenceStore();
+		return DiffPlugin.getDefault().getPreferenceStore();
+	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IDiffConstants.CONTENT_TYPE_DIFF;
 	}
 }

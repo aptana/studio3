@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.StringConverter;
@@ -51,6 +50,7 @@ import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.editor.common.spelling.SpellingPreferences;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
@@ -226,6 +226,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	private DocumentScopeManager fDocumentScopeManager;
 	private IPreferenceChangeListener fThemeChangeListener;
+	private SpellingPreferences spellingPreferences;
 
 	/**
 	 * The constructor
@@ -251,6 +252,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
+		spellingPreferences = new SpellingPreferences();
 
 		addPartListener();
 	}
@@ -264,7 +266,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			private void setOccurrenceColors()
 			{
-				IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+				IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 				Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 
 				prefs.put("OccurrenceIndicationColor", StringConverter.asString(theme.getSearchResultColor())); //$NON-NLS-1$
@@ -295,7 +297,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 				setOccurrenceColors();
 
-				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
 				return Status.OK_STATUS;
 			}
@@ -315,7 +317,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			if (fThemeChangeListener != null)
 			{
-				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 
 				fThemeChangeListener = null;
 			}
@@ -327,6 +329,10 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			if (fDocumentScopeManager != null)
 			{
 				fDocumentScopeManager.dispose();
+			}
+			if (spellingPreferences != null) {
+				spellingPreferences.dispose();
+				spellingPreferences = null;
 			}
 		}
 		finally
@@ -384,6 +390,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return getImageRegistry().get(imageID);
 	}
 
+	/**
+	 * @return the spellingPreferences
+	 */
+	public SpellingPreferences getSpellingPreferences() {
+		return spellingPreferences;
+	}
+
 	public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry)
 	{
 		if (fTemplateStoreMap == null)
@@ -401,7 +414,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			catch (IOException e)
 			{
-				logError(e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
 			}
 		}
 		return store;
@@ -476,85 +489,5 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 		}
-	}
-
-	/**
-	 * Log a particular status
-	 * 
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(IStatus status)
-	{
-		IdeLog.log(getDefault(), status);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 * @deprecated Use IdeLog instead
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logError(String message, Throwable e)
-	{
-		IdeLog.logError(getDefault(), message, e);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message)
-	{
-		IdeLog.logWarning(getDefault(), message, null, null);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 * @param e
-	 */
-	public static void logWarning(String message, Throwable e)
-	{
-		IdeLog.logWarning(getDefault(), message, e, null);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @deprecated Use IdeLog instead
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message, null);
 	}
 }

@@ -16,7 +16,7 @@ public class MatchContext
 	private String[] _steps;
 	private int _currentIndex;
 	private Stack<Integer> _savedPositions;
-	
+
 	/**
 	 * MatchContext
 	 * 
@@ -25,10 +25,10 @@ public class MatchContext
 	MatchContext(String scope)
 	{
 		this._steps = (scope != null) ? spaces.split(scope) : new String[0];
-		this._currentIndex = 0;
+		this._currentIndex = this._steps.length - 1;
 		this._savedPositions = new Stack<Integer>();
 	}
-	
+
 	/**
 	 * advance
 	 */
@@ -36,7 +36,12 @@ public class MatchContext
 	{
 		this._currentIndex++;
 	}
-	
+
+	public void backup()
+	{
+		this._currentIndex--;
+	}
+
 	/**
 	 * getCurrentStep
 	 * 
@@ -45,15 +50,15 @@ public class MatchContext
 	public String getCurrentStep()
 	{
 		String result = null;
-		
+
 		if (0 <= this._currentIndex && this._currentIndex < this._steps.length)
 		{
 			result = this._steps[this._currentIndex];
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getLength
 	 * 
@@ -63,7 +68,7 @@ public class MatchContext
 	{
 		return this._steps.length;
 	}
-	
+
 	/**
 	 * popCurrentStep
 	 */
@@ -71,7 +76,7 @@ public class MatchContext
 	{
 		this.popCurrentStep(true);
 	}
-	
+
 	/**
 	 * popCurrentStep
 	 * 
@@ -82,14 +87,14 @@ public class MatchContext
 		if (this._savedPositions.size() > 0)
 		{
 			int value = this._savedPositions.pop();
-			
+
 			if (restore)
 			{
 				this._currentIndex = value;
 			}
 		}
 	}
-	
+
 	/**
 	 * pushCurrentStep
 	 */
@@ -97,7 +102,7 @@ public class MatchContext
 	{
 		this._savedPositions.push(this._currentIndex);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -105,5 +110,10 @@ public class MatchContext
 	public String toString()
 	{
 		return this.getCurrentStep();
+	}
+
+	public boolean canAdvance()
+	{
+		return _currentIndex < _steps.length - 1;
 	}
 }

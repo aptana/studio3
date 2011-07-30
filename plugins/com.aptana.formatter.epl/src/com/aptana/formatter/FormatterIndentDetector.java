@@ -11,6 +11,8 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
+import java.util.List;
+
 import org.eclipse.jface.text.IRegion;
 
 import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
@@ -39,6 +41,11 @@ public class FormatterIndentDetector implements IFormatterWriter
 	{
 		// empty
 
+	}
+
+	public void excludeRegions(List<IRegion> regions, EXCLUDE_STRATEGY strategy)
+	{
+		// empty
 	}
 
 	public void ensureLineStarted(IFormatterContext context)

@@ -16,12 +16,22 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.messages"; //$NON-NLS-1$
 	private static final String BUNDLE_FOR_CONSTRUCTED_KEYS = BUNDLE_NAME;
 	private static ResourceBundle fgBundleForConstructedKeys = ResourceBundle.getBundle(BUNDLE_FOR_CONSTRUCTED_KEYS);
-	
+
+	public static String AbstractThemeableEditor_ConfirmOverwrite_Message;
+	public static String AbstractThemeableEditor_ConfirmOverwrite_Title;
 	public static String AbstractThemeableEditor_CursorPositionLabel;
+	public static String AbstractThemeableEditor_Error_Message;
+	public static String AbstractThemeableEditor_Error_Title;
+	public static String AbstractThemeableEditor_SaveToggleDialog_LocalFilesystem;
+	public static String AbstractThemeableEditor_SaveToggleDialog_Message;
+	public static String AbstractThemeableEditor_SaveToggleDialog_Project;
+	public static String AbstractThemeableEditor_SaveToggleDialog_Title;
+
 	public static String CommonOccurrencesUpdater_Mark_Word_Occurrences;
 	public static String CommonOccurrencesUpdater_Word_Occurrence_Description;
 	public static String FileService_FailedToParse;
 	public static String Folding_GroupName;
+
 	static
 	{
 		// initialize resource bundle

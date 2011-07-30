@@ -6,18 +6,19 @@ Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.editor.svg.SVGPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
- com.aptana.core;bundle-version="3.0.3",
+ com.aptana.core,
+ beaver,
+ com.aptana.parsing,
+ com.aptana.index.core,
  com.aptana.editor.common,
  com.aptana.editor.xml,
- com.aptana.index.core,
  com.aptana.editor.js,
- com.aptana.editor.css,
- com.aptana.parsing,
- beaver
+ com.aptana.editor.css
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.editor.svg,

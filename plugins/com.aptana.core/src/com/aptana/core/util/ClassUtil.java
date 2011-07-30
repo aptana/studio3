@@ -13,46 +13,58 @@ import java.util.List;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class ClassUtil {
+public final class ClassUtil
+{
 
 	/**
 	 * 
 	 */
-	private ClassUtil() {
+	private ClassUtil()
+	{
 	}
-	
-	public static List<Class<?>> getClassesTree(Class<?> clazz) {
+
+	public static List<Class<?>> getClassesTree(Class<?> clazz)
+	{
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		classes.add(clazz);
-		if (clazz.isInterface()) {
+		if (clazz.isInterface())
+		{
 			processInterface(clazz, classes);
-		} else {
+		}
+		else
+		{
 			processClass(clazz, classes);
 		}
 		return classes;
 	}
 
-	private static void processClass(Class<?> clazz, List<Class<?>> classes) {
+	private static void processClass(Class<?> clazz, List<Class<?>> classes)
+	{
 		Class<?>[] interfaces = clazz.getInterfaces();
-		for (Class<?> i : interfaces) {
-			if (!classes.contains(i)) {
+		for (Class<?> i : interfaces)
+		{
+			if (!classes.contains(i))
+			{
 				classes.add(i);
 				processInterface(i, classes);
 			}
 		}
 		Class<?> superClass = clazz.getSuperclass();
-		if (superClass != null && !classes.contains(superClass)) {
+		if (superClass != null && !classes.contains(superClass))
+		{
 			classes.add(superClass);
 			processClass(superClass, classes);
 		}
 	}
 
-	private static void processInterface(Class<?> clazz, List<Class<?>> classes) {
+	private static void processInterface(Class<?> clazz, List<Class<?>> classes)
+	{
 		Class<?>[] interfaces = clazz.getInterfaces();
-		for (Class<?> i : interfaces) {
-			if (!classes.contains(i)) {
+		for (Class<?> i : interfaces)
+		{
+			if (!classes.contains(i))
+			{
 				classes.add(i);
 				processInterface(i, classes);
 			}

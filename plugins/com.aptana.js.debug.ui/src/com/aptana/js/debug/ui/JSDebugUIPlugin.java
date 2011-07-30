@@ -31,6 +31,7 @@ import com.aptana.js.debug.core.internal.browsers.FirebugUtil;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.ui.internal.DebugUIImages;
 import com.aptana.js.debug.ui.internal.LaunchConfigurationsHelper;
+import com.aptana.ui.CommonMessages;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -154,7 +155,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	private void registerAsFirebugEditor() {
 		IPath launcher = EclipseUtil.getApplicationLauncher();
 		if (launcher != null) {
-			FirebugUtil.registerEditor("Aptana", "Aptana Studio", launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
+			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher, StringUtil.EMPTY);
 		}
 	}
 
@@ -170,8 +171,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 							.getAdapter(UniformResourceStorage.class);
 					if (storage != null) {
 						URI uri = storage.getURI();
-						if ("dbgsource".equals(uri.getScheme())) //$NON-NLS-1$
-						{
+						if ("dbgsource".equals(uri.getScheme())) { //$NON-NLS-1$
 							closeEditors.add(ref);
 						}
 					}

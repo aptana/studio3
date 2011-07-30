@@ -84,10 +84,10 @@ function bar(p){
  * Braces
  */
 function bar(p) {
-    for( i = 0; i < 10; i++)                //
+    for( i = 0; i < 10; i++)//
     {
     }
-    switch (p) 				//
+    switch (p)//
     {
         case 0:
             fField.set(0);
@@ -99,12 +99,12 @@ function bar(p) {
         default:
             fField.reset();
     }
-    v =  //
+    v = //
     {
         a : 0,
         b : 1
     };
-    e =  //
+    e = //
     {
     };
 }

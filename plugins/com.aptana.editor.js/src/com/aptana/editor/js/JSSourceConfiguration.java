@@ -17,20 +17,20 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.EmptyCommentRule;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.ResumableSingleLineRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
@@ -57,21 +57,13 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
-			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new EmptyCommentRule(new Token(JS_MULTILINE_COMMENT)),
-			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new JSRegExpRule(new Token(JS_REGEXP)) };
-
-	private JSCodeScanner codeScanner;
-	private JSDocScanner docScanner;
-	private JSEscapeSequenceScanner singleQuoteScanner;
-	private JSEscapeSequenceScanner doubleQuoteScanner;
-	private JSEscapeSequenceScanner regexpScanner;
-	private RuleBasedScanner multiLineCommentScanner;
-	private RuleBasedScanner singleLineCommentScanner;
+			new EndOfLineRule("//", getToken(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
+			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(getToken(STRING_DOUBLE)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(getToken(STRING_SINGLE)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new EmptyCommentRule(getToken(JS_MULTILINE_COMMENT)),
+			new MultiLineRule("/**", "*/", getToken(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("/*", "*/", getToken(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new JSRegExpRule(getToken(JS_REGEXP)) };
 
 	private static JSSourceConfiguration instance;
 
@@ -126,7 +118,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
 	/*
@@ -189,55 +181,34 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	}
 
 	private ITokenScanner getMultiLineCommentScanner() {
-		if (multiLineCommentScanner == null) {
-			multiLineCommentScanner = new CommentScanner(getToken("comment.block.js")); //$NON-NLS-1$
-		}
-		return multiLineCommentScanner;
+		return new CommentScanner(getToken("comment.block.js")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getSingleLineCommentScanner() {
-		if (singleLineCommentScanner == null) {
-			singleLineCommentScanner = new CommentScanner(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
-		}
-		return singleLineCommentScanner;
+		return new CommentScanner(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getRegexpScanner() {
-		if (regexpScanner == null) {
-			regexpScanner = new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
-		}
-		return regexpScanner;
+		return new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getDoubleQuotedStringScanner() {
-		if (doubleQuoteScanner == null) {
-			doubleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
-		}
-		return doubleQuoteScanner;
+		return new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getSingleQuotedStringScanner() {
-		if (singleQuoteScanner == null) {
-			singleQuoteScanner = new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
-		}
-		return singleQuoteScanner;
+		return new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
 	}
 
 	private ITokenScanner getJSDocScanner() {
-		if (docScanner == null) {
-			docScanner = new JSDocScanner();
-		}
-		return docScanner;
+		return new JSDocScanner();
 	}
 
 	private ITokenScanner getCodeScanner() {
-		if (codeScanner == null) {
-			codeScanner = new JSCodeScanner();
-		}
-		return codeScanner;
+		return new JSCodeScanner();
 	}
 
 	private IToken getToken(String tokenName) {
-		return new Token(tokenName);
+		return CommonUtil.getToken(tokenName);
 	}
 }

@@ -33,7 +33,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.preview.Activator;
+import com.aptana.preview.PreviewPlugin;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
@@ -206,7 +206,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 			}
 			catch (CoreException e)
 			{
-				Activator.log(Messages.ProjectPreviewPropertyPage_ERR_FailToCreateServer, e);
+				PreviewPlugin.log(Messages.ProjectPreviewPropertyPage_ERR_FailToCreateServer, e);
 			}
 		}
 	}

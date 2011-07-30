@@ -10,14 +10,14 @@ package com.aptana.editor.js.formatter.nodes;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
  * JS formatter node for get-property nodes (a.b.c).
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-public class FormatterJSGetPropertyNode extends FormatterBlockWithBeginNode
+public class FormatterJSGetPropertyNode extends FormatterBlockWithBeginEndNode
 {
 
 	private JSNode propertyNode;
@@ -79,5 +79,4 @@ public class FormatterJSGetPropertyNode extends FormatterBlockWithBeginNode
 	{
 		return !isAddingBeginNewLine();
 	}
-
 }

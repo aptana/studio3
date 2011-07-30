@@ -9,12 +9,12 @@ package com.aptana.editor.css.formatter.preferences;
 
 import java.net.URL;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
@@ -34,34 +34,34 @@ public class CSSFormatterWhiteSpacesPage extends FormatterModifyTabPage
 	@Override
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		// Punctuation Group
-		Group punctuationGroup = SWTFactory.createGroup(parent,
-				Messages.CSSFormatterWhiteSpacesPage_punctuationGroupLabel, 5, 1, GridData.FILL_HORIZONTAL);
+		Group wrappingGroup = SWTFactory.createGroup(parent, Messages.CSSFormatterWhiteSpacesPage_spacingSettings, 1,
+				1, GridData.FILL_HORIZONTAL);
+
+		// Punctuation Group (we only have one group, so we expand it by default)
+		ExpandableComposite expandibleComposite = SWTFactory.createExpandibleComposite(wrappingGroup,
+				Messages.CSSFormatterWhiteSpacesPage_punctuationGroupLabel, 3, true);
+		Composite punctuationGroup = SWTFactory
+				.createComposite(expandibleComposite, 3, 20, 1, GridData.FILL_HORIZONTAL);
+		expandibleComposite.setClient(punctuationGroup);
+
+		SWTFactory.createCenteredLabel(punctuationGroup, StringUtil.EMPTY);
+		SWTFactory.createCenteredLabel(punctuationGroup, Messages.CSSFormatterWhiteSpacesPage_before);
+		SWTFactory.createCenteredLabel(punctuationGroup, Messages.CSSFormatterWhiteSpacesPage_after);
 
 		// Commas
-		Label label = new Label(punctuationGroup, SWT.NONE);
-		label.setText(Messages.CSSFormatterWhiteSpacesPage_commasLabel);
-		manager.createNumber(punctuationGroup, CSSFormatterConstants.SPACES_BEFORE_COMMAS,
-				Messages.CSSFormatterWhiteSpacesPage_before);
-		manager.createNumber(punctuationGroup, CSSFormatterConstants.SPACES_AFTER_COMMAS,
-				Messages.CSSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(punctuationGroup, Messages.CSSFormatterWhiteSpacesPage_commasLabel);
+		manager.createSpinner(punctuationGroup, CSSFormatterConstants.SPACES_BEFORE_COMMAS);
+		manager.createSpinner(punctuationGroup, CSSFormatterConstants.SPACES_AFTER_COMMAS);
 
 		// Colons
-		label = new Label(punctuationGroup, SWT.NONE);
-		label.setText(Messages.CSSFormatterWhiteSpacesPage_colonLabel);
-		manager.createNumber(punctuationGroup, CSSFormatterConstants.SPACES_BEFORE_COLON,
-				Messages.CSSFormatterWhiteSpacesPage_before);
-		manager.createNumber(punctuationGroup, CSSFormatterConstants.SPACES_AFTER_COLON,
-				Messages.CSSFormatterWhiteSpacesPage_after);
+		SWTFactory.createLabel(punctuationGroup, Messages.CSSFormatterWhiteSpacesPage_colonLabel);
+		manager.createSpinner(punctuationGroup, CSSFormatterConstants.SPACES_BEFORE_COLON);
+		manager.createSpinner(punctuationGroup, CSSFormatterConstants.SPACES_AFTER_COLON);
 
 		// Parenthesis in selectors
-		label = new Label(punctuationGroup, SWT.NONE);
-		label.setText(Messages.CSSFormatterWhiteSpacesPage_parenthesisLabel);
-		manager.createNumber(punctuationGroup, CSSFormatterConstants.SPACES_BEFORE_PARENTHESES,
-				Messages.CSSFormatterWhiteSpacesPage_before);
-		manager.createNumber(punctuationGroup, CSSFormatterConstants.SPACES_AFTER_PARENTHESES,
-				Messages.CSSFormatterWhiteSpacesPage_after);
-
+		SWTFactory.createLabel(punctuationGroup, Messages.CSSFormatterWhiteSpacesPage_parenthesisLabel);
+		manager.createSpinner(punctuationGroup, CSSFormatterConstants.SPACES_BEFORE_PARENTHESES);
+		manager.createSpinner(punctuationGroup, CSSFormatterConstants.SPACES_AFTER_PARENTHESES);
 	}
 
 	protected URL getPreviewContent()

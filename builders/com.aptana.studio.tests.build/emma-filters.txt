@@ -1,0 +1,9 @@
+-*Test*
+-*Application*
+-*Messages
+-net.contentobjects.*
+-com.aptana.studio.tests.all.*
+-com.aptana.editor.epl.tests.*
+-com.aptana.editor.js.tests.*
+-cef.*
+-org.eclipse.jface.text.*

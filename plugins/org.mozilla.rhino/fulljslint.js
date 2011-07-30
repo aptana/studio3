@@ -5,6 +5,7 @@ aptanaOptions.undef = true;
 aptanaOptions.browser = true;
 aptanaOptions.jscript = true;
 aptanaOptions.debug = true;
+aptanaOptions.predef = ["Ti","Titanium"];
 
 // jslint.js
 // 2010-12-02

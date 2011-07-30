@@ -13,13 +13,12 @@ import java.util.Enumeration;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
@@ -194,7 +193,7 @@ public final class JSLaunchConfigurationHelper {
 	 * @param configuration
 	 */
 	public static void setDebugDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		IScopeContext[] scopes = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+		IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
 				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes));
@@ -286,7 +285,7 @@ public final class JSLaunchConfigurationHelper {
 					.toString(configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, false)));
 		} else {
-			IScopeContext[] scopes = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+			IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, Boolean
 					.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes)));
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, Boolean

@@ -102,6 +102,17 @@ public class HTMLUtils
 	}
 
 	/**
+	 * Returns true if the specified tag contents has valid ending
+	 * 
+	 * @param tagContents
+	 * @return
+	 */
+	public static boolean isTagComplete(String tagContents)
+	{
+		return tagContents.endsWith(">"); //$NON-NLS-1$
+	}
+
+	/**
 	 * Returns true if the specified tag contents has JavaScript &lt;script&gt; tag
 	 * 
 	 * @param tagContents
@@ -109,6 +120,10 @@ public class HTMLUtils
 	 */
 	public static boolean isJavaScriptTag(String tagContents)
 	{
+		if (!isTagComplete(tagContents))
+		{
+			return false;
+		}
 		String type = getTagAttribute(tagContents, "type"); //$NON-NLS-1$
 		if (type != null && type.toLowerCase().contains("javascript")) //$NON-NLS-1$
 		{

@@ -93,6 +93,7 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 			case JSNodeTypes.RETURN:
 			case JSNodeTypes.THROW:
 			case JSNodeTypes.ARGUMENTS:
+			case JSNodeTypes.SUBTRACT:
 				return true;
 			default:
 				return false;

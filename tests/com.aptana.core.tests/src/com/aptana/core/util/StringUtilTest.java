@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import junit.framework.TestCase;
 
 public class StringUtilTest extends TestCase
 {
+
 	public void testMd5()
 	{
 		assertEquals("d41d8cd98f00b204e9800998ecf8427e", StringUtil.md5(""));
@@ -56,6 +59,15 @@ public class StringUtilTest extends TestCase
 		assertEquals("Pass me. Pass!", result);
 	}
 
+	public void testReplaceAllWithNull()
+	{
+		assertNull(StringUtil.replaceAll(null, new HashMap<String, String>()));
+
+		String template = "_replace_ me";
+		assertEquals(template, StringUtil.replaceAll(template, null));
+		assertEquals(template, StringUtil.replaceAll(template, new HashMap<String, String>()));
+	}
+
 	public void testTokenize()
 	{
 		String inputString = "chris\0williams";
@@ -71,29 +83,27 @@ public class StringUtilTest extends TestCase
 		assertEquals(" williams", tokens.get(1));
 	}
 
-	public void testAreNotEqualWithNulls()
+	public void testTokenizeWithNull()
 	{
-		assertFalse(StringUtil.areNotEqual(null, null));
-	}
-
-	public void testAreNotEqualFirstIsNull()
-	{
-		assertTrue(StringUtil.areNotEqual(null, "test"));
-	}
-
-	public void testAreNotEqualLastIsNull()
-	{
-		assertTrue(StringUtil.areNotEqual("test", null));
+		assertEquals(0, StringUtil.tokenize(null, "\0").size());
 	}
 
 	public void testAreNotEqual()
 	{
+		assertFalse(StringUtil.areNotEqual(null, null));
+		assertTrue(StringUtil.areNotEqual(null, "test"));
+		assertTrue(StringUtil.areNotEqual("test", null));
 		assertFalse(StringUtil.areNotEqual("test", "test"));
+		assertTrue(StringUtil.areNotEqual("test", "tes"));
 	}
 
-	public void testAreNotEqual2()
+	public void testAreEqual()
 	{
-		assertTrue(StringUtil.areNotEqual("test", "tes"));
+		assertTrue(StringUtil.areEqual(null, null));
+		assertFalse(StringUtil.areEqual(null, "test"));
+		assertFalse(StringUtil.areEqual("test", null));
+		assertTrue(StringUtil.areEqual("test", "test"));
+		assertFalse(StringUtil.areEqual("test", "tes"));
 	}
 
 	public void testCompare()
@@ -126,19 +136,19 @@ public class StringUtilTest extends TestCase
 		assertTrue(StringUtil.compareCaseInsensitive("A", "b") < 0);
 	}
 
-	public void getStringValueWithNull()
+	public void testGetStringValueWithNull()
 	{
 		assertSame(StringUtil.EMPTY, StringUtil.getStringValue(null));
 	}
 
-	public void getStringValueWithString()
+	public void testGetStringValueWithString()
 	{
 		String text = "abc";
 
 		assertSame(text, StringUtil.getStringValue(text));
 	}
 
-	public void getStringValueWithObject()
+	public void testGetStringValueWithObject()
 	{
 		final String text = "hello";
 		Object item = new Object()
@@ -150,5 +160,132 @@ public class StringUtilTest extends TestCase
 		};
 
 		assertSame(text, StringUtil.getStringValue(item));
+	}
+
+	public void testCharacterInstanceCount()
+	{
+		String text = "how_many_character_one_has";
+
+		assertEquals(4, StringUtil.characterInstanceCount(text, 'a'));
+		assertEquals(0, StringUtil.characterInstanceCount(text, 'g'));
+	}
+
+	public void testCharacterInstanceCountWithNull()
+	{
+		assertEquals(-1, StringUtil.characterInstanceCount(null, 'a'));
+	}
+
+	public void testContains()
+	{
+		String[] array = new String[] { "test", "test1", "test2" };
+
+		assertTrue(StringUtil.contains(array, "test"));
+		assertFalse(StringUtil.contains(array, "test3"));
+		assertFalse(StringUtil.contains(array, null));
+	}
+
+	public void testContainsWithNull()
+	{
+		assertFalse(StringUtil.contains(null, "test"));
+	}
+
+	public void testEllipsify()
+	{
+		String text = "Ellipsify";
+
+		assertEquals(text + "...", StringUtil.ellipsify(text));
+		assertNull(StringUtil.ellipsify(null));
+	}
+
+	public void testFormatWithIntReplacement()
+	{
+		String text = "replace integer {0}";
+
+		assertEquals("replace integer 0", StringUtil.format(text, 0));
+	}
+
+	public void testFormatWithLongReplacement()
+	{
+		String text = "replace long {0}";
+
+		assertEquals("replace long 987654321", StringUtil.format(text, 987654321l));
+	}
+
+	public void testJoinCollection()
+	{
+		Collection<String> test = new ArrayList<String>();
+		test.add("test");
+		test.add("test1");
+
+		assertEquals("test&test1", StringUtil.join("&", test));
+	}
+
+	public void testJoinList()
+	{
+		List<String> test = new ArrayList<String>();
+		test.add("test");
+		test.add("test1");
+
+		assertEquals("test&test1", StringUtil.join("&", test));
+	}
+
+	public void testJoinListWithNull()
+	{
+		assertNull(StringUtil.join("&", (List<String>) null));
+	}
+
+	public void testJoinEmptyList()
+	{
+		assertEquals(StringUtil.EMPTY, StringUtil.join("&", new ArrayList<String>()));
+	}
+
+	public void testJoinArray()
+	{
+		String[] test = new String[] { "test", "test1" };
+
+		assertEquals("test&test1", StringUtil.join("&", test));
+	}
+
+	public void testJoinArrayWithNull()
+	{
+		assertNull(StringUtil.join("&", (String[]) null));
+	}
+
+	public void testJoinEmptyArray()
+	{
+		assertEquals(StringUtil.EMPTY, StringUtil.join("&", new String[0]));
+	}
+
+	public void testMakeFormLabel()
+	{
+		String text = "label";
+
+		assertEquals(text + ":", StringUtil.makeFormLabel(text));
+		assertNull(StringUtil.makeFormLabel(null));
+	}
+
+	public void testQuote()
+	{
+		String text = "quote";
+
+		assertEquals("'quote'", StringUtil.quote(text));
+		assertNull(StringUtil.quote(null));
+	}
+
+	public void testReplace()
+	{
+		String text = "this##is##replace##test";
+
+		assertEquals("this is replace test", StringUtil.replace(text, "##", " "));
+		assertNull(StringUtil.replace(null, "##", "@"));
+	}
+
+	public void testTruncate()
+	{
+		String text = "truncate test";
+
+		assertEquals("truncate...", StringUtil.truncate(text, 8));
+		assertEquals(text, StringUtil.truncate(text, 14));
+		assertNull(StringUtil.truncate(null, 8));
 	}
 }

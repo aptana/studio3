@@ -7,10 +7,12 @@
  */
 package com.aptana.editor.css.formatter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
@@ -32,9 +34,7 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -45,7 +45,6 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 {
 
 	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]"); //$NON-NLS-1$
-	private String lineSeparator;
 
 	protected static final String[] SPACES = { CSSFormatterConstants.SPACES_AFTER_CHILD_COMBINATOR,
 			CSSFormatterConstants.SPACES_AFTER_COMMAS, CSSFormatterConstants.SPACES_AFTER_PARENTHESES,
@@ -61,8 +60,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	protected CSSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
-		super(preferences, mainContentType);
-		this.lineSeparator = lineSeparator;
+		super(preferences, mainContentType, lineSeparator);
 	}
 
 	/**
@@ -83,13 +81,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				return super.detectIndentationLevel(document, offset);
 			}
 
-			IParser parser = checkoutParser();
-			IParseState parseState = new ParseState();
 			String source = document.get();
-			parseState.setEditState(source, null, 0, 0);
-
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = ParserPoolFactory.parse(getMainContentType(), source);
 			if (parseResult != null)
 			{
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
@@ -125,13 +118,11 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
 		try
 		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			IParseRootNode parseResult = null;
+			parseResult = ParserPoolFactory.parse(getMainContentType(), input);
+
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, offset, isSelection, indentSufix,
@@ -165,6 +156,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			{
 				FormatterPlugin.logError(e);
 			}
+
 		}
 		catch (Exception e)
 		{
@@ -239,11 +231,6 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			boolean isSelection, String indentSufix, boolean prefixWithNewLine, boolean postfixWithNewLine)
 			throws Exception
 	{
-		int spacesCount = -1;
-		if (isSelection)
-		{
-			spacesCount = countLeftWhitespaceChars(input);
-		}
 		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -255,24 +242,26 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		root.accept(context, writer);
 		writer.flush(context);
 		String output = writer.getOutput();
-		if (isSelection)
+		List<IRegion> offOnRegions = builder.getOffOnRegions();
+		if (offOnRegions != null && !offOnRegions.isEmpty())
 		{
-			output = leftTrim(output, spacesCount);
+			// We re-parse the output to extract its On-Off regions, so we will be able to compute the offsets and
+			// adjust it.
+			List<IRegion> outputOnOffRegions = getOutputOnOffRegions(output,
+					getString(CSSFormatterConstants.FORMATTER_OFF), getString(CSSFormatterConstants.FORMATTER_ON));
+			output = FormatterUtils.applyOffOnRegions(input, output, offOnRegions, outputOnOffRegions);
 		}
-		else
+		if (output.length() > 0)
 		{
-			if (output.length() > 0)
+			if (prefixWithNewLine && !output.startsWith(lineSeparator))
 			{
-				if (prefixWithNewLine && !output.startsWith(lineSeparator))
-				{
-					output = lineSeparator + output;
-				}
-				if (postfixWithNewLine && !output.endsWith(lineSeparator))
-				{
-					output += lineSeparator;
-				}
-				output += indentSufix;
+				output = lineSeparator + output;
 			}
+			if (postfixWithNewLine && !output.endsWith(lineSeparator))
+			{
+				output += lineSeparator;
+			}
+			output += indentSufix;
 		}
 		return output;
 	}
@@ -288,6 +277,12 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setInt(CSSFormatterConstants.LINES_AFTER_DECLARATION,
 				getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
+		// Formatter OFF/ON
+		document.setBoolean(CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED,
+				getBoolean(CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED));
+		document.setString(CSSFormatterConstants.FORMATTER_ON, getString(CSSFormatterConstants.FORMATTER_ON));
+		document.setString(CSSFormatterConstants.FORMATTER_OFF, getString(CSSFormatterConstants.FORMATTER_OFF));
 
 		// Set the spaces values
 		for (String key : SPACES)

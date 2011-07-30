@@ -13,7 +13,6 @@
 package com.aptana.formatter.ui.preferences;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -28,6 +27,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -103,13 +103,13 @@ public class ScriptSourcePreviewerUpdater
 				JFaceResources.getFontRegistry().removeListener(fontChangeListener);
 				if (themeListener != null)
 				{
-					new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
+					EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeListener);
 				}
 			}
 		});
 
 		JFaceResources.getFontRegistry().addListener(fontChangeListener);
 		preferenceStore.addPropertyChangeListener(propertyChangeListener);
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeListener);
 	}
 }

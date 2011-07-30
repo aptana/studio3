@@ -37,5 +37,7 @@ public class JSFormatterModifyDialog extends FormatterModifyDialog
 		addTabPage(Messages.JSFormatterModifyDialog_bracesTabName, new JSFormatterBracesPage(this));
 		addTabPage(Messages.JSFormatterModifyDialog_whiteSpacesTabName, new JSFormatterWhiteSpacesPage(this));
 		addTabPage(Messages.JSFormatterModifyDialog_commentsTabName, new JSFormatterCommentsPage(this));
+		addTabPage(com.aptana.formatter.ui.preferences.Messages.FormatterModifyDialog_OffOnTags,
+				new JSFormatterOffOnPage(this));
 	}
 }

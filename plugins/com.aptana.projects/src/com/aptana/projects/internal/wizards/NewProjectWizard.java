@@ -63,7 +63,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.dialogs.ContainerGenerator;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
@@ -103,7 +103,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 
 	private static final String IMAGE = "icons/web_project_wiz.png"; //$NON-NLS-1$
 
-	protected WizardNewProjectCreationPage mainPage;
+	protected IWizardProjectCreationPage mainPage;
 	protected ProjectTemplateSelectionPage templatesPage;
 	protected WizardNewProjectReferencePage referencePage;
 
@@ -144,7 +144,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	{
 		super.addPages();
 
-		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
@@ -262,16 +262,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			}
 		}
 
-		boolean fromGit = false;
-		if (templatesPage != null)
+		boolean fromGit = isCloneFromGit();
+		if (fromGit)
 		{
-			IProjectTemplate template = templatesPage.getSelectedTemplate();
-			if (template != null && !template.getLocation().endsWith(".zip")) //$NON-NLS-1$
-			{
-				// assumes to be creating the project from a git URL
-				fromGit = true;
-				doCloneFromGit(template, newProjectHandle, description);
-			}
+			cloneFromGit(newProjectHandle, description);
 		}
 		if (!fromGit)
 		{
@@ -295,6 +289,33 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 
 		newProject = newProjectHandle;
 		return newProject;
+	}
+
+	/**
+	 * Returns true if the project should be cloned from a GIT repository.
+	 * 
+	 * @return True, if the project should be cloned from a GIT; False, otherwise.
+	 */
+	protected boolean isCloneFromGit()
+	{
+		if (templatesPage != null)
+		{
+			IProjectTemplate template = templatesPage.getSelectedTemplate();
+			return template != null && !template.getLocation().endsWith(".zip"); //$NON-NLS-1$
+		}
+		return false;
+	}
+
+	/**
+	 * Clone a project from a GIT repository.
+	 * 
+	 * @param newProjectHandle
+	 * @param description
+	 */
+	protected void cloneFromGit(IProject newProjectHandle, IProjectDescription description)
+	{
+		IProjectTemplate template = templatesPage.getSelectedTemplate();
+		doCloneFromGit(template.getLocation(), newProjectHandle, description);
 	}
 
 	/**
@@ -529,6 +550,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 						{
 							try
 							{
+								// makes sure the parent path is created
+								(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
 								newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
 										true, null);
 							}
@@ -734,7 +757,14 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void doCloneFromGit(IProjectTemplate template, final IProject projectHandle,
+	/**
+	 * Do a GIT clone from a given source URI
+	 * 
+	 * @param sourceURI
+	 * @param projectHandle
+	 * @param projectDescription
+	 */
+	protected void doCloneFromGit(String sourceURI, final IProject projectHandle,
 			final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
@@ -745,7 +775,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			path = path.append(projectDescription.getName());
 		}
 		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
-		Job job = new CloneJob(template.getLocation(), path.toOSString(), true, true);
+		Job job = new CloneJob(sourceURI, path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
 

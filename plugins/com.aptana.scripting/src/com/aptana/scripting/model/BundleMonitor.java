@@ -32,11 +32,16 @@ import com.aptana.scripting.ScriptingActivator;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
+	// @formatter:off
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
 	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets|templates)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/(?:commands|snippets|templates)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+
+	private static final Pattern BUNDLE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets|templates)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	// @formatter:on
 
 	private static BundleMonitor INSTANCE;
 
@@ -98,7 +103,11 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				{
 					this._watchId = FileWatcher.addWatch(userBundlesPath, IJNotify.FILE_ANY, true, this);
 
-					this.showFileEvent("Begin file system monitoring"); //$NON-NLS-1$
+					if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(),
+							IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+					{
+						this.showFileEvent("Begin file system monitoring"); //$NON-NLS-1$
+					}
 				}
 				catch (JNotifyException e)
 				{
@@ -107,9 +116,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			}
 			else
 			{
-				String message = MessageFormat.format(
-						Messages.BundleMonitor_INVALID_WATCHER_PATH,
-						userBundlesPath);
+				String message = MessageFormat.format(Messages.BundleMonitor_INVALID_WATCHER_PATH, userBundlesPath);
 
 				ScriptingActivator.logError(message, null);
 			}
@@ -134,7 +141,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				FileWatcher.removeWatch(this._watchId);
 				this._watchId = -1;
 
-				this.showFileEvent("End file system monitoring"); //$NON-NLS-1$
+				if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+				{
+					this.showFileEvent("End file system monitoring"); //$NON-NLS-1$
+				}
 			}
 
 			this._registered = false;
@@ -151,7 +161,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	synchronized public void fileCreated(int wd, String rootPath, String name)
 	{
 		fileCreatedHelper(rootPath, name);
-		
+
 		// used by unit tests
 		this.notifyAll();
 	}
@@ -166,7 +176,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
-			this.showFileEvent("File created: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			{
+				this.showFileEvent("File created: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
 			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
@@ -200,7 +213,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	synchronized public void fileDeleted(int wd, String rootPath, String name)
 	{
 		fileDeletedHelper(rootPath, name);
-		
+
 		// used by unit tests
 		this.notifyAll();
 	}
@@ -215,8 +228,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
-			this.showFileEvent("File deleted: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
-			
+			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			{
+				this.showFileEvent("File deleted: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
@@ -233,8 +248,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		else
 		{
-			this.showFileEvent("Skipped file deleted: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
-			
+			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			{
+				this.showFileEvent("Skipped file deleted: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			reloadDependentScripts(new File(rootPath, name));
 		}
 	}
@@ -250,19 +267,23 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
-			this.showFileEvent("File modified: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
-			
+			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			{
+				this.showFileEvent("File modified: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			File file = new File(rootPath, name);
 
 			BundleManager.getInstance().reloadScript(file);
 		}
 		else
 		{
-			this.showFileEvent("Skipped file modified: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
-			
+			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			{
+				this.showFileEvent("Skipped file modified: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			reloadDependentScripts(new File(rootPath, name));
 		}
-		
+
 		// used by unit tests
 		this.notifyAll();
 	}
@@ -278,10 +299,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	synchronized public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
 		this.showFileEvent("File renamed: " + rootPath + "," + oldName + "=>" + newName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		
+
 		this.fileDeletedHelper(rootPath, oldName);
 		this.fileCreatedHelper(rootPath, newName);
-		
+
 		// used by unit tests
 		this.notifyAll();
 	}
@@ -296,20 +317,32 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		String fullProjectPath = delta.getFullPath().toString();
 		boolean result = false;
-		
-		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+
+		if (BUNDLE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+				|| BUNDLE_PATTERN.matcher(fullProjectPath).matches())
 		{
 			// always return true for bundle.rb files
 			result = true;
 		}
-		else if (FILE_PATTERN.matcher(fullProjectPath).matches())
+		else if (FILE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+				|| FILE_PATTERN.matcher(fullProjectPath).matches())
 		{
 			// only return true if the script is part of an existing bundle.
-			File script = delta.getResource().getLocation().toFile();
-			
-			result = this.isScriptInExistingBundle(script);
+			IResource resource = delta.getResource();
+
+			if (resource != null)
+			{
+				IPath location = resource.getLocation();
+
+				if (location != null)
+				{
+					File script = delta.getResource().getLocation().toFile();
+
+					result = this.isScriptInExistingBundle(script);
+				}
+			}
 		}
-		
+
 		return result;
 	}
 
@@ -323,21 +356,21 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		BundleManager manager = BundleManager.getInstance();
 		File bundleDirectory = manager.getBundleDirectory(script);
-		
+
 		return manager.hasBundleAtPath(bundleDirectory);
 	}
-	
+
 	/**
 	 * isUserbundlesFile
+	 * 
 	 * @param rootPath
 	 * @param name
-	 * 
 	 * @return
 	 */
 	private boolean isUserBundleFile(String rootPath, String name)
 	{
 		boolean result = false;
-		
+
 		if (USER_BUNDLE_PATTERN.matcher(name).matches())
 		{
 			// always return true for bundle.rb files
@@ -347,10 +380,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			// only return true if the script is part of an existing bundle.
 			File script = new File(rootPath, name);
-			
+
 			result = this.isScriptInExistingBundle(script);
 		}
-		
+
 		return result;
 	}
 
@@ -379,7 +412,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 					case IResourceDelta.ADDED:
 						this.showResourceEvent("Added: " + file); //$NON-NLS-1$
 
-						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+						if (BUNDLE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+								|| BUNDLE_PATTERN.matcher(fullProjectPath).matches())
 						{
 							manager.loadBundle(file.getParentFile());
 						}
@@ -391,15 +425,16 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 					case IResourceDelta.REMOVED:
 						this.showResourceEvent("Removed: " + file); //$NON-NLS-1$
-						
-						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+
+						if (BUNDLE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+								|| BUNDLE_PATTERN.matcher(fullProjectPath).matches())
 						{
 							// NOTE: we have to both unload all scripts associated with this bundle
 							// and the bundle file itself. Technically, the bundle file doesn't
 							// exist any more so it won't get unloaded
 							manager.unloadBundle(file.getParentFile());
 						}
-						
+
 						manager.unloadScript(file);
 						break;
 
@@ -407,8 +442,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						if ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)
 						{
 							IPath movedFromPath = delta.getMovedFromPath();
-							IResource movedFrom = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
-									movedFromPath);
+							IResource movedFrom = ResourcesPlugin.getWorkspace().getRoot()
+									.getFileForLocation(movedFromPath);
 
 							if (movedFrom != null && movedFrom instanceof IFile)
 							{
@@ -460,7 +495,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		BundleManager manager = BundleManager.getInstance();
 		String fullPath = file.getAbsolutePath();
 		LibraryCrossReference xref = LibraryCrossReference.getInstance();
-		
+
 		if (xref.hasLibrary(fullPath))
 		{
 			for (String script : xref.getPathsFromLibrary(fullPath))
@@ -487,7 +522,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			ScriptingActivator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
 		}
 	}
-	
+
 	/**
 	 * showFileEvent
 	 * 
@@ -497,7 +532,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS);
 	}
-	
+
 	/**
 	 * showResourceEvent
 	 * 
@@ -507,7 +542,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_RESOURCE_EVENTS);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)

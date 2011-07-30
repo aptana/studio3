@@ -12,10 +12,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.internal.ControlThemerFactory;
 import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
@@ -70,7 +70,7 @@ public class ThemePlugin extends AbstractUIPlugin
 				}
 			}
 		};
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 		fInvasiveThemesEnabled = Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
 				IPreferenceConstants.INVASIVE_THEMES, false, null);
 
@@ -88,7 +88,7 @@ public class ThemePlugin extends AbstractUIPlugin
 		{
 			if (fThemeChangeListener != null)
 			{
-				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 			}
 
 			if (themeHijacker != null)
@@ -131,7 +131,7 @@ public class ThemePlugin extends AbstractUIPlugin
 	 * 
 	 * @return
 	 */
-	public ColorManager getColorManager()
+	public synchronized ColorManager getColorManager()
 	{
 		if (this.fColorManager == null)
 		{

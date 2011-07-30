@@ -75,4 +75,10 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	{
 		return new JSFoldingComputer(this, document);
 	}
+
+	@Override
+	protected String getFileServiceContentTypeId()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
+	}
 }

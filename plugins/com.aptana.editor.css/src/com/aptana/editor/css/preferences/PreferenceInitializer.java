@@ -8,9 +8,9 @@
 package com.aptana.editor.css.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
@@ -18,15 +18,12 @@ import com.aptana.editor.css.ICSSConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-	 */
+
 	@SuppressWarnings("nls")
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(CSSPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CSSPlugin.PLUGIN_ID);
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
@@ -43,12 +40,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// mark occurrences
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 
-		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs = EclipseUtil.defaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 
-		String[] filtered = new String[] { ".*Unknown pseudo-element.*", ".*Property _.*", ".*-moz-.*", ".*-o-*",
-				".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*", ".*filter.*",
-				".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*",
-				".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
+		String[] filtered = new String[] { ".*Unknown pseudo-element.*", "Property\\s*[-_].*doesn't exist.*",
+				".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*",
+				".*filter.*", ".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*",
+				".*scrollbar-.*", ".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
 				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
 				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a background.*" };
 
@@ -56,5 +53,4 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
 				StringUtil.join("####", filtered));
 	}
-
 }

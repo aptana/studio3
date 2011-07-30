@@ -390,6 +390,22 @@ public class JSModelFormatter
 	}
 
 	/**
+	 * getSimpleDescription
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static String getSimpleDescription(FunctionElement function)
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		buffer.append(function.getName());
+		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		return buffer.toString();
+	}
+
+	/**
 	 * getDisplayTypeName
 	 * 
 	 * @param type

@@ -11,8 +11,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import beaver.Symbol;
 
@@ -93,6 +95,7 @@ import com.aptana.editor.js.parsing.ast.JSVarNode;
 import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.NodeTypes.TypeOperator;
@@ -124,7 +127,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		final IFormatterContainerNode rootNode = new FormatterJSRootNode(document);
 		start(rootNode);
 		JSParseRootNode jsRootNode = (JSParseRootNode) parseResult;
-		generateSingleLineCommentEndOffsets(jsRootNode.getCommentNodes());
+		generateCommentEndOffsets(jsRootNode.getCommentNodes());
 		jsRootNode.accept(new JSFormatterTreeWalker());
 		checkedPop(rootNode, document.getLength());
 		return rootNode;
@@ -140,7 +143,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return hasErrors;
 	}
 
-	private void generateSingleLineCommentEndOffsets(IParseNode[] comments)
+	private void generateCommentEndOffsets(IParseNode[] comments)
 	{
 		singleLinecommentEndOffsets = new HashSet<Integer>();
 		multiLinecommentEndOffsets = new HashSet<Integer>();
@@ -148,18 +151,40 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			return;
 		}
+		boolean onOffEnabled = document.getBoolean(JSFormatterConstants.FORMATTER_OFF_ON_ENABLED);
+		LinkedHashMap<Integer, String> commentsMap = onOffEnabled ? new LinkedHashMap<Integer, String>(comments.length)
+				: null;
 		for (IParseNode comment : comments)
 		{
 			short commentType = comment.getNodeType();
+			int end = comment.getEndingOffset();
 			if (commentType == JSNodeTypes.SINGLE_LINE_COMMENT)
 			{
-				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset()));
+				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end));
 			}
 			else if (commentType == JSNodeTypes.MULTI_LINE_COMMENT || commentType == JSNodeTypes.SDOC_COMMENT
 					|| commentType == JSNodeTypes.VSDOC_COMMENT)
 			{
-				multiLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset() + 1));
+				multiLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end + 1));
 			}
+			// Add to the map of comments when the On-Off is enabled.
+			if (onOffEnabled)
+			{
+				int start = comment.getStartingOffset();
+				// The end offset of a JS multi-line comment should be increased by 1 in order to include the last
+				// closing char. However, for the OFF/ON support it does'nt really matter, since the regex will never
+				// match that ending char, so we can simply use the 'end' offset as is.
+				String commentStr = document.get(start, end);
+				commentsMap.put(start, commentStr);
+			}
+		}
+		// Generate the On-Off regions
+		if (onOffEnabled && !commentsMap.isEmpty())
+		{
+			Pattern onPattern = Pattern.compile(Pattern.quote(document.getString(JSFormatterConstants.FORMATTER_ON)));
+			Pattern offPattern = Pattern.compile(Pattern.quote(document.getString(JSFormatterConstants.FORMATTER_OFF)));
+			setOffOnRegions(FormatterUtils.resolveOnOffRegions(commentsMap, onPattern, offPattern,
+					document.getLength() - 1));
 		}
 	}
 
@@ -382,7 +407,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			ifNode.setBegin(createTextNode(document, ifStart, ifStart + 2));
 			push(ifNode);
 			// push the 'if' condition
-			pushNodeInParentheses('(', ')', ifStart + 2, trueBlock.getStartingOffset(), (JSNode) node.getCondition(),
+			pushNodeInParentheses('(', ')', node.getLeftParenthesis().getStart(), node.getRightParenthesis().getEnd() + 1, (JSNode) node.getCondition(),
 					false);
 			// Construct the 'true' part of the 'if' and visit its children
 			if (isCurlyTrueBlock)
@@ -996,7 +1021,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// Push the function's name. Node that the function 'name' may be an expression in a group.
 			JSNode functionName = (JSNode) node.getExpression();
 			short nodeType = functionName.getNodeType();
-			if (nodeType == JSNodeTypes.GROUP || nodeType == JSNodeTypes.FUNCTION)
+			if (nodeType == JSNodeTypes.GROUP || nodeType == JSNodeTypes.FUNCTION
+					|| nodeType == JSNodeTypes.GET_PROPERTY)
 			{
 				// inline invocation
 				functionName.accept(this);
@@ -1079,7 +1105,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
 				int startingOffset = node.getStartingOffset();
-				visitTextNode(startingOffset, startingOffset + 4, true, 0, 0, false);
+				visitTextNode(startingOffset, startingOffset + 5, true, 0, 0, false);
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());
 			}
@@ -1139,11 +1165,28 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSGetPropertyNode node)
 		{
 			// a.b.c
+			int startingOffset = node.getStartingOffset();
 			FormatterJSGetPropertyNode getElementNode = new FormatterJSGetPropertyNode(document, node,
-					hasAnyCommentBefore(node.getStartingOffset()));
-			getElementNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getEndingOffset() + 1));
+					hasAnyCommentBefore(startingOffset));
+			getElementNode.setBegin(createTextNode(document, startingOffset, startingOffset));
 			push(getElementNode);
-			checkedPop(getElementNode, node.getEndingOffset());
+
+			// visit the internals
+			JSNode leftHandSide = (JSNode) node.getLeftHandSide();
+			JSNode rightHandSide = (JSNode) node.getRightHandSide();
+			Symbol operator = node.getOperator();
+			if (leftHandSide != null)
+			{
+				leftHandSide.accept(this);
+			}
+			pushTypePunctuation(TypePunctuation.JS_DOT_PROPERTY, operator.getStart());
+			if (rightHandSide != null)
+			{
+				rightHandSide.accept(this);
+			}
+			int endingOffset = node.getEndingOffset() + 1;
+			getElementNode.setEnd(createTextNode(document, endingOffset, endingOffset));
+			checkedPop(getElementNode, endingOffset);
 		}
 
 		/*
@@ -1229,7 +1272,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int openParen = locateCharForward(document, openChar, parenLookupStart);
 			int closeParen = locateCharBackward(document, closeChar, parenLookupEnd);
 			FormatterJSParenthesesNode parenthesesNode = new FormatterJSParenthesesNode(document, false,
-					hasAnyCommentBefore(node.getStartingOffset()));
+					hasSingleCommentBefore(openParen), hasSingleCommentBefore(closeParen));
 			parenthesesNode.setBegin(createTextNode(document, openParen, openParen + 1));
 			push(parenthesesNode);
 			if (node != null)
@@ -1243,7 +1286,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					node.accept(this);
 				}
 			}
-			checkedPop(parenthesesNode, -1);
+			if (hasAnyCommentBefore(closeParen))
+			{
+				checkedPop(parenthesesNode, closeParen);
+			}
+			else
+			{
+				checkedPop(parenthesesNode, -1);
+			}
 			parenthesesNode.setEnd(createTextNode(document, closeParen, closeParen + 1));
 		}
 
@@ -1355,7 +1405,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 			else
 			{
-				parenthesesNode = new FormatterJSParenthesesNode(document, true, hasAnyCommentBefore(openParen));
+				parenthesesNode = new FormatterJSParenthesesNode(document, true);
 				parenthesesNode.setBegin(createTextNode(document, openParen, openParen));
 			}
 			push(parenthesesNode);
@@ -1381,17 +1431,21 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				closeParenStart = locateCharBackward(document, ')', expressionEndOffset);
 				closeParenEnd = closeParenStart + 1;
 			}
-			if (hasAnyCommentBefore(closeParenStart))
+			int popCheckOffset = -1;
+			if (hasSingleCommentBefore(openParen))
 			{
-				// Make sure that the closing pair will not get pushed up when there is a comment line right before it.
-				parenthesesNode.setNewLineBeforeClosing(true);
-				checkedPop(parenthesesNode, closeParenStart);
+				parenthesesNode.setHasCommentBeforeOpen(true);
 			}
-			else
+			if (hasSingleCommentBefore(closeParenStart))
 			{
-				checkedPop(parenthesesNode, -1);
+				parenthesesNode.setHasCommentBeforeClose(true);
+				popCheckOffset = closeParenStart;
 			}
-
+			if (hasMultiLineCommentBefore(closeParenStart))
+			{
+				popCheckOffset = closeParenStart;
+			}
+			checkedPop(parenthesesNode, popCheckOffset);
 			parenthesesNode.setEnd(createTextNode(document, closeParenStart, closeParenEnd));
 		}
 
@@ -1462,9 +1516,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			FormatterJSCaseNode caseNode = new FormatterJSCaseNode(document, hasBlockedChild);
 			caseNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset + 1));
 			push(caseNode);
+
 			if (hasBlockedChild)
 			{
 				// we have a 'case' with a curly-block
+				// lastChild == JSNodeTypes.STATEMENTS
 				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document,
 						hasAnyCommentBefore(lastChild.getStartingOffset()));
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),
@@ -1778,7 +1834,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				else
 				{
 					// we'll have a problem with such a node.
-					IdeLog.logError(JSFormatterPlugin.getDefault(),
+					IdeLog.logError(
+							JSFormatterPlugin.getDefault(),
 							MessageFormat.format("Expected JSFormatter and got {0}", child.getClass().getName()), (Throwable) null); //$NON-NLS-1$
 				}
 			}

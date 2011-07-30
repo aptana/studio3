@@ -11,6 +11,9 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
@@ -113,47 +116,6 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect(
 				"<!DOCTYPE |html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n	\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">", //$NON-NLS-1$
 				'\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	public void testCloseTagProposal1()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		// Should be no unclosed tags at this point
-		fProcessor.doComputeCompletionProposals(viewer, 0, '\t', false);
-		assertEquals(0, fProcessor.getUnclosedTagNames(0).size());
-	}
-
-	public void testCloseTagProposal2()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		fProcessor.doComputeCompletionProposals(viewer, 1, '\t', false);
-		assertEquals(0, fProcessor.getUnclosedTagNames(1).size());
-	}
-
-	public void testCloseTagProposal3()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		fProcessor.doComputeCompletionProposals(viewer, 2, '\t', false);
-		assertEquals(0, fProcessor.getUnclosedTagNames(2).size());
-	}
-
-	public void testCloseTagProposal4()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-
-		fProcessor.doComputeCompletionProposals(viewer, 3, '\t', false);
-		assertEquals(1, fProcessor.getUnclosedTagNames(3).size());
-	}
-
-	public void testCloseTagProposal5()
-	{
-		ITextViewer viewer = createTextViewer(createDocument("<a>Test <b>Item</b>", false)); //$NON-NLS-1$
-		// show unclosed tag once we get past the '>'
-		fProcessor.doComputeCompletionProposals(viewer, 4, '\t', false);
-		assertEquals(1, fProcessor.getUnclosedTagNames(4).size());
 	}
 
 	public void testABBRProposal1()
@@ -501,6 +463,73 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		}
 	}
 
+	public void testApstud2959() throws Exception
+	{
+		String document = "<a href=\"http://|\" />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		// Generate some folders/files to use as proposals
+		String tmpDir = System.getProperty("java.io.tmpdir");
+		final File dir = new File(tmpDir, "testApstud2959" + System.currentTimeMillis());
+		dir.mkdirs();
+
+		File folder = new File(dir, "email");
+		folder.mkdirs();
+		try
+		{
+			fProcessor = new HTMLContentAssistProcessor(null)
+			{
+				@Override
+				protected URI getURI()
+				{
+					return new File(dir, "file.html").toURI();
+				}
+			};
+
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+			assertEquals(0, proposals.length);
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dir);
+		}
+	}
+
+	public void testRootFileSystemForHREF() throws Exception
+	{
+		String document = "<a href=\"file://|\" />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		IFileStore root = EFS.getLocalFileSystem().getStore(Path.ROOT);
+		String[] names = root.childNames(EFS.NONE, null);
+		int count = 0;
+		for (String name : names)
+		{
+			if (name.startsWith("."))
+			{
+				continue;
+			}
+			count++;
+		}
+		fProcessor = new HTMLContentAssistProcessor(null)
+		{
+			@Override
+			protected URI getURI()
+			{
+				// Shouldn't be necessary...
+				return new File(System.getProperty("java.io.tmpdir"), "file.html").toURI();
+			}
+		};
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(count, proposals.length);
+
+	}
+
 	public void testLinkHREFFileProposalWithPrefix() throws Exception
 	{
 		String document = "<link rel=\"stylesheet\" href=\"roo|\" />";
@@ -649,6 +678,36 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertTrue(proposals.length > 0);
 		assertNotNull(findProposal("scroll", proposals));
+	}
+
+	public void testRelativeHREFFileProposals() throws Exception
+	{
+		// FIXME I need to set up files on the filesystem and relative to editor to test those!
+
+		String document = "<a href=\"|\"></a>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		final File tmpFile = File.createTempFile("test", ".html");
+		tmpFile.deleteOnExit();
+
+		File sibling = new File(tmpFile.getParentFile(), "sibling.html");
+		sibling.createNewFile();
+		sibling.deleteOnExit();
+
+		fProcessor = new HTMLContentAssistProcessor(null)
+		{
+			@Override
+			protected URI getURI()
+			{
+				return tmpFile.toURI();
+			}
+		};
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
+		assertNotNull(findProposal("sibling.html", proposals));
 	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)

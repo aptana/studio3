@@ -10,6 +10,7 @@ package com.aptana.editor.xml.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.xml.TagUtilTest;
 import com.aptana.editor.xml.XMLEditorTest;
 import com.aptana.editor.xml.XMLParserTest;
 import com.aptana.editor.xml.XMLPartitionScannerTest;
@@ -26,6 +27,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
+		suite.addTestSuite(TagUtilTest.class);
 		suite.addTestSuite(XMLPartitionScannerTest.class);
 		suite.addTestSuite(XMLScannerTest.class);
 		suite.addTestSuite(XMLFoldingComputerTest.class);

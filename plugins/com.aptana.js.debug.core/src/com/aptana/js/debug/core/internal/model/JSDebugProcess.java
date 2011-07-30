@@ -29,6 +29,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.internal.StreamsProxy;
@@ -112,8 +113,8 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	}
 
 	protected void createStreams() {
-		createStream(IJSDebugConstants.ID_STANDARD_OUTPUT_STREAM);
-		createStream(IJSDebugConstants.ID_STANDARD_ERROR_STREAM);
+		createStream(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM);
+		createStream(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM);
 		createStream(IJSDebugConstants.ID_WARNING_STREAM);
 	}
 

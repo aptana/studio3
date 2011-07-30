@@ -9,6 +9,7 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Path;
 
@@ -30,8 +31,8 @@ public class FileUtil
 
 	/**
 	 * Removes the "middle" part from a path to make it short enough to fit within the specified length, i.e.
-	 * c:/Documents and Settings/username/My Documents/workspace/whatever.txt would become c:/Documents and
-	 * Settings/.../workspace/whatever.txt.
+	 * c:/Documents and Settings/username/My Documents/workspace/whatever.txt would become c:/.../username/My
+	 * Documents/workspace/whatever.txt.
 	 * 
 	 * @param path
 	 *            the path to compress
@@ -111,11 +112,7 @@ public class FileUtil
 		}
 
 		int index = fileName.lastIndexOf('.');
-		if (index == -1)
-		{
-			return StringUtil.EMPTY;
-		}
-		if (index == fileName.length())
+		if (index == -1 || index == fileName.length())
 		{
 			return StringUtil.EMPTY;
 		}
@@ -170,10 +167,9 @@ public class FileUtil
 	 * @param arguments
 	 * @return
 	 */
-	public static ArrayList<File> gatherFilesFromCommandLineArguments(final String[] arguments)
+	public static List<File> gatherFilesFromCommandLineArguments(String[] arguments)
 	{
-		final ArrayList<File> files = new ArrayList<File>();
-
+		List<File> files = new ArrayList<File>();
 		for (int i = 0; i < arguments.length; i++)
 		{
 			// skip the keyring argument as a possible file
@@ -195,5 +191,4 @@ public class FileUtil
 
 		return files;
 	}
-
 }

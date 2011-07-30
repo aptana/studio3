@@ -11,6 +11,25 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationValueNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSParenthesesNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSPunctuationNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSExpressionNode;
+import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
+import com.aptana.editor.css.parsing.ast.CSSMediaNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
+import com.aptana.editor.css.parsing.ast.CSSPageNode;
+import com.aptana.editor.css.parsing.ast.CSSPageSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSRuleNode;
+import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
+import com.aptana.editor.css.parsing.ast.CSSTermListNode;
+import com.aptana.editor.css.parsing.ast.CSSTextNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -18,15 +37,9 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.NodeTypes.TypePunctuation;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationValueNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSParenthesesNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSPunctuationNode;
-import com.aptana.editor.css.parsing.ast.*;
+import com.aptana.parsing.lexer.IRange;
 
 /**
  * CSS formatter node builder.<br>
@@ -55,6 +68,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		IParseNode[] children = parseResult.getChildren();
 		addNodes(children);
 		checkedPop(rootNode, document.getLength());
+		// Collect Off/On tags
+		if (parseResult instanceof IParseRootNode)
+		{
+			setOffOnRegions(resolveOffOnRegions((IParseRootNode) parseResult, document,
+					CSSFormatterConstants.FORMATTER_OFF_ON_ENABLED, CSSFormatterConstants.FORMATTER_OFF,
+					CSSFormatterConstants.FORMATTER_ON));
+		}
 		return rootNode;
 	}
 
@@ -144,7 +164,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false, false);
 		formatterSelectorNode.setBegin(createTextNode(document,
 				getBeginWithoutWhiteSpaces(selectorStartingOffset, document),
-				getEndWithoutWhiteSpaces(selectEndingOffset, document)));
+				getEndWithoutWhiteSpaces(selectEndingOffset, document) + 1));
 		push(formatterSelectorNode);
 
 		findAndPushPunctuationNode(TypePunctuation.SEMICOLON, selectEndingOffset, false);
@@ -414,12 +434,26 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				if (expressionNode instanceof CSSTermListNode)
 				{
-					pushTermListNode((CSSTermListNode) expressionNode);
+					pushTermListNode((CSSTermListNode) expressionNode, i == declarations.length - 1);
 				}
 				else
 				{
-					pushDeclarationValueNode(expressionNode);
+					pushDeclarationValueNode(expressionNode, i == declarations.length - 1);
 				}
+
+				// Push a text node for status nodes: currently it's only !important
+				IRange statusRange = declarationNode.getStatusRange();
+				if (declarationNode.getStatus() != null)
+				{
+					formatterBlockNode.addChild(createTextNode(document, statusRange.getStartingOffset(),
+							statusRange.getEndingOffset() + 1));
+				}
+			}
+
+			// Push a semicolon if the declaration ends with one
+			if (document.charAt(declarationNode.getEndingOffset()) == ';')
+			{
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, declarationNode.getEndingOffset(), true);
 			}
 
 			// Create text nodes for comments between declaration
@@ -440,7 +474,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 	}
 
-	private void pushDeclarationValueNode(CSSExpressionNode expressionNode)
+	private void pushDeclarationValueNode(CSSExpressionNode expressionNode, boolean isLastDeclaration)
 	{
 
 		int expressionEndOffset = expressionNode.getEndingOffset();
@@ -463,7 +497,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			endsWithComma = true;
 		}
 
-		if (document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r')
+		if ((document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r') && isLastDeclaration)
 		{
 			isLastNodeInDeclaration = true;
 		}
@@ -476,31 +510,27 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		push(formatterDeclarationValueNode);
 		checkedPop(formatterDeclarationValueNode, -1);
 
-		if (endsWithSemicolon)
-		{
-			findAndPushPunctuationNode(TypePunctuation.SEMICOLON, semicolonLocation, true);
-		}
-		else if (endsWithComma)
+		if (endsWithComma)
 		{
 			findAndPushPunctuationNode(TypePunctuation.COMMA, commaLocation, false);
 		}
 
 	}
 
-	private void pushTermListNode(CSSTermListNode termListNode)
+	private void pushTermListNode(CSSTermListNode termListNode, boolean isLastDeclaration)
 	{
 		CSSExpressionNode leftExpression = termListNode.getLeftExpression();
 		CSSExpressionNode rightExpression = termListNode.getRightExpression();
 		if (leftExpression instanceof CSSTermListNode)
 		{
-			pushTermListNode((CSSTermListNode) leftExpression);
+			pushTermListNode((CSSTermListNode) leftExpression, isLastDeclaration);
 			// push the right expression here, as we are moving back up the tree
-			pushDeclarationValueNode(rightExpression);
+			pushDeclarationValueNode(rightExpression, isLastDeclaration);
 		}
 		else
 		{
-			pushDeclarationValueNode(leftExpression);
-			pushDeclarationValueNode(rightExpression);
+			pushDeclarationValueNode(leftExpression, isLastDeclaration);
+			pushDeclarationValueNode(rightExpression, isLastDeclaration);
 		}
 	}
 
