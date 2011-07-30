@@ -148,10 +148,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	protected boolean fInPropertyValue;
 	protected boolean fInSelector;
 
-	private boolean fInPropertyValue;
-
-	private boolean fInSelector;
-
 	/**
 	 * CodeScanner
 	 */
