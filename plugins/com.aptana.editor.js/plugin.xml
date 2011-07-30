@@ -210,11 +210,19 @@
       <hover
             class="com.aptana.editor.js.text.JSTextHover"
             id="com.aptana.editor.js.hover"
-            label="JS Documentation Hover">
+            label="%js.hover.label">
          <contentType
                type="com.aptana.contenttype.js">
          </contentType>
       </hover>
+   </extension>
+   <extension
+         point="com.aptana.index.core.ui.indexViewContributors">
+      <contributor
+            content-provider="com.aptana.editor.js.views.JSIndexViewContentProvider"
+            label-provider="com.aptana.editor.js.views.JSIndexViewLabelProvider"
+            name="%js.index.view.contributors">
+      </contributor>
    </extension>
 
 </plugin>

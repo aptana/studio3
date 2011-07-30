@@ -111,4 +111,9 @@ public class UntitledFileStorageEditorInput implements IStorageEditorInput, ILoc
 	{
 		return URIUtil.toPath(uri);
 	}
+
+	public URI getURI()
+	{
+		return uri;
+	}
 }

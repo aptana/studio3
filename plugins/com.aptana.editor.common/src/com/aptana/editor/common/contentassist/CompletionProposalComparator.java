@@ -10,6 +10,7 @@ package com.aptana.editor.common.contentassist;
 import java.util.Comparator;
 
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.templates.TemplateProposal;
 
 public enum CompletionProposalComparator implements Comparator<ICompletionProposal>
 {
@@ -24,8 +25,26 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 				int o2Relevance = ((ICommonCompletionProposal) o2).getRelevance();
 				return Integer.valueOf(o1Relevance).compareTo(o2Relevance);
 			}
-
 			return 0;
+		}
+	},
+	TemplateSort
+	{
+		public int compare(ICompletionProposal o1, ICompletionProposal o2)
+		{
+			// Templates appear after other items. Note reveral of terms
+			if (o1 instanceof TemplateProposal && !(o2 instanceof TemplateProposal))
+			{
+				return -1;
+			}
+			else if (!(o1 instanceof TemplateProposal) && o2 instanceof TemplateProposal)
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
 		}
 	},
 	NameSort

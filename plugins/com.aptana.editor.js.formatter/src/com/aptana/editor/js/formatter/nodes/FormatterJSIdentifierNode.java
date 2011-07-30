@@ -68,6 +68,7 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 					case JSNodeTypes.PARAMETERS:
 					case JSNodeTypes.ARGUMENTS:
 					case JSNodeTypes.ADD:
+					case JSNodeTypes.SUBTRACT:
 					case JSNodeTypes.MULTIPLY:
 					case JSNodeTypes.MOD:
 					case JSNodeTypes.DIVIDE:
