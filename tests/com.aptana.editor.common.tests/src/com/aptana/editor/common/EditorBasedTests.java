@@ -38,6 +38,7 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scripting.model.SnippetElement;
 
 public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> extends TestCase
 {
@@ -160,6 +161,25 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		assertTrue(editor instanceof AbstractThemeableEditor);
 
 		return editor;
+	}
+
+	/**
+	 * Create a snippet
+	 * 
+	 * @param path
+	 * @param displayName
+	 * @param trigger
+	 * @param scope
+	 * @return
+	 */
+	protected SnippetElement createSnippet(String path, String displayName, String trigger, String scope)
+	{
+		SnippetElement se = new SnippetElement(path);
+		se.setDisplayName(displayName);
+		se.setTrigger("prefix", new String[] { trigger });
+		se.setScope(scope);
+
+		return se;
 	}
 
 	/**

@@ -218,7 +218,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		// Sort by relevance first, descending, and then alphabetically, ascending
 		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
-				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
+				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.TemplateSort,
+				CompletionProposalComparator.NameSort)));
 	}
 
 	/**
