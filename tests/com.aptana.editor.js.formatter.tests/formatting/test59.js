@@ -7918,13 +7918,13 @@ if( typeof dojo == "undefined") {
                                         segs.splice(j, 1);
                                         j--;
                                     }
-                                } else if(j > 0 && !(j == 1 && segs[0] == "") && segs[j] == ".." && segs[ j - 1] != "..") {
+                                } else if(j > 0 && !(j == 1 && segs[0] == "") && segs[j] == ".." && segs[j - 1] != "..") {
 
                                     if(j == (segs.length - 1)) {
                                         segs.splice(j, 1);
-                                        segs[ j - 1] = "";
+                                        segs[j - 1] = "";
                                     } else {
-                                        segs.splice( j - 1, 2);
+                                        segs.splice(j - 1, 2);
                                         j -= 2;
                                     }
                                 }
@@ -8248,7 +8248,8 @@ if( typeof dojo == "undefined") {
             }
             arguments.callee.initialized = true;
             if( typeof dojo["_khtmlTimer"] != 'undefined') {
-                clearInterval(dojo._khtmlTimer); delete dojo._khtmlTimer;
+                clearInterval(dojo._khtmlTimer);
+                delete dojo._khtmlTimer;
             }
 
             if(dojo._inFlightCount == 0) {
@@ -9014,8 +9015,8 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         remove : function(/*Object*/source, /*String*/method, /*Handle*/handle) {
             var f = (source||dojo.global)[method];
             // remember that handle is the index+1 (0 is not a valid handle)
-            if(f && f._listeners && handle--) { delete
-                f._listeners[handle];
+            if(f && f._listeners && handle--) {
+                delete f._listeners[handle];
             }
         }
     };
@@ -9132,8 +9133,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         if(handle && handle[0] !== undefined) {
             dojo._disconnect.apply(this, handle);
             // let's not keep this reference
-            delete
-            handle[0];
+            delete handle[0];
         }
     }
 
@@ -10307,9 +10307,9 @@ if(!dojo._hasResource["dojo._base.event"]) {//_hasResource checks added by build
                     // remove a listener from an object
                     remove : function(/*Object*/source, /*String*/method, /*Handle*/handle) {
                         var f = (source||dojo.global)[method], l = f && f._listeners;
-                        if(f && l && handle--) { delete
-                            ieh[l[handle]]; delete
-                            l[handle];
+                        if(f && l && handle--) {
+                            delete ieh[l[handle]];
+                            delete l[handle];
                         }
                     }
                 };
@@ -10835,7 +10835,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 if(position == 0) {
                     return _insertBefore(node, refNode.firstChild);
                 }
-                return _insertAfter(node, cn[ position - 1]);
+                return _insertAfter(node, cn[position - 1]);
             }
             switch(position.toLowerCase()) {
                 case "before":
@@ -11356,10 +11356,10 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             // Controlling box-model is harder, in a pinch you might set dojo.boxModel.
             var bb = dojo._usesBorderBox(node), pb = bb ? _nilExtents : dojo._getPadBorderExtents(node, s), mb = dojo._getMarginExtents(node, s);
             if(widthPx >= 0) {
-                widthPx = Math.max( widthPx - pb.w - mb.w, 0);
+                widthPx = Math.max(widthPx - pb.w - mb.w, 0);
             }
             if(heightPx >= 0) {
-                heightPx = Math.max( heightPx - pb.h - mb.h, 0);
+                heightPx = Math.max(heightPx - pb.h - mb.h, 0);
             }
             dojo._setBox(node, leftPx, topPx, widthPx, heightPx);
         }
@@ -12763,7 +12763,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                 } else if(condition.indexOf("0n+") == 0) {
                     var ncount = pi(condition.substr(3));
                     return function(elem) {
-                        return (elem.parentNode.childNodes[ ncount - 1] === elem);
+                        return (elem.parentNode.childNodes[ncount - 1] === elem);
                     }
                 } else if((condition.indexOf("n+") > 0) && (condition.length > 3)) {
                     var tparts = condition.split("n+", 2);
@@ -14075,7 +14075,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             clearTimeout(this._timer);
             if(this._active) {
                 var curr = new Date().valueOf();
-                var step = ( curr - this._startTime) / (this._endTime - this._startTime);
+                var step = (curr - this._startTime) / (this._endTime - this._startTime);
 
                 if(step >= 1) {
                     step = 1;
