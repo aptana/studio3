@@ -305,7 +305,7 @@ class EditBundleJob extends Job
 	{
 		for (IProject project : workspace.getRoot().getProjects())
 		{
-			if (project.getLocation().equals(dest))
+			if (dest.equals(project.getLocation()))
 			{
 				return project;
 			}
