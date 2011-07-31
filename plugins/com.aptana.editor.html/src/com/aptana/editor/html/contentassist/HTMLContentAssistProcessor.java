@@ -1416,6 +1416,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		for (int i = lexemeProvider.getLexemeCeilingIndex(offset); i < lexemeProvider.size(); i++)
 		{
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
+			if (lexeme == null)
+			{
+				// no lexeme to replace, so return empty range
+				break;
+			}
 			HTMLTokenType type = lexeme.getType();
 
 			if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
