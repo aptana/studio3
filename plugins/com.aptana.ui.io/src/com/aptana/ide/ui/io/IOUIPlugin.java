@@ -274,15 +274,19 @@ public class IOUIPlugin extends AbstractUIPlugin
 					refreshNavigatorInternal(view, element, selection);
 
 					view = findView(RemoteNavigatorView.ID);
-					// if the content of the remote category changed, refresh the root of Remote view
-					if (element instanceof IConnectionPointCategory && ((IConnectionPointCategory) element).isRemote())
+					if (view != null)
 					{
-						Object input = ((CommonNavigator) view).getCommonViewer().getInput();
-						refreshNavigatorInternal(view, input, selection);
-					}
-					else
-					{
-						refreshNavigatorInternal(view, element, selection);
+						// if the content of the remote category changed, refresh the root of Remote view
+						if (element instanceof IConnectionPointCategory
+								&& ((IConnectionPointCategory) element).isRemote())
+						{
+							Object input = ((CommonNavigator) view).getCommonViewer().getInput();
+							refreshNavigatorInternal(view, input, selection);
+						}
+						else
+						{
+							refreshNavigatorInternal(view, element, selection);
+						}
 					}
 				}
 				catch (PartInitException e)
