@@ -15,6 +15,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.portal.ui.internal.startpage.messages"; //$NON-NLS-1$
+	public static String StartPageBrowserEditor_startPageTitle;
+	public static String StartPageBrowserEditor_startPageTooltip;
 	public static String StartPageStartup_launchingStartPage;
 	static
 	{
