@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -35,6 +37,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
@@ -117,8 +120,7 @@ public class Portal
 			{
 				url = getDefaultURL();
 			}
-			URL urlWithGetParams = new URL(url.toString() + getURLForProject(PortalUIPlugin.getActiveProject()));
-			url = urlWithGetParams;
+			url = URLUtil.appendParameters(url, getURLParametersForProject(PortalUIPlugin.getActiveProject()), false);
 		}
 		catch (IOException e)
 		{
@@ -215,25 +217,20 @@ public class Portal
 	 * @return The GET parameters string
 	 */
 	@SuppressWarnings("nls")
-	protected String getURLForProject(final IProject activeProject)
+	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("?v=");
-		builder.append(getVersion());
+		final Map<String, String> builder = new HashMap<String, String>();
+		builder.put("v", getVersion());
 
-		builder.append("&bg=");
-		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
-		builder.append("&fg=");
-		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
+		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
 
 		// "chrome"
-		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
 		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		builder.append(toHex(color.getRGB()));
+		builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's bg?
 
 		// project type
-		builder.append("&p=");
-		builder.append(getProjectType(activeProject));
+		builder.put("p", String.valueOf(getProjectType(activeProject)));
 
 		// version control
 		// builder.append("&vc=");
@@ -244,40 +241,39 @@ public class Portal
 		// builder.append(hasGithubRemote() ? '1' : '0');
 
 		// timestamp to force updates to server (bypass browser cache)
-		builder.append("&ts=");
-		builder.append(System.currentTimeMillis());
+		builder.put("ts", String.valueOf(System.currentTimeMillis()));
 
 		// guid that relates to a single install of the IDE
-		builder.append("&id=");
-		builder.append(getGUID());
+		builder.put("id", getGUID());
 
 		// deploy info
-		builder.append(getDeployParam(activeProject));
+		builder.putAll(getDeployParam(activeProject));
 
 		// for debugging output
 		// builder.append("&debug=1");
-		return builder.toString();
+		return builder;
 	}
 
 	@SuppressWarnings("nls")
-	protected String getDeployParam(IProject selectedProject)
+	protected Map<String, String> getDeployParam(IProject selectedProject)
 	{
+		final Map<String, String> builder = new HashMap<String, String>();
 		if (selectedProject != null && selectedProject.exists())
 		{
 			IFile file = selectedProject.getFile("deploy/default.rb");
 			if (file.exists())
-				return "&dep=ch";
+				builder.put("dep", "ch");
 			file = selectedProject.getFile("deploy/solo.rb");
 			if (file.exists())
-				return "&dep=cs";
+				builder.put("dep", "cs");
 			file = selectedProject.getFile("Capfile");
 			if (file.exists())
-				return "&dep=cap";
+				builder.put("dep", "cap");
 			file = selectedProject.getFile("capfile");
 			if (file.exists())
-				return "&dep=cap";
+				builder.put("dep", "cap");
 		}
-		return "";
+		return builder;
 	}
 
 	/**

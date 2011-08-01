@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -330,9 +332,46 @@ public class GitExecutable
 		}
 		if (!env.isEmpty())
 		{
+			if (Platform.OS_WIN32.equals(Platform.getOS()))
+			{
+				String pathVal = env.get("PATH"); //$NON-NLS-1$
+				// Hack to see if paths look like cygwin paths
+				if (!pathVal.contains(";")) //$NON-NLS-1$
+				{
+					env.put("PATH", convertCygwinPathsToWindows(pathVal)); //$NON-NLS-1$
+				}
+				// Convert PWD too
+				String pwd = env.get("PWD"); //$NON-NLS-1$
+				if (pwd != null)
+				{
+					env.put("PWD", convertCygwinPathsToWindows(pwd)); //$NON-NLS-1$
+				}
+			}
 			env = filterOutVariables(env);
 		}
 		return env;
+	}
+
+	private static String convertCygwinPathsToWindows(String envValue)
+	{
+		if (envValue == null)
+		{
+			return null;
+		}
+		String[] values = envValue.split(":"); //$NON-NLS-1$
+		StringBuilder newValue = new StringBuilder();
+		if (values != null && values.length > 0)
+		{
+			// FIXME This is a quick and dirty hack. To really do this correctly, we need to use cygpath -w
+			for (String value : values)
+			{
+				String converted = value.replaceFirst("/([a-zA-Z])/", "$1:\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+				converted = converted.replace('/', '\\');
+				newValue.append(converted).append(";"); //$NON-NLS-1$
+			}
+			newValue.deleteCharAt(newValue.length() - 1);
+		}
+		return newValue.toString();
 	}
 
 	/**
@@ -371,12 +410,24 @@ public class GitExecutable
 		}
 
 		try
-		{
+		{			
+			// Special handling for funky msysgit version string
+			if (versionString.contains("msysgit.")) //$NON-NLS-1$
+			{
+				versionString = versionString.replace("msysgit.", "msysgit_"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				// If there's still too many periods, turn ".msys" into "_msys"
+				if (StringUtil.characterInstanceCount(versionString, '.') > 3)
+				{
+					versionString = versionString.replace(".msysgit", "_msysgit"); //$NON-NLS-1$ //$NON-NLS-2$
+				}	
+			}
 			return Version.parseVersion(versionString);
 		}
-		catch (IllegalArgumentException ex)
+		catch (Exception ex)
 		{
-			IdeLog.logError(GitPlugin.getDefault(), Messages.GitExecutable_UnableToParseGitVersion, ex);
+			IdeLog.logError(GitPlugin.getDefault(),
+					StringUtil.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex);
 			return Version.emptyVersion;
 		}
 	}
