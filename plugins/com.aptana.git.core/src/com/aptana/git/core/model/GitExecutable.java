@@ -372,6 +372,11 @@ public class GitExecutable
 
 		try
 		{
+			// Special handling for funky msysgit version string
+			if (versionString.contains(".msysgit.")) //$NON-NLS-1$
+			{
+				versionString = versionString.replace(".msysgit.", "_mysysgit_"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return Version.parseVersion(versionString);
 		}
 		catch (IllegalArgumentException ex)
