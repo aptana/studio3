@@ -13,6 +13,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.projects.internal.wizards.messages"; //$NON-NLS-1$
 
+	public static String CommonWizardNewProjectCreationPage_location_has_existing_content_warning;
+
 	public static String NewProjectWizard_CreateOp_Title;
 	public static String NewProjectWizard_CreationProblem;
 	public static String NewProjectWizard_ERR_FailToDisconnect;
