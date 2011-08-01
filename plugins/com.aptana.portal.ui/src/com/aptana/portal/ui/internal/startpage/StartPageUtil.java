@@ -86,7 +86,7 @@ public class StartPageUtil
 	 */
 	public static boolean shouldShowStartPage()
 	{
-		// TODO - Un-comment this if we decide to prevent the Studio's start page from loading in Titaium Studio.
+		// TODO - Un-comment this if we decide to prevent the Studio's start page from loading in Titanium Studio.
 		// if (EclipseUtil.getPluginVersion("com.appcelerator.titanium.rcp") != null)
 		// {
 		// return false;

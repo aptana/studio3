@@ -28,6 +28,7 @@ public class AllUtilTests
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(VersionUtilTest.class);
+		suite.addTestSuite(URLUtilTest.class);
 		// $JUnit-END$
 		return suite;
 	}
