@@ -1395,38 +1395,44 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		int startingOffset = -1;
 		int endingOffset = -1;
+		int floorIndex = lexemeProvider.getLexemeFloorIndex(offset);
+		int ceilingIndex = lexemeProvider.getLexemeCeilingIndex(offset);
 
-		for (int i = lexemeProvider.getLexemeFloorIndex(offset); i >= 0; i--)
+		// NOTE: technically don't need to make this check since the loop condition will catch this case, but adding
+		// this here for symmetry with next loop and to make it explicit that we are handling a case where the offset
+		// does not provide a lexeme
+		if (floorIndex != -1)
 		{
-			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
-
-			// NOTE: we have to check the offset since it's possible to get the right-hand side quote here
-			if (lexeme.getStartingOffset() < offset)
+			for (int i = floorIndex; i >= 0; i--)
 			{
-				HTMLTokenType type = lexeme.getType();
+				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
 
-				if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+				// NOTE: we have to check the offset since it's possible to get the right-hand side quote here
+				if (lexeme.getStartingOffset() < offset)
 				{
-					startingOffset = lexeme.getStartingOffset() + 1;
-					break;
+					HTMLTokenType type = lexeme.getType();
+
+					if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+					{
+						startingOffset = lexeme.getStartingOffset() + 1;
+						break;
+					}
 				}
 			}
 		}
 
-		for (int i = lexemeProvider.getLexemeCeilingIndex(offset); i < lexemeProvider.size(); i++)
+		if (ceilingIndex != -1)
 		{
-			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
-			if (lexeme == null)
+			for (int i = ceilingIndex; i < lexemeProvider.size(); i++)
 			{
-				// no lexeme to replace, so return empty range
-				break;
-			}
-			HTMLTokenType type = lexeme.getType();
+				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
+				HTMLTokenType type = lexeme.getType();
 
-			if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
-			{
-				endingOffset = lexeme.getEndingOffset() - 1;
-				break;
+				if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
+				{
+					endingOffset = lexeme.getEndingOffset() - 1;
+					break;
+				}
 			}
 		}
 
