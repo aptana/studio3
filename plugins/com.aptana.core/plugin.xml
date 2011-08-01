@@ -66,6 +66,13 @@
                properties="os,ws,arch"
                type="java.lang.Object">
          </propertyTester>
+         <propertyTester
+               class="com.aptana.core.internal.PluginPropertyTester"
+               id="com.aptana.core.pluginPropertyTester"
+               namespace="com.aptana.core"
+               properties="hasPlugin"
+               type="java.lang.Object">
+         </propertyTester>
       </extension>
 
 </plugin>

@@ -24,9 +24,6 @@ public class StartPageBrowserEditor extends AbstractPortalBrowserEditor
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.startPage"; //$NON-NLS-1$
 	public static final String STUDIO_START_PAGE_URL = "http://content.aptana.com/aptana/my_aptana/?content=start"; //$NON-NLS-1$
 
-	private static final String TITLE = "Start Page"; //$NON-NLS-1$
-	private static final String TITLE_TIP = "Aptana Studio Start Page"; //$NON-NLS-1$
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.portal.ui.browser.AbstractPortalBrowserEditor#init(org.eclipse.ui.IEditorSite,
@@ -36,7 +33,7 @@ public class StartPageBrowserEditor extends AbstractPortalBrowserEditor
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException
 	{
 		super.init(site, input);
-		setPartName(TITLE);
+		setPartName(Messages.StartPageBrowserEditor_startPageTitle);
 	}
 
 	/*
@@ -46,7 +43,7 @@ public class StartPageBrowserEditor extends AbstractPortalBrowserEditor
 	@Override
 	public String getTitleToolTip()
 	{
-		return TITLE_TIP;
+		return Messages.StartPageBrowserEditor_startPageTooltip;
 	}
 
 	/*
