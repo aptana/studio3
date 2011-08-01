@@ -86,11 +86,10 @@ public class StartPageUtil
 	 */
 	public static boolean shouldShowStartPage()
 	{
-		// TODO - Un-comment this if we decide to prevent the Studio's start page from loading in Titaium Studio.
-		// if (EclipseUtil.getPluginVersion("com.appcelerator.titanium.rcp") != null)
-		// {
-		// return false;
-		// }
+		if (EclipseUtil.getPluginVersion("com.appcelerator.titanium.rcp") != null) //$NON-NLS-1$
+		{
+			return false;
+		}
 		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID);
 		String lastVersion = store.get(IPortalPreferences.LAST_KNOWN_STUDIO_VERSION, null);
 		if (lastVersion == null)

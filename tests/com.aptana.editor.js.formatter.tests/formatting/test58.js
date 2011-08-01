@@ -3792,13 +3792,12 @@ else if(m[1] == "@") {
                 } else if(events[type]) {
                     // remove the given handler for the given type
                     if(handler)
-                        delete
-                        events[type][handler.guid];
+                        delete events[type][handler.guid];
 
                     // remove all handlers for the given type
                     else
-                        for(handler in element.$events[type] ) delete
-                        events[type][handler];
+                        for(handler in element.$events[type] )
+                        delete events[type][handler];
 
                     // remove generic event handler if no more handlers exist
                     for(ret in events[type] )
@@ -3808,12 +3807,12 @@ else if(m[1] == "@") {
                             element.removeEventListener(type, element.$handle, false);
                         else
                             element.detachEvent("on" + type, element.$handle);
-                        ret = null; delete
-                        events[type];
+                        ret = null;
+                        delete events[type];
 
                         // Remove element from the global event type cache
-                        while(this.global[type] && (( index = jQuery.inArray(element, this.global[type])) >= 0 )) delete
-                        this.global[type][index];
+                        while(this.global[type] && (( index = jQuery.inArray(element, this.global[type])) >= 0 ))
+                        delete this.global[type][index];
                     }
                 }
 
@@ -4134,7 +4133,7 @@ else if(m[1] == "@") {
                 var els = global[type], i = els.length;
                 if(i && type != 'unload')
                     do
-                        els[ i - 1] && jQuery.event.remove(els[ i - 1], type);
+                        els[i - 1] && jQuery.event.remove(els[i - 1], type);
                     while (--i);
             }
         });
@@ -4831,7 +4830,7 @@ else if(m[1] == "@") {
                     var p = n / options.duration;
 
                     // Perform the easing function, defaults to swing
-                    z.now = jQuery.easing[options.easing](p, n, firstNum, ( lastNum - firstNum), options.duration);
+                    z.now = jQuery.easing[options.easing](p, n, firstNum, (lastNum - firstNum), options.duration);
 
                     // Perform the next step of the animation
                     z.a();

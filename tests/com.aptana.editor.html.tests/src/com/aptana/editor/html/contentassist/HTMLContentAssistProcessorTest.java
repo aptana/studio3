@@ -680,6 +680,17 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertNotNull(findProposal("scroll", proposals));
 	}
 
+	public void testAttributeValueProposals()
+	{
+		String document = "<li><a class=|</li>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length == 0);
+	}
+
 	public void testRelativeHREFFileProposals() throws Exception
 	{
 		// FIXME I need to set up files on the filesystem and relative to editor to test those!
