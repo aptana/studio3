@@ -31,11 +31,15 @@ public class URLUtilTest extends TestCase
 		assertTrue("Parameter list incorrectly joined", param.indexOf("f=#") >= 0);
 		assertTrue("Parameter list incorrectly joined", param.indexOf("g=h i") >= 0);
 
-		param = URLUtil.joinParameters(params, true);
+		// true is default case
+		param = URLUtil.joinParameters(params);
 		assertTrue("Parameter list incorrectly joined", param.indexOf("a=b") >= 0);
 		assertTrue("Parameter list incorrectly joined", param.indexOf("&c=d%3Fe") >= 0);
 		assertTrue("Parameter list incorrectly joined", param.indexOf("f=%23") >= 0);
 		assertTrue("Parameter list incorrectly joined", param.indexOf("g=h+i") >= 0);
+
+		// test null case
+		assertEquals("Parameter list incorrectly joined", "", URLUtil.joinParameters(null, false));
 	}
 
 	public void testAppendParameters() throws MalformedURLException, UnsupportedEncodingException
@@ -76,28 +80,35 @@ public class URLUtilTest extends TestCase
 
 		// url, no params
 		url = new URL("http://www.aptana.com");
-		newUrl = URLUtil.appendParameters(url, params, true);
+		newUrl = URLUtil.appendParameters(url, params);
 		assertEquals("http://www.aptana.com?c=d%23e", newUrl.toString());
 
 		// url, no params, with anchor
 		url = new URL("http://www.aptana.com#anchor");
-		newUrl = URLUtil.appendParameters(url, params, true);
+		newUrl = URLUtil.appendParameters(url, params);
 		assertEquals("http://www.aptana.com?c=d%23e#anchor", newUrl.toString());
 
 		// url, params, no anchor
 		url = new URL("http://www.aptana.com?a=b");
-		newUrl = URLUtil.appendParameters(url, params, true);
+		newUrl = URLUtil.appendParameters(url, params);
 		assertEquals("http://www.aptana.com?a=b&c=d%23e", newUrl.toString());
 
 		// url, params, anchor
 		url = new URL("http://www.aptana.com?a=b#anchor");
-		newUrl = URLUtil.appendParameters(url, params, true);
+		newUrl = URLUtil.appendParameters(url, params);
 		assertEquals("http://www.aptana.com?a=b&c=d%23e#anchor", newUrl.toString());
 
 		// url, existing same param, anchor
 		url = new URL("http://www.aptana.com?a=b&c=d#anchor");
-		newUrl = URLUtil.appendParameters(url, params, true);
+		newUrl = URLUtil.appendParameters(url, params);
 		assertEquals("http://www.aptana.com?a=b&c=d&c=d%23e#anchor", newUrl.toString());
 
+		// test null case
+		url = new URL("http://www.aptana.com");
+		assertEquals("Parameter list incorrectly joined", url, URLUtil.appendParameters(url, null));
+
+		assertEquals("Parameter list incorrectly joined", null, URLUtil.appendParameters(null, params));
+
+		assertEquals("Parameter list incorrectly joined", null, URLUtil.appendParameters(null, null));
 	}
 }
