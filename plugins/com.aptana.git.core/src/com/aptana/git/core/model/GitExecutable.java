@@ -376,7 +376,8 @@ public class GitExecutable
 		}
 		catch (IllegalArgumentException ex)
 		{
-			IdeLog.logError(GitPlugin.getDefault(), Messages.GitExecutable_UnableToParseGitVersion, ex);
+			IdeLog.logError(GitPlugin.getDefault(),
+					StringUtil.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex);
 			return Version.emptyVersion;
 		}
 	}
