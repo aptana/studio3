@@ -114,7 +114,10 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			for (EnvironmentElement e : envs)
 			{
 				RubyProc invoke = e.getInvokeBlock();
-				invoke.call(runtime.getCurrentContext(), new IRubyObject[] { hash });
+				if (invoke != null)
+				{
+					invoke.call(runtime.getCurrentContext(), new IRubyObject[] { hash });
+				}
 			}
 		}
 	}
