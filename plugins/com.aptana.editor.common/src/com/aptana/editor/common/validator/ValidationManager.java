@@ -454,6 +454,11 @@ public class ValidationManager implements IValidationManager
 			return;
 		}
 
+		if (fDocument == null)
+		{
+			return;
+		}
+
 		for (IParseError parseError : parseState.getErrors())
 		{
 			try

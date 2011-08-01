@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
+import beaver.Symbol;
 
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.ValidationItem;
 import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.ParseError;
 
 public class ValidationManagerTest extends TestCase
 {
@@ -71,11 +73,18 @@ public class ValidationManagerTest extends TestCase
 
 	public void testAddParseErrors()
 	{
-		FileService fileService = new FileService(null, new ParseState());
+		ParseState ps = new ParseState();
+
+		Symbol s = new Symbol(0);
+
+		FileService fileService = new FileService(null, ps);
+		ps.addError(new ParseError(s, IParseError.Severity.ERROR));
+		ps.addError(new ParseError(s, IParseError.Severity.WARNING));
+
 		IValidationManager validationManager = fileService.getValidationManager();
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		items.add(new ValidationItem(0, "message", 0, 0, 0, "test.js"));
 		validationManager.addParseErrors(items);
+		assertEquals(0, items.size()); // should be 2, but we have a null document
 	}
 
 	// public void testHasErrorOrWarningOnLine()
