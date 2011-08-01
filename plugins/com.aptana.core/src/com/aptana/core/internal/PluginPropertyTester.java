@@ -34,11 +34,7 @@ public class PluginPropertyTester extends PropertyTester
 			for (Object pluginId : args)
 			{
 				String detectedVersion = EclipseUtil.getPluginVersion(pluginId.toString());
-				if (expected && detectedVersion == null)
-				{
-					return false;
-				}
-				if (!expected && detectedVersion != null)
+				if ((expected && detectedVersion == null) || (!expected && detectedVersion != null))
 				{
 					return false;
 				}
