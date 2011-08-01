@@ -11,6 +11,8 @@ import java.io.File;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -18,6 +20,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Shalom Gibly <sgibly@appcelerator.com>
@@ -63,21 +66,31 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	@Override
 	public void createControl(Composite parent)
 	{
-
 		super.createControl(parent);
 		createWarningArea();
-
 	}
 
 	private void createWarningArea()
 	{
 		Composite control = (Composite) getControl();
-		Font font = new Font(control.getDisplay(), SWTUtils.italicizedFont(getFont()));
+		final Font font = new Font(control.getDisplay(), SWTUtils.italicizedFont(getFont()));
 
 		warningLabel = new Label(control, SWT.WRAP);
 		warningLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).grab(true, false)
 				.create());
 		warningLabel.setFont(font);
+		warningLabel.setForeground(UIUtils.getDisplay().getSystemColor(SWT.COLOR_RED));
+
+		control.addDisposeListener(new DisposeListener()
+		{
+			public void widgetDisposed(DisposeEvent e)
+			{
+				if (font != null && !font.isDisposed())
+				{
+					font.dispose();
+				}
+			}
+		});
 	}
 
 	/*
@@ -106,6 +119,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 				{
 					warningLabel
 							.setText(Messages.CommonWizardNewProjectCreationPage_location_has_existing_content_warning);
+					warningLabel.getParent().layout(true);
 				}
 			}
 		}
