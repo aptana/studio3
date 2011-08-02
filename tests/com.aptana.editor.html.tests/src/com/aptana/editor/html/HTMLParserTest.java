@@ -7,14 +7,22 @@
  */
 package com.aptana.editor.html;
 
+import java.text.MessageFormat;
+import java.util.List;
+
 import junit.framework.TestCase;
 
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.editor.html.parsing.Messages;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ast.INameNode;
+import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseError.Severity;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Range;
 
@@ -22,6 +30,10 @@ public class HTMLParserTest extends TestCase
 {
 
 	private static final String EOL = "\n";
+
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
+			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
+			"text/ecmascript", "text/jscript" };
 
 	private HTMLParser fParser;
 	private HTMLParseState fParseState;
@@ -206,6 +218,78 @@ public class HTMLParserTest extends TestCase
 		CSSParseRootNode cssRootNode = (CSSParseRootNode) style.getChild(0);
 		assertEquals(72, cssRootNode.getCommentNodes()[0].getStartingOffset());
 		assertEquals(88, cssRootNode.getCommentNodes()[0].getEndingOffset());
+	}
+
+	public void testMissingEndTagError() throws Exception
+	{
+		String source = "<title><body><div><p></body>";
+		fParseState.setEditState(source, source, 0, 0);
+		fParser.parse(fParseState);
+
+		List<IParseError> errors = fParseState.getErrors();
+		// should contain only two errors, for unclosed <title> and <div>, but not <p> since </p> is optional
+		assertEquals(2, errors.size());
+
+		IParseError divError = errors.get(0);
+		assertEquals(Severity.WARNING, divError.getSeverity());
+		assertEquals(17, divError.getOffset());
+		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "div"), divError.getMessage());
+
+		IParseError titleError = errors.get(1);
+		assertEquals(Severity.WARNING, titleError.getSeverity());
+		assertEquals(6, titleError.getOffset());
+		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "title"), titleError.getMessage());
+	}
+
+	public void testTypeAttributeForStyle() throws Exception
+	{
+		String source = "<style type=\"text/css\">html {color: red;}</script>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		IParseNode[] grandchildren = children[0].getChildren();
+
+		// should be a CSS node
+		assertEquals(ICSSConstants.CONTENT_TYPE_CSS, grandchildren[0].getLanguage());
+	}
+
+	public void testIncorrectTypeAttributeForStyle() throws Exception
+	{
+		String source = "<style type=\"text/incorrect\">html {color: red;}</script>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		IParseNode[] grandchildren = children[0].getChildren();
+
+		// should remain a HTML node
+		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, grandchildren[0].getLanguage());
+	}
+
+	public void testTypeAttributeForScript() throws Exception
+	{
+		for (String type : JS_VALID_TYPE_ATTR)
+		{
+			String source = "<script type=\"" + type + "\">var one = 1;</script>";
+			fParseState.setEditState(source, source, 0, 0);
+			IParseNode result = fParser.parse(fParseState);
+			IParseNode[] children = result.getChildren();
+			IParseNode[] grandchildren = children[0].getChildren();
+
+			// should be a JS node
+			assertEquals(IJSConstants.CONTENT_TYPE_JS, grandchildren[0].getLanguage());
+		}
+	}
+
+	public void testIncorrectTypeAttributeForScript() throws Exception
+	{
+		String source = "<script type=\"text/incorrect\">var one = 1;</script>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		IParseNode[] grandchildren = children[0].getChildren();
+
+		// should remain a HTML node
+		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, grandchildren[0].getLanguage());
 	}
 
 	protected void parseTest(String source) throws Exception

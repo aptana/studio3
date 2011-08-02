@@ -8,6 +8,7 @@
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -388,8 +389,8 @@ public class HTMLParser implements IParser
 	{
 		if (fParseState.getCloseTagType(node.getName()) != HTMLTagInfo.END_OPTIONAL)
 		{
-			fParseState.addError(new ParseError(node.getEndingOffset(), Messages.HTMLParser_missing_end_tag_error
-					+ node.getName() + ">", IParseError.Severity.WARNING)); //$NON-NLS-1$
+			fParseState.addError(new ParseError(node.getEndingOffset(), MessageFormat.format(
+					Messages.HTMLParser_missing_end_tag_error, node.getName()), IParseError.Severity.WARNING));
 		}
 	}
 
