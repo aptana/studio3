@@ -102,7 +102,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		resetRules(defaultPartitionScanner.getRules());
 		resetRules(primaryPartitionScanner.getRules());
 		currentPartitionScanner = defaultPartitionScanner;
-		currentPartitionScanner.setLastToken(contentType != null ? new Token(contentType) : null);
+		currentPartitionScanner.setLastToken(new Token(contentType));
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
 			TypedPosition partition = partitioner.findClosestPosition(offset);
 			if (partition != null) {
