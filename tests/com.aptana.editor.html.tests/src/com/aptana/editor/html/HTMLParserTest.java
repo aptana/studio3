@@ -246,11 +246,11 @@ public class HTMLParserTest extends TestCase
 		String source = "<style type=\"text/css\">html {color: red;}</script>";
 		fParseState.setEditState(source, source, 0, 0);
 		IParseNode result = fParser.parse(fParseState);
-		IParseNode[] children = result.getChildren();
-		IParseNode[] grandchildren = children[0].getChildren();
+		IParseNode styleTag = result.getChild(0);
+		IParseNode cssNode = styleTag.getChild(0);
 
 		// should be a CSS node
-		assertEquals(ICSSConstants.CONTENT_TYPE_CSS, grandchildren[0].getLanguage());
+		assertEquals(ICSSConstants.CONTENT_TYPE_CSS, cssNode.getLanguage());
 	}
 
 	public void testIncorrectTypeAttributeForStyle() throws Exception
@@ -258,11 +258,11 @@ public class HTMLParserTest extends TestCase
 		String source = "<style type=\"text/incorrect\">html {color: red;}</script>";
 		fParseState.setEditState(source, source, 0, 0);
 		IParseNode result = fParser.parse(fParseState);
-		IParseNode[] children = result.getChildren();
-		IParseNode[] grandchildren = children[0].getChildren();
+		IParseNode styleTag = result.getChild(0);
+		IParseNode textNode = styleTag.getChild(0);
 
 		// should remain a HTML node
-		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, grandchildren[0].getLanguage());
+		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
 	}
 
 	public void testTypeAttributeForScript() throws Exception
@@ -272,11 +272,11 @@ public class HTMLParserTest extends TestCase
 			String source = "<script type=\"" + type + "\">var one = 1;</script>";
 			fParseState.setEditState(source, source, 0, 0);
 			IParseNode result = fParser.parse(fParseState);
-			IParseNode[] children = result.getChildren();
-			IParseNode[] grandchildren = children[0].getChildren();
+			IParseNode scriptTag = result.getChild(0);
+			IParseNode jsNode = scriptTag.getChild(0);
 
 			// should be a JS node
-			assertEquals(IJSConstants.CONTENT_TYPE_JS, grandchildren[0].getLanguage());
+			assertEquals(IJSConstants.CONTENT_TYPE_JS, jsNode.getLanguage());
 		}
 	}
 
@@ -285,11 +285,11 @@ public class HTMLParserTest extends TestCase
 		String source = "<script type=\"text/incorrect\">var one = 1;</script>";
 		fParseState.setEditState(source, source, 0, 0);
 		IParseNode result = fParser.parse(fParseState);
-		IParseNode[] children = result.getChildren();
-		IParseNode[] grandchildren = children[0].getChildren();
+		IParseNode scriptTag = result.getChild(0);
+		IParseNode textNode = scriptTag.getChild(0);
 
 		// should remain a HTML node
-		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, grandchildren[0].getLanguage());
+		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
 	}
 
 	protected void parseTest(String source) throws Exception
