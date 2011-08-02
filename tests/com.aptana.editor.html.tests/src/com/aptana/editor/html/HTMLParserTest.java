@@ -9,9 +9,11 @@ package com.aptana.editor.html;
 
 import junit.framework.TestCase;
 
+import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Range;
@@ -172,6 +174,38 @@ public class HTMLParserTest extends TestCase
 		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
 		assertNotNull(endTag);
 		assertEquals(new Range(20, 28), endTag.getNameRange());
+	}
+
+	public void testAPSTUD3191() throws Exception
+	{
+		String source = "<html>\n" + //
+				"  <head>\n" + //
+				"    <script>\n" + //
+				"/* JS comment */\n" + //
+				"    </script>\n" + //
+				"    <style>\n" + //
+				"/* CSS comment */\n" + //
+				"    </style>\n" + //
+				"  </head>\n" + //
+				"</html>"; //
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+
+		HTMLElementNode html = (HTMLElementNode) children[0];
+		HTMLElementNode head = (HTMLElementNode) html.getChild(1);
+		HTMLElementNode script = (HTMLElementNode) head.getChild(1);
+		HTMLElementNode style = (HTMLElementNode) head.getChild(3);
+
+		// Check JS Comment node offsets
+		JSParseRootNode jsRootNode = (JSParseRootNode) script.getChild(0);
+		assertEquals(29, jsRootNode.getCommentNodes()[0].getStartingOffset());
+		assertEquals(44, jsRootNode.getCommentNodes()[0].getEndingOffset());
+
+		// Check CSS comment node offsets
+		CSSParseRootNode cssRootNode = (CSSParseRootNode) style.getChild(0);
+		assertEquals(72, cssRootNode.getCommentNodes()[0].getStartingOffset());
+		assertEquals(88, cssRootNode.getCommentNodes()[0].getEndingOffset());
 	}
 
 	protected void parseTest(String source) throws Exception
