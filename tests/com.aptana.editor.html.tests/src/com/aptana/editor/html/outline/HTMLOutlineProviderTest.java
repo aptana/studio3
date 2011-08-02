@@ -12,10 +12,15 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.outline.CommonOutlineItem;
+import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
+import com.aptana.editor.js.IJSConstants;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLOutlineProviderTest extends TestCase
@@ -135,5 +140,45 @@ public class HTMLOutlineProviderTest extends TestCase
 		outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
 		assertEquals("some texts", fLabelProvider.getText(outlineResult[0]));
+	}
+
+	public void testInlineCSS() throws Exception
+	{
+		String source = "<td style=\"color: red;\"></td>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode astRoot = fParser.parse(fParseState);
+
+		Object[] outlineResult = fContentProvider.getElements(astRoot);
+		assertEquals(1, outlineResult.length);
+		assertEquals(astRoot.getChild(0), ((CommonOutlineItem) outlineResult[0]).getReferenceNode());
+
+		Object[] cssChildren = fContentProvider.getElements(outlineResult[0]);
+		assertEquals(1, cssChildren.length);
+
+		IParseNode cssNode = ((CommonOutlineItem) cssChildren[0]).getReferenceNode();
+		assertEquals(ICSSConstants.CONTENT_TYPE_CSS, cssNode.getLanguage());
+		assertEquals(CSSNodeTypes.DECLARATION, cssNode.getNodeType());
+		assertEquals(11, cssNode.getStartingOffset());
+		assertEquals(21, cssNode.getEndingOffset());
+	}
+
+	public void testInlineJSAttribute() throws Exception
+	{
+		String source = "<a onClick=\"test();\"></a>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode astRoot = fParser.parse(fParseState);
+
+		Object[] outlineResult = fContentProvider.getElements(astRoot);
+		assertEquals(1, outlineResult.length);
+		assertEquals(astRoot.getChild(0), ((CommonOutlineItem) outlineResult[0]).getReferenceNode());
+
+		Object[] jsChildren = fContentProvider.getElements(outlineResult[0]);
+		assertEquals(1, jsChildren.length);
+
+		IParseNode jsNode = ((CommonOutlineItem) outlineResult[0]).getReferenceNode();
+		assertEquals(IJSConstants.CONTENT_TYPE_JS, jsNode.getLanguage());
+		assertEquals(JSNodeTypes.INVOKE, jsNode.getNodeType());
+		assertEquals(12, jsNode.getStartingOffset());
+		assertEquals(18, jsNode.getEndingOffset());
 	}
 }
