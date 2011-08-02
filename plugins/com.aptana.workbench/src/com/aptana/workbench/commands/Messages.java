@@ -17,6 +17,7 @@ public class Messages extends NLS {
 	public static String EditBundleJob_Name;
 	public static String EditBundleJob_RequiresGitError;
 	public static String EditorCommandsMenuContributor_CommandsForOtherScopes;
+	public static String EditorCommandsMenuContributor_ErrorExecutingCommandNullResult;
 	public static String EditorCommandsMenuContributor_LBL_EditBundle;
 	public static String EditorCommandsMenuContributor_MSG_CommandNotDefined;
 	public static String EditorCommandsMenuContributor_TITLE_CommandNotDefined;
