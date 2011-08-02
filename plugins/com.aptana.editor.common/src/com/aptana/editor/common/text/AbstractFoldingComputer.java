@@ -217,7 +217,17 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 		{
 			return false;
 		}
-		return child.hasChildren();
+		if (child.hasChildren())
+		{
+			return true;
+		}
+		if (child instanceof ParseRootNode)
+		{
+			ParseRootNode root = (ParseRootNode) child;
+			IParseNode[] comments = root.getCommentNodes();
+			return comments != null && comments.length > 0;
+		}
+		return false;
 	}
 
 }

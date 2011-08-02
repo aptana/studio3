@@ -571,6 +571,14 @@ public class HTMLParser implements IParser
 			ParseNode parseNode = (ParseNode) node;
 			parseNode.addOffset(offset);
 		}
+		if (node instanceof ParseRootNode)
+		{
+			ParseRootNode rootNode = (ParseRootNode) node;
+			for (IParseNode commentNode : rootNode.getCommentNodes())
+			{
+				((ParseNode) commentNode).addOffset(offset);
+			}
+		}
 		IParseNode[] children = node.getChildren();
 		for (IParseNode child : children)
 		{
