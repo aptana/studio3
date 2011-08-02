@@ -48,6 +48,8 @@ public class CoarseLocationTests extends TestCase
 		}
 	}
 	
+	// @formatter:off
+
 	/**
 	 * testNoSource
 	 */
@@ -157,6 +159,16 @@ public class CoarseLocationTests extends TestCase
 			new LocationTypeRange(LocationType.OUTSIDE_RULE, 11, 19),
 			new LocationTypeRange(LocationType.INSIDE_RULE, 20, 24),
 			new LocationTypeRange(LocationType.OUTSIDE_RULE, 25, source.length())
+		);
+	}
+
+	public void testPseudoClassRegression()
+	{
+		String source = "a: {}";
+
+		this.coarseLocationTests(
+			source,
+			new LocationTypeRange(LocationType.OUTSIDE_RULE, 0, 3)
 		);
 	}
 }
