@@ -87,7 +87,7 @@ public class HTMLOutlineProviderTest extends TestCase
 
 	public void testHrefAttribute() throws Exception
 	{
-		String source = "<link src=\"stylesheet.css\">";
+		String source = "<link href=\"stylesheet.css\">";
 		fParseState.setEditState(source, source, 0, 0);
 		IParseNode astRoot = fParser.parse(fParseState);
 
