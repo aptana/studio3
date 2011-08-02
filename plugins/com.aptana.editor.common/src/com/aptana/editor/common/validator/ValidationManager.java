@@ -76,6 +76,10 @@ public class ValidationManager implements IValidationManager
 
 	public ValidationManager(FileService fileService)
 	{
+		if (fileService == null)
+		{
+			throw new IllegalArgumentException(Messages.ValidationManager_FileServiceNonNull);
+		}
 		fFileService = fileService;
 		fNestedLanguages = new HashSet<String>();
 		fItemsByType = new HashMap<String, List<IValidationItem>>();
@@ -446,6 +450,11 @@ public class ValidationManager implements IValidationManager
 		IParseState parseState = getParseState();
 
 		if (parseState == null)
+		{
+			return;
+		}
+
+		if (fDocument == null)
 		{
 			return;
 		}
