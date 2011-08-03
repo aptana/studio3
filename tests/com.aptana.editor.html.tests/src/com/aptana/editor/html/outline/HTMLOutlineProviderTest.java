@@ -161,24 +161,4 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals(11, cssNode.getStartingOffset());
 		assertEquals(21, cssNode.getEndingOffset());
 	}
-
-	public void testInlineJSAttribute() throws Exception
-	{
-		String source = "<a onClick=\"test();\"></a>";
-		fParseState.setEditState(source, source, 0, 0);
-		IParseNode astRoot = fParser.parse(fParseState);
-
-		Object[] outlineResult = fContentProvider.getElements(astRoot);
-		assertEquals(1, outlineResult.length);
-		assertEquals(astRoot.getChild(0), ((CommonOutlineItem) outlineResult[0]).getReferenceNode());
-
-		Object[] jsChildren = fContentProvider.getElements(outlineResult[0]);
-		assertEquals(1, jsChildren.length);
-
-		IParseNode jsNode = ((CommonOutlineItem) outlineResult[0]).getReferenceNode();
-		assertEquals(IJSConstants.CONTENT_TYPE_JS, jsNode.getLanguage());
-		assertEquals(JSNodeTypes.INVOKE, jsNode.getNodeType());
-		assertEquals(12, jsNode.getStartingOffset());
-		assertEquals(18, jsNode.getEndingOffset());
-	}
 }
