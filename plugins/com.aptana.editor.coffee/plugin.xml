@@ -52,5 +52,14 @@
          </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.coffee.preferences.CoffeePreferencePage"
+            id="com.aptana.editor.coffee.preferences.CoffeePreferencePage"
+            name="%editor.prefpage.name">
+      </page>
+   </extension>
 
 </plugin>
