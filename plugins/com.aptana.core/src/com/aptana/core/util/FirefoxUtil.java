@@ -75,7 +75,7 @@ public final class FirefoxUtil {
 	 * @return IPath
 	 */
 	public static IPath findDefaultProfileLocation() {
-		String[] locations = (String[]) LOCATIONS.get(Platform.getOS());
+		String[] locations = LOCATIONS.get(Platform.getOS());
 		if (locations != null) {
 			for (int i = 0; i < locations.length; ++i) {
 				String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
@@ -155,8 +155,8 @@ public final class FirefoxUtil {
 				for (Entry<String, Map<String, String>> entry : sections.entrySet()) {
 					if (entry.getKey().startsWith("Profile")) { //$NON-NLS-1$
 						Map<String, String> properties = entry.getValue();
-						String path = (String) properties.get("Path"); //$NON-NLS-1$
-						String isRelative = (String) properties.get("IsRelative"); //$NON-NLS-1$
+						String path = properties.get("Path"); //$NON-NLS-1$
+						String isRelative = properties.get("IsRelative"); //$NON-NLS-1$
 						File profile;
 						if (isRelative != null && "1".equals(isRelative)) { //$NON-NLS-1$
 							profile = new File(dir, path);
