@@ -30,7 +30,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
@@ -41,7 +40,6 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 
 public class ValidationManager implements IValidationManager
@@ -447,42 +445,44 @@ public class ValidationManager implements IValidationManager
 	public void addParseErrors(List<IValidationItem> items)
 	{
 
-		IParseState parseState = getParseState();
+		// We are temporarily disabling the parse errors in validations
 
-		if (parseState == null)
-		{
-			return;
-		}
-
-		if (fDocument == null)
-		{
-			return;
-		}
-
-		for (IParseError parseError : parseState.getErrors())
-		{
-			try
-			{
-				if (parseError.getSeverity() == IParseError.Severity.ERROR)
-				{
-					items.add(createError(parseError.getMessage(),
-							fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
-							fResourceUri));
-				}
-				else
-				{
-					items.add(createWarning(parseError.getMessage(),
-							fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
-							fResourceUri));
-				}
-
-			}
-			catch (BadLocationException e)
-			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(),
-						NLS.bind("Error finding line on given offset : {0}", parseError.getOffset() + 1), e); //$NON-NLS-1$
-			}
-		}
+		// IParseState parseState = getParseState();
+		//
+		// if (parseState == null)
+		// {
+		// return;
+		// }
+		//
+		// if (fDocument == null)
+		// {
+		// return;
+		// }
+		//
+		// for (IParseError parseError : parseState.getErrors())
+		// {
+		// try
+		// {
+		// if (parseError.getSeverity() == IParseError.Severity.ERROR)
+		// {
+		// items.add(createError(parseError.getMessage(),
+		// fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
+		// fResourceUri));
+		// }
+		// else
+		// {
+		// items.add(createWarning(parseError.getMessage(),
+		// fDocument.getLineOfOffset(parseError.getOffset()) + 1, parseError.getOffset(), 0,
+		// fResourceUri));
+		// }
+		//
+		// }
+		// catch (BadLocationException e)
+		// {
+		// IdeLog.logError(CommonEditorPlugin.getDefault(),
+		//						NLS.bind("Error finding line on given offset : {0}", parseError.getOffset() + 1), e); //$NON-NLS-1$
+		// }
+		// }
 
 	}
 
