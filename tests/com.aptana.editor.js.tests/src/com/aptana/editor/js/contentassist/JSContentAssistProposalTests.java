@@ -46,11 +46,16 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
 
-		// note template is before true proposal, as we are ordering by trigger prefix
-		this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "finally", "focus", "for", "forward",
-				"frames", "function", "FunctionTemplate", "Function");
-
-		BundleManager.getInstance().unloadScript(f);
+		try
+		{
+			// note template is before true proposal, as we are ordering by trigger prefix
+			this.checkProposals("contentAssist/f-prefix.js", true, true, "FunctionTemplate", "false", "finally",
+					"focus", "for", "forward", "frames", "function", "Function");
+		}
+		finally
+		{
+			BundleManager.getInstance().unloadScript(f);
+		}
 
 	}
 
@@ -91,8 +96,7 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
 
-		// note after is before true proposal, as we are ordering by trigger prefix
-		this.checkProposals("contentAssist/this.js", true, true, "this", "throw", "$(this)");
+		this.checkProposals("contentAssist/this.js", true, true, "$(this)", "this", "throw");
 
 		BundleManager.getInstance().unloadScript(f);
 

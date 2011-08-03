@@ -32,7 +32,7 @@ public enum CompletionProposalComparator implements Comparator<ICompletionPropos
 	{
 		public int compare(ICompletionProposal o1, ICompletionProposal o2)
 		{
-			// Templates appear after other items. Note reveral of terms
+			// Templates appear after other items. Note reversal of terms
 			if (o1 instanceof TemplateProposal && !(o2 instanceof TemplateProposal))
 			{
 				return -1;
