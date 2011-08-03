@@ -7,14 +7,21 @@
  */
 package com.aptana.editor.coffee;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+
+@SuppressWarnings("restriction")
 public class CoffeeScriptEditorPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.coffee"; //$NON-NLS-1$
+
 	private static CoffeeScriptEditorPlugin plugin;
 
 	/**
@@ -82,5 +89,12 @@ public class CoffeeScriptEditorPlugin extends AbstractUIPlugin
 		{
 			reg.put(imageFilePath, imageDescriptorFromPlugin(PLUGIN_ID, imageFilePath));
 		}
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] {
+				CoffeeScriptEditorPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 }
