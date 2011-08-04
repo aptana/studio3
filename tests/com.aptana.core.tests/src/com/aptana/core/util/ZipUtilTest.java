@@ -16,7 +16,6 @@ import java.util.HashSet;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -33,10 +32,10 @@ public class ZipUtilTest extends TestCase
 	public void testUnzipFile() throws IOException
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath resourcePath = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
-		File newZip = new File(resourcePath.toOSString(), "test");
+		File resourceFile = ResourceUtil.resourcePathToFile(resourceURL);
+		File newZip = new File(resourceFile, "test");
 
-		ZipUtil.extract(resourcePath.append(TEST_ZIP).toFile(), resourcePath.toFile(), new NullProgressMonitor());
+		ZipUtil.extract(new File(resourceFile, TEST_ZIP), resourceFile, new NullProgressMonitor());
 
 		assertNotNull("Failed to extract zip", newZip);
 
@@ -61,17 +60,15 @@ public class ZipUtilTest extends TestCase
 		}
 
 		// remove the contents after we are done with the test
-
 		FileUtil.deleteRecursively(newZip);
 	}
 
 	public void testOpenEntry() throws IOException
 	{
 		URL zipURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath resourcePath = Path.fromOSString(ResourceUtil.resourcePathToString(zipURL));
-		IPath zipPath = resourcePath.append(STREAM_TEST_ZIP);
+		File resource = ResourceUtil.resourcePathToFile(zipURL);
 		InputStream stream;
-		File zipFile = zipPath.toFile();
+		File zipFile = new File(resource, STREAM_TEST_ZIP);
 
 		// Open entry should return null when it can't find the specified file
 		assertNull(ZipUtil.openEntry(zipFile, Path.fromOSString("test.haml")));
