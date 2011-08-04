@@ -136,17 +136,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 	}
 
-	/**
-	 * getAbstractThemeableEditor
-	 * 
-	 * @deprecated Use {@link #getEditor()}
-	 * @return
-	 */
-	protected AbstractThemeableEditor getAbstractThemeableEditor()
-	{
-		return getEditor();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getAnnotationHover(org.eclipse.jface.text.source.

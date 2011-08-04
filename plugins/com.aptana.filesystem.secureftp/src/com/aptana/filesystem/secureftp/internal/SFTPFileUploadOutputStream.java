@@ -101,7 +101,7 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 						ftpClient.setModTime(actualFilename, modificationTime);
 					}
 					if (permissions > 0) {
-						((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), actualFilename);
+						ftpClient.changeMode((int) (permissions & 0777), actualFilename);
 					}
 				} catch (FTPException e) {
 					if (e.getReplyCode() != SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {

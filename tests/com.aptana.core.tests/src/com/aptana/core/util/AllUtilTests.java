@@ -27,6 +27,7 @@ public class AllUtilTests
 		suite.addTestSuite(ResourceUtilTest.class);
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
+		suite.addTestSuite(TimeZoneUtilTest.class);
 		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(URLUtilTest.class);
 		// $JUnit-END$

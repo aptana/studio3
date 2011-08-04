@@ -54,28 +54,12 @@ public class ResourceUtil
 	 */
 	static public File resourcePathToFile(URL url)
 	{
+		URI fileURI = resourcePathToURI(url);
 		File result = null;
 
-		if (url != null)
+		if (fileURI != null)
 		{
-			try
-			{
-				URL fileURL = FileLocator.toFileURL(url);
-				URI fileURI = toURI(fileURL); // Use Eclipse to get around Java 1.5 bug on Windows
-				result = new File(fileURI);
-			}
-			catch (IOException e)
-			{
-				String message = MessageFormat.format(Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
-						new Object[] { url });
-				IdeLog.logError(CorePlugin.getDefault(), message, e);
-			}
-			catch (URISyntaxException e)
-			{
-				String message = MessageFormat.format(Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
-						new Object[] { url });
-				IdeLog.logError(CorePlugin.getDefault(), message, e);
-			}
+			result = new File(fileURI);
 		}
 
 		return result;
@@ -95,6 +79,41 @@ public class ResourceUtil
 		if (file != null)
 		{
 			result = file.getAbsolutePath();
+		}
+
+		return result;
+	}
+
+	/**
+	 * resourcePathToURI
+	 * 
+	 * @param url
+	 * @return
+	 */
+	static public URI resourcePathToURI(URL url)
+	{
+		URI result = null;
+
+		if (url != null)
+		{
+			try
+			{
+				URL fileURL = FileLocator.toFileURL(url);
+
+				result = toURI(fileURL); // Use Eclipse to get around Java 1.5 bug on Windows
+			}
+			catch (IOException e)
+			{
+				String message = MessageFormat.format(Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
+						new Object[] { url });
+				IdeLog.logError(CorePlugin.getDefault(), message, e);
+			}
+			catch (URISyntaxException e)
+			{
+				String message = MessageFormat.format(Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
+						new Object[] { url });
+				IdeLog.logError(CorePlugin.getDefault(), message, e);
+			}
 		}
 
 		return result;

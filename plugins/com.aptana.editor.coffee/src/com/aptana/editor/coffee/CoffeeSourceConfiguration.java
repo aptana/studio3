@@ -45,32 +45,32 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 
 	public final static String PREFIX = "__coffee_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__coffee" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String COFFEE_SINGLELINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
-	public final static String COFFEE_BLOCK_COMMENT = PREFIX + "block_comment"; //$NON-NLS-1$
+	public final static String SINGLELINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
+	public final static String MULTILINE_COMMENT = PREFIX + "block_comment"; //$NON-NLS-1$
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
-	public final static String COFFEE_REGEXP = PREFIX + "regexp"; //$NON-NLS-1$
-	public static final String COFFEE_HEREDOC = PREFIX + "heredoc"; //$NON-NLS-1$
-	public static final String COFFEE_DOUBLE_HEREDOC = PREFIX + "heredoc_double"; //$NON-NLS-1$
-	public static final String COFFEE_COMMAND = PREFIX + "command"; //$NON-NLS-1$
-	public static final String COFFEE_HEREGEX = PREFIX + "heregex"; //$NON-NLS-1$
+	public final static String REGEXP = PREFIX + "regexp"; //$NON-NLS-1$
+	public static final String HEREDOC = PREFIX + "heredoc"; //$NON-NLS-1$
+	public static final String DOUBLE_HEREDOC = PREFIX + "heredoc_double"; //$NON-NLS-1$
+	public static final String COMMAND = PREFIX + "command"; //$NON-NLS-1$
+	public static final String HEREGEX = PREFIX + "heregex"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COFFEE_SINGLELINE_COMMENT,
-			COFFEE_BLOCK_COMMENT, STRING_DOUBLE, STRING_SINGLE, COFFEE_REGEXP, COFFEE_HEREDOC, COFFEE_DOUBLE_HEREDOC,
-			COFFEE_COMMAND, COFFEE_HEREGEX };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLELINE_COMMENT, MULTILINE_COMMENT,
+			STRING_DOUBLE, STRING_SINGLE, REGEXP, HEREDOC, DOUBLE_HEREDOC, COMMAND,
+			HEREGEX };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICoffeeConstants.CONTENT_TYPE_COFFEE } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("###", "###", getToken(COFFEE_BLOCK_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
-			new EndOfLineRule("#", getToken(COFFEE_SINGLELINE_COMMENT)), //$NON-NLS-1$
+			new MultiLineRule("###", "###", getToken(MULTILINE_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
+			new EndOfLineRule("#", getToken(SINGLELINE_COMMENT)), //$NON-NLS-1$			
+			new MultiLineRule("`", "`", getToken(COMMAND), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("'''", "'''", getToken(HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("\"\"\"", "\"\"\"", getToken(DOUBLE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("\"", "\"", getToken(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("\'", "\'", getToken(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("`", "`", getToken(COFFEE_COMMAND), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("'''", "'''", getToken(COFFEE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("\"\"\"", "\"\"\"", getToken(COFFEE_DOUBLE_HEREDOC)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("///", "///", getToken(COFFEE_HEREGEX)), //$NON-NLS-1$ //$NON-NLS-2$
-			new JSRegExpRule(new Token(COFFEE_REGEXP)) };
+			new MultiLineRule("///", "///", getToken(HEREGEX)), //$NON-NLS-1$ //$NON-NLS-2$
+			new JSRegExpRule(new Token(REGEXP)) };
 
 	private static CoffeeSourceConfiguration instance;
 
@@ -79,25 +79,23 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(ICoffeeConstants.CONTENT_TYPE_COFFEE), new QualifiedContentType(
 				ICoffeeScopeConstants.TOPLEVEL));
-		// TODO Extract scope to ICoffeeScopeConstants
-		c.addTranslation(new QualifiedContentType(COFFEE_HEREDOC), new QualifiedContentType(
-				"string.quoted.heredoc.coffee")); //$NON-NLS-1$
-		// TODO Extract scope to ICoffeeScopeConstants
-		c.addTranslation(new QualifiedContentType(COFFEE_DOUBLE_HEREDOC), new QualifiedContentType(
-				"string.quoted.double.heredoc.coffee")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HEREDOC), new QualifiedContentType(
+				ICoffeeScopeConstants.STRING_HEREDOC_SINGLE));
+		c.addTranslation(new QualifiedContentType(DOUBLE_HEREDOC), new QualifiedContentType(
+				ICoffeeScopeConstants.STRING_HEREDOC_DOUBLE));
 		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(
 				ICoffeeScopeConstants.STRING_SINGLE));
 		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
 				ICoffeeScopeConstants.STRING_DOUBLE));
-		c.addTranslation(new QualifiedContentType(COFFEE_COMMAND), new QualifiedContentType(
+		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(
 				ICoffeeScopeConstants.COMMAND));
-		c.addTranslation(new QualifiedContentType(COFFEE_BLOCK_COMMENT), new QualifiedContentType(
+		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
 				ICoffeeScopeConstants.COMMENT_BLOCK));
-		c.addTranslation(new QualifiedContentType(COFFEE_SINGLELINE_COMMENT), new QualifiedContentType(
+		c.addTranslation(new QualifiedContentType(SINGLELINE_COMMENT), new QualifiedContentType(
 				ICoffeeScopeConstants.COMMENT_LINE));
-		c.addTranslation(new QualifiedContentType(COFFEE_HEREGEX), new QualifiedContentType(
+		c.addTranslation(new QualifiedContentType(HEREGEX), new QualifiedContentType(
 				ICoffeeScopeConstants.REGEXP));
-		c.addTranslation(new QualifiedContentType(COFFEE_REGEXP),
+		c.addTranslation(new QualifiedContentType(REGEXP),
 				new QualifiedContentType(ICoffeeScopeConstants.REGEXP));
 	}
 
@@ -179,8 +177,8 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 		reconciler.setRepairer(dr, DEFAULT);
 
 		dr = new ThemeingDamagerRepairer(getBlockCommentScanner());
-		reconciler.setDamager(dr, COFFEE_BLOCK_COMMENT);
-		reconciler.setRepairer(dr, COFFEE_BLOCK_COMMENT);
+		reconciler.setDamager(dr, MULTILINE_COMMENT);
+		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
 		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_SINGLE);
@@ -191,12 +189,28 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 
 		dr = new ThemeingDamagerRepairer(getSingleLineCommentScanner());
-		reconciler.setDamager(dr, COFFEE_SINGLELINE_COMMENT);
-		reconciler.setRepairer(dr, COFFEE_SINGLELINE_COMMENT);
+		reconciler.setDamager(dr, SINGLELINE_COMMENT);
+		reconciler.setRepairer(dr, SINGLELINE_COMMENT);
 
 		dr = new ThemeingDamagerRepairer(getRegexpScanner());
-		reconciler.setDamager(dr, COFFEE_REGEXP);
-		reconciler.setRepairer(dr, COFFEE_REGEXP);
+		reconciler.setDamager(dr, REGEXP);
+		reconciler.setRepairer(dr, REGEXP);
+
+		dr = new ThemeingDamagerRepairer(getHeredocScanner());
+		reconciler.setDamager(dr, HEREDOC);
+		reconciler.setRepairer(dr, HEREDOC);
+
+		dr = new ThemeingDamagerRepairer(getDoubleHeredocScanner());
+		reconciler.setDamager(dr, DOUBLE_HEREDOC);
+		reconciler.setRepairer(dr, DOUBLE_HEREDOC);
+
+		dr = new ThemeingDamagerRepairer(getCommandScanner());
+		reconciler.setDamager(dr, COMMAND);
+		reconciler.setRepairer(dr, COMMAND);
+
+		dr = new ThemeingDamagerRepairer(getHeregexScanner());
+		reconciler.setDamager(dr, HEREGEX);
+		reconciler.setRepairer(dr, HEREGEX);
 	}
 
 	private ITokenScanner getDoubleQuotedStringScanner()
@@ -205,15 +219,41 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 		return new JSEscapeSequenceScanner(ICoffeeScopeConstants.STRING_DOUBLE);
 	}
 
+	private ITokenScanner getDoubleHeredocScanner()
+	{
+		// TODO Need to handle character escapes and interpolation (like in ruby)!
+		return new JSEscapeSequenceScanner(ICoffeeScopeConstants.STRING_HEREDOC_DOUBLE);
+	}
+
 	private ITokenScanner getRegexpScanner()
 	{
 		return new JSEscapeSequenceScanner(ICoffeeScopeConstants.REGEXP);
+	}
+
+	private ITokenScanner getHeregexScanner()
+	{
+		// TODO Need to handle allowing singleline comments inside!
+		return getRegexpScanner();
+	}
+
+	private ITokenScanner getCommandScanner()
+	{
+		RuleBasedScanner scanner = new RuleBasedScanner();
+		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.COMMAND));
+		return scanner;
 	}
 
 	private ITokenScanner getSingleQuotedStringScanner()
 	{
 		RuleBasedScanner scanner = new RuleBasedScanner();
 		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.STRING_SINGLE));
+		return scanner;
+	}
+
+	private ITokenScanner getHeredocScanner()
+	{
+		RuleBasedScanner scanner = new RuleBasedScanner();
+		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.STRING_HEREDOC_SINGLE));
 		return scanner;
 	}
 
@@ -238,9 +278,9 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 		return new CommonContentAssistProcessor(editor);
 	}
 
-    private static IToken getToken(String tokenName)
-    {
-        return CommonUtil.getToken(tokenName);
-    }
+	private static IToken getToken(String tokenName)
+	{
+		return CommonUtil.getToken(tokenName);
+	}
 
 }
