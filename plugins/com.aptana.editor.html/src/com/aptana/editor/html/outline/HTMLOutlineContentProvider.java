@@ -310,7 +310,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 
 					public void run()
 					{
-						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
+						treeViewer.add(getOutlineItem(parent), finalElements);
 					}
 				});
 				sub.done();
