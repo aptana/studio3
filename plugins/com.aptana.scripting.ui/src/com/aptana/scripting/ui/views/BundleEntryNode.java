@@ -20,6 +20,7 @@ import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.TemplateElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class BundleEntryNode extends BaseNode
@@ -31,9 +32,8 @@ class BundleEntryNode extends BaseNode
 
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
 	private BundleEntry _entry;
-	
+
 	private Action reloadAction;
-	
 
 	/**
 	 * BundleEntryNode
@@ -43,7 +43,7 @@ class BundleEntryNode extends BaseNode
 	public BundleEntryNode(BundleEntry entry)
 	{
 		this._entry = entry;
-		
+
 		this.makeActions();
 	}
 
@@ -72,12 +72,17 @@ class BundleEntryNode extends BaseNode
 		// divide commands into commands and snippets
 		List<CommandElement> commands = new ArrayList<CommandElement>();
 		List<CommandElement> snippets = new ArrayList<CommandElement>();
+		List<CommandElement> fileTemplates = new ArrayList<CommandElement>();
 
 		for (CommandElement element : this._entry.getCommands())
 		{
 			if (element instanceof SnippetElement)
 			{
 				snippets.add(element);
+			}
+			else if (element instanceof TemplateElement)
+			{
+				fileTemplates.add(element);
 			}
 			else
 			{
@@ -95,6 +100,12 @@ class BundleEntryNode extends BaseNode
 		if (snippets.size() > 0)
 		{
 			result.add(new SnippetsNode(snippets));
+		}
+
+		// visible file templates
+		if (fileTemplates.size() > 0)
+		{
+			result.add(new FileTemplatesNode(fileTemplates));
 		}
 
 		// add visible menus
@@ -153,10 +164,10 @@ class BundleEntryNode extends BaseNode
 				case NAME:
 					result = this._entry.getName();
 					break;
-					
+
 				case CONTRIBUTOR_COUNT:
 					List<BundleElement> bundles = this._entry.getBundles();
-					
+
 					result = (bundles != null) ? bundles.size() : 0;
 					break;
 			}
@@ -164,7 +175,6 @@ class BundleEntryNode extends BaseNode
 
 		return result;
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -185,7 +195,7 @@ class BundleEntryNode extends BaseNode
 
 		return result;
 	}
-	
+
 	/**
 	 * makeActions
 	 */
@@ -199,6 +209,6 @@ class BundleEntryNode extends BaseNode
 			}
 		};
 		reloadAction.setText(Messages.BundleEntryNode_TXT_Reload);
-		//reloadAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_));
+		// reloadAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_));
 	}
 }

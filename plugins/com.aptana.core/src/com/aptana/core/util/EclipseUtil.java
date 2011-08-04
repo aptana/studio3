@@ -56,6 +56,8 @@ public class EclipseUtil
 	static final String[] LAUNCHER_NAMES = { "Eclipse", "AptanaStudio3", "Aptana Studio 3", "TitaniumStudio",
 			"Titanium Studio" };
 
+	private static Boolean isTesting;
+
 	private EclipseUtil()
 	{
 	}
@@ -195,6 +197,10 @@ public class EclipseUtil
 	 */
 	public static boolean isTesting()
 	{
+		if (isTesting != null)
+		{
+			return isTesting;
+		}
 		String application = System.getProperty("eclipse.application"); //$NON-NLS-1$
 		if (application != null)
 		{
@@ -202,12 +208,14 @@ public class EclipseUtil
 			{
 				if (id.equals(application))
 				{
-					return true;
+					isTesting = Boolean.TRUE;
+					return isTesting;
 				}
 			}
 		}
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
-		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
+		isTesting = Boolean.valueOf((commands != null) ? commands.toString().contains("-testLoaderClass") : false); //$NON-NLS-1$
+		return isTesting;
 	}
 
 	/**
