@@ -43,13 +43,17 @@ public class ZipUtilTest extends TestCase
 		if (newZip.isDirectory())
 		{
 			File[] files = newZip.listFiles();
-			assertTrue("Unzipped contents to not match expected number of files", files.length == 3);
+			assertTrue("Unzipped contents to not match expected number of files", files.length == 4);
 
 			for (File file : files)
 			{
 				if (file.isDirectory())
 				{
-					assertTrue(file.list().length == 1);
+					// test2 folder should have 1 file in it
+					if (file.getName().equals("test2"))
+					{
+						assertTrue(file.list().length == 1);
+					}
 					continue;
 				}
 				assertTrue("Unexpected file: " + file + " in unzipped contents", FILES.contains(file.getName()));
@@ -75,7 +79,7 @@ public class ZipUtilTest extends TestCase
 		stream = ZipUtil.openEntry(zipFile, Path.fromOSString("streamtest"));
 
 		String test = IOUtil.read(stream);
-		
+
 		assertTrue(test.equals("this is a test\n\n"));
 	}
 
