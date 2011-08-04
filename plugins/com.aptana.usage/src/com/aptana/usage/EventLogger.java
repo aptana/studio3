@@ -62,7 +62,7 @@ public final class EventLogger
 		String dateTime = Long.toString(System.currentTimeMillis());
 		String query = MessageFormat.format("INSERT INTO {0}({1},{2},{3}) VALUES({4},''{5}'',''{6}'')", //$NON-NLS-1$
 				new Object[] { TABLE_NAME, DATE_TIME, EVENT_TYPE, MESSAGE, dateTime,
-						(eventType != null && eventType.length() > 0) ? eventType : LogEventTypes.UNKNOWN,
+						(eventType != null && eventType.length() > 0) ? eventType : ILogEventTypes.UNKNOWN,
 						(message != null) ? message : "" //$NON-NLS-1$
 				});
 

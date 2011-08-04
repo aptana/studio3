@@ -13,12 +13,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ResourceUtil;
 
 /**
@@ -33,12 +32,10 @@ public class AptanaDB
 
 	private static AptanaDB INSTANCE;
 
-	private List<IDBListener> _listeners = new ArrayList<IDBListener>();
 	private boolean _driverLoaded;
 
 	private AptanaDB()
 	{
-		_listeners = new ArrayList<IDBListener>();
 	}
 
 	public static AptanaDB getInstance()
@@ -49,19 +46,6 @@ public class AptanaDB
 			INSTANCE.loadDriver();
 		}
 		return INSTANCE;
-	}
-
-	public void addListener(IDBListener listener)
-	{
-		if (!_listeners.contains(listener))
-		{
-			_listeners.add(listener);
-		}
-	}
-
-	public void removeListener(IDBListener listener)
-	{
-		_listeners.remove(listener);
 	}
 
 	public void execute(String query)
@@ -96,7 +80,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				UsagePlugin.logError(Messages.AptanaDB_Error_Execute_Query, e);
+				IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_Error_Execute_Query, e);
 			}
 			finally
 			{
@@ -152,7 +136,7 @@ public class AptanaDB
 			}
 			catch (SQLException e)
 			{
-				UsagePlugin.logError(Messages.AptanaDB_FailedToConnect, e);
+				IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToConnect, e);
 			}
 		}
 		return null;
@@ -162,11 +146,6 @@ public class AptanaDB
 	{
 		if (_driverLoaded)
 		{
-			// fire shutdown event
-			for (IDBListener listener : _listeners)
-			{
-				listener.shutdown();
-			}
 			try
 			{
 				DriverManager.getConnection(PROTOCOL + DATABASE_NAME + ";shutdown=true"); //$NON-NLS-1$
@@ -177,7 +156,7 @@ public class AptanaDB
 				// one for successful shutdown. SQLState is "08006" and ErrorCode is 45000 for single database shutdown
 				if (e.getErrorCode() != 45000 && !"XJ015".equals(e.getSQLState()) && !"08006".equals(e.getSQLState())) //$NON-NLS-1$ //$NON-NLS-2$
 				{
-					UsagePlugin.logError(Messages.AptanaDB_ErrorShutdown, e);
+					IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_ErrorShutdown, e);
 				}
 			}
 		}
@@ -269,15 +248,15 @@ public class AptanaDB
 		}
 		catch (InstantiationException e)
 		{
-			UsagePlugin.logError(Messages.AptanaDB_FailedToInstantiate, e);
+			IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToInstantiate, e);
 		}
 		catch (IllegalAccessException e)
 		{
-			UsagePlugin.logError(Messages.AptanaDB_FailedToAccess, e);
+			IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToAccess, e);
 		}
 		catch (ClassNotFoundException e)
 		{
-			UsagePlugin.logError(Messages.AptanaDB_FailedToLoad, e);
+			IdeLog.logError(UsagePlugin.getDefault(), Messages.AptanaDB_FailedToLoad, e);
 		}
 	}
 }
