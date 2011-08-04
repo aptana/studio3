@@ -4,7 +4,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.coffee.CoffeeCodeScannerTest;
 import com.aptana.editor.coffee.CoffeeDoubleClickStrategyTest;
+import com.aptana.editor.coffee.CoffeeSourcePartitionScannerTest;
+import com.aptana.editor.coffee.internal.index.CoffeeFileIndexingParticipantTest;
 import com.aptana.editor.coffee.internal.text.CoffeeFoldingComputerTest;
 import com.aptana.editor.coffee.parsing.CoffeeParserTest;
 import com.aptana.editor.coffee.parsing.lexer.CoffeeScannerTest;
@@ -20,6 +23,10 @@ public class AllTests extends TestCase
 		suite.addTestSuite(CoffeeParserTest.class);
 		suite.addTestSuite(CoffeeFoldingComputerTest.class);
 		suite.addTestSuite(CoffeeDoubleClickStrategyTest.class);
+		suite.addTestSuite(CoffeeFileIndexingParticipantTest.class);
+		suite.addTestSuite(CoffeeCodeScannerTest.class);
+		suite.addTestSuite(CoffeeSourcePartitionScannerTest.class);
+		suite.addTestSuite(CoffeescriptScopesTest.class);
 		// $JUnit-END$
 		return suite;
 	}
