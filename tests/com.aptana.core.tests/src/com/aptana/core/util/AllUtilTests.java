@@ -30,6 +30,7 @@ public class AllUtilTests
 		suite.addTestSuite(TimeZoneUtilTest.class);
 		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(URLUtilTest.class);
+		suite.addTestSuite(ZipUtilTest.class);
 		// $JUnit-END$
 		return suite;
 	}
