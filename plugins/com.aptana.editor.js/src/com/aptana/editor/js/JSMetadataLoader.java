@@ -9,6 +9,7 @@ package com.aptana.editor.js;
 
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -18,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
@@ -30,6 +32,7 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.ui.util.UIUtils;
 
 public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 {
@@ -90,10 +93,10 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	{
 		return new String[] { //
 		"/metadata/js_core.xml", //$NON-NLS-1$
-			"/metadata/dom_0.xml", //$NON-NLS-1$
-			"/metadata/dom_2.xml", //$NON-NLS-1$
-			"/metadata/dom_3.xml", //$NON-NLS-1$
-			"/metadata/dom_5.xml" //$NON-NLS-1$;
+				"/metadata/dom_0.xml", //$NON-NLS-1$
+				"/metadata/dom_2.xml", //$NON-NLS-1$
+				"/metadata/dom_3.xml", //$NON-NLS-1$
+				"/metadata/dom_5.xml" //$NON-NLS-1$;
 		};
 	}
 
@@ -135,9 +138,28 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 				{
 					ws.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 				}
-				catch (CoreException e)
+				catch (final CoreException e)
 				{
-					return e.getStatus();
+					UIUtils.getDisplay().asyncExec(new Runnable()
+					{
+
+						public void run()
+						{
+							IStatus status = e.getStatus();
+							if (status.isMultiStatus())
+							{
+								IStatus[] children = status.getChildren();
+								if (children.length > 0)
+								{
+									status = children[0];
+								}
+							}
+							MessageDialog.openError(UIUtils.getActiveShell(),
+									Messages.JSMetadataLoader_RebuildingProjectIndexError_Title,
+									MessageFormat.format("{0} {1}", status.getMessage(), //$NON-NLS-1$
+											Messages.JSMetadataLoader_RebuildingProjectIndexError_Message));
+						}
+					});
 				}
 
 				return Status.OK_STATUS;
@@ -159,8 +181,9 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
 
 		JSIndexWriter indexer = new JSIndexWriter();
-		
-		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
+
+		// TODO: The following should be done in the index writer, but this will introduce a dependency to
+		// com.aptana.parsing in com.aptana.index.core
 		Index index = getIndex();
 
 		// write types
@@ -178,7 +201,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	protected Index getIndex()
 	{
