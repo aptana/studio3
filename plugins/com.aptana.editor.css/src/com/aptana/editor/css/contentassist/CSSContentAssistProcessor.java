@@ -1055,30 +1055,55 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 					}
 					break LOOP;
+
 				case RCURLY:
 					result = (lexeme.getEndingOffset() < offset) ? LocationType.OUTSIDE_RULE : LocationType.INSIDE_RULE;
 					break LOOP;
 
 				case COLON:
-					result = LocationType.INSIDE_RULE;
-					// Pseudo-classes/elements
-					if (index >= 1)
+					// try walking left
+					for (int i = index - 1; i >= 0; i--)
 					{
-						Lexeme<CSSTokenType> previous = lexemeProvider.getLexeme(index - 1);
-						if (previous != null
-								&& (previous.getType() == CSSTokenType.RCURLY
-										|| previous.getType() == CSSTokenType.ELEMENT
-										|| previous.getType() == CSSTokenType.CLASS
-										|| previous.getType() == CSSTokenType.ID || previous.getType() == CSSTokenType.COLON))
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
 						{
-							result = LocationType.OUTSIDE_RULE;
+							case COLOR:
+							case SEMICOLON:
+							case LCURLY:
+								result = LocationType.INSIDE_RULE;
+								break LOOP;
+
+							case CLASS:
+							case ID:
+							case RCURLY:
+								result = LocationType.OUTSIDE_RULE;
+								break LOOP;
 						}
 					}
-					else
+
+					// try walking right
+					for (int i = index + 1; i < lexemeProvider.size(); i++)
 					{
-						result = LocationType.OUTSIDE_RULE;
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
+						{
+							case COLOR:
+							case SEMICOLON:
+								result = LocationType.INSIDE_RULE;
+								break LOOP;
+
+							case CLASS:
+							case ID:
+							case LCURLY:
+								result = LocationType.OUTSIDE_RULE;
+								break LOOP;
+						}
 					}
+					result = LocationType.OUTSIDE_RULE;
 					break LOOP;
+
 				case PROPERTY:
 				case VALUE:
 					result = LocationType.INSIDE_RULE;
