@@ -185,6 +185,14 @@
          <command
                commandId="com.aptana.portal.ui.command.openStartPage"
                style="push">
+            <visibleWhen>
+               <test
+                     args="com.appcelerator.titanium.rcp"
+                     forcePluginActivation="true"
+                     property="com.aptana.core.hasPlugin"
+                     value="false">
+               </test>
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
