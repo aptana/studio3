@@ -20,7 +20,6 @@ public class Messages extends NLS
 	public static String BuildPathManager_UnableToConvertURI;
 	public static String BuildPathManager_UnableToConvertURLToURI;
 	public static String BuildPathManager_UnableToCreatePathContributor;
-	public static String BuildPathManager_UnableToResolveURL;
 	public static String BuildPathManager_UnableToRetrievePersistenceProperty;
 	public static String BuildPathManager_UnableToSetPersistenceProperty;
 	static
