@@ -7,7 +7,6 @@
  */
 package com.aptana.buildpath.core;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -32,6 +31,7 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -167,18 +167,16 @@ public class BuildPathManager
 	 */
 	public Set<BuildPathEntry> getBuildPaths()
 	{
-		Set<BuildPathEntry> result;
+		Set<BuildPathEntry> result = new HashSet<BuildPathEntry>();
 
+		// Add static paths, if we have any
 		if (buildPaths != null)
 		{
-			result = new HashSet<BuildPathEntry>(buildPaths);
+			result.addAll(buildPaths);
+		}
 
-			result.addAll(getDynamicBuildPaths());
-		}
-		else
-		{
-			result = Collections.emptySet();
-		}
+		// Add dynamic paths
+		result.addAll(getDynamicBuildPaths());
 
 		return result;
 	}
@@ -344,13 +342,13 @@ public class BuildPathManager
 						URL url = FileLocator.find(bundle, new Path(resource), null);
 
 						// add item to master list
-						try
-						{
-							url = FileLocator.resolve(url);
+						URI localFileURI = ResourceUtil.resourcePathToURI(url);
 
-							addBuildPath(name, url.toURI());
+						if (localFileURI != null)
+						{
+							addBuildPath(name, localFileURI);
 						}
-						catch (URISyntaxException e)
+						else
 						{
 							String message = MessageFormat.format(
 								Messages.BuildPathManager_UnableToConvertURLToURI,
@@ -360,19 +358,7 @@ public class BuildPathManager
 								pluginId
 							);
 
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
-						}
-						catch (IOException e)
-						{
-							String message = MessageFormat.format(
-								Messages.BuildPathManager_UnableToResolveURL,
-								url.toString(),
-								ELEMENT_BUILD_PATH,
-								BUILD_PATHS_ID,
-								pluginId
-							);
-
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
 						}
 					}
 					else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))

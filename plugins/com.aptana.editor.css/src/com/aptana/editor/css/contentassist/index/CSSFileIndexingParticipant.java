@@ -102,7 +102,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				if (commentNode instanceof CSSCommentNode)
 				{
-					processCommentNode(file, rootNode.getStartingOffset(), (CSSCommentNode) commentNode);
+					processCommentNode(file, (CSSCommentNode) commentNode);
 				}
 				sub.worked(1);
 			}
@@ -161,17 +161,19 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	}
 
-	private void processCommentNode(IFileStore store, int initialOffset, CSSCommentNode commentNode)
+	private void processCommentNode(IFileStore store, CSSCommentNode commentNode)
 	{
 		String text = commentNode.getText();
 		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
-		int offset = initialOffset;
+		int lastOffset = 0;
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
+			int offset = text.indexOf(line, lastOffset);
+
 			for (TaskTag entry : TaskTag.getTaskTags())
 			{
 				String tag = entry.getName();
@@ -194,8 +196,8 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				int start = commentNode.getStartingOffset() + offset + index;
 				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
 			}
-			// FIXME This doesn't take the newline into account from split!
-			offset += line.length();
+
+			lastOffset = offset;
 		}
 	}
 

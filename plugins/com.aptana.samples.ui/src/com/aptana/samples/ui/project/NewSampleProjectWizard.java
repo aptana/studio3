@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -58,7 +57,6 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.internal.wizards.NewProjectWizard;
@@ -185,11 +183,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			description.setNatureIds(samplesRef.getNatures());
 		}
-
-		// Add Unified Builder
-		ICommand command = description.newCommand();
-		command.setBuilderName(UnifiedBuilder.ID);
-		description.setBuildSpec(new ICommand[] { command });
 
 		try
 		{

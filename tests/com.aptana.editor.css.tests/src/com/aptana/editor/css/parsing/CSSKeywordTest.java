@@ -57,5 +57,7 @@ public class CSSKeywordTest extends CSSTokensTest
 	{
 		assertToken("!important", CSSTokenType.IMPORTANT, 0, 10); //$NON-NLS-1$
 		assertToken("! important", CSSTokenType.IMPORTANT, 0, 11); //$NON-NLS-1$
+		assertToken("!Important", CSSTokenType.IMPORTANT, 0, 10); //$NON-NLS-1$
+
 	}
 }

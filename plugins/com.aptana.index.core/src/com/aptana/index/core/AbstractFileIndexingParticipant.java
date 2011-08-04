@@ -84,7 +84,17 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	 */
 	protected String getIndexingMessage(Index index, IFileStore file)
 	{
-		return MessageFormat.format("Indexing {0}", index.getRelativeDocumentPath(file.toURI()).toString()); //$NON-NLS-1$
+		String relativePath = null;
+		if (index != null)
+		{
+			relativePath = index.getRelativeDocumentPath(file.toURI()).toString();
+		}
+		else
+		{
+			relativePath = file.toURI().toString();
+		}
+
+		return MessageFormat.format("Indexing {0}", relativePath); //$NON-NLS-1$
 	}
 
 	/*
