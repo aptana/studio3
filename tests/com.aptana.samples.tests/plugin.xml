@@ -20,7 +20,7 @@
             </localDescription>
          </local>
          <include
-               path="lib/">
+               path="libs/">
          </include>
          <nature
                id="com.aptana.projects.webnature">
