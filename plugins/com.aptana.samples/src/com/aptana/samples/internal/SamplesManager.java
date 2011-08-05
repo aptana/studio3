@@ -218,6 +218,7 @@ public class SamplesManager implements ISamplesManager
 					}
 				}
 			}
+			samplesRef.setIncludePaths(includePaths.toArray(new String[includePaths.size()]));
 		}
 	}
 }
