@@ -46,6 +46,7 @@ class BundleNode extends BaseNode
 	{
 		CommandsNode commands = new CommandsNode(this._bundle);
 		SnippetsNode snippets = new SnippetsNode(this._bundle);
+		FileTemplatesNode fileTemplates = new FileTemplatesNode(this._bundle);
 		MenusNode menus = new MenusNode(this._bundle);
 		List<Object> items = new LinkedList<Object>();
 
@@ -56,6 +57,10 @@ class BundleNode extends BaseNode
 		if (snippets.hasChildren())
 		{
 			items.add(snippets);
+		}
+		if (fileTemplates.hasChildren())
+		{
+			items.add(fileTemplates);
 		}
 		if (menus.hasChildren())
 		{

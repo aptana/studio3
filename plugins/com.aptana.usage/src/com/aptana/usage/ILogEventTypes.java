@@ -10,7 +10,7 @@ package com.aptana.usage;
 /**
  * @author Kevin Lindsey
  */
-public class LogEventTypes
+public interface ILogEventTypes
 {
 
 	/**

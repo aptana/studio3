@@ -1220,7 +1220,7 @@ public class GitRepository
 	 */
 	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, GitExecutable.getShellEnvironment(), args);
+		return execute(readOrWrite, GitExecutable.getEnvironment(), args);
 	}
 
 	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)

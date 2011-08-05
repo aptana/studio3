@@ -98,7 +98,7 @@ public class CloneJob extends Job
 			Version version = GitExecutable.instance().version();
 			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
 
-			Map<String, String> env = GitExecutable.getShellEnvironment();
+			Map<String, String> env = GitExecutable.getEnvironment();
 			List<String> args = new ArrayList<String>();
 			args.add("clone"); //$NON-NLS-1$
 			if (shallowClone)

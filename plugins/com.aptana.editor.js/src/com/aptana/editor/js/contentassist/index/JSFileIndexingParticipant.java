@@ -193,7 +193,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		if (ast instanceof IParseRootNode)
 		{
-			processComments(file, source, ast.getStartingOffset(), ((IParseRootNode) ast).getCommentNodes(),
+			processComments(file, source, ((IParseRootNode) ast).getCommentNodes(),
 					sub.newChild(20));
 		}
 		sub.setWorkRemaining(80);
@@ -241,7 +241,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		sub.done();
 	}
 
-	private void processComments(IFileStore file, String source, int initialOffset, IParseNode[] commentNodes,
+	private void processComments(IFileStore file, String source, IParseNode[] commentNodes,
 			IProgressMonitor monitor)
 	{
 		if (commentNodes == null || commentNodes.length == 0)
@@ -253,24 +253,26 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			if (commentNode instanceof JSCommentNode)
 			{
-				processCommentNode(file, source, initialOffset, (JSCommentNode) commentNode);
+				processCommentNode(file, source, (JSCommentNode) commentNode);
 			}
 			sub.worked(1);
 		}
 		sub.done();
 	}
 
-	private void processCommentNode(IFileStore store, String source, int initialOffset, JSCommentNode commentNode)
+	private void processCommentNode(IFileStore store, String source, JSCommentNode commentNode)
 	{
-		int offset = initialOffset;
-		String text = getText(source, initialOffset, commentNode);
+		String text = getText(source, commentNode);
 		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
+		int lastOffset = 0;
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
+			int offset = text.indexOf(line, lastOffset);
+
 			for (TaskTag entry : TaskTag.getTaskTags())
 			{
 				String tag = entry.getName();
@@ -298,15 +300,14 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				int start = commentNode.getStartingOffset() + offset + index;
 				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
 			}
-			// FIXME This doesn't take the newline into account from split!
-			offset += line.length();
+
+			lastOffset = offset;
 		}
 	}
 
-	private String getText(String source, int initialOffset, JSCommentNode commentNode)
+	private String getText(String source, JSCommentNode commentNode)
 	{
-		return new String(source.substring(initialOffset + commentNode.getStartingOffset(),
-				initialOffset + commentNode.getEndingOffset() + 1));
+		return new String(source.substring(commentNode.getStartingOffset(), commentNode.getEndingOffset() + 1));
 	}
 
 	/**

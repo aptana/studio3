@@ -15,6 +15,8 @@ public class Messages extends NLS
 
 	public static String BundleEntryNode_TXT_Reload;
 	public static String CommandsNode_Commands_Node;
+
+	public static String FileTemplatesNode_FileTemplatesNodeName;
 	public static String MenusNode_Menus_Node;
 	public static String SnippetsNode_Snippets_Node;
 
