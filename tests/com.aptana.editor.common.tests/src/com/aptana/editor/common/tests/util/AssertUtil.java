@@ -8,6 +8,7 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
 public class AssertUtil
@@ -35,7 +36,7 @@ public class AssertUtil
 	 * @param offset
 	 */
 	public static void assertProposalApplies(String expected, IDocument document, String proposal,
-			ICompletionProposal[] proposals, int offset)
+			ICompletionProposal[] proposals, int offset, Point point)
 	{
 		if (proposal != null)
 		{
@@ -44,6 +45,14 @@ public class AssertUtil
 			TestCase.assertTrue("Selected proposal doesn't validate against document",
 					((ICompletionProposalExtension2) p).validate(document, offset, null));
 			((ICompletionProposalExtension2) p).apply(viewer, '\t', SWT.NONE, offset);
+
+			if (point != null)
+			{
+				Point pt = viewer.getSelectedRange();
+				TestCase.assertEquals(point.x, pt.x);
+				TestCase.assertEquals(point.y, pt.y);
+			}
+
 		}
 		TestCase.assertEquals(expected, document.get());
 	}

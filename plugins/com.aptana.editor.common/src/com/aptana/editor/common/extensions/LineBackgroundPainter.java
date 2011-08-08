@@ -275,7 +275,8 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			return;
 		}
-		if (fViewer.getTextWidget().isDisposed())
+
+		if (!fViewer.getTextWidget().isDisposed())
 		{
 			fViewer.getTextWidget().redraw(rect.x, rect.y, rect.width, rect.height, true);
 		}

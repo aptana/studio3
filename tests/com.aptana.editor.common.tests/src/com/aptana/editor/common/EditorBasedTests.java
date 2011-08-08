@@ -8,6 +8,7 @@
 package com.aptana.editor.common;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +44,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.Bundle;
 
-import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
@@ -153,7 +154,19 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	/**
 	 * createEditor
 	 * 
-	 * @param file
+	 * @param createEditor
+	 * @return
+	 */
+	protected ITextEditor createEditor(IFileStore fileStore)
+	{
+		FileStoreEditorInput editorInput = new FileStoreEditorInput(fileStore);
+		return createEditor(editorInput);
+	}
+
+	/**
+	 * createEditor
+	 * 
+	 * @param createEditor
 	 * @return
 	 */
 	protected ITextEditor createEditor(IEditorInput editorInput)
@@ -214,7 +227,7 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		try
 		{
 			tempFile = File.createTempFile(prefix, extension);
-			FileUtil.writeStringToFile(contents, tempFile);
+			IOUtil.write(new FileOutputStream(tempFile), contents);
 			fileStore = EFS.getStore(tempFile.toURI());
 		}
 		catch (IOException e)
@@ -290,15 +303,12 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	 */
 	protected Index getIndex()
 	{
-		URI indexURI = this.fileUri;
-		Index result = null;
-
-		if (indexURI != null)
+		if (this.fileUri == null)
 		{
-			result = IndexManager.getInstance().getIndex(indexURI);
+			return null;
 		}
+		return IndexManager.getInstance().getIndex(this.fileUri);
 
-		return result;
 	}
 
 	/**
