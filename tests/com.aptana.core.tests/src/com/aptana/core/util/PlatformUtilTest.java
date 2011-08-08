@@ -28,7 +28,7 @@ public class PlatformUtilTest extends TestCase {
 		for (ProcessItem i : processes) {
 			assertTrue(i.getPid() > 0);
 			assertTrue(i.getExecutableName().trim().length() > 0);
-			i.toString();
+			assertNotNull(i.toString());
 		}
 	}
 
