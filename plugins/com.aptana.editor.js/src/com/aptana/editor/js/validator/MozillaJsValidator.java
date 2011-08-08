@@ -46,6 +46,7 @@ public class MozillaJsValidator implements IValidator
 			}
 			catch (EvaluatorException e)
 			{
+				// ignores the exception here
 			}
 		}
 		finally
