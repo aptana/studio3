@@ -74,22 +74,24 @@ public class PlatformUtilTest extends TestCase {
 
 	public void testExpandEnvironmentStrings() {
 		assertEquals("abc/d", PlatformUtil.expandEnvironmentStrings("abc/d"));
-		expandAndCompareEnvironmentStrings("~/test");
-		expandAndCompareEnvironmentStrings(PlatformUtil.HOME_DIRECTORY + "/test");
+		expandAndCompareEnvironmentStrings("~", "/test");
+		expandAndCompareEnvironmentStrings(PlatformUtil.HOME_DIRECTORY, "/test");
 		if (Platform.OS_WIN32.equals(Platform.getOS())) {
-			expandAndCompareEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY + "/test");
-			expandAndCompareEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY + "/test");
-			expandAndCompareEnvironmentStrings(PlatformUtil.COMMON_APPDATA + "/test");
-			expandAndCompareEnvironmentStrings(PlatformUtil.LOCAL_APPDATA + "/test");
+			expandAndCompareEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY, "/test");
+			expandAndCompareEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY, "/test");
+			expandAndCompareEnvironmentStrings(PlatformUtil.COMMON_APPDATA, "/test");
+			expandAndCompareEnvironmentStrings(PlatformUtil.LOCAL_APPDATA, "/test");
 		}
 		else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			expandAndCompareEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY + "/test");
-			expandAndCompareEnvironmentStrings(PlatformUtil.DOCUMENTS_DIRECTORY + "/test");
+			expandAndCompareEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY, "/test");
+			expandAndCompareEnvironmentStrings(PlatformUtil.DOCUMENTS_DIRECTORY, "/test");
 		}
 	}
 
-	private void expandAndCompareEnvironmentStrings(String string) {
-		assertNotSame(string, PlatformUtil.expandEnvironmentStrings(string));
+	private void expandAndCompareEnvironmentStrings(String token, String path) {
+		String expanded = PlatformUtil.expandEnvironmentStrings(token+path);
+		assertNotSame(token+path, expanded);
+		assertTrue(expanded.endsWith(path));
 	}
 
 }
