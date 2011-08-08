@@ -25,6 +25,7 @@ public class AllUtilTests
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
+		suite.addTestSuite(OutputStreamThreadTest.class);
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(TimeZoneUtilTest.class);
