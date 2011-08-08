@@ -21,6 +21,7 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
 public class HTMLTestUtil
 {
+
 	/**
 	 * createDocument
 	 * 
@@ -42,6 +43,33 @@ public class HTMLTestUtil
 		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 
 		final IDocument document = new Document(source);
+		partitioner.connect(document);
+		document.setDocumentPartitioner(partitioner);
+
+		return document;
+	}
+
+	/**
+	 * createDocument
+	 * 
+	 * @param partitionType
+	 * @param source
+	 * @return
+	 */
+	public static IDocument createBadDocument(String source, boolean stripCursor)
+	{
+		if (stripCursor)
+		{
+			source = source.replaceAll("\\|", "");
+		}
+
+		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration.getDefault()
+				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
+				.getDefault().getContentTypes());
+		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
+
+		final IDocument document = new BadDocument(source);
 		partitioner.connect(document);
 		document.setDocumentPartitioner(partitioner);
 

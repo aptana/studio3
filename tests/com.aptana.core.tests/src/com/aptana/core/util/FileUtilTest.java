@@ -7,7 +7,9 @@
  */
 package com.aptana.core.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -177,5 +179,29 @@ public class FileUtilTest extends TestCase
 		{
 			fail("Unable to test parsing of file name from command line");
 		}
+	}
+
+	public void testWriteStringToFile() throws IOException
+	{
+
+		File temp = File.createTempFile("test", "txt");
+		temp.deleteOnExit();
+
+		String testText = "This is a test" + FileUtil.NEW_LINE + "And a new line";
+		FileUtil.writeStringToFile(testText, temp);
+
+		StringBuffer contents = new StringBuffer();
+		BufferedReader reader = new BufferedReader(new FileReader(temp));
+		String text = "";
+		while ((text = reader.readLine()) != null)
+		{
+			if (contents.length() > 0)
+			{
+				contents.append(FileUtil.NEW_LINE);
+			}
+			contents.append(text);
+		}
+
+		assertEquals(testText, contents.toString());
 	}
 }
