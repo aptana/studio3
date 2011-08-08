@@ -123,4 +123,9 @@ public class ProgressMonitorInterrupterTest extends TestCase {
 		assertTrue(passed[0]);
 	}
 
+	public void testNull() {
+		ProgressMonitorInterrupter interrupter = new ProgressMonitorInterrupter(null);
+		interrupter.dispose();
+	}
+
 }
