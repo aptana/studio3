@@ -31,6 +31,8 @@ public class AllUtilTests
 		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(URLUtilTest.class);
 		suite.addTestSuite(ZipUtilTest.class);
+		suite.addTestSuite(WriterOutputStreamTest.class);
+		suite.addTestSuite(InputStreamGobblerTest.class);
 		// $JUnit-END$
 		return suite;
 	}
