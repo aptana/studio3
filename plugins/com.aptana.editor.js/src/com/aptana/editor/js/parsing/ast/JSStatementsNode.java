@@ -16,7 +16,7 @@ public class JSStatementsNode extends JSNode
 	 */
 	public JSStatementsNode(JSNode... children)
 	{
-		super(JSNodeTypes.STATEMENTS, children);
+		super(IJSNodeTypes.STATEMENTS, children);
 	}
 
 	/*

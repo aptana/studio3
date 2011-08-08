@@ -23,8 +23,8 @@ public class JSWithNode extends JSNode
 	 */
 	public JSWithNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.WITH, expression, body);
-		
+		super(IJSNodeTypes.WITH, expression, body);
+
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
 	}

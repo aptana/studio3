@@ -1,3 +1,11 @@
+// $codepro.audit.disable
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.parsing;
 
 import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
@@ -200,10 +208,10 @@ public class JSParser extends Parser implements IParser {
 			{
 				switch (node.getNodeType())
 				{
-					case JSNodeTypes.STATEMENTS:
+					case IJSNodeTypes.STATEMENTS:
 						IParseNode parent = node.getParent();
 
-						if (parent.getNodeType() == JSNodeTypes.FUNCTION)
+						if (parent.getNodeType() == IJSNodeTypes.FUNCTION)
 						{
 							((JSNode) parent).setDocumentation(block);
 						}
@@ -259,13 +267,13 @@ public class JSParser extends Parser implements IParser {
 					{
 						switch (node.getNodeType())
 						{
-							case JSNodeTypes.VAR:
+							case IJSNodeTypes.VAR:
 								// associate documentation with first declared variable's value
 								JSVarNode varNode = (JSVarNode) node;
 								((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
 								break;
 
-							case JSNodeTypes.IDENTIFIER:
+							case IJSNodeTypes.IDENTIFIER:
 								IParseNode parent = node.getParent();
 
 								if (parent instanceof JSNameValuePairNode)
@@ -375,22 +383,22 @@ public class JSParser extends Parser implements IParser {
 
 				for (Symbol symbol : fScanner.getSDocComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 for (Symbol symbol : fScanner.getVSDocComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 for (Symbol symbol : fScanner.getSingleLineComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 for (Symbol symbol : fScanner.getMultiLineComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));

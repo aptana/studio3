@@ -52,8 +52,8 @@ public class ClassType extends Type
 	public void toSource(SourcePrinter writer)
 	{
 		writer.print(JSTypeConstants.CLASS_TYPE);
-		writer.print("<"); //$NON-NLS-1$
+		writer.print('<');
 		this._type.toSource(writer);
-		writer.print(">"); //$NON-NLS-1$
+		writer.print('>');
 	}
 }

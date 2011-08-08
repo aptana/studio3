@@ -1,3 +1,4 @@
+// $codepro.audit.disable characterComparison
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -39,7 +40,7 @@ public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanne
 				char c = fDocument.getChar(offset);
 
 				// keep backtracking if we hit whitespace
-				if (Character.isWhitespace(c) == false)
+				if (!Character.isWhitespace(c))
 				{
 					// Compare to the set of last characters from the following tokens:
 					// IDENTIFIER, NUMBER, REGEX, STRING, RPAREN, PLUS_PLUS, MINUS_MINUS,
@@ -82,7 +83,7 @@ public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanne
 				offset--;
 			}
 		}
-		catch (BadLocationException e)
+		catch (BadLocationException e) // $codepro.audit.disable emptyCatchClause
 		{
 		}
 

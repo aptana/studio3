@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.js.contentassist;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,11 +21,9 @@ import java.util.Set;
 
 import org.mortbay.util.ajax.JSON;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -43,7 +40,7 @@ public class JSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
+		return IndexManager.getInstance().getIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	private JSIndexReader _reader;
@@ -78,18 +75,7 @@ public class JSIndexQueryHelper
 	 */
 	protected FunctionElement getFunction(Index index, String typeName, String methodName)
 	{
-		FunctionElement result = null;
-
-		try
-		{
-			result = this._reader.getFunction(index, typeName, methodName);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
-
-		return result;
+		return this._reader.getFunction(index, typeName, methodName);
 	}
 
 	/**
@@ -102,17 +88,7 @@ public class JSIndexQueryHelper
 	 */
 	protected List<FunctionElement> getFunctions(Index index, List<String> typeNames)
 	{
-		List<FunctionElement> result = null;
-		try
-		{
-			result = this._reader.getFunctions(index, typeNames);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
-
-		return result;
+		return this._reader.getFunctions(index, typeNames);
 	}
 
 	/**
@@ -125,17 +101,7 @@ public class JSIndexQueryHelper
 	 */
 	protected List<FunctionElement> getFunctions(Index index, String typeName)
 	{
-		List<FunctionElement> result = null;
-		try
-		{
-			result = this._reader.getFunctions(index, typeName);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
-
-		return result;
+		return this._reader.getFunctions(index, typeName);
 	}
 
 	/**
@@ -177,31 +143,23 @@ public class JSIndexQueryHelper
 	public String getIndexAsJSON(Index index)
 	{
 		String result = StringUtil.EMPTY;
+		List<TypeElement> types = this._reader.getTypes(index, true);
+		Map<String, Object> docs = new HashMap<String, Object>();
 
-		try
+		// sort types by name
+		Collections.sort(types, new Comparator<TypeElement>()
 		{
-			List<TypeElement> types = this._reader.getTypes(index, true);
-			Map<String, Object> docs = new HashMap<String, Object>();
-
-			// sort types by name
-			Collections.sort(types, new Comparator<TypeElement>()
+			public int compare(TypeElement arg0, TypeElement arg1)
 			{
-				public int compare(TypeElement arg0, TypeElement arg1)
-				{
-					return arg0.getName().compareTo(arg1.getName());
-				}
-			});
+				return arg0.getName().compareTo(arg1.getName());
+			}
+		});
 
-			// include types as a separate property
-			docs.put("types", types); //$NON-NLS-1$
+		// include types as a separate property
+		docs.put("types", types); //$NON-NLS-1$
 
-			// convert to JSON
-			result = JSON.toString(docs);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
+		// convert to JSON
+		result = JSON.toString(docs);
 
 		return result;
 	}
@@ -303,17 +261,7 @@ public class JSIndexQueryHelper
 	 */
 	protected List<PropertyElement> getProperties(Index index, List<String> typeNames)
 	{
-		List<PropertyElement> result = null;
-		try
-		{
-			result = this._reader.getProperties(index, typeNames);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
-
-		return result;
+		return this._reader.getProperties(index, typeNames);
 	}
 
 	/**
@@ -326,17 +274,7 @@ public class JSIndexQueryHelper
 	 */
 	protected List<PropertyElement> getProperties(Index index, String typeName)
 	{
-		List<PropertyElement> result = null;
-		try
-		{
-			result = this._reader.getProperties(index, typeName);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
-
-		return result;
+		return this._reader.getProperties(index, typeName);
 	}
 
 	/**
@@ -350,17 +288,7 @@ public class JSIndexQueryHelper
 	 */
 	protected PropertyElement getProperty(Index index, String typeName, String propertyName)
 	{
-		PropertyElement result = null;
-		try
-		{
-			result = this._reader.getProperty(index, typeName, propertyName);
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-		}
-
-		return result;
+		return this._reader.getProperty(index, typeName, propertyName);
 	}
 
 	/**
@@ -374,6 +302,7 @@ public class JSIndexQueryHelper
 	public TypeElement getType(Index index, String typeName, boolean indexMembers)
 	{
 		TypeElement result = this._reader.getType(index, typeName, indexMembers);
+
 		if (result == null)
 		{
 			result = this._reader.getType(getIndex(), typeName, indexMembers);
@@ -400,7 +329,7 @@ public class JSIndexQueryHelper
 		// prime the queue
 		queue.offer(typeName);
 
-		while (queue.isEmpty() == false)
+		while (!queue.isEmpty())
 		{
 			String name = queue.poll();
 			TypeElement type = this.getType(index, name, false);
@@ -409,11 +338,11 @@ public class JSIndexQueryHelper
 			{
 				for (String parentType : type.getParentTypes())
 				{
-					if (types.contains(parentType) == false)
+					if (!types.contains(parentType))
 					{
 						types.add(parentType);
 
-						if (JSTypeConstants.OBJECT_TYPE.equals(parentType) == false)
+						if (!JSTypeConstants.OBJECT_TYPE.equals(parentType))
 						{
 							queue.offer(parentType);
 						}
@@ -437,6 +366,7 @@ public class JSIndexQueryHelper
 	public PropertyElement getTypeMember(Index index, String typeName, String memberName)
 	{
 		PropertyElement result = this.getMember(index, typeName, memberName);
+
 		if (result == null)
 		{
 			result = this.getMember(getIndex(), typeName, memberName);
@@ -547,14 +477,7 @@ public class JSIndexQueryHelper
 
 		if (index != null)
 		{
-			try
-			{
-				result = this._reader.getTypes(index, true);
-			}
-			catch (IOException e)
-			{
-				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
-			}
+			result = this._reader.getTypes(index, true);
 		}
 
 		return result;

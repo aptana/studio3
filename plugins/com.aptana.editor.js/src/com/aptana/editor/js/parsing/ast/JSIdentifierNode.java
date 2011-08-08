@@ -18,8 +18,8 @@ public class JSIdentifierNode extends JSPrimitiveNode
 	 */
 	public JSIdentifierNode(Symbol identifier)
 	{
-		super(JSNodeTypes.IDENTIFIER, (String) identifier.value);
-		
+		super(IJSNodeTypes.IDENTIFIER, (String) identifier.value);
+
 		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 

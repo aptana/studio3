@@ -23,7 +23,7 @@ public class JSObjectNode extends JSNode
 	 */
 	public JSObjectNode(Symbol leftBrace, Symbol rightBrace, JSNode... properties)
 	{
-		super(JSNodeTypes.OBJECT_LITERAL, properties);
+		super(IJSNodeTypes.OBJECT_LITERAL, properties);
 
 		this._leftBrace = leftBrace;
 		this._rightBrace = rightBrace;
@@ -48,7 +48,7 @@ public class JSObjectNode extends JSNode
 	{
 		return this._leftBrace;
 	}
-	
+
 	/**
 	 * getRightBrace
 	 * 

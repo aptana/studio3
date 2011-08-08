@@ -109,7 +109,7 @@ public class JSTypeMapper
 					String srcType = element.getAttribute(ATTR_SRC_TYPE);
 					String dstType = element.getAttribute(ATTR_DST_TYPE);
 
-					if (StringUtil.isEmpty(srcType) == false && StringUtil.isEmpty(dstType) == false)
+					if (!StringUtil.isEmpty(srcType) && !StringUtil.isEmpty(dstType))
 					{
 						addTypeMapping(srcType, dstType);
 					}

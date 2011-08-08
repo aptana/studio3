@@ -146,11 +146,11 @@ public class JSSymbolTypeInferrer
 			// prime the queue
 			queue.addAll(object.getValues());
 
-			while (queue.isEmpty() == false)
+			while (!queue.isEmpty())
 			{
 				JSNode node = queue.poll();
 
-				if (visitedSymbols.contains(node) == false)
+				if (!visitedSymbols.contains(node))
 				{
 					visitedSymbols.add(node);
 
@@ -258,7 +258,7 @@ public class JSSymbolTypeInferrer
 		for (String name : activeObject.getPropertyNames())
 		{
 			// TODO: Treat as new property if names match but not their types?
-			if (propertyMap.containsKey(name) == false || JSTypeConstants.PROTOTYPE_PROPERTY.equals(name))
+			if (!propertyMap.containsKey(name) || JSTypeConstants.PROTOTYPE_PROPERTY.equals(name))
 			{
 				additionalProperties.add(name);
 			}
@@ -413,7 +413,7 @@ public class JSSymbolTypeInferrer
 		{
 			List<String> additionalProperties = this.getAdditionalProperties(property, types);
 
-			if (additionalProperties.isEmpty() == false)
+			if (!additionalProperties.isEmpty())
 			{
 				// create new type
 				TypeElement subType = generateType(property, types);
@@ -431,9 +431,10 @@ public class JSSymbolTypeInferrer
 
 				String propertyType = subType.getName();
 
-				if (returnTypes.isEmpty() == false)
+				if (!returnTypes.isEmpty())
 				{
-					propertyType += JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes);
+					propertyType += JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER
+							+ StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes);
 				}
 
 				// reset list to contain only this newly generated type

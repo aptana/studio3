@@ -15,7 +15,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSPostUnaryOperatorNode extends JSNode
 {
 	private Symbol _operator;
-	
+
 	/**
 	 * JSPostUnaryOperatorNode
 	 * 
@@ -33,11 +33,11 @@ public class JSPostUnaryOperatorNode extends JSNode
 		switch (token)
 		{
 			case MINUS_MINUS:
-				type = JSNodeTypes.POST_DECREMENT;
+				type = IJSNodeTypes.POST_DECREMENT;
 				break;
 
 			case PLUS_PLUS:
-				type = JSNodeTypes.POST_INCREMENT;
+				type = IJSNodeTypes.POST_INCREMENT;
 				break;
 
 			default:
@@ -66,7 +66,7 @@ public class JSPostUnaryOperatorNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
 	/**
 	 * getOperator
 	 * 

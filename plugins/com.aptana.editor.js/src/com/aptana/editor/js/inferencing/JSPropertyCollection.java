@@ -41,7 +41,7 @@ public class JSPropertyCollection
 
 		// NOTE: The number of types in the list will be small, so the contains
 		// test should not have any performance issues.
-		if (type != null && type.length() > 0 && this._types.contains(type) == false)
+		if (type != null && type.length() > 0 && !this._types.contains(type))
 		{
 			this._types.add(type);
 		}
@@ -160,7 +160,7 @@ public class JSPropertyCollection
 
 		if (this._properties != null)
 		{
-			result = this._properties.isEmpty() == false;
+			result = !this._properties.isEmpty();
 		}
 
 		return result;

@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 
-public interface InvocationProcessor
+public interface IInvocationProcessor
 {
 	/**
 	 * getInvocationPatterns

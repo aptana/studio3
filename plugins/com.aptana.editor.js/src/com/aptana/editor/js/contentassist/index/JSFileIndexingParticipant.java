@@ -118,7 +118,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				}
 			}
 		}
-		catch (Parser.Exception e)
+		catch (Parser.Exception e) // $codepro.audit.disable emptyCatchClause
 		{
 			// ignore parse errors
 		}
@@ -153,7 +153,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				List<JSFunctionNode> functions = (List<JSFunctionNode>) queryResult;
 
-				if (functions.isEmpty() == false)
+				if (!functions.isEmpty())
 				{
 					result = new ArrayList<PropertyElement>();
 
@@ -173,7 +173,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (JaxenException e)
 		{
-			e.printStackTrace();
+			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return result;
@@ -193,8 +193,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		if (ast instanceof IParseRootNode)
 		{
-			processComments(file, source, ((IParseRootNode) ast).getCommentNodes(),
-					sub.newChild(20));
+			processComments(file, source, ((IParseRootNode) ast).getCommentNodes(), sub.newChild(20));
 		}
 		sub.setWorkRemaining(80);
 
@@ -241,8 +240,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		sub.done();
 	}
 
-	private void processComments(IFileStore file, String source, IParseNode[] commentNodes,
-			IProgressMonitor monitor)
+	private void processComments(IFileStore file, String source, IParseNode[] commentNodes, IProgressMonitor monitor)
 	{
 		if (commentNodes == null || commentNodes.length == 0)
 		{
@@ -268,7 +266,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			text = text.toLowerCase();
 		}
 		int lastOffset = 0;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		for (String line : lines)
 		{
 			int offset = text.indexOf(line, lastOffset);
@@ -332,7 +330,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				{
 					List<String> typeNames = property.getTypeNames();
 
-					if (typeNames != null && typeNames.isEmpty() == false)
+					if (typeNames != null && !typeNames.isEmpty())
 					{
 						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 

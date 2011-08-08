@@ -45,14 +45,16 @@ public class JSTypeConstants
 	public static final String PARAMETER_DELIMITER = ","; //$NON-NLS-1$
 	public static final String RETURN_TYPE_DELIMITER = ","; //$NON-NLS-1$
 
-	public static final Pattern FUNCTION_PREFIX = Pattern.compile( //
-		MessageFormat.format( //
-			"^({0}$|{0}{1}|{0}{2})", // //$NON-NLS-1$
-			FUNCTION_TYPE, //
-			FUNCTION_SIGNATURE_DELIMITER, //
-			GENERIC_OPEN //
-			) //
-		); //
+	// @formatter:off
+	public static final Pattern FUNCTION_PREFIX = Pattern.compile(
+		MessageFormat.format(
+			"^({0}$|{0}{1}|{0}{2})", //$NON-NLS-1$
+			FUNCTION_TYPE,
+			FUNCTION_SIGNATURE_DELIMITER,
+			GENERIC_OPEN
+		)
+	);
+	// @formatter:on
 
 	public static final String DEFAULT_ASSIGNMENT_TYPE = NUMBER_TYPE;
 	public static final String DEFAULT_PARAMETER_TYPE = OBJECT_TYPE;

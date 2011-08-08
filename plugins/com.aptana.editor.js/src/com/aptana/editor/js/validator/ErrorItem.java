@@ -17,7 +17,7 @@ class ErrorItem
 	private final String lineText;
 	private final int lineOffset;
 
-	public ErrorItem(int severity, String message, String sourceURI, int line, String lineText, int lineOffset)
+	ErrorItem(int severity, String message, String sourceURI, int line, String lineText, int lineOffset)
 	{
 		this.severity = severity;
 		this.message = message;

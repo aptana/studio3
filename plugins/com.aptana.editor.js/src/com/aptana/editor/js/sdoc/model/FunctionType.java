@@ -40,7 +40,7 @@ public class FunctionType extends Type
 			{
 				this._parameterTypes = new ArrayList<Type>();
 			}
-			
+
 			this._parameterTypes.add(parameterType);
 		}
 	}
@@ -58,7 +58,7 @@ public class FunctionType extends Type
 			{
 				this._returnTypes = new ArrayList<Type>();
 			}
-			
+
 			this._returnTypes.add(returnType);
 		}
 	}
@@ -71,12 +71,12 @@ public class FunctionType extends Type
 	public List<Type> getReturnTypes()
 	{
 		List<Type> result = this._returnTypes;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -91,17 +91,17 @@ public class FunctionType extends Type
 
 		boolean first;
 
-		if (this._parameterTypes != null && this._parameterTypes.isEmpty() == false)
+		if (this._parameterTypes != null && !this._parameterTypes.isEmpty())
 		{
 			first = true;
 
-			writer.print("("); //$NON-NLS-1$
+			writer.print('(');
 
 			for (Type type : this._parameterTypes)
 			{
-				if (first == false)
+				if (!first)
 				{
-					writer.print(","); //$NON-NLS-1$
+					writer.print(',');
 				}
 				else
 				{
@@ -111,10 +111,10 @@ public class FunctionType extends Type
 				type.toSource(writer);
 			}
 
-			writer.print(")"); //$NON-NLS-1$
+			writer.print(')'); //$NON-NLS-1$
 		}
 
-		if (this._returnTypes != null && this._returnTypes.isEmpty() == false)
+		if (this._returnTypes != null && !this._returnTypes.isEmpty())
 		{
 			first = true;
 
@@ -122,14 +122,14 @@ public class FunctionType extends Type
 
 			if (this._returnTypes.size() > 1)
 			{
-				writer.print("("); //$NON-NLS-1$
+				writer.print('(');
 			}
 
 			for (Type type : this._returnTypes)
 			{
-				if (first == false)
+				if (!first)
 				{
-					writer.print(","); //$NON-NLS-1$
+					writer.print(',');
 				}
 				else
 				{
@@ -141,7 +141,7 @@ public class FunctionType extends Type
 
 			if (this._returnTypes.size() > 1)
 			{
-				writer.print(")"); //$NON-NLS-1$
+				writer.print(')');
 			}
 		}
 	}

@@ -29,52 +29,52 @@ public class JSBinaryArithmeticOperatorNode extends JSBinaryOperatorNode
 
 		switch (token)
 		{
-			// additive operators
+		// additive operators
 			case PLUS:
-				type = JSNodeTypes.ADD;
+				type = IJSNodeTypes.ADD;
 				break;
 
 			case MINUS:
-				type = JSNodeTypes.SUBTRACT;
+				type = IJSNodeTypes.SUBTRACT;
 				break;
 
 			// shift operators
 			case LESS_LESS:
-				type = JSNodeTypes.SHIFT_LEFT;
+				type = IJSNodeTypes.SHIFT_LEFT;
 				break;
 
 			case GREATER_GREATER:
-				type = JSNodeTypes.SHIFT_RIGHT;
+				type = IJSNodeTypes.SHIFT_RIGHT;
 				break;
 
 			case GREATER_GREATER_GREATER:
-				type = JSNodeTypes.ARITHMETIC_SHIFT_RIGHT;
+				type = IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT;
 				break;
 
 			// bit operator
 			case AMPERSAND:
-				type = JSNodeTypes.BITWISE_AND;
+				type = IJSNodeTypes.BITWISE_AND;
 				break;
 
 			case CARET:
-				type = JSNodeTypes.BITWISE_XOR;
+				type = IJSNodeTypes.BITWISE_XOR;
 				break;
 
 			case PIPE:
-				type = JSNodeTypes.BITWISE_OR;
+				type = IJSNodeTypes.BITWISE_OR;
 				break;
 
 			// multiplicative operators
 			case STAR:
-				type = JSNodeTypes.MULTIPLY;
+				type = IJSNodeTypes.MULTIPLY;
 				break;
 
 			case FORWARD_SLASH:
-				type = JSNodeTypes.DIVIDE;
+				type = IJSNodeTypes.DIVIDE;
 				break;
 
 			case PERCENT:
-				type = JSNodeTypes.MOD;
+				type = IJSNodeTypes.MOD;
 				break;
 
 			default:
