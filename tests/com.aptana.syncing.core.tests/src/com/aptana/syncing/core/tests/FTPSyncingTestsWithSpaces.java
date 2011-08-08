@@ -25,19 +25,18 @@ public class FTPSyncingTestsWithSpaces extends SyncingTests
 	{
 		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		baseTempFile.deleteOnExit();
-		
+
 		File baseDirectory = baseTempFile.getParentFile();
-		
+
 		LocalConnectionPoint lcp = new LocalConnectionPoint();
 		lcp.setPath(new Path(baseDirectory.getAbsolutePath()));
 		clientManager = lcp;
 
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
-		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path", "/home/ftpuser"))); 
+		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
+		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$
+		ftpcp.setPassword(getConfig().getProperty("ftp.password").toCharArray());
+		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path")));
 		serverManager = ftpcp;
 
 		ConnectionContext context = new ConnectionContext();
@@ -46,7 +45,7 @@ public class FTPSyncingTestsWithSpaces extends SyncingTests
 
 		fileName = "file name.txt";
 		folderName = "folder name";
-		
+
 		super.setUp();
 	}
 

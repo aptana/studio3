@@ -23,16 +23,16 @@ public class FTPConnectionTest extends CommonConnectionTest
 	protected void setUp() throws Exception
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
-		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path", "/home/ftpuser"))); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
+		ftpcp.setLogin(getConfig().getProperty("ftp.username")); //$NON-NLS-1$
+		ftpcp.setPassword(getConfig().getProperty("ftp.password").toCharArray()); //$NON-NLS-1$
+		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path"))); //$NON-NLS-1$
 		cp = ftpcp;
 		super.setUp();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
@@ -40,7 +40,6 @@ public class FTPConnectionTest extends CommonConnectionTest
 	{
 		return true;
 	}
-
 
 	/*
 	 * (non-Javadoc)

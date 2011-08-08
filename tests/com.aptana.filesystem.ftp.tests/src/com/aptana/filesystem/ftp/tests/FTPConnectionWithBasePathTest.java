@@ -28,11 +28,10 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	private static FTPConnectionPoint setupConnection()
 	{
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
-		
+		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
+		ftpcp.setLogin(getConfig().getProperty("ftp.username")); //$NON-NLS-1$
+		ftpcp.setPassword(getConfig().getProperty("ftp.password").toCharArray());
+
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
 		CoreIOPlugin.setConnectionContext(ftpcp, context);
@@ -51,26 +50,32 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	protected void tearDown() throws Exception
+	{
 		super.tearDown();
 		cleanupBasePath();
 	}
 
-	public static IPath constructBasePath() {
-		return new Path(getConfig().getProperty("ftp.path", "/home/ftpuser")).append(FTPConnectionWithBasePathTest.class.getSimpleName());
+	public static IPath constructBasePath()
+	{
+		return new Path(getConfig().getProperty("ftp.path"))
+				.append(FTPConnectionWithBasePathTest.class.getSimpleName());
 	}
-	
+
 	public static void initBasePath() throws CoreException
 	{
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		try {
+		try
+		{
 			if (!fs.fetchInfo().exists())
 			{
 				fs.mkdir(EFS.NONE, null);
 			}
-		} finally {
+		}
+		finally
+		{
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
@@ -81,18 +86,22 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		try {
+		try
+		{
 			if (fs.fetchInfo().exists())
 			{
 				fs.delete(EFS.NONE, null);
 			}
-		} finally {
+		}
+		finally
+		{
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
@@ -100,7 +109,6 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	{
 		return true;
 	}
-
 
 	/*
 	 * (non-Javadoc)
