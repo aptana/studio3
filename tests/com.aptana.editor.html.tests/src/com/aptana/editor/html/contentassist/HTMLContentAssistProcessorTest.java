@@ -355,7 +355,6 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	{
 		assertHREFProposal("<link rel=\"stylesheet\" href=\"|\" />", "<link rel=\"stylesheet\" href=\"folder/\" />",
 				"folder/");
-
 	}
 
 	public void testLinkHREFFileProposal() throws Exception
@@ -494,7 +493,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("root.css", proposals);
 		AssertUtil.assertProposalFound("folder/", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder/' />", document, "folder/", proposals,
-				offset);
+				offset, new Point(0, 0));
 
 		WebServerCorePlugin.getDefault().getServerConfigurationManager().removeServerConfiguration(server);
 		project.delete();
@@ -516,7 +515,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		AssertUtil.assertProposalFound("railsfile.html", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/railsfile.html' />", document,
-				"railsfile.html", proposals, offset);
+				"railsfile.html", proposals, offset, new Point(0, 0));
 
 		project.delete();
 
@@ -552,7 +551,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertEquals(1, proposals.length);
 		AssertUtil.assertProposalFound("inside_folder.css", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='" + fileUri + "/inside_folder.css' />",
-				fDocument, "inside_folder.css", proposals, offset);
+				fDocument, "inside_folder.css", proposals, offset, new Point(0, 0));
 
 		project.delete();
 	}
@@ -588,7 +587,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		AssertUtil.assertProposalFound("inside_folder.css", proposals);
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='" + fileUri + "/inside_folder.css' />",
-				fDocument, "inside_folder.css", proposals, offset);
+				fDocument, "inside_folder.css", proposals, offset, new Point(0, 0));
 
 		project.delete();
 
@@ -607,7 +606,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
 		AssertUtil.assertProposalFound(proposalToChoose, proposals);
-		AssertUtil.assertProposalApplies(expected, document, proposalToChoose, proposals, offset);
+		AssertUtil.assertProposalApplies(expected, document, proposalToChoose, proposals, offset, new Point(0, 0));
 
 		project.delete();
 	}
@@ -676,7 +675,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalFound("sibling.html", proposals);
 	}
 
-	public void testIsValidAutoActivationLocation()
+	public void testIsValidAutoActivationLocationElement()
 	{
 
 		// need to close previous editor
@@ -690,33 +689,38 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, offset));
 		assertTrue(processor.isValidAutoActivationLocation('\t', '\t', document, offset));
 		assertFalse(processor.isValidAutoActivationLocation('b', 'b', document, offset));
+	}
 
-		this.tearDownTestContext();
-
-		source = "<a |>";
-		fileStore = createFileStore("proposal_tests", "html", source);
+	public void testIsValidAutoActivationLocationAttribute()
+	{
+		String source = "<a |>";
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
 		this.setupTestContext(fileStore);
-		offset = this.cursorOffsets.get(0);
+		int offset = this.cursorOffsets.get(0);
 
 		// starting to type an attribute
 		assertTrue(processor.isValidAutoActivationLocation('b', 'b', document, offset));
 
-		this.tearDownTestContext();
+	}
 
-		source = "<a class=\"|\"|>";
-		fileStore = createFileStore("proposal_tests", "html", source);
+	public void testIsValidAutoActivationLocationAttributeValue()
+	{
+		String source = "<a class=\"|\"|>";
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
 		this.setupTestContext(fileStore);
-		offset = this.cursorOffsets.get(0);
+		int offset = this.cursorOffsets.get(0);
 
 		// starting to type an attribute value
 		assertTrue(processor.isValidAutoActivationLocation('f', 'f', document, offset));
+	}
 
-		this.tearDownTestContext();
-
-		source = "<a>|";
-		fileStore = createFileStore("proposal_tests", "html", source);
+	public void testIsValidAutoActivationLocationText()
+	{
+		// need to close previous editor
+		String source = "<a>|";
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
 		this.setupTestContext(fileStore);
-		offset = this.cursorOffsets.get(0);
+		int offset = this.cursorOffsets.get(0);
 
 		assertFalse(processor.isValidAutoActivationLocation('t', 't', document, offset));
 	}
@@ -764,14 +768,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		if (proposalToChoose != null)
 		{
 			AssertUtil.assertProposalFound(proposalToChoose, proposals);
-			AssertUtil.assertProposalApplies(postCompletion, document, proposalToChoose, proposals, offset);
+			AssertUtil.assertProposalApplies(postCompletion, document, proposalToChoose, proposals, offset, point);
 		}
-
-		// if (point != null)
-		// {
-		// Point p = viewer.getSelectedRange();
-		// assertEquals(point.x, p.x);
-		// assertEquals(point.y, p.y);
-		// }
 	}
 }
