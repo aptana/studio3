@@ -20,8 +20,8 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSNode extends ParseNode
 {
-	protected static final short DEFAULT_TYPE = JSNodeTypes.EMPTY;
-	private static Map<Short, String> typeNameMap;
+	protected static final short DEFAULT_TYPE = IJSNodeTypes.EMPTY;
+	private static Map<Short, String> TYPE_NAME_MAP;
 
 	private short fType;
 	private boolean fSemicolonIncluded;
@@ -32,9 +32,9 @@ public class JSNode extends ParseNode
 	 */
 	static
 	{
-		typeNameMap = new HashMap<Short, String>();
+		TYPE_NAME_MAP = new HashMap<Short, String>();
 
-		Class<?> klass = JSNodeTypes.class;
+		Class<?> klass = IJSNodeTypes.class;
 
 		for (Field field : klass.getFields())
 		{
@@ -44,12 +44,12 @@ public class JSNode extends ParseNode
 			{
 				Short value = field.getShort(klass);
 
-				typeNameMap.put(value, name);
+				TYPE_NAME_MAP.put(value, name);
 			}
-			catch (IllegalArgumentException e)
+			catch (IllegalArgumentException e) // $codepro.audit.disable emptyCatchClause
 			{
 			}
-			catch (IllegalAccessException e)
+			catch (IllegalAccessException e) // $codepro.audit.disable emptyCatchClause
 			{
 			}
 		}
@@ -62,7 +62,7 @@ public class JSNode extends ParseNode
 	{
 		this(DEFAULT_TYPE);
 	}
-	
+
 	/**
 	 * JSNode
 	 * 
@@ -100,13 +100,25 @@ public class JSNode extends ParseNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof JSNode))
+		boolean result = false;
+
+		if (this == obj)
 		{
-			return false;
+			result = true;
 		}
-		JSNode other = (JSNode) obj;
-		return getNodeType() == other.getNodeType() && getSemicolonIncluded() == other.getSemicolonIncluded()
-			&& Arrays.equals(getChildren(), other.getChildren());
+		else if (obj instanceof JSNode)
+		{
+			JSNode other = (JSNode) obj;
+
+			// @formatter:off
+			result = 
+					getNodeType() == other.getNodeType()
+				&&	getSemicolonIncluded() == other.getSemicolonIncluded()
+				&&	Arrays.equals(getChildren(), other.getChildren());
+			// @formatter:on
+		}
+
+		return result;
 	}
 
 	/**
@@ -122,7 +134,7 @@ public class JSNode extends ParseNode
 
 		while (parent != null)
 		{
-			if (parent instanceof ParseRootNode || parent.getNodeType() == JSNodeTypes.STATEMENTS)
+			if (parent instanceof ParseRootNode || parent.getNodeType() == IJSNodeTypes.STATEMENTS)
 			{
 				break;
 			}
@@ -153,7 +165,7 @@ public class JSNode extends ParseNode
 	@Override
 	public String getElementName()
 	{
-		String result = typeNameMap.get(this.getNodeType());
+		String result = TYPE_NAME_MAP.get(this.getNodeType());
 
 		return (result == null) ? super.getElementName() : result;
 	}
@@ -197,7 +209,7 @@ public class JSNode extends ParseNode
 	 */
 	public boolean isEmpty()
 	{
-		return getNodeType() == JSNodeTypes.EMPTY;
+		return getNodeType() == IJSNodeTypes.EMPTY;
 	}
 
 	/**
@@ -229,7 +241,7 @@ public class JSNode extends ParseNode
 	{
 		fSemicolonIncluded = included;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#toString()
@@ -237,9 +249,9 @@ public class JSNode extends ParseNode
 	public String toString()
 	{
 		JSFormatWalker walker = new JSFormatWalker();
-		
+
 		this.accept(walker);
-		
+
 		return walker.getText();
 	}
 }

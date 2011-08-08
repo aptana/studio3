@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.js.parsing.ast;
 
-public interface JSNodeTypes
+public interface IJSNodeTypes
 {
 	public static final short ERROR = -1;
 	public static final short EMPTY = 0;

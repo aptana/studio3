@@ -35,7 +35,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 		public final int parenCount;
 		public final int curlyCount;
 
-		public DelimiterCounter(int offset)
+		DelimiterCounter(int offset)
 		{
 			int commaCount = 0;
 			int parenCount = 0;
@@ -44,7 +44,8 @@ public class JSContextInformationValidator implements IContextInformationValidat
 
 			// grab lexemes
 			IDocument document = _viewer.getDocument();
-			LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, _startingOffset, new JSTokenScanner());
+			LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, _startingOffset,
+					new JSTokenScanner());
 
 			// get starting index based on the initial offset provided to this validator
 			int index = lexemeProvider.getLexemeFloorIndex(_startingOffset);

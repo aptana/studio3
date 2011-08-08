@@ -18,7 +18,7 @@ public class JSTryNode extends JSNode
 	 */
 	public JSTryNode(JSNode... children)
 	{
-		super(JSNodeTypes.TRY, children);
+		super(IJSNodeTypes.TRY, children);
 	}
 
 	/*

@@ -18,7 +18,7 @@ public class JSConstructNode extends JSNode
 	 */
 	public JSConstructNode(JSNode... children)
 	{
-		super(JSNodeTypes.CONSTRUCT, children);
+		super(IJSNodeTypes.CONSTRUCT, children);
 	}
 
 	/*

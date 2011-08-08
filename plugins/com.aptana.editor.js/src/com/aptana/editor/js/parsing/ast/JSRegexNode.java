@@ -18,7 +18,7 @@ public class JSRegexNode extends JSPrimitiveNode
 	 */
 	public JSRegexNode(String text)
 	{
-		super(JSNodeTypes.REGEX, text);
+		super(IJSNodeTypes.REGEX, text);
 	}
 
 	/**

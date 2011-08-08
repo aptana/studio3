@@ -131,9 +131,10 @@ public class PropertyElement extends BaseElement
 		super.fromJSON(object);
 
 		this.setOwningType(StringUtil.getStringValue(object.get(OWNING_TYPE_PROPERTY)));
-		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY));
-		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY));
-		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY));
+		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY)); // $codepro.audit.disable useEquals
+		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY)); // $codepro.audit.disable
+																						// useEquals
+		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY)); // $codepro.audit.disable useEquals
 
 		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY), ReturnTypeElement.class);
 		this._examples = IndexUtil.createList(object.get(EXAMPLES_PROPERTY));

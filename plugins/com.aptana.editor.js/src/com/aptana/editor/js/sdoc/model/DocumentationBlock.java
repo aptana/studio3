@@ -62,12 +62,12 @@ public class DocumentationBlock extends Symbol
 	public List<Tag> getTags()
 	{
 		List<Tag> result = this._tags;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -77,11 +77,11 @@ public class DocumentationBlock extends Symbol
 	 * @param tagSelector
 	 * @return
 	 */
-	public List<Tag> getTags(EnumSet<TagType> tagSelector)
+	public List<Tag> getTags(EnumSet<TagType> tagSelector) // $codepro.audit.disable declareAsInterface
 	{
 		List<Tag> result;
 
-		if (this._tags != null && this._tags.isEmpty() == false)
+		if (this._tags != null && !this._tags.isEmpty())
 		{
 			result = new ArrayList<Tag>();
 
@@ -129,7 +129,7 @@ public class DocumentationBlock extends Symbol
 	 */
 	public boolean hasTags()
 	{
-		return (this._tags != null && this._tags.isEmpty() == false);
+		return this._tags != null && !this._tags.isEmpty();
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class DocumentationBlock extends Symbol
 	{
 		writer.println("/**").increaseIndent(); //$NON-NLS-1$
 
-		if (this._text != null && StringUtil.isEmpty(this._text) == false)
+		if (this._text != null && !StringUtil.isEmpty(this._text))
 		{
 			writer.printlnWithIndent(this._text);
 

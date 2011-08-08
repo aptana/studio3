@@ -16,7 +16,7 @@ public class JSElisionNode extends JSNode
 	 */
 	public JSElisionNode(JSNode... children)
 	{
-		super(JSNodeTypes.ELISION, children);
+		super(IJSNodeTypes.ELISION, children);
 	}
 
 	/*

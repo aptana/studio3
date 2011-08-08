@@ -19,7 +19,7 @@ public abstract class JSPrimitiveNode extends JSNode
 	 * @param end
 	 * @param text
 	 */
-	public JSPrimitiveNode(short type, String text)
+	protected JSPrimitiveNode(short type, String text)
 	{
 		super(type);
 

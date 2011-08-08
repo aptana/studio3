@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.js.sdoc.parsing;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -60,7 +59,7 @@ public class SDocScanner extends Scanner
 	 * @see beaver.Scanner#nextToken()
 	 */
 	@Override
-	public Symbol nextToken() throws IOException, Exception
+	public Symbol nextToken() throws Exception
 	{
 		Symbol result;
 
@@ -104,7 +103,8 @@ public class SDocScanner extends Scanner
 						length = 0;
 					}
 
-					result = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
+					result = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1,
+							fDocument.get(offset, length));
 				}
 				catch (BadLocationException e)
 				{
@@ -128,7 +128,7 @@ public class SDocScanner extends Scanner
 		fTypeTokenScanner.setRange(fDocument, typesOffset, typesLength);
 		IToken token = fTypeTokenScanner.nextToken();
 
-		while (token != Token.EOF)
+		while (token != Token.EOF) // $codepro.audit.disable useEquals
 		{
 			int offset = fTypeTokenScanner.getTokenOffset();
 			int length = fTypeTokenScanner.getTokenLength();
@@ -137,7 +137,8 @@ public class SDocScanner extends Scanner
 
 			try
 			{
-				Symbol symbol = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1, fDocument.get(offset, length));
+				Symbol symbol = new Symbol(type.getIndex(), offset + fOffset, offset + fOffset + length - 1,
+						fDocument.get(offset, length));
 
 				fQueue.offer(symbol);
 

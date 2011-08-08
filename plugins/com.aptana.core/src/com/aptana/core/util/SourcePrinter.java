@@ -183,6 +183,20 @@ public class SourcePrinter
 	 *            The text to append to this buffer
 	 * @return Returns self
 	 */
+	public SourcePrinter println(char text)
+	{
+		this._buffer.append(text).append(_newLine);
+
+		return this;
+	}
+
+	/**
+	 * Add a line of text to the current source
+	 * 
+	 * @param text
+	 *            The text to append to this buffer
+	 * @return Returns self
+	 */
 	public SourcePrinter println(String text)
 	{
 		this._buffer.append(text).append(_newLine);
@@ -196,9 +210,35 @@ public class SourcePrinter
 	 * @param text
 	 * @return Returns self
 	 */
+	public SourcePrinter printlnWithIndent(char text)
+	{
+		this._buffer.append(this._currentIndent).append(text).append(_newLine);
+
+		return this;
+	}
+
+	/**
+	 * Add the current indent text and then a line of text to the current source
+	 * 
+	 * @param text
+	 * @return Returns self
+	 */
 	public SourcePrinter printlnWithIndent(String text)
 	{
 		this._buffer.append(this._currentIndent).append(text).append(_newLine);
+
+		return this;
+	}
+
+	/**
+	 * Output the current indent text and then the specified text
+	 * 
+	 * @param text
+	 * @return Returns self
+	 */
+	public SourcePrinter printWithIndent(char text)
+	{
+		this._buffer.append(this._currentIndent).append(text);
 
 		return this;
 	}

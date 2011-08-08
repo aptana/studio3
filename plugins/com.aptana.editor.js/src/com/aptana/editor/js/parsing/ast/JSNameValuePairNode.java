@@ -14,7 +14,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSNameValuePairNode extends JSNode
 {
 	private Symbol _colon;
-	
+
 	/**
 	 * JSNameValuePairNode
 	 * 
@@ -24,8 +24,8 @@ public class JSNameValuePairNode extends JSNode
 	 */
 	public JSNameValuePairNode(JSNode name, Symbol colon, JSNode value)
 	{
-		super(JSNodeTypes.NAME_VALUE_PAIR, name, value);
-		
+		super(IJSNodeTypes.NAME_VALUE_PAIR, name, value);
+
 		this._colon = colon;
 	}
 
@@ -48,7 +48,7 @@ public class JSNameValuePairNode extends JSNode
 	{
 		return this._colon;
 	}
-	
+
 	/**
 	 * getName
 	 */

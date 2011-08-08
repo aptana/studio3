@@ -33,7 +33,7 @@ public class JSFunctionNode extends JSNode
 	 */
 	public JSFunctionNode(JSNode... children)
 	{
-		super(JSNodeTypes.FUNCTION, children);
+		super(IJSNodeTypes.FUNCTION, children);
 	}
 
 	/*
@@ -119,7 +119,7 @@ public class JSFunctionNode extends JSNode
 			{
 				result.add((JSReturnNode) current);
 			}
-			else if (current instanceof JSFunctionNode == false)
+			else if (!(current instanceof JSFunctionNode))
 			{
 				for (IParseNode child : current)
 				{

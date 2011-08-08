@@ -12,7 +12,7 @@ import beaver.Symbol;
 public class JSDefaultNode extends JSNode
 {
 	private Symbol _colon;
-	
+
 	/**
 	 * JSDefaultNode
 	 * 
@@ -21,8 +21,8 @@ public class JSDefaultNode extends JSNode
 	 */
 	public JSDefaultNode(Symbol colon, JSNode... children)
 	{
-		super(JSNodeTypes.DEFAULT, children);
-		
+		super(IJSNodeTypes.DEFAULT, children);
+
 		this._colon = colon;
 	}
 
@@ -35,7 +35,7 @@ public class JSDefaultNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	/**
 	 * getColon
 	 * 

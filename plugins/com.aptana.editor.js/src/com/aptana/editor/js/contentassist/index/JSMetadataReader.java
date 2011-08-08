@@ -160,7 +160,7 @@ public class JSMetadataReader extends MetadataReader
 				String propertyName = parts[i];
 
 				// update accumulated type name
-				accumulatedTypeName += "." + propertyName; //$NON-NLS-1$
+				accumulatedTypeName += "." + propertyName; //$NON-NLS-1$ // $codepro.audit.disable stringConcatenationInLoop
 
 				// try to grab the property off of the current type
 				PropertyElement property = type.getProperty(propertyName);
@@ -203,8 +203,8 @@ public class JSMetadataReader extends MetadataReader
 					}
 					else
 					{
-						String message = MessageFormat.format(
-								Messages.JSMetadataReader_Invalid_Base_Type, superType, typeName); 
+						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Base_Type, superType,
+								typeName);
 
 						this.logError(message);
 					}
@@ -217,7 +217,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName); 
+			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName);
 
 			this.logError(message);
 		}
@@ -259,7 +259,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			this.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName); 
+			this.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName);
 		}
 	}
 
@@ -374,8 +374,8 @@ public class JSMetadataReader extends MetadataReader
 			}
 			else
 			{
-				String message = MessageFormat.format(
-						Messages.JSMetadataReader_Invalid_Parameter_Type, typespec, parameterName); 
+				String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, typespec,
+						parameterName);
 
 				this.logError(message);
 			}
@@ -419,10 +419,7 @@ public class JSMetadataReader extends MetadataReader
 			{
 				property.setIsClassProperty(true);
 			}
-			else
-			{
-				// TODO: error or warning?
-			}
+			// TODO: else error or warning?
 
 			// set types
 			String types = attrs.get("type"); //$NON-NLS-1$
@@ -435,8 +432,8 @@ public class JSMetadataReader extends MetadataReader
 				}
 				else
 				{
-					String message = MessageFormat.format(
-							Messages.JSMetadataReader_Invalid_Property_Type, propertyType, propertyName); 
+					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type,
+							propertyType, propertyName);
 
 					this.logError(message);
 				}
@@ -489,7 +486,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			this.logError(Messages.JSMetadataReader_Invalid_Return_Type + type); 
+			this.logError(Messages.JSMetadataReader_Invalid_Return_Type + type);
 		}
 	}
 
@@ -668,10 +665,7 @@ public class JSMetadataReader extends MetadataReader
 			// add description to the current method
 			this._currentUserAgent.setDescription(description);
 		}
-		else
-		{
-			// throw error
-		}
+		// TODO: else throw error
 	}
 
 	/**
@@ -709,17 +703,14 @@ public class JSMetadataReader extends MetadataReader
 		if (this._currentException != null)
 		{
 			if (this._currentProperty != null)
-			{
-				// this doesn't make sense to me, but it is defined in the schema
+			{ // $codepro.audit.disable emptyIfStatement
+				// this doesn't make sense to me, but it is defined in the schema. Ignore for now
 			}
 			else if (this._currentFunction != null)
 			{
 				this._currentFunction.addException(this._currentException);
 			}
-			else
-			{
-				// throw error
-			}
+			// TODO: else throw error
 
 			this._currentException = null;
 		}
@@ -761,10 +752,7 @@ public class JSMetadataReader extends MetadataReader
 					this._currentType.addProperty(this._currentFunction);
 				}
 			}
-			else
-			{
-				// TODO: warning or error about unknown method role
-			}
+			// TODO: else warning or error about unknown method role
 
 			this._currentFunction = null;
 		}
@@ -817,10 +805,7 @@ public class JSMetadataReader extends MetadataReader
 					this._currentType.addProperty(this._currentProperty);
 				}
 			}
-			else
-			{
-				// TODO: warning or error about unknown property role
-			}
+			// TODO: else warning or error about unknown property role
 
 			this._currentProperty = null;
 		}
@@ -1003,7 +988,7 @@ public class JSMetadataReader extends MetadataReader
 		{
 			types = parser.parseType(typeSpec);
 		}
-		catch (Exception e)
+		catch (Exception e) // $codepro.audit.disable emptyCatchClause
 		{
 			// we return null if the typeSpec is invalid
 		}

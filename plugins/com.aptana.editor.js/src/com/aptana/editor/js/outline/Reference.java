@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -28,12 +28,12 @@ class Reference
 	private String fType;
 	private IParseNode fNameNode;
 
-	public Reference(IParseNode scopeNode, IParseNode nameNode, String name, String type)
+	Reference(IParseNode scopeNode, IParseNode nameNode, String name, String type)
 	{
 		this(createScopeString(scopeNode), nameNode, name, type);
 	}
 
-	public Reference(String scope, IParseNode nameNode, String name, String type)
+	Reference(String scope, IParseNode nameNode, String name, String type)
 	{
 		fScope = scope;
 		fNameNode = nameNode;
@@ -74,12 +74,12 @@ class Reference
 
 		switch (currentNode.getNodeType())
 		{
-			case JSNodeTypes.IDENTIFIER:
-			case JSNodeTypes.THIS:
+			case IJSNodeTypes.IDENTIFIER:
+			case IJSNodeTypes.THIS:
 				parent = currentNode.getParent();
-				if (parent.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				if (parent.getNodeType() == IJSNodeTypes.GET_PROPERTY)
 				{
-					if (parent.getChild(1) == currentNode)
+					if (parent.getChild(1) == currentNode) // $codepro.audit.disable useEquals
 					{
 						parts.add(parent.toString());
 					}
@@ -90,22 +90,22 @@ class Reference
 				}
 				currentNode = parent;
 				break;
-			case JSNodeTypes.GET_PROPERTY:
+			case IJSNodeTypes.GET_PROPERTY:
 				parts.add(currentNode.getChild(0).toString());
 				currentNode = currentNode.getParent();
 				break;
-			case JSNodeTypes.FUNCTION:
+			case IJSNodeTypes.FUNCTION:
 				parent = currentNode.getParent();
 
 				// NOTE: The following block is for 'dojo.lang.extend', 'MochiKit.Base.update',
 				// and 'Object.extend' support
-				if (parent != null && parent.getNodeType() == JSNodeTypes.NAME_VALUE_PAIR)
+				if (parent != null && parent.getNodeType() == IJSNodeTypes.NAME_VALUE_PAIR)
 				{
 					IParseNode grandparent = parent.getParent();
-					if (grandparent != null && grandparent.getNodeType() == JSNodeTypes.OBJECT_LITERAL)
+					if (grandparent != null && grandparent.getNodeType() == IJSNodeTypes.OBJECT_LITERAL)
 					{
 						IParseNode greatgrandparent = grandparent.getParent();
-						if (greatgrandparent != null && greatgrandparent.getNodeType() == JSNodeTypes.ARGUMENTS)
+						if (greatgrandparent != null && greatgrandparent.getNodeType() == IJSNodeTypes.ARGUMENTS)
 						{
 							parts.add(greatgrandparent.getChild(0) + "."); //$NON-NLS-1$
 						}
@@ -119,7 +119,7 @@ class Reference
 		{
 			switch (currentNode.getNodeType())
 			{
-				case JSNodeTypes.FUNCTION:
+				case IJSNodeTypes.FUNCTION:
 					String functionName = currentNode.getText();
 					if (functionName.length() > 0)
 					{
@@ -137,8 +137,9 @@ class Reference
 							grandParentNode = parentNode.getParent();
 						}
 
-						if (parentNode != null && grandParentNode != null && parentNode.getNodeType() == JSNodeTypes.GROUP
-								&& grandParentNode.getNodeType() == JSNodeTypes.INVOKE)
+						if (parentNode != null && grandParentNode != null
+								&& parentNode.getNodeType() == IJSNodeTypes.GROUP
+								&& grandParentNode.getNodeType() == IJSNodeTypes.INVOKE)
 						{
 							currentNode = grandParentNode;
 						}
@@ -165,13 +166,13 @@ class Reference
 						}
 					}
 					break;
-				case JSNodeTypes.NAME_VALUE_PAIR:
+				case IJSNodeTypes.NAME_VALUE_PAIR:
 					IParseNode property = currentNode.getChild(0);
 					parts.add(property.getText());
 					break;
-				case JSNodeTypes.DECLARATION:
+				case IJSNodeTypes.DECLARATION:
 					IParseNode assignedValue = currentNode.getChild(1);
-					if (assignedValue.getNodeType() == JSNodeTypes.OBJECT_LITERAL)
+					if (assignedValue.getNodeType() == IJSNodeTypes.OBJECT_LITERAL)
 					{
 						parts.add(currentNode.getChild(0).getText());
 					}

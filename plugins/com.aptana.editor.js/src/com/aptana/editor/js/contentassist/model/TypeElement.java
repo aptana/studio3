@@ -94,7 +94,7 @@ public class TypeElement extends BaseElement
 				this._parentTypes = new ArrayList<String>();
 			}
 
-			if (this._parentTypes.contains(type) == false)
+			if (!this._parentTypes.contains(type))
 			{
 				this._parentTypes.add(type);
 			}
@@ -161,7 +161,8 @@ public class TypeElement extends BaseElement
 
 		if (object.containsKey(PROPERTIES_PROPERTY))
 		{
-			List<PropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY), PropertyElement.class);
+			List<PropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY),
+					PropertyElement.class);
 
 			for (PropertyElement property : properties)
 			{
@@ -171,7 +172,8 @@ public class TypeElement extends BaseElement
 
 		if (object.containsKey(FUNCTIONS_PROPERTY))
 		{
-			List<PropertyElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY), PropertyElement.class);
+			List<PropertyElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY),
+					PropertyElement.class);
 
 			for (PropertyElement function : functions)
 			{
@@ -209,7 +211,7 @@ public class TypeElement extends BaseElement
 			}
 		}
 
-		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY));
+		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
 	}
 
 	/**
@@ -350,7 +352,7 @@ public class TypeElement extends BaseElement
 	 */
 	public boolean hasParentTypes()
 	{
-		return this._parentTypes != null && this._parentTypes.isEmpty() == false;
+		return this._parentTypes != null && !this._parentTypes.isEmpty();
 	}
 
 	/**
@@ -360,7 +362,7 @@ public class TypeElement extends BaseElement
 	 */
 	public boolean hasProperties()
 	{
-		return this._properties != null && this._properties.isEmpty() == false;
+		return this._properties != null && !this._properties.isEmpty();
 	}
 
 	/**
@@ -471,20 +473,20 @@ public class TypeElement extends BaseElement
 			printer.print(" : ").print(StringUtil.join(", ", this.getParentTypes())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		printer.println().print("{").increaseIndent().println(); //$NON-NLS-1$
+		printer.println().print('{').increaseIndent().println(); //$NON-NLS-1$
 
 		for (PropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
-			printer.println(";"); //$NON-NLS-1$
+			printer.println(';'); //$NON-NLS-1$
 		}
 
 		for (EventElement event : this.getEvents())
 		{
 			event.toSource(printer);
-			printer.println(";"); //$NON-NLS-1$
+			printer.println(';'); //$NON-NLS-1$
 		}
 
-		printer.decreaseIndent().println("}"); //$NON-NLS-1$
+		printer.decreaseIndent().println('}'); //$NON-NLS-1$
 	}
 }

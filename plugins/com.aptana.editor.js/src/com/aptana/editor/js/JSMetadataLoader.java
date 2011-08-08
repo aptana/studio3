@@ -25,7 +25,7 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -71,7 +71,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected double getIndexVersion()
 	{
-		return JSIndexConstants.INDEX_VERSION;
+		return IJSIndexConstants.INDEX_VERSION;
 	}
 
 	/*
@@ -178,7 +178,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	protected void writeIndex(JSMetadataReader reader)
 	{
 		// remove old index
-		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
+		IndexManager.getInstance().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
 
 		JSIndexWriter indexer = new JSIndexWriter();
 

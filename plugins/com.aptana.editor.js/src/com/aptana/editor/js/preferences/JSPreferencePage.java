@@ -86,10 +86,10 @@ public class JSPreferencePage extends CommonEditorPreferencePage
 	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
-		if (event.getSource() == enableFolding)
+		if (event.getSource() == enableFolding) // $codepro.audit.disable useEquals
 		{
 			Object newValue = event.getNewValue();
-			if (Boolean.TRUE == newValue)
+			if (Boolean.TRUE == newValue) // $codepro.audit.disable useEquals
 			{
 				foldComments.setEnabled(true, foldingGroup);
 				foldFunctions.setEnabled(true, foldingGroup);

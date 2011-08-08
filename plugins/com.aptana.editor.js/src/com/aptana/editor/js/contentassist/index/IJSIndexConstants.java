@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.js.contentassist.index;
 
-public interface JSIndexConstants
+public interface IJSIndexConstants
 {
 	// the content format version of the JS index files
 	// 0.1 - Initial version

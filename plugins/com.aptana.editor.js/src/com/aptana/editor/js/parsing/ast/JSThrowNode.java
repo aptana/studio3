@@ -16,7 +16,7 @@ public class JSThrowNode extends JSPreUnaryOperatorNode
 	 */
 	public JSThrowNode(JSNode expression)
 	{
-		super(JSNodeTypes.THROW, expression);
+		super(IJSNodeTypes.THROW, expression);
 	}
 
 	/*

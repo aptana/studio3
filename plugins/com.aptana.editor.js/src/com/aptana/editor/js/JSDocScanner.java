@@ -33,7 +33,7 @@ public class JSDocScanner extends RuleBasedScanner
 		 */
 		public boolean isWordStart(char c)
 		{
-			return (c == '@');
+			return c == '@';
 		}
 
 		/*

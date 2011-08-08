@@ -169,8 +169,8 @@ public class FunctionElement extends PropertyElement
 	{
 		super.fromJSON(object);
 
-		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY));
-		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY));
+		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY)); // $codepro.audit.disable useEquals
+		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY)); // $codepro.audit.disable useEquals
 
 		this._parameters = IndexUtil.createList(object.get(PARAMETERS_PROPERTY), ParameterElement.class);
 		this._returnTypes = IndexUtil.createList(object.get(RETURN_TYPES_PROPERTY), ReturnTypeElement.class);
@@ -326,7 +326,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasExceptions()
 	{
-		return this._exceptions != null && this._exceptions.isEmpty() == false;
+		return this._exceptions != null && !this._exceptions.isEmpty();
 	}
 
 	/**
@@ -336,7 +336,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public boolean hasParameters()
 	{
-		return this._parameters != null && this._parameters.isEmpty() == false;
+		return this._parameters != null && !this._parameters.isEmpty();
 	}
 
 	/**
@@ -406,7 +406,7 @@ public class FunctionElement extends PropertyElement
 		printer.printIndent();
 
 		// print any annotations
-		if (this.isInstanceProperty() == false)
+		if (!this.isInstanceProperty())
 		{
 			printer.print("static "); //$NON-NLS-1$
 		}
@@ -427,14 +427,15 @@ public class FunctionElement extends PropertyElement
 		printer.print(this.getName());
 
 		// print parameter types
-		printer.print("(").print(StringUtil.join(JSTypeConstants.PARAMETER_DELIMITER, this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.print('(').print(StringUtil.join(JSTypeConstants.PARAMETER_DELIMITER, this.getParameterTypes()))
+				.print(')');
 
 		// print return types
 		List<String> returnTypes = this.getReturnTypeNames();
 
 		printer.print(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
 
-		if (returnTypes != null && returnTypes.isEmpty() == false)
+		if (returnTypes != null && !returnTypes.isEmpty())
 		{
 			printer.print(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes));
 		}

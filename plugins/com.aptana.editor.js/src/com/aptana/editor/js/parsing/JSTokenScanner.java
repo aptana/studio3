@@ -146,7 +146,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 				{
 					boolean result = false;
 
-					if (this._closed == false)
+					if (!this._closed)
 					{
 						if (c == '/')
 						{
@@ -264,7 +264,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 		IToken result = super.nextToken();
 
 		// NOTE: Only save the last token if it is not whitespace
-		if (result.isWhitespace() == false)
+		if (!result.isWhitespace())
 		{
 			fToken = result;
 		}

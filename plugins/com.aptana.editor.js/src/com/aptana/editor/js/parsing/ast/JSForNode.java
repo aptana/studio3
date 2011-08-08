@@ -23,10 +23,10 @@ public class JSForNode extends JSNode
 	 * 
 	 * @param children
 	 */
-	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition, Symbol semicolon2, JSNode advance,
-		Symbol rightParenthesis, JSNode body)
+	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition,
+			Symbol semicolon2, JSNode advance, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.FOR, initializer, condition, advance, body);
+		super(IJSNodeTypes.FOR, initializer, condition, advance, body);
 
 		this._leftParenthesis = leftParenthesis;
 		this._semicolon1 = semicolon1;
