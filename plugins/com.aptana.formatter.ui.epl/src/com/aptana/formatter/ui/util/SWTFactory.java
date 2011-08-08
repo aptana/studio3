@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.aptana.formatter.ui.util;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
@@ -394,7 +395,11 @@ public class SWTFactory
 
 		GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false, hspan, 1);
 		PixelConverter pc = new PixelConverter(spinner);
-		gd.widthHint = pc.convertWidthInCharsToPixels(2);
+		// See http://jira.appcelerator.org/browse/APSTUD-3215
+		// We need to add some extra spacing to the MacOSX spinner in order to adjust the size to the way Mac draws
+		// spinners.
+		int extraWidth = Platform.OS_MACOSX.equals(Platform.getOS()) ? 25 : 0;
+		gd.widthHint = pc.convertWidthInCharsToPixels(2) + extraWidth;
 		spinner.setLayoutData(gd);
 		return spinner;
 	}
