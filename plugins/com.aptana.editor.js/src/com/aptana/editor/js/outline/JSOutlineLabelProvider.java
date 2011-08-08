@@ -1,3 +1,7 @@
+// $codepro.audit.disable unnecessaryImport
+// NOTE: CodePro is saying "import com.aptana.editor.js.outline.JSOutlineItem.Type;"
+// is unnecessary even though it is required. Also, I couldn't disable code pro
+// on that import statement and had to place this at the file level
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.

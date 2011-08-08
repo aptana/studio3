@@ -134,8 +134,8 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		cmRule.add(':', getToken(SDocTokenType.COLON));
 		cmRule.add(',', getToken(SDocTokenType.COMMA));
 		cmRule.add('|', getToken(SDocTokenType.PIPE));
-		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE));
-		cmRule.add('\n', getToken(SDocTokenType.WHITESPACE));
+		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE)); // $codepro.audit.disable platformSpecificLineSeparator
+		cmRule.add('\n', getToken(SDocTokenType.WHITESPACE)); // $codepro.audit.disable platformSpecificLineSeparator
 		rules.add(cmRule);
 
 		WordRule keywordRules = new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER));

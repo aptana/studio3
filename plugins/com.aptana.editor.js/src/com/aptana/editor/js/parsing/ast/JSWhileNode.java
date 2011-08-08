@@ -23,8 +23,8 @@ public class JSWhileNode extends JSNode
 	 */
 	public JSWhileNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.WHILE, condition, body);
-		
+		super(IJSNodeTypes.WHILE, condition, body);
+
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
 	}

@@ -16,7 +16,7 @@ public class JSBreakNode extends JSLabelStatementNode
 	 */
 	public JSBreakNode()
 	{
-		super(JSNodeTypes.BREAK);
+		super(IJSNodeTypes.BREAK);
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class JSBreakNode extends JSLabelStatementNode
 	 */
 	public JSBreakNode(Symbol label)
 	{
-		super(JSNodeTypes.BREAK, label);
+		super(IJSNodeTypes.BREAK, label);
 	}
 
 	/*

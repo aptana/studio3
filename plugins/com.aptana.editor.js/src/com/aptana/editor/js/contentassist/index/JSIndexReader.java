@@ -34,7 +34,7 @@ public class JSIndexReader extends IndexReader
 	 * @param index
 	 * @throws IOException
 	 */
-	protected void attachMembers(TypeElement type, Index index) throws IOException
+	protected void attachMembers(TypeElement type, Index index)
 	{
 		// members
 		if (type != null && index != null)
@@ -84,7 +84,7 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	protected TypeElement createType(QueryResult type) throws IOException
+	protected TypeElement createType(QueryResult type)
 	{
 		TypeElement result;
 		String[] columns = this.getDelimiterPattern().split(type.getWord());
@@ -130,7 +130,7 @@ public class JSIndexReader extends IndexReader
 	@Override
 	protected String getDelimiter()
 	{
-		return JSIndexConstants.DELIMITER;
+		return IJSIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -142,17 +142,19 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public FunctionElement getFunction(Index index, String owningType, String propertyName) throws IOException
+	public FunctionElement getFunction(Index index, String owningType, String propertyName)
 	{
 		FunctionElement result = null;
 
-		if (index != null && StringUtil.isEmpty(owningType) == false && StringUtil.isEmpty(propertyName) == false)
+		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
 		{
-			List<QueryResult> functions = index.query( //
-				new String[] { JSIndexConstants.FUNCTION }, //
-				this.getMemberPattern(owningType, propertyName), //
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			// @formatter:off
+			List<QueryResult> functions = index.query(
+				new String[] { IJSIndexConstants.FUNCTION },
+				this.getMemberPattern(owningType, propertyName),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
+			// @formatter:on
 
 			if (functions != null && functions.size() > 0)
 			{
@@ -171,18 +173,20 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<FunctionElement> getFunctions(Index index, List<String> owningTypes) throws IOException
+	public List<FunctionElement> getFunctions(Index index, List<String> owningTypes)
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (index != null && CollectionsUtil.isEmpty(owningTypes) == false)
+		if (index != null && !CollectionsUtil.isEmpty(owningTypes))
 		{
 			// read functions
-			List<QueryResult> functions = index.query( //
-				new String[] { JSIndexConstants.FUNCTION }, //
-				this.getMemberPattern(owningTypes), //
-				SearchPattern.REGEX_MATCH //
-				);
+			// @formatter:off
+			List<QueryResult> functions = index.query(
+				new String[] { IJSIndexConstants.FUNCTION },
+				this.getMemberPattern(owningTypes),
+				SearchPattern.REGEX_MATCH
+			);
+			// @formatter:on
 
 			if (functions != null)
 			{
@@ -204,18 +208,20 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<FunctionElement> getFunctions(Index index, String owningType) throws IOException
+	public List<FunctionElement> getFunctions(Index index, String owningType)
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (index != null && StringUtil.isEmpty(owningType) == false)
+		if (index != null && !StringUtil.isEmpty(owningType))
 		{
 			// read functions
-			List<QueryResult> functions = index.query( //
-				new String[] { JSIndexConstants.FUNCTION }, //
-				this.getMemberPattern(owningType), //
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			// @formatter:off
+			List<QueryResult> functions = index.query(
+				new String[] { IJSIndexConstants.FUNCTION },
+				this.getMemberPattern(owningType),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
+			// @formatter:on
 
 			if (functions != null)
 			{
@@ -273,18 +279,20 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, List<String> owningTypes) throws IOException
+	public List<PropertyElement> getProperties(Index index, List<String> owningTypes)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null && CollectionsUtil.isEmpty(owningTypes) == false)
+		if (index != null && !CollectionsUtil.isEmpty(owningTypes))
 		{
 			// read properties
-			List<QueryResult> properties = index.query( //
-				new String[] { JSIndexConstants.PROPERTY }, //
-				this.getMemberPattern(owningTypes), //
-				SearchPattern.REGEX_MATCH //
-				);
+			// @formatter:off
+			List<QueryResult> properties = index.query(
+				new String[] { IJSIndexConstants.PROPERTY },
+				this.getMemberPattern(owningTypes),
+				SearchPattern.REGEX_MATCH
+			);
+			// @formatter:on
 
 			if (properties != null)
 			{
@@ -306,18 +314,20 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, String owningType) throws IOException
+	public List<PropertyElement> getProperties(Index index, String owningType)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null && StringUtil.isEmpty(owningType) == false)
+		if (index != null && !StringUtil.isEmpty(owningType))
 		{
 			// read properties
-			List<QueryResult> properties = index.query( //
-				new String[] { JSIndexConstants.PROPERTY }, //
-				this.getMemberPattern(owningType), //
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			// @formatter:off
+			List<QueryResult> properties = index.query(
+				new String[] { IJSIndexConstants.PROPERTY },
+				this.getMemberPattern(owningType),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
+			// @formatter:on
 
 			if (properties != null)
 			{
@@ -340,17 +350,19 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public PropertyElement getProperty(Index index, String owningType, String propertyName) throws IOException
+	public PropertyElement getProperty(Index index, String owningType, String propertyName)
 	{
 		PropertyElement result = null;
 
-		if (index != null && StringUtil.isEmpty(owningType) == false && StringUtil.isEmpty(propertyName) == false)
+		if (index != null && !StringUtil.isEmpty(owningType) && !StringUtil.isEmpty(propertyName))
 		{
-			List<QueryResult> properties = index.query( //
-				new String[] { JSIndexConstants.PROPERTY }, //
-				this.getMemberPattern(owningType, propertyName), //
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			// @formatter:off
+			List<QueryResult> properties = index.query(
+				new String[] { IJSIndexConstants.PROPERTY },
+				this.getMemberPattern(owningType, propertyName),
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE
 			);
+			// @formatter:on
 
 			if (properties != null && properties.size() > 0)
 			{
@@ -368,7 +380,7 @@ public class JSIndexReader extends IndexReader
 	@Override
 	protected String getSubDelimiter()
 	{
-		return JSIndexConstants.SUB_DELIMITER;
+		return IJSIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -383,27 +395,28 @@ public class JSIndexReader extends IndexReader
 	{
 		TypeElement result = null;
 
-		if (index != null && StringUtil.isEmpty(typeName) == false)
+		if (index != null && !StringUtil.isEmpty(typeName))
 		{
-			try
-			{
-				String pattern = typeName + this.getDelimiter();
-				List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
+			String pattern = typeName + this.getDelimiter();
 
-				if (types != null && types.isEmpty() == false)
+			// @formatter:off
+			List<QueryResult> types = index.query(
+				new String[] { IJSIndexConstants.TYPE },
+				pattern,
+				SearchPattern.PREFIX_MATCH
+			);
+			// @formatter:on
+
+			if (types != null && !types.isEmpty())
+			{
+				result = createType(types.get(0));
+
+				if (includeMembers)
 				{
-					result = createType(types.get(0));
+					this.attachMembers(result, index);
 
-					if (includeMembers)
-					{
-						this.attachMembers(result, index);
-						
-						result.setSerializeProperties(true);
-					}
+					result.setSerializeProperties(true);
 				}
-			}
-			catch (IOException e)
-			{
 			}
 		}
 
@@ -418,7 +431,7 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getTypeProperties(Index index, String typeName) throws IOException
+	public List<PropertyElement> getTypeProperties(Index index, String typeName)
 	{
 		List<PropertyElement> properties = this.getProperties(index, typeName);
 
@@ -435,18 +448,24 @@ public class JSIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<TypeElement> getTypes(Index index, boolean includeMembers) throws IOException
+	public List<TypeElement> getTypes(Index index, boolean includeMembers)
 	{
 		List<TypeElement> result = Collections.emptyList();
 
 		if (index != null)
 		{
-			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
+			// @formatter:off
+			List<QueryResult> types = index.query(
+				new String[] { IJSIndexConstants.TYPE },
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH
+			);
+			// @formatter:on
 
 			if (types != null)
 			{
 				result = new ArrayList<TypeElement>();
-				
+
 				for (QueryResult type : types)
 				{
 					TypeElement t = this.createType(type);
@@ -454,7 +473,7 @@ public class JSIndexReader extends IndexReader
 					if (includeMembers)
 					{
 						this.attachMembers(t, index);
-						
+
 						t.setSerializeProperties(true);
 					}
 

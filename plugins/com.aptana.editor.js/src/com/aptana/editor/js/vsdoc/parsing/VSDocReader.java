@@ -361,7 +361,8 @@ public class VSDocReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(JSPlugin.getDefault().getBundle(), Path.fromPortableString(METADATA_SCHEMA_XML), false);
+			return FileLocator.openStream(JSPlugin.getDefault().getBundle(),
+					Path.fromPortableString(METADATA_SCHEMA_XML), false);
 		}
 		catch (IOException e)
 		{
@@ -388,7 +389,7 @@ public class VSDocReader extends MetadataReader
 	{
 		List<Type> result = Collections.emptyList();
 
-		if (StringUtil.isEmpty(types) == false)
+		if (!StringUtil.isEmpty(types))
 		{
 			try
 			{

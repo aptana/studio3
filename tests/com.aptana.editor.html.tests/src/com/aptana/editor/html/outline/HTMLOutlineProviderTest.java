@@ -20,7 +20,7 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLOutlineProviderTest extends TestCase

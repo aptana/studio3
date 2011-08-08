@@ -1,10 +1,17 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.sdoc.parsing;
 
 /**
- * This class lists terminals used by the
- * grammar specified in "SDoc.grammar".
+ * This class lists terminals used by the grammar specified in "SDoc.grammar".
  */
-public class Terminals {
+public class Terminals // $codepro.audit.disable convertClassToInterface
+{ // $codepro.audit.disable convertClassToInterface
 	static public final short EOF = 0;
 	static public final short IDENTIFIER = 1;
 	static public final short RCURLY = 2;

@@ -8,7 +8,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
@@ -49,8 +49,8 @@ public class FormatterJSGetElementNode extends FormatterBlockWithBeginNode
 		{
 			JSNode parent = (JSNode) getNode.getParent();
 			short parentType = parent.getNodeType();
-			if (parentType != JSNodeTypes.RETURN && parentType != JSNodeTypes.THROW && parentType != JSNodeTypes.DELETE
-					&& parentType != JSNodeTypes.VOID && parent.getSemicolonIncluded() && parent.getChild(0) == getNode)
+			if (parentType != IJSNodeTypes.RETURN && parentType != IJSNodeTypes.THROW && parentType != IJSNodeTypes.DELETE
+					&& parentType != IJSNodeTypes.VOID && parent.getSemicolonIncluded() && parent.getChild(0) == getNode)
 			{
 				return true;
 			}

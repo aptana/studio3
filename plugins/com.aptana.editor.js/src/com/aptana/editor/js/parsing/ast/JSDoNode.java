@@ -15,7 +15,7 @@ public class JSDoNode extends JSNode
 {
 	private Symbol _leftParenthesis;
 	private Symbol _rightParenthesis;
-	
+
 	/**
 	 * JSDoNode
 	 * 
@@ -23,8 +23,8 @@ public class JSDoNode extends JSNode
 	 */
 	public JSDoNode(JSNode body, Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis)
 	{
-		super(JSNodeTypes.DO, body, condition);
-		
+		super(IJSNodeTypes.DO, body, condition);
+
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
 	}
@@ -58,7 +58,7 @@ public class JSDoNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-	
+
 	/**
 	 * getLeftParenthesis
 	 * 
@@ -68,7 +68,7 @@ public class JSDoNode extends JSNode
 	{
 		return this._leftParenthesis;
 	}
-	
+
 	/**
 	 * getRightParenthesis
 	 * 

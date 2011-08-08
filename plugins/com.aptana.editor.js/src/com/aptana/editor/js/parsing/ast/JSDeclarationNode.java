@@ -14,7 +14,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSDeclarationNode extends JSNode
 {
 	private Symbol _equalSign;
-	
+
 	/**
 	 * JSDeclarationNode
 	 * 
@@ -22,8 +22,8 @@ public class JSDeclarationNode extends JSNode
 	 */
 	public JSDeclarationNode(JSNode identifier, Symbol equalSign, JSNode value)
 	{
-		super(JSNodeTypes.DECLARATION, identifier, value);
-		
+		super(IJSNodeTypes.DECLARATION, identifier, value);
+
 		this._equalSign = equalSign;
 	}
 
@@ -46,7 +46,7 @@ public class JSDeclarationNode extends JSNode
 	{
 		return this._equalSign;
 	}
-	
+
 	/**
 	 * getIdentifier
 	 * 

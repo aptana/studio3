@@ -1,3 +1,4 @@
+// $codepro.audit.disable appendString
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -72,7 +73,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		for (IParseNode child : node)
 		{
-			if (first == false)
+			if (!first)
 			{
 				this._printer.print(delimiter);
 			}
@@ -123,7 +124,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (node instanceof JSNode)
 		{
-			result = ((JSNode) node).isEmpty() == false;
+			result = !((JSNode) node).isEmpty();
 		}
 
 		return result;
@@ -196,7 +197,7 @@ public class JSFormatWalker extends JSTreeWalker
 		if (label != null)
 		{
 			String text = (String) label.value;
-			
+
 			if (text != null && text.length() > 0)
 			{
 				this._printer.print(" ").print(text); //$NON-NLS-1$
@@ -299,7 +300,7 @@ public class JSFormatWalker extends JSTreeWalker
 		if (label != null)
 		{
 			String text = (String) label.value;
-			
+
 			if (text != null && text.length() > 0)
 			{
 				this._printer.print(" ").print(text); //$NON-NLS-1$
@@ -322,7 +323,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (value instanceof JSNode)
 		{
-			if (((JSNode) value).isEmpty() == false)
+			if (!((JSNode) value).isEmpty())
 			{
 				this._printer.print(" = "); //$NON-NLS-1$
 				this.formatNode(value);
@@ -352,10 +353,10 @@ public class JSFormatWalker extends JSTreeWalker
 		this._printer.print("do "); //$NON-NLS-1$
 
 		IParseNode body = node.getBody();
-		
+
 		this.formatNode(body);
 
-		if (body.getNodeType() != JSNodeTypes.STATEMENTS)
+		if (body.getNodeType() != IJSNodeTypes.STATEMENTS)
 		{
 			this._printer.print(";"); //$NON-NLS-1$
 		}
@@ -387,7 +388,8 @@ public class JSFormatWalker extends JSTreeWalker
 		this.formatNaryNode(node, "", ", ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSEmptyNode)
 	 */
 	@Override
@@ -563,7 +565,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (this.isNotEmpty(falseBlock))
 		{
-			if (trueBlock.getNodeType() != JSNodeTypes.STATEMENTS)
+			if (trueBlock.getNodeType() != IJSNodeTypes.STATEMENTS)
 			{
 				this._printer.print(";"); //$NON-NLS-1$
 			}
@@ -666,7 +668,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		for (IParseNode child : node)
 		{
-			if (first == false)
+			if (!first)
 			{
 				this._printer.print(" "); //$NON-NLS-1$
 			}
@@ -691,11 +693,11 @@ public class JSFormatWalker extends JSTreeWalker
 
 		switch (node.getNodeType())
 		{
-			case JSNodeTypes.POST_DECREMENT:
+			case IJSNodeTypes.POST_DECREMENT:
 				this._printer.print("--"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.POST_INCREMENT:
+			case IJSNodeTypes.POST_INCREMENT:
 				this._printer.print("++"); //$NON-NLS-1$
 				break;
 		}
@@ -714,44 +716,44 @@ public class JSFormatWalker extends JSTreeWalker
 
 		switch (node.getNodeType())
 		{
-			case JSNodeTypes.DELETE:
+			case IJSNodeTypes.DELETE:
 				this._printer.print("delete "); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.LOGICAL_NOT:
+			case IJSNodeTypes.LOGICAL_NOT:
 				this._printer.print("!"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.NEGATIVE:
+			case IJSNodeTypes.NEGATIVE:
 				this._printer.print("-"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.PRE_DECREMENT:
+			case IJSNodeTypes.PRE_DECREMENT:
 				this._printer.print("--"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.POSITIVE:
+			case IJSNodeTypes.POSITIVE:
 				this._printer.print("+"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.PRE_INCREMENT:
+			case IJSNodeTypes.PRE_INCREMENT:
 				this._printer.print("++"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.BITWISE_NOT:
+			case IJSNodeTypes.BITWISE_NOT:
 				this._printer.print("~"); //$NON-NLS-1$
 				break;
 
-			case JSNodeTypes.TYPEOF:
+			case IJSNodeTypes.TYPEOF:
 				this._printer.print("typeof"); //$NON-NLS-1$
 
-				if (expression.getNodeType() != JSNodeTypes.GROUP)
+				if (expression.getNodeType() != IJSNodeTypes.GROUP)
 				{
 					this._printer.print(" "); //$NON-NLS-1$
 				}
 				break;
 
-			case JSNodeTypes.VOID:
+			case IJSNodeTypes.VOID:
 				this._printer.print("void "); //$NON-NLS-1$
 				break;
 		}

@@ -13,6 +13,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationExtension;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -21,7 +22,7 @@ import com.aptana.core.util.StringUtil;
 public class JSContextInformation implements IContextInformation, IContextInformationExtension
 {
 	public static final String DESCRIPTION_DELIMITER = "\ufeff"; //$NON-NLS-1$
-	private static final String LINE_DELIMITER = "\n" + DESCRIPTION_DELIMITER; //$NON-NLS-1$
+	private static final String LINE_DELIMITER = FileUtil.NEW_LINE + DESCRIPTION_DELIMITER; //$NON-NLS-1$
 
 	private String _contextString;
 	private String _infoString;
@@ -34,7 +35,8 @@ public class JSContextInformation implements IContextInformation, IContextInform
 	 * @param informationDisplayStrings
 	 * @param informationPosition
 	 */
-	public JSContextInformation(String contextDisplayString, List<String> informationDisplayStrings, int informationPosition)
+	public JSContextInformation(String contextDisplayString, List<String> informationDisplayStrings,
+			int informationPosition)
 	{
 		this._contextString = contextDisplayString;
 		this._infoString = StringUtil.join(LINE_DELIMITER, informationDisplayStrings);

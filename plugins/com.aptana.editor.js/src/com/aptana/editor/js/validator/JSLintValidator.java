@@ -38,7 +38,7 @@ public class JSLintValidator implements IValidator
 {
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
-	private static Script jsLintScript;
+	private static Script JS_LINT_SCRIPT;
 
 	public JSLintValidator()
 	{
@@ -132,7 +132,7 @@ public class JSLintValidator implements IValidator
 
 	private static synchronized Script getJSLintScript()
 	{
-		if (jsLintScript == null)
+		if (JS_LINT_SCRIPT == null)
 		{
 			URL url = Platform.getBundle("org.mozilla.rhino").getEntry("/" + JSLINT_FILENAME); //$NON-NLS-1$ //$NON-NLS-2$
 			if (url != null)
@@ -147,11 +147,11 @@ public class JSLintValidator implements IValidator
 				}
 				if (source != null)
 				{
-					jsLintScript = getJSLintScript(source);
+					JS_LINT_SCRIPT = getJSLintScript(source);
 				}
 			}
 		}
-		return jsLintScript;
+		return JS_LINT_SCRIPT;
 	}
 
 	private static Script getJSLintScript(String source)

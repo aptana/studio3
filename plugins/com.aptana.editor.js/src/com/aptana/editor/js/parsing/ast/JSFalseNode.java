@@ -20,7 +20,7 @@ public class JSFalseNode extends JSPrimitiveNode
 	 */
 	public JSFalseNode()
 	{
-		super(JSNodeTypes.FALSE, "false"); //$NON-NLS-1$
+		super(IJSNodeTypes.FALSE, "false"); //$NON-NLS-1$
 	}
 
 	/**

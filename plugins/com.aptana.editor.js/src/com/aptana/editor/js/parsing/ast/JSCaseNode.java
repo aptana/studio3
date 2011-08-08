@@ -22,13 +22,13 @@ public class JSCaseNode extends JSNode
 	 */
 	public JSCaseNode(JSNode expression, Symbol colon, JSNode... children)
 	{
-		super(JSNodeTypes.CASE, expression);
+		super(IJSNodeTypes.CASE, expression);
 
 		for (JSNode child : children)
 		{
 			this.addChild(child);
 		}
-		
+
 		this._colon = colon;
 	}
 

@@ -8,7 +8,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
@@ -52,13 +52,13 @@ public class FormatterJSGetPropertyNode extends FormatterBlockWithBeginEndNode
 			boolean addingLine = true;
 			switch (parentType)
 			{
-				case JSNodeTypes.DELETE:
-				case JSNodeTypes.PRE_DECREMENT:
-				case JSNodeTypes.PRE_INCREMENT:
-				case JSNodeTypes.VOID:
-				case JSNodeTypes.TYPEOF:
-				case JSNodeTypes.RETURN:
-				case JSNodeTypes.THROW:
+				case IJSNodeTypes.DELETE:
+				case IJSNodeTypes.PRE_DECREMENT:
+				case IJSNodeTypes.PRE_INCREMENT:
+				case IJSNodeTypes.VOID:
+				case IJSNodeTypes.TYPEOF:
+				case IJSNodeTypes.RETURN:
+				case IJSNodeTypes.THROW:
 					addingLine = false;
 					break;
 			}

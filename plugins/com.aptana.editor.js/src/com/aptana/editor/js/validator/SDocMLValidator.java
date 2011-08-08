@@ -20,7 +20,7 @@ import com.aptana.sax.IValidatingReaderLogger;
 
 public class SDocMLValidator implements IValidator
 {
-	private class LogCollector implements IValidatingReaderLogger
+	private static class LogCollector implements IValidatingReaderLogger
 	{
 		private URI path;
 		private IValidationManager manager;
@@ -32,7 +32,7 @@ public class SDocMLValidator implements IValidator
 		 * @param manager
 		 * @param path
 		 */
-		public LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
+		private LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
 		{
 			this.path = path;
 			this.manager = manager;
