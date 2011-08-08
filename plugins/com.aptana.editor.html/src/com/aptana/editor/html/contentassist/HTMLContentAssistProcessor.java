@@ -503,9 +503,16 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			if (lastSlash != -1)
 			{
 				IFileStore possibleChild = baseStore.getChild(valuePrefix.substring(0, lastSlash));
-				if (possibleChild.fetchInfo().exists())
+				try
 				{
-					baseStore = possibleChild;
+					if (possibleChild.fetchInfo().exists())
+					{
+						baseStore = possibleChild;
+					}
+				}
+				catch (Exception e)
+				{
+					// ignore
 				}
 				offset += lastSlash + 1;
 				valuePrefix = valuePrefix.substring(lastSlash + 1);
