@@ -73,7 +73,7 @@ public class SamplesManagerTest extends TestCase
 		assertEquals("com.aptana.projects.webnature", natures[0]);
 		String[] includes = localSample.getIncludePaths();
 		assertEquals(1, includes.length);
-		assertEquals(getFullPath("lib/"), includes[0]);
+		assertEquals(getFullPath("libs/"), includes[0]);
 
 		List<SampleEntry> entries = localSample.getSamples();
 		assertEquals(1, entries.size());

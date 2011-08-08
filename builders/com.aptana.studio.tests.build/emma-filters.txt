@@ -5,5 +5,6 @@
 -com.aptana.studio.tests.all.*
 -com.aptana.editor.epl.tests.*
 -com.aptana.editor.js.tests.*
+-com.aptana.testing.*
 -cef.*
 -org.eclipse.jface.text.*
