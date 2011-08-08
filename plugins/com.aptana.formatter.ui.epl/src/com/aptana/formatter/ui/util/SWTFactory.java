@@ -393,7 +393,8 @@ public class SWTFactory
 		spinner.setMaximum(max);
 
 		GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false, hspan, 1);
-		gd.widthHint = 20;
+		PixelConverter pc = new PixelConverter(spinner);
+		gd.widthHint = pc.convertWidthInCharsToPixels(2);
 		spinner.setLayoutData(gd);
 		return spinner;
 	}
