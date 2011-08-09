@@ -7,16 +7,6 @@ import org.eclipse.core.runtime.IStatus;
 public class ProcessStatusTest extends TestCase
 {
 
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
 	public void testGetMessageReturnsStdErrWithEmptyStdOutAndNonZeroExitCode() throws Exception
 	{
 		String stdOut = "";
