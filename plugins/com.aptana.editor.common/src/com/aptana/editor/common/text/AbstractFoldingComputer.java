@@ -31,7 +31,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	private ArrayList<Integer> fLines;
 	private boolean initialReconcile;
 
-	public AbstractFoldingComputer(AbstractThemeableEditor editor, IDocument document)
+	protected AbstractFoldingComputer(AbstractThemeableEditor editor, IDocument document)
 	{
 		super();
 		this.fEditor = editor;

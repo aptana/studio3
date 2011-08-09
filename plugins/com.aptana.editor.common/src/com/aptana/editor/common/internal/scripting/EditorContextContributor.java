@@ -64,7 +64,7 @@ public class EditorContextContributor implements ContextContributor
 	 */
 	private boolean onUIThread()
 	{
-		return (this.getDisplay() != null);
+		return this.getDisplay() != null;
 	}
 
 	/**

@@ -275,7 +275,11 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		{
 			return;
 		}
-		fViewer.getTextWidget().redraw(rect.x, rect.y, rect.width, rect.height, true);
+
+		if (!fViewer.getTextWidget().isDisposed())
+		{
+			fViewer.getTextWidget().redraw(rect.x, rect.y, rect.width, rect.height, true);
+		}
 	}
 
 	private Rectangle getLineRectangle(Position position)
@@ -430,7 +434,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 		Color background = textWidget.getBackground();
-		final int[] positions = new int[ranges.length * 2];
+		final int[] positions = new int[ranges.length << 1];
 		int x = 0;
 		boolean apply = false;
 		for (StyleRange range : ranges)
@@ -547,13 +551,13 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 
 		int previousAlpha = e.gc.getAlpha();
 		Color previousBG = e.gc.getBackground();
-		
+
 		e.gc.setAlpha(lineHighlight.getAlpha());
 		e.gc.setBackground(getColorManager().getColor(lineHighlight.toRGB()));
 		// Only paint the part of lineRect that is contained in rect!
 		e.gc.fillRectangle(lineRect.intersection(rect));
-		
-		// BUGFIX: need to set alpha and background color back to what they were before or it breaks 
+
+		// BUGFIX: need to set alpha and background color back to what they were before or it breaks
 		// the painting of pair matching!
 		e.gc.setAlpha(previousAlpha);
 		e.gc.setBackground(previousBG);

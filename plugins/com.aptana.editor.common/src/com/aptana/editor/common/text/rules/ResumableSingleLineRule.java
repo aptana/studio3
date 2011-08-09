@@ -64,7 +64,7 @@ public class ResumableSingleLineRule extends SingleLineRule implements IResumabl
 	@Override
 	protected boolean endSequenceDetected(ICharacterScanner scanner) {
 		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, fResume ? "" : String.valueOf(fStartSequence)); //$NON-NLS-1$
-		scanner = fResume && fToken instanceof ExtendedToken ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContentSubstring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
+		scanner = (fResume && fToken instanceof ExtendedToken) ? new PrefixedCharacterScanner(((ExtendedToken) fToken).getContentSubstring(fStartSequence.length), collectingCharacterScanner) : collectingCharacterScanner;
 		if (doDetectEndSequence(scanner)) {
 			if (fToken instanceof ExtendedToken) {
 				ExtendedToken extendedToken = (ExtendedToken) fToken;

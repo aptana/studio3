@@ -7,12 +7,16 @@
  */
 package com.aptana.editor.html.tests;
 
+import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.EditorBasedTests;
+import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
+import com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 
 /**
  * HTMLEditorBasedTests
@@ -49,4 +53,34 @@ public class HTMLEditorBasedTests extends EditorBasedTests<HTMLContentAssistProc
 	{
 		return HTMLPlugin.PLUGIN_ID;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	 */
+	@Override
+	protected IFileStoreIndexingParticipant createIndexer()
+	{
+		return new HTMLFileIndexingParticipant();
+	}
+
+	/**
+	 * Create a sample web project
+	 * 
+	 * @param projectNamePrefix
+	 * @return
+	 * @throws CoreException
+	 */
+	protected TestProject createWebProject(String projectNamePrefix) throws CoreException
+	{
+		TestProject project = new TestProject(projectNamePrefix, new String[] { "com.aptana.projects.webnature" });
+
+		project.createFile("file.html", "");
+		project.createFile("root.css", "");
+		project.createFolder("folder");
+		project.createFile("folder/inside_folder.css", "");
+
+		return project;
+	}
+
 }

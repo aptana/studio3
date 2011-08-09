@@ -70,7 +70,7 @@ public class NextEditorHandler extends AbstractHandler
 					}
 				}
 				int activeEditorIndex = editorsList.indexOf(activeEditor);
-				int toEditorIndex = (activeEditorIndex == -1 ? 0 : (activeEditorIndex + (next ? 1 : -1)));
+				int toEditorIndex = ((activeEditorIndex == -1) ? 0 : (activeEditorIndex + (next ? 1 : -1)));
 				if (toEditorIndex < 0)
 				{
 					toEditorIndex = editorsList.size() - 1;

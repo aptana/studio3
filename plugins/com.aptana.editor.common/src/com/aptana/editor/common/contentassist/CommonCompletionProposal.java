@@ -360,7 +360,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		if (validated && event != null)
 		{
 			// make sure that we change the replacement length as the document content changes
-			int delta = (event.fText == null ? 0 : event.fText.length()) - event.fLength;
+			int delta = ((event.fText == null) ? 0 : event.fText.length()) - event.fLength;
 			final int newLength = Math.max(_replacementLength + delta, 0);
 			_replacementLength = newLength;
 		}

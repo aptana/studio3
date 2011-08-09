@@ -169,7 +169,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			text = text.toLowerCase();
 		}
 		int offset = 0;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		for (String line : lines)
 		{
 			for (TaskTag entry : TaskTag.getTaskTags())

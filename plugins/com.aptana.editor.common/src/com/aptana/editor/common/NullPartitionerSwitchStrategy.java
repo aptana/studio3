@@ -24,7 +24,7 @@ public class NullPartitionerSwitchStrategy implements IPartitionerSwitchStrategy
 			return EMPTY_SWITCHES;
 		}
 
-		public SequenceBypassHandler getSequenceBypassHandler() {
+		public ISequenceBypassHandler getSequenceBypassHandler() {
 			return null;
 		}
 	};

@@ -202,7 +202,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * AbstractThemeableEditor
 	 */
-	public AbstractThemeableEditor()
+	protected AbstractThemeableEditor()
 	{
 		super();
 		fThemeableEditorFindBarExtension = new FindBarEditorExtension(this);

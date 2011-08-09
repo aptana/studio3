@@ -243,6 +243,18 @@ public final class IdeLog
 	 * @param message
 	 *            The message to log
 	 */
+	public static void logError(Plugin plugin, String message)
+	{
+		log(plugin, IStatus.ERROR, message, null, null);
+	}
+
+	/**
+	 * Logs an error
+	 * 
+	 * @param plugin
+	 * @param message
+	 *            The message to log
+	 */
 	public static void logError(Plugin plugin, String message, Throwable th)
 	{
 		log(plugin, IStatus.ERROR, message, null, th);

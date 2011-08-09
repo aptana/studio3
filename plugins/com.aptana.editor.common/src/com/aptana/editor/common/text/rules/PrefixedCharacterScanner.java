@@ -39,7 +39,7 @@ public class PrefixedCharacterScanner implements ICharacterScanner {
 	 * @see org.eclipse.jface.text.rules.ICharacterScanner#getColumn()
 	 */
 	public int getColumn() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("unsupporthed method"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
