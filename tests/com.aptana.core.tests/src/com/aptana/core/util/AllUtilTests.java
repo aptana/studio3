@@ -23,19 +23,24 @@ public class AllUtilTests
 		suite.addTestSuite(EclipseUtilTest.class);
 		suite.addTestSuite(FileUtilTest.class);
 		suite.addTestSuite(FirefoxUtilTest.class);
+		suite.addTestSuite(InputStreamGobblerTest.class);
 		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(PlatformUtilTest.class);
+		suite.addTestSuite(ProcessStatusTest.class);
+		suite.addTestSuite(ProcessUtilTest.class);
+		suite.addTestSuite(ProgressMonitorInterrupterTest.class);
 		suite.addTestSuite(RegexUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
 		suite.addTestSuite(OutputStreamThreadTest.class);
+		suite.addTestSuite(SocketUtilTest.class);
 		suite.addTestSuite(SourcePrinterTest.class);
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(TimeZoneUtilTest.class);
-		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(URLUtilTest.class);
-		suite.addTestSuite(ZipUtilTest.class);
+		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(WriterOutputStreamTest.class);
-		suite.addTestSuite(InputStreamGobblerTest.class);
+		suite.addTestSuite(ZipUtilTest.class);
 		// $JUnit-END$
 		return suite;
 	}

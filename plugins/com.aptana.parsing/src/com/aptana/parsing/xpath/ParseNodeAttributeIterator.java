@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import com.aptana.parsing.ast.IParseNodeAttribute;
 
 /**
- * @author Kevin Lindsey
+ * ParseNodeAttributeIterator
  */
 public class ParseNodeAttributeIterator implements Iterator<Object>
 {
@@ -47,7 +47,7 @@ public class ParseNodeAttributeIterator implements Iterator<Object>
 		}
 		else
 		{
-			throw new NoSuchElementException();
+			throw new NoSuchElementException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 	}
 
@@ -56,6 +56,6 @@ public class ParseNodeAttributeIterator implements Iterator<Object>
 	 */
 	public void remove()
 	{
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 	}
 }

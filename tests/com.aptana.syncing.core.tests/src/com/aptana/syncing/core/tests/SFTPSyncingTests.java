@@ -46,11 +46,4 @@ public class SFTPSyncingTests extends SyncingTests
 		super.setUp();
 	}
 
-	@Override
-	protected void tearDown() throws Exception
-	{
-		// TODO Auto-generated method stub
-		super.tearDown();
-	}
-
 }

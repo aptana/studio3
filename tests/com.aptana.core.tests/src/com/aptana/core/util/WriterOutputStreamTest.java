@@ -32,8 +32,9 @@ public class WriterOutputStreamTest extends TestCase
 	@Override
 	protected void setUp() throws Exception
 	{
-		testFile = new File("resources/test.txt");
 		super.setUp();
+		testFile = new File(System.getProperty("java.io.tmpdir"), "resources/test.txt");
+		testFile.getParentFile().mkdirs();
 	}
 
 	/*

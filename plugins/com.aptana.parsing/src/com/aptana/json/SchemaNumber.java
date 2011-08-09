@@ -32,6 +32,6 @@ public class SchemaNumber extends SchemaPrimitive
 	@Override
 	protected boolean validValue(Object value)
 	{
-		return (value instanceof Double);
+		return value instanceof Double;
 	}
 }
