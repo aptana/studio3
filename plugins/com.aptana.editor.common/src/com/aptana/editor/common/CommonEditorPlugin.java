@@ -246,13 +246,25 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		listenForThemeChanges();
 
 		// Activate indexing
+		// FIXME Why can't we just have the indexing plugin load lazily on-demand?
 		IndexPlugin.getDefault();
 
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
+		// FIXME initialize spelling preferences lazily
 		spellingPreferences = new SpellingPreferences();
 
-		addPartListener();
+		new UIJob("adding part listener")
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				addPartListener();
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+
 	}
 
 	/**
