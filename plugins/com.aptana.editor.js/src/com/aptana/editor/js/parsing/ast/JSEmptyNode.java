@@ -20,14 +20,14 @@ public class JSEmptyNode extends JSNode
 	{
 		this(symbol.getEnd() + 1);
 	}
-	
+
 	/**
 	 * JSEmptyNode
 	 */
 	public JSEmptyNode(int offset)
 	{
-		super(JSNodeTypes.EMPTY);
-		
+		super(IJSNodeTypes.EMPTY);
+
 		this.setLocation(offset, offset - 1);
 	}
 
@@ -41,14 +41,15 @@ public class JSEmptyNode extends JSNode
 		walker.visit(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#setSemicolonIncluded(boolean)
 	 */
 	@Override
 	public void setSemicolonIncluded(boolean included)
 	{
 		super.setSemicolonIncluded(included);
-		
+
 		if (included)
 		{
 			this.setLocation(this.getStart(), this.getStart());

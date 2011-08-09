@@ -14,7 +14,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSLabelledNode extends JSNode
 {
 	private Symbol _colon;
-	
+
 	/**
 	 * JSLabelledNode
 	 * 
@@ -22,8 +22,8 @@ public class JSLabelledNode extends JSNode
 	 */
 	public JSLabelledNode(JSNode label, Symbol colon, JSNode block)
 	{
-		super(JSNodeTypes.LABELLED, label, block);
-		
+		super(IJSNodeTypes.LABELLED, label, block);
+
 		this._colon = colon;
 	}
 
@@ -46,7 +46,7 @@ public class JSLabelledNode extends JSNode
 	{
 		return this.getChild(1);
 	}
-	
+
 	/**
 	 * getColon
 	 * 

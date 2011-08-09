@@ -316,7 +316,7 @@ public class HTMLIndexQueryHelper
 	}
 
 	/**
-	 * getIDs
+	 * Retrieve CSS IDs from the current index
 	 * 
 	 * @param index
 	 * @return

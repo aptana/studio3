@@ -74,7 +74,7 @@ import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNullNode;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
@@ -158,12 +158,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			short commentType = comment.getNodeType();
 			int end = comment.getEndingOffset();
-			if (commentType == JSNodeTypes.SINGLE_LINE_COMMENT)
+			if (commentType == IJSNodeTypes.SINGLE_LINE_COMMENT)
 			{
 				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end));
 			}
-			else if (commentType == JSNodeTypes.MULTI_LINE_COMMENT || commentType == JSNodeTypes.SDOC_COMMENT
-					|| commentType == JSNodeTypes.VSDOC_COMMENT)
+			else if (commentType == IJSNodeTypes.MULTI_LINE_COMMENT || commentType == IJSNodeTypes.SDOC_COMMENT
+					|| commentType == IJSNodeTypes.VSDOC_COMMENT)
 			{
 				multiLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end + 1));
 			}
@@ -241,7 +241,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			// Push the function name, if exists
 			JSNode functionName = (JSNode) node.getName();
-			if (functionName != null && functionName.getNodeType() != JSNodeTypes.EMPTY)
+			if (functionName != null && functionName.getNodeType() != IJSNodeTypes.EMPTY)
 			{
 				// push the function name
 				visitTextNode(functionName, true, 1);
@@ -397,9 +397,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			JSNode trueBlock = (JSNode) node.getTrueBlock();
 			JSNode falseBlock = (JSNode) node.getFalseBlock();
 
-			boolean isEmptyFalseBlock = (falseBlock.getNodeType() == JSNodeTypes.EMPTY);
-			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
-			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
+			boolean isEmptyFalseBlock = (falseBlock.getNodeType() == IJSNodeTypes.EMPTY);
+			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == IJSNodeTypes.STATEMENTS);
+			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == IJSNodeTypes.STATEMENTS);
 			// First, construct the if condition node
 			FormatterJSIfNode ifNode = new FormatterJSIfNode(document, isCurlyTrueBlock, node,
 					hasAnyCommentBefore(node.getStartingOffset()));
@@ -432,7 +432,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elsePos = segment.toLowerCase().indexOf("else"); //$NON-NLS-1$
 				int elseBlockStart = elsePos + trueBlockEnd + 1;
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
-				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
+				boolean isElseIf = (falseBlock.getNodeType() == IJSNodeTypes.IF);
 				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf,
 						isCurlyTrueBlock, hasAnyCommentBefore(elseBlockStart));
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
@@ -484,7 +484,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// Push the special do-while block node
 			JSNode body = (JSNode) node.getBody();
 			int blockEnd;
-			boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
+			boolean bodyInBrackets = (body.getNodeType() == IJSNodeTypes.STATEMENTS);
 			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document,
 					hasAnyCommentBefore(body.getStartingOffset()));
 			if (bodyInBrackets)
@@ -795,12 +795,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// new-lines and spaces)
 			visitCommonBlock(node, node.getStartingOffset() + 2, node.getBody());
 			IParseNode catchBlock = node.getCatchBlock();
-			if (catchBlock.getNodeType() == JSNodeTypes.CATCH)
+			if (catchBlock.getNodeType() == IJSNodeTypes.CATCH)
 			{
 				visit((JSCatchNode) catchBlock);
 			}
 			IParseNode finallyBlock = node.getFinallyBlock();
-			if (finallyBlock.getNodeType() == JSNodeTypes.FINALLY)
+			if (finallyBlock.getNodeType() == IJSNodeTypes.FINALLY)
 			{
 				visit((JSFinallyNode) finallyBlock);
 			}
@@ -1021,8 +1021,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// Push the function's name. Node that the function 'name' may be an expression in a group.
 			JSNode functionName = (JSNode) node.getExpression();
 			short nodeType = functionName.getNodeType();
-			if (nodeType == JSNodeTypes.GROUP || nodeType == JSNodeTypes.FUNCTION
-					|| nodeType == JSNodeTypes.GET_PROPERTY)
+			if (nodeType == IJSNodeTypes.GROUP || nodeType == IJSNodeTypes.FUNCTION
+					|| nodeType == IJSNodeTypes.GET_PROPERTY)
 			{
 				// inline invocation
 				functionName.accept(this);
@@ -1052,7 +1052,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
 				int startingOffset = node.getStartingOffset();
-				if (node.getChildCount() > 0 && node.getChild(0).getNodeType() != JSNodeTypes.EMPTY)
+				if (node.getChildCount() > 0 && node.getChild(0).getNodeType() != IJSNodeTypes.EMPTY)
 				{
 					// push the 'return' keyword with a forced space after it.
 					visitTextNode(startingOffset, startingOffset + 6, true, 0, 1, false);
@@ -1502,12 +1502,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (node.getChildCount() > 0)
 			{
 				lastChild = (JSNode) node.getLastChild();
-				while (lastChild.getNodeType() == JSNodeTypes.EMPTY && lastChild.getSemicolonIncluded())
+				while (lastChild.getNodeType() == IJSNodeTypes.EMPTY && lastChild.getSemicolonIncluded())
 				{
 					// get the previous one to the semicolon node
 					lastChild = (JSNode) lastChild.getPreviousSibling();
 				}
-				if (lastChild != null && lastChild.getNodeType() == JSNodeTypes.STATEMENTS)
+				if (lastChild != null && lastChild.getNodeType() == IJSNodeTypes.STATEMENTS)
 				{
 					hasBlockedChild = true;
 				}
@@ -1526,7 +1526,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),
 						lastChild.getStartingOffset() + 1));
 				push(caseBodyNode);
-				if (node.getNodeType() == JSNodeTypes.CASE)
+				if (node.getNodeType() == IJSNodeTypes.CASE)
 				{
 					visitChildren(lastChild);
 				}
@@ -1541,7 +1541,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 			else
 			{
-				if (node.getNodeType() == JSNodeTypes.CASE)
+				if (node.getNodeType() == IJSNodeTypes.CASE)
 				{
 					visitChildren(node, 1);
 				}
@@ -1586,14 +1586,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		private void visitCommonBlock(JSNode node, int declarationEndOffset, IParseNode body)
 		{
 			pushCommonDeclaration(node, declarationEndOffset, body);
-			boolean hasBody = (body.getNodeType() != JSNodeTypes.EMPTY);
+			boolean hasBody = (body.getNodeType() != IJSNodeTypes.EMPTY);
 			if (hasBody)
 			{
 				// Then, push the body (the body might be defined without any brackets, so in those cases the begin and
 				// end would be empty)
 				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document,
 						hasAnyCommentBefore(body.getStartingOffset()));
-				boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
+				boolean bodyInBrackets = (body.getNodeType() == IJSNodeTypes.STATEMENTS);
 				if (bodyInBrackets)
 				{
 					blockNode
@@ -1641,12 +1641,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// First, push the declaration part
 			// In some cases, the body is empty (like in a 'while' with no body). Those cases get a special treatment.
 			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
-					(body != null && body.getNodeType() == JSNodeTypes.STATEMENTS), node,
+					(body != null && body.getNodeType() == IJSNodeTypes.STATEMENTS), node,
 					hasAnyCommentBefore(node.getStartingOffset()));
 			int endDeclarationOffset = declarationEndOffset + 1;
 			if (body != null)
 			{
-				if (body.getNodeType() != JSNodeTypes.EMPTY)
+				if (body.getNodeType() != IJSNodeTypes.EMPTY)
 				{
 					endDeclarationOffset = declarationEndOffset + 1;
 				}

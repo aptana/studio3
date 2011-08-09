@@ -24,14 +24,21 @@ public class AllUtilTests
 		suite.addTestSuite(FileUtilTest.class);
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(RegexUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
+<<<<<<< HEAD
 		suite.addTestSuite(OutputStreamThreadTest.class);
+=======
+		suite.addTestSuite(SourcePrinterTest.class);
+>>>>>>> 397c3b125e9d005970af30b0bbf1ae0d3a94b9be
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(TimeZoneUtilTest.class);
 		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(URLUtilTest.class);
 		suite.addTestSuite(ZipUtilTest.class);
+		suite.addTestSuite(WriterOutputStreamTest.class);
+		suite.addTestSuite(InputStreamGobblerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

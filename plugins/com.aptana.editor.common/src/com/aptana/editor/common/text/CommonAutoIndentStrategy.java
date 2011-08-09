@@ -34,7 +34,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	private ISourceViewer fSourceViewer;
 	private IPreferenceStore fPrefStore;
 
-	public CommonAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
+	protected CommonAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
 			ISourceViewer sourceViewer, IPreferenceStore prefStore)
 	{
 		fContentType = contentType;
@@ -145,10 +145,10 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			// What we want is to add a star if user hit return inside a comment block
 			if (c1 == '*' && upToOffset.lastIndexOf("*/") <= upToOffset.lastIndexOf("/*") && isComment(c.offset)) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				buf.append("*"); //$NON-NLS-1$
+				buf.append('*');
 				if (d.getChar(c.offset) != '/')
 				{
-					buf.append(" "); //$NON-NLS-1$
+					buf.append(' ');
 				}
 			}
 			// Return after /*

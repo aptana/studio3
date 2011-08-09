@@ -13,7 +13,6 @@ import junit.framework.TestCase;
 import beaver.Symbol;
 
 import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
-import com.aptana.editor.js.sdoc.parsing.SDocScanner;
 
 public class SDocScannerTests extends TestCase
 {
@@ -63,10 +62,6 @@ public class SDocScannerTests extends TestCase
 				Symbol symbol = this._scanner.nextToken();
 				
 				assertEquals(symbol.value + " at index " + i, type.getIndex(), symbol.getId());
-			}
-			catch (IOException e)
-			{
-				fail(e.getMessage());
 			}
 			catch (Exception e)
 			{

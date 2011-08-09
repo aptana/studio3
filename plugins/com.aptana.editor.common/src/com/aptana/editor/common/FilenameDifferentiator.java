@@ -52,7 +52,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	 * Separates original filename from disambiguating name(s)
 	 */
 	private static final String SEPARATOR = " | "; //$NON-NLS-1$
-	private HashMap<String, Set<IEditorPart>> baseNames;
+	private Map<String, Set<IEditorPart>> baseNames;
 
 	public FilenameDifferentiator()
 	{

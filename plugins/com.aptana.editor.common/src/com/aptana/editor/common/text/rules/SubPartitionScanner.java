@@ -39,7 +39,7 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes, IToken defaultToken) {
 		this.rules = rules;
 		this.contentTypes.addAll(Arrays.asList(contentTypes));
-		this.defaultToken = defaultToken != null ? defaultToken : DEFAULT_TOKEN;
+		this.defaultToken = (defaultToken != null) ? defaultToken : DEFAULT_TOKEN;
 	}
 
 	/* (non-Javadoc)

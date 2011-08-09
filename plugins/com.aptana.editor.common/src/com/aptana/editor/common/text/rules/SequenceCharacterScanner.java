@@ -12,7 +12,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
-import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy.ISequenceBypassHandler;
 import com.aptana.editor.common.TextUtils;
 
 /**
@@ -23,7 +23,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 
 	private ICharacterScanner characterScanner;
 	private IPartitionScannerSwitchStrategy switchStrategy;
-	private SequenceBypassHandler sequenceBypassHandler;
+	private ISequenceBypassHandler sequenceBypassHandler;
 	private char[][] switchSequences;
 	private boolean found = false;
 	private boolean eof = false;

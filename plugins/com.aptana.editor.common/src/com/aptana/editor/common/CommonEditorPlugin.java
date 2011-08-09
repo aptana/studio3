@@ -179,10 +179,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		protected IViewReference findView(IWorkbenchPage page, String viewId)
 		{
-			IViewReference refs[] = page.getViewReferences();
-			for (int i = 0; i < refs.length; i++)
+			for (IViewReference ref : page.getViewReferences())
 			{
-				IViewReference ref = refs[i];
 				if (viewId.equals(ref.getId()))
 				{
 					return ref;

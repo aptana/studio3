@@ -35,7 +35,7 @@ public class JSCAReader extends SchemaReader
 	{
 		private static final String JSCA_METADATA_SCHEMA = "/metadata/JSMetadataSchema.json"; //$NON-NLS-1$
 
-		public SchemaPool()
+		SchemaPool()
 		{
 			// No need for schemas to expire
 			super(-1);
@@ -81,7 +81,7 @@ public class JSCAReader extends SchemaReader
 					{
 						isr.close();
 					}
-					catch (IOException e)
+					catch (IOException e) // $codepro.audit.disable emptyCatchClause
 					{
 					}
 				}
@@ -97,7 +97,7 @@ public class JSCAReader extends SchemaReader
 
 		public boolean validate(Schema o)
 		{
-			return (o != null);
+			return o != null;
 		}
 	}
 

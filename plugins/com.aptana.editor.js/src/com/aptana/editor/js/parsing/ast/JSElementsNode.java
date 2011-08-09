@@ -16,7 +16,7 @@ public class JSElementsNode extends JSNode
 	 */
 	public JSElementsNode(JSNode... children)
 	{
-		super(JSNodeTypes.ELEMENTS, children);
+		super(IJSNodeTypes.ELEMENTS, children);
 	}
 
 	/*

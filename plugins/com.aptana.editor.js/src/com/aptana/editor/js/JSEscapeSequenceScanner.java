@@ -21,9 +21,7 @@ public class JSEscapeSequenceScanner extends BufferedRuleBasedScanner
 	 */
 	public JSEscapeSequenceScanner(String defaultScope)
 	{
-		IRule[] rules = new IRule[] {
-			new JSEscapeSequenceRule(getToken("constant.character.escape.js")) //$NON-NLS-1$
-		};
+		IRule[] rules = new IRule[] { new JSEscapeSequenceRule(getToken("constant.character.escape.js")) }; //$NON-NLS-1$
 
 		setRules(rules);
 

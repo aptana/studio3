@@ -25,8 +25,12 @@ import com.aptana.editor.common.extensions.IThemeableEditor;
  * 
  * @author schitale
  */
-public abstract class TextEditorUtils
+public final class TextEditorUtils
 {
+
+	private TextEditorUtils()
+	{
+	}
 
 	/**
 	 * Tries to get the accurate location of the caret relative to the document.

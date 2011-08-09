@@ -12,7 +12,7 @@ import beaver.Symbol;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
-public abstract class Tag extends Symbol
+public class Tag extends Symbol
 {
 	private TagType _type;
 	private String _text;
@@ -22,9 +22,9 @@ public abstract class Tag extends Symbol
 	 * 
 	 * @param name
 	 */
-	public Tag(TagType type)
+	protected Tag(TagType type)
 	{
-		this(type, ""); //$NON-NLS-1$
+		this(type, StringUtil.EMPTY);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public abstract class Tag extends Symbol
 	 * 
 	 * @param name
 	 */
-	public Tag(TagType type, String text)
+	protected Tag(TagType type, String text)
 	{
 		this._type = type;
 		this._text = text;
@@ -90,9 +90,9 @@ public abstract class Tag extends Symbol
 			writer.print(TagType.UNKNOWN.toString());
 		}
 
-		if (this._text != null && StringUtil.isEmpty(this._text) == false)
+		if (this._text != null && !StringUtil.isEmpty(this._text))
 		{
-			writer.print(" ").print(this._text); //$NON-NLS-1$
+			writer.print(' ').print(this._text); //$NON-NLS-1$
 		}
 	}
 }

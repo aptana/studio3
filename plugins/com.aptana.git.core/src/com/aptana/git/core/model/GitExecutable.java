@@ -13,10 +13,9 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -311,7 +310,7 @@ public class GitExecutable
 	 * 
 	 * @return
 	 */
-	public static Map<String, String> getShellEnvironment()
+	public static Map<String, String> getEnvironment()
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.putAll(ShellExecutable.getEnvironment());
@@ -330,48 +329,14 @@ public class GitExecutable
 		{
 			env.put("GIT_ASKPASS", git_askpass.toOSString()); //$NON-NLS-1$
 		}
-		if (!env.isEmpty())
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			if (Platform.OS_WIN32.equals(Platform.getOS()))
-			{
-				String pathVal = env.get("PATH"); //$NON-NLS-1$
-				// Hack to see if paths look like cygwin paths
-				if (!pathVal.contains(";")) //$NON-NLS-1$
-				{
-					env.put("PATH", convertCygwinPathsToWindows(pathVal)); //$NON-NLS-1$
-				}
-				// Convert PWD too
-				String pwd = env.get("PWD"); //$NON-NLS-1$
-				if (pwd != null)
-				{
-					env.put("PWD", convertCygwinPathsToWindows(pwd)); //$NON-NLS-1$
-				}
-			}
-			env = filterOutVariables(env);
+			env.remove("PATH"); //$NON-NLS-1$
+			env.remove("PWD"); //$NON-NLS-1$
+			String path = System.getenv("Path"); //$NON-NLS-1$
+			env.put("Path", instance().path().removeLastSegments(1).toOSString()+File.pathSeparator+path); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		return env;
-	}
-
-	private static String convertCygwinPathsToWindows(String envValue)
-	{
-		if (envValue == null)
-		{
-			return null;
-		}
-		String[] values = envValue.split(":"); //$NON-NLS-1$
-		StringBuilder newValue = new StringBuilder();
-		if (values != null && values.length > 0)
-		{
-			// FIXME This is a quick and dirty hack. To really do this correctly, we need to use cygpath -w
-			for (String value : values)
-			{
-				String converted = value.replaceFirst("/([a-zA-Z])/", "$1:\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
-				converted = converted.replace('/', '\\');
-				newValue.append(converted).append(";"); //$NON-NLS-1$
-			}
-			newValue.deleteCharAt(newValue.length() - 1);
-		}
-		return newValue.toString();
+		return filterOutVariables(env);
 	}
 
 	/**
@@ -383,17 +348,15 @@ public class GitExecutable
 	 */
 	private static Map<String, String> filterOutVariables(Map<String, String> env)
 	{
-		Map<String, String> filtered = new HashMap<String, String>();
-		for (Map.Entry<String, String> entry : env.entrySet())
+		for (Iterator<Map.Entry<String, String>> i = env.entrySet().iterator(); i.hasNext(); )
 		{
-			String value = entry.getValue();
+			String value = i.next().getValue();
 			if (value.contains("${")) //$NON-NLS-1$
 			{
-				continue;
+				i.remove();
 			}
-			filtered.put(entry.getKey(), value);
 		}
-		return filtered;
+		return env;
 	}
 
 	/**

@@ -15,7 +15,7 @@ public class JSConditionalNode extends JSNode
 {
 	private Symbol _questionMark;
 	private Symbol _colon;
-	
+
 	/**
 	 * JSConditionalNode
 	 * 
@@ -23,8 +23,8 @@ public class JSConditionalNode extends JSNode
 	 */
 	public JSConditionalNode(JSNode test, Symbol questionMark, JSNode trueCase, Symbol colon, JSNode falseCase)
 	{
-		super(JSNodeTypes.CONDITIONAL, test, trueCase, falseCase);
-		
+		super(IJSNodeTypes.CONDITIONAL, test, trueCase, falseCase);
+
 		this._questionMark = questionMark;
 		this._colon = colon;
 	}
@@ -48,7 +48,7 @@ public class JSConditionalNode extends JSNode
 	{
 		return this._colon;
 	}
-	
+
 	/**
 	 * getFalseExpression
 	 * 
@@ -68,7 +68,7 @@ public class JSConditionalNode extends JSNode
 	{
 		return this._questionMark;
 	}
-	
+
 	/**
 	 * getTestExpression
 	 * 

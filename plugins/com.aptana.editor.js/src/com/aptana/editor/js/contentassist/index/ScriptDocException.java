@@ -12,7 +12,7 @@ package com.aptana.editor.js.contentassist.index;
  */
 public class ScriptDocException extends Exception
 {
-	private static final long serialVersionUID = 8223887793849150985L;
+	private static final long serialVersionUID = 8223887793849150985L; // $codepro.audit.disable hidingInheritedFields
 
 	/**
 	 * Create a new instance of DocumentationException

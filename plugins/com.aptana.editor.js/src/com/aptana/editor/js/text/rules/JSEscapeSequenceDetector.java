@@ -1,3 +1,4 @@
+// $codepro.audit.disable characterComparison
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.

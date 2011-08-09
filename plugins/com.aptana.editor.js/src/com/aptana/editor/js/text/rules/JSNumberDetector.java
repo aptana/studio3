@@ -59,7 +59,7 @@ class JSNumberDetector implements IWordDetector
 
 			// decimal point
 			case '.':
-				result = (this._inExponent == false && this._seenDecimalPoint == false);
+				result = (!this._inExponent && !this._seenDecimalPoint);
 				this._seenDecimalPoint = true;
 				break;
 
@@ -94,8 +94,8 @@ class JSNumberDetector implements IWordDetector
 			// exponent
 			case 'e':
 			case 'E':
-				result = (this._inHex || this._inExponent == false);
-				this._inExponent = (this._inHex == false);
+				result = (this._inHex || !this._inExponent);
+				this._inExponent = !this._inHex;
 				break;
 
 			default:

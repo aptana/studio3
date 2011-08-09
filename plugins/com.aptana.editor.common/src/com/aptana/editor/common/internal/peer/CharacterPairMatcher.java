@@ -486,9 +486,12 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			for (int i = 0; i < fPairs.length; i += 2)
 			{
 				if (searchForward && getStartChar(i) == c)
+				{
 					return true;
-				else if (!searchForward && getEndChar(i) == c)
+				} else if (!searchForward && getEndChar(i) == c)
+				{
 					return true;
+				}
 			}
 			return false;
 		}
@@ -536,9 +539,12 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			for (int i = 0; i < fPairs.length; i += 2)
 			{
 				if (getStartChar(i) == c)
+				{
 					return getEndChar(i);
-				else if (getEndChar(i) == c)
+				} else if (getEndChar(i) == c)
+				{
 					return getStartChar(i);
+				}
 			}
 			Assert.isTrue(false);
 			return '\0';

@@ -40,7 +40,7 @@ public class JSLanguageConstants
 			"getAttention", "getAllResponseHeaders", "min", "mergeAttributes", "match", "margins", "max", "moveBy",
 			"moveBelow", "moveToAbsolute", "moveTo", "moveAbove", "btoa", "big", "blink", "bold", "borderWidths",
 			"back" };
-	
+
 	@SuppressWarnings("nls")
 	public static final String[] EVENT_HANDLER_FUNCTIONS = new String[] { "onRowsinserted", "onRowsdelete",
 			"onRowenter", "onRowexit", "onResizestart", "onResizeend", "onResize", "onReset", "onReadystatechange",
@@ -53,62 +53,61 @@ public class JSLanguageConstants
 			"onDragstart", "onDragleave", "onDrag", "onDblclick", "onUnload", "onPaste", "onPropertychange",
 			"onErrorupdate", "onError", "onKeydown", "onKeyup", "onKeypress", "onFocus", "onLoad", "onActivate",
 			"onAbort", "onAfterupdate", "onAfterprint" };
-	
+
 	@SuppressWarnings("nls")
-	public static final String[] DOM_FUNCTIONS = new String[] { "substringData", "submit", "splitText",
-			"setNamedItem", "setAttributeNode", "setAttribute", "select", "hasChildNodes", "hasFeature", "namedItem",
-			"click", "close", "cloneNode", "createComment", "createCDATASection", "createCaption", "createTHead",
-			"createTextNode", "createTFoot", "createDocumentFragment", "createProcessingInstruction",
-			"createEntityReference", "createElement", "createAttribute", "tabIndex", "insertRow", "insertBefore",
-			"insertCell", "insertData", "item", "open", "deleteRow", "deleteCell", "deleteCaption", "deleteTHead",
-			"deleteTFoot", "deleteData", "focus", "writeln", "write", "add", "appendChild", "appendData", "reset",
-			"replaceChild", "replaceData", "removeNamedItem", "removeChild", "removeAttributeNode", "removeAttribute",
-			"remove", "getNamedItem", "getElementsByName", "getElementsByTagName", "getElementById",
-			"getAttributeNode", "getAttribute", "blur" };
-	
+	public static final String[] DOM_FUNCTIONS = new String[] { "substringData", "submit", "splitText", "setNamedItem",
+			"setAttributeNode", "setAttribute", "select", "hasChildNodes", "hasFeature", "namedItem", "click", "close",
+			"cloneNode", "createComment", "createCDATASection", "createCaption", "createTHead", "createTextNode",
+			"createTFoot", "createDocumentFragment", "createProcessingInstruction", "createEntityReference",
+			"createElement", "createAttribute", "tabIndex", "insertRow", "insertBefore", "insertCell", "insertData",
+			"item", "open", "deleteRow", "deleteCell", "deleteCaption", "deleteTHead", "deleteTFoot", "deleteData",
+			"focus", "writeln", "write", "add", "appendChild", "appendData", "reset", "replaceChild", "replaceData",
+			"removeNamedItem", "removeChild", "removeAttributeNode", "removeAttribute", "remove", "getNamedItem",
+			"getElementsByName", "getElementsByTagName", "getElementById", "getAttributeNode", "getAttribute", "blur" };
+
 	@SuppressWarnings("nls")
-	public static final String[] OPERATORS = { ">>>=", ">>>", "<<=", ">>=", "===", "!==", ">>", "<<", "!=", "<=",
-			">=", "==", "--", "++", "&&", "||", "*=", "/=", "%=", "+=", "-=", "&=", "|=", "^=" };
-	
+	public static final String[] OPERATORS = { ">>>=", ">>>", "<<=", ">>=", "===", "!==", ">>", "<<", "!=", "<=", ">=",
+			"==", "--", "++", "&&", "||", "*=", "/=", "%=", "+=", "-=", "&=", "|=", "^=" };
+
 	public static final char[] SINGLE_CHARACTER_OPERATORS = { '?', '!', '%', '&', '*', '-', '+', '~', '=', '<', '>',
-	'^', '|', '/' };
-	
+			'^', '|', '/' };
+
 	@SuppressWarnings("nls")
 	public static final String[] KEYWORD_CONTROL = new String[] { "break", "case", "catch", "continue", "default",
 			"do", "else", "finally", "for", "if", "return", "switch", "throw", "try", "while" };
-	
+
 	@SuppressWarnings("nls")
 	public static final String[] SUPPORT_CLASSES = new String[] { "Anchor", "Applet", "Area", "Array", "Boolean",
-			"Button", "Checkbox", "Date", "document", "Error", "event", "FileUpload", "Form", "Frame", "Function", "Hidden",
-			"History", "Image", "JavaArray", "JavaClass", "JavaObject", "JavaPackage", "java", "Layer", "Link",
-			"Location", "Math", "MimeType", "Number", "navigator", "netscape", "Object", "Option", "Packages",
+			"Button", "Checkbox", "Date", "document", "Error", "event", "FileUpload", "Form", "Frame", "Function",
+			"Hidden", "History", "Image", "JavaArray", "JavaClass", "JavaObject", "JavaPackage", "java", "Layer",
+			"Link", "Location", "Math", "MimeType", "Number", "navigator", "netscape", "Object", "Option", "Packages",
 			"Password", "Plugin", "Radio", "RegExp", "Reset", "Select", "String", "Style", "Submit", "screen", "sun",
 			"Text", "Textarea", "window", "XMLHttpRequest" };
-	
+
 	@SuppressWarnings("nls")
-	public static final String[] SUPPORT_DOM_CONSTANTS = new String[] { "ELEMENT_NODE", "ATTRIBUTE_NODE",
-			"TEXT_NODE", "CDATA_SECTION_NODE", "ENTITY_REFERENCE_NODE", "ENTITY_NODE", "PROCESSING_INSTRUCTION_NODE",
+	public static final String[] SUPPORT_DOM_CONSTANTS = new String[] { "ELEMENT_NODE", "ATTRIBUTE_NODE", "TEXT_NODE",
+			"CDATA_SECTION_NODE", "ENTITY_REFERENCE_NODE", "ENTITY_NODE", "PROCESSING_INSTRUCTION_NODE",
 			"COMMENT_NODE", "DOCUMENT_NODE", "DOCUMENT_TYPE_NODE", "DOCUMENT_FRAGMENT_NODE", "NOTATION_NODE",
 			"INDEX_SIZE_ERR", "DOMSTRING_SIZE_ERR", "HIERARCHY_REQUEST_ERR", "WRONG_DOCUMENT_ERR",
 			"INVALID_CHARACTER_ERR", "NO_DATA_ALLOWED_ERR", "NO_MODIFICATION_ALLOWED_ERR", "NOT_FOUND_ERR",
 			"NOT_SUPPORTED_ERR", "INUSE_ATTRIBUTE_ERR" };
-	
+
 	@SuppressWarnings("nls")
 	public static final String[] KEYWORD_CONTROL_FUTURE = new String[] { "goto", "import", "package" };
-	
+
 	@SuppressWarnings("nls")
-	public static final String[] STORAGE_TYPES = new String[] { "boolean", "byte", "char", "class", "double",
-			"enum", "float", "function", "int", "interface", "long", "short", "var", "void" };
-	
+	public static final String[] STORAGE_TYPES = new String[] { "boolean", "byte", "char", "class", "double", "enum",
+			"float", "function", "int", "interface", "long", "short", "var", "void" };
+
 	@SuppressWarnings("nls")
 	public static final String[] STORAGE_MODIFIERS = new String[] { "const", "export", "extends", "final",
 			"implements", "native", "private", "protected", "public", "static", "synchronized", "throws", "transient",
 			"volatile" };
-	
+
 	@SuppressWarnings("nls")
 	public static final String[] FIREBUG_FUNCTIONS = new String[] { ".warn", ".info", ".log", ".error", ".time",
 			".timeEnd", ".assert" };
-	
+
 	@SuppressWarnings("nls")
 	public static final String[] DOM_CONSTANTS = { "shape", "src", "systemId", "scheme", "scope", "scrolling",
 			"standby", "start", "size", "summary", "specified", "sectionRowIndex", "selectedIndex", "selected",
@@ -126,12 +125,12 @@ public class JSLanguageConstants
 			"accessKey", "acceptCharset", "accept", "action", "alt", "align", "archive", "areas", "axis", "aLink",
 			"abbr", "rows", "rowSpan", "rowIndex", "rules", "rev", "referrer", "rel", "readOnly", "multiple", "method",
 			"media", "marginHeight", "marginWidth", "maxLength", "body", "border", "background", "bgColor" };
-	
+
 	@SuppressWarnings("nls")
-	public static final String[] SUPPORT_CONSTANTS = { "systemLanguage", "scripts", "scrollbars", "screenX",
-			"screenY", "screenTop", "screenLeft", "styleSheets", "style", "statusText", "statusbar", "status",
-			"siblingBelow", "siblingAbove", "source", "suffixes", "securityPolicy", "security", "selection", "self",
-			"history", "hostname", "host", "hash", "hasFocus", "y", "XMLDocument", "XSLDocument", "next", "namespaces",
+	public static final String[] SUPPORT_CONSTANTS = { "systemLanguage", "scripts", "scrollbars", "screenX", "screenY",
+			"screenTop", "screenLeft", "styleSheets", "style", "statusText", "statusbar", "status", "siblingBelow",
+			"siblingAbove", "source", "suffixes", "securityPolicy", "security", "selection", "self", "history",
+			"hostname", "host", "hash", "hasFocus", "y", "XMLDocument", "XSLDocument", "next", "namespaces",
 			"namespaceURI", "nameProp", "MIN_VALUE", "MAX_VALUE", "characterSet", "constructor", "controllers",
 			"cookieEnabled", "colorDepth", "components", "complete", "current", "cpuClass", "clipboardData", "clip",
 			"clientInformation", "closed", "classes", "callee", "caller", "crypto", "toolbar", "top", "textTransform",
@@ -154,7 +153,7 @@ public class JSLanguageConstants
 			"mimeTypes", "multiline", "menubar", "marginRight", "marginBottom", "marginTop", "marginLeft", "LN10",
 			"LN2", "LOG10E", "LOG2E", "bottom", "borderRightWidth", "borderBottomWidth", "borderStyle", "borderColor",
 			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
-	
+
 	@SuppressWarnings("nls")
 	public static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
 

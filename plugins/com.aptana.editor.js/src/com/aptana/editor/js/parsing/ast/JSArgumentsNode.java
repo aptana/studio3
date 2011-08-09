@@ -16,7 +16,7 @@ public class JSArgumentsNode extends JSNode
 	 */
 	public JSArgumentsNode(JSNode... children)
 	{
-		super(JSNodeTypes.ARGUMENTS, children);
+		super(IJSNodeTypes.ARGUMENTS, children);
 	}
 
 	/*

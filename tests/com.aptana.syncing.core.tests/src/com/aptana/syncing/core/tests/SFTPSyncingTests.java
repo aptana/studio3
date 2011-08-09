@@ -24,20 +24,19 @@ public class SFTPSyncingTests extends SyncingTests
 	{
 		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		baseTempFile.deleteOnExit();
-		
+
 		File baseDirectory = baseTempFile.getParentFile();
-		
+
 		LocalConnectionPoint lcp = new LocalConnectionPoint();
 		lcp.setPath(new Path(baseDirectory.getAbsolutePath()));
 		clientManager = lcp;
 
 		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("sftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("sftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("sftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		ftpcp.setHost(getConfig().getProperty("sftp.host")); //$NON-NLS-1$
+		ftpcp.setLogin(getConfig().getProperty("sftp.username")); //$NON-NLS-1$
+		ftpcp.setPassword(getConfig().getProperty("sftp.password").toCharArray()); //$NON-NLS-1$
 		ftpcp.setPort(Integer.valueOf(getConfig().getProperty("sftp.port", "22"))); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path","/home/ftpuser"))); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path"))); //$NON-NLS-1$
 		serverManager = ftpcp;
 
 		ConnectionContext context = new ConnectionContext();

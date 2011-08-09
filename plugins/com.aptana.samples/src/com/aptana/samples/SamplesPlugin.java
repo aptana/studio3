@@ -41,7 +41,6 @@ public class SamplesPlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		samplesManager = new SamplesManager();
 	}
 
 	/*
@@ -66,6 +65,10 @@ public class SamplesPlugin extends Plugin
 
 	public ISamplesManager getSamplesManager()
 	{
+		if (samplesManager == null)
+		{
+			samplesManager = new SamplesManager();
+		}
 		return samplesManager;
 	}
 }

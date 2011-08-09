@@ -1,3 +1,4 @@
+// $codepro.audit.disable platformSpecificLineSeparator
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -31,7 +32,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 	{
 		public boolean isWordStart(char c)
 		{
-			return (c == '@');
+			return c == '@';
 		}
 
 		public boolean isWordPart(char c)

@@ -178,9 +178,9 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 				}
 				Annotation[] annotationsToRemove = (Annotation[]) toRemove.toArray(new Annotation[toRemove.size()]);
 
-				if (fAnnotationModel instanceof IAnnotationModelExtension)
+				if (fAnnotationModel instanceof IAnnotationModelExtension) {
 					((IAnnotationModelExtension) fAnnotationModel).replaceAnnotations(annotationsToRemove, fAddAnnotations);
-				else {
+				} else {
 					for (int i = 0; i < annotationsToRemove.length; i++)
 						fAnnotationModel.removeAnnotation(annotationsToRemove[i]);
 					for (Iterator iter = fAddAnnotations.keySet().iterator(); iter.hasNext(); ) {

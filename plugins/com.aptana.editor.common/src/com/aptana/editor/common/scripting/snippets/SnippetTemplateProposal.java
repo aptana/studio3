@@ -258,9 +258,12 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					}
 
 					if (proposals.length > 1)
+					{
 						first = new ProposalPosition(document, offsets[0] + start, length, sequenceNumber, proposals);
-					else
+					} else
+					{
 						first = new LinkedPosition(document, offsets[0] + start, length, sequenceNumber);
+					}
 				}
 
 				for (int j = 0; j != offsets.length; j++)
@@ -520,7 +523,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 		}
 
-		return spaceIndentSize != 0 ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
+		return (spaceIndentSize != 0) ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
 	}
 
 	private void openErrorDialog(Shell shell, Exception e)
@@ -575,7 +578,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 			Template template = getTemplate();
 			styledActivationString = new StyledString(String.format("%1$10.10s ", //$NON-NLS-1$
 					template.getName() + " \u00bb") //$NON-NLS-1$
-					+ (triggerChar == '\000' ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
+					+ ((triggerChar == '\000') ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
 					// Need padding on windows to work around the width computation
 					+ (Platform.OS_WIN32.equals(Platform.getOS()) ? "                                " : ""), //$NON-NLS-1$ //$NON-NLS-2$ 
 					styler);

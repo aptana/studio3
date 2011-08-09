@@ -32,18 +32,18 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.parsing.JSTokenScanner;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
@@ -58,7 +58,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
 
-	private static String[] keywords = ArrayUtil.flatten(JSLanguageConstants.KEYWORD_OPERATORS,
+	private static String[] KEYWORDS = ArrayUtil.flatten(JSLanguageConstants.KEYWORD_OPERATORS,
 			JSLanguageConstants.GRAMMAR_KEYWORDS, JSLanguageConstants.KEYWORD_CONTROL);
 
 	private JSIndexQueryHelper _indexHelper;
@@ -117,7 +117,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (globals != null)
 		{
 			URI projectURI = this.getProjectURI();
-			String location = JSIndexConstants.CORE;
+			String location = IJSIndexConstants.CORE;
 
 			for (PropertyElement property : globals)
 			{
@@ -180,7 +180,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex());
 
-		if (projectGlobals != null && projectGlobals.isEmpty() == false)
+		if (projectGlobals != null && !projectGlobals.isEmpty())
 		{
 			Image[] userAgents = this.getAllUserAgentIcons();
 			URI projectURI = this.getProjectURI();
@@ -223,7 +223,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
 	{
-		for (String name : keywords)
+		for (String name : KEYWORDS)
 		{
 			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
 			this.addProposal(proposals, name, JS_KEYWORD, description, this.getAllUserAgentIcons(),
@@ -270,7 +270,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (this._replaceRange != null)
 		{
-			offset = this._replaceRange.getStartingOffset();
+			offset = this._replaceRange.getStartingOffset(); // $codepro.audit.disable questionableAssignment
 			replaceLength = this._replaceRange.getLength();
 		}
 
@@ -402,7 +402,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				}
 
 				// prevent context info popup from appearing and immediately disappearing
-				if (inObjectLiteral == false)
+				if (!inObjectLiteral)
 				{
 					String info = JSModelFormatter.getContextInfo(function);
 					List<String> lines = JSModelFormatter.getContextLines(function);
@@ -493,7 +493,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String prefix = document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
 				setSelectedProposal(prefix, resultList);
 			}
-			catch (BadLocationException e)
+			catch (BadLocationException e) // $codepro.audit.disable emptyCatchClause
 			{
 				// ignore
 			}
@@ -576,13 +576,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		JSArgumentsNode result = null;
 
 		// work a way up the AST to determine if we're in an arguments node
-		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		while (node instanceof JSNode && node.getNodeType() != IJSNodeTypes.ARGUMENTS)
 		{
 			node = node.getParent();
 		}
 
 		// process arguments node as long as we're not to the left of the opening parenthesis
-		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
+		if (node instanceof JSNode && node.getNodeType() == IJSNodeTypes.ARGUMENTS
+				&& node.getStartingOffset() != offset)
 		{
 			result = (JSArgumentsNode) node;
 		}
@@ -863,7 +864,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (offset > 0)
 		{
 			Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
-			return lexeme != null ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
+			return (lexeme != null) ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
 		}
 		return false;
 	}
@@ -874,7 +875,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidIdentifier(char c, int keyCode)
 	{
-		return (Character.isJavaIdentifierStart(c) || Character.isJavaIdentifierPart(c) || c == '$');
+		return Character.isJavaIdentifierStart(c) || Character.isJavaIdentifierPart(c) || c == '$';
 	}
 
 	/*

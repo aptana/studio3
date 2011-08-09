@@ -7,20 +7,26 @@
  */
 package com.aptana.editor.common;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -29,15 +35,21 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
 import com.aptana.scripting.model.SnippetElement;
 
 public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> extends TestCase
@@ -49,6 +61,8 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	protected String source;
 	protected T processor;
 	protected List<Integer> cursorOffsets;
+
+	private URI fileUri;
 
 	/**
 	 * checkProposals
@@ -140,13 +154,24 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	/**
 	 * createEditor
 	 * 
-	 * @param file
+	 * @param createEditor
 	 * @return
 	 */
-	protected ITextEditor createEditor(IFileStore file)
+	protected ITextEditor createEditor(IFileStore fileStore)
+	{
+		FileStoreEditorInput editorInput = new FileStoreEditorInput(fileStore);
+		return createEditor(editorInput);
+	}
+
+	/**
+	 * createEditor
+	 * 
+	 * @param createEditor
+	 * @return
+	 */
+	protected ITextEditor createEditor(IEditorInput editorInput)
 	{
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		FileStoreEditorInput editorInput = new FileStoreEditorInput(file);
 		ITextEditor editor = null;
 
 		try
@@ -195,6 +220,34 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	 * @param resource
 	 * @return
 	 */
+	protected IFileStore createFileStore(String prefix, String extension, String contents)
+	{
+		File tempFile;
+		IFileStore fileStore = null;
+		try
+		{
+			tempFile = File.createTempFile(prefix, extension);
+			IOUtil.write(new FileOutputStream(tempFile), contents);
+			fileStore = EFS.getStore(tempFile.toURI());
+		}
+		catch (IOException e)
+		{
+			fail();
+		}
+		catch (CoreException e)
+		{
+			fail();
+		}
+
+		return fileStore;
+	}
+
+	/**
+	 * getFileStore
+	 * 
+	 * @param resource
+	 * @return
+	 */
 	protected IFileStore getFileStore(String resource)
 	{
 		Path path = new Path(resource);
@@ -234,19 +287,84 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	protected abstract String getPluginId();
 
 	/**
-	 * getFileInfo
+	 * Is we wish to index our files, the index we should use
+	 * 
+	 * @return
+	 */
+	protected IFileStoreIndexingParticipant createIndexer()
+	{
+		return null;
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	protected Index getIndex()
+	{
+		if (this.fileUri == null)
+		{
+			return null;
+		}
+		return IndexManager.getInstance().getIndex(this.fileUri);
+
+	}
+
+	/**
+	 * setupTestContext
+	 * 
+	 * @param resource
+	 * @return
+	 * @throws CoreException
+	 */
+	protected void setupTestContext(IFile file) throws CoreException
+	{
+		IFileStore store = EFS.getStore(file.getRawLocationURI());
+		FileEditorInput editorInput = new FileEditorInput(file);
+		setupTestContext(store, editorInput);
+	}
+
+	/**
+	 * setupTestContext
 	 * 
 	 * @param resource
 	 * @return
 	 */
-	protected void setupTestContext(String resource)
+	protected void setupTestContext(IFileStore file)
 	{
-		IFileStore file = this.getFileStore(resource);
+		FileStoreEditorInput editorInput = new FileStoreEditorInput(file);
+		setupTestContext(file, editorInput);
+	}
 
-		this.editor = this.createEditor(file);
+	/**
+	 * setupTestContext
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	protected void setupTestContext(IFileStore store, IEditorInput editorInput)
+	{
+		this.fileUri = store.toURI();
+		this.editor = this.createEditor(editorInput);
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		this.source = document.get();
 		this.processor = this.createContentAssistProcessor((AbstractThemeableEditor) this.editor);
+
+		IFileStoreIndexingParticipant indexer = this.createIndexer();
+		if (indexer != null)
+		{
+			Set<IFileStore> set = new HashSet<IFileStore>();
+			set.add(store);
+			try
+			{
+				indexer.index(set, this.getIndex(), new NullProgressMonitor());
+			}
+			catch (CoreException e)
+			{
+				fail("Error indexing file");
+			}
+		}
 
 		// find offsets
 		this.cursorOffsets = new ArrayList<Integer>();
@@ -274,6 +392,42 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		}
 	}
 
+	/**
+	 * getFileInfo
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	protected void setupTestContext(String resource)
+	{
+		IFileStore file = this.getFileStore(resource);
+		setupTestContext(file);
+	}
+
+	/**
+	 * tearDownTestContext
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	protected void tearDownTestContext()
+	{
+		if (editor != null)
+		{
+			editor.close(false);
+		}
+
+		if (processor != null)
+		{
+			processor.dispose();
+		}
+
+		if (fileUri != null)
+		{
+			IndexManager.getInstance().removeIndex(fileUri);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
@@ -281,10 +435,8 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	@Override
 	protected void tearDown() throws Exception
 	{
-		if (editor != null)
-		{
-			editor.close(false);
-		}
+		tearDownTestContext();
+
 		editor = null;
 		document = null;
 		source = null;

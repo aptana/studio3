@@ -23,8 +23,12 @@ import com.aptana.editor.common.CommonEditorPlugin;
  * 
  * @author Sandip V. Chitale
  */
-public abstract class Utilities
+public final class Utilities
 {
+
+	private Utilities()
+	{
+	}
 
 	/**
 	 * Creates a new file editor input.

@@ -75,7 +75,15 @@ public final class FirefoxUtil {
 	 * @return IPath
 	 */
 	public static IPath findDefaultProfileLocation() {
-		String[] locations = LOCATIONS.get(Platform.getOS());
+		return findDefaultProfileLocation(LOCATIONS.get(Platform.getOS()));
+	}
+
+	/**
+	 * Find location of user's default(current) Firefox profile.
+	 *
+	 * @return IPath
+	 */
+	protected static IPath findDefaultProfileLocation(String[] locations) {
 		if (locations != null) {
 			for (int i = 0; i < locations.length; ++i) {
 				String location = PlatformUtil.expandEnvironmentStrings(locations[i]);

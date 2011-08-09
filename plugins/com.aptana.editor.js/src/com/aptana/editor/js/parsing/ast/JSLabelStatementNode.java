@@ -21,7 +21,7 @@ public abstract class JSLabelStatementNode extends JSNode
 	 * 
 	 * @param type
 	 */
-	public JSLabelStatementNode(short type)
+	protected JSLabelStatementNode(short type)
 	{
 		this(type, null);
 	}
@@ -32,7 +32,7 @@ public abstract class JSLabelStatementNode extends JSNode
 	 * @param type
 	 * @param label
 	 */
-	public JSLabelStatementNode(short type, Symbol label)
+	protected JSLabelStatementNode(short type, Symbol label)
 	{
 		super(type);
 
@@ -50,10 +50,10 @@ public abstract class JSLabelStatementNode extends JSNode
 		{
 			return false;
 		}
-		
+
 		JSLabelStatementNode other = (JSLabelStatementNode) obj;
-		
-		return _label == null ? other._label == null : _label.value.equals(other._label.value);
+
+		return (_label == null) ? other._label == null : _label.value.equals(other._label.value);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public abstract class JSLabelStatementNode extends JSNode
 	public int hashCode()
 	{
 		int hash = super.hashCode();
-		
-		return hash * 31 + (_label == null ? 0 : _label.value.hashCode());
+
+		return hash * 31 + ((_label == null) ? 0 : _label.value.hashCode());
 	}
 }

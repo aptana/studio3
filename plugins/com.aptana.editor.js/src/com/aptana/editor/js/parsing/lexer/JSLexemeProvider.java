@@ -28,7 +28,7 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 	{
 		super(document, offset, includeOffset, scanner);
 	}
-	
+
 	/**
 	 * Convert the partition that contains the given offset into a list of lexemes.
 	 * 

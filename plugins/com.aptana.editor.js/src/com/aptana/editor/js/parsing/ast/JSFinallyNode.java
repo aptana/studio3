@@ -18,7 +18,7 @@ public class JSFinallyNode extends JSNode
 	 */
 	public JSFinallyNode(JSNode... children)
 	{
-		super(JSNodeTypes.FINALLY, children);
+		super(IJSNodeTypes.FINALLY, children);
 	}
 
 	/*

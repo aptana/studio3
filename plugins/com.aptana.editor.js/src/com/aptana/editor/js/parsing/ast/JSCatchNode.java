@@ -18,7 +18,7 @@ public class JSCatchNode extends JSNode
 	 */
 	public JSCatchNode(JSNode... children)
 	{
-		super(JSNodeTypes.CATCH, children);
+		super(IJSNodeTypes.CATCH, children);
 	}
 
 	/*

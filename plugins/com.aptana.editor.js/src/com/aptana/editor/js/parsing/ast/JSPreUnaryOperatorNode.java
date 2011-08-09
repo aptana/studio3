@@ -46,39 +46,39 @@ public class JSPreUnaryOperatorNode extends JSNode
 		switch (token)
 		{
 			case DELETE:
-				type = JSNodeTypes.DELETE;
+				type = IJSNodeTypes.DELETE;
 				break;
 
 			case EXCLAMATION:
-				type = JSNodeTypes.LOGICAL_NOT;
+				type = IJSNodeTypes.LOGICAL_NOT;
 				break;
 
 			case MINUS:
-				type = JSNodeTypes.NEGATIVE;
+				type = IJSNodeTypes.NEGATIVE;
 				break;
 
 			case MINUS_MINUS:
-				type = JSNodeTypes.PRE_DECREMENT;
+				type = IJSNodeTypes.PRE_DECREMENT;
 				break;
 
 			case PLUS:
-				type = JSNodeTypes.POSITIVE;
+				type = IJSNodeTypes.POSITIVE;
 				break;
 
 			case PLUS_PLUS:
-				type = JSNodeTypes.PRE_INCREMENT;
+				type = IJSNodeTypes.PRE_INCREMENT;
 				break;
 
 			case TILDE:
-				type = JSNodeTypes.BITWISE_NOT;
+				type = IJSNodeTypes.BITWISE_NOT;
 				break;
 
 			case TYPEOF:
-				type = JSNodeTypes.TYPEOF;
+				type = IJSNodeTypes.TYPEOF;
 				break;
 
 			case VOID:
-				type = JSNodeTypes.VOID;
+				type = IJSNodeTypes.VOID;
 				break;
 
 			default:

@@ -16,7 +16,8 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 
-public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration {
+public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+{
 
 	/**
 	 * JSSourceViewerConfiguration
@@ -24,7 +25,8 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 	 * @param preferences
 	 * @param editor
 	 */
-	public JSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
+	public JSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
 		super(preferences, editor);
 	}
 
@@ -33,12 +35,14 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
 	 */
 	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration() {
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
 		return JSSourceConfiguration.getDefault();
 	}
 
 	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
 		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, JSPlugin
 				.getDefault().getPreferenceStore()) };
 	}
