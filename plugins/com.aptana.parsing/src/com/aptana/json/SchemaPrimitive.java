@@ -17,7 +17,7 @@ public abstract class SchemaPrimitive implements IState
 	 * 
 	 * @param text
 	 */
-	public SchemaPrimitive()
+	protected SchemaPrimitive()
 	{
 	}
 
@@ -50,7 +50,7 @@ public abstract class SchemaPrimitive implements IState
 	 */
 	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
-		return (event == SchemaEventType.PRIMITIVE && this.validValue(value));
+		return event == SchemaEventType.PRIMITIVE && this.validValue(value);
 	}
 
 	/**
@@ -71,9 +71,9 @@ public abstract class SchemaPrimitive implements IState
 	 */
 	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
-		if (this.isValidTransition(event, value) == false)
+		if (!this.isValidTransition(event, value))
 		{
-			throw new IllegalStateException();
+			throw new IllegalStateException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 
 		// TODO: verify popped type matches this type

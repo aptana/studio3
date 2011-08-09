@@ -18,5 +18,5 @@ public interface IParser
 	 * @return
 	 * @throws Exception
 	 */
-	public IParseRootNode parse(IParseState parseState) throws Exception;
+	public IParseRootNode parse(IParseState parseState) throws Exception; // $codepro.audit.disable declaredExceptions
 }

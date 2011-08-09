@@ -8,19 +8,11 @@
 package com.aptana.sax;
 
 /**
- * @author Kevin Lindsey
+ * InvalidTransitionException
  */
 public class InvalidTransitionException extends Exception
 {
-
-	/*
-	 * Fields
-	 */
-	private static final long serialVersionUID = 549557395315065491L;
-
-	/*
-	 * Constructors
-	 */
+	private static final long serialVersionUID = 549557395315065491L; // $codepro.audit.disable hidingInheritedFields
 
 	/**
 	 * Create a new instance of InvalidTransitionException

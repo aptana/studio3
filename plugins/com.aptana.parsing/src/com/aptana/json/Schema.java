@@ -57,7 +57,7 @@ public class Schema implements IState, IPropertyContainer
 	{
 		IState result = this.getType(typeName);
 
-		if (result == EMPTY_TYPE)
+		if (result == EMPTY_TYPE) // $codepro.audit.disable useEquals
 		{
 			// type doesn't exist, so create it
 			result = this.createObject();
@@ -574,15 +574,9 @@ public class Schema implements IState, IPropertyContainer
 
 						this.addType(name, object);
 					}
-					else
-					{
-						// TODO: warn?
-					}
+					// TODO: else warn?
 				}
-				else
-				{
-					// TODO: warn?
-				}
+				// TODO: else warn?
 			}
 		}
 	}
@@ -627,7 +621,7 @@ public class Schema implements IState, IPropertyContainer
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.printWithIndent("schema ").print("\"").print(this.getName()).println("\"").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		writer.printWithIndent("schema ").print('"').print(this.getName()).println('"').increaseIndent(); //$NON-NLS-1$
 
 		writer.printWithIndent("version := ").println(this._version); //$NON-NLS-1$
 		writer.printWithIndent("result  := ").println(this._rootTypeName); //$NON-NLS-1$

@@ -8,19 +8,11 @@
 package com.aptana.sax;
 
 /**
- * @author Kevin Lindsey
+ * SchemaInitializationException
  */
 public class SchemaInitializationException extends Exception
 {
-
-	/*
-	 * Fields
-	 */
-	private static final long serialVersionUID = -5772556417571650024L;
-
-	/*
-	 * Constructors
-	 */
+	private static final long serialVersionUID = -5772556417571650024L; // $codepro.audit.disable hidingInheritedFields
 
 	/**
 	 * Create a new instance of SchemaInitializationException

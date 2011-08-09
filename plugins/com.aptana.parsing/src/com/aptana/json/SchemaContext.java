@@ -14,7 +14,7 @@ import java.util.Stack;
  */
 public class SchemaContext implements ISchemaContext
 {
-	private Stack<IState> _typeStack;
+	private Stack<IState> _typeStack; // $codepro.audit.disable declareAsInterface
 	private IContextHandler _handler;
 
 	/**
@@ -81,7 +81,7 @@ public class SchemaContext implements ISchemaContext
 	 */
 	public boolean hasTypes()
 	{
-		return (this._typeStack != null && this._typeStack.isEmpty() == false);
+		return this._typeStack != null && !this._typeStack.isEmpty();
 	}
 
 	/*
@@ -94,7 +94,7 @@ public class SchemaContext implements ISchemaContext
 		// for array elements
 		if (this._typeStack != null)
 		{
-			if (this._typeStack.isEmpty() == false)
+			if (!this._typeStack.isEmpty())
 			{
 				this._typeStack.pop();
 			}

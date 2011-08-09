@@ -26,12 +26,12 @@ import com.aptana.parsing.lexer.ITypePredicate;
  */
 public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRecoveryStrategy
 {
-	private class CandidateToken
+	private class CandidateToken // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.favorStaticMemberClassesOverNonStatic
 	{
 		public final T tokenType;
 		public final String tokenText;
 
-		public CandidateToken(T tokenType, String tokenText)
+		private CandidateToken(T tokenType, String tokenText)
 		{
 			this.tokenType = tokenType;
 			this.tokenText = tokenText;

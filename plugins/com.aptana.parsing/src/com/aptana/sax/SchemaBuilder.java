@@ -47,7 +47,7 @@ public final class SchemaBuilder extends ValidatingReader
 	private static String SCHEMA_1_1_NAMESPACE = "http://www.aptana.com/2007/schema/1.1"; //$NON-NLS-1$
 
 	private Schema _newSchema;
-	private Stack<ISchemaElement> _elementStack;
+	private Stack<ISchemaElement> _elementStack; // $codepro.audit.disable declareAsInterface
 	private ISchemaElement _currentElement;
 
 	private String _currentSetId;
@@ -333,7 +333,7 @@ public final class SchemaBuilder extends ValidatingReader
 				{
 					fi.close();
 				}
-				catch (IOException e)
+				catch (IOException e) // $codepro.audit.disable emptyCatchClause
 				{
 				}
 			}
@@ -434,10 +434,8 @@ public final class SchemaBuilder extends ValidatingReader
 
 	/**
 	 * startDocument handler
-	 * 
-	 * @throws SAXException
 	 */
-	public void startDocument() throws SAXException
+	public void startDocument()
 	{
 		super.startDocument();
 
@@ -565,7 +563,7 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @throws SAXException
 	 */
 	public void startElementSetElement(String namespaceURI, String localName, String qualifiedName,
-			Attributes attributes) throws SAXException
+			Attributes attributes)
 	{
 		// create a new SchemaElement for our target element
 		ISchemaElement set = this._newSchema.createElement(localName, false);
@@ -617,19 +615,19 @@ public final class SchemaBuilder extends ValidatingReader
 		}
 		catch (IllegalArgumentException e)
 		{
-			throw new SAXException(e);
+			throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 		catch (InvalidTransitionException e)
 		{
-			throw new SAXException(e);
+			throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 		catch (IllegalAccessException e)
 		{
-			throw new SAXException(e);
+			throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 		catch (InvocationTargetException e)
 		{
-			throw new SAXException(e);
+			throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 	}
 
@@ -643,7 +641,7 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @throws SAXException
 	 */
 	public void startUseElementSetElement(String namespaceURI, String localName, String qualifiedName,
-			Attributes attributes) throws SAXException
+			Attributes attributes)
 	{
 		String name = attributes.getValue(NAME_ATTRIBUTE);
 		String id = name.substring(1);

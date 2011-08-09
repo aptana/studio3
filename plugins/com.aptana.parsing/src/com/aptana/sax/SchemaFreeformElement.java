@@ -10,7 +10,6 @@ package com.aptana.sax;
 import java.lang.reflect.Method;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author klindsey
@@ -223,7 +222,7 @@ public class SchemaFreeformElement implements ISchemaElement
 	 * (non-Javadoc)
 	 * @see com.aptana.sax.ISchemaElement#setOnEnter(java.lang.String)
 	 */
-	public void setOnEnter(String onEnterMethod) throws SecurityException, NoSuchMethodException
+	public void setOnEnter(String onEnterMethod) throws SecurityException
 	{
 		// do nothing
 	}
@@ -232,7 +231,7 @@ public class SchemaFreeformElement implements ISchemaElement
 	 * (non-Javadoc)
 	 * @see com.aptana.sax.ISchemaElement#setOnExit(java.lang.String)
 	 */
-	public void setOnExit(String onExitMethod) throws SecurityException, NoSuchMethodException
+	public void setOnExit(String onExitMethod) throws SecurityException
 	{
 		// do nothing
 	}
@@ -241,7 +240,7 @@ public class SchemaFreeformElement implements ISchemaElement
 	 * (non-Javadoc)
 	 * @see com.aptana.sax.ISchemaElement#validateAttributes(org.xml.sax.Attributes)
 	 */
-	public void validateAttributes(Attributes attributes) throws SAXException
+	public void validateAttributes(Attributes attributes)
 	{
 		// do nothing
 	}

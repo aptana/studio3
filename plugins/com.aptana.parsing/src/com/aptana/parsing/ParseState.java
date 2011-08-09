@@ -128,7 +128,7 @@ public class ParseState implements IParseState
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		text.append("@").append(fStartingOffset); //$NON-NLS-1$
+		text.append('@').append(fStartingOffset);
 
 		if (fRemovedLength > 0)
 		{
@@ -138,12 +138,12 @@ public class ParseState implements IParseState
 		int insertedLength = fInsertedText.length;
 		if (insertedLength > 0)
 		{
-			text.append(":i").append(insertedLength).append(":").append(fInsertedText); //$NON-NLS-1$ //$NON-NLS-2$
+			text.append(":i").append(insertedLength).append(':').append(fInsertedText); //$NON-NLS-1$
 		}
 		else
 		{
 			// outputs closing delimiter for proper parsing of the offset
-			text.append(":"); //$NON-NLS-1$
+			text.append(':');
 		}
 
 		return text.toString();
