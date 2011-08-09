@@ -26,10 +26,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.SyncState;
 import com.aptana.ide.syncing.core.old.Synchronizer;
@@ -49,18 +51,47 @@ public abstract class SyncingTests extends TestCase
 
 	protected String fileName = "test.txt";
 	protected String folderName = "test";
-		
+
 	private static Properties cachedProperties;
 
-	protected static final Properties getConfig() {
-		if (cachedProperties == null) {
+	protected synchronized static final Properties getConfig()
+	{
+		if (cachedProperties == null)
+		{
 			cachedProperties = new Properties();
 			String propertiesFile = System.getenv("junit.properties");
-			if (propertiesFile != null && new File(propertiesFile).length() > 0) {
-				try {
-					cachedProperties.load(new FileInputStream(propertiesFile));
-				} catch (IOException ignore) {
+			if (propertiesFile != null && new File(propertiesFile).length() > 0)
+			{
+				FileInputStream stream = null;
+				try
+				{
+					stream = new FileInputStream(propertiesFile);
+					cachedProperties.load(stream);
 				}
+				catch (IOException e)
+				{
+					IdeLog.logError(SyncingPlugin.getDefault(), "Failed to load junit.properties file at "
+							+ propertiesFile, e);
+				}
+				finally
+				{
+					if (stream != null)
+					{
+						try
+						{
+							stream.close();
+						}
+						catch (IOException ignore)
+						{
+							// ignore
+						}
+					}
+				}
+			}
+			else
+			{
+				IdeLog.logError(SyncingPlugin.getDefault(), "Expected, but did not find, testing properties at: "
+						+ propertiesFile);
 			}
 		}
 		return cachedProperties;
@@ -78,7 +109,7 @@ public abstract class SyncingTests extends TestCase
 		Random r = new Random();
 		int i = r.nextInt();
 		long millis = System.currentTimeMillis();
-		
+
 		clientDirectory = clientManager.getRoot().getFileStore(new Path("/client_" + millis + "_" + i));
 		assertNotNull(clientDirectory);
 		clientDirectory.mkdir(EFS.NONE, null);
@@ -319,12 +350,14 @@ public abstract class SyncingTests extends TestCase
 	protected IFileStore createFile(IFileStore fs, long modificationTime, String content) throws IOException,
 			CoreException
 	{
-		//System.out.print("Creating file: " + fs.toURI().toString() + ". ");
-		
-		if(fs.fetchInfo().isDirectory()) {
+		// System.out.print("Creating file: " + fs.toURI().toString() + ". ");
+
+		if (fs.fetchInfo().isDirectory())
+		{
 			fs.mkdir(EFS.NONE, null);
 		}
-		else {
+		else
+		{
 			fs.getParent().mkdir(EFS.NONE, null);
 		}
 		Writer w = new OutputStreamWriter(fs.openOutputStream(EFS.NONE, null));
@@ -337,15 +370,15 @@ public abstract class SyncingTests extends TestCase
 			w.write("");
 		}
 		w.close();
-		
+
 		IFileInfo fi = fs.fetchInfo();
 
-		//System.out.print("Created: " + fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified() + ". ");
+		// System.out.print("Created: " + fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified() + ". ");
 
 		fi.setLastModified(modificationTime);
 		fs.putInfo(fi, EFS.SET_LAST_MODIFIED, null);
 
-		//System.out.print("Modified: " + fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified() + "\n");
+		// System.out.print("Modified: " + fs.fetchInfo(IExtendedFileStore.DETAILED, null).getLastModified() + "\n");
 
 		return fs;
 	}
@@ -395,25 +428,25 @@ public abstract class SyncingTests extends TestCase
 
 		syncManager.setLogger(new ILogger()
 		{
-			
+
 			public void logWarning(String message, Throwable th)
 			{
 				// TODO Auto-generated method stub
-				
+
 			}
-						
+
 			public void logInfo(String message, Throwable th)
 			{
 				System.out.print(message);
 			}
-						
+
 			public void logError(String message, Throwable th)
 			{
 				// TODO Auto-generated method stub
-				
-			}		
+
+			}
 		});
-		
+
 		return syncManager.getSyncItems(clientManager, serverManager, clientRoot, serverRoot, null);
 	}
 
@@ -510,7 +543,7 @@ public abstract class SyncingTests extends TestCase
 		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ServerItemOnly, items[0].getSyncState());
 	}
-	
+
 	/**
 	 * testServerDirectoryOnly
 	 * 
@@ -911,7 +944,6 @@ public abstract class SyncingTests extends TestCase
 
 		Synchronizer syncManager = new Synchronizer(false, 10);
 
-		
 		VirtualFileSyncPair[] items = syncManager.getSyncItems(clientManager, serverManager, clientDirectory,
 				serverDirectory, null);
 
@@ -1817,7 +1849,8 @@ public abstract class SyncingTests extends TestCase
 	public void testServerNewerFileFullSync() throws IOException, CoreException
 	{
 		long currentTime = new Date().getTime();
-		IFileStore clientFile = this.createClientFile(FileUtil.getRandomFileName(folderName, ".txt"), currentTime - 1000); //$NON-NLS-1$ //$NON-NLS-2$
+		IFileStore clientFile = this.createClientFile(
+				FileUtil.getRandomFileName(folderName, ".txt"), currentTime - 1000); //$NON-NLS-1$ //$NON-NLS-2$
 		IFileStore serverFile = this.createServerFile(clientFile.getName(), currentTime);
 
 		Synchronizer syncManager = new Synchronizer(false, 10);
@@ -2007,9 +2040,11 @@ public abstract class SyncingTests extends TestCase
 		assertEquals(0, syncManager.getServerFileDeletedCount());
 		assertEquals(1, syncManager.getServerFileTransferedCount());
 	}
-	
-	protected void assertSyncPairLength(int length, VirtualFileSyncPair[] items) {
-		if(items.length != length) {
+
+	protected void assertSyncPairLength(int length, VirtualFileSyncPair[] items)
+	{
+		if (items.length != length)
+		{
 			String itemText = "";
 			for (int i = 0; i < items.length; i++)
 			{
