@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.operations;bundle-version="2.0.0";resolution:=optional,
  com.aptana.portal.ui,
  com.aptana.configurations,
- org.mortbay.jetty.util
+ org.mortbay.jetty.util,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true

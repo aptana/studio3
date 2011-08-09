@@ -198,7 +198,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 	}
 

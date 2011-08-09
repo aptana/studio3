@@ -189,11 +189,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		catch (BadPositionCategoryException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -659,7 +659,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 						}
 						catch (BadLocationException e)
 						{
-							IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+							IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 						}
 					}
 
@@ -672,7 +672,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 						}
 						catch (BadPositionCategoryException e)
 						{
-							IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+							IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 						}
 					}
 				}

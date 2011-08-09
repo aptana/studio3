@@ -10,9 +10,7 @@ package com.aptana.portal.ui;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.IEditorPart;
@@ -199,30 +197,5 @@ public class PortalUIPlugin extends AbstractUIPlugin
 		reg.put(XAMPP_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, XAMPP_IMAGE));
 		reg.put(JS_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, JS_IMAGE));
 		reg.put(PYTHON_IMAGE, imageDescriptorFromPlugin(PLUGIN_ID, PYTHON_IMAGE));
-	}
-
-	public static void logInfo(String string, Throwable t)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, string, t));
-	}
-
-	public static void logError(Throwable t)
-	{
-		logError(t.getLocalizedMessage(), t);
-	}
-
-	public static void logError(String string, Throwable t)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, string, t));
-	}
-
-	public static void logWarning(String message)
-	{
-		log(new Status(IStatus.WARNING, PLUGIN_ID, message));
-	}
-	
-	public static void log(IStatus status)
-	{
-		getDefault().getLog().log(status);
 	}
 }

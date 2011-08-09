@@ -19,6 +19,7 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
@@ -58,7 +59,7 @@ public class ExportConnectionsWizard extends Wizard implements IExportWizard
 		}
 		catch (BackingStoreException e)
 		{
-			SyncingUIPlugin.logError(Messages.ExportConnectionsWizard_ERR_FailSaveExportPrefs, e);
+			IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.ExportConnectionsWizard_ERR_FailSaveExportPrefs, e);
 		}
 
 		File file = path.toFile();

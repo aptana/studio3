@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -83,12 +84,12 @@ public class SquashMergeBranchHandler extends AbstractGitHandler
 				}
 				catch (CoreException e)
 				{
-					GitUIPlugin.logError(e);
+					IdeLog.logError(GitUIPlugin.getDefault(), e);
 					return e.getStatus();
 				}
 				catch (Throwable e)
 				{
-					GitUIPlugin.logError(e.getMessage(), e);
+					IdeLog.logError(GitUIPlugin.getDefault(), e);
 					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
 				}
 				finally

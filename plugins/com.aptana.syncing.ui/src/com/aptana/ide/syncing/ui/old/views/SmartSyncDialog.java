@@ -78,6 +78,7 @@ import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -1146,7 +1147,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				syncer.setEventHandler(new SyncEventHandlerAdapterWithProgressMonitor(monitor)
 				{
 
-					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
+					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems,
+							IProgressMonitor monitor)
 					{
 						if (item != null)
 						{
@@ -1249,7 +1251,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				}
 				catch (Exception e1)
 				{
-					SyncingUIPlugin.logError(Messages.SmartSyncDialog_ErrorSmartSync, e1);
+					IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.SmartSyncDialog_ErrorSmartSync, e1);
 					error = e1;
 				}
 				if (monitor.isCanceled())
@@ -1724,7 +1726,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			// cancels the previous job if exists
 			syncJob.cancel();
 		}
-		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this, MessageFormat.format(Messages.SmartSyncDialog_Endpoints, end1, end2));
+		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this, MessageFormat.format(
+				Messages.SmartSyncDialog_Endpoints, end1, end2));
 		syncJob.schedule();
 	}
 

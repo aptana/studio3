@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -399,7 +400,7 @@ public class S3ConnectionPropertyComposite extends Composite implements IOptions
 							}
 							catch (CoreException e)
 							{
-								S3UIPlugin.logImportant(e);
+								IdeLog.logWarning(S3UIPlugin.getDefault(), e);
 							}
 						}
 					}
@@ -511,7 +512,7 @@ public class S3ConnectionPropertyComposite extends Composite implements IOptions
 		}
 		catch (CoreException e)
 		{
-			S3UIPlugin.logError(Messages.S3ConnectionPointPropertyDialog_ERR_FailedCreate, e);
+			IdeLog.logError(S3UIPlugin.getDefault(), Messages.S3ConnectionPointPropertyDialog_ERR_FailedCreate, e);
 			listener.close();
 			throw new SWTException();
 		}
@@ -689,7 +690,7 @@ public class S3ConnectionPropertyComposite extends Composite implements IOptions
 		}
 		catch (CoreException e)
 		{
-			S3UIPlugin.logImportant(e);
+			IdeLog.logWarning(S3UIPlugin.getDefault(), e);
 		}
 		if (dlg.open() == Window.OK)
 		{

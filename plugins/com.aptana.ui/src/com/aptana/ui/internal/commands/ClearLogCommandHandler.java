@@ -54,7 +54,7 @@ public class ClearLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}

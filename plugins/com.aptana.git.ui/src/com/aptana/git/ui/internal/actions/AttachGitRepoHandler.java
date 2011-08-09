@@ -25,7 +25,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.ISources;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
@@ -74,7 +76,7 @@ public class AttachGitRepoHandler extends AbstractHandler
 				}
 				catch (CoreException e)
 				{
-					GitUIPlugin.logError(e);
+					IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 					return e.getStatus();
 				}
 				finally

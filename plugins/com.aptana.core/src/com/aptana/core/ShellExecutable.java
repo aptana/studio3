@@ -211,7 +211,7 @@ public final class ShellExecutable {
 					if (status.isOK()) {
 						result = buildEnvironment(status.getMessage());
 					} else {
-						IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed: "+status.getMessage(), (Throwable)null); //$NON-NLS-1$
+						IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed: "+status.getMessage()); //$NON-NLS-1$
 					}
 				} catch (Exception e) {
 					IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed.", e); //$NON-NLS-1$

@@ -16,6 +16,7 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -60,15 +61,19 @@ public class BrowserActionController extends AbstractActionController
 		}
 		try
 		{
-			IWebBrowser browser = PortalUIPlugin.getDefault().getWorkbench().getBrowserSupport().createBrowser(
-					IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR
-							| IWorkbenchBrowserSupport.STATUS | IWorkbenchBrowserSupport.NAVIGATION_BAR,
-					url.toString(), null, null);
+			IWebBrowser browser = PortalUIPlugin
+					.getDefault()
+					.getWorkbench()
+					.getBrowserSupport()
+					.createBrowser(
+							IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.LOCATION_BAR
+									| IWorkbenchBrowserSupport.STATUS | IWorkbenchBrowserSupport.NAVIGATION_BAR,
+							url.toString(), null, null);
 			browser.openURL(url);
 		}
 		catch (PartInitException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
 		return IBrowserNotificationConstants.JSON_OK;
@@ -91,13 +96,17 @@ public class BrowserActionController extends AbstractActionController
 		}
 		try
 		{
-			IWebBrowser browser = PortalUIPlugin.getDefault().getWorkbench().getBrowserSupport().createBrowser(
-					IWorkbenchBrowserSupport.AS_EXTERNAL | IWorkbenchBrowserSupport.STATUS, url.toString(), null, null);
+			IWebBrowser browser = PortalUIPlugin
+					.getDefault()
+					.getWorkbench()
+					.getBrowserSupport()
+					.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL | IWorkbenchBrowserSupport.STATUS,
+							url.toString(), null, null);
 			browser.openURL(url);
 		}
 		catch (PartInitException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
 		return IBrowserNotificationConstants.JSON_OK;
@@ -122,21 +131,20 @@ public class BrowserActionController extends AbstractActionController
 				}
 				catch (MalformedURLException e)
 				{
-					PortalUIPlugin.logError("Invalid URL: " + arr[0], e); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Invalid URL: " + arr[0], e); //$NON-NLS-1$
 				}
 			}
 			else
 			{
-				PortalUIPlugin
-						.logError(new Exception(
-								"Wrong argument count passed to BrowserActionController::getURL. Expected 1 and got " + arr.length));//$NON-NLS-1$
+				String message = "Wrong argument count passed to BrowserActionController::getURL. Expected 1 and got " + arr.length; //$NON-NLS-1$
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			}
 		}
 		else
 		{
-			PortalUIPlugin.logError(new Exception(
-					"Wrong argument type passed to BrowserActionController::getURL. Expected Object[] and got " //$NON-NLS-1$
-							+ ((attributes == null) ? "null" : attributes.getClass().getName()))); //$NON-NLS-1$s
+			String message = "Wrong argument type passed to BrowserActionController::getURL. Expected Object[] and got " //$NON-NLS-1$
+					+ ((attributes == null) ? "null" : attributes.getClass().getName()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 		}
 		return null;
 	}

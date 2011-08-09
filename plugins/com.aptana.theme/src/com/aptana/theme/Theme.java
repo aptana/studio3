@@ -34,6 +34,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
@@ -226,7 +227,8 @@ public class Theme
 			return new RGBa(0, 0, 0);
 		if (hex.length() != 7 && hex.length() != 9)
 		{
-			ThemePlugin.logError(MessageFormat.format("Received RGBa Hex value with invalid length: {0}", hex), null); //$NON-NLS-1$
+			IdeLog.logError(ThemePlugin.getDefault(),
+					MessageFormat.format("Received RGBa Hex value with invalid length: {0}", hex)); //$NON-NLS-1$
 			if (defaultFG != null)
 			{
 				return new RGBa(defaultFG);
@@ -670,7 +672,7 @@ public class Theme
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -731,7 +733,7 @@ public class Theme
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -847,7 +849,7 @@ public class Theme
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 			return null;
 		}
 	}

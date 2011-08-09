@@ -472,8 +472,7 @@ public class JSCAHandler implements IContextHandler
 				}
 				else
 				{
-					IdeLog.logError(JSPlugin.getDefault(), Messages.JSCAHandler_Invalid_Type_Name + type,
-							(Throwable) null);
+					IdeLog.logError(JSPlugin.getDefault(), Messages.JSCAHandler_Invalid_Type_Name + type);
 				}
 			}
 		}
@@ -588,7 +587,7 @@ public class JSCAHandler implements IContextHandler
 		}
 		else
 		{
-			IdeLog.logError(JSPlugin.getDefault(), message, (Throwable) null);
+			IdeLog.logError(JSPlugin.getDefault(), message);
 		}
 	}
 

@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -117,7 +118,7 @@ public class InputURLDialog extends Dialog {
 				try {
 					new URI(newText).toURL();
 				} catch (Exception e) {
-					return Messages.InputURLDialog_InvalidURL;
+					return EplMessages.InputURLDialog_InvalidURL;
 				}
 				return null;
 			}
@@ -321,7 +322,7 @@ public class InputURLDialog extends Dialog {
 				XMLMemento memento = XMLMemento.createReadRoot(reader);
 				return memento;
 			} catch (Exception e) {
-				UIEplPlugin.log(e);
+				IdeLog.logError(UIEplPlugin.getDefault(), e);
 			}
 		}
 		return null;
@@ -335,7 +336,7 @@ public class InputURLDialog extends Dialog {
 			FileWriter writer = new FileWriter(file);
 			memento.save(writer);
 		} catch (IOException e) {
-			UIEplPlugin.log(e);
+			IdeLog.logError(UIEplPlugin.getDefault(), e);
 		}
 
 	}

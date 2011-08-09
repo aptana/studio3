@@ -25,7 +25,9 @@ import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
@@ -75,7 +77,7 @@ public class MergeConflictsHandler extends AbstractGitHandler
 		}
 		catch (CoreException e)
 		{
-			GitUIPlugin.logError(e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return null;
 		}
 		// Now we use the pre-merge file and compare against the merging version.

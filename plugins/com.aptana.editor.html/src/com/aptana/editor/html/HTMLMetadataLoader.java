@@ -142,7 +142,7 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 	}
 

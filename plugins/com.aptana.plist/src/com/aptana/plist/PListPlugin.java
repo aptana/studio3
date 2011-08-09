@@ -7,36 +7,15 @@
  */
 package com.aptana.plist;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 public class PListPlugin extends Plugin
 {
+
 	public static final String PLUGIN_ID = "com.aptana.plist"; //$NON-NLS-1$
+
 	private static PListPlugin plugin;
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static PListPlugin getDefault()
-	{
-		return plugin;
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
-	}
 
 	/**
 	 * The constructor
@@ -63,5 +42,15 @@ public class PListPlugin extends Plugin
 	{
 		plugin = null;
 		super.stop(context);
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static PListPlugin getDefault()
+	{
+		return plugin;
 	}
 }

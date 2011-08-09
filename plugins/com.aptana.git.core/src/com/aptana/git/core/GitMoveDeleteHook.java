@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -148,7 +149,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		}
 		catch (IOException e)
 		{
-			GitPlugin.logError("File.getCanonicalPath failed.", e); //$NON-NLS-1$
+			IdeLog.logError(GitPlugin.getDefault(), "File.getCanonicalPath failed.", e, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 
 		IPath source = getRepoRelativePath(project, repo);
@@ -324,7 +325,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		}
 		catch (CoreException e)
 		{
-			GitPlugin.logError(e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 	}
 

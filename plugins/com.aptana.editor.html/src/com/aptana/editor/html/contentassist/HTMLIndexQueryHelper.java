@@ -67,7 +67,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 
@@ -139,7 +139,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 
 			if (attributes != null && attributes.isEmpty() == false)
@@ -231,7 +231,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 
@@ -252,7 +252,7 @@ public class HTMLIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -272,7 +272,7 @@ public class HTMLIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -308,7 +308,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 

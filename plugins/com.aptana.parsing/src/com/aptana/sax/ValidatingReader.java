@@ -22,6 +22,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.parsing.ParsingPlugin;
 
 /**
@@ -129,7 +130,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			ParsingPlugin.logError(message, null);
+			IdeLog.logError(ParsingPlugin.getDefault(), message);
 		}
 	}
 
@@ -146,7 +147,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			ParsingPlugin.logInfo(message);
+			IdeLog.logInfo(ParsingPlugin.getDefault(), message);
 		}
 	}
 
@@ -163,7 +164,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			ParsingPlugin.logWarning(message);
+			IdeLog.logWarning(ParsingPlugin.getDefault(), message);
 		}
 	}
 
@@ -180,20 +181,20 @@ public class ValidatingReader extends DefaultHandler
 	{
 		// create a new SAX factory class
 		SAXParserFactory factory = SAXParserFactory.newInstance();
-		
+
 		// make sure it generates namespace aware parsers
 		factory.setNamespaceAware(true);
 
 		// create the parser
 		SAXParser saxParser = factory.newSAXParser();
-		
-		//saxParser.getXMLReader().setFeature("http://xml.org/sax/features/validation", false);
-		//saxParser.setProperty("http://apache.org/xml/features/validation/warn-on-duplicate-attdef", Boolean.FALSE);
-		
+
+		// saxParser.getXMLReader().setFeature("http://xml.org/sax/features/validation", false);
+		// saxParser.setProperty("http://apache.org/xml/features/validation/warn-on-duplicate-attdef", Boolean.FALSE);
+
 		// associate our custom entity resolver
-		//XMLReader reader = saxParser.getXMLReader();
-		//reader.setEntityResolver(new SimpleResolver());
-		
+		// XMLReader reader = saxParser.getXMLReader();
+		// reader.setEntityResolver(new SimpleResolver());
+
 		// parse the XML
 		saxParser.parse(in, this);
 	}
@@ -270,7 +271,7 @@ public class ValidatingReader extends DefaultHandler
 			catch (InvocationTargetException e)
 			{
 				Throwable innerException = e.getCause();
-				
+
 				if (innerException instanceof SAXException)
 				{
 					throw (SAXException) innerException;

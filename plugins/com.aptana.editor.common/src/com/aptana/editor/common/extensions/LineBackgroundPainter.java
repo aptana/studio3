@@ -138,7 +138,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 			drawHighlightLine(fLastLine);
@@ -388,7 +388,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 

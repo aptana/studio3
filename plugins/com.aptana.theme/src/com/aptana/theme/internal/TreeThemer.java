@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -337,7 +338,7 @@ class TreeThemer extends ControlThemer
 								}
 								catch (Exception e)
 								{
-									ThemePlugin.logError(e);
+									IdeLog.logError(ThemePlugin.getDefault(), e);
 								}
 							}
 							// HACK! This is a major hack to force down the height of the row when we resize our font to
@@ -363,7 +364,7 @@ class TreeThemer extends ControlThemer
 								}
 								catch (Exception e)
 								{
-									ThemePlugin.logError(e);
+									IdeLog.logError(ThemePlugin.getDefault(), e);
 								}
 							}
 						}

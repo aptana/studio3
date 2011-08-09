@@ -22,12 +22,11 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -125,15 +124,15 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 					}
 				}
 			} catch (IOException e) {
-				SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
-						Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e));
+				IdeLog.logError(SyncingPlugin.getDefault(), Messages.SiteConnectionManager_ERR_FailedToLoadConnections,
+						e);
 			} catch (CoreException e) {
 				// could be an 1.5 exported file; try to migrate
 				try {
 					load15State(file);
 				} catch (Exception e1) {
-					SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
-							Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1));
+					IdeLog.logError(SyncingPlugin.getDefault(),
+							Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1);
 				}
 			} finally {
 				if (reader != null) {

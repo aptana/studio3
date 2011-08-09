@@ -25,9 +25,10 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class ParserPoolFactory
 {
+
 	private static ParserPoolFactory fgInstance;
 	private Map<String, IConfigurationElement> parsers;
-	private HashMap<String, IParserPool> pools;
+	private Map<String, IParserPool> pools;
 
 	/**
 	 * Singleton!
@@ -40,7 +41,6 @@ public class ParserPoolFactory
 		{
 			fgInstance = new ParserPoolFactory();
 		}
-
 		return fgInstance;
 	}
 
@@ -172,6 +172,7 @@ public class ParserPoolFactory
 	{
 		return parse(contentTypeId, source, null);
 	}
+
 	/**
 	 * parse
 	 * 
@@ -182,7 +183,6 @@ public class ParserPoolFactory
 	public static IParseRootNode parse(String contentTypeId, String source, IProgressMonitor monitor) throws Exception
 	{
 		ParseState parseState = new ParseState();
-
 		parseState.setEditState(source, null, 0, 0);
 		parseState.setProgressMonitor(monitor);
 
@@ -224,7 +224,7 @@ public class ParserPoolFactory
 			else
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
-				ParsingPlugin.logError(message, null);
+				IdeLog.logError(ParsingPlugin.getDefault(), message);
 			}
 		}
 		else
@@ -233,7 +233,7 @@ public class ParserPoolFactory
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
 						contentTypeId);
-				ParsingPlugin.logInfo(message);
+				IdeLog.logInfo(ParsingPlugin.getDefault(), message);
 			}
 		}
 

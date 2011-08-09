@@ -21,7 +21,10 @@ import org.eclipse.team.ui.IConfigurationWizard;
 import org.eclipse.team.ui.IConfigurationWizardExtension;
 import org.eclipse.ui.IWorkbench;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
+import com.aptana.git.ui.GitUIPlugin;
 
 public class SharingWizard extends Wizard implements IConfigurationWizard, IConfigurationWizardExtension
 {
@@ -78,7 +81,7 @@ public class SharingWizard extends Wizard implements IConfigurationWizard, IConf
 				status = new Status(IStatus.ERROR, GitPlugin.getPluginId(), 1,
 						Messages.SharingWizard_failed, e);
 			}
-			GitPlugin.logError(Messages.SharingWizard_failed, e);
+			IdeLog.logError(GitUIPlugin.getDefault(), Messages.SharingWizard_failed, e, IDebugScopes.DEBUG);
 			ErrorDialog.openError(getContainer().getShell(), getWindowTitle(),
 					Messages.SharingWizard_failed, status, status.getSeverity());
 			return false;

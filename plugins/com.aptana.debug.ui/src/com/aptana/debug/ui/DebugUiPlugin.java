@@ -110,7 +110,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 */
 	public static void errorDialog(String message, Throwable t)
 	{
-		IdeLog.logError(getDefault(), t.getMessage(), t);
+		IdeLog.logError(getDefault(), t);
 		Shell shell = UIUtils.getActiveShell();
 		if (shell != null)
 		{

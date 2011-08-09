@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
@@ -75,7 +76,7 @@ public class VirtualFileSyncPair
 		}
 		catch (CoreException e)
 		{
-			SyncingPlugin.logError(Messages.VirtualFileSyncPair_SourceFileInfoError, e);
+			IdeLog.logError(SyncingPlugin.getDefault(), Messages.VirtualFileSyncPair_SourceFileInfoError, e);
 			return null;
 		}
 	}
@@ -154,7 +155,7 @@ public class VirtualFileSyncPair
 		}
 		catch (CoreException e)
 		{
-			SyncingPlugin.logError(Messages.VirtualFileSyncPair_DestFileInfoErrror, e);
+			IdeLog.logError(SyncingPlugin.getDefault(), Messages.VirtualFileSyncPair_DestFileInfoErrror, e);
 			return null;
 		}
 	}
@@ -281,7 +282,7 @@ public class VirtualFileSyncPair
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns a nicely formatted version of the file pair
 	 */

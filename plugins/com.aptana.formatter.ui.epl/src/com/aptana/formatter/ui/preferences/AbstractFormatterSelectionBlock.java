@@ -57,10 +57,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.ContributionExtensionManager;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IScriptFormatterFactory;
-import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
 import com.aptana.formatter.preferences.PreferenceKey;
 import com.aptana.formatter.preferences.profile.IProfile;
@@ -73,6 +74,7 @@ import com.aptana.formatter.preferences.profile.ProfileStore;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.ExceptionHandler;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 import com.aptana.ui.UIPlugin;
@@ -196,7 +198,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 			catch (CoreException e)
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		IProfile selected = manager.getSelected(fProject);
@@ -484,7 +486,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		catch (CoreException e)
 		{
-			FormatterPlugin.logError(FormatterMessages.AbstractFormatterSelectionBlock_notValidProfile, e);
+			IdeLog.logError(FormatterUIEplPlugin.getDefault(),
+					FormatterMessages.AbstractFormatterSelectionBlock_notValidProfile, e, IDebugScopes.DEBUG);
 		}
 		if (profiles == null || profiles.isEmpty())
 			return;

@@ -215,7 +215,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}

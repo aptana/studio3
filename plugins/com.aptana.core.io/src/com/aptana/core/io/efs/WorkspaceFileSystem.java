@@ -137,7 +137,7 @@ public class WorkspaceFileSystem extends FileSystem {
 			} catch (CoreException e) {
 				// TODO: this exception could be thrown after 3.6M1
 				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=280944
-				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.WorkspaceFileSystem_FetchingTreeError, e, null);
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.WorkspaceFileSystem_FetchingTreeError, e);
 			}
 		}
 		return null;

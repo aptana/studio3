@@ -112,7 +112,7 @@ public class HerokuDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(HerokuPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HerokuPlugin.getDefault(), e);
 			}
 		}
 		return true;
@@ -229,7 +229,7 @@ public class HerokuDeployWizard extends AbstractDeployWizard
 						IdeLog.logError(
 								HerokuPlugin.getDefault(),
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
-										builder.toString()), (Throwable) null);
+										builder.toString()));
 					}
 					else
 					{
@@ -337,7 +337,7 @@ public class HerokuDeployWizard extends AbstractDeployWizard
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(HerokuPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HerokuPlugin.getDefault(), e);
 		}
 	}
 }

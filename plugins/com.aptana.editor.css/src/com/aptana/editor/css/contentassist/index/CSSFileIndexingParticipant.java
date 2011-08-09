@@ -71,7 +71,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e, null);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 		finally
 		{

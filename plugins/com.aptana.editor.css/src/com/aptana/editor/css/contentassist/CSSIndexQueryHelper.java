@@ -102,7 +102,7 @@ public class CSSIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CSSPlugin.getDefault(), e);
 			}
 		}
 
@@ -123,7 +123,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -154,7 +154,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -181,7 +181,7 @@ public class CSSIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CSSPlugin.getDefault(), e);
 			}
 		}
 
@@ -202,7 +202,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -222,7 +222,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;

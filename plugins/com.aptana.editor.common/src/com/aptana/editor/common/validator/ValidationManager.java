@@ -380,7 +380,7 @@ public class ValidationManager implements IValidationManager
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 	}

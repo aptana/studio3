@@ -120,7 +120,7 @@ public abstract class IOUtil
 		{
 			return;
 		}
-		IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+		IdeLog.logError(CorePlugin.getDefault(), e);
 	}
 
 	/**
@@ -179,7 +179,7 @@ public abstract class IOUtil
 						error //
 						);
 
-				IdeLog.logError(CorePlugin.getDefault(), message, (Throwable) null);
+				IdeLog.logError(CorePlugin.getDefault(), message);
 			}
 		}
 		else

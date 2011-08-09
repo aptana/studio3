@@ -7,8 +7,6 @@
  */
 package com.aptana.projects;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -73,10 +71,5 @@ public class ProjectsPlugin extends AbstractUIPlugin
 			}
 		}
 		return getDefault().getImageRegistry().getDescriptor(string);
-	}
-
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 }

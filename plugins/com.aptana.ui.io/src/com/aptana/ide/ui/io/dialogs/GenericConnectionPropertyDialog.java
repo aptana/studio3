@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.GenericConnectionPoint;
@@ -129,7 +130,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 				genericConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.GenericConnectionPropertyDialog_FailedToCreate, e);
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.GenericConnectionPropertyDialog_FailedToCreate, e);
 				close();
 			}
 		}

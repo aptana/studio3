@@ -228,7 +228,7 @@ public final class MarkerManager
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CorePlugin.getDefault(), e);
 			}
 		}
 		return rootMarker;
@@ -382,7 +382,7 @@ public final class MarkerManager
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CorePlugin.getDefault(), e);
 				}
 			}
 		}

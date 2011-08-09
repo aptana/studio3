@@ -1,1 +1,2 @@
 # This file is here so we can turn on tracing for the plugin to have debug logs
+com.aptana.git.core/debug=true

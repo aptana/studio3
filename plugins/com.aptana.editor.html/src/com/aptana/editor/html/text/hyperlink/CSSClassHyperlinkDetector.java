@@ -90,7 +90,7 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 		if (hyperlinks.isEmpty())
 		{

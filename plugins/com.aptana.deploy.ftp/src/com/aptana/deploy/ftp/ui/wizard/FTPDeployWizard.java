@@ -85,7 +85,7 @@ public class FTPDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(FTPDeployPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(FTPDeployPlugin.getDefault(), e);
 			}
 		}
 		return true;

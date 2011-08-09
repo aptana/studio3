@@ -16,6 +16,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 
@@ -40,7 +41,8 @@ public class ToggleAppExplorerHandler extends AbstractHandler
 				}
 				catch (PartInitException e)
 				{
-					ExplorerPlugin.logError(Messages.ToggleAppExplorerHandler_ERR_OpeningAppExplorer, e);
+					IdeLog.logError(ExplorerPlugin.getDefault(),
+							Messages.ToggleAppExplorerHandler_ERR_OpeningAppExplorer, e);
 				}
 			}
 			else

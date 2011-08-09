@@ -118,7 +118,7 @@ public class StartPageUtil
 		if (version == null && !Platform.inDevelopmentMode())
 		{
 			// we have a problem...
-			IdeLog.logError(PortalUIPlugin.getDefault(), "Could not identify the Studio's version", (String) null); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), "Could not identify the Studio's version"); //$NON-NLS-1$
 		}
 		return version;
 	}

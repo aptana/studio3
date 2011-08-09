@@ -35,7 +35,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -77,7 +79,7 @@ public class BlameHandler extends AbstractGitHandler
 					}
 					catch (PartInitException e)
 					{
-						GitUIPlugin.logError(e);
+						IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 					}
 				}
 			}

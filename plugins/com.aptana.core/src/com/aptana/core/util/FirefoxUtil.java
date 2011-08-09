@@ -180,7 +180,7 @@ public final class FirefoxUtil {
 					}
 				}
 			} catch (IOException e) {
-				IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", profilesIni.getAbsolutePath()), e, null); //$NON-NLS-1$
+				IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", profilesIni.getAbsolutePath()), e); //$NON-NLS-1$
 			} finally {
 				if (r != null) {
 					try {
@@ -257,7 +257,7 @@ public final class FirefoxUtil {
 				}
 			}
 		} catch (Exception e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -284,7 +284,7 @@ public final class FirefoxUtil {
 				out = new FileOutputStream(file);
 				out.write(linkedPath.getBytes());
 			} catch (IOException e) {
-				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CorePlugin.getDefault(), e);
 			} finally {
 				if (out != null) {
 					try {
@@ -327,7 +327,7 @@ public final class FirefoxUtil {
 				out.write(buffer, 0, n);
 			}
 		} catch (IOException e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 			if (file != null) {
 				if (!file.delete()) {
 					file.deleteOnExit();
@@ -352,7 +352,7 @@ public final class FirefoxUtil {
 		try {
 			ZipUtil.extract(file, dir, null);
 		} catch (IOException e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 			return false;
 		} finally {
 			if (!file.delete()) {

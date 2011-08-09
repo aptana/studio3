@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification;
 
@@ -176,7 +177,7 @@ public class BrowserInteractionRegistry
 			}
 			catch (CoreException e)
 			{
-				PortalUIPlugin.logError("Failed creating a browser action contoller extension", e); //$NON-NLS-1$
+				IdeLog.logError(PortalUIPlugin.getDefault(), "Failed creating a browser action contoller extension", e); //$NON-NLS-1$
 			}
 		}
 	}

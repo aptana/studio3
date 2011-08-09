@@ -369,7 +369,7 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				// the editor when this code throws errors and will impact them severely
 				catch (Throwable e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 
 				return Status.OK_STATUS;

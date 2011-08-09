@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -296,8 +297,9 @@ public class CopyFilesOperation {
         try {
         	SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
         } catch (CoreException e) {
-			IOUIPlugin.logError(MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopy, sourceStore,
-					destinationStore), e);
+			IdeLog.logError(IOUIPlugin.getDefault(),
+					MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopy, sourceStore, destinationStore),
+					e);
             success = false;
         }
         return success;
@@ -364,8 +366,8 @@ public class CopyFilesOperation {
                 success = copyFile(sourceStores[i], targetStores[i], monitor) && success;
             }
         } catch (CoreException e) {
-			IOUIPlugin.logError(MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopyToDest, sourceStore,
-					destinationRoot), e);
+			IdeLog.logError(IOUIPlugin.getDefault(), MessageFormat.format(
+					Messages.CopyFilesOperation_ERR_FailedToCopyToDest, sourceStore, destinationRoot), e);
             success = false;
         }
         return success;

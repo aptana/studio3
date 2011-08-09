@@ -65,7 +65,7 @@ public class EngineYardAPI
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(EngineYardPlugin.getDefault(), e);
 			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(),
 					Messages.EngineYardAPI_CredentialsFile_Invalid);
 		}
@@ -205,7 +205,7 @@ public class EngineYardAPI
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(EngineYardPlugin.getDefault(), e);
 			}
 			finally
 			{

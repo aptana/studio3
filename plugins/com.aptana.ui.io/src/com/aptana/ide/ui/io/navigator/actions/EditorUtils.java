@@ -27,6 +27,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.io.efs.SyncUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
@@ -55,15 +56,21 @@ public class EditorUtils
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				IEditorInput editorInput;
-				try {
+				try
+				{
 					editorInput = UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, monitor);
-				} catch (CoreException e) {
-					UIUtils.showErrorMessage(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString()), e);
+				}
+				catch (CoreException e)
+				{
+					UIUtils.showErrorMessage(
+							MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString()), e);
 					return Status.CANCEL_STATUS;
 				}
 				final IEditorInput finalEditorInput = editorInput;
 
-				UIJob openEditor = new UIJob(MessageFormat.format(Messages.EditorUtils_OpeningEditor, fileStore.toString())) {
+				UIJob openEditor = new UIJob(MessageFormat.format(Messages.EditorUtils_OpeningEditor,
+						fileStore.toString()))
+				{
 
 					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
@@ -178,7 +185,7 @@ public class EditorUtils
 								}
 								catch (CoreException e)
 								{
-									IOUIPlugin.logError(e);
+									IdeLog.logError(IOUIPlugin.getDefault(), e);
 								}
 							}
 							return Status.OK_STATUS;

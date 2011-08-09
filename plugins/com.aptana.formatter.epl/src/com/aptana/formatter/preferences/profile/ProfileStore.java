@@ -49,6 +49,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.epl.FormatterPlugin;
 
 /**
@@ -413,7 +415,8 @@ public class ProfileStore implements IProfileStore
 			}
 			else
 			{
-				FormatterPlugin.logError(NLS.bind(ProfilesMessages.ProfileStore_noValueForKey, key));
+				IdeLog.logError(FormatterPlugin.getDefault(),
+						NLS.bind(ProfilesMessages.ProfileStore_noValueForKey, key), IDebugScopes.DEBUG);
 			}
 		}
 		return element;

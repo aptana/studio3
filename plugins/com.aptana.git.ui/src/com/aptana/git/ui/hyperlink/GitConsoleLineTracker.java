@@ -6,6 +6,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.ui.GitUIPlugin;
 
 /**
@@ -43,7 +45,7 @@ public class GitConsoleLineTracker implements IConsoleLineTracker
 		}
 		catch (BadLocationException e)
 		{
-			GitUIPlugin.logError(e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 	}
 

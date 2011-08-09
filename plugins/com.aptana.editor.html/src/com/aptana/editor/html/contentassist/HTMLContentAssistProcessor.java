@@ -605,7 +605,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
 		return proposals;

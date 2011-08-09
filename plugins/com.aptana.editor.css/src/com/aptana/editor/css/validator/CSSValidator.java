@@ -356,7 +356,7 @@ public class CSSValidator implements IValidator
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		StyleSheet stylesheet = parser.getStyleSheet();

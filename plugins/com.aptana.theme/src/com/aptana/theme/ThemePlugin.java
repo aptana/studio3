@@ -7,9 +7,7 @@
  */
 package com.aptana.theme;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -88,7 +86,8 @@ public class ThemePlugin extends AbstractUIPlugin
 		{
 			if (fThemeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.removePreferenceChangeListener(fThemeChangeListener);
 			}
 
 			if (themeHijacker != null)
@@ -144,21 +143,6 @@ public class ThemePlugin extends AbstractUIPlugin
 	public IThemeManager getThemeManager()
 	{
 		return ThemeManager.instance();
-	}
-
-	public static void logError(Exception e)
-	{
-		logError(e.getMessage(), e);
-	}
-
-	public static void logError(String string, Exception e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
-	}
-
-	public static void logWarning(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
 	}
 
 	public synchronized IControlThemerFactory getControlThemerFactory()

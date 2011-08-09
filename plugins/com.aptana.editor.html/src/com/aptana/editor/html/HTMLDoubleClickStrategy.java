@@ -63,7 +63,7 @@ public class HTMLDoubleClickStrategy extends CommonDoubleClickStrategy
 		{
 			if (Platform.inDebugMode())
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), x.getMessage(), x);
+				IdeLog.logError(HTMLPlugin.getDefault(), x);
 			}
 		}
 		return false;

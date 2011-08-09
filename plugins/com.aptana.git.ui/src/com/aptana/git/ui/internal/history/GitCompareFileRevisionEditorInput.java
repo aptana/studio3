@@ -43,6 +43,8 @@ import org.eclipse.team.internal.ui.synchronize.LocalResourceTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
@@ -103,7 +105,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			}
 			catch (CoreException e)
 			{
-				GitUIPlugin.logError(e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		if (right != null)
@@ -114,7 +116,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			}
 			catch (CoreException e)
 			{
-				GitUIPlugin.logError(e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 	}
@@ -411,7 +413,8 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				}
 				catch (CoreException e)
 				{
-					GitUIPlugin.logError(Messages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error, e);
+					IdeLog.logError(GitUIPlugin.getDefault(),
+							Messages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error, e, IDebugScopes.DEBUG);
 				}
 			}
 			else
@@ -512,13 +515,14 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			}
 			catch (Exception e)
 			{
-				GitUIPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 
 		if (fPane != null && (fPane.getViewer() instanceof TextMergeViewer))
 		{
-			// TODO Set up source viewer in way so we actually get syntax coloring. We'd need to be able to grab one by the file's content type!
+			// TODO Set up source viewer in way so we actually get syntax coloring. We'd need to be able to grab one by
+			// the file's content type!
 			((TextMergeViewer) fPane.getViewer()).setBackgroundColor(ThemePlugin.getDefault().getThemeManager()
 					.getCurrentTheme().getBackground());
 			((TextMergeViewer) fPane.getViewer()).setForegroundColor(ThemePlugin.getDefault().getThemeManager()

@@ -164,7 +164,7 @@ public class ProcessUtil
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
 	}

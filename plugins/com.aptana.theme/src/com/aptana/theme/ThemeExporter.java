@@ -16,6 +16,8 @@ import java.util.UUID;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 
+import com.aptana.core.logging.IdeLog;
+
 /**
  * @author cwilliams
  */
@@ -127,7 +129,7 @@ public class ThemeExporter
 		}
 		catch (IOException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		finally
 		{

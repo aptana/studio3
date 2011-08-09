@@ -245,7 +245,17 @@ public final class IdeLog
 	 */
 	public static void logError(Plugin plugin, String message)
 	{
-		log(plugin, IStatus.ERROR, message, null, null);
+		logError(plugin, message, (Throwable) null);
+	}
+
+	public static void logError(Plugin plugin, Throwable th)
+	{
+		logError(plugin, th, null);
+	}
+
+	public static void logError(Plugin plugin, Throwable th, String scope)
+	{
+		logError(plugin, th.getMessage(), th, scope);
 	}
 
 	/**
@@ -257,7 +267,7 @@ public final class IdeLog
 	 */
 	public static void logError(Plugin plugin, String message, Throwable th)
 	{
-		log(plugin, IStatus.ERROR, message, null, th);
+		logError(plugin, message, th, null);
 	}
 
 	/**
@@ -269,7 +279,7 @@ public final class IdeLog
 	 */
 	public static void logError(Plugin plugin, String message, String scope)
 	{
-		log(plugin, IStatus.ERROR, message, scope, null);
+		logError(plugin, message, null, scope);
 	}
 
 	/**
@@ -313,6 +323,16 @@ public final class IdeLog
 	public static void logWarning(Plugin plugin, String message, String scope)
 	{
 		logWarning(plugin, message, null, scope);
+	}
+
+	public static void logWarning(Plugin plugin, Throwable th)
+	{
+		logWarning(plugin, th.getMessage(), th);
+	}
+
+	public static void logWarning(Plugin plugin, String message, Throwable th)
+	{
+		logWarning(plugin, message, th, null);
 	}
 
 	/**

@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -93,7 +94,7 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 						{
 							String msg = MessageFormat
 									.format("command returned non-zero exit value. wd: {0}, command: {1}", currentRepo.workingDirectory(), StringUtil.join(" ", command)); //$NON-NLS-1$ //$NON-NLS-2$
-							GitUIPlugin.logWarning(msg);
+							IdeLog.logWarning(GitUIPlugin.getDefault(), msg);
 						}
 					}
 					catch (CoreException e)

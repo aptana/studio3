@@ -80,6 +80,7 @@ import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.explorer.ExplorerPlugin;
@@ -655,7 +656,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					}
 				}
 			};
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+					.addPreferenceChangeListener(fThemeChangeListener);
 			setButtonBackgrounds();
 		}
 	}
@@ -779,7 +781,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 		catch (BackingStoreException e)
 		{
-			ExplorerPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(ExplorerPlugin.getDefault(), e);
 		}
 	}
 
@@ -793,7 +795,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 		catch (BackingStoreException e)
 		{
-			ExplorerPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(ExplorerPlugin.getDefault(), e);
 		}
 	}
 
@@ -858,7 +860,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fThemeChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fThemeChangeListener);
 		}
 		fThemeChangeListener = null;
 	}
@@ -873,8 +876,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fActiveProjectPrefChangeListener != null)
 		{
-			EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fActiveProjectPrefChangeListener);
+			EclipseUtil.instanceScope().getNode(ExplorerPlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fActiveProjectPrefChangeListener);
 		}
 		fActiveProjectPrefChangeListener = null;
 	}
@@ -974,7 +977,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 							else if (delta.getKind() == IResourceDelta.REMOVED
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-												.isAccessible()))
+											.isAccessible()))
 							{
 								// Remove from menu and if it was the active
 								// project, switch away from it!

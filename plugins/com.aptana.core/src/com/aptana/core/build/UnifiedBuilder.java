@@ -88,7 +88,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		}
 		IdeLog.logError(CorePlugin.getDefault(),
 				MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
-						getProject().getRawLocationURI(), getProject().getFullPath()), (Throwable) null);
+						getProject().getRawLocationURI(), getProject().getFullPath()));
 		uri = getProject().getRawLocationURI();
 		return uri;
 	}
@@ -192,7 +192,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CorePlugin.getDefault(), e);
 			}
 		}
 		sub.done();

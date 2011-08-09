@@ -114,7 +114,7 @@ public class VirtualFileSystem extends FileSystem {
 			} catch (CoreException e) {
 				// TODO: this exception could be thrown after 3.6M1
 				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=280944
-				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.VirtualFileSystem_ERR_FetchFileTree, e, null);
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.VirtualFileSystem_ERR_FetchFileTree, e);
 			}
 		}
 		return null;

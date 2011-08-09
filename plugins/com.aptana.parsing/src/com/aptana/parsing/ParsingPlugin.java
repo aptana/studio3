@@ -10,66 +10,15 @@ package com.aptana.parsing;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.logging.IdeLog;
-
 /**
  * The activator class controls the plug-in life cycle
  */
 public class ParsingPlugin extends Plugin
 {
+
 	public static final String PLUGIN_ID = "com.aptana.parsing"; //$NON-NLS-1$
+
 	private static ParsingPlugin plugin;
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static ParsingPlugin getDefault()
-	{
-		return plugin;
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void logError(Exception e)
-	{
-		logError(e.getMessage(), e);
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		IdeLog.logError(getDefault(), msg, e);
-	}
-
-	/**
-	 * logInfo
-	 * 
-	 * @param message
-	 */
-	public static void logInfo(String message)
-	{
-		IdeLog.logInfo(getDefault(), message);
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param message
-	 */
-	public static void logWarning(String message)
-	{
-		IdeLog.logWarning(getDefault(), message);
-	}
 
 	/**
 	 * The constructor
@@ -103,5 +52,15 @@ public class ParsingPlugin extends Plugin
 			plugin = null;
 			super.stop(context);
 		}
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static ParsingPlugin getDefault()
+	{
+		return plugin;
 	}
 }

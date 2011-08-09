@@ -11,10 +11,11 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.editor.html.formatter.HTMLFormatterPlugin;
-import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
@@ -66,7 +67,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		}
 		catch (BackingStoreException e)
 		{
-			FormatterPlugin.logError(e);
+			IdeLog.logError(HTMLFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 	}
 }

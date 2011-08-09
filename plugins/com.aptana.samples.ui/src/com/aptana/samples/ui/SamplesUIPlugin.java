@@ -7,8 +7,6 @@
  */
 package com.aptana.samples.ui;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -86,15 +84,5 @@ public class SamplesUIPlugin extends AbstractUIPlugin
 		desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
 		getDefault().getImageRegistry().put(path, desc);
 		return desc;
-	}
-
-	public static void logError(Exception e)
-	{
-		logError(e.getLocalizedMessage(), e);
-	}
-
-	public static void logError(String message, Exception e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
 	}
 }

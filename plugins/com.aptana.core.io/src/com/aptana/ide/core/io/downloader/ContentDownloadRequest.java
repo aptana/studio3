@@ -130,7 +130,7 @@ public class ContentDownloadRequest
 		}
 		catch (URISyntaxException e)
 		{
-			IdeLog.logError(CoreIOPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CoreIOPlugin.getDefault(), e);
 		}
 
 		try

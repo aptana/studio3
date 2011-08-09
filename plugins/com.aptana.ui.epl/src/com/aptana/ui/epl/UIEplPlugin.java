@@ -10,10 +10,8 @@ package com.aptana.ui.epl;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -22,8 +20,6 @@ import org.osgi.framework.BundleContext;
 
 public class UIEplPlugin extends AbstractUIPlugin
 {
-
-	public static final int INTERNAL_ERROR = 10001;
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.ui.epl"; //$NON-NLS-1$
@@ -71,31 +67,6 @@ public class UIEplPlugin extends AbstractUIPlugin
 	public static UIEplPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void log(Throwable e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
-	}
-
-	public static void log(String msg)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
-	}
-
-	public static void log(String msg, Throwable e)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void log(IStatus status)
-	{
-		getDefault().getLog().log(status);
-	}
-
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
 	public static Image getImage(String string)

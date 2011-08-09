@@ -120,7 +120,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			catch (Throwable e)
 			{
-				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(JSPlugin.getDefault(), e);
 			}
 			finally
 			{

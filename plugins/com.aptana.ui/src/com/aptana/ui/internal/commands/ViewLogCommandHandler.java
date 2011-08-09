@@ -53,7 +53,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -90,7 +90,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 			}
 			catch (PartInitException e)
 			{
-				IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(UIPlugin.getDefault(), e);
 			}
 		}
 	}

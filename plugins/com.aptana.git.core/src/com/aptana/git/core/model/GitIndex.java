@@ -33,10 +33,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 
 public class GitIndex
 {
@@ -491,7 +493,7 @@ public class GitIndex
 		}
 		if (!result.isOK())
 		{
-			GitPlugin.logError("Failed to stage files: " + result.getMessage(), null); //$NON-NLS-1$
+			IdeLog.logError(GitPlugin.getDefault(), "Failed to stage files: " + result.getMessage(), IDebugScopes.DEBUG); //$NON-NLS-1$
 			return false;
 		}
 		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(stageFiles.size());
@@ -527,7 +529,7 @@ public class GitIndex
 		}
 		if (!result.isOK())
 		{
-			GitPlugin.logError("Failed to stage files: " + result.getMessage(), null); //$NON-NLS-1$
+			IdeLog.logError(GitPlugin.getDefault(), "Failed to stage files: " + result.getMessage(), IDebugScopes.DEBUG); //$NON-NLS-1$
 			return false;
 		}
 

@@ -33,7 +33,7 @@ public class LocalFileAdapterFactory implements IAdapterFactory {
 			try {
 				return ((LocalFile) adaptableObject).toLocalFile(EFS.NONE, null);
 			} catch (CoreException e) {
-				IdeLog.logWarning(CoreIOPlugin.getDefault(), e.getMessage(), e, null);
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 			}
 		}
 		return null;

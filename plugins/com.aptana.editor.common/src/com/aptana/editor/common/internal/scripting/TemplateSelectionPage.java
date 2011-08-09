@@ -202,7 +202,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 		catch (Exception e)
 		{
 			// logs the exception but allows the page to continue
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		if (templateContent == null)
 		{

@@ -59,7 +59,7 @@ public class CapistranoDeployWizard extends AbstractDeployWizard
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CapistranoPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CapistranoPlugin.getDefault(), e);
 		}
 
 		return true;

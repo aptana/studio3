@@ -42,7 +42,7 @@ public final class CoreMacOSX {
 			int type = ((Integer) OSTypeToIntMethod.invoke(FileManagerClass, new Object[] { folderType })).intValue();
 			return (String) findFolderMethod.invoke(FileManagerClass, new Object[] { domain, type });
 		} catch (Exception e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
 	}

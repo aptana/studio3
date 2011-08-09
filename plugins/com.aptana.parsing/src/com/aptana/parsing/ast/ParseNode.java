@@ -14,12 +14,14 @@ import java.util.NoSuchElementException;
 import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
 public class ParseNode extends Node implements IParseNode
 {
+
 	protected static final class NameNode implements INameNode
 	{
 		private final String fName;
@@ -653,7 +655,7 @@ public class ParseNode extends Node implements IParseNode
 					source //
 					);
 
-			ParsingPlugin.logError(message, null);
+			IdeLog.logError(ParsingPlugin.getDefault(), message);
 
 			end = start - 1;
 		}

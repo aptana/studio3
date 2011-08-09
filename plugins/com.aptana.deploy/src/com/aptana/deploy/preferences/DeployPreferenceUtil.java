@@ -97,7 +97,7 @@ public class DeployPreferenceUtil
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(DeployPlugin.getDefault(), e);
 		}
 		return id;
 	}
@@ -141,7 +141,7 @@ public class DeployPreferenceUtil
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(DeployPlugin.getDefault(), e);
 		}
 	}
 

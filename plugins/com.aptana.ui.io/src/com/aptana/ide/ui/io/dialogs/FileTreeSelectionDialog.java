@@ -38,6 +38,7 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -176,7 +177,7 @@ public class FileTreeSelectionDialog extends ElementTreeSelectionDialog {
 						try {
 							return new Object[] { ((IConnectionPoint) element).getRoot() };
 						} catch (CoreException e) {
-							IOUIPlugin.logImportant("", e); //$NON-NLS-1$
+							IdeLog.logWarning(IOUIPlugin.getDefault(), e);
 						}
 					}
 					return super.getElements(element);
@@ -263,7 +264,7 @@ public class FileTreeSelectionDialog extends ElementTreeSelectionDialog {
 						selectionExpander.setSelection(treePath);
 					}
 				} catch (CoreException e) {
-					IOUIPlugin.logImportant("", e); //$NON-NLS-1$
+					IdeLog.logWarning(IOUIPlugin.getDefault(), e);
 				}
             }
         });

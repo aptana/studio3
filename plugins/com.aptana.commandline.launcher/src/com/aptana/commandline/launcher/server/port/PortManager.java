@@ -193,7 +193,7 @@ public class PortManager
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 			return -1;
 		}
 		finally

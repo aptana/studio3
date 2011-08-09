@@ -142,7 +142,7 @@ public class CapifyProjectPage extends WizardPage
 				}
 				catch (Exception e1)
 				{
-					IdeLog.logError(CapistranoPlugin.getDefault(), e1.getMessage(), e1);
+					IdeLog.logError(CapistranoPlugin.getDefault(), e1);
 				}
 			}
 		});

@@ -22,6 +22,7 @@ import org.eclipse.ui.IWorkbench;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ProcessStatus;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.GitUIPlugin;
 
@@ -67,12 +68,12 @@ public class CloneWizard extends Wizard implements IImportWizard
 			}
 			else
 			{
-				IdeLog.logError(GitUIPlugin.getDefault(), null, e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(GitUIPlugin.getDefault(), null, e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return true;
 	}

@@ -70,7 +70,7 @@ public class RedHatDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(RedHatPlugin.getDefault(), e);
 			}
 		}
 		return true;
