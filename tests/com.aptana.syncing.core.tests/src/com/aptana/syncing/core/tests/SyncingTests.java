@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -59,7 +61,7 @@ public abstract class SyncingTests extends TestCase
 		if (cachedProperties == null)
 		{
 			cachedProperties = new Properties();
-			String propertiesFile = System.getenv("junit.properties");
+			String propertiesFile = System.getProperty("junit.properties");
 			if (propertiesFile != null && new File(propertiesFile).length() > 0)
 			{
 				FileInputStream stream = null;
@@ -67,6 +69,12 @@ public abstract class SyncingTests extends TestCase
 				{
 					stream = new FileInputStream(propertiesFile);
 					cachedProperties.load(stream);
+					if (IdeLog.isInfoEnabled(SyncingPlugin.getDefault(), null))
+					{
+						StringWriter strWriter = new StringWriter();
+						cachedProperties.list(new PrintWriter(strWriter));
+						IdeLog.logInfo(SyncingPlugin.getDefault(), "Loaded junit.properties: " + strWriter.toString());
+					}
 				}
 				catch (IOException e)
 				{

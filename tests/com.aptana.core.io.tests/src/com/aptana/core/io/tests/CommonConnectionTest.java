@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -40,6 +41,7 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.core.io.vfs.ExtendedFileInfo;
 import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -68,7 +70,7 @@ public abstract class CommonConnectionTest extends TestCase
 	protected IPath testPath;
 	private static Properties cachedProperties;
 
-	protected static final Properties getConfig()
+	protected synchronized static final Properties getConfig()
 	{
 		if (cachedProperties == null)
 		{
@@ -76,15 +78,42 @@ public abstract class CommonConnectionTest extends TestCase
 			String propertiesFile = System.getProperty("junit.properties"); //$NON-NLS-1$
 			if (propertiesFile != null && new File(propertiesFile).length() > 0)
 			{
+				FileInputStream stream = null;
 				try
 				{
-					cachedProperties.load(new FileInputStream(propertiesFile));
-					cachedProperties.list(System.out);
+					stream = new FileInputStream(propertiesFile);
+					cachedProperties.load(stream);
+					if (IdeLog.isInfoEnabled(CoreIOPlugin.getDefault(), null))
+					{
+						StringWriter strWriter = new StringWriter();
+						cachedProperties.list(new PrintWriter(strWriter));
+						IdeLog.logInfo(CoreIOPlugin.getDefault(), "Loaded junit.properties: " + strWriter.toString());
+					}
 				}
-				catch (IOException ignore)
+				catch (IOException e)
 				{
-					ignore.printStackTrace();
+					IdeLog.logError(CoreIOPlugin.getDefault(), "Failed to load junit.properties file at "
+							+ propertiesFile, e);
 				}
+				finally
+				{
+					if (stream != null)
+					{
+						try
+						{
+							stream.close();
+						}
+						catch (IOException ignore)
+						{
+							// ignore
+						}
+					}
+				}
+			}
+			else
+			{
+				IdeLog.logError(CoreIOPlugin.getDefault(), "Expected, but did not find, testing properties at: "
+						+ propertiesFile);
 			}
 		}
 		return cachedProperties;
@@ -102,7 +131,8 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fs);
 		fs.mkdir(EFS.NONE, null);
 		cp.disconnect(null);
-		if (persistentConnection()) {
+		if (persistentConnection())
+		{
 			assertFalse(cp.isConnected());
 		}
 	}
@@ -153,11 +183,13 @@ public abstract class CommonConnectionTest extends TestCase
 	{
 		cp.connect(null);
 		assertTrue(cp.isConnected());
-		if (persistentConnection()) {
+		if (persistentConnection())
+		{
 			assertTrue(cp.canDisconnect());
 		}
 		cp.disconnect(null);
-		if (persistentConnection()) {
+		if (persistentConnection())
+		{
 			assertFalse(cp.isConnected());
 		}
 		assertFalse(cp.canDisconnect());
