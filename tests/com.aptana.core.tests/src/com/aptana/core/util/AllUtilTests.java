@@ -27,7 +27,7 @@ public class AllUtilTests
 		suite.addTestSuite(IOUtilTest.class);
 		suite.addTestSuite(PlatformUtilTest.class);
 		suite.addTestSuite(ProcessStatusTest.class);
-		//suite.addTestSuite(ProcessUtilTest.class);
+		suite.addTestSuite(ProcessUtilTest.class);
 		suite.addTestSuite(ProgressMonitorInterrupterTest.class);
 		suite.addTestSuite(RegexUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
