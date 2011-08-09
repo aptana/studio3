@@ -8,19 +8,26 @@
 package com.aptana.core.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.Platform;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 
-import com.aptana.core.util.IOUtil;
-
 public class IOUtilTest extends TestCase
 {
+	private static final String BUNDLE_ID = "com.aptana.core.tests";
+	private static final String RESOURCE_DIR = "resources";
 
 	private Mockery context = new Mockery()
 	{
@@ -85,5 +92,76 @@ public class IOUtilTest extends TestCase
 		String multilineString = "line one\r\nline two\r\nline three\r\n";
 		InputStream stream = new ByteArrayInputStream(multilineString.getBytes("UTF-8"));
 		assertEquals("line one\r\nline two\r\nline three\r\n", IOUtil.read(stream, "UTF-8"));
+	}
+
+	public void testCopyDirectory() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+		File source = new File(resourceFolder, "copyTest");
+		File dest = new File(resourceFolder, "tempdir");
+
+		IOUtil.copyDirectory(source, dest);
+
+		assertTrue(compareDirectory(source, dest));
+
+		FileUtil.deleteRecursively(dest);
+	}
+
+	private boolean compareDirectory(File directory1, File directory2)
+	{
+		if (!directory1.isDirectory() || !directory2.isDirectory())
+		{
+			return false;
+		}
+
+		List<String> fileNames = Arrays.asList(directory2.list());
+
+		List<File> fileList1 = Arrays.asList(directory1.listFiles());
+		List<File> fileList2 = Arrays.asList(directory2.listFiles());
+
+		if (fileList1.size() != fileList2.size())
+		{
+			return false;
+		}
+
+		for (File file : fileList1)
+		{
+			if (!fileNames.contains(file.getName()))
+			{
+				return false;
+			}
+
+			File file2 = fileList2.get(fileNames.indexOf(file.getName()));
+
+			if (file.isDirectory())
+			{
+				if (!compareDirectory(file, file2))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				try
+				{
+					if (!compareFiles(file, file2))
+					{
+						return false;
+					}
+				}
+				catch (FileNotFoundException e)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean compareFiles(File file1, File file2) throws FileNotFoundException
+	{
+		return IOUtil.read(new FileInputStream(file1)).equals(IOUtil.read(new FileInputStream(file2)));
 	}
 }
