@@ -52,7 +52,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	/**
 	 * EditorsPreferencePage
 	 */
-	public CommonEditorPreferencePage()
+	protected CommonEditorPreferencePage()
 	{
 		super(GRID);
 		setDescription(Messages.CommonEditorPreferencePage_Editor_Preferences);

@@ -434,7 +434,7 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 		Color background = textWidget.getBackground();
-		final int[] positions = new int[ranges.length * 2];
+		final int[] positions = new int[ranges.length << 1];
 		int x = 0;
 		boolean apply = false;
 		for (StyleRange range : ranges)

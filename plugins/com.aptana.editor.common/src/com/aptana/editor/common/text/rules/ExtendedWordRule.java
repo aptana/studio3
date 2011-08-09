@@ -38,7 +38,7 @@ public abstract class ExtendedWordRule extends WordRule {
 	 *            the case sensitivity associated with this rule
 	 * @see #addWord(String, IToken)
 	 */
-	public ExtendedWordRule(IWordDetector detector, IToken defaultToken, boolean ignoreCase) {
+	protected ExtendedWordRule(IWordDetector detector, IToken defaultToken, boolean ignoreCase) {
 		super(detector, defaultToken, ignoreCase);
 		this.ignoreCase = ignoreCase;
 	}

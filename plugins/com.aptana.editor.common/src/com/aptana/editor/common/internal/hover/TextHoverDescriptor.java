@@ -56,7 +56,7 @@ public class TextHoverDescriptor {
 			readElement(element);
 		}
 		IConfigurationElement[] elements = configurationElement.getChildren(ExpressionTagNames.ENABLEMENT);
-		enablementExpression = elements.length > 0 ? ExpressionConverter.getDefault().perform(elements[0]) : null;
+		enablementExpression = (elements.length > 0) ? ExpressionConverter.getDefault().perform(elements[0]) : null;
 	}
 	
 	/**

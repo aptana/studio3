@@ -43,7 +43,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 		this.canModifyEditor = canModifyEditor(textEditor); // Can we cache this value?
 		this.textViewer = viewer;
 		this.contentAssistant = contentAssistant;
-		document = textEditor != null ? textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()) : null;
+		document = (textEditor != null) ? textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()) : null;
 	}
 
 	public void verifyKey(VerifyEvent event) {
@@ -102,13 +102,16 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 
 	private static boolean canModifyEditor(ITextEditor editor) {
 		if (editor instanceof ITextEditorExtension2)
+		{
 			return ((ITextEditorExtension2) editor).isEditorInputModifiable();
-		else if (editor instanceof ITextEditorExtension)
+		} else if (editor instanceof ITextEditorExtension)
+		{
 			return !((ITextEditorExtension) editor).isEditorInputReadOnly();
-		else if (editor != null)
+		} else if (editor != null)
+		{
 			return editor.isEditable();
-		else
-			return false;
+		}
+		return false;
 	}
 
 	private static String getScope(ITextViewer viewer, int offset) {

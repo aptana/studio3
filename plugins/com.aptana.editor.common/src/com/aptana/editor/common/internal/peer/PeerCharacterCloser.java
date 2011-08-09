@@ -560,7 +560,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 			int eventOffset = event.getOffset();
 			int eventOldLength = event.getLength();
-			int eventNewLength = event.getText() == null ? 0 : event.getText().length();
+			int eventNewLength = (event.getText() == null) ? 0 : event.getText().length();
 			int deltaLength = eventNewLength - eventOldLength;
 
 			try
@@ -580,13 +580,15 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 					int end = offset + length;
 
 					if (offset >= eventOffset + eventOldLength)
+					{
 						// position comes
 						// after change - shift
 						position.setOffset(offset + deltaLength);
-					else if (end <= eventOffset)
+					} else if (end <= eventOffset)
 					{
 						// position comes way before change -
 						// leave alone
+						continue;
 					}
 					else if (offset <= eventOffset && end >= eventOffset + eventOldLength)
 					{

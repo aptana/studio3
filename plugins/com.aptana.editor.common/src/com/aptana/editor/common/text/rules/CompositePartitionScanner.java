@@ -84,7 +84,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	 */
 	@Override
 	public void setPredicateRules(IPredicateRule[] rules) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("unsupported method"); //$NON-NLS-1$
 	}
 
 	/*

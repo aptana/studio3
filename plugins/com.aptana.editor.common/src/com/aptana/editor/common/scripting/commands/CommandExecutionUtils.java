@@ -1047,13 +1047,18 @@ public class CommandExecutionUtils
 		if (breakIter.isBoundary(offset))
 		{
 			if (end - offset > offset - start)
+			{
 				start = offset;
-			else
+			} else
+			{
 				end = offset;
+			}
 		}
 
 		if (end == start)
+		{
 			return new Region(start, 0);
+		}
 		return new Region(start, end - start);
 	}
 

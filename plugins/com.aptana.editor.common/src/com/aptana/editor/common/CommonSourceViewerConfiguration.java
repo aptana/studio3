@@ -95,7 +95,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
 	private CommonReconciler fReconciler;
-	ArrayList<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
+	List<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -103,7 +103,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * @param preferenceStore
 	 * @param editor
 	 */
-	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
+	protected CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
 		super(preferenceStore);
 
 		fTextEditor = editor;
@@ -366,7 +366,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 			for (int i = 0; i < tabWidth; ++i)
 			{
-				buf.append(" "); //$NON-NLS-1$
+				buf.append(' ');
 			}
 
 			return buf.toString();

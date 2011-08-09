@@ -51,7 +51,7 @@ public class RubyRegexpFolder implements IFoldingComputer
 		{
 			return Collections.emptyMap();
 		}
-		Map<ProjectionAnnotation, Position> newPositions = new HashMap<ProjectionAnnotation, Position>(lineCount / 4);
+		Map<ProjectionAnnotation, Position> newPositions = new HashMap<ProjectionAnnotation, Position>(lineCount >> 2);
 		Map<Integer, Integer> starts = new HashMap<Integer, Integer>(3);
 		if (monitor != null)
 		{

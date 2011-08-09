@@ -28,7 +28,7 @@ public class WizardNewTemplateFilePage extends WizardNewFileCreationPage
 
 		String filetype = template.getFiletype();
 		// strips the leading * before . if there is one
-		int index = filetype.lastIndexOf("."); //$NON-NLS-1$
+		int index = filetype.lastIndexOf('.');
 		if (index > -1)
 		{
 			filetype = filetype.substring(index);
