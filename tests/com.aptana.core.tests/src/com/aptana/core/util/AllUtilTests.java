@@ -24,7 +24,9 @@ public class AllUtilTests
 		suite.addTestSuite(FileUtilTest.class);
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(RegexUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
+		suite.addTestSuite(SourcePrinterTest.class);
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(TimeZoneUtilTest.class);
