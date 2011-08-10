@@ -143,7 +143,7 @@ public class IOUtilTest extends TestCase
 				IOUtil.copyDirectory(source, dest);
 				assertFalse(compareDirectory(source, dest));
 				FileUtil.deleteRecursively(dest);
-				Runtime.getRuntime().exec(new String[] { "chmod", "744", source.getAbsolutePath() }); //$NON-NLS-1$
+				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }); //$NON-NLS-1$
 			}
 			catch (Exception ignore)
 			{
