@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
@@ -64,7 +65,7 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 		{
 			return ((SampleEntry) parentElement).getSubEntries();
 		}
-		return new Object[0];
+		return ArrayUtil.NO_STRINGS;
 	}
 
 	/**

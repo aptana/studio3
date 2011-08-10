@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.util.DebugUtil;
@@ -68,7 +69,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 			createHitCountEditor(mainComposite);
 			createTypeSpecificEditors(mainComposite);
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		setValid(true);
 		return mainComposite;
@@ -319,7 +320,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 				lineNumber.append(lNumber);
 			}
 		} catch (CoreException ce) {
-			JSDebugUIPlugin.log(ce);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), ce);
 		}
 		if (lineNumber.length() > 0) {
 			createLabel(parent, Messages.JSLineBreakpointPropertyPage_LineNumber);
@@ -442,7 +443,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 			ResourcesPlugin.getWorkspace().run(wr, null, 0, null);
 		} catch (CoreException e) {
 			DebugUiPlugin.errorDialog(Messages.JSLineBreakpointPropertyPage_ExceptionWhileSavingBreakpointProperties, e);
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return super.performOk();
 	}
@@ -464,8 +465,9 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 			try {
 				hitCount = Integer.parseInt(fHitCountText.getText());
 			} catch (NumberFormatException e) {
-				JSDebugUIPlugin.log(MessageFormat.format(Messages.JSLineBreakpointPropertyPage_PageAllowedInputOfInvalidStringForHitCountValue_0,
-												fHitCountText.getText()), e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), MessageFormat.format(
+						Messages.JSLineBreakpointPropertyPage_PageAllowedInputOfInvalidStringForHitCountValue_0,
+						fHitCountText.getText()), e);
 			}
 		}
 		breakpoint.setHitCount(hitCount);

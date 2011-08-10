@@ -25,11 +25,11 @@ import com.aptana.core.util.ClassUtil;
  */
 public final class ImageAssociations {
 
-	protected static final String TAG_OBJECT_IMAGE = "objectImage"; //$NON-NLS-1$
-	protected static final String TAG_IMAGE = "image"; //$NON-NLS-1$
-	protected static final String ATT_ID = "id"; //$NON-NLS-1$
-	protected static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
-	protected static final String ATT_ICON = "icon"; //$NON-NLS-1$
+	private static final String TAG_OBJECT_IMAGE = "objectImage"; //$NON-NLS-1$
+	private static final String TAG_IMAGE = "image"; //$NON-NLS-1$
+	private static final String ATT_ID = "id"; //$NON-NLS-1$
+	private static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
+	private static final String ATT_ICON = "icon"; //$NON-NLS-1$
 
 	private static final String EXTENSION_POINT_ID = UIPlugin.PLUGIN_ID + ".imageAssociations"; //$NON-NLS-1$
 

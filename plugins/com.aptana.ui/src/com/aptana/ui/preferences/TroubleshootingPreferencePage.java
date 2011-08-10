@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -37,6 +38,7 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.logging.IdeLog.StatusLevel;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.SWTUtils;
@@ -59,8 +61,8 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		super(GRID);
 
-		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(EclipseUtil.instanceScope(),
-				CorePlugin.getDefault().getBundle().getSymbolicName());
+		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(
+				EclipseUtil.instanceScope(), CorePlugin.getDefault().getBundle().getSymbolicName());
 		setPreferenceStore(preferenceStore);
 		setDescription(Messages.TroubleshootingPreferencePage_TroubleshootingPageHeader);
 	}
@@ -138,7 +140,8 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		categoryViewer.setSorter(new ViewerSorter());
 
 		Map<String, String> tItems = EclipseUtil.getTraceableItems();
-		String items[] = tItems.keySet().toArray(new String[0]);
+		Set<String> keys = tItems.keySet();
+		String[] items = keys.toArray(new String[keys.size()]);
 		Arrays.sort(items);
 
 		categoryViewer.setInput(items);
@@ -201,7 +204,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		debugSlider.setSelection(getPreferenceStore().getDefaultInt(
 				com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL));
-		categoryViewer.setCheckedElements(new Object[0]);
+		categoryViewer.setCheckedElements(ArrayUtil.NO_OBJECTS);
 		super.performDefaults();
 	}
 
@@ -213,8 +216,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	public boolean performOk()
 	{
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(ICorePreferenceConstants.PREF_DEBUG_LEVEL,
-				getStatusLevel(debugSlider.getSelection()).toString());
+		store.setValue(ICorePreferenceConstants.PREF_DEBUG_LEVEL, getStatusLevel(debugSlider.getSelection()).toString());
 
 		String[] currentOptions = EclipseUtil.getCurrentDebuggableComponents();
 		EclipseUtil.setBundleDebugOptions(currentOptions, false);

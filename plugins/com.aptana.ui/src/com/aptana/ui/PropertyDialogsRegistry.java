@@ -25,9 +25,9 @@ import org.eclipse.jface.window.IShellProvider;
  */
 public final class PropertyDialogsRegistry {
 
-	protected static final String TAG_DIALOG = "dialog"; //$NON-NLS-1$
-	protected static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
-	protected static final String ATT_CLASS = "class"; //$NON-NLS-1$
+	private static final String TAG_DIALOG = "dialog"; //$NON-NLS-1$
+	private static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
+	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 
 	private static final String EXTENSION_POINT_ID = UIPlugin.PLUGIN_ID + ".propertyDialogs"; //$NON-NLS-1$
 

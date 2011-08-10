@@ -82,7 +82,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 			{
 				editorDescriptor = editorRegistry.getDefaultEditor(filePath);
 			}
-			String editorId = (editorDescriptor == null ? "com.aptana.editor.text" : editorDescriptor.getId()); //$NON-NLS-1$
+			String editorId = (editorDescriptor == null) ? "com.aptana.editor.text" : editorDescriptor.getId(); //$NON-NLS-1$
 			try
 			{
 				IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file.toURI(),

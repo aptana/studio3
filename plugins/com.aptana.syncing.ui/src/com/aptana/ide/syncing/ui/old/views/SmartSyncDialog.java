@@ -71,7 +71,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -1809,18 +1808,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				if (clientConnection instanceof WorkspaceConnectionPoint)
 				{
 					IResource resource = ((WorkspaceConnectionPoint) clientConnection).getResource();
-					try
+					IViewPart viewPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
+					if (viewPart instanceof CommonNavigator)
 					{
-						IViewPart viewPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
-						if (viewPart instanceof CommonNavigator)
-						{
-							CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
-							viewer.refresh(resource);
-						}
-					}
-					catch (PartInitException e)
-					{
-						// Unable to refresh the project explorer view
+						CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+						viewer.refresh(resource);
 					}
 				}
 
@@ -1828,18 +1820,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				ConnectionPointType type = CoreIOPlugin.getConnectionPointManager().getType(serverConnection);
 				if (type != null && type.getCategory().isRemote())
 				{
-					try
+					IViewPart viewPart = UIUtils.findView(RemoteNavigatorView.ID);
+					if (viewPart instanceof RemoteNavigatorView)
 					{
-						IViewPart viewPart = UIUtils.findView(RemoteNavigatorView.ID);
-						if (viewPart instanceof RemoteNavigatorView)
-						{
-							RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
-							view.getCommonViewer().refresh(serverConnection);
-						}
-					}
-					catch (PartInitException e)
-					{
-						// Unable to refresh the remote view
+						RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
+						view.getCommonViewer().refresh(serverConnection);
 					}
 				}
 			}

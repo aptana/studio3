@@ -50,6 +50,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.ui.internal.ActiveResourcePathGetterAdapter;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
@@ -365,7 +366,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 				managedServersView.setSelection(new StructuredSelection(server));
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
 		} finally {
 			hookListeners(true);
 			updateEnablement();

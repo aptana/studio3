@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 
@@ -49,8 +50,8 @@ public class SamplesReference
 		this.isRemote = isRemote;
 		this.descriptions = toolTipText;
 		configElement = element;
-		natures = new String[0];
-		includePaths = new String[0];
+		natures = ArrayUtil.NO_STRINGS;
+		includePaths = ArrayUtil.NO_STRINGS;
 		samples = new ArrayList<SampleEntry>();
 
 		if (!isRemote)

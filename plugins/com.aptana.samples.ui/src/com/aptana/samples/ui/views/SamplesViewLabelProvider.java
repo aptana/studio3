@@ -118,7 +118,7 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 		{
 			SamplesReference samplesRef = (SamplesReference) element;
 			String name = samplesRef.getName();
-			return name == null ? samplesRef.getPath() : name;
+			return (name == null) ? samplesRef.getPath() : name;
 		}
 		if (element instanceof SampleEntry)
 		{

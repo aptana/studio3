@@ -122,7 +122,7 @@ public class DiagnosticHandler extends AbstractHandler
 						if (log != null && log.length() > 0)
 						{
 							content.append(log);
-							content.append("\n"); //$NON-NLS-1$
+							content.append('\n');
 						}
 					}
 				}

@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.debug.core.DebugOptionsManager;
 import com.aptana.js.debug.core.model.JSDebugModel;
@@ -60,7 +61,7 @@ public final class WorkbenchCloseListener implements Listener {
 					try {
 						preferences.flush();
 					} catch (BackingStoreException e) {
-						JSDebugUIPlugin.log(e);
+						IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 					}
 				}
 			}
