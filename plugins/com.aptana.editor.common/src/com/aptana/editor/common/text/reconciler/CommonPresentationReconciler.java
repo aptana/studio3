@@ -83,6 +83,9 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		try {
 			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT*5);
 			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damage.getOffset(), damage.getLength(), false);
+			if (partitioning.length == 0) {
+				return presentation;
+			}
 			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
 			for (int i = 0; i < limit; ++i) {
 				ITypedRegion r = partitioning[i];
