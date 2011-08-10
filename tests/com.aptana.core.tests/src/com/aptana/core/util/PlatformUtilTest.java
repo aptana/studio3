@@ -9,6 +9,7 @@
 package com.aptana.core.util;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -46,7 +47,7 @@ public class PlatformUtilTest extends TestCase {
 				break;
 			}
 		}
-		assertTrue(passed);
+		assertTrue("Expected child process \""+cmd+"\" not found in "+Arrays.asList(processes).toString(), passed);
 	}
 
 	public void testKillProcesses() throws IOException {
@@ -64,11 +65,11 @@ public class PlatformUtilTest extends TestCase {
 				break;
 			}
 		}
-		assertTrue(pid > 0);
+		assertTrue("Expected child process \""+cmd+"\" not found in "+Arrays.asList(processes).toString(), pid > 0);
 		PlatformUtil.killProcess(pid);
 		processes = PlatformUtil.getRunningChildProcesses();
 		for (ProcessItem i : processes) {
-			assertNotSame(pid, i.getPid());
+			assertNotSame("Expected process did not terminate on kill command", pid, i.getPid());
 		}
 	}
 
