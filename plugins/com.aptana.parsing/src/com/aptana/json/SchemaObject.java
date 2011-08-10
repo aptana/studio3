@@ -143,7 +143,7 @@ public class SchemaObject implements IState, IPropertyContainer
 	 */
 	public boolean hasProperty(String name)
 	{
-		return (this._properties != null && this._properties.containsKey(name));
+		return this._properties != null && this._properties.containsKey(name);
 	}
 
 	/*
@@ -222,7 +222,7 @@ public class SchemaObject implements IState, IPropertyContainer
 	public void toSource(SourcePrinter writer)
 	{
 		// emit properties
-		if (this._properties != null && this._properties.isEmpty() == false)
+		if (this._properties != null && !this._properties.isEmpty())
 		{
 			for (Map.Entry<String, SchemaProperty> entry : this._properties.entrySet())
 			{
@@ -279,7 +279,7 @@ public class SchemaObject implements IState, IPropertyContainer
 				context.pushType(this._currentPropertyName, this._currentPropertyType);
 
 				// fire element type creation event
-				if (this._currentPropertyType instanceof SchemaPrimitive == false)
+				if (!(this._currentPropertyType instanceof SchemaPrimitive))
 				{
 					context.createType(this._currentPropertyTypeName, this._currentPropertyType, value);
 				}

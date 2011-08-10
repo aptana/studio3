@@ -32,6 +32,6 @@ public class SchemaNull extends SchemaPrimitive
 	@Override
 	protected boolean validValue(Object value)
 	{
-		return (value == null);
+		return value == null;
 	}
 }

@@ -12,7 +12,7 @@ import java.text.MessageFormat;
 public class Range implements IRange
 {
 	public static final Range EMPTY = new Range(0, -1);
-	
+
 	private int fStart;
 	private int fEnd;
 
@@ -25,7 +25,7 @@ public class Range implements IRange
 	{
 		this(offset, offset);
 	}
-	
+
 	/**
 	 * Range
 	 * 
@@ -54,11 +54,18 @@ public class Range implements IRange
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (this == obj)
+		{
+			return true;
+		}
+
 		if (!(obj instanceof Range))
 		{
 			return false;
 		}
+
 		Range otherRange = (Range) obj;
+
 		return getStartingOffset() == otherRange.getStartingOffset() && getLength() == otherRange.getLength();
 	}
 
@@ -106,7 +113,7 @@ public class Range implements IRange
 	{
 		return fEnd < fStart;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()

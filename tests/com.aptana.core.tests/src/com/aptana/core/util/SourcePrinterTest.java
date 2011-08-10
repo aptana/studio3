@@ -123,6 +123,33 @@ public class SourcePrinterTest extends TestCase
 		printer.printWithIndent("Testing");
 
 		assertEquals("  Testing", printer.getBuffer().toString());
+	}
 
+	public void testPrintLnText()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		printer.print('a');
+		printer.print('b');
+		printer.println('c');
+
+		assertEquals("abc\n", printer.toString());
+	}
+
+	public void testPrintCharTextWithIndent()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		printer.increaseIndent();
+		printer.printWithIndent('a');
+
+		assertEquals("  a", printer.toString());
+	}
+
+	public void testPrintLnCharTextWithIndent()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		printer.increaseIndent();
+		printer.printlnWithIndent('a');
+
+		assertEquals("  a\n", printer.toString());
 	}
 }

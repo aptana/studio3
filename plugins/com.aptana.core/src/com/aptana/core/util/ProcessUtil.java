@@ -357,11 +357,13 @@ public class ProcessUtil
 			{
 				timeoutThread.start();
 				exitcode = process.waitFor();
-				waitingThread.interrupt();
 			}
 			catch (InterruptedException e)
 			{
 				Thread.interrupted();
+			} finally
+			{
+				timeoutThread.interrupt();
 			}
 			if (forceKillAfterTimeout)
 			{

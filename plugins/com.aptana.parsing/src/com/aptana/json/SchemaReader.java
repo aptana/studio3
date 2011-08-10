@@ -14,6 +14,9 @@ import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.parsing.ParsingPlugin;
+
 /**
  * SchemaReader
  */
@@ -43,7 +46,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#endArray()
 	 */
-	public boolean endArray() throws ParseException, IOException
+	public boolean endArray()
 	{
 		if (this._schema != null)
 		{
@@ -57,7 +60,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#endJSON()
 	 */
-	public void endJSON() throws ParseException, IOException
+	public void endJSON()
 	{
 		if (this._schema != null)
 		{
@@ -70,7 +73,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#endObject()
 	 */
-	public boolean endObject() throws ParseException, IOException
+	public boolean endObject()
 	{
 		if (this._schema != null)
 		{
@@ -84,7 +87,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#endObjectEntry()
 	 */
-	public boolean endObjectEntry() throws ParseException, IOException
+	public boolean endObjectEntry()
 	{
 		if (this._schema != null)
 		{
@@ -118,7 +121,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#primitive(java.lang.Object)
 	 */
-	public boolean primitive(Object value) throws ParseException, IOException
+	public boolean primitive(Object value)
 	{
 		if (this._schema != null)
 		{
@@ -146,11 +149,11 @@ public class SchemaReader implements ContentHandler
 		}
 		catch (IOException e)
 		{
-			// log
+			IdeLog.logError(ParsingPlugin.getDefault(), e.getMessage(), e);
 		}
 		catch (ParseException e)
 		{
-			// log
+			IdeLog.logError(ParsingPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		// drop ref to context
@@ -171,7 +174,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#startArray()
 	 */
-	public boolean startArray() throws ParseException, IOException
+	public boolean startArray()
 	{
 		if (this._schema != null)
 		{
@@ -185,7 +188,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#startJSON()
 	 */
-	public void startJSON() throws ParseException, IOException
+	public void startJSON()
 	{
 		if (this._schema != null)
 		{
@@ -198,7 +201,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#startObject()
 	 */
-	public boolean startObject() throws ParseException, IOException
+	public boolean startObject()
 	{
 		if (this._schema != null)
 		{
@@ -212,7 +215,7 @@ public class SchemaReader implements ContentHandler
 	 * (non-Javadoc)
 	 * @see org.json.simple.parser.ContentHandler#startObjectEntry(java.lang.String)
 	 */
-	public boolean startObjectEntry(String key) throws ParseException, IOException
+	public boolean startObjectEntry(String key)
 	{
 		if (this._schema != null)
 		{

@@ -19,18 +19,15 @@ import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 
-
 /**
  * @author Max Stepanov
- *
  */
 public class ImplicitFTPSConnectionTest extends TestCase {
 
 	protected IConnectionPoint cp;
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost("ftp.secureftp-test.com"); //$NON-NLS-1$
 		ftpcp.setLogin("test"); //$NON-NLS-1$
@@ -45,8 +42,7 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 	}
 
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		if (cp.isConnected()) {
 			cp.disconnect(null);
 		}
@@ -58,7 +54,7 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 		assertTrue(cp.canDisconnect());
 		cp.disconnect(null);
 		assertFalse(cp.isConnected());
-		assertFalse(cp.canDisconnect());		
+		assertFalse(cp.canDisconnect());
 	}
 
 	public final void testFetchRootInfo() throws CoreException {
@@ -70,7 +66,7 @@ public class ImplicitFTPSConnectionTest extends TestCase {
 		assertNotNull(fi);
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
-		assertEquals(Path.ROOT.toPortableString(), fi.getName());		
+		assertEquals(Path.ROOT.toPortableString(), fi.getName());
 	}
 
 }

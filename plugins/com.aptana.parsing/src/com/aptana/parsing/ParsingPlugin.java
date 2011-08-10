@@ -17,8 +17,7 @@ public class ParsingPlugin extends Plugin
 {
 
 	public static final String PLUGIN_ID = "com.aptana.parsing"; //$NON-NLS-1$
-
-	private static ParsingPlugin plugin;
+	private static ParsingPlugin PLUGIN;
 
 	/**
 	 * The constructor
@@ -31,17 +30,17 @@ public class ParsingPlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception
+	public void start(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		super.start(context);
-		plugin = this;
+		PLUGIN = this;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception
+	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		try
 		{
@@ -49,7 +48,7 @@ public class ParsingPlugin extends Plugin
 		}
 		finally
 		{
-			plugin = null;
+			PLUGIN = null;
 			super.stop(context);
 		}
 	}
@@ -61,6 +60,6 @@ public class ParsingPlugin extends Plugin
 	 */
 	public static ParsingPlugin getDefault()
 	{
-		return plugin;
+		return PLUGIN;
 	}
 }

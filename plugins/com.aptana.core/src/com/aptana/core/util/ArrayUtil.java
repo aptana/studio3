@@ -10,6 +10,12 @@ package com.aptana.core.util;
 public class ArrayUtil
 {
 
+	/**
+	 * Immutable arrays that can be re-used across system to avoid creating lots of empty array copies.
+	 */
+	public static final String[] NO_STRINGS = new String[0];
+	public static final Object[] NO_OBJECTS = new Object[0];
+
 	private ArrayUtil()
 	{
 	}

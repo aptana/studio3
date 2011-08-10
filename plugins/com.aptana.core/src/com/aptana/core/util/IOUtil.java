@@ -254,6 +254,12 @@ public abstract class IOUtil
 		URL url = FileLocator.find(Platform.getBundle(bundleId), path, null);
 		InputStream in = null;
 		FileOutputStream out = null;
+
+		if (url == null)
+		{
+			return;
+		}
+
 		try
 		{
 			in = url.openStream();
@@ -295,6 +301,11 @@ public abstract class IOUtil
 		if (stream == null)
 		{
 			return;
+		}
+
+		if (rawSource == null)
+		{
+			rawSource = StringUtil.EMPTY;
 		}
 
 		Writer writer = null;

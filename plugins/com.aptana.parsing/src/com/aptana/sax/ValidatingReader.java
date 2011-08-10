@@ -56,7 +56,7 @@ public class ValidatingReader extends DefaultHandler
 		// make sure we have a valid schema
 		if (schema == null)
 		{
-			schema = new Schema(this);
+			schema = new Schema(this); // $codepro.audit.disable questionableAssignment
 		}
 
 		this._schema = schema;
@@ -104,15 +104,15 @@ public class ValidatingReader extends DefaultHandler
 			}
 			catch (IllegalArgumentException e)
 			{
-				throw new SAXException(e);
+				throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 			catch (IllegalAccessException e)
 			{
-				throw new SAXException(e);
+				throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 			catch (InvocationTargetException e)
 			{
-				throw new SAXException(e);
+				throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 		}
 	}
@@ -226,7 +226,7 @@ public class ValidatingReader extends DefaultHandler
 	 * 
 	 * @throws SAXException
 	 */
-	public void startDocument() throws SAXException
+	public void startDocument()
 	{
 		if (this._schema != null)
 		{
@@ -258,15 +258,15 @@ public class ValidatingReader extends DefaultHandler
 			}
 			catch (IllegalArgumentException e)
 			{
-				throw new SAXException(e);
+				throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 			catch (InvalidTransitionException e)
 			{
-				throw new SAXException(e);
+				throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 			catch (IllegalAccessException e)
 			{
-				throw new SAXException(e);
+				throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 			catch (InvocationTargetException e)
 			{
@@ -278,7 +278,7 @@ public class ValidatingReader extends DefaultHandler
 				}
 				else
 				{
-					throw new SAXException(e);
+					throw new SAXException(e); // $codepro.audit.disable exceptionUsage.exceptionCreation
 				}
 			}
 		}

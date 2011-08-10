@@ -302,9 +302,9 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 						{
 							// Log this
 							IdeLog.logError(PortalUI36Plugin.getDefault(),
-									MessageFormat.format("Error while retrieving the profile for '{0}' update site", //$NON-NLS-1$
+									MessageFormat.format("Error while retrieving the profile for ''{0}'' update site", //$NON-NLS-1$
 											updateSite),
-									new RuntimeException(MessageFormat.format("The profile for '{0}' was null", //$NON-NLS-1$
+									new RuntimeException(MessageFormat.format("The profile for ''{0}'' was null", //$NON-NLS-1$
 											profileId)));
 						}
 					}

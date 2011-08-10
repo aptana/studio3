@@ -22,11 +22,9 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
-{
+public class FTPSConnectionWithBasePathTest extends CommonConnectionTest {
 
-	private static FTPSConnectionPoint setupConnection()
-	{
+	private static FTPSConnectionPoint setupConnection() {
 		FTPSConnectionPoint ftpcp = new FTPSConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftps.host")); //$NON-NLS-1$
 		ftpcp.setLogin(getConfig().getProperty("ftps.username")); //$NON-NLS-1$
@@ -41,8 +39,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		initBasePath();
 		FTPSConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(constructBasePath());
@@ -51,51 +48,41 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		super.tearDown();
 		cleanupBasePath();
 	}
 
-	public static IPath constructBasePath()
-	{
+	public static IPath constructBasePath() {
 		return new Path(getConfig().getProperty("ftp.path")).append(FTPSConnectionWithBasePathTest.class
 				.getSimpleName());
 	}
 
-	public static void initBasePath() throws CoreException
-	{
+	public static void initBasePath() throws CoreException {
 		FTPSConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		try
-		{
-			if (!fs.fetchInfo().exists())
-			{
+		try {
+			if (!fs.fetchInfo().exists()) {
 				fs.mkdir(EFS.NONE, null);
 			}
 		}
-		finally
-		{
+		finally {
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
 	}
 
-	public static void cleanupBasePath() throws CoreException
-	{
+	public static void cleanupBasePath() throws CoreException {
 		FTPSConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		try
-		{
-			if (fs.fetchInfo().exists())
-			{
+		try {
+			if (fs.fetchInfo().exists()) {
 				fs.delete(EFS.NONE, null);
 			}
 		}
-		finally
-		{
+		finally {
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
@@ -106,9 +93,16 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime()
-	{
+	protected boolean supportsSetModificationTime() {
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsFolderSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsFolderSetModificationTime() {
+		return false;
 	}
 
 	/*
@@ -116,8 +110,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup()
-	{
+	protected boolean supportsChangeGroup() {
 		return false;
 	}
 
@@ -126,8 +119,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return true;
+	protected boolean supportsChangePermissions() {
+		return false;
 	}
 }

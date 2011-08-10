@@ -13,7 +13,6 @@ import org.jaxen.DefaultNavigator;
 import org.jaxen.JaxenConstants;
 import org.jaxen.UnsupportedAxisException;
 import org.jaxen.XPath;
-import org.jaxen.saxpath.SAXPathException;
 
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
@@ -24,7 +23,7 @@ import com.aptana.parsing.ast.IParseNodeAttribute;
 public class ParseNodeNavigator extends DefaultNavigator
 {
 	private static final long serialVersionUID = 841503047993117262L;
-	private static ParseNodeNavigator _instance = new ParseNodeNavigator();
+	private static ParseNodeNavigator INSTANCE = new ParseNodeNavigator();
 
 	/**
 	 * getInstance
@@ -33,13 +32,13 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public static ParseNodeNavigator getInstance()
 	{
-		return _instance;
+		return INSTANCE;
 	}
 
 	/**
 	 * @see org.jaxen.DefaultNavigator#getAttributeAxisIterator(java.lang.Object)
 	 */
-	public Iterator<?> getAttributeAxisIterator(Object contextNode) throws UnsupportedAxisException
+	public Iterator<?> getAttributeAxisIterator(Object contextNode)
 	{
 		if (isElement(contextNode))
 		{
@@ -102,7 +101,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	/**
 	 * @see org.jaxen.DefaultNavigator#getChildAxisIterator(java.lang.Object)
 	 */
-	public Iterator<?> getChildAxisIterator(Object contextNode) throws UnsupportedAxisException
+	public Iterator<?> getChildAxisIterator(Object contextNode)
 	{
 		if (contextNode instanceof IParseNode)
 		{
@@ -280,7 +279,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	/**
 	 * @see org.jaxen.DefaultNavigator#getParentNode(java.lang.Object)
 	 */
-	public Object getParentNode(Object contextNode) throws UnsupportedAxisException
+	public Object getParentNode(Object contextNode)
 	{
 		if (isAttribute(contextNode))
 		{
@@ -312,7 +311,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isAttribute(Object object)
 	{
-		return (object instanceof IParseNodeAttribute);
+		return object instanceof IParseNodeAttribute;
 	}
 
 	/**
@@ -336,7 +335,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isElement(Object object)
 	{
-		return (object instanceof IParseNode);
+		return object instanceof IParseNode;
 	}
 
 	/**
@@ -360,13 +359,13 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public boolean isText(Object object)
 	{
-		return (object instanceof String);
+		return object instanceof String;
 	}
 
 	/**
 	 * @see org.jaxen.Navigator#parseXPath(java.lang.String)
 	 */
-	public XPath parseXPath(String xpath) throws SAXPathException
+	public XPath parseXPath(String xpath)
 	{
 		return null;
 	}

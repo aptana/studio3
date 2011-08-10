@@ -145,8 +145,8 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 							SSLFTPClient.AUTH_TLS_C,
 							SSLFTPClient.AUTH_SSL								
 					};
-					boolean supportsPBSZ = false;
-					boolean supportsPROT = false;
+					boolean supportsPBSZ = true;
+					boolean supportsPROT = true;
 					try {
 						String[] features = ftpClient.features();
 						if (features != null && features.length > 0) {
@@ -171,12 +171,15 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 						ftpsClient.auth(securityMechanism);
 					} else {
 						// server didn't indicate its supported auth mechanism, try them one-by-one
-						for (String i : supportedMechanisms) {
+						for (String auth : supportedMechanisms) {
 							try {
-								ftpsClient.auth(securityMechanism);
-								securityMechanism = i;
+								ftpsClient.auth(auth);
+								securityMechanism = auth;
 								break;
-							} catch (FTPException ignore) {
+							} catch (SSLFTPCertificateException e) {
+								throw e;
+							} catch (FTPException e) {
+								e.getCause();
 							}
 						}
 					}
@@ -187,6 +190,8 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 						if (supportsPROT) {
 							ftpsClient.prot(SSLFTPClient.PROT_PRIVATE);
 						}
+					} catch (SSLFTPCertificateException e) {
+						throw e;
 					} catch (FTPException e) {
 						if (supportsPROT) {
 							ftpsClient.prot(SSLFTPClient.PROT_CLEAR);

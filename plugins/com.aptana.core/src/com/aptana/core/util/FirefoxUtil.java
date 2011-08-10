@@ -360,6 +360,6 @@ public final class FirefoxUtil {
 			}
 		}
 
-		return true;
+		return dir.list().length > 0;
 	}
 }
