@@ -34,29 +34,7 @@ public class IOUtilTest extends TestCase
 	private static final String RESOURCE_DIR = "resources";
 	private static final String TEST_DIR = "copyTest";
 
-	private String tempDir;
-
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		tempDir = System.getProperty("java.io.tmpdir");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-		tempDir = null;
-	}
+	private static final String tempDir = System.getProperty("java.io.tmpdir");
 
 	private Mockery context = new Mockery()
 	{
