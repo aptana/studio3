@@ -21,6 +21,7 @@ public class AllUtilTests
 		suite.addTestSuite(ClassUtilTest.class);
 		suite.addTestSuite(CollectionsUtilTest.class);
 		suite.addTestSuite(EclipseUtilTest.class);
+		suite.addTestSuite(ExpiringMapTests.class);
 		suite.addTestSuite(FileUtilTest.class);
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(InputStreamGobblerTest.class);
