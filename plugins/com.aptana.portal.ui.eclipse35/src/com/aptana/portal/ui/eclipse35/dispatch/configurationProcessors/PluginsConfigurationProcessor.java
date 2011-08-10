@@ -258,7 +258,7 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 				}
 				catch (URISyntaxException e)
 				{
-					PortalUIPlugin.logError(e);
+					IdeLog.logError(Activator.getDefault(), e);
 				}
 				return result;
 			}
