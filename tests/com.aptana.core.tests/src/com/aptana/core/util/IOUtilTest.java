@@ -139,11 +139,11 @@ public class IOUtilTest extends TestCase
 				File source = new File(resourceFolder, TEST_DIR);
 				File dest = new File(tempDir, "tempdir");
 
-				Runtime.getRuntime().exec(new String[] { "chmod", "333", source.getAbsolutePath() }); //$NON-NLS-1$
+				Runtime.getRuntime().exec(new String[] { "chmod", "333", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
 				IOUtil.copyDirectory(source, dest);
 				assertFalse(compareDirectory(source, dest));
 				FileUtil.deleteRecursively(dest);
-				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }); //$NON-NLS-1$
+				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
 			}
 			catch (Exception ignore)
 			{
