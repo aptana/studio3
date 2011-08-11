@@ -310,7 +310,7 @@ public final class IdeLog
 	 */
 	public static void logWarning(Plugin plugin, String message)
 	{
-		logWarning(plugin, message, null, null);
+		logWarning(plugin, message, (Throwable) null);
 	}
 
 	/**
@@ -362,7 +362,7 @@ public final class IdeLog
 	 */
 	public static void logInfo(Plugin plugin, String message)
 	{
-		logInfo(plugin, message, null, null);
+		logInfo(plugin, message, null);
 	}
 
 	/**
