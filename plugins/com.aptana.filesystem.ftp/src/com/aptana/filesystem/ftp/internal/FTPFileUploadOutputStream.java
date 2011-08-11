@@ -123,7 +123,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
                 }
 			} catch (FTPException e) {
 				safeQuit(true);
-				throw new IOException(e.getMessage(), e);
+				throw new IOException(e.getMessage());
 			}
 		} finally {
 			safeQuit(false);
