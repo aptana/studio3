@@ -7,18 +7,22 @@
  */
 package com.aptana.core.util;
 
+import java.io.File;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.Version;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.util.EclipseUtil.LauncherFilter;
 
 public class EclipseUtilTest extends TestCase
 {
@@ -102,5 +106,18 @@ public class EclipseUtilTest extends TestCase
 		assertNotNull(EclipseUtil.getPluginVersion(CorePlugin.PLUGIN_ID));
 		assertNull(EclipseUtil.getPluginVersion((Plugin) null));
 		assertNull(EclipseUtil.getPluginVersion((String) null));
+	}
+
+	public void testLauncherFilter()
+	{
+		Location location = Platform.getInstallLocation();
+		assertNotNull(location);
+
+		IPath launcher = new Path(location.getURL().getFile());
+		File file = launcher.toFile();
+		assertTrue(file.isDirectory());
+
+		String[] executableFiles = file.list(new LauncherFilter());
+		assertTrue(executableFiles.length > 0);
 	}
 }

@@ -44,6 +44,32 @@ import com.aptana.core.ICorePreferenceConstants;
 public class EclipseUtil
 {
 
+	protected static final class LauncherFilter implements FilenameFilter
+	{
+
+		public boolean accept(File dir, String name)
+		{
+			IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
+			name = path.removeFileExtension().lastSegment();
+			String ext = path.getFileExtension();
+			if (Platform.OS_MACOSX.equals(Platform.getOS()))
+			{
+				if (!"app".equals(ext)) //$NON-NLS-1$
+				{
+					return false;
+				}
+			}
+			for (String launcherName : LAUNCHER_NAMES)
+			{
+				if (launcherName.equalsIgnoreCase(name))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
@@ -263,29 +289,7 @@ public class EclipseUtil
 				launcher = new Path(location.getURL().getFile());
 				if (launcher.toFile().isDirectory())
 				{
-					String[] executableFiles = launcher.toFile().list(new FilenameFilter()
-					{
-						public boolean accept(File dir, String name)
-						{
-							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
-							name = path.removeFileExtension().lastSegment();
-							String ext = path.getFileExtension();
-							if (Platform.OS_MACOSX.equals(Platform.getOS()))
-							{
-								if (!"app".equals(ext)) { //$NON-NLS-1$
-									return false;
-								}
-							}
-							for (String launcherName : LAUNCHER_NAMES)
-							{
-								if (launcherName.equalsIgnoreCase(name))
-								{
-									return true;
-								}
-							}
-							return false;
-						}
-					});
+					String[] executableFiles = launcher.toFile().list(new LauncherFilter());
 					if (executableFiles.length > 0)
 					{
 						launcher = launcher.append(executableFiles[0]);
