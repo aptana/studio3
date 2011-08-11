@@ -11,7 +11,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class CommonMessages extends NLS {
 
-	private static final String BUNDLE_NAME = "com.aptana.ui.common_messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.js.debug.ui.common_messages"; //$NON-NLS-1$
 
 	public static String ProductName;
 	public static String ProductShortName;
