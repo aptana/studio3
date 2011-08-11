@@ -37,7 +37,7 @@ public class FTPSConnectionTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsSetModificationTime() {
-		return true;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.setmodtime"));
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +45,7 @@ public class FTPSConnectionTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsFolderSetModificationTime() {
-		return false;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.foldersetmodtime"));
 	}
 
 	/*
@@ -54,7 +54,7 @@ public class FTPSConnectionTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsChangeGroup() {
-		return false;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.changegroup"));
 	}
 
 	/*
@@ -63,6 +63,6 @@ public class FTPSConnectionTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsChangePermissions() {
-		return false;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.permissions"));
 	}
 }
