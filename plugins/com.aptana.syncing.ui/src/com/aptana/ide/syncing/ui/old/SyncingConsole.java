@@ -17,6 +17,7 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.theme.ConsoleThemer;
@@ -100,7 +101,8 @@ public class SyncingConsole extends MessageConsole
 		}
 		catch (Exception e)
 		{
-			SyncingUIPlugin.logError(StringUtil.format(Messages.SyncingConsole_UnableToWriteToConsole, message), e);
+			IdeLog.logError(SyncingUIPlugin.getDefault(),
+					StringUtil.format(Messages.SyncingConsole_UnableToWriteToConsole, message), e);
 		}
 	}
 
@@ -117,7 +119,7 @@ public class SyncingConsole extends MessageConsole
 		}
 		catch (IOException e)
 		{
-			SyncingUIPlugin.logError(Messages.SyncingConsole_ErrorClosingStream, e);
+			IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.SyncingConsole_ErrorClosingStream, e);
 		}
 	}
 }

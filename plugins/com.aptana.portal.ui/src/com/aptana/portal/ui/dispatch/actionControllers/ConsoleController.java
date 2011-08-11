@@ -25,6 +25,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
@@ -105,10 +106,9 @@ public class ConsoleController extends AbstractActionController
 			}
 			catch (PartInitException e)
 			{
-				PortalUIPlugin.logError(e);
+				IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			}
 		}
-
 	}
 
 	private MessageConsole findOrCreateConsole()

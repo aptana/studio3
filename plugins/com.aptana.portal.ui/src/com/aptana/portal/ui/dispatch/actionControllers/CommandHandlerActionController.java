@@ -21,6 +21,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
@@ -82,7 +83,7 @@ public class CommandHandlerActionController extends AbstractActionController
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
 		return IBrowserNotificationConstants.JSON_OK;
@@ -105,16 +106,15 @@ public class CommandHandlerActionController extends AbstractActionController
 			}
 			else
 			{
-				PortalUIPlugin
-						.logError(new Exception(
-								"Wrong argument count passed to CommandHandlerActionController::execute. Expected 1 or 2 and got " + arr.length));//$NON-NLS-1$
+				String message = "Wrong argument count passed to CommandHandlerActionController::execute. Expected 1 or 2 and got " + arr.length; //$NON-NLS-1$
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			}
 		}
 		else
 		{
-			PortalUIPlugin.logError(new Exception(
-					"Wrong argument type passed to CommandHandlerActionController::execute. Expected Object[] and got " //$NON-NLS-1$
-							+ ((attributes == null) ? "null" : attributes.getClass().getName()))); //$NON-NLS-1$s
+			String message = "Wrong argument type passed to CommandHandlerActionController::execute. Expected Object[] and got " //$NON-NLS-1$
+					+ ((attributes == null) ? "null" : attributes.getClass().getName()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 		}
 		return null;
 	}
@@ -135,9 +135,9 @@ public class CommandHandlerActionController extends AbstractActionController
 			}
 			else
 			{
-				PortalUIPlugin.logError(new Exception(
-						"Wrong argument type passed as command-arguments to CommandHandlerActionController::execute. Expected 'Map' and got " //$NON-NLS-1$
-								+ arr[1].getClass().getName()));
+				String message = "Wrong argument type passed as command-arguments to CommandHandlerActionController::execute. Expected 'Map' and got " //$NON-NLS-1$
+						+ arr[1].getClass().getName();
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			}
 		}
 		return null;

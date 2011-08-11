@@ -5,24 +5,22 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.projects.internal;
+package com.aptana.js.debug.ui;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS
-{
+public class CommonMessages extends NLS {
 
-	private static final String BUNDLE_NAME = "com.aptana.projects.internal.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ui.common_messages"; //$NON-NLS-1$
 
-	public static String ProjectPropertyTester_ERR_ProjectNature;
-
-	static
-	{
+	public static String ProductName;
+	public static String ProductShortName;
+	
+	static {
 		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		NLS.initializeMessages(BUNDLE_NAME, CommonMessages.class);
 	}
 
-	private Messages()
-	{
+	private CommonMessages() {
 	}
 }

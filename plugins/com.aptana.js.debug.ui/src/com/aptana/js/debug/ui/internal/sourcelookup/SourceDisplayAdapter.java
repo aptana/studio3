@@ -35,6 +35,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.ui.SourceDisplayUtil;
 import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.ISourceLink;
@@ -126,7 +127,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 					sourceLookupDirector.setSourcePathComputer(sourcePathComputer);
 				}
 			} catch (CoreException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 		return fDefaultSourceLocator;

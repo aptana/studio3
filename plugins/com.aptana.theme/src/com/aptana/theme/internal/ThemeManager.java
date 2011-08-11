@@ -50,6 +50,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotationPreferences;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.IThemeManager;
@@ -206,7 +207,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
@@ -284,7 +285,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Set the bg/fg/selection colors for compare editors
@@ -308,7 +309,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
@@ -330,7 +331,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
@@ -342,7 +343,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Force font
@@ -426,7 +427,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -481,13 +482,13 @@ public class ThemeManager implements IThemeManager
 				}
 				catch (Exception e)
 				{
-					ThemePlugin.logError(e);
+					IdeLog.logError(ThemePlugin.getDefault(), e);
 				}
 			}
 		}
 		catch (IOException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -544,7 +545,7 @@ public class ThemeManager implements IThemeManager
 			}
 			catch (Exception e)
 			{
-				ThemePlugin.logError(url.toString(), e);
+				IdeLog.logError(ThemePlugin.getDefault(), url.toString(), e);
 			}
 		}
 
@@ -579,7 +580,7 @@ public class ThemeManager implements IThemeManager
 			}
 			catch (Exception e)
 			{
-				ThemePlugin.logError(e);
+				IdeLog.logError(ThemePlugin.getDefault(), e);
 			}
 		}
 
@@ -596,7 +597,7 @@ public class ThemeManager implements IThemeManager
 			}
 			catch (Exception e)
 			{
-				ThemePlugin.logError(e);
+				IdeLog.logError(ThemePlugin.getDefault(), e);
 			}
 		}
 	}
@@ -633,7 +634,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 

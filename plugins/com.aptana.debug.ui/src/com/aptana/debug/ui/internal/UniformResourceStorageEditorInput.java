@@ -110,7 +110,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				}
 			}
 		} catch (CoreException e) {
-			IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(DebugUiPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -127,7 +127,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				try {
 					loadRemoteFileStorage((UniformResourceStorage) storage, new File(filePath));
 				} catch (CoreException e) {
-					IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(DebugUiPlugin.getDefault(), e);
 				}
 			}
 		}

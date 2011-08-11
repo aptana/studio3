@@ -99,7 +99,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 	}

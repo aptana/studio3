@@ -167,7 +167,7 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 		for (File file : files)
 		{
 			String filename = file.getName();
-			int index = filename.lastIndexOf("."); //$NON-NLS-1$
+			int index = filename.lastIndexOf('.');
 			if (index > -1)
 			{
 				try

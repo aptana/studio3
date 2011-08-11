@@ -48,6 +48,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -418,7 +419,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 							}
 							catch (CoreException e)
 							{
-								FTPUIPlugin.logImportant("", e); //$NON-NLS-1$
+								IdeLog.logWarning(FTPUIPlugin.getDefault(), e);
 							}
 						}
 					}
@@ -536,7 +537,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		}
 		catch (CoreException e)
 		{
-			FTPUIPlugin.logError(Messages.FTPConnectionPointPropertyDialog_ERR_FailedCreate, e);
+			IdeLog.logError(FTPUIPlugin.getDefault(), Messages.FTPConnectionPointPropertyDialog_ERR_FailedCreate, e);
 			listener.close();
 			throw new SWTException();
 		}
@@ -743,7 +744,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		}
 		catch (CoreException e)
 		{
-			FTPUIPlugin.logImportant("", e); //$NON-NLS-1$
+			IdeLog.logWarning(FTPUIPlugin.getDefault(), e);
 		}
 		if (dlg.open() == Window.OK)
 		{

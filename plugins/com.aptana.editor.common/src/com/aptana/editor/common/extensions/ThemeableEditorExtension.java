@@ -350,7 +350,7 @@ public class ThemeableEditorExtension
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 }

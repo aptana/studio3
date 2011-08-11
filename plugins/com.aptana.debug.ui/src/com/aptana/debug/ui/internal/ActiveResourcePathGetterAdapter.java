@@ -103,7 +103,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 							try {
 								result[0] = ((UniformResourceStorage) storage).getURI().toURL();
 							} catch (MalformedURLException e) {
-								IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+								IdeLog.logError(DebugUiPlugin.getDefault(), e);
 							}
 						}
 					}

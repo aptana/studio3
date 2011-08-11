@@ -23,6 +23,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
@@ -31,7 +32,6 @@ import com.aptana.js.debug.core.internal.browsers.FirebugUtil;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.ui.internal.DebugUIImages;
 import com.aptana.js.debug.ui.internal.LaunchConfigurationsHelper;
-import com.aptana.ui.CommonMessages;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -124,22 +124,6 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 		return DebugUIImages.getImageRegistry();
 	}
 
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
-	}
-
-	public static void log(String msg) {
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
-	}
-
-	public static void log(String msg, Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-
 	/**
 	 * getModelPresentation
 	 * 
@@ -176,7 +160,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 						}
 					}
 				} catch (PartInitException e) {
-					log(e.getStatus());
+					IdeLog.logError(getDefault(), e);
 				}
 			}
 			if (!closeEditors.isEmpty()) {
@@ -184,7 +168,5 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 						false);
 			}
 		}
-
 	}
-
 }

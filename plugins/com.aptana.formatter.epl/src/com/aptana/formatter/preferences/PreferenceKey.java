@@ -16,6 +16,7 @@ import org.eclipse.ui.preferences.IWorkingCopyManager;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.epl.FormatterPlugin;
 
 public final class PreferenceKey
@@ -50,7 +51,7 @@ public final class PreferenceKey
 			}
 			catch (BackingStoreException e)
 			{
-				IdeLog.logError(FormatterPlugin.getDefault(), "Error flushing a node", e); //$NON-NLS-1$
+				IdeLog.logError(FormatterPlugin.getDefault(), "Error flushing a node", e, IDebugScopes.DEBUG); //$NON-NLS-1$
 			}
 		}
 	}

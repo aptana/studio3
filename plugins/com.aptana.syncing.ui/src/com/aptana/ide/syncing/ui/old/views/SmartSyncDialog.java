@@ -71,13 +71,13 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -994,15 +994,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 					String path = resource.getPath().toString();
 					Matcher m = searchPattern.matcher(path);
-
-					if (m.find())
-					{
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return m.find();
 				}
 				return false;
 			}
@@ -1146,7 +1138,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				syncer.setEventHandler(new SyncEventHandlerAdapterWithProgressMonitor(monitor)
 				{
 
-					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
+					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems,
+							IProgressMonitor monitor)
 					{
 						if (item != null)
 						{
@@ -1249,7 +1242,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				}
 				catch (Exception e1)
 				{
-					SyncingUIPlugin.logError(Messages.SmartSyncDialog_ErrorSmartSync, e1);
+					IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.SmartSyncDialog_ErrorSmartSync, e1);
 					error = e1;
 				}
 				if (monitor.isCanceled())
@@ -1724,7 +1717,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			// cancels the previous job if exists
 			syncJob.cancel();
 		}
-		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this, MessageFormat.format(Messages.SmartSyncDialog_Endpoints, end1, end2));
+		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this, MessageFormat.format(
+				Messages.SmartSyncDialog_Endpoints, end1, end2));
 		syncJob.schedule();
 	}
 
@@ -1806,18 +1800,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				if (clientConnection instanceof WorkspaceConnectionPoint)
 				{
 					IResource resource = ((WorkspaceConnectionPoint) clientConnection).getResource();
-					try
+					IViewPart viewPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
+					if (viewPart instanceof CommonNavigator)
 					{
-						IViewPart viewPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
-						if (viewPart instanceof CommonNavigator)
-						{
-							CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
-							viewer.refresh(resource);
-						}
-					}
-					catch (PartInitException e)
-					{
-						// Unable to refresh the project explorer view
+						CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+						viewer.refresh(resource);
 					}
 				}
 
@@ -1825,18 +1812,11 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				ConnectionPointType type = CoreIOPlugin.getConnectionPointManager().getType(serverConnection);
 				if (type != null && type.getCategory().isRemote())
 				{
-					try
+					IViewPart viewPart = UIUtils.findView(RemoteNavigatorView.ID);
+					if (viewPart instanceof RemoteNavigatorView)
 					{
-						IViewPart viewPart = UIUtils.findView(RemoteNavigatorView.ID);
-						if (viewPart instanceof RemoteNavigatorView)
-						{
-							RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
-							view.getCommonViewer().refresh(serverConnection);
-						}
-					}
-					catch (PartInitException e)
-					{
-						// Unable to refresh the remote view
+						RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
+						view.getCommonViewer().refresh(serverConnection);
 					}
 				}
 			}
@@ -2033,7 +2013,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private class LabelToolTip extends ToolTip
 	{
 
-		public LabelToolTip(Control control)
+		LabelToolTip(Control control)
 		{
 			super(control, ToolTip.NO_RECREATE, false);
 		}
@@ -2048,7 +2028,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			for (int i = 0; i < filesToBeSynced.length; ++i)
 			{
 				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i], null));
-				buf.append("\n"); //$NON-NLS-1$
+				buf.append('\n');
 			}
 			Text text;
 			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);

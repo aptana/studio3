@@ -154,7 +154,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				}
 				catch (BadLocationException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 			IToken token = ThemePlugin.getDefault().getThemeManager().getToken(fFullScope);

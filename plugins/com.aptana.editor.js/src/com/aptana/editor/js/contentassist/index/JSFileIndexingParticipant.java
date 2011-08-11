@@ -57,7 +57,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (JaxenException e)
 		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 	}
 
@@ -124,7 +124,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -173,7 +173,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (JaxenException e)
 		{
-			IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 
 		return result;

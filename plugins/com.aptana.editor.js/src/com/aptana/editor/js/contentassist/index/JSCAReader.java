@@ -71,7 +71,7 @@ public class JSCAReader extends SchemaReader
 			}
 			catch (Throwable t)
 			{
-				IdeLog.logError(JSPlugin.getDefault(), t.getMessage(), t);
+				IdeLog.logError(JSPlugin.getDefault(), t);
 			}
 			finally
 			{

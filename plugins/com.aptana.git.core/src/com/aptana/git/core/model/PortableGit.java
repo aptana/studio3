@@ -17,8 +17,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 
 /**
  * @author Max Stepanov
@@ -67,7 +69,7 @@ public final class PortableGit {
 						try {
 							getBundle().start(Bundle.START_TRANSIENT);
 						} catch (BundleException e) {
-							GitPlugin.logError(e);
+							IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 						}
 						return Status.OK_STATUS;
 					}
@@ -86,7 +88,7 @@ public final class PortableGit {
 				bundle.start(Bundle.START_TRANSIENT);
 				locationInitialized = false;
 			} catch (BundleException e) {
-				GitPlugin.logError(e);
+				IdeLog.logError(GitPlugin.getDefault(), e);
 			}
 		}
 	}

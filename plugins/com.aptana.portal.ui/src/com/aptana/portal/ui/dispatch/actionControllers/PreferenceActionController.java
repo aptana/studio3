@@ -13,6 +13,7 @@ import java.util.Set;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -49,7 +50,7 @@ public class PreferenceActionController extends AbstractActionController
 		}
 		catch (Throwable t)
 		{
-			PortalUIPlugin.logError(t);
+			IdeLog.logError(PortalUIPlugin.getDefault(), t);
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
 	}
@@ -79,7 +80,7 @@ public class PreferenceActionController extends AbstractActionController
 		}
 		catch (Throwable t)
 		{
-			PortalUIPlugin.logError(t);
+			IdeLog.logError(PortalUIPlugin.getDefault(), t);
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
 		return IBrowserNotificationConstants.JSON_OK;
@@ -89,18 +90,17 @@ public class PreferenceActionController extends AbstractActionController
 	{
 		if (!(arguments instanceof Object[]))
 		{
-			PortalUIPlugin.logError(new Exception(
-					"Wrong argument type passed to PreferenceActionController::setPreferenceValue. Expected Object[] and got " //$NON-NLS-1$
-							+ ((arguments == null) ? "null" : arguments.getClass().getName()))); //$NON-NLS-1$
+			String message = "Wrong argument type passed to PreferenceActionController::setPreferenceValue. Expected Object[] and got " //$NON-NLS-1$
+					+ ((arguments == null) ? "null" : arguments.getClass().getName()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
 					null);
 		}
 		Object[] arr = (Object[]) arguments;
 		if (arr.length != 1 || !(arr[0] instanceof Map))
 		{
-			PortalUIPlugin
-					.logError(new Exception(
-							"Wrong argument type passed to PreferenceActionController::setPreferenceValue. Expected a Map in the object array")); //$NON-NLS-1$
+			String message = "Wrong argument type passed to PreferenceActionController::setPreferenceValue. Expected a Map in the object array"; //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
 					null);
 		}

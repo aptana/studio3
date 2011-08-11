@@ -81,7 +81,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return commandElements;
 	}

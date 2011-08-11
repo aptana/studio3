@@ -39,6 +39,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.ui.io.navigator.actions.EditorUtils;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
@@ -244,7 +245,7 @@ public class SamplesView extends ViewPart
 					}
 					catch (Exception e)
 					{
-						SamplesUIPlugin.logError(Messages.SamplesView_ERR_UnableToOpenHelp, e);
+						IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.SamplesView_ERR_UnableToOpenHelp, e);
 					}
 				}
 			}
@@ -295,7 +296,7 @@ public class SamplesView extends ViewPart
 						}
 						catch (CoreException e)
 						{
-							SamplesUIPlugin.logError(Messages.SamplesView_ERR_UnableToOpenFile, e);
+							IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.SamplesView_ERR_UnableToOpenFile, e);
 						}
 					}
 				}

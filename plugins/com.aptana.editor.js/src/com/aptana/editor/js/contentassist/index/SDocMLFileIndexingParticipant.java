@@ -170,7 +170,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 			}
 			catch (Throwable e)
 			{
-				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(JSPlugin.getDefault(), e);
 			}
 		}
 		finally

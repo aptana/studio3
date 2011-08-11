@@ -560,7 +560,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				} catch (FileNotFoundException fnfe) {
 					fileInfo.setExists(false);
 				} catch (Exception ignore) {
-					IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.BaseConnectionFileManager_symlink_resolve_failed, e, null);
+					IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.BaseConnectionFileManager_symlink_resolve_failed, e);
 				}
 			}
 		}

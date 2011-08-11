@@ -11,63 +11,77 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.syncing.core.ISiteConnection;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class ConnectionEditorInput implements IEditorInput {
+public class ConnectionEditorInput implements IEditorInput
+{
 
-    private ISiteConnection fSite;
+	private ISiteConnection fSite;
 
-    public ConnectionEditorInput(ISiteConnection site) {
-        fSite = site;
-    }
+	public ConnectionEditorInput(ISiteConnection site)
+	{
+		fSite = site;
+	}
 
-    public ISiteConnection getConnection() {
-        return fSite;
-    }
+	public ISiteConnection getConnection()
+	{
+		return fSite;
+	}
 
-    public void setConnection(ISiteConnection site) {
-        fSite = site;
-    }
+	public void setConnection(ISiteConnection site)
+	{
+		fSite = site;
+	}
 
-    public boolean exists() {
-        return false;
-    }
+	public boolean exists()
+	{
+		return false;
+	}
 
-    public ImageDescriptor getImageDescriptor() {
-        return null;
-    }
+	public ImageDescriptor getImageDescriptor()
+	{
+		return null;
+	}
 
-    public String getName() {
-        return fSite == null ? "" : fSite.getName(); //$NON-NLS-1$
-    }
+	public String getName()
+	{
+		return (fSite == null) ? StringUtil.EMPTY : fSite.getName();
+	}
 
-    public IPersistableElement getPersistable() {
-        return null;
-    }
+	public IPersistableElement getPersistable()
+	{
+		return null;
+	}
 
-    public String getToolTipText() {
-        return fSite == null ? "" : fSite.toString(); //$NON-NLS-1$
-    }
+	public String getToolTipText()
+	{
+		return (fSite == null) ? StringUtil.EMPTY : fSite.toString();
+	}
 
-    @SuppressWarnings("rawtypes")
-	public Object getAdapter(Class adapter) {
-        return null;
-    }
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Class adapter)
+	{
+		return null;
+	}
 
-    @Override
-    public int hashCode() {
-        return fSite.hashCode();
-    }
+	@Override
+	public int hashCode()
+	{
+		return fSite.hashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ConnectionEditorInput)) {
-            return false;
-        }
-        ConnectionEditorInput other = (ConnectionEditorInput) obj;
-        return fSite == other.getConnection();
-    }
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof ConnectionEditorInput))
+		{
+			return false;
+		}
+		ConnectionEditorInput other = (ConnectionEditorInput) obj;
+		return fSite == other.getConnection();
+	}
 }

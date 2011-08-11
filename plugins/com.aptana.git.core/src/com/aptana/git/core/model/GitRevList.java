@@ -21,7 +21,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 
 public class GitRevList
 {
@@ -135,7 +137,8 @@ public class GitRevList
 				{
 					if (((parentString.length() + 1) % 41) != 0)
 					{
-						GitPlugin.logError(MessageFormat.format("invalid parents: {0}", parentString.length()), null); //$NON-NLS-1$
+						IdeLog.logError(GitPlugin.getDefault(),
+								MessageFormat.format("invalid parents: {0}", parentString.length()), IDebugScopes.DEBUG); //$NON-NLS-1$
 						continue;
 					}
 					int nParents = (parentString.length() + 1) / 41;
@@ -162,13 +165,14 @@ public class GitRevList
 					stream.read(); // Remove separator
 					char c = (char) stream.read();
 					if (c != '>' && c != '<' && c != '^' && c != '-')
-						GitPlugin.logError("Error loading commits: sign not correct", null); //$NON-NLS-1$
+						IdeLog.logError(GitPlugin.getDefault(),
+								"Error loading commits: sign not correct", IDebugScopes.DEBUG); //$NON-NLS-1$
 					// newCommit.setSign(c);
 				}
 
 				int read = stream.read();
 				if (read != 0 && read != -1)
-					GitPlugin.logError("Error", null); //$NON-NLS-1$
+					IdeLog.logError(GitPlugin.getDefault(), "Error", IDebugScopes.DEBUG); //$NON-NLS-1$
 
 				revisions.add(newCommit);
 
@@ -204,7 +208,7 @@ public class GitRevList
 	private void logInfo(String string)
 	{
 		if (GitPlugin.getDefault() != null)
-			GitPlugin.logInfo(string);
+			IdeLog.logInfo(GitPlugin.getDefault(), string);
 		else
 			System.out.println(string);
 	}

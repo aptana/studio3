@@ -8,8 +8,6 @@
 
 package com.aptana.ide.ui.io;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -332,26 +330,6 @@ public class IOUIPlugin extends AbstractUIPlugin
 			viewer.expandToLevel(element, 1);
 			viewer.setSelection(new StructuredSelection(selection));
 		}
-	}
-
-	public static void logError(String msg, Exception e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void logError(Exception e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
-	}
-
-	public static void logImportant(String msg, Exception e)
-	{
-		log(new Status(IStatus.WARNING, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	private static void log(IStatus status)
-	{
-		getDefault().getLog().log(status);
 	}
 
 	private static IViewPart findView(String viewID) throws PartInitException

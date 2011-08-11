@@ -109,7 +109,7 @@ public class DeployProviderRegistry
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(DeployPlugin.getDefault(), e);
 			}
 		}
 		return providers;
@@ -136,7 +136,7 @@ public class DeployProviderRegistry
 			}
 			catch (InvalidRegistryObjectException e)
 			{
-				IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(DeployPlugin.getDefault(), e);
 			}
 		}
 		return providersById;
@@ -157,7 +157,7 @@ public class DeployProviderRegistry
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(DeployPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(DeployPlugin.getDefault(), e);
 			}
 		}
 		return null;

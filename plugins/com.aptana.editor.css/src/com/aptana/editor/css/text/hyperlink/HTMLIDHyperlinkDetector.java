@@ -108,7 +108,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 		if (hyperlinks.isEmpty())
 		{

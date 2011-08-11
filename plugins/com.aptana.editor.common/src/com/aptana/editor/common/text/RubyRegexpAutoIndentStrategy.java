@@ -127,7 +127,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 
 		return;
@@ -195,7 +195,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 
 		return false;
@@ -354,7 +354,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 
 		return getTabWidth();

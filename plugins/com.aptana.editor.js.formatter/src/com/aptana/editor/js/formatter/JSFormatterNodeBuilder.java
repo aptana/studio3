@@ -96,6 +96,7 @@ import com.aptana.editor.js.parsing.ast.JSWhileNode;
 import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterUtils;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.NodeTypes.TypeOperator;
@@ -407,8 +408,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			ifNode.setBegin(createTextNode(document, ifStart, ifStart + 2));
 			push(ifNode);
 			// push the 'if' condition
-			pushNodeInParentheses('(', ')', node.getLeftParenthesis().getStart(), node.getRightParenthesis().getEnd() + 1, (JSNode) node.getCondition(),
-					false);
+			pushNodeInParentheses('(', ')', node.getLeftParenthesis().getStart(),
+					node.getRightParenthesis().getEnd() + 1, (JSNode) node.getCondition(), false);
 			// Construct the 'true' part of the 'if' and visit its children
 			if (isCurlyTrueBlock)
 			{
@@ -1836,7 +1837,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					// we'll have a problem with such a node.
 					IdeLog.logError(
 							JSFormatterPlugin.getDefault(),
-							MessageFormat.format("Expected JSFormatter and got {0}", child.getClass().getName()), (Throwable) null); //$NON-NLS-1$
+							MessageFormat.format("Expected JSFormatter and got {0}", child.getClass().getName()), IDebugScopes.DEBUG); //$NON-NLS-1$
 				}
 			}
 			return jsChildren;

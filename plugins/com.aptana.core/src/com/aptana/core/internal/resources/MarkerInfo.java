@@ -31,7 +31,7 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 			}
 			superClass.getMethod("setAttributes", Map.class, boolean.class).invoke(this, map, validate); //$NON-NLS-1$
 		} catch (Exception e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 	}
 
@@ -45,7 +45,7 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 			}
 			superClass.getMethod("setAttribute", String.class, Object.class, boolean.class).invoke(this, attributeName, value, validate); //$NON-NLS-1$
 		} catch (Exception e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 			}
 			superClass.getMethod("setAttributes", String[].class, Object[].class, boolean.class).invoke(this, attributeNames, values, validate); //$NON-NLS-1$
 		} catch (Exception e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 	}
 }

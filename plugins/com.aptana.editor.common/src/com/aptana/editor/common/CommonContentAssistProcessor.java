@@ -286,7 +286,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return proposals;
 	}
@@ -392,7 +392,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							}
 							catch (MalformedURLException e1)
 							{
-								IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+								IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
 							}
 						}
 						if (imageURL != null)

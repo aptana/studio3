@@ -36,7 +36,7 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 					try {
 						SourceDisplayUtil.openInEditor(editorInput, -1);
 					} catch (CoreException e) {
-						IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+						IdeLog.logError(DebugUiPlugin.getDefault(), e);
 
 					}
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().forceActive();

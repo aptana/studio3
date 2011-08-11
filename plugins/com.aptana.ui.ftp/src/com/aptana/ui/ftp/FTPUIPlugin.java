@@ -8,8 +8,6 @@
 
 package com.aptana.ui.ftp;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -17,25 +15,28 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class FTPUIPlugin extends AbstractUIPlugin {
+public class FTPUIPlugin extends AbstractUIPlugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.ui.ftp"; //$NON-NLS-1$
 
 	// The shared instance
 	private static FTPUIPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public FTPUIPlugin() {
+	public FTPUIPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 	}
@@ -44,39 +45,31 @@ public class FTPUIPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		plugin = null;
 		super.stop(context);
 	}
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
-	public static FTPUIPlugin getDefault() {
+	public static FTPUIPlugin getDefault()
+	{
 		return plugin;
 	}
 
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
-	 * @param path the path
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
-
-    public static void logError(String msg, Exception e) {
-        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-    }
-
-    public static void logImportant(String msg, Exception e) {
-        log(new Status(IStatus.WARNING, PLUGIN_ID, IStatus.OK, msg, e));
-    }
-
-    private static void log(IStatus status) {
-        getDefault().getLog().log(status);
-    }
 }

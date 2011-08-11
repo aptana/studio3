@@ -53,7 +53,7 @@ public class BuildPathIndexContributor implements IIndexFileContributor
 							}
 							catch (CoreException e)
 							{
-								IdeLog.logError(BuildPathCorePlugin.getDefault(), e.getMessage(), e);
+								IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
 							}
 						}
 					}

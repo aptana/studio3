@@ -190,7 +190,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		catch (BadLocationException e)
 		{
 			// Should never happen
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 

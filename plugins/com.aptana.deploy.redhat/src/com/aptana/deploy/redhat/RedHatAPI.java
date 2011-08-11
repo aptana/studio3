@@ -91,7 +91,7 @@ public class RedHatAPI
 		}
 		catch (StorageException e)
 		{
-			IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(RedHatPlugin.getDefault(), e);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class RedHatAPI
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(RedHatPlugin.getDefault(), e);
 		}
 	}
 

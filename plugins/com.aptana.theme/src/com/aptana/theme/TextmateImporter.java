@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.plist.PListParserFactory;
 import com.aptana.theme.internal.OrderedProperties;
 
@@ -58,7 +59,7 @@ public class TextmateImporter
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		return null;
 	}

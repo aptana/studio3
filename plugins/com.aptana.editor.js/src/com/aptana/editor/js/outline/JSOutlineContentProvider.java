@@ -425,14 +425,16 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 
 							// processes all key/value pairs
 							IParseNode keyValuePair;
+							IParseNode key;
+							String keyString;
+							Reference keyValueReference;
 							int size = target.getChildCount();
 							for (int i = 0; i < size; ++i)
 							{
 								keyValuePair = target.getChild(i);
-								IParseNode key = keyValuePair.getChild(0);
-								String keyString = key.toString();
-								Reference keyValueReference = new Reference(parentFullPath, key, keyString,
-										PROPERTY_TYPE);
+								key = keyValuePair.getChild(0);
+								keyString = key.toString();
+								keyValueReference = new Reference(parentFullPath, key, keyString, PROPERTY_TYPE);
 								addVirtualChild(elements, keyValueReference, node, keyValuePair);
 							}
 							break;

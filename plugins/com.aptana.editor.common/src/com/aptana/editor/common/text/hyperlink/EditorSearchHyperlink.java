@@ -74,7 +74,7 @@ public class EditorSearchHyperlink implements IHyperlink
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 }

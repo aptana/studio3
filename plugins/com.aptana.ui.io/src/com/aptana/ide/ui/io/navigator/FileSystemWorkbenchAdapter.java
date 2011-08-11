@@ -30,6 +30,7 @@ import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
 import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.ide.core.io.IConnectionPointManager;
@@ -81,7 +82,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 				try {
 					return container.members();
 				} catch (CoreException e) {
-					IOUIPlugin.logImportant(Messages.FileSystemWorkbenchAdapter_FailedToGetMembers, e);
+					IdeLog.logWarning(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToGetMembers, e);
 				}
 			} else {
 				try {
@@ -92,7 +93,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                         connectionPoint.connect(true, new NullProgressMonitor());
                         return fetchFileSystemChildren(connectionPoint.getRoot(), new NullProgressMonitor());
                     } catch (CoreException e1) {
-                        IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+                        IdeLog.logError(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
                         UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
                     }
 				}
@@ -103,7 +104,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			try {
 				return fetchFileSystemChildren(((LocalRoot) object).getRoot(), new NullProgressMonitor());
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 				UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 			}
 		} else if (object instanceof IConnectionPointManager) {
@@ -236,7 +237,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 				}
 				return;
 			}
-			IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
+			IdeLog.logError(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
 			UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 		} finally {
 			collector.done();

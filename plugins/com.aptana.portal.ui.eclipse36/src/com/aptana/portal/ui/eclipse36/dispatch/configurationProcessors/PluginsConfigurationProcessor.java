@@ -9,6 +9,7 @@ package com.aptana.portal.ui.eclipse36.dispatch.configurationProcessors;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,7 +46,9 @@ import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.eclipse36.PortalUI36Plugin;
 
 /**
  * A configuration processor for eclipse-plugins management.<br>
@@ -81,15 +84,16 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		if (!loadingStatus.isOK())
 		{
 			applyErrorAttributes(loadingStatus.getMessage());
-			PortalUIPlugin.log(loadingStatus);
+			IdeLog.log(PortalUI36Plugin.getDefault(), loadingStatus);
 			return configurationStatus;
 		}
 
 		// Check that we got the plugin-id and version in the attributes.
 		if (!attributesMap.containsKey(PLUGIN_ID_ATTR) || !attributesMap.containsKey(PLUGIN_VERSION_ATTR))
 		{
-			applyErrorAttributes(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest);
-			PortalUIPlugin.logError(new Exception(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest));
+			String message = Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest;
+			applyErrorAttributes(message);
+			IdeLog.logError(PortalUI36Plugin.getDefault(), new Exception(message));
 			return configurationStatus;
 		}
 		// Start the check
@@ -157,16 +161,18 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		IStatus loadingStatus = loadAttributes(attributes);
 		if (!loadingStatus.isOK())
 		{
-			applyErrorAttributes(loadingStatus.getMessage());
-			PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
+			String message = loadingStatus.getMessage();
+			applyErrorAttributes(message);
+			IdeLog.logError(PortalUI36Plugin.getDefault(), new Exception(message));
 			return configurationStatus;
 		}
 
 		// Check that we got the plugin-id and version in the attributes.
 		if (!attributesMap.containsKey(FEATURE_ID_ATTR))
 		{
-			applyErrorAttributes(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest);
-			PortalUIPlugin.logError(new Exception(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest));
+			String message = Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest;
+			applyErrorAttributes(message);
+			IdeLog.logError(PortalUI36Plugin.getDefault(), new Exception(message));
 			return configurationStatus;
 		}
 
@@ -199,7 +205,7 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError("Error while trying to install a new plugin", e); //$NON-NLS-1$
+			IdeLog.logError(PortalUI36Plugin.getDefault(), "Error while trying to install a new plugin", e); //$NON-NLS-1$
 			applyErrorAttributes(e.getMessage());
 		}
 		return configurationStatus;
@@ -295,9 +301,11 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 						else
 						{
 							// Log this
-							PortalUIPlugin.logError(
-									"Error while retrieving the profile for '" + updateSite + "' update site", //$NON-NLS-1$  //$NON-NLS-2$
-									new RuntimeException("The profile for '" + profileId + "' was null")); //$NON-NLS-1$  //$NON-NLS-2$
+							IdeLog.logError(PortalUI36Plugin.getDefault(),
+									MessageFormat.format("Error while retrieving the profile for ''{0}'' update site", //$NON-NLS-1$
+											updateSite),
+									new RuntimeException(MessageFormat.format("The profile for ''{0}'' was null", //$NON-NLS-1$
+											profileId)));
 						}
 					}
 					units.addAll(roots.toSet());

@@ -75,6 +75,7 @@ import org.eclipse.ui.views.properties.PropertySheet;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.IControlThemerFactory;
@@ -204,7 +205,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -540,9 +541,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
-		setGitAndMercurialValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
+		setGitAndMercurialValues(theme,
+				EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 
-		setGeneralEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
+		setGeneralEditorValues(theme,
+				EclipseUtil.instanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
 		setEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
 
 		if (monitor.isCanceled())
@@ -639,7 +642,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Override JDT editor font
@@ -777,7 +780,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -852,7 +855,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -908,7 +911,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -943,7 +946,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 

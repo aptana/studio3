@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncState;
@@ -59,14 +60,14 @@ public class SyncExporter
 					builder.append(" " + iSyncResource.getPath().toString() + ": "
 							+ getSyncState(iSyncResource.getSyncState()));
 				}
-				builder.append("\n");
+				builder.append('\n');
 			}
 
 			writer.write(builder.toString());
 		}
 		catch (IOException e)
 		{
-			SyncingUIPlugin.logError(e.getLocalizedMessage(), e);
+			IdeLog.logError(SyncingUIPlugin.getDefault(), e);
 		}
 		finally
 		{

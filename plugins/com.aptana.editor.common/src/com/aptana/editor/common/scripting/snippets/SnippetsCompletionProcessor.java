@@ -111,7 +111,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return new SnippetTemplateContextType(contentTypeString);
 	}

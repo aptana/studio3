@@ -16,6 +16,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -104,7 +105,7 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 		try {
 			currentHitCount = breakpoint.getHitCount();
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		String initialValue = currentHitCount > 0 ? Integer.toString(currentHitCount) : "1"; //$NON-NLS-1$;
 
@@ -119,5 +120,4 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 		}
 		return 0;
 	}
-
 }

@@ -260,7 +260,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
 			{

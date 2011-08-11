@@ -91,7 +91,7 @@ public class HerokuContributionItem extends DeployContributionItem
 				}
 				catch (Exception e1)
 				{
-					IdeLog.logError(HerokuPlugin.getDefault(), e1.getMessage(), e1);
+					IdeLog.logError(HerokuPlugin.getDefault(), e1);
 				}
 			}
 		});

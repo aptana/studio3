@@ -29,6 +29,7 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -208,7 +209,7 @@ public class XMLEditor extends AbstractThemeableEditor
 					}
 					catch (BadLocationException e)
 					{
-						XMLPlugin.logError(e.getMessage(), e);
+						IdeLog.logError(XMLPlugin.getDefault(), e);
 					}
 					for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
 					{

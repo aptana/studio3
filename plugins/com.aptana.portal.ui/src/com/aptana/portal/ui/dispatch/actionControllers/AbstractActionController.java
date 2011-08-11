@@ -8,6 +8,7 @@
 package com.aptana.portal.ui.dispatch.actionControllers;
 
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
 import com.aptana.configurations.processor.IConfigurationProcessor;
 import com.aptana.configurations.processor.IConfigurationProcessorListener;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IActionController;
@@ -88,9 +90,9 @@ public abstract class AbstractActionController implements IActionController, ICo
 					final IConfigurationProcessor processor = getProcessor();
 					if (processor == null)
 					{
-						PortalUIPlugin.logError(new Exception(
-								"The configuration process for " + this.getClass().getName() //$NON-NLS-1$
-										+ " was null")); //$NON-NLS-1$
+						String message = MessageFormat.format(
+								"The configuration process for {0} was null", this.getClass().getName()); //$NON-NLS-1$
+						IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 						return createInternalErrorNotification();
 					}
 				}
@@ -106,7 +108,7 @@ public abstract class AbstractActionController implements IActionController, ICo
 			}
 			catch (Exception e)
 			{
-				PortalUIPlugin.logError(e);
+				IdeLog.logError(PortalUIPlugin.getDefault(), e);
 				return BrowserNotifier
 						.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR, e.getMessage());
 			}

@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
@@ -169,7 +170,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 				localConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.LocalConnectionPropertyDialog_FailedToCreate, e);
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.LocalConnectionPropertyDialog_FailedToCreate, e);
 				close();
 			}
 		}
@@ -293,6 +294,6 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		if (value != null) {
 			return value;
 		}
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 }

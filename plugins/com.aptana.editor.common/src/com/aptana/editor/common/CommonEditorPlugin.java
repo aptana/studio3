@@ -254,7 +254,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		// FIXME initialize spelling preferences lazily
 		spellingPreferences = new SpellingPreferences();
 
-		new UIJob("adding part listener")
+		new UIJob("adding part listener") //$NON-NLS-1$
 		{
 
 			@Override
@@ -424,7 +424,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 		return store;

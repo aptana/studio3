@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -97,7 +98,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -122,7 +123,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				return DebugUIImages.get(DebugUIImages.IMG_OBJS_INSPECT);
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return super.getImage(element);
 	}
@@ -311,7 +312,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return flags;
 	}
@@ -380,7 +381,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		try {
 			details = value.getValueString();
 		} catch (DebugException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		listener.detailComputed(value, details);
 	}
@@ -520,7 +521,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 			try {
 				details = target.computeValueDetails(value);
 			} catch (DebugException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 			listener.detailComputed(value, details);
 			return Status.OK_STATUS;

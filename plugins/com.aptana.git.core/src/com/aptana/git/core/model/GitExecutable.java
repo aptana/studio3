@@ -35,6 +35,7 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 
 public class GitExecutable
@@ -111,11 +112,11 @@ public class GitExecutable
 			{
 				return path;
 			}
-			GitPlugin
-					.logError(
-							MessageFormat
-									.format("You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
-											MIN_GIT_VERSION), null);
+			IdeLog.logError(
+					GitPlugin.getDefault(),
+					MessageFormat
+							.format("You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
+							MIN_GIT_VERSION), IDebugScopes.DEBUG);
 		}
 		return null;
 	}
@@ -137,7 +138,7 @@ public class GitExecutable
 		}
 		catch (BackingStoreException e)
 		{
-			GitPlugin.logError("Saving preferences failed.", e); //$NON-NLS-1$
+			IdeLog.logError(GitPlugin.getDefault(), "Saving preferences failed.", e, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 		fgExecutable = null;
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
@@ -187,7 +188,7 @@ public class GitExecutable
 
 	private static void log(String string)
 	{
-		GitPlugin.logInfo(string);
+		IdeLog.logInfo(GitPlugin.getDefault(), string);
 	}
 
 	private synchronized static List<IPath> searchLocations()
@@ -334,7 +335,7 @@ public class GitExecutable
 			env.remove("PATH"); //$NON-NLS-1$
 			env.remove("PWD"); //$NON-NLS-1$
 			String path = System.getenv("Path"); //$NON-NLS-1$
-			env.put("Path", instance().path().removeLastSegments(1).toOSString()+File.pathSeparator+path); //$NON-NLS-1$ //$NON-NLS-2$
+			env.put("Path", instance().path().removeLastSegments(1).toOSString() + File.pathSeparator + path); //$NON-NLS-1$
 		}
 		return filterOutVariables(env);
 	}
@@ -348,7 +349,7 @@ public class GitExecutable
 	 */
 	private static Map<String, String> filterOutVariables(Map<String, String> env)
 	{
-		for (Iterator<Map.Entry<String, String>> i = env.entrySet().iterator(); i.hasNext(); )
+		for (Iterator<Map.Entry<String, String>> i = env.entrySet().iterator(); i.hasNext();)
 		{
 			String value = i.next().getValue();
 			if (value.contains("${")) //$NON-NLS-1$
@@ -373,7 +374,7 @@ public class GitExecutable
 		}
 
 		try
-		{			
+		{
 			// Special handling for funky msysgit version string
 			if (versionString.contains("msysgit.")) //$NON-NLS-1$
 			{
@@ -383,14 +384,15 @@ public class GitExecutable
 				if (StringUtil.characterInstanceCount(versionString, '.') > 3)
 				{
 					versionString = versionString.replace(".msysgit", "_msysgit"); //$NON-NLS-1$ //$NON-NLS-2$
-				}	
+				}
 			}
 			return Version.parseVersion(versionString);
 		}
 		catch (Exception ex)
 		{
 			IdeLog.logError(GitPlugin.getDefault(),
-					StringUtil.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex);
+					StringUtil.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex,
+					IDebugScopes.DEBUG);
 			return Version.emptyVersion;
 		}
 	}

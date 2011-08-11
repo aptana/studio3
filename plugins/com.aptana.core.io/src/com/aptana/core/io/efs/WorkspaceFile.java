@@ -216,7 +216,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		try {
 			return new URI(WorkspaceFileSystem.SCHEME_WORKSPACE, path.toPortableString(), null);
 		} catch (URISyntaxException e) {
-			IdeLog.logError(CoreIOPlugin.getDefault(), e.getLocalizedMessage(), e);
+			IdeLog.logError(CoreIOPlugin.getDefault(), e);
 		}
 		return null;
 	}

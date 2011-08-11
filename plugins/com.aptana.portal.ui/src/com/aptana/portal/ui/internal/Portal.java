@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
@@ -124,7 +125,7 @@ public class Portal
 		}
 		catch (IOException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return;
 		}
 		if (portalBrowser != null && !portalBrowser.isDisposed())
@@ -150,7 +151,7 @@ public class Portal
 				}
 				catch (PartInitException e)
 				{
-					PortalUIPlugin.logError("Cannot open Aptana Portal", e); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Cannot open Aptana Portal", e); //$NON-NLS-1$
 				}
 				return Status.OK_STATUS;
 			}
@@ -199,8 +200,8 @@ public class Portal
 		catch (Exception e)
 		{
 			connected = false;
-			PortalUIPlugin
-					.logWarning("Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
+			IdeLog.logWarning(PortalUIPlugin.getDefault(),
+					"Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -327,7 +328,7 @@ public class Portal
 			}
 			catch (CoreException e)
 			{
-				PortalUIPlugin.logError(e);
+				IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			}
 		}
 		return 'O';

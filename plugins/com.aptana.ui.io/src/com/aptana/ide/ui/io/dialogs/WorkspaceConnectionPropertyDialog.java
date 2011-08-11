@@ -38,6 +38,7 @@ import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
@@ -175,7 +176,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 				workspaceConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.WorkspaceConnectionPropertyDialog_FailedToCreate, e);
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.WorkspaceConnectionPropertyDialog_FailedToCreate, e);
 				close();
 			}
 		}

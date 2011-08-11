@@ -25,6 +25,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class ParserPoolFactory
 {
+
 	private static ParserPoolFactory INSTANCE;
 
 	private Map<String, IConfigurationElement> parsers;
@@ -169,11 +170,12 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable declaredExceptions
+	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
+																								// declaredExceptions
 	{
 		return parse(contentTypeId, source, null);
 	}
-	
+
 	/**
 	 * parse
 	 * 
@@ -181,10 +183,10 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source, IProgressMonitor monitor) throws Exception // $codepro.audit.disable declaredExceptions
+	public static IParseRootNode parse(String contentTypeId, String source, IProgressMonitor monitor) throws Exception // $codepro.audit.disable
+																														// declaredExceptions
 	{
 		ParseState parseState = new ParseState();
-
 		parseState.setEditState(source, null, 0, 0);
 		parseState.setProgressMonitor(monitor);
 
@@ -198,7 +200,8 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable declaredExceptions
+	public static IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
+																										// declaredExceptions
 	{
 		if (contentTypeId == null)
 		{
@@ -226,7 +229,7 @@ public class ParserPoolFactory
 			else
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
-				ParsingPlugin.logError(message, null);
+				IdeLog.logError(ParsingPlugin.getDefault(), message);
 			}
 		}
 		else
@@ -235,7 +238,7 @@ public class ParserPoolFactory
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
 						contentTypeId);
-				ParsingPlugin.logInfo(message);
+				IdeLog.logInfo(ParsingPlugin.getDefault(), message);
 			}
 		}
 

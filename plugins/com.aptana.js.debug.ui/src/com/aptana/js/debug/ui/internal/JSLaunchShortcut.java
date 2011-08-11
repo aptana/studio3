@@ -24,6 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
@@ -108,7 +109,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return createConfiguration(current ? null : path);
 	}
@@ -136,7 +137,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 			}
 			config = wc.doSave();
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return config;
 	}

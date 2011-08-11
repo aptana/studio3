@@ -247,7 +247,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(DebugCorePlugin.getDefault(), e);
 		}
 	}
 
@@ -299,7 +299,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 					breakpoint.delete();
 				}
 			} catch (CoreException e) {
-				IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(DebugCorePlugin.getDefault(), e);
 			}
 		}
 	}

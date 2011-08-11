@@ -7,9 +7,7 @@
  */
 package com.aptana.formatter.ui.epl;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -61,30 +59,5 @@ public class FormatterUIEplPlugin extends AbstractUIPlugin
 	public static FormatterUIEplPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void log(IStatus status)
-	{
-		FormatterUIEplPlugin.getDefault().getLog().log(status);
-	}
-
-	public static void logError(String message)
-	{
-		logError(message, null);
-	}
-
-	public static void warn(String message, Throwable throwable)
-	{
-		log(new Status(IStatus.WARNING, PLUGIN_ID, INTERNAL_ERROR, message, throwable));
-	}
-
-	public static void logError(String message, Throwable throwable)
-	{
-		FormatterUIEplPlugin.log(new Status(IStatus.ERROR, FormatterUIEplPlugin.PLUGIN_ID, INTERNAL_ERROR, message, throwable));
-	}
-
-	public static void logError(Throwable t)
-	{
-		logError(t.getMessage(), t);
 	}
 }

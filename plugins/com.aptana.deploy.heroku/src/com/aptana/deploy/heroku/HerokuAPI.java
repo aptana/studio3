@@ -124,7 +124,7 @@ public class HerokuAPI
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(HerokuPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HerokuPlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -156,7 +156,7 @@ public class HerokuAPI
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(HerokuPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HerokuPlugin.getDefault(), e);
 		}
 		finally
 		{

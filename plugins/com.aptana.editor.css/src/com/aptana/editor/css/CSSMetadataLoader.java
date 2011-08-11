@@ -139,7 +139,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 	}
 

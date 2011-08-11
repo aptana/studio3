@@ -78,6 +78,7 @@ import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -127,7 +128,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		}
 		catch (CoreException e)
 		{
-			UIEplPlugin.logError(Messages.ProjectNaturesPage_ERR_RetrieveNatures, e);
+			IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_RetrieveNatures, e);
 			fCurrentProjectNatures = new String[0];
 		}
 		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
@@ -233,7 +234,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		}
 		catch (InvocationTargetException e)
 		{
-			UIEplPlugin.logError(Messages.ProjectNaturesPage_ERR_SetNatures, e);
+			IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_SetNatures, e);
 			return false;
 		}
 		resetProject();
@@ -375,7 +376,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			}
 			catch (InvocationTargetException e)
 			{
-				UIEplPlugin.logError(Messages.ProjectNaturesPage_ERR_CloseProject, e);
+				IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_CloseProject, e);
 			}
 
 			// re-open the project
@@ -403,7 +404,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			}
 			catch (InvocationTargetException e)
 			{
-				UIEplPlugin.logError(Messages.ProjectNaturesPage_ERR_OpenProject, e);
+				IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_OpenProject, e);
 			}
 		}
 	}
@@ -504,7 +505,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	private boolean isPrimaryNatureModified()
 	{
 		if (fInitialPrimaryNature == null)
-		{		
+		{
 			return fPrimaryNature != null;
 		}
 		return !fInitialPrimaryNature.equals(fPrimaryNature);

@@ -126,19 +126,29 @@ public class IOUtilTest extends TestCase
 		assertFalse(compareDirectory(source, dest));
 	}
 
-	public void testCopyFromReadOnlyDirectory() throws IOException
+	public void testCopyFromNonReadableDirectory() throws IOException
 	{
-		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+		// We can use source.setReadable(false) when we decide to use java 1.6
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			try
+			{
+				URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+				File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
 
-		File source = new File(resourceFolder, TEST_DIR);
-		File dest = new File(tempDir, "tempdir");
+				File source = new File(resourceFolder, TEST_DIR);
+				File dest = new File(tempDir, "tempdir");
 
-		source.setReadable(false);
-		IOUtil.copyDirectory(source, dest);
-		assertFalse(compareDirectory(source, dest));
-		FileUtil.deleteRecursively(dest);
-		source.setReadable(true);
+				Runtime.getRuntime().exec(new String[] { "chmod", "333", source.getAbsolutePath() }); //$NON-NLS-1$
+				IOUtil.copyDirectory(source, dest);
+				assertFalse(compareDirectory(source, dest));
+				FileUtil.deleteRecursively(dest);
+				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }); //$NON-NLS-1$
+			}
+			catch (Exception ignore)
+			{
+			}
+		}
 	}
 
 	public void testCopyToNotWriteableExistingDirectory() throws IOException
@@ -173,23 +183,25 @@ public class IOUtilTest extends TestCase
 
 	public void testExtractFile() throws IOException
 	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
 		File dest = new File(tempDir, "testfile.txt");
-		IPath source = new Path("resources/test.js");
+		File sourceFile = new File(resourceFolder, "test.js");
+		IPath sourcePath = new Path("resources/test.js");
 
-		IOUtil.extractFile(BUNDLE_ID, source, dest);
-		assertTrue(compareFiles(source.toFile(), dest));
+
+		IOUtil.extractFile(BUNDLE_ID, sourcePath, dest);
+		assertTrue(compareFiles(sourceFile, dest));
 		dest.delete();
 	}
 
 	public void testExtractFileWithInvalidPath() throws IOException
 	{
+		File dest = new File(tempDir, "testfile");
 		IPath source = new Path("invalid_file");
-		File dest = new File(tempDir, "testfile.txt");
 
 		IOUtil.extractFile(BUNDLE_ID, source, dest);
-
 		assertFalse(dest.exists());
-
 	}
 
 	public void testWrite() throws IOException

@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.formatter.epl.FormatterPlugin;
 
 /**
@@ -191,7 +192,7 @@ public abstract class ContributionExtensionManager
 		}
 		catch (CoreException e)
 		{
-			FormatterPlugin.logError(e);
+			IdeLog.logError(FormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return null;
 	}

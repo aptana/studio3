@@ -22,6 +22,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.parsing.ParsingPlugin;
 
 /**
@@ -129,7 +130,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			ParsingPlugin.logError(message, null);
+			IdeLog.logError(ParsingPlugin.getDefault(), message);
 		}
 	}
 
@@ -146,7 +147,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			ParsingPlugin.logInfo(message);
+			IdeLog.logInfo(ParsingPlugin.getDefault(), message);
 		}
 	}
 
@@ -163,7 +164,7 @@ public class ValidatingReader extends DefaultHandler
 		}
 		else
 		{
-			ParsingPlugin.logWarning(message);
+			IdeLog.logWarning(ParsingPlugin.getDefault(), message);
 		}
 	}
 

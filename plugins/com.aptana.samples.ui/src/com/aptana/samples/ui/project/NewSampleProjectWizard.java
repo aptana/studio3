@@ -57,6 +57,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.internal.wizards.NewProjectWizard;
@@ -368,7 +369,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				}
 				catch (ExecutionException e)
 				{
-					SamplesUIPlugin.logError(Messages.NewSampleProjectWizard_ERR_FailToDisconnect, e);
+					IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.NewSampleProjectWizard_ERR_FailToDisconnect,
+							e);
 				}
 
 				doPostProjectCreation(newProject);
@@ -404,7 +406,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				}
 				catch (PartInitException e)
 				{
-					SamplesUIPlugin.logError(Messages.NewSampleProjectWizard_ERR_OpenIndexFile, e);
+					IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.NewSampleProjectWizard_ERR_OpenIndexFile, e);
 				}
 			}
 		}

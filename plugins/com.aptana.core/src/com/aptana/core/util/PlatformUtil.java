@@ -109,7 +109,7 @@ public final class PlatformUtil
 					return list.toArray(new ProcessItem[list.size()]);
 				}
 			} catch (UnsatisfiedLinkError e) {
-				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS())) {
 			Process process = null;
@@ -235,7 +235,7 @@ public final class PlatformUtil
 			try {
 				currentPid = CoreNatives.GetCurrentProcessId();
 			} catch (UnsatisfiedLinkError e) {
-				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			Process process = null;
@@ -296,7 +296,7 @@ public final class PlatformUtil
 			try {
 				CoreNatives.KillProcess(pid);
 			} catch (UnsatisfiedLinkError e) {
-				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			try {
@@ -484,7 +484,7 @@ public final class PlatformUtil
 						}
 					} catch (IOException e) {
 						IdeLog.logError(CorePlugin.getDefault(),
-								MessageFormat.format("Reading {0} fails", plist.getAbsolutePath()), e, null); //$NON-NLS-1$
+								MessageFormat.format("Reading {0} fails", plist.getAbsolutePath()), e); //$NON-NLS-1$
 					} finally {
 						if (r != null) {
 							try {

@@ -94,7 +94,7 @@ public class InputStreamGobbler extends Thread
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		finally
 		{

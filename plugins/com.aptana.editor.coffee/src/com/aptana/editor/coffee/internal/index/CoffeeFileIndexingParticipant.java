@@ -65,7 +65,7 @@ public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipa
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(CoffeeScriptEditorPlugin.getDefault(), null, e);
+			IdeLog.logError(CoffeeScriptEditorPlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -84,7 +84,7 @@ public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipa
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CoffeeScriptEditorPlugin.getDefault(), null, e);
+			IdeLog.logError(CoffeeScriptEditorPlugin.getDefault(), e);
 		}
 		finally
 		{

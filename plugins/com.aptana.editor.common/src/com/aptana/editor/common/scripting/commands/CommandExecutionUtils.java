@@ -394,7 +394,7 @@ public class CommandExecutionUtils
 				}
 				catch (BadLocationException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -423,7 +423,7 @@ public class CommandExecutionUtils
 		Point selectionRange = textWidget.getSelectedRange();
 		switch (inputType)
 		{
-		// TODO Move this logic into the enum itself
+			// TODO Move this logic into the enum itself
 			case UNDEFINED:
 			case NONE:
 				return CommandExecutionUtils.EOF;
@@ -507,7 +507,7 @@ public class CommandExecutionUtils
 		// separate out the commands that require a text editor and the ones that do not
 		switch (commandResult.getOutputType())
 		{
-		// TODO Move this logic into the enum itself!
+			// TODO Move this logic into the enum itself!
 			case DISCARD:
 			case UNDEFINED:
 				break;
@@ -656,7 +656,7 @@ public class CommandExecutionUtils
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -841,13 +841,13 @@ public class CommandExecutionUtils
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 
 		}
 		catch (PartInitException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -967,7 +967,7 @@ public class CommandExecutionUtils
 			}
 			catch (FileNotFoundException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 			if (pw != null)
 			{
@@ -994,11 +994,11 @@ public class CommandExecutionUtils
 				}
 				catch (PartInitException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 				catch (MalformedURLException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -1049,7 +1049,8 @@ public class CommandExecutionUtils
 			if (end - offset > offset - start)
 			{
 				start = offset;
-			} else
+			}
+			else
 			{
 				end = offset;
 			}

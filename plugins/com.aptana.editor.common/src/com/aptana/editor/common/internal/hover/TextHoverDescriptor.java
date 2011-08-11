@@ -78,7 +78,7 @@ public class TextHoverDescriptor {
 				try {
 					descriptors.add(new TextHoverDescriptor(element));
 				} catch (CoreException e) {
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -107,7 +107,7 @@ public class TextHoverDescriptor {
 			try {
 				return enablementExpression.evaluate(context) != EvaluationResult.FALSE;
 			} catch (CoreException e) {
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				return false;
 			}
 		}
@@ -122,7 +122,7 @@ public class TextHoverDescriptor {
 		try {
 			return (ITextHover) configurationElement.createExecutableExtension(ATT_CLASS);
 		} catch (CoreException e) {
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}

@@ -22,7 +22,7 @@ import com.aptana.core.resources.AbstractUniformResource;
 
 	private final FileStoreEditorInput editorInput;
 
-	public FileStoreEditorInputUniformResource(FileStoreEditorInput editorInput)
+	FileStoreEditorInputUniformResource(FileStoreEditorInput editorInput)
 	{
 		super();
 		this.editorInput = editorInput;

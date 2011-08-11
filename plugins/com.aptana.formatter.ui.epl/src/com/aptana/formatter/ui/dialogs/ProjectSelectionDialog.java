@@ -39,6 +39,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.StatusInfo;
 
@@ -141,7 +143,7 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 						}
 						catch (CoreException e)
 						{
-							FormatterUIEplPlugin.logError(e);
+							IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 							return false;
 						}
 					}
