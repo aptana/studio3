@@ -51,7 +51,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
     protected IFileStore fDestinationRoot;
     protected boolean fSelectedFromSource;
 
-    public BaseSyncAction() {
+    protected BaseSyncAction() {
         fSelectedElements = new ArrayList<IAdaptable>();
     }
 

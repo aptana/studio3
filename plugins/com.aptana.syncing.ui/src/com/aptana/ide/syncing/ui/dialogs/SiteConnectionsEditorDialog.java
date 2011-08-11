@@ -194,7 +194,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 						sitePropertiesWidget.setSource(null);
 						sitesViewer.refresh();
 						if (newSelectionIndex > -1 && newSelectionIndex < sitesViewer.getList().getItemCount()) {
-							setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
+							setSelection((newSelectionIndex == 0) ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
 						}
 					}
 				}
@@ -359,7 +359,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
     	return MessageFormat.format("{0} {1}", baseName, lastIndex + 1); //$NON-NLS-1$
     }
 
-    private class SitesLabelProvider extends LabelProvider {
+    private static class SitesLabelProvider extends LabelProvider {
 
     	/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
@@ -373,7 +373,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		}
     }
     
-    private class SitesSorter extends ViewerComparator {
+    private static class SitesSorter extends ViewerComparator {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ViewerComparator#category(java.lang.Object)
 		 */

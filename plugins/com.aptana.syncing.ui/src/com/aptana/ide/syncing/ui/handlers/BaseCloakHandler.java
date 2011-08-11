@@ -34,7 +34,7 @@ public abstract class BaseCloakHandler extends BaseSyncHandler
 
 	private List<IFileStore> fSelectedFiles;
 
-	public BaseCloakHandler()
+	protected BaseCloakHandler()
 	{
 		fSelectedFiles = new ArrayList<IFileStore>();
 	}

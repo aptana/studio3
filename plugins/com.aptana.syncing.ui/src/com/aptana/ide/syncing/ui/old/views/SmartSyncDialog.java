@@ -994,15 +994,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 					String path = resource.getPath().toString();
 					Matcher m = searchPattern.matcher(path);
-
-					if (m.find())
-					{
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return m.find();
 				}
 				return false;
 			}
@@ -2021,7 +2013,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private class LabelToolTip extends ToolTip
 	{
 
-		public LabelToolTip(Control control)
+		LabelToolTip(Control control)
 		{
 			super(control, ToolTip.NO_RECREATE, false);
 		}
@@ -2036,7 +2028,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			for (int i = 0; i < filesToBeSynced.length; ++i)
 			{
 				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i], null));
-				buf.append("\n"); //$NON-NLS-1$
+				buf.append('\n');
 			}
 			Text text;
 			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);

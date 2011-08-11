@@ -16,12 +16,10 @@ import com.aptana.filesystem.ftp.FTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class FTPConnectionTest extends CommonConnectionTest
-{
+public class FTPConnectionTest extends CommonConnectionTest {
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
 		ftpcp.setLogin(getConfig().getProperty("ftp.username")); //$NON-NLS-1$

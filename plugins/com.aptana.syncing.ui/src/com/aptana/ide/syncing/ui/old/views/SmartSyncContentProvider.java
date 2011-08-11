@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFolder;
 import com.aptana.ide.syncing.core.old.SyncState;
@@ -127,7 +128,7 @@ public class SmartSyncContentProvider implements ITreeContentProvider
 			}
 			return resources.toArray(new ISyncResource[resources.size()]);
 		}
-		return new Object[0];
+		return ArrayUtil.NO_OBJECTS;
 	}
 
 	/**
@@ -237,5 +238,4 @@ public class SmartSyncContentProvider implements ITreeContentProvider
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
 	}
-
 }

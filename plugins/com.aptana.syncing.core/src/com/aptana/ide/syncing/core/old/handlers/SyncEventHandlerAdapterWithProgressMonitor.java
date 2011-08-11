@@ -20,48 +20,59 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 
 /**
  * @author Max Stepanov (mstepanov@aptana.com)
- *
  */
-public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandlerAdapter {
+public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandlerAdapter
+{
 
 	private static final int TRANSFER_SCALE = 1024;
 	private static final int PATH_DISPLAY_CHARACTERS = 40;
-	
+
 	private IProgressMonitor monitor;
 	private Map<VirtualFileSyncPair, SubProgressMonitor> itemsProgress = new HashMap<VirtualFileSyncPair, SubProgressMonitor>();
 	private Map<VirtualFileSyncPair, Long> itemsTransfer = new HashMap<VirtualFileSyncPair, Long>();
-	
+
 	/**
 	 * 
 	 */
-	public SyncEventHandlerAdapterWithProgressMonitor(IProgressMonitor monitor) {
-		this.monitor = monitor != null ? monitor : new NullProgressMonitor();
+	public SyncEventHandlerAdapterWithProgressMonitor(IProgressMonitor monitor)
+	{
+		this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#getFilesEvent(com.aptana.ide.core.io.IVirtualFileManager, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#getFilesEvent(com.aptana.ide.core.io.IVirtualFileManager,
+	 * java.lang.String)
 	 */
 	@Override
-	public boolean getFilesEvent(IConnectionPoint manager, String path) {
+	public boolean getFilesEvent(IConnectionPoint manager, String path)
+	{
 		monitor.subTask(FileUtil.compressPath(path, PATH_DISPLAY_CHARACTERS));
 		return !monitor.isCanceled() && super.getFilesEvent(manager, path);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncContinue()
 	 */
 	@Override
-	public boolean syncContinue(IProgressMonitor monitor) {
+	public boolean syncContinue(IProgressMonitor monitor)
+	{
 		return !monitor.isCanceled() && super.syncContinue(monitor);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncDone(com.aptana.ide.core.io.sync.VirtualFileSyncPair)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncDone(com.aptana.ide.core.io.sync.VirtualFileSyncPair)
 	 */
 	@Override
-	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor) {
+	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
+	{
 		SubProgressMonitor itemProgressMonitor = itemsProgress.get(item);
-		if (itemProgressMonitor != null) {
+		if (itemProgressMonitor != null)
+		{
 			itemProgressMonitor.done();
 			itemsProgress.remove(item);
 			itemsTransfer.remove(item);
@@ -69,13 +80,18 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 		super.syncDone(item, monitor);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncErrorEvent(com.aptana.ide.core.io.sync.VirtualFileSyncPair, java.lang.Exception)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncErrorEvent(com.aptana.ide.core.io.sync.VirtualFileSyncPair
+	 * , java.lang.Exception)
 	 */
 	@Override
-	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor) {
+	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
+	{
 		SubProgressMonitor itemProgressMonitor = itemsProgress.get(item);
-		if (itemProgressMonitor != null) {
+		if (itemProgressMonitor != null)
+		{
 			itemProgressMonitor.done();
 			itemsProgress.remove(item);
 			itemsTransfer.remove(item);
@@ -83,13 +99,18 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 		return !monitor.isCanceled() && super.syncErrorEvent(item, e, monitor);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncEvent(com.aptana.ide.core.io.sync.VirtualFileSyncPair, int, int)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncEvent(com.aptana.ide.core.io.sync.VirtualFileSyncPair,
+	 * int, int)
 	 */
 	@Override
-	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor) {
+	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
+	{
 		SubProgressMonitor itemProgressMonitor = itemsProgress.get(item);
-		if (itemProgressMonitor == null && item != null) {
+		if (itemProgressMonitor == null && item != null)
+		{
 			itemProgressMonitor = new SubProgressMonitor(monitor, 1);
 			itemsProgress.put(item, itemProgressMonitor);
 			itemsTransfer.put(item, Long.valueOf(0));
@@ -99,26 +120,33 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 		return !monitor.isCanceled() && super.syncEvent(item, index, totalItems, monitor);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncTransferring(com.aptana.ide.core.io.sync.VirtualFileSyncPair, long)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncTransferring(com.aptana.ide.core.io.sync.VirtualFileSyncPair
+	 * , long)
 	 */
 	@Override
-	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor) {
+	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor)
+	{
 		SubProgressMonitor itemProgressMonitor = itemsProgress.get(item);
-		if (itemProgressMonitor != null) {
+		if (itemProgressMonitor != null)
+		{
 			long delta = bytes - ((Long) itemsTransfer.get(item));
 			itemsTransfer.put(item, Long.valueOf(bytes));
-			itemProgressMonitor.worked((int) (delta/TRANSFER_SCALE));
+			itemProgressMonitor.worked((int) (delta / TRANSFER_SCALE));
 		}
 		super.syncTransferring(item, bytes, monitor);
 	}
-	
-	private static int getItemProgressAmount(VirtualFileSyncPair item) {
-		switch (item.getSyncDirection()) {
-		case VirtualFileSyncPair.Direction_ClientToServer:
-			return (int) (item.getSourceFile().fetchInfo().getLength()/TRANSFER_SCALE);
-		case VirtualFileSyncPair.Direction_ServerToClient:
-			return (int) (item.getDestinationFile().fetchInfo().getLength()/TRANSFER_SCALE);
+
+	private static int getItemProgressAmount(VirtualFileSyncPair item)
+	{
+		switch (item.getSyncDirection())
+		{
+			case VirtualFileSyncPair.Direction_ClientToServer:
+				return (int) (item.getSourceFile().fetchInfo().getLength() / TRANSFER_SCALE);
+			case VirtualFileSyncPair.Direction_ServerToClient:
+				return (int) (item.getDestinationFile().fetchInfo().getLength() / TRANSFER_SCALE);
 		}
 		return 1;
 	}

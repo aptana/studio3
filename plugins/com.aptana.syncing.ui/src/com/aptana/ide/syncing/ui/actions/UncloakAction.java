@@ -101,7 +101,7 @@ public class UncloakAction implements IObjectActionDelegate, IViewActionDelegate
 	private static String getFileType(IFileStore fileStore)
 	{
 		String name = fileStore.getName();
-		int index = name.lastIndexOf("."); //$NON-NLS-1$
+		int index = name.lastIndexOf('.');
 		if (index < 0)
 		{
 			return name;

@@ -22,11 +22,9 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public class FTPConnectionWithBasePathTest extends CommonConnectionTest
-{
+public class FTPConnectionWithBasePathTest extends CommonConnectionTest {
 
-	private static FTPConnectionPoint setupConnection()
-	{
+	private static FTPConnectionPoint setupConnection() {
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
 		ftpcp.setLogin(getConfig().getProperty("ftp.username")); //$NON-NLS-1$
@@ -40,8 +38,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(constructBasePath());
@@ -50,51 +47,41 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	@Override
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		super.tearDown();
 		cleanupBasePath();
 	}
 
-	public static IPath constructBasePath()
-	{
+	public static IPath constructBasePath() {
 		return new Path(getConfig().getProperty("ftp.path"))
 				.append(FTPConnectionWithBasePathTest.class.getSimpleName());
 	}
 
-	public static void initBasePath() throws CoreException
-	{
+	public static void initBasePath() throws CoreException {
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		try
-		{
-			if (!fs.fetchInfo().exists())
-			{
+		try {
+			if (!fs.fetchInfo().exists()) {
 				fs.mkdir(EFS.NONE, null);
 			}
 		}
-		finally
-		{
+		finally {
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
 	}
 
-	public static void cleanupBasePath() throws CoreException
-	{
+	public static void cleanupBasePath() throws CoreException {
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
-		try
-		{
-			if (fs.fetchInfo().exists())
-			{
+		try {
+			if (fs.fetchInfo().exists()) {
 				fs.delete(EFS.NONE, null);
 			}
 		}
-		finally
-		{
+		finally {
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());

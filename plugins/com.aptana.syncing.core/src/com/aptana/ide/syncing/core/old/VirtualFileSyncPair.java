@@ -109,7 +109,7 @@ public class VirtualFileSyncPair
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public InputStream getSourceInputStream() throws IOException, CoreException
+	public InputStream getSourceInputStream() throws CoreException
 	{
 		InputStream result = null;
 
@@ -188,7 +188,7 @@ public class VirtualFileSyncPair
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public InputStream getDestinationInputStream() throws IOException, CoreException
+	public InputStream getDestinationInputStream() throws CoreException
 	{
 		InputStream result = null;
 
@@ -270,17 +270,11 @@ public class VirtualFileSyncPair
 		{
 			return false;
 		}
-		else
+		if (getSourceFile() != null && getSourceFile().fetchInfo().isDirectory())
 		{
-			if (getSourceFile() != null && getSourceFile().fetchInfo().isDirectory())
-			{
-				return true;
-			}
-			else
-			{
-				return (getDestinationFile() != null && getDestinationFile().fetchInfo().isDirectory());
-			}
+			return true;
 		}
+		return getDestinationFile() != null && getDestinationFile().fetchInfo().isDirectory();
 	}
 
 	/**

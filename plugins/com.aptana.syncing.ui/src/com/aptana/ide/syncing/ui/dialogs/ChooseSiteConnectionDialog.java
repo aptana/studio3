@@ -27,7 +27,6 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.ui.dialogs.Messages;
 import com.aptana.ui.UIPlugin;
 import com.aptana.ui.util.SWTUtils;
 
