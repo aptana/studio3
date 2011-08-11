@@ -123,7 +123,8 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
+		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
+																											// com.instantiations.assist.eclipse.analysis.unnecessaryToString
 	}
 
 	/**
@@ -145,7 +146,8 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
+		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
+																								// com.instantiations.assist.eclipse.analysis.unnecessaryToString
 	}
 
 	/**
