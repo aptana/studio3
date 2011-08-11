@@ -10,6 +10,8 @@ package com.aptana.core.util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -20,6 +22,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.build.UnifiedBuilder;
 
@@ -38,36 +41,83 @@ public class ResourceUtilTest extends TestCase
 
 	protected void setUp() throws Exception
 	{
-		// TODO Auto-generated method stub
-		super.setUp();
 		testProject = createProject();
 	}
 
 	protected void tearDown() throws Exception
 	{
-		// TODO Auto-generated method stub
-		super.tearDown();
 		deleteProject(testProject);
 	}
 
 	public void testResourcePathToFile()
 	{
-		// fail("Not yet implemented");
+		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
+
+		File file = ResourceUtil.resourcePathToFile(url);
+		assertTrue(file.exists());
+	}
+
+	public void testResourcePathToFileWithNull()
+	{
+		assertNull(ResourceUtil.resourcePathToFile(null));
 	}
 
 	public void testResourcePathToString()
 	{
-		// fail("Not yet implemented");
+		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
+
+		String path = ResourceUtil.resourcePathToString(url);
+		assertTrue(path.endsWith("com.aptana.core.tests/resources"));
 	}
 
-	public void testToURI()
+	public void testResourcePathToStringWithNull()
 	{
-		// fail("Not yet implemented");
+		assertNull(ResourceUtil.resourcePathToString(null));
+	}
+
+	public void testResourcePathToURI()
+	{
+		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
+
+		URI uri = ResourceUtil.resourcePathToURI(url);
+		assertTrue(uri.toString().endsWith("com.aptana.core.tests/resources/"));
+	}
+
+	public void testResourcePathToURIWithNull()
+	{
+		assertNull(ResourceUtil.resourcePathToURI(null));
+	}
+
+	public void testToURIWithSpaceInURL() throws Exception
+	{
+		String urlString = "file:/Applications/Aptana Studio 3/";
+
+		assertEquals("file:/Applications/Aptana%20Studio%203/", ResourceUtil.toURI(new URL(urlString)).toString());
+	}
+
+	public void testToURIWithUNCPath() throws Exception
+	{
+		String urlString = "file://Server/Volume/File";
+
+		assertEquals("file:////Server/Volume/File", ResourceUtil.toURI(new URL(urlString)).toString());
+	}
+
+	public void testToURIWithHttpProtocol() throws Exception
+	{
+		String urlString = "http://www.appcelerator.com";
+
+		assertEquals(urlString, ResourceUtil.toURI(new URL(urlString)).toString());
+	}
+
+	public void testToURIWithNullURL() throws Exception
+	{
+		assertNull(ResourceUtil.toURI(null));
 	}
 
 	public void testGetLineSeparatorValue()
 	{
-		// fail("Not yet implemented");
+		assertEquals(System.getProperty("line.separator"), ResourceUtil.getLineSeparatorValue(null));
+		assertEquals(System.getProperty("line.separator"), ResourceUtil.getLineSeparatorValue(testProject));
 	}
 
 	public void testBuilders() throws CoreException

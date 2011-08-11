@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -196,7 +197,8 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 						URI uri = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
 						if ("file".equals(uri.getScheme())) { //$NON-NLS-1$
 							fileName = DebugUtil.getPath(uri);
-							IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
+							IFile file = ResourcesPlugin.getWorkspace().getRoot()
+									.getFileForLocation(Path.fromOSString(fileName));
 							if (file != null) {
 								fileName = file.getFullPath().toString();
 							}
