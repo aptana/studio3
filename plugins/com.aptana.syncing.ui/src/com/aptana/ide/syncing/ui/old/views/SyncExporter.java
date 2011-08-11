@@ -60,7 +60,7 @@ public class SyncExporter
 					builder.append(" " + iSyncResource.getPath().toString() + ": "
 							+ getSyncState(iSyncResource.getSyncState()));
 				}
-				builder.append("\n");
+				builder.append('\n');
 			}
 
 			writer.write(builder.toString());
