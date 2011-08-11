@@ -10,6 +10,7 @@ package com.aptana.index.core;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -334,6 +335,8 @@ public class Index implements IReadWriteMonitor
 	 */
 	void deleteIndexFile()
 	{
+		IndexPlugin.logInfo(MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER);
+
 		File indexFile = this.getIndexFile();
 
 		if (indexFile != null && indexFile.exists())
@@ -483,7 +486,7 @@ public class Index implements IReadWriteMonitor
 			// the call to exitReadEnterWrite below
 			this.enterRead();
 
-			if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
+			if (this.memoryIndex.shouldMerge() && this.exitReadEnterWrite())
 			{
 				try
 				{
@@ -491,7 +494,7 @@ public class Index implements IReadWriteMonitor
 				}
 				finally
 				{
-					monitor.exitWriteEnterRead();
+					this.exitWriteEnterRead();
 				}
 			}
 
@@ -553,7 +556,23 @@ public class Index implements IReadWriteMonitor
 	 */
 	public void remove(URI containerRelativeURI)
 	{
-		this.memoryIndex.remove(containerRelativeURI.toString());
+		String documentName = containerRelativeURI.toString();
+
+		// TODO: Don't do any of this unless we are logging INFOs
+		if (memoryIndex.hasDocument(documentName))
+		{
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Removing URI ''{0}'' from index ''{1}''",
+				containerRelativeURI,
+				this
+			);
+			// @formatter:on
+
+			IndexPlugin.logInfo(message, IDebugScopes.INDEXER);
+		}
+
+		this.memoryIndex.remove(documentName);
 	}
 
 	/**
@@ -581,6 +600,8 @@ public class Index implements IReadWriteMonitor
 	 */
 	public void save() throws IOException
 	{
+		IndexPlugin.logInfo(MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER);
+
 		this.save(true);
 	}
 

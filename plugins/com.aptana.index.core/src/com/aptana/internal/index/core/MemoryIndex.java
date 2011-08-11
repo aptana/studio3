@@ -226,6 +226,17 @@ public class MemoryIndex
 	}
 
 	/**
+	 * hasDocument
+	 * 
+	 * @param documentName
+	 * @return
+	 */
+	public boolean hasDocument(String documentName)
+	{
+		return documentsToTable.get(documentName) != null;
+	}
+
+	/**
 	 * numberOfChanges
 	 * 
 	 * @return

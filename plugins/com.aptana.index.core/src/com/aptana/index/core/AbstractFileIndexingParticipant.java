@@ -146,7 +146,16 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 
 			Thread.yield(); // be nice to other threads, let them get in before each file...
 
-			IndexPlugin.logInfo(file.toString(), IDebugScopes.INDEXER);
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Add file ''{0}'' to index ''{1}''",
+				file,
+				index
+			);
+			// @formatter:on
+
+			IndexPlugin.logInfo(message, IDebugScopes.INDEXER);
+
 			indexFileStore(index, file, sub.newChild(100));
 		}
 
