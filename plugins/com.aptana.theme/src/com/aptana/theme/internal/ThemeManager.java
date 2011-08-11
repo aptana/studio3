@@ -152,7 +152,7 @@ public class ThemeManager implements IThemeManager
 				});
 	}
 
-	public static ThemeManager instance()
+	public synchronized static ThemeManager instance()
 	{
 		if (fgInstance == null)
 		{
@@ -452,6 +452,7 @@ public class ThemeManager implements IThemeManager
 
 	private Theme loadUserTheme(String themeName)
 	{
+		InputStream byteStream = null;
 		try
 		{
 			byte[] array = Platform.getPreferencesService().getByteArray(ThemePlugin.PLUGIN_ID,
@@ -460,8 +461,9 @@ public class ThemeManager implements IThemeManager
 			{
 				return null;
 			}
+			byteStream = new ByteArrayInputStream(array);
 			Properties props = new OrderedProperties();
-			props.load(new ByteArrayInputStream(array));
+			props.load(byteStream);
 			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (IllegalArgumentException iae)
@@ -471,10 +473,12 @@ public class ThemeManager implements IThemeManager
 					THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
 			if (xml != null)
 			{
+				InputStream stream = null;
 				try
 				{
+					stream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
 					Properties props = new OrderedProperties();
-					props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+					props.loadFromXML(stream);
 					// Now store it as byte array explicitly so we don't run into this!
 					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
 					theme.save();
@@ -484,11 +488,39 @@ public class ThemeManager implements IThemeManager
 				{
 					IdeLog.logError(ThemePlugin.getDefault(), e);
 				}
+				finally
+				{
+					if (stream != null)
+					{
+						try
+						{
+							stream.close();
+						}
+						catch (IOException e)
+						{
+							// ignore
+						}
+					}
+				}
 			}
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+		finally
+		{
+			if (byteStream != null)
+			{
+				try
+				{
+					byteStream.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
 		}
 		return null;
 	}
