@@ -138,7 +138,6 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		String directory = getWorkingDirectory();
 		String fileType = getFileType();
 		String testBundleId = getTestBundleId();
-		@SuppressWarnings("unchecked")
 		Enumeration<String> entryPaths = Platform.getBundle(testBundleId).getEntryPaths(directory);
 		ArrayList<String> filePaths = new ArrayList<String>();
 		String path;
