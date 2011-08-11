@@ -42,7 +42,7 @@ import com.aptana.ui.util.UIUtils;
  */
 @SuppressWarnings("restriction")
 public final class SourceDisplayUtil {
-	
+
 	private SourceDisplayUtil() {
 	}
 

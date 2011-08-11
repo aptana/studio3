@@ -119,8 +119,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 			suspendOnFirstLine.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
 			suspendOnExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
 			suspendOnErrors.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
-			suspendOnDebuggerKeyword
-					.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+			suspendOnDebuggerKeyword.setSelection(preferences
+					.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 		} else if (object instanceof ILaunchConfiguration) {
 			ILaunchConfiguration configuration = (ILaunchConfiguration) object;
 			suspendOnFirstLine.setSelection(configuration.getAttribute(

@@ -339,7 +339,8 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 
 	private void loadDetailFormatters() {
 		formatters = new TreeSet<DetailFormatter>();
-		for (DetailFormatter detailFormatter : JSDebugPlugin.getDefault().getDebugOptionsManager().getDetailFormatters()) {
+		for (DetailFormatter detailFormatter : JSDebugPlugin.getDefault().getDebugOptionsManager()
+				.getDetailFormatters()) {
 			formatters.add(detailFormatter);
 		}
 	}

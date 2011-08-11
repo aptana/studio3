@@ -20,7 +20,7 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.IProcessConfiguration;
 
-/* package */ abstract class AbstractProcessConfiguration implements IProcessConfiguration {
+/* package */abstract class AbstractProcessConfiguration implements IProcessConfiguration {
 
 	/*
 	 * (non-Javadoc)

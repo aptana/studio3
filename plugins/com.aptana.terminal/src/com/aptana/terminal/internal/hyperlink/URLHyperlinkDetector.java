@@ -24,8 +24,7 @@ import com.aptana.terminal.hyperlink.IHyperlinkDetector;
  * 
  * @author cwilliams
  */
-public class URLHyperlinkDetector implements IHyperlinkDetector
-{
+public class URLHyperlinkDetector implements IHyperlinkDetector {
 
 	// Base URL detection
 	// private static final Pattern URL_DETECT_PATTERN = Pattern
@@ -51,13 +50,11 @@ public class URLHyperlinkDetector implements IHyperlinkDetector
 			+ "      [.!,?]+ [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]+\n" + "    )*\n" + "  )?",
 			Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
 
-	public IHyperlink[] detectHyperlinks(String contents)
-	{
+	public IHyperlink[] detectHyperlinks(String contents) {
 		List<IHyperlink> list = new ArrayList<IHyperlink>();
 		Matcher m = URL_DETECT_PATTERN.matcher(contents);
 		int start = 0;
-		while (m.find(start))
-		{
+		while (m.find(start)) {
 			String urlString = m.group().trim();
 			start = m.end();
 			IRegion region = new Region(m.start(), urlString.length());

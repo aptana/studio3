@@ -14,15 +14,13 @@ import java.net.URLStreamHandler;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class DbgSourceURLStreamHandler extends URLStreamHandler {
-	
+
 	private static DbgSourceURLStreamHandler instance;
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.net.URLStreamHandler#openConnection(java.net.URL)
 	 */
 	protected URLConnection openConnection(URL u) throws IOException {

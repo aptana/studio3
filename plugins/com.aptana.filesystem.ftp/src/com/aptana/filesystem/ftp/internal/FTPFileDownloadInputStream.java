@@ -19,17 +19,15 @@ import com.enterprisedt.net.ftp.FileTransferInputStream;
 
 /**
  * @author Max Stepanov
- *
  */
 public class FTPFileDownloadInputStream extends InputStream {
 
 	private FTPClientInterface ftpClient;
 	private FileTransferInputStream ftpInputStream;
 	private FTPClientPool pool;
-	
+
 	/**
-	 * @param pool 
-	 * 
+	 * @param pool
 	 */
 	public FTPFileDownloadInputStream(FTPClientPool pool, FTPClientInterface _ftpClient, FileTransferInputStream ftpInputStream) {
 		this.ftpClient = _ftpClient;
@@ -47,7 +45,7 @@ public class FTPFileDownloadInputStream extends InputStream {
 			}
 		});
 	}
-	
+
 	private void safeQuit() {
 		try {
 			ftpInputStream.close();
@@ -58,7 +56,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#read()
 	 */
 	@Override
@@ -71,7 +70,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#available()
 	 */
 	@Override
@@ -84,7 +84,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#close()
 	 */
 	@Override
@@ -96,7 +97,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#read(byte[], int, int)
 	 */
 	@Override

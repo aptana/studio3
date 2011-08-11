@@ -36,12 +36,11 @@ import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 /**
  * @author Chris Williams
  * @author Max Stepanov
- *
  */
 public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.TextCanvas {
 
 	private static final String HYPERLINK_DETECTOR_EXT_PT = TerminalPlugin.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$
-	
+
 	private Map<Integer, IHyperlink[]> fLinks = new HashMap<Integer, IHyperlink[]>();
 	private int fLastHash;
 	private IHyperlinkDetector[] fDetectors;
@@ -56,7 +55,8 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		super(parent, model, style, cellRenderer);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.TextCanvas#searchLineForHyperlinks(int)
 	 */
 	@Override
@@ -103,7 +103,8 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.TextCanvas#findHyperlink(org.eclipse.swt.graphics.Point)
 	 */
 	@Override
@@ -115,7 +116,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		for (int i = 0; i < links.length; i++) {
 			IHyperlink link = links[i];
 			IRegion region = link.getHyperlinkRegion();
-			
+
 			int col = region.getOffset();
 			int endCol = region.getOffset() + region.getLength() - 1;
 			// clicked between start and end col
@@ -134,7 +135,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 			Field f = text.getClass().getDeclaredField("fTerminal"); //$NON-NLS-1$
 			f.setAccessible(true);
 			ITerminalTextData data = (ITerminalTextData) f.get(text);
-			
+
 			for (int col = startCol; col <= endCol; col++) {
 				char c = data.getChar(line, col);
 				Style style = data.getStyle(line, col);
@@ -172,7 +173,6 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		}
 		return ""; //$NON-NLS-1$
 	}
-
 
 	private boolean regionsChanged(IHyperlink[] oldLinks, IHyperlink[] newLinks) {
 		int oldLinkLength = oldLinks == null ? 0 : oldLinks.length;

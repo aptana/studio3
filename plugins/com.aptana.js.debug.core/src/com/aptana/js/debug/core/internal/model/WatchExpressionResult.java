@@ -15,7 +15,7 @@ import org.eclipse.debug.core.model.IWatchExpressionResult;
  * @author Max Stepanov
  */
 public class WatchExpressionResult implements IWatchExpressionResult {
-	
+
 	private final IValue value;
 	private final String expression;
 	private final String[] errorMessages;

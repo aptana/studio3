@@ -37,16 +37,15 @@ import com.aptana.terminal.internal.emulator.VT100TerminalControl;
 
 /**
  * @author Max Stepanov
- *
  */
 public class TerminalComposite extends Composite {
-	
+
 	private ITerminalListener terminalListener;
 	private IProcessListener processListener;
 	private VT100TerminalControl fCtlTerminal;
 	private List<String> inputs = new ArrayList<String>();
 	private boolean connecting;
-	
+
 	/**
 	 * @param parent
 	 * @param style
@@ -63,7 +62,7 @@ public class TerminalComposite extends Composite {
 			}
 		});
 	}
-	
+
 	/**
 	 * Connect
 	 */
@@ -76,7 +75,7 @@ public class TerminalComposite extends Composite {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
-					if (fCtlTerminal.getState() == TerminalState.CLOSED  && !fCtlTerminal.isDisposed()) {
+					if (fCtlTerminal.getState() == TerminalState.CLOSED && !fCtlTerminal.isDisposed()) {
 						fCtlTerminal.connectTerminal();
 						hookProcessListener();
 						sendInputs();
@@ -98,14 +97,16 @@ public class TerminalComposite extends Composite {
 	}
 
 	/**
-	 * @param terminalListener the terminalListener to set
+	 * @param terminalListener
+	 *            the terminalListener to set
 	 */
 	public void setTerminalListener(ITerminalListener terminalListener) {
 		this.terminalListener = terminalListener;
 	}
 
 	/**
-	 * @param processListener the processListener to set
+	 * @param processListener
+	 *            the processListener to set
 	 */
 	public void setProcessListener(IProcessListener processListener) {
 		this.processListener = processListener;
@@ -118,7 +119,7 @@ public class TerminalComposite extends Composite {
 		}
 		return new ITerminalConnector[] { connector };
 	}
-	
+
 	private ITerminalListener getTerminalListener() {
 		return new ITerminalListener() {
 			public void setTerminalTitle(String title) {
@@ -126,7 +127,7 @@ public class TerminalComposite extends Composite {
 					terminalListener.setTerminalTitle(title);
 				}
 			}
-			
+
 			public void setState(TerminalState state) {
 				if (terminalListener != null) {
 					terminalListener.setState(state);
@@ -137,23 +138,27 @@ public class TerminalComposite extends Composite {
 
 	/**
 	 * Set working directory
+	 * 
 	 * @param workingDirectory
 	 */
 	public void setWorkingDirectory(IPath workingDirectory) {
 		if (workingDirectory != null) {
-			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal
+					.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
 			if (localTerminalConnector != null) {
 				localTerminalConnector.setWorkingDirectory(workingDirectory);
-			}		
+			}
 		}
 	}
 
 	/**
 	 * Get working directory
+	 * 
 	 * @return
 	 */
 	public IPath getWorkingDirectory() {
-		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector()
+				.getAdapter(LocalTerminalConnector.class);
 		if (localTerminalConnector != null) {
 			return localTerminalConnector.getWorkingDirectory();
 		}
@@ -161,7 +166,8 @@ public class TerminalComposite extends Composite {
 	}
 
 	public boolean canCloseTerminal() {
-		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector()
+				.getAdapter(LocalTerminalConnector.class);
 		if (localTerminalConnector != null) {
 			return TerminalCloseHelper.canCloseTerminal(new SameShellProvider(this), localTerminalConnector);
 		}
@@ -170,6 +176,7 @@ public class TerminalComposite extends Composite {
 
 	/**
 	 * Send terminal input
+	 * 
 	 * @param text
 	 */
 	public void sendInput(String text) {
@@ -192,7 +199,8 @@ public class TerminalComposite extends Composite {
 	}
 
 	protected void hookProcessListener() {
-		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector()
+				.getAdapter(LocalTerminalConnector.class);
 		if (localTerminalConnector != null && processListener != null) {
 			localTerminalConnector.addProcessListener(processListener);
 		}
@@ -230,7 +238,6 @@ public class TerminalComposite extends Composite {
 	}
 
 	/**
-	 * 
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#clearTerminal()
 	 */
 	public void clear() {
@@ -245,7 +252,8 @@ public class TerminalComposite extends Composite {
 		return fCtlTerminal.isEmpty();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Composite#setFocus()
 	 */
 	@Override

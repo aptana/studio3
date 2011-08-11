@@ -62,7 +62,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	/*
 	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.ui.IEditorPart)
+	 * org.eclipse.ui.IEditorPart)
 	 */
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 	}
@@ -93,7 +93,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	/*
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.jface.viewers.ISelection)
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
 	@SuppressWarnings("rawtypes")
 	public void selectionChanged(IAction action, ISelection selection) {
@@ -147,7 +147,6 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	/*
 	 * createExpression
-	 * 
 	 * @param expressionText
 	 */
 	protected void createExpression(String expressionText) {

@@ -14,11 +14,11 @@ import org.eclipse.ui.IActionFilter;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class StartPageActionFilter implements IActionFilter {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IActionFilter#testAttribute(java.lang.Object, java.lang.String, java.lang.String)
 	 */
 	public boolean testAttribute(Object target, String name, String value) {
@@ -34,7 +34,8 @@ public class StartPageActionFilter implements IActionFilter {
 
 	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -44,13 +45,14 @@ public class StartPageActionFilter implements IActionFilter {
 			return null;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
 		public Class[] getAdapterList() {
 			return new Class[] { IActionFilter.class };
 		}
-		
+
 	}
-	
+
 }

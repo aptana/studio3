@@ -107,8 +107,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 					}
 				}
 				/**
-				 * Commented by Ingo request due need to apply some fix to
-				 * #PHP-15 (It's not possible to set breakpoints in PHP editor)
+				 * Commented by Ingo request due need to apply some fix to #PHP-15 (It's not possible to set breakpoints
+				 * in PHP editor)
 				 */
 				// UnifiedEditor unifiedEditor = (UnifiedEditor)
 				// part.getAdapter(UnifiedEditor.class);

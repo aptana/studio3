@@ -38,21 +38,21 @@ public class BreakpointPropertiesAction implements IObjectActionDelegate {
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		PropertyDialogAction propertyAction = new PropertyDialogAction(new SameShellProvider(
-				UIUtils.getActiveShell()), new ISelectionProvider() {
-			public void addSelectionChangedListener(ISelectionChangedListener listener) {
-			}
+		PropertyDialogAction propertyAction = new PropertyDialogAction(new SameShellProvider(UIUtils.getActiveShell()),
+				new ISelectionProvider() {
+					public void addSelectionChangedListener(ISelectionChangedListener listener) {
+					}
 
-			public ISelection getSelection() {
-				return new StructuredSelection(breakpoint);
-			}
+					public ISelection getSelection() {
+						return new StructuredSelection(breakpoint);
+					}
 
-			public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-			}
+					public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+					}
 
-			public void setSelection(ISelection selection) {
-			}
-		});
+					public void setSelection(ISelection selection) {
+					}
+				});
 		propertyAction.run();
 	}
 

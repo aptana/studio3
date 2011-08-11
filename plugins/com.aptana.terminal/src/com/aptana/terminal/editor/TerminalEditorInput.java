@@ -21,7 +21,7 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 
 	private String title;
 	private IPath workingDirectory;
-	
+
 	public TerminalEditorInput() {
 	}
 
@@ -74,14 +74,16 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
 	 */
 	public String getFactoryId() {
 		return TerminalElementFactory.ID;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
 	 */
 	public void saveState(IMemento memento) {
@@ -92,7 +94,7 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 			child.putTextData(workingDirectory.toOSString());
 		}
 	}
-	
+
 	protected void loadState(IMemento memento) {
 		IMemento child = memento.getChild(PROP_TITLE);
 		if (child != null) {
@@ -104,7 +106,7 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 			if (value != null) {
 				setWorkingDirectory(Path.fromOSString(value));
 			}
-		}		
+		}
 	}
 
 	/**
@@ -115,7 +117,8 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	/**
-	 * @param title the title to set
+	 * @param title
+	 *            the title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;
@@ -129,7 +132,8 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	/**
-	 * @param workingDirectory the workingDirectory to set
+	 * @param workingDirectory
+	 *            the workingDirectory to set
 	 */
 	public void setWorkingDirectory(IPath workingDirectory) {
 		this.workingDirectory = workingDirectory;

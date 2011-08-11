@@ -22,10 +22,7 @@ import com.aptana.js.debug.core.model.IJSImplicitBreakpoint;
 public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImplicitBreakpoint {
 
 	enum Type {
-		DEBUGGER_KEYWORD,
-		FIRST_LINE,
-		EXCEPTION,
-		WATCHPOINT
+		DEBUGGER_KEYWORD, FIRST_LINE, EXCEPTION, WATCHPOINT
 	}
 
 	private final URI fileName;

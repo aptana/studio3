@@ -102,7 +102,8 @@ public final class DetailFormatter implements Comparable<Object> {
 		return fTypeName.compareTo(detailFormatter.fTypeName);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -114,7 +115,8 @@ public final class DetailFormatter implements Comparable<Object> {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

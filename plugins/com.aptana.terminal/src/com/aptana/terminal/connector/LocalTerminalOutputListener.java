@@ -17,25 +17,26 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
+/* package */class LocalTerminalOutputListener implements IStreamListener {
 
 	private PrintStream printStream;
 	private IOutputFilter outputFilter;
 	private boolean hasOutput = false;
 
 	/**
-	 * @throws UnsupportedEncodingException 
-	 * 
+	 * @throws UnsupportedEncodingException
 	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) throws UnsupportedEncodingException {
+	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter)
+			throws UnsupportedEncodingException {
 		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true, LocalTerminalConnector.ENCODING);
 		this.outputFilter = outputFilter;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String,
+	 * org.eclipse.debug.core.model.IStreamMonitor)
 	 */
 	public void streamAppended(String text, IStreamMonitor monitor) {
 		if (outputFilter != null) {
@@ -47,8 +48,8 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 			hasOutput = text.length() > 0;
 		}
 	}
-	
-	/* package */ boolean hasOutput() {
+
+	/* package */boolean hasOutput() {
 		return hasOutput;
 	}
 

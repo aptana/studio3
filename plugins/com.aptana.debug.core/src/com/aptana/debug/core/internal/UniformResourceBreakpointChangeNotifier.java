@@ -29,7 +29,9 @@ public class UniformResourceBreakpointChangeNotifier implements IBreakpointManag
 	private class ResourceChangeListener implements IUniformResourceChangeListener {
 
 		/*
-		 * @see com.aptana.ide.core.resources.IUniformResourceChangeListener#resourceChanged(com.aptana.ide.core.resources.IUniformResourceChangeEvent)
+		 * @see
+		 * com.aptana.ide.core.resources.IUniformResourceChangeListener#resourceChanged(com.aptana.ide.core.resources
+		 * .IUniformResourceChangeEvent)
 		 */
 		public void resourceChanged(IUniformResourceChangeEvent event) {
 			handleResourceChanged(event);

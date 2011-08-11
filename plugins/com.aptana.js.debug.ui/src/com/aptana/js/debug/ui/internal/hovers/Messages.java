@@ -10,9 +10,7 @@ package com.aptana.js.debug.ui.internal.hovers;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * 
  * @author Ingo Muschenetz
- * 
  */
 public final class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.aptana.js.debug.ui.internal.hovers.messages"; //$NON-NLS-1$

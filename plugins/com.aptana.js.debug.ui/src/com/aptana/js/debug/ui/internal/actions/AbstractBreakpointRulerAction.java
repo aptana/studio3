@@ -45,13 +45,13 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	protected IBreakpoint determineBreakpoint() {
 		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager()
 				.getBreakpoints(IJSDebugConstants.ID_DEBUG_MODEL);
-		/*IBreakpoint[] phpBreakpoints = DebugPlugin.getDefault().getBreakpointManager()
-				.getBreakpoints(IJSDebugConstants.PHP_DEBUG_MODEL);
-		ArrayList<IBreakpoint> allBreakPoints = new ArrayList<IBreakpoint>();
-		allBreakPoints.addAll(Arrays.asList(breakpoints));
-		allBreakPoints.addAll(Arrays.asList(phpBreakpoints));
-		breakpoints = new IBreakpoint[allBreakPoints.size()];
-		allBreakPoints.toArray(breakpoints);*/
+		/*
+		 * IBreakpoint[] phpBreakpoints = DebugPlugin.getDefault().getBreakpointManager()
+		 * .getBreakpoints(IJSDebugConstants.PHP_DEBUG_MODEL); ArrayList<IBreakpoint> allBreakPoints = new
+		 * ArrayList<IBreakpoint>(); allBreakPoints.addAll(Arrays.asList(breakpoints));
+		 * allBreakPoints.addAll(Arrays.asList(phpBreakpoints)); breakpoints = new IBreakpoint[allBreakPoints.size()];
+		 * allBreakPoints.toArray(breakpoints);
+		 */
 		for (IBreakpoint breakpoint : breakpoints) {
 			if (breakpoint instanceof ILineBreakpoint) {
 				ILineBreakpoint jBreakpoint = (ILineBreakpoint) breakpoint;
@@ -105,8 +105,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	}
 
 	/**
-	 * Returns the resource for which to create the marker, or <code>null</code>
-	 * if there is no applicable resource.
+	 * Returns the resource for which to create the marker, or <code>null</code> if there is no applicable resource.
 	 * 
 	 * @return the resource for which to create the marker or <code>null</code>
 	 */
@@ -169,8 +168,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	}
 
 	/**
-	 * Returns the <code>AbstractMarkerAnnotationModel</code> of the editor's
-	 * input.
+	 * Returns the <code>AbstractMarkerAnnotationModel</code> of the editor's input.
 	 * 
 	 * @return the marker annotation model
 	 */

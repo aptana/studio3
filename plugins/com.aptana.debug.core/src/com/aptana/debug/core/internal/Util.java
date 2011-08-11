@@ -15,7 +15,6 @@ import java.net.URLDecoder;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class Util {
 
@@ -42,7 +41,7 @@ public final class Util {
 		}
 		return url;
 	}
-	
+
 	public static URL toURL(URI uri) throws MalformedURLException {
 		if (uri != null) {
 			return uri.toURL();

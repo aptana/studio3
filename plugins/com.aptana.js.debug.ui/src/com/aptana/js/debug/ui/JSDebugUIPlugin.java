@@ -98,7 +98,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static JSDebugUIPlugin getDefault() {
@@ -106,8 +106,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
 	 * @param path
 	 *            the path
@@ -139,7 +138,8 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	private void registerAsFirebugEditor() {
 		IPath launcher = EclipseUtil.getApplicationLauncher();
 		if (launcher != null) {
-			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher, StringUtil.EMPTY);
+			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher,
+					StringUtil.EMPTY);
 		}
 	}
 

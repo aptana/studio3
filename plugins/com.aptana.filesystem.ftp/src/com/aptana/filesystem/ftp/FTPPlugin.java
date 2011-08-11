@@ -31,9 +31,9 @@ public class FTPPlugin extends Plugin {
 
 	// The shared instance
 	private static FTPPlugin plugin;
-	
+
 	private IFTPCommandLog ftpCommandLog;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -63,7 +63,7 @@ public class FTPPlugin extends Plugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static FTPPlugin getDefault() {
@@ -92,11 +92,11 @@ public class FTPPlugin extends Plugin {
 		Object adapter = null;
 		IAdapterManager manager = Platform.getAdapterManager();
 		if (manager.hasAdapter(this, clazz.getName())) {
-			adapter = manager.getAdapter(this,clazz.getName());
+			adapter = manager.getAdapter(this, clazz.getName());
 			if (adapter == null) {
 				adapter = manager.loadAdapter(this, clazz.getName());
 			}
 		}
 		return adapter;
-	}	
+	}
 }

@@ -35,16 +35,16 @@ import com.aptana.theme.ThemePlugin;
 public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl {
 
 	private static final Set<Character> IGNORE_ALT_WITH_KEYS = new HashSet<Character>();
-	
+
 	static {
 		for (char c : "@#\\|[]{}".toCharArray()) { //$NON-NLS-1$
 			IGNORE_ALT_WITH_KEYS.add(c);
 		}
 	}
-	
+
 	private IPreferenceChangeListener preferenceChangeListener;
 	private IPropertyChangeListener propertyChangeListener;
-	
+
 	public VT100TerminalControl(ITerminalListener target, Composite wndParent, ITerminalConnector[] connectors) {
 		super(target, wndParent, connectors);
 		getRootControl().setBackground(ThemedTextLineRenderer.getStyleMap().getBackgroundColor());
@@ -59,7 +59,8 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 				}
 			}
 		};
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(preferenceChangeListener);
 		propertyChangeListener = new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
 				if (JFaceResources.TEXT_FONT.equals(event.getProperty())) {
@@ -70,8 +71,9 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 		JFaceResources.getFontRegistry().addListener(propertyChangeListener);
 		getCtlText().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
-				if (e.button == 2) { //paste clipboard selection
-					String text = (String) getClipboard().getContents(TextTransfer.getInstance(), DND.SELECTION_CLIPBOARD);
+				if (e.button == 2) { // paste clipboard selection
+					String text = (String) getClipboard().getContents(TextTransfer.getInstance(),
+							DND.SELECTION_CLIPBOARD);
 					if (text != null && text.length() > 0) {
 						pasteString(text);
 					}
@@ -80,7 +82,8 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 		});
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#setEncoding(java.lang.String)
 	 */
 	@Override
@@ -91,7 +94,8 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 		super.setEncoding(encoding);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#sendChar(char, boolean)
 	 */
 	@Override
@@ -102,26 +106,36 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 		super.sendChar(chKey, altKeyPressed);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#disposeTerminal()
 	 */
 	@Override
 	public void disposeTerminal() {
 		JFaceResources.getFontRegistry().removeListener(propertyChangeListener);
-		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
+		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+				.removePreferenceChangeListener(preferenceChangeListener);
 		super.disposeTerminal();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#createTextCanvas(org.eclipse.swt.widgets.Composite, org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel, org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#createTextCanvas(org.eclipse.swt.widgets.Composite
+	 * , org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel,
+	 * org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer)
 	 */
 	@Override
-	protected org.eclipse.tm.internal.terminal.textcanvas.TextCanvas createTextCanvas(Composite parent, ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
+	protected org.eclipse.tm.internal.terminal.textcanvas.TextCanvas createTextCanvas(Composite parent,
+			ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
 		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#createLineRenderer(org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#createLineRenderer(org.eclipse.tm.internal.terminal
+	 * .textcanvas.ITextCanvasModel)
 	 */
 	@Override
 	protected ILinelRenderer createLineRenderer(ITextCanvasModel model) {

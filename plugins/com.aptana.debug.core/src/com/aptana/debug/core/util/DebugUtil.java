@@ -61,14 +61,13 @@ public final class DebugUtil {
 	}
 
 	/**
-	 * Returns raw path string for the provided element which could be
-	 * an uniform resource, URI or plain String.
-	 *
+	 * Returns raw path string for the provided element which could be an uniform resource, URI or plain String.
+	 * 
 	 * @param element
 	 * @return path
 	 */
 	public static String getPath(Object element) {
-		if ( element instanceof IUniformResource ) {
+		if (element instanceof IUniformResource) {
 			IUniformResource resource = (IUniformResource) element;
 			IPath path = (IPath) resource.getAdapter(IPath.class);
 			if (path == null) {
@@ -77,21 +76,21 @@ public final class DebugUtil {
 					path = (IPath) storage.getAdapter(IPath.class);
 				}
 			}
-			if ( path != null ) {
-				return path.toOSString();	
+			if (path != null) {
+				return path.toOSString();
 			} else {
 				return resource.getURI().toString();
-			}			
+			}
 		}
-		if ( element instanceof String ) {
+		if (element instanceof String) {
 			try {
 				element = new URI((String) element);
 			} catch (URISyntaxException e) {
-			}	
+			}
 		}
-		if ( element instanceof URI ) {
+		if (element instanceof URI) {
 			URI uri = (URI) element;
-			if ( "file".equals(uri.getScheme()) ) //$NON-NLS-1$
+			if ("file".equals(uri.getScheme())) //$NON-NLS-1$
 			{
 				return uri.getSchemeSpecificPart();
 			}
@@ -99,7 +98,7 @@ public final class DebugUtil {
 		}
 		return null;
 	}
-	
+
 	public static int getDebuggerPort() {
 		int port = SocketUtil.findFreePort(null);
 		if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -110,7 +109,7 @@ public final class DebugUtil {
 		}
 		return port;
 	}
-	
+
 	public static ServerSocket allocateServerSocket(int port) throws IOException {
 		ServerSocket socket = new ServerSocket(port);
 		if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$

@@ -164,8 +164,7 @@ public interface ILaunchConfigurationConstants {
 	/**
 	 * DEFAULT_BROWSER_WINDOWS_FIREFOX
 	 */
-	String[] DEFAULT_BROWSER_WINDOWS_FIREFOX = new String[] {
-			"%ProgramFiles%\\Mozilla Firefox\\firefox.exe", //$NON-NLS-1$
+	String[] DEFAULT_BROWSER_WINDOWS_FIREFOX = new String[] { "%ProgramFiles%\\Mozilla Firefox\\firefox.exe", //$NON-NLS-1$
 			"%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe" //$NON-NLS-1$
 	};
 
@@ -177,16 +176,14 @@ public interface ILaunchConfigurationConstants {
 	/**
 	 * DEFAULT_BROWSER_MACOSX_FIREFOX
 	 */
-	String[] DEFAULT_BROWSER_MACOSX_FIREFOX = new String[] {
-			"/Applications/Firefox.app", //$NON-NLS-1$
+	String[] DEFAULT_BROWSER_MACOSX_FIREFOX = new String[] { "/Applications/Firefox.app", //$NON-NLS-1$
 			"~/Applications/Firefox.app" //$NON-NLS-1$
 	};
 
 	/**
 	 * DEFAULT_BROWSER_LINUX_FIREFOX
 	 */
-	String[] DEFAULT_BROWSER_LINUX_FIREFOX = new String[] {
-			"/usr/bin/firefox/firefox", //$NON-NLS-1$
+	String[] DEFAULT_BROWSER_LINUX_FIREFOX = new String[] { "/usr/bin/firefox/firefox", //$NON-NLS-1$
 			"/usr/bin/firefox", //$NON-NLS-1$
 			"/usr/lib/firefox/firefox", //$NON-NLS-1$
 			"/usr/local/firefox/firefox", //$NON-NLS-1$

@@ -17,7 +17,7 @@ import org.eclipse.debug.core.model.IVariable;
  * @author Max Stepanov
  */
 public interface IJSStackFrame extends IStackFrame {
-	
+
 	/**
 	 * Source location for this stack frame
 	 * 

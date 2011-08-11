@@ -16,7 +16,7 @@ import org.eclipse.debug.core.model.ILineBreakpoint;
  * @author Max Stepanov
  */
 public interface IJSImplicitBreakpoint extends ILineBreakpoint {
-	
+
 	/**
 	 * Returns breakpoint location filename
 	 * 

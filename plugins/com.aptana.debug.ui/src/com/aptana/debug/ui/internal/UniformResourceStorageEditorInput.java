@@ -115,7 +115,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 		return null;
 	}
 
-	/* package */ void validate(UniformResourceStorageEditorInput editorInput) {
+	/* package */void validate(UniformResourceStorageEditorInput editorInput) {
 		IStorage storage = editorInput.getStorage();
 		IPath path = ((UniformResourceStorage) storage).getFullPath();
 		if (path != null) {

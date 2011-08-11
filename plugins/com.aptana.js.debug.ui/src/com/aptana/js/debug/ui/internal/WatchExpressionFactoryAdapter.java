@@ -16,13 +16,11 @@ import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class WatchExpressionFactoryAdapter implements IWatchExpressionFactoryAdapter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter#
 	 * createWatchExpression(org.eclipse.debug.core.model.IVariable)
 	 */
@@ -37,8 +35,7 @@ public class WatchExpressionFactoryAdapter implements IWatchExpressionFactoryAda
 	public static class Factory implements IAdapterFactory {
 
 		/*
-		 * @see
-		 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (adapterType == IWatchExpressionFactoryAdapter.class) {

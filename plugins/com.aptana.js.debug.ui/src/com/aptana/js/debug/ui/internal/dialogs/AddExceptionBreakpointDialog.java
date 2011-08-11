@@ -76,8 +76,7 @@ public class AddExceptionBreakpointDialog extends JSTypeSelectionDialog {
 					list.add(breakpoint);
 					Runnable r = new Runnable() {
 						public void run() {
-							IViewPart part = UIUtils.getActivePage().findView(
-									IDebugUIConstants.ID_BREAKPOINT_VIEW);
+							IViewPart part = UIUtils.getActivePage().findView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 							if (part instanceof IDebugView) {
 								Viewer viewer = ((IDebugView) part).getViewer();
 								if (viewer instanceof StructuredViewer) {

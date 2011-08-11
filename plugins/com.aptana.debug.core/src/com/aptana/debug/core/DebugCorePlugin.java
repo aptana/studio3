@@ -73,7 +73,7 @@ public class DebugCorePlugin extends Plugin {
 	public static DebugCorePlugin getDefault() {
 		return plugin;
 	}
-	
+
 	public RemoteSourceCacheManager getRemoteSourceCacheManager() {
 		return remoteSourceCacheManager;
 	}

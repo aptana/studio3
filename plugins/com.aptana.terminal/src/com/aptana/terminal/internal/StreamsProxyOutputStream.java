@@ -15,13 +15,12 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
  * @author Max Stepanov
- *
  */
 public class StreamsProxyOutputStream extends OutputStream {
 
 	private IStreamsProxy streamsProxy;
 	private String encoding;
-	
+
 	/**
 	 * 
 	 */
@@ -30,20 +29,22 @@ public class StreamsProxyOutputStream extends OutputStream {
 		this.encoding = encoding;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#write(int)
 	 */
 	@Override
 	public void write(int b) throws IOException {
-		streamsProxy.write(new String(new byte[] { (byte) (b&0xFF) }, encoding ));
+		streamsProxy.write(new String(new byte[] { (byte) (b & 0xFF) }, encoding));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
-		streamsProxy.write(new String(b, off, len, encoding ));
+		streamsProxy.write(new String(b, off, len, encoding));
 	}
 
 }

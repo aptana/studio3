@@ -18,13 +18,11 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class NewWatchpointAction extends ObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {

@@ -27,10 +27,9 @@ import com.aptana.js.debug.core.internal.ProtocolLogger;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class DebugConnection {
-	
+
 	public interface IHandler {
 		void handleMessage(String message);
 
@@ -58,7 +57,6 @@ public class DebugConnection {
 
 	/**
 	 * @throws DebugException
-	 * 
 	 */
 	public static DebugConnection createConnection(Socket socket) throws DebugException {
 		return createConnection(socket, null);
@@ -66,14 +64,11 @@ public class DebugConnection {
 
 	/**
 	 * @throws DebugException
-	 * 
 	 */
 	public static DebugConnection createConnection(Socket socket, ProtocolLogger logger) throws DebugException {
 		try {
-			return new DebugConnection(socket,
-					new InputStreamReader(socket.getInputStream()),
-					new OutputStreamWriter(socket.getOutputStream()),
-					logger);
+			return new DebugConnection(socket, new InputStreamReader(socket.getInputStream()), new OutputStreamWriter(
+					socket.getOutputStream()), logger);
 		} catch (IOException e) {
 			throwDebugException(e);
 			return null;
@@ -310,8 +305,8 @@ public class DebugConnection {
 	 * @throws DebugException
 	 */
 	protected static void throwDebugException(Exception exception) throws DebugException {
-		throw new DebugException(
-				new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, DebugException.TARGET_REQUEST_FAILED, "", exception)); //$NON-NLS-1$
+		throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID,
+				DebugException.TARGET_REQUEST_FAILED, "", exception)); //$NON-NLS-1$
 	}
 
 }

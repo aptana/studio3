@@ -13,14 +13,12 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.filesystem.ftp.FTPPlugin;
 
-public class FTPPreferenceInitializer extends AbstractPreferenceInitializer
-{
+public class FTPPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public static final int DEFAULT_KEEP_ALIVE_MINUTES = 7;
 
 	@Override
-	public void initializeDefaultPreferences()
-	{
+	public void initializeDefaultPreferences() {
 		IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(FTPPlugin.PLUGIN_ID);
 		prefs.putInt(IFTPPreferenceConstants.KEEP_ALIVE_TIME, DEFAULT_KEEP_ALIVE_MINUTES);
 	}

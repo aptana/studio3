@@ -20,9 +20,7 @@ public class JSRemoteLaunchConfigurationTabGroup extends AbstractLaunchConfigura
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ILaunchConfigurationTabGroup#createTabs(org.eclipse
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTabGroup#createTabs(org.eclipse
 	 * .debug.ui.ILaunchConfigurationDialog, java.lang.String)
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {

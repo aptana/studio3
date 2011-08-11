@@ -15,7 +15,7 @@ import org.eclipse.debug.core.model.IDebugElement;
  * @author Max Stepanov
  */
 public interface ISourceLink extends IDebugElement {
-	
+
 	/**
 	 * Source location (path or URL)
 	 * 

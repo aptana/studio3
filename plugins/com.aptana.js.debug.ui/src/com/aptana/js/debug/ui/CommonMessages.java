@@ -15,7 +15,7 @@ public class CommonMessages extends NLS {
 
 	public static String ProductName;
 	public static String ProductShortName;
-	
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, CommonMessages.class);

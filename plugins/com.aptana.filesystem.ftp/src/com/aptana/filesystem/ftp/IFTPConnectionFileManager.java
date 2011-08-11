@@ -14,10 +14,10 @@ import com.aptana.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IFTPConnectionFileManager extends IConnectionFileManager {
 
-	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive, String transferType, String encoding, String timezone);
-	
+	public void init(String host, int port, IPath basePath, String login, char[] password, boolean passive,
+			String transferType, String encoding, String timezone);
+
 }

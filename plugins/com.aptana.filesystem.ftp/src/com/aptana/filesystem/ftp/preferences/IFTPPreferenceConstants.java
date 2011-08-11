@@ -7,7 +7,6 @@
  */
 package com.aptana.filesystem.ftp.preferences;
 
-public interface IFTPPreferenceConstants
-{
+public interface IFTPPreferenceConstants {
 	public static final String KEEP_ALIVE_TIME = "KeepAliveTime"; //$NON-NLS-1$
 }

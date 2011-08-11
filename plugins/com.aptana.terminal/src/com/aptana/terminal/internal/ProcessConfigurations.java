@@ -20,7 +20,6 @@ import com.aptana.terminal.IProcessConfiguration;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class ProcessConfigurations {
 
@@ -33,23 +32,24 @@ public final class ProcessConfigurations {
 
 	private static ProcessConfigurations instance = null;
 	private List<IProcessConfiguration> configurations = new ArrayList<IProcessConfiguration>();
-	
+
 	/**
 	 * 
 	 */
 	private ProcessConfigurations() {
 		readExtensionRegistry();
 	}
-	
+
 	public static ProcessConfigurations getInstance() {
 		if (instance == null) {
 			instance = new ProcessConfigurations();
 		}
-		return instance;		
+		return instance;
 	}
 
 	private void readExtensionRegistry() {
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
+		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
+				EXTENSION_POINT_ID);
 		for (int i = 0; i < elements.length; ++i) {
 			readElement(elements[i], TAG_CONFIGURATION);
 		}
@@ -86,7 +86,7 @@ public final class ProcessConfigurations {
 			}
 		}
 	}
-	
+
 	public IProcessConfiguration[] getProcessConfigurations() {
 		return configurations.toArray(new IProcessConfiguration[configurations.size()]);
 	}

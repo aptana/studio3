@@ -20,7 +20,7 @@ import com.aptana.debug.core.DebugCorePlugin;
  * @author Max Stepanov
  */
 public class RemoteSourceContainer extends AbstractSourceContainer {
-	
+
 	/*
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
 	 */
@@ -50,7 +50,6 @@ public class RemoteSourceContainer extends AbstractSourceContainer {
 
 	/*
 	 * Not persisted via the launch configuration
-	 * 
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getType()
 	 */
 	public ISourceContainerType getType() {

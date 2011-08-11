@@ -39,14 +39,13 @@ import com.aptana.terminal.internal.StreamsProxyOutputStream;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("restriction")
 public class LocalTerminalConnector extends TerminalConnectorImpl implements IProcessListener, IOutputFilter {
 
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
-	
-	protected  static final String ENCODING = "UTF-8"; //$NON-NLS-1$
+
+	protected static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final char DLE = '\u0010';
 	private static final int PROCESS_LIST_TIMEOUT = 1500;
 
@@ -54,22 +53,23 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	// so as not to create a dependency on the two projects.
 	private static final String ACTIVE_PROJECT_PROPERTY = "activeProject"; //$NON-NLS-1$
 	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
-	
+
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 
 	private ProcessLauncher processLauncher;
 	private StreamsProxy streamsProxy;
 	private OutputStream processInputStream;
-	
+
 	private int currentWidth = 0;
 	private int currentHeight = 0;
-	
+
 	private StringBuffer filteredSequence = new StringBuffer();
 	private List<Integer> processList = new ArrayList<Integer>();
-	
+
 	private IPath initialDirectory;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl#getSettingsSummary()
 	 */
 	@Override
@@ -77,7 +77,8 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		return "TODO - LocalTerminalConnector.getSettingsSummary()"; //$NON-NLS-1$
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl#getTerminalToRemoteStream()
 	 */
 	@Override
@@ -95,13 +96,14 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				if (startProcess(control)) {
 					control.setState(TerminalState.CONNECTED);
 				} else {
-					control.setState(TerminalState.CLOSED);			
+					control.setState(TerminalState.CLOSED);
 				}
 			}
 		}.start();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl#setTerminalSize(int, int)
 	 */
 	@Override
@@ -113,23 +115,24 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		currentHeight = newHeight;
 		sendTerminalSize();
 	}
-	
+
 	private void sendTerminalSize() {
 		if (streamsProxy == null) {
 			return;
 		}
 		try {
-			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			streamsProxy
+					.write("\u001b[8;" + Integer.toString(currentHeight) + ";" + Integer.toString(currentWidth) + "t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
 			TerminalPlugin.log("Send terminal size failed.", e); //$NON-NLS-1$
 		}
 	}
-	
+
 	private Integer[] getProcessList() {
 		processList.clear();
 		if (streamsProxy != null) {
 			try {
-				streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
+				streamsProxy.write(DLE + "$p"); //$NON-NLS-1$
 			} catch (IOException e) {
 				TerminalPlugin.log("Get terminal process list failed.", e); //$NON-NLS-1$
 				return null;
@@ -146,8 +149,9 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
 	public void processCompleted() {
@@ -157,8 +161,9 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			streamsProxy = null;
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl#doDisconnect()
 	 */
 	@Override
@@ -197,21 +202,23 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		try {
 			initialDirectory = getInitialDirectory();
 			if (!FileUtil.isDirectoryAccessible(initialDirectory.toFile())) {
-				control.displayTextInTerminal(MessageFormat.format(Messages.LocalTerminalConnector_WorkingDirectoryPermissionErrorMessage, initialDirectory.toOSString()));
+				control.displayTextInTerminal(MessageFormat.format(
+						Messages.LocalTerminalConnector_WorkingDirectoryPermissionErrorMessage,
+						initialDirectory.toOSString()));
 				initialDirectory = null;
 				initialDirectory = getInitialDirectory();
 			}
 			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory);
 			processLauncher.addProcessListener(this);
 			processLauncher.launch();
-			
+
 			streamsProxy = new StreamsProxy(processLauncher.getProcess(), ENCODING);
 			sendTerminalSize();
-			
+
 			// Hook up standard input:
 			//
 			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, ENCODING), 1024);
-			
+
 			// Hook up standard output:
 			//
 			IStreamMonitor outputMonitor = streamsProxy.getOutputStreamMonitor();
@@ -235,7 +242,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		control.displayTextInTerminal(Messages.LocalTerminalConnector_NoShellErrorMessage);
 		return false;
 	}
-	
+
 	private IProcessConfiguration getCurrentConfiguration() {
 		return ProcessConfigurations.getInstance().getProcessConfigurations()[0];
 	}
@@ -244,12 +251,14 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		if (initialDirectory != null && initialDirectory.toFile().isDirectory()) {
 			return initialDirectory;
 		}
-		String activeProjeectName = Platform.getPreferencesService().getString(EXPLORER_PLUGIN_ID, ACTIVE_PROJECT_PROPERTY, null, null);
+		String activeProjeectName = Platform.getPreferencesService().getString(EXPLORER_PLUGIN_ID,
+				ACTIVE_PROJECT_PROPERTY, null, null);
 		if (activeProjeectName != null) {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
 			if (project != null) {
 				IPath location = project.getLocation();
-				if (location != null && location.toFile().isDirectory() && FileUtil.isDirectoryAccessible(location.toFile())) {
+				if (location != null && location.toFile().isDirectory()
+						&& FileUtil.isDirectoryAccessible(location.toFile())) {
 					return location;
 				}
 			}
@@ -264,7 +273,8 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.connector.IOutputFilter#filterOutput(char[])
 	 */
 	public char[] filterOutput(char[] output) {
@@ -287,13 +297,13 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		}
 		return result.length() == output.length ? output : result.toString().toCharArray();
 	}
-	
+
 	private void processCommandResponse(String response) {
-		if (response.startsWith(DLE+"$") && response.endsWith("p")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (response.startsWith(DLE + "$") && response.endsWith("p")) { //$NON-NLS-1$ //$NON-NLS-2$
 			synchronized (processList) {
 				processList.notifyAll();
 				processList.clear();
-				response = response.substring(2, response.length()-1);
+				response = response.substring(2, response.length() - 1);
 				for (String pid : response.split(",")) { //$NON-NLS-1$
 					try {
 						processList.add(Integer.parseInt(pid));
@@ -302,7 +312,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				}
 			}
 		} else {
-			TerminalPlugin.log("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
+			TerminalPlugin.log("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: " + response); //$NON-NLS-1$
 		}
 	}
 
@@ -322,7 +332,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 					if (comSpec == null) {
 						comSpec = env.get("COMSPEC"); //$NON-NLS-1$
 					}
-					if (processName.equals(comSpec)) { 
+					if (processName.equals(comSpec)) {
 						map.remove(list[0]);
 					}
 				}
@@ -342,7 +352,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 						}
 						index = processName.lastIndexOf('/');
 						if (index != -1) {
-							processName = processName.substring(index+1, processName.length());
+							processName = processName.substring(index + 1, processName.length());
 						}
 					}
 					processes.add(processName);

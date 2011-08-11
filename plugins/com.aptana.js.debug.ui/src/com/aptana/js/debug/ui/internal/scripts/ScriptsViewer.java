@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class ScriptsViewer extends TreeViewer {
 

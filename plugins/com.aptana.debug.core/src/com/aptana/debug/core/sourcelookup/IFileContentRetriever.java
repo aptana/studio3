@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
  * @author Max Stepanov
  */
 public interface IFileContentRetriever {
-	
+
 	/**
 	 * Returns source code input stream for the provided URI
 	 * 

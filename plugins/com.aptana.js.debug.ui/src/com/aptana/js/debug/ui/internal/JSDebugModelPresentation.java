@@ -64,8 +64,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	private boolean showTypes = false;
 
 	/**
-	 * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String,
-	 *      java.lang.Object)
+	 * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String, java.lang.Object)
 	 */
 	public void setAttribute(String attribute, Object value) {
 		if (IDebugModelPresentation.DISPLAY_VARIABLE_TYPE_NAMES.equals(attribute)) {
@@ -396,8 +395,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	}
 
 	/**
-	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput,
-	 *      java.lang.Object)
+	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput, java.lang.Object)
 	 */
 	public String getEditorId(IEditorInput input, Object element) {
 		return SourceDisplayUtil.getEditorId(input, element);

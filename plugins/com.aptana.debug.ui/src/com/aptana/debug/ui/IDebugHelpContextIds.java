@@ -7,7 +7,6 @@
  */
 package com.aptana.debug.ui;
 
-
 /**
  * @author Max Stepanov
  */

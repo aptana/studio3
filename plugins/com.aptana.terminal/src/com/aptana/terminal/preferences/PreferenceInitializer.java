@@ -13,20 +13,17 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.terminal.TerminalPlugin;
 
-public class PreferenceInitializer extends AbstractPreferenceInitializer
-{
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	/**
 	 * PreferenceInitializer
 	 */
-	public PreferenceInitializer()
-	{
+	public PreferenceInitializer() {
 	}
 
 	/**
 	 * initializeDefaultPreferences
 	 */
-	public void initializeDefaultPreferences()
-	{
+	public void initializeDefaultPreferences() {
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(TerminalPlugin.PLUGIN_ID);
 
 		prefs.putBoolean(IPreferenceConstants.FIRST_RUN, true);
