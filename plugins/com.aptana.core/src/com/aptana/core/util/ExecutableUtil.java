@@ -9,7 +9,6 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.List;
@@ -95,6 +94,12 @@ public final class ExecutableUtil
 	{
 		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
 		String[] paths;
+
+		if (executableName == null)
+		{
+			return null;
+		}
+
 		if (env != null && env.containsKey(PATH))
 		{
 			paths = env.get(PATH).split(ShellExecutable.PATH_SEPARATOR);
@@ -194,14 +199,7 @@ public final class ExecutableUtil
 				return (Boolean) m.invoke(file);
 			}
 		}
-		catch (NoSuchMethodException e)
-		{
-			// ignore, only available on Java 6+
-		}
-		catch (IllegalAccessException e)
-		{
-		}
-		catch (InvocationTargetException e)
+		catch (Exception e)
 		{
 		}
 

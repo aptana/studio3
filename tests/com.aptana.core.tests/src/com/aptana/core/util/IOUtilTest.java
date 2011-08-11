@@ -109,9 +109,15 @@ public class IOUtilTest extends TestCase
 		File source = new File(resourceFolder, TEST_DIR);
 		File dest = new File(tempDir, "tempdir");
 
-		IOUtil.copyDirectory(source, dest);
-		assertTrue(compareDirectory(source, dest));
-		FileUtil.deleteRecursively(dest);
+		try
+		{
+			IOUtil.copyDirectory(source, dest);
+			assertTrue(compareDirectory(source, dest));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dest);
+		}
 	}
 
 	public void testCopyDirectorytoFile() throws IOException
@@ -126,28 +132,29 @@ public class IOUtilTest extends TestCase
 		assertFalse(compareDirectory(source, dest));
 	}
 
-	public void testCopyFromNonReadableDirectory() throws IOException
+	public void testCopyFromNonReadableDirectory() throws Exception
 	{
 		// We can use source.setReadable(false) when we decide to use java 1.6
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
+			URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+			File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+			File source = new File(resourceFolder, TEST_DIR);
+			File dest = new File(tempDir, "tempdir");
+
 			try
 			{
-				URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-				File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
-
-				File source = new File(resourceFolder, TEST_DIR);
-				File dest = new File(tempDir, "tempdir");
-
 				Runtime.getRuntime().exec(new String[] { "chmod", "333", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
 				IOUtil.copyDirectory(source, dest);
 				assertFalse(compareDirectory(source, dest));
+			}
+			finally
+			{
 				FileUtil.deleteRecursively(dest);
 				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
 			}
-			catch (Exception ignore)
-			{
-			}
+
 		}
 	}
 
@@ -159,11 +166,17 @@ public class IOUtilTest extends TestCase
 		File source = new File(resourceFolder, TEST_DIR);
 		File dest = new File(tempDir, "testdir");
 
-		dest.mkdir();
-		dest.setReadOnly();
-		IOUtil.copyDirectory(source, dest);
-		assertFalse(compareDirectory(source, dest));
-		FileUtil.deleteRecursively(dest);
+		try
+		{
+			dest.mkdir();
+			dest.setReadOnly();
+			IOUtil.copyDirectory(source, dest);
+			assertFalse(compareDirectory(source, dest));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dest);
+		}
 	}
 
 	public void testCopyToNotWritableDirectory() throws IOException
@@ -174,11 +187,17 @@ public class IOUtilTest extends TestCase
 		File source = new File(resourceFolder, TEST_DIR);
 		File dest = new File(tempDir, "testdir");
 
-		dest.mkdir();
-		dest.setReadOnly();
-		IOUtil.copyDirectory(source, new File(dest, "testdir2"));
-		assertFalse(compareDirectory(source, dest));
-		FileUtil.deleteRecursively(dest);
+		try
+		{
+			dest.mkdir();
+			dest.setReadOnly();
+			IOUtil.copyDirectory(source, new File(dest, "testdir2"));
+			assertFalse(compareDirectory(source, dest));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dest);
+		}
 	}
 
 	public void testExtractFile() throws IOException
@@ -189,10 +208,15 @@ public class IOUtilTest extends TestCase
 		File sourceFile = new File(resourceFolder, "test.js");
 		IPath sourcePath = new Path("resources/test.js");
 
-
-		IOUtil.extractFile(BUNDLE_ID, sourcePath, dest);
-		assertTrue(compareFiles(sourceFile, dest));
-		dest.delete();
+		try
+		{
+			IOUtil.extractFile(BUNDLE_ID, sourcePath, dest);
+			assertTrue(compareFiles(sourceFile, dest));
+		}
+		finally
+		{
+			dest.delete();
+		}
 	}
 
 	public void testExtractFileWithInvalidPath() throws IOException
@@ -209,16 +233,20 @@ public class IOUtilTest extends TestCase
 		File dest = new File(tempDir, "test.txt");
 		dest.createNewFile();
 		String text = "This is a text for texting IOUtil.write()";
-
 		OutputStream output = new FileOutputStream(dest);
 		InputStream input = new FileInputStream(dest);
+		try
+		{
 
-		IOUtil.write(output, text);
-		assertTrue(IOUtil.read(input).equals(text));
-
-		input.close();
-		output.close();
-		dest.delete();
+			IOUtil.write(output, text);
+			assertTrue(IOUtil.read(input).equals(text));
+		}
+		finally
+		{
+			input.close();
+			output.close();
+			dest.delete();
+		}
 	}
 
 	public void testWriteWithNullText() throws IOException
@@ -229,12 +257,17 @@ public class IOUtilTest extends TestCase
 		OutputStream output = new FileOutputStream(dest);
 		InputStream input = new FileInputStream(dest);
 
-		IOUtil.write(output, null);
-		assertTrue(IOUtil.read(input).equals(StringUtil.EMPTY));
-
-		input.close();
-		output.close();
-		dest.delete();
+		try
+		{
+			IOUtil.write(output, null);
+			assertTrue(IOUtil.read(input).equals(StringUtil.EMPTY));
+		}
+		finally
+		{
+			input.close();
+			output.close();
+			dest.delete();
+		}
 	}
 
 	public void testPipe() throws IOException
@@ -248,14 +281,18 @@ public class IOUtilTest extends TestCase
 		InputStream input = new FileInputStream(source);
 		OutputStream output = new FileOutputStream(dest);
 
-		IOUtil.pipe(input, output);
+		try
+		{
+			IOUtil.pipe(input, output);
 
-		assertTrue(compareFiles(source, dest));
-
-		input.close();
-		output.close();
-		dest.delete();
-
+			assertTrue(compareFiles(source, dest));
+		}
+		finally
+		{
+			input.close();
+			output.close();
+			dest.delete();
+		}
 	}
 
 	private boolean compareDirectory(File directory1, File directory2)
