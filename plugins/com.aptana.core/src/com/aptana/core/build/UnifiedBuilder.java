@@ -174,8 +174,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
 				{
-					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex.toArray(new IFile[0]);
-					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[0]);
+					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex
+							.toArray(new IFile[resourceCollector.filesToRemoveFromIndex.size()]);
+					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[resourceCollector.filesToIndex
+							.size()]);
 					IdeLog.logInfo(
 							CorePlugin.getDefault(),
 							StringUtil.format(Messages.UnifiedBuilder_IndexingResourceDelta,

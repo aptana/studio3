@@ -123,7 +123,7 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
+		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
+		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
 	}
 
 	/**
@@ -419,7 +419,7 @@ public class EclipseUtil
 		Map<String, BundleContext> bundles = getCurrentBundleContexts();
 		for (String key : currentOptions)
 		{
-			String symbolicName = key.substring(0, key.indexOf("/")); //$NON-NLS-1$
+			String symbolicName = key.substring(0, key.indexOf('/'));
 			BundleContext bundleContext = bundles.get(symbolicName);
 			if (bundleContext == null)
 			{
@@ -457,7 +457,7 @@ public class EclipseUtil
 		{
 			return checked.split(","); //$NON-NLS-1$
 		}
-		return new String[0];
+		return ArrayUtil.NO_STRINGS;
 	}
 
 	/**
