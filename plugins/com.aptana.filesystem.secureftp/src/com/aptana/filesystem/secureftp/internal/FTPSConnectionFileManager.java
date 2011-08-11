@@ -5,6 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.filesystem.secureftp.internal;
 
@@ -76,11 +80,11 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			this.host = host;
 			this.port = port;
 			this.login = login;
-			this.password = (password == null) ? new char[0] : password;
-			this.basePath = basePath != null ? basePath : Path.ROOT;
+			this.password = (password == null) ? "".toCharArray() : password; //$NON-NLS-1$
+			this.basePath = (basePath != null) ? basePath : Path.ROOT;
 			this.authId = Policy.generateAuthId("FTPS", login, host, port); //$NON-NLS-1$
 			this.transferType = transferType;
-			this.timezone = timezone != null && timezone.length() == 0 ? null : timezone;
+			this.timezone = (timezone != null && timezone.length() == 0) ? null : timezone;
 			this.validateCertificate = validateCertificate;
 			this.noSSLSessionResumption = noSSLSessionResumption;
 			initFTPSClient((SSLFTPClient) ftpClient, explicit, passive, encoding, validateCertificate, noSSLSessionResumption);
@@ -138,7 +142,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			ftpClient.setRemotePort(port);
 			while (true) {
 				monitor.subTask(Messages.FTPSConnectionFileManager_Connecting);
-				connectFTPClient(ftpsClient);
+				connectFTPSClient(ftpsClient);
 				if (!ftpsClient.isImplicitFTPS()) {
 					final String[] supportedMechanisms = new String[] {
 							SSLFTPClient.AUTH_TLS,
@@ -274,7 +278,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		return null;
 	}
 
-	private static void connectFTPClient(FTPClient ftpClient) throws IOException, FTPException {
+	private static void connectFTPSClient(FTPClient ftpClient) throws IOException, FTPException {
 		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPSConnectionFileManager.class.getName()); //$NON-NLS-1$
 		stats.startRun(ftpClient.getRemoteHost());
 		try {
@@ -293,11 +297,11 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			return;
 		}
 		SSLFTPClient newFtpsClient = (SSLFTPClient) newFtpClient;
-		initFTPSClient(newFtpsClient, !((SSLFTPClient) ftpClient).isImplicitFTPS(), ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding(), validateCertificate, noSSLSessionResumption);
+		initFTPSClient(newFtpsClient, !((SSLFTPClient) ftpClient).isImplicitFTPS(), FTPConnectMode.PASV.equals(ftpClient.getConnectMode()), ftpClient.getControlEncoding(), validateCertificate, noSSLSessionResumption);
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
 		Policy.checkCanceled(monitor);
-		connectFTPClient(newFtpsClient);
+		connectFTPSClient(newFtpsClient);
 		monitor.worked(1);
 		Policy.checkCanceled(monitor);
 		if (!newFtpsClient.isImplicitFTPS()) {
@@ -325,7 +329,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	@Override
 	protected URI getRootCanonicalURI() {
 		try {
-			return new URI("ftps", login, host, port != IFTPSConstants.FTP_PORT_DEFAULT && port != IFTPSConstants.FTPS_IMPLICIT_PORT ? port : -1, Path.ROOT.toPortableString(), null, null); //$NON-NLS-1$
+			return new URI("ftps", login, host, (port != IFTPSConstants.FTP_PORT_DEFAULT && port != IFTPSConstants.FTPS_IMPLICIT_PORT) ? port : -1, Path.ROOT.toPortableString(), null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}
