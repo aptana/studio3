@@ -92,6 +92,10 @@ public class EclipseUtil
 	 */
 	public static String getSystemProperty(String option)
 	{
+		if (option == null)
+		{
+			return null;
+		}
 		return System.getProperty(option);
 	}
 
