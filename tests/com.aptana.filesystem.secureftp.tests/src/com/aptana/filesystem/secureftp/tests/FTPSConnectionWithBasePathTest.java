@@ -54,7 +54,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest {
 	}
 
 	public static IPath constructBasePath() {
-		return new Path(getConfig().getProperty("ftp.path")).append(FTPSConnectionWithBasePathTest.class
+		return new Path(getConfig().getProperty("ftps.path")).append(FTPSConnectionWithBasePathTest.class
 				.getSimpleName());
 	}
 
@@ -94,7 +94,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsSetModificationTime() {
-		return true;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.setmodtime"));
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +102,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsFolderSetModificationTime() {
-		return false;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.foldersetmodtime"));
 	}
 
 	/*
@@ -111,7 +111,7 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsChangeGroup() {
-		return false;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.changegroup"));
 	}
 
 	/*
@@ -120,6 +120,6 @@ public class FTPSConnectionWithBasePathTest extends CommonConnectionTest {
 	 */
 	@Override
 	protected boolean supportsChangePermissions() {
-		return false;
+		return Boolean.parseBoolean(getConfig().getProperty("ftps.supports.permissions"));
 	}
 }
