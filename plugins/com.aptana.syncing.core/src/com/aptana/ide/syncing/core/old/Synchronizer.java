@@ -313,7 +313,7 @@ public class Synchronizer implements ILoggable
 	 * @throws CoreException
 	 */
 	public VirtualFileSyncPair[] getSyncItems(IConnectionPoint clientPoint, IConnectionPoint serverPoint,
-			IFileStore client, IFileStore server, IProgressMonitor monitor) throws IOException, CoreException
+			IFileStore client, IFileStore server, IProgressMonitor monitor) throws CoreException
 	{
 		// store references to file managers
 		setClientFileManager(clientPoint);
@@ -398,7 +398,7 @@ public class Synchronizer implements ILoggable
 	 * @throws CoreException
 	 */
 	public VirtualFileSyncPair[] createSyncItems(IFileStore[] clientFiles, IFileStore[] serverFiles,
-			IProgressMonitor monitor) throws IOException, CoreException
+			IProgressMonitor monitor) throws CoreException
 	{
 		log(FileUtil.NEW_LINE + Messages.Synchronizer_Generating_Comparison);
 
@@ -614,7 +614,7 @@ public class Synchronizer implements ILoggable
 	 * @return SyncState
 	 * @throws CoreException
 	 */
-	private int compareCRC(VirtualFileSyncPair item) throws IOException, CoreException
+	private int compareCRC(VirtualFileSyncPair item) throws CoreException
 	{
 		InputStream clientStream = item.getSourceInputStream();
 		InputStream serverStream = item.getDestinationInputStream();
@@ -699,9 +699,9 @@ public class Synchronizer implements ILoggable
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 */
-	public boolean download(VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
+	public boolean download(VirtualFileSyncPair[] fileList, IProgressMonitor monitor)
 	{
-		return this.downloadAndDelete(fileList, false, monitor);
+		return downloadAndDelete(fileList, false, monitor);
 	}
 
 	/**
@@ -713,9 +713,9 @@ public class Synchronizer implements ILoggable
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 */
-	public boolean downloadAndDelete(VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
+	public boolean downloadAndDelete(VirtualFileSyncPair[] fileList, IProgressMonitor monitor)
 	{
-		return this.downloadAndDelete(fileList, true, monitor);
+		return downloadAndDelete(fileList, true, monitor);
 	}
 
 	/**
@@ -729,7 +729,6 @@ public class Synchronizer implements ILoggable
 	 * @throws VirtualFileManagerException
 	 */
 	public boolean downloadAndDelete(VirtualFileSyncPair[] fileList, boolean delete, IProgressMonitor monitor)
-			throws CoreException
 	{
 		FileWatcher.avoidNotify();
 		try
@@ -910,11 +909,14 @@ public class Synchronizer implements ILoggable
 	private String getSyncStatus(VirtualFileSyncPair item)
 	{
 		if (item.getSyncDirection() == VirtualFileSyncPair.Direction_ClientToServer)
+		{
 			return MessageFormat.format(Messages.Synchronizer_Uploading, item.getRelativePath());
+		}
 		if (item.getSyncDirection() == VirtualFileSyncPair.Direction_ServerToClient)
+		{
 			return MessageFormat.format(Messages.Synchronizer_Downloading, item.getRelativePath());
-		else
-			return MessageFormat.format(Messages.Synchronizer_Skipping_File, item.getRelativePath());
+		}
+		return MessageFormat.format(Messages.Synchronizer_Skipping_File, item.getRelativePath());
 	}
 
 	/**
@@ -1260,7 +1262,7 @@ public class Synchronizer implements ILoggable
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 */
-	public boolean upload(final VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
+	public boolean upload(VirtualFileSyncPair[] fileList, IProgressMonitor monitor)
 	{
 		return uploadAndDelete(fileList, false, monitor);
 	}
@@ -1274,7 +1276,7 @@ public class Synchronizer implements ILoggable
 	 * @throws ConnectionException
 	 * @throws VirtualFileManagerException
 	 */
-	public boolean uploadAndDelete(final VirtualFileSyncPair[] fileList, IProgressMonitor monitor) throws CoreException
+	public boolean uploadAndDelete(VirtualFileSyncPair[] fileList, IProgressMonitor monitor)
 	{
 		return uploadAndDelete(fileList, true, monitor);
 	}
@@ -1289,7 +1291,6 @@ public class Synchronizer implements ILoggable
 	 * @throws VirtualFileManagerException
 	 */
 	public boolean uploadAndDelete(VirtualFileSyncPair[] fileList, boolean delete, IProgressMonitor monitor)
-			throws CoreException
 	{
 		FileWatcher.avoidNotify();
 		try
@@ -1686,7 +1687,7 @@ public class Synchronizer implements ILoggable
 		catch (CoreException e)
 		{
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			IdeLog.logError(SyncingPlugin.getDefault(), e);
 		}
 	}
 

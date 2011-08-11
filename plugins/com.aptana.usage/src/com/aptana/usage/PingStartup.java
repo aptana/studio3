@@ -303,7 +303,7 @@ public class PingStartup implements IStartup
 		try
 		{
 			StringBuilder text = new StringBuilder();
-			text.append(URLEncoder.encode(key, ENCODING)).append("=").append(URLEncoder.encode(value, ENCODING)); //$NON-NLS-1$
+			text.append(URLEncoder.encode(key, ENCODING)).append('=').append(URLEncoder.encode(value, ENCODING));
 			return text.toString();
 		}
 		catch (UnsupportedEncodingException e)

@@ -21,6 +21,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -85,7 +86,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		getStructuredViewer().refresh();
 	}
@@ -108,7 +109,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 					return !((IJSVariable) element).isConst();
 				}
 			} catch (DebugException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 		return true;

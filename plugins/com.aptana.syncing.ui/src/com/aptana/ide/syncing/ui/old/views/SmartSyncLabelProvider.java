@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFile;
 import com.aptana.ide.syncing.core.old.SyncFolder;
@@ -209,7 +210,7 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 								return Messages.SmartSyncDialog_New;
 							}
 						default:
-							return ""; //$NON-NLS-1$
+							return StringUtil.EMPTY;
 					}
 				case 3:
 					if (resource.isSkipped())
@@ -219,7 +220,7 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 					if (fSyncDirection == DirectionToolBar.FORCE_DOWNLOAD
 							|| fSyncDirection == DirectionToolBar.DOWNLOAD)
 					{
-						return ""; //$NON-NLS-1$
+						return StringUtil.EMPTY;
 					}
 
 					switch (resource.getSyncState())
@@ -242,19 +243,19 @@ public class SmartSyncLabelProvider implements ITableLabelProvider, ITableColorP
 								return Messages.SmartSyncDialog_New;
 							}
 						default:
-							return ""; //$NON-NLS-1$
+							return StringUtil.EMPTY;
 					}
 				case 4:
 					VirtualFileSyncPair pair = resource.getPair();
-					return pair == null ? "" : getModificationDate(pair.getSourceFileInfo()); //$NON-NLS-1$
+					return (pair == null) ? StringUtil.EMPTY : getModificationDate(pair.getSourceFileInfo());
 				case 5:
 					pair = resource.getPair();
-					return pair == null ? "" : getModificationDate(pair.getDestinationFileInfo()); //$NON-NLS-1$
+					return (pair == null) ? StringUtil.EMPTY : getModificationDate(pair.getDestinationFileInfo());
 				default:
-					return ""; //$NON-NLS-1$
+					return StringUtil.EMPTY;
 			}
 		}
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 
 	/**

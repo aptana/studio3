@@ -10,7 +10,7 @@ package com.aptana.ide.syncing.core.old;
 /**
  * @author Kevin Lindsey
  */
-public final class SyncState
+public interface SyncState
 {
 	/**
 	 * Unknown state

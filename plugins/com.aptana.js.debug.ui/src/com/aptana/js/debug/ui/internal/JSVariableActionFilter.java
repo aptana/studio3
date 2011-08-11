@@ -13,6 +13,7 @@ import java.util.Set;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ui.IActionFilter;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.core.model.JSDebugModel;
@@ -58,7 +59,7 @@ public class JSVariableActionFilter implements IActionFilter {
 				}
 			}
 		} catch (DebugException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return false;
 	}

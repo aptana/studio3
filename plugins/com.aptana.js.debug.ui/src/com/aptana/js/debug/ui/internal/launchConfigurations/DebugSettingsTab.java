@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
@@ -150,7 +151,7 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 					ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false));
 			setValuesFrom(configuration);
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
 		} finally {
 			updateEnablement();
 		}

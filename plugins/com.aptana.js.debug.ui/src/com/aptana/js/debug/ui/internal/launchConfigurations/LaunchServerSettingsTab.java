@@ -40,6 +40,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.ui.internal.ActiveResourcePathGetterAdapter;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
@@ -348,7 +349,7 @@ public class LaunchServerSettingsTab extends AbstractLaunchConfigurationTab {
 					ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY));
 
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
 		} finally {
 			hookListeners(true);
 			updateEnablement();
