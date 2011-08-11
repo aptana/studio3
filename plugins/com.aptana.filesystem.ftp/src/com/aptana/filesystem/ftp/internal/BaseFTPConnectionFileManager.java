@@ -100,7 +100,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 		return getRootCanonicalURI().resolve(URLEncoder.encode(basePath.append(path).toPortableString(), null, null));
 	}
 
-	protected abstract void checkConnected() throws Exception;
+	protected abstract void checkConnected() throws Exception; // $codepro.audit.disable declaredExceptions
 	protected abstract URI getRootCanonicalURI();
 
 	/*

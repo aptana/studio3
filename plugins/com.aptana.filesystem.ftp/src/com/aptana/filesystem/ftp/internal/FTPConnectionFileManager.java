@@ -5,6 +5,11 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable emptyCatchClause
+// $codepro.audit.disable variableDeclaredInLoop
 
 package com.aptana.filesystem.ftp.internal;
 
@@ -108,11 +113,11 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			this.host = host;
 			this.port = port;
 			this.login = login;
-			this.password = (password == null) ? new char[0] : password;
-			this.basePath = basePath != null ? basePath : Path.ROOT;
+			this.password = (password == null) ? "".toCharArray() : password; //$NON-NLS-1$
+			this.basePath = (basePath != null) ? basePath : Path.ROOT;
 			this.authId = Policy.generateAuthId("FTP", login, host, port); //$NON-NLS-1$
 			this.transferType = transferType;
-			this.timezone = timezone != null && timezone.length() == 0 ? null : timezone;
+			this.timezone = (timezone != null && timezone.length() == 0) ? null : timezone;
 			initFTPClient(ftpClient, passive, encoding);
 		} catch (Exception e) {
 			FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_initialization_failed, e));
@@ -147,7 +152,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			return;
 		}
 		FTPClient newFtpClient = (FTPClient) clientInterface;
-		initFTPClient(newFtpClient, ftpClient.getConnectMode() == FTPConnectMode.PASV, ftpClient.getControlEncoding());
+		initFTPClient(newFtpClient, FTPConnectMode.PASV.equals(ftpClient.getConnectMode()), ftpClient.getControlEncoding());
 		newFtpClient.setRemoteHost(host);
 		newFtpClient.setRemotePort(port);
 		Policy.checkCanceled(monitor);
@@ -509,7 +514,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		fileInfo.setName(ftpFile.getName());
 		fileInfo.setDirectory(ftpFile.isDir());
 		fileInfo.setLength(ftpFile.size());
-		fileInfo.setLastModified(ftpFile.lastModified() != null ? ftpFile.lastModified().getTime() : 0);
+		fileInfo.setLastModified((ftpFile.lastModified() != null) ? ftpFile.lastModified().getTime() : 0);
 		fileInfo.setOwner(ftpFile.getOwner());
 		fileInfo.setGroup(ftpFile.getGroup());
 		fileInfo.setPermissions(Policy.permissionsFromString(ftpFile.getPermissions()));
@@ -575,7 +580,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 * @see com.aptana.ide.core.ftp.BaseFTPConnectionFileManager#checkConnected()
 	 */
 	@Override
-	protected void checkConnected() throws Exception {
+	protected void checkConnected() throws Exception { // $codepro.audit.disable declaredExceptions
 		if (ftpClient.connected()) {
 			try {
 				ftpClient.noOperation();
@@ -595,7 +600,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected URI getRootCanonicalURI() {
 		try {
-			return new URI("ftp", login, host, port != IFTPConstants.FTP_PORT_DEFAULT ? port : -1, Path.ROOT.toPortableString(), null, null); //$NON-NLS-1$
+			return new URI("ftp", login, host, (port != IFTPConstants.FTP_PORT_DEFAULT) ? port : -1, Path.ROOT.toPortableString(), null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}

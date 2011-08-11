@@ -8,6 +8,7 @@
 package com.aptana.filesystem.ftp;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -27,7 +28,7 @@ public class FTPFileSystem extends FileSystem
 	/**
 	 * used to retain a cache of connection managers for the same host/username/password/port
 	 */
-	private static WeakHashMap<String, IFTPConnectionFileManager> fgConnectionManagers = new WeakHashMap<String, IFTPConnectionFileManager>();
+	private static Map<String, IFTPConnectionFileManager> fgConnectionManagers = new WeakHashMap<String, IFTPConnectionFileManager>();
 
 	public FTPFileSystem()
 	{

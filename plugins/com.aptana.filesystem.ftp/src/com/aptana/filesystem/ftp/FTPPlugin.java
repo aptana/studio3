@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 
 package com.aptana.filesystem.ftp;
 
@@ -80,7 +81,7 @@ public class FTPPlugin extends Plugin {
 		if (ftpCommandLog != null) {
 			OutputStream out = ftpCommandLog.getOutputStream();
 			if (out != null) {
-				return new PrintWriter(out);
+				return new PrintWriter(out); // $codepro.audit.disable closeWhereCreated
 			}
 		}
 		return null;
