@@ -193,7 +193,14 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		push(formatterBlockNode);
 
 		// Recursively add this node's children
-		addNodes(mediaNode.getStatements());
+		CSSNode[] statements = mediaNode.getStatements();
+		addNodes(statements);
+
+		if (statements.length > 0)
+		{
+			formatterBlockNode.addChild(createTextNode(document,
+					statements[statements.length - 1].getEndingOffset() + 1, mediaNode.getEndingOffset()));
+		}
 
 		checkedPop(formatterBlockNode, -1);
 		formatterBlockNode
