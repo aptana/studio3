@@ -44,7 +44,6 @@ public enum CSSTokenType implements ITypePredicate
 	// Stuff for the parser only:
 	EOF("", Terminals.EOF), //$NON-NLS-1$
 	LBRACKET("punctuation.bracket.css", Terminals.LBRACKET), //$NON-NLS-1$
-	SELECTOR(".css", Terminals.SELECTOR), //$NON-NLS-1$
 	URL(".css", Terminals.URL), //$NON-NLS-1$
 	LENGTH("keyword.other.unit.css", Terminals.LENGTH), //$NON-NLS-1$
 	EMS("keyword.other.unit.css", Terminals.EMS), //$NON-NLS-1$
