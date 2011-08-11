@@ -26,13 +26,13 @@ public class AllUtilTests
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(InputStreamGobblerTest.class);
 		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(OutputStreamThreadTest.class);
 		suite.addTestSuite(PlatformUtilTest.class);
 		suite.addTestSuite(ProcessStatusTest.class);
 		suite.addTestSuite(ProcessUtilTest.class);
 		suite.addTestSuite(ProgressMonitorInterrupterTest.class);
 		suite.addTestSuite(RegexUtilTest.class);
 		suite.addTestSuite(ResourceUtilTest.class);
-		suite.addTestSuite(OutputStreamThreadTest.class);
 		suite.addTestSuite(SocketUtilTest.class);
 		suite.addTestSuite(SourcePrinterTest.class);
 		suite.addTestSuite(StreamUtilTest.class);
