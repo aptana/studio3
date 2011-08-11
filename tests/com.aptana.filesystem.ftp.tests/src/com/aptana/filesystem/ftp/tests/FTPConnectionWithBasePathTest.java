@@ -105,9 +105,8 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return true;
+	protected boolean supportsSetModificationTime() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.setmodtime"));
 	}
 
 	/*
@@ -115,9 +114,8 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return false;
+	protected boolean supportsChangeGroup() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.changegroup"));
 	}
 
 	/*
@@ -125,8 +123,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return true;
+	protected boolean supportsChangePermissions() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.permissions"));
 	}
 }
