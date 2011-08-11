@@ -31,6 +31,8 @@ import com.aptana.core.logging.IdeLog;
 public abstract class IOUtil
 {
 
+	private static final int BUFFER_SIZE = 4096;
+
 	/**
 	 * Reads an InputStream into a String. Safely closes the stream after reading, or if any exceptions occur. Returns
 	 * null if the stream is null or an exception occurs reading in the stream.
@@ -85,7 +87,7 @@ public abstract class IOUtil
 			}
 
 			// emit the rest of the stream into the output buffer
-			char[] buffer = new char[1024 * 4];
+			char[] buffer = new char[BUFFER_SIZE];
 			int read = 0;
 
 			while ((read = reader.read(buffer)) != -1)

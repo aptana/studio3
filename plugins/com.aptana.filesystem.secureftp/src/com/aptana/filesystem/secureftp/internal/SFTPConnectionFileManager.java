@@ -5,6 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable reusableImmutables
+// $codepro.audit.disable disallowSleepInsideWhile
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable exceptionUsage.exceptionCreation
+// $codepro.audit.disable declaredExceptions
 
 package com.aptana.filesystem.secureftp.internal;
 
@@ -85,7 +93,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			this.keyFilePath = keyFilePath;
 			this.login = login;
 			this.password = (password == null) ? new char[0] : password;
-			this.basePath = basePath != null ? basePath : Path.ROOT;
+			this.basePath = (basePath != null) ? basePath : Path.ROOT;
 			if (keyFilePath != null) {
 				this.authId = Policy.generateAuthId("SFTP/PUBLICKEY", login, host, port); //$NON-NLS-1$				
 			} else {
@@ -234,6 +242,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.quitImmediately();
 			} catch (Exception ignore) {
+				ignore.getCause();
 			}
 		}		
 	}
@@ -245,6 +254,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				thread.join();
 			} catch (InterruptedException e) {
+				return;
 			}
 		}
 		keepaliveThread = new Thread() {
@@ -257,7 +267,8 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 						if (ftpClient.connected()) {
 							try {
 								ftpClient.quitImmediately();
-							} catch (Exception exc) {
+							} catch (Exception ignore) {
+								ignore.getCause();
 							}
 						}
 					} catch (Exception e) {
@@ -283,6 +294,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		try {
 			checkConnected();
 		} catch (Exception ignore) {
+			ignore.getCause();
 		}
 		if (!isConnected()) {
 			return;
@@ -295,6 +307,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.quitImmediately();
 			} catch (Exception ignore) {
+				ignore.getCause();
 			}
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDisconnectConnection, e));
 		} finally {
@@ -352,7 +365,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		fileInfo.setName(ftpFile.getName());
 		fileInfo.setDirectory(ftpFile.isDir());
 		fileInfo.setLength(ftpFile.size());
-		fileInfo.setLastModified(ftpFile.lastModified() != null ? ftpFile.lastModified().getTime() : 0);
+		fileInfo.setLastModified((ftpFile.lastModified() != null) ? ftpFile.lastModified().getTime() : 0);
 		fileInfo.setOwner(ftpFile.getOwner());
 		fileInfo.setGroup(ftpFile.getGroup());
 		fileInfo.setPermissions(Policy.permissionsFromString(ftpFile.getPermissions()));
@@ -395,9 +408,10 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.keepAlive();
 				return;
-			} catch (FTPException ignore) {
+			} catch (FTPException e) {
 				return;
-			} catch (IOException e) {
+			} catch (IOException ignore) {
+				ignore.getCause();
 			}
 			ftpClient.quitImmediately();
 		}
@@ -410,7 +424,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected URI getRootCanonicalURI() {
 		try {
-			return new URI("sftp", login, host, port != ISFTPConstants.SFTP_PORT_DEFAULT ? port : -1, Path.ROOT.toPortableString(), null, null); //$NON-NLS-1$
+			return new URI("sftp", login, host, (port != ISFTPConstants.SFTP_PORT_DEFAULT) ? port : -1, Path.ROOT.toPortableString(), null, null); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
 			return null;
 		}
@@ -436,6 +450,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 						try {
 							throwWrappedException(e, path, SshFxpStatus.STATUS_FX_FAILURE);
 						} catch (FileNotFoundException ignore) {
+							ignore.getCause();
 						}
 					}
 					return fileInfo;
@@ -522,6 +537,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 					changeCurrentDir(path);
 					return; // directory exists - return
 				} catch (FileNotFoundException ignore) {
+					ignore.getCause();
 				}
 				ftpClient.mkdir(path.toPortableString());
 				changeFilePermissions(path, PreferenceUtils.getDirectoryPermissions(), monitor);

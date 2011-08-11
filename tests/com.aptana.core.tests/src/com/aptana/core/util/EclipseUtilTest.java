@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.framework.Version;
 
@@ -73,5 +74,33 @@ public class EclipseUtilTest extends TestCase
 		{
 			assertEquals(testComponents[i], components[i]);
 		}
+	}
+
+	public void testGetSystemProperty()
+	{
+		assertEquals("1.6", EclipseUtil.getSystemProperty("java.specification.version"));
+		assertNull(EclipseUtil.getSystemProperty("random_property"));
+		assertNull(EclipseUtil.getSystemProperty(null));
+	}
+
+	public void testIsSystemPropertyEnabled()
+	{
+		assertTrue(EclipseUtil.isSystemPropertyEnabled("java.specification.version"));
+		assertFalse(EclipseUtil.isSystemPropertyEnabled("random_property"));
+		assertFalse(EclipseUtil.isSystemPropertyEnabled(null));
+	}
+
+	public void testIsPluginLoaded()
+	{
+		assertTrue(EclipseUtil.isPluginLoaded(CorePlugin.getDefault()));
+		assertFalse(EclipseUtil.isPluginLoaded(null));
+	}
+
+	public void testGetPluginVersion()
+	{
+		assertNotNull(EclipseUtil.getPluginVersion(CorePlugin.getDefault()));
+		assertNotNull(EclipseUtil.getPluginVersion(CorePlugin.PLUGIN_ID));
+		assertNull(EclipseUtil.getPluginVersion((Plugin) null));
+		assertNull(EclipseUtil.getPluginVersion((String) null));
 	}
 }

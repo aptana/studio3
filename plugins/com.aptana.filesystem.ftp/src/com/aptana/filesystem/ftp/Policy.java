@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.filesystem.ftp;
 
@@ -63,20 +64,23 @@ public final class Policy {
 	}
 	
 	public static IProgressMonitor monitorFor(IProgressMonitor monitor) {
-		return monitor == null ? new NullProgressMonitor() : monitor;
+		return (monitor == null) ? new NullProgressMonitor() : monitor;
 	}
 
 	public static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks) {
-		if (monitor == null)
+		if (monitor == null) {
 			return new NullProgressMonitor();
-		if (monitor instanceof NullProgressMonitor)
+		}
+		if (monitor instanceof NullProgressMonitor) {
 			return monitor;
+		}
 		return new SubProgressMonitor(monitor, ticks);
 	}
 
 	public static void checkCanceled(IProgressMonitor monitor) {
-		if (monitor.isCanceled())
+		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
+		}
 	}
 
 

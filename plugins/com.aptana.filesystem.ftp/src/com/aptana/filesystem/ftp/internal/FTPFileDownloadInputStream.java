@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
 
 package com.aptana.filesystem.ftp.internal;
 
@@ -41,6 +42,7 @@ public class FTPFileDownloadInputStream extends InputStream {
 						ftpClient.quitImmediately();
 					}
 				} catch (Exception ignore) {
+					ignore.getCause();
 				}
 			}
 		});
@@ -50,6 +52,7 @@ public class FTPFileDownloadInputStream extends InputStream {
 		try {
 			ftpInputStream.close();
 		} catch (IOException ignore) {
+			ignore.getCause();
 		}
 		pool.checkIn(ftpClient);
 		ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);

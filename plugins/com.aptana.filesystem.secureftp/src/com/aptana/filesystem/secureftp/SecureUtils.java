@@ -33,6 +33,8 @@ import com.enterprisedt.net.puretls.LoadProviders;
 @SuppressWarnings("restriction")
 public final class SecureUtils {
 
+	private static final String[] EMPTY = new String[0];
+
 	/**
 	 * 
 	 */
@@ -59,7 +61,8 @@ public final class SecureUtils {
 			if (e.getCause() instanceof NoSuchAlgorithmException) {
 				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, e.getCause().getMessage()));
 			}
-		} catch (IOException e) {
+		} catch (IOException ignore) {
+			ignore.getCause();
 		}
 		return false;
 	}
@@ -73,6 +76,6 @@ public final class SecureUtils {
 		if (value != null && value.length() > 0) {
 			return value.trim().split(","); //$NON-NLS-1$
 		}
-		return new String[0];
+		return EMPTY;
 	}
 }

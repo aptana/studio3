@@ -34,6 +34,8 @@ import com.aptana.core.logging.IdeLog;
 public final class PlatformUtil
 {
 	
+	private static final ProcessItem[] NO_PROCESS_ITEMS = new ProcessItem[0];
+
 	public static class ProcessItem {
 		private String executableName;
 		private int pid;
@@ -220,7 +222,7 @@ public final class PlatformUtil
 				}
 			}
 		}
-		return new ProcessItem[0];
+		return NO_PROCESS_ITEMS;
 	}
 
 	/**
@@ -285,7 +287,7 @@ public final class PlatformUtil
 			return list.toArray(new ProcessItem[list.size()]);
 		}
 
-		return new ProcessItem[0];
+		return NO_PROCESS_ITEMS;
 	}
 
 	public static void killProcess(int pid) {
@@ -347,7 +349,8 @@ public final class PlatformUtil
 				}
 			}
 		}
-		if (path.startsWith("~")) { //$NON-NLS-1$
+		if (path.length() > 0 && path.charAt(0) == '~')
+		{
 			String home = System.getProperty("user.home"); //$NON-NLS-1$
 			if (home != null) {
 				return home + path.substring(1);

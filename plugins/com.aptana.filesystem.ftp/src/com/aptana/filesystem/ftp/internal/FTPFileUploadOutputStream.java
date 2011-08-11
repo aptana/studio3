@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
 
 package com.aptana.filesystem.ftp.internal;
 
@@ -53,6 +54,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 						ftpClient.quitImmediately();
 					}
 				} catch (Exception ignore) {
+					ignore.getCause();
 				}
 			}
 		});
@@ -66,10 +68,12 @@ public class FTPFileUploadOutputStream extends OutputStream {
 				}
 			}
 		} catch (Exception ignore) {
+			ignore.getCause();
 		} finally {
 			try {
 				ftpOutputStream.close();
 			} catch (IOException ignore) {
+				ignore.getCause();
 			}
 			pool.checkIn(ftpClient);
 			if (completeRunnable != null) {
@@ -101,7 +105,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		try {
 			ftpOutputStream.close();
 			try {
-				String actualFilename = filename != null ? filename : ftpOutputStream.getRemoteFile();
+				String actualFilename = (filename != null) ? filename : ftpOutputStream.getRemoteFile();
 				if (filename != null) {
 					if (ftpClient.exists(filename)) {
 						ftpClient.delete(filename);
@@ -119,7 +123,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
                 }
 			} catch (FTPException e) {
 				safeQuit(true);
-				throw new IOException(e.getMessage()); 
+				throw new IOException(e.getMessage(), e);
 			}
 		} finally {
 			safeQuit(false);

@@ -250,11 +250,12 @@ class TreeThemer extends ControlThemer
 				gc.drawRectangle(x + 1, y + 1, width - 2, width - 2); // make it smaller than the area erased
 				gc.setAlpha(255);
 				// draw '-'
-				gc.drawLine(x + 3, y + (width / 2), x + 7, y + (width / 2));
+				int halfWidth = width >> 1;
+				gc.drawLine(x + 3, y + halfWidth, x + 7, y + halfWidth);
 				if (!isExpanded)
 				{
 					// draw '|' to make it a plus
-					gc.drawLine(x + (width / 2), y + 3, x + (width / 2), y + 7);
+					gc.drawLine(x + halfWidth, y + 3, x + halfWidth, y + 7);
 				}
 				gc.setBackground(oldBackground);
 

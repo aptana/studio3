@@ -96,15 +96,15 @@ public class ThemeExporter
 			int style = attr.getStyle();
 			if ((style & SWT.ITALIC) != 0)
 			{
-				value.append("italic").append(",");
+				value.append("italic").append(',');
 			}
 			if ((style & TextAttribute.UNDERLINE) != 0)
 			{
-				value.append("underline").append(",");
+				value.append("underline").append(',');
 			}
 			if ((style & SWT.BOLD) != 0)
 			{
-				value.append("bold").append(",");
+				value.append("bold").append(',');
 			}
 			if (value.length() > 0)
 			{

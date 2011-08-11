@@ -8,7 +8,6 @@
 package com.aptana.theme.preferences;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1311,18 +1310,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			File themeFile = new File(path);
 			editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
 
-			try
+			Theme theme = new TextmateImporter().convert(themeFile);
+			if (theme != null)
 			{
-				Theme theme = new TextmateImporter().convert(themeFile);
 				getThemeManager().addTheme(theme);
 				getThemeManager().setCurrentTheme(theme);
 				loadThemeNames();
 				setTheme(theme.getName());
 			}
-			catch (FileNotFoundException e1)
+			else
 			{
-				IdeLog.logError(ThemePlugin.getDefault(), e1);
+				// FIXME Show an error dialog?
 			}
+
 		}
 		else if (source == fExportButton)
 		{

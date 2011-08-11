@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.core.build;
 
 import java.net.URI;
@@ -167,8 +174,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
 				{
-					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex.toArray(new IFile[0]);
-					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[0]);
+					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex
+							.toArray(new IFile[resourceCollector.filesToRemoveFromIndex.size()]);
+					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[resourceCollector.filesToIndex
+							.size()]);
 					IdeLog.logInfo(
 							CorePlugin.getDefault(),
 							StringUtil.format(Messages.UnifiedBuilder_IndexingResourceDelta,

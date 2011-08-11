@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declareAsInterface
+// $codepro.audit.disable emptyCatchClause
 
 package com.aptana.filesystem.ftp;
 
@@ -175,10 +177,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPath(org.eclipse.core.runtime.IPath)
 	 */
 	public void setPath(IPath path) {
-		if (path.isEmpty()) {
-			path = Path.ROOT;
-		}
-		this.path = path;
+		this.path = path.isEmpty() ? Path.ROOT : path;
 		notifyChanged();
 		resetConnectionFileManager();
 	}
@@ -326,7 +325,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (IConnectionFileManager.class == adapter) {
+		if (IConnectionFileManager.class.equals(adapter)) {
 			return getConnectionFileManager();
 		}
 		return super.getAdapter(adapter);

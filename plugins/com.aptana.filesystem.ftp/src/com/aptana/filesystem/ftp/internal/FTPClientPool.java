@@ -54,6 +54,7 @@ public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
 			}
 			catch (Exception ignore)
 			{
+				ignore.getCause();
 			}
 		}
 	}
