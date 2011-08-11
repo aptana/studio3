@@ -8,14 +8,32 @@
 package com.aptana.editor.css.parsing;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class AllTests
 {
-
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.ide.editor.css.parsing");
+		TestSuite suite = new TestSuite("Test for com.aptana.ide.editor.css.parsing")
+		{
+			/*
+			 * (non-Javadoc)
+			 * @see junit.framework.TestSuite#run(junit.framework.TestResult)
+			 */
+			@Override
+			public void run(TestResult result)
+			{
+				super.run(result);
+
+				// Verify that all CSS token types were tested
+				if (!result.shouldStop())
+				{
+					runTest(new VerifyTestedTokensTest(), result);
+				}
+			}
+		};
+
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSCommentTest.class);
 		suite.addTestSuite(CSSIdentifierTest.class);
