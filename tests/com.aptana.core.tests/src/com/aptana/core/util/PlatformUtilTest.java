@@ -34,7 +34,7 @@ public class PlatformUtilTest extends TestCase {
 	}
 
 	public void testGetRunningChildProcesses() throws IOException {
-		String cmd = Platform.OS_WIN32.equals(Platform.getOS()) ? "cmd.exe" : (Platform.OS_MACOSX.equals(Platform.getOS()) ? "sleep 5s" : "sh -c sleep 5s");
+		String cmd = Platform.OS_WIN32.equals(Platform.getOS()) ? "cmd.exe" : (Platform.OS_MACOSX.equals(Platform.getOS()) ? "sleep 5s" : "sh");
 		String[] command = Platform.OS_WIN32.equals(Platform.getOS()) ? new String[] { "cmd.exe", "/C", "sleep 5s" }
 				: new String[] { "sh", "-c", "sleep 5s" };
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -51,7 +51,7 @@ public class PlatformUtilTest extends TestCase {
 	}
 
 	public void testKillProcesses() throws IOException {
-		String cmd = Platform.OS_WIN32.equals(Platform.getOS()) ? "cmd.exe" : (Platform.OS_MACOSX.equals(Platform.getOS()) ? "sleep 5s" : "sh -c sleep 5s");
+		String cmd = Platform.OS_WIN32.equals(Platform.getOS()) ? "cmd.exe" : (Platform.OS_MACOSX.equals(Platform.getOS()) ? "sleep 5s" : "sh");
 		String[] command = Platform.OS_WIN32.equals(Platform.getOS()) ? new String[] { "cmd.exe", "/C", "sleep 5s" }
 				: new String[] { "sh", "-c", "sleep 5s" };
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
