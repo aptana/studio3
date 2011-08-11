@@ -75,7 +75,7 @@ public class TerminalComposite extends Composite {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				try {
-					if (fCtlTerminal.getState() == TerminalState.CLOSED && !fCtlTerminal.isDisposed()) {
+					if (TerminalState.CLOSED.equals(fCtlTerminal.getState()) && !fCtlTerminal.isDisposed()) {
 						fCtlTerminal.connectTerminal();
 						hookProcessListener();
 						sendInputs();
@@ -192,8 +192,7 @@ public class TerminalComposite extends Composite {
 				return;
 			}
 			while (!inputs.isEmpty()) {
-				String text = inputs.remove(0);
-				fCtlTerminal.pasteString(text);
+				fCtlTerminal.pasteString(inputs.remove(0));
 			}
 		}
 	}

@@ -7,6 +7,7 @@
  */
 // $codepro.audit.disable declaredExceptions
 // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.filesystem.secureftp.internal;
 

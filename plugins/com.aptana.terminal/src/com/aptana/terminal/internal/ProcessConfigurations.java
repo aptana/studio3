@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.terminal.internal;
 
@@ -15,8 +16,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.IProcessConfiguration;
+import com.aptana.terminal.TerminalPlugin;
 
 /**
  * @author Max Stepanov

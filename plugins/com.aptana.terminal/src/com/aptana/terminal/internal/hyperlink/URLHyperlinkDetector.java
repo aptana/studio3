@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable platformSpecificLineSeparator
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.terminal.internal.hyperlink;
 
 import java.util.ArrayList;
@@ -60,11 +63,11 @@ public class URLHyperlinkDetector implements IHyperlinkDetector {
 			IRegion region = new Region(m.start(), urlString.length());
 			if (!urlString.startsWith("http://")) //$NON-NLS-1$
 			{
-				urlString = "http://" + urlString; //$NON-NLS-1$
+				urlString = "http://" + urlString; //$NON-NLS-1$ // $codepro.audit.disable stringConcatenationInLoop
 			}
 			list.add(new URLHyperlink(region, urlString));
 		}
-		return list.toArray(new IHyperlink[0]);
+		return list.toArray(new IHyperlink[list.size()]);
 	}
 
 }

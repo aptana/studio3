@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.terminal.internal.handlers;
 
 import java.net.URI;
@@ -33,6 +35,7 @@ import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.preferences.IPreferenceConstants;
@@ -69,6 +72,7 @@ public class OpenTerminalHandler extends AbstractHandler {
 						return true;
 					}
 				} catch (CoreException e) {
+					IdeLog.logError(TerminalPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -96,7 +100,7 @@ public class OpenTerminalHandler extends AbstractHandler {
 						}
 					}
 				} catch (CoreException e) {
-					// ignore
+					IdeLog.logError(TerminalPlugin.getDefault(), e);
 				}
 			}
 			if (input instanceof IPathEditorInput) {

@@ -88,7 +88,7 @@ public class TerminalEditorInput implements IEditorInput, IPersistableElement {
 	 */
 	public void saveState(IMemento memento) {
 		IMemento child = memento.createChild(PROP_TITLE);
-		child.putTextData(title != null ? title : ""); //$NON-NLS-1$
+		child.putTextData((title != null) ? title : ""); //$NON-NLS-1$
 		child = memento.createChild(PROP_WORKING_DIRECTORY);
 		if (workingDirectory != null) {
 			child.putTextData(workingDirectory.toOSString());

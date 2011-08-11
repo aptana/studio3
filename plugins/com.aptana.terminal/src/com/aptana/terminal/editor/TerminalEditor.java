@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IPath;
@@ -136,7 +139,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 						keyDownFilter.setEnabled(true);
 						keyDownFilter.handleEvent(event);
 					} finally {
-						if (focusControl == e.display.getFocusControl()) {
+						if (focusControl == e.display.getFocusControl()) { // $codepro.audit.disable useEquals
 							keyDownFilter.setEnabled(enabled);
 						}
 					}
@@ -151,11 +154,11 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 			public void drop(DropTargetEvent event) {
 				FileTransfer ft = FileTransfer.getInstance();
 				if (ft.isSupportedType(event.currentDataType)) {
-					String fileList[] = (String[]) event.data;
+					String[] fileList = (String[]) event.data;
 					if (fileList != null && fileList.length > 0) {
 						StringBuilder builder = new StringBuilder();
 						for (String file : fileList) {
-							builder.append(file).append(" "); //$NON-NLS-1$
+							builder.append(file).append(' ');
 						}
 						terminalComposite.sendInput(builder.toString());
 					}

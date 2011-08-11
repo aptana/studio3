@@ -37,7 +37,7 @@ public class ProcessLauncher {
 	public void launch() throws IOException, CoreException {
 		ProcessBuilder builder = new ProcessBuilder(configuration.getCommandLine());
 		builder.environment().putAll(configuration.getEnvironment());
-		builder.directory(initialDirectory != null ? initialDirectory.toFile() : null);
+		builder.directory((initialDirectory != null) ? initialDirectory.toFile() : null);
 		process = builder.start();
 
 		new Thread("Process watcher") { //$NON-NLS-1$
@@ -45,7 +45,8 @@ public class ProcessLauncher {
 			public void run() {
 				try {
 					process.waitFor();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException ignore) {
+					ignore.getCause();
 				} finally {
 					notofyProcessCompleted();
 				}

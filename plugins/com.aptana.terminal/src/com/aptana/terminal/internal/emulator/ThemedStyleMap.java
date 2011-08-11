@@ -43,7 +43,7 @@ import com.aptana.theme.ThemePlugin;
 				return theme.getForeground(ansiName);
 			}
 		}
-		boolean isForeground = map == fColorMapForeground;
+		boolean isForeground = map == fColorMapForeground; // $codepro.audit.disable useEquals
 		if (StyleMap.BLACK.equals(colorName)) {
 			return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
 		}

@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
 
 package com.aptana.terminal.internal.emulator;
 
@@ -34,8 +35,8 @@ import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 
 /**
- * @author Chris Williams
  * @author Max Stepanov
+ * @author Chris Williams
  */
 public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.TextCanvas {
 
@@ -80,7 +81,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 				}
 			}
 			IHyperlink[] oldLinks = fLinks.remove(line);
-			IHyperlink[] newLinks = list.toArray(new IHyperlink[0]);
+			IHyperlink[] newLinks = list.toArray(new IHyperlink[list.size()]);
 			// Update map
 			fLinks.put(Integer.valueOf(line), newLinks);
 			// Only modify underlines if regions changed in any way...
@@ -175,8 +176,8 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 	}
 
 	private boolean regionsChanged(IHyperlink[] oldLinks, IHyperlink[] newLinks) {
-		int oldLinkLength = oldLinks == null ? 0 : oldLinks.length;
-		int newLinkLength = newLinks == null ? 0 : newLinks.length;
+		int oldLinkLength = (oldLinks == null) ? 0 : oldLinks.length;
+		int newLinkLength = (newLinks == null) ? 0 : newLinks.length;
 		// size changed, so we definitely have changes
 		if (oldLinkLength != newLinkLength) {
 			return true;

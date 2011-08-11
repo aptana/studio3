@@ -89,7 +89,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	@Override
 	public void setEncoding(String encoding) throws UnsupportedEncodingException {
 		if (encoding == null) {
-			encoding = "UTF-8"; //$NON-NLS-1$
+			encoding = "UTF-8"; //$NON-NLS-1$ // $codepro.audit.disable questionableAssignment
 		}
 		super.setEncoding(encoding);
 	}
@@ -101,7 +101,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	@Override
 	protected void sendChar(char chKey, boolean altKeyPressed) {
 		if (altKeyPressed && IGNORE_ALT_WITH_KEYS.contains(chKey)) {
-			altKeyPressed = false;
+			altKeyPressed = false; // $codepro.audit.disable questionableAssignment
 		}
 		super.sendChar(chKey, altKeyPressed);
 	}

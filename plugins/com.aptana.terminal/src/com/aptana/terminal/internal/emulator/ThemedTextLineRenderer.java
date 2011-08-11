@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.terminal.internal.emulator;
 
@@ -25,7 +26,7 @@ import com.aptana.theme.ThemePlugin;
 	/**
 	 * @param model
 	 */
-	public ThemedTextLineRenderer(ITextCanvasModel model) {
+	protected ThemedTextLineRenderer(ITextCanvasModel model) {
 		super(null, model);
 		fStyleMap = getStyleMap();
 	}

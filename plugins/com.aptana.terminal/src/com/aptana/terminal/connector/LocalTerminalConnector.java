@@ -5,6 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable disallowSleepInsideWhile
+
 package com.aptana.terminal.connector;
 
 import java.io.BufferedOutputStream;
@@ -27,11 +31,12 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.PlatformUtil.ProcessItem;
-import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.IProcessConfiguration;
+import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.internal.IProcessListener;
 import com.aptana.terminal.internal.ProcessConfigurations;
 import com.aptana.terminal.internal.ProcessLauncher;
@@ -141,7 +146,8 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				if (processList.isEmpty()) {
 					try {
 						processList.wait(PROCESS_LIST_TIMEOUT);
-					} catch (InterruptedException e) {
+					} catch (InterruptedException ignore) {
+						ignore.getCause();
 					}
 				}
 				return processList.toArray(new Integer[processList.size()]);
@@ -295,7 +301,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				result.append(output[i]);
 			}
 		}
-		return result.length() == output.length ? output : result.toString().toCharArray();
+		return (result.length() == output.length) ? output : result.toString().toCharArray();
 	}
 
 	private void processCommandResponse(String response) {
@@ -303,11 +309,12 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			synchronized (processList) {
 				processList.notifyAll();
 				processList.clear();
-				response = response.substring(2, response.length() - 1);
+				response = response.substring(2, response.length() - 1); // $codepro.audit.disable questionableAssignment
 				for (String pid : response.split(",")) { //$NON-NLS-1$
 					try {
 						processList.add(Integer.parseInt(pid));
-					} catch (NumberFormatException ignore) {
+					} catch (NumberFormatException e) {
+						IdeLog.logError(TerminalPlugin.getDefault(), e);
 					}
 				}
 			}
@@ -343,7 +350,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 					if (Platform.OS_WIN32.equals(Platform.getOS())) {
 						processName = Path.fromOSString(processName).removeFileExtension().lastSegment();
 					} else {
-						if (processName.startsWith("-")) { //$NON-NLS-1$
+						if (processName.length() > 0 && processName.charAt(0) == '-') {
 							processName = processName.substring(1);
 						}
 						int index = processName.indexOf(' ');
