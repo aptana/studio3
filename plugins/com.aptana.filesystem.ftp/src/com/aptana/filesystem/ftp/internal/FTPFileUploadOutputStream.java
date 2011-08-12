@@ -23,10 +23,9 @@ import com.enterprisedt.net.ftp.FileTransferOutputStream;
 
 /**
  * @author Max Stepanov
- *
  */
 public class FTPFileUploadOutputStream extends OutputStream {
-	
+
 	private FTPClientInterface ftpClient;
 	private FileTransferOutputStream ftpOutputStream;
 	private String filename;
@@ -34,10 +33,9 @@ public class FTPFileUploadOutputStream extends OutputStream {
 	private long permissions;
 	private FTPClientPool pool;
 	private Runnable completeRunnable;
-	
+
 	/**
-	 * @param pool 
-	 * 
+	 * @param pool
 	 */
 	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface _ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions, Runnable completeRunnable) {
 		this.ftpClient = _ftpClient;
@@ -84,7 +82,8 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#write(int)
 	 */
 	@Override
@@ -97,7 +96,8 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#close()
 	 */
 	@Override
@@ -123,14 +123,15 @@ public class FTPFileUploadOutputStream extends OutputStream {
                 }
 			} catch (FTPException e) {
 				safeQuit(true);
-				throw new IOException(e.getMessage());
+				throw new IOException(e.getMessage()); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 		} finally {
 			safeQuit(false);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	@Override
@@ -140,7 +141,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		} catch (IOException e) {
 			safeQuit(true);
 			throw e;
-		}		
+		}
 	}
 
 }

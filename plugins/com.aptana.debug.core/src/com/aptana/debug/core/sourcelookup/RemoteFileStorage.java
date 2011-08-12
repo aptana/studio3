@@ -21,7 +21,7 @@ import com.aptana.debug.core.DebugCorePlugin;
  * @author Max Stepanov
  */
 public class RemoteFileStorage extends UniformResourceStorage {
-	
+
 	private URI fURI;
 	private IFileContentRetriever fRetriever;
 	private InputStream fIn;

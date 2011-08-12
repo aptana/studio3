@@ -40,9 +40,8 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	private IJSInspectExpression expression;
 
 	/**
-	 * see
-	 * org.eclipse.jface.text.information.IInformationProvider#getInformation
-	 * (org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+	 * see org.eclipse.jface.text.information.IInformationProvider#getInformation (org.eclipse.jface.text.ITextViewer,
+	 * org.eclipse.jface.text.IRegion)
 	 * 
 	 * @param textViewer
 	 * @param subject
@@ -56,8 +55,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	}
 
 	/**
-	 * @see org.eclipse.jface.text.information.IInformationProvider#getSubject(org.eclipse.jface.text.ITextViewer,
-	 *      int)
+	 * @see org.eclipse.jface.text.information.IInformationProvider#getSubject(org.eclipse.jface.text.ITextViewer, int)
 	 */
 	public IRegion getSubject(ITextViewer textViewer, int offset) {
 		return getRegion();

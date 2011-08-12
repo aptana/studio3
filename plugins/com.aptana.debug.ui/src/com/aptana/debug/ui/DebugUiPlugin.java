@@ -22,8 +22,7 @@ import com.aptana.ui.util.UIUtils;
 /**
  * The main plugin class to be used in the desktop.
  */
-public class DebugUiPlugin extends AbstractUIPlugin
-{
+public class DebugUiPlugin extends AbstractUIPlugin {
 	/**
 	 * ID
 	 */
@@ -35,8 +34,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	/**
 	 * The constructor.
 	 */
-	public DebugUiPlugin()
-	{
+	public DebugUiPlugin() {
 	}
 
 	/**
@@ -45,8 +43,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 * @param context
 	 * @throws Exception
 	 */
-	public void start(BundleContext context) throws Exception
-	{
+	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
@@ -57,8 +54,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 * @param context
 	 * @throws Exception
 	 */
-	public void stop(BundleContext context) throws Exception
-	{
+	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		plugin = null;
 	}
@@ -68,8 +64,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 * 
 	 * @return DebugUiPlugin
 	 */
-	public static DebugUiPlugin getDefault()
-	{
+	public static DebugUiPlugin getDefault() {
 		return plugin;
 	}
 
@@ -80,8 +75,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 *            the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getImageDescriptor(String path)
-	{
+	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
@@ -91,12 +85,10 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 * 
 	 * @return Display
 	 */
-	public static Display getStandardDisplay()
-	{
+	public static Display getStandardDisplay() {
 		Display display;
 		display = Display.getCurrent();
-		if (display == null)
-		{
+		if (display == null) {
 			display = Display.getDefault();
 		}
 		return display;
@@ -108,12 +100,10 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	 * @param message
 	 * @param t
 	 */
-	public static void errorDialog(String message, Throwable t)
-	{
+	public static void errorDialog(String message, Throwable t) {
 		IdeLog.logError(getDefault(), t);
 		Shell shell = UIUtils.getActiveShell();
-		if (shell != null)
-		{
+		if (shell != null) {
 			IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR,
 					"Error logged from Studio Debug UI: ", t); //$NON-NLS-1$	
 			ErrorDialog.openError(shell, "Error", message, status); //$NON-NLS-1$

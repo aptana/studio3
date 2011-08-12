@@ -28,7 +28,6 @@ public class OpenURLAction implements IWorkbenchWindowActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
 	 */
 	public void dispose() {
@@ -37,9 +36,7 @@ public class OpenURLAction implements IWorkbenchWindowActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.
-	 * IWorkbenchWindow)
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui. IWorkbenchWindow)
 	 */
 	public void init(IWorkbenchWindow window) {
 		fWindow = window;
@@ -47,24 +44,21 @@ public class OpenURLAction implements IWorkbenchWindowActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
 		InputURLDialog dlg = new InputURLDialog(fWindow.getShell(), Messages.OpenURLAction_Open_URL,
 				Messages.OpenURLAction_Specify_URL_To_Open, "http://"); //$NON-NLS-1$
 		if (dlg.open() == Window.OK) {
-			SourceDisplayUtil.displaySource(JSDebugModel.createSourceLink(URI.create(dlg.getValue())), fWindow.getActivePage(),
-					true);
+			SourceDisplayUtil.displaySource(JSDebugModel.createSourceLink(URI.create(dlg.getValue())),
+					fWindow.getActivePage(), true);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action .IAction,
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}

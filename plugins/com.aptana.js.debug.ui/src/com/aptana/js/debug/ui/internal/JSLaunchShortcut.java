@@ -35,8 +35,7 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
  */
 public class JSLaunchShortcut implements ILaunchShortcut {
 	/**
-	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.jface.viewers.ISelection,
-	 *      java.lang.String)
+	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.jface.viewers.ISelection, java.lang.String)
 	 */
 	public void launch(ISelection selection, String mode) {
 		if (selection instanceof IStructuredSelection) {
@@ -48,8 +47,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 	}
 
 	/**
-	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.ui.IEditorPart,
-	 *      java.lang.String)
+	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.ui.IEditorPart, java.lang.String)
 	 */
 	public void launch(IEditorPart editor, String mode) {
 		IEditorInput input = editor.getEditorInput();

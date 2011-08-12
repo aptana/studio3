@@ -38,8 +38,7 @@ public class JSVariableActionFilter implements IActionFilter {
 	}
 
 	/**
-	 * @see org.eclipse.ui.IActionFilter#testAttribute(java.lang.Object,
-	 *      java.lang.String, java.lang.String)
+	 * @see org.eclipse.ui.IActionFilter#testAttribute(java.lang.Object, java.lang.String, java.lang.String)
 	 */
 	public boolean testAttribute(Object target, String name, String value) {
 		try {

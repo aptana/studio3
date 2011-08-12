@@ -39,12 +39,12 @@ import com.aptana.core.util.StringUtil;
  * @author Max Stepanov
  */
 public final class DebugOptionsManager implements IDebugEventSetListener {
-	
+
 	/**
 	 * DEBUGGER_ACTIVE_SUFFIX
 	 */
 	private static final String DEBUGGER_ACTIVE_SUFFIX = ".debuggerActive"; //$NON-NLS-1$
-	
+
 	/**
 	 * DETAIL_FORMATTER_IS_ENABLED
 	 */
@@ -60,8 +60,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	private IPreferenceChangeListener preferenceChangeListener;
 
 	/**
-	 * Map of types to the associated formatter (code snippet). (
-	 * <code>String</code> -> <code>String</code>)
+	 * Map of types to the associated formatter (code snippet). ( <code>String</code> -> <code>String</code>)
 	 */
 	private HashMap<String, DetailFormatter> fDetailFormattersMap;
 
@@ -75,14 +74,15 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	public void startup() {
 		DebugPlugin.getDefault().addDebugEventListener(this);
 		populateDetailFormattersMap();
-		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener = new IPreferenceChangeListener() {
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (getDetailFormattersPrefName().equals(event.getKey())) {
-					populateDetailFormattersMap();
-					notifyChangeListeners();
-				}
-			}
-		});
+		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(preferenceChangeListener = new IPreferenceChangeListener() {
+					public void preferenceChange(PreferenceChangeEvent event) {
+						if (getDetailFormattersPrefName().equals(event.getKey())) {
+							populateDetailFormattersMap();
+							notifyChangeListeners();
+						}
+					}
+				});
 	}
 
 	/**
@@ -90,11 +90,12 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public void shutdown() {
 		DebugPlugin.getDefault().removeDebugEventListener(this);
-		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
+		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID)
+				.removePreferenceChangeListener(preferenceChangeListener);
 	}
-	
+
 	public static boolean isDebuggerActive(String modelIdentifier) {
-		return "true".equals(System.getProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
+		return "true".equals(System.getProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
 	}
 
 	/**
@@ -213,17 +214,17 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		}
 		return buffer.toString();
 	}
-	
+
 	private String getDetailFormattersPrefName() {
-		return modelIdentifier+IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST;
+		return modelIdentifier + IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST;
 	}
 
 	/**
 	 * Populate the detail formatters map with data from preferences.
 	 */
 	private void populateDetailFormattersMap() {
-		String[] detailFormattersList = DebugOptionsManager.parseList(
-				EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID).get(getDetailFormattersPrefName(), StringUtil.EMPTY));
+		String[] detailFormattersList = DebugOptionsManager.parseList(EclipseUtil.instanceScope()
+				.getNode(DebugCorePlugin.PLUGIN_ID).get(getDetailFormattersPrefName(), StringUtil.EMPTY));
 		fDetailFormattersMap = new HashMap<String, DetailFormatter>(detailFormattersList.length / 3);
 		for (int i = 0, length = detailFormattersList.length; i < length;) {
 			String typeName = detailFormattersList[i++];
@@ -262,17 +263,18 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
 		for (DebugEvent event : events) {
-			if (event.getSource() instanceof IDebugTarget && modelIdentifier.equals(((IDebugTarget) event.getSource()).getModelIdentifier())) {
+			if (event.getSource() instanceof IDebugTarget
+					&& modelIdentifier.equals(((IDebugTarget) event.getSource()).getModelIdentifier())) {
 				switch (event.getKind()) {
-				case DebugEvent.CREATE:
-					System.setProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
-					break;
-				case DebugEvent.TERMINATE:
-					System.getProperties().remove(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX);
-					cleanupBreakpoints();
-					break;
-				default:
-					break;
+					case DebugEvent.CREATE:
+						System.setProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
+						break;
+					case DebugEvent.TERMINATE:
+						System.getProperties().remove(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX);
+						cleanupBreakpoints();
+						break;
+					default:
+						break;
 				}
 			}
 		}

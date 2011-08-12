@@ -11,7 +11,6 @@ import org.eclipse.debug.core.model.IErrorReportingExpression;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IJSInspectExpression extends IErrorReportingExpression {
 

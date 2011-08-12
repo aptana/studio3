@@ -23,13 +23,14 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("restriction")
 public class JSConsoleColorProvider extends ConsoleColorProvider {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.console.ConsoleColorProvider#connect(org.eclipse.debug.core.model.IProcess, org.eclipse.debug.ui.console.IConsole)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.debug.ui.console.ConsoleColorProvider#connect(org.eclipse.debug.core.model.IProcess,
+	 * org.eclipse.debug.ui.console.IConsole)
 	 */
 	@Override
 	public void connect(IProcess process, IConsole console) {
@@ -38,24 +39,26 @@ public class JSConsoleColorProvider extends ConsoleColorProvider {
 		if (streamsProxy instanceof IExtendedStreamsProxy) {
 			IExtendedStreamsProxy extendedStreamsProxy = (IExtendedStreamsProxy) streamsProxy;
 			for (String streamIdentifer : extendedStreamsProxy.getStreamIdentifers()) {
-				if (!IDebugCoreConstants.ID_STANDARD_ERROR_STREAM.equals(streamIdentifer) &&
-						!IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM.equals(streamIdentifer)) {
+				if (!IDebugCoreConstants.ID_STANDARD_ERROR_STREAM.equals(streamIdentifer)
+						&& !IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM.equals(streamIdentifer)) {
 					console.connect(extendedStreamsProxy.getStreamMonitor(streamIdentifer), streamIdentifer);
 				}
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.debug.ui.console.ConsoleColorProvider#getColor(java.lang.String)
 	 */
 	@Override
 	public Color getColor(String streamIdentifer) {
 		if (IJSDebugConstants.ID_WARNING_STREAM.equals(streamIdentifer)) {
-			return ColorManager.getDefault().getColor(PreferenceConverter.getColor(JSDebugUIPlugin.getDefault().getPreferenceStore(), IJSDebugUIConstants.CONSOLE_WARN_COLOR));
+			return ColorManager.getDefault().getColor(
+					PreferenceConverter.getColor(JSDebugUIPlugin.getDefault().getPreferenceStore(),
+							IJSDebugUIConstants.CONSOLE_WARN_COLOR));
 		}
 		return super.getColor(streamIdentifer);
 	}
-
 
 }

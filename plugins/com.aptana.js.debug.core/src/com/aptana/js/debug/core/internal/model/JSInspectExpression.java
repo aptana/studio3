@@ -131,10 +131,11 @@ public class JSInspectExpression extends PlatformObject implements IJSInspectExp
 		}
 		return new String[0];
 	}
-	
+
 	private class DebugEventSetListener implements IDebugEventSetListener {
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 		 */
 		public void handleDebugEvents(DebugEvent[] events) {
@@ -144,7 +145,7 @@ public class JSInspectExpression extends PlatformObject implements IJSInspectExp
 				}
 			}
 		}
-		
+
 	}
 
 }

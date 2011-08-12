@@ -13,7 +13,7 @@ import java.util.Date;
  * @author Max Stepanov
  */
 public interface IXHRTransfer {
-	
+
 	public interface IHeader {
 		/**
 		 * getName
@@ -113,6 +113,5 @@ public interface IXHRTransfer {
 	 * @return boolean
 	 */
 	boolean hasError();
-	
 
 }

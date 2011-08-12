@@ -33,9 +33,7 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
+		 * @see org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
 		 */
 		public String isValid(String newText) {
 			int value = -1;
@@ -52,10 +50,8 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface. action.IAction,
+	 * org.eclipse.ui.IWorkbenchPart)
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// TODO Auto-generated method stub
@@ -63,10 +59,8 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action .IAction,
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = null;
@@ -77,7 +71,6 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {

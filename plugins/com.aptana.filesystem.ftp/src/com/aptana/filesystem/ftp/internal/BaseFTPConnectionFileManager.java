@@ -27,7 +27,6 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
 public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileManager {
 
@@ -42,13 +41,15 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 
 	protected String host;
 	protected int port;
-	
+
 	private long lastOperationTime;
 	protected String defaultOwner;
 	protected String defaultGroup;
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#canUseTemporaryFile(org.eclipse.core.runtime.IPath, com.aptana.core.io.vfs.ExtendedFileInfo, org.eclipse.core.runtime.IProgressMonitor)
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#canUseTemporaryFile(org.eclipse.core.runtime.IPath,
+	 * com.aptana.core.io.vfs.ExtendedFileInfo, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected boolean canUseTemporaryFile(IPath path, ExtendedFileInfo fileInfo, IProgressMonitor monitor) {
@@ -59,7 +60,8 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 		if (fileInfo.exists()) {
 			// test if using temporary file for existing file may cause any differences on remote side
 			if (defaultOwner == null || defaultGroup == null) {
-				IPath tempFile = basePath.append(path).removeLastSegments(1).append(System.currentTimeMillis()+TMP_UPLOAD_SUFFIX);
+				IPath tempFile = basePath.append(path).removeLastSegments(1)
+						.append(System.currentTimeMillis() + TMP_UPLOAD_SUFFIX);
 				ExtendedFileInfo tempFileInfo = null;
 				monitor.beginTask(Messages.BaseFTPConnectionFileManager_GetheringServerDetails, 3);
 				try {
@@ -70,7 +72,8 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 						deleteFile(tempFile, Policy.subMonitorFor(monitor, 1));
 					}
 				} catch (Exception e) {
-					FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.BaseFTPConnectionFileManager_ErrorDetectOwnerGroup, e));
+					FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID,
+							Messages.BaseFTPConnectionFileManager_ErrorDetectOwnerGroup, e));
 				}
 
 				if (tempFileInfo != null) {
@@ -84,15 +87,15 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 			if (defaultGroup == null) {
 				defaultGroup = Long.toHexString(System.currentTimeMillis());
 			}
-			if (!defaultOwner.equals(fileInfo.getOwner())
-				|| !defaultGroup.equals(fileInfo.getGroup())) {
+			if (!defaultOwner.equals(fileInfo.getOwner()) || !defaultGroup.equals(fileInfo.getGroup())) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.vfs.IConnectionFileManager#getCanonicalURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI getCanonicalURI(IPath path) {
@@ -101,6 +104,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 	}
 
 	protected abstract void checkConnected() throws Exception; // $codepro.audit.disable declaredExceptions
+
 	protected abstract URI getRootCanonicalURI();
 
 	/*
@@ -119,16 +123,18 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 					setLastOperationTime();
 				}
 			} catch (Exception e) {
-				FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.BaseFTPConnectionFileManager_connection_check_failed, e));
+				FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID,
+						Messages.BaseFTPConnectionFileManager_connection_check_failed, e));
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#setLastOperationTime()
 	 */
 	@Override
 	protected void setLastOperationTime() {
-		lastOperationTime = System.currentTimeMillis();		
-	}	
+		lastOperationTime = System.currentTimeMillis();
+	}
 }

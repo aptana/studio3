@@ -40,8 +40,7 @@ public interface IJSDebugTarget extends IDebugTarget, IStepFilters {
 	// public boolean supportsInstanceBreakpoints();
 
 	/**
-	 * Returns whether constructors are filtered when stepping, if step filters
-	 * are enabled.
+	 * Returns whether constructors are filtered when stepping, if step filters are enabled.
 	 * 
 	 * @return whether constructors are filtered when stepping
 	 */
@@ -56,20 +55,18 @@ public interface IJSDebugTarget extends IDebugTarget, IStepFilters {
 	void setFilterConstructors(boolean filter);
 
 	/**
-	 * Returns the list of active step filters in this target. The list is a
-	 * collection of Strings. Each string is the fully qualified name/pattern of
-	 * a type/package to filter when stepping. For example
-	 * <code>java.lang.*</code> or <code>java.lang.String</code>.
+	 * Returns the list of active step filters in this target. The list is a collection of Strings. Each string is the
+	 * fully qualified name/pattern of a type/package to filter when stepping. For example <code>java.lang.*</code> or
+	 * <code>java.lang.String</code>.
 	 * 
 	 * @return the list of active step filters, or <code>null</code>
 	 */
 	String[] getStepFilters();
 
 	/**
-	 * Sets the list of active step filters in this target. The list is a
-	 * collection of Strings. Each string is the fully qualified name/pattern of
-	 * a type/package to filter when stepping. For example
-	 * <code>java.lang.*</code> or <code>java.lang.String</code>.
+	 * Sets the list of active step filters in this target. The list is a collection of Strings. Each string is the
+	 * fully qualified name/pattern of a type/package to filter when stepping. For example <code>java.lang.*</code> or
+	 * <code>java.lang.String</code>.
 	 * 
 	 * @param list
 	 *            active step filters, or <code>null</code>

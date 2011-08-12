@@ -45,8 +45,7 @@ import com.aptana.debug.ui.DebugUiPlugin;
 public class RunToLineAdapter implements IRunToLineTarget {
 	/**
 	 * @see org.eclipse.debug.ui.actions.IRunToLineTarget#runToLine(org.eclipse.ui.IWorkbenchPart,
-	 *      org.eclipse.jface.viewers.ISelection,
-	 *      org.eclipse.debug.core.model.ISuspendResume)
+	 *      org.eclipse.jface.viewers.ISelection, org.eclipse.debug.core.model.ISuspendResume)
 	 */
 	public void runToLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) throws CoreException {
 		IEditorPart editorPart = (IEditorPart) part;
@@ -103,14 +102,12 @@ public class RunToLineAdapter implements IRunToLineTarget {
 				}
 			}
 		}
-		throw new CoreException(new Status(IStatus.ERROR, JSDebugUIPlugin.PLUGIN_ID, IStatus.OK,
-				errorMessage, null));
+		throw new CoreException(new Status(IStatus.ERROR, JSDebugUIPlugin.PLUGIN_ID, IStatus.OK, errorMessage, null));
 	}
 
 	/**
 	 * @see org.eclipse.debug.ui.actions.IRunToLineTarget#canRunToLine(org.eclipse.ui.IWorkbenchPart,
-	 *      org.eclipse.jface.viewers.ISelection,
-	 *      org.eclipse.debug.core.model.ISuspendResume)
+	 *      org.eclipse.jface.viewers.ISelection, org.eclipse.debug.core.model.ISuspendResume)
 	 */
 	public boolean canRunToLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) {
 		if (target instanceof IDebugElement) {

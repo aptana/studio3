@@ -18,11 +18,10 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
 import com.aptana.js.debug.core.model.ISourceLink;
 
 /**
- * The source lookup participant knows how to translate a JS stack frame into a
- * source file name
+ * The source lookup participant knows how to translate a JS stack frame into a source file name
  */
 public class JSSourceLookupParticipant extends RemoteContentSourceLookupParticipant {
-	
+
 	/*
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant#getSourceName(java.lang.Object)
 	 */

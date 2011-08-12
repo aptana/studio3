@@ -8,9 +8,7 @@ import org.osgi.framework.BundleContext;
 import com.aptana.debug.core.DebugOptionsManager;
 
 /**
- * 
  * @author Max Stepanov
- *
  */
 public class JSDebugPlugin extends Plugin {
 
@@ -19,7 +17,7 @@ public class JSDebugPlugin extends Plugin {
 
 	// The shared instance
 	private static JSDebugPlugin plugin;
-	
+
 	private DebugOptionsManager debugOptionsManager;
 
 	/*

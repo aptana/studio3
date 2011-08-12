@@ -21,12 +21,12 @@ import com.aptana.js.debug.core.JSDebugPlugin;
  * @author Max Stepanov
  */
 public abstract class JSDebugElement extends DebugElement {
-	
+
 	/**
-	 * Constructs a debug element referring to an artifact in the given debug
-	 * target.
+	 * Constructs a debug element referring to an artifact in the given debug target.
 	 * 
-	 * @param target debug target containing this element
+	 * @param target
+	 *            debug target containing this element
 	 */
 	public JSDebugElement(IDebugTarget target) {
 		super(target);
@@ -46,13 +46,12 @@ public abstract class JSDebugElement extends DebugElement {
 	 * @throws DebugException
 	 */
 	protected void throwDebugException(String message) throws DebugException {
-		throw new DebugException(
-				new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, DebugException.TARGET_REQUEST_FAILED, message, null));
+		throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID,
+				DebugException.TARGET_REQUEST_FAILED, message, null));
 	}
 
 	/**
-	 * Throws a debug exception with the given message, error code, and
-	 * underlying exception.
+	 * Throws a debug exception with the given message, error code, and underlying exception.
 	 * 
 	 * @param code
 	 * @param message
@@ -70,18 +69,17 @@ public abstract class JSDebugElement extends DebugElement {
 	 * @throws DebugException
 	 */
 	protected void throwDebugException(Exception exception) throws DebugException {
-		throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, DebugException.TARGET_REQUEST_FAILED,
-				StringUtil.EMPTY, exception));
+		throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID,
+				DebugException.TARGET_REQUEST_FAILED, StringUtil.EMPTY, exception));
 	}
 
 	/**
-	 * Throws an unimplemented debug exception.
-	 * 
-	 * XXX: remove me later
+	 * Throws an unimplemented debug exception. XXX: remove me later
 	 * 
 	 * @throws DebugException
 	 */
 	protected void throwNotImplemented() throws DebugException {
-		throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, "not implemented", null)); //$NON-NLS-1$
+		throw new DebugException(
+				new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, "not implemented", null)); //$NON-NLS-1$
 	}
 }

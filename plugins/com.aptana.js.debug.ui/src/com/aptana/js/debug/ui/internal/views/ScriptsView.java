@@ -200,16 +200,16 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 				continue;
 			}
 			switch (event.getKind()) {
-			case DebugEvent.CHANGE:
-				if (event.getDetail() == DebugEvent.CONTENT) {
-					getViewer().getControl().getDisplay().syncExec(new Runnable() {
-						public void run() {
-							getViewer().refresh();
-						}
-					});
-				}
-				break;
-			default:
+				case DebugEvent.CHANGE:
+					if (event.getDetail() == DebugEvent.CONTENT) {
+						getViewer().getControl().getDisplay().syncExec(new Runnable() {
+							public void run() {
+								getViewer().refresh();
+							}
+						});
+					}
+					break;
+				default:
 			}
 		}
 	}

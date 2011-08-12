@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.filesystem.ftp;
 
 import java.net.URI;
@@ -42,7 +44,7 @@ public class FTPFileSystem extends FileSystem
 		String path = uri.getPath();
 		String userInfo = uri.getUserInfo();
 		String login = StringUtil.EMPTY;
-		char[] password = new char[0];
+		char[] password = StringUtil.EMPTY.toCharArray();
 		if (userInfo != null && userInfo.length() > 0)
 		{
 			if (userInfo.contains(":")) //$NON-NLS-1$

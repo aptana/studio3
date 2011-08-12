@@ -99,8 +99,7 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 				SourceDisplayUtil.openInEditor(editorInput, lineNumber);
 				return;
 			}
-			MessageDialog.openInformation(UIUtils.getActiveShell(),
-					Messages.OpenScriptSourceAction_Information,
+			MessageDialog.openInformation(UIUtils.getActiveShell(), Messages.OpenScriptSourceAction_Information,
 					MessageFormat.format(Messages.OpenScriptSourceAction_SourceNotFoundFor_0, location.getPath()));
 		} catch (CoreException e) {
 			DebugUiPlugin.errorDialog(Messages.OpenScriptSourceAction_ExceptionWhileOpeningScriptSource, e);

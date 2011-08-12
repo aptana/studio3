@@ -65,7 +65,7 @@ import com.aptana.webserver.ui.IWebServerUIConstants;
  * Launch settings tab
  */
 public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
-	
+
 	private Listener dirtyListener;
 	private Image image;
 
@@ -124,7 +124,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		fBrowserExeText = new Text(group, SWT.SINGLE | SWT.BORDER);
-		fBrowserExeText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		fBrowserExeText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
+				.create());
 
 		Button bBrowserExeBrowse = new Button(group, SWT.PUSH);
 		bBrowserExeBrowse.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
@@ -135,12 +136,13 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		fCommandArgsText = new Text(group, SWT.SINGLE | SWT.BORDER);
-		fCommandArgsText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		fCommandArgsText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
+				.create());
 
 		bBrowserExeBrowse.addSelectionListener(new SelectionAdapter() {
 			/**
-			 * Prompts the user to choose a location from the filesystem and
-			 * sets the location as the full path of the selected file.
+			 * Prompts the user to choose a location from the filesystem and sets the location as the full path of the
+			 * selected file.
 			 */
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
@@ -168,7 +170,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		/* row 1 */
 		rbCurrentPage = new Button(group, SWT.RADIO);
 		rbCurrentPage.setText(Messages.LaunchBrowserSettingsTab_UseCurrentPage);
-		rbCurrentPage.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(3, 1).grab(true, false).create());
+		rbCurrentPage.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(3, 1)
+				.grab(true, false).create());
 
 		/* row 2 */
 		rbSpecificPage = new Button(group, SWT.RADIO);
@@ -176,7 +179,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		rbSpecificPage.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		fSpecificPageText = new Text(group, SWT.SINGLE | SWT.BORDER);
-		fSpecificPageText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		fSpecificPageText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
+				.create());
 
 		bSpecificPageBrowse = new Button(group, SWT.PUSH);
 		bSpecificPageBrowse.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
@@ -188,7 +192,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		rbStartUrl.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		fStartUrlText = new Text(group, SWT.SINGLE | SWT.BORDER);
-		fStartUrlText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(2, 1).grab(true, false).create());
+		fStartUrlText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(2, 1)
+				.grab(true, false).create());
 
 		bSpecificPageBrowse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -229,7 +234,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 				return super.getText(element);
 			}
 		});
-		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations());
+		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager()
+				.getServerConfigurations());
 
 		Link configureLink = new Link(group, SWT.NONE);
 		configureLink.setText(MessageFormat.format("<a>{0}</a>", Messages.LaunchBrowserSettingsTab_Configure_Label)); //$NON-NLS-1$
@@ -237,11 +243,14 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		configureLink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				PreferenceDialog dlg = PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(), IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID,
-						new String[] { IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID }, null, PreferencesUtil.OPTION_FILTER_LOCKED);
+				PreferenceDialog dlg = PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(),
+						IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID,
+						new String[] { IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID }, null,
+						PreferencesUtil.OPTION_FILTER_LOCKED);
 				dlg.open();
 				ISelection selection = managedServersView.getSelection();
-				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations());
+				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager()
+						.getServerConfigurations());
 				managedServersView.setSelection(selection);
 			}
 		});
@@ -301,7 +310,10 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		fStartUrlText.setEnabled(startUrlEnabled);
 		fbaseUrlText.setEnabled(!startUrlEnabled && rbCustomServer.getSelection());
 		managedServersView.getControl().setEnabled(!startUrlEnabled && rbManagedServer.getSelection());
-		managedServersView.getControl().setForeground(getShell().getDisplay().getSystemColor(!startUrlEnabled && rbManagedServer.getSelection() ? SWT.COLOR_LIST_FOREGROUND : SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		managedServersView.getControl().setForeground(
+				getShell().getDisplay().getSystemColor(
+						!startUrlEnabled && rbManagedServer.getSelection() ? SWT.COLOR_LIST_FOREGROUND
+								: SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		rbInternalServer.setEnabled(!startUrlEnabled);
 		rbManagedServer.setEnabled(!startUrlEnabled);
 		rbCustomServer.setEnabled(!startUrlEnabled);
@@ -360,8 +372,12 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			fbaseUrlText.setText(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY));
 			rbManagedServer.setSelection(serverType == ILaunchConfigurationConstants.SERVER_MANAGED);
-			AbstractWebServerConfiguration server = WebServerCorePlugin.getDefault().getServerConfigurationManager().findServerConfiguration(
-					configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME, StringUtil.EMPTY));
+			AbstractWebServerConfiguration server = WebServerCorePlugin
+					.getDefault()
+					.getServerConfigurationManager()
+					.findServerConfiguration(
+							configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
+									StringUtil.EMPTY));
 			if (server != null) {
 				managedServersView.setSelection(new StructuredSelection(server));
 			}
@@ -412,10 +428,13 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		value = fbaseUrlText.getText();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, value);
 
-		AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView.getSelection()).getFirstElement();
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME, serverSelection != null ? serverSelection.getName() : null);
+		AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView
+				.getSelection()).getFirstElement();
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
+				serverSelection != null ? serverSelection.getName() : null);
 
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, fAddProjectName.getSelection());
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME,
+				fAddProjectName.getSelection());
 	}
 
 	/**
@@ -464,7 +483,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		if (rbManagedServer.getSelection()) {
-			AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView.getSelection()).getFirstElement();
+			AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView
+					.getSelection()).getFirstElement();
 			if (serverSelection == null) {
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_ServerNotSelected);
 				return false;

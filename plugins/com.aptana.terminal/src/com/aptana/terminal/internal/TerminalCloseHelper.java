@@ -18,7 +18,6 @@ import com.aptana.terminal.connector.LocalTerminalConnector;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class TerminalCloseHelper {
 
@@ -27,7 +26,7 @@ public final class TerminalCloseHelper {
 	 */
 	private TerminalCloseHelper() {
 	}
-	
+
 	public static boolean canCloseTerminal(IShellProvider shellProvider, LocalTerminalConnector terminalConnector) {
 		List<String> processes = terminalConnector.getRunningProcesses();
 		if (processes.size() < 2) {
@@ -35,9 +34,8 @@ public final class TerminalCloseHelper {
 		}
 
 		int closeId = 1;
-		MessageDialog dialog = new MessageDialog(shellProvider.getShell(), Messages.TerminalCloseHelper_DialogTitle, null,
-				Messages.TerminalCloseHelper_DialogMessage + processes.toString(),
-				MessageDialog.QUESTION,
+		MessageDialog dialog = new MessageDialog(shellProvider.getShell(), Messages.TerminalCloseHelper_DialogTitle,
+				null, Messages.TerminalCloseHelper_DialogMessage + processes.toString(), MessageDialog.QUESTION,
 				new String[] { IDialogConstants.CANCEL_LABEL, IDialogConstants.CLOSE_LABEL }, closeId);
 		return dialog.open() == closeId;
 	}

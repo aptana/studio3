@@ -6,6 +6,8 @@
  * Any modifications to this file must keep this entire header intact.
  */
 // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.filesystem.ftp;
 
@@ -31,9 +33,9 @@ public class FTPPlugin extends Plugin {
 
 	// The shared instance
 	private static FTPPlugin plugin;
-	
+
 	private IFTPCommandLog ftpCommandLog;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -63,7 +65,7 @@ public class FTPPlugin extends Plugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static FTPPlugin getDefault() {
@@ -92,11 +94,11 @@ public class FTPPlugin extends Plugin {
 		Object adapter = null;
 		IAdapterManager manager = Platform.getAdapterManager();
 		if (manager.hasAdapter(this, clazz.getName())) {
-			adapter = manager.getAdapter(this,clazz.getName());
+			adapter = manager.getAdapter(this, clazz.getName());
 			if (adapter == null) {
 				adapter = manager.loadAdapter(this, clazz.getName());
 			}
 		}
 		return adapter;
-	}	
+	}
 }

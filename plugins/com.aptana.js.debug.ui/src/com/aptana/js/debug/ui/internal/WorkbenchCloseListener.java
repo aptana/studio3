@@ -32,9 +32,7 @@ public final class WorkbenchCloseListener implements Listener {
 	}
 
 	/*
-	 * @see
-	 * org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.
-	 * Event)
+	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets. Event)
 	 */
 	public void handleEvent(Event event) {
 		if (event.widget instanceof Shell && PlatformUI.getWorkbench().getWorkbenchWindowCount() == 1

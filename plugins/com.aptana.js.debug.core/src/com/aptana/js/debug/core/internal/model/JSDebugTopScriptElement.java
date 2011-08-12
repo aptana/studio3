@@ -17,7 +17,7 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
  * @author Max Stepanov
  */
 public class JSDebugTopScriptElement extends JSDebugScriptElement {
-	
+
 	private final URI location;
 
 	/**
@@ -40,7 +40,8 @@ public class JSDebugTopScriptElement extends JSDebugScriptElement {
 	}
 
 	/*
-	 * @see com.aptana.js.debug.core.internal.model.JSDebugScriptElement#setParent(com.aptana.js.debug.core.model.IJSScriptElement)
+	 * @see com.aptana.js.debug.core.internal.model.JSDebugScriptElement#setParent(com.aptana.js.debug.core.model.
+	 * IJSScriptElement)
 	 */
 	protected void setParent(IJSScriptElement parent) {
 	}

@@ -31,7 +31,6 @@ import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class FirebugUtil {
 
@@ -132,14 +131,15 @@ public final class FirebugUtil {
 				}
 			}
 			if (doWrite) {
-				writer = new PrintWriter(
-						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(prefs.toFile()), "UTF8"))); //$NON-NLS-1$
+				writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+						new FileOutputStream(prefs.toFile()), "UTF8"))); //$NON-NLS-1$
 				for (String string : lines) {
 					writer.println(string);
 				}
 			}
 		} catch (IOException e) {
-			IdeLog.logError(JSDebugPlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugPlugin.getDefault(),
+					MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
 		} finally {
 			if (reader != null) {
 				try {

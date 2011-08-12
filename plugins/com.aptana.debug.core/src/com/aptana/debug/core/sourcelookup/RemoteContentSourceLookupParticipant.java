@@ -13,7 +13,6 @@ import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 
 /**
  * @author Max Stepanov
- *
  */
 public abstract class RemoteContentSourceLookupParticipant extends AbstractSourceLookupParticipant {
 
@@ -36,6 +35,5 @@ public abstract class RemoteContentSourceLookupParticipant extends AbstractSourc
 		}
 		return super.findSourceElements(object);
 	}
-
 
 }

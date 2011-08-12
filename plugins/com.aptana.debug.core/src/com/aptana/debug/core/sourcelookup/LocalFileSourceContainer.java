@@ -27,7 +27,7 @@ import com.aptana.core.io.efs.EFSUtils;
  * @author Max Stepanov
  */
 public class LocalFileSourceContainer extends AbstractSourceContainer {
-	
+
 	private static final Object[] EMPTY = new Object[0];
 
 	/*
@@ -81,7 +81,6 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 
 	/*
 	 * Not persisted via the launch configuration
-	 * 
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getType()
 	 */
 	public ISourceContainerType getType() {

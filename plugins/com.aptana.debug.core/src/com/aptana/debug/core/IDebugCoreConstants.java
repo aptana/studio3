@@ -13,7 +13,7 @@ package com.aptana.debug.core;
 public interface IDebugCoreConstants {
 
 	String PREFIX = DebugCorePlugin.PLUGIN_ID;
-	
+
 	/**
 	 * Unique identifier for the JS line breakpoint markers (value
 	 * <code>com.aptana.debug.core.lineBreakpointMarker</code>).
@@ -27,26 +27,23 @@ public interface IDebugCoreConstants {
 	String ID_EXCEPTION_BREAKPOINT_MARKER = PREFIX + ".exceptionBreakpointMarker"; //$NON-NLS-1$
 
 	/**
-	 * Unique identifier for the JS watchpoint markers (value
-	 * <code>com.aptana.debug.core.watchpointMarker</code>).
+	 * Unique identifier for the JS watchpoint markers (value <code>com.aptana.debug.core.watchpointMarker</code>).
 	 */
 	String ID_WATCHPOINT_MARKER = PREFIX + ".watchpointMarker"; //$NON-NLS-1$
 
 	/**
-	 * Unique identifier for the JS breakpoints location (value
-	 * <code>com.aptana.debug.core.breakpointLocation</code>).
+	 * Unique identifier for the JS breakpoints location (value <code>com.aptana.debug.core.breakpointLocation</code>).
 	 */
 	String BREAKPOINT_LOCATION = PREFIX + ".breakpointLocation"; //$NON-NLS-1$
 
 	/**
-	 * Unique identifier for the JS breakpoints hit count (value
-	 * <code>com.aptana.debug.core.breakpointHitCount</code>).
+	 * Unique identifier for the JS breakpoints hit count (value <code>com.aptana.debug.core.breakpointHitCount</code>).
 	 */
 	String BREAKPOINT_HIT_COUNT = PREFIX + ".breakpointHitCount"; //$NON-NLS-1$
 
 	/**
-	 * Unique identifier for the JS breakpoints condition (value
-	 * <code>com.aptana.debug.core.breakpointCondition</code>).
+	 * Unique identifier for the JS breakpoints condition (value <code>com.aptana.debug.core.breakpointCondition</code>
+	 * ).
 	 */
 	String BREAKPOINT_CONDITION = PREFIX + ".breakpointCondition"; //$NON-NLS-1$
 
@@ -76,8 +73,7 @@ public interface IDebugCoreConstants {
 
 	/**
 	 * Unique fill accessor for the JS watchpoint variable name (value
-	 * <code>com.aptana.debug.core.watchpointVariableAccessor</code>).
-	 * Internal use only.
+	 * <code>com.aptana.debug.core.watchpointVariableAccessor</code>). Internal use only.
 	 */
 	String WATCHPOINT_VARIABLE_ACCESSOR = PREFIX + ".watchpointVariableAccessor"; //$NON-NLS-1$
 

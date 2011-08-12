@@ -67,8 +67,8 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	}
 
 	/*
-	 * 
-	 * @see org.eclipse.debug.ui.sourcelookup.ISourceDisplay#displaySource(java.lang.Object, org.eclipse.ui.IWorkbenchPage, boolean)
+	 * @see org.eclipse.debug.ui.sourcelookup.ISourceDisplay#displaySource(java.lang.Object,
+	 * org.eclipse.ui.IWorkbenchPage, boolean)
 	 */
 	public void displaySource(Object element, IWorkbenchPage page, boolean forceSourceLookup) {
 		fSourceLookupJob.setLookupInfo(element,
@@ -103,7 +103,6 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 						/*
 						 * (non-Javadoc)
-						 * 
 						 * @see org.eclipse.debug.core.sourcelookup.containers.
 						 * DefaultSourceContainer#createSourceContainers()
 						 */
@@ -156,9 +155,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-		 * IProgressMonitor)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 		 */
 		protected IStatus run(IProgressMonitor monitor) {
 			if (!monitor.isCanceled()) {
@@ -203,10 +200,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime
-		 * .IProgressMonitor)
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime .IProgressMonitor)
 		 */
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			ISourceLookupResult result = null;
@@ -257,8 +251,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	public static class Factory implements IAdapterFactory {
 
 		/*
-		 * @see
-		 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (adapterType == ISourceDisplay.class) {

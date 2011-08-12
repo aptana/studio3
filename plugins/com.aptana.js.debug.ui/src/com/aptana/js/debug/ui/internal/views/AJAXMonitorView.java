@@ -223,20 +223,20 @@ public class AJAXMonitorView extends AbstractDebugView implements IDebugEventSet
 				continue;
 			}
 			switch (event.getKind()) {
-			case DebugEvent.CHANGE:
-				getViewer().getControl().getDisplay().syncExec(new Runnable() {
-					public void run() {
-						if (data != null) {
-							((StructuredViewer) getViewer()).update(current, null);
-						} else {
-							updateTitle();
-							((StructuredViewer) getViewer()).refresh(current);
+				case DebugEvent.CHANGE:
+					getViewer().getControl().getDisplay().syncExec(new Runnable() {
+						public void run() {
+							if (data != null) {
+								((StructuredViewer) getViewer()).update(current, null);
+							} else {
+								updateTitle();
+								((StructuredViewer) getViewer()).refresh(current);
+							}
 						}
-					}
-				});
-				break;
-			default:
-				break;
+					});
+					break;
+				default:
+					break;
 			}
 		}
 	}

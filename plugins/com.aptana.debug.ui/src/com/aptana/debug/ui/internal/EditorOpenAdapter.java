@@ -20,7 +20,6 @@ import com.aptana.debug.ui.SourceDisplayUtil;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class EditorOpenAdapter implements IEditorOpenAdapter {
 

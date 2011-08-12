@@ -19,7 +19,7 @@ import com.aptana.js.debug.core.model.IJSVariable;
  * @author Max Stepanov
  */
 public class JSDebugVariable extends JSDebugElement implements IJSVariable {
-	
+
 	/**
 	 * FLAGS_MODIFIABLE
 	 */
@@ -54,7 +54,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	private final String qualifier;
 	private final String name;
 	private IValue value;
-	/* package */ int flags;
+	/* package */int flags;
 
 	/**
 	 * JSDebugVariable
@@ -228,12 +228,12 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 		}
 		return fullname;
 	}
-	
-	/* package */ String getQualifier() {
+
+	/* package */String getQualifier() {
 		return qualifier;
 	}
-	
-	/* package */ String getThreadId() {
+
+	/* package */String getThreadId() {
 		return threadId;
 	}
 

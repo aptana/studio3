@@ -18,62 +18,45 @@ import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPTransferType;
 
-public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
-{
+public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface> {
 
 	private IPoolConnectionManager manager;
 
-	public FTPClientPool(IPoolConnectionManager manager)
-	{
+	public FTPClientPool(IPoolConnectionManager manager) {
 		super(Platform.getPreferencesService().getInt(FTPPlugin.PLUGIN_ID, IFTPPreferenceConstants.KEEP_ALIVE_TIME,
 				FTPPreferenceInitializer.DEFAULT_KEEP_ALIVE_MINUTES, null) * 60 * 1000);
 		this.manager = manager;
 		start();
 	}
 
-	public FTPClientInterface create()
-	{
+	public FTPClientInterface create() {
 		return manager.newClient();
 	}
 
-	public void expire(FTPClientInterface ftpClient)
-	{
-		if (ftpClient == null)
-		{
+	public void expire(FTPClientInterface ftpClient) {
+		if (ftpClient == null) {
 			return;
 		}
-		try
-		{
+		try {
 			ftpClient.quit();
-		}
-		catch (Exception e)
-		{
-			try
-			{
+		} catch (Exception e) {
+			try {
 				ftpClient.quitImmediately();
-			}
-			catch (Exception ignore)
-			{
+			} catch (Exception ignore) {
 				ignore.getCause();
 			}
 		}
 	}
 
-	public boolean validate(FTPClientInterface o)
-	{
-		if (!o.connected())
-		{
+	public boolean validate(FTPClientInterface o) {
+		if (!o.connected()) {
 			return false;
 		}
-		if (o instanceof FTPClient)
-		{
-			try
-			{
+		if (o instanceof FTPClient) {
+			try {
 				((FTPClient) o).noOperation();
 				((FTPClient) o).setType(FTPTransferType.BINARY);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				// ignore
 				return false;
 			}

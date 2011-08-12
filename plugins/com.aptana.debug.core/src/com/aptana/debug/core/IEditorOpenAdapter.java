@@ -9,7 +9,6 @@ package com.aptana.debug.core;
 
 /**
  * @author Max Stepanov
- * 
  */
 public interface IEditorOpenAdapter {
 

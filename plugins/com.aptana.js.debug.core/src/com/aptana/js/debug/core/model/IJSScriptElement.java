@@ -15,7 +15,7 @@ import org.eclipse.debug.core.model.IDebugElement;
  * @author Max Stepanov
  */
 public interface IJSScriptElement extends IDebugElement {
-	
+
 	/**
 	 * Function name
 	 * 

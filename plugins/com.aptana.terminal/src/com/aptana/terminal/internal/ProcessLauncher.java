@@ -18,7 +18,6 @@ import com.aptana.terminal.IProcessConfiguration;
 
 /**
  * @author Max Stepanov
- *
  */
 public class ProcessLauncher {
 
@@ -26,7 +25,7 @@ public class ProcessLauncher {
 	private IPath initialDirectory;
 	private Process process;
 	private ListenerList processListeners = new ListenerList();
-	
+
 	/**
 	 * 
 	 */
@@ -34,26 +33,27 @@ public class ProcessLauncher {
 		this.configuration = configuration;
 		this.initialDirectory = initialDirectory;
 	}
-	
+
 	public void launch() throws IOException, CoreException {
 		ProcessBuilder builder = new ProcessBuilder(configuration.getCommandLine());
 		builder.environment().putAll(configuration.getEnvironment());
-		builder.directory(initialDirectory != null ? initialDirectory.toFile() : null);
+		builder.directory((initialDirectory != null) ? initialDirectory.toFile() : null);
 		process = builder.start();
-		
+
 		new Thread("Process watcher") { //$NON-NLS-1$
 			@Override
 			public void run() {
 				try {
 					process.waitFor();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException ignore) {
+					ignore.getCause();
 				} finally {
 					notofyProcessCompleted();
 				}
 			}
 		}.start();
 	}
-	
+
 	public void destroy() {
 		if (process != null) {
 			try {
@@ -63,14 +63,14 @@ public class ProcessLauncher {
 			}
 		}
 	}
-	
+
 	/**
 	 * @return the process
 	 */
 	public Process getProcess() {
 		return process;
 	}
-	
+
 	public void addProcessListener(IProcessListener listener) {
 		processListeners.add(listener);
 	}
@@ -78,7 +78,7 @@ public class ProcessLauncher {
 	public void removeProcessListener(IProcessListener listener) {
 		processListeners.remove(listener);
 	}
-	
+
 	private void notofyProcessCompleted() {
 		for (Object listener : processListeners.getListeners()) {
 			((IProcessListener) listener).processCompleted();

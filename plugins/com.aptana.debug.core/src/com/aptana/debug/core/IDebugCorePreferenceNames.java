@@ -13,9 +13,8 @@ package com.aptana.debug.core;
 public interface IDebugCorePreferenceNames {
 
 	/**
-	 * List of defined detail formatters.A String containing a comma separated
-	 * list of fully qualified type names, the associated code snippet and an
-	 * 'enabled' flag.
+	 * List of defined detail formatters.A String containing a comma separated list of fully qualified type names, the
+	 * associated code snippet and an 'enabled' flag.
 	 */
 	String SUFFIX_DETAIL_FORMATTERS_LIST = ".detail_formatters"; //$NON-NLS-1$
 

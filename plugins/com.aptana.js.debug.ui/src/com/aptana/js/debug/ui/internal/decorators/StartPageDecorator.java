@@ -43,7 +43,8 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object, org.eclipse.jface.viewers.IDecoration)
+	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object,
+	 * org.eclipse.jface.viewers.IDecoration)
 	 */
 	public void decorate(Object element, IDecoration decoration) {
 		if (element instanceof IFile) {
@@ -80,7 +81,8 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 * @see
+	 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 	 */
 	public void removeListener(ILabelProviderListener listener) {
 		listeners.remove(listener);
@@ -88,7 +90,9 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.js.debug.ui.internal.StartPageManager.IStartPageChangeListener#startPageChanged(org.eclipse.core.resources.IResource)
+	 * @see
+	 * com.aptana.js.debug.ui.internal.StartPageManager.IStartPageChangeListener#startPageChanged(org.eclipse.core.resources
+	 * .IResource)
 	 */
 	public void startPageChanged(IResource resource) {
 		LabelProviderChangedEvent event;

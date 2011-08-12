@@ -242,8 +242,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 	}
 
 	/**
-	 * Validates the current state of the hit count editor. Hit count value must
-	 * be a positive integer.
+	 * Validates the current state of the hit count editor. Hit count value must be a positive integer.
 	 */
 	private void hitCountChanged() {
 		if (!fHitCountButton.getSelection()) {
@@ -334,8 +333,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 	}
 
 	/**
-	 * Creates the controls that allow the user to specify the breakpoint's
-	 * condition
+	 * Creates the controls that allow the user to specify the breakpoint's condition
 	 * 
 	 * @param parent
 	 *            the composite in which the condition editor should be created
@@ -389,11 +387,10 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 	}
 
 	/**
-	 * Adds the given error message to the errors currently displayed on this
-	 * page. The page displays the most recently added error message. Clients
-	 * should retain messages that are passed into this method as the message
-	 * should later be passed into removeErrorMessage(String) to clear the
-	 * error. This method should be used instead of setErrorMessage(String).
+	 * Adds the given error message to the errors currently displayed on this page. The page displays the most recently
+	 * added error message. Clients should retain messages that are passed into this method as the message should later
+	 * be passed into removeErrorMessage(String) to clear the error. This method should be used instead of
+	 * setErrorMessage(String).
 	 * 
 	 * @param message
 	 *            the error message to display on this page.
@@ -409,11 +406,9 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 	}
 
 	/**
-	 * Removes the given error message from the errors currently displayed on
-	 * this page. When an error message is removed, the page displays the error
-	 * that was added before the given message. This is akin to popping the
-	 * message from a stack. Clients should call this method instead of
-	 * setErrorMessage(null).
+	 * Removes the given error message from the errors currently displayed on this page. When an error message is
+	 * removed, the page displays the error that was added before the given message. This is akin to popping the message
+	 * from a stack. Clients should call this method instead of setErrorMessage(null).
 	 * 
 	 * @param message
 	 *            the error message to clear
@@ -442,7 +437,8 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 		try {
 			ResourcesPlugin.getWorkspace().run(wr, null, 0, null);
 		} catch (CoreException e) {
-			DebugUiPlugin.errorDialog(Messages.JSLineBreakpointPropertyPage_ExceptionWhileSavingBreakpointProperties, e);
+			DebugUiPlugin
+					.errorDialog(Messages.JSLineBreakpointPropertyPage_ExceptionWhileSavingBreakpointProperties, e);
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return super.performOk();

@@ -47,8 +47,7 @@ public class EditDetailFormatterAction extends ObjectActionDelegate {
 		}
 		DebugOptionsManager detailFormattersManager = JSDebugPlugin.getDefault().getDebugOptionsManager();
 		DetailFormatter detailFormatter = detailFormattersManager.getAssociatedDetailFormatter(typeName);
-		if (new DetailFormatterDialog(UIUtils.getActiveShell(), detailFormatter,
-				null, false, true).open() == Window.OK) {
+		if (new DetailFormatterDialog(UIUtils.getActiveShell(), detailFormatter, null, false, true).open() == Window.OK) {
 			detailFormattersManager.setAssociatedDetailFormatter(detailFormatter);
 			refreshCurrentSelection();
 		}

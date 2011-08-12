@@ -27,7 +27,6 @@ public class JSDebugImageDescriptor extends CompositeImageDescriptor {
 	private Point size;
 
 	/**
-	 * 
 	 * @param baseImage
 	 * @param flags
 	 */

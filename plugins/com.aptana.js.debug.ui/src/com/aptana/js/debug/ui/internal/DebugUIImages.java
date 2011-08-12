@@ -137,8 +137,7 @@ public final class DebugUIImages {
 	}
 
 	/**
-	 * Returns the <code>ImageDescriptor</code> identified by the given key, or
-	 * <code>null</code> if it does not exist.
+	 * Returns the <code>ImageDescriptor</code> identified by the given key, or <code>null</code> if it does not exist.
 	 * 
 	 * @param key
 	 * @return ImageDescriptor
@@ -205,9 +204,8 @@ public final class DebugUIImages {
 	 * @param key
 	 *            The key to use when registering the image
 	 * @param path
-	 *            The path where the image can be found. This path is relative
-	 *            to where this plugin class is found (i.e. typically the
-	 *            packages directory)
+	 *            The path where the image can be found. This path is relative to where this plugin class is found (i.e.
+	 *            typically the packages directory)
 	 */
 	private static void declareRegistryImage(String key, String path) {
 		ImageDescriptor desc = ImageDescriptor.getMissingImageDescriptor();

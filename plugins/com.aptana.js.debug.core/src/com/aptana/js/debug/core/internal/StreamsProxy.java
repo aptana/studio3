@@ -49,16 +49,14 @@ public class StreamsProxy implements IExtendedStreamsProxy {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.aptana.debug.core.IExtendedStreamsProxy#getStreamMonitor(java.lang
-	 * .String)
+	 * @see com.aptana.debug.core.IExtendedStreamsProxy#getStreamMonitor(java.lang .String)
 	 */
 	public IStreamMonitor getStreamMonitor(String streamIdentifier) {
 		return monitorMap.get(streamIdentifier);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.debug.core.IExtendedStreamsProxy#getStreamIdentifers()
 	 */
 	public String[] getStreamIdentifers() {

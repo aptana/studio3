@@ -21,7 +21,6 @@ import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class Policy {
 
@@ -30,7 +29,7 @@ public final class Policy {
 	 */
 	private Policy() {
 	}
-	
+
 	public static String generateAuthId(String proto, IBaseRemoteConnectionPoint connectionPoint) {
 		return generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost(), connectionPoint.getPort());
 	}
@@ -38,8 +37,7 @@ public final class Policy {
 	public static String generateAuthId(String proto, String login, String host, int port) {
 		if (host != null && host.length() > 0 && port > 0 && login != null && login.length() > 0) {
 			return MessageFormat.format("{0}/{1}@{2}:{3}", new Object[] { //$NON-NLS-1$
-					proto, login, host, Integer.toString(port)
-			});
+					proto, login, host, Integer.toString(port) });
 		}
 		return null;
 	}
@@ -51,18 +49,18 @@ public final class Policy {
 			permissions |= (string.charAt(index++) == 'r') ? IExtendedFileInfo.PERMISSION_OWNER_READ : 0;
 			permissions |= (string.charAt(index++) == 'w') ? IExtendedFileInfo.PERMISSION_OWNER_WRITE : 0;
 			permissions |= (string.charAt(index++) == 'x') ? IExtendedFileInfo.PERMISSION_OWNER_EXECUTE : 0;
-			
+
 			permissions |= (string.charAt(index++) == 'r') ? IExtendedFileInfo.PERMISSION_GROUP_READ : 0;
 			permissions |= (string.charAt(index++) == 'w') ? IExtendedFileInfo.PERMISSION_GROUP_WRITE : 0;
 			permissions |= (string.charAt(index++) == 'x') ? IExtendedFileInfo.PERMISSION_GROUP_EXECUTE : 0;
-			
+
 			permissions |= (string.charAt(index++) == 'r') ? IExtendedFileInfo.PERMISSION_OTHERS_READ : 0;
 			permissions |= (string.charAt(index++) == 'w') ? IExtendedFileInfo.PERMISSION_OTHERS_WRITE : 0;
 			permissions |= (string.charAt(index++) == 'x') ? IExtendedFileInfo.PERMISSION_OTHERS_EXECUTE : 0;
 		}
 		return permissions;
 	}
-	
+
 	public static IProgressMonitor monitorFor(IProgressMonitor monitor) {
 		return (monitor == null) ? new NullProgressMonitor() : monitor;
 	}
@@ -82,6 +80,5 @@ public final class Policy {
 			throw new OperationCanceledException();
 		}
 	}
-
 
 }

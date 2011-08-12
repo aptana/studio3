@@ -11,7 +11,6 @@ import java.io.File;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class Firefox {
 
@@ -35,6 +34,5 @@ public final class Firefox {
 		}
 		return false;
 	}
-
 
 }

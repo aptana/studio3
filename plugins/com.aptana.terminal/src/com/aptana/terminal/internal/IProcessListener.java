@@ -10,7 +10,6 @@ package com.aptana.terminal.internal;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IProcessListener {
 

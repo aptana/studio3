@@ -12,17 +12,14 @@ import org.eclipse.debug.core.model.IWatchpoint;
 
 /**
  * @author Max Stepanov
- * 
  */
 public interface IJSWatchpoint extends IWatchpoint {
 	/**
 	 * Returns the name of the variable associated with this watchpoint
 	 * 
-	 * @return field the name of the variable on which this watchpoint is
-	 *         installed
+	 * @return field the name of the variable on which this watchpoint is installed
 	 * @exception CoreException
-	 *                if unable to access the property on this breakpoint's
-	 *                underlying marker
+	 *                if unable to access the property on this breakpoint's underlying marker
 	 */
 	public String getVariableName() throws CoreException;
 
