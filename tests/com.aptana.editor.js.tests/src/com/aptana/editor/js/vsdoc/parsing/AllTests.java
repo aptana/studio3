@@ -21,6 +21,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.vsdoc.parsing");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(VSDocNodeAttachmentTests.class);
 		suite.addTestSuite(VSDocParserTests.class);
 		//$JUnit-END$
 		return suite;

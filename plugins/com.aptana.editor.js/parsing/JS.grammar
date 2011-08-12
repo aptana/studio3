@@ -87,10 +87,10 @@
 			{
 				switch (node.getNodeType())
 				{
-					case JSNodeTypes.STATEMENTS:
+					case IJSNodeTypes.STATEMENTS:
 						IParseNode parent = node.getParent();
 
-						if (parent.getNodeType() == JSNodeTypes.FUNCTION)
+						if (parent.getNodeType() == IJSNodeTypes.FUNCTION)
 						{
 							((JSNode) parent).setDocumentation(block);
 						}
@@ -130,10 +130,6 @@
 				{
 					((JSNode) node.getFirstChild()).setDocumentation(block);
 				}
-				else if (node instanceof JSIdentifierNode && node.getParent() instanceof JSNameValuePairNode && node.getNextSibling() instanceof JSFunctionNode)
-				{
-					((JSNode) node.getNextSibling()).setDocumentation(block);
-				}
 				else
 				{
 					IParseNode statement = ((JSNode) node).getContainingStatementNode();
@@ -146,13 +142,13 @@
 					{
 						switch (node.getNodeType())
 						{
-							case JSNodeTypes.VAR:
+							case IJSNodeTypes.VAR:
 								// associate documentation with first declared variable's value
 								JSVarNode varNode = (JSVarNode) node;
 								((JSNode) varNode.getFirstChild().getLastChild()).setDocumentation(block);
 								break;
 
-							case JSNodeTypes.IDENTIFIER:
+							case IJSNodeTypes.IDENTIFIER:
 								IParseNode parent = node.getParent();
 
 								if (parent instanceof JSNameValuePairNode)
@@ -262,22 +258,22 @@
 
 				for (Symbol symbol : fScanner.getSDocComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 for (Symbol symbol : fScanner.getVSDocComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 for (Symbol symbol : fScanner.getSingleLineComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 for (Symbol symbol : fScanner.getMultiLineComments())
                 {
-                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                    comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
 
                 root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
@@ -1092,6 +1088,7 @@ ArrayLiteral
 		:}
 	|	LBRACKET.l Elision.e RBRACKET.r
 		{:
+			e.addChild(new JSNullNode());
 			return new JSArrayNode(l, r, e);
 		:}
 	|	LBRACKET.l ElementList.e RBRACKET.r
@@ -1104,6 +1101,7 @@ ArrayLiteral
 		:}
 	|	LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
 		{:
+			n.addChild(new JSNullNode());
 			return new JSArrayNode(l, r, e, n);
 		:}
 	;
@@ -1141,7 +1139,7 @@ Elision
 		:}
 	|	COMMA
 		{:
-			return new JSElisionNode(new JSNullNode(), new JSNullNode());
+			return new JSElisionNode(new JSNullNode());
 		:}
 	;
 

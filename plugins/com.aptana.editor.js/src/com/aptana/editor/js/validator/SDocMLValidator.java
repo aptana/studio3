@@ -86,7 +86,7 @@ public class SDocMLValidator implements IValidator
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		JSMetadataReader reader = new JSMetadataReader();
-		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
+		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes()); // $codepro.audit.disable closeWhereCreated
 		LogCollector collector = new LogCollector(manager, path, items);
 
 		manager.addParseErrors(items);

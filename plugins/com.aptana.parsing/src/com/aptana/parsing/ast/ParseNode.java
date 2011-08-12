@@ -15,6 +15,7 @@ import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
@@ -713,5 +714,58 @@ public class ParseNode extends Node implements IParseNode
 		}
 
 		return text.toString();
+	}
+
+	/**
+	 * toXML
+	 * 
+	 * @return
+	 */
+	public String toXML()
+	{
+		SourcePrinter printer = new SourcePrinter();
+
+		toXML(printer);
+
+		return printer.toString();
+	}
+
+	/**
+	 * toXML
+	 * 
+	 * @param printer
+	 */
+	protected void toXML(SourcePrinter printer)
+	{
+		if (hasChildren())
+		{
+			printer.printWithIndent('<').print(getElementName()).increaseIndent();
+
+			IParseNodeAttribute[] attrs = getAttributes();
+
+			if (attrs != null)
+			{
+				for (IParseNodeAttribute attr : attrs)
+				{
+					printer.print(' ').print(attr.getName()).print("=\"").print(attr.getValue()).print('"'); //$NON-NLS-1$
+				}
+			}
+
+			printer.println('>');
+
+			for (IParseNode child : this)
+			{
+				if (child instanceof ParseNode)
+				{
+					((ParseNode) child).toXML(printer);
+				}
+			}
+
+			printer.decreaseIndent().printWithIndent("</").print(getElementName()).println('>'); //$NON-NLS-1$
+		}
+		else
+		{
+			printer.printWithIndent('<').print(getElementName()).println("/>"); //$NON-NLS-1$
+		}
 	}
 }
