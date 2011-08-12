@@ -75,7 +75,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 			@Override
 			public Object[] getElements(Object inputElement) {
 				if (inputElement instanceof ServerConfigurationManager) {
-					inputElement = ((ServerConfigurationManager) inputElement).getServerConfigurations();
+					inputElement = ((ServerConfigurationManager) inputElement).getServerConfigurations(); // $codepro.audit.disable questionableAssignment
 				}
 				return super.getElements(inputElement);
 			}
@@ -138,7 +138,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				dlg.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getConfigurationTypes());
 				dlg.setTitle(Messages.ServersPreferencePage_Title);
 				Object[] result;
-				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) {
+				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) { // $codepro.audit.disable assignmentInCondition
 					String typeId = ((ConfigurationType) result[0]).getId();
 					try {
 						AbstractWebServerConfiguration newConfiguration = WebServerCorePlugin.getDefault().getServerConfigurationManager()

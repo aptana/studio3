@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryImport
 
 package com.aptana.webserver.core;
 
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -28,6 +30,7 @@ import org.eclipse.core.runtime.SafeRunner;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.webserver.core.ServerConfigurationChangeEvent.Kind;
 
 /**
@@ -40,7 +43,7 @@ public final class ServerConfigurationManager {
 
 	private static final String EXTENSION_POINT_ID = WebServerCorePlugin.PLUGIN_ID + ".webServerTypes"; //$NON-NLS-1$
 	private static final String TAG_TYPE = "type"; //$NON-NLS-1$
-	protected static final String ATT_ID = "id"; //$NON-NLS-1$
+	/* package */ static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATT_NAME = "name"; //$NON-NLS-1$
 
@@ -132,12 +135,15 @@ public final class ServerConfigurationManager {
 					}
 				}
 			} catch (IOException e) {
+				IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			} catch (CoreException e) {
+				IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			} finally {
 				if (reader != null) {
 					try {
 						reader.close();
 					} catch (IOException e) {
+						IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 					}
 				}
 			}
@@ -170,11 +176,13 @@ public final class ServerConfigurationManager {
 			writer = new FileWriter(path.toFile());
 			memento.save(writer);
 		} catch (IOException e) {
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 		} finally {
 			if (writer != null) {
 				try {
 					writer.close();
 				} catch (IOException e) {
+					IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 				}
 			}
 		}
@@ -200,9 +208,7 @@ public final class ServerConfigurationManager {
 	}
 
 	public void addServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
-		if (serverConfiguration == null) {
-			throw new IllegalArgumentException();
-		}
+		Assert.isLegal(serverConfiguration != null);
 		if (!serverConfigurations.contains(serverConfiguration)) {
 			serverConfigurations.add(serverConfiguration);
 			notifyListeners(Kind.ADDED, serverConfiguration);
@@ -287,7 +293,7 @@ public final class ServerConfigurationManager {
 		for (Object i : listeners.getListeners()) {
 			final IServerConfigurationChangeListener listener = (IServerConfigurationChangeListener) i;
 			SafeRunner.run(new ISafeRunnable() {
-				public void run() throws Exception {
+				public void run() {
 					listener.configurationChanged(event);
 				}
 				

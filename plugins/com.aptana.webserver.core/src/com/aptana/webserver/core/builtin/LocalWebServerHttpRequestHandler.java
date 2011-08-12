@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
 
 package com.aptana.webserver.core.builtin;
 
@@ -58,7 +59,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 	/**
 	 * @param documentRoot
 	 */
-	public LocalWebServerHttpRequestHandler(EFSWebServerConfiguration configuration) {
+	protected LocalWebServerHttpRequestHandler(EFSWebServerConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -89,8 +90,8 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 					response.setStatusCode(HttpStatus.SC_OK);
 					if (METHOD_GET.equals(method)) {
 						File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
-						final File temporaryFile = file == null ? fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor()) : null;
-						response.setEntity(new NFileEntity(file != null ? file : temporaryFile,  getMimeType(fileStore.getName())) {
+						final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor()) : null;
+						response.setEntity(new NFileEntity((file != null) ? file : temporaryFile,  getMimeType(fileStore.getName())) {
 							@Override
 							public void finish() {
 								super.finish();

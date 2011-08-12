@@ -35,11 +35,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.IPropertyDialogProvider;
 import com.aptana.webserver.core.SimpleWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.ui.WebServerUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -151,7 +153,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 
 		if (source != null) {
 			String name = source.getName();
-			nameText.setText(name != null ? name : StringUtil.EMPTY);
+			nameText.setText((name != null) ? name : StringUtil.EMPTY);
 			URL url = source.getBaseURL();
 			if (url != null) {
 				baseUrlText.setText(url.toExternalForm());
@@ -198,6 +200,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 			try {
 				source.setBaseURL(new URL(baseUrlText.getText()));
 			} catch (MalformedURLException e) {
+				IdeLog.logError(WebServerUIPlugin.getDefault(), e);
 			}
 			IPath path = Path.fromOSString(documentRootText.getText());
 			source.setDocumentRootPath(path);

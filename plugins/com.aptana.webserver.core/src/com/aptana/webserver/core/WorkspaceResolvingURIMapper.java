@@ -66,7 +66,7 @@ public class WorkspaceResolvingURIMapper implements IURIMapper
 	public IFileStore resolve(URI uri)
 	{
 		IFileStore fileStore = baseMapper.resolve(uri);
-		if (fileStore != null && fileStore.getFileSystem() == EFS.getLocalFileSystem())
+		if (fileStore != null && fileStore.getFileSystem() == EFS.getLocalFileSystem()) // $codepro.audit.disable useEquals
 		{
 			try
 			{
