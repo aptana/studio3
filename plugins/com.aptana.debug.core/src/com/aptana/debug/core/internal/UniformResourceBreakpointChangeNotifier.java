@@ -81,8 +81,10 @@ public class UniformResourceBreakpointChangeNotifier implements IBreakpointManag
 				if (breakpoint != null) {
 					if (kind == IResourceDelta.ADDED) {
 						/* TODO */
+						breakpoint.hashCode();
 					} else if (kind == IResourceDelta.REMOVED) {
 						/* TODO */
+						breakpoint.hashCode();
 					} else {
 						breakpointManager.fireBreakpointChanged(breakpoint);
 					}

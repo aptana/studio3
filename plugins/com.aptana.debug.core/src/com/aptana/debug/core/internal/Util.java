@@ -34,10 +34,12 @@ public final class Util {
 		try {
 			return URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
 		} catch (Exception ignore) {
+			ignore.getCause();
 		}
 		try {
 			return URLDecoder.decode(url, "ASCII"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException ignore) {
+			ignore.getCause();
 		}
 		return url;
 	}

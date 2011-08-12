@@ -15,6 +15,9 @@ import org.eclipse.ui.console.IPatternMatchListenerDelegate;
 import org.eclipse.ui.console.PatternMatchEvent;
 import org.eclipse.ui.console.TextConsole;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.debug.ui.DebugUiPlugin;
+
 /**
  * @author Max Stepanov
  */
@@ -46,11 +49,13 @@ public class ConsoleTracker implements IPatternMatchListenerDelegate {
 			try {
 				lineNumber = Integer.parseInt(text.substring(index + 1));
 			} catch (NumberFormatException ignore) {
+				ignore.getCause();
 			}
 			text = text.substring(0, index);
 			IHyperlink link = new ConsoleHyperlink(fConsole, text, lineNumber);
 			fConsole.addHyperlink(link, event.getOffset() + 1, event.getLength() - 2);
-		} catch (BadLocationException ignore) {
+		} catch (BadLocationException e) {
+			IdeLog.logWarning(DebugUiPlugin.getDefault(), e);
 		}
 	}
 

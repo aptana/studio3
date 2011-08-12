@@ -52,7 +52,7 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IEditorOpenAdapter.class) {
+			if (IEditorOpenAdapter.class.equals(adapterType)) {
 				return new EditorOpenAdapter();
 			}
 			return null;

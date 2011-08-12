@@ -84,8 +84,9 @@ public final class DebugUtil {
 		}
 		if (element instanceof String) {
 			try {
-				element = new URI((String) element);
-			} catch (URISyntaxException e) {
+				element = new URI((String) element); // $codepro.audit.disable questionableAssignment
+			} catch (URISyntaxException ignore) {
+				ignore.getCause();
 			}
 		}
 		if (element instanceof URI) {

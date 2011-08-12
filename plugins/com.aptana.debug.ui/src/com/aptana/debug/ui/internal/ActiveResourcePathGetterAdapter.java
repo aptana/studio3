@@ -123,7 +123,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 	private IResource findConnectedResource(IResource resource) {
 		IPath location = resource.getLocation();
 		IPath path = findConnectedPath(location);
-		if (path != location) {
+		if (path != location) { // $codepro.audit.disable useEquals
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
 			if (file != null) {
 				return file;
@@ -157,7 +157,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IActiveResourcePathGetterAdapter.class) {
+			if (IActiveResourcePathGetterAdapter.class.equals(adapterType)) {
 				return new ActiveResourcePathGetterAdapter();
 			}
 			return null;

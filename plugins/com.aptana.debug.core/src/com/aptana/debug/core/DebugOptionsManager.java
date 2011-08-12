@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.debug.core;
 
 import java.net.URI;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
@@ -62,7 +65,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	/**
 	 * Map of types to the associated formatter (code snippet). ( <code>String</code> -> <code>String</code>)
 	 */
-	private HashMap<String, DetailFormatter> fDetailFormattersMap;
+	private Map<String, DetailFormatter> fDetailFormattersMap;
 
 	public DebugOptionsManager(String modelIdentifier) {
 		this.modelIdentifier = modelIdentifier;
@@ -188,8 +191,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		List<String> list = new ArrayList<String>(10);
 		StringTokenizer tokenizer = new StringTokenizer(listString, ","); //$NON-NLS-1$
 		while (tokenizer.hasMoreTokens()) {
-			String token = tokenizer.nextToken();
-			list.add(token);
+			list.add(tokenizer.nextToken());
 		}
 		return (String[]) list.toArray(new String[list.size()]);
 	}

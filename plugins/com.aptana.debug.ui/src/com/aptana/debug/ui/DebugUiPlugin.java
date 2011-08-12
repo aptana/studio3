@@ -5,6 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
+
 package com.aptana.debug.ui;
 
 import org.eclipse.core.runtime.IStatus;

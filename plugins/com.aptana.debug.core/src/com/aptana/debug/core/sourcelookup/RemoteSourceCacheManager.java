@@ -78,7 +78,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 		if (fileContentRetriever != null) {
 			for (RemoteFileStorage storage : cache.values()) {
 				if (clear) {
-					if (storage.getFileContentRetriever() == fileContentRetriever) {
+					if (storage.getFileContentRetriever() == fileContentRetriever) { // $codepro.audit.disable useEquals
 						storage.setFileContentRetriever(null);
 
 					}
