@@ -14,10 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
@@ -84,7 +82,15 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			aptanaEditors = getAptanaEditorFiletypeMap();
 		}
 
-		Set<String> editors = new TreeSet<String>(aptanaEditors.keySet());
+		List<String> editors = new ArrayList<String>(aptanaEditors.keySet());
+		Collections.sort(editors, new Comparator<String>()
+		{
+
+			public int compare(String o1, String o2)
+			{
+				return o1.compareToIgnoreCase(o2);
+			}
+		});
 
 		// constructs the menus
 		Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
