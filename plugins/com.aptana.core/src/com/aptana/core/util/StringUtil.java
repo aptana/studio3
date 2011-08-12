@@ -28,6 +28,7 @@ public class StringUtil
 	 * EMPTY
 	 */
 	public static final String EMPTY = ""; //$NON-NLS-1$
+	public static final String[] EMPTY_ARRAY = new String[0];
 
 	private StringUtil()
 	{

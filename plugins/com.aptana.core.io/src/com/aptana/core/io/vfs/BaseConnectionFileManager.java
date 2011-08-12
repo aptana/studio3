@@ -5,6 +5,11 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.core.io.vfs;
 
@@ -48,9 +53,13 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 
 	protected static final int CACHE_TTL = 60000; /* 1min */
 	private static final int RETRIES_AFTER_FAILURE = 2;
+	protected static final char[] EMPTY_PASSWORD = "".toCharArray(); //$NON-NLS-1$
+	protected static final String[] EMPTY_STRING_ARRAY = new String[0];
+	protected static final byte[] EMPTY_BYTES = new byte[0];
+	protected static final IExtendedFileInfo[] EMPTY_FILEINFO_ARRAY = new IExtendedFileInfo[0];
 
 	protected String login;
-	protected char[] password = new char[0];
+	protected char[] password = EMPTY_PASSWORD;
 	protected IPath basePath;
 	protected String authId;
 
@@ -67,7 +76,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		password = CoreIOPlugin.getAuthenticationManager().promptPassword(
 						authId, login, title, message);
 		if (password == null) {
-		    password = new char[0];
+		    password = EMPTY_PASSWORD;
 			throw new OperationCanceledException();
 		}
 	}
@@ -75,7 +84,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected final void getOrPromptPassword(String title, String message) {
 		password = CoreIOPlugin.getAuthenticationManager().getPassword(authId);
 		if (password == null) {
-		    password = new char[0];
+		    password = EMPTY_PASSWORD;
 			promptPassword(title, message);
 		}
 	}
@@ -136,7 +145,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			return result;
 		} catch (FileNotFoundException e) {
 			setLastOperationTime();
-			return new String[0];
+			return EMPTY_STRING_ARRAY;
 		} finally {
 			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			monitor.done();
@@ -164,7 +173,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 					setLastOperationTime();
 				} catch (FileNotFoundException e) {
 					setLastOperationTime();
-					return new IExtendedFileInfo[0];
+					return EMPTY_FILEINFO_ARRAY;
 				} catch (PermissionDeniedException e) {
 					setLastOperationTime();
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
@@ -198,7 +207,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 						Messages.BaseConnectionFileManager_file_is_directory, initFileNotFoundException(path, null)));
 			}
 			if (fileInfo.getLength() == 0) {
-				return new ByteArrayInputStream(new byte[0]);
+				return new ByteArrayInputStream(EMPTY_BYTES);
 			}
 			ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 			return readFile(basePath.append(path), Policy.subMonitorFor(monitor, 1));			
@@ -455,7 +464,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected abstract boolean canUseTemporaryFile(IPath path, ExtendedFileInfo fileInfo, IProgressMonitor monitor);
 	
 	// all methods here accept absolute path
-	protected abstract void changeCurrentDir(IPath path) throws Exception, IOException, CoreException;
+	protected abstract void changeCurrentDir(IPath path) throws Exception, IOException, CoreException; 
 	protected abstract ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException;
 	protected abstract ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException;
 	protected abstract String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
@@ -523,7 +532,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		try {
 			fileInfo = fetchFileInternal(basePath.append(path), options, monitor);
 		} catch (FileNotFoundException e) {
-			fileInfo = new ExtendedFileInfo(path.segmentCount() > 0 ? path.lastSegment() : Path.ROOT.toPortableString());
+			fileInfo = new ExtendedFileInfo((path.segmentCount() > 0) ? path.lastSegment() : Path.ROOT.toPortableString());
 			fileInfo.setExists(false);
 			return fileInfo;
 		} catch (PermissionDeniedException e) {
@@ -550,7 +559,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 					fileInfo.setGroup(targetFileInfo.getGroup());
 					fileInfo.setPermissions(targetFileInfo.getPermissions());
 				} else {
-					throw new FileNotFoundException();
+					throw new FileNotFoundException(fileInfo.getName());
 				}
 			} catch (FileNotFoundException e) {
 				try {
@@ -603,11 +612,11 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	private final ExtendedFileInfo getCachedFileInfo(IPath path) {
-		return fileInfoCache != null ? fileInfoCache.get(path) : null;
+		return (fileInfoCache != null) ? fileInfoCache.get(path) : null;
 	}
 
 	private final ExtendedFileInfo[] getCachedFileInfos(IPath path) {
-		return fileInfosCache !=  null ? fileInfosCache.get(path) : null;
+		return (fileInfosCache !=  null) ? fileInfosCache.get(path) : null;
 	}
 
 	private final ExtendedFileInfo cache(IPath path, ExtendedFileInfo fileInfo) {

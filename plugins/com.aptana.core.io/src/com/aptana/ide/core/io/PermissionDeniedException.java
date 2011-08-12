@@ -9,7 +9,7 @@ package com.aptana.ide.core.io;
 
 public class PermissionDeniedException extends Exception {
 
-	private static final long serialVersionUID = -443040597160397837L;
+	private static final long serialVersionUID = -443040597160397837L; // $codepro.audit.disable hidingInheritedFields
 
 	/**
 	 * Create a new instance of PermissionDeniedException

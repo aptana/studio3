@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.PlatformUtil;
 
 /**
@@ -76,10 +77,10 @@ public final class LocalRoot extends PlatformObject {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (File.class == adapter) {
+		if (File.class.equals(adapter)) {
 			return getFile();
 		}
-		if (IFileStore.class == adapter) {
+		if (IFileStore.class.equals(adapter)) {
 			return getRoot();
 		}
 		return super.getAdapter(adapter);
@@ -97,6 +98,9 @@ public final class LocalRoot extends PlatformObject {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
 		if (!(obj instanceof LocalRoot)) {
 			return false;
 		}
@@ -130,6 +134,7 @@ public final class LocalRoot extends PlatformObject {
 						}
 					}
 				} catch (IOException e) {
+					IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 				}
 			}
 		} else if (!ON_WINDOWS) {
@@ -137,6 +142,7 @@ public final class LocalRoot extends PlatformObject {
 				try {
 					list.add(new LocalRoot(root.getName(), root.getCanonicalFile()));
 				} catch (IOException e) {
+					IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 				}
 			}			
 		}
@@ -152,6 +158,7 @@ public final class LocalRoot extends PlatformObject {
                 try {
                     list.add(new LocalRoot(homeFile.getName(), homeFile.getCanonicalFile()));
                 } catch (IOException e) {
+                	IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
                 }
             }
 		}
@@ -167,6 +174,7 @@ public final class LocalRoot extends PlatformObject {
                 try {
                     list.add(new LocalRoot(desktopFile.getName(), desktopFile.getCanonicalFile()));
                 } catch (IOException e) {
+                	IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
                 }
             }
 		}
@@ -177,6 +185,7 @@ public final class LocalRoot extends PlatformObject {
 				try {
 					list.add(new LocalRoot(docsPath.lastSegment(), docsFile.getCanonicalFile()));
 				} catch (IOException e) {
+					IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 				}				
 			}
 		}
@@ -192,6 +201,7 @@ public final class LocalRoot extends PlatformObject {
 				subroots.add(new LocalRoot(FileSystemView.getFileSystemView()
 						.getSystemDisplayName(drive), drive.getCanonicalFile()));
 			} catch (IOException e) {
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 			}
 		}
 		return subroots.toArray(new LocalRoot[subroots.size()]);

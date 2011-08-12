@@ -112,7 +112,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			this.host = host;
 			this.port = port;
 			this.login = login;
-			this.password = (password == null) ? "".toCharArray() : password; //$NON-NLS-1$
+			this.password = (password == null) ? EMPTY_PASSWORD : password; //$NON-NLS-1$
 			this.basePath = (basePath != null) ? basePath : Path.ROOT;
 			this.authId = Policy.generateAuthId("FTP", login, host, port); //$NON-NLS-1$
 			this.transferType = transferType;

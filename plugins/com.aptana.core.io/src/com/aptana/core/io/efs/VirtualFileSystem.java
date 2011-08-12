@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable thrownExceptions
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.core.io.efs;
 
@@ -57,7 +60,7 @@ public class VirtualFileSystem extends FileSystem {
 			try {
 				EFS.getFileSystem(SCHEME_VIRTUAL);
 			} catch (CoreException e) {
-				throw new Error(e);
+				throw new RuntimeException(e);
 			}
 		}
 		return instance;

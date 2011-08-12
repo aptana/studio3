@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.ide.core.io;
 
 import java.io.File;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -29,6 +32,7 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 
@@ -38,12 +42,12 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
  */
 /* package */ final class ConnectionPointManager extends PlatformObject implements IConnectionPointManager {
 
-	protected static final String STATE_FILENAME = "connections"; //$NON-NLS-1$
+	/* package */ static final String STATE_FILENAME = "connections"; //$NON-NLS-1$
 
 	private static final String EXTENSION_POINT_ID = CoreIOPlugin.PLUGIN_ID + ".connectionPoint"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_POINT_TYPE = "connectionPointType"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_POINT_CATEGORY = "connectionPointCategory"; //$NON-NLS-1$
-	protected static final String ATT_ID = "id"; //$NON-NLS-1$
+	/* package */ static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_NAME = "name"; //$NON-NLS-1$
 	private static final String ATT_ORDER = "order"; //$NON-NLS-1$
 	private static final String ATT_REMOTE = "remote"; //$NON-NLS-1$
@@ -128,11 +132,13 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 			memento.save(writer);
 			isChanged();
 		} catch (IOException e) {
+			IdeLog.logError(CoreIOPlugin.getDefault(), e);
 		} finally {
 		    if (writer != null) {
 		        try {
                     writer.close();
                 } catch (IOException e) {
+                	IdeLog.logError(CoreIOPlugin.getDefault(), e);
                 }
 		    }
 		}
@@ -156,12 +162,15 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 					}
 				}
 			} catch (IOException e) {
+				IdeLog.logError(CoreIOPlugin.getDefault(), e);
 			} catch (CoreException e) {
+				IdeLog.logError(CoreIOPlugin.getDefault(), e);
 			} finally {
 				if (reader != null) {
 					try {
 						reader.close();
 					} catch (IOException e) {
+						IdeLog.logError(CoreIOPlugin.getDefault(), e);
 					}
 				}
 			}
@@ -207,9 +216,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * @see com.aptana.ide.core.io.IConnectionPointManager#addConnectionPoint(com.aptana.ide.core.io.IConnectionPoint)
 	 */
 	public void addConnectionPoint(IConnectionPoint connectionPoint) {
-		if (!(connectionPoint instanceof ConnectionPoint)) {
-			throw new IllegalArgumentException();
-		}
+		Assert.isLegal(connectionPoint instanceof ConnectionPoint);
 		if (!connections.contains(connectionPoint)) {
 			connections.add((ConnectionPoint) connectionPoint);
 			dirty = true;
@@ -243,9 +250,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * @see com.aptana.ide.core.io.IConnectionPointManager#cloneConnectionPoint(com.aptana.ide.core.io.IConnectionPoint)
 	 */
 	public IConnectionPoint cloneConnectionPoint(IConnectionPoint connectionPoint) throws CoreException {
-		if (!(connectionPoint instanceof ConnectionPoint)) {
-			throw new IllegalArgumentException();
-		}
+		Assert.isLegal(connectionPoint instanceof ConnectionPoint);
 		IMemento memento;
 		try {
 			memento = storeConnectionPoint((ConnectionPoint) connectionPoint);
@@ -279,9 +284,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * @see com.aptana.ide.core.io.IConnectionPointManager#getType(com.aptana.ide.core.io.IConnectionPoint)
 	 */
 	public ConnectionPointType getType(IConnectionPoint connectionPoint) {
-		if (!(connectionPoint instanceof ConnectionPoint)) {
-			throw new IllegalArgumentException();
-		}
+		Assert.isLegal(connectionPoint instanceof ConnectionPoint);
 		return getType(((ConnectionPoint) connectionPoint).getType());
 	}
 
@@ -324,7 +327,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 				Object object = element.createExecutableExtension(ATT_CLASS);
 				if (object instanceof ConnectionPoint) {
 					connectionPoint = (ConnectionPoint) object;
-					connectionPoint.setId(id != null ? id : memento.getString(ATTR_ID));
+					connectionPoint.setId((id != null) ? id : memento.getString(ATTR_ID));
 					connectionPoint.loadState(memento);
 				}
 			}
@@ -432,6 +435,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 			try {
 				order = Integer.parseInt(element.getAttribute(ATT_ORDER));
 			} catch (NumberFormatException e) {
+				e.getCause();
 			}
 			boolean remote = Boolean.parseBoolean(element.getAttribute(ATT_REMOTE));
 			categories.put(id, new ConnectionPointCategory(id, name, order, remote));

@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
 
 package com.aptana.ide.core.io;
 
@@ -91,7 +92,7 @@ public class LocalConnectionPoint extends ConnectionPoint {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-	    if (adapter == File.class) {
+	    if (File.class.equals(adapter)) {
 	        return getFile();
 	    }
 	    return super.getAdapter(adapter);
