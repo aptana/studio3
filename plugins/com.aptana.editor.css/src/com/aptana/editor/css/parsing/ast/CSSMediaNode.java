@@ -27,7 +27,7 @@ public class CSSMediaNode extends CSSNode
 	 */
 	public CSSMediaNode(CSSTextNode[] medias, CSSNode... statements)
 	{
-		super(CSSNodeTypes.MEDIA);
+		super(ICSSNodeTypes.MEDIA);
 
 		fMedias = medias;
 		setChildren(statements);
@@ -86,7 +86,7 @@ public class CSSMediaNode extends CSSNode
 		text.append(MEDIA);
 		for (CSSTextNode media : fMedias)
 		{
-			text.append(" ").append(media); //$NON-NLS-1$
+			text.append(' ').append(media);
 		}
 		return text.toString();
 	}
@@ -110,16 +110,16 @@ public class CSSMediaNode extends CSSNode
 			text.append(MEDIA);
 			for (CSSTextNode media : fMedias)
 			{
-				text.append(" ").append(media); //$NON-NLS-1$
+				text.append(' ').append(media);
 			}
 
-			text.append("{"); //$NON-NLS-1$
+			text.append('{');
 			CSSNode[] statements = getStatements();
 			for (CSSNode statement : statements)
 			{
 				text.append(statement);
 			}
-			text.append("}"); //$NON-NLS-1$
+			text.append('}');
 
 			fText = text.toString();
 		}

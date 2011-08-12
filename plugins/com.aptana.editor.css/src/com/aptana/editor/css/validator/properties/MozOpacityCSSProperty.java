@@ -33,7 +33,7 @@ public class MozOpacityCSSProperty extends PlugableCSSProperty
 
 		public boolean canValidate(CssValue value)
 		{
-			return (value instanceof CssNumber);
+			return value instanceof CssNumber;
 		}
 
 		public boolean isValid(CssValue value)

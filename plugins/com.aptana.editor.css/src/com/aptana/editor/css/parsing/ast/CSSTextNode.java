@@ -20,7 +20,7 @@ public class CSSTextNode extends CSSNode
 	 */
 	public CSSTextNode(String text)
 	{
-		super(CSSNodeTypes.TEXT);
+		super(ICSSNodeTypes.TEXT);
 		
 		fText = text;
 	}

@@ -26,7 +26,7 @@ public class CSSIndexWriter extends IndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION);
+		return URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION);
 	}
 
 	/**
@@ -40,12 +40,12 @@ public class CSSIndexWriter extends IndexWriter
 		if (index != null && element != null)
 		{
 			String key = StringUtil.join( //
-				CSSIndexConstants.DELIMITER, //
+				ICSSIndexConstants.DELIMITER, //
 				element.getName(), //
 				this.serialize(element) //
 				);
 
-			index.addEntry(CSSIndexConstants.ELEMENT, key, this.getDocumentPath());
+			index.addEntry(ICSSIndexConstants.ELEMENT, key, this.getDocumentPath());
 		}
 	}
 
@@ -60,12 +60,12 @@ public class CSSIndexWriter extends IndexWriter
 		if (index != null && property != null)
 		{
 			String key = StringUtil.join( //
-				CSSIndexConstants.DELIMITER, //
+				ICSSIndexConstants.DELIMITER, //
 				property.getName(), //
 				this.serialize(property) //
 				);
 
-			index.addEntry(CSSIndexConstants.PROPERTY, key, this.getDocumentPath());
+			index.addEntry(ICSSIndexConstants.PROPERTY, key, this.getDocumentPath());
 		}
 	}
 
@@ -81,7 +81,7 @@ public class CSSIndexWriter extends IndexWriter
 		{
 			String key = this.serialize(pseudoClass);
 
-			index.addEntry(CSSIndexConstants.PSUEDO_CLASS, key, this.getDocumentPath());
+			index.addEntry(ICSSIndexConstants.PSUEDO_CLASS, key, this.getDocumentPath());
 		}
 	}
 
@@ -97,7 +97,7 @@ public class CSSIndexWriter extends IndexWriter
 		{
 			String key = this.serialize(pseudoElement);
 
-			index.addEntry(CSSIndexConstants.PSUEDO_ELEMENT, key, this.getDocumentPath());
+			index.addEntry(ICSSIndexConstants.PSUEDO_ELEMENT, key, this.getDocumentPath());
 		}
 	}
 }

@@ -22,7 +22,7 @@ public class CSSImportNode extends CSSNode
 	 */
 	public CSSImportNode(String uri, CSSTextNode... mediaList)
 	{
-		super(CSSNodeTypes.IMPORT);
+		super(ICSSNodeTypes.IMPORT);
 
 		fUriStr = uri;
 		fMediaList = mediaList;
@@ -103,15 +103,15 @@ public class CSSImportNode extends CSSNode
 
 		for (int i = 0; i < fMediaList.length; ++i)
 		{
-			text.append(" ").append(fMediaList[i]); //$NON-NLS-1$
+			text.append(' ').append(fMediaList[i]);
 
 			if (i < fMediaList.length - 1)
 			{
-				text.append(","); //$NON-NLS-1$
+				text.append(',');
 			}
 		}
 
-		text.append(";"); //$NON-NLS-1$
+		text.append(';');
 
 		return text.toString();
 	}

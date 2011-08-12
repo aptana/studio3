@@ -36,7 +36,7 @@ public class CSSAtRuleNode extends CSSNode
 	 */
 	public CSSAtRuleNode(String name, String id)
 	{
-		super(CSSNodeTypes.AT_RULE);
+		super(ICSSNodeTypes.AT_RULE);
 
 		fName = name;
 		fId = id;
@@ -86,9 +86,9 @@ public class CSSAtRuleNode extends CSSNode
 			// TODO: take into acct semicolon vs. block (curly braces)
 			buf.append(fName);
 
-			if (StringUtil.isEmpty(fId) == false)
+			if (!StringUtil.isEmpty(fId))
 			{
-				buf.append(" ").append(fId).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+				buf.append(' ').append(fId).append(';');
 			}
 
 			fText = buf.toString();

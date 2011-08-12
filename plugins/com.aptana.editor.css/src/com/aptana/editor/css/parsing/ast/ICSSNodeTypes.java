@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-public class CSSNodeTypes
+public interface ICSSNodeTypes
 {
 	public static final short UNKNOWN = 0;
 	public static final short ATTRIBUTE_SELECTOR = 1;

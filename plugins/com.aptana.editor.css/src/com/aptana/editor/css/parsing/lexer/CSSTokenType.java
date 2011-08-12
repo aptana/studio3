@@ -150,7 +150,7 @@ public enum CSSTokenType implements ITypePredicate
 	 */
 	public boolean isDefined()
 	{
-		return (this != UNDEFINED);
+		return this != UNDEFINED;
 	}
 
 	/**

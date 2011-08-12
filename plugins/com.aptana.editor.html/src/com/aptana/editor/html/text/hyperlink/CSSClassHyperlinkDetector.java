@@ -23,7 +23,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
@@ -61,7 +61,7 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			// FIXME What if it uses multiple classes?
 			String cssClass = m.group(1);
 			// TODO Make this smarter, find the best match (i.e. div.class or #some-id.class)?
-			List<QueryResult> results = index.query(new String[] { CSSIndexConstants.CLASS }, cssClass,
+			List<QueryResult> results = index.query(new String[] { ICSSIndexConstants.CLASS }, cssClass,
 					SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE);
 			if (results == null || results.isEmpty())
 			{

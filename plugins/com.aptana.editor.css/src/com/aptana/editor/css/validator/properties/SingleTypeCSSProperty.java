@@ -20,7 +20,7 @@ import org.w3c.css.values.CssExpression;
 public abstract class SingleTypeCSSProperty extends PlugableCSSProperty
 {
 
-	public SingleTypeCSSProperty(String property)
+	protected SingleTypeCSSProperty(String property)
 	{
 		super(property);
 	}
@@ -39,7 +39,7 @@ public abstract class SingleTypeCSSProperty extends PlugableCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public SingleTypeCSSProperty(String propertyName, Class type, ApplContext context, CssExpression expression,
+	protected SingleTypeCSSProperty(String propertyName, Class type, ApplContext context, CssExpression expression,
 			boolean check) throws InvalidParamException
 	{
 		super(propertyName, new Class[] { type }, null, null, context, expression, check);
@@ -57,7 +57,7 @@ public abstract class SingleTypeCSSProperty extends PlugableCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public SingleTypeCSSProperty(String propertyName, Class type, ApplContext context, CssExpression expression)
+	protected SingleTypeCSSProperty(String propertyName, Class type, ApplContext context, CssExpression expression)
 			throws InvalidParamException
 	{
 		this(propertyName, type, context, expression, false);

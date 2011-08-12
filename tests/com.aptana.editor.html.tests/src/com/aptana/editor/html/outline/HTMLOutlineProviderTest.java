@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
@@ -157,7 +157,7 @@ public class HTMLOutlineProviderTest extends TestCase
 
 		IParseNode cssNode = ((CommonOutlineItem) cssChildren[0]).getReferenceNode();
 		assertEquals(ICSSConstants.CONTENT_TYPE_CSS, cssNode.getLanguage());
-		assertEquals(CSSNodeTypes.DECLARATION, cssNode.getNodeType());
+		assertEquals(ICSSNodeTypes.DECLARATION, cssNode.getNodeType());
 		assertEquals(11, cssNode.getStartingOffset());
 		assertEquals(21, cssNode.getEndingOffset());
 	}

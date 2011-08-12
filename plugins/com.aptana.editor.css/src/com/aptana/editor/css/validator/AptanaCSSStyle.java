@@ -18,6 +18,7 @@ import org.w3c.css.properties.css3.Css3Style;
 import org.w3c.css.util.Utf8Properties;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.CSSPlugin;
 
 /**
@@ -101,10 +102,14 @@ public class AptanaCSSStyle extends Css3Style
 	 */
 	private CssProperty createNewDefaultInstance(String propertyName)
 	{
+		if (StringUtil.isEmpty(propertyName))
+		{
+			return null;
+		}
 		try
 		{
 			String nameToSearch = propertyName;
-			if (propertyName.startsWith("-")) //$NON-NLS-1$
+			if (propertyName.charAt(0) == '-')
 			{
 				nameToSearch = propertyName.substring(1);
 			}

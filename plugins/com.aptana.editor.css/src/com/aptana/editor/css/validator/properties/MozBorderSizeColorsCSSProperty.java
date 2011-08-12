@@ -30,7 +30,7 @@ public abstract class MozBorderSizeColorsCSSProperty extends CustomCSSProperty
 
 	private final List<CssValue> values;
 
-	public MozBorderSizeColorsCSSProperty(String propertyName)
+	protected MozBorderSizeColorsCSSProperty(String propertyName)
 	{
 		super(propertyName);
 		values = null;
@@ -48,7 +48,7 @@ public abstract class MozBorderSizeColorsCSSProperty extends CustomCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public MozBorderSizeColorsCSSProperty(String propertyName, ApplContext context, CssExpression expression,
+	protected MozBorderSizeColorsCSSProperty(String propertyName, ApplContext context, CssExpression expression,
 			boolean check) throws InvalidParamException
 	{
 		super(propertyName);
@@ -94,7 +94,7 @@ public abstract class MozBorderSizeColorsCSSProperty extends CustomCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public MozBorderSizeColorsCSSProperty(String propertyName, ApplContext context, CssExpression expression)
+	protected MozBorderSizeColorsCSSProperty(String propertyName, ApplContext context, CssExpression expression)
 			throws InvalidParamException
 	{
 		this(propertyName, context, expression, false);

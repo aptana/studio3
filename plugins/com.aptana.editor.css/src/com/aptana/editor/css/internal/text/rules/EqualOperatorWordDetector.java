@@ -22,7 +22,7 @@ public class EqualOperatorWordDetector implements IWordDetector
 	{
 		index++;
 
-		return (index == 1 && c == '=');
+		return index == 1 && c == '=';
 	}
 
 	public boolean isWordStart(char c)

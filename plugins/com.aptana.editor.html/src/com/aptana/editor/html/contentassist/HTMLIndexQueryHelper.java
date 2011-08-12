@@ -17,7 +17,7 @@ import java.util.Map;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
@@ -206,7 +206,7 @@ public class HTMLIndexQueryHelper
 	 */
 	public Map<String, String> getClasses(Index index)
 	{
-		return this._reader.getValues(index, CSSIndexConstants.CLASS);
+		return this._reader.getValues(index, ICSSIndexConstants.CLASS);
 	}
 
 	/**
@@ -323,6 +323,6 @@ public class HTMLIndexQueryHelper
 	 */
 	public Map<String, String> getIDs(Index index)
 	{
-		return this._reader.getValues(index, CSSIndexConstants.IDENTIFIER);
+		return this._reader.getValues(index, ICSSIndexConstants.IDENTIFIER);
 	}
 }

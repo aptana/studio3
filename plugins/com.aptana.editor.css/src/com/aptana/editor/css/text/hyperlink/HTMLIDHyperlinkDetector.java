@@ -26,7 +26,7 @@ import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -77,7 +77,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			}
 
 			String htmlId = m.group().substring(1);
-			List<QueryResult> results = index.query(new String[] { CSSIndexConstants.IDENTIFIER }, htmlId,
+			List<QueryResult> results = index.query(new String[] { ICSSIndexConstants.IDENTIFIER }, htmlId,
 					SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE);
 			if (results == null || results.isEmpty())
 			{

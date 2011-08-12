@@ -26,7 +26,7 @@ import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -64,7 +64,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			while (tokenizer.hasMoreTokens())
 			{
-				addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
+				addIndex(index, file, ICSSIndexConstants.CLASS, tokenizer.nextToken());
 			}
 		}
 
@@ -72,7 +72,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		if (id != null && id.trim().length() > 0)
 		{
-			addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
+			addIndex(index, file, ICSSIndexConstants.IDENTIFIER, id);
 		}
 
 		if (element.getName().equalsIgnoreCase(ELEMENT_LINK))

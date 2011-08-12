@@ -26,7 +26,7 @@ public class CSSPageNode extends CSSNode
 	 */
 	public CSSPageNode(List<CSSDeclarationNode> declarations)
 	{
-		super(CSSNodeTypes.PAGE);
+		super(ICSSNodeTypes.PAGE);
 
 		if (declarations != null)
 		{
@@ -139,10 +139,10 @@ public class CSSPageNode extends CSSNode
 
 			if (i < size - 1)
 			{
-				text.append(" "); //$NON-NLS-1$
+				text.append(' ');
 			}
 		}
-		text.append("}"); //$NON-NLS-1$
+		text.append('}');
 
 		return text.toString();
 	}

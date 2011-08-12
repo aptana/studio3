@@ -23,6 +23,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.parsing.FileService;
@@ -34,7 +35,7 @@ import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSTermListNode;
 import com.aptana.parsing.ParserPoolFactory;
@@ -42,12 +43,12 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
-	private class RegionInfo
+	private static class RegionInfo
 	{
 		public final IRegion region;
 		public final Object info;
 
-		public RegionInfo(IRegion region, Object info)
+		RegionInfo(IRegion region, Object info)
 		{
 			this.region = region;
 			this.info = info;
@@ -83,7 +84,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 				if (fs != null)
 				{
-					fs.parse();
+					fs.parse(null);
 
 					// TODO: check for failed parse status and abort?
 					ast = fs.getParseResult();
@@ -197,7 +198,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 				switch (cssNode.getNodeType())
 				{
-					case CSSNodeTypes.TERM:
+					case ICSSNodeTypes.TERM:
 					{
 						IParseNode parent = cssNode.getParent();
 
@@ -205,9 +206,9 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 						{
 							String text = cssNode.getText();
 
-							if (text != null)
+							if (!StringUtil.isEmpty(text))
 							{
-								if (text.startsWith("#")) //$NON-NLS-1$
+								if (text.charAt(0) == '#')
 								{
 									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
 									info = CSSColors.hexToRGB(text);
@@ -242,7 +243,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 						break;
 					}
 
-					case CSSNodeTypes.DECLARATION:
+					case ICSSNodeTypes.DECLARATION:
 					{
 						CSSDeclarationNode decl = (CSSDeclarationNode) cssNode;
 						String propertyName = decl.getIdentifier();
@@ -263,7 +264,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 						break;
 					}
 
-					case CSSNodeTypes.FUNCTION:
+					case ICSSNodeTypes.FUNCTION:
 					{
 						RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) cssNode);
 
@@ -275,7 +276,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 						break;
 					}
 
-					case CSSNodeTypes.SIMPLE_SELECTOR:
+					case ICSSNodeTypes.SIMPLE_SELECTOR:
 					{
 						CSSSimpleSelectorNode simpleSelector = (CSSSimpleSelectorNode) cssNode;
 						String elementName = simpleSelector.getTypeSelector();

@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-public abstract class CSSColors
+public class CSSColors
 {
 	private static final String HASH = "#"; //$NON-NLS-1$
 	private static Map<String, String> NAMED_COLORS = new HashMap<String, String>();

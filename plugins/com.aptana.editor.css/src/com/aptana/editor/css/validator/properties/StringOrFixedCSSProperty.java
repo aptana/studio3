@@ -20,7 +20,7 @@ import org.w3c.css.values.CssIdent;
 public abstract class StringOrFixedCSSProperty extends TypeOrFixedCSSProperty
 {
 
-	public StringOrFixedCSSProperty(String propertyName)
+	protected StringOrFixedCSSProperty(String propertyName)
 	{
 		super(propertyName);
 	}
@@ -39,7 +39,7 @@ public abstract class StringOrFixedCSSProperty extends TypeOrFixedCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public StringOrFixedCSSProperty(String propertyName, String[] values, ApplContext context,
+	protected StringOrFixedCSSProperty(String propertyName, String[] values, ApplContext context,
 			CssExpression expression, boolean check) throws InvalidParamException
 	{
 		super(propertyName, new Class[] { CssIdent.class }, null, values, context, expression, check);
@@ -57,7 +57,7 @@ public abstract class StringOrFixedCSSProperty extends TypeOrFixedCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public StringOrFixedCSSProperty(String propertyName, String[] values, ApplContext context, CssExpression expression)
+	protected StringOrFixedCSSProperty(String propertyName, String[] values, ApplContext context, CssExpression expression)
 			throws InvalidParamException
 	{
 		this(propertyName, values, context, expression, false);

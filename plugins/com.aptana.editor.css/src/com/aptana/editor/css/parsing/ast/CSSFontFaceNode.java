@@ -31,7 +31,7 @@ public class CSSFontFaceNode extends CSSNode
 	 */
 	public CSSFontFaceNode(List<CSSDeclarationNode> declarations)
 	{
-		super(CSSNodeTypes.FONTFACE);
+		super(ICSSNodeTypes.FONTFACE);
 
 		if (declarations != null)
 		{
@@ -111,10 +111,10 @@ public class CSSFontFaceNode extends CSSNode
 
 			if (i < size - 1)
 			{
-				text.append(" "); //$NON-NLS-1$
+				text.append(' ');
 			}
 		}
-		text.append("}"); //$NON-NLS-1$
+		text.append('}');
 
 		return text.toString();
 	}

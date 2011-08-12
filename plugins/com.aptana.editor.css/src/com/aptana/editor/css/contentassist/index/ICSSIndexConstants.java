@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
-public interface CSSIndexConstants
+public interface ICSSIndexConstants
 {
 	// the content format version of the CSS index files
 	// 0.1 - Initial version
