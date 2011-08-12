@@ -22,11 +22,13 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.core.preferences.IWebServerPreferenceConstants;
+import com.aptana.webserver.ui.WebServerUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -74,6 +76,7 @@ public class LocalWebServerPreferencePage extends FieldEditorPreferencePage impl
 							return true;
 						}
 					} catch (NumberFormatException e) {
+						IdeLog.logError(WebServerUIPlugin.getDefault(), e);
 					}					
 				}
 				return false;

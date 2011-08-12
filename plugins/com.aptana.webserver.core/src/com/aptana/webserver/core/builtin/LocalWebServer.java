@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable disallowSleepInsideWhile
+// $codepro.audit.disable disallowYieldUsage
 
 package com.aptana.webserver.core.builtin;
 
@@ -57,7 +59,7 @@ public class LocalWebServer {
 	private static final int SOCKET_TIMEOUT = 10000;
 	private static final long STARTUP_TIMEOUT = 10000;
 	private static final long SHUTDOWN_TIMEOUT = 2000;
-	private static final int SOCKET_BUFFER_SIZE = 16*1024;
+	private static final int SOCKET_BUFFER_SIZE = 16*1024; // $codepro.audit.disable multiplicationOrDivisionByPowersOf2
 	private static final int WORKER_COUNT = 2;
 	
 	private final EFSWebServerConfiguration configuration;
@@ -101,7 +103,7 @@ public class LocalWebServer {
 		CoreException exception = null;
 		for (int trial = 0; trial < 3; ++trial) {
 			try {
-				URLConnection connection = url.openConnection();
+				URLConnection connection = url.openConnection(); // $codepro.audit.disable variableDeclaredInLoop
 				connection.connect();
 				connection.getContentType();
 				return;
@@ -136,7 +138,8 @@ public class LocalWebServer {
 			}
 			try {
 				Thread.sleep(10);
-			} catch (InterruptedException ignore) {
+			} catch (InterruptedException e) {
+				break;
 			}
 		}
 	}
@@ -147,12 +150,14 @@ public class LocalWebServer {
 				try {
 					reactor.shutdown(SHUTDOWN_TIMEOUT);
 				} catch (IOException ignore) {
+					ignore.getCause();
 				}
 			}
 			thread.interrupt();
 			try {
 				thread.join(SHUTDOWN_TIMEOUT);
-			} catch (InterruptedException ignore) {
+			} catch (InterruptedException e) {
+				e.getCause();
 			}
 		}
 	}
