@@ -5,13 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.xml;
+package com.aptana.editor.xml.parsing;
 
 import junit.framework.TestCase;
 
 import com.aptana.editor.xml.parsing.XMLParser;
+import com.aptana.editor.xml.parsing.ast.XMLNodeType;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class XMLParserTest extends TestCase
 {
@@ -38,6 +40,40 @@ public class XMLParserTest extends TestCase
 	{
 		String source = "<html><head></head><body><p>Text</p></html>\n";
 		parseTest(source, "<html><head></head><body><p></p></body></html>\n");
+	}
+
+	public void testComment() throws Exception
+	{
+		String source = "<!-- this is a comment -->";
+		ParseState parseState = new ParseState();
+		parseState.setEditState(source, source, 0, 0);
+		IParseRootNode rootNode = (IParseRootNode) fParser.parse(parseState);
+
+		assertEquals(1, rootNode.getChildCount());
+
+		IParseNode[] comments = rootNode.getCommentNodes();
+		assertEquals(1, comments.length);
+		assertEquals(rootNode.getChild(0), comments[0]);
+		assertEquals(XMLNodeType.COMMENT.getIndex(), comments[0].getNodeType());
+		assertEquals(0, comments[0].getStartingOffset());
+		assertEquals(source.length() - 1, comments[0].getEndingOffset());
+		assertEquals(source, comments[0].getText());
+	}
+
+	public void testCDATA() throws Exception
+	{
+		String source = "<![CDATA[<author>Appcelerator</author>]]>";
+		ParseState parseState = new ParseState();
+		parseState.setEditState(source, source, 0, 0);
+		IParseRootNode rootNode = (IParseRootNode) fParser.parse(parseState);
+
+		assertEquals(1, rootNode.getChildCount());
+
+		IParseNode cdataNode = rootNode.getChild(0);
+		assertEquals(XMLNodeType.CDATA.getIndex(), cdataNode.getNodeType());
+		assertEquals(0, cdataNode.getStartingOffset());
+		assertEquals(source.length() - 1, cdataNode.getEndingOffset());
+		assertEquals(source, cdataNode.getText());
 	}
 
 	protected void parseTest(String source) throws Exception
