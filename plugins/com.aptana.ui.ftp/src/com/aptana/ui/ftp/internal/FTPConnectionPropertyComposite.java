@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.ui.ftp.internal;
 
@@ -50,14 +53,14 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
+import com.aptana.filesystem.ftp.IFTPConstants;
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
-import com.aptana.filesystem.ftp.IFTPConstants;
-import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
@@ -70,10 +73,10 @@ import com.aptana.ui.util.UIUtils;
  * @author Max Stepanov
  *
  */
-public class FTPConnectionPropertyComposite extends Composite implements IOptionsComposite.Listener
+public class FTPConnectionPropertyComposite extends Composite implements IOptionsComposite.IListener
 {
 
-	public static interface Listener
+	public static interface IListener
 	{
 		public void setValid(boolean valid);
 
@@ -113,10 +116,10 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 	private ModifyListener modifyListener;
 	private SelectionListener selectionListener;
 
-	private Listener listener;
+	private IListener listener;
 
 	public FTPConnectionPropertyComposite(Composite parent, int style, IBaseRemoteConnectionPoint connectionPoint,
-			Listener listener)
+			IListener listener)
 	{
 		super(parent, style);
 		setConnectionPoint(connectionPoint);
@@ -307,7 +310,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		{
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(ftpConnectionPoint);
 		}
-		else if (ftpConnectionPoint != originalFtpConnectionPoint)
+		else if (ftpConnectionPoint != originalFtpConnectionPoint) // $codepro.audit.disable useEquals
 		{
 			ftpConnectionPoint.setId(originalFtpConnectionPoint.getId());
 			CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(originalFtpConnectionPoint);
@@ -366,7 +369,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 			message = advancedOptions.isValid();
 		}
 		listener.error(message);
-		return (message == null);
+		return message == null;
 	}
 
 	public boolean testConnection(ConnectionContext context, final IConnectionRunnable connectRunnable)
@@ -387,7 +390,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 			savePropertiesTo(connectionPoint);
 			if (context == null)
 			{
-				context = new ConnectionContext();
+				context = new ConnectionContext(); // $codepro.audit.disable questionableAssignment
 				context.setBoolean(ConnectionContext.QUICK_CONNECT, true);
 			}
 			context.setBoolean(ConnectionContext.NO_PASSWORD_PROMPT, true);
@@ -439,6 +442,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		}
 		catch (InterruptedException e)
 		{
+			e.getCause();
 		}
 		catch (InvocationTargetException e)
 		{
@@ -538,8 +542,8 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		catch (CoreException e)
 		{
 			IdeLog.logError(FTPUIPlugin.getDefault(), Messages.FTPConnectionPointPropertyDialog_ERR_FailedCreate, e);
-			listener.close();
-			throw new SWTException();
+			listener.close(); // $codepro.audit.disable closeInFinally
+			throw new SWTException(e.getLocalizedMessage());
 		}
 	}
 
@@ -651,7 +655,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 				public void modifyText(ModifyEvent e)
 				{
 					validate();
-					if (e.widget != nameText)
+					if (e.widget != nameText) // $codepro.audit.disable useEquals
 					{
 						connectionTested = false;
 					}

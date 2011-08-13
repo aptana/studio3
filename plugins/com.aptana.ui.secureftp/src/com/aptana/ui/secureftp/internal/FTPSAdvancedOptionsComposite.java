@@ -45,7 +45,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	
 	private static final String EMPTY = ""; //$NON-NLS-1$
 	
-	private Listener listener;
+	private IListener listener;
 	private Combo securityMethodCombo;
 	private Button validateCertificateCheckbox;
 	private Button noSSLSessionResumptionCheckbox;
@@ -61,7 +61,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	 * @param parent
 	 * @param style
 	 */
-	public FTPSAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
+	public FTPSAdvancedOptionsComposite(Composite parent, int style, IListener listener) {
 		super(parent, style);
 		this.listener = listener;
 		

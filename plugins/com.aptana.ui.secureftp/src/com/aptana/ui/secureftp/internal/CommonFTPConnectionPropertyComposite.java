@@ -69,10 +69,10 @@ public class CommonFTPConnectionPropertyComposite extends FTPConnectionPropertyC
 	private Composite[] advancedOptionsComposites;
 
 	private ConnectionPointType connectionType;
-	private Listener listener;
+	private IListener listener;
 
 	public CommonFTPConnectionPropertyComposite(Composite parent, int style,
-			IBaseRemoteConnectionPoint connectionPoint, Listener listener)
+			IBaseRemoteConnectionPoint connectionPoint, IListener listener)
 	{
 		super(parent, style, connectionPoint, listener);
 		this.listener = listener;

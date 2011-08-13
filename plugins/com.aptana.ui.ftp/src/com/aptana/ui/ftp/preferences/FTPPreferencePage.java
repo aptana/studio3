@@ -23,6 +23,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.ftp.FTPPlugin;
@@ -33,6 +34,7 @@ import com.aptana.ide.core.io.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.preferences.PreferenceInitializer;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
+import com.aptana.ui.ftp.FTPUIPlugin;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
@@ -68,6 +70,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		}
 		catch (BackingStoreException e)
 		{
+			IdeLog.logError(FTPUIPlugin.getDefault(), e);
 		}
 
 		prefs = (EclipseUtil.instanceScope()).getNode(FTPPlugin.PLUGIN_ID);
@@ -78,6 +81,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		}
 		catch (BackingStoreException e)
 		{
+			IdeLog.logError(FTPUIPlugin.getDefault(), e);
 		}
 		return super.performOk();
 	}
@@ -148,7 +152,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 				int mins = Integer.parseInt(keepAliveMins);
 				if (mins <= 0)
 				{
-					throw new NumberFormatException();
+					throw new NumberFormatException("negative"); //$NON-NLS-1$
 				}
 			}
 			catch (NumberFormatException e)

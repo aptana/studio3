@@ -36,7 +36,7 @@ import com.aptana.ui.ftp.internal.NumberVerifyListener;
  */
 public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsComposite {
 	
-	private Listener listener;
+	private IListener listener;
 	private Combo compressionCombo;
 	private Text portText;
 	private Combo encodingCombo;
@@ -47,7 +47,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 	 * @param parent
 	 * @param style
 	 */
-	public SFTPAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
+	public SFTPAdvancedOptionsComposite(Composite parent, int style, IListener listener) {
 		super(parent, style);
 		this.listener = listener;
 		
