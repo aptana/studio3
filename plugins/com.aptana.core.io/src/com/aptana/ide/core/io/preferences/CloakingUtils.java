@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -134,7 +135,7 @@ public class CloakingUtils {
                 IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS,
                 PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS, null);
         if (extensions.equals("")) { //$NON-NLS-1$
-            return StringUtil.EMPTY_ARRAY;
+            return ArrayUtil.NO_STRINGS;
         }
         return extensions.split(";"); //$NON-NLS-1$
     }

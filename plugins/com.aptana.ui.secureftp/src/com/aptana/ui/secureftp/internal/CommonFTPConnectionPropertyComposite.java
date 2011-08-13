@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
 
 package com.aptana.ui.secureftp.internal;
 
@@ -29,7 +30,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
+import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.secureftp.IFTPSConnectionPoint;
 import com.aptana.filesystem.secureftp.ISFTPConnectionPoint;
 import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
@@ -37,12 +41,11 @@ import com.aptana.filesystem.secureftp.SecureUtils;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
-import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.ftp.internal.FTPAdvancedOptionsComposite;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ui.ftp.internal.IOptionsComposite;
+import com.aptana.ui.secureftp.SecureFTPUIPlugin;
 import com.aptana.ui.secureftp.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
 
@@ -264,6 +267,7 @@ public class CommonFTPConnectionPropertyComposite extends FTPConnectionPropertyC
 				}
 				catch (CoreException e)
 				{
+					IdeLog.logError(SecureFTPUIPlugin.getDefault(), e);
 				}
 			}
 			updateLayout();
@@ -327,7 +331,7 @@ public class CommonFTPConnectionPropertyComposite extends FTPConnectionPropertyC
 
 	private void changeProtocolType(ConnectionPointType newType)
 	{
-		if (newType == null || newType == getConnectionPointType())
+		if (newType == null || newType.equals(getConnectionPointType()))
 		{
 			return;
 		}
@@ -348,11 +352,12 @@ public class CommonFTPConnectionPropertyComposite extends FTPConnectionPropertyC
 
 		if (enabled)
 		{
+			FileDialog dlg;
+			String ssh_home = SecureUtils.getSSH_HOME();
 			while (true)
 			{
-				FileDialog dlg = new FileDialog(getShell(), SWT.OPEN);
+				dlg = new FileDialog(getShell(), SWT.OPEN);
 				dlg.setText(Messages.CommonFTPConnectionPointPropertyDialog_SpecifyPrivateKey);
-				String ssh_home = SecureUtils.getSSH_HOME();
 				if (ssh_home != null && ssh_home.length() != 0)
 				{
 					File dir = new File(ssh_home);

@@ -35,7 +35,7 @@ public class CommonFTPPropertyDialogProvider implements IPropertyDialogProvider 
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (IPropertyDialogProvider.class == adapterType) {
+			if (IPropertyDialogProvider.class.equals(adapterType)) {
 				return new CommonFTPPropertyDialogProvider();
 			}
 			return null;
