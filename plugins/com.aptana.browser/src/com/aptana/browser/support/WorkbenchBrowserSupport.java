@@ -5,10 +5,12 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.browser.support;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -25,7 +27,7 @@ import org.eclipse.ui.internal.browser.InternalBrowserInstance;
 @SuppressWarnings("restriction")
 public class WorkbenchBrowserSupport extends DefaultBrowserSupport {
 
-	private static final String DEFAULT_ID_BASE = "com.aptana.browser.defaultBrowser"; //$NON-NLS-1$
+	private static final String DEFAULT_ID_BASE = "com.aptana.browser.defaultBrowser"; //$NON-NLS-1$ // $codepro.audit.disable hidingInheritedFields
 
 	/**
 	 * 
@@ -62,7 +64,7 @@ public class WorkbenchBrowserSupport extends DefaultBrowserSupport {
 		// we should only share internal browsers within one workbench window. Each workbench window can have a shared browser with the same id
 		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		Integer key = Integer.valueOf(workbenchWindow.hashCode());
-		HashMap wmap = (HashMap) browserIdMap.get(browserId);
+		Map wmap = (Map) browserIdMap.get(browserId);
 		if (wmap == null) {
 			wmap = new HashMap();
 			browserIdMap.put(browserId, wmap);
@@ -79,7 +81,7 @@ public class WorkbenchBrowserSupport extends DefaultBrowserSupport {
 		return true;
 	}
 
-	private String getDefaultId() {
+	private String getDefaultId() { // $codepro.audit.disable overridingPrivateMethod
 		String id = null;
 		for (int i = 0; i < Integer.MAX_VALUE; i++) {
 			id = DEFAULT_ID_BASE + i;

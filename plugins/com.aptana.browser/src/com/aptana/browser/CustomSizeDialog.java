@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.browser;
 
@@ -34,7 +35,7 @@ import org.eclipse.swt.widgets.Text;
 	int fWidth;
 	int fHeight;
 
-	public CustomSizeDialog(Shell parentShell) {
+	protected CustomSizeDialog(Shell parentShell) {
 		super(parentShell);
 		setHelpAvailable(false);
 	}
@@ -103,7 +104,7 @@ import org.eclipse.swt.widgets.Text;
 			try {
 				int width = Integer.parseInt(text);
 				if (width <= 0) {
-					throw (new NumberFormatException());
+					throw new NumberFormatException();
 				}
 			} catch (NumberFormatException e) {
 				message = Messages.WebBrowserViewer_ERR_InvalidWidth;
@@ -118,7 +119,7 @@ import org.eclipse.swt.widgets.Text;
 				try {
 					int height = Integer.parseInt(text);
 					if (height <= 0) {
-						throw (new NumberFormatException());
+						throw new NumberFormatException();
 					}
 				} catch (NumberFormatException e) {
 					message = Messages.WebBrowserViewer_ERR_InvalidHeight;
