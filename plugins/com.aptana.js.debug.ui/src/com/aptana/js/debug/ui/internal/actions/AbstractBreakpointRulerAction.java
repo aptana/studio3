@@ -141,7 +141,8 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 						}
 						return true;
 					}
-				} catch (BadLocationException x) {
+				} catch (BadLocationException ignore) {
+					ignore.getCause();
 				}
 			}
 		}

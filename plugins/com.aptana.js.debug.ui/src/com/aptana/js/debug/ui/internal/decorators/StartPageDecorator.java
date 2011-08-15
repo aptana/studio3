@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable declaredExceptions
+
 package com.aptana.js.debug.ui.internal.decorators;
 
 import org.eclipse.core.resources.IFile;

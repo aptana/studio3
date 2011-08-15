@@ -43,7 +43,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		ViewerFilter[] filters = viewer.getFilters();
 		ViewerFilter filter = null;
 		for (ViewerFilter f : filters) {
-			if (f == this) {
+			if (this.equals(f)) {
 				filter = f;
 				break;
 			}

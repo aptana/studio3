@@ -245,7 +245,7 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		removeFormatterButton.setEnabled(!selection.isEmpty());
 		editFormatterButton.setEnabled(selection.size() == 1);
 		sourceViewer.getDocument()
-				.set(selection.size() == 1 ? ((DetailFormatter) selection.getFirstElement()).getSnippet()
+				.set((selection.size() == 1) ? ((DetailFormatter) selection.getFirstElement()).getSnippet()
 						: StringUtil.EMPTY);
 	}
 

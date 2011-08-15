@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.js.debug.ui.internal;
 
 import java.util.HashMap;
@@ -61,7 +63,7 @@ public final class StartPageManager {
 			}
 
 			public void launchConfigurationChanged(ILaunchConfiguration configuration) {
-				if (configuration instanceof ILaunchConfigurationWorkingCopy == false) {
+				if (!(configuration instanceof ILaunchConfigurationWorkingCopy)) {
 					launchConfigurationRemovedInternal(configuration);
 					launchConfigurationAddedInternal(configuration);
 				}
@@ -232,7 +234,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			/* ignore */
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 

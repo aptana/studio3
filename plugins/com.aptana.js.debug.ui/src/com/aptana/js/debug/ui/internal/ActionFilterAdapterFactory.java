@@ -25,7 +25,7 @@ public class ActionFilterAdapterFactory implements IAdapterFactory {
 		if (adapterType.isInstance(adaptableObject)) {
 			return adaptableObject;
 		}
-		if (adapterType == IActionFilter.class) {
+		if (IActionFilter.class.equals(adapterType)) {
 			if (adaptableObject instanceof IJSVariable) {
 				return new JSVariableActionFilter();
 			}

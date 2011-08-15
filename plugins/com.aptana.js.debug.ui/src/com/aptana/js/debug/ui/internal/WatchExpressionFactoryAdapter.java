@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import org.eclipse.core.runtime.CoreException;
@@ -38,7 +40,7 @@ public class WatchExpressionFactoryAdapter implements IWatchExpressionFactoryAda
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IWatchExpressionFactoryAdapter.class) {
+			if (IWatchExpressionFactoryAdapter.class.equals(adapterType)) {
 				return new WatchExpressionFactoryAdapter();
 			}
 			return null;

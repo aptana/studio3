@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.js.debug.ui.internal.sourcelookup;
 
 import java.text.MessageFormat;
@@ -49,6 +51,8 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 	private static final String DEFAULT_SOURCE_LOCATOR_ID = "com.aptana.js.debug.core.sourceLookupDirector"; //$NON-NLS-1$
 	private static final String DEFAULT_SOURCE_PATH_COMPUTER_ID = "com.aptana.debug.core.sourcePathComputer"; //$NON-NLS-1$
+
+	private static final ISourceContainer[] EMPTY_CONTAINERS = new ISourceContainer[0];
 
 	private static SourceDisplayAdapter fInstance;
 
@@ -117,7 +121,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 								return sourcePathComputer.computeSourceContainers(null, null);
 							}
 
-							return new ISourceContainer[0];
+							return EMPTY_CONTAINERS;
 						}
 
 					} });
@@ -141,7 +145,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		/**
 		 * Constructs a new source lookup job.
 		 */
-		public SourceLookupJob() {
+		protected SourceLookupJob() {
 			super("Debug Source Lookup"); //$NON-NLS-1$
 			setPriority(Job.INTERACTIVE);
 			setSystem(true);
@@ -184,7 +188,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		private ISourceLookupResult fResult;
 		private IWorkbenchPage fPage;
 
-		public SourceDisplayJob() {
+		protected SourceDisplayJob() {
 			super("Debug Source Display"); //$NON-NLS-1$
 			setSystem(true);
 			setPriority(Job.INTERACTIVE);
@@ -254,7 +258,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == ISourceDisplay.class) {
+			if (ISourceDisplay.class.equals(adapterType)) {
 				return SourceDisplayAdapter.getInstance();
 			}
 			return null;

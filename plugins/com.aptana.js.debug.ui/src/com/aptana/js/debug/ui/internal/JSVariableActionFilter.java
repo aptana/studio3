@@ -26,7 +26,7 @@ public class JSVariableActionFilter implements IActionFilter {
 	private static final Set<String> fgPrimitiveTypes = initPrimitiveTypes();
 
 	private static Set<String> initPrimitiveTypes() {
-		HashSet<String> set = new HashSet<String>(8);
+		Set<String> set = new HashSet<String>(8);
 		set.add("integer"); //$NON-NLS-1$
 		set.add("float"); //$NON-NLS-1$
 		set.add("boolean"); //$NON-NLS-1$

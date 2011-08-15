@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import java.text.MessageFormat;
@@ -91,7 +94,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 					default:
 						break;
 				}
-				String urlString = ((String) source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
+				String urlString = (((String) source).indexOf("Internet Explorer") != -1) //$NON-NLS-1$
 				? URL_DOCS_INSTALL_IE_DEBUGGER
 						: URL_DOCS_INSTALL_DEBUGGER;
 				WorkbenchBrowserUtil.launchExternalBrowser(urlString);
@@ -123,7 +126,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 				default:
 					break;
 			}
-			String urlString = ((String) source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
+			String urlString = (((String) source).indexOf("Internet Explorer") != -1) //$NON-NLS-1$
 			? URL_DOCS_INSTALL_IE_DEBUGGER
 					: URL_DOCS_INSTALL_DEBUGGER;
 			WorkbenchBrowserUtil.launchExternalBrowser(urlString);

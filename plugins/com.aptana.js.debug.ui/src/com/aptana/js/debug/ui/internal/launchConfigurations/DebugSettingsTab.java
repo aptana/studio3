@@ -109,7 +109,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 			} else {
 				setValuesFrom(new ScopedPreferenceStore(EclipseUtil.instanceScope(), JSDebugPlugin.PLUGIN_ID));
 			}
-		} catch (CoreException ignore) {
+		} catch (CoreException e) {
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 

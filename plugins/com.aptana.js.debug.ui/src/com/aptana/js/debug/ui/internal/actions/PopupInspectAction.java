@@ -123,7 +123,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	private static Point getPopupAnchor(ITextViewer viewer) {
 		StyledText textWidget = viewer.getTextWidget();
 		Point docRange = textWidget.getSelectionRange();
-		int midOffset = docRange.x + (docRange.y / 2);
+		int midOffset = docRange.x + (docRange.y >> 1);
 		Point point = textWidget.getLocationAtOffset(midOffset);
 		point = textWidget.toDisplay(point);
 

@@ -88,9 +88,10 @@ public class DebugConnection {
 		connected = true;
 		new Thread("Aptana: JS Debugger") { //$NON-NLS-1$
 			public void run() {
+				String message;
 				while ((socket != null && !socket.isClosed()) || reader != null) {
 					try {
-						String message = readMessage();
+						message = readMessage();
 						if (message == null) {
 							break;
 						}
@@ -288,8 +289,9 @@ public class DebugConnection {
 
 		char[] buffer = new char[1024];
 		sb.setLength(0); // clear the buffer
+		int n;
 		while (messageSize > sb.length()) {
-			int n = reader.read(buffer, 0, Math.min(messageSize - sb.length(), buffer.length));
+			n = reader.read(buffer, 0, Math.min(messageSize - sb.length(), buffer.length));
 			if (n == -1) {
 				return null;
 			}

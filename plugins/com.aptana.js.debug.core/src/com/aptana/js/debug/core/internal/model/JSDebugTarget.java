@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.js.debug.core.internal.model;
 
 import java.io.ByteArrayInputStream;

@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal.actions;
 
 import org.eclipse.core.resources.IFile;
@@ -85,7 +87,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
 	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
-		return (selection instanceof ITextSelection);
+		return selection instanceof ITextSelection;
 	}
 
 	private boolean canToggleLineBreakpoint(IWorkbenchPart part, ISelection selection) {

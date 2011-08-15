@@ -40,6 +40,7 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 			try {
 				value = Integer.valueOf(newText.trim()).intValue();
 			} catch (NumberFormatException e) {
+				e.getCause();
 			}
 			if (value < 1) {
 				return Messages.BreakpointHitCountAction_HitCountPositiveInteger;
@@ -100,7 +101,7 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 		} catch (CoreException e) {
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
-		String initialValue = currentHitCount > 0 ? Integer.toString(currentHitCount) : "1"; //$NON-NLS-1$;
+		String initialValue = (currentHitCount > 0) ? Integer.toString(currentHitCount) : "1"; //$NON-NLS-1$;
 
 		HitCountDialog dlg = new HitCountDialog(UIUtils.getActiveShell(),
 				Messages.BreakpointHitCountAction_SetBreakpointHitCount,

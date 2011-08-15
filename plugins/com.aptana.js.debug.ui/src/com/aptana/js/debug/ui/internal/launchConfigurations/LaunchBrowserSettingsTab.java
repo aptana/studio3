@@ -312,7 +312,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		managedServersView.getControl().setEnabled(!startUrlEnabled && rbManagedServer.getSelection());
 		managedServersView.getControl().setForeground(
 				getShell().getDisplay().getSystemColor(
-						!startUrlEnabled && rbManagedServer.getSelection() ? SWT.COLOR_LIST_FOREGROUND
+						(!startUrlEnabled && rbManagedServer.getSelection()) ? SWT.COLOR_LIST_FOREGROUND
 								: SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		rbInternalServer.setEnabled(!startUrlEnabled);
 		rbManagedServer.setEnabled(!startUrlEnabled);
@@ -431,7 +431,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView
 				.getSelection()).getFirstElement();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
-				serverSelection != null ? serverSelection.getName() : null);
+				(serverSelection != null) ? serverSelection.getName() : null);
 
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME,
 				fAddProjectName.getSelection());
