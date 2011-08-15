@@ -30,8 +30,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 
 /**
  * This class represents the default implementation of the
@@ -91,6 +94,27 @@ public final class XMLMemento implements IMemento {
             if (baseDir != null) {
 				source.setSystemId(baseDir);
 			}
+
+			parser.setErrorHandler(new ErrorHandler() {
+				/**
+				 * @throws SAXException
+				 */
+				public void warning(SAXParseException exception) throws SAXException {
+					// ignore
+				}
+
+				/**
+				 * @throws SAXException
+				 */
+				public void error(SAXParseException exception) throws SAXException {
+					// ignore
+				}
+
+				public void fatalError(SAXParseException exception) throws SAXException {
+					throw exception;
+				}
+			});
+
             Document document = parser.parse(source);
             NodeList list = document.getChildNodes();
             for (int i = 0; i < list.getLength(); i++) {
