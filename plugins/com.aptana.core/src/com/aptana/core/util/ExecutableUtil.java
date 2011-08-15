@@ -92,13 +92,13 @@ public final class ExecutableUtil
 	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter, IPath workingDirectory)
 	{
-		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
-		String[] paths;
-
 		if (executableName == null)
 		{
 			return null;
 		}
+
+		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
+		String[] paths;
 
 		if (env != null && env.containsKey(PATH))
 		{
