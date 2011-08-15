@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,16 @@
  *     IBM Corporation - initial API and implementation
  *     Appcelerator, Inc - non-UI adoption
  *******************************************************************************/
+// $codepro.audit.disable appendString
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable parenthesizeCondition
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable platformSpecificLineSeparator
+// $codepro.audit.disable thrownExceptions
+// $codepro.audit.disable reusableImmutables
+// $codepro.audit.disable declareAsInterface
+// $codepro.audit.disable exceptionUsage.exceptionCreation
+
 package com.aptana.core.epl;
 
 import java.io.IOException;

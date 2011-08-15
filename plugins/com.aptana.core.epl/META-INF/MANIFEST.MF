@@ -12,5 +12,6 @@ Export-Package: com.aptana.core.epl,
  com.aptana.filewatcher.poller,
  com.aptana.core.epl.downloader
 Bundle-ActivationPolicy: lazy
+Eclipse-LazyStart: true
 Bundle-Activator: com.aptana.core.epl.CoreEPLPlugin
 Eclipse-ExtensibleAPI: true
