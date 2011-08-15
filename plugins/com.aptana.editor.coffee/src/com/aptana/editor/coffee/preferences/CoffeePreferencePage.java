@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.coffee.CoffeeEditor;
 import com.aptana.editor.coffee.CoffeeScriptEditorPlugin;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 
@@ -36,7 +37,24 @@ public class CoffeePreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IPreferenceStore getChainedEditorPreferenceStore()
 	{
-		return CoffeeScriptEditorPlugin.getChainedPreferenceStore();
+		return CoffeeEditor.getChainedPreferenceStore();
 	}
 
+	@Override
+	protected IEclipsePreferences getDefaultPluginPreferenceStore()
+	{
+		return EclipseUtil.defaultScope().getNode(CoffeeScriptEditorPlugin.PLUGIN_ID);
+	}
+
+	@Override
+	protected boolean getDefaultSpacesForTabs()
+	{
+		return ICoffeePreferenceConstants.DEFAULT_SPACES_FOR_TABS;
+	}
+
+	@Override
+	protected int getDefaultTabWidth()
+	{
+		return ICoffeePreferenceConstants.DEFAULT_TAB_WIDTH;
+	}
 }

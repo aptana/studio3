@@ -11,6 +11,7 @@ import com.aptana.editor.coffee.internal.index.CoffeeFileIndexingParticipantTest
 import com.aptana.editor.coffee.internal.text.CoffeeFoldingComputerTest;
 import com.aptana.editor.coffee.parsing.CoffeeParserTest;
 import com.aptana.editor.coffee.parsing.lexer.CoffeeScannerTest;
+import com.aptana.editor.coffee.preferences.CoffeePreferencePageTest;
 
 public class AllTests extends TestCase
 {
@@ -27,6 +28,7 @@ public class AllTests extends TestCase
 		suite.addTestSuite(CoffeeCodeScannerTest.class);
 		suite.addTestSuite(CoffeeSourcePartitionScannerTest.class);
 		suite.addTestSuite(CoffeescriptScopesTest.class);
+		suite.addTestSuite(CoffeePreferencePageTest.class);
 		// $JUnit-END$
 		return suite;
 	}
