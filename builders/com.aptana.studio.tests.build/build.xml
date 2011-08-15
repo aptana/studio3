@@ -113,6 +113,10 @@
 		<!-- Install Studio Core feature -->
 		<antcall target="install.studio.core" />
 		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
+		<antcall target="run.director">
+			<param name="p2.installIU" value="com.windowtester.runtime.feature.group" />
+			<param name="p2.repo" value="${windowtester.p2.repo}" />
+		</antcall>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
