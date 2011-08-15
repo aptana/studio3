@@ -24,10 +24,17 @@ public class ExecutableUtilTest extends TestCase
 
 	public void testFindExecutableFile()
 	{
+		IPath path;
+
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			IPath path = ExecutableUtil.find("bash", false, null);
+			path = ExecutableUtil.find("bash", false, null);
 			assertNotNull("Could not find bash executable", path);
+		}
+		else
+		{
+			path = ExecutableUtil.find("cmd", true, null);
+			assertNotNull("Could not find cmd executable", path);
 		}
 	}
 

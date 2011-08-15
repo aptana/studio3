@@ -12,9 +12,11 @@ import junit.framework.TestSuite;
 
 import org.kohsuke.junit.ParallelTestSuite;
 
-public class AllTests {
+public class AllTests
+{
 
-	public static Test suite() {
+	public static Test suite()
+	{
 		TestSuite suite;
 		// Run in parallel locally, not on unit test build...
 		// String user = System.getenv("USER");
@@ -28,9 +30,9 @@ public class AllTests {
 		// }
 		// $JUnit-BEGIN$
 		suite.addTestSuite(SFTPConnectionTest.class);
-		suite.addTestSuite(FTPSConnectionTest.class);
-		suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
-		suite.addTestSuite(ImplicitFTPSConnectionTest.class);
+		// suite.addTestSuite(FTPSConnectionTest.class);
+		// suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
+		// suite.addTestSuite(ImplicitFTPSConnectionTest.class);
 		// $JUnit-END$
 		return suite;
 	}
