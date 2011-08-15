@@ -28,7 +28,7 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 	 * @param attributes
 	 */
 	@SuppressWarnings("rawtypes")
-	public ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
+	protected ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
 		super(launch, process, name, attributes);
 	}
 
