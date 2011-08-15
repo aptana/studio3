@@ -72,7 +72,6 @@ public class CoffeePreferencePageTest extends UITestCaseSWT
 			// ui.keyClick(WT.COMMAND, ',');
 			runInUI(new Runnable()
 			{
-				@Override
 				public void run()
 				{
 					PreferencesUtil.createPreferenceDialogOn(null,
