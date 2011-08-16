@@ -7,7 +7,8 @@
  */
 package com.aptana.core.util;
 
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,7 @@ import org.eclipse.core.runtime.Platform;
 
 public class ExecutableUtilTest extends TestCase
 {
-	private static final String BUNDLE_ID = "com.aptana.core.tests";
-	private static final String RESOURCE_DIR = "resources";
+	private static final String tempDir = System.getProperty("java.io.tmpdir");
 
 	public void testFindExecutableFile()
 	{
@@ -48,38 +48,73 @@ public class ExecutableUtilTest extends TestCase
 		assertNull(ExecutableUtil.find("invalid_executable", false, null));
 	}
 
-	public void testFindFileInWorkingDirectory()
+	public void testFindFileInWorkingDirectory() throws IOException, InterruptedException
 	{
-		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath resourceDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
-		String executableFile = "executableTest";
-		List<IPath> location = new ArrayList<IPath>();
-		location.add(resourceDirectory);
+		String executableFileName = "executableTest";
+		File executableFile = new File(tempDir, executableFileName);
+		if (!executableFile.exists())
+		{
+			executableFile.createNewFile();
+		}
 
-		IPath path = ExecutableUtil.find(executableFile, false, location, resourceDirectory);
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			Runtime.getRuntime().exec(new String[] { "chmod", "755", executableFile.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
+		}
+
+		List<IPath> location = new ArrayList<IPath>();
+		IPath executablePath = new Path(executableFile.getAbsolutePath());
+		IPath tempDirectoryPath = executablePath.removeLastSegments(1);
+		location.add(tempDirectoryPath);
+
+		IPath path = ExecutableUtil.find(executableFileName, false, location, tempDirectoryPath);
+
+		executableFile.delete();
 		assertNotNull("Could not find executable file in working directory", path);
 	}
 
-	public void testFindFileNotExecutable()
+	public void testFindFileNotExecutable() throws IOException
 	{
-		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath workingDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
-		List<IPath> location = new ArrayList<IPath>();
-		location.add(workingDirectory);
+		String executableFileName = "executableTest";
+		File executableFile = new File(tempDir, executableFileName);
+		if (!executableFile.exists())
+		{
+			executableFile.createNewFile();
+		}
 
-		IPath path = ExecutableUtil.find("test.js", false, location);
-		assertTrue("Found a non-executable file", workingDirectory.append("test.js").toFile().exists() && path == null);
+		executableFile.setReadOnly();
+		List<IPath> location = new ArrayList<IPath>();
+		IPath executablePath = new Path(executableFile.getAbsolutePath());
+		location.add(executablePath.removeLastSegments(1));
+
+		IPath path = ExecutableUtil.find(executableFileName, false, location, (IPath) null);
+		executableFile.delete();
+
+		assertNull("Found a non-executable file", path);
+
 	}
 
-	public void testFindWithNullWorkingDirectory()
+	public void testFindWithNullWorkingDirectory() throws IOException, InterruptedException
 	{
-		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath resourceDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
-		String executableFile = "executableTest";
-		List<IPath> location = new ArrayList<IPath>();
-		location.add(resourceDirectory);
+		String executableFileName = "executableTest";
+		File executableFile = new File(tempDir, executableFileName);
+		if (!executableFile.exists())
+		{
+			executableFile.createNewFile();
+		}
 
-		IPath path = ExecutableUtil.find(executableFile, false, location, (IPath) null);
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			Runtime.getRuntime().exec(new String[] { "chmod", "755", executableFile.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
+		}
+
+		List<IPath> location = new ArrayList<IPath>();
+		IPath executablePath = new Path(executableFile.getAbsolutePath());
+		location.add(executablePath.removeLastSegments(1));
+
+		IPath path = ExecutableUtil.find(executableFileName, false, location, (IPath) null);
+
+		executableFile.delete();
 		assertNotNull("Could not find executable with valid search location", path);
 	}
 
