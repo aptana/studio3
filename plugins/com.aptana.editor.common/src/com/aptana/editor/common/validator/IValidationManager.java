@@ -80,7 +80,8 @@ public interface IValidationManager
 	 * Adds parse errors to the given list of validation items
 	 * 
 	 * @param items
+	 * @param language
 	 */
-	public void addParseErrors(List<IValidationItem> items);
+	public void addParseErrors(List<IValidationItem> items, String language);
 
 }

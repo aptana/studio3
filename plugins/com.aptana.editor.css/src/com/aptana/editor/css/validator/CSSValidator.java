@@ -89,7 +89,7 @@ public class CSSValidator implements IValidator
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = getReport(source, path);
-		manager.addParseErrors(items);
+		manager.addParseErrors(items, ICSSConstants.CONTENT_TYPE_CSS);
 		processErrorsInReport(report, path, manager, items);
 		processWarningsInReport(report, path, manager, items);
 		return items;
