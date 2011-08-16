@@ -447,7 +447,11 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 			clearCache(sourcePath);
 			clearCache(destinationPath);
-			renameFile(basePath.append(sourcePath), basePath.append(destinationPath), Policy.subMonitorFor(monitor, 2));
+			if (isDirectory) {
+				renameDirectory(basePath.append(sourcePath), basePath.append(destinationPath), Policy.subMonitorFor(monitor, 2));
+			} else {
+				renameFile(basePath.append(sourcePath), basePath.append(destinationPath), Policy.subMonitorFor(monitor, 2));
+			}
 			setLastOperationTime();
 		} catch (FileNotFoundException e) {
 			setLastOperationTime();
@@ -473,6 +477,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected abstract void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException;
 	protected abstract void createDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
+	protected abstract void renameDirectory(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void deleteFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void deleteDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void setModificationTime(IPath path, long modificationTime, IProgressMonitor monitor) throws CoreException, FileNotFoundException;

@@ -996,6 +996,14 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	}
 
 	/* (non-Javadoc)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#renameDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void renameDirectory(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+		renameFile(sourcePath, destinationPath, monitor);
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.BaseFTPConnectionFileManager#setModificationTime(org.eclipse.core.runtime.IPath, long, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
