@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.ui.io.navigator;
 
@@ -227,6 +228,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                             monitor);
                     return;
                 } catch (CoreException e1) {
+                	IdeLog.logWarning(IOUIPlugin.getDefault(), e1);
                 }
             }
 			else if (object instanceof FileSystemObject && e.getCause() instanceof PermissionDeniedException)
@@ -277,9 +279,9 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (IWorkbenchAdapter.class == adapterType) {
+			if (IWorkbenchAdapter.class.equals(adapterType)) {
 				return getInstance();
-			} else if (IDeferredWorkbenchAdapter.class == adapterType) {
+			} else if (IDeferredWorkbenchAdapter.class.equals(adapterType)) {
 				if (adaptableObject instanceof WorkspaceConnectionPoint
 						|| adaptableObject instanceof LocalConnectionPoint
 						|| adaptableObject instanceof LocalRoot) {

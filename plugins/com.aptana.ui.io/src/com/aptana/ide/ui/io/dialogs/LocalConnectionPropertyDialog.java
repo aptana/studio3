@@ -171,7 +171,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 				isNew = true;
 			} catch (CoreException e) {
 				IdeLog.logError(IOUIPlugin.getDefault(), Messages.LocalConnectionPropertyDialog_FailedToCreate, e);
-				close();
+				close(); // $codepro.audit.disable closeInFinally
 			}
 		}
 		loadPropertiesFrom(localConnectionPoint);
@@ -208,6 +208,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		}
 		if (savePropertiesTo(localConnectionPoint)) {
 			/* TODO: notify */
+			localConnectionPoint.hashCode();
 		}
 		if (isNew) {
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(localConnectionPoint);
@@ -232,7 +233,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		try {
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			IPath path = connectionPoint.getPath();
-			localPathText.setText(path != null ? path.toPortableString() : ""); //$NON-NLS-1$
+			localPathText.setText((path != null) ? path.toPortableString() : ""); //$NON-NLS-1$
 		} finally {
 			addListeners();
 		}

@@ -37,6 +37,7 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
      */
     public static final String ID = IOUIPlugin.PLUGIN_ID + ".PasteAction"; //$NON-NLS-1$
 
+    private static final IFileStore[] NO_FILES = new IFileStore[0];
     /**
      * The shell in which to show any dialogs
      */
@@ -90,7 +91,7 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
     @Override
     protected boolean updateSelection(IStructuredSelection selection) {
         fDestFileStores.clear();
-        fClipboardData = new IFileStore[0];
+        fClipboardData = NO_FILES;
         if (!super.updateSelection(selection)) {
             return false;
         }

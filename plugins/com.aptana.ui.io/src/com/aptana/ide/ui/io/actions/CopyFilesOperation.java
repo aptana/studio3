@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.ide.ui.io.actions;
 
@@ -474,7 +475,7 @@ public class CopyFilesOperation
 	private IFileStore getNewNameFor(final IFileStore originalFile)
 	{
 		final IFileStore parent = originalFile.getParent();
-		final String returnValue[] = { "" }; //$NON-NLS-1$
+		final String[] returnValue = { "" }; //$NON-NLS-1$
 
 		fShell.getDisplay().syncExec(new Runnable()
 		{

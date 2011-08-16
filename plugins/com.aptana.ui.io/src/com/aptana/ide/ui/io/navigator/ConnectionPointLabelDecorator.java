@@ -66,7 +66,7 @@ public class ConnectionPointLabelDecorator implements ILabelDecorator
 			IConnectionPoint[] connections = CoreIOPlugin.getConnectionPointManager().getConnectionPoints();
 			for (IConnectionPoint connection : connections)
 			{
-				if (connection != currentConnection && connection instanceof IBaseRemoteConnectionPoint
+				if (!connection.equals(currentConnection) && connection instanceof IBaseRemoteConnectionPoint
 						&& currentName.equals(connection.getName()))
 				{
 					// there are remote connections with the same name, so adds the compressed path to distinguish
@@ -87,7 +87,7 @@ public class ConnectionPointLabelDecorator implements ILabelDecorator
 						}
 					}
 					return MessageFormat.format("{0} ({1})", text, //$NON-NLS-1$
-							decoratedText == null ? currentPath.toPortableString() : decoratedText);
+							(decoratedText == null) ? currentPath.toPortableString() : decoratedText);
 				}
 			}
 		}

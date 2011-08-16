@@ -89,7 +89,7 @@ public class EditorUtils
 								{
 									name = finalEditorInput.getName();
 								}
-								String editorId = editorDescriptor == null ? IDE.getEditorDescriptor(name).getId()
+								String editorId = (editorDescriptor == null) ? IDE.getEditorDescriptor(name).getId()
 										: editorDescriptor.getId();
 								int matchFlags = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
 								boolean opened = page.findEditors(finalEditorInput, editorId, matchFlags).length > 0;

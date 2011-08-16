@@ -103,6 +103,10 @@ public class UniformFileStoreEditorInput extends FileStoreEditorInput implements
 	@Override
 	public boolean equals(Object o)
 	{
+		if (this == o)
+		{
+			return true;
+		}
 		if (o instanceof UniformFileStoreEditorInput)
 		{
 			return fRealFileStore.equals(((UniformFileStoreEditorInput) o).fRealFileStore);
@@ -114,15 +118,15 @@ public class UniformFileStoreEditorInput extends FileStoreEditorInput implements
 	@Override
 	public Object getAdapter(Class adapter)
 	{
-		if (IFileStore.class == adapter)
+		if (IFileStore.class.equals(adapter))
 		{
 			return fRealFileStore;
 		}
-		else if (IFileInfo.class == adapter)
+		else if (IFileInfo.class.equals(adapter))
 		{
 			return fRealFileInfo;
 		}
-		else if (URI.class == adapter)
+		else if (URI.class.equals(adapter))
 		{
 			if (fRealFileStore instanceof IExtendedFileStore)
 			{

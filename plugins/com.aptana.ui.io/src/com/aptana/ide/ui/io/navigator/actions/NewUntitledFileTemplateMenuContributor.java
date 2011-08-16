@@ -53,7 +53,7 @@ public class NewUntitledFileTemplateMenuContributor extends NewFileTemplateMenuC
 		// creates untitled file
 		String fileExtension = template.getFiletype();
 		// strips the leading * before . if there is one
-		int index = fileExtension.lastIndexOf("."); //$NON-NLS-1$
+		int index = fileExtension.lastIndexOf('.');
 		if (index > -1)
 		{
 			fileExtension = fileExtension.substring(index + 1);

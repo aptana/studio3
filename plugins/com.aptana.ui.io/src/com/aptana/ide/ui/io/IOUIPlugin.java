@@ -5,6 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 
 package com.aptana.ide.ui.io;
 
@@ -306,7 +310,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 			if (element == null)
 			{
 				// full refresh
-				System.err.println("FIXME: full refresh for " + viewer.getClass().getSimpleName()); //$NON-NLS-1$
+				System.err.println("FIXME: full refresh for " + viewer.getClass().getSimpleName()); //$NON-NLS-1$ // $codepro.audit.disable debuggingCode
 				viewer.refresh();
 			}
 			else

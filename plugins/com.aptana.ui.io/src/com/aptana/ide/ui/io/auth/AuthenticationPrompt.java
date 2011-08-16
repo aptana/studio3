@@ -66,7 +66,7 @@ public class AuthenticationPrompt implements IAuthenticationPrompt
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType)
 		{
-			if (IAuthenticationPrompt.class == adapterType)
+			if (IAuthenticationPrompt.class.equals(adapterType))
 			{
 				return new AuthenticationPrompt();
 			}

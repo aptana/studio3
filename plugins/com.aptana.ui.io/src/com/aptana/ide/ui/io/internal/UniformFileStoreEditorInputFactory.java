@@ -61,7 +61,7 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 
 	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor) throws CoreException
 	{
-		if (fileStore.getFileSystem() == EFS.getLocalFileSystem()) {
+		if (fileStore.getFileSystem() == EFS.getLocalFileSystem()) { // $codepro.audit.disable useEquals
 			return new FileStoreEditorInput(fileStore);
 		}
 		IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);

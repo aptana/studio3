@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
 
 package com.aptana.ide.ui.io.properties;
 
@@ -85,7 +86,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 							try {
 								result[0] = fileStore.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 							} catch (CoreException e) {
-								throw new InvocationTargetException(e);
+								throw new InvocationTargetException(e, e.getLocalizedMessage());
 							} finally {
 								monitor.done();
 							}
@@ -94,6 +95,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 				} catch (InvocationTargetException e) {
 					 throw (CoreException) e.getTargetException();
 				} catch (InterruptedException e) {
+					e.getCause();
 				}
 				fFileInfo = result[0];
 			}

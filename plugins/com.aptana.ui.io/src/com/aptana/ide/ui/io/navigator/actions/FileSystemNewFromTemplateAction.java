@@ -27,7 +27,7 @@ public class FileSystemNewFromTemplateAction extends BaseSelectionListenerAction
 
 		private MenuManager dropDownMenuMgr;
 
-		public MenuCreator()
+		protected MenuCreator()
 		{
 		}
 

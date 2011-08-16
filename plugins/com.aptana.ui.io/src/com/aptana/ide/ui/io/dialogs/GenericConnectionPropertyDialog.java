@@ -131,7 +131,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 				isNew = true;
 			} catch (CoreException e) {
 				IdeLog.logError(IOUIPlugin.getDefault(), Messages.GenericConnectionPropertyDialog_FailedToCreate, e);
-				close();
+				close(); // $codepro.audit.disable closeInFinally
 			}
 		}
 		loadPropertiesFrom(genericConnectionPoint);
@@ -168,6 +168,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		}
 		if (savePropertiesTo(genericConnectionPoint)) {
 			/* TODO: notify */
+			genericConnectionPoint.hashCode();
 		}
 		if (isNew) {
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(genericConnectionPoint);
@@ -182,8 +183,6 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 	protected Control createContents(Composite parent) {
 		try {
 			return super.createContents(parent);
-		} catch (RuntimeException e) {
-			throw e;
 		} finally {
 			validate();
 		}
@@ -194,7 +193,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		try {
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			URI uri = connectionPoint.getURI();
-			uriText.setText(uri != null ? uri.toString() : ""); //$NON-NLS-1$
+			uriText.setText((uri != null) ? uri.toString() : ""); //$NON-NLS-1$
 		} finally {
 			addListeners();
 		}

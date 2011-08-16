@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.ui.io;
 
@@ -47,7 +48,7 @@ public final class ImageUtils {
     private static final boolean ON_WINDOWS = Platform.OS_WIN32.equals(Platform.getOS());
 
 	private static javax.swing.JFileChooser jFileChooser;
-	private static final WeakHashMap<Object, String> iconToKeyMap = new WeakHashMap<Object, String>();
+	private static final Map<Object, String> iconToKeyMap = new WeakHashMap<Object, String>();
 
 	// Maintain a map of image keys that indicate if a specific icon needs a reset (usually after a theme change).
 	// We cannot just reset all images at once, as it yields image-disposed errors.
@@ -215,10 +216,11 @@ public final class ImageUtils {
 					colorModel.getPixelSize(), palette);
 			java.awt.image.WritableRaster raster = bufferedImage.getRaster();
 			int[] pixelArray = new int[3];
+			int pixel;
 			for (int y = 0; y < data.height; y++) {
 				for (int x = 0; x < data.width; x++) {
 					raster.getPixel(x, y, pixelArray);
-					int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+					pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
 					data.setPixel(x, y, pixel);
 				}
 			}

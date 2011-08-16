@@ -39,6 +39,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -116,13 +117,13 @@ public class FileTreeSelectionDialog extends ElementTreeSelectionDialog {
 		/**
 		 * @param allowFiles
 		 */
-		public FileContentProvider(boolean allowFiles) {
+		protected FileContentProvider(boolean allowFiles) {
 			super();
 			this.allowFiles = allowFiles;
 		}
 
 		public Object[] getChildren(Object parentElement) {
-			return new Object[0];
+			return ArrayUtil.NO_OBJECTS;
 		}
 
 		public Object getParent(Object element) {
@@ -142,7 +143,7 @@ public class FileTreeSelectionDialog extends ElementTreeSelectionDialog {
 
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
-			if (treeViewer.getContentProvider() != this) {
+			if (!this.equals(treeViewer.getContentProvider())) {
 				return;
 			}
 			DeferredTreeContentManager deferredTreeContentManager = new DeferredTreeContentManager(treeViewer) {
@@ -165,7 +166,7 @@ public class FileTreeSelectionDialog extends ElementTreeSelectionDialog {
 							}
 							filtered.add(i);
 						}
-						children = filtered.toArray();
+						children = filtered.toArray(); // $codepro.audit.disable questionableAssignment
 					}
 					super.addChildren(parent, children, monitor);
 				}

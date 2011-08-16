@@ -37,6 +37,9 @@ public class FileSystemObject implements IAdaptable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
 		if (obj instanceof FileSystemObject) {
 			return fileStore.equals(((FileSystemObject) obj).fileStore);
 		}
@@ -64,12 +67,12 @@ public class FileSystemObject implements IAdaptable {
 	 */
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
-		if (IFileStore.class == adapter) {
+		if (IFileStore.class.equals(adapter)) {
 			return fileStore;
-		} else if (IFileInfo.class == adapter) {
+		} else if (IFileInfo.class.equals(adapter)) {
 			return fileInfo;
-		} else if (IDeferredWorkbenchAdapter.class == adapter
-				|| IWorkbenchAdapter.class == adapter) {
+		} else if (IDeferredWorkbenchAdapter.class.equals(adapter)
+				|| IWorkbenchAdapter.class.equals(adapter)) {
 			return FileSystemWorkbenchAdapter.getInstance();
 		}
 		return fileStore.getAdapter(adapter);

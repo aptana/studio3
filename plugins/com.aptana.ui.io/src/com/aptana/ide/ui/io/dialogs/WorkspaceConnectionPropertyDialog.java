@@ -177,7 +177,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 				isNew = true;
 			} catch (CoreException e) {
 				IdeLog.logError(IOUIPlugin.getDefault(), Messages.WorkspaceConnectionPropertyDialog_FailedToCreate, e);
-				close();
+				close(); // $codepro.audit.disable closeInFinally
 			}
 		}
 		loadPropertiesFrom(workspaceConnectionPoint);
@@ -214,6 +214,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		}
 		if (savePropertiesTo(workspaceConnectionPoint)) {
 			/* TODO: notify */
+			workspaceConnectionPoint.hashCode();
 		}
 		if (isNew) {
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(workspaceConnectionPoint);
@@ -238,7 +239,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		try {
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			IContainer resource = connectionPoint.getResource();
-			workspacePathText.setText(resource != null ? resource.getFullPath().toPortableString() : ""); //$NON-NLS-1$
+			workspacePathText.setText((resource != null) ? resource.getFullPath().toPortableString() : ""); //$NON-NLS-1$
 		} finally {
 			addListeners();
 		}
