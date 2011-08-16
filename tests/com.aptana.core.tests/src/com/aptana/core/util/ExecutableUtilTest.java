@@ -51,13 +51,13 @@ public class ExecutableUtilTest extends TestCase
 	public void testFindFileInWorkingDirectory()
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath workingDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
+		IPath resourceDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
 		String executableFile = "executableTest";
 		List<IPath> location = new ArrayList<IPath>();
-		location.add(workingDirectory);
+		location.add(resourceDirectory);
 
-		IPath path = ExecutableUtil.find(executableFile, false, location, workingDirectory);
-		assertTrue("Could not find executable file in working directory", path.lastSegment().equals(executableFile));
+		IPath path = ExecutableUtil.find(executableFile, false, location, resourceDirectory);
+		assertNotNull("Could not find executable file in working directory", path);
 	}
 
 	public void testFindFileNotExecutable()
@@ -74,13 +74,13 @@ public class ExecutableUtilTest extends TestCase
 	public void testFindWithNullWorkingDirectory()
 	{
 		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		IPath workingDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
+		IPath resourceDirectory = Path.fromOSString(ResourceUtil.resourcePathToString(resourceURL));
 		String executableFile = "executableTest";
 		List<IPath> location = new ArrayList<IPath>();
-		location.add(workingDirectory);
+		location.add(resourceDirectory);
 
 		IPath path = ExecutableUtil.find(executableFile, false, location, (IPath) null);
-		assertTrue("Could not find executable with valid search location", path.lastSegment().equals(executableFile));
+		assertNotNull("Could not find executable with valid search location", path);
 	}
 
 	public void testFindNullDirectory()
