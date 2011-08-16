@@ -8,7 +8,6 @@
 package com.aptana.scripting.ui.views;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -16,19 +15,18 @@ import java.util.Set;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.TemplateElement;
+import com.aptana.scripting.model.EnvironmentElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
+class EnvsNode extends BaseNode<EnvsNode.Property>
 {
-	enum Property implements IPropertyInformation<FileTemplatesNode>
+	enum Property implements IPropertyInformation<EnvsNode>
 	{
-		COUNT(Messages.FileTemplatesNode_File_Templates_Count)
+		COUNT(Messages.EnvsNode_Envs_Count)
 		{
-			public Object getPropertyValue(FileTemplatesNode node)
+			public Object getPropertyValue(EnvsNode node)
 			{
-				return node.fileTemplates.length;
+				return node.envs.length;
 			}
 		};
 
@@ -44,23 +42,23 @@ class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
 			return header;
 		}
 
-		public Object getPropertyValue(FileTemplatesNode node)
+		public Object getPropertyValue(EnvsNode node)
 		{
 			return null;
 		}
 	}
 
-	private static final Image FILE_TEMPLATES_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	private FileTemplateNode[] fileTemplates;
+	private static final Image ENVS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	private EnvNode[] envs;
 
 	/**
 	 * CommandsNode
 	 * 
 	 * @param bundle
 	 */
-	FileTemplatesNode(BundleElement bundle)
+	EnvsNode(BundleElement bundle)
 	{
-		this(bundle.getCommands());
+		this(bundle.getEnvs());
 	}
 
 	/**
@@ -68,24 +66,19 @@ class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
 	 * 
 	 * @param elements
 	 */
-	FileTemplatesNode(List<CommandElement> elements)
+	EnvsNode(List<EnvironmentElement> elements)
 	{
-		List<FileTemplateNode> items = new ArrayList<FileTemplateNode>();
+		List<EnvNode> items = new ArrayList<EnvNode>();
 
 		if (elements != null)
 		{
-			Collections.sort(elements);
-
-			for (CommandElement command : elements)
+			for (EnvironmentElement env : elements)
 			{
-				if (command instanceof TemplateElement)
-				{
-					items.add(new FileTemplateNode((TemplateElement) command));
-				}
+				items.add(new EnvNode(env));
 			}
 		}
 
-		fileTemplates = items.toArray(new FileTemplateNode[items.size()]);
+		envs = items.toArray(new EnvNode[items.size()]);
 	}
 
 	/*
@@ -94,7 +87,7 @@ class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
 	 */
 	public Object[] getChildren()
 	{
-		return fileTemplates;
+		return envs;
 	}
 
 	/*
@@ -103,7 +96,7 @@ class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
 	 */
 	public Image getImage()
 	{
-		return FILE_TEMPLATES_ICON;
+		return ENVS_ICON;
 	}
 
 	/*
@@ -122,7 +115,7 @@ class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
 	 */
 	public String getLabel()
 	{
-		return Messages.FileTemplatesNode_FileTemplatesNodeName;
+		return Messages.EnvsNode_Envs;
 	}
 
 	/**
@@ -132,6 +125,6 @@ class FileTemplatesNode extends BaseNode<FileTemplatesNode.Property>
 	 */
 	public boolean hasChildren()
 	{
-		return fileTemplates.length > 0;
+		return envs.length > 0;
 	}
 }

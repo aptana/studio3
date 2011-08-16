@@ -8,8 +8,10 @@
 package com.aptana.scripting.ui.views;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
@@ -18,17 +20,40 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class CommandsNode extends BaseNode
+class CommandsNode extends BaseNode<CommandsNode.Property>
 {
+	enum Property implements IPropertyInformation<CommandsNode>
+	{
+		COUNT(Messages.CommandsNode_Commands_Count)
+		{
+			public Object getPropertyValue(CommandsNode node)
+			{
+				return node.commands.length;
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final Image COMMANDS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	private CommandNode[] _commands;
+	private CommandNode[] commands;
 
 	/**
 	 * CommandsNode
 	 * 
 	 * @param bundle
 	 */
-	public CommandsNode(BundleElement bundle)
+	CommandsNode(BundleElement bundle)
 	{
 		this(bundle.getCommands());
 	}
@@ -38,9 +63,9 @@ class CommandsNode extends BaseNode
 	 * 
 	 * @param elements
 	 */
-	public CommandsNode(List<CommandElement> elements)
+	CommandsNode(List<CommandElement> elements)
 	{
-		List<CommandNode> commands = new LinkedList<CommandNode>();
+		List<CommandNode> items = new LinkedList<CommandNode>();
 
 		if (elements != null)
 		{
@@ -48,14 +73,14 @@ class CommandsNode extends BaseNode
 
 			for (CommandElement command : elements)
 			{
-				if ((command instanceof SnippetElement) == false)
+				if (!(command instanceof SnippetElement))
 				{
-					commands.add(new CommandNode(command));
+					items.add(new CommandNode(command));
 				}
 			}
 		}
 
-		this._commands = commands.toArray(new CommandNode[commands.size()]);
+		commands = items.toArray(new CommandNode[items.size()]);
 	}
 
 	/*
@@ -64,7 +89,7 @@ class CommandsNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		return this._commands;
+		return commands;
 	}
 
 	/*
@@ -74,6 +99,16 @@ class CommandsNode extends BaseNode
 	public Image getImage()
 	{
 		return COMMANDS_ICON;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/*
@@ -92,6 +127,6 @@ class CommandsNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._commands.length > 0;
+		return commands.length > 0;
 	}
 }

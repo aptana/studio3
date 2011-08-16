@@ -7,26 +7,26 @@
  */
 package com.aptana.scripting.ui.views;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.scripting.model.BuildPathElement;
 import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class MenusNode extends BaseNode<MenusNode.Property>
+class BuildPathsNode extends BaseNode<BuildPathsNode.Property>
 {
-	enum Property implements IPropertyInformation<MenusNode>
+	enum Property implements IPropertyInformation<BuildPathsNode>
 	{
-		COUNT(Messages.MenusNode_Menus_Count)
+		COUNT(Messages.BuildPathsNode_Build_Paths_Count)
 		{
-			public Object getPropertyValue(MenusNode node)
+			public Object getPropertyValue(BuildPathsNode node)
 			{
-				return node.menus.length;
+				return node.buildPaths.length;
 			}
 		};
 
@@ -42,47 +42,43 @@ class MenusNode extends BaseNode<MenusNode.Property>
 			return header;
 		}
 
-		public Object getPropertyValue(MenusNode node)
+		public Object getPropertyValue(BuildPathsNode node)
 		{
 			return null;
 		}
 	}
 
-	private static final Image MENUS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	private MenuNode[] menus;
+	private static final Image BUILD_PATHS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	private BuildPathNode[] buildPaths;
 
 	/**
 	 * CommandsNode
 	 * 
 	 * @param bundle
 	 */
-	MenusNode(BundleElement bundle)
+	BuildPathsNode(BundleElement bundle)
 	{
-		this(bundle.getMenus());
+		this(bundle.getBuildPaths());
 	}
 
 	/**
-	 * MenusNode
+	 * FileTemplatesNode
 	 * 
 	 * @param elements
 	 */
-	MenusNode(List<MenuElement> elements)
+	BuildPathsNode(List<BuildPathElement> elements)
 	{
+		List<BuildPathNode> paths = new ArrayList<BuildPathNode>();
+
 		if (elements != null)
 		{
-			Collections.sort(elements);
-
-			menus = new MenuNode[elements.size()];
-
-			for (int i = 0; i < elements.size(); i++)
+			for (BuildPathElement buildPath : elements)
 			{
-				menus[i] = new MenuNode(elements.get(i));
+				paths.add(new BuildPathNode(buildPath));
 			}
 		}
-		else
-		{
-			menus = new MenuNode[0]; // $codepro.audit.disable reusableImmutables
-		}
+
+		buildPaths = paths.toArray(new BuildPathNode[paths.size()]);
 	}
 
 	/*
@@ -91,7 +87,7 @@ class MenusNode extends BaseNode<MenusNode.Property>
 	 */
 	public Object[] getChildren()
 	{
-		return menus;
+		return buildPaths;
 	}
 
 	/*
@@ -100,7 +96,16 @@ class MenusNode extends BaseNode<MenusNode.Property>
 	 */
 	public Image getImage()
 	{
-		return MENUS_ICON;
+		return BUILD_PATHS_ICON;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
+	 */
+	public String getLabel()
+	{
+		return Messages.BuildPathsNode_Build_Paths;
 	}
 
 	/*
@@ -113,15 +118,6 @@ class MenusNode extends BaseNode<MenusNode.Property>
 		return EnumSet.allOf(Property.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
-	 */
-	public String getLabel()
-	{
-		return Messages.MenusNode_Menus_Node;
-	}
-
 	/**
 	 * hasChildren
 	 * 
@@ -129,6 +125,6 @@ class MenusNode extends BaseNode<MenusNode.Property>
 	 */
 	public boolean hasChildren()
 	{
-		return menus.length > 0;
+		return buildPaths.length > 0;
 	}
 }

@@ -7,15 +7,20 @@
  */
 package com.aptana.scripting.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.PropertyDescriptor;
 
-class BaseNode implements IBundleViewNode, IPropertySource
+abstract class BaseNode<P extends Enum<P> & IPropertyInformation<? extends BaseNode<P>>> implements IBundleViewNode,
+		IPropertySource
 {
-	protected IPropertyDescriptor[] NO_DESCRIPTORS = new IPropertyDescriptor[0];
-	protected Object[] NO_OBJECTS = new Object[0];
+	protected Object[] NO_OBJECTS = new Object[0]; // $codepro.audit.disable reusableImmutables
 
 	/*
 	 * (non-Javadoc)
@@ -68,16 +73,38 @@ class BaseNode implements IBundleViewNode, IPropertySource
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
-		return NO_DESCRIPTORS;
+		List<IPropertyDescriptor> result = new ArrayList<IPropertyDescriptor>();
+
+		for (P p : getPropertyInfoSet())
+		{
+			result.add(new PropertyDescriptor(p, p.getHeader()));
+		}
+
+		return result.toArray(new IPropertyDescriptor[result.size()]);
 	}
+
+	/**
+	 * getPropertyInfoSet
+	 * 
+	 * @return Set
+	 */
+	protected abstract Set<P> getPropertyInfoSet();
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	public Object getPropertyValue(Object id)
 	{
-		return null;
+		Object result = null;
+
+		if (id instanceof IPropertyInformation)
+		{
+			result = ((IPropertyInformation<BaseNode<P>>) id).getPropertyValue(this);
+		}
+
+		return result;
 	}
 
 	/*

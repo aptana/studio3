@@ -7,32 +7,100 @@
  */
 package com.aptana.scripting.ui.views;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class SnippetNode extends BaseNode
+class SnippetNode extends BaseNode<SnippetNode.Property>
 {
-	private enum Property
+	enum Property implements IPropertyInformation<SnippetNode>
 	{
-		NAME, PATH, SCOPE, TRIGGERS, EXPANSION
+		NAME(Messages.SnippetNode_Snippet_Name)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				return node.snippet.getDisplayName();
+			}
+		},
+		PATH(Messages.SnippetNode_Snippet_Path)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				return node.snippet.getPath();
+			}
+		},
+		SCOPE(Messages.SnippetNode_Snippet_Scope)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				String scope = node.snippet.getScope();
+
+				return (scope != null && scope.length() > 0) ? scope : "all"; //$NON-NLS-1$
+			}
+		},
+		TRIGGERS(Messages.SnippetNode_Snippet_Triggers)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				String[] triggers = node.snippet.getTriggerTypeValues(TriggerType.PREFIX);
+
+				if (triggers != null)
+				{
+					StringBuilder buffer = new StringBuilder();
+
+					for (int i = 0; i < triggers.length; i++)
+					{
+						if (i > 0)
+						{
+							buffer.append(", "); //$NON-NLS-1$
+						}
+
+						buffer.append(triggers[i]);
+					}
+
+					return buffer.toString();
+				}
+
+				return null;
+			}
+		},
+		EXPANSION(Messages.SnippetNode_Snippet_Expansion)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				return node.snippet.getDisplayName();
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
 	}
 
 	private static final Image SNIPPET_ICON = ScriptingUIPlugin.getImage("icons/snippet.png"); //$NON-NLS-1$
-	private SnippetElement _snippet;
+	private SnippetElement snippet;
 
 	/**
 	 * SnippetNode
 	 * 
 	 * @param snippet
 	 */
-	public SnippetNode(SnippetElement snippet)
+	SnippetNode(SnippetElement snippet)
 	{
-		this._snippet = snippet;
+		this.snippet = snippet;
 	}
 
 	/*
@@ -46,82 +114,20 @@ class SnippetNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
 	 */
 	public String getLabel()
 	{
-		return this._snippet.getDisplayName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyDescriptors()
-	 */
-	public IPropertyDescriptor[] getPropertyDescriptors()
-	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name"); //$NON-NLS-1$
-		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path"); //$NON-NLS-1$
-		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope"); //$NON-NLS-1$
-		PropertyDescriptor triggersProperty = new PropertyDescriptor(Property.TRIGGERS, "Triggers"); //$NON-NLS-1$
-		PropertyDescriptor expansionProperty = new PropertyDescriptor(Property.EXPANSION, "Expansion"); //$NON-NLS-1$
-
-		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, triggersProperty,
-				expansionProperty };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyValue(java.lang.Object)
-	 */
-	public Object getPropertyValue(Object id)
-	{
-		Object result = null;
-
-		if (id instanceof Property)
-		{
-			switch ((Property) id)
-			{
-				case NAME:
-					result = this._snippet.getDisplayName();
-					break;
-
-				case PATH:
-					result = this._snippet.getPath();
-					break;
-
-				case SCOPE:
-					String scope = this._snippet.getScope();
-
-					result = (scope != null && scope.length() > 0) ? scope : "all"; //$NON-NLS-1$
-					break;
-
-				case TRIGGERS:
-					String[] triggers = this._snippet.getTriggerTypeValues(TriggerType.PREFIX);
-
-					if (triggers != null)
-					{
-						StringBuilder buffer = new StringBuilder();
-
-						for (int i = 0; i < triggers.length; i++)
-						{
-							if (i > 0)
-							{
-								buffer.append(", "); //$NON-NLS-1$
-							}
-
-							buffer.append(triggers[i]);
-						}
-
-						result = buffer.toString();
-					}
-					break;
-
-				case EXPANSION:
-					result = this._snippet.getExpansion();
-					break;
-			}
-		}
-
-		return result;
+		return snippet.getDisplayName();
 	}
 }
