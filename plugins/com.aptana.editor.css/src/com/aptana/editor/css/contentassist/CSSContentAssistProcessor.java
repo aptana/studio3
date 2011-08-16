@@ -17,8 +17,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
@@ -252,13 +254,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					case LCURLY:
 					case RCURLY:
 						this._replaceRange = this._currentLexeme = null;
-						break;
-
-					case PROPERTY:
-						if (offset == this._currentLexeme.getStartingOffset())
-						{
-							this._replaceRange = this._currentLexeme = null;
-						}
 						break;
 
 					default:
@@ -715,6 +710,41 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * Return the range required to properly select appropriate lexemes
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	protected IRange getLexemeRange(IDocument document, int offset)
+	{
+		int startOffset = 0;
+		try
+		{
+			int testOffset = document.get(0, offset).lastIndexOf('}', offset);
+			// add one because we don't want to include the closing brace
+			startOffset = (testOffset < 0) ? 0 : testOffset + 1;
+		}
+		catch (BadLocationException e)
+		{
+			// we'll assume starting offset is 0
+		}
+
+		int endOffset = offset;
+		try
+		{
+			ITypedRegion region = document.getPartition(offset);
+			endOffset = Math.max(startOffset, region.getOffset() + region.getLength() - 1);
+		}
+		catch (BadLocationException e)
+		{
+			// we'll assume ending offset is the offset passed in
+		}
+
+		return new Range(startOffset, endOffset);
+	}
+
+	/**
 	 * createLexemeProvider
 	 * 
 	 * @param document
@@ -737,7 +767,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
-			return new LexemeProvider<CSSTokenType>(document, offset, new CSSTokenScanner())
+			IRange range = getLexemeRange(document, offset);
+			return new LexemeProvider<CSSTokenType>(document, range, new CSSTokenScanner())
 			{
 				@Override
 				protected CSSTokenType getTypeFromData(Object data)

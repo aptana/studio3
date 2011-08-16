@@ -1,5 +1,7 @@
 package com.aptana.editor.common.tests.util;
 
+import java.text.MessageFormat;
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.IDocument;
@@ -38,6 +40,22 @@ public class AssertUtil
 	public static void assertProposalApplies(String expected, IDocument document, String proposal,
 			ICompletionProposal[] proposals, int offset, Point point)
 	{
+		assertProposalApplies(document, proposal, proposals, offset, point);
+		TestCase.assertEquals(expected, document.get());
+	}
+
+	/**
+	 * Assert that the proposal correctly inserts into the document
+	 * 
+	 * @param expected
+	 * @param document
+	 * @param proposal
+	 * @param proposals
+	 * @param offset
+	 */
+	public static void assertProposalApplies(IDocument document, String proposal, ICompletionProposal[] proposals,
+			int offset, Point point)
+	{
 		if (proposal != null)
 		{
 			ICompletionProposal p = findProposal(proposal, proposals);
@@ -54,7 +72,6 @@ public class AssertUtil
 			}
 
 		}
-		TestCase.assertEquals(expected, document.get());
 	}
 
 	/**
@@ -66,7 +83,7 @@ public class AssertUtil
 	public static void assertProposalFound(String proposal, ICompletionProposal[] proposals)
 	{
 		ICompletionProposal p = findProposal(proposal, proposals);
-		TestCase.assertNotNull(p);
+		TestCase.assertNotNull(MessageFormat.format("Proposal {0} not found in list", proposal), p);
 	}
 
 	/**
