@@ -49,6 +49,12 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 
+/**
+ * Supplies proposals for content assist in the CSS editor.
+ * 
+ * @author Kevin Lindsey
+ * @author Chris Williams
+ */
 public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
@@ -727,7 +733,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
-			// we'll assume starting offset is 0
+			startOffset = 0;
 		}
 
 		int endOffset = offset;
@@ -738,7 +744,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
-			// we'll assume ending offset is the offset passed in
+			endOffset = offset;
 		}
 
 		return new Range(startOffset, endOffset);
@@ -904,7 +910,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case PROPERTY:
 					boolean afterColon = false;
 
-					COLON_LOOP: for (int i = index - 1; i >= 0; i--)
+					COLON_LOOP: for (int i = index - 1; i >= 0; i--) // $codepro.audit.disable nonCaseLabelInSwitch
 					{
 						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
 
