@@ -37,11 +37,11 @@ import com.aptana.theme.ThemePlugin;
 
 public class BundleView extends ViewPart
 {
-	TreeViewer _treeViewer;
-	BundleViewContentProvider _contentProvider;
-	BundleViewLabelProvider _labelProvider;
-	LoadCycleListener _loadCycleListener;
-	Job _refreshJob;
+	private TreeViewer treeViewer;
+	private BundleViewContentProvider contentProvider;
+	private BundleViewLabelProvider labelProvider;
+	private LoadCycleListener loadCycleListener;
+	private Job refreshJob;
 
 	/**
 	 * BundleView
@@ -55,7 +55,7 @@ public class BundleView extends ViewPart
 	 */
 	private void addListeners()
 	{
-		this.listenForScriptChanges();
+		listenForScriptChanges();
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class BundleView extends ViewPart
 	 */
 	private void applyTheme()
 	{
-		ThemePlugin.getDefault().getControlThemerFactory().apply(this._treeViewer);
+		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
 	}
 
 	/**
@@ -71,14 +71,14 @@ public class BundleView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
-		this._treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		this._contentProvider = new BundleViewContentProvider();
-		this._labelProvider = new BundleViewLabelProvider();
+		treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		contentProvider = new BundleViewContentProvider();
+		labelProvider = new BundleViewLabelProvider();
 
-		this._treeViewer.setContentProvider(this._contentProvider);
-		this._treeViewer.setLabelProvider(_labelProvider);
-		this._treeViewer.setInput(BundleManager.getInstance());
-		this._treeViewer.setSorter(new ViewerSorter()
+		treeViewer.setContentProvider(contentProvider);
+		treeViewer.setLabelProvider(labelProvider);
+		treeViewer.setInput(BundleManager.getInstance());
+		treeViewer.setSorter(new ViewerSorter()
 		{
 			/*
 			 * (non-Javadoc)
@@ -118,12 +118,12 @@ public class BundleView extends ViewPart
 		});
 
 		// add selection provider
-		this.getSite().setSelectionProvider(this._treeViewer);
+		getSite().setSelectionProvider(treeViewer);
 
 		// listen to theme changes
-		this.hookContextMenu();
-		this.addListeners();
-		this.applyTheme();
+		hookContextMenu();
+		addListeners();
+		applyTheme();
 	}
 
 	/*
@@ -133,12 +133,12 @@ public class BundleView extends ViewPart
 	public void dispose()
 	{
 		// remove selection provider
-		this.getSite().setSelectionProvider(null);
+		getSite().setSelectionProvider(null);
 
 		// remove load cycle listener
-		BundleManager.getInstance().removeLoadCycleListener(this._loadCycleListener);
+		BundleManager.getInstance().removeLoadCycleListener(loadCycleListener);
 
-		ThemePlugin.getDefault().getControlThemerFactory().dispose(this._treeViewer);
+		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 
 		super.dispose();
 	}
@@ -150,7 +150,7 @@ public class BundleView extends ViewPart
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
-		ISelection selection = this._treeViewer.getSelection();
+		ISelection selection = treeViewer.getSelection();
 
 		if (selection instanceof TreeSelection)
 		{
@@ -159,7 +159,7 @@ public class BundleView extends ViewPart
 
 			if (item instanceof BaseNode)
 			{
-				BaseNode node = (BaseNode) item;
+				BaseNode<?> node = (BaseNode<?>) item;
 				Action[] actions = node.getActions();
 
 				if (actions != null)
@@ -190,11 +190,11 @@ public class BundleView extends ViewPart
 		});
 
 		// Create menu.
-		Menu menu = menuMgr.createContextMenu(this._treeViewer.getControl());
-		this._treeViewer.getControl().setMenu(menu);
+		Menu menu = menuMgr.createContextMenu(treeViewer.getControl());
+		treeViewer.getControl().setMenu(menu);
 
 		// Register menu for extension.
-		getSite().registerContextMenu(menuMgr, this._treeViewer);
+		getSite().registerContextMenu(menuMgr, treeViewer);
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class BundleView extends ViewPart
 	 */
 	private void listenForScriptChanges()
 	{
-		this._loadCycleListener = new LoadCycleListener()
+		loadCycleListener = new LoadCycleListener()
 		{
 			public void scriptLoaded(File script)
 			{
@@ -220,7 +220,7 @@ public class BundleView extends ViewPart
 			}
 		};
 
-		BundleManager.getInstance().addLoadCycleListener(this._loadCycleListener);
+		BundleManager.getInstance().addLoadCycleListener(loadCycleListener);
 	}
 
 	/**
@@ -228,21 +228,21 @@ public class BundleView extends ViewPart
 	 */
 	public void refresh()
 	{
-		if (_refreshJob != null && _refreshJob.shouldSchedule())
+		if (refreshJob != null && refreshJob.shouldSchedule())
 		{
-			_refreshJob.cancel();
+			refreshJob.cancel();
 		}
-		_refreshJob = new UIJob("Refresh Bundles View") //$NON-NLS-1$
+		refreshJob = new UIJob("Refresh Bundles View") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				_treeViewer.refresh();
+				treeViewer.refresh();
 
 				return Status.OK_STATUS;
 			}
 		};
-		_refreshJob.setPriority(Job.SHORT);
-		_refreshJob.schedule();
+		refreshJob.setPriority(Job.SHORT);
+		refreshJob.schedule();
 	}
 
 	/**

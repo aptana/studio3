@@ -15,6 +15,7 @@ import java.util.List;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 import com.aptana.sax.IValidatingReaderLogger;
 
@@ -86,10 +87,10 @@ public class SDocMLValidator implements IValidator
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		JSMetadataReader reader = new JSMetadataReader();
-		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
+		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes()); // $codepro.audit.disable closeWhereCreated
 		LogCollector collector = new LogCollector(manager, path, items);
 
-		manager.addParseErrors(items);
+		manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
 		reader.setLogger(collector);
 
 		try

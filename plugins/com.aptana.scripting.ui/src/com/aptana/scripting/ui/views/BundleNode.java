@@ -8,34 +8,136 @@
 package com.aptana.scripting.ui.views;
 
 import java.io.File;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class BundleNode extends BaseNode
+class BundleNode extends BaseNode<BundleNode.Property>
 {
-	private enum Property
+	enum Property implements IPropertyInformation<BundleNode>
 	{
-		NAME, PATH, VISIBLE, REFERENCE, PRECEDENCE, AUTHOR, COPYRIGHT, DESCRIPTION, LICENSE, LICENSE_URL, REPOSITORY
+		NAME(Messages.BundleNode_Bundle_Name)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getDisplayName();
+			}
+		},
+		PATH(Messages.BundleNode_Bundle_Path)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getPath();
+			}
+		},
+		VISIBLE(Messages.BundleNode_Bundle_Visible)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.isVisible();
+			}
+		},
+		REFERENCE(Messages.BundleNode_Bundle_Reference)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.isReference();
+			}
+		},
+		PRECEDENCE(Messages.BundleNode_Bundle_Precedence)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getBundlePrecedence();
+			}
+		},
+		AUTHOR(Messages.BundleNode_Bundle_Author)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getAuthor();
+			}
+		},
+		COPYRIGHT(Messages.BundleNode_Bundle_Copyright)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getCopyright();
+			}
+		},
+		DESCRIPTION(Messages.BundleNode_Bundle_Description)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getDescription();
+			}
+		},
+		LICENSE(Messages.BundleNode_Bundle_License)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getLicense();
+			}
+		},
+		LICENSE_URL(Messages.BundleNode_Bundle_License_URL)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getLicenseUrl();
+			}
+		},
+		REPOSITORY(Messages.BundleNode_Bundle_Repository)
+		{
+			public Object getPropertyValue(BundleNode node)
+			{
+				return node.bundle.getRepository();
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
 	}
 
 	private static final Image BUNDLE_ICON = ScriptingUIPlugin.getImage("icons/bundle_directory.png"); //$NON-NLS-1$
-	private BundleElement _bundle;
+	private BundleElement bundle;
 
 	/**
 	 * BundleNode
 	 * 
 	 * @param bundle
 	 */
-	public BundleNode(BundleElement bundle)
+	BundleNode(BundleElement bundle)
 	{
-		this._bundle = bundle;
+		this.bundle = bundle;
+	}
+
+	/**
+	 * addNode
+	 * 
+	 * @param items
+	 * @param node
+	 */
+	private void addNode(List<Object> items, BaseNode<?> node)
+	{
+		if (node != null && node.hasChildren())
+		{
+			items.add(node);
+		}
 	}
 
 	/*
@@ -44,28 +146,16 @@ class BundleNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		CommandsNode commands = new CommandsNode(this._bundle);
-		SnippetsNode snippets = new SnippetsNode(this._bundle);
-		FileTemplatesNode fileTemplates = new FileTemplatesNode(this._bundle);
-		MenusNode menus = new MenusNode(this._bundle);
 		List<Object> items = new LinkedList<Object>();
 
-		if (commands.hasChildren())
-		{
-			items.add(commands);
-		}
-		if (snippets.hasChildren())
-		{
-			items.add(snippets);
-		}
-		if (fileTemplates.hasChildren())
-		{
-			items.add(fileTemplates);
-		}
-		if (menus.hasChildren())
-		{
-			items.add(menus);
-		}
+		// create and add children
+		addNode(items, new CommandsNode(bundle));
+		addNode(items, new SnippetsNode(bundle));
+		addNode(items, new FileTemplatesNode(bundle));
+		addNode(items, new MenusNode(bundle));
+		addNode(items, new BuildPathsNode(bundle));
+		addNode(items, new EnvsNode(bundle));
+		addNode(items, new ProjectTemplatesNode(bundle));
 
 		return items.toArray(new Object[items.size()]);
 	}
@@ -85,96 +175,19 @@ class BundleNode extends BaseNode
 	 */
 	public String getLabel()
 	{
-		File file = new File(this._bundle.getPath());
+		File file = new File(bundle.getPath());
 
 		return file.getAbsolutePath();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyDescriptors()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
 	 */
-	public IPropertyDescriptor[] getPropertyDescriptors()
+	@Override
+	protected Set<Property> getPropertyInfoSet()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name"); //$NON-NLS-1$
-		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path"); //$NON-NLS-1$
-		PropertyDescriptor visibleProperty = new PropertyDescriptor(Property.VISIBLE, "Visible"); //$NON-NLS-1$
-		PropertyDescriptor referenceProperty = new PropertyDescriptor(Property.REFERENCE, "Reference"); //$NON-NLS-1$
-		PropertyDescriptor precedenceProperty = new PropertyDescriptor(Property.PRECEDENCE, "Precedence"); //$NON-NLS-1$
-		PropertyDescriptor authorProperty = new PropertyDescriptor(Property.AUTHOR, "Author"); //$NON-NLS-1$
-		PropertyDescriptor copyrightProperty = new PropertyDescriptor(Property.COPYRIGHT, "Copyright"); //$NON-NLS-1$
-		PropertyDescriptor descriptionProperty = new PropertyDescriptor(Property.DESCRIPTION, "Description"); //$NON-NLS-1$
-		PropertyDescriptor licenseProperty = new PropertyDescriptor(Property.LICENSE, "License"); //$NON-NLS-1$
-		PropertyDescriptor licenseUrlProperty = new PropertyDescriptor(Property.LICENSE_URL, "License URL"); //$NON-NLS-1$
-		PropertyDescriptor repositoryProperty = new PropertyDescriptor(Property.REPOSITORY, "Repository"); //$NON-NLS-1$
-
-		return new IPropertyDescriptor[] { nameProperty, pathProperty, visibleProperty, referenceProperty,
-				precedenceProperty, authorProperty, copyrightProperty, descriptionProperty, licenseProperty,
-				licenseUrlProperty, repositoryProperty };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyValue(java.lang.Object)
-	 */
-	public Object getPropertyValue(Object id)
-	{
-		Object result = null;
-
-		if (id instanceof Property)
-		{
-			switch ((Property) id)
-			{
-				case NAME:
-					result = this._bundle.getDisplayName();
-					break;
-
-				case PATH:
-					result = this._bundle.getPath();
-					break;
-
-				case VISIBLE:
-					result = this._bundle.isVisible();
-					break;
-
-				case REFERENCE:
-					result = this._bundle.isReference();
-					break;
-					
-				case PRECEDENCE:
-					result = this._bundle.getBundlePrecedence();
-					break;
-
-				case AUTHOR:
-					result = this._bundle.getAuthor();
-					break;
-
-				case COPYRIGHT:
-					result = this._bundle.getCopyright();
-					break;
-
-				case DESCRIPTION:
-					result = this._bundle.getDescription();
-					break;
-
-				case LICENSE:
-					result = this._bundle.getLicense();
-					break;
-
-				case LICENSE_URL:
-					result = this._bundle.getLicenseUrl();
-					break;
-
-				case REPOSITORY:
-					result = this._bundle.getRepository();
-					break;
-
-				default:
-					break;
-			}
-		}
-
-		return result;
+		return EnumSet.allOf(Property.class);
 	}
 
 	/*
@@ -183,6 +196,6 @@ class BundleNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._bundle.hasChildren();
+		return bundle.hasChildren();
 	}
 }

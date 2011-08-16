@@ -50,7 +50,7 @@ public class HTMLTidyValidator implements IValidator
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		manager.addParseErrors(items);
+		manager.addParseErrors(items, IHTMLConstants.CONTENT_TYPE_HTML);
 		String report = parseWithTidy(source);
 		if (!StringUtil.isEmpty(report))
 		{

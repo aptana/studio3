@@ -36,7 +36,7 @@ public class JSFormatWalker extends JSTreeWalker
 		{
 			if (((JSNode) node).getSemicolonIncluded())
 			{
-				this._printer.print(";"); //$NON-NLS-1$
+				this._printer.print(';');
 			}
 		}
 	}
@@ -52,7 +52,7 @@ public class JSFormatWalker extends JSTreeWalker
 	protected void formatBinaryOperator(IParseNode node, IParseNode lhs, Symbol operator, IParseNode rhs)
 	{
 		this.formatNode(lhs);
-		this._printer.print(" ").print(operator.value).print(" "); //$NON-NLS-1$ //$NON-NLS-2$
+		this._printer.print(' ').print(operator.value).print(' ');
 		this.formatNode(rhs);
 		this.addSemicolon(node);
 	}
@@ -110,6 +110,17 @@ public class JSFormatWalker extends JSTreeWalker
 	public String getText()
 	{
 		return this._printer.toString();
+	}
+
+	/**
+	 * hasSemicolon
+	 * 
+	 * @param node
+	 * @return
+	 */
+	protected boolean hasSemicolon(IParseNode node)
+	{
+		return (node instanceof JSNode) ? ((JSNode) node).getSemicolonIncluded() : false;
 	}
 
 	/**
@@ -200,7 +211,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 			if (text != null && text.length() > 0)
 			{
-				this._printer.print(" ").print(text); //$NON-NLS-1$
+				this._printer.print(' ').print(text);
 			}
 		}
 
@@ -303,7 +314,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 			if (text != null && text.length() > 0)
 			{
-				this._printer.print(" ").print(text); //$NON-NLS-1$
+				this._printer.print(' ').print(text);
 			}
 		}
 
@@ -356,14 +367,14 @@ public class JSFormatWalker extends JSTreeWalker
 
 		this.formatNode(body);
 
-		if (body.getNodeType() != IJSNodeTypes.STATEMENTS)
+		if (body.getNodeType() != IJSNodeTypes.STATEMENTS && !hasSemicolon(body))
 		{
-			this._printer.print(";"); //$NON-NLS-1$
+			this._printer.print(';');
 		}
 
 		this._printer.print(" while ("); //$NON-NLS-1$
 		this.formatNode(node.getCondition());
-		this._printer.print(")"); //$NON-NLS-1$
+		this._printer.print(')');
 
 		this.addSemicolon(node);
 	}
@@ -447,6 +458,7 @@ public class JSFormatWalker extends JSTreeWalker
 		IParseNode initializer = node.getInitializer();
 		IParseNode condition = node.getCondition();
 		IParseNode advance = node.getAdvance();
+		IParseNode body = node.getBody();
 
 		this._printer.print("for ("); //$NON-NLS-1$
 
@@ -454,25 +466,28 @@ public class JSFormatWalker extends JSTreeWalker
 		{
 			this.formatNode(initializer);
 		}
-		this._printer.print(";"); //$NON-NLS-1$
+		this._printer.print(';');
 
 		if (this.isNotEmpty(condition))
 		{
-			this._printer.print(" "); //$NON-NLS-1$
+			this._printer.print(' ');
 			this.formatNode(condition);
 		}
-		this._printer.print(";"); //$NON-NLS-1$
+		this._printer.print(';');
 
 		if (this.isNotEmpty(advance))
 		{
-			this._printer.print(" "); //$NON-NLS-1$
+			this._printer.print(' ');
 			this.formatNode(advance);
 		}
 		this._printer.print(") "); //$NON-NLS-1$
 
-		this.formatNode(node.getBody());
+		this.formatNode(body);
 
-		this.addSemicolon(node);
+		if (body.getNodeType() != IJSNodeTypes.STATEMENTS)
+		{
+			this.addSemicolon(node);
+		}
 	}
 
 	/*
@@ -488,11 +503,11 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (name != null && name.length() > 0)
 		{
-			this._printer.print(name).print(" "); //$NON-NLS-1$
+			this._printer.print(name).print(' ');
 		}
 
 		this.formatNode(node.getParameters());
-		this._printer.print(" "); //$NON-NLS-1$
+		this._printer.print(' ');
 		this.formatNode(node.getBody());
 		this.addSemicolon(node);
 	}
@@ -531,9 +546,9 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSGroupNode node)
 	{
-		this._printer.print("("); //$NON-NLS-1$
+		this._printer.print('(');
 		this.formatNode(node.getExpression());
-		this._printer.print(")"); //$NON-NLS-1$
+		this._printer.print(')');
 		this.addSemicolon(node);
 	}
 
@@ -565,11 +580,6 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (this.isNotEmpty(falseBlock))
 		{
-			if (trueBlock.getNodeType() != IJSNodeTypes.STATEMENTS)
-			{
-				this._printer.print(";"); //$NON-NLS-1$
-			}
-
 			this._printer.print(" else "); //$NON-NLS-1$
 			this.formatNode(falseBlock);
 		}
@@ -670,7 +680,7 @@ public class JSFormatWalker extends JSTreeWalker
 		{
 			if (!first)
 			{
-				this._printer.print(" "); //$NON-NLS-1$
+				this._printer.print(' ');
 			}
 			else
 			{
@@ -721,11 +731,11 @@ public class JSFormatWalker extends JSTreeWalker
 				break;
 
 			case IJSNodeTypes.LOGICAL_NOT:
-				this._printer.print("!"); //$NON-NLS-1$
+				this._printer.print('!');
 				break;
 
 			case IJSNodeTypes.NEGATIVE:
-				this._printer.print("-"); //$NON-NLS-1$
+				this._printer.print('-');
 				break;
 
 			case IJSNodeTypes.PRE_DECREMENT:
@@ -733,7 +743,7 @@ public class JSFormatWalker extends JSTreeWalker
 				break;
 
 			case IJSNodeTypes.POSITIVE:
-				this._printer.print("+"); //$NON-NLS-1$
+				this._printer.print('+');
 				break;
 
 			case IJSNodeTypes.PRE_INCREMENT:
@@ -741,7 +751,7 @@ public class JSFormatWalker extends JSTreeWalker
 				break;
 
 			case IJSNodeTypes.BITWISE_NOT:
-				this._printer.print("~"); //$NON-NLS-1$
+				this._printer.print('~');
 				break;
 
 			case IJSNodeTypes.TYPEOF:
@@ -749,7 +759,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 				if (expression.getNodeType() != IJSNodeTypes.GROUP)
 				{
-					this._printer.print(" "); //$NON-NLS-1$
+					this._printer.print(' ');
 				}
 				break;
 
@@ -786,7 +796,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (this.isNotEmpty(expression))
 		{
-			this._printer.print(" "); //$NON-NLS-1$
+			this._printer.print(' ');
 			this.formatNode(expression);
 		}
 
@@ -838,7 +848,7 @@ public class JSFormatWalker extends JSTreeWalker
 			this.formatNode(child);
 		}
 
-		this._printer.print("}"); //$NON-NLS-1$
+		this._printer.print('}');
 
 		this.addSemicolon(node);
 	}
@@ -892,13 +902,13 @@ public class JSFormatWalker extends JSTreeWalker
 
 		if (this.isNotEmpty(catchBlock))
 		{
-			this._printer.print(" "); //$NON-NLS-1$
+			this._printer.print(' ');
 			this.formatNode(catchBlock);
 		}
 
 		if (this.isNotEmpty(finallyBlock))
 		{
-			this._printer.print(" "); //$NON-NLS-1$
+			this._printer.print(' ');
 			this.formatNode(finallyBlock);
 		}
 
@@ -922,11 +932,17 @@ public class JSFormatWalker extends JSTreeWalker
 	@Override
 	public void visit(JSWhileNode node)
 	{
+		IParseNode body = node.getBody();
+
 		this._printer.print("while ("); //$NON-NLS-1$
 		this.formatNode(node.getCondition());
 		this._printer.print(") "); //$NON-NLS-1$
-		this.formatNode(node.getBody());
-		this.addSemicolon(node);
+		this.formatNode(body);
+
+		if (body.getNodeType() == IJSNodeTypes.STATEMENTS)
+		{
+			this.addSemicolon(node);
+		}
 	}
 
 	/*
