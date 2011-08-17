@@ -417,8 +417,8 @@ public class CoffeeRewriter
 	private List<CoffeeSymbol> indentation(CoffeeSymbol token)
 	{
 		List<CoffeeSymbol> symbols = new ArrayList<CoffeeSymbol>();
-		symbols.add(new CoffeeSymbol(Terminals.INDENT, 2));
-		symbols.add(new CoffeeSymbol(Terminals.OUTDENT, 2));
+		symbols.add(new CoffeeSymbol(Terminals.INDENT, token.getEnd(), token.getEnd(), 2));
+		symbols.add(new CoffeeSymbol(Terminals.OUTDENT, token.getEnd(), token.getEnd(), 2));
 		return symbols;
 	}
 
@@ -476,6 +476,8 @@ public class CoffeeRewriter
 						{
 							index = j - 1;
 						}
+						// Fix the outdent offsets!
+						outdent.setLocation(innerToken.getEnd(), innerToken.getEnd());
 						this.fTokens.add(index, outdent);
 						break;
 					}
@@ -486,6 +488,8 @@ public class CoffeeRewriter
 						{
 							index = j - 1;
 						}
+						// Fix the outdent offsets!
+						outdent.setLocation(innerToken.getEnd(), innerToken.getEnd());
 						this.fTokens.add(index, outdent);
 						break;
 					}

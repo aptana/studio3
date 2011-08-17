@@ -753,7 +753,10 @@ public class CoffeeScanner extends Scanner
 					comment.length() - 1);
 			this.token(Terminals.TERMINATOR, "\n", 1);
 		}
-		this.fComments.add(new CoffeeCommentNode(comment, this.fOffset, comment.length()));
+		int addOffset = comment.indexOf('#');
+		int startOffset = this.fOffset + addOffset;
+		this.fComments.add(new CoffeeCommentNode(comment.substring(addOffset), startOffset, this.fOffset
+				+ comment.length()));
 		this.fLine += count(comment, "\n");
 		return comment.length();
 	}
