@@ -1122,10 +1122,10 @@ public class CoffeeParserTest extends TestCase
 		assertParseNode(animalBlockNode, 12, 103);
 
 		IParseNode valueNode = animalBlockNode.getChild(0);
-		assertParseNode(valueNode, 0, 103); // FIXME This doesn't seem right...
+		assertParseNode(valueNode, 12, 103);
 
 		IParseNode objNode = valueNode.getChild(0);
-		assertParseNode(objNode, 0, 103); // FIXME This doesn't seem right...
+		assertParseNode(objNode, 12, 103);
 
 		// the assignment of the function to "constructor"
 		IParseNode assignNode = objNode.getChild(0);
