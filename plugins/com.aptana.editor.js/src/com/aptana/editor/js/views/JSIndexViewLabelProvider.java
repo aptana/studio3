@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.js.views;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
@@ -21,12 +25,14 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 /**
  * JSIndexViewLabelProvider
  */
-public class JSIndexViewLabelProvider implements ILabelProvider
+public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 {
 	private static final Image CLASS_ICON = JSPlugin.getImage("icons/class.png"); //$NON-NLS-1$
 	private static final Image CONSTRUCTOR_ICON = JSPlugin.getImage("icons/constructor.png"); //$NON-NLS-1$
 	private static final Image FUNCTION_ICON = JSPlugin.getImage("icons/js_function.png"); //$NON-NLS-1$
 	private static final Image PROPERTY_ICON = JSPlugin.getImage("icons/js_property.png"); //$NON-NLS-1$
+
+	private static final ImageDescriptor STATIC_OVERLAY = JSPlugin.getImageDescriptor("icons/overlays/static.png");
 
 	/*
 	 * (non-Javadoc)
@@ -34,6 +40,39 @@ public class JSIndexViewLabelProvider implements ILabelProvider
 	 */
 	public void addListener(ILabelProviderListener listener)
 	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image, java.lang.Object)
+	 */
+	public Image decorateImage(Image image, Object element)
+	{
+		Image result = null;
+
+		if (image != null && element instanceof PropertyElement)
+		{
+			PropertyElement property = (PropertyElement) element;
+
+			if (property.isClassProperty())
+			{
+				DecorationOverlayIcon decorator = new DecorationOverlayIcon(image, STATIC_OVERLAY,
+						IDecoration.TOP_RIGHT);
+
+				result = decorator.createImage();
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String, java.lang.Object)
+	 */
+	public String decorateText(String text, Object element)
+	{
+		return null;
 	}
 
 	/*
@@ -81,6 +120,13 @@ public class JSIndexViewLabelProvider implements ILabelProvider
 			result = PROPERTY_ICON;
 		}
 
+		Image decorated = this.decorateImage(result, element);
+
+		if (decorated != null)
+		{
+			result = decorated;
+		}
+
 		return result;
 	}
 
@@ -100,7 +146,7 @@ public class JSIndexViewLabelProvider implements ILabelProvider
 		}
 		else if (element instanceof BaseElement)
 		{
-			result = ((BaseElement) element).getName();
+			result = ((BaseElement<?>) element).getName();
 		}
 
 		return result;
