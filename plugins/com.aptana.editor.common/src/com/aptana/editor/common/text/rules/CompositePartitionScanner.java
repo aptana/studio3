@@ -19,6 +19,7 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
 
@@ -32,7 +33,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	public final static String[] SWITCHING_CONTENT_TYPES = new String[] { START_SWITCH_TAG, END_SWITCH_TAG };
 
-	private static final boolean LOGGING_ENABLED = IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null);
+	private static final boolean LOGGING_ENABLED = IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PARTITIONER);
 
 	private ISubPartitionScanner defaultPartitionScanner;
 	private ISubPartitionScanner primaryPartitionScanner;

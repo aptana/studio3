@@ -2,3 +2,4 @@
 com.aptana.editor.common/perf/content_assist=300
 com.aptana.editor.common/perf/content_assist/rubles=200
 com.aptana.editor.common/perf/content_assist/snippets=50
+com.aptana.editor.common/debug/partitioner=true
