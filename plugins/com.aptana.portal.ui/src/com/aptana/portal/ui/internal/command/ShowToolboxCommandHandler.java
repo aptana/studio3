@@ -28,7 +28,7 @@ public class ShowToolboxCommandHandler extends AbstractHandler
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		Portal.getInstance().openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
+		Portal.getInstance().openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, true);
 		return null;
 	}
 }

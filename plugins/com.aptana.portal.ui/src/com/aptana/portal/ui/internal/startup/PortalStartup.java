@@ -34,7 +34,7 @@ public class PortalStartup implements IStartup
 				Portal portal = Portal.getInstance();
 				if (portal.shouldOpenPortal())
 				{
-					portal.openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
+					portal.openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, true);
 				}
 				return Status.OK_STATUS;
 			}

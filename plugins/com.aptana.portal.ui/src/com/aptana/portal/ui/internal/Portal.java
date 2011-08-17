@@ -28,6 +28,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -112,8 +115,10 @@ public class Portal
 	 * @param browserEditorId
 	 *            the identifier of the browser-editor that was registered through the org.eclipse.ui.editors extension
 	 *            point.
+	 * @param bringToTop
+	 *            Indicate whether the opened portal should be brought to the top when opened.
 	 */
-	public void openPortal(URL url, final String browserEditorId)
+	public void openPortal(URL url, final String browserEditorId, final boolean bringToTop)
 	{
 		try
 		{
@@ -143,11 +148,45 @@ public class Portal
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				WebBrowserEditorInput input = new WebBrowserEditorInput(finalURL, 0, PortalUIPlugin.PORTAL_ID);
+
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+				if (!bringToTop)
+				{
+					// In case the portal should not be opened as the top-editor, make sure we open it in a way it stays
+					// in the back.
+					IEditorPart activeEditor = page.getActiveEditor();
+					if (activeEditor != null)
+					{
+						try
+						{
+							// We use openEditors() to manipulate the opening order. Otherwise, using the regular
+							// openEditor() will bring the editor to the top no matter what.
+							IEditorReference[] editors = page.openEditors(
+									new IEditorInput[] { activeEditor.getEditorInput(), input }, new String[] {
+											activeEditor.getEditorSite().getId(), browserEditorId },
+									IWorkbenchPage.MATCH_INPUT);
+							portalBrowser = (AbstractPortalBrowserEditor) editors[1].getEditor(true);
+						}
+						catch (Exception e)
+						{
+							// catch any exception here
+							IdeLog.logError(PortalUIPlugin.getDefault(),
+									"Could not open the Aptana portal as a 'non-focused' editor", e); //$NON-NLS-1$
+						}
+					}
+				}
 				try
 				{
-					portalBrowser = (AbstractPortalBrowserEditor) page.openEditor(input, browserEditorId);
-					portalBrowser.addDisposeListener(new PortalDisposeListener());
+					if (portalBrowser == null)
+					{
+						// Just open the portal using the openEditor. The editor will be brought to the top.
+						portalBrowser = (AbstractPortalBrowserEditor) page.openEditor(input, browserEditorId);
+					}
+					if (portalBrowser != null)
+					{
+						portalBrowser.addDisposeListener(new PortalDisposeListener());
+					}
 				}
 				catch (PartInitException e)
 				{
