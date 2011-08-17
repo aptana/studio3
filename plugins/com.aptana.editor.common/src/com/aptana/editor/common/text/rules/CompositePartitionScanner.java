@@ -33,7 +33,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	public final static String[] SWITCHING_CONTENT_TYPES = new String[] { START_SWITCH_TAG, END_SWITCH_TAG };
 
-	private static final boolean LOGGING_ENABLED = IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PARTITIONER);
+	private final boolean traceEnabled = IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PARTITIONER);
 
 	private ISubPartitionScanner defaultPartitionScanner;
 	private ISubPartitionScanner primaryPartitionScanner;
@@ -185,7 +185,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (defaultTokenState != null && defaultTokenState.hasToken()) {
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			if (LOGGING_ENABLED) {
+			if (traceEnabled) {
 				trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
 			}
 			return token;
@@ -320,7 +320,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				defaultTokenState = null;
 			}
 		}
-		if (LOGGING_ENABLED) {
+		if (traceEnabled) {
 			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
 		}
 		return token;
