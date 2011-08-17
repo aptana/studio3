@@ -107,6 +107,24 @@ public class Portal
 	/**
 	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
 	 * portal to the new URL.<br>
+	 * This method must be called from the UI thread (preferably, through a UIJob).<br>
+	 * By default, this method will open the portal as the top editor.
+	 * 
+	 * @param url
+	 *            A URL (can be null).
+	 * @param browserEditorId
+	 *            the identifier of the browser-editor that was registered through the org.eclipse.ui.editors extension
+	 *            point.
+	 * @see #openPortal(URL, String, boolean)
+	 */
+	public void openPortal(URL url, final String browserEditorId)
+	{
+		openPortal(url, browserEditorId, true);
+	}
+
+	/**
+	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
+	 * portal to the new URL.<br>
 	 * This method must be called from the UI thread (preferably, through a UIJob).
 	 * 
 	 * @param url
