@@ -39,7 +39,7 @@ public class BrowserActionController extends AbstractActionController
 	@ControllerAction
 	public Object refreshPortal(Object attributes)
 	{
-		Portal.getInstance().openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
+		Portal.getInstance().openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, false);
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 

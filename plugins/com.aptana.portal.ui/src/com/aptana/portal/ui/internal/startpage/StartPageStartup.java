@@ -69,7 +69,7 @@ public class StartPageStartup implements IStartup
 				if (EclipseUtil.isSystemPropertyEnabled(IStartPageUISystemProperties.FORCE_START_PAGE)
 						|| StartPageUtil.shouldShowStartPage())
 				{
-					StartPageUtil.showStartPage();
+					StartPageUtil.showStartPage(true);
 				}
 				return Status.OK_STATUS;
 			}

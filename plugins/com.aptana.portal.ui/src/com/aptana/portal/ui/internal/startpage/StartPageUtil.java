@@ -47,11 +47,12 @@ public class StartPageUtil
 	/**
 	 * Show the Start-Page.
 	 */
-	public static void showStartPage()
+	public static void showStartPage(boolean bringToTop)
 	{
 		try
 		{
-			Portal.getInstance().openPortal(new URL(getStartPageURL()), StartPageBrowserEditor.WEB_BROWSER_EDITOR_ID);
+			Portal.getInstance().openPortal(new URL(getStartPageURL()), StartPageBrowserEditor.WEB_BROWSER_EDITOR_ID,
+					bringToTop);
 			// Update the preference key with the current studio's version
 			String currentVersion = getCurrentVersion();
 			if (currentVersion != null)
