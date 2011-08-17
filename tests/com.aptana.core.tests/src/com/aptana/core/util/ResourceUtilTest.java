@@ -69,7 +69,7 @@ public class ResourceUtilTest extends TestCase
 
 		String path = ResourceUtil.resourcePathToString(url);
 		String expectedPostfix = "com.aptana.core.tests/resources";
-		assertTrue(MessageFormat.format("Path ({0}) doesn't end with expected postfix: {1}", path, expectedPostfix),
+		assertTrue(MessageFormat.format("Path ({0}) doesn''t end with expected postfix: {1}", path, expectedPostfix),
 				path.endsWith(expectedPostfix));
 	}
 
@@ -84,7 +84,7 @@ public class ResourceUtilTest extends TestCase
 
 		URI uri = ResourceUtil.resourcePathToURI(url);
 		String expectedPostfix = "com.aptana.core.tests/resources/";
-		assertTrue(MessageFormat.format("URI ({0}) doesn't end with expected postfix: {1}", uri.toString(),
+		assertTrue(MessageFormat.format("URI ({0}) doesn''t end with expected postfix: {1}", uri.toString(),
 				expectedPostfix), uri.toString().endsWith(expectedPostfix));
 	}
 
