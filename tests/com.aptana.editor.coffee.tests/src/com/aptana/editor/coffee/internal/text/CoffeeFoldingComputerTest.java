@@ -142,6 +142,43 @@ public class CoffeeFoldingComputerTest extends TestCase
 		assertTrue("Folding incorrect for if block", positions.contains(new Position(0, src.length())));
 	}
 
+	public void testClassesExample1() throws Exception
+	{
+		String source = "class Animal\n" + //
+				"  constructor: (@name) ->\n" + //
+				"\n" + //
+				"  move: (meters) ->\n" + //
+				"    alert @name + \" moved \" + meters + \"m.\"\n" + //
+				"\n" + //
+				"class Snake extends Animal\n" + //
+				"  move: ->\n" + //
+				"    alert \"Slithering...\"\n" + //
+				"    super 5\n" + //
+				"\n" + //
+				"class Horse extends Animal\n" + //
+				"  move: ->\n" + //
+				"    alert \"Galloping...\"\n" + //
+				"    super 45\n" + //
+				"\n" + //
+				"sam = new Snake \"Sammy the Python\"\n" + //
+				"tom = new Horse \"Tommy the Palomino\"\n" + //
+				"\n" + //
+				"sam.move()\n" + //
+				"tom.move()\n"; //
+
+		IDocument document = new Document(source);
+		Map<ProjectionAnnotation, Position> annotations = getFoldingComputer(document).emitFoldingRegions(true, null);
+		Collection<Position> positions = annotations.values();
+		assertEquals("Incorrect number of folding positions reported", 7, positions.size());
+		assertTrue("Folding incorrect for Animal class block", positions.contains(new Position(0, 104)));
+		assertTrue("Folding incorrect for Animal.constructor function block", positions.contains(new Position(28, 12)));
+		assertTrue("Folding incorrect for Animal.move function block", positions.contains(new Position(48, 56)));
+		assertTrue("Folding incorrect for Snake class block", positions.contains(new Position(105, 76)));
+		assertTrue("Folding incorrect for Snake.move function block", positions.contains(new Position(140, 41)));
+		assertTrue("Folding incorrect for Horse class block", positions.contains(new Position(182, 76)));
+		assertTrue("Folding incorrect for Horse.move function block", positions.contains(new Position(217, 41)));
+	}
+
 	// TODO Do we want folding on try/catch/finally blocks?
 	// @Test
 	// public void testTryCatch() throws Exception
