@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -137,7 +138,9 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 				// verify each specified name is in the resulting proposal list
 				for (String displayName : displayNames)
 				{
-					assertTrue("Did not find " + displayName + " in the proposal list", names.contains(displayName));
+					assertTrue(
+							MessageFormat.format("Did not find {0} in the proposal list <{1}>", displayName,
+									StringUtil.join(", ", names)), names.contains(displayName));
 				}
 			}
 		}
