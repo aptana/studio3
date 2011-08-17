@@ -674,6 +674,41 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 
 	/* (non-Javadoc)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#renameDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	protected void renameDirectory(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+		try {
+			changeCurrentDir(sourcePath.removeLastSegments(1));
+			Policy.checkCanceled(monitor);
+			if (ftpClient.exists(destinationPath.toPortableString())) {
+				changeCurrentDir(destinationPath.removeLastSegments(1));
+				ftpClient.rmdir(destinationPath.lastSegment());
+			}
+			try {
+				ftpClient.rename(sourcePath.toPortableString(), destinationPath.toPortableString());
+			} catch (FTPException e) {
+				throwWrappedException(e, sourcePath);
+                SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat
+                        .format(Messages.SFTPConnectionFileManager_FailedRename, new Object[] { sourcePath,
+                                destinationPath }), e));
+				throw e;
+			}
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (PermissionDeniedException e) {
+			throw new CoreException(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID,
+					MessageFormat.format(Messages.SFTPConnectionFileManager_PermissionDenied0, sourcePath.toPortableString()), e));
+		} catch (OperationCanceledException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedRenaming, e));
+		} finally {
+			monitor.done();
+		}
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#listDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override

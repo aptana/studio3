@@ -96,6 +96,14 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest {
 		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.setmodtime"));
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsFolderSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsFolderSetModificationTime() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.foldersetmodtime"));
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
