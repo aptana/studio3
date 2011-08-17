@@ -27,7 +27,7 @@ public class ShowStartPageCommandHandler extends AbstractHandler
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		StartPageUtil.showStartPage();
+		StartPageUtil.showStartPage(true);
 		return null;
 	}
 }

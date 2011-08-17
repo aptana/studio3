@@ -15,6 +15,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -232,11 +233,20 @@ public class ResourceUtil
 			}
 			// when a builder is disabled, Eclipse turns it into an external tool builder, so we have to do a little
 			// hack to see if the new builder id matches one of the disabled builds
-			String configHandler = command.getArguments().get("LaunchConfigHandle").toString(); //$NON-NLS-1$ // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.unnecessaryToString
-			if (configHandler != null && configHandler.indexOf(builderId) > -1)
+			Map arguments = command.getArguments();
+			if (arguments != null)
 			{
-				addBuilder = false;
-				break;
+				Object value = arguments.get("LaunchConfigHandle"); //$NON-NLS-1$
+				if (value != null)
+				{
+					String configHandler = value.toString(); // $codepro.audit.disable
+																// com.instantiations.assist.eclipse.analysis.unnecessaryToString
+					if (configHandler != null && configHandler.indexOf(builderId) > -1)
+					{
+						addBuilder = false;
+						break;
+					}
+				}
 			}
 		}
 		// add builder to project
