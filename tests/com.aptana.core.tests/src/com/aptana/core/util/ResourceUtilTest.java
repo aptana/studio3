@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
+import java.text.MessageFormat;
 
 import junit.framework.TestCase;
 
@@ -67,7 +68,9 @@ public class ResourceUtilTest extends TestCase
 		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
 
 		String path = ResourceUtil.resourcePathToString(url);
-		assertTrue(path.endsWith("com.aptana.core.tests/resources"));
+		String expectedPostfix = "com.aptana.core.tests/resources";
+		assertTrue(MessageFormat.format("Path ({0}) doesn't end with expected postfix: {1}", path, expectedPostfix),
+				path.endsWith(expectedPostfix));
 	}
 
 	public void testResourcePathToStringWithNull()
@@ -80,7 +83,9 @@ public class ResourceUtilTest extends TestCase
 		URL url = Platform.getBundle("com.aptana.core.tests").getEntry("resources");
 
 		URI uri = ResourceUtil.resourcePathToURI(url);
-		assertTrue(uri.toString().endsWith("com.aptana.core.tests/resources/"));
+		String expectedPostfix = "com.aptana.core.tests/resources/";
+		assertTrue(MessageFormat.format("URI ({0}) doesn't end with expected postfix: {1}", uri.toString(),
+				expectedPostfix), uri.toString().endsWith(expectedPostfix));
 	}
 
 	public void testResourcePathToURIWithNull()
