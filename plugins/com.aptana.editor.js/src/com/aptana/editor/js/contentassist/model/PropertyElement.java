@@ -57,7 +57,14 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
-				return StringUtil.join(", ", node.getTypeNames());
+				if (node instanceof FunctionElement)
+				{
+					return StringUtil.join(", ", node.getTypeNames());
+				}
+				else
+				{
+					return StringUtil.join(", ", ((FunctionElement) node).getReturnTypeNames());
+				}
 			}
 		},
 		DOCUMENTS("Documents")
