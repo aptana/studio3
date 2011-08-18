@@ -374,7 +374,7 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 	{
 		printer.printIndent();
 
-		if (this.isInstanceProperty())
+		if (this.isClassProperty())
 		{
 			printer.print("static "); //$NON-NLS-1$
 		}
