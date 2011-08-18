@@ -117,6 +117,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 		createStream(IDebugCoreConstants.ID_STANDARD_OUTPUT_STREAM);
 		createStream(IDebugCoreConstants.ID_STANDARD_ERROR_STREAM);
 		createStream(IJSDebugConstants.ID_WARNING_STREAM);
+		getStreamsProxy();
 	}
 
 	protected final void createStream(String streamIdentifier) {
@@ -140,7 +141,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	/*
 	 * @see org.eclipse.debug.core.model.IProcess#getStreamsProxy()
 	 */
-	public IStreamsProxy getStreamsProxy() {
+	public synchronized IStreamsProxy getStreamsProxy() {
 		if (streamsProxy == null) {
 			try {
 				Map<String, InputStream> inputs = new HashMap<String, InputStream>();
