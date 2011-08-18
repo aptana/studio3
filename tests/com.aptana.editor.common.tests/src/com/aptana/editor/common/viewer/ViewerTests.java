@@ -5,23 +5,21 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.scripting.snippets;
+package com.aptana.editor.common.viewer;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class SnippetsTests
+public class ViewerTests
 {
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(SnippetsTests.class.getName());
+		TestSuite suite = new TestSuite(ViewerTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(CommandTemplateTest.class);
-		suite.addTestSuite(ExpandSnippetVerifyKeyListenerTest.class);
-		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
-		suite.addTestSuite(SnippetTemplateTranslatorTest.class);
-		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
+		suite.addTestSuite(CommonProjectionViewerTest.class);
+		// Please do not include ad-hoc performance test classes in here.
+		// They have no pass/fail and just slow down the build!
 		// $JUnit-END$
 		return suite;
 	}

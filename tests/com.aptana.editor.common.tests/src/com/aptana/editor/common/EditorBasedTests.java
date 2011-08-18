@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,12 +29,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -53,106 +50,16 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.scripting.model.SnippetElement;
 
-public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> extends TestCase
+public abstract class EditorBasedTests extends TestCase
 {
 	private static final Pattern CURSOR = Pattern.compile("\\|");
 
 	protected ITextEditor editor;
 	protected IDocument document;
 	protected String source;
-	protected T processor;
 	protected List<Integer> cursorOffsets;
 
 	private URI fileUri;
-
-	/**
-	 * checkProposals
-	 * 
-	 * @param resource
-	 * @param displayNames
-	 */
-	protected void checkProposals(String resource, String... displayNames)
-	{
-		checkProposals(resource, false, false, displayNames);
-	}
-
-	/**
-	 * checkProposals
-	 * 
-	 * @param resource
-	 * @param displayNames
-	 */
-	protected void checkProposals(String resource, boolean enforceOrder, boolean enforceSize, String... displayNames)
-	{
-		this.setupTestContext(resource);
-
-		ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
-		viewer.setDocument(this.document);
-
-		for (int offset : this.cursorOffsets)
-		{
-			// get proposals
-			ICompletionProposal[] proposals = this.processor.computeCompletionProposals(viewer, offset, '\0', false);
-
-			// build a list of display names
-			ArrayList<String> names = new ArrayList<String>();
-
-			for (ICompletionProposal proposal : proposals)
-			{
-				// we need to check if it is a valid proposal given the context
-				if (proposal instanceof ICompletionProposalExtension2)
-				{
-					ICompletionProposalExtension2 p = (ICompletionProposalExtension2) proposal;
-					if (p.validate(document, offset, null))
-					{
-						names.add(proposal.getDisplayString());
-					}
-				}
-				else
-				{
-					names.add(proposal.getDisplayString());
-				}
-			}
-
-			if (enforceOrder || enforceSize)
-			{
-				assertTrue(
-						StringUtil.format(
-								"Length of expected proposal list and actual proposal list did not match.\nExpected: <{0}> Actual: <{1}>",
-								new Object[] { StringUtil.join(", ", displayNames), StringUtil.join(", ", names) }),
-						displayNames.length == names.size());
-			}
-
-			// this only really makes sense with enforce size
-			if (enforceOrder)
-			{
-				for (int i = 0; i < displayNames.length; i++)
-				{
-					String displayName = displayNames[i];
-					assertEquals("Did not find " + displayName + " in the proposal list at the expected spot",
-							displayName, names.get(i));
-				}
-			}
-			else
-			{
-				// verify each specified name is in the resulting proposal list
-				for (String displayName : displayNames)
-				{
-					assertTrue(
-							MessageFormat.format("Did not find {0} in the proposal list <{1}>", displayName,
-									StringUtil.join(", ", names)), names.contains(displayName));
-				}
-			}
-		}
-	}
-
-	/**
-	 * createContentAssistProcessor
-	 * 
-	 * @param editor
-	 * @return
-	 */
-	protected abstract T createContentAssistProcessor(AbstractThemeableEditor editor);
 
 	/**
 	 * createEditor
@@ -174,12 +81,24 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	 */
 	protected ITextEditor createEditor(IEditorInput editorInput)
 	{
+		return createEditor(editorInput, this.getPluginId());
+	}
+
+	/**
+	 * createEditor
+	 * 
+	 * @param createEditor
+	 * @param editorId
+	 * @return
+	 */
+	protected ITextEditor createEditor(IEditorInput editorInput, String editorId)
+	{
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		ITextEditor editor = null;
 
 		try
 		{
-			editor = (ITextEditor) page.openEditor(editorInput, this.getPluginId());
+			editor = (ITextEditor) page.openEditor(editorInput, editorId);
 		}
 		catch (PartInitException e)
 		{
@@ -202,9 +121,26 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	 */
 	protected SnippetElement createSnippet(String path, String displayName, String trigger, String scope)
 	{
+		return createSnippet(path, displayName, trigger, scope);
+	}
+
+	/**
+	 * Create a snippet
+	 * 
+	 * @param path
+	 * @param displayName
+	 * @param trigger
+	 * @param expansion
+	 * @param scope
+	 * @return
+	 */
+	protected SnippetElement createSnippet(String path, String displayName, String trigger, String expansion,
+			String scope)
+	{
 		SnippetElement se = new SnippetElement(path);
 		se.setDisplayName(displayName);
 		se.setTrigger("prefix", new String[] { trigger });
+		se.setExpansion(expansion);
 		se.setScope(scope);
 
 		return se;
@@ -352,7 +288,6 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		this.editor = this.createEditor(editorInput);
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		this.source = document.get();
-		this.processor = this.createContentAssistProcessor((AbstractThemeableEditor) this.editor);
 
 		IFileStoreIndexingParticipant indexer = this.createIndexer();
 		if (indexer != null)
@@ -396,6 +331,30 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 	}
 
 	/**
+	 * Creates a verify key event
+	 * 
+	 * @param character
+	 * @param keyCode
+	 * @param offset
+	 * @return
+	 */
+	protected VerifyEvent createVerifyKeyEvent(char character, int keyCode, int offset)
+	{
+		Event e = new Event();
+		e.character = character;
+		e.text = String.valueOf(character);
+		e.start = offset;
+		e.keyCode = keyCode;
+		e.end = offset;
+		e.doit = true;
+
+		ITextViewer viewer = (ITextViewer) editor.getAdapter(ITextOperationTarget.class);
+		e.widget = viewer.getTextWidget();
+		viewer.setSelectedRange(offset, 0);
+		return new VerifyEvent(e);
+	}
+
+	/**
 	 * getFileInfo
 	 * 
 	 * @param resource
@@ -420,11 +379,6 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 			editor.close(false);
 		}
 
-		if (processor != null)
-		{
-			processor.dispose();
-		}
-
 		if (fileUri != null)
 		{
 			IndexManager.getInstance().removeIndex(fileUri);
@@ -443,7 +397,6 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 		editor = null;
 		document = null;
 		source = null;
-		processor = null;
 		cursorOffsets = null;
 
 		super.tearDown();
