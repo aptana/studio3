@@ -170,7 +170,7 @@ public class ThemeManager implements IThemeManager
 		return new TextAttribute(ThemePlugin.getDefault().getColorManager().getColor(new RGB(255, 255, 255)));
 	}
 
-	public synchronized Theme getCurrentTheme()
+	public Theme getCurrentTheme()
 	{
 		if (fCurrentTheme == null)
 		{
@@ -201,10 +201,8 @@ public class ThemeManager implements IThemeManager
 
 	public void setCurrentTheme(Theme theme)
 	{
-		synchronized (this)
-		{
-			fCurrentTheme = theme;
-		}
+		fCurrentTheme = theme;
+
 		// Set the find in file search color
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
 		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
