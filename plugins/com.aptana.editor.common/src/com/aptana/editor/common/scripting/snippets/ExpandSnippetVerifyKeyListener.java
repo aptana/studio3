@@ -52,12 +52,8 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 
 	public void verifyKey(VerifyEvent event)
 	{
-		if (textViewer == null || document == null || !canModifyEditor || !event.doit || event.character != '\t')
-		{
-			return;
-		}
-
-		if (enableSnippetProposals == false)
+		if (textViewer == null || document == null || !canModifyEditor || !event.doit || event.character != '\t'
+				|| !enableSnippetProposals)
 		{
 			return;
 		}
