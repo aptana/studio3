@@ -215,7 +215,7 @@ public class CommonProjectionViewer extends ProjectionViewer implements IAdaptab
 	 */
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
-		if (event.getKey().equals(IPreferenceConstants.CONTENT_ASSIST_DELAY))
+		if (IPreferenceConstants.CONTENT_ASSIST_DELAY.equals(event.getKey()))
 		{
 			setSnippetProcessorEnablement();
 		}
@@ -233,13 +233,6 @@ public class CommonProjectionViewer extends ProjectionViewer implements IAdaptab
 
 		int delay = fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY);
-		if (delay >= 0)
-		{
-			fKeyListener.setEnabled(true);
-		}
-		else
-		{
-			fKeyListener.setEnabled(false);
-		}
+		fKeyListener.setEnabled(delay >= 0);
 	}
 }
