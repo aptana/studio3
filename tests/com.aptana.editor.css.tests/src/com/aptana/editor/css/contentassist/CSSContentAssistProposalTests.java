@@ -468,7 +468,6 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-		// FIXME: should work
 		AssertUtil.assertProposalFound(".testclass", proposals);
 	}
 
@@ -504,7 +503,6 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-		// FIXME: should works
 		AssertUtil.assertProposalFound("#testid", proposals);
 	}
 
