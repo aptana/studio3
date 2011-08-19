@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
 
 package com.aptana.filesystem.ftp.internal;
 
@@ -18,17 +19,15 @@ import com.enterprisedt.net.ftp.FileTransferInputStream;
 
 /**
  * @author Max Stepanov
- *
  */
 public class FTPFileDownloadInputStream extends InputStream {
 
 	private FTPClientInterface ftpClient;
 	private FileTransferInputStream ftpInputStream;
 	private FTPClientPool pool;
-	
+
 	/**
-	 * @param pool 
-	 * 
+	 * @param pool
 	 */
 	public FTPFileDownloadInputStream(FTPClientPool pool, FTPClientInterface _ftpClient, FileTransferInputStream ftpInputStream) {
 		this.ftpClient = _ftpClient;
@@ -41,21 +40,24 @@ public class FTPFileDownloadInputStream extends InputStream {
 						ftpClient.quitImmediately();
 					}
 				} catch (Exception ignore) {
+					ignore.getCause();
 				}
 			}
 		});
 	}
-	
+
 	private void safeQuit() {
 		try {
 			ftpInputStream.close();
 		} catch (IOException ignore) {
+			ignore.getCause();
 		}
 		pool.checkIn(ftpClient);
 		ProgressMonitorInterrupter.setCurrentThreadInterruptDelegate(null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#read()
 	 */
 	@Override
@@ -68,7 +70,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#available()
 	 */
 	@Override
@@ -81,7 +84,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#close()
 	 */
 	@Override
@@ -93,7 +97,8 @@ public class FTPFileDownloadInputStream extends InputStream {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.io.InputStream#read(byte[], int, int)
 	 */
 	@Override

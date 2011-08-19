@@ -39,7 +39,6 @@ import com.aptana.debug.ui.IDebugHelpContextIds;
 
 /**
  * @author Max Stepanov
- * 
  */
 @SuppressWarnings("restriction")
 public class DetailFormatterDialog extends StatusDialog {
@@ -53,7 +52,6 @@ public class DetailFormatterDialog extends StatusDialog {
 
 	/**
 	 * DetailFormatterDialog
-	 * 
 	 */
 	public DetailFormatterDialog(Shell parent, DetailFormatter detailFormatter, List<String> definedTypes,
 			boolean editDialog) {
@@ -62,7 +60,6 @@ public class DetailFormatterDialog extends StatusDialog {
 
 	/**
 	 * DetailFormatterDialog
-	 * 
 	 */
 	public DetailFormatterDialog(Shell parent, DetailFormatter formatter, List<String> definedTypes,
 			boolean editTypeName, boolean editDialog) {

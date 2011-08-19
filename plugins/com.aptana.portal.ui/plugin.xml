@@ -161,7 +161,65 @@
             class="com.aptana.portal.ui.internal.startpage.StartPageStartup">
       </startup>
    </extension>
-   
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.portal.ui.internal.command.ShowStartPageCommandHandler"
+            description="%openStudioStartPage.description"
+            id="com.aptana.portal.ui.command.openStartPage"
+            name="%openStudioStartPage.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.portal.ui.command.openStartPage"
+            icon="icons/obj16/aptana16.png">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:aptanahelp?after=additions">
+         <command
+               commandId="com.aptana.portal.ui.command.openStartPage"
+               style="push">
+            <visibleWhen>
+               <test
+                     args="com.appcelerator.titanium.rcp"
+                     forcePluginActivation="true"
+                     property="com.aptana.core.hasPlugin"
+                     value="false">
+               </test>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.portal.ui.command.openStartPage"
+                  style="push">
+               <visibleWhen>
+                  <and>
+                     <reference
+                           definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                     </reference>
+                     <!-- Test that there is NO com.appcelerator.titanium.rcp in the installation -->
+                     <test
+                           args="com.appcelerator.titanium.rcp"
+                           forcePluginActivation="true"
+                           property="com.aptana.core.hasPlugin"
+                           value="false">
+                     </test>
+                  </and>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+    </extension>
    <!-- Commenting out untill we integrate the Portal (Dev Toolbox) completely.
    <extension
          point="org.eclipse.ui.commands">

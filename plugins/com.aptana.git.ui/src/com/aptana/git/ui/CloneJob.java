@@ -44,6 +44,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
@@ -98,7 +99,7 @@ public class CloneJob extends Job
 			Version version = GitExecutable.instance().version();
 			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
 
-			Map<String, String> env = GitExecutable.getShellEnvironment();
+			Map<String, String> env = GitExecutable.getEnvironment();
 			List<String> args = new ArrayList<String>();
 			args.add("clone"); //$NON-NLS-1$
 			if (shallowClone)
@@ -168,7 +169,7 @@ public class CloneJob extends Job
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 		}
 		finally
@@ -238,7 +239,7 @@ public class CloneJob extends Job
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 			}
 			finally
@@ -297,7 +298,7 @@ public class CloneJob extends Job
 			}
 			catch (IOException exception)
 			{
-				IdeLog.logError(GitUIPlugin.getDefault(), exception.getMessage(), exception);
+				IdeLog.logError(GitUIPlugin.getDefault(), exception, IDebugScopes.DEBUG);
 				StatusManager.getManager()
 						.handle(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(),
 								exception));
@@ -341,7 +342,7 @@ public class CloneJob extends Job
 					}
 					catch (IOException exception)
 					{
-						IdeLog.logError(GitUIPlugin.getDefault(), exception.getMessage(), exception);
+						IdeLog.logError(GitUIPlugin.getDefault(), exception, IDebugScopes.DEBUG);
 						StatusManager.getManager().handle(
 								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(),
 										exception));

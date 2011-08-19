@@ -25,7 +25,7 @@ public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewer
 	 * @param preferenceStore
 	 * @param editor
 	 */
-	public SimpleSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
+	protected SimpleSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
 		super(preferenceStore, editor);
 	}
 

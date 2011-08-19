@@ -29,55 +29,55 @@ public class JSBinaryBooleanOperatorNode extends JSBinaryOperatorNode
 
 		switch (token)
 		{
-			// equality operators
+		// equality operators
 			case EQUAL_EQUAL:
-				type = JSNodeTypes.EQUAL;
+				type = IJSNodeTypes.EQUAL;
 				break;
 
 			case EXCLAMATION_EQUAL:
-				type = JSNodeTypes.NOT_EQUAL;
+				type = IJSNodeTypes.NOT_EQUAL;
 				break;
 
 			case EQUAL_EQUAL_EQUAL:
-				type = JSNodeTypes.IDENTITY;
+				type = IJSNodeTypes.IDENTITY;
 				break;
 
 			case EXCLAMATION_EQUAL_EQUAL:
-				type = JSNodeTypes.NOT_IDENTITY;
+				type = IJSNodeTypes.NOT_IDENTITY;
 				break;
 
 			// relational operators
 			case LESS:
-				type = JSNodeTypes.LESS_THAN;
+				type = IJSNodeTypes.LESS_THAN;
 				break;
 
 			case GREATER:
-				type = JSNodeTypes.GREATER_THAN;
+				type = IJSNodeTypes.GREATER_THAN;
 				break;
 
 			case LESS_EQUAL:
-				type = JSNodeTypes.LESS_THAN_OR_EQUAL;
+				type = IJSNodeTypes.LESS_THAN_OR_EQUAL;
 				break;
 
 			case GREATER_EQUAL:
-				type = JSNodeTypes.GREATER_THAN_OR_EQUAL;
+				type = IJSNodeTypes.GREATER_THAN_OR_EQUAL;
 				break;
 
 			case INSTANCEOF:
-				type = JSNodeTypes.INSTANCE_OF;
+				type = IJSNodeTypes.INSTANCE_OF;
 				break;
 
 			case IN:
-				type = JSNodeTypes.IN;
+				type = IJSNodeTypes.IN;
 				break;
 
 			// logical operators
 			case AMPERSAND_AMPERSAND:
-				type = JSNodeTypes.LOGICAL_AND;
+				type = IJSNodeTypes.LOGICAL_AND;
 				break;
 
 			case PIPE_PIPE:
-				type = JSNodeTypes.LOGICAL_OR;
+				type = IJSNodeTypes.LOGICAL_OR;
 				break;
 
 			default:

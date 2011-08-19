@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.core.io;
 
@@ -47,7 +49,7 @@ public final class WorkspaceConnectionPoint extends ConnectionPoint {
 	/**
 	 * 
 	 */
-	protected WorkspaceConnectionPoint(IContainer resource) {
+	/* package */ WorkspaceConnectionPoint(IContainer resource) {
 		super(TYPE);
 		this.path = resource.getFullPath();
 	}

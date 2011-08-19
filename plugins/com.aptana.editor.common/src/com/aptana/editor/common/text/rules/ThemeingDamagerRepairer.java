@@ -117,7 +117,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 		lastAttribute = super.getTokenTextAttribute(token);
@@ -158,7 +158,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		super.addRange(presentation, offset, length, attr);
 	}

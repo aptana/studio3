@@ -17,6 +17,8 @@ public class Messages extends NLS
 	public static String ProjectFileValidationListener_ERR_ApplyMarker;
 	public static String ProjectFileValidationListener_ERR_UpdateMarkers;
 
+	public static String ValidationManager_FileServiceNonNull;
+
 	public static String ValidatorReference_ERR_FailToCreateValidator;
 
 	static

@@ -51,10 +51,12 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
@@ -567,7 +569,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				}
 				catch (Exception e)
 				{
-					ExplorerPlugin.logError(e.getMessage(), e);
+					IdeLog.logError(ExplorerPlugin.getDefault(), e, IDebugScopes.DEBUG);
 					return new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID, e.getMessage(), e);
 				}
 			}
@@ -683,7 +685,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					}
 					catch (Exception e)
 					{
-						ExplorerPlugin.logError(e.getMessage(), e);
+						IdeLog.logError(ExplorerPlugin.getDefault(), e, IDebugScopes.DEBUG);
 					}
 				}
 			}

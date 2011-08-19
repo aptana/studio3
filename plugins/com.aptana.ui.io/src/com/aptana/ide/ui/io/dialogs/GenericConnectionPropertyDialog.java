@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.GenericConnectionPoint;
@@ -129,8 +130,8 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 				genericConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.GenericConnectionPropertyDialog_FailedToCreate, e);
-				close();
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.GenericConnectionPropertyDialog_FailedToCreate, e);
+				close(); // $codepro.audit.disable closeInFinally
 			}
 		}
 		loadPropertiesFrom(genericConnectionPoint);
@@ -167,6 +168,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		}
 		if (savePropertiesTo(genericConnectionPoint)) {
 			/* TODO: notify */
+			genericConnectionPoint.hashCode();
 		}
 		if (isNew) {
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(genericConnectionPoint);
@@ -181,8 +183,6 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 	protected Control createContents(Composite parent) {
 		try {
 			return super.createContents(parent);
-		} catch (RuntimeException e) {
-			throw e;
 		} finally {
 			validate();
 		}
@@ -193,7 +193,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		try {
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			URI uri = connectionPoint.getURI();
-			uriText.setText(uri != null ? uri.toString() : ""); //$NON-NLS-1$
+			uriText.setText((uri != null) ? uri.toString() : ""); //$NON-NLS-1$
 		} finally {
 			addListeners();
 		}

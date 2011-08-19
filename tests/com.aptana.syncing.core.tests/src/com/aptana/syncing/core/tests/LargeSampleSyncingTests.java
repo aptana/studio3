@@ -7,8 +7,6 @@
  */
 package com.aptana.syncing.core.tests;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
@@ -45,26 +43,9 @@ public abstract class LargeSampleSyncingTests extends TestCase
 	protected IConnectionPoint clientManager;
 	protected IConnectionPoint serverManager;
 
-	private static Properties cachedProperties;
-
-	protected static final Properties getConfig()
+	protected synchronized static final Properties getConfig()
 	{
-		if (cachedProperties == null)
-		{
-			cachedProperties = new Properties();
-			String propertiesFile = System.getenv("junit.properties");
-			if (propertiesFile != null && new File(propertiesFile).length() > 0)
-			{
-				try
-				{
-					cachedProperties.load(new FileInputStream(propertiesFile));
-				}
-				catch (IOException ignore)
-				{
-				}
-			}
-		}
-		return cachedProperties;
+		return SyncingTests.getConfig();
 	}
 
 	/**

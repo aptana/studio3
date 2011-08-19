@@ -27,7 +27,7 @@ import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
-public class FTPDeployWizardPage extends WizardPage implements FTPConnectionPropertyComposite.Listener
+public class FTPDeployWizardPage extends WizardPage implements FTPConnectionPropertyComposite.IListener
 {
 
 	public static final String NAME = "FTPDeployment"; //$NON-NLS-1$

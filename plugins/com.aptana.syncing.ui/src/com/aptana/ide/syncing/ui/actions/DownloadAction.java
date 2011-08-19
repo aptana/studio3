@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -150,7 +151,7 @@ public class DownloadAction extends BaseSyncAction
 				}
 				catch (Exception e)
 				{
-					SyncingUIPlugin.logError(Messages.DownloadAction_ERR_FailToDownload, e);
+					IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.DownloadAction_ERR_FailToDownload, e);
 					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID,
 							Messages.DownloadAction_ERR_FailToDownload, e);
 				}

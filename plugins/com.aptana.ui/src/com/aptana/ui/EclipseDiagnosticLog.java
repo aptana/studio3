@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.Platform;
 public class EclipseDiagnosticLog implements IDiagnosticLog
 {
 
+	private static final char NEW_LINE = '\n';
+
 	public String getLog()
 	{
 		StringBuilder buf = new StringBuilder();
@@ -19,32 +21,32 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 		// Host OS
 		buf.append(Messages.EclipseDiagnosticLog_host_os);
 		buf.append(System.getProperty("os.name")); //$NON-NLS-1$
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// OS arch
 		buf.append(Messages.EclipseDiagnosticLog_os_arch);
 		buf.append(Platform.getOSArch());
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// JRE version
 		buf.append(Messages.EclipseDiagnosticLog_jre_version);
 		buf.append(System.getProperty("java.version")); //$NON-NLS-1$
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// Java vendor
 		buf.append(Messages.EclipseDiagnosticLog_jre_vendor);
 		buf.append(System.getProperty("java.vendor")); //$NON-NLS-1$
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// JRE home
 		buf.append(Messages.EclipseDiagnosticLog_jre_home);
 		buf.append(System.getProperty("java.home")); //$NON-NLS-1$
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// Install Directory
 		buf.append(Messages.EclipseDiagnosticLog_install_dir);
 		buf.append(Platform.getInstallLocation().getURL());
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// Eclipse version
 		buf.append(Messages.EclipseDiagnosticLog_eclipse_version);
@@ -55,25 +57,24 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 			property = property.substring(0, index);
 		}
 		buf.append(property);
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// VM arguments
 		buf.append(Messages.EclipseDiagnosticLog_vm_args);
 		property = System.getProperty("eclipse.vmargs"); //$NON-NLS-1$
 		buf.append((property == null) ? "" : property); //$NON-NLS-1$
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// workspace area
 		buf.append(Messages.EclipseDiagnosticLog_workspace_dir);
 		buf.append(Platform.getInstanceLocation().getURL());
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		// Language
 		buf.append(Messages.EclipseDiagnosticLog_language);
 		buf.append(Platform.getNL());
-		buf.append("\n"); //$NON-NLS-1$
+		buf.append(NEW_LINE);
 
 		return buf.toString();
 	}
-
 }

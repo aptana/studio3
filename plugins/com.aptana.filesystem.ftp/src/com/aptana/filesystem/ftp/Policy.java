@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.filesystem.ftp;
 
@@ -20,7 +21,6 @@ import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class Policy {
 
@@ -29,7 +29,7 @@ public final class Policy {
 	 */
 	private Policy() {
 	}
-	
+
 	public static String generateAuthId(String proto, IBaseRemoteConnectionPoint connectionPoint) {
 		return generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost(), connectionPoint.getPort());
 	}
@@ -37,8 +37,7 @@ public final class Policy {
 	public static String generateAuthId(String proto, String login, String host, int port) {
 		if (host != null && host.length() > 0 && port > 0 && login != null && login.length() > 0) {
 			return MessageFormat.format("{0}/{1}@{2}:{3}", new Object[] { //$NON-NLS-1$
-					proto, login, host, Integer.toString(port)
-			});
+					proto, login, host, Integer.toString(port) });
 		}
 		return null;
 	}
@@ -50,34 +49,36 @@ public final class Policy {
 			permissions |= (string.charAt(index++) == 'r') ? IExtendedFileInfo.PERMISSION_OWNER_READ : 0;
 			permissions |= (string.charAt(index++) == 'w') ? IExtendedFileInfo.PERMISSION_OWNER_WRITE : 0;
 			permissions |= (string.charAt(index++) == 'x') ? IExtendedFileInfo.PERMISSION_OWNER_EXECUTE : 0;
-			
+
 			permissions |= (string.charAt(index++) == 'r') ? IExtendedFileInfo.PERMISSION_GROUP_READ : 0;
 			permissions |= (string.charAt(index++) == 'w') ? IExtendedFileInfo.PERMISSION_GROUP_WRITE : 0;
 			permissions |= (string.charAt(index++) == 'x') ? IExtendedFileInfo.PERMISSION_GROUP_EXECUTE : 0;
-			
+
 			permissions |= (string.charAt(index++) == 'r') ? IExtendedFileInfo.PERMISSION_OTHERS_READ : 0;
 			permissions |= (string.charAt(index++) == 'w') ? IExtendedFileInfo.PERMISSION_OTHERS_WRITE : 0;
 			permissions |= (string.charAt(index++) == 'x') ? IExtendedFileInfo.PERMISSION_OTHERS_EXECUTE : 0;
 		}
 		return permissions;
 	}
-	
+
 	public static IProgressMonitor monitorFor(IProgressMonitor monitor) {
-		return monitor == null ? new NullProgressMonitor() : monitor;
+		return (monitor == null) ? new NullProgressMonitor() : monitor;
 	}
 
 	public static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks) {
-		if (monitor == null)
+		if (monitor == null) {
 			return new NullProgressMonitor();
-		if (monitor instanceof NullProgressMonitor)
+		}
+		if (monitor instanceof NullProgressMonitor) {
 			return monitor;
+		}
 		return new SubProgressMonitor(monitor, ticks);
 	}
 
 	public static void checkCanceled(IProgressMonitor monitor) {
-		if (monitor.isCanceled())
+		if (monitor.isCanceled()) {
 			throw new OperationCanceledException();
+		}
 	}
-
 
 }

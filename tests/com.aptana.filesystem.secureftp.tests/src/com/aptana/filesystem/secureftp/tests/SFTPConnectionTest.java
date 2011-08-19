@@ -16,29 +16,26 @@ import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 /**
  * @author Max Stepanov
  */
-public class SFTPConnectionTest extends CommonConnectionTest
-{
+public class SFTPConnectionTest extends CommonConnectionTest {
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("sftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("sftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("sftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
+		ftpcp.setHost(getConfig().getProperty("sftp.host")); //$NON-NLS-1$
+		ftpcp.setLogin(getConfig().getProperty("sftp.username")); //$NON-NLS-1$
+		ftpcp.setPassword(getConfig().getProperty("sftp.password").toCharArray()); //$NON-NLS-1$
 		ftpcp.setPort(Integer.valueOf(getConfig().getProperty("sftp.port", "22"))); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path","/home/ftpuser"))); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setPath(Path.fromPortableString(getConfig().getProperty("sftp.path"))); //$NON-NLS-1$
 		cp = ftpcp;
 		super.setUp();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime()
-	{
+	protected boolean supportsSetModificationTime() {
 		return true;
 	}
 
@@ -47,8 +44,7 @@ public class SFTPConnectionTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup()
-	{
+	protected boolean supportsChangeGroup() {
 		return false;
 	}
 
@@ -57,8 +53,7 @@ public class SFTPConnectionTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions()
-	{
+	protected boolean supportsChangePermissions() {
 		return true;
 	}
 }

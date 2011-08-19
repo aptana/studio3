@@ -106,7 +106,7 @@ public class EngineYardDeployWizard extends AbstractDeployWizard
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(EngineYardPlugin.getDefault(), e);
 			}
 		}
 		return true;
@@ -150,7 +150,7 @@ public class EngineYardDeployWizard extends AbstractDeployWizard
 						IdeLog.logError(
 								EngineYardPlugin.getDefault(),
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
-										builder.toString()), (Throwable) null);
+										builder.toString()));
 					}
 					else
 					{
@@ -283,7 +283,7 @@ public class EngineYardDeployWizard extends AbstractDeployWizard
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(EngineYardPlugin.getDefault(), e);
 		}
 	}
 }

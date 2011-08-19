@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.xml;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -16,25 +14,27 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
-public class XMLPlugin extends AbstractUIPlugin {
+public class XMLPlugin extends AbstractUIPlugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.xml"; //$NON-NLS-1$
 
 	// The shared instance
 	private static XMLPlugin plugin;
-	
+
 	private IDocumentProvider xmlDocumentProvider;
 
-
-	public XMLPlugin() {
+	public XMLPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 	}
@@ -43,7 +43,8 @@ public class XMLPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		plugin = null;
 		super.stop(context);
 	}
@@ -53,16 +54,20 @@ public class XMLPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static XMLPlugin getDefault() {
+	public static XMLPlugin getDefault()
+	{
 		return plugin;
 	}
 
-	public static Image getImage(String path) {
+	public static Image getImage(String path)
+	{
 		ImageRegistry registry = plugin.getImageRegistry();
 		Image image = registry.get(path);
-		if (image == null) {
+		if (image == null)
+		{
 			ImageDescriptor id = getImageDescriptor(path);
-			if (id == null) {
+			if (id == null)
+			{
 				return null;
 			}
 			registry.put(path, id);
@@ -71,23 +76,22 @@ public class XMLPlugin extends AbstractUIPlugin {
 		return image;
 	}
 
-	public static ImageDescriptor getImageDescriptor(String path) {
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
-	public static void logError(String message, Throwable e) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
-	}
-	
 	/**
 	 * Returns XML document provider
+	 * 
 	 * @return
 	 */
-	public synchronized IDocumentProvider getXMLDocumentProvider() {
-		if (xmlDocumentProvider == null) {
+	public synchronized IDocumentProvider getXMLDocumentProvider()
+	{
+		if (xmlDocumentProvider == null)
+		{
 			xmlDocumentProvider = new XMLDocumentProvider();
 		}
 		return xmlDocumentProvider;
 	}
-
 }

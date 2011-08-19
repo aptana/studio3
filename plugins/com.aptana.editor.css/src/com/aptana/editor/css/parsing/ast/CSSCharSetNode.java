@@ -21,8 +21,8 @@ public class CSSCharSetNode extends CSSNode
 	 */
 	public CSSCharSetNode(String encoding)
 	{
-		super(CSSNodeTypes.CHAR_SET);
-		
+		super(ICSSNodeTypes.CHAR_SET);
+
 		fEncoding = encoding;
 	}
 
@@ -47,9 +47,9 @@ public class CSSCharSetNode extends CSSNode
 		{
 			return false;
 		}
-		
+
 		CSSCharSetNode other = (CSSCharSetNode) obj;
-		
+
 		return fEncoding.equals(other.fEncoding);
 	}
 
@@ -73,11 +73,11 @@ public class CSSCharSetNode extends CSSNode
 		if (fText == null)
 		{
 			StringBuilder buf = new StringBuilder();
-			
-			buf.append("@charset ").append(fEncoding).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			buf.append("@charset ").append(fEncoding).append(';'); //$NON-NLS-1$
 			fText = buf.toString();
 		}
-		
+
 		return fText;
 	}
 }

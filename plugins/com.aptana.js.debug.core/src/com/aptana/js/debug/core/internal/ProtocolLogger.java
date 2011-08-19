@@ -26,23 +26,21 @@ import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
 public class ProtocolLogger {
 
 	private PrintWriter writer;
 
 	/**
-	 * @throws FileNotFoundException 
-	 * 
+	 * @throws FileNotFoundException
 	 */
 	public ProtocolLogger(String filename, String pluginId) throws DebugException {
-		this(Platform.getStateLocation(Platform.getBundle(pluginId)).append("logs").append(filename).addFileExtension("log"), pluginId); //$NON-NLS-1$ //$NON-NLS-2$
+		this(Platform.getStateLocation(Platform.getBundle(pluginId))
+				.append("logs").append(filename).addFileExtension("log"), pluginId); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/**
-	 * @throws FileNotFoundException 
-	 * 
+	 * @throws FileNotFoundException
 	 */
 	public ProtocolLogger(IPath location, String pluginId) throws DebugException {
 		File file = location.toFile();
@@ -53,16 +51,18 @@ public class ProtocolLogger {
 			writer.println(MessageFormat.format("Component: {0}", pluginId)); //$NON-NLS-1$
 			writer.println(MessageFormat.format("Version: {0}", EclipseUtil.getPluginVersion(pluginId))); //$NON-NLS-1$
 		} catch (FileNotFoundException e) {
-			throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, DebugException.TARGET_REQUEST_FAILED, StringUtil.EMPTY, e));
+			throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID,
+					DebugException.TARGET_REQUEST_FAILED, StringUtil.EMPTY, e));
 		}
 	}
-	
+
 	public void log(boolean recv, String message) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
-		writer.println(MessageFormat.format("[{0,number,##}:{1,number,##}.{2,number,###}] {3}: >{4}<", cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND), recv ? "Recv" : "Sent", message)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		writer.println(MessageFormat
+				.format("[{0,number,##}:{1,number,##}.{2,number,###}] {3}: >{4}<", cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND), recv ? "Recv" : "Sent", message)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	public void close() {
 		writer.println("----------End of file----------"); //$NON-NLS-1$
 		writer.close();

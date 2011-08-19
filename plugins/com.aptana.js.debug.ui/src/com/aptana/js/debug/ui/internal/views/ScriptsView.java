@@ -30,12 +30,12 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.ui.internal.JSDebugModelPresentation;
 import com.aptana.js.debug.ui.internal.actions.OpenScriptSourceAction;
 import com.aptana.js.debug.ui.internal.scripts.ScriptsContentProvider;
 import com.aptana.js.debug.ui.internal.scripts.ScriptsViewer;
-import com.aptana.debug.core.util.DebugUtil;
 
 /**
  * @author Max Stepanov
@@ -134,7 +134,7 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 
 	private void setViewerInput(IDebugTarget target) {
 		if (!(target instanceof IJSDebugTarget) || ((IJSDebugTarget) target).isTerminated()) {
-			target = null;
+			target = null; // $codepro.audit.disable questionableAssignment
 		}
 		if (currentTarget == null && target == null) {
 			return;
@@ -196,20 +196,20 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 				currentTerminated = true;
 			}
 
-			if (currentTarget == null || source != currentTarget) {
+			if (currentTarget == null || source != currentTarget) { // $codepro.audit.disable useEquals
 				continue;
 			}
 			switch (event.getKind()) {
-			case DebugEvent.CHANGE:
-				if (event.getDetail() == DebugEvent.CONTENT) {
-					getViewer().getControl().getDisplay().syncExec(new Runnable() {
-						public void run() {
-							getViewer().refresh();
-						}
-					});
-				}
-				break;
-			default:
+				case DebugEvent.CHANGE:
+					if (event.getDetail() == DebugEvent.CONTENT) {
+						getViewer().getControl().getDisplay().syncExec(new Runnable() {
+							public void run() {
+								getViewer().refresh();
+							}
+						});
+					}
+					break;
+				default:
 			}
 		}
 	}

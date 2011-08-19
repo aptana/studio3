@@ -16,7 +16,7 @@ public class JSCommaNode extends JSNode
 	 */
 	public JSCommaNode(JSNode... children)
 	{
-		super(JSNodeTypes.COMMA, children);
+		super(IJSNodeTypes.COMMA, children);
 	}
 
 	/*

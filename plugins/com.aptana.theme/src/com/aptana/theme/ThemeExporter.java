@@ -16,6 +16,8 @@ import java.util.UUID;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 
+import com.aptana.core.logging.IdeLog;
+
 /**
  * @author cwilliams
  */
@@ -94,15 +96,15 @@ public class ThemeExporter
 			int style = attr.getStyle();
 			if ((style & SWT.ITALIC) != 0)
 			{
-				value.append("italic").append(",");
+				value.append("italic").append(',');
 			}
 			if ((style & TextAttribute.UNDERLINE) != 0)
 			{
-				value.append("underline").append(",");
+				value.append("underline").append(',');
 			}
 			if ((style & SWT.BOLD) != 0)
 			{
-				value.append("bold").append(",");
+				value.append("bold").append(',');
 			}
 			if (value.length() > 0)
 			{
@@ -127,7 +129,7 @@ public class ThemeExporter
 		}
 		catch (IOException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		finally
 		{

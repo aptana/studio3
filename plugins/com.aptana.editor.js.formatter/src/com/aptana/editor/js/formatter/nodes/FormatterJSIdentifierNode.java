@@ -8,7 +8,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -65,57 +65,57 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 			{
 				switch (parentType)
 				{
-					case JSNodeTypes.PARAMETERS:
-					case JSNodeTypes.ARGUMENTS:
-					case JSNodeTypes.ADD:
-					case JSNodeTypes.SUBTRACT:
-					case JSNodeTypes.MULTIPLY:
-					case JSNodeTypes.MOD:
-					case JSNodeTypes.DIVIDE:
-					case JSNodeTypes.BITWISE_AND:
-					case JSNodeTypes.BITWISE_OR:
-					case JSNodeTypes.BITWISE_XOR:
-					case JSNodeTypes.PRE_INCREMENT:
-					case JSNodeTypes.PRE_DECREMENT:
-					case JSNodeTypes.POST_INCREMENT:
-					case JSNodeTypes.POST_DECREMENT:
-					case JSNodeTypes.NEGATIVE:
-					case JSNodeTypes.POSITIVE:
-					case JSNodeTypes.EQUAL:
-					case JSNodeTypes.GREATER_THAN:
-					case JSNodeTypes.GREATER_THAN_OR_EQUAL:
-					case JSNodeTypes.IDENTITY:
-					case JSNodeTypes.LESS_THAN:
-					case JSNodeTypes.LESS_THAN_OR_EQUAL:
-					case JSNodeTypes.LOGICAL_AND:
-					case JSNodeTypes.LOGICAL_OR:
-					case JSNodeTypes.NOT_EQUAL:
-					case JSNodeTypes.NOT_IDENTITY:
-					case JSNodeTypes.ADD_AND_ASSIGN:
-					case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
-					case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
-					case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
-					case JSNodeTypes.DIVIDE_AND_ASSIGN:
-					case JSNodeTypes.MOD_AND_ASSIGN:
-					case JSNodeTypes.MULTIPLY_AND_ASSIGN:
-					case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
-					case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
-					case JSNodeTypes.SHIFT_RIGHT:
-					case JSNodeTypes.SHIFT_LEFT:
-					case JSNodeTypes.SUBTRACT_AND_ASSIGN:
-					case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT:
-					case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
-					case JSNodeTypes.IF:
-					case JSNodeTypes.WHILE:
-					case JSNodeTypes.COMMA:
-					case JSNodeTypes.ELEMENTS:
-					case JSNodeTypes.WITH:
-					case JSNodeTypes.FOR:
-					case JSNodeTypes.FOR_IN:
-					case JSNodeTypes.LOGICAL_NOT:
-					case JSNodeTypes.BITWISE_NOT:
-					case JSNodeTypes.GROUP:
-					case JSNodeTypes.GET_PROPERTY:
+					case IJSNodeTypes.PARAMETERS:
+					case IJSNodeTypes.ARGUMENTS:
+					case IJSNodeTypes.ADD:
+					case IJSNodeTypes.SUBTRACT:
+					case IJSNodeTypes.MULTIPLY:
+					case IJSNodeTypes.MOD:
+					case IJSNodeTypes.DIVIDE:
+					case IJSNodeTypes.BITWISE_AND:
+					case IJSNodeTypes.BITWISE_OR:
+					case IJSNodeTypes.BITWISE_XOR:
+					case IJSNodeTypes.PRE_INCREMENT:
+					case IJSNodeTypes.PRE_DECREMENT:
+					case IJSNodeTypes.POST_INCREMENT:
+					case IJSNodeTypes.POST_DECREMENT:
+					case IJSNodeTypes.NEGATIVE:
+					case IJSNodeTypes.POSITIVE:
+					case IJSNodeTypes.EQUAL:
+					case IJSNodeTypes.GREATER_THAN:
+					case IJSNodeTypes.GREATER_THAN_OR_EQUAL:
+					case IJSNodeTypes.IDENTITY:
+					case IJSNodeTypes.LESS_THAN:
+					case IJSNodeTypes.LESS_THAN_OR_EQUAL:
+					case IJSNodeTypes.LOGICAL_AND:
+					case IJSNodeTypes.LOGICAL_OR:
+					case IJSNodeTypes.NOT_EQUAL:
+					case IJSNodeTypes.NOT_IDENTITY:
+					case IJSNodeTypes.ADD_AND_ASSIGN:
+					case IJSNodeTypes.BITWISE_AND_AND_ASSIGN:
+					case IJSNodeTypes.BITWISE_OR_AND_ASSIGN:
+					case IJSNodeTypes.BITWISE_XOR_AND_ASSIGN:
+					case IJSNodeTypes.DIVIDE_AND_ASSIGN:
+					case IJSNodeTypes.MOD_AND_ASSIGN:
+					case IJSNodeTypes.MULTIPLY_AND_ASSIGN:
+					case IJSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
+					case IJSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
+					case IJSNodeTypes.SHIFT_RIGHT:
+					case IJSNodeTypes.SHIFT_LEFT:
+					case IJSNodeTypes.SUBTRACT_AND_ASSIGN:
+					case IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT:
+					case IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
+					case IJSNodeTypes.IF:
+					case IJSNodeTypes.WHILE:
+					case IJSNodeTypes.COMMA:
+					case IJSNodeTypes.ELEMENTS:
+					case IJSNodeTypes.WITH:
+					case IJSNodeTypes.FOR:
+					case IJSNodeTypes.FOR_IN:
+					case IJSNodeTypes.LOGICAL_NOT:
+					case IJSNodeTypes.BITWISE_NOT:
+					case IJSNodeTypes.GROUP:
+					case IJSNodeTypes.GET_PROPERTY:
 						return 0;
 					default:
 						return 1;
@@ -126,7 +126,7 @@ public class FormatterJSIdentifierNode extends FormatterJSTextNode
 				// Using switch-case here to prepare for any future tweaks.
 				switch (parentType)
 				{
-					case JSNodeTypes.FOR_IN:
+					case IJSNodeTypes.FOR_IN:
 						return 1;
 				}
 			}

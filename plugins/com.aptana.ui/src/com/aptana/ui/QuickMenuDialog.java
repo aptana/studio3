@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.StringUtil;
+
 /**
  * Pop up a quick menu. useful for commands when we want users to be able to select a value without having to take their
  * hands off the keyboard. Much better UI than a dialog with a combo!
@@ -177,9 +179,10 @@ public class QuickMenuDialog extends PopupDialog
 			}
 
 			tableItem.setText(1, item.getText());
-			tableItem.setData(MNEMONIC, mnemonic); // FIXME This is really off by one, but we expect it to be later. Funky
-												// code from Sandip. Just use real value maybe?
-			tableItem.setText(2, (mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "")); //$NON-NLS-1$
+			tableItem.setData(MNEMONIC, mnemonic); // FIXME This is really off by one, but we expect it to be later.
+													// Funky code from Sandip. Just use real value maybe?
+			tableItem.setText(2, (mnemonic < MNEMONICS.length()) ? String.valueOf(MNEMONICS.charAt(mnemonic++))
+					: StringUtil.EMPTY);
 			tableItem.setData(INDEX, index);
 		}
 

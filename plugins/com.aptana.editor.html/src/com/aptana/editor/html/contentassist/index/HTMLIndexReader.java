@@ -19,7 +19,7 @@ import java.util.Set;
 
 import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
@@ -91,7 +91,7 @@ public class HTMLIndexReader extends IndexReader
 		{
 			List<QueryResult> attributes = index.query( //
 					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
-					name + CSSIndexConstants.DELIMITER, //
+					name + ICSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
 
@@ -210,7 +210,7 @@ public class HTMLIndexReader extends IndexReader
 			{
 				List<QueryResult> elements = index.query( //
 						new String[] { HTMLIndexConstants.ELEMENT }, //
-						name + CSSIndexConstants.DELIMITER, //
+						name + ICSSIndexConstants.DELIMITER, //
 						SearchPattern.PREFIX_MATCH //
 						);
 
@@ -273,7 +273,7 @@ public class HTMLIndexReader extends IndexReader
 		{
 			List<QueryResult> entities = index.query( //
 					new String[] { HTMLIndexConstants.ENTITY }, //
-					name + CSSIndexConstants.DELIMITER, //
+					name + ICSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
 
@@ -308,7 +308,7 @@ public class HTMLIndexReader extends IndexReader
 		{
 			List<QueryResult> events = index.query( //
 					new String[] { HTMLIndexConstants.EVENT }, //
-					name + CSSIndexConstants.DELIMITER, //
+					name + ICSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
 

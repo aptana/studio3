@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import java.net.URI;
@@ -15,6 +17,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,8 +40,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResourceMarker;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.ui.SourceDisplayUtil;
@@ -62,8 +65,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	private boolean showTypes = false;
 
 	/**
-	 * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String,
-	 *      java.lang.Object)
+	 * @see org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String, java.lang.Object)
 	 */
 	public void setAttribute(String attribute, Object value) {
 		if (IDebugModelPresentation.DISPLAY_VARIABLE_TYPE_NAMES.equals(attribute)) {
@@ -97,7 +99,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -122,7 +124,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				return DebugUIImages.get(DebugUIImages.IMG_OBJS_INSPECT);
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return super.getImage(element);
 	}
@@ -144,7 +146,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		}
 		int line = frame.getLineNumber();
 		return MessageFormat.format("{0} [{1}:{2}]", //$NON-NLS-1$
-				frame.getName(), fileName, line >= 0 ? Integer.toString(line)
+				frame.getName(), fileName, (line >= 0) ? Integer.toString(line)
 						: Messages.JSDebugModelPresentation_notavailable);
 	}
 
@@ -195,7 +197,8 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 						URI uri = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
 						if ("file".equals(uri.getScheme())) { //$NON-NLS-1$
 							fileName = DebugUtil.getPath(uri);
-							IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
+							IFile file = ResourcesPlugin.getWorkspace().getRoot()
+									.getFileForLocation(Path.fromOSString(fileName));
 							if (file != null) {
 								fileName = file.getFullPath().toString();
 							}
@@ -257,6 +260,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				label.append(MessageFormat.format(
 						" [{0}: {1}]", Messages.JSDebugModelPresentation_line, Integer.toString(lineNumber))); //$NON-NLS-1$
 			} catch (CoreException e) {
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 		return label.toString();
@@ -311,7 +315,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return flags;
 	}
@@ -380,7 +384,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		try {
 			details = value.getValueString();
 		} catch (DebugException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		listener.detailComputed(value, details);
 	}
@@ -393,8 +397,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	}
 
 	/**
-	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput,
-	 *      java.lang.Object)
+	 * @see org.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.IEditorInput, java.lang.Object)
 	 */
 	public String getEditorId(IEditorInput input, Object element) {
 		return SourceDisplayUtil.getEditorId(input, element);
@@ -411,22 +414,26 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		try {
 			varLabel = variable.getName();
 		} catch (DebugException e) {
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		String typeName = Messages.JSDebugModelPresentation_UnknownType;
 		try {
 			typeName = variable.getReferenceTypeName();
 		} catch (DebugException e) {
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		IValue value = null;
 		try {
 			value = variable.getValue();
 		} catch (DebugException e) {
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		String valueString = Messages.JSDebugModelPresentation_UnknownValue;
 		if (value != null) {
 			try {
 				valueString = getValueText(value);
 			} catch (DebugException e) {
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 
@@ -507,7 +514,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		 * @param value
 		 * @param listener
 		 */
-		public DetailsJob(IValue value, IValueDetailListener listener) {
+		protected DetailsJob(IValue value, IValueDetailListener listener) {
 			super(Messages.JSDebugModelPresentation_DetailsComputing);
 			setSystem(true);
 			this.value = value;
@@ -520,7 +527,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 			try {
 				details = target.computeValueDetails(value);
 			} catch (DebugException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 			listener.detailComputed(value, details);
 			return Status.OK_STATUS;

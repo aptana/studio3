@@ -63,7 +63,7 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSLocationIdentifier extends JSTreeWalker
 {
-	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
+	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE); // $codepro.audit.disable declareAsInterface
 
 	private int _offset;
 	private IParseNode _targetNode;
@@ -167,7 +167,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 		{
 			((JSParseRootNode) ast).accept(this);
 
-			if (IGNORED_TYPES.contains(this._type) == false)
+			if (!IGNORED_TYPES.contains(this._type))
 			{
 				JSRangeFinder rangeWalker = new JSRangeFinder(actualOffset);
 
@@ -362,7 +362,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 				this.setType(node.getTestExpression());
 			}
 			else if (this._offset == questionMark.getStart())
-			{
+			{ // $codepro.audit.disable emptyIfStatement
 				// done
 			}
 			else if (this._offset < colon.getStart())
@@ -370,7 +370,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 				this.setType(node.getTrueExpression());
 			}
 			else if (this._offset == colon.getStart())
-			{
+			{ // $codepro.audit.disable emptyIfStatement
 				// done
 			}
 			else
@@ -1315,7 +1315,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 	public void visit(JSVarNode node)
 	{
 		// @formatter:off
-		if (node.contains(this._offset) && (this._offset != node.getEndingOffset() || node.getSemicolonIncluded() == false))
+		if (node.contains(this._offset) && (this._offset != node.getEndingOffset() || !node.getSemicolonIncluded()))
 		// @formatter:on
 		{
 			IParseNode firstDeclaration = node.getFirstChild();

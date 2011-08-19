@@ -21,7 +21,7 @@ public class JSArrayNode extends JSNode
 	 */
 	public JSArrayNode(Symbol leftBracket, Symbol rightBracket, JSNode... elements)
 	{
-		super(JSNodeTypes.ARRAY_LITERAL, elements);
+		super(IJSNodeTypes.ARRAY_LITERAL, elements);
 
 		this._leftBracket = leftBracket;
 		this._rightBracket = rightBracket;

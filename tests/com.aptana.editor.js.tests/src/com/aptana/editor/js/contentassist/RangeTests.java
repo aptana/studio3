@@ -277,4 +277,15 @@ public class RangeTests extends JSEditorBasedTests
 	{
 		rangeTest("ranges/apstud-3017.js", 40, 1);
 	}
+
+	/**
+	 * Test secondary fix for APSTUD-3017
+	 * 
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public void testApstud3017_2() throws IOException, Exception
+	{
+		rangeTest("ranges/apstud-3017-2.js", 55, 1);
+	}
 }

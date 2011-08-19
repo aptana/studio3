@@ -28,7 +28,6 @@ import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class JSLaunchConfigurationHelper {
 
@@ -86,7 +85,8 @@ public final class JSLaunchConfigurationHelper {
 
 				/* IE */
 				if (INTERNET_EXPLORER.equals(nature) || (nature == null)) {
-					String path = PlatformUtil.expandEnvironmentStrings(ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_IE);
+					String path = PlatformUtil
+							.expandEnvironmentStrings(ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_IE);
 					if (new File(path).exists()) {
 						browser = path;
 						break;
@@ -95,7 +95,7 @@ public final class JSLaunchConfigurationHelper {
 			} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 				/* Firefox */
 				if (FIREFOX.equals(nature) || (nature == null)) {
-					for (String location: ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_FIREFOX) {
+					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_FIREFOX) {
 						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
 						if (file.exists() && file.isDirectory()) {
@@ -195,14 +195,22 @@ public final class JSLaunchConfigurationHelper {
 	public static void setDebugDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false);
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
-				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes));
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
-				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes));
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
-				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes));
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
-				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false, scopes));
+		configuration.setAttribute(
+				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+						IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes));
+		configuration.setAttribute(
+				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+						IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes));
+		configuration.setAttribute(
+				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+						IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes));
+		configuration.setAttribute(
+				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+						IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false, scopes));
 	}
 
 	/**
@@ -222,8 +230,8 @@ public final class JSLaunchConfigurationHelper {
 	public static void setHttpDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_POST_DATA, StringUtil.EMPTY);
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_POST_CONTENT_TYPE,
-				StringUtil.EMPTY);
+		configuration
+				.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_POST_CONTENT_TYPE, StringUtil.EMPTY);
 	}
 
 	/**
@@ -286,14 +294,22 @@ public final class JSLaunchConfigurationHelper {
 							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, false)));
 		} else {
 			IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, Boolean
-					.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, Boolean
-					.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
-					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
-					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false, scopes)));
+			launch.setAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
+					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+							IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes)));
+			launch.setAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
+					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+							IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes)));
+			launch.setAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+							IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes)));
+			launch.setAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
+					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
+							IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false, scopes)));
 
 		}
 	}

@@ -96,7 +96,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				IRegion info = fDocument.getLineInformationOfOffset(event.getOffset());
 				int start = Math.max(partition.getOffset(), info.getOffset());
 
-				int end = event.getOffset() + (event.getText() == null ? event.getLength() : event.getText().length());
+				int end = event.getOffset() + ((event.getText() == null) ? event.getLength() : event.getText().length());
 
 				if (info.getOffset() <= end && end <= info.getOffset() + info.getLength())
 				{
@@ -154,7 +154,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 				}
 				catch (BadLocationException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 			IToken token = ThemePlugin.getDefault().getThemeManager().getToken(fFullScope);

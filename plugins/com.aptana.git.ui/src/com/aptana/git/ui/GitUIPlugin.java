@@ -9,7 +9,6 @@ package com.aptana.git.ui;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -40,6 +39,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
@@ -103,11 +103,10 @@ public class GitUIPlugin extends AbstractUIPlugin
 							}
 							catch (BackingStoreException e)
 							{
-								GitUIPlugin.logError(e.getMessage(), e);
+								IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
 							}
 						}
 					});
-
 				}
 			}
 		};
@@ -125,7 +124,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			if (themeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.removePreferenceChangeListener(themeChangeListener);
 			}
 			themeChangeListener = null;
 		}
@@ -217,7 +217,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		}
 		catch (InvocationTargetException e)
 		{
-			logError(e);
+			IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
 		}
 		catch (InterruptedException e)
 		{
@@ -283,43 +283,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
-	}
-
-	/**
-	 * @deprecated
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		IdeLog.logError(getDefault(), msg, e);
-	}
-
-	/**
-	 * @deprecated
-	 * @param e
-	 */
-	public static void logError(CoreException e)
-	{
-		IdeLog.log(getDefault(), e.getStatus());
-	}
-
-	/**
-	 * @deprecated
-	 * @param e
-	 */
-	public static void logError(Exception e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * @deprecated
-	 * @param msg
-	 */
-	public static void logWarning(String msg)
-	{
-		IdeLog.logWarning(getDefault(), msg);
 	}
 
 	public static Image getImage(String string)

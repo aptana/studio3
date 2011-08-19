@@ -13,6 +13,7 @@ import java.util.Set;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ui.IActionFilter;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.core.model.JSDebugModel;
@@ -25,7 +26,7 @@ public class JSVariableActionFilter implements IActionFilter {
 	private static final Set<String> fgPrimitiveTypes = initPrimitiveTypes();
 
 	private static Set<String> initPrimitiveTypes() {
-		HashSet<String> set = new HashSet<String>(8);
+		Set<String> set = new HashSet<String>(8);
 		set.add("integer"); //$NON-NLS-1$
 		set.add("float"); //$NON-NLS-1$
 		set.add("boolean"); //$NON-NLS-1$
@@ -37,8 +38,7 @@ public class JSVariableActionFilter implements IActionFilter {
 	}
 
 	/**
-	 * @see org.eclipse.ui.IActionFilter#testAttribute(java.lang.Object,
-	 *      java.lang.String, java.lang.String)
+	 * @see org.eclipse.ui.IActionFilter#testAttribute(java.lang.Object, java.lang.String, java.lang.String)
 	 */
 	public boolean testAttribute(Object target, String name, String value) {
 		try {
@@ -58,7 +58,7 @@ public class JSVariableActionFilter implements IActionFilter {
 				}
 			}
 		} catch (DebugException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return false;
 	}

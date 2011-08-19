@@ -210,6 +210,8 @@ public final class ShellExecutable {
 					IStatus status = ProcessUtil.processResult(run(envCommand, workingDirectory, null));
 					if (status.isOK()) {
 						result = buildEnvironment(status.getMessage());
+					} else {
+						IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed: "+status.getMessage()); //$NON-NLS-1$
 					}
 				} catch (Exception e) {
 					IdeLog.logError(CorePlugin.getDefault(), "Get shell environment failed.", e); //$NON-NLS-1$
@@ -265,7 +267,7 @@ public final class ShellExecutable {
 		shellCommand.add("-c"); //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer();
 		for (String arg : command) {
-			sb.append(arg.replaceAll("\"|\'| ", "\\\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(arg.replaceAll("\"|\'|\\(|\\)| ", "\\\\$0")).append(' '); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		shellCommand.add(sb.toString().trim());
 		return shellCommand;

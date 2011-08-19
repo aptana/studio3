@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.mortbay.util.ajax.JSON;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IPortalPreferences;
@@ -119,7 +120,7 @@ public class CachedVersionProcessorDelegate extends BaseVersionProcessor
 					}
 					catch (BackingStoreException e)
 					{
-						PortalUIPlugin.logError(e);
+						IdeLog.logError(PortalUIPlugin.getDefault(), e);
 						return null;
 					}
 					return version;

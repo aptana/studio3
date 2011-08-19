@@ -19,14 +19,13 @@ import com.aptana.js.debug.core.model.IJSVariable;
 public class ActionFilterAdapterFactory implements IAdapterFactory {
 
 	/**
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-	 *      java.lang.Class)
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType.isInstance(adaptableObject)) {
 			return adaptableObject;
 		}
-		if (adapterType == IActionFilter.class) {
+		if (IActionFilter.class.equals(adapterType)) {
 			if (adaptableObject instanceof IJSVariable) {
 				return new JSVariableActionFilter();
 			}

@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.deploy.IDeployProvider;
-import com.aptana.deploy.ftp.FTPDeployProvider;
 import com.aptana.deploy.util.DeployProviderUtil;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -71,6 +70,8 @@ public class FTPDeployProviderTest extends TestCase
 		IDeployProvider provider = DeployProviderUtil.getDeployProvider(testProject);
 		assertNotNull(provider);
 		assertEquals(FTPDeployProvider.class, provider.getClass());
+		assertEquals(FTPDeployProvider.ID, DeployProviderUtil.getIdForProvider(provider));
+		assertTrue(provider.handles(testProject));
 	}
 
 	/**

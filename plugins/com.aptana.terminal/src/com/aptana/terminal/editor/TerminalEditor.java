@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IPath;
@@ -67,15 +70,15 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	private TerminalActionPaste fActionEditPaste;
 	private TerminalActionClearAll fActionEditClearAll;
 	private TerminalActionSelectAll fActionEditSelectAll;
-	
+
 	private boolean checkCanClose = false;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent) {		
+	public void createPartControl(Composite parent) {
 		terminalComposite = new TerminalComposite(parent, SWT.NONE);
 		terminalComposite.setTerminalListener(new ITerminalListener() {
 			public void setTerminalTitle(final String title) {
@@ -85,7 +88,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 					}
 				});
 			}
-			
+
 			public void setState(TerminalState state) {
 			}
 		});
@@ -102,12 +105,12 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(terminalComposite.getTerminalControl(), ID);
-		
+
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
 		saveInputState();
-		
+
 		terminalComposite.getTerminalControl().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
@@ -118,7 +121,8 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.doit) {
-					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(
+							IBindingService.class);
 					Event event = new Event();
 					event.character = e.character;
 					event.keyCode = e.keyCode;
@@ -135,32 +139,27 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 						keyDownFilter.setEnabled(true);
 						keyDownFilter.handleEvent(event);
 					} finally {
-						if (focusControl == e.display.getFocusControl()) {
+						if (focusControl == e.display.getFocusControl()) { // $codepro.audit.disable useEquals
 							keyDownFilter.setEnabled(enabled);
 						}
 					}
 				}
 			}
 		});
-		
-		// Add drag and drop support for file paths		
+
+		// Add drag and drop support for file paths
 		DropTarget dt = new DropTarget(terminalComposite.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
 		dt.setTransfer(new Transfer[] { FileTransfer.getInstance() });
-		dt.addDropListener(new DropTargetAdapter()
-		{
-			public void drop(DropTargetEvent event)
-			{
+		dt.addDropListener(new DropTargetAdapter() {
+			public void drop(DropTargetEvent event) {
 				FileTransfer ft = FileTransfer.getInstance();
-				if (ft.isSupportedType(event.currentDataType))
-				{
-					String fileList[] = (String[]) event.data;
-					if (fileList != null && fileList.length > 0)
-					{
+				if (ft.isSupportedType(event.currentDataType)) {
+					String[] fileList = (String[]) event.data;
+					if (fileList != null && fileList.length > 0) {
 						StringBuilder builder = new StringBuilder();
-						for (String file : fileList)
-						{
-							builder.append(file).append(" "); //$NON-NLS-1$
-						}				
+						for (String file : fileList) {
+							builder.append(file).append(' ');
+						}
 						terminalComposite.sendInput(builder.toString());
 					}
 				}
@@ -168,8 +167,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		});
 		terminalComposite.connect();
 	}
-	
-	
+
 	/**
 	 * @param text
 	 * @see com.aptana.terminal.widget.TerminalComposite#sendInput(java.lang.String)
@@ -177,7 +175,6 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	public void sendInput(String text) {
 		terminalComposite.sendInput(text);
 	}
-
 
 	private void saveInputState() {
 		IEditorInput input = getEditorInput();
@@ -198,7 +195,8 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
 	public void processCompleted() {
@@ -231,7 +229,8 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#isSaveOnCloseNeeded()
 	 */
 	@Override
@@ -240,14 +239,16 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
 	 */
 	public int promptToSaveOnClose() {
 		return terminalComposite.canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#setContentDescription(java.lang.String)
 	 */
 	@Override
@@ -261,8 +262,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public void doSave(IProgressMonitor monitor)
-	{
+	public void doSave(IProgressMonitor monitor) {
 	}
 
 	/*
@@ -270,8 +270,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
 	@Override
-	public void doSaveAs()
-	{
+	public void doSaveAs() {
 	}
 
 	/**
@@ -279,8 +278,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	 * 
 	 * @param menuMgr
 	 */
-	private void fillContextMenu(IMenuManager menuMgr)
-	{
+	private void fillContextMenu(IMenuManager menuMgr) {
 		menuMgr.add(fActionEditCopy);
 		menuMgr.add(fActionEditPaste);
 		menuMgr.add(new Separator());
@@ -307,7 +305,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		fActionEditCopy.updateAction(true);
 		fActionEditPaste.updateAction(true);
 		fActionEditSelectAll.updateAction(true);
-		fActionEditClearAll.updateAction(true);		
+		fActionEditClearAll.updateAction(true);
 	}
 
 	/**
@@ -324,8 +322,7 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	/**
 	 * hookContextMenu
 	 */
-	private void hookContextMenu()
-	{
+	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
@@ -338,20 +335,20 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 		Menu menu = menuMgr.createContextMenu(control);
 		control.setMenu(menu);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException{
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setInput(input);
 		setPartName(Messages.TerminalEditor_Part_Name);
 		setTitleToolTip(Messages.TerminalEditor_Title_Tool_Tip);
 		setTitleImage(TerminalPlugin.getImage("icons/terminal.png")); //$NON-NLS-1$
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
@@ -360,9 +357,8 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, IProce
 	public void setFocus() {
 		terminalComposite.setFocus();
 	}
-	
-	public IPath getWorkingDirectory()
-	{
+
+	public IPath getWorkingDirectory() {
 		return terminalComposite.getWorkingDirectory();
 	}
 }

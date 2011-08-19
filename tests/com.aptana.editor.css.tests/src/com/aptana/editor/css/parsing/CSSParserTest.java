@@ -9,7 +9,12 @@ package com.aptana.editor.css.parsing;
 
 import junit.framework.TestCase;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.css.parsing.ast.CSSParseRootNode;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 /**
  * @author Kevin Lindsey
@@ -934,6 +939,57 @@ public class CSSParserTest extends TestCase
 	public void testMultipleAttributeSelectors() throws Exception
 	{
 		parseTest("a#myId .myClass {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * test missing semi-colon declaration
+	 * 
+	 * @throws Exception
+	 */
+	public void testMissingSemiColon() throws Exception
+	{
+		IParseState parseState = new ParseState();
+		parseStateTest(parseState,
+				"h1      , h2      , h3 {color   : #AA2808\ncolor   : #AA2808}");
+
+		assertTrue("Could not find parse errors in parse state", !parseState.getErrors().isEmpty());
+	}
+
+	/**
+	 * test css comments inside declarations
+	 * 
+	 * @throws Exception
+	 */
+	public void testCommentsInsideDeclaration() throws Exception
+	{
+		IParseState parseState = new ParseState();
+		IParseRootNode parseResult = parseStateTest(parseState, "body{color   : #AA2808;\n /*this is a comment*/}"
+				+ EOL);
+		assertTrue("Comments were not stored in parse result", parseResult.getCommentNodes().length == 1);
+	}
+
+	/**
+	 * test blank css content
+	 * 
+	 * @throws Exception
+	 */
+	public void testBlankCSSContent() throws Exception
+	{
+		IParseState parseState = new ParseState();
+		IParseRootNode parseResult = parseStateTest(parseState, StringUtil.EMPTY + EOL);
+
+		assertTrue(parseResult instanceof CSSParseRootNode);
+	}
+
+	/**
+	 * parseTest
+	 * 
+	 * @throws Exception
+	 */
+	public IParseRootNode parseStateTest(IParseState parseState, String source) throws Exception
+	{
+		parseState.setEditState(source, source, 0, 0);
+		return fParser.parse(parseState);
 	}
 
 	/**

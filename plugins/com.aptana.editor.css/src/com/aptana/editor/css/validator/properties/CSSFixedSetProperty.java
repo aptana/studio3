@@ -39,7 +39,7 @@ public abstract class CSSFixedSetProperty extends CustomCSSProperty
 	 *            property first in the result array. Otherwise {@link CSSFixedSetProperty#isDefault()} should be
 	 *            overridden.
 	 */
-	public CSSFixedSetProperty(String propertyName, String[] values)
+	protected CSSFixedSetProperty(String propertyName, String[] values)
 	{
 		super(propertyName);
 		this.values = values;
@@ -62,7 +62,7 @@ public abstract class CSSFixedSetProperty extends CustomCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public CSSFixedSetProperty(String propertyName, String[] values, ApplContext context, CssExpression expression,
+	protected CSSFixedSetProperty(String propertyName, String[] values, ApplContext context, CssExpression expression,
 			boolean check) throws InvalidParamException
 	{
 		super(propertyName);
@@ -107,7 +107,7 @@ public abstract class CSSFixedSetProperty extends CustomCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public CSSFixedSetProperty(String propertyName, String[] values, ApplContext context, CssExpression expression)
+	protected CSSFixedSetProperty(String propertyName, String[] values, ApplContext context, CssExpression expression)
 			throws InvalidParamException
 	{
 		this(propertyName, values, context, expression, false);

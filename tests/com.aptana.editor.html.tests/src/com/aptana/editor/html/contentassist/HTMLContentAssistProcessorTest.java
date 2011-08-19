@@ -9,30 +9,41 @@ package com.aptana.editor.html.contentassist;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
+import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.tests.util.AssertUtil;
+import com.aptana.editor.common.tests.util.TestProject;
+import com.aptana.editor.html.BadDocument;
 import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.html.tests.HTMLEditorBasedTests;
+import com.aptana.projects.WebProjectNature;
+import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
-public class HTMLContentAssistProcessorTest extends LocationTestCase
+public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 {
 
 	private static final int ELEMENT_PROPOSALS_COUNT = 133;
@@ -53,6 +64,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		loader.join();
 
 		fProcessor = new HTMLContentAssistProcessor(null);
+
 	}
 
 	@Override
@@ -60,7 +72,21 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	{
 		fProcessor = null;
 		fDocument = null;
+
 		super.tearDown();
+	}
+
+	public void testGetContextInformationValidator()
+	{
+		IContextInformationValidator validator = fProcessor.getContextInformationValidator();
+		assertNotNull(validator);
+		// should be the same object as we are caching them
+		assertEquals(validator, fProcessor.getContextInformationValidator());
+	}
+
+	public void testEmptyDocument()
+	{
+		assertCompletionCorrect("|", '\t', 0, null, StringUtil.EMPTY, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public void testLinkProposal()
@@ -209,6 +235,18 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div>&a|acute;</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testProposalsBadLocation()
+	{
+		String document = "<body>&|";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createBadDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		// offset is outside document size
+		((BadDocument) fDocument).setThrowBadLocation(true);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+	}
+
 	public void testIMGProposal()
 	{
 		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "img", "<img />", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -266,7 +304,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div |>", '\t', 64, "style", "<div style=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// Now test that we have two tabstops. One inside the quotes, one just after
-		LinkedModeModel model = LinkedModeModel.getModel(fDocument, 12);
+		LinkedModeModel model = LinkedModeModel.getModel(document, 12);
 		assertNotNull(model);
 		List list = model.getTabStopSequence();
 		assertNotNull(list);
@@ -286,7 +324,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div |>", '\t', 64, "onmouseenter", "<div onmouseenter=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// Now test that we have two tabstops. One inside the quotes, one just after
-		LinkedModeModel model = LinkedModeModel.getModel(fDocument, 19);
+		LinkedModeModel model = LinkedModeModel.getModel(document, 19);
 		assertNotNull(model);
 		List list = model.getTabStopSequence();
 		assertNotNull(list);
@@ -315,191 +353,73 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	// TODO Add tests for src/href folder/filepath proposals
 	public void testLinkHREFFolderProposal() throws Exception
 	{
-		String document = "<link rel=\"stylesheet\" href=\"|\" />";
-		int offset = HTMLTestUtil.findCursorOffset(document);
-		fDocument = HTMLTestUtil.createDocument(document, true);
-		ITextViewer viewer = createTextViewer(fDocument);
-
-		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testLinkHREFFolderProposal" + System.currentTimeMillis());
-		dir.mkdirs();
-
-		File folder = new File(dir, "folder");
-		folder.mkdirs();
-
-		File underFolder = null;
-		File rootFile = null;
-		try
-		{
-			underFolder = new File(folder, "inside_folder.css");
-			underFolder.createNewFile();
-
-			rootFile = new File(dir, "root.css");
-			rootFile.createNewFile();
-
-			fProcessor = new HTMLContentAssistProcessor(null)
-			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
-
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(2, proposals.length);
-			assertNotNull(findProposal("folder/", proposals));
-			assertNotNull(findProposal("root.css", proposals));
-			assertApplyProposal(viewer, proposals, "folder/", offset);
-			assertEquals("<link rel=\"stylesheet\" href=\"folder/\" />", fDocument.get());
-		}
-		finally
-		{
-			FileUtil.deleteRecursively(dir);
-		}
-	}
-
-	protected void assertApplyProposal(ITextViewer viewer, ICompletionProposal[] proposals, String proposalToSelect,
-			int offset)
-	{
-		ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
-		assertNotNull("Unable to find proposal you wanted to select: " + proposalToSelect, closeProposal);
-		assertTrue("Selected proposal doesn't validate against document",
-				((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) closeProposal).apply(viewer, '\t', SWT.NONE, offset);
+		assertHREFProposal("<link rel=\"stylesheet\" href=\"|\" />", "<link rel=\"stylesheet\" href=\"folder/\" />",
+				"folder/");
 	}
 
 	public void testLinkHREFFileProposal() throws Exception
 	{
-		String document = "<link rel=\"stylesheet\" href=\"|\" />";
-		int offset = HTMLTestUtil.findCursorOffset(document);
-		fDocument = HTMLTestUtil.createDocument(document, true);
-		ITextViewer viewer = createTextViewer(fDocument);
+		assertHREFProposal("<link rel='stylesheet' href='|' />", "<link rel='stylesheet' href='root.css' />",
+				"root.css");
 
-		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testLinkHREFFileProposal" + System.currentTimeMillis());
-		dir.mkdirs();
-
-		File folder = new File(dir, "folder");
-		folder.mkdirs();
-
-		File underFolder = null;
-		File rootFile = null;
-		try
-		{
-			underFolder = new File(folder, "inside_folder.css");
-			underFolder.createNewFile();
-
-			rootFile = new File(dir, "root.css");
-			rootFile.createNewFile();
-
-			fProcessor = new HTMLContentAssistProcessor(null)
-			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
-
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(2, proposals.length);
-			assertNotNull(findProposal("folder/", proposals));
-			assertNotNull(findProposal("root.css", proposals));
-			assertApplyProposal(viewer, proposals, "root.css", offset);
-			assertEquals("<link rel=\"stylesheet\" href=\"root.css\" />", fDocument.get());
-		}
-		finally
-		{
-			FileUtil.deleteRecursively(dir);
-		}
 	}
 
 	public void testLinkHREFFileUnderFolderProposal() throws Exception
 	{
-		String document = "<link rel=\"stylesheet\" href=\"folder/|\" />";
-		int offset = HTMLTestUtil.findCursorOffset(document);
-		fDocument = HTMLTestUtil.createDocument(document, true);
-		ITextViewer viewer = createTextViewer(fDocument);
+		assertHREFProposal("<link rel='stylesheet' href='folder/|' />",
+				"<link rel='stylesheet' href='folder/inside_folder.css' />", "inside_folder.css");
 
-		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testLinkHREFFileUnderFolderProposal" + System.currentTimeMillis());
-		dir.mkdirs();
+	}
 
-		File folder = new File(dir, "folder");
-		folder.mkdirs();
+	public void testLinkHREFFileProposalWithPrefix() throws Exception
+	{
+		assertHREFProposal("<link rel='stylesheet' href='roo|' />", "<link rel='stylesheet' href='root.css' />",
+				"root.css");
 
-		File underFolder = null;
-		File rootFile = null;
-		try
-		{
-			underFolder = new File(folder, "inside_folder.css");
-			underFolder.createNewFile();
+	}
 
-			rootFile = new File(dir, "root.css");
-			rootFile.createNewFile();
+	public void testLinkHREFFolderProposalWithPrefix() throws Exception
+	{
+		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder/' />",
+				"folder/");
 
-			fProcessor = new HTMLContentAssistProcessor(null)
-			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
+	}
 
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(1, proposals.length);
-			assertNotNull(findProposal("inside_folder.css", proposals));
-			assertApplyProposal(viewer, proposals, "inside_folder.css", offset);
-			assertEquals("<link rel=\"stylesheet\" href=\"folder/inside_folder.css\" />", fDocument.get());
-		}
-		finally
-		{
-			FileUtil.deleteRecursively(dir);
-		}
+	public void testLinkHREFFileInsideFolderProposalWithPrefix() throws Exception
+	{
+		assertHREFProposal("<link rel='stylesheet' href='folder/in|' />",
+				"<link rel='stylesheet' href='folder/inside_folder.css' />", "inside_folder.css");
 	}
 
 	public void testApstud2959() throws Exception
 	{
-		String document = "<a href=\"http://|\" />";
+		String document = "<a href='http://|' />";
 		int offset = HTMLTestUtil.findCursorOffset(document);
 		fDocument = HTMLTestUtil.createDocument(document, true);
 		ITextViewer viewer = createTextViewer(fDocument);
 
-		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testApstud2959" + System.currentTimeMillis());
-		dir.mkdirs();
+		TestProject project = new TestProject("Apstud2959", new String[] { WebProjectNature.ID });
+		final IFile file = project.createFile("testApstud2959", "");
+		project.createFolder("email");
 
-		File folder = new File(dir, "email");
-		folder.mkdirs();
-		try
+		fProcessor = new HTMLContentAssistProcessor(null)
 		{
-			fProcessor = new HTMLContentAssistProcessor(null)
+			@Override
+			protected URI getURI()
 			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
+				return file.getRawLocationURI();
+			}
+		};
 
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(0, proposals.length);
-		}
-		finally
-		{
-			FileUtil.deleteRecursively(dir);
-		}
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(0, proposals.length);
+
+		project.delete();
 	}
 
 	public void testRootFileSystemForHREF() throws Exception
 	{
-		String document = "<a href=\"file://|\" />";
+		String document = "<a href='file://|' />";
 		int offset = HTMLTestUtil.findCursorOffset(document);
 		fDocument = HTMLTestUtil.createDocument(document, true);
 		ITextViewer viewer = createTextViewer(fDocument);
@@ -530,142 +450,165 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 	}
 
-	public void testLinkHREFFileProposalWithPrefix() throws Exception
+	public void testRootFileSystemForHREFBadPrefix() throws Exception
 	{
-		String document = "<link rel=\"stylesheet\" href=\"roo|\" />";
+		// Busted scheme
+		String document = "<a href='file:/|' />";
 		int offset = HTMLTestUtil.findCursorOffset(document);
 		fDocument = HTMLTestUtil.createDocument(document, true);
 		ITextViewer viewer = createTextViewer(fDocument);
 
-		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testLinkHREFFileProposalWithPrefix" + System.currentTimeMillis());
-		dir.mkdirs();
-
-		File folder = new File(dir, "folder");
-		folder.mkdirs();
-
-		File underFolder = null;
-		File rootFile = null;
-		try
+		fProcessor = new HTMLContentAssistProcessor(null)
 		{
-			underFolder = new File(folder, "inside_folder.css");
-			underFolder.createNewFile();
-
-			rootFile = new File(dir, "root.css");
-			rootFile.createNewFile();
-
-			fProcessor = new HTMLContentAssistProcessor(null)
+			@Override
+			protected URI getURI()
 			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
+				// Shouldn't be necessary...
+				return new File(System.getProperty("java.io.tmpdir"), "file.html").toURI();
+			}
+		};
 
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(1, proposals.length);
-			assertNotNull(findProposal("root.css", proposals));
-			assertApplyProposal(viewer, proposals, "root.css", offset);
-			assertEquals("<link rel=\"stylesheet\" href=\"root.css\" />", fDocument.get());
-		}
-		finally
-		{
-			FileUtil.deleteRecursively(dir);
-		}
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(0, proposals.length);
+
 	}
 
-	public void testLinkHREFFolderProposalWithPrefix() throws Exception
+	public void testServerHREF() throws Exception
 	{
-		String document = "<link rel=\"stylesheet\" href=\"fo|\" />";
-		int offset = HTMLTestUtil.findCursorOffset(document);
-		fDocument = HTMLTestUtil.createDocument(document, true);
-		ITextViewer viewer = createTextViewer(fDocument);
-
 		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testLinkHREFFolderProposalWithPrefix" + System.currentTimeMillis());
-		dir.mkdirs();
+		TestProject project = createWebProject("href_file_proposal");
+		final IFile file = project.createFile("test.html", "<link rel='stylesheet' href='/|' />");
+		this.setupTestContext(file);
 
-		File folder = new File(dir, "folder");
-		folder.mkdirs();
+		EFSWebServerConfiguration server = new EFSWebServerConfiguration();
+		server.setDocumentRoot(project.getURI());
+		server.setBaseURL(new URL("http://www.test.com/"));
+		WebServerCorePlugin.getDefault().getServerConfigurationManager().addServerConfiguration(server);
 
-		File underFolder = null;
-		File rootFile = null;
-		try
-		{
-			underFolder = new File(folder, "inside_folder.css");
-			underFolder.createNewFile();
+		int offset = this.cursorOffsets.get(0);
+		ITextViewer viewer = AssertUtil.createTextViewer(document);
+		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-			rootFile = new File(dir, "root.css");
-			rootFile.createNewFile();
+		AssertUtil.assertProposalFound("file.html", proposals);
+		AssertUtil.assertProposalFound("root.css", proposals);
+		AssertUtil.assertProposalFound("folder/", proposals);
+		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder/' />", document, "folder/", proposals,
+				offset, new Point(0, 0));
 
-			fProcessor = new HTMLContentAssistProcessor(null)
-			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
+		WebServerCorePlugin.getDefault().getServerConfigurationManager().removeServerConfiguration(server);
+		project.delete();
 
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(1, proposals.length);
-			assertNotNull(findProposal("folder/", proposals));
-			assertApplyProposal(viewer, proposals, "folder/", offset);
-			assertEquals("<link rel=\"stylesheet\" href=\"folder/\" />", fDocument.get());
-		}
-		finally
-		{
-			FileUtil.deleteRecursively(dir);
-		}
 	}
 
-	public void testLinkHREFFileInsideFolderProposalWithPrefix() throws Exception
+	public void testRailsServerHREF() throws Exception
 	{
-		String document = "<link rel=\"stylesheet\" href=\"folder/in|\" />";
+		// Generate some folders/files to use as proposals
+		TestProject project = createWebProject("href_file_proposal");
+		project.createFolder("public");
+		project.createFile("public/railsfile.html", "");
+		final IFile file = project.createFile("test.html", "<link rel='stylesheet' href='/|' />");
+		this.setupTestContext(file);
+
+		int offset = this.cursorOffsets.get(0);
+		ITextViewer viewer = AssertUtil.createTextViewer(document);
+		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
+
+		AssertUtil.assertProposalFound("railsfile.html", proposals);
+		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/railsfile.html' />", document,
+				"railsfile.html", proposals, offset, new Point(0, 0));
+
+		project.delete();
+
+	}
+
+	public void testRootFileSystemForHREFWithFolderPrefix() throws Exception
+	{
+		// Generate some folders/files to use as proposals
+		TestProject project = new TestProject("href_file_proposal", new String[] { WebProjectNature.ID });
+		final IFolder folder = project.createFolder("folder");
+
+		String fileUri = folder.getRawLocationURI().toString();
+		fileUri = fileUri.replace("file:/", "file://");
+		String document = "<link rel='stylesheet' href='" + fileUri + "/|' />";
 		int offset = HTMLTestUtil.findCursorOffset(document);
 		fDocument = HTMLTestUtil.createDocument(document, true);
 		ITextViewer viewer = createTextViewer(fDocument);
 
-		// Generate some folders/files to use as proposals
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		final File dir = new File(tmpDir, "testLinkHREFFileInsideFolderProposalWithPrefix" + System.currentTimeMillis());
-		dir.mkdirs();
+		project.createFile("folder/inside_folder.css", "");
 
-		File folder = new File(dir, "folder");
-		folder.mkdirs();
+		final IFile file = project.createFile("file.html", "");
 
-		File underFolder = null;
-		File rootFile = null;
-		try
+		fProcessor = new HTMLContentAssistProcessor(null)
 		{
-			underFolder = new File(folder, "inside_folder.css");
-			underFolder.createNewFile();
-
-			rootFile = new File(dir, "root.css");
-			rootFile.createNewFile();
-
-			fProcessor = new HTMLContentAssistProcessor(null)
+			@Override
+			protected URI getURI()
 			{
-				@Override
-				protected URI getURI()
-				{
-					return new File(dir, "file.html").toURI();
-				}
-			};
+				return file.getRawLocationURI();
+			}
+		};
 
-			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
-			assertEquals(1, proposals.length);
-			assertNotNull(findProposal("inside_folder.css", proposals));
-			assertApplyProposal(viewer, proposals, "inside_folder.css", offset);
-			assertEquals("<link rel=\"stylesheet\" href=\"folder/inside_folder.css\" />", fDocument.get());
-		}
-		finally
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(1, proposals.length);
+		AssertUtil.assertProposalFound("inside_folder.css", proposals);
+		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='" + fileUri + "/inside_folder.css' />",
+				fDocument, "inside_folder.css", proposals, offset, new Point(0, 0));
+
+		project.delete();
+	}
+
+	public void testRootFileSystemForHREFWithFolderAndFilePrefix() throws Exception
+	{
+		// Generate some folders/files to use as proposals
+		TestProject project = new TestProject("href_file_proposal", new String[] { WebProjectNature.ID });
+		final IFolder folder = project.createFolder("folder");
+
+		String fileUri = folder.getLocationURI().toString();
+		fileUri = fileUri.replace("file:/", "file://");
+		String document = "<link rel='stylesheet' href='" + fileUri + "/inside|' />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		project.createFile("folder/inside_folder.css", "");
+
+		final IFile file = project.createFile("file.html", "");
+
+		fProcessor = new HTMLContentAssistProcessor(null)
 		{
-			FileUtil.deleteRecursively(dir);
-		}
+			@Override
+			protected URI getURI()
+			{
+				return file.getLocationURI();
+			}
+		};
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(1, proposals.length);
+
+		AssertUtil.assertProposalFound("inside_folder.css", proposals);
+		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='" + fileUri + "/inside_folder.css' />",
+				fDocument, "inside_folder.css", proposals, offset, new Point(0, 0));
+
+		project.delete();
+
+	}
+
+	private void assertHREFProposal(String source, String expected, String proposalToChoose) throws Exception
+	{
+		// Generate some folders/files to use as proposals
+		TestProject project = createWebProject("href_file_proposal");
+		final IResource file = project.createFile("test.html", source);
+		IFileStore fileStore = EFS.getStore(file.getRawLocationURI());
+		this.setupTestContext(fileStore);
+
+		int offset = this.cursorOffsets.get(0);
+		ITextViewer viewer = AssertUtil.createTextViewer(document);
+		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
+
+		AssertUtil.assertProposalFound(proposalToChoose, proposals);
+		AssertUtil.assertProposalApplies(expected, document, proposalToChoose, proposals, offset, new Point(0, 0));
+
+		project.delete();
 	}
 
 	public void testAttributeAfterElementName()
@@ -677,7 +620,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertTrue(proposals.length > 0);
-		assertNotNull(findProposal("scroll", proposals));
+		AssertUtil.assertProposalFound("scroll", proposals);
 	}
 
 	public void testAttributeValueProposals()
@@ -689,6 +632,17 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertTrue(proposals.length == 0);
+	}
+
+	public void testAttributeValueProposalsBeforeEquals()
+	{
+		String document = "<li><a clas|s=</li>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
 	}
 
 	public void testRelativeHREFFileProposals() throws Exception
@@ -718,19 +672,68 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertTrue(proposals.length > 0);
-		assertNotNull(findProposal("sibling.html", proposals));
+		AssertUtil.assertProposalFound("sibling.html", proposals);
 	}
 
-	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
+	public void testIsValidAutoActivationLocationElement()
 	{
-		for (ICompletionProposal proposal : proposals)
-		{
-			if (proposal.getDisplayString().equals(string))
-			{
-				return proposal;
-			}
-		}
-		return null;
+
+		// need to close previous editor
+		String source = "<a|>";
+
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
+		this.setupTestContext(fileStore);
+		int offset = this.cursorOffsets.get(0);
+
+		// starting to type an attribute
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, offset));
+		assertTrue(processor.isValidAutoActivationLocation('\t', '\t', document, offset));
+		assertFalse(processor.isValidAutoActivationLocation('b', 'b', document, offset));
+	}
+
+	public void testIsValidAutoActivationLocationAttribute()
+	{
+		String source = "<a |>";
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
+		this.setupTestContext(fileStore);
+		int offset = this.cursorOffsets.get(0);
+
+		// starting to type an attribute
+		assertTrue(processor.isValidAutoActivationLocation('b', 'b', document, offset));
+
+	}
+
+	public void testIsValidAutoActivationLocationAttributeValue()
+	{
+		String source = "<a class=\"|\"|>";
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
+		this.setupTestContext(fileStore);
+		int offset = this.cursorOffsets.get(0);
+
+		// starting to type an attribute value
+		assertTrue(processor.isValidAutoActivationLocation('f', 'f', document, offset));
+	}
+
+	public void testIsValidAutoActivationLocationText()
+	{
+		// need to close previous editor
+		String source = "<a>|";
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
+		this.setupTestContext(fileStore);
+		int offset = this.cursorOffsets.get(0);
+
+		assertFalse(processor.isValidAutoActivationLocation('t', 't', document, offset));
+	}
+
+	public void testIsValidIdentifier()
+	{
+		assertTrue(fProcessor.isValidIdentifier('a', 'a'));
+		assertTrue(fProcessor.isValidIdentifier('z', 'z'));
+		assertTrue(fProcessor.isValidIdentifier('A', 'A'));
+		assertTrue(fProcessor.isValidIdentifier('Z', 'Z'));
+		assertFalse(fProcessor.isValidIdentifier('_', '_'));
+		assertFalse(fProcessor.isValidIdentifier('$', '$'));
+		assertFalse(fProcessor.isValidIdentifier(' ', ' '));
 	}
 
 	protected ITextViewer createTextViewer(IDocument fDocument)
@@ -751,31 +754,21 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(location, l);
 	}
 
-	protected void assertCompletionCorrect(String document, char trigger, int proposalCount, String proposalToSelect,
+	protected void assertCompletionCorrect(String source, char trigger, int proposalCount, String proposalToChoose,
 			String postCompletion, Point point)
 	{
-		int offset = HTMLTestUtil.findCursorOffset(document);
-		fDocument = HTMLTestUtil.createDocument(document, true);
-		ITextViewer viewer = createTextViewer(fDocument);
+		IFileStore fileStore = createFileStore("proposal_tests", "html", source);
+		this.setupTestContext(fileStore);
 
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		int offset = this.cursorOffsets.get(0);
+		ITextViewer viewer = AssertUtil.createTextViewer(document);
+		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, trigger, false);
+
 		assertEquals(proposalCount, proposals.length);
-
-		if (proposalToSelect != null)
+		if (proposalToChoose != null)
 		{
-			ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
-			assertNotNull("Unable to find proposal you wanted to select: " + proposalToSelect, closeProposal);
-			assertTrue("Selected proposal doesn't validate against document",
-					((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
-			((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
-		}
-		assertEquals(postCompletion, fDocument.get());
-
-		if (point != null)
-		{
-			Point p = viewer.getSelectedRange();
-			assertEquals(point.x, p.x);
-			assertEquals(point.y, p.y);
+			AssertUtil.assertProposalFound(proposalToChoose, proposals);
+			AssertUtil.assertProposalApplies(postCompletion, document, proposalToChoose, proposals, offset, point);
 		}
 	}
 }

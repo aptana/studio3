@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.terminal;
 
 import org.eclipse.core.runtime.IStatus;
@@ -35,10 +38,7 @@ public class TerminalPlugin extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -47,10 +47,7 @@ public class TerminalPlugin extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -79,8 +76,7 @@ public class TerminalPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
+	 * Returns an image descriptor for the image file at the given plug-in relative path
 	 * 
 	 * @param path
 	 *            the path

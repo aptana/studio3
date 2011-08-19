@@ -27,7 +27,7 @@ public class FTPPropertyDialogProvider implements IPropertyDialogProvider {
 	public Dialog createPropertyDialog(IShellProvider shellProvider) {
 		IPropertyDialogProvider contributedPropertyDialogProvider = (IPropertyDialogProvider) Platform.getAdapterManager()
 								.loadAdapter(this, IPropertyDialogProvider.class.getName());
-		if (contributedPropertyDialogProvider != null && contributedPropertyDialogProvider != this) {
+		if (contributedPropertyDialogProvider != null && !contributedPropertyDialogProvider.equals(this)) {
 			return contributedPropertyDialogProvider.createPropertyDialog(shellProvider);
 		}
 		return new FTPConnectionPointPropertyDialog(shellProvider.getShell());

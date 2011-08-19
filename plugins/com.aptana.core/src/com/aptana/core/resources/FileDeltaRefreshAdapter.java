@@ -208,7 +208,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -249,7 +249,9 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 	{
 		// If the names are the same, call to fileModified
 		if (oldName != null && newName != null && oldName.equals(newName))
+		{
 			fileModified(wd, rootPath, oldName);
+		}
 		else
 		{
 			if (oldName != null)

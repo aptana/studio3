@@ -75,7 +75,15 @@ public final class FirefoxUtil {
 	 * @return IPath
 	 */
 	public static IPath findDefaultProfileLocation() {
-		String[] locations = (String[]) LOCATIONS.get(Platform.getOS());
+		return findDefaultProfileLocation(LOCATIONS.get(Platform.getOS()));
+	}
+
+	/**
+	 * Find location of user's default(current) Firefox profile.
+	 *
+	 * @return IPath
+	 */
+	protected static IPath findDefaultProfileLocation(String[] locations) {
 		if (locations != null) {
 			for (int i = 0; i < locations.length; ++i) {
 				String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
@@ -155,8 +163,8 @@ public final class FirefoxUtil {
 				for (Entry<String, Map<String, String>> entry : sections.entrySet()) {
 					if (entry.getKey().startsWith("Profile")) { //$NON-NLS-1$
 						Map<String, String> properties = entry.getValue();
-						String path = (String) properties.get("Path"); //$NON-NLS-1$
-						String isRelative = (String) properties.get("IsRelative"); //$NON-NLS-1$
+						String path = properties.get("Path"); //$NON-NLS-1$
+						String isRelative = properties.get("IsRelative"); //$NON-NLS-1$
 						File profile;
 						if (isRelative != null && "1".equals(isRelative)) { //$NON-NLS-1$
 							profile = new File(dir, path);
@@ -172,7 +180,7 @@ public final class FirefoxUtil {
 					}
 				}
 			} catch (IOException e) {
-				IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", profilesIni.getAbsolutePath()), e, null); //$NON-NLS-1$
+				IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", profilesIni.getAbsolutePath()), e); //$NON-NLS-1$
 			} finally {
 				if (r != null) {
 					try {
@@ -249,7 +257,7 @@ public final class FirefoxUtil {
 				}
 			}
 		} catch (Exception e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -276,7 +284,7 @@ public final class FirefoxUtil {
 				out = new FileOutputStream(file);
 				out.write(linkedPath.getBytes());
 			} catch (IOException e) {
-				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CorePlugin.getDefault(), e);
 			} finally {
 				if (out != null) {
 					try {
@@ -319,7 +327,7 @@ public final class FirefoxUtil {
 				out.write(buffer, 0, n);
 			}
 		} catch (IOException e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 			if (file != null) {
 				if (!file.delete()) {
 					file.deleteOnExit();
@@ -344,7 +352,7 @@ public final class FirefoxUtil {
 		try {
 			ZipUtil.extract(file, dir, null);
 		} catch (IOException e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 			return false;
 		} finally {
 			if (!file.delete()) {
@@ -352,6 +360,6 @@ public final class FirefoxUtil {
 			}
 		}
 
-		return true;
+		return dir.list().length > 0;
 	}
 }

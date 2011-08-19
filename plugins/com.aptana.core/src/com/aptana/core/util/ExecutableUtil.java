@@ -9,7 +9,6 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.List;
@@ -93,8 +92,14 @@ public final class ExecutableUtil
 	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter, IPath workingDirectory)
 	{
+		if (executableName == null)
+		{
+			return null;
+		}
+
 		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
 		String[] paths;
+
 		if (env != null && env.containsKey(PATH))
 		{
 			paths = env.get(PATH).split(ShellExecutable.PATH_SEPARATOR);
@@ -154,8 +159,10 @@ public final class ExecutableUtil
 			String[] extensions = System.getenv(PATHEXT).split(File.pathSeparator);
 			for (String ext : extensions)
 			{
-				if (ext.startsWith(".")) //$NON-NLS-1$
+				if (ext.length() > 0 && ext.charAt(0) == '.')
+				{
 					ext = ext.substring(1);
+				}
 				IPath pathWithExt = basename.addFileExtension(ext);
 				if (isExecutable(pathWithExt))
 				{
@@ -192,14 +199,7 @@ public final class ExecutableUtil
 				return (Boolean) m.invoke(file);
 			}
 		}
-		catch (NoSuchMethodException e)
-		{
-			// ignore, only available on Java 6+
-		}
-		catch (IllegalAccessException e)
-		{
-		}
-		catch (InvocationTargetException e)
+		catch (Exception e)
 		{
 		}
 

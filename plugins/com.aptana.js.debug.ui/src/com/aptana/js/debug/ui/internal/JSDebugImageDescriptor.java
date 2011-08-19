@@ -27,7 +27,6 @@ public class JSDebugImageDescriptor extends CompositeImageDescriptor {
 	private Point size;
 
 	/**
-	 * 
 	 * @param baseImage
 	 * @param flags
 	 */
@@ -53,9 +52,12 @@ public class JSDebugImageDescriptor extends CompositeImageDescriptor {
 	}
 
 	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
 		if (object instanceof JSDebugImageDescriptor) {
 			JSDebugImageDescriptor other = (JSDebugImageDescriptor) object;
-			return (getBaseImage().equals(other.getBaseImage()) && getFlags() == other.getFlags());
+			return getBaseImage().equals(other.getBaseImage()) && getFlags() == other.getFlags();
 		}
 		return false;
 	}

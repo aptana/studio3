@@ -20,7 +20,6 @@ import com.aptana.debug.ui.SourceDisplayUtil;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class EditorOpenAdapter implements IEditorOpenAdapter {
 
@@ -36,7 +35,7 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 					try {
 						SourceDisplayUtil.openInEditor(editorInput, -1);
 					} catch (CoreException e) {
-						IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+						IdeLog.logError(DebugUiPlugin.getDefault(), e);
 
 					}
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().forceActive();
@@ -53,7 +52,7 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IEditorOpenAdapter.class) {
+			if (IEditorOpenAdapter.class.equals(adapterType)) {
 				return new EditorOpenAdapter();
 			}
 			return null;

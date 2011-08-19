@@ -34,6 +34,7 @@ import org.eclipse.ui.navigator.CommonDropAdapter;
 import org.eclipse.ui.navigator.resources.ResourceDropAdapterAssistant;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -45,6 +46,8 @@ import com.aptana.ide.ui.io.actions.MoveFilesOperation;
  */
 public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
 
+	private static final IAdaptable[] EMPTY_ADAPTABLE = new IAdaptable[0];
+
     @Override
     public IStatus handleDrop(CommonDropAdapter aDropAdapter, DropTargetEvent aDropTargetEvent,
             Object aTarget) {
@@ -54,7 +57,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
     	} catch (Exception e) {
     		// ignores the exception to allow our customized handler to take over
     	}
-		if (status == Status.OK_STATUS || (status instanceof MultiStatus && ((MultiStatus) status).isOK())) {
+		if (Status.OK_STATUS.equals(status) || (status instanceof MultiStatus && ((MultiStatus) status).isOK())) {
 			return status;
 		}
 
@@ -87,7 +90,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
     @Override
     public IStatus validateDrop(Object target, int operation, TransferData transferType) {
         IStatus status = super.validateDrop(target, operation, transferType);
-        if (status == Status.OK_STATUS) {
+        if (Status.OK_STATUS.equals(status)) {
             return status;
         }
 
@@ -119,7 +122,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         } else if (FileTransfer.getInstance().isSupportedType(transferType)) {
             String[] sourceNames = (String[]) FileTransfer.getInstance().nativeToJava(transferType);
             if (sourceNames == null) {
-                sourceNames = new String[0];
+                sourceNames = ArrayUtil.NO_STRINGS;
             }
 
             String message = CopyFilesOperation.validateDestination(destination, sourceNames);
@@ -203,7 +206,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         return problems;
     }
 
-    private void openError(IStatus status) {
+    private void openError(IStatus status) { // $codepro.audit.disable overridingPrivateMethod
         if (status == null) {
             return;
         }
@@ -239,7 +242,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         if (selection instanceof IStructuredSelection) {
             return getSelectedSourceFiles((IStructuredSelection) selection);
         }
-        return new IAdaptable[0];
+        return EMPTY_ADAPTABLE;
     }
 
     @SuppressWarnings("rawtypes")
@@ -249,10 +252,11 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         Iterator iter = selection.iterator();
         Object object;
         IFileStore fileStore;
+        IAdaptable adaptable;
         while (iter.hasNext()) {
             object = iter.next();
             if (object instanceof IAdaptable) {
-                IAdaptable adaptable = (IAdaptable) object;
+                adaptable = (IAdaptable) object;
                 fileStore = Utils.getFileStore(adaptable);
                 if (fileStore != null) {
                     // valid selection
@@ -293,7 +297,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
             if (sourceFileStore == null) {
                 return false;
             }
-            if (sourceFileStore.getFileSystem() != filesystem) {
+            if (!sourceFileStore.getFileSystem().equals(filesystem)) {
                 return false;
             }
         }

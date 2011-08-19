@@ -69,8 +69,10 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 						.getActiveEditor();
 				if (editorPart != null) {
 					IEditorInput editorInput = editorPart.getEditorInput();
-					IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput.getAdapter(IFileEditorInput.class);
-					IPathEditorInput pathEditorInput = (IPathEditorInput) editorInput.getAdapter(IPathEditorInput.class);
+					IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput
+							.getAdapter(IFileEditorInput.class);
+					IPathEditorInput pathEditorInput = (IPathEditorInput) editorInput
+							.getAdapter(IPathEditorInput.class);
 					if (fileEditorInput != null) {
 						result[0] = fileEditorInput.getFile().getLocation();
 					} else if (pathEditorInput != null) {
@@ -103,7 +105,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 							try {
 								result[0] = ((UniformResourceStorage) storage).getURI().toURL();
 							} catch (MalformedURLException e) {
-								IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+								IdeLog.logError(DebugUiPlugin.getDefault(), e);
 							}
 						}
 					}
@@ -115,14 +117,13 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 
 	/*
 	 * findConnectedResource
-	 * 
 	 * @param resource
 	 * @return IResource
 	 */
 	private IResource findConnectedResource(IResource resource) {
 		IPath location = resource.getLocation();
 		IPath path = findConnectedPath(location);
-		if (path != location) {
+		if (path != location) { // $codepro.audit.disable useEquals
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
 			if (file != null) {
 				return file;
@@ -133,24 +134,18 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 
 	/*
 	 * findConnectedPath
-	 * 
 	 * @param path
 	 * @return IPath
 	 */
 	private IPath findConnectedPath(IPath path) {
-		/* TODO
-		 * String uri = path.toFile().toURI().toString(); // XXX: workaround for
-		 * file:// issue in Profile if (uri.startsWith("file:/") &&
-		 * uri.charAt(6) != '/') { //$NON-NLS-1$ uri = "file://" +
-		 * uri.substring(6); //$NON-NLS-1$ } ProfileManager profileManager =
-		 * UnifiedEditorsPlugin.getDefault().getProfileManager(); Profile
-		 * profile = profileManager.getCurrentProfile(); if
-		 * (profile.containsURI(uri) >= 0) { uri = profile.getURI(); if (uri !=
-		 * null && uri.length() > 0) { try { File osFile = new File(new
-		 * URI(uri).getSchemeSpecificPart()); return new
-		 * Path(osFile.getCanonicalPath()); } catch (URISyntaxException e) {
-		 * DebugUiPlugin.log(e); } catch (IOException e) { DebugUiPlugin.log(e);
-		 * } } }
+		/*
+		 * TODO String uri = path.toFile().toURI().toString(); // XXX: workaround for file:// issue in Profile if
+		 * (uri.startsWith("file:/") && uri.charAt(6) != '/') { //$NON-NLS-1$ uri = "file://" + uri.substring(6);
+		 * //$NON-NLS-1$ } ProfileManager profileManager = UnifiedEditorsPlugin.getDefault().getProfileManager();
+		 * Profile profile = profileManager.getCurrentProfile(); if (profile.containsURI(uri) >= 0) { uri =
+		 * profile.getURI(); if (uri != null && uri.length() > 0) { try { File osFile = new File(new
+		 * URI(uri).getSchemeSpecificPart()); return new Path(osFile.getCanonicalPath()); } catch (URISyntaxException e)
+		 * { DebugUiPlugin.log(e); } catch (IOException e) { DebugUiPlugin.log(e); } } }
 		 */
 		return path;
 	}
@@ -162,7 +157,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IActiveResourcePathGetterAdapter.class) {
+			if (IActiveResourcePathGetterAdapter.class.equals(adapterType)) {
 				return new ActiveResourcePathGetterAdapter();
 			}
 			return null;

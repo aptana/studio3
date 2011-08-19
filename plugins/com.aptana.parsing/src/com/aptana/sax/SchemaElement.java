@@ -212,7 +212,7 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public boolean hasAttribute(String name)
 	{
-		return (this._attributes.containsKey(name));
+		return this._attributes.containsKey(name);
 	}
 
 	/*
@@ -221,7 +221,7 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public boolean hasOnEnterMethod()
 	{
-		return (this._onEnter != null);
+		return this._onEnter != null;
 	}
 
 	/*
@@ -230,7 +230,7 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public boolean hasOnExitMethod()
 	{
-		return (this._onExit != null);
+		return this._onExit != null;
 	}
 
 	/*
@@ -248,7 +248,7 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public boolean hasTransitions()
 	{
-		return (this._transitions.size() > 0);
+		return this._transitions.size() > 0;
 	}
 
 	/*
@@ -311,7 +311,7 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public boolean isValidAttribute(String name)
 	{
-		return (this._attributes.containsKey(name));
+		return this._attributes.containsKey(name);
 	}
 
 	/*
@@ -432,15 +432,17 @@ public class SchemaElement implements ISchemaElement
 		// save attributes for possible error messaging
 		if (attributes.getLength() > 0)
 		{
-			this._instanceAttributes = ""; //$NON-NLS-1$
+			StringBuilder buffer = new StringBuilder();
 
 			for (int i = 0; i < attributes.getLength(); i++)
 			{
 				String key = attributes.getLocalName(i);
 				String value = attributes.getValue(i);
 
-				this._instanceAttributes += " " + key + "=\"" + value + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				buffer.append(' ').append(key).append("=\"").append(value).append('"'); //$NON-NLS-1$
 			}
+
+			this._instanceAttributes = buffer.toString();
 		}
 
 		// make sure all required attributes are in the list
@@ -453,7 +455,7 @@ public class SchemaElement implements ISchemaElement
 			{
 				SourcePrinter writer = new SourcePrinter();
 
-				writer.print("<").print(this._name).print("> requires a '").print(name).println("' attribute"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				writer.print('<').print(this._name).print("> requires a '").print(name).println("' attribute"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				this.getOwningSchema().buildErrorMessage(writer, this._name, attributes);
 
 				throw new SAXException(writer.toString());
@@ -465,7 +467,7 @@ public class SchemaElement implements ISchemaElement
 		{
 			String name = attributes.getLocalName(i);
 
-			if (this._attributes.containsKey(name) == false)
+			if (!this._attributes.containsKey(name))
 			{
 				String message = MessageFormat.format(Messages.SchemaElement_Invalid_attribute_on_tag, new Object[] {
 						name, this._name });

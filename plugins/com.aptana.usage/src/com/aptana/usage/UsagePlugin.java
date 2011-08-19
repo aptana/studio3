@@ -7,10 +7,8 @@
  */
 package com.aptana.usage;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -67,21 +65,6 @@ public class UsagePlugin extends Plugin
 	public static UsagePlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void logError(String message, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
-	}
-
-	public static void logInfo(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
-	}
-
-	public static void logWarning(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
 	}
 
 	/**

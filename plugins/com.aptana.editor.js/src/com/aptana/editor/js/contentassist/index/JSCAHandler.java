@@ -472,7 +472,7 @@ public class JSCAHandler implements IContextHandler
 				}
 				else
 				{
-					IdeLog.logError(JSPlugin.getDefault(), Messages.JSCAHandler_Invalid_Type_Name + type,(Throwable) null);
+					IdeLog.logError(JSPlugin.getDefault(), Messages.JSCAHandler_Invalid_Type_Name + type);
 				}
 			}
 		}
@@ -583,11 +583,11 @@ public class JSCAHandler implements IContextHandler
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			System.out.println(message);
+			System.out.println(message); // $codepro.audit.disable debuggingCode
 		}
 		else
 		{
-			IdeLog.logError(JSPlugin.getDefault(), message, (Throwable) null);
+			IdeLog.logError(JSPlugin.getDefault(), message);
 		}
 	}
 
@@ -620,7 +620,7 @@ public class JSCAHandler implements IContextHandler
 					this._currentSince.setName(this._currentString);
 				}
 				else if (this._currentExample != null)
-				{
+				{ // $codepro.audit.disable emptyIfStatement
 					// TODO: add ExampleElement to support for name+code
 				}
 				else if (this._currentEventProperty != null)
@@ -946,7 +946,7 @@ public class JSCAHandler implements IContextHandler
 				String pName = parts[i];
 
 				// update accumulated type name
-				accumulatedName += "." + pName; //$NON-NLS-1$
+				accumulatedName += "." + pName; //$NON-NLS-1$ // $codepro.audit.disable stringConcatenationInLoop
 
 				// try to grab the property off of the current type
 				PropertyElement property = type.getProperty(pName);

@@ -19,6 +19,7 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
 
@@ -31,6 +32,8 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	public final static String END_SWITCH_TAG = "__common_end_switch_tag"; //$NON-NLS-1$
 
 	public final static String[] SWITCHING_CONTENT_TYPES = new String[] { START_SWITCH_TAG, END_SWITCH_TAG };
+
+	private final boolean traceEnabled = IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PARTITIONER);
 
 	private ISubPartitionScanner defaultPartitionScanner;
 	private ISubPartitionScanner primaryPartitionScanner;
@@ -84,7 +87,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	 */
 	@Override
 	public void setPredicateRules(IPredicateRule[] rules) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("unsupported method"); //$NON-NLS-1$
 	}
 
 	/*
@@ -102,7 +105,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		resetRules(defaultPartitionScanner.getRules());
 		resetRules(primaryPartitionScanner.getRules());
 		currentPartitionScanner = defaultPartitionScanner;
-		currentPartitionScanner.setLastToken(contentType != null ? new Token(contentType) : null);
+		currentPartitionScanner.setLastToken(new Token(contentType));
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
 			TypedPosition partition = partitioner.findClosestPosition(offset);
 			if (partition != null) {
@@ -182,7 +185,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (defaultTokenState != null && defaultTokenState.hasToken()) {
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null)) {
+			if (traceEnabled) {
 				trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
 			}
 			return token;
@@ -317,7 +320,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				defaultTokenState = null;
 			}
 		}
-		if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), null)) {
+		if (traceEnabled) {
 			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
 		}
 		return token;

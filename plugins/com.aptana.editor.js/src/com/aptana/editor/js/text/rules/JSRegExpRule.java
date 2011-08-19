@@ -1,3 +1,4 @@
+// $codepro.audit.disable platformSpecificLineSeparator
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -72,7 +73,7 @@ public class JSRegExpRule implements IPredicateRule
 
 							case '/':
 								// We allow stray slashes inside of character classes
-								if (inCharacterClass == false)
+								if (!inCharacterClass)
 								{
 									if (unreadCount > 1)
 									{
@@ -135,7 +136,7 @@ public class JSRegExpRule implements IPredicateRule
 		// we always read at least one character too many, so push that back
 		scanner.unread();
 
-		if (state == State.OPTIONS && this.token != null && this.token.isUndefined() == false)
+		if (state == State.OPTIONS && this.token != null && !this.token.isUndefined())
 		{
 			return this.token;
 		}

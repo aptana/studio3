@@ -29,13 +29,13 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ExampleTag;
 import com.aptana.editor.js.sdoc.model.ParamTag;
@@ -231,7 +231,7 @@ public class JSTypeUtil
 				}
 
 				// chop off the signature to continue processing the type
-				typeName = typeName.substring(0, delimiter);
+				typeName = typeName.substring(0, delimiter); // $codepro.audit.disable questionableAssignment
 			}
 
 			function.addType(typeName);
@@ -396,26 +396,26 @@ public class JSTypeUtil
 			{
 				switch (current.getNodeType())
 				{
-					case JSNodeTypes.IDENTIFIER:
+					case IJSNodeTypes.IDENTIFIER:
 						parts.add(current.getText());
 						break;
 
-					case JSNodeTypes.FUNCTION:
+					case IJSNodeTypes.FUNCTION:
 						JSFunctionNode function = (JSFunctionNode) current;
 						IParseNode functionName = function.getName();
 
-						if (functionName.isEmpty() == false)
+						if (!functionName.isEmpty())
 						{
 							parts.add(functionName.getText());
 						}
 						break;
 
-					case JSNodeTypes.NAME_VALUE_PAIR:
+					case IJSNodeTypes.NAME_VALUE_PAIR:
 						JSNameValuePairNode entry = (JSNameValuePairNode) current;
 						IParseNode entryName = entry.getName();
 						String name = entryName.getText();
 
-						if (entryName.getNodeType() == JSNodeTypes.STRING)
+						if (entryName.getNodeType() == IJSNodeTypes.STRING)
 						{
 							name = name.substring(1, name.length() - 1);
 						}
@@ -423,14 +423,14 @@ public class JSTypeUtil
 						parts.add(name);
 						break;
 
-					case JSNodeTypes.DECLARATION:
+					case IJSNodeTypes.DECLARATION:
 						JSDeclarationNode declaration = (JSDeclarationNode) current;
 						IParseNode declarationName = declaration.getIdentifier();
 
 						parts.add(declarationName.getText());
 						break;
 
-					case JSNodeTypes.ASSIGN:
+					case IJSNodeTypes.ASSIGN:
 						JSAssignmentNode assignment = (JSAssignmentNode) current;
 						IParseNode lhs = assignment.getLeftHandSide();
 
@@ -519,7 +519,7 @@ public class JSTypeUtil
 	{
 		String result = type;
 
-		if (isFunctionPrefix(type) == false)
+		if (!isFunctionPrefix(type))
 		{
 			result = JSTypeConstants.GENERIC_FUNCTION_OPEN + type + JSTypeConstants.GENERIC_CLOSE;
 		}

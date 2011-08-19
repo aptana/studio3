@@ -296,7 +296,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
 	}
 
-	protected List<TaskTag> createTaskTags(String rawTagNames, String rawTagPriorities)
+	private List<TaskTag> createTaskTags(String rawTagNames, String rawTagPriorities)
 	{
 		List<TaskTag> tags = new ArrayList<TaskTag>();
 		String[] tagNames = rawTagNames.split(DELIMITER);

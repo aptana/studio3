@@ -25,6 +25,7 @@ import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessorDelegate;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -56,8 +57,9 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 		clearErrorAttributes();
 		if (attributes == null || !(attributes instanceof Object[]))
 		{
-			applyErrorAttributes(Messages.SystemConfigurationProcessor_missingConfigurationItems);
-			PortalUIPlugin.logError(new Exception(Messages.SystemConfigurationProcessor_missingConfigurationItems));
+			String message = Messages.SystemConfigurationProcessor_missingConfigurationItems;
+			applyErrorAttributes(message);
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			return configurationStatus;
 		}
 		// Place the array values into a hash.
@@ -68,9 +70,9 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 			Object[] def = null;
 			if (!(itemDef instanceof Object[]) || (def = (Object[]) itemDef).length != 3)
 			{
-				applyErrorAttributes(Messages.SystemConfigurationProcessor_wrongConfigurationAttributesStructure);
-				PortalUIPlugin.logError(new Exception(
-						Messages.SystemConfigurationProcessor_wrongConfigurationAttributesStructure));
+				String message = Messages.SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
+				applyErrorAttributes(message);
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 				return configurationStatus;
 			}
 			// We only use the first two arguments. The third is the installation site URL.

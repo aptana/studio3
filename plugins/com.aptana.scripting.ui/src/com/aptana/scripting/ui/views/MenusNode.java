@@ -8,7 +8,9 @@
 package com.aptana.scripting.ui.views;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
@@ -16,17 +18,45 @@ import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class MenusNode extends BaseNode
+class MenusNode extends BaseNode<MenusNode.Property>
 {
+	enum Property implements IPropertyInformation<MenusNode>
+	{
+		COUNT(Messages.MenusNode_Menus_Count)
+		{
+			public Object getPropertyValue(MenusNode node)
+			{
+				return node.menus.length;
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+
+		public Object getPropertyValue(MenusNode node)
+		{
+			return null;
+		}
+	}
+
 	private static final Image MENUS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	private MenuNode[] _menus;
+	private MenuNode[] menus;
 
 	/**
 	 * CommandsNode
 	 * 
 	 * @param bundle
 	 */
-	public MenusNode(BundleElement bundle)
+	MenusNode(BundleElement bundle)
 	{
 		this(bundle.getMenus());
 	}
@@ -36,22 +66,22 @@ class MenusNode extends BaseNode
 	 * 
 	 * @param elements
 	 */
-	public MenusNode(List<MenuElement> elements)
+	MenusNode(List<MenuElement> elements)
 	{
 		if (elements != null)
 		{
 			Collections.sort(elements);
 
-			this._menus = new MenuNode[elements.size()];
+			menus = new MenuNode[elements.size()];
 
 			for (int i = 0; i < elements.size(); i++)
 			{
-				this._menus[i] = new MenuNode(elements.get(i));
+				menus[i] = new MenuNode(elements.get(i));
 			}
 		}
 		else
 		{
-			this._menus = new MenuNode[0];
+			menus = new MenuNode[0]; // $codepro.audit.disable reusableImmutables
 		}
 	}
 
@@ -61,7 +91,7 @@ class MenusNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		return this._menus;
+		return menus;
 	}
 
 	/*
@@ -71,6 +101,16 @@ class MenusNode extends BaseNode
 	public Image getImage()
 	{
 		return MENUS_ICON;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/*
@@ -89,6 +129,6 @@ class MenusNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._menus.length > 0;
+		return menus.length > 0;
 	}
 }

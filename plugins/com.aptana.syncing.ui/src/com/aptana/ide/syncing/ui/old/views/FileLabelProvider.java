@@ -8,6 +8,7 @@
 package com.aptana.ide.syncing.ui.old.views;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -22,7 +23,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
 public class FileLabelProvider extends LabelProvider
 {
 
-	private HashMap<IEditorDescriptor, Image> images = new HashMap<IEditorDescriptor, Image>();
+	private Map<IEditorDescriptor, Image> images = new HashMap<IEditorDescriptor, Image>();
 
 	/**
 	 * @see org.eclipse.jface.viewers.LabelProvider#dispose()

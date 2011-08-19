@@ -8,14 +8,13 @@
 package com.aptana.theme;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.plist.PListParserFactory;
 import com.aptana.theme.internal.OrderedProperties;
 
@@ -48,9 +47,8 @@ public class TextmateImporter
 	 * 
 	 * @param file
 	 * @return
-	 * @throws FileNotFoundException
 	 */
-	public Theme convert(File file) throws FileNotFoundException
+	public Theme convert(File file)
 	{
 		try
 		{
@@ -58,7 +56,7 @@ public class TextmateImporter
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -139,25 +137,5 @@ public class TextmateImporter
 	private static Map<String, Object> parse(File file) throws IOException
 	{
 		return PListParserFactory.parse(file);
-	}
-
-	public static void main(String[] args)
-	{
-		File input = new File(args[0]);
-		try
-		{
-			Properties p = TextmateImporter.convertToProperties(input);
-			p.store(new FileOutputStream(new File(args[1])), ""); //$NON-NLS-1$
-		}
-		catch (FileNotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }

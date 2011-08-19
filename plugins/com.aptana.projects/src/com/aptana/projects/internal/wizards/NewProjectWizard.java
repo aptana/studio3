@@ -76,6 +76,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.build.UnifiedBuilder;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
@@ -568,7 +569,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								}
 								else
 								{
-									ProjectsPlugin.logError(Messages.NewProjectWizard_ZipFailure, re);
+									IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ZipFailure,
+											re);
 								}
 							}
 						}
@@ -601,7 +603,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								}
 								catch (Exception e)
 								{
-									ProjectsPlugin.logError(
+									IdeLog.logError(ProjectsPlugin.getDefault(),
 											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 								}
 							}
@@ -615,11 +617,12 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			}
 			catch (CoreException e)
 			{
-				ProjectsPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(ProjectsPlugin.getDefault(), e);
 			}
 			catch (Exception e)
 			{
-				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
+				IdeLog.logError(ProjectsPlugin.getDefault(),
+						MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 			}
 			finally
 			{
@@ -671,7 +674,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			}
 			catch (Exception e)
 			{
-				ProjectsPlugin.logError(
+				IdeLog.logError(ProjectsPlugin.getDefault(),
 						"Error applying a template. Trying to write the file as is, without template evaluation.", e); //$NON-NLS-1$
 			}
 		}
@@ -818,7 +821,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				}
 				catch (ExecutionException e)
 				{
-					ProjectsPlugin.logError(Messages.NewProjectWizard_ERR_FailToDisconnect, e);
+					IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ERR_FailToDisconnect, e);
 				}
 			}
 		});
@@ -839,7 +842,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				}
 				catch (PartInitException e)
 				{
-					ProjectsPlugin.logError(Messages.NewProjectWizard_ERR_OpeningIndex, e);
+					IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ERR_OpeningIndex, e);
 				}
 			}
 		}

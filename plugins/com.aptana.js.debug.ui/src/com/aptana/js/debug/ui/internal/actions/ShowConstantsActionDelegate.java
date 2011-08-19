@@ -21,6 +21,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -42,7 +43,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		ViewerFilter[] filters = viewer.getFilters();
 		ViewerFilter filter = null;
 		for (ViewerFilter f : filters) {
-			if (f == this) {
+			if (this.equals(f)) {
 				filter = f;
 				break;
 			}
@@ -69,7 +70,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 
 	/*
 	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.swt.widgets.Event)
+	 * org.eclipse.swt.widgets.Event)
 	 */
 	public void runWithEvent(IAction action, Event event) {
 		run(action);
@@ -85,21 +86,21 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		getStructuredViewer().refresh();
 	}
 
 	/*
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.jface.viewers.ISelection)
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
 	/*
-	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
-	 *      java.lang.Object, java.lang.Object)
+	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 * java.lang.Object)
 	 */
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		if (element instanceof IJSVariable) {
@@ -108,7 +109,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 					return !((IJSVariable) element).isConst();
 				}
 			} catch (DebugException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 		return true;
@@ -120,7 +121,6 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 
 	/*
 	 * getPreferenceValue
-	 * 
 	 * @param part
 	 * @return boolean
 	 */
@@ -134,7 +134,6 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 
 	/*
 	 * getStructuredViewer
-	 * 
 	 * @return StructuredViewer
 	 */
 	protected StructuredViewer getStructuredViewer() {
@@ -150,7 +149,6 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 
 	/*
 	 * Returns whether this action is seleted/checked.
-	 * 
 	 * @return whether this action is seleted/checked
 	 */
 	protected boolean getValue() {
@@ -159,7 +157,6 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 
 	/*
 	 * getPreferenceKey
-	 * 
 	 * @return String
 	 */
 	protected String getPreferenceKey() {

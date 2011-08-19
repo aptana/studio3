@@ -37,7 +37,7 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 		}
 		catch (MalformedURLException e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 		}
 		catch (PartInitException e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 
 		return null;

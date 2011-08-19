@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.parsing.ast.IParseNode;
@@ -43,9 +43,9 @@ public class FormatterJSObjectNode extends FormatterJSBlockNode
 		IParseNode parent = node.getParent();
 		switch (parent.getNodeType())
 		{
-			case JSNodeTypes.ELEMENTS:
+			case IJSNodeTypes.ELEMENTS:
 				return 0;
-			case JSNodeTypes.ARGUMENTS:
+			case IJSNodeTypes.ARGUMENTS:
 				// Only if it's the first argument, return 0
 				if (parent.getChildIndex(node) == 0)
 				{

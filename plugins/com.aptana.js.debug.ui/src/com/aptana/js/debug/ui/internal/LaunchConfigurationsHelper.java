@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import java.util.Iterator;
@@ -40,6 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
@@ -49,14 +53,13 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * @author Max Stepanov
- * 
  */
 @SuppressWarnings("restriction")
 public final class LaunchConfigurationsHelper {
 
 	private LaunchConfigurationsHelper() {
 	}
-	
+
 	public static void doCheckDefaultLaunchConfigurations() {
 		UIJob job = new UIJob("Checking default launch configuration") { //$NON-NLS-1$
 
@@ -72,7 +75,6 @@ public final class LaunchConfigurationsHelper {
 		job.setSystem(true);
 		job.schedule();
 	}
-
 
 	private void checkDefaultLaunchConfiguration() {
 		Stack<ILaunchConfiguration> defaultConfigurations = new Stack<ILaunchConfiguration>();
@@ -232,7 +234,7 @@ public final class LaunchConfigurationsHelper {
 			}
 			return wc.doSave();
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -265,26 +267,25 @@ public final class LaunchConfigurationsHelper {
 
 				int returnCode = md.open();
 				switch (returnCode) {
-				case IDialogConstants.INTERNAL_ID:
-					FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-							.getShell(), SWT.OPEN);
-					if (Platform.OS_WIN32.equals(Platform.getOS())) {
-						fileDialog.setFilterExtensions(new String[] { "*.exe" }); //$NON-NLS-1$
-						fileDialog.setFilterNames(new String[] { Messages.Startup_ExecutableFiles });
-					}
-					path[0] = fileDialog.open();
-					break;
-				case IDialogConstants.INTERNAL_ID + 1:
-					if (download) {
-						WorkbenchBrowserUtil.launchExternalBrowser("http://www.getfirefox.com"); //$NON-NLS-1$
-					}
-					path[0] = StringUtil.EMPTY;
-					break;
-				default:
+					case IDialogConstants.INTERNAL_ID:
+						FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+								.getShell(), SWT.OPEN);
+						if (Platform.OS_WIN32.equals(Platform.getOS())) {
+							fileDialog.setFilterExtensions(new String[] { "*.exe" }); //$NON-NLS-1$
+							fileDialog.setFilterNames(new String[] { Messages.Startup_ExecutableFiles });
+						}
+						path[0] = fileDialog.open();
+						break;
+					case IDialogConstants.INTERNAL_ID + 1:
+						if (download) {
+							WorkbenchBrowserUtil.launchExternalBrowser("http://www.getfirefox.com"); //$NON-NLS-1$
+						}
+						path[0] = StringUtil.EMPTY;
+						break;
+					default:
 				}
 			}
 		});
 		return path[0];
 	}
-
 }

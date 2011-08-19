@@ -10,18 +10,18 @@ package com.aptana.editor.js.tests;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.EditorBasedTests;
+import com.aptana.editor.common.EditorContentAssistBasedTests;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
 /**
  * @author klindsey
  */
-public class JSEditorBasedTests extends EditorBasedTests<JSContentAssistProcessor>
+public class JSEditorBasedTests extends EditorContentAssistBasedTests<JSContentAssistProcessor>
 {
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#createContentAssistProcessor(com.aptana.editor.common.
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#createContentAssistProcessor(com.aptana.editor.common.
 	 * AbstractThemeableEditor)
 	 */
 	@Override
@@ -32,7 +32,7 @@ public class JSEditorBasedTests extends EditorBasedTests<JSContentAssistProcesso
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#getBundle()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getBundle()
 	 */
 	@Override
 	protected Bundle getBundle()
@@ -42,7 +42,7 @@ public class JSEditorBasedTests extends EditorBasedTests<JSContentAssistProcesso
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#getPluginId()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getPluginId()
 	 */
 	@Override
 	protected String getPluginId()

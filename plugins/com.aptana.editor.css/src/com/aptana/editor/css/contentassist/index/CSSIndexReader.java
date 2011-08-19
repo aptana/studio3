@@ -75,7 +75,7 @@ public class CSSIndexReader extends IndexReader
 	@Override
 	protected String getDelimiter()
 	{
-		return CSSIndexConstants.DELIMITER;
+		return ICSSIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> items = index.query( //
-					new String[] { CSSIndexConstants.ELEMENT }, //
+					new String[] { ICSSIndexConstants.ELEMENT }, //
 					"*", //$NON-NLS-1$
 					SearchPattern.PATTERN_MATCH //
 					);
@@ -118,8 +118,8 @@ public class CSSIndexReader extends IndexReader
 			for (String name : names)
 			{
 				List<QueryResult> elements = index.query( //
-						new String[] { CSSIndexConstants.ELEMENT }, //
-						name + CSSIndexConstants.DELIMITER, //
+						new String[] { ICSSIndexConstants.ELEMENT }, //
+						name + ICSSIndexConstants.DELIMITER, //
 						SearchPattern.PREFIX_MATCH //
 						);
 
@@ -150,7 +150,7 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> properties = index.query( //
-					new String[] { CSSIndexConstants.PROPERTY }, //
+					new String[] { ICSSIndexConstants.PROPERTY }, //
 					"*", //$NON-NLS-1$
 					SearchPattern.PATTERN_MATCH //
 					);
@@ -184,8 +184,8 @@ public class CSSIndexReader extends IndexReader
 			for (String name : names)
 			{
 				List<QueryResult> properties = index.query( //
-						new String[] { CSSIndexConstants.PROPERTY }, //
-						name + CSSIndexConstants.DELIMITER, //
+						new String[] { ICSSIndexConstants.PROPERTY }, //
+						name + ICSSIndexConstants.DELIMITER, //
 						SearchPattern.PREFIX_MATCH //
 						);
 
@@ -216,7 +216,7 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> pseudoClasses = index.query( //
-					new String[] { CSSIndexConstants.PSUEDO_CLASS }, //
+					new String[] { ICSSIndexConstants.PSUEDO_CLASS }, //
 					"*", //$NON-NLS-1$
 					SearchPattern.PATTERN_MATCH //
 					);
@@ -247,7 +247,7 @@ public class CSSIndexReader extends IndexReader
 		if (index != null)
 		{
 			List<QueryResult> pseudoElements = index.query( //
-					new String[] { CSSIndexConstants.PSUEDO_ELEMENT }, //
+					new String[] { ICSSIndexConstants.PSUEDO_ELEMENT }, //
 					"*", //$NON-NLS-1$
 					SearchPattern.PATTERN_MATCH //
 					);
@@ -271,7 +271,7 @@ public class CSSIndexReader extends IndexReader
 	@Override
 	protected String getSubDelimiter()
 	{
-		return CSSIndexConstants.SUB_DELIMITER;
+		return ICSSIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class CSSIndexReader extends IndexReader
 	{
 		Map<String, String> result = null;
 
-		if (index != null && StringUtil.isEmpty(category) == false)
+		if (index != null && !StringUtil.isEmpty(category))
 		{
 			String pattern = "*"; //$NON-NLS-1$
 			List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);

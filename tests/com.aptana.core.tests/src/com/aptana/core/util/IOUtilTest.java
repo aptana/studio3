@@ -8,19 +8,33 @@
 package com.aptana.core.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 
-import com.aptana.core.util.IOUtil;
-
 public class IOUtilTest extends TestCase
 {
+	private static final String BUNDLE_ID = "com.aptana.core.tests";
+	private static final String RESOURCE_DIR = "resources";
+	private static final String TEST_DIR = "copyTest";
+
+	private static final String tempDir = System.getProperty("java.io.tmpdir");
 
 	private Mockery context = new Mockery()
 	{
@@ -85,5 +99,255 @@ public class IOUtilTest extends TestCase
 		String multilineString = "line one\r\nline two\r\nline three\r\n";
 		InputStream stream = new ByteArrayInputStream(multilineString.getBytes("UTF-8"));
 		assertEquals("line one\r\nline two\r\nline three\r\n", IOUtil.read(stream, "UTF-8"));
+	}
+
+	public void testCopyDirectory() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+		File source = new File(resourceFolder, TEST_DIR);
+		File dest = new File(tempDir, "tempdir");
+
+		try
+		{
+			IOUtil.copyDirectory(source, dest);
+			assertTrue(compareDirectory(source, dest));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dest);
+		}
+	}
+
+	public void testCopyDirectorytoFile() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+		File source = new File(resourceFolder, TEST_DIR);
+		File dest = new File(resourceFolder, "test.js");
+
+		IOUtil.copyDirectory(source, dest);
+		assertFalse(compareDirectory(source, dest));
+	}
+
+	public void testCopyFromNonReadableDirectory() throws Exception
+	{
+		// We can use source.setReadable(false) when we decide to use java 1.6
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+			File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+			File source = new File(resourceFolder, TEST_DIR);
+			File dest = new File(tempDir, "tempdir");
+
+			try
+			{
+				Runtime.getRuntime().exec(new String[] { "chmod", "333", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
+				IOUtil.copyDirectory(source, dest);
+				assertFalse(compareDirectory(source, dest));
+			}
+			finally
+			{
+				FileUtil.deleteRecursively(dest);
+				Runtime.getRuntime().exec(new String[] { "chmod", "755", source.getAbsolutePath() }).waitFor(); //$NON-NLS-1$
+			}
+
+		}
+	}
+
+	public void testCopyToNotWriteableExistingDirectory() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+		File source = new File(resourceFolder, TEST_DIR);
+		File dest = new File(tempDir, "testdir");
+
+		try
+		{
+			dest.mkdir();
+			dest.setReadOnly();
+			IOUtil.copyDirectory(source, dest);
+			assertFalse(compareDirectory(source, dest));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dest);
+		}
+	}
+
+	public void testCopyToNotWritableDirectory() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+		File source = new File(resourceFolder, TEST_DIR);
+		File dest = new File(tempDir, "testdir");
+
+		try
+		{
+			dest.mkdir();
+			dest.setReadOnly();
+			IOUtil.copyDirectory(source, new File(dest, "testdir2"));
+			assertFalse(compareDirectory(source, dest));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dest);
+		}
+	}
+
+	public void testExtractFile() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+		File dest = new File(tempDir, "testfile.txt");
+		File sourceFile = new File(resourceFolder, "test.js");
+		IPath sourcePath = new Path("resources/test.js");
+
+		try
+		{
+			IOUtil.extractFile(BUNDLE_ID, sourcePath, dest);
+			assertTrue(compareFiles(sourceFile, dest));
+		}
+		finally
+		{
+			dest.delete();
+		}
+	}
+
+	public void testExtractFileWithInvalidPath() throws IOException
+	{
+		File dest = new File(tempDir, "testfile");
+		IPath source = new Path("invalid_file");
+
+		IOUtil.extractFile(BUNDLE_ID, source, dest);
+		assertFalse(dest.exists());
+	}
+
+	public void testWrite() throws IOException
+	{
+		File dest = new File(tempDir, "test.txt");
+		dest.createNewFile();
+		String text = "This is a text for texting IOUtil.write()";
+		OutputStream output = new FileOutputStream(dest);
+		InputStream input = new FileInputStream(dest);
+		try
+		{
+
+			IOUtil.write(output, text);
+			assertTrue(IOUtil.read(input).equals(text));
+		}
+		finally
+		{
+			input.close();
+			output.close();
+			dest.delete();
+		}
+	}
+
+	public void testWriteWithNullText() throws IOException
+	{
+		File dest = new File(tempDir, "test.txt");
+		dest.createNewFile();
+
+		OutputStream output = new FileOutputStream(dest);
+		InputStream input = new FileInputStream(dest);
+
+		try
+		{
+			IOUtil.write(output, null);
+			assertTrue(IOUtil.read(input).equals(StringUtil.EMPTY));
+		}
+		finally
+		{
+			input.close();
+			output.close();
+			dest.delete();
+		}
+	}
+
+	public void testPipe() throws IOException
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		File resourceFolder = ResourceUtil.resourcePathToFile(resourceURL);
+
+		File source = new File(resourceFolder, "test.js");
+		File dest = new File(tempDir, "test.txt");
+
+		InputStream input = new FileInputStream(source);
+		OutputStream output = new FileOutputStream(dest);
+
+		try
+		{
+			IOUtil.pipe(input, output);
+
+			assertTrue(compareFiles(source, dest));
+		}
+		finally
+		{
+			input.close();
+			output.close();
+			dest.delete();
+		}
+	}
+
+	private boolean compareDirectory(File directory1, File directory2)
+	{
+		if (!directory1.isDirectory() || !directory2.isDirectory())
+		{
+			return false;
+		}
+
+		List<String> fileNames = Arrays.asList(directory2.list());
+
+		List<File> fileList1 = Arrays.asList(directory1.listFiles());
+		List<File> fileList2 = Arrays.asList(directory2.listFiles());
+
+		if (fileList1.size() != fileList2.size())
+		{
+			return false;
+		}
+
+		for (File file : fileList1)
+		{
+			if (!fileNames.contains(file.getName()))
+			{
+				return false;
+			}
+
+			File file2 = fileList2.get(fileNames.indexOf(file.getName()));
+
+			if (file.isDirectory())
+			{
+				if (!compareDirectory(file, file2))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				try
+				{
+					if (!compareFiles(file, file2))
+					{
+						return false;
+					}
+				}
+				catch (FileNotFoundException e)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean compareFiles(File file1, File file2) throws FileNotFoundException
+	{
+		return file1.length() == file2.length();
 	}
 }

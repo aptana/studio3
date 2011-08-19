@@ -53,7 +53,7 @@ public class ArrayType extends Type
 	{
 		writer.print(JSTypeConstants.ARRAY_TYPE);
 
-		if (this._memberType != Type.OBJECT_TYPE)
+		if (this._memberType != Type.OBJECT_TYPE) // $codepro.audit.disable useEquals
 		{
 			writer.print(JSTypeConstants.GENERIC_OPEN);
 			this._memberType.toSource(writer);

@@ -8,7 +8,6 @@
 package com.aptana.theme.preferences;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,6 +102,7 @@ import org.eclipse.ui.internal.themes.ThemeElementHelper;
 import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.ConsoleThemer;
@@ -1187,7 +1187,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 		super.performDefaults();
 	}
@@ -1230,7 +1230,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 			catch (BackingStoreException e1)
 			{
-				ThemePlugin.logError(e1);
+				IdeLog.logError(ThemePlugin.getDefault(), e1);
 			}
 		}
 		else if (source == fInvasiveFontCheckbox)
@@ -1243,7 +1243,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 			catch (BackingStoreException e1)
 			{
-				ThemePlugin.logError(e1);
+				IdeLog.logError(ThemePlugin.getDefault(), e1);
 			}
 		}
 		else if (source == fThemeCombo)
@@ -1310,18 +1310,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			File themeFile = new File(path);
 			editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
 
-			try
+			Theme theme = new TextmateImporter().convert(themeFile);
+			if (theme != null)
 			{
-				Theme theme = new TextmateImporter().convert(themeFile);
 				getThemeManager().addTheme(theme);
 				getThemeManager().setCurrentTheme(theme);
 				loadThemeNames();
 				setTheme(theme.getName());
 			}
-			catch (FileNotFoundException e1)
+			else
 			{
-				ThemePlugin.logError(e1);
+				// FIXME Show an error dialog?
 			}
+
 		}
 		else if (source == fExportButton)
 		{

@@ -25,12 +25,14 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
-import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterSyntaxProblemException;
+import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.util.Util;
 
 public class FormatterPreviewUtils
@@ -58,7 +60,7 @@ public class FormatterPreviewUtils
 			}
 			catch (IOException e)
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 				disablePreview(viewer);
 				return;
 			}
@@ -87,11 +89,11 @@ public class FormatterPreviewUtils
 			}
 			catch (BadLocationException e)
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 			catch (MalformedTreeException e)
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 			catch (FormatterSyntaxProblemException e)
 			{
@@ -99,7 +101,7 @@ public class FormatterPreviewUtils
 			}
 			catch (FormatterException e)
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 			// TODO indicate error/warning state
 			viewer.getDocument().set(content);

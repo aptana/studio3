@@ -9,6 +9,7 @@ package com.aptana.ui.internal.commands;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -46,15 +47,28 @@ public class ClearLogCommandHandler extends AbstractHandler
 			return null;
 		}
 
+		FileOutputStream outputStream = null;
 		try
 		{
-			File file = new File(logFile);
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			fileOutputStream.close();
+			outputStream = new FileOutputStream(new File(logFile));
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
+		}
+		finally
+		{
+			if (outputStream != null)
+			{
+				try
+				{
+					outputStream.close();
+				}
+				catch (IOException e)
+				{
+					// ignores the exception
+				}
+			}
 		}
 		return null;
 	}

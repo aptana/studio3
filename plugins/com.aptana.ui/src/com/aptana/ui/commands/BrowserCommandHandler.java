@@ -59,7 +59,7 @@ public class BrowserCommandHandler extends AbstractHandler
 		}
 		catch (PartInitException e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 
 		return null;
@@ -79,7 +79,7 @@ public class BrowserCommandHandler extends AbstractHandler
 		}
 		catch (MalformedURLException e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 	}
 }

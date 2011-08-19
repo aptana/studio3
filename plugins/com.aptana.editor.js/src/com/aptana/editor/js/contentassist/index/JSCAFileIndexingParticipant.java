@@ -89,7 +89,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 					String typeName = type.getName();
 
-					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false) //$NON-NLS-1$
+					if (!typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN)) //$NON-NLS-1$
 					{
 						PropertyElement property = window.getProperty(typeName);
 
@@ -120,7 +120,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 			catch (Throwable e)
 			{
-				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(JSPlugin.getDefault(), e);
 			}
 			finally
 			{
@@ -130,7 +130,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 					{
 						isr.close();
 					}
-					catch (IOException e)
+					catch (IOException e) // $codepro.audit.disable emptyCatchClause
 					{
 					}
 				}

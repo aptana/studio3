@@ -129,9 +129,9 @@ public class Lexeme<T> implements ILexeme
 
 		buffer.append(type);
 		buffer.append(" ["); //$NON-NLS-1$
-		buffer.append(this.getStartingOffset()).append("-").append(this.getEndingOffset()); //$NON-NLS-1$
-		buffer.append(",").append(this.getText()); //$NON-NLS-1$
-		buffer.append("]"); //$NON-NLS-1$
+		buffer.append(this.getStartingOffset()).append('-').append(this.getEndingOffset());
+		buffer.append(',').append(this.getText());
+		buffer.append(']');
 
 		return buffer.toString();
 	}

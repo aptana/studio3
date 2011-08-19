@@ -31,7 +31,7 @@ public abstract class ConnectionActionDelegate implements IObjectActionDelegate 
 	
 	private List<IConnectionPoint> connectionPoints;
 
-	public ConnectionActionDelegate() {
+	protected ConnectionActionDelegate() {
 	    connectionPoints = new ArrayList<IConnectionPoint>();
 	}
 

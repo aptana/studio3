@@ -7,25 +7,30 @@
  */
 package com.aptana.editor.css.parsing;
 
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.rules.IToken;
+
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSTokensTest extends TestCase
 {
 	class TokenInfo
 	{
-		public final Object data;
+		public final CSSTokenType type;
 		public final int offset;
 		public final int length;
 
-		public TokenInfo(Object data, int offset, int length)
+		public TokenInfo(CSSTokenType type, int offset, int length)
 		{
-			this.data = data;
+			this.type = type;
 			this.offset = offset;
 			this.length = length;
 		}
 	}
+
 	private CSSTokenScanner fScanner;
 
 	@Override
@@ -40,10 +45,10 @@ public class CSSTokensTest extends TestCase
 		fScanner = null;
 	}
 
-	protected void assertToken(String source, Object data, int offset, int length)
+	protected void assertToken(String source, CSSTokenType type, int offset, int length)
 	{
-		assertToken(source, new TokenInfo(data, offset, length));
-		assertToken(source.toUpperCase(), new TokenInfo(data, offset, length));
+		assertToken(source, new TokenInfo(type, offset, length));
+		assertToken(source.toUpperCase(), new TokenInfo(type, offset, length));
 	}
 
 	protected void assertToken(String source, TokenInfo... infos)
@@ -52,16 +57,27 @@ public class CSSTokensTest extends TestCase
 		assertToken(infos);
 	}
 
-	protected void assertToken(Object data, int offset, int length)
+	protected void assertToken(CSSTokenType type, int offset, int length)
 	{
-		assertToken(new TokenInfo(data, offset, length));
+		assertToken(new TokenInfo(type, offset, length));
 	}
 
 	protected void assertToken(TokenInfo... infos)
 	{
 		for (TokenInfo info : infos)
 		{
-			assertEquals("Checking token type", info.data, fScanner.nextToken().getData());
+			IToken token = fScanner.nextToken();
+
+			// Allow null types when we don't need to verify the type, like with WHITESPACE, for example
+			if (info.type != null)
+			{
+				// Add in token types that are being tested, regardless if they pass or not. This info is used by
+				// another test to determine if we've covered all token types during testing
+				VerifyTestedTokensTest.TESTED_TOKEN_TYPES.add(info.type);
+
+				assertEquals("Checking token type", info.type, token.getData());
+			}
+
 			assertEquals("Checking token offset", info.offset, fScanner.getTokenOffset());
 			assertEquals("Checking token length", info.length, fScanner.getTokenLength());
 		}

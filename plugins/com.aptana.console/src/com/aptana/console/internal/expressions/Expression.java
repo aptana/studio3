@@ -65,16 +65,16 @@ public final class Expression {
 				} else {
 					TextAttribute defaultTextAttribute = getCurrentTheme().getTextAttribute(groupScopes.get(groupScopes.firstKey()));
 					int previous = 0;
+					int offset, length;
 					for (int group = 1; group <= groupCount; ++group) {
-						int offset = matcher.start(group);
-						int length = matcher.group(group).length();
+						offset = matcher.start(group);
+						length = matcher.group(group).length();
 						if (offset > previous) {
 							result.add(createStyleRange(lineOffset + previous, offset - previous, defaultTextAttribute));
 						}
 						previous = offset + length;
 						if (groupScopes.containsKey(group)) {
-							TextAttribute textAttribute = getCurrentTheme().getTextAttribute(groupScopes.get(group));
-							result.add(createStyleRange(lineOffset + offset, length, textAttribute));
+							result.add(createStyleRange(lineOffset + offset, length, getCurrentTheme().getTextAttribute(groupScopes.get(group))));
 						} else {
 							previous = offset;
 						}

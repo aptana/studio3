@@ -15,7 +15,7 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexWriter;
 import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
 import com.aptana.editor.css.contentassist.model.ElementElement;
@@ -63,7 +63,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 	@Override
 	protected double getIndexVersion()
 	{
-		return CSSIndexConstants.INDEX_VERSION;
+		return ICSSIndexConstants.INDEX_VERSION;
 	}
 
 	/*
@@ -105,7 +105,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 	protected void writeIndex(CSSMetadataReader reader)
 	{
 		// remove old index
-		IndexManager.getInstance().removeIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
+		IndexManager.getInstance().removeIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
 
@@ -139,7 +139,7 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 	}
 

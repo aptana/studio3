@@ -17,14 +17,13 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 @SuppressWarnings("rawtypes")
 public class RetargettableActionAdapterFactory implements IAdapterFactory {
 	/**
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-	 *      java.lang.Class)
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adapterType == IRunToLineTarget.class) {
+		if (IRunToLineTarget.class.equals(adapterType)) {
 			return new RunToLineAdapter();
 		}
-		if (adapterType == IToggleBreakpointsTarget.class) {
+		if (IToggleBreakpointsTarget.class.equals(adapterType)) {
 			return new ToggleBreakpointAdapter();
 		}
 		return null;

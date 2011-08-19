@@ -19,6 +19,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.browser.BrowserPlugin;
+import com.aptana.core.logging.IdeLog;
 
 public class BrowserConfigurationManager
 {
@@ -109,6 +110,7 @@ public class BrowserConfigurationManager
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			sizeCategories.put(categoryId, new BrowserSizeCategory(categoryId, categoryName, order));
 		}
@@ -132,11 +134,12 @@ public class BrowserConfigurationManager
 				horizontalIndent = Integer.parseInt(element.getAttribute(ATT_HOR_INDENT));
 				if (horizontalIndent < 0)
 				{
-					throw new NumberFormatException();
+					horizontalIndent = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			int verticalIndent = 0;
 			try
@@ -144,11 +147,12 @@ public class BrowserConfigurationManager
 				verticalIndent = Integer.parseInt(element.getAttribute(ATT_VER_INDENT));
 				if (verticalIndent < 0)
 				{
-					throw new NumberFormatException();
+					verticalIndent = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			boolean blackBackground = false;
 			String bgcolor = element.getAttribute(ATT_BG_COLOR);
@@ -177,11 +181,12 @@ public class BrowserConfigurationManager
 				width = Integer.parseInt(widthStr);
 				if (width < 0)
 				{
-					throw new NumberFormatException();
+					width = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			String heightStr = element.getAttribute(ATT_HEIGHT);
 			if (isEmpty(heightStr))
@@ -194,11 +199,12 @@ public class BrowserConfigurationManager
 				height = Integer.parseInt(heightStr);
 				if (height < 0)
 				{
-					throw new NumberFormatException();
+					height = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			String categoryId = element.getAttribute(ATT_CATEGORY);
 			if (isEmpty(categoryId))

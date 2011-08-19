@@ -34,7 +34,7 @@ public final class WorkbenchBrowserUtil {
 		try {
 			launchExternalBrowser(new URL(url));
 		} catch (MalformedURLException e) {
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 	}
 
@@ -46,7 +46,7 @@ public final class WorkbenchBrowserUtil {
 		try {
 			return launchExternalBrowser(new URL(url), browserId);
 		} catch (MalformedURLException e) {
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -61,7 +61,7 @@ public final class WorkbenchBrowserUtil {
 					return webBrowser;
 				}
 			} catch (PartInitException e) {
-				IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(UIPlugin.getDefault(), e);
 			}
 		}
 		try {
@@ -69,7 +69,7 @@ public final class WorkbenchBrowserUtil {
 			webBrowser.openURL(url);
 			return webBrowser;
 		} catch (PartInitException e) {
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -90,7 +90,7 @@ public final class WorkbenchBrowserUtil {
 			}
 			return webBrowser;
 		} catch (Exception e) {
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}

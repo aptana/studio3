@@ -61,13 +61,18 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private Map<String, List<String>> selectedValidatorsMap;
 	// stores the list of filter expressions by language type
 	private Map<String, List<String>> filterExpressionsMap;
+	// stores the list of languages that have parsing errors enabled
+	private List<String> parseErrorEnabledList;
 
 	private String selectedLanguage;
+	private String enableParseError;
 
 	public ValidationPreferencePage()
 	{
 		selectedValidatorsMap = new HashMap<String, List<String>>();
 		filterExpressionsMap = new HashMap<String, List<String>>();
+		parseErrorEnabledList = new ArrayList<String>();
+		enableParseError = Messages.ValidationPreferencePage_enable_parse_errors_label;
 	}
 
 	public void init(IWorkbench workbench)
@@ -82,6 +87,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	{
 		selectedValidatorsMap.clear();
 		filterExpressionsMap.clear();
+		parseErrorEnabledList.clear();
 		super.dispose();
 	}
 
@@ -166,10 +172,9 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			storeCurrentSelectedValidators();
 			storeCurrentFilterExpressions();
 		}
-		// persists the selected validators and filter expressions for each language
+		// persist the selected validators and filter expressions for each language
 		saveAllSelectedValidators();
 		saveAllFilterExpressions();
-
 		return super.performOk();
 	}
 
@@ -277,9 +282,9 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private void loadAllSelectedValidators()
 	{
 		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		String languageType, list;
 		for (ValidatorLanguage language : languages)
 		{
+			String languageType, list;
 			languageType = language.getType();
 			list = getPreferenceStore().getString(getSelectedValidatorsPrefKey(languageType));
 			if (!StringUtil.isEmpty(list))
@@ -291,16 +296,22 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 				}
 				selectedValidatorsMap.put(languageType, names);
 			}
+			// Add parse error preference
+			if (getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(languageType)))
+			{
+				parseErrorEnabledList.add(languageType);
+			}
 		}
 	}
 
 	private void saveAllSelectedValidators()
 	{
 		Set<String> languages = selectedValidatorsMap.keySet();
-		List<String> selectedValidators;
-		String value;
+
 		for (String language : languages)
 		{
+			List<String> selectedValidators;
+			String value;
 			selectedValidators = selectedValidatorsMap.get(language);
 			int size = selectedValidators.size();
 			if (size == 0)
@@ -313,15 +324,19 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 						selectedValidators.toArray(new String[selectedValidators.size()]));
 			}
 			getPreferenceStore().setValue(getSelectedValidatorsPrefKey(language), value);
+			// Save parse error preference
+			getPreferenceStore().setValue(getParseErrorEnabledPrefKey(language),
+					parseErrorEnabledList.contains(language));
+
 		}
 	}
 
 	private void loadAllFilterExpressions()
 	{
 		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		String languageType, list;
 		for (ValidatorLanguage language : languages)
 		{
+			String languageType, list;
 			languageType = language.getType();
 			list = getPreferenceStore().getString(getFilterExpressionsPrefKey(languageType));
 			if (!StringUtil.isEmpty(list))
@@ -336,9 +351,9 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private void saveAllFilterExpressions()
 	{
 		Set<String> languages = filterExpressionsMap.keySet();
-		List<String> expressions;
 		for (String language : languages)
 		{
+			List<String> expressions;
 			expressions = filterExpressionsMap.get(language);
 			getPreferenceStore().setValue(getFilterExpressionsPrefKey(language),
 					StringUtil.join(FILTER_DELIMITER, expressions.toArray(new String[expressions.size()])));
@@ -354,12 +369,19 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			selectedValidatorsMap.put(selectedLanguage, validatorsList);
 		}
 		validatorsList.clear();
+		parseErrorEnabledList.remove(selectedLanguage);
 		Object[] selectedValidators = validatorsViewer.getCheckedElements();
 		for (Object validator : selectedValidators)
 		{
 			if (validator instanceof ValidatorReference)
 			{
+
 				validatorsList.add(((ValidatorReference) validator).getName());
+			}
+			// if it is the parse error, store it in a separate map
+			else if (validator.equals(enableParseError))
+			{
+				parseErrorEnabledList.add(selectedLanguage);
 			}
 		}
 	}
@@ -389,7 +411,12 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		else
 		{
 			List<ValidatorReference> validators = ValidatorLoader.getInstance().getValidators(selectedLanguage);
+
 			validatorsViewer.setInput(validators.toArray(new ValidatorReference[validators.size()]));
+
+			// Add parse errors for each language
+			validatorsViewer.add(enableParseError);
+			validatorsViewer.setChecked(enableParseError, parseErrorEnabledList.contains(selectedLanguage));
 
 			// makes appropriate validators checked
 			if (selectedValidatorsMap.containsKey(selectedLanguage))
@@ -442,11 +469,16 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 	private static String getSelectedValidatorsPrefKey(String language)
 	{
-		return language + ":" + IPreferenceConstants.SELECTED_VALIDATORS; //$NON-NLS-1$
+		return language + ':' + IPreferenceConstants.SELECTED_VALIDATORS;
 	}
 
 	private static String getFilterExpressionsPrefKey(String language)
 	{
-		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
+		return language + ':' + IPreferenceConstants.FILTER_EXPRESSIONS;
+	}
+
+	private static String getParseErrorEnabledPrefKey(String language)
+	{
+		return language + ':' + IPreferenceConstants.PARSE_ERROR_ENABLED;
 	}
 }

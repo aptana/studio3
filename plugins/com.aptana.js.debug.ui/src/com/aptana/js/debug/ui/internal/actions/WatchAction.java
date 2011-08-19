@@ -32,7 +32,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -62,7 +64,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	/*
 	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.ui.IEditorPart)
+	 * org.eclipse.ui.IEditorPart)
 	 */
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 	}
@@ -93,7 +95,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	/*
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.jface.viewers.ISelection)
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
 	@SuppressWarnings("rawtypes")
 	public void selectionChanged(IAction action, ISelection selection) {
@@ -108,8 +110,9 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 			IStructuredSelection sSelection = (IStructuredSelection) selection;
 			size = sSelection.size();
 			IExpressionManager manager = DebugPlugin.getDefault().getExpressionManager();
+			IVariable variable;
 			for (Iterator iterator = sSelection.iterator(); iterator.hasNext();) {
-				IVariable variable = (IVariable) iterator.next();
+				variable = (IVariable) iterator.next();
 				if (manager.hasWatchExpressionDelegate(variable.getModelIdentifier())) {
 					enabled++;
 				} else {
@@ -138,6 +141,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 			try {
 				page.showView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 			} catch (PartInitException e) {
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		} else {
 			page.bringToTop(part);
@@ -147,7 +151,6 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	/*
 	 * createExpression
-	 * 
 	 * @param expressionText
 	 */
 	protected void createExpression(String expressionText) {

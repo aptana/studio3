@@ -21,8 +21,7 @@ import com.aptana.ui.ftp.internal.FTPPropertyDialogProvider;
 /**
  * @author Max Stepanov
  */
-public class NewFTPConnectionAction implements IObjectActionDelegate
-{
+public class NewFTPConnectionAction implements IObjectActionDelegate {
 
 	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
 
@@ -33,8 +32,7 @@ public class NewFTPConnectionAction implements IObjectActionDelegate
 	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
 	 * org.eclipse.ui.IWorkbenchPart)
 	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
-	{
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		this.targetPart = targetPart;
 	}
 
@@ -42,22 +40,17 @@ public class NewFTPConnectionAction implements IObjectActionDelegate
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	public void run(IAction action)
-	{
+	public void run(IAction action) {
 		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog)
-		{
+		if (dlg instanceof IPropertyDialog) {
 			String typeId;
-			if (action == null)
-			{
+			if (action == null) {
 				typeId = DEFAULT_TYPE;
 			}
-			else
-			{
+			else {
 				typeId = action.getId();
 				int index = typeId.lastIndexOf('.');
-				if (index >= 0 && index + 1 < typeId.length())
-				{
+				if (index >= 0 && index + 1 < typeId.length()) {
 					typeId = typeId.substring(index + 1);
 				}
 			}
@@ -71,7 +64,6 @@ public class NewFTPConnectionAction implements IObjectActionDelegate
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 * org.eclipse.jface.viewers.ISelection)
 	 */
-	public void selectionChanged(IAction action, ISelection selection)
-	{
+	public void selectionChanged(IAction action, ISelection selection) {
 	}
 }

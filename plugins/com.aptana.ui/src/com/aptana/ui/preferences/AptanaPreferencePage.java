@@ -106,7 +106,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 
 		return super.performOk();

@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.core.io.efs;
 
@@ -58,6 +61,8 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 @SuppressWarnings("restriction")
 /* package */class WorkspaceFile extends FileStore {
 
+	private static final byte[] EMPTY_ARRAY = new byte[0];
+	
 	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 	private IResource resource;
@@ -74,7 +79,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 	/**
 	 * 
 	 */
-	public WorkspaceFile(IPath path) {
+	protected WorkspaceFile(IPath path) {
 		this(null, path);
 	}
 
@@ -94,10 +99,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (IResource.class == adapter) {
+		if (IResource.class.equals(adapter)) {
 			try {
 				ensureResource();
 			} catch (CoreException e) {
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 			}
 			return resource;
 		}
@@ -216,7 +222,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		try {
 			return new URI(WorkspaceFileSystem.SCHEME_WORKSPACE, path.toPortableString(), null);
 		} catch (URISyntaxException e) {
-			IdeLog.logError(CoreIOPlugin.getDefault(), e.getLocalizedMessage(), e);
+			IdeLog.logError(CoreIOPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -282,6 +288,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
 		if (!(obj instanceof WorkspaceFile)) {
 			return false;
 		}
@@ -428,7 +437,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		monitor.beginTask(StringUtil.EMPTY, 100);
 		if (localFileStore == null) {
 			try {
-				((IFile) resource).create(new ByteArrayInputStream(new byte[0]), IResource.FORCE, Policy.subMonitorFor(monitor, 50));
+				((IFile) resource).create(new ByteArrayInputStream(EMPTY_ARRAY), IResource.FORCE, Policy.subMonitorFor(monitor, 50));
 			} catch (CoreException e) {
 				fileNotFoundError(e, path);
 			}
@@ -472,9 +481,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 				resource = container.findMember(path.lastSegment());
 			}
 			if (resource == null) {
-				if (resourceClass == IFile.class) {
+				if (IFile.class.equals(resourceClass)) {
 					resource = workspaceRoot.getFile(path);
-				} else if (resourceClass == IFolder.class) {
+				} else if (IFolder.class.equals(resourceClass)) {
 					resource = workspaceRoot.getFolder(path);
 				}
 			}

@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -249,11 +250,12 @@ class TreeThemer extends ControlThemer
 				gc.drawRectangle(x + 1, y + 1, width - 2, width - 2); // make it smaller than the area erased
 				gc.setAlpha(255);
 				// draw '-'
-				gc.drawLine(x + 3, y + (width / 2), x + 7, y + (width / 2));
+				int halfWidth = width >> 1;
+				gc.drawLine(x + 3, y + halfWidth, x + 7, y + halfWidth);
 				if (!isExpanded)
 				{
 					// draw '|' to make it a plus
-					gc.drawLine(x + (width / 2), y + 3, x + (width / 2), y + 7);
+					gc.drawLine(x + halfWidth, y + 3, x + halfWidth, y + 7);
 				}
 				gc.setBackground(oldBackground);
 
@@ -337,7 +339,7 @@ class TreeThemer extends ControlThemer
 								}
 								catch (Exception e)
 								{
-									ThemePlugin.logError(e);
+									IdeLog.logError(ThemePlugin.getDefault(), e);
 								}
 							}
 							// HACK! This is a major hack to force down the height of the row when we resize our font to
@@ -363,7 +365,7 @@ class TreeThemer extends ControlThemer
 								}
 								catch (Exception e)
 								{
-									ThemePlugin.logError(e);
+									IdeLog.logError(ThemePlugin.getDefault(), e);
 								}
 							}
 						}

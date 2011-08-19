@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
@@ -33,17 +33,18 @@ import com.aptana.index.core.IndexManager;
 
 public class JSMetadataIndexWriterTests extends TestCase
 {
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
-		
+		IndexManager.getInstance().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
+
 		super.tearDown();
 	}
-	
+
 	/**
 	 * getIndex
 	 * 
@@ -63,10 +64,10 @@ public class JSMetadataIndexWriterTests extends TestCase
 	private TypeElement getType(String typeName)
 	{
 		JSIndexReader reader = new JSIndexReader();
-		
+
 		return reader.getType(this.getIndex(), typeName, true);
 	}
-	
+
 	/**
 	 * loadResource
 	 * 
@@ -92,23 +93,23 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		return stream;
 	}
-	
+
 	/**
 	 * writeMetadataResource
 	 * 
 	 * @param resource
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private void writeMetadataResource(String resource) throws Exception
 	{
 		InputStream stream = this.loadResource(resource);
 		assertNotNull(stream);
-		
+
 		JSMetadataReader reader = new JSMetadataReader();
 		reader.loadXML(stream);
 		JSIndexWriter writer = new JSIndexWriter();
 		Index index = this.getIndex();
-		
+
 		for (TypeElement type : reader.getTypes())
 		{
 			writer.writeType(index, type);
@@ -127,11 +128,11 @@ public class JSMetadataIndexWriterTests extends TestCase
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeOnly.xml");
 		TypeElement retrievedType = this.getType(typeName);
-		
+
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
 	}
-	
+
 	/**
 	 * testMethod
 	 * 
@@ -145,24 +146,24 @@ public class JSMetadataIndexWriterTests extends TestCase
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithMethod.xml");
 		TypeElement retrievedType = this.getType(typeName);
-		
+
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
-		
+
 		// make sure we have one property
 		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
 		assertTrue(properties.size() == 1);
-		
+
 		// make sure it is a function
 		PropertyElement property = properties.get(0);
 		assertTrue(property instanceof FunctionElement);
-		
+
 		// make sure it is the function we added earlier
 		FunctionElement retrievedMethod = (FunctionElement) property;
 		assertEquals(methodName, retrievedMethod.getName());
 	}
-	
+
 	/**
 	 * testProperty
 	 * 
@@ -172,24 +173,24 @@ public class JSMetadataIndexWriterTests extends TestCase
 	{
 		String typeName = "MyClass";
 		String propertyName = "myProperty";
-		
+
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithProperty.xml");
 		TypeElement retrievedType = this.getType(typeName);
-		
+
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
-		
+
 		// make sure we have one property
 		List<PropertyElement> properties = retrievedType.getProperties();
 		assertNotNull(properties);
 		assertTrue(properties.size() == 1);
-		
+
 		// make sure it is a function
 		PropertyElement property = properties.get(0);
 		assertEquals(propertyName, property.getName());
 	}
-	
+
 	/**
 	 * testTypeDescription
 	 * 
@@ -198,14 +199,14 @@ public class JSMetadataIndexWriterTests extends TestCase
 	public void testTypeDescription() throws Exception
 	{
 		String typeName = "MyClass";
-		
+
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithDescription.xml");
 		TypeElement retrievedType = this.getType(typeName);
-		
+
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
-		
+
 		// make sure we have one property
 		String description = retrievedType.getDescription();
 		assertEquals("This is a description of MyClass", description);

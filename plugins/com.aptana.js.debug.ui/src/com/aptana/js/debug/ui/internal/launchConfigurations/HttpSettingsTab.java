@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
@@ -89,7 +90,7 @@ public class HttpSettingsTab extends AbstractLaunchConfigurationTab {
 			httpGetQuery.setText(configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY,
 					StringUtil.EMPTY));
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
 		} finally {
 			hookListeners(true);
 		}

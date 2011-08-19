@@ -27,7 +27,7 @@ public class CSSDeclarationNode extends CSSNode
 	 */
 	protected CSSDeclarationNode()
 	{
-		super(CSSNodeTypes.DECLARATION);
+		super(ICSSNodeTypes.DECLARATION);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class CSSDeclarationNode extends CSSNode
 	 */
 	public CSSDeclarationNode(String identifier, CSSExpressionNode value, Symbol status)
 	{
-		super(CSSNodeTypes.DECLARATION);
+		super(ICSSNodeTypes.DECLARATION);
 
 		fIdentifier = identifier;
 
@@ -136,7 +136,7 @@ public class CSSDeclarationNode extends CSSNode
 	 */
 	public IRange getStatusRange()
 	{
-		return fStatusRange != null ? fStatusRange : Range.EMPTY;
+		return (fStatusRange != null) ? fStatusRange : Range.EMPTY;
 	}
 
 	/*
@@ -154,7 +154,7 @@ public class CSSDeclarationNode extends CSSNode
 		int hash = super.hashCode();
 
 		hash = hash * 31 + fIdentifier.hashCode();
-		hash = hash * 31 + (fStatus == null ? 0 : fStatus.hashCode());
+		hash = hash * 31 + ((fStatus == null) ? 0 : fStatus.hashCode());
 		hash = hash * 31 + Boolean.valueOf(fHasSemicolon).hashCode();
 
 		return hash;
@@ -188,13 +188,13 @@ public class CSSDeclarationNode extends CSSNode
 
 			if (fStatus != null)
 			{
-				text.append(" ").append(fStatus); //$NON-NLS-1$
+				text.append(' ').append(fStatus);
 			}
 		}
 
 		if (fHasSemicolon)
 		{
-			text.append(";"); //$NON-NLS-1$
+			text.append(';');
 		}
 
 		return text.toString();

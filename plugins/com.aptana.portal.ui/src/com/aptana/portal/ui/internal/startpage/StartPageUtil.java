@@ -47,11 +47,12 @@ public class StartPageUtil
 	/**
 	 * Show the Start-Page.
 	 */
-	public static void showStartPage()
+	public static void showStartPage(boolean bringToTop)
 	{
 		try
 		{
-			Portal.getInstance().openPortal(new URL(getStartPageURL()), StartPageBrowserEditor.WEB_BROWSER_EDITOR_ID);
+			Portal.getInstance().openPortal(new URL(getStartPageURL()), StartPageBrowserEditor.WEB_BROWSER_EDITOR_ID,
+					bringToTop);
 			// Update the preference key with the current studio's version
 			String currentVersion = getCurrentVersion();
 			if (currentVersion != null)
@@ -86,11 +87,10 @@ public class StartPageUtil
 	 */
 	public static boolean shouldShowStartPage()
 	{
-		// TODO - Un-comment this if we decide to prevent the Studio's start page from loading in Titaium Studio.
-		// if (EclipseUtil.getPluginVersion("com.appcelerator.titanium.rcp") != null)
-		// {
-		// return false;
-		// }
+		if (EclipseUtil.getPluginVersion("com.appcelerator.titanium.rcp") != null) //$NON-NLS-1$
+		{
+			return false;
+		}
 		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(PortalUIPlugin.PLUGIN_ID);
 		String lastVersion = store.get(IPortalPreferences.LAST_KNOWN_STUDIO_VERSION, null);
 		if (lastVersion == null)
@@ -119,7 +119,7 @@ public class StartPageUtil
 		if (version == null && !Platform.inDevelopmentMode())
 		{
 			// we have a problem...
-			IdeLog.logError(PortalUIPlugin.getDefault(), "Could not identify the Studio's version", (String) null); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), "Could not identify the Studio's version"); //$NON-NLS-1$
 		}
 		return version;
 	}

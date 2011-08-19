@@ -113,7 +113,7 @@ public class EngineYardDeployWizardPage extends WizardPage
 						}
 						catch (Exception e)
 						{
-							IdeLog.logError(EngineYardPlugin.getDefault(), e.getMessage(), e);
+							IdeLog.logError(EngineYardPlugin.getDefault(), e);
 						}
 					}
 				});

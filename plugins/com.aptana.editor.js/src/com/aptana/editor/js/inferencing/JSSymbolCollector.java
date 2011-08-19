@@ -1,3 +1,4 @@
+// $codepro.audit.disable nonCaseLabelInSwitch
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
@@ -22,7 +24,6 @@ import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSLabelledNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
@@ -32,8 +33,8 @@ import com.aptana.parsing.lexer.IRange;
 
 public class JSSymbolCollector extends JSTreeWalker
 {
-	private static List<InvocationProcessor> PROCESSORS;
-	private static Map<String, InvocationProcessor> INVOCATION_PROCESSORS;
+	private static List<IInvocationProcessor> PROCESSORS;
+	private static Map<String, IInvocationProcessor> INVOCATION_PROCESSORS;
 
 	private JSScope _scope;
 
@@ -42,13 +43,13 @@ public class JSSymbolCollector extends JSTreeWalker
 	 * 
 	 * @return
 	 */
-	private static InvocationProcessor getInvocationProcessor(String pattern)
+	private static IInvocationProcessor getInvocationProcessor(String pattern)
 	{
 		if (INVOCATION_PROCESSORS == null)
 		{
-			INVOCATION_PROCESSORS = new HashMap<String, InvocationProcessor>();
+			INVOCATION_PROCESSORS = new HashMap<String, IInvocationProcessor>();
 
-			for (InvocationProcessor processor : getInvocationProcessors())
+			for (IInvocationProcessor processor : getInvocationProcessors())
 			{
 				for (String invocationPattern : processor.getInvocationPatterns())
 				{
@@ -65,11 +66,11 @@ public class JSSymbolCollector extends JSTreeWalker
 	 * 
 	 * @return
 	 */
-	private static List<InvocationProcessor> getInvocationProcessors()
+	private static List<IInvocationProcessor> getInvocationProcessors()
 	{
 		if (PROCESSORS == null)
 		{
-			PROCESSORS = new ArrayList<InvocationProcessor>();
+			PROCESSORS = new ArrayList<IInvocationProcessor>();
 
 			// TODO: Eventually, this will be handled via an extension point.
 			// We're targeting jQuery only right now, so we'll hard code this.
@@ -197,7 +198,7 @@ public class JSSymbolCollector extends JSTreeWalker
 
 		switch (lhs.getNodeType())
 		{
-			case JSNodeTypes.IDENTIFIER:
+			case IJSNodeTypes.IDENTIFIER:
 				this.addPropertyValue(lhs.getText(), node);
 				break;
 
@@ -206,12 +207,12 @@ public class JSSymbolCollector extends JSTreeWalker
 				{
 					switch (lhs.getNodeType())
 					{
-						case JSNodeTypes.IDENTIFIER:
+						case IJSNodeTypes.IDENTIFIER:
 							JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
 							collector.visit(node);
 							break LOOP;
 
-						case JSNodeTypes.THIS:
+						case IJSNodeTypes.THIS:
 							// TODO: implement this once we're properly handling [[proto]]
 							break LOOP;
 
@@ -311,7 +312,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		}
 
 		// default behavior
-		if (processed == false)
+		if (!processed)
 		{
 			for (IParseNode parameter : node.getParameters())
 			{
@@ -353,7 +354,7 @@ public class JSSymbolCollector extends JSTreeWalker
 		// NOTE: limiting to dotted names for efficiency
 		if (expression instanceof JSGetPropertyNode)
 		{
-			InvocationProcessor processor = getInvocationProcessor(expression.toString());
+			IInvocationProcessor processor = getInvocationProcessor(expression.toString());
 
 			if (processor != null)
 			{
@@ -361,7 +362,7 @@ public class JSSymbolCollector extends JSTreeWalker
 			}
 		}
 
-		if (processed == false)
+		if (!processed)
 		{
 			super.visit(node);
 		}

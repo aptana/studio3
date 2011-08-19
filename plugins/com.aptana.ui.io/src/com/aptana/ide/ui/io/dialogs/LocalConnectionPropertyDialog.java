@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
@@ -169,8 +170,8 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 				localConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.LocalConnectionPropertyDialog_FailedToCreate, e);
-				close();
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.LocalConnectionPropertyDialog_FailedToCreate, e);
+				close(); // $codepro.audit.disable closeInFinally
 			}
 		}
 		loadPropertiesFrom(localConnectionPoint);
@@ -207,6 +208,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		}
 		if (savePropertiesTo(localConnectionPoint)) {
 			/* TODO: notify */
+			localConnectionPoint.hashCode();
 		}
 		if (isNew) {
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(localConnectionPoint);
@@ -231,7 +233,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		try {
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			IPath path = connectionPoint.getPath();
-			localPathText.setText(path != null ? path.toPortableString() : ""); //$NON-NLS-1$
+			localPathText.setText((path != null) ? path.toPortableString() : ""); //$NON-NLS-1$
 		} finally {
 			addListeners();
 		}
@@ -293,6 +295,6 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		if (value != null) {
 			return value;
 		}
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 }

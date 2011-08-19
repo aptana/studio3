@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declareAsInterface
+// $codepro.audit.disable emptyCatchClause
 
 package com.aptana.filesystem.ftp;
 
@@ -24,7 +26,6 @@ import com.aptana.ide.core.io.IConnectionPoint15Constants;
 
 /**
  * @author Max Stepanov
- *
  */
 public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConnectionPoint {
 
@@ -38,7 +39,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	private static final String ELEMENT_TRANSFER_TYPE = "transferType"; //$NON-NLS-1$
 	private static final String ELEMENT_ENCODING = "encoding"; //$NON-NLS-1$
 	private static final String ELEMENT_TIMEZONE = "timezone"; //$NON-NLS-1$
-		
+
 	private String host;
 	private int port = IFTPConstants.FTP_PORT_DEFAULT;
 	private IPath path = Path.ROOT;
@@ -48,9 +49,9 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	private String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
 	private String encoding = IFTPConstants.ENCODING_DEFAULT;
 	private String timezone = null;
-	
+
 	private IFTPConnectionFileManager connectionFileManager;
-	
+
 	/**
 	 * Default constructor
 	 */
@@ -58,7 +59,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		super(TYPE);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#loadState(com.aptana.ide.core.io.epl.IMemento)
 	 */
 	@Override
@@ -104,7 +106,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#saveState(com.aptana.ide.core.io.epl.IMemento)
 	 */
 	@Override
@@ -132,14 +135,16 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getHost()
 	 */
 	public String getHost() {
 		return host;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setHost(java.lang.String)
 	 */
 	public void setHost(String host) {
@@ -148,14 +153,16 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		resetConnectionFileManager();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getPort()
 	 */
 	public int getPort() {
 		return port;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPort(int)
 	 */
 	public void setPort(int port) {
@@ -164,33 +171,34 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		resetConnectionFileManager();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getPath()
 	 */
 	public IPath getPath() {
 		return path;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPath(org.eclipse.core.runtime.IPath)
 	 */
 	public void setPath(IPath path) {
-		if (path.isEmpty()) {
-			path = Path.ROOT;
-		}
-		this.path = path;
+		this.path = path.isEmpty() ? Path.ROOT : path;
 		notifyChanged();
 		resetConnectionFileManager();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getLogin()
 	 */
 	public String getLogin() {
 		return login;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setLogin(java.lang.String)
 	 */
 	public void setLogin(String login) {
@@ -199,14 +207,16 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		resetConnectionFileManager();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#getPassword()
 	 */
 	public char[] getPassword() {
 		return password;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.ftp.IBaseRemoteConnectionPoint#setPassword(char[])
 	 */
 	public void setPassword(char[] password) {
@@ -223,7 +233,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	}
 
 	/**
-	 * @param passiveMode the passiveMode to set
+	 * @param passiveMode
+	 *            the passiveMode to set
 	 */
 	public void setPassiveMode(boolean passiveMode) {
 		this.passiveMode = passiveMode;
@@ -239,7 +250,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	}
 
 	/**
-	 * @param transferType the transferType to set
+	 * @param transferType
+	 *            the transferType to set
 	 */
 	public void setTransferType(String transferType) {
 		this.transferType = transferType;
@@ -255,7 +267,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	}
 
 	/**
-	 * @param encoding the encoding to set
+	 * @param encoding
+	 *            the encoding to set
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
@@ -271,7 +284,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	}
 
 	/**
-	 * @param timezone the timezone to set
+	 * @param timezone
+	 *            the timezone to set
 	 */
 	public void setTimezone(String timezone) {
 		this.timezone = timezone;
@@ -279,7 +293,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		resetConnectionFileManager();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
@@ -294,7 +309,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		getConnectionFileManager().connect(monitor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
@@ -304,7 +320,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#isConnected()
 	 */
 	@Override
@@ -312,7 +329,8 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		return connectionFileManager != null && connectionFileManager.isConnected();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ConnectionPoint#canDisconnect()
 	 */
 	@Override
@@ -320,29 +338,31 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		return isConnected() && true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (IConnectionFileManager.class == adapter) {
+		if (IConnectionFileManager.class.equals(adapter)) {
 			return getConnectionFileManager();
 		}
 		return super.getAdapter(adapter);
 	}
-	
+
 	private synchronized void resetConnectionFileManager() {
 		connectionFileManager = null;
 	}
-	
+
 	private synchronized IConnectionFileManager getConnectionFileManager() {
 		if (connectionFileManager == null) {
 			// find contributed first
 			connectionFileManager = (IFTPConnectionFileManager) super.getAdapter(IFTPConnectionFileManager.class);
 			if (connectionFileManager == null
 					&& Platform.getAdapterManager().hasAdapter(this, IFTPConnectionFileManager.class.getName())) {
-				connectionFileManager = (IFTPConnectionFileManager) Platform.getAdapterManager().loadAdapter(this, IFTPConnectionFileManager.class.getName());
+				connectionFileManager = (IFTPConnectionFileManager) Platform.getAdapterManager().loadAdapter(this,
+						IFTPConnectionFileManager.class.getName());
 			}
 			if (connectionFileManager == null) {
 				connectionFileManager = new FTPConnectionFileManager();
@@ -351,34 +371,35 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 			if (context != null) {
 				CoreIOPlugin.setConnectionContext(connectionFileManager, context);
 			}
-			connectionFileManager.init(host, port, path, login, password, passiveMode, transferType, encoding, timezone);
+			connectionFileManager
+					.init(host, port, path, login, password, passiveMode, transferType, encoding, timezone);
 		}
 		return connectionFileManager;
 	}
 
-    @Override
-    public boolean load15Data(String data) {
-        String[] items = data.split(IConnectionPoint15Constants.DELIMITER);
+	@Override
+	public boolean load15Data(String data) {
+		String[] items = data.split(IConnectionPoint15Constants.DELIMITER);
 
-        if (items.length < 7) {
-            return false;
-        }
+		if (items.length < 7) {
+			return false;
+		}
 
-        setName(items[0]);
-        setHost(items[1]);
-        if (items[2] == null || items[2].equals("")) { //$NON-NLS-1$
-            setPath(Path.ROOT);
-        } else {
-            setPath(new Path(items[2]));
-        }
-        setLogin(items[3]);
-        setPassword(items[4].toCharArray());
-        setPassiveMode(items[5].equals(Boolean.TRUE.toString()));
-        setId(items[6]);
+		setName(items[0]);
+		setHost(items[1]);
+		if (items[2] == null || items[2].equals("")) { //$NON-NLS-1$
+			setPath(Path.ROOT);
+		} else {
+			setPath(new Path(items[2]));
+		}
+		setLogin(items[3]);
+		setPassword(items[4].toCharArray());
+		setPassiveMode(items[5].equals(Boolean.TRUE.toString()));
+		setId(items[6]);
 
-        if (items.length >= 10) {
-            setPort(Integer.parseInt(items[9]));
-        }
-        return true;
-    }
+		if (items.length >= 10) {
+			setPort(Integer.parseInt(items[9]));
+		}
+		return true;
+	}
 }

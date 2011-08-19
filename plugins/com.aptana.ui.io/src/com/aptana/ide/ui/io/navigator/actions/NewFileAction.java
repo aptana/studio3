@@ -32,6 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -142,7 +143,7 @@ public class NewFileAction extends BaseSelectionListenerAction
 						}
 						catch (IOException e)
 						{
-							IOUIPlugin.logError(e);
+							IdeLog.logError(IOUIPlugin.getDefault(), e);
 						}
 						finally
 						{

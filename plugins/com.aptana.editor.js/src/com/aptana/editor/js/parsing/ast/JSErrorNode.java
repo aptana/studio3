@@ -14,7 +14,7 @@ public class JSErrorNode extends JSNode
 	 */
 	public JSErrorNode()
 	{
-		super(JSNodeTypes.ERROR);
+		super(IJSNodeTypes.ERROR);
 	}
 
 	/*

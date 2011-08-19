@@ -9,6 +9,7 @@
 package com.aptana.editor.common.internal.scripting;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -39,7 +40,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 {
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
-	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
+	private Map<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
 
 	/**
 	 * Store the filename for the document so we can dynamically look up the scope later.
@@ -214,7 +215,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}

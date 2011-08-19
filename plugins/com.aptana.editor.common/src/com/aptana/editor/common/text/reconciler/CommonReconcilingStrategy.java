@@ -120,7 +120,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
 		// early because of cancel...

@@ -34,7 +34,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.OrderedProperties;
@@ -105,18 +107,28 @@ public class Theme
 		if (name == null)
 		{
 			// Log the properties
-			StringWriter sw = new StringWriter();
+			String properties = StringUtil.EMPTY;
+			PrintWriter pw = null;
 			try
 			{
-				PrintWriter pw = new PrintWriter(sw);
+				StringWriter sw = new StringWriter(); // $codepro.audit.disable closeWhereCreated
+				pw = new PrintWriter(sw);
 				props.list(pw);
+				properties = sw.toString();
 			}
 			catch (Exception e)
 			{
 				// ignore
 			}
+			finally
+			{
+				if (pw != null)
+				{
+					pw.close();
+				}
+			}
 			throw new IllegalStateException(
-					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " + sw.toString()); //$NON-NLS-1$
+					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " + properties); //$NON-NLS-1$
 		}
 		// The general editor colors
 		// FIXME Add fallback rgb colors to use! black on white, etc.
@@ -157,7 +169,7 @@ public class Theme
 					// empty fg!
 					skipFG = true;
 				}
-				else if (token.startsWith("#")) //$NON-NLS-1$
+				else if (token.length() > 0 && token.charAt(0) == '#')
 				{
 					// it's a color!
 					if (foreground == null && !skipFG)
@@ -226,7 +238,8 @@ public class Theme
 			return new RGBa(0, 0, 0);
 		if (hex.length() != 7 && hex.length() != 9)
 		{
-			ThemePlugin.logError(MessageFormat.format("Received RGBa Hex value with invalid length: {0}", hex), null); //$NON-NLS-1$
+			IdeLog.logError(ThemePlugin.getDefault(),
+					MessageFormat.format("Received RGBa Hex value with invalid length: {0}", hex)); //$NON-NLS-1$
 			if (defaultFG != null)
 			{
 				return new RGBa(defaultFG);
@@ -659,9 +672,10 @@ public class Theme
 
 	private void save(IScopeContext scope)
 	{
+		ByteArrayOutputStream os = null;
 		try
 		{
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			os = new ByteArrayOutputStream();
 			toProps().store(os, null);
 			IEclipsePreferences prefs = scope.getNode(ThemePlugin.PLUGIN_ID);
 			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
@@ -670,7 +684,21 @@ public class Theme
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+		finally
+		{
+			if (os != null)
+			{
+				try
+				{
+					os.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
 		}
 	}
 
@@ -679,6 +707,7 @@ public class Theme
 		Properties props = null;
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
+		ByteArrayInputStream byteStream = null;
 		try
 		{
 			byte[] array = preferences.getByteArray(getName(), null);
@@ -687,7 +716,8 @@ public class Theme
 				return;
 			}
 			props = new OrderedProperties();
-			props.load(new ByteArrayInputStream(array));
+			byteStream = new ByteArrayInputStream(array);
+			props.load(byteStream);
 		}
 		catch (IllegalArgumentException iae)
 		{
@@ -697,9 +727,42 @@ public class Theme
 			{
 				return;
 			}
-			props = new OrderedProperties();
-			props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
-			save(EclipseUtil.defaultScope());
+			ByteArrayInputStream xmlStream = null;
+			try
+			{
+				xmlStream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
+				props = new OrderedProperties();
+				props.loadFromXML(xmlStream);
+				save(EclipseUtil.defaultScope());
+			}
+			finally
+			{
+				if (xmlStream != null)
+				{
+					try
+					{
+						xmlStream.close();
+					}
+					catch (Exception e)
+					{
+						// ignore
+					}
+				}
+			}
+		}
+		finally
+		{
+			if (byteStream != null)
+			{
+				try
+				{
+					byteStream.close();
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
+			}
 		}
 		coloringRules.clear();
 		wipeCache();
@@ -731,7 +794,7 @@ public class Theme
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -847,7 +910,7 @@ public class Theme
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 			return null;
 		}
 	}

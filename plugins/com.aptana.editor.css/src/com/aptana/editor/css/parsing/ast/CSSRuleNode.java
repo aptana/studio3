@@ -37,7 +37,7 @@ public class CSSRuleNode extends CSSNode
 	 */
 	public CSSRuleNode(List<CSSSelectorNode> selectors, List<CSSDeclarationNode> declarations)
 	{
-		super(CSSNodeTypes.RULE);
+		super(ICSSNodeTypes.RULE);
 
 		fSelectors = selectors.toArray(new CSSSelectorNode[selectors.size()]);
 		fDeclarations = (declarations != null) ? declarations.toArray(new CSSDeclarationNode[declarations.size()])
@@ -212,12 +212,12 @@ public class CSSRuleNode extends CSSNode
 			combinator = selector.getCombinator();
 			if (!StringUtil.isEmpty(combinator))
 			{
-				if (",".equals(combinator) == false) //$NON-NLS-1$
+				if (!",".equals(combinator)) //$NON-NLS-1$
 				{
-					text.append(" "); //$NON-NLS-1$
+					text.append(' ');
 				}
 
-				text.append(combinator).append(" "); //$NON-NLS-1$
+				text.append(combinator).append(' ');
 			}
 		}
 
@@ -231,11 +231,11 @@ public class CSSRuleNode extends CSSNode
 
 			if (i < declarations.length - 1)
 			{
-				text.append(" "); //$NON-NLS-1$
+				text.append(' ');
 			}
 		}
 
-		text.append("}"); //$NON-NLS-1$
+		text.append('}');
 
 		return text.toString();
 	}

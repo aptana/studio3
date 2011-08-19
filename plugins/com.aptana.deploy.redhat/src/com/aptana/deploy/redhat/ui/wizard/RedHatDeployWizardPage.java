@@ -105,7 +105,7 @@ public class RedHatDeployWizardPage extends WizardPage
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(RedHatPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(RedHatPlugin.getDefault(), e);
 		}
 		return RedHatAPI.PHP_5_3_2;
 	}

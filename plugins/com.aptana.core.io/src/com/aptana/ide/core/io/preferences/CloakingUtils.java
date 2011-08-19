@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
+
 package com.aptana.ide.core.io.preferences;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -100,7 +104,7 @@ public class CloakingUtils {
         }
         String result = null;
 
-        if (expression.startsWith("/") && expression.endsWith("/")) { //$NON-NLS-1$//$NON-NLS-2$
+        if (expression.length() > 1 && expression.charAt(0) == '/' && expression.charAt(expression.length()-1) == '/') {
             // already an regular expression
             return expression.substring(1, expression.length() - 1);
         }
@@ -131,7 +135,7 @@ public class CloakingUtils {
                 IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS,
                 PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS, null);
         if (extensions.equals("")) { //$NON-NLS-1$
-            return new String[0];
+            return ArrayUtil.NO_STRINGS;
         }
         return extensions.split(";"); //$NON-NLS-1$
     }
@@ -143,6 +147,7 @@ public class CloakingUtils {
         try {
             prefs.flush();
         } catch (BackingStoreException e) {
+        	IdeLog.logError(CoreIOPlugin.getDefault(), e);
         }
     }
 }

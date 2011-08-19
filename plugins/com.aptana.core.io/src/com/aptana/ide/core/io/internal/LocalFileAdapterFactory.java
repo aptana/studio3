@@ -29,11 +29,11 @@ public class LocalFileAdapterFactory implements IAdapterFactory {
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adapterType == File.class && adaptableObject instanceof LocalFile) {
+		if (File.class.equals(adapterType) && adaptableObject instanceof LocalFile) {
 			try {
 				return ((LocalFile) adaptableObject).toLocalFile(EFS.NONE, null);
 			} catch (CoreException e) {
-				IdeLog.logWarning(CoreIOPlugin.getDefault(), e.getMessage(), e, null);
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), e);
 			}
 		}
 		return null;

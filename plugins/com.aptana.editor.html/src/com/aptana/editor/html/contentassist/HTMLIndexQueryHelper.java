@@ -17,7 +17,7 @@ import java.util.Map;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
@@ -67,7 +67,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 
@@ -139,7 +139,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 
 			if (attributes != null && attributes.isEmpty() == false)
@@ -206,7 +206,7 @@ public class HTMLIndexQueryHelper
 	 */
 	public Map<String, String> getClasses(Index index)
 	{
-		return this._reader.getValues(index, CSSIndexConstants.CLASS);
+		return this._reader.getValues(index, ICSSIndexConstants.CLASS);
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 
@@ -252,7 +252,7 @@ public class HTMLIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -272,7 +272,7 @@ public class HTMLIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -308,7 +308,7 @@ public class HTMLIndexQueryHelper
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 
@@ -316,13 +316,13 @@ public class HTMLIndexQueryHelper
 	}
 
 	/**
-	 * getIDs
+	 * Retrieve CSS IDs from the current index
 	 * 
 	 * @param index
 	 * @return
 	 */
 	public Map<String, String> getIDs(Index index)
 	{
-		return this._reader.getValues(index, CSSIndexConstants.IDENTIFIER);
+		return this._reader.getValues(index, ICSSIndexConstants.IDENTIFIER);
 	}
 }

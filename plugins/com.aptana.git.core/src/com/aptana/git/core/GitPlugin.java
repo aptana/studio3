@@ -12,7 +12,6 @@ import java.io.File;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -119,34 +118,6 @@ public class GitPlugin extends Plugin
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
-	}
-
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
-	}
-
-	protected static void logError(CoreException e)
-	{
-		getDefault().getLog().log(e.getStatus());
-	}
-
-	public static void logWarning(String warning)
-	{
-		if (getDefault() != null)
-			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
-	}
-
-	public static void logError(Exception e)
-	{
-		if (getDefault() != null)
-			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e)); //$NON-NLS-1$
-	}
-
-	public static void logInfo(String string)
-	{
-		if (getDefault() != null && getDefault().isDebugging())
-			getDefault().getLog().log(new Status(IStatus.INFO, getPluginId(), string));
 	}
 
 	/**

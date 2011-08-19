@@ -179,10 +179,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		protected IViewReference findView(IWorkbenchPage page, String viewId)
 		{
-			IViewReference refs[] = page.getViewReferences();
-			for (int i = 0; i < refs.length; i++)
+			for (IViewReference ref : page.getViewReferences())
 			{
-				IViewReference ref = refs[i];
 				if (viewId.equals(ref.getId()))
 				{
 					return ref;
@@ -248,13 +246,25 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		listenForThemeChanges();
 
 		// Activate indexing
+		// FIXME Why can't we just have the indexing plugin load lazily on-demand?
 		IndexPlugin.getDefault();
 
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
+		// FIXME initialize spelling preferences lazily
 		spellingPreferences = new SpellingPreferences();
 
-		addPartListener();
+		new UIJob("adding part listener") //$NON-NLS-1$
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				addPartListener();
+				return Status.OK_STATUS;
+			}
+		}.schedule();
+
 	}
 
 	/**
@@ -414,7 +424,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 		return store;

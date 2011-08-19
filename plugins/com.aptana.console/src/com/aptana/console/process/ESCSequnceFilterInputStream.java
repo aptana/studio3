@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.console.process;
 
@@ -76,7 +78,8 @@ public class ESCSequnceFilterInputStream extends FilterInputStream {
 			}
 			b[off + i] = (byte)c;
 		    }
-		} catch (IOException ee) {
+		} catch (IOException e) {
+			e.getCause();
 		}
 		return i;
 	}

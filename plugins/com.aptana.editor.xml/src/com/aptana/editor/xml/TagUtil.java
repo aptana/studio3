@@ -17,6 +17,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 
+import com.aptana.core.logging.IdeLog;
+
 /**
  * Utilities for dealing with tags.
  * 
@@ -111,7 +113,7 @@ public class TagUtil
 		}
 		catch (BadLocationException e)
 		{
-			XMLPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(XMLPlugin.getDefault(), e);
 		}
 		return null;
 	}

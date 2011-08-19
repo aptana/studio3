@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.css.parsing;
 
-import org.eclipse.jface.text.rules.Token;
-
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSPunctuatorTest extends CSSTokensTest
@@ -72,11 +70,11 @@ public class CSSPunctuatorTest extends CSSTokensTest
 	public void testMinus()
 	{
 		setSource("10 - 5");
-		assertToken(CSSTokenType.NUMBER, 0, 2); //$NON-NLS-1$
-		assertToken(Token.WHITESPACE.getData(), 2, 1); //$NON-NLS-1$
-		assertToken(CSSTokenType.MINUS, 3, 1); //$NON-NLS-1$
-		assertToken(Token.WHITESPACE.getData(), 4, 1); //$NON-NLS-1$
-		assertToken(CSSTokenType.NUMBER, 5, 1); //$NON-NLS-1$
+		assertToken(CSSTokenType.NUMBER, 0, 2);
+		assertToken(null, 2, 1);
+		assertToken(CSSTokenType.MINUS, 3, 1);
+		assertToken(null, 4, 1);
+		assertToken(CSSTokenType.NUMBER, 5, 1);
 	}
 
 	public void testStar()
@@ -99,12 +97,12 @@ public class CSSPunctuatorTest extends CSSTokensTest
 		assertToken("=", CSSTokenType.EQUAL, 0, 1); //$NON-NLS-1$
 	}
 
-	public void beginsWith()
+	public void testBeginsWith()
 	{
 		assertToken("^=", CSSTokenType.BEGINS_WITH, 0, 2); //$NON-NLS-1$
 	}
 
-	public void endsWith()
+	public void testEndsWith()
 	{
 		assertToken("$=", CSSTokenType.ENDS_WITH, 0, 2); //$NON-NLS-1$
 	}

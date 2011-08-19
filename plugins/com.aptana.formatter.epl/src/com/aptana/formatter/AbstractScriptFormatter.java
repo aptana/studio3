@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -218,15 +216,15 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		if (FormatterPlugin.getDefault().isDebugging())
 		{
 			// Log complete
-			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
-					FormatterMessages.Formatter_formatterError, new DumpContentException("\nInput:\n\n" + input //$NON-NLS-1$
-							+ "\n<!----------------------------!> \nOutput:\n " + output))); //$NON-NLS-1$
+			IdeLog.logError(FormatterPlugin.getDefault(), FormatterMessages.Formatter_formatterError,
+					new DumpContentException("\nInput:\n\n" + input //$NON-NLS-1$
+							+ "\n<!----------------------------!> \nOutput:\n " + output), IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 		else
 		{
 			// Log basic
-			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
-					FormatterMessages.Formatter_basicLogFormatterError, null));
+			IdeLog.logError(FormatterPlugin.getDefault(), FormatterMessages.Formatter_basicLogFormatterError,
+					IDebugScopes.DEBUG);
 		}
 	}
 
@@ -333,7 +331,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		catch (Exception e)
 		{
 			IdeLog.logError(FormatterPlugin.getDefault(),
-					"Error while computing the formatter's output OFF/ON regions", e); //$NON-NLS-1$
+					"Error while computing the formatter's output OFF/ON regions", e, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 		return onOffRegions;
 	}
@@ -603,7 +601,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		catch (BadLocationException e)
 		{
-			FormatterPlugin.logError(e);
+			IdeLog.logError(FormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return 0;
 	}

@@ -20,6 +20,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.ui.io.Utils;
 
@@ -54,22 +55,22 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 
 	public Object[] getChildren()
 	{
-		return new Object[0];
+		return ArrayUtil.NO_OBJECTS;
 	}
 
 	public Image getImage()
 	{
-		return fileStore == null ? null : CompareUI.getImage(getType());
+		return (fileStore == null) ? null : CompareUI.getImage(getType());
 	}
 
 	public String getName()
 	{
-		return fileStore == null ? null : fileStore.getName();
+		return (fileStore == null) ? null : fileStore.getName();
 	}
 
 	public String getType()
 	{
-		return fileStore == null ? ITypedElement.UNKNOWN_TYPE : FileUtil.getExtension(fileStore.getName());
+		return (fileStore == null) ? ITypedElement.UNKNOWN_TYPE : FileUtil.getExtension(fileStore.getName());
 	}
 
 	public boolean isEditable()
@@ -84,6 +85,6 @@ public class FileStoreNode extends BufferedContent implements IStructureComparat
 
 	public long getModificationDate()
 	{
-		return fileStore == null ? 0 : Utils.getDetailedFileInfo(fileStore).getLastModified();
+		return (fileStore == null) ? 0 : Utils.getDetailedFileInfo(fileStore).getLastModified();
 	}
 }

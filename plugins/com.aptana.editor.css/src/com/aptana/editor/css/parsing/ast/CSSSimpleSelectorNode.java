@@ -14,6 +14,9 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSSimpleSelectorNode extends CSSNode
 {
+
+	private static final CSSAttributeSelectorNode[] NO_ATTRIBUTE_SELECTORS = new CSSAttributeSelectorNode[0];
+
 	private String fTypeSelector;
 
 	/**
@@ -33,7 +36,7 @@ public class CSSSimpleSelectorNode extends CSSNode
 	 */
 	public CSSSimpleSelectorNode(String typeSelector)
 	{
-		this(typeSelector, new CSSAttributeSelectorNode[0]);
+		this(typeSelector, NO_ATTRIBUTE_SELECTORS);
 	}
 
 	/**
@@ -44,7 +47,7 @@ public class CSSSimpleSelectorNode extends CSSNode
 	 */
 	public CSSSimpleSelectorNode(String typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
 	{
-		super(CSSNodeTypes.SIMPLE_SELECTOR);
+		super(ICSSNodeTypes.SIMPLE_SELECTOR);
 
 		fTypeSelector = typeSelector;
 
@@ -133,7 +136,7 @@ public class CSSSimpleSelectorNode extends CSSNode
 
 			if (i < size - 1)
 			{
-				text.append(" "); //$NON-NLS-1$
+				text.append(' ');
 			}
 		}
 

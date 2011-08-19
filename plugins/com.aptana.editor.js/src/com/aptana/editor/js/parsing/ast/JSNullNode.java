@@ -16,7 +16,7 @@ public class JSNullNode extends JSPrimitiveNode
 	 */
 	public JSNullNode()
 	{
-		super(JSNodeTypes.NULL, "null"); //$NON-NLS-1$
+		super(IJSNodeTypes.NULL, "null"); //$NON-NLS-1$
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class JSNullNode extends JSPrimitiveNode
 	 */
 	public JSNullNode(Symbol identifier)
 	{
-		super(JSNodeTypes.NULL, (String) identifier.value);
+		super(IJSNodeTypes.NULL, (String) identifier.value);
 	}
 
 	/*

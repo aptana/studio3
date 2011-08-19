@@ -16,12 +16,13 @@ public class SnippetsTests
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite(SnippetsTests.class.getName());
-		//$JUnit-BEGIN$
+		// $JUnit-BEGIN$
 		suite.addTestSuite(CommandTemplateTest.class);
+		suite.addTestSuite(ExpandSnippetVerifyKeyListenerTest.class);
 		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
 		suite.addTestSuite(SnippetTemplateTranslatorTest.class);
 		suite.addTestSuite(SnippetsCompletionProcessorTest.class);
-		//$JUnit-END$
+		// $JUnit-END$
 		return suite;
 	}
 

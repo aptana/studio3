@@ -16,7 +16,7 @@ public class JSContinueNode extends JSLabelStatementNode
 	 */
 	public JSContinueNode()
 	{
-		super(JSNodeTypes.CONTINUE);
+		super(IJSNodeTypes.CONTINUE);
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class JSContinueNode extends JSLabelStatementNode
 	 */
 	public JSContinueNode(Symbol label)
 	{
-		super(JSNodeTypes.CONTINUE, label);
+		super(IJSNodeTypes.CONTINUE, label);
 	}
 
 	/*

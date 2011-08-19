@@ -80,7 +80,7 @@ public class FileSystemCopyAction extends BaseSelectionListenerAction {
         for (int i = 0; i < fileStores.length; ++i) {
             fileNames[i] = fileStores[i].toString();
             if (i > 0) {
-                buf.append("\n"); //$NON-NLS-1$
+                buf.append('\n'); // $codepro.audit.disable platformSpecificLineSeparator
             }
             buf.append(fileStores[i].getName());
         }
@@ -146,7 +146,7 @@ public class FileSystemCopyAction extends BaseSelectionListenerAction {
             }
         } catch (SWTError e) {
             if (e.code != DND.ERROR_CANNOT_SET_CLIPBOARD) {
-                throw e;
+                throw e; // $codepro.audit.disable thrownExceptions
             }
             if (MessageDialog.openQuestion(fShell, "Problem with copy title", //$NON-NLS-1$
                     "Problem with copy.")) { //$NON-NLS-1$

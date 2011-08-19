@@ -29,7 +29,25 @@ public class CoffeeParserTest extends TestCase
 				"  Assign\n" + //
 				"    Value \"number\"\n" + //
 				"    Value \"42\"\n";
-		assertAST(expectedAST, source);
+
+		IParseRootNode root = parse(source);
+		assertAST(expectedAST, root);
+		// Make sure offsets are correct
+		IParseNode rootBlock = root.getChild(0);
+
+		// number = 42
+		IParseNode assignNode = rootBlock.getChild(0);
+		assertEquals(0, assignNode.getStartingOffset());
+		assertEquals(11, assignNode.getEndingOffset());
+
+		// number
+		IParseNode lhNode = assignNode.getChild(0);
+		assertEquals(0, lhNode.getStartingOffset());
+		assertEquals(6, lhNode.getEndingOffset());
+		// 42
+		IParseNode rhNode = assignNode.getChild(1);
+		assertEquals(9, rhNode.getStartingOffset());
+		assertEquals(11, rhNode.getEndingOffset());
 	}
 
 	public void testBooleanAssignment() throws Exception
@@ -41,7 +59,25 @@ public class CoffeeParserTest extends TestCase
 				"  Assign\n" + //
 				"    Value \"opposite\"\n" + //
 				"    Value \"true\"\n";
-		assertAST(expectedAST, source);
+
+		IParseRootNode root = parse(source);
+		assertAST(expectedAST, root);
+		// Make sure offsets are correct
+		IParseNode rootBlock = root.getChild(0);
+
+		// opposite = true
+		IParseNode assignNode = rootBlock.getChild(0);
+		assertEquals(0, assignNode.getStartingOffset());
+		assertEquals(15, assignNode.getEndingOffset());
+
+		// opposite
+		IParseNode lhNode = assignNode.getChild(0);
+		assertEquals(0, lhNode.getStartingOffset());
+		assertEquals(8, lhNode.getEndingOffset());
+		// true
+		IParseNode rhNode = assignNode.getChild(1);
+		assertEquals(11, rhNode.getStartingOffset());
+		assertEquals(15, rhNode.getEndingOffset());
 	}
 
 	public void testWebsiteExample() throws Exception
@@ -156,7 +192,20 @@ public class CoffeeParserTest extends TestCase
 				"                  Access \"cube\"\n" + //
 				"                Value \"num\"\n" + //
 				"            Value \"list\"\n";
-		assertAST(expected, source);
+
+		IParseRootNode rootNode = parse(source);
+		assertAST(expected, rootNode);
+		IParseNode[] comments = rootNode.getCommentNodes();
+		assertNotNull("Should have gotten an array of comment nodes", comments);
+		assertEquals("Number of comments doesn't match expectations", 8, comments.length);
+		assertCommentNode(comments[0], 0, 13, "# Assignment:");
+		assertCommentNode(comments[1], 45, 58, "# Conditions:");
+		assertCommentNode(comments[2], 85, 97, "# Functions:");
+		assertCommentNode(comments[3], 121, 130, "# Arrays:");
+		assertCommentNode(comments[4], 155, 165, "# Objects:");
+		assertCommentNode(comments[5], 241, 250, "# Splats:");
+		assertCommentNode(comments[6], 307, 319, "# Existence:");
+		assertCommentNode(comments[7], 350, 373, "# Array comprehensions:");
 	}
 
 	public void testFunctionsExample1() throws Exception
@@ -1061,7 +1110,34 @@ public class CoffeeParserTest extends TestCase
 				"  Call\n" + //
 				"    Value \"tom\"\n" + //
 				"      Access \"move\"\n";
-		assertAST(expected, source);
+
+		IParseRootNode root = parse(source);
+		assertAST(expected, root);
+		IParseNode rootBlock = root.getChild(0);
+
+		IParseNode animalClassNode = rootBlock.getChild(0);
+		assertParseNode(animalClassNode, 0, 103);
+
+		IParseNode animalBlockNode = animalClassNode.getChild(1);
+		assertParseNode(animalBlockNode, 12, 103);
+
+		IParseNode valueNode = animalBlockNode.getChild(0);
+		assertParseNode(valueNode, 12, 103);
+
+		IParseNode objNode = valueNode.getChild(0);
+		assertParseNode(objNode, 12, 103);
+
+		// the assignment of the function to "constructor"
+		IParseNode assignNode = objNode.getChild(0);
+		assertParseNode(assignNode, 15, 39);
+
+		// the function, includes params and body
+		IParseNode codeNode = assignNode.getChild(1);
+		assertParseNode(codeNode, 28, 39);
+
+		// block for the "constructor" function, which is empty
+		IParseNode constructorBlockNode = codeNode.getChild(1);
+		assertParseNode(constructorBlockNode, 38, 39);
 	}
 
 	public void testClassesExample2() throws Exception
@@ -1466,16 +1542,33 @@ public class CoffeeParserTest extends TestCase
 		assertAST(expected, source);
 	}
 
+	protected IParseRootNode parse(String source) throws Exception
+	{
+		CoffeeParser parser = new CoffeeParser();
+		ParseState parseState = new ParseState();
+		parseState.setEditState(source, null, 0, 0);
+		return parser.parse(parseState);
+	}
+
+	protected void assertCommentNode(IParseNode comment, int start, int end, String text)
+	{
+		assertParseNode(comment, start, end);
+		assertEquals("Text of comment doesn't match expectations", text, comment.getText());
+	}
+
+	protected void assertParseNode(IParseNode node, int start, int end)
+	{
+		assertEquals("Start offset of node doesn't match expectations", start, node.getStartingOffset());
+		assertEquals("End offset of node doesn't match expectations", end, node.getEndingOffset());
+	}
+
 	protected void assertAST(String expectedAST, String source) throws Exception
 	{
 		if (expectedAST == null || expectedAST.length() == 0)
 		{
 			fail("expected AST not yet filled in!");
 		}
-		CoffeeParser parser = new CoffeeParser();
-		ParseState parseState = new ParseState();
-		parseState.setEditState(source, null, 0, 0);
-		IParseRootNode root = parser.parse(parseState);
+		IParseRootNode root = parse(source);
 		assertAST(expectedAST, root);
 	}
 

@@ -19,6 +19,8 @@ import com.aptana.editor.common.scripting.snippets.SnippetsTests;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategyTest;
 import com.aptana.editor.common.text.reconciler.ReconcilerTests;
 import com.aptana.editor.common.text.rules.RulesTests;
+import com.aptana.editor.common.validation.ValidationTests;
+import com.aptana.editor.common.viewer.ViewerTests;
 
 public class AllTests
 {
@@ -33,6 +35,8 @@ public class AllTests
 		suite.addTest(SnippetsTests.suite());
 		suite.addTest(ReconcilerTests.suite());
 		suite.addTest(ScriptingCommandsTests.suite());
+		suite.addTest(ValidationTests.suite());
+		suite.addTest(ViewerTests.suite());
 		suite.addTestSuite(ScriptingInputOutputTest.class);
 		suite.addTestSuite(RubyRegexpAutoIndentStrategyTest.class);
 		suite.addTestSuite(DocumentScopeManagerTest.class);

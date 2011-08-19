@@ -14,12 +14,15 @@ import java.util.NoSuchElementException;
 import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
 public class ParseNode extends Node implements IParseNode
 {
+
 	protected static final class NameNode implements INameNode
 	{
 		private final String fName;
@@ -60,7 +63,7 @@ public class ParseNode extends Node implements IParseNode
 	public ParseNode(String language)
 	{
 		fLanguage = language;
-		fChildren = new IParseNode[0];
+		fChildren = NO_CHILDREN;
 	}
 
 	/*
@@ -123,27 +126,42 @@ public class ParseNode extends Node implements IParseNode
 	 */
 	public boolean equals(Object obj)
 	{
+		if (this == obj)
+		{
+			return true;
+		}
+
 		// Must be a parse node
 		if (!(obj instanceof IParseNode))
+		{
 			return false;
+		}
 
 		IParseNode other = (IParseNode) obj;
 		// Must be same language
 		if (!getLanguage().equals(other.getLanguage()))
+		{
 			return false;
+		}
 
 		// Same type
 		if (getNodeType() != other.getNodeType())
+		{
 			return false;
+		}
 
 		// Must have same parent
 		if (getParent() == null)
 		{
 			if (other.getParent() != null)
+			{
 				return false;
+			}
 		}
 		else if (!getParent().equals(other.getParent()))
+		{
 			return false;
+		}
 
 		// That's about the best we can check from here, since offsets can change a lot. Should really also check
 		// identifier/name
@@ -182,7 +200,7 @@ public class ParseNode extends Node implements IParseNode
 
 		for (int i = 0; i < fChildrenCount; i++)
 		{
-			if (fChildren[i] == child)
+			if (fChildren[i] == child) // $codepro.audit.disable useEquals
 			{
 				result = i;
 				break;
@@ -568,9 +586,9 @@ public class ParseNode extends Node implements IParseNode
 
 			public IParseNode next()
 			{
-				if (hasNext() == false)
+				if (!hasNext())
 				{
-					throw new NoSuchElementException();
+					throw new NoSuchElementException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 				}
 
 				return fChildren[index++];
@@ -578,7 +596,7 @@ public class ParseNode extends Node implements IParseNode
 
 			public void remove()
 			{
-				throw new UnsupportedOperationException();
+				throw new UnsupportedOperationException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 			}
 		};
 	}
@@ -653,9 +671,9 @@ public class ParseNode extends Node implements IParseNode
 					source //
 					);
 
-			ParsingPlugin.logError(message, null);
+			IdeLog.logError(ParsingPlugin.getDefault(), message);
 
-			end = start - 1;
+			end = start - 1; // $codepro.audit.disable questionableAssignment
 		}
 
 		super.setLocation(start, end);
@@ -684,14 +702,70 @@ public class ParseNode extends Node implements IParseNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
+
 		for (int i = 0; i < fChildrenCount; ++i)
 		{
 			text.append(fChildren[i]);
+
 			if (i < fChildrenCount - 1)
 			{
-				text.append(" "); //$NON-NLS-1$
+				text.append(' ');
 			}
 		}
+
 		return text.toString();
+	}
+
+	/**
+	 * toXML
+	 * 
+	 * @return
+	 */
+	public String toXML()
+	{
+		SourcePrinter printer = new SourcePrinter();
+
+		toXML(printer);
+
+		return printer.toString();
+	}
+
+	/**
+	 * toXML
+	 * 
+	 * @param printer
+	 */
+	protected void toXML(SourcePrinter printer)
+	{
+		if (hasChildren())
+		{
+			printer.printWithIndent('<').print(getElementName()).increaseIndent();
+
+			IParseNodeAttribute[] attrs = getAttributes();
+
+			if (attrs != null)
+			{
+				for (IParseNodeAttribute attr : attrs)
+				{
+					printer.print(' ').print(attr.getName()).print("=\"").print(attr.getValue()).print('"'); //$NON-NLS-1$
+				}
+			}
+
+			printer.println('>');
+
+			for (IParseNode child : this)
+			{
+				if (child instanceof ParseNode)
+				{
+					((ParseNode) child).toXML(printer);
+				}
+			}
+
+			printer.decreaseIndent().printWithIndent("</").print(getElementName()).println('>'); //$NON-NLS-1$
+		}
+		else
+		{
+			printer.printWithIndent('<').print(getElementName()).println("/>"); //$NON-NLS-1$
+		}
 	}
 }

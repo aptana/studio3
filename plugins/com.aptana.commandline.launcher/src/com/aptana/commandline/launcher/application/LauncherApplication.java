@@ -59,7 +59,7 @@ public class LauncherApplication implements IApplication
 				{
 					Exception e = new IllegalStateException(NLS.bind(Messages.LauncherApplication_ApplicationNotFound,
 							productApplicationId));
-					IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 				}
 			}
 			else
@@ -76,7 +76,7 @@ public class LauncherApplication implements IApplication
 						{
 							Exception e = new IllegalStateException(
 									Messages.LauncherApplication_CouldNotSendCommandLineArguments);
-							IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+							IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 						}
 					}
 				}
@@ -84,7 +84,7 @@ public class LauncherApplication implements IApplication
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 		}
 		return EXIT_OK;
 	}
@@ -147,7 +147,7 @@ public class LauncherApplication implements IApplication
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 			return false;
 		}
 

@@ -41,7 +41,7 @@ public class ToggleTextNodesHandler extends AbstractHandler
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
 		IEditorPart editor = HandlerUtil.getActiveEditor(event);

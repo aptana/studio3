@@ -41,7 +41,6 @@ public class SamplesPlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		samplesManager = new SamplesManager();
 	}
 
 	/*
@@ -50,6 +49,7 @@ public class SamplesPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		samplesManager = null;
 		plugin = null;
 		super.stop(context);
 	}
@@ -64,8 +64,12 @@ public class SamplesPlugin extends Plugin
 		return plugin;
 	}
 
-	public ISamplesManager getSamplesManager()
+	public synchronized ISamplesManager getSamplesManager()
 	{
+		if (samplesManager == null)
+		{
+			samplesManager = new SamplesManager();
+		}
 		return samplesManager;
 	}
 }

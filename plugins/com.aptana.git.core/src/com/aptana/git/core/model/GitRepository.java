@@ -56,11 +56,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.epl.ReadWriteMonitor;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitRef.TYPE;
 
@@ -270,7 +272,7 @@ public class GitRepository
 									}
 									catch (JNotifyException e)
 									{
-										GitPlugin.logError(e.getMessage(), e);
+										IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 									}
 
 									if (remoteDirCreationWatchId == -1)
@@ -287,7 +289,7 @@ public class GitRepository
 											}
 											catch (JNotifyException e)
 											{
-												GitPlugin.logError(e.getMessage(), e);
+												IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 											}
 											return Status.OK_STATUS;
 										}
@@ -364,7 +366,7 @@ public class GitRepository
 		}
 		catch (JNotifyException e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 	}
 
@@ -536,7 +538,7 @@ public class GitRepository
 		}
 		catch (FileNotFoundException e)
 		{
-			GitPlugin.logError(e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		finally
 		{
@@ -647,7 +649,7 @@ public class GitRepository
 			}
 			catch (CoreException e)
 			{
-				GitPlugin.logError(e);
+				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		sub.done();
@@ -668,7 +670,7 @@ public class GitRepository
 			}
 			catch (CoreException e)
 			{
-				GitPlugin.logError(e);
+				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		sub.done();
@@ -1028,7 +1030,7 @@ public class GitRepository
 		}
 		catch (FileNotFoundException e)
 		{
-			GitPlugin.logError(e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 
 		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName); //$NON-NLS-1$
@@ -1092,7 +1094,7 @@ public class GitRepository
 		}
 		catch (FileNotFoundException e)
 		{
-			GitPlugin.logError(e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		finally
 		{
@@ -1220,7 +1222,7 @@ public class GitRepository
 	 */
 	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, GitExecutable.getShellEnvironment(), args);
+		return execute(readOrWrite, GitExecutable.getEnvironment(), args);
 	}
 
 	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
@@ -1338,7 +1340,7 @@ public class GitRepository
 				}
 				catch (JNotifyException e)
 				{
-					GitPlugin.logError(e.getMessage(), e);
+					IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 				}
 			}
 		}
@@ -1382,7 +1384,7 @@ public class GitRepository
 		}
 		catch (Exception e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		finally
 		{
@@ -1578,7 +1580,7 @@ public class GitRepository
 		}
 		catch (IOException e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return false;
 		}
 		finally

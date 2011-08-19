@@ -39,7 +39,8 @@ public class JSDebugUIPreferenceInitializer extends AbstractPreferenceInitialize
 
 		// override default org.eclipse.debug.ui options
 		node = EclipseUtil.defaultScope().getNode(DebugUIPlugin.getDefault().getBundle().getSymbolicName());
-		if (MessageDialogWithToggle.NEVER.equals(node.get(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, StringUtil.EMPTY))) {
+		if (MessageDialogWithToggle.NEVER.equals(node.get(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE,
+				StringUtil.EMPTY))) {
 			node.put(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.PROMPT);
 		}
 	}

@@ -14,7 +14,7 @@ import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.parsing.ast.IParseNode;
 
-public class JQueryInvocationProcessor implements InvocationProcessor
+public class JQueryInvocationProcessor implements IInvocationProcessor
 {
 	private static final List<String> PATTERNS;
 
@@ -40,7 +40,9 @@ public class JQueryInvocationProcessor implements InvocationProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.inferencing.InvocationProcessor#processInvocation(com.aptana.editor.js.inferencing.JSScope, com.aptana.editor.js.parsing.ast.JSInvokeNode)
+	 * @see
+	 * com.aptana.editor.js.inferencing.InvocationProcessor#processInvocation(com.aptana.editor.js.inferencing.JSScope,
+	 * com.aptana.editor.js.parsing.ast.JSInvokeNode)
 	 */
 	public boolean processInvocation(JSScope scope, JSInvokeNode node)
 	{

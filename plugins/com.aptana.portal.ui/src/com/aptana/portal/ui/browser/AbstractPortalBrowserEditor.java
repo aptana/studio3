@@ -29,6 +29,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.EditorPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
@@ -49,8 +50,8 @@ import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
 public abstract class AbstractPortalBrowserEditor extends EditorPart
 {
 
-	private static final String BROWSER_SWT = "swt";
-	private static final String BROWSER_CHROMIUM = "chromium";
+	private static final String BROWSER_SWT = "swt"; //$NON-NLS-1$
+	private static final String BROWSER_CHROMIUM = "chromium"; //$NON-NLS-1$
 
 	private BrowserViewerWrapper browserViewer;
 	private BrowserWrapper browser;
@@ -72,7 +73,7 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		}
 		else
 		{
-			PortalUIPlugin.logWarning("Ignoring a null URL that was passed to the Aptana Portal"); //$NON-NLS-1$
+			IdeLog.logWarning(PortalUIPlugin.getDefault(), "Ignoring a null URL that was passed to the Aptana Portal"); //$NON-NLS-1$
 		}
 	}
 
@@ -133,7 +134,8 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		if (BROWSER_CHROMIUM.equals(browserType))
 		{
 			return BrowserViewerWrapper.createWebkitBrowserViewer(parent, 0);
-		} else
+		}
+		else
 		{
 			return BrowserViewerWrapper.createSWTBrowserViewer(parent, 0);
 		}
@@ -145,7 +147,8 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		if (BROWSER_CHROMIUM.equals(browserType) && !isChromiumWebkitSupported())
 		{
 			browserType = BROWSER_SWT;
-		} else if (browserType == null && isChromiumWebkitSupported())
+		}
+		else if (browserType == null && isChromiumWebkitSupported())
 		{
 			browserType = BROWSER_CHROMIUM;
 		}
@@ -156,8 +159,10 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	{
 		if (Platform.ARCH_X86.equals(Platform.getOSArch()))
 		{
-			return Platform.OS_WIN32.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()) || Platform.OS_LINUX.equals(Platform.getOS());
-		} else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
+			return Platform.OS_WIN32.equals(Platform.getOS()) /* || Platform.OS_MACOSX.equals(Platform.getOS()) */
+					|| Platform.OS_LINUX.equals(Platform.getOS());
+		}
+		else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
 		{
 			return Platform.OS_LINUX.equals(Platform.getOS());
 		}
@@ -301,7 +306,8 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 		executionResult = browser.execute("window.onerror=customErrorHandler;"); //$NON-NLS-1$
 		if (!executionResult)
 		{
-			PortalUIPlugin.logError("Error registering the Portal browser functions", new IllegalStateException()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(),
+					"Error registering the Portal browser functions", new IllegalStateException()); //$NON-NLS-1$
 		}
 	}
 

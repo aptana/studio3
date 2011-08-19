@@ -8,43 +8,77 @@
 package com.aptana.scripting.ui.views;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
-import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.MenuElement;
-import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class BundleEntryNode extends BaseNode
+class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 {
-	private enum Property
+	enum Property implements IPropertyInformation<BundleEntryNode>
 	{
-		NAME, CONTRIBUTOR_COUNT
+		NAME(Messages.BundleEntryNode_Bundle_Entry_Name)
+		{
+			public Object getPropertyValue(BundleEntryNode node)
+			{
+				return node.entry.getName();
+			}
+		},
+		CONTRIBUTOR_COUNT(Messages.BundleEntryNode_Bundle_Entry_Contributor_Count)
+		{
+			public Object getPropertyValue(BundleEntryNode node)
+			{
+				return node.entry.getBundles().size();
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
 	}
 
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
-	private BundleEntry _entry;
-	
+	private BundleEntry entry;
 	private Action reloadAction;
-	
 
 	/**
 	 * BundleEntryNode
 	 * 
 	 * @param entry
 	 */
-	public BundleEntryNode(BundleEntry entry)
+	BundleEntryNode(BundleEntry entry)
 	{
-		this._entry = entry;
-		
-		this.makeActions();
+		this.entry = entry;
+
+		makeActions();
+	}
+
+	/**
+	 * addNode
+	 * 
+	 * @param items
+	 * @param node
+	 */
+	private void addNode(List<Object> items, BaseNode<?> node)
+	{
+		if (node != null && node.hasChildren())
+		{
+			items.add(node);
+		}
 	}
 
 	/**
@@ -63,47 +97,20 @@ class BundleEntryNode extends BaseNode
 	{
 		List<Object> result = new ArrayList<Object>();
 
-		// add bundle element that contribute to this bundle
-		for (BundleElement bundle : this._entry.getBundles())
+		// add bundle elements that contribute to this bundle
+		for (BundleElement bundle : entry.getBundles())
 		{
 			result.add(new BundleNode(bundle));
 		}
 
-		// divide commands into commands and snippets
-		List<CommandElement> commands = new ArrayList<CommandElement>();
-		List<CommandElement> snippets = new ArrayList<CommandElement>();
-
-		for (CommandElement element : this._entry.getCommands())
-		{
-			if (element instanceof SnippetElement)
-			{
-				snippets.add(element);
-			}
-			else
-			{
-				commands.add(element);
-			}
-		}
-
-		// add visible commands
-		if (commands.size() > 0)
-		{
-			result.add(new CommandsNode(commands));
-		}
-
-		// add visible snippets
-		if (snippets.size() > 0)
-		{
-			result.add(new SnippetsNode(snippets));
-		}
-
-		// add visible menus
-		List<MenuElement> menus = this._entry.getMenus();
-
-		if (menus != null && menus.size() > 0)
-		{
-			result.add(new MenusNode(menus));
-		}
+		// create and add children
+		addNode(result, new CommandsNode(entry.getCommands()));
+		addNode(result, new SnippetsNode(entry.getCommands()));
+		addNode(result, new FileTemplatesNode(entry.getCommands()));
+		addNode(result, new MenusNode(entry.getMenus()));
+		addNode(result, new BuildPathsNode(entry.getBuildPaths()));
+		addNode(result, new EnvsNode(entry.getEnvs()));
+		addNode(result, new ProjectTemplatesNode(entry.getProjectTemplates()));
 
 		return result.toArray();
 	}
@@ -123,48 +130,18 @@ class BundleEntryNode extends BaseNode
 	 */
 	public String getLabel()
 	{
-		return this._entry.getName();
+		return entry.getName();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyDescriptors()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
 	 */
-	public IPropertyDescriptor[] getPropertyDescriptors()
+	@Override
+	protected Set<Property> getPropertyInfoSet()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name"); //$NON-NLS-1$
-		PropertyDescriptor contributorCountProperty = new PropertyDescriptor(Property.CONTRIBUTOR_COUNT, "Contributors"); //$NON-NLS-1$
-
-		return new IPropertyDescriptor[] { nameProperty, contributorCountProperty };
+		return EnumSet.allOf(Property.class);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyValue(java.lang.Object)
-	 */
-	public Object getPropertyValue(Object id)
-	{
-		Object result = null;
-
-		if (id instanceof Property)
-		{
-			switch ((Property) id)
-			{
-				case NAME:
-					result = this._entry.getName();
-					break;
-					
-				case CONTRIBUTOR_COUNT:
-					List<BundleElement> bundles = this._entry.getBundles();
-					
-					result = (bundles != null) ? bundles.size() : 0;
-					break;
-			}
-		}
-
-		return result;
-	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -174,7 +151,7 @@ class BundleEntryNode extends BaseNode
 	{
 		boolean result = false;
 
-		for (BundleElement bundle : this._entry.getBundles())
+		for (BundleElement bundle : entry.getBundles())
 		{
 			if (bundle.hasChildren())
 			{
@@ -185,7 +162,7 @@ class BundleEntryNode extends BaseNode
 
 		return result;
 	}
-	
+
 	/**
 	 * makeActions
 	 */
@@ -195,10 +172,10 @@ class BundleEntryNode extends BaseNode
 		{
 			public void run()
 			{
-				_entry.reload();
+				entry.reload();
 			}
 		};
 		reloadAction.setText(Messages.BundleEntryNode_TXT_Reload);
-		//reloadAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_));
+		// reloadAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_));
 	}
 }

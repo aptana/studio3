@@ -16,6 +16,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -32,15 +33,14 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
+		 * @see org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
 		 */
 		public String isValid(String newText) {
 			int value = -1;
 			try {
 				value = Integer.valueOf(newText.trim()).intValue();
 			} catch (NumberFormatException e) {
+				e.getCause();
 			}
 			if (value < 1) {
 				return Messages.BreakpointHitCountAction_HitCountPositiveInteger;
@@ -51,10 +51,8 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface. action.IAction,
+	 * org.eclipse.ui.IWorkbenchPart)
 	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// TODO Auto-generated method stub
@@ -62,10 +60,8 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action .IAction,
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = null;
@@ -76,7 +72,6 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
@@ -104,9 +99,9 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 		try {
 			currentHitCount = breakpoint.getHitCount();
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
-		String initialValue = currentHitCount > 0 ? Integer.toString(currentHitCount) : "1"; //$NON-NLS-1$;
+		String initialValue = (currentHitCount > 0) ? Integer.toString(currentHitCount) : "1"; //$NON-NLS-1$;
 
 		HitCountDialog dlg = new HitCountDialog(UIUtils.getActiveShell(),
 				Messages.BreakpointHitCountAction_SetBreakpointHitCount,
@@ -119,5 +114,4 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 		}
 		return 0;
 	}
-
 }

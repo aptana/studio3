@@ -83,6 +83,9 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		try {
 			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT*5);
 			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damage.getOffset(), damage.getLength(), false);
+			if (partitioning.length == 0) {
+				return presentation;
+			}
 			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
 			for (int i = 0; i < limit; ++i) {
 				ITypedRegion r = partitioning[i];
@@ -119,10 +122,10 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		if (delayedRegion != null) {
 			if (delayedRegion.getOffset() >= startOffset) {
 				int length = delayedRegion.getLength() - (endOffset-delayedRegion.getOffset());
-				delayedRegion = length > 0 ? new Region(endOffset, length) : null;				
+				delayedRegion = (length > 0) ? new Region(endOffset, length) : null;
 			} else if (delayedRegion.getOffset()+delayedRegion.getLength() <= endOffset) {
 				int length = startOffset - delayedRegion.getOffset();
-				delayedRegion = length > 0 ? new Region(delayedRegion.getOffset(), length) : null;				
+				delayedRegion = (length > 0) ? new Region(delayedRegion.getOffset(), length) : null;
 			}
 		}
 	}

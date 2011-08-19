@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.parsing.ast.IParseNode;
@@ -18,7 +19,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class CommonOutlineContentProvider implements ITreeContentProvider
 {
 
-	protected static final Object[] EMPTY = new Object[0];
+	protected static final Object[] EMPTY = ArrayUtil.NO_OBJECTS;
 	private IParseListener fListener;
 	protected IPathResolver resolver;
 

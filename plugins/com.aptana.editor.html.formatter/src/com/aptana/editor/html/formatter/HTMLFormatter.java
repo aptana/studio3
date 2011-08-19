@@ -18,6 +18,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
@@ -28,6 +29,7 @@ import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.ScriptFormatterManager;
@@ -144,7 +146,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			{
 				StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
 						ERROR_DISPLAY_TIMEOUT, true);
-				FormatterPlugin.logError(e);
+				IdeLog.logError(HTMLFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 
 				// In case of a parse error (which is unlikely to HTML parsing), just try to indent the given source.
 				return indent(source, input, offset, length, indentationLevel);
@@ -183,14 +185,14 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.getDefault().isDebugging())
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(HTMLFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		catch (Throwable t)
 		{
 			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
 					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(t);
+			IdeLog.logError(HTMLFormatterPlugin.getDefault(), t, IDebugScopes.DEBUG);
 		}
 		return null;
 	}

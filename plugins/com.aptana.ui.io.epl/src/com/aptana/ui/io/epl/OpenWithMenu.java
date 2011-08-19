@@ -10,6 +10,9 @@
  *     Benjamin Muskalla -  Bug 29633 [EditorMgmt] "Open" menu should
  *                          have Open With-->Other
  *******************************************************************************/
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable interfaceNamingConvention
+
 package com.aptana.ui.io.epl;
 
 import java.io.File;
@@ -20,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -46,6 +50,8 @@ import org.eclipse.ui.dialogs.EditorSelectionDialog;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A menu for opening files in the workbench.
@@ -78,7 +84,7 @@ public class OpenWithMenu extends ContributionItem {
     private IEditorRegistry registry = PlatformUI.getWorkbench()
             .getEditorRegistry();
 
-    private static Hashtable<ImageDescriptor, Image> imageCache = new Hashtable<ImageDescriptor, Image>(11);
+    private static Map<ImageDescriptor, Image> imageCache = new Hashtable<ImageDescriptor, Image>(11);
 
     /**
      * The id of this action.
@@ -243,7 +249,7 @@ public class OpenWithMenu extends ContributionItem {
         try {
             preferredEditor = IDE.getEditorDescriptor(file.getName()); // may be null
         } catch (PartInitException e) {
-            // ignores the exception
+        	IdeLog.logError(IOUIEplPlugin.getDefault(), e);
         }
 
         IContentType finalType = null;
@@ -270,7 +276,7 @@ public class OpenWithMenu extends ContributionItem {
                     }
                 }
             } catch (Exception e) {
-                // ignores the exception
+            	IdeLog.logWarning(IOUIEplPlugin.getDefault(), e);
             }
         }
         IEditorDescriptor[] editors = registry.getEditors(file.getName(), finalType);

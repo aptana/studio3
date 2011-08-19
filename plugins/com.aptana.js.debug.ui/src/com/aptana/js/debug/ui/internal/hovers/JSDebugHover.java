@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.js.debug.ui.internal.hovers;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -27,16 +29,17 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
  * @author Max Stepanov
  */
 public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
-	
+
 	private static IDebugModelPresentation modelPresentation;
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer,
+	 * org.eclipse.jface.text.IRegion)
 	 */
 	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
 		Object info = getHoverInfo2(textViewer, hoverRegion);
-		return info != null ? info.toString() : null;
+		return (info != null) ? info.toString() : null;
 	}
 
 	/*
@@ -47,8 +50,10 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 		return findWord(textViewer.getDocument(), offset);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer,
+	 * org.eclipse.jface.text.IRegion)
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
 		IJSStackFrame frame = getFrame();
@@ -98,30 +103,30 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 	}
 
 	/*
-	 * Replaces reserved HTML characters in the given string with their escaped
-	 * equivalents. This is to ensure that variable values containing reserved
-	 * characters are correctly displayed.
+	 * Replaces reserved HTML characters in the given string with their escaped equivalents. This is to ensure that
+	 * variable values containing reserved characters are correctly displayed.
 	 */
 	private static String replaceHTMLChars(String variableText) {
 		StringBuilder sb = new StringBuilder(variableText.length());
 		char[] characters = variableText.toCharArray();
+		char character;
 		for (int i = 0; i < characters.length; i++) {
-			char character = characters[i];
+			character = characters[i];
 			switch (character) {
-			case '<':
-				sb.append("&lt;"); //$NON-NLS-1$
-				break;
-			case '>':
-				sb.append("&gt;"); //$NON-NLS-1$
-				break;
-			case '&':
-				sb.append("&amp;"); //$NON-NLS-1$
-				break;
-			case '"':
-				sb.append("&quot;"); //$NON-NLS-1$
-				break;
-			default:
-				sb.append(character);
+				case '<':
+					sb.append("&lt;"); //$NON-NLS-1$
+					break;
+				case '>':
+					sb.append("&gt;"); //$NON-NLS-1$
+					break;
+				case '&':
+					sb.append("&amp;"); //$NON-NLS-1$
+					break;
+				case '"':
+					sb.append("&quot;"); //$NON-NLS-1$
+					break;
+				default:
+					sb.append(character);
 			}
 		}
 		return sb.toString();
@@ -165,6 +170,7 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 			end = pos;
 
 		} catch (BadLocationException ignore) {
+			ignore.getCause();
 		}
 
 		if (start >= -1 && end > -1) {

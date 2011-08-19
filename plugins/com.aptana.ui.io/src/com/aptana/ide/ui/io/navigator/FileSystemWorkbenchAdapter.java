@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.ui.io.navigator;
 
@@ -30,6 +31,7 @@ import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
 import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.ide.core.io.IConnectionPointManager;
@@ -81,7 +83,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 				try {
 					return container.members();
 				} catch (CoreException e) {
-					IOUIPlugin.logImportant(Messages.FileSystemWorkbenchAdapter_FailedToGetMembers, e);
+					IdeLog.logWarning(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToGetMembers, e);
 				}
 			} else {
 				try {
@@ -92,7 +94,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                         connectionPoint.connect(true, new NullProgressMonitor());
                         return fetchFileSystemChildren(connectionPoint.getRoot(), new NullProgressMonitor());
                     } catch (CoreException e1) {
-                        IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+                        IdeLog.logError(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
                         UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
                     }
 				}
@@ -103,7 +105,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			try {
 				return fetchFileSystemChildren(((LocalRoot) object).getRoot(), new NullProgressMonitor());
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 				UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 			}
 		} else if (object instanceof IConnectionPointManager) {
@@ -226,6 +228,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                             monitor);
                     return;
                 } catch (CoreException e1) {
+                	IdeLog.logWarning(IOUIPlugin.getDefault(), e1);
                 }
             }
 			else if (object instanceof FileSystemObject && e.getCause() instanceof PermissionDeniedException)
@@ -236,7 +239,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 				}
 				return;
 			}
-			IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
+			IdeLog.logError(IOUIPlugin.getDefault(), Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
 			UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 		} finally {
 			collector.done();
@@ -276,9 +279,9 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (IWorkbenchAdapter.class == adapterType) {
+			if (IWorkbenchAdapter.class.equals(adapterType)) {
 				return getInstance();
-			} else if (IDeferredWorkbenchAdapter.class == adapterType) {
+			} else if (IDeferredWorkbenchAdapter.class.equals(adapterType)) {
 				if (adaptableObject instanceof WorkspaceConnectionPoint
 						|| adaptableObject instanceof LocalConnectionPoint
 						|| adaptableObject instanceof LocalRoot) {

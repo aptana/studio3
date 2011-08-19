@@ -28,7 +28,7 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 	 * Creates composite reconciling strategy.
 	 */
 	public CompositeReconcilingStrategy(IReconcilingStrategy... strategies ) {
-		fStrategies = strategies != null ? strategies : new IReconcilingStrategy[0];
+		fStrategies = (strategies != null) ? strategies : new IReconcilingStrategy[0];
 	}
 
 	/*

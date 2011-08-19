@@ -235,7 +235,7 @@ public class FormatterUtils
 		if (outputOffOnRegions == null || inputOffOnRegions.size() != outputOffOnRegions.size())
 		{
 			IdeLog.logError(FormatterPlugin.getDefault(), outputOffOnRegions == null ? "Output OFF/ON regions was null" //$NON-NLS-1$
-					: "Output OFF/ON regions do not match in size to the input regions", (String) null); //$NON-NLS-1$
+					: "Output OFF/ON regions do not match in size to the input regions", IDebugScopes.DEBUG); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID,
 					"Error applying the formatter ON-OFF regions")); //$NON-NLS-1$
 		}

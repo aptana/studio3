@@ -87,7 +87,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 			return null;
 		}
@@ -108,7 +108,7 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 		if (ours.isEmpty())

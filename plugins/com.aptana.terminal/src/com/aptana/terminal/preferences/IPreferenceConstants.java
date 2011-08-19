@@ -9,8 +9,7 @@ package com.aptana.terminal.preferences;
 
 import com.aptana.terminal.TerminalPlugin;
 
-public interface IPreferenceConstants
-{
+public interface IPreferenceConstants {
 	public static final String FIRST_RUN = TerminalPlugin.PLUGIN_ID + ".firstRun"; //$NON-NLS-1$
 	public static final String CLOSE_VIEW_ON_EXIT = TerminalPlugin.PLUGIN_ID + ".closeViewOnExit"; //$NON-NLS-1$
 	public static final String WORKING_DIRECTORY = TerminalPlugin.PLUGIN_ID + ".workingDirectory"; //$NON-NLS-1$

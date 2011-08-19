@@ -96,7 +96,7 @@ public final class FileSystemUtils {
 		List<IFileStore> list = new ArrayList<IFileStore>();
 		while (fileStore != null) {
 			list.add(0, fileStore);
-			fileStore = fileStore.getParent();
+			fileStore = fileStore.getParent(); // $codepro.audit.disable questionableAssignment
 		}
 		return new TreePath(list.toArray());
 	}
@@ -115,7 +115,7 @@ public final class FileSystemUtils {
 		if (result instanceof FetchFileInfoStatus) {
 			return ((FetchFileInfoStatus) result).getFileInfo();
 		}
-		if (result == Status.CANCEL_STATUS) {
+		if (Status.CANCEL_STATUS.equals(result)) {
 			return null;
 		}
 		return null;

@@ -15,6 +15,7 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -51,11 +52,14 @@ public class RecentFilesBrowserNotification extends AbstractBrowserNotification
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				IWorkbenchPage activePage = PortalUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow()
-						.getActivePage();
-				if (activePage != null)
+				IWorkbenchWindow window = PortalUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+				if (window != null)
 				{
-					activePage.addPartListener(partListener);
+					IWorkbenchPage activePage = window.getActivePage();
+					if (activePage != null)
+					{
+						activePage.addPartListener(partListener);
+					}
 				}
 				return Status.OK_STATUS;
 			}

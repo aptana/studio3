@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.js.debug.ui.internal;
 
 import java.util.HashMap;
@@ -23,6 +25,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.launchConfigurations.LaunchHistory;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
@@ -30,14 +33,12 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
 @SuppressWarnings("restriction")
 public final class StartPageManager {
 
 	/**
 	 * IStartPageChangeListener
-	 * 
 	 */
 	public interface IStartPageChangeListener {
 		void startPageChanged(IResource resource);
@@ -62,7 +63,7 @@ public final class StartPageManager {
 			}
 
 			public void launchConfigurationChanged(ILaunchConfiguration configuration) {
-				if (configuration instanceof ILaunchConfigurationWorkingCopy == false) {
+				if (!(configuration instanceof ILaunchConfigurationWorkingCopy)) {
 					launchConfigurationRemovedInternal(configuration);
 					launchConfigurationAddedInternal(configuration);
 				}
@@ -80,7 +81,7 @@ public final class StartPageManager {
 				launchConfigurationAddedInternal(config);
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 
@@ -135,7 +136,7 @@ public final class StartPageManager {
 			try {
 				updateLaunchConfiguration(config, resource);
 			} catch (CoreException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 	}
@@ -159,7 +160,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 
@@ -176,7 +177,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return createConfiguration(Messages.StartPageManager_DefaultConfigurationName);
 	}
@@ -190,7 +191,7 @@ public final class StartPageManager {
 			JSLaunchConfigurationHelper.setDefaults(wc, null);
 			config = wc.doSave();
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return config;
 	}
@@ -220,7 +221,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Could not access launch configuration", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Could not access launch configuration", e); //$NON-NLS-1$
 		}
 	}
 
@@ -233,7 +234,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			/* ignore */
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 

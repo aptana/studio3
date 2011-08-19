@@ -35,7 +35,7 @@ import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
  * @author Max Stepanov
  *
  */
-public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements IPropertyDialog, FTPConnectionPropertyComposite.Listener {
+public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements IPropertyDialog, FTPConnectionPropertyComposite.IListener {
 
 	private Image titleImage;
 	private FTPConnectionPropertyComposite ftpComposite;

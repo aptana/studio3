@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ui.util.UIUtils;
@@ -45,8 +46,8 @@ public class EditorUtils {
                             ((ConnectionEditor) editorPart).setSelectedSite(site);
                         }
                     } catch (PartInitException e) {
-                        SyncingUIPlugin.logError(MessageFormat.format(
-                                Messages.EditorUtils_FailedToOpenEditor, site.getName()), e);
+						IdeLog.logError(SyncingUIPlugin.getDefault(),
+								MessageFormat.format(Messages.EditorUtils_FailedToOpenEditor, site.getName()), e);
                     }
                 }
             }

@@ -26,14 +26,14 @@ import java.util.List;
 	/**
 	 * 
 	 */
-	public ConnectionPointCategory(String id, String name, int order) {
+	protected ConnectionPointCategory(String id, String name, int order) {
 		this(id, name, order, false);
 	}
 
 	/**
 	 * 
 	 */
-	public ConnectionPointCategory(String id, String name, int order, boolean remote) {
+	protected ConnectionPointCategory(String id, String name, int order, boolean remote) {
 		this.id = id;
 		this.name = name;
 		this.order = order;

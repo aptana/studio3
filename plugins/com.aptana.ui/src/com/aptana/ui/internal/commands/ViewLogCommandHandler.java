@@ -53,7 +53,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(UIPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -82,7 +82,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 			{
 				editorDescriptor = editorRegistry.getDefaultEditor(filePath);
 			}
-			String editorId = (editorDescriptor == null ? "com.aptana.editor.text" : editorDescriptor.getId()); //$NON-NLS-1$
+			String editorId = (editorDescriptor == null) ? "com.aptana.editor.text" : editorDescriptor.getId(); //$NON-NLS-1$
 			try
 			{
 				IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file.toURI(),
@@ -90,7 +90,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 			}
 			catch (PartInitException e)
 			{
-				IdeLog.logError(UIPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(UIPlugin.getDefault(), e);
 			}
 		}
 	}

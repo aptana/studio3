@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import org.eclipse.core.runtime.CoreException;
@@ -22,8 +24,7 @@ import com.aptana.ui.util.UIUtils;
  */
 public class LaunchDebuggerPromptStatusHandler implements IStatusHandler {
 	/**
-	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus,
-	 *      java.lang.Object)
+	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, java.lang.Object)
 	 */
 	public Object handleStatus(IStatus status, Object source) throws CoreException {
 		Shell shell = UIUtils.getActiveShell();

@@ -22,9 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.js.debug.ui.internal.actions.Messages;
 
 /**
- * 
  * @author Max Stepanov
- * 
  */
 public class HitCountDialog extends InputDialog {
 	private boolean enabled;

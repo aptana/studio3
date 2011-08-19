@@ -73,7 +73,7 @@ public class URIHyperlink extends URLHyperlink
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			if (wrapped)
 			{
 				super.open();

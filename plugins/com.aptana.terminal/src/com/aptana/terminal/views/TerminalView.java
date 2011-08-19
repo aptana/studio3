@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
 
 package com.aptana.terminal.views;
 
@@ -64,7 +65,6 @@ import com.aptana.terminal.widget.TerminalComposite;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("restriction")
 public class TerminalView extends ViewPart implements ISaveablePart2, IProcessListener {
@@ -76,7 +76,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 
 	private TerminalComposite terminalComposite;
 	private IMemento savedState = null;
-	
+
 	private Action fOpenEditorAction;
 	private Action fOpenViewAction;
 	private TerminalActionCopy fActionEditCopy;
@@ -84,7 +84,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 	private TerminalActionPaste fActionEditPaste;
 	private TerminalActionClearAll fActionEditClearAll;
 	private TerminalActionSelectAll fActionEditSelectAll;
-	
+
 	private boolean checkCanClose = false;
 
 	/**
@@ -98,7 +98,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 	 */
 	public static TerminalView openView(String secondaryId, String title, IPath workingDirectory) {
 		TerminalView view = null;
-		secondaryId  = secondaryId != null ? secondaryId : Long.toHexString(System.currentTimeMillis());
+		secondaryId = (secondaryId != null) ? secondaryId : Long.toHexString(System.currentTimeMillis()); // $codepro.audit.disable questionableAssignment
 		try {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			view = (TerminalView) page.showView(TerminalView.ID, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
@@ -108,8 +108,9 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		}
 		return view;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.ViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
 	 */
 	@Override
@@ -118,7 +119,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		savedState = memento;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
@@ -132,7 +134,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 					}
 				});
 			}
-			
+
 			public void setState(TerminalState state) {
 			}
 		});
@@ -146,7 +148,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
-		
+
 		terminalComposite.getTerminalControl().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
@@ -157,7 +159,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.doit) {
-					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(
+							IBindingService.class);
 					Event event = new Event();
 					event.character = e.character;
 					event.keyCode = e.keyCode;
@@ -174,39 +177,34 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 						keyDownFilter.setEnabled(true);
 						keyDownFilter.handleEvent(event);
 					} finally {
-						if (focusControl == e.display.getFocusControl()) {
+						if (focusControl == e.display.getFocusControl()) { // $codepro.audit.disable useEquals
 							keyDownFilter.setEnabled(enabled);
 						}
 					}
 				}
 			}
 		});
-		
-		// Add drag and drop support for file paths		
+
+		// Add drag and drop support for file paths
 		DropTarget dt = new DropTarget(terminalComposite.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
 		dt.setTransfer(new Transfer[] { FileTransfer.getInstance() });
-		dt.addDropListener(new DropTargetAdapter()
-		{
-			public void drop(DropTargetEvent event)
-			{
+		dt.addDropListener(new DropTargetAdapter() {
+			public void drop(DropTargetEvent event) {
 				FileTransfer ft = FileTransfer.getInstance();
-				if (ft.isSupportedType(event.currentDataType))
-				{
-					String fileList[] = (String[]) event.data;
-					if (fileList != null && fileList.length > 0)
-					{
+				if (ft.isSupportedType(event.currentDataType)) {
+					String[] fileList = (String[]) event.data;
+					if (fileList != null && fileList.length > 0) {
 						StringBuilder builder = new StringBuilder();
-						for (String file : fileList)
-						{
-							builder.append(file).append(" "); //$NON-NLS-1$
-						}				
+						for (String file : fileList) {
+							builder.append(file).append(' ');
+						}
 						terminalComposite.sendInput(builder.toString());
 					}
 				}
 			}
 		});
 	}
-	
+
 	protected void close() {
 		if (terminalComposite != null && !terminalComposite.isDisposed()) {
 			terminalComposite.getTerminalControl().getDisplay().asyncExec(new Runnable() {
@@ -217,7 +215,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
 	 */
 	public void processCompleted() {
@@ -228,26 +227,30 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
 	 */
 	public int promptToSaveOnClose() {
 		return terminalComposite.canCloseTerminal() ? ISaveablePart2.YES : ISaveablePart2.CANCEL;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void doSave(IProgressMonitor monitor) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
 	public void doSaveAs() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
 	public boolean isDirty() {
@@ -258,14 +261,16 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
 	public boolean isSaveOnCloseNeeded() {
@@ -273,7 +278,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.ViewPart#saveState(org.eclipse.ui.IMemento)
 	 */
 	@Override
@@ -301,14 +307,15 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
 	public void setFocus() {
 		terminalComposite.setFocus();
 	}
-		
+
 	protected void initialize(String title, IPath workingDirectory) {
 		if (terminalComposite.isConnected()) {
 			return;
@@ -317,7 +324,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		terminalComposite.setWorkingDirectory(workingDirectory);
 		terminalComposite.connect();
 	}
-		
+
 	/**
 	 * @param text
 	 * @see com.aptana.terminal.widget.TerminalComposite#sendInput(java.lang.String)
@@ -342,7 +349,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		Menu menu = menuMgr.createContextMenu(control);
 		control.setMenu(menu);
 	}
-	
+
 	private void fillContextMenu(IMenuManager menuMgr) {
 		menuMgr.add(fActionEditCopy);
 		menuMgr.add(fActionEditPaste);
@@ -363,7 +370,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		IActionBars actionBars = getViewSite().getActionBars();
 		fillLocalPullDown(actionBars.getMenuManager());
 		fillLocalToolBar(actionBars.getToolBarManager());
-		
+
 		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), fActionEditCopy);
 		actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), fActionEditPaste);
 		actionBars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), fActionEditSelectAll);
@@ -381,7 +388,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		manager.add(new Separator());
 		manager.add(fActionEditClearAll);
 	}
-	
+
 	private void updateActions() {
 		fActionEditCut.updateAction(true);
 		fActionEditCopy.updateAction(true);
@@ -401,7 +408,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
 
 		// open view action
-		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, TerminalPlugin.getImageDescriptor("/icons/terminal_small_add.png")) { //$NON-NLS-1$
+		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View,
+				TerminalPlugin.getImageDescriptor("/icons/terminal_small_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				openView(null, getPartName(), getWorkingDirectory());
@@ -410,7 +418,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		fOpenViewAction.setToolTipText(Messages.TerminalView_Create_Terminal_View_Tooltip);
 
 		// open editor action
-		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, TerminalPlugin.getImageDescriptor("/icons/terminal_add.png")) { //$NON-NLS-1$
+		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor,
+				TerminalPlugin.getImageDescriptor("/icons/terminal_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				Utils.openTerminalEditor(TerminalEditor.ID, true);
@@ -418,9 +427,8 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		};
 		fOpenEditorAction.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
 	}
-	
-	public IPath getWorkingDirectory()
-	{
+
+	public IPath getWorkingDirectory() {
 		return terminalComposite.getWorkingDirectory();
 	}
 

@@ -29,8 +29,24 @@ import com.aptana.core.logging.IdeLog;
  * 
  * @author cwilliams
  */
-public abstract class ProcessUtil
+public class ProcessUtil
 {
+
+	private static ProcessUtil fgInstance;
+
+	protected ProcessUtil()
+	{
+		// added so tests can subclass.
+	}
+
+	private synchronized static ProcessUtil instance()
+	{
+		if (fgInstance == null)
+		{
+			fgInstance = new ProcessUtil();
+		}
+		return fgInstance;
+	}
 
 	public static String outputForCommand(String command, IPath workingDir, String... args)
 	{
@@ -148,7 +164,7 @@ public abstract class ProcessUtil
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -246,7 +262,23 @@ public abstract class ProcessUtil
 	public static Process run(List<String> command, IPath workingDirectory, Map<String, String> environment)
 			throws IOException, CoreException
 	{
-		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		return ProcessUtil.instance().doRun(command, workingDirectory, environment);
+	}
+
+	/**
+	 * Instance method so that we can test this class! Not meant to be called outside tests
+	 * 
+	 * @param command
+	 * @param workingDirectory
+	 * @param environment
+	 * @return
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	protected Process doRun(List<String> command, IPath workingDirectory, Map<String, String> environment)
+			throws IOException, CoreException
+	{
+		ProcessBuilder processBuilder = createProcessBuilder(command);
 		if (workingDirectory != null)
 		{
 			processBuilder.directory(workingDirectory.toFile());
@@ -258,16 +290,48 @@ public abstract class ProcessUtil
 			map = new TreeMap<String, String>(environment);
 			processBuilder.environment().putAll(environment);
 		}
-		if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL))
+		if (isInfoLoggingEnabled())
 		{
-			IdeLog.logInfo(
-					CorePlugin.getDefault(),
-					StringUtil.format(Messages.ProcessUtil_RunningProcess,
-							new Object[] { StringUtil.join("\" \"", command), workingDirectory, map }), IDebugScopes.SHELL); //$NON-NLS-1$
+			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess,
+					new Object[] { StringUtil.join("\" \"", command), workingDirectory, map }));//$NON-NLS-1$
 		}
+		return startProcess(processBuilder);
+	}
+
+	protected Process startProcess(ProcessBuilder processBuilder) throws IOException
+	{
 		return processBuilder.start();
 	}
 
+	protected void logInfo(String msg)
+	{
+		IdeLog.logInfo(CorePlugin.getDefault(), msg, IDebugScopes.SHELL);
+	}
+
+	protected boolean isInfoLoggingEnabled()
+	{
+		return IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.SHELL);
+	}
+
+	/**
+	 * @param command
+	 * @return
+	 */
+	protected ProcessBuilder createProcessBuilder(List<String> command)
+	{
+		return new ProcessBuilder(command);
+	}
+
+	/**
+	 * Returns the exit code of the process. If timeout passes, we return early. If forceKill is specified and timeout
+	 * elapses, we will call destroy on the process before returning. Returns -1 if we were uanble to get the real exiit
+	 * code.
+	 * 
+	 * @param process
+	 * @param timeout
+	 * @param forceKillAfterTimeout
+	 * @return
+	 */
 	public static int waitForProcess(Process process, final long timeout, boolean forceKillAfterTimeout)
 	{
 		final Thread waitingThread = Thread.currentThread();
@@ -286,18 +350,20 @@ public abstract class ProcessUtil
 			}
 		};
 
-		int exitcode = 0;
-		if (timeout != -1)
+		int exitcode = -1;
+		if (timeout > 0)
 		{
 			try
 			{
 				timeoutThread.start();
 				exitcode = process.waitFor();
-				waitingThread.interrupt();
 			}
 			catch (InterruptedException e)
 			{
 				Thread.interrupted();
+			} finally
+			{
+				timeoutThread.interrupt();
 			}
 			if (forceKillAfterTimeout)
 			{

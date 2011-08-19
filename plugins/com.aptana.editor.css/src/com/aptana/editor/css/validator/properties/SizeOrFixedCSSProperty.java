@@ -23,7 +23,7 @@ public abstract class SizeOrFixedCSSProperty extends TypeOrFixedCSSProperty
 
 	private static ICSSValueTypeConverter[] CONVERTERS_ARRAY = new ICSSValueTypeConverter[] { new NumberToLengthConverter() };
 
-	public SizeOrFixedCSSProperty(String propertyName)
+	protected SizeOrFixedCSSProperty(String propertyName)
 	{
 		super(propertyName);
 	}
@@ -42,7 +42,7 @@ public abstract class SizeOrFixedCSSProperty extends TypeOrFixedCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public SizeOrFixedCSSProperty(String propertyName, String[] values, ApplContext context, CssExpression expression,
+	protected SizeOrFixedCSSProperty(String propertyName, String[] values, ApplContext context, CssExpression expression,
 			boolean check) throws InvalidParamException
 	{
 		super(propertyName, new Class[] { CssLength.class, CssNumber.class }, CONVERTERS_ARRAY, values, context,
@@ -61,7 +61,7 @@ public abstract class SizeOrFixedCSSProperty extends TypeOrFixedCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public SizeOrFixedCSSProperty(String propertyName, String[] values, ApplContext context, CssExpression expression)
+	protected SizeOrFixedCSSProperty(String propertyName, String[] values, ApplContext context, CssExpression expression)
 			throws InvalidParamException
 	{
 		this(propertyName, values, context, expression, false);

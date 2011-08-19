@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -70,7 +71,8 @@ public class DeleteConnectionAction extends ConnectionActionDelegate
 						}
 						catch (CoreException e)
 						{
-							IOUIPlugin.logError(Messages.DeleteConnectionAction_FailedToDisconnect, e);
+							IdeLog.logError(IOUIPlugin.getDefault(),
+									Messages.DeleteConnectionAction_FailedToDisconnect, e);
 						}
 					}
 				}

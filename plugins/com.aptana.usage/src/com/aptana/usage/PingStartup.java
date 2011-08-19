@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ui.IStartup;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.preferences.IPreferenceConstants;
 import com.eaio.uuid.MACAddress;
@@ -109,17 +110,17 @@ public class PingStartup implements IStartup
 		parseOSNameAndVersion();
 		add(keyValues, "os_name", osName); //$NON-NLS-1$
 		add(keyValues, "os_version", osVersion); //$NON-NLS-1$
-		add(keyValues, LogEventTypes.STUDIO_KEY, MACAddress.getMACAddress());
+		add(keyValues, ILogEventTypes.STUDIO_KEY, MACAddress.getMACAddress());
 
 		// adds date/time stamp
-		EventLogger.getInstance().logEvent(LogEventTypes.DATE_TIME);
+		EventLogger.getInstance().logEvent(ILogEventTypes.DATE_TIME);
 
 		// adds any custom key/value pairs
 		EventInfo[] events = EventLogger.getInstance().getEvents();
 		for (EventInfo event : events)
 		{
 			// ignores preview events
-			if (!event.getEventType().equals(LogEventTypes.PREVIEW))
+			if (!event.getEventType().equals(ILogEventTypes.PREVIEW))
 			{
 				// specifies the key as an array in case we have more than one value of the same event type
 				String key = event.getEventType() + "[]"; //$NON-NLS-1$
@@ -302,7 +303,7 @@ public class PingStartup implements IStartup
 		try
 		{
 			StringBuilder text = new StringBuilder();
-			text.append(URLEncoder.encode(key, ENCODING)).append("=").append(URLEncoder.encode(value, ENCODING)); //$NON-NLS-1$
+			text.append(URLEncoder.encode(key, ENCODING)).append('=').append(URLEncoder.encode(value, ENCODING));
 			return text.toString();
 		}
 		catch (UnsupportedEncodingException e)
@@ -399,16 +400,17 @@ public class PingStartup implements IStartup
 		{
 			if (url != null)
 			{
-				UsagePlugin.logError(MessageFormat.format(Messages.PingStartup_ERR_MalformedURL, url), e);
+				IdeLog.logError(UsagePlugin.getDefault(),
+						MessageFormat.format(Messages.PingStartup_ERR_MalformedURL, url), e);
 			}
 		}
 		catch (IOException e)
 		{
-			UsagePlugin.logError(Messages.PingStartup_ERR_IOException, e);
+			IdeLog.logError(UsagePlugin.getDefault(), Messages.PingStartup_ERR_IOException, e);
 		}
 		catch (Exception e)
 		{
-			UsagePlugin.logError(Messages.PingStartup_ERR_FailedToContactServer, e);
+			IdeLog.logError(UsagePlugin.getDefault(), Messages.PingStartup_ERR_FailedToContactServer, e);
 		}
 		finally
 		{

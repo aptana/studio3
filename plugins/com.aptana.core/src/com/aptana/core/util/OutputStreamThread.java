@@ -1,5 +1,3 @@
-package com.aptana.core.util;
-
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -7,6 +5,7 @@ package com.aptana.core.util;
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.core.util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class OutputStreamThread extends Thread
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		finally
 		{

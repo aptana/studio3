@@ -32,7 +32,10 @@ public interface ICoffeeScopeConstants
 	// Strings
 	String STRING_SINGLE = "string.quoted.single.coffee";
 	String STRING_DOUBLE = "string.quoted.double.coffee";
+	String STRING_HEREDOC_SINGLE = "string.quoted.heredoc.coffee";
+	String STRING_HEREDOC_DOUBLE = "string.quoted.double.heredoc.coffee";
 	String REGEXP = "string.regexp.coffee";
+	// Embedded JS
 	String COMMAND = "string.quoted.script.coffee";
 
 	// Entities

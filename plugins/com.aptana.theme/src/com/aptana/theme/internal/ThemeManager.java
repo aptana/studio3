@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -50,6 +51,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotationPreferences;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.IThemeManager;
@@ -79,7 +81,7 @@ public class ThemeManager implements IThemeManager
 	public static final String THEMES_NODE = "themes"; //$NON-NLS-1$
 	// TODO Don't expose this node name. Fold saving/loading of themes into this impl
 
-	private Theme fCurrentTheme;
+	private volatile Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
 
@@ -151,7 +153,7 @@ public class ThemeManager implements IThemeManager
 				});
 	}
 
-	public static ThemeManager instance()
+	public synchronized static ThemeManager instance()
 	{
 		if (fgInstance == null)
 		{
@@ -163,7 +165,9 @@ public class ThemeManager implements IThemeManager
 	private TextAttribute getTextAttribute(String name)
 	{
 		if (getCurrentTheme() != null)
+		{
 			return getCurrentTheme().getTextAttribute(name);
+		}
 		return new TextAttribute(ThemePlugin.getDefault().getColorManager().getColor(new RGB(255, 255, 255)));
 	}
 
@@ -171,23 +175,26 @@ public class ThemeManager implements IThemeManager
 	{
 		if (fCurrentTheme == null)
 		{
-			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
-					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
-			if (activeThemeName != null)
+			synchronized (this)
 			{
-				fCurrentTheme = getTheme(activeThemeName);
-			}
-			if (fCurrentTheme == null)
-			{
-				// if we can't find the default theme, just use the first one in the list
-				if (!getThemeMap().values().isEmpty())
+				String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+						IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
+				if (activeThemeName != null)
 				{
-					fCurrentTheme = getThemeMap().values().iterator().next();
+					fCurrentTheme = getTheme(activeThemeName);
 				}
-			}
-			if (fCurrentTheme != null)
-			{
-				setCurrentTheme(fCurrentTheme);
+				if (fCurrentTheme == null)
+				{
+					// if we can't find the default theme, just use the first one in the list
+					if (!getThemeMap().values().isEmpty())
+					{
+						fCurrentTheme = getThemeMap().values().iterator().next();
+					}
+				}
+				if (fCurrentTheme != null)
+				{
+					setCurrentTheme(fCurrentTheme);
+				}
 			}
 		}
 		return fCurrentTheme;
@@ -206,7 +213,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
@@ -284,7 +291,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Set the bg/fg/selection colors for compare editors
@@ -308,7 +315,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
@@ -330,7 +337,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
@@ -342,7 +349,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Force font
@@ -426,7 +433,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -440,17 +447,28 @@ public class ThemeManager implements IThemeManager
 		while (tokenizer.hasMoreElements())
 		{
 			String themeName = tokenizer.nextToken();
-			Theme theme = loadUserTheme(themeName);
-			if (theme == null)
+			try
 			{
-				continue;
+				Theme theme = loadUserTheme(themeName);
+				if (theme == null)
+				{
+					continue;
+				}
+				fThemeMap.put(theme.getName(), theme);
 			}
-			fThemeMap.put(theme.getName(), theme);
+			catch (IllegalStateException e)
+			{
+				// This theme may have failed deserialization, lets log it and move on
+				IdeLog.logError(ThemePlugin.getDefault(),
+						"User theme failed to de-serialize from preferences: " + themeName, e); //$NON-NLS-1$
+			}
 		}
 	}
 
+	@SuppressWarnings("restriction")
 	private Theme loadUserTheme(String themeName)
 	{
+		InputStream byteStream = null;
 		try
 		{
 			byte[] array = Platform.getPreferencesService().getByteArray(ThemePlugin.PLUGIN_ID,
@@ -459,8 +477,21 @@ public class ThemeManager implements IThemeManager
 			{
 				return null;
 			}
+			byteStream = new ByteArrayInputStream(array);
 			Properties props = new OrderedProperties();
-			props.load(new ByteArrayInputStream(array));
+			props.load(byteStream);
+			// if it looks like the byte array was not Base64 decoded, try decoding and then running it through
+			if (!props.containsKey(Theme.THEME_NAME_PROP_KEY)) // anything else we can check for this?
+			{
+				IdeLog.logWarning(
+						ThemePlugin.getDefault(),
+						MessageFormat
+								.format("User theme {0} de-serialized, but was left Base64 encoded. Manually decoding and trying to load.", //$NON-NLS-1$
+										themeName));
+				byteStream = new ByteArrayInputStream(Base64.decode(array));
+				props = new OrderedProperties();
+				props.load(byteStream);
+			}
 			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (IllegalArgumentException iae)
@@ -470,10 +501,12 @@ public class ThemeManager implements IThemeManager
 					THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
 			if (xml != null)
 			{
+				InputStream stream = null;
 				try
 				{
+					stream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
 					Properties props = new OrderedProperties();
-					props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+					props.loadFromXML(stream);
 					// Now store it as byte array explicitly so we don't run into this!
 					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
 					theme.save();
@@ -481,13 +514,41 @@ public class ThemeManager implements IThemeManager
 				}
 				catch (Exception e)
 				{
-					ThemePlugin.logError(e);
+					IdeLog.logError(ThemePlugin.getDefault(), e);
+				}
+				finally
+				{
+					if (stream != null)
+					{
+						try
+						{
+							stream.close();
+						}
+						catch (IOException e)
+						{
+							// ignore
+						}
+					}
 				}
 			}
 		}
 		catch (IOException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+		finally
+		{
+			if (byteStream != null)
+			{
+				try
+				{
+					byteStream.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
 		}
 		return null;
 	}
@@ -544,7 +605,7 @@ public class ThemeManager implements IThemeManager
 			}
 			catch (Exception e)
 			{
-				ThemePlugin.logError(url.toString(), e);
+				IdeLog.logError(ThemePlugin.getDefault(), url.toString(), e);
 			}
 		}
 
@@ -579,7 +640,7 @@ public class ThemeManager implements IThemeManager
 			}
 			catch (Exception e)
 			{
-				ThemePlugin.logError(e);
+				IdeLog.logError(ThemePlugin.getDefault(), e);
 			}
 		}
 
@@ -596,7 +657,7 @@ public class ThemeManager implements IThemeManager
 			}
 			catch (Exception e)
 			{
-				ThemePlugin.logError(e);
+				IdeLog.logError(ThemePlugin.getDefault(), e);
 			}
 		}
 	}
@@ -633,7 +694,7 @@ public class ThemeManager implements IThemeManager
 		}
 		catch (Exception e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 

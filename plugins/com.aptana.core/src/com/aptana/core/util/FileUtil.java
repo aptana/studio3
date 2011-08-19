@@ -26,6 +26,10 @@ public class FileUtil
 
 	public static boolean isDirectoryAccessible(File directory)
 	{
+		if (directory == null)
+		{
+			return false;
+		}
 		return ExecutableUtil.isExecutable(Path.fromOSString(directory.getAbsolutePath()));
 	}
 
@@ -42,6 +46,10 @@ public class FileUtil
 	 */
 	public static String compressPath(String path, int pathLength)
 	{
+		if (StringUtil.isEmpty(path))
+		{
+			return path;
+		}
 		path = path.replace('\\', '/');
 
 		if (path.length() > pathLength)
@@ -62,7 +70,10 @@ public class FileUtil
 
 			// case where last segment is longer than the path length, but we could end with a '/'
 			lastSlash = path.lastIndexOf('/', path.length() - 2);
-			return path.substring(0, firstSlash) + "/..." + path.substring(lastSlash); //$NON-NLS-1$
+			if (lastSlash > firstSlash)
+			{
+				return path.substring(0, firstSlash) + "/..." + path.substring(lastSlash); //$NON-NLS-1$
+			}
 		}
 		return path;
 	}
@@ -80,6 +91,10 @@ public class FileUtil
 	 */
 	public static String compressLeadingPath(String path, int pathLength)
 	{
+		if (StringUtil.isEmpty(path))
+		{
+			return path;
+		}
 		path = path.replace('\\', '/');
 
 		if (path.length() <= pathLength)
@@ -106,7 +121,7 @@ public class FileUtil
 	public static String getExtension(String fileName)
 	{
 		// We need kernel api to validate the extension or a filename
-		if (fileName == null || StringUtil.EMPTY.equals(fileName))
+		if (StringUtil.isEmpty(fileName))
 		{
 			return fileName;
 		}
@@ -130,11 +145,17 @@ public class FileUtil
 	 */
 	public static String getRandomFileName(String prefix, String suffix)
 	{
-		if (suffix == null)
+		StringBuilder name = new StringBuilder();
+		if (prefix != null)
 		{
-			return prefix + (long) (Integer.MAX_VALUE * Math.random());
+			name.append(prefix);
 		}
-		return prefix + (long) (Integer.MAX_VALUE * Math.random()) + suffix;
+		name.append((long) (Integer.MAX_VALUE * Math.random()));
+		if (suffix != null)
+		{
+			name.append(suffix);
+		}
+		return name.toString();
 	}
 
 	/**

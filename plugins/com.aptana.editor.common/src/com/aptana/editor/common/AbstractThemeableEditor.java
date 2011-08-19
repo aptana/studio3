@@ -202,7 +202,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * AbstractThemeableEditor
 	 */
-	public AbstractThemeableEditor()
+	protected AbstractThemeableEditor()
 	{
 		super();
 		fThemeableEditorFindBarExtension = new FindBarEditorExtension(this);
@@ -585,7 +585,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 					}
 					catch (BackingStoreException e)
 					{
-						IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+						IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 					}
 				}
 			}
@@ -619,7 +619,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				}
 				catch (CoreException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 					MessageDialog.openError(shell, Messages.AbstractThemeableEditor_Error_Title,
 							MessageFormat.format(Messages.AbstractThemeableEditor_Error_Message, path));
 					return;
@@ -818,7 +818,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -837,7 +837,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -881,7 +881,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -945,7 +945,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return raw;
 	}
@@ -974,7 +974,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -1000,7 +1000,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}

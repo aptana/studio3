@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -26,6 +28,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -34,7 +39,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
@@ -101,6 +108,24 @@ public class Portal
 	/**
 	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
 	 * portal to the new URL.<br>
+	 * This method must be called from the UI thread (preferably, through a UIJob).<br>
+	 * By default, this method will open the portal as the top editor.
+	 * 
+	 * @param url
+	 *            A URL (can be null).
+	 * @param browserEditorId
+	 *            the identifier of the browser-editor that was registered through the org.eclipse.ui.editors extension
+	 *            point.
+	 * @see #openPortal(URL, String, boolean)
+	 */
+	public void openPortal(URL url, final String browserEditorId)
+	{
+		openPortal(url, browserEditorId, true);
+	}
+
+	/**
+	 * Opens the portal with a given URL. In case the portal is already open, and the given URL is valid, direct the
+	 * portal to the new URL.<br>
 	 * This method must be called from the UI thread (preferably, through a UIJob).
 	 * 
 	 * @param url
@@ -108,8 +133,10 @@ public class Portal
 	 * @param browserEditorId
 	 *            the identifier of the browser-editor that was registered through the org.eclipse.ui.editors extension
 	 *            point.
+	 * @param bringToTop
+	 *            Indicate whether the opened portal should be brought to the top when opened.
 	 */
-	public void openPortal(URL url, final String browserEditorId)
+	public void openPortal(URL url, final String browserEditorId, final boolean bringToTop)
 	{
 		try
 		{
@@ -117,12 +144,11 @@ public class Portal
 			{
 				url = getDefaultURL();
 			}
-			URL urlWithGetParams = new URL(url.toString() + getURLForProject(PortalUIPlugin.getActiveProject()));
-			url = urlWithGetParams;
+			url = URLUtil.appendParameters(url, getURLParametersForProject(PortalUIPlugin.getActiveProject()), false);
 		}
 		catch (IOException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return;
 		}
 		if (portalBrowser != null && !portalBrowser.isDisposed())
@@ -140,15 +166,49 @@ public class Portal
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				WebBrowserEditorInput input = new WebBrowserEditorInput(finalURL, 0, PortalUIPlugin.PORTAL_ID);
+
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+				if (!bringToTop)
+				{
+					// In case the portal should not be opened as the top-editor, make sure we open it in a way it stays
+					// in the back.
+					IEditorPart activeEditor = page.getActiveEditor();
+					if (activeEditor != null)
+					{
+						try
+						{
+							// We use openEditors() to manipulate the opening order. Otherwise, using the regular
+							// openEditor() will bring the editor to the top no matter what.
+							IEditorReference[] editors = page.openEditors(
+									new IEditorInput[] { activeEditor.getEditorInput(), input }, new String[] {
+											activeEditor.getEditorSite().getId(), browserEditorId },
+									IWorkbenchPage.MATCH_INPUT);
+							portalBrowser = (AbstractPortalBrowserEditor) editors[1].getEditor(true);
+						}
+						catch (Exception e)
+						{
+							// catch any exception here
+							IdeLog.logError(PortalUIPlugin.getDefault(),
+									"Could not open the Aptana portal as a 'non-focused' editor", e); //$NON-NLS-1$
+						}
+					}
+				}
 				try
 				{
-					portalBrowser = (AbstractPortalBrowserEditor) page.openEditor(input, browserEditorId);
-					portalBrowser.addDisposeListener(new PortalDisposeListener());
+					if (portalBrowser == null)
+					{
+						// Just open the portal using the openEditor. The editor will be brought to the top.
+						portalBrowser = (AbstractPortalBrowserEditor) page.openEditor(input, browserEditorId);
+					}
+					if (portalBrowser != null)
+					{
+						portalBrowser.addDisposeListener(new PortalDisposeListener());
+					}
 				}
 				catch (PartInitException e)
 				{
-					PortalUIPlugin.logError("Cannot open Aptana Portal", e); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Cannot open Aptana Portal", e); //$NON-NLS-1$
 				}
 				return Status.OK_STATUS;
 			}
@@ -197,8 +257,8 @@ public class Portal
 		catch (Exception e)
 		{
 			connected = false;
-			PortalUIPlugin
-					.logWarning("Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
+			IdeLog.logWarning(PortalUIPlugin.getDefault(),
+					"Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -215,25 +275,20 @@ public class Portal
 	 * @return The GET parameters string
 	 */
 	@SuppressWarnings("nls")
-	protected String getURLForProject(final IProject activeProject)
+	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("?v=");
-		builder.append(getVersion());
+		final Map<String, String> builder = new HashMap<String, String>();
+		builder.put("v", getVersion());
 
-		builder.append("&bg=");
-		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
-		builder.append("&fg=");
-		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
+		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
 
 		// "chrome"
-		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
 		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		builder.append(toHex(color.getRGB()));
+		builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's bg?
 
 		// project type
-		builder.append("&p=");
-		builder.append(getProjectType(activeProject));
+		builder.put("p", String.valueOf(getProjectType(activeProject)));
 
 		// version control
 		// builder.append("&vc=");
@@ -244,40 +299,39 @@ public class Portal
 		// builder.append(hasGithubRemote() ? '1' : '0');
 
 		// timestamp to force updates to server (bypass browser cache)
-		builder.append("&ts=");
-		builder.append(System.currentTimeMillis());
+		builder.put("ts", String.valueOf(System.currentTimeMillis()));
 
 		// guid that relates to a single install of the IDE
-		builder.append("&id=");
-		builder.append(getGUID());
+		builder.put("id", getGUID());
 
 		// deploy info
-		builder.append(getDeployParam(activeProject));
+		builder.putAll(getDeployParam(activeProject));
 
 		// for debugging output
 		// builder.append("&debug=1");
-		return builder.toString();
+		return builder;
 	}
 
 	@SuppressWarnings("nls")
-	protected String getDeployParam(IProject selectedProject)
+	protected Map<String, String> getDeployParam(IProject selectedProject)
 	{
+		final Map<String, String> builder = new HashMap<String, String>();
 		if (selectedProject != null && selectedProject.exists())
 		{
 			IFile file = selectedProject.getFile("deploy/default.rb");
 			if (file.exists())
-				return "&dep=ch";
+				builder.put("dep", "ch");
 			file = selectedProject.getFile("deploy/solo.rb");
 			if (file.exists())
-				return "&dep=cs";
+				builder.put("dep", "cs");
 			file = selectedProject.getFile("Capfile");
 			if (file.exists())
-				return "&dep=cap";
+				builder.put("dep", "cap");
 			file = selectedProject.getFile("capfile");
 			if (file.exists())
-				return "&dep=cap";
+				builder.put("dep", "cap");
 		}
-		return "";
+		return builder;
 	}
 
 	/**
@@ -331,7 +385,7 @@ public class Portal
 			}
 			catch (CoreException e)
 			{
-				PortalUIPlugin.logError(e);
+				IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			}
 		}
 		return 'O';

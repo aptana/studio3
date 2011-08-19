@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declareAsInterface
 
 package com.aptana.ui.ftp.internal;
 
@@ -16,7 +17,7 @@ import com.aptana.ide.core.io.ConnectionContext;
  */
 public interface IOptionsComposite {
 
-	public static interface Listener {
+	public static interface IListener {
 
 		public boolean isValid();
 		public void validate();

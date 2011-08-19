@@ -20,8 +20,8 @@ public class ScriptsContentProvider implements ITreeContentProvider {
 	private static final Object[] EMPTY = new Object[0];
 
 	/**
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-	 *      java.lang.Object, java.lang.Object)
+	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 *      java.lang.Object)
 	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	}

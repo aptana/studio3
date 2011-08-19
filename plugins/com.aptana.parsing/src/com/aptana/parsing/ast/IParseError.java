@@ -10,7 +10,7 @@ package com.aptana.parsing.ast;
 /**
  * @author ayeung
  */
-public interface IParseError
+public interface IParseError // $codepro.audit.disable consistentSuffixUsage
 {
 	public enum Severity
 	{
@@ -49,5 +49,4 @@ public interface IParseError
 	 * @return the severity of the error
 	 */
 	public Severity getSeverity();
-
 }

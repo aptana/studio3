@@ -12,6 +12,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.core.DebugOptionsManager;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.js.debug.core.JSDebugPlugin;
@@ -41,13 +42,12 @@ public class EditDetailFormatterAction extends ObjectActionDelegate {
 				return;
 			}
 		} catch (DebugException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			return;
 		}
 		DebugOptionsManager detailFormattersManager = JSDebugPlugin.getDefault().getDebugOptionsManager();
 		DetailFormatter detailFormatter = detailFormattersManager.getAssociatedDetailFormatter(typeName);
-		if (new DetailFormatterDialog(UIUtils.getActiveShell(), detailFormatter,
-				null, false, true).open() == Window.OK) {
+		if (new DetailFormatterDialog(UIUtils.getActiveShell(), detailFormatter, null, false, true).open() == Window.OK) {
 			detailFormattersManager.setAssociatedDetailFormatter(detailFormatter);
 			refreshCurrentSelection();
 		}

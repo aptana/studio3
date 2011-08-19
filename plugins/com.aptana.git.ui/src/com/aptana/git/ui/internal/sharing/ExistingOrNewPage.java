@@ -36,7 +36,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -127,8 +129,8 @@ class ExistingOrNewPage extends WizardPage
 				}
 				catch (CoreException e2)
 				{
-					GitUIPlugin.logError(NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir),
-							e2);
+					IdeLog.logError(GitUIPlugin.getDefault(),
+							NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir), e2, IDebugScopes.DEBUG);
 				}
 				for (TreeItem ti : tree.getSelection())
 				{

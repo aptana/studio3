@@ -278,8 +278,8 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				int refNodeEnd = ((CommonOutlineItem) element).getReferenceNode().getEndingOffset();
 				int elementStart = ((CommonOutlineItem) element).getStartingOffset();
 				int elementEnd = ((CommonOutlineItem) element).getEndingOffset();
-				start = refNodeStart < elementStart ? refNodeStart : elementStart;
-				end = refNodeEnd > elementEnd ? refNodeEnd : elementEnd;
+				start = (refNodeStart < elementStart) ? refNodeStart : elementStart;
+				end = (refNodeEnd > elementEnd) ? refNodeEnd : elementEnd;
 			}
 
 			if (start != -1)
@@ -369,7 +369,7 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 				// the editor when this code throws errors and will impact them severely
 				catch (Throwable e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 
 				return Status.OK_STATUS;
@@ -838,7 +838,7 @@ class CommonQuickOutlinePage extends ContentOutlinePage
 			elements.add(child);
 
 			// filling parents list for the child
-			ArrayList<Object> parentsList = new ArrayList<Object>();
+			List<Object> parentsList = new ArrayList<Object>();
 
 			// adding list of parent's parents, if exists
 			if (elementParentsList != null)

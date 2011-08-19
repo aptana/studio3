@@ -41,6 +41,8 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -52,6 +54,7 @@ public class ValidationManager implements IValidationManager
 	private Object fResource;
 	private URI fResourceUri;
 	private String fCurrentContentType;
+	private IParseState fParseState;
 	// the nested languages that need to be validated as well
 	private Set<String> fNestedLanguages;
 	private Map<String, List<IValidationItem>> fItemsByType;
@@ -65,7 +68,8 @@ public class ValidationManager implements IValidationManager
 			if (fCurrentContentType != null)
 			{
 				if (getSelectedValidatorsPrefKey(fCurrentContentType).equals(property)
-						|| getFilterExpressionsPrefKey(fCurrentContentType).equals(property))
+						|| getFilterExpressionsPrefKey(fCurrentContentType).equals(property)
+						|| getParseErrorEnabledPrefKey(fCurrentContentType).equals(property))
 				{
 					// re-validate
 					validate(fDocument.get(), fCurrentContentType);
@@ -76,7 +80,12 @@ public class ValidationManager implements IValidationManager
 
 	public ValidationManager(FileService fileService)
 	{
+		if (fileService == null)
+		{
+			throw new IllegalArgumentException(Messages.ValidationManager_FileServiceNonNull);
+		}
 		fFileService = fileService;
+		fParseState = fileService.getParseState();
 		fNestedLanguages = new HashSet<String>();
 		fItemsByType = new HashMap<String, List<IValidationItem>>();
 		CommonEditorPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
@@ -87,6 +96,7 @@ public class ValidationManager implements IValidationManager
 		fDocument = null;
 		fResource = null;
 		fResourceUri = null;
+		fParseState = null;
 		fItemsByType.clear();
 		CommonEditorPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
 	}
@@ -198,6 +208,10 @@ public class ValidationManager implements IValidationManager
 				try
 				{
 					String source = fDocument.get(node.getStartingOffset(), node.getLength());
+					ParseState parseState = new ParseState();
+					parseState.setEditState(source, null, 0, 0);
+					setParseState(parseState);
+					ParserPoolFactory.parse(language, parseState);
 					List<IValidationItem> newItems = validator.validate(source, fResourceUri, this);
 					int lines = fDocument.getLineOfOffset(node.getStartingOffset());
 					for (IValidationItem item : newItems)
@@ -206,6 +220,7 @@ public class ValidationManager implements IValidationManager
 						((ValidationItem) item).setOffset(node.getStartingOffset() + item.getOffset());
 						items.add(item);
 					}
+					setParseState(fFileService.getParseState());
 				}
 				catch (Exception e)
 				{
@@ -253,6 +268,11 @@ public class ValidationManager implements IValidationManager
 			}
 		}
 		return false;
+	}
+
+	public Collection<List<IValidationItem>> getValidationItems()
+	{
+		return fItemsByType.values();
 	}
 
 	private IValidationItem addItem(int severity, String message, int lineNumber, int lineOffset, int length,
@@ -378,7 +398,7 @@ public class ValidationManager implements IValidationManager
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 	}
@@ -435,17 +455,30 @@ public class ValidationManager implements IValidationManager
 		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
 	}
 
-	public IParseState getParseState()
+	private static String getParseErrorEnabledPrefKey(String language)
 	{
-		return fFileService.getParseState();
+		return language + ":" + IPreferenceConstants.PARSE_ERROR_ENABLED; //$NON-NLS-1$
 	}
 
-	public void addParseErrors(List<IValidationItem> items)
+	public IParseState getParseState()
+	{
+		return fParseState;
+	}
+
+	private void setParseState(IParseState parseState)
+	{
+		fParseState = parseState;
+	}
+
+	public void addParseErrors(List<IValidationItem> items, String language)
 	{
 
 		IParseState parseState = getParseState();
 
-		if (parseState == null)
+		if (parseState == null
+				|| fDocument == null
+				|| !CommonEditorPlugin.getDefault().getPreferenceStore()
+						.getBoolean(getParseErrorEnabledPrefKey(language)))
 		{
 			return;
 		}

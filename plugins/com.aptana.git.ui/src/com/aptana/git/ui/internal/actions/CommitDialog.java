@@ -82,6 +82,8 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
@@ -780,7 +782,7 @@ class CommitDialog extends StatusDialog
 		}
 		catch (Throwable t)
 		{
-			GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+			IdeLog.logError(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 		updateDiff(file, diff);
 	}

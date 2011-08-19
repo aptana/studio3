@@ -10,6 +10,8 @@ package com.aptana.filesystem.secureftp.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,10 +33,20 @@ public class SSHHostValidator extends SSHFTPValidator {
 		String ssh_home = SecureUtils.getSSH_HOME();
 		File knownHosts = new File(ssh_home, "known_hosts"); //$NON-NLS-1$
 		if (knownHosts.exists() && knownHosts.isFile()) {
+			InputStream fin = null;
 			try {
-				loadKnownHosts(new FileInputStream(knownHosts));
+				loadKnownHosts(fin = new FileInputStream(knownHosts));
 			} catch (Exception e) {
 				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SSHHostValidator_FailedLoadKnownHosts, e));
+			} finally {
+				if (fin != null) {
+					try {
+						fin.close();
+					}
+					catch (IOException ignore) {
+						ignore.getCause();
+					}
+				}
 			}
 		}
 	}

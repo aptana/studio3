@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.core.io.vfs;
 
@@ -35,7 +37,7 @@ public class VirtualConnectionManager {
 	
 	private static VirtualConnectionManager instance;
 	
-	private WeakHashMap<ConnectionPoint, URI> connections = new WeakHashMap<ConnectionPoint, URI>();
+	private Map<ConnectionPoint, URI> connections = new WeakHashMap<ConnectionPoint, URI>();
 	private Map<URI, WeakReference<ConnectionPoint>> uris = new HashMap<URI, WeakReference<ConnectionPoint>>();
 	
 	/**
@@ -74,6 +76,7 @@ public class VirtualConnectionManager {
 				}
 				uri = new URI(VirtualFileSystem.SCHEME_VIRTUAL, id, ROOT_STRING, null, null);
 			} catch (URISyntaxException e) {
+				IdeLog.logError(CoreIOPlugin.getDefault(), e);
 			}
 			// we do not update connection URI once it has been assigned even if its ID changed
 			connections.put(connectionPoint, uri);
@@ -106,6 +109,7 @@ public class VirtualConnectionManager {
 			try {
 				uri = new URI(uri.getScheme(), uri.getAuthority(), ROOT_STRING, null, null);
 			} catch (URISyntaxException e) {
+				IdeLog.logError(CoreIOPlugin.getDefault(), e);
 			}
 		}
 		return uri;

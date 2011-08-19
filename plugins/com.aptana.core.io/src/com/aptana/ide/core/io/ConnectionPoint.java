@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
 
 package com.aptana.ide.core.io;
 
@@ -185,7 +186,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
     @SuppressWarnings("rawtypes")
 	@Override
     public Object getAdapter(Class adapter) {
-        if (IFileStore.class == adapter) {
+        if (IFileStore.class.equals(adapter)) {
             try {
                 return getRoot();
             } catch (CoreException e) {

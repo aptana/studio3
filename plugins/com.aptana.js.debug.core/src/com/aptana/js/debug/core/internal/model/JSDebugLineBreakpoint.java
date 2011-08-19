@@ -36,9 +36,8 @@ import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBreakpoint {
 
 	/**
-	 * Default constructor is required for the breakpoint manager to re-create
-	 * persisted breakpoints. After instantiating a breakpoint, the
-	 * <code>setMarker(...)</code> method is called to restore this breakpoint's
+	 * Default constructor is required for the breakpoint manager to re-create persisted breakpoints. After
+	 * instantiating a breakpoint, the <code>setMarker(...)</code> method is called to restore this breakpoint's
 	 * attributes.
 	 */
 	public JSDebugLineBreakpoint() {
@@ -46,9 +45,8 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * Constructs a line breakpoint on the given resource at the given line
-	 * number. The line number is 1-based (i.e. the first line of a file is line
-	 * number 1).
+	 * Constructs a line breakpoint on the given resource at the given line number. The line number is 1-based (i.e. the
+	 * first line of a file is line number 1).
 	 * 
 	 * @param resource
 	 *            file on which to set the breakpoint
@@ -73,9 +71,8 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * Constructs a line breakpoint on the given resource at the given line
-	 * number. The line number is 1-based (i.e. the first line of a file is line
-	 * number 1).
+	 * Constructs a line breakpoint on the given resource at the given line number. The line number is 1-based (i.e. the
+	 * first line of a file is line number 1).
 	 * 
 	 * @param resource
 	 *            file on which to set the breakpoint
@@ -115,8 +112,8 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 * @param register
 	 * @throws CoreException
 	 */
-	public JSDebugLineBreakpoint(final IUniformResource resource, final int lineNumber, final Map<String, Object> attributes,
-			final boolean register) throws CoreException {
+	public JSDebugLineBreakpoint(final IUniformResource resource, final int lineNumber,
+			final Map<String, Object> attributes, final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IMarker marker = MarkerUtils.createMarker(resource, attributes,
@@ -125,8 +122,10 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
 				attributes.put(IMarker.LINE_NUMBER, Integer.valueOf(lineNumber));
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
-				attributes.put(IMarker.MESSAGE, MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,
-						DebugUtil.getPath(resource), Integer.toString(lineNumber)));
+				attributes.put(
+						IMarker.MESSAGE,
+						MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,
+								DebugUtil.getPath(resource), Integer.toString(lineNumber)));
 				ensureMarker().setAttributes(attributes);
 				register(register);
 			}
@@ -134,7 +133,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 		try {
 			ResourcesPlugin.getWorkspace().run(wr, null, 0, new NullProgressMonitor());
 		} catch (CoreException e) {
-			JSDebugPlugin.log(Messages.JSDebugLineBreakpoint_BreakpointMarkerCreationFailed,e);
+			JSDebugPlugin.log(Messages.JSDebugLineBreakpoint_BreakpointMarkerCreationFailed, e);
 		}
 	}
 
@@ -154,8 +153,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/*
-	 * Add this breakpoint to the breakpoint manager, or sets it as
-	 * unregistered.
+	 * Add this breakpoint to the breakpoint manager, or sets it as unregistered.
 	 */
 	private void register(boolean register) throws CoreException {
 		if (register) {

@@ -21,10 +21,11 @@ public class JSIfNode extends JSNode
 	 * 
 	 * @param children
 	 */
-	public JSIfNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode trueBlock, JSNode falseBlock)
+	public JSIfNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode trueBlock,
+			JSNode falseBlock)
 	{
-		super(JSNodeTypes.IF, condition, trueBlock, falseBlock);
-		
+		super(IJSNodeTypes.IF, condition, trueBlock, falseBlock);
+
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
 	}

@@ -5,11 +5,13 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 
 package com.aptana.ide.ui.io;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -274,15 +276,19 @@ public class IOUIPlugin extends AbstractUIPlugin
 					refreshNavigatorInternal(view, element, selection);
 
 					view = findView(RemoteNavigatorView.ID);
-					// if the content of the remote category changed, refresh the root of Remote view
-					if (element instanceof IConnectionPointCategory && ((IConnectionPointCategory) element).isRemote())
+					if (view != null)
 					{
-						Object input = ((CommonNavigator) view).getCommonViewer().getInput();
-						refreshNavigatorInternal(view, input, selection);
-					}
-					else
-					{
-						refreshNavigatorInternal(view, element, selection);
+						// if the content of the remote category changed, refresh the root of Remote view
+						if (element instanceof IConnectionPointCategory
+								&& ((IConnectionPointCategory) element).isRemote())
+						{
+							Object input = ((CommonNavigator) view).getCommonViewer().getInput();
+							refreshNavigatorInternal(view, input, selection);
+						}
+						else
+						{
+							refreshNavigatorInternal(view, element, selection);
+						}
 					}
 				}
 				catch (PartInitException e)
@@ -304,7 +310,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 			if (element == null)
 			{
 				// full refresh
-				System.err.println("FIXME: full refresh for " + viewer.getClass().getSimpleName()); //$NON-NLS-1$
+				System.err.println("FIXME: full refresh for " + viewer.getClass().getSimpleName()); //$NON-NLS-1$ // $codepro.audit.disable debuggingCode
 				viewer.refresh();
 			}
 			else
@@ -328,26 +334,6 @@ public class IOUIPlugin extends AbstractUIPlugin
 			viewer.expandToLevel(element, 1);
 			viewer.setSelection(new StructuredSelection(selection));
 		}
-	}
-
-	public static void logError(String msg, Exception e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void logError(Exception e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
-	}
-
-	public static void logImportant(String msg, Exception e)
-	{
-		log(new Status(IStatus.WARNING, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	private static void log(IStatus status)
-	{
-		getDefault().getLog().log(status);
 	}
 
 	private static IViewPart findView(String viewID) throws PartInitException

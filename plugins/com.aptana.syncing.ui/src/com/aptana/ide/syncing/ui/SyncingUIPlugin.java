@@ -13,8 +13,6 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -231,14 +229,6 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 			image = registry.get(path);
 		}
 		return image;
-    }
-
-    public static void logError(String msg, Exception e) {
-        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-    }
-
-    private static void log(IStatus status) {
-        getDefault().getLog().log(status);
     }
 
 	private void addCommandSaveListener()

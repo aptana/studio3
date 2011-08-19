@@ -96,7 +96,7 @@ public class SVGMetadataLoader extends Job
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(SVGPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(SVGPlugin.getDefault(), e);
 		}
 	}
 

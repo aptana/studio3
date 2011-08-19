@@ -31,7 +31,7 @@ public class CSSTermListNode extends CSSExpressionNode
 	 */
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right, String separator)
 	{
-		super(CSSNodeTypes.TERM_LIST);
+		super(ICSSNodeTypes.TERM_LIST);
 
 		this.fSeparator = separator;
 
@@ -108,7 +108,7 @@ public class CSSTermListNode extends CSSExpressionNode
 
 		if (fSeparator == null)
 		{
-			text.append(" "); //$NON-NLS-1$
+			text.append(' ');
 		}
 		else
 		{

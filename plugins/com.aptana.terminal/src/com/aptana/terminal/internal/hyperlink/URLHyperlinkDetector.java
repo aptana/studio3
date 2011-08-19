@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable platformSpecificLineSeparator
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.terminal.internal.hyperlink;
 
 import java.util.ArrayList;
@@ -24,8 +27,7 @@ import com.aptana.terminal.hyperlink.IHyperlinkDetector;
  * 
  * @author cwilliams
  */
-public class URLHyperlinkDetector implements IHyperlinkDetector
-{
+public class URLHyperlinkDetector implements IHyperlinkDetector {
 
 	// Base URL detection
 	// private static final Pattern URL_DETECT_PATTERN = Pattern
@@ -51,23 +53,21 @@ public class URLHyperlinkDetector implements IHyperlinkDetector
 			+ "      [.!,?]+ [^.!,?;\"\\'<>()\\[\\]\\{\\}\\s\\x7F-\\xFF]+\n" + "    )*\n" + "  )?",
 			Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
 
-	public IHyperlink[] detectHyperlinks(String contents)
-	{
+	public IHyperlink[] detectHyperlinks(String contents) {
 		List<IHyperlink> list = new ArrayList<IHyperlink>();
 		Matcher m = URL_DETECT_PATTERN.matcher(contents);
 		int start = 0;
-		while (m.find(start))
-		{
+		while (m.find(start)) {
 			String urlString = m.group().trim();
 			start = m.end();
 			IRegion region = new Region(m.start(), urlString.length());
 			if (!urlString.startsWith("http://")) //$NON-NLS-1$
 			{
-				urlString = "http://" + urlString; //$NON-NLS-1$
+				urlString = "http://" + urlString; //$NON-NLS-1$ // $codepro.audit.disable stringConcatenationInLoop
 			}
 			list.add(new URLHyperlink(region, urlString));
 		}
-		return list.toArray(new IHyperlink[0]);
+		return list.toArray(new IHyperlink[list.size()]);
 	}
 
 }

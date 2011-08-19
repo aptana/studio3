@@ -34,12 +34,12 @@ public class ParamTag extends TagWithTypes
 	public String getName()
 	{
 		String result = ""; //$NON-NLS-1$
-		
+
 		if (this._parameter != null)
 		{
 			result = this._parameter.getName();
 		}
-		
+
 		return result;
 	}
 
@@ -51,12 +51,12 @@ public class ParamTag extends TagWithTypes
 	public Usage getUsage()
 	{
 		Usage result = Usage.UNKNOWN;
-		
+
 		if (this._parameter != null)
 		{
 			result = this._parameter.getUsage();
 		}
-		
+
 		return result;
 	}
 
@@ -73,9 +73,9 @@ public class ParamTag extends TagWithTypes
 		writer.print(" {"); //$NON-NLS-1$
 		for (Type type : this.getTypes())
 		{
-			if (first == false)
+			if (!first)
 			{
-				writer.print(","); //$NON-NLS-1$
+				writer.print(',');
 			}
 			else
 			{
@@ -93,7 +93,7 @@ public class ParamTag extends TagWithTypes
 
 		String text = this.getText();
 
-		if (text != null && StringUtil.isEmpty(text) == false)
+		if (text != null && !StringUtil.isEmpty(text))
 		{
 			writer.println();
 			writer.printIndent().print("    ").print(text); //$NON-NLS-1$

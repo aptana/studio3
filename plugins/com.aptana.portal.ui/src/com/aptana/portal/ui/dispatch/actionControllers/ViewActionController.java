@@ -10,12 +10,14 @@ package com.aptana.portal.ui.dispatch.actionControllers;
 import java.util.Set;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
  * An action controller for opening Studio's Views.<br>
- * Executing example (for JS with Prototype): <code>result = dispatch($H({controller:'portal.views', action:"openView", args : [viewId].toJSON()}).toJSON());</code>
+ * Executing example (for JS with Prototype):
+ * <code>result = dispatch($H({controller:'portal.views', action:"openView", args : [viewId].toJSON()}).toJSON());</code>
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
@@ -43,7 +45,7 @@ public class ViewActionController extends AbstractActionController
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return IBrowserNotificationConstants.JSON_ERROR;
 		}
 		return IBrowserNotificationConstants.JSON_OK;
@@ -66,16 +68,15 @@ public class ViewActionController extends AbstractActionController
 			}
 			else
 			{
-				PortalUIPlugin
-						.logError(new Exception(
-								"Wrong argument count passed to ViewActionController::openView. Expected 1 and got " + arr.length));//$NON-NLS-1$
+				String message = "Wrong argument count passed to ViewActionController::openView. Expected 1 and got " + arr.length; //$NON-NLS-1$
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			}
 		}
 		else
 		{
-			PortalUIPlugin.logError(new Exception(
-					"Wrong argument type passed to ViewActionController::openView. Expected Object[] and got " //$NON-NLS-1$
-							+ ((attributes == null) ? "null" : attributes.getClass().getName()))); //$NON-NLS-1$s
+			String message = "Wrong argument type passed to ViewActionController::openView. Expected Object[] and got " //$NON-NLS-1$
+					+ ((attributes == null) ? "null" : attributes.getClass().getName()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 		}
 		return null;
 	}

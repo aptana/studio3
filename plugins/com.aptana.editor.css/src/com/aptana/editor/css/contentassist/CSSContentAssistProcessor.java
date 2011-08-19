@@ -11,14 +11,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
@@ -35,7 +38,7 @@ import com.aptana.editor.common.contentassist.CompletionProposalComparator;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
@@ -47,6 +50,12 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 
+/**
+ * Supplies proposals for content assist in the CSS editor.
+ * 
+ * @author Kevin Lindsey
+ * @author Chris Williams
+ */
 public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
@@ -254,15 +263,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this._replaceRange = this._currentLexeme = null;
 						break;
 
-					case PROPERTY:
-						if (offset == this._currentLexeme.getStartingOffset())
-						{
-							this._replaceRange = this._currentLexeme = null;
-						}
-						break;
-
 					default:
-						if (this._currentLexeme.contains(offset) == false
+						if (!this._currentLexeme.contains(offset)
 								&& this._currentLexeme.getEndingOffset() != offset - 1)
 						{
 							this._replaceRange = this._currentLexeme = null;
@@ -384,8 +386,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (this._currentLexeme.getType())
 			{
 				case COMMA:
-					int index = lexemeProvider.getLexemeCeilingIndex(offset);
-					this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
+					this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset);
 					break;
 
 				case COLON:
@@ -569,7 +570,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
 			int offset)
 	{
-		return createProposal(name, image, description, userAgents, CSSIndexConstants.CORE, offset);
+		return createProposal(name, image, description, userAgents, ICSSIndexConstants.CORE, offset);
 	}
 
 	/**
@@ -603,7 +604,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
 			Image[] userAgents, int offset)
 	{
-		return createProposal(displayName, name, image, description, userAgents, CSSIndexConstants.CORE, offset);
+		return createProposal(displayName, name, image, description, userAgents, ICSSIndexConstants.CORE, offset);
 	}
 
 	/**
@@ -715,6 +716,39 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * Return the range required to properly select appropriate lexemes
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	protected IRange getLexemeRange(IDocument document, int offset)
+	{
+		int startOffset = 0;
+		try
+		{
+			int testOffset = document.get(0, offset).lastIndexOf('}', offset);
+			// add one because we don't want to include the closing brace
+			startOffset = (testOffset < 0) ? 0 : testOffset + 1;
+		}
+		catch (BadLocationException e)
+		{
+		}
+
+		int endOffset = offset;
+		try
+		{
+			ITypedRegion region = document.getPartition(offset);
+			endOffset = Math.max(startOffset, region.getOffset() + region.getLength() - 1);
+		}
+		catch (BadLocationException e)
+		{
+		}
+
+		return new Range(startOffset, endOffset);
+	}
+
+	/**
 	 * createLexemeProvider
 	 * 
 	 * @param document
@@ -737,7 +771,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
-			return new LexemeProvider<CSSTokenType>(document, offset, new CSSTokenScanner())
+			IRange range = getLexemeRange(document, offset);
+			return new LexemeProvider<CSSTokenType>(document, range, new CSSTokenScanner())
 			{
 				@Override
 				protected CSSTokenType getTypeFromData(Object data)
@@ -873,7 +908,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case PROPERTY:
 					boolean afterColon = false;
 
-					COLON_LOOP: for (int i = index - 1; i >= 0; i--)
+					COLON_LOOP: for (int i = index - 1; i >= 0; i--) // $codepro.audit.disable nonCaseLabelInSwitch
 					{
 						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
 
@@ -890,7 +925,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						}
 					}
 
-					if (afterColon == false)
+					if (!afterColon)
 					{
 						if (lexeme.contains(offset) || lexeme.getEndingOffset() == offset - 1)
 						{
@@ -960,7 +995,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> previousLexeme = (i > 0) ? lexemeProvider.getLexeme(i - 1) : null;
 
-				if (this.isValueDelimiter(currentLexeme) || previousLexeme.isContiguousWith(currentLexeme) == false)
+				if (this.isValueDelimiter(currentLexeme) || !previousLexeme.isContiguousWith(currentLexeme))
 				{
 					// the current lexeme is a natural delimiter or there's a space between this lexeme and the previous
 					// lexeme, so treat the previous lexeme like it is the delimiter
@@ -992,7 +1027,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// get the staring lexeme
 		Lexeme<CSSTokenType> startingLexeme = lexemeProvider.getLexeme(index);
 
-		if (startingLexeme != null && this.isValueDelimiter(startingLexeme) == false)
+		if (startingLexeme != null && !this.isValueDelimiter(startingLexeme))
 		{
 			Lexeme<CSSTokenType> endingLexeme = startingLexeme;
 
@@ -1003,7 +1038,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> candidateLexeme = lexemeProvider.getLexeme(index);
 
-				if (this.isValueDelimiter(candidateLexeme) || endingLexeme.isContiguousWith(candidateLexeme) == false)
+				if (this.isValueDelimiter(candidateLexeme) || !endingLexeme.isContiguousWith(candidateLexeme))
 				{
 					// we've hit a delimiting lexeme or have passed over whitespace, so we're done
 					break;
@@ -1055,30 +1090,55 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 					}
 					break LOOP;
+
 				case RCURLY:
 					result = (lexeme.getEndingOffset() < offset) ? LocationType.OUTSIDE_RULE : LocationType.INSIDE_RULE;
 					break LOOP;
 
 				case COLON:
-					result = LocationType.INSIDE_RULE;
-					// Pseudo-classes/elements
-					if (index >= 1)
+					// try walking left
+					for (int i = index - 1; i >= 0; i--)
 					{
-						Lexeme<CSSTokenType> previous = lexemeProvider.getLexeme(index - 1);
-						if (previous != null
-								&& (previous.getType() == CSSTokenType.RCURLY
-										|| previous.getType() == CSSTokenType.ELEMENT
-										|| previous.getType() == CSSTokenType.CLASS
-										|| previous.getType() == CSSTokenType.ID || previous.getType() == CSSTokenType.COLON))
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
 						{
-							result = LocationType.OUTSIDE_RULE;
+							case COLOR:
+							case SEMICOLON:
+							case LCURLY:
+								result = LocationType.INSIDE_RULE;
+								break LOOP;
+
+							case CLASS:
+							case ID:
+							case RCURLY:
+								result = LocationType.OUTSIDE_RULE;
+								break LOOP;
 						}
 					}
-					else
+
+					// try walking right
+					for (int i = index + 1; i < lexemeProvider.size(); i++)
 					{
-						result = LocationType.OUTSIDE_RULE;
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
+						{
+							case COLOR:
+							case SEMICOLON:
+								result = LocationType.INSIDE_RULE;
+								break LOOP;
+
+							case CLASS:
+							case ID:
+							case LCURLY:
+								result = LocationType.OUTSIDE_RULE;
+								break LOOP;
+						}
 					}
+					result = LocationType.OUTSIDE_RULE;
 					break LOOP;
+
 				case PROPERTY:
 				case VALUE:
 					result = LocationType.INSIDE_RULE;
@@ -1196,7 +1256,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					case RCURLY:
 						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
 
-						if (candidate != null && this.isValueDelimiter(candidate) == false)
+						if (candidate != null && !this.isValueDelimiter(candidate))
 						{
 							this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 						}
@@ -1229,14 +1289,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
-		CSSTokenType[] types = new CSSTokenType[] { CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
-				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID };
-		Arrays.sort(types);
+		EnumSet<CSSTokenType> types = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
+				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID);
+
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		if (offset > 0)
 		{
 			Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
-			return lexeme != null ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
+			return (lexeme != null) ? types.contains(lexeme.getType()) : false;
 		}
 		return false;
 	}

@@ -7,33 +7,74 @@
  */
 package com.aptana.scripting.ui.views;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.views.properties.IPropertyDescriptor;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class MenuNode extends BaseNode
+class MenuNode extends BaseNode<MenuNode.Property>
 {
-	private enum Property
+	enum Property implements IPropertyInformation<MenuNode>
 	{
-		NAME, PATH, SCOPE, SEPARATOR
+		NAME(Messages.MenuNode_Menu_Name)
+		{
+			public Object getPropertyValue(MenuNode node)
+			{
+				return node.menu.getDisplayName();
+			}
+		},
+		PATH(Messages.MenuNode_Menu_Path)
+		{
+			public Object getPropertyValue(MenuNode node)
+			{
+				return node.menu.getPath();
+			}
+		},
+		SCOPE(Messages.MenuNode_Menu_Scope)
+		{
+			public Object getPropertyValue(MenuNode node)
+			{
+				String scope = node.menu.getScope();
+
+				return (scope != null && scope.length() > 0) ? scope : "all"; //$NON-NLS-1$
+			}
+		},
+		SEPARATOR(Messages.MenuNode_Menu_Separator)
+		{
+			public Object getPropertyValue(MenuNode node)
+			{
+				return node.menu.isSeparator();
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
 	}
 
 	private static final Image MENU_ICON = ScriptingUIPlugin.getImage("icons/menu.png"); //$NON-NLS-1$
-	private MenuElement _menu;
+	private MenuElement menu;
 
 	/**
 	 * MenuNode
 	 * 
 	 * @param menu
 	 */
-	public MenuNode(MenuElement menu)
+	MenuNode(MenuElement menu)
 	{
-		this._menu = menu;
+		this.menu = menu;
 	}
 
 	/*
@@ -42,7 +83,7 @@ class MenuNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		List<MenuElement> children = this._menu.getChildren();
+		List<MenuElement> children = menu.getChildren();
 		Object[] result = new Object[children.size()];
 
 		for (int i = 0; i < result.length; i++)
@@ -64,60 +105,21 @@ class MenuNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
 	 */
 	public String getLabel()
 	{
-		return this._menu.getDisplayName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyDescriptors()
-	 */
-	public IPropertyDescriptor[] getPropertyDescriptors()
-	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name"); //$NON-NLS-1$
-		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path"); //$NON-NLS-1$
-		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope"); //$NON-NLS-1$
-		PropertyDescriptor separatorProperty = new PropertyDescriptor(Property.SEPARATOR, "Separator"); //$NON-NLS-1$
-
-		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, separatorProperty };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyValue(java.lang.Object)
-	 */
-	public Object getPropertyValue(Object id)
-	{
-		Object result = null;
-
-		if (id instanceof Property)
-		{
-			switch ((Property) id)
-			{
-				case NAME:
-					result = this._menu.getDisplayName();
-					break;
-
-				case PATH:
-					result = this._menu.getPath();
-					break;
-
-				case SCOPE:
-					String scope = this._menu.getScope();
-
-					result = (scope != null && scope.length() > 0) ? scope : "all"; //$NON-NLS-1$
-					break;
-
-				case SEPARATOR:
-					result = this._menu.isSeparator();
-					break;
-			}
-		}
-
-		return result;
+		return menu.getDisplayName();
 	}
 
 	/*
@@ -126,6 +128,6 @@ class MenuNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._menu.hasChildren();
+		return menu.hasChildren();
 	}
 }

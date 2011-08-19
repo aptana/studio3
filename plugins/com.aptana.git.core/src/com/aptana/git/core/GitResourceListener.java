@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
@@ -114,9 +115,9 @@ class GitResourceListener implements IResourceChangeListener
 				}
 			}, true /* includePhantoms */);
 		}
-		catch (final CoreException e)
+		catch (CoreException e)
 		{
-			GitPlugin.logError(e);
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 
 		if (autoAttachGitRepos() && !projectsToAttach.isEmpty())

@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable packageNamingConvention
+
 package com.aptana.js.debug.ui.internal.launchConfigurations;
 
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -70,7 +73,7 @@ public class AdvancedSettingsTab extends AbstractLaunchConfigurationTab {
 			advancedRunEnabled.setSelection(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false));
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
 		}
 	}
 

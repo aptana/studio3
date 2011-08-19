@@ -15,16 +15,14 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ProjectScope;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -52,33 +50,10 @@ public class ResourceUtil
 	 * @param url
 	 * @return
 	 */
-	static public File resourcePathToFile(URL url)
+	public static File resourcePathToFile(URL url)
 	{
-		File result = null;
-
-		if (url != null)
-		{
-			try
-			{
-				URL fileURL = FileLocator.toFileURL(url);
-				URI fileURI = toURI(fileURL); // Use Eclipse to get around Java 1.5 bug on Windows
-				result = new File(fileURI);
-			}
-			catch (IOException e)
-			{
-				String message = MessageFormat.format(Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
-						new Object[] { url });
-				IdeLog.logError(CorePlugin.getDefault(), message, e);
-			}
-			catch (URISyntaxException e)
-			{
-				String message = MessageFormat.format(Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
-						new Object[] { url });
-				IdeLog.logError(CorePlugin.getDefault(), message, e);
-			}
-		}
-
-		return result;
+		URI fileURI = resourcePathToURI(url);
+		return (fileURI == null) ? null : new File(fileURI);
 	}
 
 	/**
@@ -87,17 +62,44 @@ public class ResourceUtil
 	 * @param url
 	 * @return
 	 */
-	static public String resourcePathToString(URL url)
+	public static String resourcePathToString(URL url)
 	{
-		String result = null;
 		File file = resourcePathToFile(url);
+		return (file == null) ? null : file.getAbsolutePath();
+	}
 
-		if (file != null)
+	/**
+	 * resourcePathToURI
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static URI resourcePathToURI(URL url)
+	{
+		if (url == null)
 		{
-			result = file.getAbsolutePath();
+			return null;
 		}
 
-		return result;
+		try
+		{
+			URL fileURL = FileLocator.toFileURL(url);
+
+			return toURI(fileURL); // Use Eclipse to get around Java 1.5 bug on Windows
+		}
+		catch (IOException e)
+		{
+			String message = MessageFormat.format(Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
+					new Object[] { url });
+			IdeLog.logError(CorePlugin.getDefault(), message, e);
+		}
+		catch (URISyntaxException e)
+		{
+			String message = MessageFormat.format(Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
+					new Object[] { url });
+			IdeLog.logError(CorePlugin.getDefault(), message, e);
+		}
+		return null;
 	}
 
 	/**
@@ -110,6 +112,11 @@ public class ResourceUtil
 	 */
 	public static URI toURI(URL url) throws URISyntaxException
 	{
+		if (url == null)
+		{
+			return null;
+		}
+
 		// URL behaves differently across platforms so for file: URLs we parse from string form
 		if (SCHEME_FILE.equals(url.getProtocol()))
 		{
@@ -226,11 +233,20 @@ public class ResourceUtil
 			}
 			// when a builder is disabled, Eclipse turns it into an external tool builder, so we have to do a little
 			// hack to see if the new builder id matches one of the disabled builds
-			String configHandler = (String) command.getArguments().get("LaunchConfigHandle"); //$NON-NLS-1$
-			if (configHandler != null && configHandler.indexOf(builderId) > -1)
+			Map arguments = command.getArguments();
+			if (arguments != null)
 			{
-				addBuilder = false;
-				break;
+				Object value = arguments.get("LaunchConfigHandle"); //$NON-NLS-1$
+				if (value != null)
+				{
+					String configHandler = value.toString(); // $codepro.audit.disable
+																// com.instantiations.assist.eclipse.analysis.unnecessaryToString
+					if (configHandler != null && configHandler.indexOf(builderId) > -1)
+					{
+						addBuilder = false;
+						break;
+					}
+				}
 			}
 		}
 		// add builder to project
@@ -245,17 +261,6 @@ public class ResourceUtil
 			description.setBuildSpec(nc);
 		}
 		return addBuilder;
-	}
-
-	/**
-	 * Finds workspace file for the provided workspace-relative path
-	 * 
-	 * @param filePath
-	 * @return IFile
-	 */
-	public static IFile findWorkspaceFile(IPath filePath)
-	{
-		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(filePath);
 	}
 
 	/**

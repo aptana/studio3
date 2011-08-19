@@ -11,11 +11,12 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.xml.formatter.XMLFormatterConstants;
 import com.aptana.editor.xml.formatter.XMLFormatterPlugin;
-import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
 public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitializer
@@ -53,7 +54,7 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		}
 		catch (BackingStoreException e)
 		{
-			FormatterPlugin.logError(e);
+			IdeLog.logError(XMLFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 	}
 }

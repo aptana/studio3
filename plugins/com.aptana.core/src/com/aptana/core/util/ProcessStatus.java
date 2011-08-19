@@ -36,7 +36,7 @@ public class ProcessStatus extends Status
 
 	private static String generateMessage(int exitCode, String stdOut, String stderr)
 	{
-		if (exitCode != 0 && (stdOut == null || stdOut.trim().length() == 0))
+		if (exitCode != 0 && StringUtil.isEmpty(stdOut))
 		{
 			return stderr;
 		}

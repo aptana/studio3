@@ -13,16 +13,13 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IExtendedStreamsProxy extends IStreamsProxy {
 
 	/**
-	 * Returns a monitor for the stream of this proxy's process identified by streamIdentifer,
-	 * or <code>null</code> if not exists.
-	 * The monitor is connected to the corresponding stream of the
-	 * associated process.
-	 *
+	 * Returns a monitor for the stream of this proxy's process identified by streamIdentifer, or <code>null</code> if
+	 * not exists. The monitor is connected to the corresponding stream of the associated process.
+	 * 
 	 * @param streamIdentifier
 	 * @return an stream monitor, or <code>null</code> if none
 	 */
@@ -30,6 +27,7 @@ public interface IExtendedStreamsProxy extends IStreamsProxy {
 
 	/**
 	 * Return list of stream identifiers handled by this streams proxy.
+	 * 
 	 * @return
 	 */
 	public String[] getStreamIdentifers();

@@ -394,7 +394,7 @@ public class CommandExecutionUtils
 				}
 				catch (BadLocationException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -493,6 +493,11 @@ public class CommandExecutionUtils
 
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer)
 	{
+		if (commandResult == null)
+		{
+			return;
+		}
+
 		if (!commandResult.executedSuccessfully())
 		{
 			outputToConsole(commandResult);
@@ -651,7 +656,7 @@ public class CommandExecutionUtils
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -836,13 +841,13 @@ public class CommandExecutionUtils
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 
 		}
 		catch (PartInitException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -962,7 +967,7 @@ public class CommandExecutionUtils
 			}
 			catch (FileNotFoundException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 			if (pw != null)
 			{
@@ -989,11 +994,11 @@ public class CommandExecutionUtils
 				}
 				catch (PartInitException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 				catch (MalformedURLException e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -1042,13 +1047,19 @@ public class CommandExecutionUtils
 		if (breakIter.isBoundary(offset))
 		{
 			if (end - offset > offset - start)
+			{
 				start = offset;
+			}
 			else
+			{
 				end = offset;
+			}
 		}
 
 		if (end == start)
+		{
 			return new Region(start, 0);
+		}
 		return new Region(start, end - start);
 	}
 

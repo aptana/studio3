@@ -35,11 +35,9 @@ import com.aptana.js.debug.core.model.ISourceLink;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 
 /**
- * Provides utility methods for creating debug targets and breakpoints specific
- * to the JS debug model.
+ * Provides utility methods for creating debug targets and breakpoints specific to the JS debug model.
  * 
  * @author Max Stepanov
- * 
  */
 public final class JSDebugModel {
 
@@ -80,7 +78,8 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 * @throws CoreException
 	 */
-	public static ILineBreakpoint createLineBreakpoint(IResource resource, int line, Map<String, Object> attributes, boolean register) throws CoreException {
+	public static ILineBreakpoint createLineBreakpoint(IResource resource, int line, Map<String, Object> attributes,
+			boolean register) throws CoreException {
 		return new JSDebugLineBreakpoint(resource, line, attributes, register);
 	}
 
@@ -106,7 +105,8 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 * @throws CoreException
 	 */
-	public static ILineBreakpoint createLineBreakpoint(IUniformResource resource, int line, Map<String, Object> attributes, boolean register) throws CoreException {
+	public static ILineBreakpoint createLineBreakpoint(IUniformResource resource, int line,
+			Map<String, Object> attributes, boolean register) throws CoreException {
 		return new JSDebugLineBreakpoint(resource, line, attributes, register);
 	}
 
@@ -120,14 +120,15 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 * @throws CoreException
 	 */
-	public static ILineBreakpoint createLineBreakpointForResource(Object resource, int line, Map<String, Object> attributes, boolean register) throws CoreException {
+	public static ILineBreakpoint createLineBreakpointForResource(Object resource, int line,
+			Map<String, Object> attributes, boolean register) throws CoreException {
 		if (resource instanceof IResource) {
 			return createLineBreakpoint((IResource) resource, line, attributes, register);
 		} else if (resource instanceof IUniformResource) {
 			return createLineBreakpoint((IUniformResource) resource, line, attributes, register);
 		} else if (resource instanceof String) {
 			attributes.put(IJSDebugConstants.BREAKPOINT_LOCATION, (String) resource);
-			return new JSDebugLineBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), line, attributes, register);			
+			return new JSDebugLineBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), line, attributes, register);
 		}
 		return null;
 	}
@@ -140,7 +141,8 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 */
 	public static ILineBreakpoint lineBreakpointExists(IResource resource, int lineNumber) {
-		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
+				.getBreakpoints(getModelIdentifier())) {
 			try {
 				if (breakpoint instanceof ILineBreakpoint && resource.equals(breakpoint.getMarker().getResource())
 						&& ((ILineBreakpoint) breakpoint).getLineNumber() == lineNumber) {
@@ -161,7 +163,8 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 */
 	public static ILineBreakpoint lineBreakpointExists(IUniformResource resource, int lineNumber) {
-		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
+				.getBreakpoints(getModelIdentifier())) {
 			try {
 				IMarker marker = breakpoint.getMarker();
 				if (breakpoint instanceof ILineBreakpoint && marker instanceof IUniformResourceMarker
@@ -184,7 +187,8 @@ public final class JSDebugModel {
 	 * @return IJSExceptionBreakpoint
 	 * @throws CoreException
 	 */
-	public static IJSExceptionBreakpoint createExceptionBreakpoint(IResource resource, String exceptionTypeName) throws CoreException {
+	public static IJSExceptionBreakpoint createExceptionBreakpoint(IResource resource, String exceptionTypeName)
+			throws CoreException {
 		return new JSDebugExceptionBreakpoint(resource, exceptionTypeName);
 	}
 
@@ -196,7 +200,8 @@ public final class JSDebugModel {
 	 * @return IJSExceptionBreakpoint
 	 * @throws CoreException
 	 */
-	public static IJSExceptionBreakpoint createExceptionBreakpoint(IUniformResource resource, String exceptionTypeName) throws CoreException {
+	public static IJSExceptionBreakpoint createExceptionBreakpoint(IUniformResource resource, String exceptionTypeName)
+			throws CoreException {
 		return new JSDebugExceptionBreakpoint(resource, exceptionTypeName);
 	}
 
@@ -207,7 +212,8 @@ public final class JSDebugModel {
 	 * @return IJSExceptionBreakpoint
 	 */
 	public static IJSExceptionBreakpoint exceptionBreakpointExists(String exceptionTypeName) {
-		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager()
+				.getBreakpoints(getModelIdentifier())) {
 			try {
 				if (breakpoint instanceof IJSExceptionBreakpoint
 						&& exceptionTypeName.equals(((IJSExceptionBreakpoint) breakpoint).getExceptionTypeName())) {
@@ -219,7 +225,7 @@ public final class JSDebugModel {
 		}
 		return null;
 	}
-	
+
 	public static IJSInspectExpression createInspectExpression(IWatchExpressionResult expressionResult) {
 		return new JSInspectExpression(expressionResult);
 	}
@@ -241,6 +247,7 @@ public final class JSDebugModel {
 
 	/**
 	 * Create source link for location
+	 * 
 	 * @param location
 	 * @return
 	 */

@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import com.aptana.ui.util.UIUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -113,10 +113,11 @@ public class FileSystemRenameAction extends BaseSelectionListenerAction {
                             showError(ex);
                         }
                         // fall through
-                    case SWT.TRAVERSE_ESCAPE:
+                    case SWT.TRAVERSE_ESCAPE: // $codepro.audit.disable nonTerminatedCaseClause
                         text.dispose();
                         e.doit = true;
                         e.detail = SWT.TRAVERSE_NONE;
+                        break;
                     default:
                         break;
                     }

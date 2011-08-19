@@ -32,34 +32,29 @@ import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 
 	/**
-	 * Watchpoint attribute storing the access value (value
-	 * <code>"com.aptana.debug.core.watchpoint.access"</code>). This
-	 * attribute is stored as a <code>boolean</code>, indicating whether a
-	 * watchpoint is an access watchpoint.
+	 * Watchpoint attribute storing the access value (value <code>"com.aptana.debug.core.watchpoint.access"</code>).
+	 * This attribute is stored as a <code>boolean</code>, indicating whether a watchpoint is an access watchpoint.
 	 */
 	protected static final String ACCESS = "com.aptana.debug.core.watchpoint.access"; //$NON-NLS-1$
 
 	/**
-	 * Watchpoint attribute storing the modification value (value
-	 * <code>"com.aptana.debug.core.watchpoint.access"</code>). This
-	 * attribute is stored as a <code>boolean</code>, indicating whether a
-	 * watchpoint is a modification watchpoint.
+	 * Watchpoint attribute storing the modification value (value <code>"com.aptana.debug.core.watchpoint.access"</code>
+	 * ). This attribute is stored as a <code>boolean</code>, indicating whether a watchpoint is a modification
+	 * watchpoint.
 	 */
 	protected static final String MODIFICATION = "com.aptana.debug.core.watchpoint.modification"; //$NON-NLS-1$	
 
 	/**
 	 * Watchpoint attribute storing the auto_disabled value (value
-	 * <code>"com.aptana.debug.core.watchpoint.auto_disabled"</code>). This
-	 * attribute is stored as a <code>boolean</code>, indicating whether a
-	 * watchpoint has been auto-disabled (as opposed to being disabled
+	 * <code>"com.aptana.debug.core.watchpoint.auto_disabled"</code>). This attribute is stored as a
+	 * <code>boolean</code>, indicating whether a watchpoint has been auto-disabled (as opposed to being disabled
 	 * explicitly by the user)
 	 */
 	protected static final String AUTO_DISABLED = "com.aptana.debug.core.watchpoint.auto_disabled"; //$NON-NLS-1$
 
 	/**
-	 * Default constructor is required for the breakpoint manager to re-create
-	 * persisted breakpoints. After instantiating a breakpoint, the
-	 * <code>setMarker(...)</code> method is called to restore this breakpoint's
+	 * Default constructor is required for the breakpoint manager to re-create persisted breakpoints. After
+	 * instantiating a breakpoint, the <code>setMarker(...)</code> method is called to restore this breakpoint's
 	 * attributes.
 	 */
 	public JSDebugWatchpoint() {
@@ -78,8 +73,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	}
 
 	/**
-	 * Constructs a exception breakpoint on the given resource for the given
-	 * exception type name.
+	 * Constructs a exception breakpoint on the given resource for the given exception type name.
 	 * 
 	 * @param resource
 	 *            file on which to set the breakpoint
@@ -91,14 +85,15 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
-	public JSDebugWatchpoint(final IResource resource, final IJSVariable variable, final Map<String, Object> attributes,
-			final boolean register) throws CoreException {
+	public JSDebugWatchpoint(final IResource resource, final IJSVariable variable,
+			final Map<String, Object> attributes, final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IMarker marker = resource.createMarker(IDebugCoreConstants.ID_WATCHPOINT_MARKER);
 				setMarker(marker);
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
-				attributes.put(IJSDebugConstants.WATCHPOINT_VARIABLE_ACCESSOR, ((JSDebugVariable) variable).getQualifier());
+				attributes.put(IJSDebugConstants.WATCHPOINT_VARIABLE_ACCESSOR,
+						((JSDebugVariable) variable).getQualifier());
 				attributes.put(IJSDebugConstants.WATCHPOINT_VARIABLE_NAME, variable.getFullName());
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE,
@@ -113,8 +108,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	}
 
 	/*
-	 * Add this breakpoint to the breakpoint manager, or sets it as
-	 * unregistered.
+	 * Add this breakpoint to the breakpoint manager, or sets it as unregistered.
 	 */
 	private void register(boolean register) throws CoreException {
 		if (register) {
@@ -212,13 +206,8 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	}
 
 	/*
-	 * Adds the default access and modification attributes of the watchpoint to
-	 * the given map
-	 * <ul>
-	 * <li>access = false
-	 * <li>modification = true
-	 * <li>auto disabled = false
-	 * <ul>
+	 * Adds the default access and modification attributes of the watchpoint to the given map <ul> <li>access = false
+	 * <li>modification = true <li>auto disabled = false <ul>
 	 */
 	private void addDefaultAccessAndModification(Map<String, Object> attributes) {
 		boolean[] values = new boolean[] { false, true }; // getDefaultAccessAndModificationValues();
@@ -228,12 +217,8 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	}
 
 	/*
-	 * Sets the default access and modification attributes of the watchpoint.
-	 * The default values are:
-	 * <ul>
-	 * <li>access = <code>false</code>
-	 * <li>modification = <code>true</code>
-	 * <ul>
+	 * Sets the default access and modification attributes of the watchpoint. The default values are: <ul> <li>access =
+	 * <code>false</code> <li>modification = <code>true</code> <ul>
 	 */
 	private void setDefaultAccessAndModification() throws CoreException {
 		boolean[] def = new boolean[] { false, true }; // getDefaultAccessAndModificationValues();
@@ -244,6 +229,5 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 		String[] attributes = new String[] { ACCESS, MODIFICATION };
 		setAttributes(attributes, values);
 	}
-
 
 }

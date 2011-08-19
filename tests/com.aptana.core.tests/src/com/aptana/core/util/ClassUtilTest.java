@@ -11,11 +11,14 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.osgi.framework.BundleActivator;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.resources.IUniformResourceMarker;
 
 public class ClassUtilTest extends TestCase
 {
@@ -30,5 +33,15 @@ public class ClassUtilTest extends TestCase
 		assertTrue(classes.contains(Plugin.class));
 		assertTrue(classes.contains(BundleActivator.class));
 		assertTrue(classes.contains(Object.class));
+	}
+
+	public void testGetInterfaceTree()
+	{
+		List<Class<?>> classes = ClassUtil.getClassesTree(IUniformResourceMarker.class);
+
+		assertEquals(3, classes.size());
+		assertTrue(classes.contains(IUniformResourceMarker.class));
+		assertTrue(classes.contains(IMarker.class));
+		assertTrue(classes.contains(IAdaptable.class));
 	}
 }

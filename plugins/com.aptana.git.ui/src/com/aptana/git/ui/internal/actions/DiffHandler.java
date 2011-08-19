@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
@@ -118,7 +120,7 @@ public class DiffHandler extends AbstractGitHandler
 		}
 		catch (Throwable t)
 		{
-			GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+			IdeLog.logError(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 
 		final String finalDiff = diff;

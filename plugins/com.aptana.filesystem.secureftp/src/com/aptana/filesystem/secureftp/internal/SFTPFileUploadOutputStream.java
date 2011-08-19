@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.filesystem.secureftp.internal;
 
@@ -87,7 +89,7 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 		try {
 			ftpOutputStream.close();
 			try {
-				String actualFilename = filename != null ? filename : ftpOutputStream.getRemoteFile();
+				String actualFilename = (filename != null) ? filename : ftpOutputStream.getRemoteFile();
 				if (filename != null) {
 					if (ftpClient.exists(filename)) {
 						ftpClient.delete(filename);
@@ -101,7 +103,7 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 						ftpClient.setModTime(actualFilename, modificationTime);
 					}
 					if (permissions > 0) {
-						((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), actualFilename);
+						ftpClient.changeMode((int) (permissions & 0777), actualFilename);
 					}
 				} catch (FTPException e) {
 					if (e.getReplyCode() != SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {

@@ -34,6 +34,12 @@ public class StartPageStartup implements IStartup
 {
 	public void earlyStartup()
 	{
+		if (EclipseUtil.isTesting())
+		{
+			// not to open the start page when in testing mode
+			return;
+		}
+
 		Job job = new UIJob(Messages.StartPageStartup_launchingStartPage)
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
@@ -69,7 +75,7 @@ public class StartPageStartup implements IStartup
 				if (EclipseUtil.isSystemPropertyEnabled(IStartPageUISystemProperties.FORCE_START_PAGE)
 						|| StartPageUtil.shouldShowStartPage())
 				{
-					StartPageUtil.showStartPage();
+					StartPageUtil.showStartPage(true);
 				}
 				return Status.OK_STATUS;
 			}

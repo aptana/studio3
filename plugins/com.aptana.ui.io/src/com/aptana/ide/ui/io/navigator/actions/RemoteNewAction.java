@@ -28,7 +28,7 @@ public class RemoteNewAction extends BaseSelectionListenerAction {
         private NewFolderAction fNewFolderAction;
         private NewFileAction fNewFileAction;
 
-        public MenuCreator() {
+        protected MenuCreator() {
             fNewFolderAction = new NewFolderAction(fWindow);
             fNewFileAction = new NewFileAction(fWindow);
         }

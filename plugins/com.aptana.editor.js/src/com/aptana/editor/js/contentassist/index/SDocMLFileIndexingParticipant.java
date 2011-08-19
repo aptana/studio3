@@ -86,11 +86,11 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 
 					String typeName = type.getName();
 
-					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false) //$NON-NLS-1$
+					if (!typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN)) //$NON-NLS-1$
 					{
 						List<FunctionElement> constructors = type.getConstructors();
 
-						if (constructors.isEmpty() == false)
+						if (!constructors.isEmpty())
 						{
 							for (FunctionElement constructor : constructors)
 							{
@@ -170,7 +170,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 			}
 			catch (Throwable e)
 			{
-				IdeLog.logError(JSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(JSPlugin.getDefault(), e);
 			}
 		}
 		finally

@@ -19,7 +19,7 @@ import org.eclipse.debug.core.model.IDebugTarget;
  * @author Max Stepanov
  */
 public final class RemoteSourceCacheManager implements IDebugEventSetListener {
-	
+
 	private Map<URI, RemoteFileStorage> cache = new HashMap<URI, RemoteFileStorage>();
 	private IFileContentRetriever fileContentRetriever;
 
@@ -54,14 +54,14 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 		for (DebugEvent event : events) {
 			if (event.getSource() instanceof IDebugTarget) {
 				switch (event.getKind()) {
-				case DebugEvent.CREATE:
-					updateStorageContent((IDebugTarget) event.getSource(), false);
-					break;
-				case DebugEvent.TERMINATE:
-					updateStorageContent((IDebugTarget) event.getSource(), true);
-					break;
-				default:
-					break;
+					case DebugEvent.CREATE:
+						updateStorageContent((IDebugTarget) event.getSource(), false);
+						break;
+					case DebugEvent.TERMINATE:
+						updateStorageContent((IDebugTarget) event.getSource(), true);
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -78,7 +78,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 		if (fileContentRetriever != null) {
 			for (RemoteFileStorage storage : cache.values()) {
 				if (clear) {
-					if (storage.getFileContentRetriever() == fileContentRetriever) {
+					if (storage.getFileContentRetriever() == fileContentRetriever) { // $codepro.audit.disable useEquals
 						storage.setFileContentRetriever(null);
 
 					}

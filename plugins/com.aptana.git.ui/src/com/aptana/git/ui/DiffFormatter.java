@@ -17,8 +17,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.IDebugScopes;
 
 /**
  * Used to share common code for formatting Diffs for display.
@@ -55,7 +57,8 @@ public abstract class DiffFormatter
 		html.append("<div class=\"diffContent\">"); //$NON-NLS-1$
 		if (!diff.startsWith("diff")) //$NON-NLS-1$
 		{
-			// New file, no "diff", all lines are added. TODO Maybe split all lines and pretend like they have a + in front?
+			// New file, no "diff", all lines are added. TODO Maybe split all lines and pretend like they have a + in
+			// front?
 			if (diff.length() == 0)
 			{
 				diff = Messages.DiffFormatter_NoContent;
@@ -149,7 +152,7 @@ public abstract class DiffFormatter
 		}
 		catch (Exception e)
 		{
-			GitUIPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return html.toString();
 		}
 	}

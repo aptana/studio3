@@ -5,6 +5,9 @@
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
+
 package com.aptana.core.epl;
 
 import org.eclipse.core.runtime.IStatus;

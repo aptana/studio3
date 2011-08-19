@@ -8,8 +8,10 @@
 package com.aptana.scripting.ui.views;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
@@ -18,17 +20,40 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class SnippetsNode extends BaseNode
+class SnippetsNode extends BaseNode<SnippetsNode.Property>
 {
+	enum Property implements IPropertyInformation<SnippetsNode>
+	{
+		COUNT(Messages.SnippetsNode_Snippets_Count)
+		{
+			public Object getPropertyValue(SnippetsNode node)
+			{
+				return node.snippets.length;
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final Image SNIPPETS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	private SnippetNode[] _snippets;
+	private SnippetNode[] snippets;
 
 	/**
 	 * CommandsNode
 	 * 
 	 * @param bundle
 	 */
-	public SnippetsNode(BundleElement bundle)
+	SnippetsNode(BundleElement bundle)
 	{
 		this(bundle.getCommands());
 	}
@@ -38,9 +63,9 @@ class SnippetsNode extends BaseNode
 	 * 
 	 * @param elements
 	 */
-	public SnippetsNode(List<CommandElement> elements)
+	SnippetsNode(List<CommandElement> elements)
 	{
-		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
+		List<SnippetNode> items = new LinkedList<SnippetNode>();
 
 		if (elements != null)
 		{
@@ -50,12 +75,12 @@ class SnippetsNode extends BaseNode
 			{
 				if (command instanceof SnippetElement)
 				{
-					snippets.add(new SnippetNode((SnippetElement) command));
+					items.add(new SnippetNode((SnippetElement) command));
 				}
 			}
 		}
 
-		this._snippets = snippets.toArray(new SnippetNode[snippets.size()]);
+		snippets = items.toArray(new SnippetNode[items.size()]);
 	}
 
 	/*
@@ -64,7 +89,7 @@ class SnippetsNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		return this._snippets;
+		return snippets;
 	}
 
 	/*
@@ -74,6 +99,16 @@ class SnippetsNode extends BaseNode
 	public Image getImage()
 	{
 		return SNIPPETS_ICON;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/*
@@ -92,6 +127,6 @@ class SnippetsNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._snippets.length > 0;
+		return snippets.length > 0;
 	}
 }

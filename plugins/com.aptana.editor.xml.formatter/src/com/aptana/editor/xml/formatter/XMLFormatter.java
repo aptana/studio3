@@ -19,12 +19,14 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
@@ -150,14 +152,14 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.getDefault().isDebugging())
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(XMLFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		catch (Exception e)
 		{
 			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
 					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(e);
+			IdeLog.logError(XMLFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return null;
 	}

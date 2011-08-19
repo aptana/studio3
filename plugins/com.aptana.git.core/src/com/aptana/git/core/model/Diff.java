@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
 
 public class Diff
@@ -162,7 +163,7 @@ public class Diff
 	private static void log(String string)
 	{
 		if (GitPlugin.getDefault() != null)
-			GitPlugin.logInfo(string);
+			IdeLog.logInfo(GitPlugin.getDefault(), string);
 		else
 			System.out.println(string);
 	}

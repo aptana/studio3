@@ -27,7 +27,7 @@ public class JSIndexWriter extends IndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(JSIndexConstants.METADATA_FILE_LOCATION);
+		return URI.create(IJSIndexConstants.METADATA_FILE_LOCATION);
 	}
 
 	/**
@@ -39,14 +39,16 @@ public class JSIndexWriter extends IndexWriter
 	 */
 	protected void writeFunction(Index index, FunctionElement function, URI location)
 	{
-		String value = StringUtil.join( //
-			JSIndexConstants.DELIMITER, //
-			function.getOwningType(), //
-			function.getName(), //
-			this.serialize(function) //
+		// @formatter:off
+		String value = StringUtil.join(
+			IJSIndexConstants.DELIMITER,
+			function.getOwningType(),
+			function.getName(),
+			this.serialize(function)
 		);
-		
-		index.addEntry(JSIndexConstants.FUNCTION, value, location);
+		// @formatter:on
+
+		index.addEntry(IJSIndexConstants.FUNCTION, value, location);
 	}
 
 	/**
@@ -58,14 +60,16 @@ public class JSIndexWriter extends IndexWriter
 	 */
 	protected void writeProperty(Index index, PropertyElement property, URI location)
 	{
-		String value = StringUtil.join( //
-			JSIndexConstants.DELIMITER, //
-			property.getOwningType(), //
-			property.getName(), //
-			this.serialize(property) //
+		// @formatter:off
+		String value = StringUtil.join(
+			IJSIndexConstants.DELIMITER,
+			property.getOwningType(),
+			property.getName(),
+			this.serialize(property)
 		);
-		
-		index.addEntry(JSIndexConstants.PROPERTY, value, location);
+		// @formatter:on
+
+		index.addEntry(IJSIndexConstants.PROPERTY, value, location);
 	}
 
 	/**
@@ -92,12 +96,12 @@ public class JSIndexWriter extends IndexWriter
 		{
 			List<String> parentTypes = type.getParentTypes();
 			String parentType;
-			
-			if (parentTypes.isEmpty() == false)
+
+			if (!parentTypes.isEmpty())
 			{
-				parentType = StringUtil.join(JSIndexConstants.SUB_DELIMITER, parentTypes);
+				parentType = StringUtil.join(IJSIndexConstants.SUB_DELIMITER, parentTypes);
 			}
-			else if (type.getName().equals(JSTypeConstants.OBJECT_TYPE) == false)
+			else if (!type.getName().equals(JSTypeConstants.OBJECT_TYPE))
 			{
 				parentType = JSTypeConstants.OBJECT_TYPE;
 			}
@@ -109,13 +113,16 @@ public class JSIndexWriter extends IndexWriter
 			// UserAgentElement[] userAgents = type.getUserAgents();
 
 			// calculate key value and add to index
-			String value = StringUtil.join( //
-				JSIndexConstants.DELIMITER, //
-				type.getName(), //
-				parentType, //
-				type.getDescription());
+			// @formatter:off
+			String value = StringUtil.join(
+				IJSIndexConstants.DELIMITER,
+				type.getName(),
+				parentType,
+				type.getDescription()
+			);
+			// @formatter:on
 
-			index.addEntry(JSIndexConstants.TYPE, value, location);
+			index.addEntry(IJSIndexConstants.TYPE, value, location);
 
 			// write properties
 			for (PropertyElement property : type.getProperties())

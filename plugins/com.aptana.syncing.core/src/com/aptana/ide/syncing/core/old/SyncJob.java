@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -191,7 +190,8 @@ public class SyncJob extends Job implements ISyncEventHandler
 	/**
 	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncContinue(IProgressMonitor)
 	 */
-	public boolean syncContinue(IProgressMonitor monitor) {
+	public boolean syncContinue(IProgressMonitor monitor)
+	{
 		return !monitor.isCanceled();
 	}
 
@@ -221,7 +221,8 @@ public class SyncJob extends Job implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(VirtualFileSyncPair, Exception, IProgressMonitor)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(VirtualFileSyncPair, Exception,
+	 *      IProgressMonitor)
 	 */
 	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
 	{
@@ -239,7 +240,8 @@ public class SyncJob extends Job implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(VirtualFileSyncPair, int, int, IProgressMonitor)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(VirtualFileSyncPair, int, int,
+	 *      IProgressMonitor)
 	 */
 	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
 	{
@@ -255,7 +257,8 @@ public class SyncJob extends Job implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(VirtualFileSyncPair, long, IProgressMonitor)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(VirtualFileSyncPair, long,
+	 *      IProgressMonitor)
 	 */
 	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor)
 	{
@@ -324,7 +327,7 @@ public class SyncJob extends Job implements ISyncEventHandler
 			fSyncer.downloadAndDelete(pairs, fDeleteLocal, sub);
 			return true;
 		}
-		catch (CoreException e)
+		catch (Exception e)
 		{
 		}
 		return false;
@@ -337,7 +340,7 @@ public class SyncJob extends Job implements ISyncEventHandler
 			fSyncer.uploadAndDelete(pairs, fDeleteRemote, sub);
 			return true;
 		}
-		catch (CoreException e)
+		catch (Exception e)
 		{
 		}
 		return false;

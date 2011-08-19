@@ -32,6 +32,7 @@ import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.JavaScriptImporterOptionsDialog;
@@ -121,8 +122,9 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 			IStatus loadingStatus = loadAttributes(attributes);
 			if (!loadingStatus.isOK())
 			{
-				applyErrorAttributes(loadingStatus.getMessage());
-				PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
+				String message = loadingStatus.getMessage();
+				applyErrorAttributes(message);
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 				return configurationStatus;
 			}
 
@@ -134,7 +136,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { JS_LIBRARY,
 						1, urls.length });
 				applyErrorAttributes(err);
-				PortalUIPlugin.logError(new Exception(err));
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 				return configurationStatus;
 			}
 			// Try to get the library name from the optional attributes. If it's not there, we log a warning and use a
@@ -144,7 +146,8 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 			{
 				// just in case
 				libraryName = JS_LIBRARY;
-				PortalUIPlugin.logWarning("Expected a name attribute for the JS library, but got null."); //$NON-NLS-1$
+				IdeLog.logWarning(PortalUIPlugin.getDefault(),
+						"Expected a name attribute for the JS library, but got null."); //$NON-NLS-1$
 			}
 			// Start the installation...
 			configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
@@ -158,9 +161,9 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
-							Messages.InstallProcessor_installerTitle, libraryName), NLS.bind(
-							Messages.InstallProcessor_installationSuccessful, libraryName));
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							NLS.bind(Messages.InstallProcessor_installerTitle, libraryName),
+							NLS.bind(Messages.InstallProcessor_installationSuccessful, libraryName));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -214,9 +217,9 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 						if (!targetFolder.exists() && !targetFolder.mkdirs())
 						{
 							// could not create the directories needed!
-							PortalUIPlugin
-									.logError(
-											"Failed to create directories when importing JS slibrary!", new Exception("Failed to create '" + fullPath + '\'')); //$NON-NLS-1$ //$NON-NLS-2$
+							IdeLog.logError(
+									PortalUIPlugin.getDefault(),
+									"Failed to create directories when importing JS slibrary!", new Exception("Failed to create '" + fullPath + '\'')); //$NON-NLS-1$ //$NON-NLS-2$
 							return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 									Messages.JSLibraryInstallProcessor_directoriesCreationFailed);
 						}
@@ -230,7 +233,8 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 								File targetLocation = new File(targetFolder, sourceLocation.getName());
 								if (targetLocation.exists())
 								{
-									if (!MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
+									if (!MessageDialog.openQuestion(
+											Display.getDefault().getActiveShell(),
 											Messages.JSLibraryInstallProcessor_fileConflictTitle,
 											Messages.JSLibraryInstallProcessor_fileConflictMessage
 													+ sourceLocation.getName()
@@ -257,8 +261,8 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 					}
 					else
 					{
-						PortalUIPlugin
-								.logError("Unexpected null project when importing a JS library!", new Exception()); //$NON-NLS-1$
+						IdeLog.logError(PortalUIPlugin.getDefault(),
+								"Unexpected null project when importing a JS library!", new Exception()); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 								Messages.JSLibraryInstallProcessor_unexpectedNull);
 					}
@@ -268,7 +272,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 					}
 					catch (CoreException e)
 					{
-						PortalUIPlugin.logError("Error while refreshing the project.", e); //$NON-NLS-1$
+						IdeLog.logError(PortalUIPlugin.getDefault(), "Error while refreshing the project.", e); //$NON-NLS-1$
 					}
 					return Status.OK_STATUS;
 				}
@@ -286,7 +290,7 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 		}
 		catch (InterruptedException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 		}
 		return job.getResult();
 	}

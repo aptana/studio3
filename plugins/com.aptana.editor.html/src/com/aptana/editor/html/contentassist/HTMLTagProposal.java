@@ -37,8 +37,8 @@ class HTMLTagProposal extends CommonCompletionProposal
 	 * @param element
 	 * @param positions
 	 */
-	HTMLTagProposal(String replacementString, int replacementOffset, int replacementLength,
-			ElementElement element, Integer... positions)
+	HTMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
+			Integer... positions)
 	{
 		super(replacementString, replacementOffset, replacementLength, positions[0],
 				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
@@ -84,7 +84,8 @@ class HTMLTagProposal extends CommonCompletionProposal
 
 					public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length)
 					{
-						if (event.character == '\n' || event.character == '\r')
+						if (event.character == '\n' || event.character == '\r') // $codepro.audit.disable
+																				// platformSpecificLineSeparator
 						{
 							return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
 						}
@@ -98,7 +99,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 			}
 			catch (BadLocationException e)
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(HTMLPlugin.getDefault(), e);
 			}
 		}
 	}

@@ -11,6 +11,7 @@ import org.w3c.css.parser.CssStyle;
 import org.w3c.css.properties.css1.CssProperty;
 import org.w3c.css.util.ApplContext;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.validator.AptanaCSSInheritanceProperties;
 import com.aptana.editor.css.validator.AptanaCSSStyle;
 
@@ -24,7 +25,7 @@ public abstract class CustomCSSProperty extends CssProperty
 
 	private final String propertyName;
 
-	public CustomCSSProperty(String propertyName)
+	protected CustomCSSProperty(String propertyName)
 	{
 		this.propertyName = propertyName;
 	}
@@ -75,6 +76,10 @@ public abstract class CustomCSSProperty extends CssProperty
 	@Override
 	public boolean equals(CssProperty property)
 	{
+		if (!(property instanceof CustomCSSProperty))
+		{
+			return false;
+		}
 		Object value = get();
 		return value != null && value.equals(property.get());
 	}
@@ -83,7 +88,7 @@ public abstract class CustomCSSProperty extends CssProperty
 	public String toString()
 	{
 		Object value = get();
-		return value == null ? "" : value.toString(); //$NON-NLS-1$
+		return (value == null) ? StringUtil.EMPTY : value.toString();
 	}
 
 	/**
@@ -96,11 +101,11 @@ public abstract class CustomCSSProperty extends CssProperty
 	protected String getPropertyNameNoMinus()
 	{
 		String propertyName = getPropertyName();
-		if (propertyName == null)
+		if (StringUtil.isEmpty(propertyName))
 		{
 			return propertyName;
 		}
-		if (propertyName.startsWith("-")) //$NON-NLS-1$
+		if (propertyName.charAt(0) == '-')
 		{
 			return propertyName.substring(1);
 		}

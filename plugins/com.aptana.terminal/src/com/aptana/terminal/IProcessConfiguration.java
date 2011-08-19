@@ -16,11 +16,12 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IProcessConfiguration {
 
 	public File getExecutable();
+
 	public List<String> getCommandLine() throws CoreException;
+
 	public Map<String, String> getEnvironment();
 }

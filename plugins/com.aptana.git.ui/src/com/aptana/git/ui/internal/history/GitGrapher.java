@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.ui.GitUIPlugin;
 
@@ -186,7 +187,7 @@ class GitGrapher
 	private void log(String string)
 	{
 		if (GitUIPlugin.getDefault() != null)
-			GitUIPlugin.logWarning(string);
+			IdeLog.logWarning(GitUIPlugin.getDefault(), string);
 		else
 			System.out.println(string);
 	}

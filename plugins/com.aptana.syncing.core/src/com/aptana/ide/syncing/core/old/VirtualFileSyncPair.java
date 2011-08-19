@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
@@ -75,7 +76,7 @@ public class VirtualFileSyncPair
 		}
 		catch (CoreException e)
 		{
-			SyncingPlugin.logError(Messages.VirtualFileSyncPair_SourceFileInfoError, e);
+			IdeLog.logError(SyncingPlugin.getDefault(), Messages.VirtualFileSyncPair_SourceFileInfoError, e);
 			return null;
 		}
 	}
@@ -108,7 +109,7 @@ public class VirtualFileSyncPair
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public InputStream getSourceInputStream() throws IOException, CoreException
+	public InputStream getSourceInputStream() throws CoreException
 	{
 		InputStream result = null;
 
@@ -154,7 +155,7 @@ public class VirtualFileSyncPair
 		}
 		catch (CoreException e)
 		{
-			SyncingPlugin.logError(Messages.VirtualFileSyncPair_DestFileInfoErrror, e);
+			IdeLog.logError(SyncingPlugin.getDefault(), Messages.VirtualFileSyncPair_DestFileInfoErrror, e);
 			return null;
 		}
 	}
@@ -187,7 +188,7 @@ public class VirtualFileSyncPair
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public InputStream getDestinationInputStream() throws IOException, CoreException
+	public InputStream getDestinationInputStream() throws CoreException
 	{
 		InputStream result = null;
 
@@ -269,19 +270,13 @@ public class VirtualFileSyncPair
 		{
 			return false;
 		}
-		else
+		if (getSourceFile() != null && getSourceFile().fetchInfo().isDirectory())
 		{
-			if (getSourceFile() != null && getSourceFile().fetchInfo().isDirectory())
-			{
-				return true;
-			}
-			else
-			{
-				return (getDestinationFile() != null && getDestinationFile().fetchInfo().isDirectory());
-			}
+			return true;
 		}
+		return getDestinationFile() != null && getDestinationFile().fetchInfo().isDirectory();
 	}
-	
+
 	/**
 	 * Returns a nicely formatted version of the file pair
 	 */

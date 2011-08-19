@@ -181,7 +181,7 @@ public enum JSTokenType implements ITypePredicate
 	 */
 	public boolean isDefined()
 	{
-		return (this != UNDEFINED);
+		return this != UNDEFINED;
 	}
 
 	/**

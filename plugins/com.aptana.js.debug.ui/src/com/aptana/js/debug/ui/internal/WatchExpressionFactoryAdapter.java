@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import org.eclipse.core.runtime.CoreException;
@@ -16,13 +18,11 @@ import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class WatchExpressionFactoryAdapter implements IWatchExpressionFactoryAdapter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter#
 	 * createWatchExpression(org.eclipse.debug.core.model.IVariable)
 	 */
@@ -37,11 +37,10 @@ public class WatchExpressionFactoryAdapter implements IWatchExpressionFactoryAda
 	public static class Factory implements IAdapterFactory {
 
 		/*
-		 * @see
-		 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IWatchExpressionFactoryAdapter.class) {
+			if (IWatchExpressionFactoryAdapter.class.equals(adapterType)) {
 				return new WatchExpressionFactoryAdapter();
 			}
 			return null;

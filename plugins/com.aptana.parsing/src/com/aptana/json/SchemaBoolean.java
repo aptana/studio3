@@ -32,6 +32,6 @@ public class SchemaBoolean extends SchemaPrimitive
 	@Override
 	protected boolean validValue(Object value)
 	{
-		return (value instanceof Boolean);
+		return value instanceof Boolean;
 	}
 }

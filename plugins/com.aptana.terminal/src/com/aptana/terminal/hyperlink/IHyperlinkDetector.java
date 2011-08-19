@@ -14,7 +14,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
  * 
  * @author cwilliams
  */
-public interface IHyperlinkDetector
-{
+public interface IHyperlinkDetector {
 	IHyperlink[] detectHyperlinks(String contents);
 }

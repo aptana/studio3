@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.browser;
 
@@ -74,7 +75,7 @@ public final class ImageResource {
 		}
 	}
 
-	protected static void initializeImageRegistry() {
+	private static void initializeImageRegistry() {
 		imageRegistry = new ImageRegistry();
 	
 		// load Web browser images

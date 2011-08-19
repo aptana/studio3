@@ -41,9 +41,8 @@ public interface IJSDebugPreferenceNames {
 	String SUSPEND_ON_DEBUGGER_KEYWORD = PREFIX + ".suspend_on_debugger_keyword"; //$NON-NLS-1$
 
 	/**
-	 * List of defined detail formatters.A String containing a comma separated
-	 * list of fully qualified type names, the associated code snippet and an
-	 * 'enabled' flag.
+	 * List of defined detail formatters.A String containing a comma separated list of fully qualified type names, the
+	 * associated code snippet and an 'enabled' flag.
 	 */
 	String PREF_DETAIL_FORMATTERS_LIST = PREFIX + IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST;
 

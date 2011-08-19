@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
@@ -81,7 +82,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String err = "The Ruby installer processor is designed to work on Windows."; //$NON-NLS-1$
-			PortalUIPlugin.logError(err, new Exception());
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 			applyErrorAttributes(err);
 			installationInProgress = false;
 			return configurationStatus;
@@ -95,8 +96,9 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			IStatus loadingStatus = loadAttributes(attributes);
 			if (!loadingStatus.isOK())
 			{
-				applyErrorAttributes(loadingStatus.getMessage());
-				PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
+				String message = loadingStatus.getMessage();
+				applyErrorAttributes(message);
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 				return configurationStatus;
 			}
 
@@ -108,7 +110,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { RUBY, 1,
 						urls.length });
 				applyErrorAttributes(err);
-				PortalUIPlugin.logError(new Exception(err));
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 				return configurationStatus;
 			}
 			// Try to get the default install directory from the optional attributes
@@ -129,9 +131,9 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
-							Messages.InstallProcessor_installerTitle, RUBY), NLS.bind(
-							Messages.InstallProcessor_installationSuccessful, RUBY));
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							NLS.bind(Messages.InstallProcessor_installerTitle, RUBY),
+							NLS.bind(Messages.InstallProcessor_installationSuccessful, RUBY));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -227,7 +229,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			{
 				return status;
 			}
-			PortalUIPlugin.logInfo("Successfully installed Ruby into " + installDir[0], null); //$NON-NLS-1$
+			IdeLog.logInfo(PortalUIPlugin.getDefault(), "Successfully installed Ruby into " + installDir[0]); //$NON-NLS-1$
 			// Ruby was installed successfully. Now we need to extract DevKit into the Ruby dir and change its
 			// configurations to match the installation location.
 
@@ -247,7 +249,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError("Error while installing Ruby", e); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), "Error while installing Ruby", e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 					Messages.InstallProcessor_errorWhileInstalling, RUBY));
 		}
@@ -276,7 +278,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 					SubMonitor subMonitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
 					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, RUBY),
 							IProgressMonitor.UNKNOWN);
-					PortalUIPlugin.logInfo("Installing Ruby into " + installDir, null); //$NON-NLS-1$
+					IdeLog.logInfo(PortalUIPlugin.getDefault(), "Installing Ruby into " + installDir); //$NON-NLS-1$
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
@@ -293,23 +295,23 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 					int res = process.waitFor();
 					if (res == RUBY_INSTALLER_PROCESS_CANCEL)
 					{
-						PortalUIPlugin.logInfo("Ruby installation cancelled", null); //$NON-NLS-1$
+						IdeLog.logInfo(PortalUIPlugin.getDefault(), "Ruby installation cancelled"); //$NON-NLS-1$
 						return Status.CANCEL_STATUS;
 					}
 					if (res != 0)
 					{
 						// We had an error while installing
-						PortalUIPlugin
-								.logError(
-										"Failed to install Ruby. The ruby installer process returned a termination code of " + res, null); //$NON-NLS-1$
+						IdeLog.logError(
+								PortalUIPlugin.getDefault(),
+								"Failed to install Ruby. The ruby installer process returned a termination code of " + res); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationErrorMessage, RUBY, RUBY), null);
 					}
 					else if (!new File(installDir).exists())
 					{
 						// Just to be sure that we got everything in place
-						PortalUIPlugin.logError(
-								"Failed to install Ruby. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
+						IdeLog.logError(PortalUIPlugin.getDefault(),
+								"Failed to install Ruby. The " + installDir + " directory was not created"); //$NON-NLS-1$ //$NON-NLS-2$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationError_installDirMissing, RUBY), null);
 					}
@@ -317,7 +319,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				}
 				catch (Exception e)
 				{
-					PortalUIPlugin.logError(e);
+					IdeLog.logError(PortalUIPlugin.getDefault(), e);
 					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 							Messages.InstallProcessor_failedToInstallSeeLog, RUBY), e);
 				}
@@ -335,7 +337,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		}
 		catch (InterruptedException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e.getMessage(), e);
 			return Status.CANCEL_STATUS;
 		}
 		return job.getResult();
@@ -360,8 +362,8 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				try
 				{
 					SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
-					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT,
-							installDir), 900);
+					subMonitor.beginTask(
+							NLS.bind(Messages.InstallProcessor_extractingPackageTaskName, DEVKIT, installDir), 900);
 					// We get a folder status first, before unzipping into the folder. This folder was just created,
 					// so there is a chance it's still being held by the OS or by the Ruby installer.
 					IStatus folderStatus = LockUtils.waitForFolderAccess(installDir, 10000);
@@ -407,7 +409,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 				}
 				catch (Throwable t)
 				{
-					PortalUIPlugin.logError("Failed to install DevKit", t); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Failed to install DevKit", t); //$NON-NLS-1$
 					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 							Messages.InstallProcessor_failedToInstallSeeLog, DEVKIT), t);
 				}
@@ -447,12 +449,12 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		try
 		{
 			fileOutputStream = new FileOutputStream(propertiesFile);
-			properties.store(fileOutputStream, NLS.bind(Messages.InstallProcessor_aptanaInstallationComment,
-					"Ruby & DevKit")); //$NON-NLS-1$
+			properties.store(fileOutputStream,
+					NLS.bind(Messages.InstallProcessor_aptanaInstallationComment, "Ruby & DevKit")); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 		}
 		finally
 		{

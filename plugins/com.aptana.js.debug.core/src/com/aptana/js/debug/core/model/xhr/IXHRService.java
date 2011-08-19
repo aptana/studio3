@@ -11,7 +11,7 @@ package com.aptana.js.debug.core.model.xhr;
  * @author Max Stepanov
  */
 public interface IXHRService {
-	
+
 	/**
 	 * Returns the list of XHT transfers
 	 * 

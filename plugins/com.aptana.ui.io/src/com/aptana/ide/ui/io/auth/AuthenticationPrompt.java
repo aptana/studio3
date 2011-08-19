@@ -17,48 +17,68 @@ import com.aptana.ide.core.io.auth.IAuthenticationPrompt;
 
 /**
  * @author Max Stepanov
- *
  */
-public class AuthenticationPrompt implements IAuthenticationPrompt {
+public class AuthenticationPrompt implements IAuthenticationPrompt
+{
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.auth.IAuthenticationPrompt#promptPassword(com.aptana.ide.core.io.auth.IAuthenticationManager, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.ide.core.io.auth.IAuthenticationPrompt#promptPassword(com.aptana.ide.core.io.auth.IAuthenticationManager
+	 * , java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public boolean promptPassword(final IAuthenticationManager authManager, final String authId, final String login, final String title, final String message) {
+	public boolean promptPassword(final IAuthenticationManager authManager, final String authId, final String login,
+			final String title, final String message)
+	{
 		final boolean[] result = new boolean[] { false };
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			public void run() {
-				PasswordPromptDialog dlg = new PasswordPromptDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
-				dlg.setLogin(login);
-				dlg.setPassword(authManager.getPassword(authId));
-				dlg.setSavePassword(authManager.hasPersistent(authId));
-				if (dlg.open() == Window.OK) {
-					authManager.setPassword(authId, dlg.getPassword(), dlg.getSavePassword());
-					result[0] = true;
+		if (PlatformUI.isWorkbenchRunning())
+		{
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+			{
+				public void run()
+				{
+					PasswordPromptDialog dlg = new PasswordPromptDialog(PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow().getShell(), title, message);
+					dlg.setLogin(login);
+					dlg.setPassword(authManager.getPassword(authId));
+					dlg.setSavePassword(authManager.hasPersistent(authId));
+					if (dlg.open() == Window.OK)
+					{
+						authManager.setPassword(authId, dlg.getPassword(), dlg.getSavePassword());
+						result[0] = true;
+					}
 				}
-			}
-		});
-		
-		return result[0];
+			});
+
+			return result[0];
+		}
+
+		return false;
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static class Factory implements IAdapterFactory {
-		
-		/* (non-Javadoc)
+	public static class Factory implements IAdapterFactory
+	{
+
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (IAuthenticationPrompt.class == adapterType) {
+		public Object getAdapter(Object adaptableObject, Class adapterType)
+		{
+			if (IAuthenticationPrompt.class.equals(adapterType))
+			{
 				return new AuthenticationPrompt();
 			}
 			return null;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		public Class[] getAdapterList() {
+		public Class[] getAdapterList()
+		{
 			return new Class[] { IAuthenticationPrompt.class };
 		}
 	}

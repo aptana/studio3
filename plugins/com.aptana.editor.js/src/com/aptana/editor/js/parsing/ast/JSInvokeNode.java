@@ -18,7 +18,7 @@ public class JSInvokeNode extends JSNode
 	 */
 	public JSInvokeNode(JSNode... children)
 	{
-		super(JSNodeTypes.INVOKE, children);
+		super(IJSNodeTypes.INVOKE, children);
 	}
 
 	/*
