@@ -32,7 +32,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -66,13 +65,14 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	private List<String> parseErrorEnabledList;
 
 	private String selectedLanguage;
-	private Button parseErrorCheckBox;
+	private String enableParseError;
 
 	public ValidationPreferencePage()
 	{
 		selectedValidatorsMap = new HashMap<String, List<String>>();
 		filterExpressionsMap = new HashMap<String, List<String>>();
 		parseErrorEnabledList = new ArrayList<String>();
+		enableParseError = Messages.ValidationPreferencePage_enable_parse_errors_label;
 	}
 
 	public void init(IWorkbench workbench)
@@ -80,7 +80,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
 		loadAllSelectedValidators();
 		loadAllFilterExpressions();
-		loadAllParseErrorEnabledPreferences();
 	}
 
 	@Override
@@ -142,14 +141,12 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 					// stores the selected validators and filter expressions for the previously selected language
 					storeCurrentSelectedValidators();
 					storeCurrentFilterExpressions();
-					storeEnabledParseErrorPreference();
 				}
 
 				selectedLanguage = getSelectedLanguageType();
-				// updates the validators, parse error checkbox and filter expressions to the newly selected language
+				// updates the validators and filter expressions to the newly selected language
 				updateValidators();
 				updateFilterExpressions();
-				updateParseErrorCheckBox();
 			}
 		});
 
@@ -159,9 +156,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 		Control validators = createValidators(rightComp);
 		validators.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-
-		// Add checkbox here to enable/diable
-		createParseErrorCheckBox(rightComp);
 
 		Control filter = createFilter(rightComp);
 		filter.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
@@ -177,13 +171,10 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		{
 			storeCurrentSelectedValidators();
 			storeCurrentFilterExpressions();
-			storeEnabledParseErrorPreference();
 		}
-		// persist the selected validators, parse error enablement and filter expressions for each language
+		// persist the selected validators and filter expressions for each language
 		saveAllSelectedValidators();
 		saveAllFilterExpressions();
-		saveAllParseErrorEnabledPreferences();
-
 		return super.performOk();
 	}
 
@@ -205,20 +196,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		}
 		updateFilterExpressions();
 
-		// Disable parse errors by default
-		parseErrorCheckBox.setSelection(false);
-		storeEnabledParseErrorPreference();
-
 		super.performDefaults();
-	}
-
-	private void createParseErrorCheckBox(Composite parent)
-	{
-		parseErrorCheckBox = new Button(parent, SWT.CHECK | SWT.LEFT);
-		parseErrorCheckBox.setText(Messages.ValidationPreferencePage_enable_parse_errors_label);
-		parseErrorCheckBox.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-
-		updateParseErrorCheckBox();
 	}
 
 	private Control createValidators(Composite parent)
@@ -301,20 +279,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		return group;
 	}
 
-	private void loadAllParseErrorEnabledPreferences()
-	{
-		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		for (ValidatorLanguage language : languages)
-		{
-			String languageType;
-			languageType = language.getType();
-			if (getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(languageType)))
-			{
-				parseErrorEnabledList.add(languageType);
-			}
-		}
-	}
-
 	private void loadAllSelectedValidators()
 	{
 		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
@@ -331,6 +295,11 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 					names.addAll(Arrays.asList(list.split(VALIDATORS_DELIMITER)));
 				}
 				selectedValidatorsMap.put(languageType, names);
+			}
+			// Add parse error preference
+			if (getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(languageType)))
+			{
+				parseErrorEnabledList.add(languageType);
 			}
 		}
 	}
@@ -355,18 +324,9 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 						selectedValidators.toArray(new String[selectedValidators.size()]));
 			}
 			getPreferenceStore().setValue(getSelectedValidatorsPrefKey(language), value);
-		}
-	}
-
-	private void saveAllParseErrorEnabledPreferences()
-	{
-		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		for (ValidatorLanguage language : languages)
-		{
-			String languageType;
-			languageType = language.getType();
-			getPreferenceStore().setValue(getParseErrorEnabledPrefKey(languageType),
-					parseErrorEnabledList.contains(languageType));
+			// Save parse error preference
+			getPreferenceStore().setValue(getParseErrorEnabledPrefKey(language),
+					parseErrorEnabledList.contains(language));
 
 		}
 	}
@@ -400,18 +360,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		}
 	}
 
-	private void storeEnabledParseErrorPreference()
-	{
-		if (parseErrorCheckBox.getSelection())
-		{
-			parseErrorEnabledList.add(selectedLanguage);
-		}
-		else
-		{
-			parseErrorEnabledList.remove(selectedLanguage);
-		}
-	}
-
 	private void storeCurrentSelectedValidators()
 	{
 		List<String> validatorsList = selectedValidatorsMap.get(selectedLanguage);
@@ -421,12 +369,19 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			selectedValidatorsMap.put(selectedLanguage, validatorsList);
 		}
 		validatorsList.clear();
+		parseErrorEnabledList.remove(selectedLanguage);
 		Object[] selectedValidators = validatorsViewer.getCheckedElements();
 		for (Object validator : selectedValidators)
 		{
 			if (validator instanceof ValidatorReference)
 			{
+
 				validatorsList.add(((ValidatorReference) validator).getName());
+			}
+			// if it is the parse error, store it in a separate map
+			else if (validator.equals(enableParseError))
+			{
+				parseErrorEnabledList.add(selectedLanguage);
 			}
 		}
 	}
@@ -447,20 +402,6 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		}
 	}
 
-	private void updateParseErrorCheckBox()
-	{
-		if (selectedLanguage == null)
-		{
-			parseErrorCheckBox.setEnabled(false);
-			parseErrorCheckBox.setSelection(false);
-		}
-		else
-		{
-			parseErrorCheckBox.setEnabled(true);
-			parseErrorCheckBox.setSelection(parseErrorEnabledList.contains(selectedLanguage));
-		}
-	}
-
 	private void updateValidators()
 	{
 		if (selectedLanguage == null)
@@ -470,7 +411,12 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		else
 		{
 			List<ValidatorReference> validators = ValidatorLoader.getInstance().getValidators(selectedLanguage);
+
 			validatorsViewer.setInput(validators.toArray(new ValidatorReference[validators.size()]));
+
+			// Add parse errors for each language
+			validatorsViewer.add(enableParseError);
+			validatorsViewer.setChecked(enableParseError, parseErrorEnabledList.contains(selectedLanguage));
 
 			// makes appropriate validators checked
 			if (selectedValidatorsMap.containsKey(selectedLanguage))
