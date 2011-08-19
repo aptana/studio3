@@ -90,10 +90,15 @@ public class JSRangeFinder extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			IParseNode name = node.getName();
+			IParseNode value = node.getValue();
 
 			if (name.contains(this._offset) || name.getEndingOffset() == this._offset)
 			{
 				this.setRange(name);
+			}
+			else if (value.contains(this._offset))
+			{
+				this.setRange(value);
 			}
 		}
 	}
