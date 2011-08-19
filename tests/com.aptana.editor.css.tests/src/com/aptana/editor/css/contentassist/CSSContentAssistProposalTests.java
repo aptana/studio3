@@ -68,8 +68,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	public void testTypeSelectorsListNoSpace()
 	{
-		// FIXME: This should work
-		// assertCompletionCorrect("p,| {}", '\t', "table", "p,table {}");
+		assertCompletionCorrect("p,| {}", '\t', "table", "p,table {}");
 	}
 
 	/*
