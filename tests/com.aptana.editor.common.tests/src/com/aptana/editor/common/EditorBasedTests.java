@@ -121,7 +121,7 @@ public abstract class EditorBasedTests extends TestCase
 	 */
 	protected SnippetElement createSnippet(String path, String displayName, String trigger, String scope)
 	{
-		return createSnippet(path, displayName, trigger, scope);
+		return createSnippet(path, displayName, trigger, "", scope);
 	}
 
 	/**
