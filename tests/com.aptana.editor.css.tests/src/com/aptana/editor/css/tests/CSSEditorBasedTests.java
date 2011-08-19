@@ -10,7 +10,7 @@ package com.aptana.editor.css.tests;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.EditorBasedTests;
+import com.aptana.editor.common.EditorContentAssistBasedTests;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
@@ -19,11 +19,11 @@ import com.aptana.index.core.IFileStoreIndexingParticipant;
 /**
  * CSSEditorBasedTests
  */
-public class CSSEditorBasedTests extends EditorBasedTests<CSSContentAssistProcessor>
+public class CSSEditorBasedTests extends EditorContentAssistBasedTests<CSSContentAssistProcessor>
 {
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#createContentAssistProcessor(com.aptana.editor.common.
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#createContentAssistProcessor(com.aptana.editor.common.
 	 * AbstractThemeableEditor)
 	 */
 	@Override
@@ -34,7 +34,7 @@ public class CSSEditorBasedTests extends EditorBasedTests<CSSContentAssistProces
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#getBundle()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getBundle()
 	 */
 	@Override
 	protected Bundle getBundle()
@@ -44,7 +44,7 @@ public class CSSEditorBasedTests extends EditorBasedTests<CSSContentAssistProces
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#getPluginId()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getPluginId()
 	 */
 	@Override
 	protected String getPluginId()
@@ -54,7 +54,7 @@ public class CSSEditorBasedTests extends EditorBasedTests<CSSContentAssistProces
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#createIndexer()
 	 */
 	@Override
 	protected IFileStoreIndexingParticipant createIndexer()

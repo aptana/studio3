@@ -10,7 +10,7 @@ package com.aptana.editor.css.contentassist;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.EnumSet;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -306,6 +306,10 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	public void testAttributeSelector()
 	{
+
+		// Left as a block of tests that will need to be split and uncommented when we actually support this
+		// functionality
+
 		// Matches any E element with the "foo" attribute set (whatever the value).
 		// assertCompletionCorrect("E[foo]", '\t', "", ""); // custom attributes
 
@@ -464,7 +468,6 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-		// FIXME: should work
 		AssertUtil.assertProposalFound(".testclass", proposals);
 	}
 
@@ -500,7 +503,6 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-		// FIXME: should works
 		AssertUtil.assertProposalFound("#testid", proposals);
 	}
 
@@ -702,9 +704,8 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 	public void testIsValidAutoActivationLocation()
 	{
-		CSSTokenType[] validTokenTypes = new CSSTokenType[] { CSSTokenType.LCURLY, CSSTokenType.COMMA,
-				CSSTokenType.COLON, CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID };
-		Arrays.sort(validTokenTypes);
+		EnumSet<CSSTokenType> validTokenTypes = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
+				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID);
 
 		// create a document with a lot of different token types
 		IFileStore fileStore = this.getFileStore("contentAssist/blueprint.css");
@@ -736,7 +737,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 				break;
 			}
 
-			if (Arrays.binarySearch(validTokenTypes, lexeme.getType()) >= 0)
+			if (validTokenTypes.contains(lexeme.getType()))
 			{
 				assertTrue(
 						MessageFormat.format(
@@ -771,25 +772,75 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 		}
 	}
 
-	public void testIsValidActivationCharacter()
+	public void testIsValidActivationCharacter_space()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidActivationCharacter(' ', ' '));
+	}
+
+	public void testIsValidActivationCharacter_a()
+	{
+		processor = createContentAssistProcessor(null);
 		assertFalse(processor.isValidActivationCharacter('a', 'a'));
 	}
 
-	public void testIsValidIdentifier()
+	public void testIsValidIdentifier_a()
 	{
 		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('a', 'a'));
+	}
+
+	public void testIsValidIdentifier_z()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('z', 'z'));
+	}
+
+	public void testIsValidIdentifier_A()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('A', 'A'));
+	}
+
+	public void testIsValidIdentifier_Z()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('Z', 'Z'));
+	}
+
+	public void testIsValidIdentifier_underscore()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('_', '_'));
+	}
+
+	public void testIsValidIdentifier_hash()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('#', '#'));
+	}
+
+	public void testIsValidIdentifier_dot()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('.', '.'));
+	}
+
+	public void testIsValidIdentifier_dash()
+	{
+		processor = createContentAssistProcessor(null);
 		assertTrue(processor.isValidIdentifier('-', '-'));
+	}
+
+	public void testIsValidIdentifier_dollar()
+	{
+		processor = createContentAssistProcessor(null);
 		assertFalse(processor.isValidIdentifier('$', '$'));
+	}
+
+	public void testIsValidIdentifier_space()
+	{
+		processor = createContentAssistProcessor(null);
 		assertFalse(processor.isValidIdentifier(' ', ' '));
 	}
 
