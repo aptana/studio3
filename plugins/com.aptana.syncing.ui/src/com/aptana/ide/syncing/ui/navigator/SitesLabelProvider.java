@@ -12,8 +12,8 @@ import com.aptana.ide.ui.io.navigator.FileTreeLabelProvider;
 
 /**
  * @author Max Stepanov
- *
  */
-public class SitesLabelProvider extends FileTreeLabelProvider {
+public class SitesLabelProvider extends FileTreeLabelProvider
+{
 
 }

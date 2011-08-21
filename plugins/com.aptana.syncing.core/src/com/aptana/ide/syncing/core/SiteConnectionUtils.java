@@ -23,61 +23,63 @@ import com.aptana.ide.core.io.IConnectionPoint;
 /**
  * @author Max Stepanov
  * @author Michael Xia
- *
  */
-public final class SiteConnectionUtils {
+public final class SiteConnectionUtils
+{
 
 	/**
 	 * 
 	 */
-	private SiteConnectionUtils() {
+	private SiteConnectionUtils()
+	{
 	}
 
-    /**
-     * Creates a new site connection with specific source and destination.
-     * 
-     * @param name
-     *            the name of the site connection
-     * @param source
-     *            the source connection point
-     * @param destination
-     *            the destination connection point
-     * @return the site connection
-     */
-    public static ISiteConnection createSite(String name, IConnectionPoint source,
-            IConnectionPoint destination) {
-        ISiteConnection site = SiteConnectionManager.getInstance().createSiteConnection();
-        site.setName(name);
-        site.setSource(source);
-        site.setDestination(destination);
+	/**
+	 * Creates a new site connection with specific source and destination.
+	 * 
+	 * @param name
+	 *            the name of the site connection
+	 * @param source
+	 *            the source connection point
+	 * @param destination
+	 *            the destination connection point
+	 * @return the site connection
+	 */
+	public static ISiteConnection createSite(String name, IConnectionPoint source, IConnectionPoint destination)
+	{
+		ISiteConnection site = SiteConnectionManager.getInstance().createSiteConnection();
+		site.setName(name);
+		site.setSource(source);
+		site.setDestination(destination);
 
-        return site;
-    }
+		return site;
+	}
 
-    /**
-     * Retrieves a list of all available sites that have the object as the
-     * source (i.e. an IContainer or FilesystemObject).
-     * 
-     * @param object
-     *            the source object
-     * @return the list as an array
-     */
-	public static ISiteConnection[] findSitesForSource(IAdaptable object) {
+	/**
+	 * Retrieves a list of all available sites that have the object as the source (i.e. an IContainer or
+	 * FilesystemObject).
+	 * 
+	 * @param object
+	 *            the source object
+	 * @return the list as an array
+	 */
+	public static ISiteConnection[] findSitesForSource(IAdaptable object)
+	{
 		return findSitesForSource(object, false);
 	}
 
-    /**
-     * Retrieves a list of all available sites that have the object as the
-     * source (i.e. an IContainer or FilesystemObject).
-     * 
-     * @param object
-     *            the source object
-     * @param strict
-     *            true if only to get the exact matches, false if the parent
-     *            folder is allowed
-     * @return the list as an array
-     */
-	public static ISiteConnection[] findSitesForSource(IAdaptable object, boolean strict) {
+	/**
+	 * Retrieves a list of all available sites that have the object as the source (i.e. an IContainer or
+	 * FilesystemObject).
+	 * 
+	 * @param object
+	 *            the source object
+	 * @param strict
+	 *            true if only to get the exact matches, false if the parent folder is allowed
+	 * @return the list as an array
+	 */
+	public static ISiteConnection[] findSitesForSource(IAdaptable object, boolean strict)
+	{
 		return findSitesForSource(object, strict, false);
 	}
 
@@ -94,52 +96,74 @@ public final class SiteConnectionUtils {
 	 *            otherwise
 	 * @return the list as an array
 	 */
-	public static ISiteConnection[] findSitesForSource(IAdaptable object, boolean strict, boolean includeChildren) {
+	public static ISiteConnection[] findSitesForSource(IAdaptable object, boolean strict, boolean includeChildren)
+	{
 		List<ISiteConnection> list = new ArrayList<ISiteConnection>();
 		ISiteConnection[] allsites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-		if (object instanceof IConnectionPoint) {
-			for (ISiteConnection i : allsites) {
-				if (object.equals(i.getSource())) {
+		if (object instanceof IConnectionPoint)
+		{
+			for (ISiteConnection i : allsites)
+			{
+				if (object.equals(i.getSource()))
+				{
 					list.add(i);
 				}
 			}
-		} else if (object instanceof IResource) {
+		}
+		else if (object instanceof IResource)
+		{
 			IResource resource = (IResource) object;
-			for (ISiteConnection i : allsites) {
+			for (ISiteConnection i : allsites)
+			{
 				IConnectionPoint sourceConnectionPoint = i.getSource();
-				if (sourceConnectionPoint != null) {
+				if (sourceConnectionPoint != null)
+				{
 					IContainer connectionRoot = (IContainer) sourceConnectionPoint.getAdapter(IResource.class);
-					if (connectionRoot != null) {
+					if (connectionRoot != null)
+					{
 						if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource))
-								|| (includeChildren && contains(resource, connectionRoot))) {
+								|| (includeChildren && contains(resource, connectionRoot)))
+						{
 							IConnectionPoint destination = i.getDestination();
 							if (destination != null
-									&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null) {
+									&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null)
+							{
 								list.add(i);
 							}
 						}
 					}
 				}
 			}
-		} else {
+		}
+		else
+		{
 			IFileStore fileStore = (IFileStore) object.getAdapter(IFileStore.class);
-			if (fileStore != null) {
-				for (ISiteConnection i : allsites) {
+			if (fileStore != null)
+			{
+				for (ISiteConnection i : allsites)
+				{
 					IConnectionPoint sourceConnectionPoint = i.getSource();
-					if (sourceConnectionPoint != null) {
-						try {
+					if (sourceConnectionPoint != null)
+					{
+						try
+						{
 							IFileStore root = sourceConnectionPoint.getRoot();
-							if (root != null) {
+							if (root != null)
+							{
 								if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore))
-										|| (includeChildren && fileStore.isParentOf(root))) {
+										|| (includeChildren && fileStore.isParentOf(root)))
+								{
 									IConnectionPoint destination = i.getDestination();
 									if (destination != null
-											&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null) {
+											&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null)
+									{
 										list.add(i);
 									}
 								}
 							}
-						} catch (CoreException ignore) {
+						}
+						catch (CoreException ignore)
+						{
 						}
 					}
 				}
@@ -148,17 +172,17 @@ public final class SiteConnectionUtils {
 		return list.toArray(new ISiteConnection[list.size()]);
 	}
 
-    /**
-     * Retrieves a list of all available sites that have the connection point as
-     * the destination.
-     * 
-     * @param destination
-     *            the connection point
-     * @return the list as an array
-     */
-    public static ISiteConnection[] findSitesWithDestination(IAdaptable object) {
-    	return findSitesWithDestination(object, false);
-    }
+	/**
+	 * Retrieves a list of all available sites that have the connection point as the destination.
+	 * 
+	 * @param destination
+	 *            the connection point
+	 * @return the list as an array
+	 */
+	public static ISiteConnection[] findSitesWithDestination(IAdaptable object)
+	{
+		return findSitesWithDestination(object, false);
+	}
 
 	/**
 	 * Retrieves a list of all available sites that have the object as the destination.
@@ -169,42 +193,62 @@ public final class SiteConnectionUtils {
 	 *            true if only to get the exact matches, false if the parent folder is allowed
 	 * @return the list as an array
 	 */
-	public static ISiteConnection[] findSitesWithDestination(IAdaptable object, boolean strict) {
+	public static ISiteConnection[] findSitesWithDestination(IAdaptable object, boolean strict)
+	{
 		List<ISiteConnection> list = new ArrayList<ISiteConnection>();
 		ISiteConnection[] allsites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-		if (object instanceof IConnectionPoint) {
-			for (ISiteConnection i : allsites) {
-				if (object.equals(i.getDestination())) {
+		if (object instanceof IConnectionPoint)
+		{
+			for (ISiteConnection i : allsites)
+			{
+				if (object.equals(i.getDestination()))
+				{
 					list.add(i);
 				}
 			}
-		} else if (object instanceof IResource) {
+		}
+		else if (object instanceof IResource)
+		{
 			IResource resource = (IResource) object;
-			for (ISiteConnection i : allsites) {
+			for (ISiteConnection i : allsites)
+			{
 				IConnectionPoint destinationConnectionPoint = i.getDestination();
-				if (destinationConnectionPoint != null) {
+				if (destinationConnectionPoint != null)
+				{
 					IContainer connectionRoot = (IContainer) destinationConnectionPoint.getAdapter(IResource.class);
-					if (connectionRoot != null) {
-						if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource))) {
+					if (connectionRoot != null)
+					{
+						if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource)))
+						{
 							list.add(i);
 						}
 					}
 				}
 			}
-		} else {
+		}
+		else
+		{
 			IFileStore fileStore = (IFileStore) object.getAdapter(IFileStore.class);
-			if (fileStore != null) {
-				for (ISiteConnection i : allsites) {
+			if (fileStore != null)
+			{
+				for (ISiteConnection i : allsites)
+				{
 					IConnectionPoint destinationConnectionPoint = i.getDestination();
-					if (destinationConnectionPoint != null) {
-						try {
+					if (destinationConnectionPoint != null)
+					{
+						try
+						{
 							IFileStore root = destinationConnectionPoint.getRoot();
-							if (root != null) {
-								if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore))) {
+							if (root != null)
+							{
+								if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore)))
+								{
 									list.add(i);
 								}
 							}
-						} catch (CoreException ignore) {
+						}
+						catch (CoreException ignore)
+						{
 						}
 					}
 				}
@@ -213,26 +257,28 @@ public final class SiteConnectionUtils {
 		return list.toArray(new ISiteConnection[list.size()]);
 	}
 
-    /**
-     * Retrieves a list of all available sites that have the specific source and
-     * destination.
-     * 
-     * @param source
-     *            the source object
-     * @param destination
-     *            the connection point as destination
-     * @return the list as an array
-     */
-    public static ISiteConnection[] findSites(IAdaptable source, IConnectionPoint destination) {
-        List<ISiteConnection> list = new ArrayList<ISiteConnection>();
-        ISiteConnection[] sites = findSitesForSource(source, true);
-        for (ISiteConnection site : sites) {
-            if (site.getDestination() == destination) {
-                list.add(site);
-            }
-        }
-        return list.toArray(new ISiteConnection[list.size()]);
-    }
+	/**
+	 * Retrieves a list of all available sites that have the specific source and destination.
+	 * 
+	 * @param source
+	 *            the source object
+	 * @param destination
+	 *            the connection point as destination
+	 * @return the list as an array
+	 */
+	public static ISiteConnection[] findSites(IAdaptable source, IConnectionPoint destination)
+	{
+		List<ISiteConnection> list = new ArrayList<ISiteConnection>();
+		ISiteConnection[] sites = findSitesForSource(source, true);
+		for (ISiteConnection site : sites)
+		{
+			if (site.getDestination() == destination)
+			{
+				list.add(site);
+			}
+		}
+		return list.toArray(new ISiteConnection[list.size()]);
+	}
 
 	public static ISiteConnection getSiteWithDestination(String destinationName, ISiteConnection[] sites)
 	{
@@ -248,7 +294,8 @@ public final class SiteConnectionUtils {
 		return null;
 	}
 
-	private static boolean contains(IResource container, IResource resource) {
+	private static boolean contains(IResource container, IResource resource)
+	{
 		return container.getFullPath().isPrefixOf(resource.getFullPath());
 	}
 }

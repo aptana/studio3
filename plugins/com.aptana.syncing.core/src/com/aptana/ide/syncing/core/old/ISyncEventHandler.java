@@ -16,11 +16,12 @@ public interface ISyncEventHandler extends IConnectionPointEventHandler
 {
 	/**
 	 * syncContinue
+	 * 
 	 * @param monitor
 	 * @return boolean
 	 */
 	boolean syncContinue(IProgressMonitor monitor);
-	
+
 	/**
 	 * syncEvent
 	 * 

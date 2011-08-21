@@ -9,19 +9,22 @@ package com.aptana.ide.syncing.ui.properties;
 
 import org.eclipse.osgi.util.NLS;
 
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.properties.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.properties.messages"; //$NON-NLS-1$
 
-    public static String SynchronizationPropertyPage_lastSyncConnection;
-    public static String SynchronizationPropertyPage_useConnectionsAsDefault;
+	public static String SynchronizationPropertyPage_lastSyncConnection;
+	public static String SynchronizationPropertyPage_useConnectionsAsDefault;
 
-    static {
-        // initialize resource bundle
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
+	static
+	{
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-    private Messages() {
-    }
+	private Messages()
+	{
+	}
 
 }

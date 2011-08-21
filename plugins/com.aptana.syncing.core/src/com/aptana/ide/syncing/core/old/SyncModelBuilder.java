@@ -35,7 +35,8 @@ public final class SyncModelBuilder
 	 * @return - the root of the syncing model
 	 */
 	@SuppressWarnings("deprecation")
-	public static SyncFolder buildSyncFolder(IConnectionPoint sourceConnectionPoint, IConnectionPoint destConnectionPoint, VirtualFileSyncPair[] pairs)
+	public static SyncFolder buildSyncFolder(IConnectionPoint sourceConnectionPoint,
+			IConnectionPoint destConnectionPoint, VirtualFileSyncPair[] pairs)
 	{
 		SyncFolder root = new SyncFolder(new Path("/"), null, null); //$NON-NLS-1$
 		List<IFileStore> ignoredFiles = new ArrayList<IFileStore>();
@@ -70,7 +71,7 @@ public final class SyncModelBuilder
 
 			if (virtualFile != null)
 			{
-				IPath realPath = new Path(pair.getRelativePath()); //EFSUtils.getRelativePath(pair.virtualFile));
+				IPath realPath = new Path(pair.getRelativePath()); // EFSUtils.getRelativePath(pair.virtualFile));
 				SyncFolder parent = root;
 				for (int i = 0; i < realPath.segmentCount(); i++)
 				{
@@ -155,7 +156,7 @@ public final class SyncModelBuilder
 						parent.setSyncState(SyncState.ServerItemIsNewer);
 						break;
 				}
-			}			
+			}
 		}
 		return root;
 	}
