@@ -30,39 +30,57 @@ import com.aptana.ide.ui.io.navigator.FileTreeContentProvider;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class SiteConnectionsContentProvider extends FileTreeContentProvider { /* using FileTreeContentProvider is correct here! */
+public class SiteConnectionsContentProvider extends FileTreeContentProvider
+{ /* using FileTreeContentProvider is correct here! */
 
 	private static final Object[] EMPTY = new Object[0];
 
 	@Override
-	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof IWorkspaceRoot) {
+	public Object[] getElements(Object inputElement)
+	{
+		if (inputElement instanceof IWorkspaceRoot)
+		{
 			inputElement = SyncingPlugin.getSiteConnectionManager();
 		}
 		return super.getElements(inputElement);
 	}
 
 	@Override
-	public Object[] getChildren(Object element) {
-		if (element instanceof IProject) {
+	public Object[] getChildren(Object element)
+	{
+		if (element instanceof IProject)
+		{
 			IProject project = (IProject) element;
-			if (project.isAccessible()) {
+			if (project.isAccessible())
+			{
 				Object[] children = new Object[1];
 				children[0] = ProjectSitesManager.getInstance().getProjectSites(project);
 				return children;
 			}
-		} else if (element instanceof ProjectSiteConnection) {
+		}
+		else if (element instanceof ProjectSiteConnection)
+		{
 			IConnectionPoint connectionPoint = ((ProjectSiteConnection) element).getSiteConnection().getDestination();
-			if (connectionPoint instanceof LocalConnectionPoint) {
-				try {
-					return fetchFileSystemChildren(((LocalConnectionPoint) connectionPoint).getRoot(), new NullProgressMonitor());
-				} catch (CoreException e) {
+			if (connectionPoint instanceof LocalConnectionPoint)
+			{
+				try
+				{
+					return fetchFileSystemChildren(((LocalConnectionPoint) connectionPoint).getRoot(),
+							new NullProgressMonitor());
+				}
+				catch (CoreException e)
+				{
 					return EMPTY;
 				}
-			} else if (connectionPoint instanceof WorkspaceConnectionPoint) {
-				try {
+			}
+			else if (connectionPoint instanceof WorkspaceConnectionPoint)
+			{
+				try
+				{
 					return ((WorkspaceConnectionPoint) connectionPoint).getResource().members();
-				} catch (CoreException e) {
+				}
+				catch (CoreException e)
+				{
 					return EMPTY;
 				}
 			}
@@ -70,10 +88,13 @@ public class SiteConnectionsContentProvider extends FileTreeContentProvider { /*
 		return super.getChildren(element);
 	}
 
-	private static FileSystemObject[] fetchFileSystemChildren(IFileStore parent, IProgressMonitor monitor) throws CoreException {
+	private static FileSystemObject[] fetchFileSystemChildren(IFileStore parent, IProgressMonitor monitor)
+			throws CoreException
+	{
 		IFileInfo[] fileInfos = FileSystemUtils.childInfos(parent, EFS.NONE, monitor);
 		List<FileSystemObject> list = new ArrayList<FileSystemObject>();
-		for (IFileInfo fi : fileInfos) {
+		for (IFileInfo fi : fileInfos)
+		{
 			list.add(new FileSystemObject(parent.getChild(fi.getName()), fi));
 		}
 		return list.toArray(new FileSystemObject[list.size()]);

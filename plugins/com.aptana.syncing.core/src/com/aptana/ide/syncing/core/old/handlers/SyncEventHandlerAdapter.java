@@ -22,13 +22,15 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 	/**
 	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncContinue(IProgressMonitor)
 	 */
-	public boolean syncContinue(IProgressMonitor monitor) {
+	public boolean syncContinue(IProgressMonitor monitor)
+	{
 		// Does nothing by default, subclasses should override
 		return true;
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair, IProgressMonitor)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
+	 *      IProgressMonitor)
 	 */
 	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 	{

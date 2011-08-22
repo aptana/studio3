@@ -24,8 +24,8 @@ public class FilePrefUtils
 	 */
 	public static long getDirectoryPermission()
 	{
-		return Policy.permissionsFromString(SyncingUIPlugin.getDefault().getPreferenceStore().getString(
-				IPreferenceConstants.DIRECTORY_PERMISSION));
+		return Policy.permissionsFromString(SyncingUIPlugin.getDefault().getPreferenceStore()
+				.getString(IPreferenceConstants.DIRECTORY_PERMISSION));
 	}
 
 	/**
@@ -35,8 +35,8 @@ public class FilePrefUtils
 	 */
 	public static long getFilePermission()
 	{
-		return Policy.permissionsFromString(SyncingUIPlugin.getDefault().getPreferenceStore().getString(
-				IPreferenceConstants.FILE_PERMISSION));
+		return Policy.permissionsFromString(SyncingUIPlugin.getDefault().getPreferenceStore()
+				.getString(IPreferenceConstants.FILE_PERMISSION));
 	}
 
 }

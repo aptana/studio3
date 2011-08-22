@@ -17,20 +17,24 @@ import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface ISiteConnectionManager {
+public interface ISiteConnectionManager
+{
 
 	public void addSiteConnection(ISiteConnection siteConnection);
+
 	public void removeSiteConnection(ISiteConnection siteConnection);
+
 	public void siteConnectionChanged(ISiteConnection siteConnection);
 
 	ISiteConnection createSiteConnection();
+
 	ISiteConnection cloneSiteConnection(ISiteConnection siteConnection) throws CoreException;
-	
+
 	public ISiteConnection[] getSiteConnections();
 
 	public void addListener(ISiteConnectionListener listener);
+
 	public void removeListener(ISiteConnectionListener listener);
 
 	public List<ISiteConnection> addConnectionsFrom(IPath path);

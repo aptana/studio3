@@ -34,13 +34,16 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
 {
 	private ISiteConnection fConnection;
 
-    public SiteConnectionSynchronizeAction() {
-    }
+	public SiteConnectionSynchronizeAction()
+	{
+	}
 
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    }
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
+	}
 
-    public void run(IAction action) {
+	public void run(IAction action)
+	{
 		final IConnectionPoint source = fConnection.getSource();
 		IConnectionPoint dest = fConnection.getDestination();
 		SmartSyncDialog dialog;
@@ -73,16 +76,19 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
 			error.setMessage(Messages.SiteConnectionSynchronizeAction_UnableToOpenSyncDialog);
 			error.open();
 		}
-    }
+	}
 
-    public void selectionChanged(IAction action, ISelection selection) {
-        fConnection = null;
-        if (selection instanceof IStructuredSelection) {
-            Object element = ((IStructuredSelection) selection).getFirstElement();
-            if (element instanceof ProjectSiteConnection) {
-            	fConnection = ((ProjectSiteConnection) element).getSiteConnection();
-            }
-        }
-    }
+	public void selectionChanged(IAction action, ISelection selection)
+	{
+		fConnection = null;
+		if (selection instanceof IStructuredSelection)
+		{
+			Object element = ((IStructuredSelection) selection).getFirstElement();
+			if (element instanceof ProjectSiteConnection)
+			{
+				fConnection = ((ProjectSiteConnection) element).getSiteConnection();
+			}
+		}
+	}
 
 }

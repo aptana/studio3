@@ -321,12 +321,12 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
 		fSource.addTreeFocusListener(new FocusListener()
 		{
-			
+
 			public void focusLost(FocusEvent e)
 			{
 				focusedConnection = null;
 			}
-			
+
 			public void focusGained(FocusEvent e)
 			{
 				focusedConnection = fSource;
@@ -341,8 +341,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		directions.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, true));
 
 		fTransferRightButton = new Button(directions, SWT.NONE);
-		fTransferRightButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(
-				ISharedImages.IMG_TOOL_FORWARD));
+		fTransferRightButton.setImage(PlatformUI.getWorkbench().getSharedImages()
+				.getImage(ISharedImages.IMG_TOOL_FORWARD));
 		fTransferRightButton.setToolTipText(Messages.FTPManagerComposite_TTP_TransferRight);
 		fTransferRightButton.setLayoutData(new GridData(SWT.CENTER, SWT.END, true, true));
 		fTransferRightButton.addSelectionListener(this);
@@ -364,12 +364,12 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
 		fTarget.addTreeFocusListener(new FocusListener()
 		{
-			
+
 			public void focusLost(FocusEvent e)
 			{
 				focusedConnection = null;
 			}
-			
+
 			public void focusGained(FocusEvent e)
 			{
 				focusedConnection = fTarget;

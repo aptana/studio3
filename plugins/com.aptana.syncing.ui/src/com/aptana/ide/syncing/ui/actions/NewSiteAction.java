@@ -21,43 +21,51 @@ import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate {
+public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate
+{
 
-    private IWorkbenchPart fActivePart;
-    private ISelection fSelection;
+	private IWorkbenchPart fActivePart;
+	private ISelection fSelection;
 
-    public NewSiteAction() {
-    }
+	public NewSiteAction()
+	{
+	}
 
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        fActivePart = targetPart;
-    }
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
+		fActivePart = targetPart;
+	}
 
-    public void run(IAction action) {
-        if (fSelection.isEmpty() || !(fSelection instanceof IStructuredSelection)) {
-            return;
-        }
-        Object element = ((IStructuredSelection) fSelection).getFirstElement();
-        
-        IAdaptable source = null;
-        if (element instanceof IAdaptable) {
-            source = (IAdaptable) element;
-        }
-        SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
-        dlg.setCreateNew(Messages.NewSiteAction_LBL_New, source, null);
-        dlg.open();
-    }
+	public void run(IAction action)
+	{
+		if (fSelection.isEmpty() || !(fSelection instanceof IStructuredSelection))
+		{
+			return;
+		}
+		Object element = ((IStructuredSelection) fSelection).getFirstElement();
 
-    public void selectionChanged(IAction action, ISelection selection) {
-        setSelection(selection);
-    }
+		IAdaptable source = null;
+		if (element instanceof IAdaptable)
+		{
+			source = (IAdaptable) element;
+		}
+		SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fActivePart.getSite().getShell());
+		dlg.setCreateNew(Messages.NewSiteAction_LBL_New, source, null);
+		dlg.open();
+	}
 
-	public void init(IViewPart view) {
+	public void selectionChanged(IAction action, ISelection selection)
+	{
+		setSelection(selection);
+	}
+
+	public void init(IViewPart view)
+	{
 		fActivePart = view;
 	}
 
-    public void setSelection(ISelection selection)
-    {
-    	fSelection = selection;
-    }
+	public void setSelection(ISelection selection)
+	{
+		fSelection = selection;
+	}
 }

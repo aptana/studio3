@@ -9,7 +9,6 @@ package com.aptana.ide.syncing.core.old;
 
 import org.eclipse.core.runtime.IPath;
 
-
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
  */

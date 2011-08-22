@@ -16,25 +16,29 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class ExtendedActionProvider extends CommonActionProvider {
+public class ExtendedActionProvider extends CommonActionProvider
+{
 
-    private DoubleClickAction fDoubleClickAction;
+	private DoubleClickAction fDoubleClickAction;
 
-    public ExtendedActionProvider() {
-    }
+	public ExtendedActionProvider()
+	{
+	}
 
-    @Override
-    public void init(ICommonActionExtensionSite aSite) {
-        super.init(aSite);
+	@Override
+	public void init(ICommonActionExtensionSite aSite)
+	{
+		super.init(aSite);
 
-        fDoubleClickAction = new DoubleClickAction(aSite.getViewSite().getShell(),
-                (TreeViewer) aSite.getStructuredViewer());
-    }
+		fDoubleClickAction = new DoubleClickAction(aSite.getViewSite().getShell(),
+				(TreeViewer) aSite.getStructuredViewer());
+	}
 
-    @Override
-    public void fillActionBars(IActionBars actionBars) {
-        super.fillActionBars(actionBars);
+	@Override
+	public void fillActionBars(IActionBars actionBars)
+	{
+		super.fillActionBars(actionBars);
 
-        actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, fDoubleClickAction);
-    }
+		actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, fDoubleClickAction);
+	}
 }
