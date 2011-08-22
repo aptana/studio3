@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -79,7 +80,7 @@ public class ThemeManager implements IThemeManager
 	public static final String THEMES_NODE = "themes"; //$NON-NLS-1$
 	// TODO Don't expose this node name. Fold saving/loading of themes into this impl
 
-	private Theme fCurrentTheme;
+	private volatile Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
 	private HashSet<String> fBuiltins;
 
@@ -163,31 +164,36 @@ public class ThemeManager implements IThemeManager
 	private TextAttribute getTextAttribute(String name)
 	{
 		if (getCurrentTheme() != null)
+		{
 			return getCurrentTheme().getTextAttribute(name);
+		}
 		return new TextAttribute(ThemePlugin.getDefault().getColorManager().getColor(new RGB(255, 255, 255)));
 	}
 
-	public Theme getCurrentTheme()
+	public synchronized Theme getCurrentTheme()
 	{
 		if (fCurrentTheme == null)
 		{
-			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
-					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
-			if (activeThemeName != null)
+			synchronized (this)
 			{
-				fCurrentTheme = getTheme(activeThemeName);
-			}
-			if (fCurrentTheme == null)
-			{
-				// if we can't find the default theme, just use the first one in the list
-				if (!getThemeMap().values().isEmpty())
+				String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+						IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
+				if (activeThemeName != null)
 				{
-					fCurrentTheme = getThemeMap().values().iterator().next();
+					fCurrentTheme = getTheme(activeThemeName);
 				}
-			}
-			if (fCurrentTheme != null)
-			{
-				setCurrentTheme(fCurrentTheme);
+				if (fCurrentTheme == null)
+				{
+					// if we can't find the default theme, just use the first one in the list
+					if (!getThemeMap().values().isEmpty())
+					{
+						fCurrentTheme = getThemeMap().values().iterator().next();
+					}
+				}
+				if (fCurrentTheme != null)
+				{
+					setCurrentTheme(fCurrentTheme);
+				}
 			}
 		}
 		return fCurrentTheme;
@@ -195,8 +201,10 @@ public class ThemeManager implements IThemeManager
 
 	public void setCurrentTheme(Theme theme)
 	{
-		fCurrentTheme = theme;
-
+		synchronized (this)
+		{
+			fCurrentTheme = theme;
+		}
 		// Set the find in file search color
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.search"); //$NON-NLS-1$
 		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
@@ -440,15 +448,25 @@ public class ThemeManager implements IThemeManager
 		while (tokenizer.hasMoreElements())
 		{
 			String themeName = tokenizer.nextToken();
-			Theme theme = loadUserTheme(themeName);
-			if (theme == null)
+			try
 			{
-				continue;
+				Theme theme = loadUserTheme(themeName);
+				if (theme == null)
+				{
+					continue;
+				}
+				fThemeMap.put(theme.getName(), theme);
 			}
-			fThemeMap.put(theme.getName(), theme);
+			catch (IllegalStateException e)
+			{
+				// This theme may have failed deserialization, lets log it and move on
+				IdeLog.logError(ThemePlugin.getDefault(),
+						"User theme failed to de-serialize from preferences: " + themeName, e); //$NON-NLS-1$
+			}
 		}
 	}
 
+	@SuppressWarnings("restriction")
 	private Theme loadUserTheme(String themeName)
 	{
 		try
@@ -460,7 +478,19 @@ public class ThemeManager implements IThemeManager
 				return null;
 			}
 			Properties props = new OrderedProperties();
-			props.load(new ByteArrayInputStream(array));
+			props.load(byteStream);
+			// if it looks like the byte array was not Base64 decoded, try decoding and then running it through
+			if (!props.containsKey(Theme.THEME_NAME_PROP_KEY)) // anything else we can check for this?
+			{
+				IdeLog.logWarning(
+						ThemePlugin.getDefault(),
+						MessageFormat
+								.format("User theme {0} de-serialized, but was left Base64 encoded. Manually decoding and trying to load.", //$NON-NLS-1$
+										themeName));
+				byteStream = new ByteArrayInputStream(Base64.decode(array));
+				props = new OrderedProperties();
+				props.load(byteStream);
+			}
 			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (IllegalArgumentException iae)
@@ -483,8 +513,8 @@ public class ThemeManager implements IThemeManager
 				{
 					ThemePlugin.logError(e);
 				}
-			}
-		}
+						}
+						}
 		catch (IOException e)
 		{
 			ThemePlugin.logError(e);
