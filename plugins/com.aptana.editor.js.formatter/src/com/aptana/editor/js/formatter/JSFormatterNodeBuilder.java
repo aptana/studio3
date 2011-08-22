@@ -43,6 +43,7 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSPunctuationNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSRootNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSSwitchNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSTextNode;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
@@ -74,7 +75,6 @@ import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNullNode;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
@@ -397,7 +397,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			JSNode trueBlock = (JSNode) node.getTrueBlock();
 			JSNode falseBlock = (JSNode) node.getFalseBlock();
-
 			boolean isEmptyFalseBlock = (falseBlock.getNodeType() == IJSNodeTypes.EMPTY);
 			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == IJSNodeTypes.STATEMENTS);
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == IJSNodeTypes.STATEMENTS);
@@ -421,7 +420,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				wrapInImplicitBlock(trueBlock, false);
 			}
 			checkedPop(ifNode, trueBlock.getEndingOffset());
-
+			if (trueBlock.getNodeType() == IJSNodeTypes.EMPTY && trueBlock.getSemicolonIncluded())
+			{
+				// APSTUD-3337
+				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, trueBlock.getEndingOffset(), false, true);
+			}
 			if (!isEmptyFalseBlock)
 			{
 				// Construct the 'false' part if exist.
