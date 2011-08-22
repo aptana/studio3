@@ -54,7 +54,7 @@ public class CoffeeScannerTest extends TestCase
 		assertToken(Terminals.IDENTIFIER, "math", 0, 4);
 		assertToken(Terminals.EQUAL, "=", 5, 6);
 		assertToken(Terminals.INDENT, 2, 6, 6);
-		assertToken(Terminals.LCURLY, "{", 0, 0);
+		assertToken(Terminals.LCURLY, "{", 6, 6); // FIXME Fix offsets for implicit curlies
 		assertToken(Terminals.IDENTIFIER, "root", 9, 13);
 		assertToken(Terminals.COLON, ":", 13, 14);
 		assertToken(Terminals.IDENTIFIER, "Math", 17, 21);
@@ -71,15 +71,15 @@ public class CoffeeScannerTest extends TestCase
 		assertToken(Terminals.IDENTIFIER, "x", 55, 56);
 		assertToken(Terminals.PARAM_END, ")", 56, 57);
 		assertToken(Terminals.FUNC_ARROW, "->", 58, 60);
-		assertToken(Terminals.INDENT, 2, 0, 0);
+		assertToken(Terminals.INDENT, 2, 60, 60);
 		assertToken(Terminals.IDENTIFIER, "x", 61, 62);
 		assertToken(Terminals.MATH, "*", 63, 64);
 		assertToken(Terminals.IDENTIFIER, "square", 65, 71);
-		assertToken(Terminals.CALL_START, "(", 0, 0);
+		assertToken(Terminals.CALL_START, "(", 72, 72);
 		assertToken(Terminals.IDENTIFIER, "x", 72, 73);
-		assertToken(Terminals.CALL_END, ")", 0, 0);
-		assertToken(Terminals.OUTDENT, 2, 0, 0);
-		assertToken(Terminals.RCURLY, "}", 0, 0);
+		assertToken(Terminals.CALL_END, ")", 73, 73);
+		assertToken(Terminals.OUTDENT, 2, 73, 73);
+		assertToken(Terminals.RCURLY, "}", 73, 73); // FIXME Fix offsets for implicit curlies
 		assertToken(Terminals.OUTDENT, 2, 73, 73);
 		assertToken(Terminals.TERMINATOR, "\n", 73, 74);
 	}
