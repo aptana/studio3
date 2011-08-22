@@ -7,8 +7,8 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
-import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
@@ -107,7 +107,17 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return hasCommentBefore;
+		if (hasCommentBefore)
+		{
+			return true;
+		}
+		switch (invocationNode.getParent().getNodeType())
+		{
+			// APSTUD-3313
+			case IJSNodeTypes.STATEMENTS:
+				return true;
+		}
+		return false;
 	}
 
 }
