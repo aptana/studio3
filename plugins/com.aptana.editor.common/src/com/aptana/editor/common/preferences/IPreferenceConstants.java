@@ -90,6 +90,11 @@ public interface IPreferenceConstants
 	public static final String FILTER_EXPRESSIONS = CommonEditorPlugin.PLUGIN_ID + ".filterExpressions"; //$NON-NLS-1$
 
 	/**
+	 * The preference key to determine whether parse errors are enabled for each language
+	 */
+	public static final String PARSE_ERROR_ENABLED = CommonEditorPlugin.PLUGIN_ID + ".enableParseError"; //$NON-NLS-1$
+
+	/**
 	 * Do we display code assist hovers
 	 */
 	public static final String CONTENT_ASSIST_HOVER = CommonEditorPlugin.PLUGIN_ID + ".contentAssistHover"; //$NON-NLS-1$

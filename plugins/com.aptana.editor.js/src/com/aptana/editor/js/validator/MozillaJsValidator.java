@@ -29,7 +29,7 @@ public class MozillaJsValidator implements IValidator
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		manager.addParseErrors(items);
+		manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
 		Context cx = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
 		try

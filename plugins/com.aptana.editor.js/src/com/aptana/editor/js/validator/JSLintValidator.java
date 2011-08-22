@@ -52,7 +52,7 @@ public class JSLintValidator implements IValidator
 		try
 		{
 			context.setErrorReporter(reporter);
-			manager.addParseErrors(items);
+			manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
 			parseWithLint(context, source, path, manager, items);
 		}
 		finally
