@@ -64,7 +64,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 			start = partition.getOffset();
 			end = start + partition.getLength();
 
-			start = Math.min(start, includeOffset);
+			start = Math.max(0, Math.min(start, includeOffset));
 			end = Math.min(Math.max(end, includeOffset), document.getLength());
 		}
 		catch (BadLocationException e)

@@ -13,6 +13,8 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.EditorBasedTests;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
+import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 
 /**
  * CSSEditorBasedTests
@@ -48,5 +50,15 @@ public class CSSEditorBasedTests extends EditorBasedTests<CSSContentAssistProces
 	protected String getPluginId()
 	{
 		return CSSPlugin.PLUGIN_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	 */
+	@Override
+	protected IFileStoreIndexingParticipant createIndexer()
+	{
+		return new CSSFileIndexingParticipant();
 	}
 }
