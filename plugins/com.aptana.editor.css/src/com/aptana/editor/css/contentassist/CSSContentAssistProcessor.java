@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -726,7 +727,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
-			// we'll assume starting offset is 0
 		}
 
 		int endOffset = offset;
@@ -737,7 +737,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
-			// we'll assume ending offset is the offset passed in
 		}
 
 		return new Range(startOffset, endOffset);
@@ -1284,14 +1283,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
-		CSSTokenType[] types = new CSSTokenType[] { CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
-				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID };
-		Arrays.sort(types);
+		EnumSet<CSSTokenType> types = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
+				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID);
+
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		if (offset > 0)
 		{
 			Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
-			return lexeme != null ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
+			return (lexeme != null) ? types.contains(lexeme.getType()) : false;
 		}
 		return false;
 	}
