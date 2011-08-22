@@ -63,5 +63,6 @@ public class JSValidatorTests extends AbstractValidatorTestCase
 		assertEquals("'hello' is not defined.", item.getMessage());
 		assertEquals(IMarker.SEVERITY_WARNING, item.getSeverity());
 		assertEquals(24, item.getOffset());
+		assertTrue(item.getSourcePath().endsWith("/parseErrorTest"));
 	}
 }
