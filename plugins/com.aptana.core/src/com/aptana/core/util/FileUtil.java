@@ -8,6 +8,8 @@
 package com.aptana.core.util;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -190,5 +192,36 @@ public class FileUtil
 		}
 
 		return files;
+	}
+
+	/**
+	 * Writes a string out to a file
+	 * 
+	 * @param text
+	 *            The text to write to the file
+	 * @param filePath
+	 *            the path of the file to write to
+	 * @throws IOException
+	 */
+	public static void writeStringToFile(String text, File file) throws IOException
+	{
+		FileWriter out = null;
+		try
+		{
+			out = new FileWriter(file);
+			out.write(text);
+		}
+		finally
+		{
+			try
+			{
+				if (out != null)
+					out.close();
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+		}
 	}
 }

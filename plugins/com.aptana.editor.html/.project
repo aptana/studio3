@@ -20,9 +20,15 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.instantiations.assist.eclipse.coverage.instrumentationBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>com.instantiations.assist.eclipse.coverage.codeCoverageNature</nature>
 	</natures>
 </projectDescription>

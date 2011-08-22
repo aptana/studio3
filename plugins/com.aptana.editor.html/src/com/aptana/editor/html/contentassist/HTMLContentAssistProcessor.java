@@ -52,6 +52,7 @@ import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.HTMLTagUtil;
+import com.aptana.editor.html.IHTMLEditorDebugScopes;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -132,20 +133,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		DOCTYPES = new HashMap<String, String>();
 		DOCTYPES.put("HTML 5", "HTML"); //$NON-NLS-1$ //$NON-NLS-2$
 		DOCTYPES.put("HTML 4.01 Strict", //$NON-NLS-1$
-				"HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\""); //$NON-NLS-1$
+				"HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("HTML 4.01 Transitional", //$NON-NLS-1$
-				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\""); //$NON-NLS-1$
-		DOCTYPES.put("HTML 4.01 Transitional (Quirks)", "HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
+				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+		DOCTYPES.put("HTML 4.01 Transitional (Quirks)", "HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""); //$NON-NLS-1$ //$NON-NLS-2$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("HTML 4.01 Frameset", //$NON-NLS-1$
-				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\""); //$NON-NLS-1$
+				"HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"\n\"http://www.w3.org/TR/html4/frameset.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("XHTML 1.1", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\""); //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("XHTML 1.0 Strict", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\""); //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("XHTML 1.0 Transitional", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\""); //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("XHTML 1.0 Frameset", //$NON-NLS-1$
-				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\""); //$NON-NLS-1$
+				"html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"\n\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\""); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		DOCTYPES.put("HTML 3.2", "HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
 		DOCTYPES.put("HTML 2.0", "HTML PUBLIC \"-//IETF//DTD HTML//EN\""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -407,37 +408,41 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			IFileStore baseStore = null;
 			if (valuePrefix.length() > 0 && valuePrefix.charAt(0) == '/')
 			{
-				baseStore = EFS.getStore(getProjectURI());
-
-				// Get the project webroot
-				IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
-				if (serverConfiguration == null)
+				URI projectUri = getProjectURI();
+				if (projectUri != null)
 				{
-					for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
-							.getServerConfigurations())
+					baseStore = EFS.getStore(projectUri);
+
+					// Get the project webroot
+					IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
+					if (serverConfiguration == null)
 					{
-						if (server.resolve(editorStore) != null)
+						for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
+								.getServerConfigurations())
 						{
-							serverConfiguration = server;
-							break;
+							if (server.resolve(editorStore) != null)
+							{
+								serverConfiguration = server;
+								break;
+							}
 						}
 					}
-				}
-				if (serverConfiguration != null && serverConfiguration instanceof EFSWebServerConfiguration)
-				{
-					URI documentRoot = ((EFSWebServerConfiguration) serverConfiguration).getDocumentRoot();
-					if (documentRoot != null)
+					if (serverConfiguration != null && serverConfiguration instanceof EFSWebServerConfiguration)
 					{
-						baseStore = EFS.getStore(documentRoot);
+						URI documentRoot = ((EFSWebServerConfiguration) serverConfiguration).getDocumentRoot();
+						if (documentRoot != null)
+						{
+							baseStore = EFS.getStore(documentRoot);
+						}
 					}
-				}
-				else
-				{
-					// HACK This is for Rails projects, when user hasn't specified special server preview
-					IFileStore publicDir = baseStore.getChild("public"); //$NON-NLS-1$
-					if (publicDir.fetchInfo().exists())
+					else
 					{
-						baseStore = publicDir;
+						// HACK This is for Rails projects, when user hasn't specified special server preview
+						IFileStore publicDir = baseStore.getChild("public"); //$NON-NLS-1$
+						if (publicDir.fetchInfo().exists())
+						{
+							baseStore = publicDir;
+						}
 					}
 				}
 			}
@@ -498,16 +503,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			if (lastSlash != -1)
 			{
 				IFileStore possibleChild = baseStore.getChild(valuePrefix.substring(0, lastSlash));
-				try
+				if (possibleChild.fetchInfo().exists())
 				{
-					if (possibleChild.fetchInfo().exists())
-					{
-						baseStore = possibleChild;
-					}
-				}
-				catch (Exception e)
-				{
-					// ignore
+					baseStore = possibleChild;
 				}
 				offset += lastSlash + 1;
 				valuePrefix = valuePrefix.substring(lastSlash + 1);
@@ -520,7 +518,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				String name = f.getName();
 				// Don't include the current file in the list
-				if (name.startsWith(".") || f.toURI().equals(editorStoreURI)) //$NON-NLS-1$
+				if (name.charAt(0) == '.' || f.toURI().equals(editorStoreURI))
 				{
 					continue;
 				}
@@ -537,7 +535,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (info.isDirectory())
 				{
 					isDir = true;
-					name = name + '/';
+					name = name + '/'; // $codepro.audit.disable stringConcatenationInLoop
 					image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 				}
 				else
@@ -678,7 +676,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					replaceOffset = _currentLexeme.getStartingOffset();
 					replaceLength = _currentLexeme.getLength();
 
-					if (nextLexeme.equals(this._currentLexeme) == false)
+					if (!nextLexeme.equals(this._currentLexeme))
 					{
 						if (nextLexeme.getType() == HTMLTokenType.TAG_END)
 						{
@@ -699,17 +697,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					.getBoolean(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS);
 
 			HTMLParseState state = null;
+			String documentText = _document.get();
 			for (ElementElement element : elements)
 			{
-				String replaceString = element.getName();
+				StringBuilder replacement = new StringBuilder(element.getName());
 				List<Integer> positions = new ArrayList<Integer>();
-				int cursorPosition = replaceString.length();
+				int cursorPosition = replacement.length();
 				if (close)
 				{
 					if (state == null)
 					{
 						state = new HTMLParseState();
-						state.setEditState(_document.get(), null, 0, 0);
+						state.setEditState(documentText, null, 0, 0);
 					}
 
 					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
@@ -720,12 +719,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
 						if (nextLexeme == null || nextLexeme.getType() == HTMLTokenType.TAG_START)
 						{
-							replaceString += " >"; //$NON-NLS-1$
+							replacement.append(" >"); //$NON-NLS-1$
 						}
 					}
 					else if (state.isEmptyTagType(element.getName()))
 					{
-						replaceString += " />"; //$NON-NLS-1$
+						replacement.append(" />"); //$NON-NLS-1$
 						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag. Right
 						// now it's stuck at end of tag
 						positions.add(cursorPosition + 3);
@@ -734,31 +733,33 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
 						// document and insert the tag into it
-						IDocument doc = new Document(_document.get());
+						IDocument doc = new Document(documentText);
 						try
 						{
 							doc.replace(replaceOffset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
 						}
 						catch (BadLocationException e)
 						{
-							// ignore
+							IdeLog.logWarning(HTMLPlugin.getDefault(), MessageFormat.format(
+									Messages.HTMLContentAssistProcessor_ErrorReplacingText, replaceOffset,
+									element.getName() + ">"), e, IHTMLEditorDebugScopes.CONTENT_ASSIST); //$NON-NLS-1$
 						}
 						if (addCloseTag && !TagUtil.tagClosed(doc, element.getName()))
 						{
-							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+							replacement.append("></" + element.getName() + ">"); //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
 							positions.add(cursorPosition + 4 + element.getName().length());
 						}
 						else
 						{
-							replaceString += ">"; //$NON-NLS-1$
+							replacement.append('>');
 							positions.add(cursorPosition + 1);
 						}
 					}
 				}
 				positions.add(0, cursorPosition);
-				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, replaceOffset, replaceLength, element,
-						positions.toArray(new Integer[positions.size()]));
+				HTMLTagProposal proposal = new HTMLTagProposal(replacement.toString(), replaceOffset, replaceLength,
+						element, positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
 		}
@@ -781,15 +782,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		String text = null;
+		int startingOffset = this._replaceRange.getStartingOffset();
+		int length = this._replaceRange.getLength();
 		try
 		{
-			text = this._document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+			text = this._document.get(startingOffset, length);
 		}
 		catch (BadLocationException e)
 		{
-			// ignore
+			IdeLog.logWarning(
+					HTMLPlugin.getDefault(),
+					MessageFormat.format(Messages.HTMLContentAssistProcessor_ErrorFetchingText, startingOffset, length),
+					e, IHTMLEditorDebugScopes.CONTENT_ASSIST);
 		}
-		if (text == null || !text.startsWith("&")) //$NON-NLS-1$
+		if (text == null || text.charAt(0) != '&')
 		{
 			return;
 		}
@@ -1015,11 +1021,13 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
+			int newOffset = offset - 1;
+			int length = 1;
 			try
 			{
 				// add the close of the tag, since we're in a situation like <|<a>
 				replaceString += ">"; //$NON-NLS-1$
-				String previous = _document.get(offset - 1, 1);
+				String previous = _document.get(newOffset, length);
 				// situation like </|<a>
 				if ("/".equals(previous)) { //$NON-NLS-1$
 					replaceOffset -= 1;
@@ -1028,7 +1036,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			catch (BadLocationException e)
 			{
-				// safe to ignore
+				IdeLog.logWarning(HTMLPlugin.getDefault(),
+						MessageFormat.format(Messages.HTMLContentAssistProcessor_ErrorFetchingText, newOffset, length),
+						e, IHTMLEditorDebugScopes.CONTENT_ASSIST);
 			}
 		}
 
@@ -1203,6 +1213,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// select the current proposal based on the current lexeme
 		if (this._replaceRange != null)
 		{
+			int startingOffset = this._replaceRange.getStartingOffset();
+			int length = this._replaceRange.getLength();
 			try
 			{
 				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
@@ -1216,6 +1228,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			catch (BadLocationException e)
 			{
+				IdeLog.logWarning(HTMLPlugin.getDefault(), MessageFormat.format(
+						Messages.HTMLContentAssistProcessor_ErrorFetchingText, startingOffset, length), e,
+						IHTMLEditorDebugScopes.CONTENT_ASSIST);
 			}
 		}
 
@@ -1511,7 +1526,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (BadLocationException e)
 		{
-			// ignore
+			IdeLog.logWarning(HTMLPlugin.getDefault(),
+					StringUtil.format(Messages.HTMLContentAssistProcessor_ErrorFetchingPartition, offset), e,
+					IHTMLEditorDebugScopes.CONTENT_ASSIST);
 		}
 
 		return result;
@@ -1720,13 +1737,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					return true;
 				}
-				else
-				{
-					// If that's not the case, check if we are actually typing the attribute name
-					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
-					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME)
-							|| (fineLocation == LocationType.IN_ATTRIBUTE_VALUE);
-				}
+				// If that's not the case, check if we are actually typing the attribute name
+				LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+				return (fineLocation == LocationType.IN_ATTRIBUTE_NAME)
+						|| (fineLocation == LocationType.IN_ATTRIBUTE_VALUE);
 			default:
 				return false;
 		}

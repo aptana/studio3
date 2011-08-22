@@ -19,7 +19,7 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	 */
 	public void testJSEventAttribute()
 	{
-		this.checkProposals("contentAssist/js-event-attribute.html", "alert");
+		this.checkProposals("contentAssist/js-event-attribute.html", false, false, "alert");
 	}
 
 	/**
@@ -65,6 +65,23 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	 */
 	public void testCSSStyleAttribute()
 	{
+		// we check the style attribute twice to confirm that calling the same processor multiple times is not an issue.
 		this.checkProposals("contentAssist/css-style-attribute.html", "font");
+	}
+
+	/**
+	 * testCSSIDAttribute
+	 */
+	public void testCSSIDAttribute()
+	{
+		this.checkProposals("contentAssist/css-id-attribute.html", "testid");
+	}
+
+	/**
+	 * testCSSIDAttribute
+	 */
+	public void testCSSClassAttribute()
+	{
+		this.checkProposals("contentAssist/css-class-attribute.html", "testclass");
 	}
 }
