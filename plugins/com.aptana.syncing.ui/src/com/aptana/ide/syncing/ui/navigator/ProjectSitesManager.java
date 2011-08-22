@@ -22,56 +22,67 @@ import com.aptana.ide.ui.io.IOUIPlugin;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class ProjectSitesManager {
+public class ProjectSitesManager
+{
 
-    private static ProjectSitesManager fInstance;
+	private static ProjectSitesManager fInstance;
 
-    private Map<IProject, ProjectSiteConnections> fProjects;
+	private Map<IProject, ProjectSiteConnections> fProjects;
 
-    private IConnectionPointListener fListener = new IConnectionPointListener() {
+	private IConnectionPointListener fListener = new IConnectionPointListener()
+	{
 
-        public void connectionPointChanged(ConnectionPointEvent event) {
-            IConnectionPoint destConnection = event.getConnectionPoint();
+		public void connectionPointChanged(ConnectionPointEvent event)
+		{
+			IConnectionPoint destConnection = event.getConnectionPoint();
 
-            switch (event.getKind()) {
-            case ConnectionPointEvent.POST_CHANGE:
-                // refreshes the project connection node that contains the
-                // connection point that was modified
-                Collection<ProjectSiteConnections> projectConnections = fProjects.values();
-                ProjectSiteConnection[] connections;
-                IConnectionPoint connectionPoint;
-                for (ProjectSiteConnections sites : projectConnections) {
-                    connections = (ProjectSiteConnection[]) sites.getChildren(null);
-                    for (ProjectSiteConnection projectConnection : connections) {
-                        connectionPoint = (IConnectionPoint) projectConnection
-                                .getAdapter(IConnectionPoint.class);
-                        if (connectionPoint == destConnection) {
-                            IOUIPlugin.refreshNavigatorView(projectConnection);
-                        }
-                    }
-                }
-            }
-        }
-    };
+			switch (event.getKind())
+			{
+				case ConnectionPointEvent.POST_CHANGE:
+					// refreshes the project connection node that contains the
+					// connection point that was modified
+					Collection<ProjectSiteConnections> projectConnections = fProjects.values();
+					ProjectSiteConnection[] connections;
+					IConnectionPoint connectionPoint;
+					for (ProjectSiteConnections sites : projectConnections)
+					{
+						connections = (ProjectSiteConnection[]) sites.getChildren(null);
+						for (ProjectSiteConnection projectConnection : connections)
+						{
+							connectionPoint = (IConnectionPoint) projectConnection.getAdapter(IConnectionPoint.class);
+							if (connectionPoint == destConnection)
+							{
+								IOUIPlugin.refreshNavigatorView(projectConnection);
+							}
+						}
+					}
+			}
+		}
+	};
 
-    public static ProjectSitesManager getInstance() {
-        if (fInstance == null) {
-            fInstance = new ProjectSitesManager();
-        }
-        return fInstance;
-    }
+	public static ProjectSitesManager getInstance()
+	{
+		if (fInstance == null)
+		{
+			fInstance = new ProjectSitesManager();
+		}
+		return fInstance;
+	}
 
-    public ProjectSiteConnections getProjectSites(IProject project) {
-        ProjectSiteConnections sites = fProjects.get(project);
-        if (sites == null) {
-            sites = new ProjectSiteConnections(project);
-            fProjects.put(project, sites);
-        }
-        return sites;
-    }
+	public ProjectSiteConnections getProjectSites(IProject project)
+	{
+		ProjectSiteConnections sites = fProjects.get(project);
+		if (sites == null)
+		{
+			sites = new ProjectSiteConnections(project);
+			fProjects.put(project, sites);
+		}
+		return sites;
+	}
 
-    private ProjectSitesManager() {
-        fProjects = new HashMap<IProject, ProjectSiteConnections>();
-        CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(fListener);
-    }
+	private ProjectSitesManager()
+	{
+		fProjects = new HashMap<IProject, ProjectSiteConnections>();
+		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(fListener);
+	}
 }

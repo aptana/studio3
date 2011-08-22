@@ -14,17 +14,16 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.messages"; //$NON-NLS-1$
 
 	public static String DiffFormatter_NoContent;
-	public static String GitUIPlugin_0;
-	public static String GitUIPlugin_1;
-	public static String GitUIPlugin_10;
-	public static String GitUIPlugin_2;
-	public static String GitUIPlugin_3;
-	public static String GitUIPlugin_4;
-	public static String GitUIPlugin_5;
-	public static String GitUIPlugin_6;
-	public static String GitUIPlugin_7;
-	public static String GitUIPlugin_8;
-	public static String GitUIPlugin_9;
+	public static String GitUIPlugin_GitInstallationValidator;
+	public static String GitUIPlugin_ConfiguringGitSupportTitle;
+	public static String GitUIPlugin_ThisPathIsNotValid;
+	public static String GitUIPlugin_ConfigureGitPluginMessage;
+	public static String GitUIPlugin_ConfiguringGitSupport;
+	public static String GitUIPlugin_GitInstallError;
+	public static String GitUIPlugin_GitConfigurationIncomplete;
+	public static String GitUIPlugin_GitExecutableFiles;
+	public static String GitUIPlugin_SelectGitExecutableLocation;
+	public static String GitUIPlugin_InvalidPathSpecified;
 	public static String GitUIPlugin_ToggleMessage;
 
 	static

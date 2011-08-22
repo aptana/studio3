@@ -21,46 +21,59 @@ import com.aptana.ide.ui.io.navigator.actions.BaseDoubleClickAction;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class DoubleClickAction extends BaseDoubleClickAction {
+public class DoubleClickAction extends BaseDoubleClickAction
+{
 
-    private Shell fShell;
-    private TreeViewer fTreeViewer;
+	private Shell fShell;
+	private TreeViewer fTreeViewer;
 
-    public DoubleClickAction(Shell shell, TreeViewer treeViewer) {
-        super(treeViewer);
-        fShell = shell;
-        fTreeViewer = treeViewer;
-    }
+	public DoubleClickAction(Shell shell, TreeViewer treeViewer)
+	{
+		super(treeViewer);
+		fShell = shell;
+		fTreeViewer = treeViewer;
+	}
 
-    public void run() {
-        IStructuredSelection selection = (IStructuredSelection) fTreeViewer.getSelection();
-        Object element = selection.getFirstElement();
-        if (element instanceof ISiteConnection) {
-            // double-clicked on a site; opens it in the connection editor
-            EditorUtils.openConnectionEditor((ISiteConnection) element);
-        } else if (element instanceof ProjectSiteConnection) {
-            // double-clicked on a site inside a project; both expands the node
-            // and opens the connection editor
-            super.run();
-            EditorUtils.openConnectionEditor(((ProjectSiteConnection) element).getSiteConnection());
-        } else {
-            if (selectionHasChildren()) {
-                super.run();
-            } else {
-                // no connection point has been defined against the project;
-                // opens the new site connection dialog
-                IAdaptable source = null;
-                if (element instanceof IAdaptable) {
-                    source = (IAdaptable) element;
-                }
-            	openNewSiteConnectionDialog(source);
-            }
-        }
-    }
+	public void run()
+	{
+		IStructuredSelection selection = (IStructuredSelection) fTreeViewer.getSelection();
+		Object element = selection.getFirstElement();
+		if (element instanceof ISiteConnection)
+		{
+			// double-clicked on a site; opens it in the connection editor
+			EditorUtils.openConnectionEditor((ISiteConnection) element);
+		}
+		else if (element instanceof ProjectSiteConnection)
+		{
+			// double-clicked on a site inside a project; both expands the node
+			// and opens the connection editor
+			super.run();
+			EditorUtils.openConnectionEditor(((ProjectSiteConnection) element).getSiteConnection());
+		}
+		else
+		{
+			if (selectionHasChildren())
+			{
+				super.run();
+			}
+			else
+			{
+				// no connection point has been defined against the project;
+				// opens the new site connection dialog
+				IAdaptable source = null;
+				if (element instanceof IAdaptable)
+				{
+					source = (IAdaptable) element;
+				}
+				openNewSiteConnectionDialog(source);
+			}
+		}
+	}
 
-    private void openNewSiteConnectionDialog(IAdaptable source) {
-        SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fShell);
-        dlg.setCreateNew(Messages.DoubleClickAction_NewConnection, source, null);
-        dlg.open();
-    }
+	private void openNewSiteConnectionDialog(IAdaptable source)
+	{
+		SiteConnectionsEditorDialog dlg = new SiteConnectionsEditorDialog(fShell);
+		dlg.setCreateNew(Messages.DoubleClickAction_NewConnection, source, null);
+		dlg.open();
+	}
 }

@@ -43,68 +43,81 @@ import com.aptana.ui.util.UIUtils;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class SyncingUIPlugin extends AbstractUIPlugin {
+public class SyncingUIPlugin extends AbstractUIPlugin
+{
 
-    // The plug-in ID
-    public static final String PLUGIN_ID = "com.aptana.syncing.ui"; //$NON-NLS-1$
+	// The plug-in ID
+	public static final String PLUGIN_ID = "com.aptana.syncing.ui"; //$NON-NLS-1$
 
-    // The shared instance
-    private static SyncingUIPlugin plugin;
+	// The shared instance
+	private static SyncingUIPlugin plugin;
 
-    private ISiteConnectionListener connectionListener = new ISiteConnectionListener() {
+	private ISiteConnectionListener connectionListener = new ISiteConnectionListener()
+	{
 
-        public void siteConnectionChanged(SiteConnectionEvent event) {
-            ISiteConnection siteConnection = event.getSiteConnection();
-            switch (event.getKind()) {
-            case SiteConnectionEvent.POST_ADD:
-                // opens the corresponding connection editor
-                // EditorUtils.openConnectionEditor(siteConnection);
-                break;
-            case SiteConnectionEvent.POST_DELETE:
-                // closes the corresponding connection editor
-                EditorUtils.closeConnectionEditor(siteConnection);
-                break;
-            }
+		public void siteConnectionChanged(SiteConnectionEvent event)
+		{
+			ISiteConnection siteConnection = event.getSiteConnection();
+			switch (event.getKind())
+			{
+				case SiteConnectionEvent.POST_ADD:
+					// opens the corresponding connection editor
+					// EditorUtils.openConnectionEditor(siteConnection);
+					break;
+				case SiteConnectionEvent.POST_DELETE:
+					// closes the corresponding connection editor
+					EditorUtils.closeConnectionEditor(siteConnection);
+					break;
+			}
 
-            refreshProjectSiteConnection(siteConnection);
-        }
-    };
+			refreshProjectSiteConnection(siteConnection);
+		}
+	};
 
-    private IConnectionPointListener connectionPointListener = new IConnectionPointListener() {
+	private IConnectionPointListener connectionPointListener = new IConnectionPointListener()
+	{
 
-        public void connectionPointChanged(ConnectionPointEvent event) {
-            IConnectionPoint connectionPoint = event.getConnectionPoint();
-            switch (event.getKind()) {
-			case ConnectionPointEvent.POST_ADD:
-				ISiteConnection[] sites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-				IConnectionPoint source, destination;
-				String id = connectionPoint.getId();
-				for (ISiteConnection site : sites) {
-					source = site.getSource();
-					if (source != null && source.getId().equals(id)) {
-						// the source is changed to a new type
-						site.setSource(connectionPoint);
+		public void connectionPointChanged(ConnectionPointEvent event)
+		{
+			IConnectionPoint connectionPoint = event.getConnectionPoint();
+			switch (event.getKind())
+			{
+				case ConnectionPointEvent.POST_ADD:
+					ISiteConnection[] sites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
+					IConnectionPoint source,
+					destination;
+					String id = connectionPoint.getId();
+					for (ISiteConnection site : sites)
+					{
+						source = site.getSource();
+						if (source != null && source.getId().equals(id))
+						{
+							// the source is changed to a new type
+							site.setSource(connectionPoint);
+						}
+						destination = site.getDestination();
+						if (destination != null && destination.getId().equals(id))
+						{
+							// the destination is changed to a new type
+							site.setDestination(connectionPoint);
+							refreshProjectSiteConnection(site);
+						}
 					}
-					destination = site.getDestination();
-					if (destination != null && destination.getId().equals(id)) {
-						// the destination is changed to a new type
-						site.setDestination(connectionPoint);
-						refreshProjectSiteConnection(site);
+					break;
+				case ConnectionPointEvent.POST_DELETE:
+					// check if any site connection has the deleted connection point as the destination
+					ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
+					for (ISiteConnection siteConnection : siteConnections)
+					{
+						if (siteConnection.getDestination() == connectionPoint)
+						{
+							refreshProjectSiteConnection(siteConnection);
+						}
 					}
-				}
-				break;
-            case ConnectionPointEvent.POST_DELETE:
-                // check if any site connection has the deleted connection point as the destination
-                ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-                for (ISiteConnection siteConnection : siteConnections) {
-                    if (siteConnection.getDestination() == connectionPoint) {
-                        refreshProjectSiteConnection(siteConnection);
-                    }
-                }
-                break;
-            }
-        }
-    };
+					break;
+			}
+		}
+	};
 
 	private static void refreshProjectSiteConnection(ISiteConnection siteConnection)
 	{
@@ -159,64 +172,69 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 		}
 	};
 
-    /**
-     * The constructor
-     */
-    public SyncingUIPlugin() {
-    }
+	/**
+	 * The constructor
+	 */
+	public SyncingUIPlugin()
+	{
+	}
 
-    /**
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-     */
-    public void start(BundleContext context) throws Exception {
-        super.start(context);
-        plugin = this;
-        SyncingPlugin.getSiteConnectionManager().addListener(connectionListener);
-        CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionPointListener);
+	/**
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception
+	{
+		super.start(context);
+		plugin = this;
+		SyncingPlugin.getSiteConnectionManager().addListener(connectionListener);
+		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionPointListener);
 		addCommandSaveListener();
-    }
+	}
 
-    /**
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-     */
-    public void stop(BundleContext context) throws Exception {
-        SyncingPlugin.getSiteConnectionManager().removeListener(connectionListener);
-        CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionPointListener);
-    	removeCommandSaveListener();
-        plugin = null;
-        super.stop(context);
-    }
+	/**
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception
+	{
+		SyncingPlugin.getSiteConnectionManager().removeListener(connectionListener);
+		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionPointListener);
+		removeCommandSaveListener();
+		plugin = null;
+		super.stop(context);
+	}
 
-    /**
-     * Returns the shared instance
-     * 
-     * @return the shared instance
-     */
-    public static SyncingUIPlugin getDefault() {
-        return plugin;
-    }
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static SyncingUIPlugin getDefault()
+	{
+		return plugin;
+	}
 
-    /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path.
-     * 
-     * @param path
-     *            the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
+	/**
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 
-    /**
-     * Returns an image for the image file at the given plug-in relative path.
-     * 
-     * @param path
-     *            the path
-     * @return the image object
-     */
-    public static Image getImage(String path) {
-    	ImageRegistry registry = plugin.getImageRegistry();
+	/**
+	 * Returns an image for the image file at the given plug-in relative path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image object
+	 */
+	public static Image getImage(String path)
+	{
+		ImageRegistry registry = plugin.getImageRegistry();
 		Image image = registry.get(path);
 		if (image == null)
 		{
@@ -229,7 +247,7 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
 			image = registry.get(path);
 		}
 		return image;
-    }
+	}
 
 	private void addCommandSaveListener()
 	{

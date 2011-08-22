@@ -428,7 +428,8 @@ public class SmartSyncViewer
 								|| file.getSyncState() == SyncState.ServerItemIsNewer)
 						{
 							final VirtualFileSyncPair pair = file.getPair();
-							FileStoreCompareEditorInput input = new FileStoreCompareEditorInput(new CompareConfiguration());
+							FileStoreCompareEditorInput input = new FileStoreCompareEditorInput(
+									new CompareConfiguration());
 							input.setLeftFileStore(pair.getSourceFile());
 							input.setRightFileStore(pair.getDestinationFile());
 							input.initializeCompareConfiguration();

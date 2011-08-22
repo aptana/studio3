@@ -356,12 +356,6 @@
             sequence="CTRL+SHIFT+TAB">
       </key>
       <key
-            commandId="com.aptana.editor.toggleWordWrapCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+SHIFT+R">
-      </key>
-      <key
             commandId="com.aptana.editor.common.toggleMarkOccurrences"
             contextId="com.aptana.editor.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"

@@ -160,6 +160,9 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
+	/**
+	 * 
+	 */
 	public void testRR3_129()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
@@ -188,8 +191,10 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
-	// https://aptana.lighthouseapp.com/projects/35272/tickets/1218
-	public void testStudio3_1218()
+	/**
+	 * APSTUD-1218
+	 */
+	public void testDontAddStarAfterBlockComment()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -208,7 +213,10 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
-	public void testStudio3_1218_2()
+	/**
+	 * APSTUD-1218
+	 */
+	public void testInsideBlockCommentAddStar()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -233,7 +241,40 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
-	public void testStudio3_1218_3()
+	/**
+	 * APSTUD-3326
+	 */
+	public void testInsideBlockCommentAddStarSdoc()
+	{
+		// JavaScript and PHP have more than one multi-line comment type. Make sure we're checking
+		// for those types too
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+			{
+				return false;
+			}
+
+			@Override
+			protected boolean isComment(int offset)
+			{
+				return true;
+			}
+		};
+		IDocument document = new Document("/**\n * \n **/function name() {\n}\n");
+
+		// Inside block comment, add star
+		DocumentCommand command = createNewlineCommand(6);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n * ", command.text);
+		assertTrue(command.doit);
+	}
+
+	/**
+	 * APSTUD-1218
+	 */
+	public void testAddNewlineInsideEndBlockComment()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -258,7 +299,10 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
-	public void testStudio3_1218_4()
+	/**
+	 * APSTUD-1218
+	 */
+	public void testNewlineInsideEndBlockComment()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -283,7 +327,12 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
-	public void testAPSTUD2867() throws Exception
+	/**
+	 * APSTUD-2867
+	 * 
+	 * @throws Exception
+	 */
+	public void testNewlineAfterEndBlockComment() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
 		IDocument document = new Document("/* comment */hello");
@@ -300,7 +349,12 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("/* comment */\nhello", document.get());
 	}
 
-	public void testAPSTUD2867_2() throws Exception
+	/**
+	 * APSTUD-2867
+	 * 
+	 * @throws Exception
+	 */
+	public void testNewlineAfterEndBlockCommentText() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
 		IDocument document = new Document("/* comment */hello");
@@ -317,7 +371,12 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("/* comment */hello\n", document.get());
 	}
 
-	public void testAPSTUD2868() throws Exception
+	/**
+	 * See APSTUD-2868
+	 * 
+	 * @throws Exception
+	 */
+	public void testNoIndentAfterComment() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy()
 		{

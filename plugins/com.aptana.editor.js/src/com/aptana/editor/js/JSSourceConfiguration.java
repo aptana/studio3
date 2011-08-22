@@ -47,7 +47,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
 	public final static String JS_MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 	public final static String JS_SINGLELINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
-	public final static String JS_DOC = PREFIX + "sdoc"; //$NON-NLS-1$
+	public final static String JS_DOC = PREFIX + "sdoc_comment"; //$NON-NLS-1$
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
 	public final static String JS_REGEXP = PREFIX + "regexp"; //$NON-NLS-1$
