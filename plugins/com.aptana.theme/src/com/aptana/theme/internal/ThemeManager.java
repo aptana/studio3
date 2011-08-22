@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,6 +50,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotationPreferences;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.IThemeManager;
@@ -176,25 +176,25 @@ public class ThemeManager implements IThemeManager
 		{
 			synchronized (this)
 			{
-			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
-					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
-			if (activeThemeName != null)
-			{
-				fCurrentTheme = getTheme(activeThemeName);
-			}
-			if (fCurrentTheme == null)
-			{
-				// if we can't find the default theme, just use the first one in the list
-				if (!getThemeMap().values().isEmpty())
+				String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+						IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
+				if (activeThemeName != null)
 				{
-					fCurrentTheme = getThemeMap().values().iterator().next();
+					fCurrentTheme = getTheme(activeThemeName);
+				}
+				if (fCurrentTheme == null)
+				{
+					// if we can't find the default theme, just use the first one in the list
+					if (!getThemeMap().values().isEmpty())
+					{
+						fCurrentTheme = getThemeMap().values().iterator().next();
+					}
+				}
+				if (fCurrentTheme != null)
+				{
+					setCurrentTheme(fCurrentTheme);
 				}
 			}
-			if (fCurrentTheme != null)
-			{
-				setCurrentTheme(fCurrentTheme);
-			}
-		}
 		}
 		return fCurrentTheme;
 	}
@@ -448,19 +448,19 @@ public class ThemeManager implements IThemeManager
 			String themeName = tokenizer.nextToken();
 			try
 			{
-			Theme theme = loadUserTheme(themeName);
-			if (theme == null)
-			{
-				continue;
+				Theme theme = loadUserTheme(themeName);
+				if (theme == null)
+				{
+					continue;
+				}
+				fThemeMap.put(theme.getName(), theme);
 			}
-			fThemeMap.put(theme.getName(), theme);
-		}
 			catch (IllegalStateException e)
 			{
 				// This theme may have failed deserialization, lets log it and move on
 				IdeLog.logError(ThemePlugin.getDefault(),
 						"User theme failed to de-serialize from preferences: " + themeName, e); //$NON-NLS-1$
-	}
+			}
 		}
 	}
 
