@@ -384,8 +384,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (this._currentLexeme.getType())
 			{
 				case COMMA:
-					int index = lexemeProvider.getLexemeCeilingIndex(offset);
-					this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
+					this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset);
 					break;
 
 				case COLON:
