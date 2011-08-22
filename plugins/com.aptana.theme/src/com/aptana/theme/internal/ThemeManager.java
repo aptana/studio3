@@ -152,7 +152,7 @@ public class ThemeManager implements IThemeManager
 				});
 	}
 
-	public static ThemeManager instance()
+	public synchronized static ThemeManager instance()
 	{
 		if (fgInstance == null)
 		{
@@ -176,25 +176,25 @@ public class ThemeManager implements IThemeManager
 		{
 			synchronized (this)
 			{
-				String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
-						IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
-				if (activeThemeName != null)
+			String activeThemeName = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+					IPreferenceConstants.ACTIVE_THEME, ThemerPreferenceInitializer.DEFAULT_THEME, null);
+			if (activeThemeName != null)
+			{
+				fCurrentTheme = getTheme(activeThemeName);
+			}
+			if (fCurrentTheme == null)
+			{
+				// if we can't find the default theme, just use the first one in the list
+				if (!getThemeMap().values().isEmpty())
 				{
-					fCurrentTheme = getTheme(activeThemeName);
-				}
-				if (fCurrentTheme == null)
-				{
-					// if we can't find the default theme, just use the first one in the list
-					if (!getThemeMap().values().isEmpty())
-					{
-						fCurrentTheme = getThemeMap().values().iterator().next();
-					}
-				}
-				if (fCurrentTheme != null)
-				{
-					setCurrentTheme(fCurrentTheme);
+					fCurrentTheme = getThemeMap().values().iterator().next();
 				}
 			}
+			if (fCurrentTheme != null)
+			{
+				setCurrentTheme(fCurrentTheme);
+			}
+		}
 		}
 		return fCurrentTheme;
 	}
@@ -448,25 +448,26 @@ public class ThemeManager implements IThemeManager
 			String themeName = tokenizer.nextToken();
 			try
 			{
-				Theme theme = loadUserTheme(themeName);
-				if (theme == null)
-				{
-					continue;
-				}
-				fThemeMap.put(theme.getName(), theme);
+			Theme theme = loadUserTheme(themeName);
+			if (theme == null)
+			{
+				continue;
 			}
+			fThemeMap.put(theme.getName(), theme);
+		}
 			catch (IllegalStateException e)
 			{
 				// This theme may have failed deserialization, lets log it and move on
 				IdeLog.logError(ThemePlugin.getDefault(),
 						"User theme failed to de-serialize from preferences: " + themeName, e); //$NON-NLS-1$
-			}
+	}
 		}
 	}
 
 	@SuppressWarnings("restriction")
 	private Theme loadUserTheme(String themeName)
 	{
+		InputStream byteStream = null;
 		try
 		{
 			byte[] array = Platform.getPreferencesService().getByteArray(ThemePlugin.PLUGIN_ID,
@@ -475,20 +476,9 @@ public class ThemeManager implements IThemeManager
 			{
 				return null;
 			}
+			byteStream = new ByteArrayInputStream(array);
 			Properties props = new OrderedProperties();
 			props.load(byteStream);
-			// if it looks like the byte array was not Base64 decoded, try decoding and then running it through
-			if (!props.containsKey(Theme.THEME_NAME_PROP_KEY)) // anything else we can check for this?
-			{
-				IdeLog.logWarning(
-						ThemePlugin.getDefault(),
-						MessageFormat
-								.format("User theme {0} de-serialized, but was left Base64 encoded. Manually decoding and trying to load.", //$NON-NLS-1$
-										themeName));
-				byteStream = new ByteArrayInputStream(Base64.decode(array));
-				props = new OrderedProperties();
-				props.load(byteStream);
-			}
 			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (IllegalArgumentException iae)
@@ -498,10 +488,12 @@ public class ThemeManager implements IThemeManager
 					THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
 			if (xml != null)
 			{
+				InputStream stream = null;
 				try
 				{
+					stream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
 					Properties props = new OrderedProperties();
-					props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+					props.loadFromXML(stream);
 					// Now store it as byte array explicitly so we don't run into this!
 					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
 					theme.save();
@@ -511,11 +503,39 @@ public class ThemeManager implements IThemeManager
 				{
 					ThemePlugin.logError(e);
 				}
+				finally
+				{
+					if (stream != null)
+					{
+						try
+						{
+							stream.close();
 						}
+						catch (IOException e)
+						{
+							// ignore
 						}
+					}
+				}
+			}
+		}
 		catch (IOException e)
 		{
 			ThemePlugin.logError(e);
+		}
+		finally
+		{
+			if (byteStream != null)
+			{
+				try
+				{
+					byteStream.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
 		}
 		return null;
 	}
