@@ -146,6 +146,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 	private static boolean canModifyEditor(ITextEditor editor)
 	{
 		if (editor instanceof ITextEditorExtension2)
+		{
 			return ((ITextEditorExtension2) editor).isEditorInputModifiable();
 		}
 		else if (editor instanceof ITextEditorExtension)
@@ -155,7 +156,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		else if (editor != null)
 		{
 			return editor.isEditable();
-		else
+		}
 		return false;
 	}
 
