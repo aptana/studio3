@@ -53,7 +53,7 @@ proc onok {} {
 
 wm title . "HTTP"
 wm focusmodel . active
-wm attributes . -topmost 1
+#wm attributes . -topmost 1
 focus -force .r.edit
 tk::PlaceWindow .
 vwait result
