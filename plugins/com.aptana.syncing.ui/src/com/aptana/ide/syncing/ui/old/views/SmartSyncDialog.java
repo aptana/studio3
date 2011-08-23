@@ -29,9 +29,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.Viewer;
@@ -76,14 +78,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
+import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
 import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
@@ -771,12 +777,12 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 		filePermission = new PermissionsGroup(group);
 		filePermission.setText(Messages.SmartSyncDialog_PermForFiles);
-		filePermission.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		filePermission.setPermissions(FilePrefUtils.getFilePermission());
+		filePermission.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		filePermission.setPermissions(PreferenceUtils.getFilePermissions());
 		dirPermission = new PermissionsGroup(group);
 		dirPermission.setText(Messages.SmartSyncDialog_PermForDirectories);
-		dirPermission.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		dirPermission.setPermissions(FilePrefUtils.getDirectoryPermission());
+		dirPermission.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		dirPermission.setPermissions(PreferenceUtils.getDirectoryPermissions());
 
 		return advanced;
 	}
@@ -1491,6 +1497,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		}
 		else if (source == startSync)
 		{
+			savePermissions();
 			String text = startSync.getText();
 			if (text.equals(Messages.SmartSyncDialog_StartSync))
 			{
@@ -1529,6 +1536,23 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			SyncExporter exporter = new SyncExporter();
 			ISyncResource[] resources = syncViewer.getCurrentResources();
 			exporter.export(logFile, resources);
+		}
+	}
+
+	private void savePermissions()
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CoreIOPlugin.PLUGIN_ID);
+		prefs.putLong(com.aptana.ide.core.io.preferences.IPreferenceConstants.FILE_PERMISSION,
+				filePermission.getPermissions());
+		prefs.putLong(com.aptana.ide.core.io.preferences.IPreferenceConstants.DIRECTORY_PERMISSION,
+				dirPermission.getPermissions());
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(SyncingUIPlugin.getDefault(), "Failed to save the permissions", e); //$NON-NLS-1$
 		}
 	}
 
