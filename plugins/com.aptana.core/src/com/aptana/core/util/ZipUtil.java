@@ -8,6 +8,7 @@
 
 package com.aptana.core.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +31,8 @@ import org.eclipse.core.runtime.SubMonitor;
  * @author Max Stepanov
  */
 public final class ZipUtil {
+
+	private static final int ATTR_SYMLINK = 0xA000;
 
 	/**
 	 * 
@@ -120,7 +123,11 @@ public final class ZipUtil {
 					if (!file.createNewFile()) {
 						continue;
 					}
-					OutputStream out = new FileOutputStream(file);
+					boolean symlink = isSymlink(entry);
+					if (symlink) {
+						file.delete();
+					}
+					OutputStream out = symlink ? new ByteArrayOutputStream() : new FileOutputStream(file);
 					InputStream in = zip.getInputStream(entry);
 					while ((n = in.read(buffer)) > 0) {
 						out.write(buffer, 0, n);
@@ -132,6 +139,10 @@ public final class ZipUtil {
 							Runtime.getRuntime().exec(new String[] { "chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
 						} catch (Exception ignore) {
 						}
+						if (symlink) {
+							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8");
+							Runtime.getRuntime().exec(new String[] { "ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
+						}
 					}
 				}
 				if (subMonitor.isCanceled()) {
@@ -142,5 +153,9 @@ public final class ZipUtil {
 		} finally {
 			subMonitor.done();
 		}
+	}
+
+	private static boolean isSymlink(ZipEntry entry) {
+		return (entry.getUnixMode() & ATTR_SYMLINK) == ATTR_SYMLINK;
 	}
 }

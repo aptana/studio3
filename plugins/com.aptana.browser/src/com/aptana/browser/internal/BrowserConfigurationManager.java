@@ -104,13 +104,17 @@ public class BrowserConfigurationManager
 				return;
 			}
 			int order = Byte.MAX_VALUE;
-			try
+			String orderStr = element.getAttribute(ATT_ORDER);
+			if (!isEmpty(orderStr))
 			{
-				order = Integer.parseInt(element.getAttribute(ATT_ORDER));
-			}
-			catch (NumberFormatException e)
-			{
-				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
+				try
+				{
+					order = Integer.parseInt(orderStr);
+				}
+				catch (NumberFormatException e)
+				{
+					IdeLog.logWarning(BrowserPlugin.getDefault(), e);
+				}
 			}
 			sizeCategories.put(categoryId, new BrowserSizeCategory(categoryId, categoryName, order));
 		}

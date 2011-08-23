@@ -620,7 +620,7 @@ public class Theme
 		return rgbString + pad(Integer.toHexString(color.getAlpha()), 2, '0');
 	}
 
-	static String toHex(RGB rgb)
+	public static String toHex(RGB rgb)
 	{
 		return MessageFormat.format("#{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
 				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));

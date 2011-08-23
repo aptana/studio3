@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.common.validation;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -25,11 +23,12 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.ValidationManager;
+import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.parsing.IParseState;
 
 public class AbstractValidatorTestCase extends TestCase
 {
+
 	protected void setEnableParseError(boolean enabled, String language)
 	{
 		// Set enable parse errors preference
@@ -39,24 +38,17 @@ public class AbstractValidatorTestCase extends TestCase
 
 	protected List<IValidationItem> getParseErrors(String source, String language, IParseState ps) throws CoreException
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		TestProject project = new TestProject("Test", new String[] { "com.aptana.projects.webnature" });
-		final IResource file = project.createFile("parseErrorTest", source);
+		IResource file = project.createFile("parseErrorTest", source);
 
 		FileService fileService = new FileService(language, ps);
-
 		fileService.setDocument(new Document(source));
 		fileService.setResource(file);
 		fileService.parse(new NullProgressMonitor());
 		fileService.validate();
 
-		ValidationManager validationManager = (ValidationManager) fileService.getValidationManager();
-		Collection<List<IValidationItem>> validationLists = validationManager.getValidationItems();
-
-		for (List<IValidationItem> list : validationLists)
-		{
-			items.addAll(list);
-		}
+		IValidationManager validationManager = fileService.getValidationManager();
+		List<IValidationItem> items = validationManager.getValidationItems();
 
 		project.delete();
 		return items;

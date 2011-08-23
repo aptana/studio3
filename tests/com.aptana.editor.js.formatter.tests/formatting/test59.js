@@ -7468,7 +7468,8 @@ if( typeof dojo == "undefined") {
             contents = '(' + contents + ')';
         }
         var value = dojo["eval"](contents + "\r\n//@ sourceURL=" + uri);
-        if(cb) { cb(value);
+        if(cb) {
+            cb(value);
         }
         return true;
         // Boolean
@@ -10481,7 +10482,8 @@ if(!dojo._hasResource["dojo._base.event"]) {//_hasResource checks added by build
                     // combinations. If you still need to access the key upstream, bubbledKeyCode is
                     // provided as a workaround.
                     this.bubbledKeyCode = this.keyCode;
-                    if(this.ctrlKey) {_trySetKeyCode(this, 0);
+                    if(this.ctrlKey) {
+                        _trySetKeyCode(this, 0);
                     }
                     this.returnValue = false;
                 }

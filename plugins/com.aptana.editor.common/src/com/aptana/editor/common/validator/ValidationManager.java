@@ -270,9 +270,15 @@ public class ValidationManager implements IValidationManager
 		return false;
 	}
 
-	public Collection<List<IValidationItem>> getValidationItems()
+	public List<IValidationItem> getValidationItems()
 	{
-		return fItemsByType.values();
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
+		Set<String> types = fItemsByType.keySet();
+		for (String type : types)
+		{
+			items.addAll(fItemsByType.get(type));
+		}
+		return items;
 	}
 
 	private IValidationItem addItem(int severity, String message, int lineNumber, int lineOffset, int length,

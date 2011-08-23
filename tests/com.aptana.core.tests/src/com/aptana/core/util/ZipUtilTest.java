@@ -19,65 +19,70 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 
+@SuppressWarnings("nls")
 public class ZipUtilTest extends TestCase
 {
 
 	private static final String BUNDLE_ID = "com.aptana.core.tests";
-	private static final String TEST_ZIP = "test.zip";
-	private static final String STREAM_TEST_ZIP = "streamtest.zip";
-	private static final String RESOURCE_DIR = "resources";
-	private static final HashSet<String> FILES = new HashSet<String>(Arrays.asList("test.haml", "test.erb"));
+
+	private static final String STREAM_TEST_ZIP = "resources/streamtest.zip";
+
+	private static final String TEST_ZIP = "resources/test.zip";
+	private static final HashSet<String> TOP_ENTRIES = new HashSet<String>(Arrays.asList("folder", "file.txt",
+			"othersym", "filesym.txt"));
 
 	public void testUnzipFile() throws IOException
 	{
-		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
+		assertNotNull(resourceURL);
 		File resourceFile = ResourceUtil.resourcePathToFile(resourceURL);
-		File newZip = new File(resourceFile, "test");
+		assertNotNull(resourceFile);
 
-		ZipUtil.extract(new File(resourceFile, TEST_ZIP), resourceFile, new NullProgressMonitor());
+		File destinationDir = File.createTempFile(getClass().getSimpleName(), null);
+		assertTrue(destinationDir.delete());
+		assertTrue(destinationDir.mkdirs());
 
-		assertNotNull("Failed to extract zip", newZip);
-
-		if (newZip.isDirectory())
+		try
 		{
-			File[] files = newZip.listFiles();
-			assertTrue("Unzipped contents to not match expected number of files", files.length == 4);
+			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+
+			File[] files = destinationDir.listFiles();
+			assertEquals("Unzipped contents to not match expected number of files", TOP_ENTRIES.size(), files.length);
 
 			for (File file : files)
 			{
-				if (file.isDirectory())
-				{
-					// test2 folder should have 1 file in it
-					if (file.getName().equals("test2"))
-					{
-						assertTrue(file.list().length == 1);
-					}
-					continue;
-				}
-				assertTrue("Unexpected file: " + file + " in unzipped contents", FILES.contains(file.getName()));
+				assertTrue("Unexpected zip entry " + file.getName(), TOP_ENTRIES.contains(file.getName()));
 			}
-		}
+			assertTrue("Expected entry is not a directory", new File(destinationDir, "folder").isDirectory());
+			assertTrue("Expected entry is not a file", new File(destinationDir, "file.txt").isFile());
+			assertTrue("Expected entry is not a directory", new File(destinationDir, "folder/other").isDirectory());
+			assertTrue("Expected entry is not a file", new File(destinationDir, "folder/file.txt").isFile());
 
-		// remove the contents after we are done with the test
-		FileUtil.deleteRecursively(newZip);
+			assertTrue("Expected entry is not a symlink", FileUtil.isSymlink(new File(destinationDir, "filesym.txt")));
+			assertTrue("Expected entry is not a symlink", FileUtil.isSymlink(new File(destinationDir, "othersym")));
+		}
+		finally
+		{
+			// remove the contents after we are done with the test
+			FileUtil.deleteRecursively(destinationDir);
+		}
 	}
 
 	public void testOpenEntry() throws IOException
 	{
-		URL zipURL = Platform.getBundle(BUNDLE_ID).getEntry(RESOURCE_DIR);
-		File resource = ResourceUtil.resourcePathToFile(zipURL);
+		URL zipURL = Platform.getBundle(BUNDLE_ID).getEntry(STREAM_TEST_ZIP);
+		File zipFile = ResourceUtil.resourcePathToFile(zipURL);
 		InputStream stream;
-		File zipFile = new File(resource, STREAM_TEST_ZIP);
 
 		// Open entry should return null when it can't find the specified file
 		assertNull(ZipUtil.openEntry(zipFile, Path.fromOSString("test.haml")));
 
 		stream = ZipUtil.openEntry(zipFile, Path.fromOSString("streamtest"));
 
-		String test = IOUtil.read(stream);
-
-		assertTrue(test.equals("this is a test\n\n"));
+		String text = IOUtil.read(stream);
+		assertEquals("this is a test\n\n", text);
 	}
 
 }
