@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.EditorBasedTests;
+import com.aptana.editor.common.EditorContentAssistBasedTests;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
@@ -21,11 +21,11 @@ import com.aptana.index.core.IFileStoreIndexingParticipant;
 /**
  * HTMLEditorBasedTests
  */
-public class HTMLEditorBasedTests extends EditorBasedTests<HTMLContentAssistProcessor>
+public class HTMLEditorBasedTests extends EditorContentAssistBasedTests<HTMLContentAssistProcessor>
 {
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#createContentAssistProcessor(com.aptana.editor.common.
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#createContentAssistProcessor(com.aptana.editor.common.
 	 * AbstractThemeableEditor)
 	 */
 	@Override
@@ -36,7 +36,7 @@ public class HTMLEditorBasedTests extends EditorBasedTests<HTMLContentAssistProc
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#getBundle()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getBundle()
 	 */
 	@Override
 	protected Bundle getBundle()
@@ -46,7 +46,7 @@ public class HTMLEditorBasedTests extends EditorBasedTests<HTMLContentAssistProc
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#getPluginId()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#getPluginId()
 	 */
 	@Override
 	protected String getPluginId()
@@ -56,7 +56,7 @@ public class HTMLEditorBasedTests extends EditorBasedTests<HTMLContentAssistProc
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	 * @see com.aptana.editor.common.EditorContentAssistBasedTests#createIndexer()
 	 */
 	@Override
 	protected IFileStoreIndexingParticipant createIndexer()
