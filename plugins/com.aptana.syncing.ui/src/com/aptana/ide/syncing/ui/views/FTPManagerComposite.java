@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -31,8 +32,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -89,7 +88,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 
 	private ISiteConnection fSelectedSite;
 	private List<Listener> fListeners;
-	private ConnectionPointComposite focusedConnection;
 
 	public FTPManagerComposite(Composite parent)
 	{
@@ -319,20 +317,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		fSource = new ConnectionPointComposite(main, Messages.FTPManagerComposite_LBL_Source, this);
 		fSource.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		fSource.addTreeFocusListener(new FocusListener()
-		{
-
-			public void focusLost(FocusEvent e)
-			{
-				focusedConnection = null;
-			}
-
-			public void focusGained(FocusEvent e)
-			{
-				focusedConnection = fSource;
-			}
-		});
-
 		// transfer arrows
 		final Composite directions = new Composite(main, SWT.NONE);
 		layout = new GridLayout();
@@ -361,20 +345,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		// destination end point
 		fTarget = new ConnectionPointComposite(main, Messages.FTPManagerComposite_LBL_Target, this);
 		fTarget.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		fTarget.addTreeFocusListener(new FocusListener()
-		{
-
-			public void focusLost(FocusEvent e)
-			{
-				focusedConnection = null;
-			}
-
-			public void focusGained(FocusEvent e)
-			{
-				focusedConnection = fTarget;
-			}
-		});
 
 		return main;
 	}
@@ -450,17 +420,24 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		SmartSyncDialog dialog;
 		try
 		{
-			if (focusedConnection == null)
+			IAdaptable[] sourceSelectedElements = fSource.getSelectedElements();
+			IAdaptable[] targetSelectedElements = fTarget.getSelectedElements();
+			IFileStore sourceStore = Utils.getFileStore(fSource.getCurrentInput());
+			IFileStore targetStore = Utils.getFileStore(fTarget.getCurrentInput());
+
+			if (sourceSelectedElements.length == 0 || targetSelectedElements.length == 0)
 			{
-				IFileStore sourceStore = Utils.getFileStore(fSource.getCurrentInput());
-				IFileStore targetStore = Utils.getFileStore(fTarget.getCurrentInput());
+				// if one of the sides doesn't have a selection, sync from the current relative paths
 				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
 						source.getName(), dest.getName());
 			}
 			else
 			{
-				IFileStore[] sourceStores = SyncUtils.getFileStores(focusedConnection.getSelectedElements());
-				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), cpsp, sourceStores);
+				IFileStore[] sourceStores = (sourceSelectedElements.length == 0) ? new IFileStore[] { sourceStore }
+						: SyncUtils.getFileStores(sourceSelectedElements);
+				IFileStore[] targetStores = (targetSelectedElements.length == 0) ? new IFileStore[] { targetStore }
+						: SyncUtils.getFileStores(targetSelectedElements);
+				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), cpsp, sourceStores, targetStores);
 			}
 
 			dialog.open();

@@ -24,14 +24,18 @@ import java.util.regex.Pattern;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.Viewer;
@@ -184,7 +188,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	private Job buildSmartSync;
 
-	private IFileStore[] filesToBeSynced;
+	private IFileStore[] sourceFilesToBeSynced;
+	private IFileStore[] destFilesToBeSynced;
 	private Image titleImage;
 	private Button left_arrow;
 	private Button right_arrow;
@@ -261,13 +266,13 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	 *            the parent shell
 	 * @param conf
 	 *            the file manager pair
-	 * @param filesToBeSynced
+	 * @param sourceFilesToBeSynced
 	 *            the selected files to be synced
 	 * @throws CoreException
 	 * @throws CoreException
 	 */
-	public SmartSyncDialog(Shell parent, ConnectionPointSyncPair conf, IFileStore[] filesToBeSynced)
-			throws CoreException
+	public SmartSyncDialog(Shell parent, ConnectionPointSyncPair conf, IFileStore[] sourceFilesToBeSynced,
+			IFileStore[] destFilesToBeSynced) throws CoreException
 	{
 		this(parent, conf.getSourceFileManager(), conf.getDestinationFileManager(), conf.getSourceFileManager()
 				.getRoot(), conf.getDestinationFileManager().getRoot(), conf.getSourceFileManager().getName(), conf
@@ -278,25 +283,46 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		destConnectionPoint = conf.getDestinationFileManager();
 		this.syncer.setClientFileRoot(sourceConnectionPoint.getRoot());
 		this.syncer.setServerFileRoot(destConnectionPoint.getRoot());
-		if (filesToBeSynced == null || filesToBeSynced.length == 0)
+
+		if (sourceFilesToBeSynced == null || sourceFilesToBeSynced.length == 0)
 		{
-			this.filesToBeSynced = null;
+			this.sourceFilesToBeSynced = null;
 		}
 		else
 		{
-			this.filesToBeSynced = filesToBeSynced;
-			if (filesToBeSynced.length == 1)
+			this.sourceFilesToBeSynced = sourceFilesToBeSynced;
+			if (sourceFilesToBeSynced.length == 1)
 			{
-				String path = EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[0], null);
-				if (path == null || path.trim().length() == 0)
+				IPath path = EFSUtils.getRelativePath(sourceConnectionPoint, sourceFilesToBeSynced[0]);
+				if (path == null || Path.EMPTY.equals(path))
 				{
-					// the selection is from the project level, so we are doing
-					// a full sync
-					this.filesToBeSynced = null;
+					// the selection is from the project level, so we are doing a full sync
+					this.sourceFilesToBeSynced = null;
 				}
 				else
 				{
-					this.end1 = this.end1 + " (" + path + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+					end1 = MessageFormat.format("{0} ({1})", end1, path); //$NON-NLS-1$
+				}
+			}
+		}
+		if (destFilesToBeSynced == null || destFilesToBeSynced.length == 0)
+		{
+			this.destFilesToBeSynced = null;
+		}
+		else
+		{
+			this.destFilesToBeSynced = destFilesToBeSynced;
+			if (destFilesToBeSynced.length == 1)
+			{
+				IPath path = EFSUtils.getRelativePath(destConnectionPoint, destFilesToBeSynced[0]);
+				if (path == null || Path.EMPTY.equals(path))
+				{
+					// can't find the path
+					this.destFilesToBeSynced = null;
+				}
+				else
+				{
+					end2 = MessageFormat.format("{0} ({1})", end2, path); //$NON-NLS-1$
 				}
 			}
 		}
@@ -493,7 +519,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
 		remote_site.setLayoutData(gridData);
 
-		if (this.filesToBeSynced == null || this.filesToBeSynced.length <= 1)
+		if (this.sourceFilesToBeSynced == null || this.sourceFilesToBeSynced.length <= 1)
 		{
 			Label end1Label = new Label(endpoints, SWT.CENTER);
 			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
@@ -514,23 +540,45 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.HORIZONTAL, false, false));
 
 			final Label end1Extra = new Label(end1Comp, SWT.NONE);
-			end1Extra.setText("(multiple files/folders)"); //$NON-NLS-1$
+			end1Extra.setText(Messages.SmartSyncDialog_LBL_MultipleFiles);
 			end1Extra.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true, false));
 
 			// uses a custom tooltip
 			end1Extra.setToolTipText(null);
-			new LabelToolTip(end1Extra);
+			new LabelToolTip(end1Extra, sourceConnectionPoint, sourceFilesToBeSynced);
 		}
 
 		sync_label = new Label(endpoints, SWT.VERTICAL | SWT.CENTER);
 		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
 		gridData.widthHint = 150;
 		sync_label.setLayoutData(gridData);
-		sync_label.setText(""); //$NON-NLS-1$
+		sync_label.setText(StringUtil.EMPTY);
 
-		Label end2Label = new Label(endpoints, SWT.CENTER);
-		end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
-		end2Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		if (destFilesToBeSynced == null || destFilesToBeSynced.length <= 1)
+		{
+			Label end2Label = new Label(endpoints, SWT.CENTER);
+			end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
+			end2Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		}
+		else
+		{
+			// multiple files/folders are selected; adds a custom label
+			Composite end2Comp = new Composite(endpoints, SWT.NONE);
+			end2Comp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+			end2Comp.setLayoutData(GridDataFactory.fillDefaults().create());
+
+			Label end2Label = new Label(end2Comp, SWT.CENTER);
+			end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
+			end2Label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).create());
+
+			Label end2Extra = new Label(end2Comp, SWT.NONE);
+			end2Extra.setText(Messages.SmartSyncDialog_LBL_MultipleFiles);
+			end2Extra.setLayoutData(GridDataFactory.swtDefaults().grab(true, false).create());
+
+			// uses a custom tooltip
+			end2Extra.setToolTipText(null);
+			new LabelToolTip(end2Extra, destConnectionPoint, destFilesToBeSynced);
+		}
 
 		Label shadow_sep_h = new Label(endpoints, SWT.SEPARATOR | SWT.SHADOW_IN | SWT.HORIZONTAL);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, false, true);
@@ -1133,6 +1181,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		}
 		buildSmartSync = new Job("Generating Synchronize Status") //$NON-NLS-1$
 		{
+
 			protected IStatus run(final IProgressMonitor monitor)
 			{
 				syncer.setEventHandler(new SyncEventHandlerAdapterWithProgressMonitor(monitor)
@@ -1175,16 +1224,15 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				{
 					if (forceUp)
 					{
-						IFileStore[] clientFiles = (IFileStore[]) ((filesToBeSynced == null) ? EFSUtils.getFiles(
-								source, true, false, null) : EFSUtils
-								.getAllFiles(filesToBeSynced, true, false, monitor));
+						IFileStore[] clientFiles = (sourceFilesToBeSynced == null) ? EFSUtils.getFiles(source, true,
+								false, null) : EFSUtils.getAllFiles(sourceFilesToBeSynced, true, false, monitor);
 						items = syncer.createSyncItems(clientFiles, new IFileStore[0], monitor);
 						Map<String, VirtualFileSyncPair> pairs = new HashMap<String, VirtualFileSyncPair>();
 						for (VirtualFileSyncPair item : items)
 						{
 							pairs.put(item.getRelativePath(), item);
 						}
-						IFileStore[] serverFiles = (IFileStore[]) EFSUtils.getFiles(dest, true, false, monitor);
+						IFileStore[] serverFiles = EFSUtils.getFiles(dest, true, false, monitor);
 						VirtualFileSyncPair pair;
 						for (IFileStore file : serverFiles)
 						{
@@ -1198,16 +1246,16 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					}
 					else if (forceDown)
 					{
-						IFileStore[] serverFiles = (IFileStore[]) ((filesToBeSynced == null) ? EFSUtils.getFiles(dest,
-								true, false, null) : SyncUtils.getDownloadFiles(sourceConnectionPoint,
-								destConnectionPoint, filesToBeSynced, true, monitor));
+						IFileStore[] serverFiles = (destFilesToBeSynced == null) ? EFSUtils.getFiles(dest, true, false,
+								null) : SyncUtils.getDownloadFiles(sourceConnectionPoint, destConnectionPoint,
+								destFilesToBeSynced, false, true, monitor);
 						items = syncer.createSyncItems(new IFileStore[0], serverFiles, monitor);
 						Map<String, VirtualFileSyncPair> pairs = new HashMap<String, VirtualFileSyncPair>();
 						for (VirtualFileSyncPair item : items)
 						{
 							pairs.put(item.getRelativePath(), item);
 						}
-						IFileStore[] clientFiles = (IFileStore[]) EFSUtils.getFiles(source, true, false, monitor);
+						IFileStore[] clientFiles = EFSUtils.getFiles(source, true, false, monitor);
 						VirtualFileSyncPair pair;
 						for (IFileStore file : clientFiles)
 						{
@@ -1221,16 +1269,19 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					}
 					else
 					{
-						if (filesToBeSynced == null)
+						if (sourceFilesToBeSynced == null && destFilesToBeSynced == null)
 						{
 							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest,
 									monitor);
 						}
 						else
 						{
-							IFileStore[] clientFiles = EFSUtils.getAllFiles(filesToBeSynced, true, false, monitor);
-							IFileStore[] serverFiles = SyncUtils.getUploadFiles(sourceConnectionPoint,
-									destConnectionPoint, filesToBeSynced, monitor);
+							IFileStore[] clientFiles = (sourceFilesToBeSynced == null) ? EFSUtils.getFiles(source,
+									true, false, null) : EFSUtils.getAllFiles(sourceFilesToBeSynced, true, false,
+									monitor);
+							IFileStore[] serverFiles = (destFilesToBeSynced == null) ? EFSUtils.getFiles(dest, true,
+									false, null) : SyncUtils.getDownloadFiles(sourceConnectionPoint,
+									destConnectionPoint, destFilesToBeSynced, false, true, monitor);
 
 							items = syncer.createSyncItems(clientFiles, serverFiles, monitor);
 						}
@@ -2010,12 +2061,17 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	/**
 	 * The custom tooltip class for the end point label.
 	 */
-	private class LabelToolTip extends ToolTip
+	private static class LabelToolTip extends ToolTip
 	{
 
-		LabelToolTip(Control control)
+		private IConnectionPoint connectionPoint;
+		private IFileStore[] files;
+
+		LabelToolTip(Control control, IConnectionPoint connectionPoint, IFileStore[] files)
 		{
 			super(control, ToolTip.NO_RECREATE, false);
+			this.connectionPoint = connectionPoint;
+			this.files = files;
 		}
 
 		@Override
@@ -2025,9 +2081,9 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			contentArea.setLayout(new GridLayout());
 
 			StringBuilder buf = new StringBuilder();
-			for (int i = 0; i < filesToBeSynced.length; ++i)
+			for (IFileStore file : files)
 			{
-				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i], null));
+				buf.append(EFSUtils.getRelativePath(connectionPoint, file, null));
 				buf.append('\n');
 			}
 			Text text;
