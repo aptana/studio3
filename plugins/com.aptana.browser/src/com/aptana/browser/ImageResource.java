@@ -10,12 +10,15 @@
 package com.aptana.browser;
 
 import java.net.URL;
+import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
@@ -71,7 +74,8 @@ public final class ImageResource {
 			ImageDescriptor id = ImageDescriptor.createFromURL(url);
 			imageRegistry.put(key, id);
 		} catch (Exception e) {
-			BrowserPlugin.log("Error registering image " + key + " from " + partialURL, e); //$NON-NLS-1$ //$NON-NLS-2$
+			IdeLog.logError(BrowserPlugin.getDefault(),
+					MessageFormat.format("Error registering image {0} from {1}", key, partialURL), e); //$NON-NLS-1$
 		}
 	}
 
@@ -96,5 +100,4 @@ public final class ImageResource {
 		registerImage(IMG_DLCL_NAV_GO, URL_DLCL + "nav_go.gif"); //$NON-NLS-1$
 		registerImage(IMG_DLCL_NAV_HOME, URL_DLCL + "nav_home.gif"); //$NON-NLS-1$	
 	}
-
 }
