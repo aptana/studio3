@@ -47,7 +47,6 @@ public class BrowserPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		browserConfigManager = new BrowserConfigurationManager();
 	}
 
 	/*
@@ -75,8 +74,12 @@ public class BrowserPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static BrowserConfigurationManager getBrowserConfigurationManager()
+	public synchronized BrowserConfigurationManager getBrowserConfigurationManager()
 	{
-		return getDefault().browserConfigManager;
+		if (browserConfigManager == null)
+		{
+			browserConfigManager = new BrowserConfigurationManager();
+		}
+		return browserConfigManager;
 	}
 }

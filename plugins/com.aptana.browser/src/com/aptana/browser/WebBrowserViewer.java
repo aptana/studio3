@@ -256,8 +256,8 @@ public class WebBrowserViewer extends Composite {
 				});
 		menuManager.add(sizeMenuManager);
 
-		BrowserSizeCategory[] categories = BrowserPlugin
-				.getBrowserConfigurationManager().getSizeCategories();
+		BrowserSizeCategory[] categories = BrowserPlugin.getDefault().getBrowserConfigurationManager()
+				.getSizeCategories();
 		Arrays.sort(categories);
 		MenuManager categoryMenuManager;
 		BrowserSize[] sizes;
