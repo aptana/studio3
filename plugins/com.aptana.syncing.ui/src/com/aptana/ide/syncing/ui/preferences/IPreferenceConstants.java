@@ -94,16 +94,6 @@ public interface IPreferenceConstants
 	static final String SHOW_MODIFICATION_TIME = "SHOW_MODIFICATION_TIME"; //$NON-NLS-1$
 
 	/**
-	 * FILE_PERMISSION
-	 */
-	static final String FILE_PERMISSION = "FILE_PERMISSION"; //$NON-NLS-1$
-
-	/**
-	 * DIRECTORY_PERMISSION
-	 */
-	static final String DIRECTORY_PERMISSION = "DIRECTORY_PERMISSION"; //$NON-NLS-1$
-
-	/**
 	 * COMPARE_IN_BACKGROUND
 	 */
 	static final String COMPARE_IN_BACKGROUND = "COMPARE_IN_BACKGROUND"; //$NON-NLS-1$

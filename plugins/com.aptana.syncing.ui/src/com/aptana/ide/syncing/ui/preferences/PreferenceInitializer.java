@@ -21,7 +21,5 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(SyncingUIPlugin.PLUGIN_ID);
 		prefs.put(IPreferenceConstants.VIEW_MODE, IPreferenceConstants.VIEW_FLAT);
 		prefs.put(IPreferenceConstants.DIRECTION_MODE, IPreferenceConstants.DIRECTION_BOTH);
-		prefs.put(IPreferenceConstants.FILE_PERMISSION, "-rw-rw-rw-"); //$NON-NLS-1$
-		prefs.put(IPreferenceConstants.DIRECTORY_PERMISSION, "drwxrwxrwx"); //$NON-NLS-1$
 	}
 }
