@@ -261,40 +261,40 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 						first = new LinkedPosition(document, offsets[0] + start, length, sequenceNumber);
 					}
 
-				for (int j = 0; j != offsets.length; j++)
-				{
-					if (j == 0)
+					for (int j = 0; j != offsets.length; j++)
 					{
-						group.addPosition(first);
+						if (j == 0)
+						{
+							group.addPosition(first);
+						}
+						else
+						{
+							group.addPosition(new LinkedPosition(document, offsets[j] + start, length));
+						}
 					}
-					else
-					{
-						group.addPosition(new LinkedPosition(document, offsets[j] + start, length));
-					}
+
+					model.addGroup(group);
+					hasPositions = true;
 				}
 
-				model.addGroup(group);
-				hasPositions = true;
+				if (hasPositions)
+				{
+					model.forceInstall();
+					LinkedModeUI ui = new LinkedModeUI(model, viewer);
+
+					// Do not cycle
+					ui.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
+					ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
+					ui.enter();
+
+					fSelectedRegion = ui.getSelectedRegion();
+				}
+				else
+				{
+					ensurePositionCategoryRemoved(document);
+					fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
+				}
 			}
-
-			if (hasPositions)
-			{
-				model.forceInstall();
-				LinkedModeUI ui = new LinkedModeUI(model, viewer);
-
-				// Do not cycle
-				ui.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
-				ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
-				ui.enter();
-
-				fSelectedRegion = ui.getSelectedRegion();
-			}
-			else
-			{
-				ensurePositionCategoryRemoved(document);
-				fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
-			}
-
 		}
 		catch (BadLocationException e)
 		{
