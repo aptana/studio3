@@ -29,7 +29,9 @@ public class AllTests
 		suite = new ParallelTestSuite(AllTests.class.getName(), 2);
 		// }
 		// $JUnit-BEGIN$
+		suite.addTestSuite(SFTPConnectionPointTest.class);
 		suite.addTestSuite(SFTPConnectionTest.class);
+		suite.addTestSuite(FTPSConnectionPointTest.class);
 		// suite.addTestSuite(FTPSConnectionTest.class);
 		// suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
 		// suite.addTestSuite(ImplicitFTPSConnectionTest.class);
