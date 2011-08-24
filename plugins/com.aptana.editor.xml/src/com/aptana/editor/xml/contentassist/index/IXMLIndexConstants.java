@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.xml.contentassist.index;
 
-public interface XMLIndexConstants
+public interface IXMLIndexConstants
 {
 	// general constants
 	static final String DELIMITER = "\0"; //$NON-NLS-1$

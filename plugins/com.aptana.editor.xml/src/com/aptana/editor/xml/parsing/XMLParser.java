@@ -31,6 +31,7 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public class XMLParser implements IParser
 {
+	public static final XMLNode[] NO_XML_NODES = new XMLNode[0];
 	private XMLParserScanner fScanner;
 	private XMLAttributeScanner fAttributeScanner;
 	private Stack<IParseNode> fElementStack;
@@ -52,7 +53,7 @@ public class XMLParser implements IParser
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	protected void advance() throws IOException, Exception
+	protected void advance() throws Exception
 	{
 		fCurrentLexeme = fScanner.nextLexeme();
 	}
@@ -122,7 +123,7 @@ public class XMLParser implements IParser
 		// creates the root node
 		ParseRootNode root = new ParseRootNode( //
 				IXMLConstants.CONTENT_TYPE_XML, //
-				new XMLNode[0], //
+				NO_XML_NODES, //
 				startingOffset, //
 				startingOffset + source.length() - 1 //
 		);
@@ -183,7 +184,7 @@ public class XMLParser implements IParser
 		String name = null;
 		String value = null;
 
-		while (token.isEOF() == false)
+		while (!token.isEOF())
 		{
 			Object data = token.getData();
 

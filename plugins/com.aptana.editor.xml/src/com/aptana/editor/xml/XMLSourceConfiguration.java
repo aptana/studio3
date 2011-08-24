@@ -69,7 +69,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	private XMLSourceConfiguration() {
 	}
 
-	public static XMLSourceConfiguration getDefault() {
+	public synchronized static XMLSourceConfiguration getDefault()
+	{
 		if (instance == null) {
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 

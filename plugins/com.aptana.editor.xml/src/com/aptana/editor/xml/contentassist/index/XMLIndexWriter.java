@@ -61,7 +61,7 @@ public class XMLIndexWriter
 			attribute.getDescription(), //
 			"" // values //$NON-NLS-1$
 		};
-		String key = StringUtil.join(XMLIndexConstants.DELIMITER, columns);
+		String key = StringUtil.join(IXMLIndexConstants.DELIMITER, columns);
 
 		index.addEntry(this._keyProvider.getAttributeKey(), key, location);
 	}
@@ -88,10 +88,10 @@ public class XMLIndexWriter
 		String[] columns = new String[] { //
 		element.getName(), //
 			element.getDisplayName(), //
-			StringUtil.join(XMLIndexConstants.SUB_DELIMITER, element.getAttributes()), //
+			StringUtil.join(IXMLIndexConstants.SUB_DELIMITER, element.getAttributes()), //
 			element.getDescription() //
 		};
-		String key = StringUtil.join(XMLIndexConstants.DELIMITER, columns);
+		String key = StringUtil.join(IXMLIndexConstants.DELIMITER, columns);
 
 		index.addEntry(this._keyProvider.getElementKey(), key, location);
 	}

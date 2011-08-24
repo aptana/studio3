@@ -7,9 +7,7 @@
  */
 package com.aptana.editor.xml.contentassist;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 
 import com.aptana.editor.xml.contentassist.index.IKeyProvider;
@@ -66,17 +64,7 @@ public class XMLIndexQueryHelper
 	 */
 	public ElementElement getElement(String elementName)
 	{
-		ElementElement result = null;
-
-		try
-		{
-			result = this._reader.getElement(this.getIndex(), elementName);
-		}
-		catch (IOException e)
-		{
-		}
-
-		return result;
+		return this._reader.getElement(this.getIndex(), elementName);
 	}
 
 	/**
@@ -86,17 +74,7 @@ public class XMLIndexQueryHelper
 	 */
 	public List<ElementElement> getElements()
 	{
-		List<ElementElement> result = Collections.emptyList();
-
-		try
-		{
-			result = this._reader.getElements(this.getIndex());
-		}
-		catch (IOException e)
-		{
-		}
-
-		return result;
+		return this._reader.getElements(this.getIndex());
 	}
 
 	/**
