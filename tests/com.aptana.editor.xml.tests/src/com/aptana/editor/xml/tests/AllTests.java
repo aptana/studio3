@@ -10,6 +10,7 @@ package com.aptana.editor.xml.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.xml.OpenTagCloserTest;
 import com.aptana.editor.xml.TagUtilTest;
 import com.aptana.editor.xml.XMLEditorTest;
 import com.aptana.editor.xml.XMLPartitionScannerTest;
@@ -36,6 +37,7 @@ public class AllTests
 		suite.addTestSuite(XMLEditorTest.class);
 		suite.addTestSuite(XMLOutlineTest.class);
 		suite.addTestSuite(DTDTransformationTests.class);
+		suite.addTestSuite(OpenTagCloserTest.class);
 		// $JUnit-END$
 		return suite;
 	}

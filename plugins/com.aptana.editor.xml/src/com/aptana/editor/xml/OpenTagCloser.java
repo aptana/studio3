@@ -13,9 +13,12 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
+
+import com.aptana.core.logging.IdeLog;
 
 @SuppressWarnings("nls")
 public class OpenTagCloser implements VerifyKeyListener
@@ -67,12 +70,15 @@ public class OpenTagCloser implements VerifyKeyListener
 					else
 					{
 						// And we are closing an ERB/PHP tag, check to see if it's "?|>>", if so overwrite '>'
-						char d = document.getChar(offset + 1);
-						if (d == '>')
+						if (offset + 1 < document.getLength())
 						{
-							nextIsLessThan = true;
-							event.doit = false;
-							textViewer.setSelectedRange(offset + 1, 0);
+							char d = document.getChar(offset + 1);
+							if (d == '>')
+							{
+								nextIsLessThan = true;
+								event.doit = false;
+								textViewer.setSelectedRange(offset + 1, 0);
+							}
 						}
 					}
 				}
@@ -86,11 +92,15 @@ public class OpenTagCloser implements VerifyKeyListener
 
 			String openTag = getOpenTag(document, offset);
 			if (openTag == null || skipOpenTag(openTag))
+			{
 				return;
+			}
 
 			String closeTag = getMatchingCloseTag(openTag);
 			if (closeTag == null)
+			{
 				return;
+			}
 
 			final StringBuffer buffer = new StringBuffer();
 			// check if the char already exists next in doc! This is the special case of when we auto-paired the '<>' in
@@ -144,8 +154,54 @@ public class OpenTagCloser implements VerifyKeyListener
 	 */
 	protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
 	{
-		// FIXME What criteria do we use for XML?
-		return true;
+		// Only auto-close XML Tags
+		ITypedRegion partition = document.getDocumentPartitioner().getPartition(offset - 1);
+		if (partition != null)
+		{
+			if (!validPartition(partition))
+			{
+				return false;
+			}
+			try
+			{
+				int length = Math.min(partition.getLength(), offset - partition.getOffset());
+				String tagContents = document.get(partition.getOffset(), length);
+				return !inString(tagContents, length);
+			}
+			catch (BadLocationException e)
+			{
+				IdeLog.logError(XMLPlugin.getDefault(), e);
+			}
+		}
+		return false;
+	}
+
+	protected boolean validPartition(ITypedRegion partition)
+	{
+		return XMLSourceConfiguration.TAG.equals(partition.getType());
+	}
+
+	private boolean inString(String tagContents, int length)
+	{
+		boolean inString = false;
+		for (int i = 0; i < length; i++)
+		{
+			char c = tagContents.charAt(i);
+			switch (c)
+			{
+				case '\\':
+					i++; // skip next char
+					break;
+				case '\'':
+				case '"':
+					// FIXME Handle storing opening string char and only toggle this when it makes sense!
+					inString = !inString;
+					break;
+				default:
+					break;
+			}
+		}
+		return inString;
 	}
 
 	protected boolean skipOpenTag(String openTag)
@@ -155,65 +211,89 @@ public class OpenTagCloser implements VerifyKeyListener
 
 	private String getMatchingCloseTag(String openTag)
 	{
-
 		int index = openTag.indexOf(' ');
 		if (index == -1)
 		{
-			index = openTag.indexOf(">");
+			index = openTag.indexOf('>');
 		}
 		String closeTag = "</" + openTag.substring(1, index);
 		if (!closeTag.endsWith(">"))
+		{
 			closeTag += ">";
+		}
 		return closeTag;
 	}
 
 	private String getOpenTag(IDocument document, int offset) throws BadLocationException
 	{
-		// Read current tag, see if it's self-closing or has been closed later...
-		int start = offset - 1;
-		boolean foundFirstChar = false;
-		for (int i = offset - 1; i >= 0; i--)
+		ITypedRegion partition = document.getPartition(offset - 1);
+		int length = Math.min(partition.getLength(), offset - partition.getOffset());
+		String tagContents = document.get(partition.getOffset(), length);
+
+		// Find last '<' not in a string
+		int lessThanIndex = 0;
+		boolean inString = false;
+		for (int i = 0; i < length; i++)
 		{
-			char c = document.getChar(i);
-			if (c == '<')
+			char c = tagContents.charAt(i);
+			switch (c)
 			{
-				start = i;
-				break;
-			}
-			// if last non-WS char is slash, tag is closed
-			else if (!Character.isWhitespace(c) && !foundFirstChar)
-			{
-				if (c == '/')
-					return null;
-				foundFirstChar = true;
+				case '<':
+					if (!inString)
+					{
+						lessThanIndex = i;
+					}
+					break;
+				case '\\':
+					if (inString)
+					{
+						i++; // skip next char
+					}
+					break;
+				case '\'':
+				case '"':
+					// FIXME Handle storing opening string char and only toggle this when it makes sense!
+					inString = !inString;
+					break;
+				default:
+					break;
 			}
 		}
-		start++;
-		int length = offset - start;
-		if (length <= 0)
+		tagContents = tagContents.substring(lessThanIndex);
+
+		if (tagContents.length() > 0 && tagContents.charAt(0) == '<')
+		{
+			tagContents = tagContents.substring(1);
+		}
+		// If it ends in a slash, we probably can just return null because it's self-closed!
+		if (tagContents.length() > 0 && tagContents.charAt(tagContents.length() - 1) == '/')
+		{
 			return null;
-		String tagName = document.get(start, length).trim();
+		}
+		String tagName = tagContents.trim();
 		// Modify tag for some tag name checks
-		String toCheck = tagName;
-		int spaceIndex = toCheck.indexOf(' ');
+		int spaceIndex = tagName.indexOf(' ');
 		if (spaceIndex != -1)
 		{
-			toCheck = toCheck.substring(0, spaceIndex);
+			tagName = tagName.substring(0, spaceIndex);
 		}
+		String toCheck = tagName;
 		if (toCheck.endsWith(">"))
 		{
 			toCheck = toCheck.substring(0, toCheck.length() - 1);
 		}
-		if (toCheck.startsWith("/"))
+		// Don't close self-closing tags, or tags with no tag name in them
+		if (tagContents.length() == 0 || toCheck.charAt(0) == '/')
 		{
 			return null;
 		}
+		// Check to see if this tag type is one that self-closes by HTML definition based on doctype.
 		if (isEmptyTagType(document, toCheck))
 		{
 			return null;
 		}
 		// Return a not necessarily good tag. May contain attrs and an additional ">", but we rely on that later...
-		return "<" + tagName + ">";
+		return new String("<" + tagName + ">");
 	}
 
 	protected boolean isEmptyTagType(IDocument doc, String tagName)

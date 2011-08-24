@@ -7,6 +7,8 @@
  */
 package com.aptana.browser.internal;
 
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+
 import junit.framework.TestCase;
 
 import com.aptana.browser.BrowserPlugin;
@@ -52,6 +54,7 @@ public class BrowserConfigurationManagerTest extends TestCase
 		assertEquals("com.aptana.browser.tests.sizeCategory", testCategory.getId());
 		assertEquals("Test", testCategory.getName());
 		assertEquals(Byte.MAX_VALUE, testCategory.getOrder());
+		assertEquals("Test", testCategory.toString());
 		sizes = testCategory.getSizes();
 		assertEquals(1, sizes.length);
 
@@ -60,12 +63,20 @@ public class BrowserConfigurationManagerTest extends TestCase
 		assertEquals("iPhone Vertical", size.getName());
 		assertEquals(460, size.getHeight());
 		assertEquals(320, size.getWidth());
-		assertNotNull(size.getImage());
+		BrowserBackgroundImage browserImage = size.getImage();
+		assertEquals("com.aptana.browser.tests.backgroundImage.iphone.vertical", browserImage.getId());
+		assertEquals(35, browserImage.getHorizontalIndent());
+		assertEquals(150, browserImage.getVerticalIndent());
+		assertEquals("iPhone Vertical", size.toString());
+		assertTrue(browserImage.isBlackBackground());
+		assertEquals(AbstractUIPlugin.imageDescriptorFromPlugin("com.aptana.browser.tests", "images/iphone_ver.png"),
+				browserImage.getImageDescriptor());
 
 		BrowserSizeCategory orderedCategory = categories[3];
 		assertEquals("com.aptana.browser.tests.sizeCategory.ordered", orderedCategory.getId());
 		assertEquals("Ordered", orderedCategory.getName());
 		assertEquals(200, orderedCategory.getOrder());
+		assertTrue(orderedCategory.compareTo(testCategory) > 0);
 		sizes = orderedCategory.getSizes();
 		assertEquals(0, sizes.length);
 	}
