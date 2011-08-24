@@ -18,7 +18,7 @@ public class CommandTemplateTest extends TestCase
 	{
 		assertTrue(matches("j.u", "j.u"));
 	}
-	
+
 	/**
 	 * Test that we keep chopping down the prefix at whitespaces and non-letter/digits from beginning until we match.
 	 */
@@ -26,25 +26,35 @@ public class CommandTemplateTest extends TestCase
 	{
 		assertTrue(matches("j.u", "u"));
 	}
-	
+
 	public void testMatchesWhenTriggerStartsWithPrefix()
 	{
 		assertTrue(matches("echo", "echoh"));
 	}
-	
+
 	public void testMatchesWhenTriggerStartsWithPrefixSegment()
 	{
 		assertTrue(matches("<div>echo", "echoh"));
 	}
-	
+
 	public void testMatchesWithCaseDifferences()
 	{
 		assertTrue(matches("EcHo", "echo"));
 	}
-	
+
 	public void testMatchesWithCaseDifferencesAndTriggerStartsWithPrefix()
 	{
 		assertTrue(matches("EcHo", "echoh"));
+	}
+
+	public void testMatchesWithPrefixTriggerParen()
+	{
+		assertTrue(matches(")echo", "echo"));
+	}
+
+	public void testMatchesWithPrefixTriggerBracketColon()
+	{
+		assertTrue(matches("[:echo", "echo"));
 	}
 
 	private boolean matches(String prefix, String trigger)

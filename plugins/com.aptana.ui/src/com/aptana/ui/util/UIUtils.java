@@ -122,7 +122,15 @@ public final class UIUtils
 
 	public static IWorkbenchWindow getActiveWorkbenchWindow()
 	{
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		try
+		{
+			return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		}
+		catch (IllegalStateException e)
+		{
+			// Workbench has not been created yet
+			return null;
+		}
 	}
 
 	/**

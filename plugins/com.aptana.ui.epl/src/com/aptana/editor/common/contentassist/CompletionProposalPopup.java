@@ -1500,9 +1500,20 @@ public class CompletionProposalPopup implements IContentAssistListener
 					char[] triggers = t.getTriggerCharacters();
 					if (contains(triggers, key))
 					{
-						e.doit = false;
-						hide();
-						insertProposal(p, key, e.stateMask, fContentAssistSubjectControlAdapter.getSelectedRange().x);
+						// we do this inside the 'if' for performance reasons
+						boolean triggerEnabled = true;
+						if (p instanceof ICommonCompletionProposal)
+						{
+							triggerEnabled = ((ICommonCompletionProposal) p).validateTrigger(
+									fContentAssistSubjectControlAdapter.getDocument(), fFilterOffset, e);
+						}
+						if (triggerEnabled)
+						{
+							e.doit = false;
+							hide();
+							insertProposal(p, key, e.stateMask,
+									fContentAssistSubjectControlAdapter.getSelectedRange().x);
+						}
 					}
 				}
 		}

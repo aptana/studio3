@@ -34,7 +34,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 		bundleElement.setDisplayName("CommonProjectionViewerTest Unit Tests");
 
 		File file = File.createTempFile("snippet", "rb");
-		SnippetElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", "f", "function",
+		SnippetElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", "fun", "function",
 				"text __dftl_partition_content_type");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
@@ -53,8 +53,8 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 
 		// turn on snippet assistance
 		listener.setEnabled(true);
-		document.set("f");
-		VerifyEvent ve = createVerifyKeyEvent('\t', 9, 1);
+		document.set("fun");
+		VerifyEvent ve = createVerifyKeyEvent('\t', 9, 3);
 		listener.verifyKey(ve);
 
 		try
@@ -62,17 +62,27 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 			// doit == false means we've popped CA
 			assertFalse(ve.doit);
 
-			// reset document
-			document.set("f");
+			// reset document. Should not pop CA here as prefix is not == snippet
+			document.set("fu");
 
-			// turn off content assist
-			listener.setEnabled(false);
-
-			ve = createVerifyKeyEvent('\t', 9, 1);
+			ve = createVerifyKeyEvent('\t', 9, 2);
 			listener.verifyKey(ve);
 
 			// doit == true means we've not popped CA
 			assertTrue(ve.doit);
+
+			// reset document
+			document.set("fun");
+
+			// turn off content assist
+			listener.setEnabled(false);
+
+			ve = createVerifyKeyEvent('\t', 9, 3);
+			listener.verifyKey(ve);
+
+			// doit == true means we've not popped CA
+			assertTrue(ve.doit);
+
 		}
 		finally
 		{

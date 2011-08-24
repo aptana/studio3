@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
@@ -517,4 +518,14 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		return 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.contentassist.ICommonCompletionProposal#isTriggerEnabled(org.eclipse.jface.text.IDocument
+	 * , int)
+	 */
+	public boolean validateTrigger(IDocument document, int offset, KeyEvent keyEvent)
+	{
+		return true;
+	}
 }
