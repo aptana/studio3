@@ -314,7 +314,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		};
 
 		job.setSystem(true);
-		job.schedule();
+		job.schedule(100);
 	}
 
 	/*
