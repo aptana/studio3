@@ -25,7 +25,8 @@ public class XMLPlugin extends AbstractUIPlugin
 
 	private IDocumentProvider xmlDocumentProvider;
 
-	public XMLPlugin()
+	public XMLPlugin() // $codepro.audit.disable
+						// com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 	{
 	}
 
