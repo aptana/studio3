@@ -259,10 +259,17 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		return extractPrefixFromDocument(viewer.getDocument(), offset);
 	}
 
+	/**
+	 * Walk backwards through the document to find the first non-whitespace character.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
 	static String extractPrefixFromDocument(IDocument document, int offset)
 	{
 		if (offset > document.getLength())
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		int i = offset;
 		try
 		{
@@ -279,7 +286,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 		catch (BadLocationException e)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 	}
 
@@ -320,6 +327,13 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 	}
 
+	/**
+	 * Walks forward through the prefix until it hits something besides a letter or a number, and returns the remaining
+	 * substring. Note that substring may still have non letter-or-digits in it later on.
+	 * 
+	 * @param prefix
+	 * @return
+	 */
 	static String narrowPrefix(String prefix)
 	{
 		for (int i = 0; i < prefix.length(); i++)
@@ -330,7 +344,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				return prefix.substring(i + 1);
 			}
 		}
-		return ""; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 
 }

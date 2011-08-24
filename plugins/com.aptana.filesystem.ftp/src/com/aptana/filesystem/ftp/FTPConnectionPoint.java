@@ -46,7 +46,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	private String login = ""; //$NON-NLS-1$
 	private char[] password;
 	private boolean passiveMode = true;
-	private String transferType = IFTPConstants.TRANSFER_TYPE_BINARY;
+	private String transferType = IFTPConstants.TRANSFER_TYPE_AUTO;
 	private String encoding = IFTPConstants.ENCODING_DEFAULT;
 	private String timezone = null;
 
