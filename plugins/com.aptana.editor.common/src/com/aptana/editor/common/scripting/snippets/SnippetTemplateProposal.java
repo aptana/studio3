@@ -253,6 +253,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					}
 
 					if (proposals.length > 1)
+					{
 						first = new ProposalPosition(document, offsets[0] + start, length, sequenceNumber, proposals);
 					}
 					else
