@@ -7,4 +7,6 @@ Bundle-Vendor: Aptana
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.browser.tests
 Require-Bundle: org.junit,
- com.aptana.browser;visibility:=reexport
+ com.aptana.browser;visibility:=reexport,
+ org.eclipse.ui,
+ org.eclipse.core.runtime
