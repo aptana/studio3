@@ -127,6 +127,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	protected void doApply(final ITextViewer viewer, char trigger, int stateMask, final int offset)
 	{
 		IDocument document = viewer.getDocument();
+
 		try
 		{
 			fContext.setReadOnly(false);
@@ -306,6 +307,11 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		{
 			openErrorDialog(viewer.getTextWidget().getShell(), e);
 			fSelectedRegion = fRegion;
+		}
+
+		if (fSelectedRegion == null)
+		{
+			fSelectedRegion = fRegion; // default case
 		}
 	}
 
