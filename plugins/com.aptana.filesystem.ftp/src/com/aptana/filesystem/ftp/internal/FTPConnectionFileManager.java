@@ -1160,7 +1160,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			} catch (FTPException e) {
 				if (e.getReplyCode() == 501 || e.getReplyCode() == 502 || e.getReplyCode() == 504) {
 					statSupported = null;
-				} else if (e.getReplyCode() != 500) {
+				} else if (Boolean.TRUE.equals(statSupported) && e.getReplyCode() != 500 && e.getReplyCode() != 550) {
 					throwFileNotFound(e, dirPath);
 				}
 			}

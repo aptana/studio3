@@ -52,7 +52,7 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 	private boolean validateCertificate = true;
 	private boolean noSSLSessionResumption = false;
 	private boolean passiveMode = true;
-	private String transferType = IFTPSConstants.TRANSFER_TYPE_BINARY;
+	private String transferType = IFTPSConstants.TRANSFER_TYPE_AUTO;
 	private String encoding = IFTPSConstants.ENCODING_DEFAULT;
 	private String timezone = null;
 	

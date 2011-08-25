@@ -39,6 +39,7 @@ public class AllUtilTests
 		suite.addTestSuite(StreamUtilTest.class);
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(TimeZoneUtilTest.class);
+		suite.addTestSuite(URLEncoderTest.class);
 		suite.addTestSuite(URLUtilTest.class);
 		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(WriterOutputStreamTest.class);

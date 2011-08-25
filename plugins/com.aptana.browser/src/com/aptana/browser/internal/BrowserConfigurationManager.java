@@ -20,6 +20,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.browser.BrowserPlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 
 public class BrowserConfigurationManager
 {
@@ -94,18 +95,18 @@ public class BrowserConfigurationManager
 		if (ELEMENT_SIZE_CATEGORY.equals(name))
 		{
 			String categoryId = element.getAttribute(ATT_ID);
-			if (isEmpty(categoryId))
+			if (StringUtil.isEmpty(categoryId))
 			{
 				return;
 			}
 			String categoryName = element.getAttribute(ATT_NAME);
-			if (isEmpty(categoryName))
+			if (StringUtil.isEmpty(categoryName))
 			{
 				return;
 			}
 			int order = Byte.MAX_VALUE;
 			String orderStr = element.getAttribute(ATT_ORDER);
-			if (!isEmpty(orderStr))
+			if (!StringUtil.isEmpty(orderStr))
 			{
 				try
 				{
@@ -121,12 +122,12 @@ public class BrowserConfigurationManager
 		else if (ELEMENT_BACKGROUND_IMAGE.equals(name))
 		{
 			String imageId = element.getAttribute(ATT_ID);
-			if (isEmpty(imageId))
+			if (StringUtil.isEmpty(imageId))
 			{
 				return;
 			}
 			String imagePath = element.getAttribute(ATT_PATH);
-			if (isEmpty(imagePath))
+			if (StringUtil.isEmpty(imagePath))
 			{
 				return;
 			}
@@ -160,7 +161,7 @@ public class BrowserConfigurationManager
 			}
 			boolean blackBackground = false;
 			String bgcolor = element.getAttribute(ATT_BG_COLOR);
-			if (!isEmpty(bgcolor))
+			if (!StringUtil.isEmpty(bgcolor))
 			{
 				blackBackground = Boolean.parseBoolean(bgcolor);
 			}
@@ -170,12 +171,12 @@ public class BrowserConfigurationManager
 		else if (ELEMENT_SIZE.equals(element.getName()))
 		{
 			String sizeName = element.getAttribute(ATT_NAME);
-			if (isEmpty(sizeName))
+			if (StringUtil.isEmpty(sizeName))
 			{
 				return;
 			}
 			String widthStr = element.getAttribute(ATT_WIDTH);
-			if (isEmpty(widthStr))
+			if (StringUtil.isEmpty(widthStr))
 			{
 				return;
 			}
@@ -193,7 +194,7 @@ public class BrowserConfigurationManager
 				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			String heightStr = element.getAttribute(ATT_HEIGHT);
-			if (isEmpty(heightStr))
+			if (StringUtil.isEmpty(heightStr))
 			{
 				return;
 			}
@@ -211,7 +212,7 @@ public class BrowserConfigurationManager
 				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			String categoryId = element.getAttribute(ATT_CATEGORY);
-			if (isEmpty(categoryId))
+			if (StringUtil.isEmpty(categoryId))
 			{
 				categoryId = ""; //$NON-NLS-1$
 			}
@@ -233,10 +234,5 @@ public class BrowserConfigurationManager
 			sizes.add(size);
 			category.addSize(size);
 		}
-	}
-
-	private static boolean isEmpty(String text)
-	{
-		return text == null || text.trim().length() == 0;
 	}
 }

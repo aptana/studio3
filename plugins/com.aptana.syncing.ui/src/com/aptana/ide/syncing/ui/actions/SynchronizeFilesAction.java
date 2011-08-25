@@ -43,7 +43,7 @@ public class SynchronizeFilesAction extends BaseSyncAction
 				{
 					IFileStore[] fileStores = SyncUtils.getFileStores(files);
 					ConnectionPointSyncPair cpsp = new ConnectionPointSyncPair(source, dest);
-					SmartSyncDialog dialog = new SmartSyncDialog(getShell(), cpsp, fileStores);
+					SmartSyncDialog dialog = new SmartSyncDialog(getShell(), cpsp, fileStores, null);
 					dialog.open();
 					dialog.setHandler(new SyncEventHandlerAdapter()
 					{

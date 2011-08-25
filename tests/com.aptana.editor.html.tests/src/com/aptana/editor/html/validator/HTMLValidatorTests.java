@@ -125,14 +125,15 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		IResource file = project.createFile("parseErrorTest", source);
 
 		FileService fileService = new FileService(language, ps);
+		IValidationManager validationManager = fileService.getValidationManager();
+		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
+		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
+
 		fileService.setDocument(new Document(source));
 		fileService.setResource(file);
 		fileService.parse(new NullProgressMonitor());
 		fileService.validate();
 
-		IValidationManager validationManager = fileService.getValidationManager();
-		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
-		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
 		List<IValidationItem> items = validationManager.getValidationItems();
 
 		project.delete();

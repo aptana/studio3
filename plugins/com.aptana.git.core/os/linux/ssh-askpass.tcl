@@ -78,7 +78,7 @@ proc onno {} {
 
 wm title . "SSH"
 wm focusmodel . active
-wm attributes . -topmost 1
+#wm attributes . -topmost 1
 if {!$yesno} {
 	focus -force .r.edit
 } else {

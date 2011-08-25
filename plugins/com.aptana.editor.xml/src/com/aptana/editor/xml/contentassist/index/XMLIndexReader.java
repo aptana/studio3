@@ -37,16 +37,16 @@ public class XMLIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	private ElementElement createElementFromKey(Index index, String key) throws IOException
+	private ElementElement createElementFromKey(Index index, String key)
 	{
-		String[] columns = key.split(XMLIndexConstants.DELIMITER);
+		String[] columns = key.split(IXMLIndexConstants.DELIMITER);
 		ElementElement element = new ElementElement();
 		int column = 0;
 
 		element.setName(columns[column++]);
 		element.setDisplayName(columns[column++]);
 
-		for (String attribute : columns[column++].split(XMLIndexConstants.SUB_DELIMITER))
+		for (String attribute : columns[column++].split(IXMLIndexConstants.SUB_DELIMITER))
 		{
 			element.addAttribute(attribute);
 		}
@@ -67,9 +67,9 @@ public class XMLIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public ElementElement getElement(Index index, String name) throws IOException
+	public ElementElement getElement(Index index, String name)
 	{
-		String searchKey = name + XMLIndexConstants.DELIMITER;
+		String searchKey = name + IXMLIndexConstants.DELIMITER;
 		List<QueryResult> items = index.query(new String[] { this._keyProvider.getElementKey() }, searchKey, SearchPattern.PREFIX_MATCH);
 		ElementElement result = null;
 
@@ -94,7 +94,7 @@ public class XMLIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<ElementElement> getElements(Index index) throws IOException
+	public List<ElementElement> getElements(Index index)
 	{
 		List<QueryResult> items = index.query(new String[] { this._keyProvider.getElementKey() }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
 		List<ElementElement> result = new LinkedList<ElementElement>();

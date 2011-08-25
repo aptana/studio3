@@ -7,7 +7,9 @@
  */
 package com.aptana.editor.common.contentassist;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Image;
 
 public interface ICommonCompletionProposal extends ICompletionProposal, Comparable<ICompletionProposal>
@@ -91,4 +93,15 @@ public interface ICommonCompletionProposal extends ICompletionProposal, Comparab
 	 * @deprecated Use setRelevance instead
 	 */
 	void setIsSuggestedSelection(boolean isSuggested);
+
+	/**
+	 * Does the current offset support the usage of trigger characters?
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param keyEvent
+	 *            The trigger character
+	 * @return
+	 */
+	boolean validateTrigger(IDocument document, int offset, KeyEvent keyEvent);
 }

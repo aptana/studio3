@@ -224,26 +224,27 @@ public class TagUtil
 	 */
 	public static String getTagName(String openTag)
 	{
-		if (openTag.startsWith("<")) //$NON-NLS-1$
+		String result = openTag;
+		if (result.length() > 0 && result.charAt(0) == '<')
 		{
-			openTag = openTag.substring(1);
+			result = result.substring(1);
 		}
-		if (openTag.startsWith("/")) //$NON-NLS-1$
+		if (result.length() > 0 && result.charAt(0) == '/')
 		{
-			openTag = openTag.substring(1);
+			result = result.substring(1);
 		}
-		int index = openTag.indexOf(">"); //$NON-NLS-1$
+		int index = result.indexOf('>');
 		if (index != -1)
 		{
-			openTag = openTag.substring(0, index);
+			result = result.substring(0, index);
 		}
-		openTag = openTag.trim();
-		int spaceIndex = openTag.indexOf(' ');
+		result = result.trim();
+		int spaceIndex = result.indexOf(' ');
 		if (spaceIndex != -1)
 		{
-			openTag = openTag.substring(0, spaceIndex);
+			result = result.substring(0, spaceIndex);
 		}
-		return openTag;
+		return result;
 	}
 
 	/**
@@ -254,7 +255,7 @@ public class TagUtil
 	 */
 	public static boolean isStartTag(String source)
 	{
-		return source.startsWith("<") && !source.startsWith("</"); //$NON-NLS-1$ //$NON-NLS-2$ 
+		return (source.length() > 0 && source.charAt(0) == '<') && !isEndTag(source);
 	}
 
 	/**
