@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.secureftp.tests;
+package com.aptana.filesystem.secureftp;
 
 import junit.framework.TestCase;
 
@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.filesystem.ftp.IFTPConstants;
-import com.aptana.filesystem.secureftp.ISFTPConstants;
-import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 
 /**
  * @author Max Stepanov
@@ -26,18 +24,6 @@ import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 @SuppressWarnings("nls")
 public class SFTPConnectionPointTest extends TestCase {
 
-	private static final class ConnectionPoint extends SFTPConnectionPoint {
-		@Override
-		public void loadState(IMemento memento) {
-			super.loadState(memento);
-		}
-
-		@Override
-		public void saveState(IMemento memento) {
-			super.saveState(memento);
-		}
-	}
-	
 	private static final String name = "My SFTP Site";
 	private static final String host = "127.0.0.1";
 	private static final int port = 2222;
@@ -72,7 +58,7 @@ public class SFTPConnectionPointTest extends TestCase {
 	}
 
 	private static void createAndTestConnectionPoint(String name, String host, int port, String login, char[] password, IPath path, String encoding, String compression, IPath keyFilePath, String transferType) {
-		ConnectionPoint cp = new ConnectionPoint();
+		SFTPConnectionPoint cp = new SFTPConnectionPoint();
 		cp.setName(name);
 		cp.setHost(host);
 		cp.setPort(port);
@@ -88,7 +74,7 @@ public class SFTPConnectionPointTest extends TestCase {
 		IMemento memento = root.createChild("item");
 		cp.saveState(memento);
 		
-		cp = new ConnectionPoint();
+		cp = new SFTPConnectionPoint();
 		cp.loadState(memento);
 		assertEquals("Name doesn't match", name, cp.getName());
 		assertEquals("Host doesn't match", host, cp.getHost());

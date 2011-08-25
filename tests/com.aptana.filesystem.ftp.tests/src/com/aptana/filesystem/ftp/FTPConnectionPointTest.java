@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.ftp.tests;
+package com.aptana.filesystem.ftp;
 
 import junit.framework.TestCase;
 
@@ -15,8 +15,6 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
-import com.aptana.filesystem.ftp.FTPConnectionPoint;
-import com.aptana.filesystem.ftp.IFTPConstants;
 
 /**
  * @author Max Stepanov
@@ -24,18 +22,6 @@ import com.aptana.filesystem.ftp.IFTPConstants;
  */
 @SuppressWarnings("nls")
 public class FTPConnectionPointTest extends TestCase {
-
-	private static final class ConnectionPoint extends FTPConnectionPoint {
-		@Override
-		public void loadState(IMemento memento) {
-			super.loadState(memento);
-		}
-
-		@Override
-		public void saveState(IMemento memento) {
-			super.saveState(memento);
-		}
-	}
 	
 	private static final String name = "My FTP Site";
 	private static final String host = "127.0.0.1";
@@ -65,7 +51,7 @@ public class FTPConnectionPointTest extends TestCase {
 	}
 	
 	private static void createAndTestConnectionPoint(String name, String host, int port, String login, char[] password, IPath path, String encoding, boolean passiveMode, String timezone, String transferType) {
-		ConnectionPoint cp = new ConnectionPoint();
+		FTPConnectionPoint cp = new FTPConnectionPoint();
 		cp.setName(name);
 		cp.setHost(host);
 		cp.setPort(port);
@@ -81,7 +67,7 @@ public class FTPConnectionPointTest extends TestCase {
 		IMemento memento = root.createChild("item");
 		cp.saveState(memento);
 		
-		cp = new ConnectionPoint();
+		cp = new FTPConnectionPoint();
 		cp.loadState(memento);
 		assertEquals("Name doesn't match", name, cp.getName());
 		assertEquals("Host doesn't match", host, cp.getHost());

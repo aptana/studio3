@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.secureftp.tests;
+package com.aptana.filesystem.secureftp;
 
 import junit.framework.TestCase;
 
@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.filesystem.ftp.IFTPConstants;
-import com.aptana.filesystem.secureftp.FTPSConnectionPoint;
-import com.aptana.filesystem.secureftp.IFTPSConstants;
 
 /**
  * @author Max Stepanov
@@ -26,18 +24,6 @@ import com.aptana.filesystem.secureftp.IFTPSConstants;
 @SuppressWarnings("nls")
 public class FTPSConnectionPointTest extends TestCase {
 
-	private static final class ConnectionPoint extends FTPSConnectionPoint {
-		@Override
-		public void loadState(IMemento memento) {
-			super.loadState(memento);
-		}
-
-		@Override
-		public void saveState(IMemento memento) {
-			super.saveState(memento);
-		}
-	}
-	
 	private static final String name = "My FTPS Site";
 	private static final String host = "127.0.0.1";
 	private static final int port = 2222;
@@ -84,19 +70,19 @@ public class FTPSConnectionPointTest extends TestCase {
 	}
 
 	public void testExplicitModeDefaultPort() {
-		ConnectionPoint cp = new ConnectionPoint();
+		FTPSConnectionPoint cp = new FTPSConnectionPoint();
 		cp.setExplicit(true);
 		assertEquals("Default explicit port doesn't match", IFTPSConstants.FTP_PORT_DEFAULT, cp.getPort());
 	}
 
 	public void testImplicitModeDefaultPort() {
-		ConnectionPoint cp = new ConnectionPoint();
+		FTPSConnectionPoint cp = new FTPSConnectionPoint();
 		cp.setExplicit(false);
 		assertEquals("Default implicit port doesn't match", IFTPSConstants.FTPS_IMPLICIT_PORT, cp.getPort());
 	}
 
 	private static void createAndTestConnectionPoint(String name, String host, int port, String login, char[] password, IPath path, String encoding, boolean passiveMode, String timezone, String transferType, boolean explicit, boolean noSSLSessionResumption, boolean validateCertificate) {
-		ConnectionPoint cp = new ConnectionPoint();
+		FTPSConnectionPoint cp = new FTPSConnectionPoint();
 		cp.setName(name);
 		cp.setHost(host);
 		cp.setPort(port);
@@ -115,7 +101,7 @@ public class FTPSConnectionPointTest extends TestCase {
 		IMemento memento = root.createChild("item");
 		cp.saveState(memento);
 		
-		cp = new ConnectionPoint();
+		cp = new FTPSConnectionPoint();
 		cp.loadState(memento);
 		assertEquals("Name doesn't match", name, cp.getName());
 		assertEquals("Host doesn't match", host, cp.getHost());
