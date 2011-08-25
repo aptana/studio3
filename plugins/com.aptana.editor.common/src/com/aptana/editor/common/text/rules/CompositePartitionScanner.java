@@ -198,6 +198,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (token != null) {
 			return token;
 		}
+		fPartitionOffset = -1;
 
 		return baseNextToken();
 	}

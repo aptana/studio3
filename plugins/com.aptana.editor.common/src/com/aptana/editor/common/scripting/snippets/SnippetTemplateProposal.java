@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -41,25 +40,21 @@ import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.internal.editors.text.EditorsPlugin;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
-import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
-import com.aptana.ui.util.UIUtils;
+import com.aptana.editor.common.util.EditorUtil;
 
 @SuppressWarnings("restriction")
 public class SnippetTemplateProposal extends TemplateProposal implements ICommonCompletionProposal,
 		ICompletionProposalExtension6, Comparable<ICompletionProposal>
 {
-	private static final int DEFAULT_SPACE_INDENT_SIZE = 2;
-
 	protected ICompletionProposal[] templateProposals;
 	protected char triggerChar;
 	protected char[] triggerChars;
@@ -93,7 +88,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		fContext = context;
 		fRegion = region;
 		fTemplate.getContextTypeId();
-		getSpaceIndentSize();
+		EditorUtil.getSpaceIndentSize();
 
 	}
 
@@ -132,6 +127,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	protected void doApply(final ITextViewer viewer, char trigger, int stateMask, final int offset)
 	{
 		IDocument document = viewer.getDocument();
+
 		try
 		{
 			fContext.setReadOnly(false);
@@ -260,7 +256,8 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					if (proposals.length > 1)
 					{
 						first = new ProposalPosition(document, offsets[0] + start, length, sequenceNumber, proposals);
-					} else
+					}
+					else
 					{
 						first = new LinkedPosition(document, offsets[0] + start, length, sequenceNumber);
 					}
@@ -312,6 +309,11 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 			openErrorDialog(viewer.getTextWidget().getShell(), e);
 			fSelectedRegion = fRegion;
 		}
+
+		if (fSelectedRegion == null)
+		{
+			fSelectedRegion = fRegion; // default case
+		}
 	}
 
 	/*
@@ -327,7 +329,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 			if (offset >= replaceOffset)
 			{
 				String content = document.get(replaceOffset, offset - replaceOffset);
-				return fTemplate.getName().toLowerCase().startsWith(content.toLowerCase());
+				return fTemplate.getName().startsWith(content);
 			}
 		}
 		catch (BadLocationException e)
@@ -389,6 +391,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	protected String conformIndents(String prefix, String indentedPattern)
 	{
 		boolean useTabs = prefix.contains("\t"); //$NON-NLS-1$
+		int indentSize = EditorUtil.getSpaceIndentSize();
 
 		Pattern p = Pattern.compile("(\r\n|\r|\n)(\\s*)"); //$NON-NLS-1$
 		Matcher m = p.matcher(indentedPattern);
@@ -398,46 +401,13 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		{
 			builder.append(indentedPattern.substring(startIndex, m.start(1)));
 			startIndex = m.end(2);
-			String indent = convertIndent(m.group(2), useTabs);
+			String indent = EditorUtil.convertIndent(m.group(2), indentSize, useTabs);
 			builder.append(m.group(1));
 			builder.append(indent);
 		}
 		builder.append(indentedPattern.substring(startIndex));
 		indentedPattern = builder.toString();
 		return indentedPattern;
-	}
-
-	private String convertIndent(String indent, boolean useTabs)
-	{
-		if (useTabs && indent.contains(" ")) //$NON-NLS-1$
-		{
-			int i;
-			String newIndent = ""; //$NON-NLS-1$
-			int spacesCount = indent.replaceAll("\t", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
-			// Add tabs based on previous number of tabs, and total number of spaces (if they can be converted to the
-			// tab equivalent)
-			for (i = 0; i < (indent.length() - spacesCount) + (spacesCount / getSpaceIndentSize()); i++)
-			{
-				newIndent += '\t';
-			}
-			// Add back remaining spaces
-			for (i = 0; i < spacesCount % getSpaceIndentSize(); i++)
-			{
-				newIndent += ' ';
-			}
-			return newIndent;
-		}
-		if (!useTabs && indent.contains("\t")) //$NON-NLS-1$
-		{
-			String newIndent = ""; //$NON-NLS-1$
-			int tabCount = indent.replaceAll(" ", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
-			for (int i = 0; i < (indent.length() - tabCount) + (tabCount * getSpaceIndentSize()); i++)
-			{
-				newIndent += " "; //$NON-NLS-1$
-			}
-			return newIndent;
-		}
-		return indent;
 	}
 
 	private void ensurePositionCategoryInstalled(final IDocument document, LinkedModeModel model)
@@ -506,26 +476,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		return buffer.getString().length();
 	}
 
-	private int getSpaceIndentSize()
-	{
-		int spaceIndentSize;
-
-		// Check the preferences of the active editor
-		spaceIndentSize = Platform.getPreferencesService().getInt(UIUtils.getActiveEditor().getSite().getId(),
-				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 0, null);
-
-		if (spaceIndentSize == 0)
-		{
-			// Fall back on CommonEditorPlugin or EditorsPlugin values if none are set for current editor
-			spaceIndentSize = new ChainedPreferenceStore(new IPreferenceStore[] {
-					CommonEditorPlugin.getDefault().getPreferenceStore(),
-					EditorsPlugin.getDefault().getPreferenceStore() })
-					.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-		}
-
-		return (spaceIndentSize != 0) ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
-	}
-
 	private void openErrorDialog(Shell shell, Exception e)
 	{
 		MessageDialog.openError(shell, Messages.SnippetTemplateProposal_TITLE_SnippetTemplateProposalError,
@@ -591,7 +541,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		return super.getTemplate();
 	}
 
-	void setTriggerChar(char triggerChar)
+	public void setTriggerChar(char triggerChar)
 	{
 		this.triggerChar = triggerChar;
 	}
@@ -734,6 +684,30 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	public void setRelevance(int relevance)
 	{
 		fRelevance = relevance;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.contentassist.ICommonCompletionProposal#isTriggerEnabled(org.eclipse.jface.text.IDocument
+	 * , int)
+	 */
+	public boolean validateTrigger(IDocument document, int offset, KeyEvent keyEvent)
+	{
+		try
+		{
+			int replaceOffset = getReplaceOffset(document, fTemplate);
+			if (offset >= replaceOffset)
+			{
+				String content = document.get(replaceOffset, offset - replaceOffset);
+				return fTemplate.getName().equals(content);
+			}
+		}
+		catch (BadLocationException e)
+		{
+			// concurrent modification - ignore
+		}
+		return false;
 	}
 
 }

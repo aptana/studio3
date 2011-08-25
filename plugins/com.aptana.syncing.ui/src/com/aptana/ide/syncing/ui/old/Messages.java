@@ -16,7 +16,6 @@ public final class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.ui.old.messages"; //$NON-NLS-1$
 
-
 	public static String SyncingConsole_UnableToWriteToConsole;
 	public static String SyncingConsole_AptanaSyncingConsole;
 	public static String SyncingConsole_ErrorClosingStream;

@@ -17,51 +17,59 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
-public class SiteSourceDecorator implements ILightweightLabelDecorator {
+public class SiteSourceDecorator implements ILightweightLabelDecorator
+{
 
-    private static final ImageDescriptor IMAGE = SyncingUIPlugin
-            .getImageDescriptor("icons/full/obj16/sync_decorator.gif"); //$NON-NLS-1$
+	private static final ImageDescriptor IMAGE = SyncingUIPlugin
+			.getImageDescriptor("icons/full/obj16/sync_decorator.gif"); //$NON-NLS-1$
 
-    /**
-     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object,
-     *      org.eclipse.jface.viewers.IDecoration)
-     */
-    public void decorate(Object element, IDecoration decoration) {
-    	if (element instanceof IAdaptable) {
+	/**
+	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object,
+	 *      org.eclipse.jface.viewers.IDecoration)
+	 */
+	public void decorate(Object element, IDecoration decoration)
+	{
+		if (element instanceof IAdaptable)
+		{
 			ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource((IAdaptable) element, true);
-			if (sites.length > 0) {
+			if (sites.length > 0)
+			{
 				addDecoration(decoration);
 			}
-    	}
-    }
+		}
+	}
 
-    /**
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-     */
-    public void addListener(ILabelProviderListener listener) {
-    }
+	/**
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 */
+	public void addListener(ILabelProviderListener listener)
+	{
+	}
 
-    /**
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-     */
-    public void dispose() {
-    }
+	/**
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+	 */
+	public void dispose()
+	{
+	}
 
-    /**
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
-     *      java.lang.String)
-     */
-    public boolean isLabelProperty(Object element, String property) {
-        return false;
-    }
+	/**
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
+	 */
+	public boolean isLabelProperty(Object element, String property)
+	{
+		return false;
+	}
 
-    /**
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-     */
-    public void removeListener(ILabelProviderListener listener) {
-    }
+	/**
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 */
+	public void removeListener(ILabelProviderListener listener)
+	{
+	}
 
-    protected void addDecoration(IDecoration decoration) {
-        decoration.addOverlay(IMAGE);
-    }
+	protected void addDecoration(IDecoration decoration)
+	{
+		decoration.addOverlay(IMAGE);
+	}
 }

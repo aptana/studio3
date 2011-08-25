@@ -53,9 +53,13 @@ public class SnippetTemplateProposalTest extends TestCase
 		DocumentSnippetTemplateContext tc = new DocumentSnippetTemplateContext(new SnippetTemplateContextType("scope"),
 				document, 0, 9);
 		SnippetTemplateProposal p = new SnippetTemplateProposal(template, tc, new Region(0, 0), null, 0);
-		p.apply(viewer, '\t', 0, 9);
+
+		// Make sure the snippet validates
+		DocumentEvent event = new DocumentEvent(document, 9, 0, "");
+		assertTrue("Snippet proposal incorrectly failed validation!", p.validate(document, 9, event));
 
 		// Now make sure the snippet got applied correctly
+		p.apply(viewer, '\t', 0, 9);
 		assertEquals("<div>Yahoo!\n", document.get());
 		context.assertIsSatisfied();
 	}
@@ -100,4 +104,74 @@ public class SnippetTemplateProposalTest extends TestCase
 		assertEquals("$(selector).add('selector')", document.get());
 		context.assertIsSatisfied();
 	}
+
+	public void testDoublePrefix()
+	{
+		Mockery context = new Mockery()
+		{
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+		// Create the snippet we want to apply
+		SnippetElement se = new SnippetElement("/some/fake/path.rb");
+		se.setDisplayName(".add");
+		se.setExpansion(".add('selector')");
+		SnippetTemplate template = new SnippetTemplate(se, ".add", "source.js");
+
+		// Set up the document we're operating on
+		final IDocument document = new Document("$(selector).add.add");
+		final ITextViewer viewer = context.mock(ITextViewer.class);
+
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(viewer).getDocument();
+				will(returnValue(document));
+			}
+		});
+
+		// Create snippet proposal, then apply it to the document
+		DocumentSnippetTemplateContext tc = new DocumentSnippetTemplateContext(new SnippetTemplateContextType(
+				"source.js"), document, 0, 19);
+		SnippetTemplateProposal p = new SnippetTemplateProposal(template, tc, new Region(0, 19), null, 0);
+
+		// FIXME not working yet
+		// // Make sure the snippet validates
+		// DocumentEvent event = new DocumentEvent(document, 19, 0, "");
+		// assertTrue("Snippet proposal incorrectly failed validation!", p.validate(document, 19, event));
+		//
+		// // Now make sure the snippet gets applied correctly. This is what TM would insert
+		// p.apply(viewer, '\t', 0, 19);
+		// assertEquals("$(selector).add.add('selector')", document.get());
+		// context.assertIsSatisfied();
+
+		// also consider case of two snippets with activation characters b.a and .a. in TM, b.a wins.
+	}
+
+	public void testIsTriggerEnabled()
+	{
+		// Create the snippet we want to apply
+		SnippetElement se = new SnippetElement("");
+		se.setDisplayName("something");
+		se.setExpansion("Yahoo!");
+		SnippetTemplate template = new SnippetTemplate(se, "echo", "whatever");
+
+		// Set up the document we're operating on
+		final IDocument document = new Document("<div>ech\n");
+
+		// Create snippet proposal, then apply it to the document
+		DocumentSnippetTemplateContext tc = new DocumentSnippetTemplateContext(new SnippetTemplateContextType("scope"),
+				document, 0, 8);
+		SnippetTemplateProposal p = new SnippetTemplateProposal(template, tc, new Region(0, 0), null, 0);
+		assertFalse(p.validateTrigger(document, 8, null));
+
+		document.set("<div>echoo\n");
+		assertFalse(p.validateTrigger(document, 10, null));
+
+		document.set("<div>echo\n");
+		assertTrue(p.validateTrigger(document, 9, null));
+
+	}
+
 }

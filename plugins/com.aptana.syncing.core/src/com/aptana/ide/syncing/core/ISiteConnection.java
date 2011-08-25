@@ -15,15 +15,16 @@ import com.aptana.ide.core.io.IConnectionPoint;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface ISiteConnection extends IAdaptable {
+public interface ISiteConnection extends IAdaptable
+{
 
 	public String getName();
 
 	public IConnectionPoint getSource();
+
 	public IConnectionPoint getDestination();
-	
+
 	public boolean excludes(IPath path);
 
 	/**
@@ -46,5 +47,5 @@ public interface ISiteConnection extends IAdaptable {
 	 * @param name
 	 */
 	public void setName(String name);
-	
+
 }

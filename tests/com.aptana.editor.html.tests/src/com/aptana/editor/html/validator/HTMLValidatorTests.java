@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.html.validator;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -20,7 +18,7 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.ValidationManager;
+import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -120,15 +118,14 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 				item.getMessage());
 	}
 
+	@Override
 	protected List<IValidationItem> getParseErrors(String source, String language, IParseState ps) throws CoreException
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		TestProject project = new TestProject("Test", new String[] { "com.aptana.projects.webnature" });
-		final IResource file = project.createFile("parseErrorTest", source);
+		IResource file = project.createFile("parseErrorTest", source);
 
 		FileService fileService = new FileService(language, ps);
-		ValidationManager validationManager = (ValidationManager) fileService.getValidationManager();
-
+		IValidationManager validationManager = fileService.getValidationManager();
 		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
 		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
 
@@ -137,15 +134,9 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		fileService.parse(new NullProgressMonitor());
 		fileService.validate();
 
-		Collection<List<IValidationItem>> validationLists = validationManager.getValidationItems();
-
-		for (List<IValidationItem> list : validationLists)
-		{
-			items.addAll(list);
-		}
+		List<IValidationItem> items = validationManager.getValidationItems();
 
 		project.delete();
 		return items;
 	}
-
 }

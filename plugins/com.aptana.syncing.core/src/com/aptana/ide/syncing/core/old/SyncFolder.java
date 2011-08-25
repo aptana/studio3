@@ -260,8 +260,7 @@ public class SyncFolder implements ISyncResource
 	}
 
 	/**
-	 * True if this folder is empty, meaning it doesn't contain any files and
-	 * all folders are empty as well
+	 * True if this folder is empty, meaning it doesn't contain any files and all folders are empty as well
 	 * 
 	 * @return - true if empty
 	 */
@@ -324,8 +323,7 @@ public class SyncFolder implements ISyncResource
 	}
 
 	/**
-	 * Gets the non empty members directly under this resources consisting of
-	 * files and non empty folders
+	 * Gets the non empty members directly under this resources consisting of files and non empty folders
 	 * 
 	 * @return - resources
 	 */
@@ -396,8 +394,7 @@ public class SyncFolder implements ISyncResource
 	}
 
 	/**
-	 * Sets this folder as skipped but with the option of not propogating to all
-	 * children
+	 * Sets this folder as skipped but with the option of not propogating to all children
 	 * 
 	 * @param skipped
 	 * @param propogate

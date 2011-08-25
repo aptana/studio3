@@ -317,6 +317,14 @@ public class CopyFilesOperation
 		try
 		{
 			SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
+			// copy the children recursively
+			IFileStore[] childStores = sourceStore.childStores(EFS.NONE, monitor);
+			IFileStore destChildStore;
+			for (IFileStore childStore : childStores)
+			{
+				destChildStore = destinationStore.getChild(childStore.getName());
+				copyFile(childStore, destChildStore, monitor);
+			}
 		}
 		catch (CoreException e)
 		{

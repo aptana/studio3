@@ -84,4 +84,9 @@ public interface IValidationManager
 	 */
 	public void addParseErrors(List<IValidationItem> items, String language);
 
+	/**
+	 * @return the list of validation items
+	 */
+	public List<IValidationItem> getValidationItems();
+
 }

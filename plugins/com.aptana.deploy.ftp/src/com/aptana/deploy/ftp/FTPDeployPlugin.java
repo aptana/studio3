@@ -14,13 +14,13 @@ import org.osgi.framework.BundleContext;
 public class FTPDeployPlugin extends AbstractUIPlugin
 {
 
-	private static final String PLUGIN_ID = "com.aptana.deploy.ftp"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.deploy.ftp"; //$NON-NLS-1$
 
 	private static FTPDeployPlugin instance;
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext bundleContext) throws Exception
 	{
@@ -30,17 +30,12 @@ public class FTPDeployPlugin extends AbstractUIPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception
 	{
 		instance = null;
 		super.stop(bundleContext);
-	}
-
-	public static String getPluginIdentifier()
-	{
-		return PLUGIN_ID;
 	}
 
 	public static FTPDeployPlugin getDefault()

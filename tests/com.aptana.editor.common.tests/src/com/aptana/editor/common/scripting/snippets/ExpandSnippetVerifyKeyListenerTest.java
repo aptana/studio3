@@ -7,7 +7,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.events.VerifyEvent;
-import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -19,13 +18,32 @@ import com.aptana.scripting.model.SnippetElement;
 public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 {
 
-	@Test
-	public void testExpandSnippetVerifyKeyListener()
+	public void assertVerifyKeySpace() throws IOException
 	{
+		// try sending a space, nothing should happen
+		assertVerifyKey("", "fun", ' ', true, false);
 	}
 
-	@Test
-	public void testVerifyKey() throws IOException
+	public void assertVerifyKeyFunctionListenerOn() throws IOException
+	{
+		// full prefix, should pop CA
+		assertVerifyKey("fun", "fun", '\t', true, false);
+	}
+
+	public void assertVerifyKeyFunctionListenerOff() throws IOException
+	{
+		// full prefix, listener off, should not pop CA
+		assertVerifyKey("fun", "fun", '\t', false, false);
+	}
+
+	public void assertVerifyKeyFunctionIncorrectPrefix() throws IOException
+	{
+		// Should not pop CA here as prefix is not == snippet
+		assertVerifyKey("fu", "fun", '\t', true, true);
+	}
+
+	public void assertVerifyKey(String documentSource, String snippetTrigger, char typedChar, boolean listenerEnabled,
+			boolean expectedOutcome) throws IOException
 	{
 		File bundleFile = File.createTempFile("common_projection_viewer_unit_tests", "rb");
 		bundleFile.deleteOnExit();
@@ -34,12 +52,12 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 		bundleElement.setDisplayName("CommonProjectionViewerTest Unit Tests");
 
 		File file = File.createTempFile("snippet", "rb");
-		SnippetElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", "f", "function",
+		SnippetElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", snippetTrigger, "",
 				"text __dftl_partition_content_type");
 		bundleElement.addChild(se);
 		BundleManager.getInstance().addBundle(bundleElement);
 
-		IFileStore fileStore = createFileStore("proposal_tests", "txt", "");
+		IFileStore fileStore = createFileStore("proposal_tests", "txt", documentSource);
 		this.setupTestContext(fileStore);
 
 		ITextViewer viewer = (ITextViewer) editor.getAdapter(ITextOperationTarget.class);
@@ -48,51 +66,22 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 		ExpandSnippetVerifyKeyListener listener = new ExpandSnippetVerifyKeyListener(editor, viewer,
 				snipContentAssistant);
 
-		// test sending something besides a \t
-		listener.verifyKey(createVerifyKeyEvent(' ', 32, 1));
+		// modify snippet assistance
+		listener.setEnabled(listenerEnabled);
 
-		// turn on snippet assistance
-		listener.setEnabled(true);
-		document.set("f");
-		VerifyEvent ve = createVerifyKeyEvent('\t', 9, 1);
+		// test sending event
+		VerifyEvent ve = createVerifyKeyEvent(typedChar, (int) typedChar, document.getLength());
 		listener.verifyKey(ve);
 
+		// doit == false means we've popped CA
 		try
 		{
-			// doit == false means we've popped CA
-			assertFalse(ve.doit);
-
-			// reset document
-			document.set("f");
-
-			// turn off content assist
-			listener.setEnabled(false);
-
-			ve = createVerifyKeyEvent('\t', 9, 1);
-			listener.verifyKey(ve);
-
-			// doit == true means we've not popped CA
-			assertTrue(ve.doit);
+			assertEquals(expectedOutcome, ve.doit);
 		}
 		finally
 		{
 			BundleManager.getInstance().unloadScript(file);
 		}
-	}
-
-	@Test
-	public void testHasMatchingSnippet()
-	{
-	}
-
-	@Test
-	public void testSetEnabled()
-	{
-	}
-
-	@Test
-	public void testGetDocumentScopeManager()
-	{
 	}
 
 	/*

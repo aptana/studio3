@@ -22,6 +22,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -70,12 +71,94 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final String DOCTYPE_PRECEDING_TEXT = "!"; //$NON-NLS-1$
+
+	private static final class URIPathProposal extends CommonCompletionProposal
+	{
+		private final boolean isDirectory;
+
+		private URIPathProposal(String replacementString, int replacementOffset, int replacementLength,
+				boolean isDirectory, Image[] userAgentIcons)
+		{
+			super(replacementString, replacementOffset, replacementLength, replacementString.length(), null,
+					replacementString, null, null);
+			this.isDirectory = isDirectory;
+			if (isDirectory)
+			{
+				setTriggerCharacters(new char[] { '/' });
+			}
+			setUserAgentImages(userAgentIcons);
+		}
+
+		@Override
+		public synchronized Image getImage()
+		{
+			if (_image == null)
+			{
+				Image image = null;
+				if (isDirectory)
+				{
+					image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+				}
+				else
+				{
+					// Try to get image based on filename.
+					ImageDescriptor imageDesc = PlatformUI.getWorkbench().getEditorRegistry()
+							.getImageDescriptor(getDisplayString());
+					if (imageDesc != null)
+					{
+						image = imageDesc.createImage();
+						final Image theImage = image;
+						UIUtils.getDisplay().disposeExec(new Runnable()
+						{
+
+							public void run()
+							{
+								if (theImage != null && !theImage.isDisposed())
+								{
+									theImage.dispose();
+								}
+							}
+						});
+					}
+					// fallback to generic file image
+					if (image == null)
+					{
+						image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+					}
+				}
+				_image = image;
+			}
+			return _image;
+		}
+
+		@Override
+		public void apply(final ITextViewer viewer, char trigger, int stateMask, int offset)
+		{
+			super.apply(viewer, trigger, stateMask, offset);
+			// HACK pop CA back up if user selected a folder, but do it on a delay so that the folder
+			// proposal insertion can finish properly (like updating selection/offset)
+			if (viewer instanceof ITextOperationTarget && isDirectory)
+			{
+				UIUtils.getDisplay().asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						if (((ITextOperationTarget) viewer).canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS))
+						{
+							((ITextOperationTarget) viewer).doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+						}
+					}
+				});
+			}
+		}
+	}
 
 	/**
 	 * LocationType
@@ -381,7 +464,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	protected List<ICompletionProposal> addURIPathProposals(int offset)
 	{
 		this._replaceRange = null;
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 
 		try
 		{
@@ -493,7 +575,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					baseStore = editorStore.getParent();
 				}
 			}
-			if (baseStore == null)
+			// For performance reasons, bail early before we start trying to list the children if we're not even able to
+			// get children of this URI type
+			if (baseStore == null || !efsFileSystemCanGrabChildren(baseStore.toURI().getScheme()))
+			{
+				return Collections.emptyList();
+			}
+
+			// Should we hit remote URIs to try and suggest children paths?
+			boolean hitRemote = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
+					IPreferenceConstants.HTML_REMOTE_HREF_PROPOSALS,
+					IPreferenceConstants.DEFAULT_REMOTE_HREF_PROPOSALS_VALUE, null);
+			if (!hitRemote && isRemoteURI(baseStore))
 			{
 				return Collections.emptyList();
 			}
@@ -519,96 +612,108 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 			this._replaceRange = new Range(offset, this._currentLexeme.getEndingOffset() - 1);
 
-			// Then we grab the filestore pointing to the parent and ask for the children!
-			Image[] userAgentIcons = this.getAllUserAgentIcons();
-			for (IFileStore f : baseStore.childStores(EFS.NONE, new NullProgressMonitor()))
-			{
-				String name = f.getName();
-				// Don't include the current file in the list
-				if (name.charAt(0) == '.' || f.toURI().equals(editorStoreURI))
-				{
-					continue;
-				}
-				if (valuePrefix != null && valuePrefix.length() > 0 && !name.startsWith(valuePrefix))
-				{
-					continue;
-				}
-
-				// Grab images based on whether it's a dir or not. For files can we determine if it matches some
-				// content type and grab the icon for that?
-				Image image = null;
-				IFileInfo info = f.fetchInfo();
-				boolean isDir = false;
-				if (info.isDirectory())
-				{
-					isDir = true;
-					name = name + '/'; // $codepro.audit.disable stringConcatenationInLoop
-					image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-				}
-				else
-				{
-					ImageDescriptor imageDesc = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(name);
-					if (imageDesc != null)
-					{
-						image = imageDesc.createImage();
-					}
-					if (image == null)
-					{
-						image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
-					}
-				}
-
-				// build proposal
-				int replaceOffset = offset;
-				int replaceLength = 0;
-				if (this._replaceRange != null)
-				{
-					replaceOffset = this._replaceRange.getStartingOffset();
-					replaceLength = this._replaceRange.getLength();
-				}
-				final boolean isDirectory = isDir;
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, replaceOffset, replaceLength,
-						name.length(), image, name, null, null)
-				{
-					@Override
-					public void apply(final ITextViewer viewer, char trigger, int stateMask, int offset)
-					{
-						super.apply(viewer, trigger, stateMask, offset);
-						// HACK pop CA back up if user selected a folder, but do it on a delay so that the folder
-						// proposal insertion can finish properly (like updating selection/offset)
-						if (viewer instanceof ITextOperationTarget && isDirectory)
-						{
-							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-							{
-								public void run()
-								{
-									if (((ITextOperationTarget) viewer)
-											.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS))
-									{
-										((ITextOperationTarget) viewer)
-												.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
-									}
-								}
-							});
-						}
-					}
-				};
-				if (isDirectory)
-				{
-					proposal.setTriggerCharacters(new char[] { '/' });
-				}
-				proposal.setUserAgentImages(userAgentIcons);
-
-				proposals.add(proposal);
-
-			}
+			return suggestChildrenOfFileStore(offset, valuePrefix, editorStoreURI, baseStore);
 		}
 		catch (CoreException e)
 		{
 			IdeLog.logError(HTMLPlugin.getDefault(), e);
 		}
 
+		return Collections.emptyList();
+	}
+
+	/**
+	 * @param offset
+	 * @param valuePrefix
+	 * @param editorStoreURI
+	 *            The URI of the current file. We use this to eliminate it from list of possible completions.
+	 * @param parent
+	 *            The parent we're grabbing children for.
+	 * @return
+	 * @throws CoreException
+	 */
+	protected List<ICompletionProposal> suggestChildrenOfFileStore(int offset, String valuePrefix, URI editorStoreURI,
+			IFileStore parent) throws CoreException
+	{
+		IFileStore[] children = parent.childStores(EFS.NONE, new NullProgressMonitor());
+		if (children == null || children.length == 0)
+		{
+			return Collections.emptyList();
+		}
+
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		Image[] userAgentIcons = this.getAllUserAgentIcons();
+		for (IFileStore f : children)
+		{
+			String name = f.getName();
+			// Don't include the current file in the list
+			// FIXME this is a possible perf issue. We really only need to check for editor store on local URIs
+			if (name.charAt(0) == '.' || f.toURI().equals(editorStoreURI))
+			{
+				continue;
+			}
+			if (valuePrefix != null && valuePrefix.length() > 0 && !name.startsWith(valuePrefix))
+			{
+				continue;
+			}
+
+			IFileInfo info = f.fetchInfo();
+			boolean isDir = false;
+			if (info.isDirectory())
+			{
+				isDir = true;
+				name = name + '/'; // $codepro.audit.disable stringConcatenationInLoop
+			}
+
+			// build proposal
+			int replaceOffset = offset;
+			int replaceLength = 0;
+			if (this._replaceRange != null)
+			{
+				replaceOffset = this._replaceRange.getStartingOffset();
+				replaceLength = this._replaceRange.getLength();
+			}
+			CommonCompletionProposal proposal = new URIPathProposal(name, replaceOffset, replaceLength, isDir,
+					userAgentIcons);
+			proposals.add(proposal);
+		}
 		return proposals;
+	}
+
+	/**
+	 * Make a best guess as to whether the IFileStore is local or remote. Should be local for LocalFile and
+	 * WorkspaceFile.
+	 * 
+	 * @param baseStore
+	 * @return
+	 */
+	private boolean isRemoteURI(IFileStore baseStore)
+	{
+		try
+		{
+			return baseStore.toLocalFile(EFS.NONE, new NullProgressMonitor()) == null;
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
+		}
+		return true;
+	}
+
+	/**
+	 * For performance reasons, this query method is used to exit early before offering herf/src path proposals based on
+	 * a base URI. Specifically we don't try to suggest any for http/https since we can't grab the list of children.
+	 * 
+	 * @param scheme
+	 * @return
+	 */
+	protected boolean efsFileSystemCanGrabChildren(String scheme)
+	{
+		if (scheme == null)
+		{
+			return false;
+		}
+		return !("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**

@@ -12,6 +12,9 @@ import junit.framework.TestSuite;
 
 import org.kohsuke.junit.ParallelTestSuite;
 
+import com.aptana.filesystem.secureftp.FTPSConnectionPointTest;
+import com.aptana.filesystem.secureftp.SFTPConnectionPointTest;
+
 public class AllTests
 {
 
@@ -29,7 +32,9 @@ public class AllTests
 		suite = new ParallelTestSuite(AllTests.class.getName(), 2);
 		// }
 		// $JUnit-BEGIN$
+		suite.addTestSuite(SFTPConnectionPointTest.class);
 		suite.addTestSuite(SFTPConnectionTest.class);
+		suite.addTestSuite(FTPSConnectionPointTest.class);
 		// suite.addTestSuite(FTPSConnectionTest.class);
 		// suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
 		// suite.addTestSuite(ImplicitFTPSConnectionTest.class);

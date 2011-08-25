@@ -113,7 +113,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			{
 				for (String trigger : triggers)
 				{
-					if (trigger != null && trigger.startsWith(prefix))
+					if (trigger != null && trigger.equals(prefix))
 					{
 						return true;
 					}

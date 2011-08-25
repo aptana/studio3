@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.xml.parsing;
 
-import java.io.IOException;
-
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -16,6 +14,8 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 import com.aptana.parsing.lexer.Lexeme;
 
@@ -109,7 +109,7 @@ public class XMLParserScanner implements ITokenScanner
 	/**
 	 * nextLexeme
 	 */
-	public Lexeme<XMLTokenType> nextLexeme() throws IOException, Exception
+	public Lexeme<XMLTokenType> nextLexeme() throws Exception
 	{
 		IToken token = fTokenScanner.nextToken();
 		Object data = token.getData();
@@ -137,7 +137,7 @@ public class XMLParserScanner implements ITokenScanner
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			IdeLog.logError(XMLPlugin.getDefault(), e.getMessage(), e);
 		}
 
 		return Token.UNDEFINED;

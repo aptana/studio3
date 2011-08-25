@@ -8,9 +8,11 @@
 package com.aptana.core.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
 
 public class FileUtil
@@ -31,6 +33,28 @@ public class FileUtil
 			return false;
 		}
 		return ExecutableUtil.isExecutable(Path.fromOSString(directory.getAbsolutePath()));
+	}
+
+	/**
+	 * Returns true if the given file is symlink
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean isSymlink(File file) throws IOException
+	{
+		Assert.isLegal(file != null);
+		File canonical;
+		if (file.getParent() == null)
+		{
+			canonical = file;
+		}
+		else
+		{
+			File canonicalDir = file.getParentFile().getCanonicalFile();
+			canonical = new File(canonicalDir, file.getName());
+		}
+		return !canonical.getCanonicalFile().equals(canonical.getAbsoluteFile());
 	}
 
 	/**

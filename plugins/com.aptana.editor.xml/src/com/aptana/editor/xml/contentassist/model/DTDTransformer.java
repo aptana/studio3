@@ -47,7 +47,7 @@ public class DTDTransformer
 		{
 			String elementName = node.getName();
 
-			if (this._elementMap.containsKey(elementName) == false)
+			if (!this._elementMap.containsKey(elementName))
 			{
 				ElementElement element = new ElementElement();
 

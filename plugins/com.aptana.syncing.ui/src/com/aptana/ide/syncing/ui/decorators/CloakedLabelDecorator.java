@@ -24,50 +24,60 @@ import com.aptana.ide.ui.io.Utils;
  * 
  * @author Michael Xia (mxia@aptana.com)
  */
-public class CloakedLabelDecorator implements ILightweightLabelDecorator {
+public class CloakedLabelDecorator implements ILightweightLabelDecorator
+{
 
-    private static final ImageDescriptor IMAGE = SyncingUIPlugin
-            .getImageDescriptor("icons/full/obj16/cloaked_decorator.gif"); //$NON-NLS-1$
+	private static final ImageDescriptor IMAGE = SyncingUIPlugin
+			.getImageDescriptor("icons/full/obj16/cloaked_decorator.gif"); //$NON-NLS-1$
 
-    /**
-     * The default implementation is to add the decorator to all objects. The
-     * subclass should override.
-     */
-    public void decorate(Object element, IDecoration decoration) {
-        if (!(element instanceof IAdaptable)) {
-            return;
-        }
-
-        IAdaptable adaptable = (IAdaptable) element;
-		// only shows the cloak decorator when the element is associated with a sync connection as a source or
-		// destination
-		if (SiteConnectionUtils.findSitesForSource(adaptable).length == 0
-				&& SiteConnectionUtils.findSitesWithDestination(adaptable).length == 0) {
+	/**
+	 * The default implementation is to add the decorator to all objects. The subclass should override.
+	 */
+	public void decorate(Object element, IDecoration decoration)
+	{
+		if (!(element instanceof IAdaptable))
+		{
 			return;
 		}
 
-        IFileStore fileStore = Utils.getFileStore(adaptable);
-        if (fileStore != null) {
-            if (CloakingUtils.isFileCloaked(fileStore)) {
-                addDecoration(decoration);
-            }
-        }
-    }
+		IAdaptable adaptable = (IAdaptable) element;
+		// only shows the cloak decorator when the element is associated with a sync connection as a source or
+		// destination
+		if (SiteConnectionUtils.findSitesForSource(adaptable).length == 0
+				&& SiteConnectionUtils.findSitesWithDestination(adaptable).length == 0)
+		{
+			return;
+		}
 
-    public void addListener(ILabelProviderListener listener) {
-    }
+		IFileStore fileStore = Utils.getFileStore(adaptable);
+		if (fileStore != null)
+		{
+			if (CloakingUtils.isFileCloaked(fileStore))
+			{
+				addDecoration(decoration);
+			}
+		}
+	}
 
-    public void dispose() {
-    }
+	public void addListener(ILabelProviderListener listener)
+	{
+	}
 
-    public boolean isLabelProperty(Object element, String property) {
-        return false;
-    }
+	public void dispose()
+	{
+	}
 
-    public void removeListener(ILabelProviderListener listener) {
-    }
+	public boolean isLabelProperty(Object element, String property)
+	{
+		return false;
+	}
 
-    protected void addDecoration(IDecoration decoration) {
-        decoration.addOverlay(IMAGE);
-    }
+	public void removeListener(ILabelProviderListener listener)
+	{
+	}
+
+	protected void addDecoration(IDecoration decoration)
+	{
+		decoration.addOverlay(IMAGE);
+	}
 }

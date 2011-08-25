@@ -19,6 +19,8 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPropertyListener;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -43,6 +45,17 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
+		fEditor.addPropertyListener(new IPropertyListener()
+		{
+
+			public void propertyChanged(Object source, int propId)
+			{
+				if (propId == IEditorPart.PROP_INPUT)
+				{
+					reconcile(false, true);
+				}
+			}
+		});
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -156,9 +169,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile)
 	{
+		reconcile(initialReconcile, false);
+	}
+
+	private void reconcile(boolean initialReconcile, boolean force)
+	{
 		FileService fileService = fEditor.getFileService();
 		// doing a full parse at the moment
-		if (fileService.parse(fMonitor))
+		if (force || fileService.parse(fMonitor))
 		{
 			// only do folding and validation when the source was changed
 			if (fEditor.isFoldingEnabled())

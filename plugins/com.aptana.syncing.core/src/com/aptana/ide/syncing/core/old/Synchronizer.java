@@ -753,6 +753,8 @@ public class Synchronizer implements ILoggable
 				final IFileStore clientFile = item.getSourceFile();
 				final IFileStore serverFile = item.getDestinationFile();
 
+				setSyncItemDirection(item, false, true);
+
 				SubMonitor childMonitor = subMonitor.newChild(1);
 				childMonitor.setTaskName(getSyncStatus(item));
 
@@ -760,8 +762,6 @@ public class Synchronizer implements ILoggable
 				{
 					final IFileInfo clientFileInfo = item.getSourceFileInfo();
 					final IFileInfo serverFileInfo = item.getDestinationFileInfo();
-
-					setSyncItemDirection(item, false, false);
 
 					// fire event
 					if (!syncEvent(item, i, totalItems, childMonitor))
@@ -973,6 +973,8 @@ public class Synchronizer implements ILoggable
 				final IFileStore clientFile = item.getSourceFile();
 				final IFileStore serverFile = item.getDestinationFile();
 
+				setSyncItemDirection(item, false, true);
+
 				SubMonitor childMonitor = subMonitor.newChild(1);
 				childMonitor.setTaskName(getSyncStatus(item));
 
@@ -980,8 +982,6 @@ public class Synchronizer implements ILoggable
 				{
 					final IFileInfo clientFileInfo = item.getSourceFileInfo(childMonitor);
 					final IFileInfo serverFileInfo = item.getDestinationFileInfo(childMonitor);
-
-					setSyncItemDirection(item, false, true);
 
 					// fire event
 					if (!syncEvent(item, i, totalItems, childMonitor))
@@ -1313,6 +1313,8 @@ public class Synchronizer implements ILoggable
 				final IFileStore clientFile = item.getSourceFile();
 				final IFileStore serverFile = item.getDestinationFile();
 
+				setSyncItemDirection(item, false, true);
+
 				SubMonitor childMonitor = subMonitor.newChild(1);
 				childMonitor.setTaskName(getSyncStatus(item));
 
@@ -1320,8 +1322,6 @@ public class Synchronizer implements ILoggable
 				{
 					final IFileInfo clientFileInfo = item.getSourceFileInfo(childMonitor);
 					final IFileInfo serverFileInfo = item.getDestinationFileInfo(childMonitor);
-
-					setSyncItemDirection(item, true, false);
 
 					// fire event
 					if (!syncEvent(item, i, totalItems, childMonitor))

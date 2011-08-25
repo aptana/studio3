@@ -19,6 +19,7 @@ public class Messages extends NLS
 	public static String HTMLPreferencePage_LBL_Description;
 	public static String HTMLPreferencePage_LBL_TagAttributes;
 	public static String HTMLPreferencePage_OutlineGroup;
+	public static String HTMLPreferencePage_TraverseRemoteURIsForPathAssistLabel;
 
 	static
 	{

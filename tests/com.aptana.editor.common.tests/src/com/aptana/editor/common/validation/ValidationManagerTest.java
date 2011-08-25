@@ -8,7 +8,6 @@
 package com.aptana.editor.common.validation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -25,6 +24,7 @@ import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.ValidationManager;
+import com.aptana.editor.common.validator.ValidatorLanguage;
 import com.aptana.parsing.ParseState;
 
 public class ValidationManagerTest extends AbstractValidatorTestCase
@@ -41,7 +41,6 @@ public class ValidationManagerTest extends AbstractValidatorTestCase
 		}
 		catch (IllegalArgumentException ex)
 		{
-
 		}
 	}
 
@@ -75,24 +74,17 @@ public class ValidationManagerTest extends AbstractValidatorTestCase
 
 		setEnableParseError(true, JS_LANGUAGE);
 
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		TestProject project = new TestProject("Test", new String[] { "com.aptana.projects.webnature" });
-		final IResource file = project.createFile("parseErrorTest", text);
+		IResource file = project.createFile("parseErrorTest", text);
 
 		FileService fileService = new FileService(JS_LANGUAGE, new ParseState());
-
 		fileService.setDocument(null);
 		fileService.setResource(file);
 		fileService.parse(new NullProgressMonitor());
 		fileService.validate();
 
-		ValidationManager validationManager = (ValidationManager) fileService.getValidationManager();
-		Collection<List<IValidationItem>> validationLists = validationManager.getValidationItems();
-
-		for (List<IValidationItem> list : validationLists)
-		{
-			items.addAll(list);
-		}
+		IValidationManager validationManager = fileService.getValidationManager();
+		List<IValidationItem> items = validationManager.getValidationItems();
 
 		project.delete();
 
@@ -127,9 +119,17 @@ public class ValidationManagerTest extends AbstractValidatorTestCase
 		assertTrue(ValidationManager.hasErrorOrWarningOnLine(items, 3));
 	}
 
+	public void testValidatorLanguage()
+	{
+		String name = "JSLint Validator";
+		ValidatorLanguage language = new ValidatorLanguage(JS_LANGUAGE, name);
+
+		assertEquals(JS_LANGUAGE, language.getType());
+		assertEquals(name, language.getName());
+	}
+
 	private static String getFilterExpressionsPrefKey(String language)
 	{
 		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
 	}
-
 }

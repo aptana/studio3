@@ -9,7 +9,7 @@ package com.aptana.editor.html;
 
 import junit.framework.TestCase;
 
-import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextViewer;
@@ -32,18 +32,14 @@ public class HTMLOpenTagCloserTest extends TestCase
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		Shell shell = display.getActiveShell();
 		if (shell == null)
-			shell = new Shell(display);
-		viewer = new TextViewer(shell, SWT.NONE);
-		closer = new HTMLOpenTagCloser(viewer)
 		{
-			protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
-			{
-				return true;
-			};
-		};
+			shell = new Shell(display);
+		}
+		viewer = new TextViewer(shell, SWT.NONE);
+		closer = new HTMLOpenTagCloser(viewer);
 	}
 
-	public void testDoesntCloseIfIsClosingTag()
+	public void testDoesntCloseIfIsClosingTag() throws Exception
 	{
 		IDocument document = setDocument("</p");
 		VerifyEvent event = createGreaterThanKeyEvent(3);
@@ -54,7 +50,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
-	public void testCloseOpenTag()
+	public void testCloseOpenTag() throws Exception
 	{
 		IDocument document = setDocument("<p");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -64,7 +60,27 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
-	public void testDoesntCloseIfNextTagIsClosingTag()
+	public void testCloseOpenScriptTag() throws Exception
+	{
+		IDocument document = setDocument("<script");
+		VerifyEvent event = createGreaterThanKeyEvent(7);
+		closer.verifyKey(event);
+
+		assertEquals("<script></script>", document.get());
+		assertFalse(event.doit);
+	}
+
+	public void testCloseOpenStyleTag() throws Exception
+	{
+		IDocument document = setDocument("<style");
+		VerifyEvent event = createGreaterThanKeyEvent(6);
+		closer.verifyKey(event);
+
+		assertEquals("<style></style>", document.get());
+		assertFalse(event.doit);
+	}
+
+	public void testDoesntCloseIfNextTagIsClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<p </p>");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -75,7 +91,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
-	public void testDoesCloseIfNextTagIsNotClosingTag()
+	public void testDoesCloseIfNextTagIsNotClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<p <div></div>");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -86,7 +102,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesntCloseIfClosedLater()
+	public void testDoesntCloseIfClosedLater() throws Exception
 	{
 		IDocument document = setDocument("<p <b></b></p>");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -96,7 +112,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
-	public void testDoesCloseIfNotClosedButPairFollows()
+	public void testDoesCloseIfNotClosedButPairFollows() throws Exception
 	{
 		IDocument document = setDocument("<p <b></b><p></p>");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -107,7 +123,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesCloseIfNextCharIsLessThanAndWeNeedToClose()
+	public void testDoesCloseIfNextCharIsLessThanAndWeNeedToClose() throws Exception
 	{
 		IDocument document = setDocument("<p>");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -118,7 +134,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose()
+	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose() throws Exception
 	{
 		IDocument document = setDocument("<a href=\"\">");
 		VerifyEvent event = createGreaterThanKeyEvent(10);
@@ -129,7 +145,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(11, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesntCloseIfNextCharIsLessThanAndWeDontNeedToCloseButOverwritesExistingLessThan()
+	public void testDoesntCloseIfNextCharIsLessThanAndWeDontNeedToCloseButOverwritesExistingLessThan() throws Exception
 	{
 		IDocument document = setDocument("<p></p>");
 		VerifyEvent event = createGreaterThanKeyEvent(2);
@@ -140,7 +156,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesntCloseImplicitSelfClosingTag()
+	public void testDoesntCloseImplicitSelfClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<br");
 		VerifyEvent event = createGreaterThanKeyEvent(4);
@@ -150,7 +166,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
-	public void testDoesntCloseExplicitSelfClosingTag()
+	public void testDoesntCloseExplicitSelfClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<br/");
 		VerifyEvent event = createGreaterThanKeyEvent(4);
@@ -161,7 +177,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(4, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesntCloseExplicitSelfClosingTagWithExtraSpaces()
+	public void testDoesntCloseExplicitSelfClosingTagWithExtraSpaces() throws Exception
 	{
 		IDocument document = setDocument("<br /");
 		VerifyEvent event = createGreaterThanKeyEvent(5);
@@ -171,7 +187,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
-	public void testDoesntCloseComments()
+	public void testDoesntCloseComments() throws Exception
 	{
 		IDocument document = setDocument("<!-- ");
 		VerifyEvent event = createGreaterThanKeyEvent(5);
@@ -182,7 +198,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 	}
 
 	// test for http://jira.appcelerator.org/browse/TISTUD-270
-	public void testTISTUD_270()
+	public void testTISTUD_270() throws Exception
 	{
 		IDocument document = setDocument("<p><span</p>");
 		VerifyEvent event = createGreaterThanKeyEvent(8);
@@ -193,7 +209,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 	}
 
 	// https://aptana.lighthouseapp.com/projects/35272/tickets/1592-cursor-moves-back-one-column-when-auto-inserting-closing-tag-in-html
-	public void testDoesStickCursorBetweenAutoClosedTagPair()
+	public void testDoesStickCursorBetweenAutoClosedTagPair() throws Exception
 	{
 		IDocument document = setDocument("<html>");
 		VerifyEvent event = createGreaterThanKeyEvent(6);
@@ -205,7 +221,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(6, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag()
+	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag() throws Exception
 	{
 		IDocument document = setDocument("<script src=\"http://example.org/src.js\">\n\n</script>");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
@@ -216,7 +232,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals(40, viewer.getSelectedRange().x);
 	}
 
-	public void testOverwritesExistingGreaterThanAtEndOfPHPTag()
+	public void testOverwritesExistingGreaterThanAtEndOfPHPTag() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>>");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
@@ -226,7 +242,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertFalse(event.doit);
 	}
 
-	public void testDoesntOverwriteExistingGreaterThanIfPHPTagIsClosedButHTMLIsnt() throws BadLocationException
+	public void testDoesntOverwriteExistingGreaterThanIfPHPTagIsClosedButHTMLIsnt() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?>");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
@@ -239,7 +255,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals("<input type='text' name='foo' <?=$blah?>>", document.get());
 	}
 
-	public void testWhatever() throws BadLocationException
+	public void testWhatever() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah? >");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
@@ -252,7 +268,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertEquals("<input type='text' name='foo' <?=$blah?> >", document.get());
 	}
 
-	public void testWhatever2() throws BadLocationException
+	public void testWhatever2() throws Exception
 	{
 		IDocument document = setDocument("<input type='text' name='foo' <?=$blah?");
 		VerifyEvent event = createGreaterThanKeyEvent(39);
@@ -277,10 +293,19 @@ public class HTMLOpenTagCloserTest extends TestCase
 		return new VerifyEvent(e);
 	}
 
-	protected IDocument setDocument(String string)
+	protected IDocument setDocument(String string) throws CoreException
 	{
-		IDocument document = new Document(string);
+		final IDocument document = new Document(string);
 		viewer.setDocument(document);
+		HTMLDocumentProvider provider = new HTMLDocumentProvider()
+		{
+			@Override
+			public IDocument getDocument(Object element)
+			{
+				return document;
+			}
+		};
+		provider.connect(document);
 		return document;
 	}
 }

@@ -21,53 +21,62 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 /**
- * Contains a list of available sites that have the specific project as the
- * source.
+ * Contains a list of available sites that have the specific project as the source.
  * 
  * @author Michael Xia (mxia@aptana.com)
  */
-public class ProjectSiteConnections extends PlatformObject implements IWorkbenchAdapter {
+public class ProjectSiteConnections extends PlatformObject implements IWorkbenchAdapter
+{
 
-    private static ImageDescriptor IMAGE_DESCRIPTOR = SyncingUIPlugin
+	private static ImageDescriptor IMAGE_DESCRIPTOR = SyncingUIPlugin
 			.getImageDescriptor("icons/full/obj16/connection.png"); //$NON-NLS-1$
 
-    private IProject fProject;
+	private IProject fProject;
 
-    public ProjectSiteConnections(IProject project) {
-        fProject = project;
-    }
+	public ProjectSiteConnections(IProject project)
+	{
+		fProject = project;
+	}
 
-    public Object[] getChildren(Object o) {
-        ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fProject, true, true);
-        List<ProjectSiteConnection> targets = new ArrayList<ProjectSiteConnection>();
-        for (ISiteConnection site : sites) {
-        	targets.add(new ProjectSiteConnection(fProject, site));
-        }
-        return targets.toArray(new ProjectSiteConnection[targets.size()]);
-    }
+	public Object[] getChildren(Object o)
+	{
+		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fProject, true, true);
+		List<ProjectSiteConnection> targets = new ArrayList<ProjectSiteConnection>();
+		for (ISiteConnection site : sites)
+		{
+			targets.add(new ProjectSiteConnection(fProject, site));
+		}
+		return targets.toArray(new ProjectSiteConnection[targets.size()]);
+	}
 
-    public ImageDescriptor getImageDescriptor(Object object) {
-        return IMAGE_DESCRIPTOR;
-    }
+	public ImageDescriptor getImageDescriptor(Object object)
+	{
+		return IMAGE_DESCRIPTOR;
+	}
 
-    public String getLabel(Object o) {
-        return Messages.ProjectSiteConnections_Name;
-    }
+	public String getLabel(Object o)
+	{
+		return Messages.ProjectSiteConnections_Name;
+	}
 
-    public Object getParent(Object o) {
-        return null;
-    }
+	public Object getParent(Object o)
+	{
+		return null;
+	}
 
-    @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class adapter) {
-        if (adapter == IProject.class || adapter == IContainer.class) {
-            return fProject;
-        }
-        return super.getAdapter(adapter);
-    }
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Class adapter)
+	{
+		if (adapter == IProject.class || adapter == IContainer.class)
+		{
+			return fProject;
+		}
+		return super.getAdapter(adapter);
+	}
 
-    @Override
-    public String toString() {
-        return Messages.ProjectSiteConnections_Name;
-    }
+	@Override
+	public String toString()
+	{
+		return Messages.ProjectSiteConnections_Name;
+	}
 }

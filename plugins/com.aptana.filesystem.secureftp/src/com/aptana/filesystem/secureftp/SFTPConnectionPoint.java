@@ -48,7 +48,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	private String login = ""; //$NON-NLS-1$
 	private IPath privateKeyFile;
 	private char[] password;
-	private String transferType = ISFTPConstants.TRANSFER_TYPE_BINARY;
+	private String transferType = ISFTPConstants.TRANSFER_TYPE_AUTO;
 	private String encoding = ISFTPConstants.ENCODING_DEFAULT;
 	private String compression = ISFTPConstants.COMPRESSION_AUTO;
 	

@@ -17,6 +17,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -35,9 +36,11 @@ import com.aptana.editor.common.tests.util.AssertUtil;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.html.BadDocument;
 import com.aptana.editor.html.HTMLMetadataLoader;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.html.tests.HTMLEditorBasedTests;
 import com.aptana.projects.WebProjectNature;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
@@ -70,6 +73,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 	@Override
 	protected void tearDown() throws Exception
 	{
+		HTMLPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.HTML_REMOTE_HREF_PROPOSALS, true);
 		fProcessor = null;
 		fDocument = null;
 
@@ -350,7 +354,6 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertEquals(0, proposals.length);
 	}
 
-	// TODO Add tests for src/href folder/filepath proposals
 	public void testLinkHREFFolderProposal() throws Exception
 	{
 		assertHREFProposal("<link rel=\"stylesheet\" href=\"|\" />", "<link rel=\"stylesheet\" href=\"folder/\" />",
@@ -591,6 +594,144 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		project.delete();
 
+	}
+
+	public void testNoProposalsForHTTPURIPath() throws Exception
+	{
+		TestProject project = null;
+		try
+		{
+			// The "project" the file we're working on sits in.
+			project = new TestProject("href_http_doesnt_fetch", new String[] { WebProjectNature.ID });
+			final IFile file = project.createFile("file.html", "");
+
+			// Set up document/file
+			String document = "<link rel='stylesheet' href='http://www.aptana.com/|' />";
+			int offset = HTMLTestUtil.findCursorOffset(document);
+			fDocument = HTMLTestUtil.createDocument(document, true);
+			ITextViewer viewer = createTextViewer(fDocument);
+			fProcessor = new HTMLContentAssistProcessor(null)
+			{
+				@Override
+				protected URI getURI()
+				{
+					return file.getLocationURI();
+				}
+
+				@Override
+				protected boolean efsFileSystemCanGrabChildren(String scheme)
+				{
+					// Verify that we can't grab children as a means of making sure we don't call fetchInfo or hit
+					// remote URI.
+					boolean result = super.efsFileSystemCanGrabChildren(scheme);
+					assertFalse(result);
+					return result;
+				}
+
+				@Override
+				protected List<ICompletionProposal> suggestChildrenOfFileStore(int offset, String valuePrefix,
+						URI editorStoreURI, IFileStore parent) throws CoreException
+				{
+					fail("We asked for children of an HTTP URI!");
+					return super.suggestChildrenOfFileStore(offset, valuePrefix, editorStoreURI, parent);
+				}
+			};
+
+			// FIXME do a more solid check that we don't call fetchInfo on the filestore. We're hacking around it with
+			// our assertion in efsFileSystemCanGrabChildren
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+			assertEquals(0, proposals.length);
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	public void testDontHitRemoteURIForChildrenIfPrefIsTurnedOff() throws Exception
+	{
+		TestProject project = null;
+		try
+		{
+			// The "project" the file we're working on sits in.
+			project = new TestProject("href_dont_hit_remote", new String[] { WebProjectNature.ID });
+			final IFile file = project.createFile("file.html", "");
+
+			// Set up document/file
+			String document = "<link rel='stylesheet' href='ftp://ftp.cs.brown.edu/|' />";
+			int offset = HTMLTestUtil.findCursorOffset(document);
+			fDocument = HTMLTestUtil.createDocument(document, true);
+			ITextViewer viewer = createTextViewer(fDocument);
+			fProcessor = new HTMLContentAssistProcessor(null)
+			{
+				@Override
+				protected URI getURI()
+				{
+					return file.getLocationURI();
+				}
+
+				@Override
+				protected List<ICompletionProposal> suggestChildrenOfFileStore(int offset, String valuePrefix,
+						URI editorStoreURI, IFileStore parent) throws CoreException
+				{
+					fail("We asked for children of a remote URI when we had that preference turned off!");
+					return super.suggestChildrenOfFileStore(offset, valuePrefix, editorStoreURI, parent);
+				}
+			};
+
+			// Turn off hitting remote
+			HTMLPlugin.getDefault().getPreferenceStore()
+					.setValue(IPreferenceConstants.HTML_REMOTE_HREF_PROPOSALS, false);
+
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+			assertEquals(0, proposals.length);
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	public void testNoProposalsForURIEndingInColonSlash() throws Exception
+	{
+		TestProject project = null;
+		try
+		{
+			// The "project" the file we're working on sits in.
+			project = new TestProject("href_http_doesnt_fetch", new String[] { WebProjectNature.ID });
+			final IFile file = project.createFile("file.html", "");
+			project.createFolder("folder");
+
+			// Set up document/file
+			String document = "<link rel='stylesheet' href='file:/|' />";
+			int offset = HTMLTestUtil.findCursorOffset(document);
+			fDocument = HTMLTestUtil.createDocument(document, true);
+			ITextViewer viewer = createTextViewer(fDocument);
+			fProcessor = new HTMLContentAssistProcessor(null)
+			{
+				@Override
+				protected URI getURI()
+				{
+					return file.getLocationURI();
+				}
+			};
+
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+			assertEquals(0, proposals.length);
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
 	}
 
 	private void assertHREFProposal(String source, String expected, String proposalToChoose) throws Exception

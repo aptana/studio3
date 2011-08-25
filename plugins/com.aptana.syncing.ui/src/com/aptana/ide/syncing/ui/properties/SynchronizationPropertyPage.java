@@ -25,80 +25,88 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 
-public class SynchronizationPropertyPage extends PreferencePage implements IWorkbenchPropertyPage {
+public class SynchronizationPropertyPage extends PreferencePage implements IWorkbenchPropertyPage
+{
 
-    private IContainer fResource;
+	private IContainer fResource;
 
-    private Combo fSitesCombo;
-    private Button fUseAsDefaultButton;
+	private Combo fSitesCombo;
+	private Button fUseAsDefaultButton;
 
-    public SynchronizationPropertyPage() {
-    }
+	public SynchronizationPropertyPage()
+	{
+	}
 
-    @Override
-    protected Control createContents(Composite parent) {
-        Composite main = new Composite(parent, SWT.NONE);
-        main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	@Override
+	protected Control createContents(Composite parent)
+	{
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginHeight = 0;
-        layout.marginWidth = 0;
-        main.setLayout(layout);
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		main.setLayout(layout);
 
-        Label label = new Label(main, SWT.LEFT);
-        label.setText(Messages.SynchronizationPropertyPage_lastSyncConnection);
-        fSitesCombo = new Combo(main, SWT.DROP_DOWN | SWT.READ_ONLY);
-        // adds the sites that have the selected resource as the source
-        ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fResource);
-        for (ISiteConnection site : sites) {
-            fSitesCombo.add(site.getDestination().getName());
-        }
-        fSitesCombo.select(0);
+		Label label = new Label(main, SWT.LEFT);
+		label.setText(Messages.SynchronizationPropertyPage_lastSyncConnection);
+		fSitesCombo = new Combo(main, SWT.DROP_DOWN | SWT.READ_ONLY);
+		// adds the sites that have the selected resource as the source
+		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fResource);
+		for (ISiteConnection site : sites)
+		{
+			fSitesCombo.add(site.getDestination().getName());
+		}
+		fSitesCombo.select(0);
 
-        String connection = ResourceSynchronizationUtils.getLastSyncConnection(fResource);
-        if (connection != null && !connection.equals("")) { //$NON-NLS-1$
-            fSitesCombo.setText(connection);
-        }
+		String connection = ResourceSynchronizationUtils.getLastSyncConnection(fResource);
+		if (connection != null && !connection.equals("")) { //$NON-NLS-1$
+			fSitesCombo.setText(connection);
+		}
 
-        fUseAsDefaultButton = new Button(main, SWT.CHECK);
-        fUseAsDefaultButton.setText(Messages.SynchronizationPropertyPage_useConnectionsAsDefault);
-        fUseAsDefaultButton
-                .setSelection(ResourceSynchronizationUtils.isRememberDecision(fResource));
-        GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gridData.horizontalSpan = 2;
-        fUseAsDefaultButton.setLayoutData(gridData);
+		fUseAsDefaultButton = new Button(main, SWT.CHECK);
+		fUseAsDefaultButton.setText(Messages.SynchronizationPropertyPage_useConnectionsAsDefault);
+		fUseAsDefaultButton.setSelection(ResourceSynchronizationUtils.isRememberDecision(fResource));
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gridData.horizontalSpan = 2;
+		fUseAsDefaultButton.setLayoutData(gridData);
 
-        return main;
-    }
+		return main;
+	}
 
-    @Override
-    protected void performDefaults() {
-        fUseAsDefaultButton.setSelection(false);
-        fSitesCombo.select(0);
+	@Override
+	protected void performDefaults()
+	{
+		fUseAsDefaultButton.setSelection(false);
+		fSitesCombo.select(0);
 
-        super.performDefaults();
-    }
+		super.performDefaults();
+	}
 
-    @Override
-    public boolean performOk() {
-        ResourceSynchronizationUtils.setRememberDecision(fResource, fUseAsDefaultButton
-                .getSelection());
-        ResourceSynchronizationUtils.setLastSyncConnection(fResource, fSitesCombo.getText());
+	@Override
+	public boolean performOk()
+	{
+		ResourceSynchronizationUtils.setRememberDecision(fResource, fUseAsDefaultButton.getSelection());
+		ResourceSynchronizationUtils.setLastSyncConnection(fResource, fSitesCombo.getText());
 
-        return super.performOk();
-    }
+		return super.performOk();
+	}
 
-    public IAdaptable getElement() {
-        return fResource;
-    }
+	public IAdaptable getElement()
+	{
+		return fResource;
+	}
 
-    public void setElement(IAdaptable element) {
-        fResource = (IContainer) element.getAdapter(IContainer.class);
-        if (fResource == null) {
-            IResource resource = (IResource) element.getAdapter(IResource.class);
-            if (resource != null) {
-                fResource = resource.getProject();
-            }
-        }
-    }
+	public void setElement(IAdaptable element)
+	{
+		fResource = (IContainer) element.getAdapter(IContainer.class);
+		if (fResource == null)
+		{
+			IResource resource = (IResource) element.getAdapter(IResource.class);
+			if (resource != null)
+			{
+				fResource = resource.getProject();
+			}
+		}
+	}
 }

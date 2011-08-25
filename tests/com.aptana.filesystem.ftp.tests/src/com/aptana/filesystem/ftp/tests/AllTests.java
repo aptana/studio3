@@ -7,10 +7,12 @@
  */
 package com.aptana.filesystem.ftp.tests;
 
-import org.kohsuke.junit.ParallelTestSuite;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.kohsuke.junit.ParallelTestSuite;
+
+import com.aptana.filesystem.ftp.FTPConnectionPointTest;
 
 public class AllTests
 {
@@ -19,6 +21,7 @@ public class AllTests
 	{
 		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2);
 		// $JUnit-BEGIN$
+		suite.addTestSuite(FTPConnectionPointTest.class);
 		suite.addTestSuite(FTPConnectionTest.class);
 		suite.addTestSuite(FTPConnectionWithBasePathTest.class);
 		// $JUnit-END$
