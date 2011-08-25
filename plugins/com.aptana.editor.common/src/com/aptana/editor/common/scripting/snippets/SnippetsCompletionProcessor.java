@@ -260,7 +260,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	}
 
 	/**
-	 * Walk backwards through the document to find the first non-whitespace character.
+	 * Walk backwards through the document to find the first whitespace character.
 	 * 
 	 * @param document
 	 * @param offset
