@@ -78,7 +78,7 @@ public final class URLEncoder
 		}
 		if (!StringUtil.isEmpty(fragment))
 		{
-			sb.append('?').append(encodeSegment(fragment));
+			sb.append('#').append(encodeSegment(fragment));
 		}
 		return sb.toString();
 	}
