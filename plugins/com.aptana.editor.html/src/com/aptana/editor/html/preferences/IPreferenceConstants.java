@@ -32,4 +32,15 @@ public interface IPreferenceConstants
 	 * The preference key on if the text nodes should be shown in the outline
 	 */
 	String HTML_OUTLINE_SHOW_TEXT_NODES = "HTML_OUTLINE_SHOW_TEXT_NODES"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to set the option for when we allow hitting remote URIs to determine href/src
+	 * path/children Content Assist proposals.
+	 */
+	String HTML_REMOTE_HREF_PROPOSALS = "HTML_REMOTE_HREF_PROPOSALS"; //$NON-NLS-1$
+
+	/**
+	 * Default value for {@link #HTML_REMOTE_HREF_PROPOSALS}
+	 */
+	boolean DEFAULT_REMOTE_HREF_PROPOSALS_VALUE = true;
 }

@@ -29,6 +29,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
 				"</>=&'\" "); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
+		prefs.putBoolean(IPreferenceConstants.HTML_REMOTE_HREF_PROPOSALS,
+				IPreferenceConstants.DEFAULT_REMOTE_HREF_PROPOSALS_VALUE);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 		prefs.put(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, DEFAULT_TAG_ATTRIBUTES_TO_SHOW);

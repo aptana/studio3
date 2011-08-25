@@ -31,7 +31,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	private String _additionalProposalInformation;
 	private IContextInformation _contextInformation;
 	private String _displayString;
-	private Image _image;
+	protected Image _image;
 	protected int _cursorPosition;
 	protected int _replacementOffset;
 	protected int _replacementLength;

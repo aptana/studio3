@@ -61,10 +61,16 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 		final Composite fieldEditorGroup = new Composite(parent, SWT.NONE);
 		fieldEditorGroup.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
 
+		// Auto-insert closing tags
 		BooleanFieldEditor closingTag = new BooleanFieldEditor(IPreferenceConstants.HTML_AUTO_CLOSE_TAG_PAIRS,
 				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, fieldEditorGroup);
-
 		addField(closingTag);
+
+		// Hit remote URLs for src/href path children proposals
+		BooleanFieldEditor remoteHREFProposals = new BooleanFieldEditor(
+				IPreferenceConstants.HTML_REMOTE_HREF_PROPOSALS,
+				Messages.HTMLPreferencePage_TraverseRemoteURIsForPathAssistLabel, fieldEditorGroup);
+		addField(remoteHREFProposals);
 
 		return caOptions;
 	}
