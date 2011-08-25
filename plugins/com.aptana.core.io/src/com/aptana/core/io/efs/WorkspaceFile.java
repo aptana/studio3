@@ -220,7 +220,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 	@Override
 	public URI toURI() {
 		try {
-			return new URI(WorkspaceFileSystem.SCHEME_WORKSPACE, path.toPortableString(), null);
+			return new URI(WorkspaceFileSystem.SCHEME_WORKSPACE, null, path.toPortableString(), null);
 		} catch (URISyntaxException e) {
 			IdeLog.logError(CoreIOPlugin.getDefault(), e);
 		}

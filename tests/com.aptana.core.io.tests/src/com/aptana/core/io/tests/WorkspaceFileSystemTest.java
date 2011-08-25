@@ -9,90 +9,172 @@ package com.aptana.core.io.tests;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.IFileSystem;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.efs.WorkspaceFileSystem;
+import com.aptana.core.util.FileUtil;
 
+@SuppressWarnings("nls")
 public class WorkspaceFileSystemTest extends TestCase {
 
-	protected IFileSystem wfs = null;
-	protected IPath location;
-	
-	protected void setUp() throws Exception {
-		super.setUp();
-		wfs = WorkspaceFileSystem.getInstance();
-		
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		location = root.getLocation();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	public void testGetInstance() {
+		assertNotNull(WorkspaceFileSystem.getInstance());
 	}
 
 	public void testAttributes() {
-		wfs.attributes();
+		assertEquals("Workspace FS attributes should match Local FS", EFS.getLocalFileSystem().attributes(), WorkspaceFileSystem.getInstance().attributes());
 	}
 
 	public void testCanDelete() throws IOException {
-		assertTrue(wfs.canDelete());
+		assertTrue(WorkspaceFileSystem.getInstance().canDelete());
 	}
 
 	public void testCanWrite() throws IOException {
-		assertTrue(wfs.canWrite());
+		assertTrue(WorkspaceFileSystem.getInstance().canWrite());
 	}
 
 	public void testIsCaseSensitive() {
-		// This is going to be OS-specific
-		//assertFalse(wfs.isCaseSensitive());
+		assertEquals("Workspace FS case-sensitivity should match Local FS", EFS.getLocalFileSystem().isCaseSensitive(), WorkspaceFileSystem.getInstance().isCaseSensitive());
 	}
 
-	public void testGetInstance() {
-		assertNotNull(wfs);
+	public void testNonWorkspaceLocalFile() throws IOException {
+		File tempFile = File.createTempFile("test", ".txt").getCanonicalFile();
+		try {
+			assertNull("Non-workspace local file cannot be converted to workspace file store", WorkspaceFileSystem.getInstance().fromLocalFile(tempFile));
+		} finally {
+			assertTrue(tempFile.delete());
+		}
 	}
 
-	public void testFromLocalFileFile() throws IOException {
-		File baseTempFile = File.createTempFile("test", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
-		IFileStore fs = wfs.fromLocalFile(baseTempFile);
-		assertNull(fs); // File from temporary location will not be in workspace
-		
+	public void testWorkspaceLocalFile() throws IOException, CoreException, InvocationTargetException, InterruptedException {
+		File tempDir = File.createTempFile("project", null).getCanonicalFile();
+		try {
+			assertTrue(tempDir.delete());
+			assertTrue(tempDir.mkdirs());
+			IProject project = createProject(tempDir);
+			
+			File file = File.createTempFile("text", ".txt", tempDir);
+			project.refreshLocal(IProject.DEPTH_INFINITE, null);
+			assertEquals("Make sure it's the same file", file, project.getFile(file.getName()).getLocation().toFile());
+			
+			IFileStore fs = WorkspaceFileSystem.getInstance().fromLocalFile(file);
+			assertNotNull("Local file residing in workspace can be converted to workspace file store", fs);
+			assertEquals("Returned file store should belong to workspace FS", WorkspaceFileSystem.getInstance(), fs.getFileSystem());
+			assertEquals("Workspace file store convertion to file should match local file is was created from", file, fs.toLocalFile(EFS.NONE, null));
+		} finally {
+			FileUtil.deleteRecursively(tempDir);
+		}
 	}
 
-	public void testGetStoreIPath() throws IOException, CoreException {
-		IFileStore fs = wfs.getStore(location);
+	public void testGetFileStoreByPath() throws IOException, CoreException, InvocationTargetException, InterruptedException {
+		File tempDir = File.createTempFile("project", null).getCanonicalFile();
+		try {
+			assertTrue(tempDir.delete());
+			assertTrue(tempDir.mkdirs());
+			IProject project = createProject(tempDir);
+			
+			File file = File.createTempFile("text", ".txt", tempDir);
+			project.refreshLocal(IProject.DEPTH_INFINITE, null);
+			assertEquals("Make sure it's the same file", file, project.getFile(file.getName()).getLocation().toFile());
 
-		// Workspace file has workspace:/ protocol and trailing '/'
+			IPath path = project.getFile(file.getName()).getFullPath();
+			IFileStore fs = WorkspaceFileSystem.getInstance().getStore(path);
+			assertTrue("File does not exist", fs.fetchInfo().exists());
+			assertEquals("Workspace and local file are not the same", file, fs.toLocalFile(EFS.NONE, null));
+			URI uri = fs.toURI();
+			assertNotNull("toURI returned null", uri);
+			assertEquals("URI scheme doesn't match", "workspace", uri.getScheme());
+			assertEquals("URI path doesn't match", path.toPortableString(), uri.getPath());
+
+		} finally {
+			FileUtil.deleteRecursively(tempDir);
+		}
+	}
+
+	public void testGetFileStoreByURI() throws IOException, CoreException, InvocationTargetException, InterruptedException, URISyntaxException {
+		File tempDir = File.createTempFile("project", null).getCanonicalFile();
+		try {
+			assertTrue(tempDir.delete());
+			assertTrue(tempDir.mkdirs());
+			IProject project = createProject(tempDir);
+			
+			File file = File.createTempFile("text", ".txt", tempDir);
+			project.refreshLocal(IProject.DEPTH_INFINITE, null);
+			assertEquals("Make sure it's the same file", file, project.getFile(file.getName()).getLocation().toFile());
+
+			IPath path = project.getFile(file.getName()).getFullPath();
+			URI targetURI = new URI(WorkspaceFileSystem.getInstance().getScheme(), path.toPortableString(), null);
+			IFileStore fs = WorkspaceFileSystem.getInstance().getStore(targetURI);
+			assertTrue("File does not exist", fs.fetchInfo().exists());
+			assertEquals("Workspace and local file are not the same", file, fs.toLocalFile(EFS.NONE, null));
+			URI uri = fs.toURI();
+			assertNotNull("toURI returned null", uri);
+			assertEquals("URI does not match", targetURI, uri);
+
+		} finally {
+			FileUtil.deleteRecursively(tempDir);
+		}
+	}
+	
+	public void testGetNonExistingFileStoreByPath() {
+		IPath path = Path.fromPortableString("/nonexistingProject/nonexistingFile.txt");
+		IFileStore fs = WorkspaceFileSystem.getInstance().getStore(path);
+		assertNotNull("File store should not be null", fs);
+		assertFalse("File does not exists", fs.fetchInfo().exists());
+		assertEquals("Path doesn't match", path.toPortableString(), fs.toURI().getPath());
+	}
+
+	public void testGetNonExistingFileStoreByURI() throws URISyntaxException {
+		URI uri = new URI(WorkspaceFileSystem.getInstance().getScheme(), "/nonexistingProject/nonexistingFile.txt", null);
+		IFileStore fs = WorkspaceFileSystem.getInstance().getStore(uri);
+		assertNotNull("File store should be not null", fs);
+		assertFalse("File does not exists", fs.fetchInfo().exists());
+		assertEquals("URI doesn't match", uri, fs.toURI());
+	}
+
+	public void testPathWithSpecialCharacters() {
+		IFileStore fs = WorkspaceFileSystem.getInstance().getStore(Path.fromPortableString("/Test _Site/file [2008-09-21].php"));
 		URI uri = fs.toURI();
-		String replaced = uri.toString().replaceAll("workspace:", "file:") + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		assertEquals(location.toFile().toURI().toString(), replaced);
+		assertNotNull("URI should not be null", uri);
+		assertEquals("File store should match when fetched by URI", fs, WorkspaceFileSystem.getInstance().getStore(uri));
 	}
 
-	public void testGetStoreURI() throws IOException, CoreException {
-		IFileStore fs = wfs.getStore(location.toFile().toURI());
+	
+	/**
+	 * Creates a project for testing
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws InvocationTargetException
+	 * @throws InterruptedException
+	 * @throws CoreException
+	 */
+	private IProject createProject(File projectFolder) throws IOException, InvocationTargetException, InterruptedException, CoreException {
+		String projectName = getClass().getSimpleName() + System.currentTimeMillis();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProjectDescription description = workspace.newProjectDescription(projectName);
+		description.setLocation(Path.fromOSString(projectFolder.getAbsolutePath()));
 
-		// Workspace file has workspace:/ protocol
-		URI uri = fs.toURI();
-		String replaced = uri.toString().replaceAll("workspace:", "file:"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals(location.toFile().toURI().toString(), replaced);
-	}
+		IProject project = workspace.getRoot().getProject(projectName);
+		project.create(description, null);
+		project.open(null);
+		assertTrue(project.isOpen());
 
-	public void testNonExistingFile() throws CoreException {
-		IFileStore fs = wfs.getStore(location);
-		IFileStore child = fs.getChild("nonexisting.txt"); //$NON-NLS-1$
-		assertFalse(child.fetchInfo().exists());
-		assertNull(child.toLocalFile(EFS.NONE, null));
+		return project;
 	}
 
 }
