@@ -12,6 +12,8 @@ import junit.framework.TestSuite;
 
 import org.kohsuke.junit.ParallelTestSuite;
 
+import com.aptana.filesystem.ftp.FTPConnectionPointTest;
+
 public class AllTests
 {
 
