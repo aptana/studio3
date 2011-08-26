@@ -50,19 +50,19 @@ public class JSMetadataReader extends MetadataReader
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
 
 	// state flags
-	private boolean _parsingCtors;
-	private TypeElement _currentClass;
-	private TypeElement _currentType;
-	private FunctionElement _currentFunction;
-	private ParameterElement _currentParameter;
-	private ReturnTypeElement _currentReturnType;
-	private UserAgentElement _currentUserAgent;
-	private PropertyElement _currentProperty;
-	private ExceptionElement _currentException;
+	private boolean parsingCtors;
+	private TypeElement currentClass;
+	private TypeElement currentType;
+	private FunctionElement currentFunction;
+	private ParameterElement currentParameter;
+	private ReturnTypeElement currentReturnType;
+	private UserAgentElement currentUserAgent;
+	private PropertyElement currentProperty;
+	private ExceptionElement currentException;
 
 	private SDocParser parser = new SDocParser();
-	private Map<String, TypeElement> _typesByName = new HashMap<String, TypeElement>();
-	private List<AliasElement> _aliases = new ArrayList<AliasElement>();
+	private Map<String, TypeElement> typesByName = new HashMap<String, TypeElement>();
+	private List<AliasElement> aliases = new ArrayList<AliasElement>();
 
 	/**
 	 * Create a new instance of CoreLoader
@@ -82,12 +82,12 @@ public class JSMetadataReader extends MetadataReader
 	public void enterAlias(String ns, String name, String qname, Attributes attributes)
 	{
 		AliasElement alias = new AliasElement();
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 
 		alias.setName(attrs.get("name")); //$NON-NLS-1$
 		alias.setType(attrs.get("type")); //$NON-NLS-1$
 
-		this._aliases.add(alias);
+		aliases.add(alias);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class JSMetadataReader extends MetadataReader
 	{
 		// create a new item documentation object
 		UserAgentElement userAgent = new UserAgentElement();
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 
 		// set platform
 		userAgent.setPlatform(attrs.get("platform")); //$NON-NLS-1$
@@ -131,7 +131,7 @@ public class JSMetadataReader extends MetadataReader
 			userAgent.setOSVersion(osVersion);
 		}
 
-		this._currentUserAgent = userAgent;
+		currentUserAgent = userAgent;
 	}
 
 	/**
@@ -144,15 +144,15 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterClass(String ns, String name, String qname, Attributes attributes)
 	{
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 		String typeName = attrs.get("type"); //$NON-NLS-1$
 
-		if (this.isValidTypeIdentifier(typeName))
+		if (isValidTypeIdentifier(typeName))
 		{
 			String[] parts = DOT_PATTERN.split(typeName);
 			String accumulatedTypeName = parts[0];
-			TypeElement type = this.getType(accumulatedTypeName);
-			TypeElement clas = this.getType(getTypeClass(accumulatedTypeName));
+			TypeElement type = getType(accumulatedTypeName);
+			TypeElement clas = getType(getTypeClass(accumulatedTypeName));
 
 			for (int i = 1; i < parts.length; i++)
 			{
@@ -179,12 +179,12 @@ public class JSMetadataReader extends MetadataReader
 				}
 
 				// make sure to save last type we visited
-				this._typesByName.put(type.getName(), type);
-				this._typesByName.put(clas.getName(), clas);
+				typesByName.put(type.getName(), type);
+				typesByName.put(clas.getName(), clas);
 
 				// create new types
-				type = this.getType(accumulatedTypeName);
-				clas = this.getType(getTypeClass(accumulatedTypeName));
+				type = getType(accumulatedTypeName);
+				clas = getType(getTypeClass(accumulatedTypeName));
 			}
 
 			// set optional superclass
@@ -196,7 +196,7 @@ public class JSMetadataReader extends MetadataReader
 
 				for (String superType : types)
 				{
-					if (this.isValidTypeIdentifier(superType))
+					if (isValidTypeIdentifier(superType))
 					{
 						type.addParentType(superType);
 						clas.addParentType(getTypeClass(superType));
@@ -206,20 +206,20 @@ public class JSMetadataReader extends MetadataReader
 						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Base_Type, superType,
 								typeName);
 
-						this.logError(message);
+						logError(message);
 					}
 				}
 			}
 
 			// set current class
-			this._currentType = type;
-			this._currentClass = clas;
+			currentType = type;
+			currentClass = clas;
 		}
 		else
 		{
 			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName);
 
-			this.logError(message);
+			logError(message);
 		}
 	}
 
@@ -233,7 +233,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterConstructors(String ns, String name, String qname, Attributes attributes)
 	{
-		this._parsingCtors = true;
+		parsingCtors = true;
 	}
 
 	/**
@@ -246,20 +246,20 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterException(String ns, String name, String qname, Attributes attributes)
 	{
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 		String exceptionName = attrs.get("type"); //$NON-NLS-1$
 
-		if (this.isValidIdentifier(exceptionName))
+		if (isValidIdentifier(exceptionName))
 		{
 			ExceptionElement exception = new ExceptionElement();
 
 			exception.setType(exceptionName);
 
-			this._currentException = exception;
+			currentException = exception;
 		}
 		else
 		{
-			this.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName);
+			logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName);
 		}
 	}
 
@@ -273,22 +273,22 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterMethod(String ns, String name, String qname, Attributes attributes)
 	{
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 		String mname = attrs.get("name"); //$NON-NLS-1$
 
-		if (mname == null && this._currentType != null)
+		if (mname == null && currentType != null)
 		{
-			mname = this._currentType.getName();
+			mname = currentType.getName();
 		}
 
-		if (this.isValidIdentifier(mname))
+		if (isValidIdentifier(mname))
 		{
 			FunctionElement function = new FunctionElement();
 
-			// function.setExtends(this._currentType.getExtends());
-			function.setIsConstructor(this._parsingCtors); // for this xml format isCtor is always one or the other,
-															// user code may vary
-			function.setIsMethod(!this._parsingCtors);
+			// function.setExtends(_currentType.getExtends());
+			function.setIsConstructor(parsingCtors); // for this xml format isCtor is always one or the other,
+														// user code may vary
+			function.setIsMethod(!parsingCtors);
 
 			// determine and set method name
 			function.setName(mname);
@@ -313,7 +313,7 @@ public class JSMetadataReader extends MetadataReader
 				function.setIsInternal(true);
 			}
 
-			this._currentFunction = function;
+			currentFunction = function;
 		}
 	}
 
@@ -351,10 +351,10 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterParameter(String ns, String name, String qname, Attributes attributes)
 	{
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 		String parameterName = attrs.get("name"); //$NON-NLS-1$
 
-		if (this.isValidIdentifier(parameterName))
+		if (isValidIdentifier(parameterName))
 		{
 			// create a new parameter documentation object
 			ParameterElement parameter = new ParameterElement();
@@ -363,7 +363,7 @@ public class JSMetadataReader extends MetadataReader
 			parameter.setName(parameterName);
 
 			String typespec = attrs.get("type"); //$NON-NLS-1$
-			List<Type> types = this.parseTypes(typespec);
+			List<Type> types = parseTypes(typespec);
 
 			if (types != null)
 			{
@@ -377,13 +377,13 @@ public class JSMetadataReader extends MetadataReader
 				String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, typespec,
 						parameterName);
 
-				this.logError(message);
+				logError(message);
 			}
 
 			parameter.setUsage(attrs.get("usage")); //$NON-NLS-1$
 
 			// store parameter
-			this._currentParameter = parameter;
+			currentParameter = parameter;
 		}
 	}
 
@@ -397,10 +397,10 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterProperty(String ns, String name, String qname, Attributes attributes)
 	{
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 		String propertyName = attrs.get("name"); //$NON-NLS-1$
 
-		if (this.isValidIdentifier(propertyName))
+		if (isValidIdentifier(propertyName))
 		{
 			// create a new property documentation object
 			PropertyElement property = new PropertyElement();
@@ -426,7 +426,7 @@ public class JSMetadataReader extends MetadataReader
 
 			for (String propertyType : PROPERTY_TYPE_DELIMITER_PATTERN.split(types))
 			{
-				if (this.isValidTypeIdentifier(propertyType))
+				if (isValidTypeIdentifier(propertyType))
 				{
 					property.addType(propertyType);
 				}
@@ -435,12 +435,12 @@ public class JSMetadataReader extends MetadataReader
 					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type,
 							propertyType, propertyName);
 
-					this.logError(message);
+					logError(message);
 				}
 			}
 
 			// set current property
-			this._currentProperty = property;
+			currentProperty = property;
 		}
 	}
 
@@ -454,11 +454,11 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterReference(String ns, String name, String qname, Attributes attributes)
 	{
-		if (this._currentFunction != null)
+		if (currentFunction != null)
 		{
-			Map<String, String> attrs = this.attributesToMap(attributes, true);
+			Map<String, String> attrs = attributesToMap(attributes, true);
 
-			this._currentFunction.addReference(attrs.get("name")); //$NON-NLS-1$
+			currentFunction.addReference(attrs.get("name")); //$NON-NLS-1$
 		}
 	}
 
@@ -472,21 +472,21 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void enterReturnType(String ns, String name, String qname, Attributes attributes)
 	{
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 		String type = attrs.get("type"); //$NON-NLS-1$
 
-		if (this.isValidTypeIdentifier(type))
+		if (isValidTypeIdentifier(type))
 		{
 			ReturnTypeElement returnType = new ReturnTypeElement();
 
 			// grab and set property values
 			returnType.setType(type);
 
-			this._currentReturnType = returnType;
+			currentReturnType = returnType;
 		}
 		else
 		{
-			this.logError(Messages.JSMetadataReader_Invalid_Return_Type + type);
+			logError(Messages.JSMetadataReader_Invalid_Return_Type + type);
 		}
 	}
 
@@ -501,7 +501,7 @@ public class JSMetadataReader extends MetadataReader
 	public void enterSpecification(String ns, String name, String qname, Attributes attributes)
 	{
 		SinceElement since = new SinceElement();
-		Map<String, String> attrs = this.attributesToMap(attributes, true);
+		Map<String, String> attrs = attributesToMap(attributes, true);
 
 		// set name
 		since.setName(attrs.get("name")); //$NON-NLS-1$
@@ -514,17 +514,17 @@ public class JSMetadataReader extends MetadataReader
 			since.setVersion(version);
 		}
 
-		if (this._currentFunction != null)
+		if (currentFunction != null)
 		{
-			this._currentFunction.addSince(since);
+			currentFunction.addSince(since);
 		}
-		else if (this._currentProperty != null)
+		else if (currentProperty != null)
 		{
-			this._currentProperty.addSince(since);
+			currentProperty.addSince(since);
 		}
-		else if (this._currentType != null)
+		else if (currentType != null)
 		{
-			this._currentType.addSince(since);
+			currentType.addSince(since);
 		}
 	}
 
@@ -549,23 +549,23 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitBrowser(String ns, String name, String qname)
 	{
-		if (this._currentUserAgent != null)
+		if (currentUserAgent != null)
 		{
-			if (this._currentProperty != null)
+			if (currentProperty != null)
 			{
-				this._currentProperty.addUserAgent(this._currentUserAgent);
+				currentProperty.addUserAgent(currentUserAgent);
 			}
-			else if (this._currentFunction != null)
+			else if (currentFunction != null)
 			{
-				this._currentFunction.addUserAgent(this._currentUserAgent);
+				currentFunction.addUserAgent(currentUserAgent);
 			}
-			else if (this._currentType != null)
+			else if (currentType != null)
 			{
-				this._currentType.addUserAgent(this._currentUserAgent);
+				currentType.addUserAgent(currentUserAgent);
 			}
 
 			// clear current class
-			this._currentUserAgent = null;
+			currentUserAgent = null;
 		}
 	}
 
@@ -578,18 +578,18 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitClass(String ns, String name, String qname)
 	{
-		if (this._currentType != null)
+		if (currentType != null)
 		{
-			this._typesByName.put(this._currentType.getName(), this._currentType);
+			typesByName.put(currentType.getName(), currentType);
 
-			this._currentType = null;
+			currentType = null;
 		}
 
-		if (this._currentClass != null)
+		if (currentClass != null)
 		{
-			this._typesByName.put(this._currentClass.getName(), this._currentClass);
+			typesByName.put(currentClass.getName(), currentClass);
 
-			this._currentClass = null;
+			currentClass = null;
 		}
 	}
 
@@ -602,7 +602,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitConstructors(String ns, String name, String qname)
 	{
-		this._parsingCtors = false;
+		parsingCtors = false;
 	}
 
 	/**
@@ -625,45 +625,45 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitDescription(String ns, String name, String qname)
 	{
-		String description = this.normalizeText(this.getText());
+		String description = normalizeText(getText());
 
-		if (this._currentParameter != null)
+		if (currentParameter != null)
 		{
-			this._currentParameter.setDescription(description);
+			currentParameter.setDescription(description);
 		}
-		// else if (this._currentException != false)
+		// else if (_currentException != false)
 		// {
 		// // ignore
-		// this._currentException = (this._currentException == false ) ? false : true;
+		// _currentException = (_currentException == false ) ? false : true;
 		// }
-		else if (this._currentProperty != null)
+		else if (currentProperty != null)
 		{
-			this._currentProperty.setDescription(description);
+			currentProperty.setDescription(description);
 		}
-		else if (this._currentFunction != null)
+		else if (currentFunction != null)
 		{
-			if (this._currentReturnType != null)
+			if (currentReturnType != null)
 			{
-				this._currentReturnType.setDescription(description);
+				currentReturnType.setDescription(description);
 			}
 			else
 			{
-				this._currentFunction.setDescription(description);
+				currentFunction.setDescription(description);
 			}
 		}
-		else if (this._currentType != null)
+		else if (currentType != null)
 		{
-			this._currentType.setDescription(description);
+			currentType.setDescription(description);
 		}
-		// else if (this._currentProject != null)
+		// else if (_currentProject != null)
 		// {
 		// // add description to the current method
-		// this._currentProject.setDescription(description);
+		// _currentProject.setDescription(description);
 		// }
-		else if (this._currentUserAgent != null)
+		else if (currentUserAgent != null)
 		{
 			// add description to the current method
-			this._currentUserAgent.setDescription(description);
+			currentUserAgent.setDescription(description);
 		}
 		// TODO: else throw error
 	}
@@ -677,15 +677,15 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitExample(String ns, String name, String qname)
 	{
-		String example = this.getText();
+		String example = getText();
 
-		if (this._currentProperty != null)
+		if (currentProperty != null)
 		{
-			this._currentProperty.addExample(example);
+			currentProperty.addExample(example);
 		}
-		else if (this._currentFunction != null)
+		else if (currentFunction != null)
 		{
-			this._currentFunction.addExample(example);
+			currentFunction.addExample(example);
 		}
 
 		// TODO: The schema allows these on classes as well
@@ -700,19 +700,19 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitException(String ns, String name, String qname)
 	{
-		if (this._currentException != null)
+		if (currentException != null)
 		{
-			if (this._currentProperty != null)
+			if (currentProperty != null)
 			{ // $codepro.audit.disable emptyIfStatement
 				// this doesn't make sense to me, but it is defined in the schema. Ignore for now
 			}
-			else if (this._currentFunction != null)
+			else if (currentFunction != null)
 			{
-				this._currentFunction.addException(this._currentException);
+				currentFunction.addException(currentException);
 			}
 			// TODO: else throw error
 
-			this._currentException = null;
+			currentException = null;
 		}
 	}
 
@@ -736,25 +736,25 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitMethod(String ns, String name, String qname)
 	{
-		if (this._currentFunction != null)
+		if (currentFunction != null)
 		{
-			if (this._currentFunction.isClassProperty())
+			if (currentFunction.isClassProperty())
 			{
-				if (this._currentClass != null)
+				if (currentClass != null)
 				{
-					this._currentClass.addProperty(this._currentFunction);
+					currentClass.addProperty(currentFunction);
 				}
 			}
-			else if (this._currentFunction.isInstanceProperty())
+			else if (currentFunction.isInstanceProperty())
 			{
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.addProperty(this._currentFunction);
+					currentType.addProperty(currentFunction);
 				}
 			}
 			// TODO: else warning or error about unknown method role
 
-			this._currentFunction = null;
+			currentFunction = null;
 		}
 	}
 
@@ -767,16 +767,16 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitParameter(String ns, String name, String qname)
 	{
-		if (this._currentParameter != null)
+		if (currentParameter != null)
 		{
-			if (this._currentFunction != null)
+			if (currentFunction != null)
 			{
 				// add parameter to parameter list
-				this._currentFunction.addParameter(this._currentParameter);
+				currentFunction.addParameter(currentParameter);
 			}
 
 			// clear current parameter
-			this._currentParameter = null;
+			currentParameter = null;
 		}
 	}
 
@@ -789,25 +789,25 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitProperty(String ns, String name, String qname)
 	{
-		if (this._currentProperty != null)
+		if (currentProperty != null)
 		{
-			if (this._currentProperty.isClassProperty())
+			if (currentProperty.isClassProperty())
 			{
-				if (this._currentClass != null)
+				if (currentClass != null)
 				{
-					this._currentClass.addProperty(this._currentProperty);
+					currentClass.addProperty(currentProperty);
 				}
 			}
-			else if (this._currentProperty.isInstanceProperty())
+			else if (currentProperty.isInstanceProperty())
 			{
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.addProperty(this._currentProperty);
+					currentType.addProperty(currentProperty);
 				}
 			}
 			// TODO: else warning or error about unknown property role
 
-			this._currentProperty = null;
+			currentProperty = null;
 		}
 	}
 
@@ -820,7 +820,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitRemarks(String ns, String name, String qname)
 	{
-		this.getText();
+		getText();
 	}
 
 	/**
@@ -832,7 +832,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitReturnDescription(String ns, String name, String qname)
 	{
-		this.getText();
+		getText();
 	}
 
 	/**
@@ -844,14 +844,14 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitReturnType(String ns, String name, String qname)
 	{
-		if (this._currentReturnType != null)
+		if (currentReturnType != null)
 		{
-			if (this._currentFunction != null)
+			if (currentFunction != null)
 			{
-				this._currentFunction.addReturnType(this._currentReturnType);
+				currentFunction.addReturnType(currentReturnType);
 			}
 
-			this._currentReturnType = null;
+			currentReturnType = null;
 		}
 	}
 
@@ -873,7 +873,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public AliasElement[] getAliases()
 	{
-		return this._aliases.toArray(new AliasElement[this._aliases.size()]);
+		return aliases.toArray(new AliasElement[aliases.size()]);
 	}
 
 	/*
@@ -890,7 +890,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		catch (IOException e)
 		{
-			return this.getClass().getResourceAsStream(JS_METADATA_SCHEMA);
+			return getClass().getResourceAsStream(JS_METADATA_SCHEMA);
 		}
 	}
 
@@ -902,7 +902,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	private TypeElement getType(String typeName)
 	{
-		TypeElement result = this._typesByName.get(typeName);
+		TypeElement result = typesByName.get(typeName);
 
 		if (result == null)
 		{
@@ -928,7 +928,7 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public TypeElement[] getTypes()
 	{
-		Collection<TypeElement> values = this._typesByName.values();
+		Collection<TypeElement> values = typesByName.values();
 		TypeElement[] types = new TypeElement[values.size()];
 
 		return values.toArray(types);
@@ -966,7 +966,7 @@ public class JSMetadataReader extends MetadataReader
 
 		if (name != null)
 		{
-			List<Type> types = this.parseTypes(name);
+			List<Type> types = parseTypes(name);
 
 			result = (types != null && types.size() == 1);
 		}

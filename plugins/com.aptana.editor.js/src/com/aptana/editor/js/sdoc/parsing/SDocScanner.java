@@ -130,9 +130,16 @@ public class SDocScanner extends Scanner
 
 		while (token != Token.EOF) // $codepro.audit.disable useEquals
 		{
+			Object data = token.getData();
+
+			while (data == SDocTokenType.WHITESPACE)
+			{
+				token = fTypeTokenScanner.nextToken();
+				data = token.getData();
+			}
+
 			int offset = fTypeTokenScanner.getTokenOffset();
 			int length = fTypeTokenScanner.getTokenLength();
-			Object data = token.getData();
 			SDocTokenType type = (data == null) ? SDocTokenType.EOF : (SDocTokenType) data;
 
 			try
