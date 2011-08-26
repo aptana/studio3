@@ -22,6 +22,7 @@ import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
+import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -196,7 +197,12 @@ public class ASTUtil
 					// Fix up type names as might be necessary
 					type = JSTypeMapper.getInstance().getMappedType(type);
 
-					if (JSTypeUtil.isFunctionPrefix(type))
+					// FIXME: (hopefully temporary) hack to fixup static properties on $ and jQuery
+					if ("Function:jQuery".equals(type) && lhs instanceof JSIdentifierNode && ("$".equals(lhs.getText()) || "jQuery".equals(lhs.getText()))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					{
+						result.add("Class<jQuery>"); //$NON-NLS-1$
+					}
+					else if (JSTypeUtil.isFunctionPrefix(type))
 					{
 						String functionType = JSTypeUtil.getFunctionSignatureType(type);
 
