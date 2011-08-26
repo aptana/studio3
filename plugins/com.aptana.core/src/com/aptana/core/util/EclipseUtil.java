@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
@@ -510,6 +511,18 @@ public class EclipseUtil
 	public static DefaultScope defaultScope()
 	{
 		return new DefaultScope();
+	}
+
+	/**
+	 * Wrapper for Eclipse 3.6- to collect all deprecated usages into a single location. Once Eclipse 3.7 is the default
+	 * base platform, we can remove this call.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public static ConfigurationScope configurationScope()
+	{
+		return new ConfigurationScope();
 	}
 
 }
