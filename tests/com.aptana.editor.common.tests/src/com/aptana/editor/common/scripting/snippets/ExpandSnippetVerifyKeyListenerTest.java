@@ -18,31 +18,32 @@ import com.aptana.scripting.model.SnippetElement;
 public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 {
 
-	public void assertVerifyKeySpace() throws IOException
+	public void testVerifyKeySpace() throws IOException
 	{
 		// try sending a space, nothing should happen
 		assertVerifyKey("", "fun", ' ', true, false);
 	}
 
-	public void assertVerifyKeyFunctionListenerOn() throws IOException
+	public void testVerifyKeyFunctionListenerOn() throws IOException
 	{
 		// full prefix, should pop CA
 		assertVerifyKey("fun", "fun", '\t', true, false);
 	}
 
-	public void assertVerifyKeyFunctionListenerOff() throws IOException
+	public void testVerifyKeyFunctionListenerOff() throws IOException
 	{
 		// full prefix, listener off, should not pop CA
 		assertVerifyKey("fun", "fun", '\t', false, false);
 	}
 
-	public void assertVerifyKeyFunctionIncorrectPrefix() throws IOException
+	public void testVerifyKeyFunctionIncorrectPrefix() throws IOException
 	{
 		// Should not pop CA here as prefix is not == snippet
 		assertVerifyKey("fu", "fun", '\t', true, true);
 	}
 
-	public void assertVerifyKey(String documentSource, String snippetTrigger, char typedChar, boolean listenerEnabled,
+	protected void assertVerifyKey(String documentSource, String snippetTrigger, char typedChar,
+			boolean listenerEnabled,
 			boolean expectedOutcome) throws IOException
 	{
 		File bundleFile = File.createTempFile("common_projection_viewer_unit_tests", "rb");
