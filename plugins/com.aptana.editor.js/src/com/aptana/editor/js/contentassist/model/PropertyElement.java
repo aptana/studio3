@@ -39,6 +39,13 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 				return node.getDescription();
 			}
 		},
+		OWNING_TYPE("Owning Type")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node.getOwningType();
+			}
+		},
 		CLASS_PROPERTY("Static Property")
 		{
 			public Object getPropertyValue(PropertyElement node)
