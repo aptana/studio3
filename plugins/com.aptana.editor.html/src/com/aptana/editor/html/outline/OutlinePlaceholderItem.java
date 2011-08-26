@@ -22,7 +22,7 @@ class OutlinePlaceholderItem
 	/**
 	 * @param message
 	 */
-	public OutlinePlaceholderItem(int status, String message)
+	OutlinePlaceholderItem(int status, String message)
 	{
 		super();
 		this.status = status;

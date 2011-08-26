@@ -14,7 +14,7 @@ public class HTMLCommentNode extends HTMLNode
 
 	public HTMLCommentNode(String text, int start, int end)
 	{
-		super(HTMLNodeTypes.COMMENT, start, end);
+		super(IHTMLNodeTypes.COMMENT, start, end);
 		fText = text;
 	}
 

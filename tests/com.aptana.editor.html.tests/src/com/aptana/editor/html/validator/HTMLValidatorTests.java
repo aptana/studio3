@@ -48,8 +48,21 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 
 		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
-		assertTrue(items.size() > 0);
-		assertEquals("Missing end tag </title>", items.get(0).getMessage());
+		assertEquals(2, items.size());
+		assertContains(items, "Missing end tag </title>");
+		assertContains(items, "missing </title> before <body>");
+	}
+
+	protected void assertContains(List<IValidationItem> items, String message)
+	{
+		for (IValidationItem item : items)
+		{
+			if (message.equals(item.getMessage()))
+			{
+				return;
+			}
+		}
+		fail("Was unable to find an IValidationItem with message: " + message);
 	}
 
 	public void testHTMLNoErrors() throws CoreException

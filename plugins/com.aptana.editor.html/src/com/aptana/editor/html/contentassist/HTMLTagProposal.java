@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
 import java.util.List;
@@ -19,7 +26,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 
 class HTMLTagProposal extends CommonCompletionProposal
@@ -42,7 +49,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 	{
 		super(replacementString, replacementOffset, replacementLength, positions[0],
 				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
-		setFileLocation(HTMLIndexConstants.CORE);
+		setFileLocation(IHTMLIndexConstants.CORE);
 
 		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);

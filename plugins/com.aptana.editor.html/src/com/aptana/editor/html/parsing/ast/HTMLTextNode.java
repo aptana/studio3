@@ -14,7 +14,7 @@ public class HTMLTextNode extends HTMLNode
 
 	public HTMLTextNode(String text, int start, int end)
 	{
-		super(HTMLNodeTypes.TEXT, start, end);
+		super(IHTMLNodeTypes.TEXT, start, end);
 		fText = text;
 	}
 

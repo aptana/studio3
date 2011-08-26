@@ -35,17 +35,17 @@ class HTMLParserTagRule extends MultiLineRule
 	private boolean fIgnoreCase;
 	private int fEmbeddedStart;
 
-	public HTMLParserTagRule(IToken token)
+	HTMLParserTagRule(IToken token)
 	{
 		this("", token); //$NON-NLS-1$
 	}
 
-	public HTMLParserTagRule(String tag, IToken token)
+	HTMLParserTagRule(String tag, IToken token)
 	{
 		this(tag, token, false);
 	}
 
-	public HTMLParserTagRule(String tag, IToken token, boolean ignoreCase)
+	HTMLParserTagRule(String tag, IToken token, boolean ignoreCase)
 	{
 		this("<" + tag, ">", token, ignoreCase); //$NON-NLS-1$ //$NON-NLS-2$
 	}

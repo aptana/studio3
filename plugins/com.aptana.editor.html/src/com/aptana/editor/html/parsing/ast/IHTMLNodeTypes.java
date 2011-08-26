@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.html.parsing.ast;
 
-public interface HTMLNodeTypes
+public interface IHTMLNodeTypes
 {
 	public static final short ERROR = -1;
 

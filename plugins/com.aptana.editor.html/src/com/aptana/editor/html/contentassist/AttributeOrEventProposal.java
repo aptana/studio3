@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -12,18 +19,18 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 
 abstract class AttributeOrEventProposal extends CommonCompletionProposal
 {
 
 	private int[] _positions;
 
-	AttributeOrEventProposal(String displayName, String description, Image icon, String replaceString,
+	protected AttributeOrEventProposal(String displayName, String description, Image icon, String replaceString,
 			Image[] userAgentIcons, int offset, int length, int[] positions)
 	{
 		super(replaceString, offset, length, positions[0], icon, displayName, null, description);
-		setFileLocation(HTMLIndexConstants.CORE);
+		setFileLocation(IHTMLIndexConstants.CORE);
 		setUserAgentImages(userAgentIcons);
 		this._positions = positions;
 	}

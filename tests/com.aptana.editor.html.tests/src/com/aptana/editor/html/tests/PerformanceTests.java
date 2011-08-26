@@ -11,6 +11,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.html.HTMLTagScannerPerformanceTest;
+import com.aptana.editor.html.validator.HTMLTidyValidatorPerformanceTest;
 
 public class PerformanceTests
 {
@@ -20,6 +21,7 @@ public class PerformanceTests
 		TestSuite suite = new TestSuite("Performance Tests for com.aptana.editor.html plugin");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
+		suite.addTestSuite(HTMLTidyValidatorPerformanceTest.class);
 		// $JUnit-END$
 		return suite;
 	}

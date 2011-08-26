@@ -35,11 +35,11 @@ public class HTMLParseState extends ParseState
 		fEndTagInfo = new HashMap<String, Integer>();
 		for (String tag : END_OPTIONAL_TAGS)
 		{
-			fEndTagInfo.put(tag, HTMLTagInfo.END_OPTIONAL);
+			fEndTagInfo.put(tag, IHTMLTagInfo.END_OPTIONAL);
 		}
 		for (String tag : END_FORBIDDEN_OR_EMPTY_TAGS)
 		{
-			fEndTagInfo.put(tag, HTMLTagInfo.END_FORBIDDEN | HTMLTagInfo.EMPTY);
+			fEndTagInfo.put(tag, IHTMLTagInfo.END_FORBIDDEN | IHTMLTagInfo.EMPTY);
 		}
 	}
 
@@ -63,13 +63,13 @@ public class HTMLParseState extends ParseState
 		if (fEndTagInfo.containsKey(key))
 		{
 			int info = fEndTagInfo.get(key);
-			int type = info & HTMLTagInfo.END_MASK;
-			if (type == HTMLTagInfo.END_FORBIDDEN || fDocumentType.compareTo(Type.XHTML_1_0_STRICT) < 0)
+			int type = info & IHTMLTagInfo.END_MASK;
+			if (type == IHTMLTagInfo.END_FORBIDDEN || fDocumentType.compareTo(Type.XHTML_1_0_STRICT) < 0)
 			{
 				return type;
 			}
 		}
-		return HTMLTagInfo.END_REQUIRED;
+		return IHTMLTagInfo.END_REQUIRED;
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class HTMLParseState extends ParseState
 		String key = tagName.toLowerCase();
 		if (fEndTagInfo.containsKey(key))
 		{
-			return (fEndTagInfo.get(key) & HTMLTagInfo.EMPTY) == HTMLTagInfo.EMPTY;
+			return (fEndTagInfo.get(key) & IHTMLTagInfo.EMPTY) == IHTMLTagInfo.EMPTY;
 		}
 		return false;
 	}

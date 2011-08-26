@@ -18,10 +18,11 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class HTMLPlugin extends AbstractUIPlugin {
-	
+public class HTMLPlugin extends AbstractUIPlugin
+{
+
 	public static final String PLUGIN_ID = "com.aptana.editor.html"; //$NON-NLS-1$
-	
+
 	private static HTMLPlugin plugin;
 
 	private IDocumentProvider htmlDocumentProvider;
@@ -31,7 +32,8 @@ public class HTMLPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static HTMLPlugin getDefault() {
+	public static HTMLPlugin getDefault()
+	{
 		return plugin;
 	}
 
@@ -41,14 +43,17 @@ public class HTMLPlugin extends AbstractUIPlugin {
 	 * @param path
 	 * @return
 	 */
-	public static Image getImage(String path) {
+	public static Image getImage(String path)
+	{
 		ImageRegistry registry = plugin.getImageRegistry();
 		Image image = registry.get(path);
 
-		if (image == null) {
+		if (image == null)
+		{
 			ImageDescriptor id = getImageDescriptor(path);
 
-			if (id != null) {
+			if (id != null)
+			{
 				registry.put(path, id);
 				image = registry.get(path);
 			}
@@ -63,21 +68,25 @@ public class HTMLPlugin extends AbstractUIPlugin {
 	 * @param path
 	 * @return
 	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
 	/**
 	 * The constructor
 	 */
-	public HTMLPlugin() {
+	public HTMLPlugin() // $codepro.audit.disable
+						// com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
+	{
 		super.start(context);
 		plugin = this;
 
@@ -89,7 +98,8 @@ public class HTMLPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
+	{
 		plugin = null;
 
 		super.stop(context);
@@ -100,8 +110,10 @@ public class HTMLPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return
 	 */
-	public synchronized IDocumentProvider getHTMLDocumentProvider() {
-		if (htmlDocumentProvider == null) {
+	public synchronized IDocumentProvider getHTMLDocumentProvider()
+	{
+		if (htmlDocumentProvider == null)
+		{
 			htmlDocumentProvider = new HTMLDocumentProvider();
 		}
 		return htmlDocumentProvider;
