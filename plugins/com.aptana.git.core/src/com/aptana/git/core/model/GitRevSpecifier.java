@@ -44,7 +44,7 @@ public class GitRevSpecifier
 
 	boolean isSimpleRef()
 	{
-		return parameters.size() == 1 && !parameters.get(0).startsWith("-"); //$NON-NLS-1$
+		return parameters.size() == 1 && (parameters.get(0).length() == 0 || parameters.get(0).charAt(0) != '-');
 	}
 
 	public GitRef simpleRef()
@@ -68,7 +68,7 @@ public class GitRevSpecifier
 		StringBuilder builder = new StringBuilder();
 		for (String param : parameters)
 		{
-			builder.append(param).append(" "); //$NON-NLS-1$
+			builder.append(param).append(' ');
 		}
 		if (builder.length() > 0)
 			builder.deleteCharAt(builder.length() - 1);

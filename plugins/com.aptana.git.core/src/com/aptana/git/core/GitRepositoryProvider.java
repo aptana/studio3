@@ -67,7 +67,7 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 		return ID;
 	}
 
-	public void deconfigure() throws CoreException
+	public void deconfigure()
 	{
 		// nothing
 	}

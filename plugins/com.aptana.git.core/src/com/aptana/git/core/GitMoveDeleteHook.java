@@ -197,14 +197,20 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	{
 		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
 		if (!force && !tree.isSynchronized(srcf, IResource.DEPTH_ZERO))
+		{
 			return false;
+		}
 
 		final GitRepository repo = getAttachedGitRepository(srcf.getProject());
 		if (repo == null)
+		{
 			return false;
+		}
 		final GitRepository dstm = getAttachedGitRepository(dstf.getProject());
 		if (dstm == null || !dstm.equals(repo))
+		{
 			return false;
+		}
 		// TODO If they're in separate repos, we need to delete and add!
 
 		// If this file is new and unstaged, we don't need to handle it!
@@ -221,9 +227,13 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		IStatus status = repo.moveFile(source, dest);
 		// Call tree.failed if failed, call tree.movedFile if success
 		if (status.isOK())
+		{
 			tree.movedFile(srcf, dstf);
+		}
 		else
+		{
 			tree.failed(status);
+		}
 		return true;
 	}
 
@@ -232,16 +242,22 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	{
 		final GitRepository repo = getAttachedGitRepository(srcf.getProject());
 		if (repo == null)
+		{
 			return false;
+		}
 		final GitRepository dstm = getAttachedGitRepository(dstf.getProject());
 		if (dstm == null || !dstm.equals(repo))
+		{
 			return false;
+		}
 		// TODO If they're in separate repos, we need to delete and add!
 
 		IPath source = getRepoRelativePath(srcf, repo);
 		// If source folder contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
+		{
 			return false;
+		}
 
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
@@ -253,9 +269,13 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		IStatus status = repo.moveFile(source, dest);
 		// Call tree.failed if failed, call tree.movedFolder if success
 		if (status.isOK())
+		{
 			tree.movedFolderSubtree(srcf, dstf);
+		}
 		else
+		{
 			tree.failed(status);
+		}
 		return true;
 	}
 
@@ -313,7 +333,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			folder.accept(new IResourceVisitor()
 			{
 
-				public boolean visit(IResource resource) throws CoreException
+				public boolean visit(IResource resource)
 				{
 					if (resource instanceof IFile)
 					{
