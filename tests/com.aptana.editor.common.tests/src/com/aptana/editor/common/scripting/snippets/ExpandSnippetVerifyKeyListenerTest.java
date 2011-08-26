@@ -21,7 +21,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 	public void testVerifyKeySpace() throws IOException
 	{
 		// try sending a space, nothing should happen
-		assertVerifyKey("", "fun", ' ', true, false);
+		assertVerifyKey("", "fun", ' ', true, true);
 	}
 
 	public void testVerifyKeyFunctionListenerOn() throws IOException
@@ -33,7 +33,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 	public void testVerifyKeyFunctionListenerOff() throws IOException
 	{
 		// full prefix, listener off, should not pop CA
-		assertVerifyKey("fun", "fun", '\t', false, false);
+		assertVerifyKey("fun", "fun", '\t', false, true);
 	}
 
 	public void testVerifyKeyFunctionIncorrectPrefix() throws IOException
@@ -43,8 +43,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 	}
 
 	protected void assertVerifyKey(String documentSource, String snippetTrigger, char typedChar,
-			boolean listenerEnabled,
-			boolean expectedOutcome) throws IOException
+			boolean listenerEnabled, boolean expectedOutcome) throws IOException
 	{
 		File bundleFile = File.createTempFile("common_projection_viewer_unit_tests", "rb");
 		bundleFile.deleteOnExit();
