@@ -131,7 +131,10 @@ public class CoffeeCodeScanner extends QueuedRuleBasedScanner
 		// Operators
 		// FIXME Properly detect Coffee operators. Just use another set here grabbed from Textmate bundle (rather than
 		// JS set)?
-		wordRule = new WordRule(new JSOperatorDetector(), Token.UNDEFINED);
+		JSOperatorDetector operatorDetector = new JSOperatorDetector();
+		operatorDetector.addWord("->");
+		operatorDetector.addWord("=>");
+		wordRule = new WordRule(operatorDetector, Token.UNDEFINED);
 		addWordRules(wordRule, createToken(CoffeeScopeType.OPERATOR), JSLanguageConstants.OPERATORS);
 		addWordRules(wordRule, createToken(CoffeeScopeType.FUNC), "->");
 		addWordRules(wordRule, createToken(CoffeeScopeType.BOUND_FUNC), "=>");

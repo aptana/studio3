@@ -947,6 +947,17 @@ public class JSParserTest extends TestCase
 		assertEquals(source.length() - 1, comment.getEndingOffset());
 	}
 
+	/**
+	 * Test fix for APSTUD-3214
+	 * 
+	 * @throws Exception
+	 */
+	public void testOperatorsWithoutSpace() throws Exception
+	{
+		parseTest("function foo() {i++>1;}" + EOL, "function foo () {i++ > 1;}" + EOL);
+		parseTest("function foo() { if(i--==y) alert('test'); }" + EOL, "function foo () {if (i-- == y) alert('test');}" + EOL);
+	}
+
 	// utility methods
 
 	protected void parseTest(String source) throws Exception
