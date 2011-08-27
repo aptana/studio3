@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
 Private-Package: !*
-Bundle-ClassPath: org.apache.httpcomponents.httpcore_4.1.3.jar
+Bundle-ClassPath: httpcomponents.httpcore_4.1.3.jar
 Implementation-Vendor: Apache Software Foundation
 Implementation-Vendor-Id: org.apache
 Specification-Title: Apache HttpCore OSGi bundle
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.html
 Bundle-SymbolicName: org.apache.httpcomponents.httpcore
 X-Compile-Target-JDK: 1.5
-Implementation-Version: 4.0.1
+Implementation-Version: 4.1.3
 Specification-Vendor: Apache Software Foundation
 Bundle-Name: Apache HttpCore OSGi bundle
 Created-By: Apache Maven Bundle Plugin
