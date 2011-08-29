@@ -43,4 +43,11 @@ public class CSSValidatorTests extends AbstractValidatorTestCase
 		assertEquals(0, items.size());
 	}
 
+	public void testCSS3TransitionPropertyError() throws CoreException
+	{
+		String text = "div {\ntransition: width 2s;\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
 }
