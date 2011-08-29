@@ -536,7 +536,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				{
 					// skip strings and comments
 					if (CSSSourceConfiguration.MULTILINE_COMMENT.equals(region.getType())
-							|| CSSSourceConfiguration.STRING.equals(region.getType()))
+							|| CSSSourceConfiguration.STRING_DOUBLE.equals(region.getType())
+							|| CSSSourceConfiguration.STRING_SINGLE.equals(region.getType()))
 					{
 						continue;
 					}

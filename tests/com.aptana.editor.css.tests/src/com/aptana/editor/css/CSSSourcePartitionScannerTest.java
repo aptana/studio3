@@ -110,7 +110,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		"' This is a single quoted CSS string'\n";
 		for (int i = 0; i <= 36; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
 	}
@@ -123,7 +123,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		"''\n";
 		for (int i = 0; i <= 1; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 2);
 	}
@@ -137,7 +137,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 
 		for (int i = 0; i <= 52; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53);
 	}
@@ -151,7 +151,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 
 		for (int i = 0; i <= 57; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 58);
 	}
@@ -164,7 +164,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		"\" This is a double quoted CSS string\"\n";
 		for (int i = 0; i <= 36; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
 	}
@@ -177,7 +177,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		"\"\"\n";
 		for (int i = 0; i <= 1; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 2);
 	}
@@ -191,7 +191,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 
 		for (int i = 0; i <= 52; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53);
 	}
@@ -205,7 +205,7 @@ public class CSSSourcePartitionScannerTest extends TestCase
 
 		for (int i = 0; i <= 57; i++)
 		{
-			assertContentType(CSSSourceConfiguration.STRING, source, i);
+			assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 58);
 	}
@@ -224,11 +224,11 @@ public class CSSSourcePartitionScannerTest extends TestCase
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 7);
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 10);
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 11);
-		assertContentType(CSSSourceConfiguration.STRING, source, 12);
-		assertContentType(CSSSourceConfiguration.STRING, source, 14);
+		assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, 12);
+		assertContentType(CSSSourceConfiguration.STRING_SINGLE, source, 14);
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 15);
-		assertContentType(CSSSourceConfiguration.STRING, source, 16);
-		assertContentType(CSSSourceConfiguration.STRING, source, 18);
+		assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, 16);
+		assertContentType(CSSSourceConfiguration.STRING_DOUBLE, source, 18);
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 19);
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 20);
 	}
