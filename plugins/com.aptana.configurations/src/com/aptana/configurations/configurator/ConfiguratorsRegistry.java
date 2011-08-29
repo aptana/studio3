@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A registry for the Studio's configurators.
@@ -89,7 +90,15 @@ public class ConfiguratorsRegistry
 			String id = element.getAttribute(ATT_ID);
 			String name = element.getAttribute(ATT_NAME);
 			String processorId = element.getAttribute(ATT_PROCESSOR);
-			configurators.add(new Configurator(name, id, processorId));
+			if (id != null && name != null && processorId != null)
+			{
+				configurators.add(new Configurator(name, id, processorId));
+			}
+			else
+			{
+				IdeLog.logError(ConfigurationsPlugin.getDefault(),
+						"Error creating a configurator. One of the required attributes was one", (String) null); //$NON-NLS-1$
+			}
 		}
 	}
 

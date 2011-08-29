@@ -67,7 +67,8 @@ The configurators contributed here will appear in the Studio&apos;s configuratio
          <attribute name="processor" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  A &apos;processor&apos; id that was contributed through the &apos;configurationProcessors&apos; extension point.
+The &apos;configurator&apos; uses the attached &apos;processor&apos; when it&apos;s being invoked.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="com.aptana.configurations.configurationProcessors/processor/@id"/>
