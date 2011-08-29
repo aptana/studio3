@@ -42,16 +42,17 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	public final static String PREFIX = "__css_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
-	public final static String STRING = PREFIX + "string"; //$NON-NLS-1$
+	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, STRING };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, STRING_SINGLE, STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(getToken(STRING)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
-			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(getToken(STRING)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\"", "\"", new ExtendedToken(getToken(STRING_DOUBLE)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
+			new ResumableSingleLineRule("\'", "\'", new ExtendedToken(getToken(STRING_SINGLE)), '\\', true), //$NON-NLS-1$ //$NON-NLS-2$
 			new EmptyCommentRule(getToken(MULTILINE_COMMENT)),
 			new MultiLineRule("/*", "*/", getToken(MULTILINE_COMMENT), (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
@@ -64,7 +65,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 				ICSSConstants.CSS_SCOPE));
 		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
 				ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
-		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
 	}
 
 	public static CSSSourceConfiguration getDefault() {
@@ -133,8 +135,12 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
 		dr = new ThemeingDamagerRepairer(getStringScanner());
-		reconciler.setDamager(dr, STRING);
-		reconciler.setRepairer(dr, STRING);
+		reconciler.setDamager(dr, STRING_DOUBLE);
+		reconciler.setRepairer(dr, STRING_DOUBLE);
+
+		dr = new ThemeingDamagerRepairer(getStringScanner());
+		reconciler.setDamager(dr, STRING_SINGLE);
+		reconciler.setRepairer(dr, STRING_SINGLE);
 	}
 
 	/*
