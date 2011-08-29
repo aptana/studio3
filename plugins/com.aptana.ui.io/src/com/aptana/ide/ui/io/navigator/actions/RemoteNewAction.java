@@ -30,7 +30,7 @@ public class RemoteNewAction extends BaseSelectionListenerAction {
 
         protected MenuCreator() {
             fNewFolderAction = new NewFolderAction(fWindow);
-            fNewFileAction = new NewFileAction(fWindow);
+            fNewFileAction = new NewFileAction();
         }
 
         public void dispose() {

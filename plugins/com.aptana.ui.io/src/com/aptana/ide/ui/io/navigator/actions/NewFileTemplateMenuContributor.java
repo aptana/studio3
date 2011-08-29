@@ -9,8 +9,8 @@
 
 package com.aptana.ide.ui.io.navigator.actions;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,7 +22,6 @@ import java.util.TreeMap;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -39,9 +38,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
-import org.jruby.embed.io.ReaderInputStream;
 
-import com.aptana.editor.common.internal.scripting.NewFileWizard;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.internal.scripting.NewTemplateFileWizard;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
@@ -208,20 +206,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 					{
 						filetype = filetype.substring(index);
 					}
-					NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(), "new_file" + filetype) //$NON-NLS-1$
-					{
-
-						@Override
-						protected InputStream getInitialContents(IPath path)
-						{
-							String templateContent = NewFileWizard.getTemplateContent(template, path);
-							if (templateContent != null)
-							{
-								return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
-							}
-							return super.getInitialContents(path);
-						}
-					};
+					NewFileAction action = new NewFileAction("new_file" + filetype, template); //$NON-NLS-1$
 					action.updateSelection(selection);
 					action.run();
 					return;
@@ -249,14 +234,14 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 				if (fileStore != null)
 				{
 					// this is a non-workspace selection
-					NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(), initialFileName)
+					NewFileAction action = new NewFileAction(initialFileName)
 					{
 
 						@Override
-						protected InputStream getInitialContents(IPath path)
+						protected InputStream getInitialContents()
 						{
-							// blank content
-							return null;
+							// empty content
+							return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
 						}
 					};
 					action.updateSelection(selection);
