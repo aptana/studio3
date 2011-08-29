@@ -2,5 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="configurationProcessors" name="Configuration Processors" schema="schema/configurationProcessors.exsd"/>
+   <extension-point id="configurators" name="Studio Configurators" schema="schema/configurators.exsd"/>
 
 </plugin>

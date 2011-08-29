@@ -13,6 +13,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.expressions.ElementHandler;
+import org.eclipse.core.expressions.Expression;
+import org.eclipse.core.expressions.ExpressionConverter;
+import org.eclipse.core.expressions.ExpressionTagNames;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
@@ -212,7 +217,10 @@ public class ConfigurationProcessorsRegistry
 		{
 			try
 			{
-				return (IConfigurationProcessorDelegate) element.createExecutableExtension(ATT_CLASS);
+				IConfigurationProcessorDelegate delegate = (IConfigurationProcessorDelegate) element
+						.createExecutableExtension(ATT_CLASS);
+				delegate.setEnablement(getEnablementExpression());
+				return delegate;
 			}
 			catch (Throwable t)
 			{
@@ -240,6 +248,7 @@ public class ConfigurationProcessorsRegistry
 				{
 					processor.setCategories(categoryStr.split(", ")); //$NON-NLS-1$
 				}
+				processor.setEnablement(getEnablementExpression());
 				return processor;
 			}
 			catch (Throwable t)
@@ -247,6 +256,31 @@ public class ConfigurationProcessorsRegistry
 				IdeLog.logError(ConfigurationsPlugin.getDefault(),
 						"Failed creating a configuration processor extension", t); //$NON-NLS-1$
 			}
+			return null;
+		}
+
+		/**
+		 * Returns an enablement expression that is attached to the processor/delegate.
+		 * 
+		 * @return An enablement {@link Expression}; <code>null</code> if none was attached.
+		 */
+		private Expression getEnablementExpression()
+		{
+			IConfigurationElement[] enablement = element.getChildren(ExpressionTagNames.ENABLEMENT);
+			if (enablement != null && enablement.length > 0)
+			{
+				try
+				{
+					return ElementHandler.getDefault().create(ExpressionConverter.getDefault(), enablement[0]);
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(ConfigurationsPlugin.getDefault(),
+							"Error while creating the configuration enablement expression.", e); //$NON-NLS-1$
+					return null;
+				}
+			}
+			// In case there is no 'enablement' element, return null (the processor/delegator is considered enabled).
 			return null;
 		}
 	}
