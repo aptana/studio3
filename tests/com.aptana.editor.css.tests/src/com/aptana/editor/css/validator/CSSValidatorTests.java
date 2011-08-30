@@ -95,4 +95,20 @@ public class CSSValidatorTests extends AbstractValidatorTestCase
 		IValidationItem item = items.get(0);
 		assertEquals(IMarker.SEVERITY_WARNING, item.getSeverity());
 	}
+
+	public void testCSS3AtRule() throws CoreException
+	{
+		String text = "@namespace \"\";";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
+
+	public void testCSS3MediaQuery() throws CoreException
+	{
+		String text = "@media only screen and (max-width: 600px) {\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
 }
