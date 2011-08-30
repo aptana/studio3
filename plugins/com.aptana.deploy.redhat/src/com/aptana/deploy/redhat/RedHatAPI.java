@@ -165,8 +165,8 @@ public class RedHatAPI
 		newArgs[1] = login;
 		newArgs[2] = PASSWORD_SWITCH;
 		newArgs[3] = password;
-		IStatus status = ProcessUtil.runInBackground(binScript == null ? args[0] : quote(binScript.toOSString()), null,
-				ShellExecutable.getEnvironment(), newArgs);
+		IStatus status = ProcessUtil.runInBackground((binScript == null) ? args[0] : quote(binScript.toOSString()),
+				null, ShellExecutable.getEnvironment(), newArgs);
 		return status;
 	}
 

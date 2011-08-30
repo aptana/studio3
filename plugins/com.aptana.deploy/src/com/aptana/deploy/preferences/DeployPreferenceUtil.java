@@ -157,6 +157,7 @@ public class DeployPreferenceUtil
 		}
 		catch (BackingStoreException e)
 		{
+			IdeLog.logError(DeployPlugin.getDefault(), e);
 		}
 	}
 }
