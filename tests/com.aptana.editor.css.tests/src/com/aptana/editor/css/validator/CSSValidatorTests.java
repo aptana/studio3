@@ -92,7 +92,6 @@ public class CSSValidatorTests extends AbstractValidatorTestCase
 		assertEquals(1, items.size());
 
 		// makes sure it's just a warning unrelated to the src
-
 		IValidationItem item = items.get(0);
 		assertEquals(IMarker.SEVERITY_WARNING, item.getSeverity());
 	}

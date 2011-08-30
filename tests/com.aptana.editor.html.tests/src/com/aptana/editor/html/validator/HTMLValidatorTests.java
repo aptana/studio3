@@ -136,7 +136,7 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		String text = "<script src=\"\"></script>";
 
 		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
-		assertEquals(0, items.size());
+		assertEquals(1, items.size());
 	}
 
 	public void testHTML5HeaderTag() throws CoreException
@@ -144,7 +144,7 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		String text = "<header><h1></h1></header>";
 
 		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
-		assertEquals(0, items.size());
+		assertEquals(1, items.size());
 	}
 
 	public void testHTML5NavTag() throws CoreException
@@ -152,7 +152,7 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		String text = "<nav></nav>";
 
 		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
-		assertEquals(0, items.size());
+		assertEquals(1, items.size());
 	}
 
 	@Override
