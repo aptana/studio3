@@ -924,7 +924,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			visitTextNode(start, start + 3, !hasAnyCommentBefore(start), 0, 0, node.getSemicolonIncluded());
 			// push the expression
 			visitTextNode(expression, true, 1);
-			if (!arguments.isEmpty())
+			if (!arguments.isEmpty() || document.charAt(argumentsNode.getStartingOffset()) == '(')
 			{
 				pushParametersInParentheses(argumentsNode.getStartingOffset(), argumentsNode.getEndingOffset(),
 						arguments, TypePunctuation.COMMA, false);
