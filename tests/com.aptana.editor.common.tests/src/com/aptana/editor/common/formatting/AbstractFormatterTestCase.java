@@ -116,8 +116,8 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		{
 			assertNotNull("Could not format " + filename, formattedTextEdit); //$NON-NLS-1$
 			formattedTextEdit.apply(document);
-			assertTrue("Formatted contents of " + filename + " do not match expected contents", //$NON-NLS-1$ //$NON-NLS-2$
-					compareWithWhiteSpace(document.get().replaceAll("\r\n", "\n"), expectedResult));//$NON-NLS-1$ //$NON-NLS-2$
+			assertEqualsWithWhiteSpace("Formatted contents of " + filename + " do not match expected contents", //$NON-NLS-1$ //$NON-NLS-2$
+					expectedResult, document.get().replaceAll("\r\n", "\n"));//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (MalformedTreeException e)
 		{
@@ -160,6 +160,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	/**
 	 * Do a basic string comparison.
 	 * 
+	 * @deprecated Please use {@link #assertEqualsWithWhiteSpace(String, String, String)}
 	 * @param formattedText
 	 * @param expectedResult
 	 * @return True, if the formattedText and the expectedResults are equal.
@@ -179,6 +180,23 @@ public abstract class AbstractFormatterTestCase extends TestCase
 			expectedResult = expectedResult.substring(0, expectedResult.length() - 1);
 		}
 		return expectedResult.equals(formattedText);
+	}
+
+	protected void assertEqualsWithWhiteSpace(String message, String expected, String actual)
+	{
+		// This is a temporary hack for cases where there is a difference when running on Windows vs. Linux.
+		// In some cases, we get an extra ending line terminator, probably because we don't run the formatting in a
+		// 'standard' way through the ScriptFormattingStrategy and the IContentFormatter.
+		// The hack check for an extra new-line and the end of one of the strings we compare.
+		if (actual.endsWith("\n") && !expected.endsWith("\n"))
+		{
+			actual = actual.substring(0, actual.length() - 1);
+		}
+		else if (!actual.endsWith("\n") && expected.endsWith("\n"))
+		{
+			expected = expected.substring(0, expected.length() - 1);
+		}
+		assertEquals(message, actual, expected);
 	}
 
 	/**
