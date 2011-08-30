@@ -3,6 +3,767 @@
   <aliases>
     <alias name="$" type="jQuery"/>
   </aliases>
+  <class type="Promise" superclass="Object">
+    <constructors>
+      <constructor>
+        <parameters/>
+        <return-types>
+          <return-type type="Promise"/>
+        </return-types>
+        <description>This object provides a subset of the methods of the Deferred object (then, done, fail, always, pipe. isResolved, and isRejected) to prevent users from changing the state of the Deferred..</description>
+      </constructor>
+    </constructors>
+    <methods>
+      <method name="pipe" scope="instance">
+        <parameters>
+          <parameter name="doneFilter" type="Function" usage="optional">
+            <description>
+        An optional function that is called when the Deferred is resolved.
+      </description>
+          </parameter>
+          <parameter name="failFilter" type="Function" usage="optional">
+            <description>
+        An optional function that is called when the Deferred is rejected.
+      </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Promise"/>
+        </return-types>
+        <description> Utility method to filter and/or chain Deferreds.  </description>
+        <examples>
+          <example>
+			&lt;p&gt;Filter resolve value:&lt;/p&gt;
+		
+		&lt;p&gt;
+var defer = $.Deferred(),
+    filtered = defer.pipe(function( value ) {
+      return value * 2;
+    });
+
+defer.resolve( 5 );
+filtered.done(function( value ) {
+  alert( "Value is ( 2*5 = ) 10: " + value );
+});
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Filter reject value:&lt;/p&gt;
+		
+		&lt;p&gt;
+var defer = $.Deferred(),
+    filtered = defer.pipe( null, function( value ) {
+      return value * 3;
+    });
+
+defer.reject( 6 );
+filtered.fail(function( value ) {
+  alert( "Value is ( 3*6 = ) 18: " + value );
+});
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Chain tasks:&lt;/p&gt;
+		
+		&lt;p&gt;
+var request = $.ajax( url, { dataType: "json" } ),
+    chained = request.pipe(function( data ) {
+      return $.ajax( url2, { data: { user: data.userId } } );
+    });
+
+chained.done(function( data ) {
+  // data retrieved from url2 as provided by the first request
+});
+
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="always" scope="instance">
+        <parameters>
+          <parameter name="alwaysCallbacks" type="Function" usage="required">
+            <description>
+        A function, or array of functions, that is called when the Deferred is resolved or rejected.
+      </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is either resolved or rejected. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get() method returns a jqXHR object, which is derived from a Deferred object, we can attach a callback for both success and error using the deferred.always() method.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php").always( function() { 
+  alert("$.get completed with success or error callback arguments"); 
+} );
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="promise" scope="instance">
+        <parameters>
+          <parameter name="target" type="Object" usage="optional">
+            <description>Object onto which the promise methods have to be attached</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Promise"/>
+        </return-types>
+        <description> Return a Deferred's Promise object. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Create a Deferred and set two timer-based functions to either resolve or reject the Deferred after a random interval. Whichever one fires first "wins" and will call one of the callbacks. The second timeout has no effect since the Deferred is already complete (in a resolved or rejected state) from the first timeout action.&lt;/p&gt;
+		
+		&lt;p&gt;// Create a Deferred and return its Promise
+function asyncEvent(){
+    var dfd = new jQuery.Deferred();
+    setTimeout(function(){
+        dfd.resolve("hurray");
+    }, Math.floor(Math.random()*1500));
+    setTimeout(function(){
+        dfd.reject("sorry");
+    }, Math.floor(Math.random()*1500));
+    return dfd.promise();
+}
+
+// Attach a done and fail handler for the asyncEvent
+$.when( asyncEvent() ).then(
+    function(status){
+        alert( status+', things are going well' );
+    },
+    function(status){
+        alert( status+', you fail this time' );
+    }
+);
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Use the target argument to promote an existing object to a Promise:&lt;/p&gt;
+		
+		&lt;p&gt;
+// Existing object
+var obj = {
+  hello: function( name ) {
+    alert( "Hello " + name );
+  }
+},
+// Create a Deferred
+defer = $.Deferred();
+
+// Set object as a promise
+defer.promise( obj );
+
+// Resolve the deferred
+defer.resolve( "John" );
+
+// Use the object as a Promise
+obj.done(function( name ) {
+  obj.hello( name ); // will alert "Hello John"
+}).hello( "Karl" ); // will alert "Hello Karl"
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="fail" scope="instance">
+        <parameters>
+          <parameter name="failCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, that are called when the Deferred is rejected.
+           </description>
+          </parameter>
+          <parameter name="failCallbacks" type="Function" usage="optional">
+            <description>
+             Optional additional functions, or arrays of functions, that are called when the Deferred is rejected.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is rejected. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get method returns a jqXHR object, which is derived from a Deferred, you can attach a success and failure callback using the deferred.done() and deferred.fail() methods.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php")
+  .done(function(){ alert("$.get succeeded"); })
+  .fail(function(){ alert("$.get failed!"); });
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="done" scope="instance">
+        <parameters>
+          <parameter name="doneCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, that are called when the Deferred is resolved.
+           </description>
+          </parameter>
+          <parameter name="doneCallbacks" type="Function" usage="optional">
+            <description>
+             Optional additional functions, or arrays of functions, that are called when the Deferred is resolved.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is resolved. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get method returns a jqXHR object, which is derived from a Deferred object, we can attach a success callback using the .done() method.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php").done(function() { 
+  alert("$.get succeeded"); 
+});
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Resolve a Deferred object when the user clicks a button, triggering a number of callback functions:&lt;/p&gt;
+		
+		&lt;p&gt;
+// 3 functions to call when the Deferred object is resolved
+function fn1() {
+  $("p").append(" 1 ");
+}
+function fn2() {
+  $("p").append(" 2 ");
+}
+function fn3(n) {
+  $("p").append(n + " 3 " + n);
+}
+
+// create a deferred object
+var dfd = $.Deferred();
+
+// add handlers to be called when dfd is resolved
+dfd
+// .done() can take any number of functions or arrays of functions
+.done( [fn1, fn2], fn3, [fn2, fn1] )
+// we can chain done methods, too
+.done(function(n) {
+  $("p").append(n + " we're done.");
+});
+
+// resolve the Deferred object when the button is clicked
+$("button").bind("click", function() {
+  dfd.resolve("and");
+});
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="then" scope="instance">
+        <parameters>
+          <parameter name="doneCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, called when the Deferred is resolved.
+           </description>
+          </parameter>
+          <parameter name="failCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, called when the Deferred is rejected.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is resolved or rejected. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get method returns a jqXHR object, which is derived from a Deferred object, we can attach handlers using the .then method.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php").then(
+    function(){ alert("$.get succeeded"); },
+    function(){ alert("$.get failed!"); }
+);
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="isRejected" scope="instance">
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <description> Determine whether a Deferred object has been rejected. </description>
+      </method>
+      <method name="isResolved" scope="instance">
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <description> Determine whether a Deferred object has been resolved. </description>
+      </method>
+    </methods>
+  </class>
+  <class type="Deferred" superclass="Object">
+    <constructors>
+      <constructor>
+        <parameters>
+          <parameter name="function" type="Function" usage="optional">
+            <description>An optional function which is called just before the constructor returns and is passed the constructed deferred object as both the this object and as the first argument to the function.</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description>A chainable utility object that can register multiple callbacks into callback queues, invoke callback queues, and relay the success or failure state of any synchronous or asynchronous function.</description>
+      </constructor>
+    </constructors>
+    <methods>
+      <method name="pipe" scope="instance">
+        <parameters>
+          <parameter name="doneFilter" type="Function" usage="optional">
+            <description>
+        An optional function that is called when the Deferred is resolved.
+      </description>
+          </parameter>
+          <parameter name="failFilter" type="Function" usage="optional">
+            <description>
+        An optional function that is called when the Deferred is rejected.
+      </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Promise"/>
+        </return-types>
+        <description> Utility method to filter and/or chain Deferreds.  </description>
+        <examples>
+          <example>
+			&lt;p&gt;Filter resolve value:&lt;/p&gt;
+		
+		&lt;p&gt;
+var defer = $.Deferred(),
+    filtered = defer.pipe(function( value ) {
+      return value * 2;
+    });
+
+defer.resolve( 5 );
+filtered.done(function( value ) {
+  alert( "Value is ( 2*5 = ) 10: " + value );
+});
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Filter reject value:&lt;/p&gt;
+		
+		&lt;p&gt;
+var defer = $.Deferred(),
+    filtered = defer.pipe( null, function( value ) {
+      return value * 3;
+    });
+
+defer.reject( 6 );
+filtered.fail(function( value ) {
+  alert( "Value is ( 3*6 = ) 18: " + value );
+});
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Chain tasks:&lt;/p&gt;
+		
+		&lt;p&gt;
+var request = $.ajax( url, { dataType: "json" } ),
+    chained = request.pipe(function( data ) {
+      return $.ajax( url2, { data: { user: data.userId } } );
+    });
+
+chained.done(function( data ) {
+  // data retrieved from url2 as provided by the first request
+});
+
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="always" scope="instance">
+        <parameters>
+          <parameter name="alwaysCallbacks" type="Function" usage="required">
+            <description>
+        A function, or array of functions, that is called when the Deferred is resolved or rejected.
+      </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is either resolved or rejected. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get() method returns a jqXHR object, which is derived from a Deferred object, we can attach a callback for both success and error using the deferred.always() method.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php").always( function() { 
+  alert("$.get completed with success or error callback arguments"); 
+} );
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="promise" scope="instance">
+        <parameters>
+          <parameter name="target" type="Object" usage="optional">
+            <description>Object onto which the promise methods have to be attached</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Promise"/>
+        </return-types>
+        <description> Return a Deferred's Promise object. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Create a Deferred and set two timer-based functions to either resolve or reject the Deferred after a random interval. Whichever one fires first "wins" and will call one of the callbacks. The second timeout has no effect since the Deferred is already complete (in a resolved or rejected state) from the first timeout action.&lt;/p&gt;
+		
+		&lt;p&gt;// Create a Deferred and return its Promise
+function asyncEvent(){
+    var dfd = new jQuery.Deferred();
+    setTimeout(function(){
+        dfd.resolve("hurray");
+    }, Math.floor(Math.random()*1500));
+    setTimeout(function(){
+        dfd.reject("sorry");
+    }, Math.floor(Math.random()*1500));
+    return dfd.promise();
+}
+
+// Attach a done and fail handler for the asyncEvent
+$.when( asyncEvent() ).then(
+    function(status){
+        alert( status+', things are going well' );
+    },
+    function(status){
+        alert( status+', you fail this time' );
+    }
+);
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Use the target argument to promote an existing object to a Promise:&lt;/p&gt;
+		
+		&lt;p&gt;
+// Existing object
+var obj = {
+  hello: function( name ) {
+    alert( "Hello " + name );
+  }
+},
+// Create a Deferred
+defer = $.Deferred();
+
+// Set object as a promise
+defer.promise( obj );
+
+// Resolve the deferred
+defer.resolve( "John" );
+
+// Use the object as a Promise
+obj.done(function( name ) {
+  obj.hello( name ); // will alert "Hello John"
+}).hello( "Karl" ); // will alert "Hello Karl"
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="resolveWith" scope="instance">
+        <parameters>
+          <parameter name="context" type="Object" usage="required">
+            <description>
+             Context passed to the doneCallbacks as the </description>
+          </parameter>
+          <parameter name="args" type="Array" usage="optional">
+            <description>
+             An optional array of arguments that are passed to the doneCallbacks.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Resolve a Deferred object and call any doneCallbacks with the given </description>
+      </method>
+      <method name="rejectWith" scope="instance">
+        <parameters>
+          <parameter name="context" type="Object" usage="required">
+            <description>
+             Context passed to the failCallbacks as the </description>
+          </parameter>
+          <parameter name="args" type="Array" usage="optional">
+            <description>
+             An optional array of arguments that are passed to the failCallbacks.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Reject a Deferred object and call any failCallbacks with the given </description>
+      </method>
+      <method name="fail" scope="instance">
+        <parameters>
+          <parameter name="failCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, that are called when the Deferred is rejected.
+           </description>
+          </parameter>
+          <parameter name="failCallbacks" type="Function" usage="optional">
+            <description>
+             Optional additional functions, or arrays of functions, that are called when the Deferred is rejected.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is rejected. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get method returns a jqXHR object, which is derived from a Deferred, you can attach a success and failure callback using the deferred.done() and deferred.fail() methods.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php")
+  .done(function(){ alert("$.get succeeded"); })
+  .fail(function(){ alert("$.get failed!"); });
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="done" scope="instance">
+        <parameters>
+          <parameter name="doneCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, that are called when the Deferred is resolved.
+           </description>
+          </parameter>
+          <parameter name="doneCallbacks" type="Function" usage="optional">
+            <description>
+             Optional additional functions, or arrays of functions, that are called when the Deferred is resolved.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is resolved. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get method returns a jqXHR object, which is derived from a Deferred object, we can attach a success callback using the .done() method.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php").done(function() { 
+  alert("$.get succeeded"); 
+});
+&lt;/p&gt;
+	</example>
+          <example>
+			&lt;p&gt;Resolve a Deferred object when the user clicks a button, triggering a number of callback functions:&lt;/p&gt;
+		
+		&lt;p&gt;
+// 3 functions to call when the Deferred object is resolved
+function fn1() {
+  $("p").append(" 1 ");
+}
+function fn2() {
+  $("p").append(" 2 ");
+}
+function fn3(n) {
+  $("p").append(n + " 3 " + n);
+}
+
+// create a deferred object
+var dfd = $.Deferred();
+
+// add handlers to be called when dfd is resolved
+dfd
+// .done() can take any number of functions or arrays of functions
+.done( [fn1, fn2], fn3, [fn2, fn1] )
+// we can chain done methods, too
+.done(function(n) {
+  $("p").append(n + " we're done.");
+});
+
+// resolve the Deferred object when the button is clicked
+$("button").bind("click", function() {
+  dfd.resolve("and");
+});
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="then" scope="instance">
+        <parameters>
+          <parameter name="doneCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, called when the Deferred is resolved.
+           </description>
+          </parameter>
+          <parameter name="failCallbacks" type="Function" usage="required">
+            <description>
+             A function, or array of functions, called when the Deferred is rejected.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Add handlers to be called when the Deferred object is resolved or rejected. </description>
+        <examples>
+          <example>
+			&lt;p&gt;Since the jQuery.get method returns a jqXHR object, which is derived from a Deferred object, we can attach handlers using the .then method.&lt;/p&gt;
+		
+		&lt;p&gt;
+$.get("test.php").then(
+    function(){ alert("$.get succeeded"); },
+    function(){ alert("$.get failed!"); }
+);
+&lt;/p&gt;
+	</example>
+        </examples>
+      </method>
+      <method name="reject" scope="instance">
+        <parameters>
+          <parameter name="args" type="Object" usage="required">
+            <description>
+             Optional arguments that are passed to the failCallbacks.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Reject a Deferred object and call any failCallbacks with the given </description>
+      </method>
+      <method name="isRejected" scope="instance">
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <description> Determine whether a Deferred object has been rejected. </description>
+      </method>
+      <method name="isResolved" scope="instance">
+        <return-types>
+          <return-type type="Boolean"/>
+        </return-types>
+        <description> Determine whether a Deferred object has been resolved. </description>
+      </method>
+      <method name="resolve" scope="instance">
+        <parameters>
+          <parameter name="args" type="Object" usage="required">
+            <description>
+             Optional arguments that are passed to the doneCallbacks.
+           </description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description> Resolve a Deferred object and call any doneCallbacks with the given </description>
+      </method>
+    </methods>
+  </class>
+  <class type="jqXHR" superclass="Promise" visibility="basic">
+    <description>Object that transfers data between a web client and a remote web server.</description>
+    <constructors>
+      <constructor visibility="internal">
+        <description>Creates a new instance of an XMLHttpRequest object.</description>
+        <parameters/>
+        <exceptions/>
+        <return-types>
+          <return-type type="jqXHR"/>
+        </return-types>
+      </constructor>
+    </constructors>
+    <properties>
+      <property name="readyState" type="Number" access="read" visibility="basic">
+        <description>Returns the current state of an object. Valid values are 0=uninitialized, 1=open, 2=sent, 3=receiving, 4=loaded.</description>
+      </property>
+      <property name="responseText" type="String" access="read" visibility="basic">
+        <description>Response formatted as a string.</description>
+      </property>
+      <property name="responseXML" type="Document" access="read" visibility="basic">
+        <description>Response formatted as an XML document.</description>
+      </property>
+      <property name="status" type="Number" access="read" visibility="basic">
+        <description>Status of the Response. (e.g. 200="OK", 404="Not Found", etc.)</description>
+      </property>
+      <property name="statusText" type="String" access="read" visibility="basic">
+        <description>Response text corresonding to status (e.g. "OK", "Not Found", etc.)</description>
+      </property>
+    </properties>
+    <methods>
+      <method name="overrideMimeType" visibility="basic">
+        <description>May be used in the beforeSend() callback function, for example, to modify the response content-type header.</description>
+        <parameters>
+          <parameter name="type" type="String" usage="required">
+            <description>String representing the mime type.</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="void"/>
+        </return-types>
+        <example/>
+        <remarks>Although currently recognized by most browsers, the XMLHttpRequest object will be part of the HTML DOM Level 3 specification.</remarks>
+      </method>
+      <method name="abort" visibility="basic">
+        <description>Cancels the current request.</description>
+        <return-types>
+          <return-type type="void"/>
+        </return-types>
+        <example/>
+        <remarks>Although currently recognized by most browsers, the XMLHttpRequest object will be part of the HTML DOM Level 3 specification.</remarks>
+      </method>
+      <method name="getAllResponseHeaders" visibility="basic">
+        <description>Returns all HTTP headers as a single string.</description>
+        <return-description>Returns all HTTP headers as a single string.</return-description>
+        <return-types>
+          <return-type type="String"/>
+        </return-types>
+        <example/>
+        <remarks>Although currently recognized by most browsers, the XMLHttpRequest object will be part of the HTML DOM Level 3 specification.</remarks>
+      </method>
+      <method name="getResponseHeader" visibility="basic">
+        <description>Returns the value of the specified HTTP header.</description>
+        <return-description>Returns the value of the specified HTTP header.</return-description>
+        <parameters>
+          <parameter name="header" type="String" usage="required">
+            <description>Name of the HTTP header.</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="String"/>
+        </return-types>
+        <example/>
+        <remarks>Although currently recognized by most browsers, the XMLHttpRequest object will be part of the HTML DOM Level 3 specification.</remarks>
+      </method>
+      <method name="setRequestHeader" visibility="basic">
+        <description>Sets a header and a value for the request.</description>
+        <parameters>
+          <parameter name="header" type="String, Document" usage="required">
+            <description>Name of the header.</description>
+          </parameter>
+          <parameter name="value" type="String, Document" usage="required">
+            <description>Value of the header.</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="void"/>
+        </return-types>
+        <exceptions>
+          <exception type="DOMException">
+            <description>Throws an UNKNOWN_ERR error.</description>
+          </exception>
+        </exceptions>
+        <example/>
+        <remarks>Although currently recognized by most browsers, the XMLHttpRequest object will be part of the HTML DOM Level 3 specification.</remarks>
+      </method>
+    </methods>
+    <example/>
+    <remarks>Although currently recognized by most browsers, the XMLHttpRequest object will be part of the HTML DOM Level 3 specification.</remarks>
+  </class>
   <class type="jQuery">
     <constructors>
       <constructor>
@@ -161,7 +922,7 @@ alert( 'You are running jQuery version: ' + $.fn.jquery );
         <examples>
           <example>
 			&lt;p&gt;Cause all animations to run with less frames.&lt;/p&gt;
-	
+		
 		&lt;p&gt;
 jQuery.fx.interval = 100;
 
@@ -345,6 +1106,17 @@ if ( $.browser.msie ) {
       </property>
     </properties>
     <methods>
+      <method name="Deferred" visibility="basic">
+        <parameters>
+          <parameter name="function" type="Function" usage="optional">
+            <description>An optional function which is called just before the constructor returns and is passed the constructed deferred object as both the this object and as the first argument to the function.</description>
+          </parameter>
+        </parameters>
+        <return-types>
+          <return-type type="Deferred"/>
+        </return-types>
+        <description>A chainable utility object that can register multiple callbacks into callback queues, invoke callback queues, and relay the success or failure state of any synchronous or asynchronous function.</description>
+      </method>
       <method name="promise" scope="instance">
         <parameters>
           <parameter name="type" type="String" usage="optional">

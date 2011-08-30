@@ -288,4 +288,73 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 	{
 		assertInstanceProperties_1_6_2("sdocml/$-add-properties.js");
 	}
+
+	// @formatter:off
+	// Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389
+	/*
+	public void testDollarJQXHR()
+	{
+		indexAndCheckProposals(
+			"sdocml/jquery.1.6.2.sdocml",
+			"sdocml/$-jqXHR.js",
+			"readyState", // Properties
+			"responseText",
+			"responseXML",
+			"status",
+			"statusText",
+			"overrideMimeType", //jqXHR methods
+			"abort",
+			"getAllResponseHeaders",
+			"getResponseHeader",
+			"setRequestHeader",
+			"pipe", // Deferred methods
+			"always",
+			"promise",
+			"fail",
+			"done",
+			"then",
+			"isRejected",
+			"isResolved"
+		);
+	}
+
+	public void testDollarDeferred()
+	{
+		indexAndCheckProposals(
+			"sdocml/jquery.1.6.2.sdocml",
+			"sdocml/$-Deferred.js",
+			"pipe", // Deferred methods
+			"always",
+			"promise",
+			"resolveWith",
+			"rejectWith",
+			"fail",
+			"done",
+			"then",
+			"reject",
+			"isRejected",
+			"isResolved",
+			"resolve"
+		);
+	}
+
+	public void testPromise()
+	{
+		// @formatter:off
+		indexAndCheckProposals(
+			"sdocml/jquery.1.6.2.sdocml",
+			"sdocml/Promise.js",
+			"pipe", // Promise methods
+			"always",
+			"promise",
+			"fail",
+			"done",
+			"then",
+			"isRejected",
+			"isResolved"
+		);
+	}
+	*/
+	// @formatter:on
+
 }
