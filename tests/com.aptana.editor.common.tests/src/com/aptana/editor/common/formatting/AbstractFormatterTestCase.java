@@ -196,7 +196,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		{
 			expected = expected.substring(0, expected.length() - 1);
 		}
-		assertEquals(message, actual, expected);
+		assertEquals(message, expected, actual);
 	}
 
 	/**
