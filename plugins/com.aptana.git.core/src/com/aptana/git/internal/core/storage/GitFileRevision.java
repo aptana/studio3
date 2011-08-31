@@ -13,7 +13,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.provider.FileRevision;
@@ -28,7 +27,7 @@ public abstract class GitFileRevision extends FileRevision
 	private static final String DEV_NULL = "/dev/null"; //$NON-NLS-1$
 	private final String path;
 
-	GitFileRevision(final String fileName)
+	protected GitFileRevision(final String fileName)
 	{
 		path = fileName;
 	}
@@ -40,7 +39,7 @@ public abstract class GitFileRevision extends FileRevision
 			return path;
 		}
 		final int last = path.lastIndexOf(File.separator);
-		return last >= 0 ? path.substring(last + 1) : path;
+		return (last >= 0) ? path.substring(last + 1) : path;
 	}
 
 	public boolean isPropertyMissing()
@@ -48,7 +47,7 @@ public abstract class GitFileRevision extends FileRevision
 		return false;
 	}
 
-	public IFileRevision withAllProperties(final IProgressMonitor monitor) throws CoreException
+	public IFileRevision withAllProperties(final IProgressMonitor monitor)
 	{
 		return this;
 	}

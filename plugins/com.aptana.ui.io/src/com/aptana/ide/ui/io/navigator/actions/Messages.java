@@ -52,8 +52,8 @@ public class Messages extends NLS
 
 	public static String NewFileAction_Confirm_Message;
 	public static String NewFileAction_Confirm_Title;
-	public static String NewFileAction_InputMessage;
-	public static String NewFileAction_InputTitle;
+	public static String NewExternalFileWizard_Description;
+	public static String NewExternalFileWizard_Title;
 	public static String NewFileAction_JobTitle;
 	public static String NewFileAction_Text;
 	public static String NewFileAction_ToolTip;
@@ -76,6 +76,8 @@ public class Messages extends NLS
 
 	public static String OpenFileAction_ERR_FailedOpenFile;
 	public static String OpenFileAction_Text;
+
+	public static String WizardNewExternalFilePage_LBL_Filename;
 
 	static
 	{

@@ -7,7 +7,13 @@
  */
 package com.aptana.editor.js.text.rules;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.text.rules.IWordDetector;
+
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSLanguageConstants;
 
 /**
  * Special "word" detector for finding JS operators.
@@ -16,7 +22,37 @@ import org.eclipse.jface.text.rules.IWordDetector;
  */
 public class JSOperatorDetector implements IWordDetector
 {
-	private int fPosition;
+	StringBuilder buffer = new StringBuilder();
+	Set<String> prefixes = new HashSet<String>();
+
+	/**
+	 * JSOperatorDetector
+	 */
+	public JSOperatorDetector()
+	{
+		for (String operator : JSLanguageConstants.OPERATORS)
+		{
+			addWord(operator);
+		}
+	}
+
+	/**
+	 * addWord
+	 * 
+	 * @param word
+	 */
+	public void addWord(String word)
+	{
+		if (!StringUtil.isEmpty(word))
+		{
+			for (int i = 1; i < word.length(); i++)
+			{
+				prefixes.add(word.substring(0, i));
+			}
+
+			prefixes.add(word);
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -24,31 +60,9 @@ public class JSOperatorDetector implements IWordDetector
 	 */
 	public boolean isWordPart(char c)
 	{
-		fPosition++;
-		if (fPosition > 1)
-		{
-			switch (c)
-			{
-				case '=':
-				case '>':
-					return true;
-				default:
-					return false;
-			}
-		}
-		switch (c)
-		{
-			case '&':
-			case '-':
-			case '+':
-			case '=':
-			case '<':
-			case '>':
-			case '|':
-				return true;
-			default:
-				return false;
-		}
+		buffer.append(c);
+
+		return prefixes.contains(buffer.toString());
 	}
 
 	/*
@@ -57,24 +71,8 @@ public class JSOperatorDetector implements IWordDetector
 	 */
 	public boolean isWordStart(char c)
 	{
-		fPosition = 0;
-		switch (c)
-		{
-			case '!':
-			case '%':
-			case '&':
-			case '*':
-			case '-':
-			case '+':
-			case '=':
-			case '<':
-			case '>':
-			case '|':
-			case '/':
-			case '^':
-				return true;
-			default:
-				return false;
-		}
+		buffer.setLength(0);
+
+		return isWordPart(c);
 	}
 }

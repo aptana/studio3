@@ -5,8 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html;
+package com.aptana.editor.js.contentassist.model;
 
+/**
+ * IPropertyInformation
+ */
+public interface IPropertyInformation<N>
+{
+	String getHeader();
 
-public class HTMLScopeScanner extends HTMLTagScanner {
+	Object getPropertyValue(N node);
 }

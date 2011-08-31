@@ -39,9 +39,8 @@ public class DeployWizardRegistry extends AbstractExtensionWizardRegistry
 	/**
 	 * 
 	 */
-	public DeployWizardRegistry()
+	private DeployWizardRegistry()
 	{
-		super();
 	}
 
 	/*

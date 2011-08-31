@@ -19,6 +19,7 @@ public class AllTests
 		suite.addTestSuite(JSIndexTests.class);
 		suite.addTestSuite(JSMetadataIndexWriterTests.class);
 		suite.addTestSuite(MetadataTests.class);
+		suite.addTestSuite(SDocMLIndexingTests.class);
 		// $JUnit-END$
 		return suite;
 	}

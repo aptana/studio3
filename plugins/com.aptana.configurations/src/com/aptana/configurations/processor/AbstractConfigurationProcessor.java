@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,6 +20,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.configurations.ConfigurationsUtil;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 
@@ -48,6 +50,7 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 
 	protected String[] urls;
 	protected Map<String, String> attributesMap;
+	protected Expression enablementExpression;
 
 	/**
 	 * Constructs a new configuration processor.<br>
@@ -84,6 +87,28 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	public String getID()
 	{
 		return processorID;
+	}
+
+	/**
+	 * Set the processor's enablement {@link Expression}.
+	 * 
+	 * @param enablementExpression
+	 *            An {@link Expression} that will be evaluated to determine the enablement of this processor. May be
+	 *            <code>null</code> to indicate that the processor is always enabled.
+	 */
+	public void setEnablement(Expression enablementExpression)
+	{
+		this.enablementExpression = enablementExpression;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.IConfigurationProcessor#isEnabled()
+	 */
+	public boolean isEnabled()
+	{
+		boolean enabled = ConfigurationsUtil.evaluateEnablement(enablementExpression);
+		return enabled && hasEnabledDelegates();
 	}
 
 	/**
@@ -231,6 +256,30 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns <code>true</code> if this processor has no delegates, of if it has delegates and at least one delegate is
+	 * enabled.
+	 * 
+	 * @return <code>true</code> if there are no delegates, or there is at least one enabled delegate.
+	 */
+	protected boolean hasEnabledDelegates()
+	{
+		Set<IConfigurationProcessorDelegate> delegates = ConfigurationProcessorsRegistry.getInstance()
+				.getProcessorDelegators(getID());
+		if (!delegates.isEmpty())
+		{
+			for (IConfigurationProcessorDelegate delegate : delegates)
+			{
+				if (delegate.isEnabled())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
 	}
 
 	/**

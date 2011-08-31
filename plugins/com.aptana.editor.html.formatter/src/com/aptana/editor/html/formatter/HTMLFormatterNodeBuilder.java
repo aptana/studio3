@@ -23,7 +23,7 @@ import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
-import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
+import com.aptana.editor.html.parsing.ast.IHTMLNodeTypes;
 import com.aptana.formatter.ExcludeRegionList.EXCLUDE_STRATEGY;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterWriter;
@@ -149,7 +149,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			HTMLNode htmlNode = (HTMLNode) node;
 			short nodeType = htmlNode.getNodeType();
-			if (nodeType == HTMLNodeTypes.COMMENT)
+			if (nodeType == IHTMLNodeTypes.COMMENT)
 			{
 				// We got a HTMLCommentNode
 				FormatterCommentNode commentNode = new FormatterHTMLCommentNode(document, htmlNode.getStartingOffset(),
@@ -157,7 +157,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// We just need to add a child here. We cannot 'push', since the comment node is not a container node.
 				addChild(commentNode);
 			}
-			else if (nodeType == HTMLNodeTypes.ELEMENT || nodeType == HTMLNodeTypes.SPECIAL)
+			else if (nodeType == IHTMLNodeTypes.ELEMENT || nodeType == IHTMLNodeTypes.SPECIAL)
 			{
 				// Check if we need to create a formatter node with a begin and end node, or just begin node.
 				HTMLElementNode elementNode = (HTMLElementNode) node;
@@ -183,7 +183,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					pushFormatterNode(elementNode);
 				}
 			}
-			else if (nodeType == HTMLNodeTypes.TEXT)
+			else if (nodeType == IHTMLNodeTypes.TEXT)
 			{
 				FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, htmlNode.getParent(),
 						htmlNode.getPreviousSibling(), htmlNode.getStart(), htmlNode.getEnd() + 1);
@@ -367,7 +367,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
 				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
-		if (node.getNodeType() == HTMLNodeTypes.SPECIAL && !IHTMLConstants.CONTENT_TYPE_HTML.equals(node.getLanguage()))
+		if (node.getNodeType() == IHTMLNodeTypes.SPECIAL && !IHTMLConstants.CONTENT_TYPE_HTML.equals(node.getLanguage()))
 		{
 			// Everything under this HTMLSpecialNode should be wrapped with a
 			// FormatterSpecialElementNode, and no need to visit its children.

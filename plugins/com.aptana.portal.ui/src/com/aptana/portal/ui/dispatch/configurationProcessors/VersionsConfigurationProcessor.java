@@ -48,7 +48,9 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 {
 	/**
 	 * Compute the versions of the given items in the attributes instance. Items that are not in the supported list of
-	 * programs are set to an 'unknown' state, just as they are not installed.
+	 * programs are set to an 'unknown' state, just as they are not installed.<br>
+	 * The computation expects an attributes array with three items - <appName><appVersion><appInstallerURL> (this
+	 * specific call don't use the installer-URL, but it needs to be there for the Portal's functionalities)
 	 */
 	@Override
 	public ConfigurationStatus computeStatus(IProgressMonitor progressMonitor, Object attributes)

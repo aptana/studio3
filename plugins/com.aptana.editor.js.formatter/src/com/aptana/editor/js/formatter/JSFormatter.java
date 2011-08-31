@@ -84,6 +84,7 @@ import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -293,7 +294,14 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		// Flatten the AST's and do a string compare
 		// The toString() of the JSParseRootNode calls the JSFormatWalker,
 		// which should generate the same string for the input and the output.
-		return outputParseResult.toString().equals(inputParseResult.toString());
+		String flattenOutputAST = outputParseResult.toString();
+		String flattenInputAST = inputParseResult.toString();
+		boolean equals = flattenOutputAST.equals(flattenInputAST);
+		if (!equals && FormatterPlugin.getDefault().isDebugging())
+		{
+			FormatterUtils.logDiff(flattenInputAST, flattenOutputAST);
+		}
+		return equals;
 	}
 
 	/*

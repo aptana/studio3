@@ -65,10 +65,10 @@ public abstract class IOUtil
 			charset = Charset.defaultCharset().name();
 		}
 
+		BufferedReader reader = null;
 		try
 		{
-			InputStreamReader inReader = new InputStreamReader(stream, charset);
-			BufferedReader reader = new BufferedReader(inReader);
+			reader = new BufferedReader(new InputStreamReader(stream, charset));
 			StringBuilder output = new StringBuilder();
 
 			// Some editors emit a BOM (EF BB BF) for UTF-8 encodings which the JVM converts to \uFEFF. For lots of
@@ -105,7 +105,14 @@ public abstract class IOUtil
 		{
 			try
 			{
-				stream.close();
+				if (reader != null)
+				{
+					reader.close();
+				}
+				else if (stream != null)
+				{
+					stream.close();
+				}
 			}
 			catch (IOException e)
 			{

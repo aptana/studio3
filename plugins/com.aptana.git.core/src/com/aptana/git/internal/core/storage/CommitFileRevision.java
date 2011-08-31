@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -24,6 +23,7 @@ import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.ITag;
 import org.eclipse.team.core.history.provider.FileRevision;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRef;
 import com.aptana.git.core.model.GitRepository;
@@ -41,7 +41,7 @@ public class CommitFileRevision extends FileRevision
 		this.path = repoRelativePath;
 	}
 
-	public IStorage getStorage(IProgressMonitor monitor) throws CoreException
+	public IStorage getStorage(IProgressMonitor monitor)
 	{
 		return new IStorage()
 		{
@@ -67,11 +67,11 @@ public class CommitFileRevision extends FileRevision
 				return CommitFileRevision.this.getFullPath();
 			}
 
-			public InputStream getContents() throws CoreException
+			public InputStream getContents()
 			{
 				if (commit == null)
 				{
-					return new ByteArrayInputStream(new byte[0]);
+					return new ByteArrayInputStream(ArrayUtil.NO_BYTES); // $codepro.audit.disable closeWhereCreated
 				}
 				IStatus result = commit.repository().execute(GitRepository.ReadWrite.READ,
 						"show", commit.sha() + ":" + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -79,11 +79,12 @@ public class CommitFileRevision extends FileRevision
 				// Encode using UTF-8, otherwise use default character set for platform
 				try
 				{
-					return new ByteArrayInputStream(result.getMessage().getBytes("UTF-8")); //$NON-NLS-1$
+					return new ByteArrayInputStream(result.getMessage().getBytes("UTF-8")); //$NON-NLS-1$ // $codepro.audit.disable closeWhereCreated
 				}
 				catch (UnsupportedEncodingException e)
 				{
-					return new ByteArrayInputStream(result.getMessage().getBytes());
+					return new ByteArrayInputStream(result.getMessage().getBytes()); // $codepro.audit.disable
+																						// closeWhereCreated
 				}
 			}
 		};
@@ -103,7 +104,7 @@ public class CommitFileRevision extends FileRevision
 		return false;
 	}
 
-	public IFileRevision withAllProperties(IProgressMonitor monitor) throws CoreException // NO_UCD
+	public IFileRevision withAllProperties(IProgressMonitor monitor)
 	{
 		return this;
 	}
@@ -247,7 +248,7 @@ public class CommitFileRevision extends FileRevision
 		return tags.toArray(new ITag[tags.size()]);
 	}
 
-	private class GitTag implements ITag
+	private static class GitTag implements ITag
 	{
 		private String name;
 

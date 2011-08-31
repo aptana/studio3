@@ -150,7 +150,7 @@ public class GitRepository
 	private GitRevSpecifier currentBranch;
 	private Set<Integer> fileWatcherIds = new HashSet<Integer>();
 	private int remoteDirCreationWatchId = -1;
-	private HashSet<IGitRepositoryListener> listeners;
+	private Set<IGitRepositoryListener> listeners;
 
 	GitRepository(URI fileURL)
 	{
@@ -173,23 +173,35 @@ public class GitRepository
 						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 						{
 							if (newName == null || !filesToWatch().contains(newName))
+							{
 								return;
+							}
 							if (newName.equals(HEAD))
+							{
 								checkForBranchChange();
+							}
 							else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
+							{
 								refreshIndex();
+							}
 						}
 
 						@Override
 						public void fileCreated(int wd, String rootPath, String name)
 						{
 							if (name == null)
+							{
 								return;
+							}
 							if (name.equals(INDEX))
+							{
 								refreshIndex();
+							}
 							else if (name.equals(ORIG_HEAD)) // this is done before merges (or pulls, which are just
 																// fetch + merge)
+							{
 								firePullEvent(); // we're conflating the two events here because I don't have the ideas
+							}
 													// separated in the listeners yet.
 						}
 
@@ -197,7 +209,9 @@ public class GitRepository
 						public void fileDeleted(int wd, String rootPath, String name)
 						{
 							if (name != null && name.equals(INDEX))
+							{
 								refreshIndex();
+							}
 						}
 
 						private Set<String> filesToWatch()
@@ -216,11 +230,17 @@ public class GitRepository
 						public void fileModified(int wd, String rootPath, String name)
 						{
 							if (name == null || !filesToWatch().contains(name))
+							{
 								return;
+							}
 							if (name.equals(HEAD))
+							{
 								checkForBranchChange();
+							}
 							else if (name.equals(INDEX) || name.equals(COMMIT_EDITMSG))
+							{
 								refreshIndex();
+							}
 						}
 
 						// Do long running work in another thread/job so we don't tie up the jnotify locks!
@@ -241,7 +261,9 @@ public class GitRepository
 									readCurrentBranch();
 									String newBranchName = currentBranch.simpleRef().shortName();
 									if (oldBranchName.equals(newBranchName))
+									{
 										return Status.OK_STATUS;
+									}
 									fireBranchChangeEvent(oldBranchName, newBranchName);
 									return Status.OK_STATUS;
 								}
@@ -276,7 +298,9 @@ public class GitRepository
 									}
 
 									if (remoteDirCreationWatchId == -1)
+									{
 										return;
+									}
 									// Remove this watcher!
 									Job job = new Job("Removing file watcher on remotes dir creation") //$NON-NLS-1$
 									{
@@ -311,7 +335,9 @@ public class GitRepository
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
 					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+					{
 						return;
+					}
 					// Remove branch in model!
 					final GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
 					branches.remove(rev);
@@ -339,7 +365,9 @@ public class GitRepository
 				public void fileCreated(int wd, String rootPath, final String name)
 				{
 					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+					{
 						return;
+					}
 					// a branch has been added
 					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
 
@@ -352,7 +380,9 @@ public class GitRepository
 							// Check if our HEAD changed
 							String oldBranchName = currentBranch.simpleRef().shortName();
 							if (oldBranchName.equals(name))
+							{
 								return Status.OK_STATUS;
+							}
 							_headRef = null;
 							readCurrentBranch();
 							fireBranchChangeEvent(oldBranchName, name);
@@ -382,7 +412,9 @@ public class GitRepository
 					public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 					{
 						if (newName == null)
+						{
 							return;
+						}
 						if (isProbablyBranch(newName))
 						{
 							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
@@ -412,7 +444,9 @@ public class GitRepository
 					public void fileModified(int wd, String rootPath, String name)
 					{
 						if (name == null)
+						{
 							return;
+						}
 						if (isProbablyBranch(name))
 						{
 							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
@@ -529,7 +563,7 @@ public class GitRepository
 		try
 		{
 			File configFile = gitFile("config"); //$NON-NLS-1$
-			String contents = IOUtil.read(new FileInputStream(configFile));
+			String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
 			Matcher m = fgRemoteNamePattern.matcher(contents);
 			while (m.find())
 			{
@@ -561,7 +595,9 @@ public class GitRepository
 	private Set<String> branches(GitRef.TYPE... types)
 	{
 		if (types == null || types.length == 0)
+		{
 			return Collections.emptySet();
+		}
 		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
 
 		// Sort branches. Make sure local ones always come before remote
@@ -570,20 +606,30 @@ public class GitRepository
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
+			{
 				continue;
+			}
 			GitRef ref = revSpec.simpleRef();
 			if (ref == null || ref.type() == null)
+			{
 				continue;
+			}
 			for (GitRef.TYPE string : types)
 			{
 				if (ref.type().equals(string))
+				{
 					break;
+				}
 			}
 			if (!validTypes.contains(ref.type()))
+			{
 				continue;
+			}
 			// Skip these magical "*.lock" files
 			if (ref.type() == TYPE.HEAD && ref.shortName().endsWith(".lock")) //$NON-NLS-1$
+			{
 				continue;
+			}
 			allBranches.add(ref.shortName());
 		}
 		return allBranches;
@@ -716,7 +762,7 @@ public class GitRepository
 		if (result.isOK())
 		{
 			String output = result.getMessage();
-			String[] lines = output.split("\r?\n|\r"); //$NON-NLS-1$
+			String[] lines = output.split("\r?\n|\r"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 			int lineNum = 0;
 			for (String line : lines)
 			{
@@ -752,7 +798,9 @@ public class GitRepository
 		{
 			// If its an empty line, skip it (e.g. with empty repositories)
 			if (line.length() == 0)
+			{
 				continue;
+			}
 
 			List<String> components = StringUtil.tokenize(line, " "); //$NON-NLS-1$
 
@@ -760,7 +808,9 @@ public class GitRepository
 			GitRef newRef = GitRef.refFromString(components.get(0));
 			GitRevSpecifier revSpec = new GitRevSpecifier(newRef);
 			if (!addBranch(revSpec).equals(revSpec))
+			{
 				ret = true;
+			}
 
 			// Also add this ref to the refs list
 			addRef(newRef, components);
@@ -776,12 +826,18 @@ public class GitRepository
 	private GitRevSpecifier addBranch(GitRevSpecifier rev)
 	{
 		if (rev.parameters().isEmpty())
+		{
 			rev = headRef();
+		}
 
 		// First check if the branch doesn't exist already
 		for (GitRevSpecifier r : branches)
+		{
 			if (rev.equals(r))
+			{
 				return r;
+			}
+		}
 
 		branches.add(rev);
 		// TODO Fire a branchAddedEvent?
@@ -791,13 +847,19 @@ public class GitRepository
 	public GitRevSpecifier headRef()
 	{
 		if (_headRef != null)
+		{
 			return _headRef;
+		}
 
 		String branch = parseSymbolicReference(HEAD);
 		if (branch != null && branch.startsWith(GitRef.REFS_HEADS))
+		{
 			_headRef = new GitRevSpecifier(GitRef.refFromString(branch));
+		}
 		else
+		{
 			_headRef = new GitRevSpecifier(GitRef.refFromString(HEAD));
+		}
 
 		return _headRef;
 	}
@@ -824,9 +886,13 @@ public class GitRepository
 
 		String sha;
 		if (type.equals(GitRef.TYPE.TAG) && components.size() == 4)
+		{
 			sha = components.get(3);
+		}
 		else
+		{
 			sha = components.get(2);
+		}
 
 		List<GitRef> curRefs = refs.get(sha);
 		if (curRefs != null)
@@ -849,7 +915,9 @@ public class GitRepository
 	public String currentBranch()
 	{
 		if (currentBranch == null)
+		{
 			return null;
+		}
 		return currentBranch.simpleRef().shortName();
 	}
 
@@ -871,47 +939,67 @@ public class GitRepository
 	private void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.branchChanged(e);
+		}
 	}
 
 	private void fireBranchRemovedEvent(String oldBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		BranchRemovedEvent e = new BranchRemovedEvent(this, oldBranchName);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.branchRemoved(e);
+		}
 	}
 
 	private void fireBranchAddedEvent(String newBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		BranchAddedEvent e = new BranchAddedEvent(this, newBranchName);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.branchAdded(e);
+		}
 	}
 
 	void fireIndexChangeEvent(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> changedFiles)
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 
 		IndexChangedEvent e = new IndexChangedEvent(this, preChangeFiles, changedFiles);
 		// If there's no diff, don't even fire the event
 		if (!e.hasDiff())
+		{
 			return;
+		}
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.indexChanged(e);
+		}
 	}
 
 	public void lazyReload()
 	{
 		if (!hasChanged)
+		{
 			return;
+		}
 
 		reloadRefs();
 		hasChanged = false;
@@ -930,7 +1018,9 @@ public class GitRepository
 	public boolean equals(Object obj)
 	{
 		if (!(obj instanceof GitRepository))
+		{
 			return false;
+		}
 		GitRepository other = (GitRepository) obj;
 		return fileURL.getPath().equals(other.fileURL.getPath());
 	}
@@ -1026,7 +1116,7 @@ public class GitRepository
 		String contents = ""; //$NON-NLS-1$
 		try
 		{
-			contents = IOUtil.read(new FileInputStream(configFile));
+			contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
 		}
 		catch (FileNotFoundException e)
 		{
@@ -1085,7 +1175,7 @@ public class GitRepository
 		try
 		{
 			File configFile = gitFile("config"); //$NON-NLS-1$
-			String contents = IOUtil.read(new FileInputStream(configFile));
+			String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
 			Matcher m = fgRemoteURLPattern.matcher(contents);
 			while (m.find())
 			{
@@ -1377,7 +1467,7 @@ public class GitRepository
 		{
 			reader = new BufferedReader(new FileReader(mergeHeadFile()));
 			String sha = null;
-			while ((sha = reader.readLine()) != null)
+			while ((sha = reader.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 			{
 				shas.add(sha);
 			}
@@ -1394,7 +1484,7 @@ public class GitRepository
 				{
 					reader.close();
 				}
-				catch (IOException e)
+				catch (IOException e) // $codepro.audit.disable emptyCatchClause
 				{
 					// ignore
 				}
@@ -1528,7 +1618,8 @@ public class GitRepository
 			if (!sha1File.isFile())
 			{
 				File packedRefs = gitFile(PACKED_REFS);
-				String packedRefContents = IOUtil.read(new FileInputStream(packedRefs));
+				String packedRefContents = IOUtil.read(new FileInputStream(packedRefs)); // $codepro.audit.disable
+																							// closeWhereCreated
 				// each line is 40 char sha, space, ref name
 				int index = packedRefContents.indexOf(ref.ref());
 				if (index != -1)
@@ -1538,13 +1629,12 @@ public class GitRepository
 			}
 			else
 			{
-				return IOUtil.read(new FileInputStream(sha1File)).trim();
+				return IOUtil.read(new FileInputStream(sha1File)).trim(); // $codepro.audit.disable closeWhereCreated
 			}
 		}
-		catch (FileNotFoundException e)
+		catch (FileNotFoundException e) // $codepro.audit.disable emptyCatchClause
 		{
 			// ignore
-			e.printStackTrace();
 		}
 		return ref.ref();
 	}
@@ -1776,7 +1866,7 @@ public class GitRepository
 				continue;
 			}
 			String remaining = remoteURL.substring(remoteURL.indexOf(GITHUB_COM) + 10);
-			if (remaining.startsWith("/") || remaining.startsWith(":")) //$NON-NLS-1$ //$NON-NLS-2$
+			if (remaining.length() > 0 && (remaining.charAt(0) == '/' || remaining.charAt(0) == ':'))
 			{
 				remaining = remaining.substring(1);
 			}
@@ -1784,7 +1874,7 @@ public class GitRepository
 			{
 				remaining = remaining.substring(0, remaining.length() - 4);
 			}
-			int split = remaining.indexOf("/"); //$NON-NLS-1$
+			int split = remaining.indexOf('/');
 			String userName = remaining.substring(0, split);
 			String repoName = remaining.substring(split + 1);
 			githubURLs.add(MessageFormat.format("https://github.com/{0}/{1}", userName, repoName)); //$NON-NLS-1$
@@ -1805,10 +1895,10 @@ public class GitRepository
 			File squashMsg = gitFile(SQUASH_MSG);
 			if (squashMsg.exists())
 			{
-				return IOUtil.read(new FileInputStream(squashMsg));
+				return IOUtil.read(new FileInputStream(squashMsg)); // $codepro.audit.disable closeWhereCreated
 			}
 		}
-		catch (FileNotFoundException e)
+		catch (FileNotFoundException e) // $codepro.audit.disable emptyCatchClause
 		{
 			// ignore
 		}

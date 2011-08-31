@@ -58,7 +58,7 @@ class GitResourceListener implements IResourceChangeListener
 		{ // Compute the changed resources by looking at the delta
 			event.getDelta().accept(new IResourceDeltaVisitor()
 			{
-				public boolean visit(IResourceDelta delta) throws CoreException
+				public boolean visit(IResourceDelta delta)
 				{
 
 					// If the file has changed but not in a way that we care

@@ -8,8 +8,10 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.mortbay.util.ajax.JSON.Output;
 
@@ -19,8 +21,80 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.index.core.IndexUtil;
 
-public class PropertyElement extends BaseElement
+public class PropertyElement extends BaseElement<PropertyElement.Property>
 {
+	enum Property implements IPropertyInformation<PropertyElement>
+	{
+		NAME("Name")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node.getName();
+			}
+		},
+		DESCRIPTION("Description")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node.getDescription();
+			}
+		},
+		OWNING_TYPE("Owning Type")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node.getOwningType();
+			}
+		},
+		CLASS_PROPERTY("Static Property")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node._isClassProperty;
+			}
+		},
+		INSTANCE_PROPERTY("Instance Property")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return node._isInstanceProperty;
+			}
+		},
+		TYPES("Types")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				if (node instanceof FunctionElement)
+				{
+					return StringUtil.join(", ", node.getTypeNames());
+				}
+				else
+				{
+					return StringUtil.join(", ", ((FunctionElement) node).getReturnTypeNames());
+				}
+			}
+		},
+		DOCUMENTS("Documents")
+		{
+			public Object getPropertyValue(PropertyElement node)
+			{
+				return StringUtil.join(", ", node.getDocuments());
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String EXAMPLES_PROPERTY = "examples"; //$NON-NLS-1$
 	private static final String TYPES_PROPERTY = "types"; //$NON-NLS-1$
 	private static final String IS_INTERNAL_PROPERTY = "isInternal"; //$NON-NLS-1$
@@ -148,6 +222,16 @@ public class PropertyElement extends BaseElement
 	public List<String> getExamples()
 	{
 		return CollectionsUtil.getListValue(this._examples);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/**
@@ -297,7 +381,7 @@ public class PropertyElement extends BaseElement
 	{
 		printer.printIndent();
 
-		if (this.isInstanceProperty())
+		if (this.isClassProperty())
 		{
 			printer.print("static "); //$NON-NLS-1$
 		}

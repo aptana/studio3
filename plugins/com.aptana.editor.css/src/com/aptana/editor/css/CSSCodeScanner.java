@@ -82,34 +82,35 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter" };
 
-	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
-			"background-color", "background-image", "background-origin", "background-position-x",
-			"background-position-y", "background-position", "background-repeat", "background-size", "background",
-			"behavior", "border-bottom-color", "border-bottom-left-radius", "border-bottom-right-radius",
-			"border-bottom-style", "border-bottom-width", "border-bottom", "border-collapse", "border-color",
-			"border-image-source", "border-image-slice", "border-image-width", "border-image-outset",
-			"border-image-repeat", "border-image", "border-left-color", "border-left-style", "border-left-width",
-			"border-left", "border-radius", "border-right-color", "border-right-style", "border-right-width",
-			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-left-radius",
-			"border-top-right-radius", "border-top-style", "border-top-width", "border-top", "border-width", "border",
-			"bottom", "box-decoration-break", "box-shadow", "caption-side", "clear", "clip", "column-count",
-			"column-gap", "column-rule", "column-width", "color", "content", "counter-increment", "counter-reset",
-			"cue-after", "cue-before", "cue", "cursor", "direction", "display", "elevation", "empty-cells", "float",
-			"font-family", "font-size-adjust", "font-size", "font-stretch", "font-style", "font-variant",
-			"font-weight", "font", "height", "left", "letter-spacing", "line-height", "list-style-image",
-			"list-style-position", "list-style-type", "list-style", "margin-bottom", "margin-left", "margin-right",
-			"margin-top", "marker-offset", "margin", "marks", "max-aspect-ratio", "max-color-index", "max-color",
-			"max-device-aspect-ratio", "max-device-height", "max-device-width", "max-height", "max-width",
-			"min-aspect-ratio", "min-color-index", "min-color", "min-device-aspect-ratio", "min-device-height",
-			"min-device-width", "min-height", "min-monochrome", "min-width", "monochrome", "-moz-border-radius",
-			"opacity", "orientation", "orphans", "outline-color", "outline-style", "outline-width", "outline",
-			"overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left", "padding-right", "padding-top",
-			"padding", "page-break-after", "page-break-before", "page-break-inside", "page", "pause-after",
-			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "resize", "richness",
-			"right", "size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "src",
-			"stress", "table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform",
-			"top", "unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows",
-			"width", "word-spacing", "z-index" };
+	private static final String[] PROPERTY_NAMES = { "alignment-adjust", "alignment-baseline", "azimuth",
+			"background-attachment", "background-clip", "background-color", "background-image", "background-origin",
+			"background-position-x", "background-position-y", "background-position", "background-repeat",
+			"background-size", "background", "behavior", "border-bottom-color", "border-bottom-left-radius",
+			"border-bottom-right-radius", "border-bottom-style", "border-bottom-width", "border-bottom",
+			"border-collapse", "border-color", "border-image-source", "border-image-slice", "border-image-width",
+			"border-image-outset", "border-image-repeat", "border-image", "border-left-color", "border-left-style",
+			"border-left-width", "border-left", "border-radius", "border-right-color", "border-right-style",
+			"border-right-width", "border-right", "border-spacing", "border-style", "border-top-color",
+			"border-top-left-radius", "border-top-right-radius", "border-top-style", "border-top-width", "border-top",
+			"border-width", "border", "bottom", "box-decoration-break", "box-shadow", "caption-side", "clear", "clip",
+			"column-count", "column-gap", "column-rule", "column-width", "color", "content", "counter-increment",
+			"counter-reset", "cue-after", "cue-before", "cue", "cursor", "direction", "display", "elevation",
+			"empty-cells", "filter", "fit", "fit-position", "float", "font-family", "font-size-adjust", "font-size",
+			"font-stretch", "font-style", "font-variant", "font-weight", "font", "height", "left", "letter-spacing",
+			"line-height", "list-style-image", "list-style-position", "list-style-type", "list-style", "margin-bottom",
+			"margin-left", "margin-right", "margin-top", "marker-offset", "margin", "marks", "max-aspect-ratio",
+			"max-color-index", "max-color", "max-device-aspect-ratio", "max-device-height", "max-device-width",
+			"max-height", "max-width", "min-aspect-ratio", "min-color-index", "min-color", "min-device-aspect-ratio",
+			"min-device-height", "min-device-width", "min-height", "min-monochrome", "min-width", "monochrome",
+			"-moz-border-radius", "opacity", "orientation", "orphans", "outline-color", "outline-style",
+			"outline-width", "outline", "overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left",
+			"padding-right", "padding-top", "padding", "page-break-after", "page-break-before", "page-break-inside",
+			"page", "pause-after", "pause-before", "pause", "pitch-range", "pitch", "play-during", "position",
+			"quotes", "resize", "richness", "right", "size", "speak-header", "speak-numeral", "speak-punctuation",
+			"speech-rate", "speak", "src", "stress", "table-layout", "text-align", "text-decoration", "text-indent",
+			"text-overflow", "text-shadow", "text-transform", "top", "transition", "unicode-bidi", "vertical-align",
+			"visibility", "voice-family", "volume", "white-space", "widows", "width", "word-spacing", "word-wrap",
+			"z-index", "zoom" };
 
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
 			"baseline", "below", "bidi-override", "blink", "block", "bold", "bolder", "both", "bottom", "break-all",
@@ -131,7 +132,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"upper-roman", "uppercase", "vertical-ideographic", "vertical-text", "visible", "w-resize", "wait",
 			"whitespace", "xx-large", "xx-small", "x-small", "x-large", "zero" };
 
-	private static final String[] FONT_NAMES = { "arial", "century", "comic", "courier", "garamond", "geneva",
+	private static final String[] FONT_NAMES = { "arial", "clean", "century", "comic", "courier", "garamond", "geneva",
 			"georgia", "helvetica", "impact", "lucida", "monaco", "symbol", "system", "tahoma", "times", "trebuchet",
 			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
 
@@ -533,7 +534,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				{
 					// skip strings and comments
 					if (CSSSourceConfiguration.MULTILINE_COMMENT.equals(region.getType())
-							|| CSSSourceConfiguration.STRING.equals(region.getType()))
+							|| CSSSourceConfiguration.STRING_DOUBLE.equals(region.getType())
+							|| CSSSourceConfiguration.STRING_SINGLE.equals(region.getType()))
 					{
 						continue;
 					}

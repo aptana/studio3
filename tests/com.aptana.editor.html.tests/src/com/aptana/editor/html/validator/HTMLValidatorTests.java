@@ -48,8 +48,21 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 
 		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
-		assertTrue(items.size() > 0);
-		assertEquals("Missing end tag </title>", items.get(0).getMessage());
+		assertEquals(2, items.size());
+		assertContains(items, "Missing end tag </title>");
+		assertContains(items, "missing </title> before <body>");
+	}
+
+	protected void assertContains(List<IValidationItem> items, String message)
+	{
+		for (IValidationItem item : items)
+		{
+			if (message.equals(item.getMessage()))
+			{
+				return;
+			}
+		}
+		fail("Was unable to find an IValidationItem with message: " + message);
 	}
 
 	public void testHTMLNoErrors() throws CoreException
@@ -116,6 +129,30 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		assertEquals("Error was not found on expected line", 4, item.getLineNumber());
 		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \"}\"",
 				item.getMessage());
+	}
+
+	public void testNoTypeAttributeRequired() throws CoreException
+	{
+		String text = "<script src=\"\"></script>";
+
+		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
+		assertEquals(1, items.size());
+	}
+
+	public void testHTML5HeaderTag() throws CoreException
+	{
+		String text = "<header><h1></h1></header>";
+
+		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
+		assertEquals(1, items.size());
+	}
+
+	public void testHTML5NavTag() throws CoreException
+	{
+		String text = "<nav></nav>";
+
+		List<IValidationItem> items = getParseErrors(text, IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
+		assertEquals(1, items.size());
 	}
 
 	@Override

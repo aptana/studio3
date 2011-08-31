@@ -86,7 +86,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				if (resolved != null)
 				{
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
+					addIndex(index, file, IHTMLIndexConstants.RESOURCE_CSS, resolved.toString());
 				}
 			}
 		}
@@ -126,7 +126,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				if (resolved != null)
 				{
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+					addIndex(index, file, IHTMLIndexConstants.RESOURCE_JS, resolved.toString());
 				}
 			}
 			else if (child != null && IJSConstants.CONTENT_TYPE_JS.equals(child.getLanguage()))
@@ -216,7 +216,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			// prime queue
 			queue.offer(parent);
 
-			while (queue.isEmpty() == false)
+			while (!queue.isEmpty())
 			{
 				IParseNode current = queue.poll();
 

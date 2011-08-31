@@ -303,7 +303,12 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 
 		in = whiteSpaceAsterisk.matcher(in).replaceAll(StringUtil.EMPTY);
 		out = whiteSpaceAsterisk.matcher(out).replaceAll(StringUtil.EMPTY);
-		return in.equals(out);
+		boolean result = in.equals(out);
+		if (!result && FormatterPlugin.getDefault().isDebugging())
+		{
+			FormatterUtils.logDiff(in, out);
+		}
+		return result;
 	}
 
 }

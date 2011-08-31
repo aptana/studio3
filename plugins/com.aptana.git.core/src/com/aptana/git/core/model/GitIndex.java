@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -95,7 +96,9 @@ public class GitIndex
 				protected IStatus run(IProgressMonitor monitor)
 				{
 					if (monitor != null && monitor.isCanceled())
+					{
 						return Status.CANCEL_STATUS;
+					}
 					refresh(monitor);
 					return Status.OK_STATUS;
 				}
@@ -226,7 +229,7 @@ public class GitIndex
 			{
 				toJoin.join();
 			}
-			catch (InterruptedException e)
+			catch (InterruptedException e) // $codepro.audit.disable emptyCatchClause
 			{
 				// ignore
 			}
@@ -240,13 +243,17 @@ public class GitIndex
 		for (ChangedFile file : this.files)
 		{
 			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
+			{
 				deleteFiles.add(file);
+			}
 		}
 
 		if (!deleteFiles.isEmpty())
 		{
 			for (ChangedFile file : deleteFiles)
+			{
 				files.remove(file);
+			}
 		}
 
 		// Now make the "final" list a copy of the temporary one we were just building up
@@ -282,7 +289,9 @@ public class GitIndex
 		for (String path : lines)
 		{
 			if (path.length() == 0)
+			{
 				continue;
+			}
 			dictionary.put(path, fileStatus);
 		}
 
@@ -307,14 +316,20 @@ public class GitIndex
 	{
 		// FIXME: throw an error?
 		if (string == null)
+		{
 			return Collections.emptyList();
+		}
 
 		// Strip trailing null
 		if (string.endsWith("\0")) //$NON-NLS-1$
+		{
 			string = string.substring(0, string.length() - 1);
+		}
 
 		if (string.length() == 0)
+		{
 			return Collections.emptyList();
+		}
 
 		return StringUtil.tokenize(string, "\0"); //$NON-NLS-1$
 	}
@@ -363,13 +378,21 @@ public class GitIndex
 							file.commitBlobMode = mode;
 
 							if (staged)
+							{
 								file.hasStagedChanges = true;
+							}
 							else
+							{
 								file.hasUnstagedChanges = true;
+							}
 							if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
+							{
 								file.status = ChangedFile.Status.DELETED;
+							}
 							else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
+							{
 								file.status = ChangedFile.Status.UNMERGED;
+							}
 						}
 						else
 						{
@@ -389,24 +412,32 @@ public class GitIndex
 
 						// Staged dictionary, so file does not have staged changes
 						if (staged)
+						{
 							file.hasStagedChanges = false;
+						}
 						// Tracked file does not have unstaged changes, file is not new,
 						// so we can set it to No. (If it would be new, it would not
 						// be in this dictionary, but in the "other dictionary").
 						else if (tracked && file.status != ChangedFile.Status.NEW)
+						{
 							file.hasUnstagedChanges = false;
+						}
 						// Unstaged, untracked dictionary ("Other" files), and file
 						// is indicated as new (which would be untracked), so let's
 						// remove it
 						else if (!tracked && file.status == ChangedFile.Status.NEW)
+						{
 							file.hasUnstagedChanges = false;
+						}
 					}
 				}
 			}
 		}
 		// Do new files only if necessary
 		if (dictionary.isEmpty())
+		{
 			return;
+		}
 
 		// All entries left in the dictionary haven't been accounted for
 		// above, so we need to add them to the "files" array
@@ -418,13 +449,21 @@ public class GitIndex
 
 				ChangedFile.Status status = ChangedFile.Status.MODIFIED;
 				if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
+				{
 					status = ChangedFile.Status.DELETED;
+				}
 				else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
+				{
 					status = ChangedFile.Status.UNMERGED;
+				}
 				else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
+				{
 					status = ChangedFile.Status.NEW;
+				}
 				else
+				{
 					status = ChangedFile.Status.MODIFIED;
+				}
 
 				ChangedFile file = new ChangedFile(path, status);
 				if (tracked)
@@ -446,9 +485,13 @@ public class GitIndex
 	private void postIndexChange(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> postChangeFiles)
 	{
 		if (this.notify)
+		{
 			this.repository.fireIndexChangeEvent(preChangeFiles, postChangeFiles);
+		}
 		else
+		{
 			this.notify = true;
+		}
 	}
 
 	/**
@@ -473,7 +516,9 @@ public class GitIndex
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
 	{
 		if (stageFiles == null || stageFiles.isEmpty())
+		{
 			return false;
+		}
 
 		List<String> args = new ArrayList<String>();
 		args.add("update-index"); //$NON-NLS-1$
@@ -514,7 +559,9 @@ public class GitIndex
 	public boolean unstageFiles(Collection<ChangedFile> unstageFiles)
 	{
 		if (unstageFiles == null || unstageFiles.isEmpty())
+		{
 			return false;
+		}
 
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : unstageFiles)
@@ -569,7 +616,9 @@ public class GitIndex
 			preFiles.add(new ChangedFile(file));
 		}
 		for (ChangedFile file : discardFiles)
+		{
 			file.hasUnstagedChanges = false;
+		}
 
 		postIndexChange(preFiles, discardFiles);
 	}
@@ -578,14 +627,20 @@ public class GitIndex
 	{
 		boolean success = doCommit(commitMessage);
 		if (!success)
+		{
 			return false;
+		}
 
 		repository.hasChanged();
 
 		if (amend)
+		{
 			this.amend = false;
+		}
 		else
+		{
 			refresh(new NullProgressMonitor()); // TODO Run async if we can!
+		}
 		return true;
 	}
 
@@ -618,15 +673,15 @@ public class GitIndex
 		}
 		if (sha1.equals(sha2))
 		{
-			return new String[0];
+			return ArrayUtil.NO_STRINGS;
 		}
 		IStatus status = repository.execute(GitRepository.ReadWrite.READ, "log", "--pretty=format:\"%s\"", //$NON-NLS-1$ //$NON-NLS-2$
 				sha1 + ".." + sha2); //$NON-NLS-1$
 		if (status == null || !status.isOK() || status.getMessage().trim().length() == 0)
 		{
-			return new String[0];
+			return ArrayUtil.NO_STRINGS;
 		}
-		return status.getMessage().split("[\r\n]+"); //$NON-NLS-1$
+		return status.getMessage().split("[\r\n]+"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 	}
 
 	/**
@@ -641,7 +696,9 @@ public class GitIndex
 	public String diffForFile(ChangedFile file, boolean staged, int contextLines)
 	{
 		if (hasBinaryAttributes(file))
+		{
 			return Messages.GitIndex_BinaryDiff_Message;
+		}
 
 		String parameter = "-U" + contextLines; //$NON-NLS-1$
 		if (staged)
@@ -668,7 +725,7 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), "UTF-8"); //$NON-NLS-1$
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), "UTF-8"); //$NON-NLS-1$ // $codepro.audit.disable closeWhereCreated
 			}
 			catch (FileNotFoundException e)
 			{
@@ -750,11 +807,15 @@ public class GitIndex
 		synchronized (changedFiles)
 		{
 			if (changedFiles.isEmpty())
+			{
 				return false;
+			}
 			for (ChangedFile changedFile : changedFiles)
 			{
 				if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
+				{
 					return true;
+				}
 			}
 			return false;
 		}
@@ -769,7 +830,9 @@ public class GitIndex
 			{
 				IResource resource = getResourceForChangedFile(changedFile);
 				if (resource != null)
+				{
 					resources.add(resource);
+				}
 			}
 		}
 		return resources;
@@ -784,7 +847,9 @@ public class GitIndex
 	protected ChangedFile getChangedFileForResource(IResource resource)
 	{
 		if (resource == null || resource.getLocationURI() == null)
+		{
 			return null;
+		}
 		IPath resourcePath = resource.getLocation();
 		synchronized (changedFiles)
 		{
@@ -814,7 +879,9 @@ public class GitIndex
 	protected List<ChangedFile> getChangedFilesForContainer(IContainer container)
 	{
 		if (container == null || container.getLocationURI() == null)
+		{
 			return Collections.emptyList();
+		}
 
 		IPath resourcePath = container.getLocation();
 		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
@@ -823,12 +890,16 @@ public class GitIndex
 		synchronized (changedFiles)
 		{
 			if (changedFiles == null || changedFiles.isEmpty())
+			{
 				return Collections.emptyList();
+			}
 			for (ChangedFile changedFile : changedFiles)
 			{
 				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
 				if (resourcePath.isPrefixOf(fullPath))
+				{
 					filtered.add(changedFile);
+				}
 			}
 		}
 		return filtered;

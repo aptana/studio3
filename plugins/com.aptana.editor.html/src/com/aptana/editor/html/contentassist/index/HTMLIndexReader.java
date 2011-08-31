@@ -83,14 +83,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @param name
 	 * @return
 	 */
-	public List<AttributeElement> getAttribute(Index index, String name) throws IOException
+	public List<AttributeElement> getAttribute(Index index, String name)
 	{
 		List<AttributeElement> result = new ArrayList<AttributeElement>();
 
 		if (index != null && name != null && name.length() > 0)
 		{
 			List<QueryResult> attributes = index.query( //
-					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+					new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
 					name + ICSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
@@ -128,14 +128,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<AttributeElement> getAttributes(Index index, List<String> names) throws IOException
+	public List<AttributeElement> getAttributes(Index index, List<String> names)
 	{
 		List<AttributeElement> result = new ArrayList<AttributeElement>();
 
 		if (index != null && names != null)
 		{
 			List<QueryResult> attributes = index.query( //
-					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+					new String[] { IHTMLIndexConstants.ATTRIBUTE }, //
 					this.getAttributePattern(names), //
 					SearchPattern.REGEX_MATCH //
 					);
@@ -159,7 +159,7 @@ public class HTMLIndexReader extends IndexReader
 	@Override
 	protected String getDelimiter()
 	{
-		return HTMLIndexConstants.DELIMITER;
+		return IHTMLIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -168,14 +168,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<ElementElement> getElements(Index index) throws IOException
+	public List<ElementElement> getElements(Index index)
 	{
 		List<ElementElement> result = new ArrayList<ElementElement>();
 
 		if (index != null)
 		{
 			List<QueryResult> elements = index.query( //
-					new String[] { HTMLIndexConstants.ELEMENT }, //
+					new String[] { IHTMLIndexConstants.ELEMENT }, //
 					"*", //$NON-NLS-1$
 					SearchPattern.PATTERN_MATCH //
 					);
@@ -200,7 +200,7 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<ElementElement> getElements(Index index, String... names) throws IOException
+	public List<ElementElement> getElements(Index index, String... names)
 	{
 		List<ElementElement> result = new ArrayList<ElementElement>();
 
@@ -209,7 +209,7 @@ public class HTMLIndexReader extends IndexReader
 			for (String name : names)
 			{
 				List<QueryResult> elements = index.query( //
-						new String[] { HTMLIndexConstants.ELEMENT }, //
+						new String[] { IHTMLIndexConstants.ELEMENT }, //
 						name + ICSSIndexConstants.DELIMITER, //
 						SearchPattern.PREFIX_MATCH //
 						);
@@ -233,14 +233,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<EntityElement> getEntities(Index index) throws IOException
+	public List<EntityElement> getEntities(Index index)
 	{
 		List<EntityElement> result = new ArrayList<EntityElement>();
 
 		if (index != null)
 		{
 			List<QueryResult> entities = index.query( //
-					new String[] { HTMLIndexConstants.ENTITY }, //
+					new String[] { IHTMLIndexConstants.ENTITY }, //
 					"*", //$NON-NLS-1$
 					SearchPattern.PATTERN_MATCH //
 					);
@@ -265,14 +265,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public EntityElement getEntity(Index index, String name) throws IOException
+	public EntityElement getEntity(Index index, String name)
 	{
 		EntityElement result = null;
 
 		if (index != null)
 		{
 			List<QueryResult> entities = index.query( //
-					new String[] { HTMLIndexConstants.ENTITY }, //
+					new String[] { IHTMLIndexConstants.ENTITY }, //
 					name + ICSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
@@ -300,14 +300,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public EventElement getEvent(Index index, String name) throws IOException
+	public EventElement getEvent(Index index, String name)
 	{
 		EventElement result = null;
 
 		if (index != null)
 		{
 			List<QueryResult> events = index.query( //
-					new String[] { HTMLIndexConstants.EVENT }, //
+					new String[] { IHTMLIndexConstants.EVENT }, //
 					name + ICSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
@@ -335,14 +335,14 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<EventElement> getEvents(Index index, List<String> names) throws IOException
+	public List<EventElement> getEvents(Index index, List<String> names)
 	{
 		List<EventElement> result = new ArrayList<EventElement>();
 
 		if (index != null && names != null)
 		{
 			List<QueryResult> events = index.query( //
-					new String[] { HTMLIndexConstants.EVENT }, //
+					new String[] { IHTMLIndexConstants.EVENT }, //
 					this.getAttributePattern(names), //
 					SearchPattern.REGEX_MATCH //
 					);
@@ -366,7 +366,7 @@ public class HTMLIndexReader extends IndexReader
 	@Override
 	protected String getSubDelimiter()
 	{
-		return HTMLIndexConstants.SUB_DELIMITER;
+		return IHTMLIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -378,7 +378,7 @@ public class HTMLIndexReader extends IndexReader
 	{
 		Map<String, String> result = null;
 
-		if (index != null && StringUtil.isEmpty(category) == false)
+		if (index != null && !StringUtil.isEmpty(category))
 		{
 			String pattern = "*"; //$NON-NLS-1$
 			List<QueryResult> items = index.query(new String[] { category }, pattern, SearchPattern.PATTERN_MATCH);

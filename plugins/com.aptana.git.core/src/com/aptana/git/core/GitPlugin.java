@@ -51,7 +51,8 @@ public class GitPlugin extends Plugin
 	/**
 	 * The constructor
 	 */
-	public GitPlugin()
+	public GitPlugin() // $codepro.audit.disable
+						// com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 	{
 	}
 
@@ -59,7 +60,7 @@ public class GitPlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception
+	public void start(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		super.start(context);
 		plugin = this;
@@ -86,7 +87,7 @@ public class GitPlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception
+	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		try
 		{
@@ -95,7 +96,9 @@ public class GitPlugin extends Plugin
 			getGitRepositoryManager().removeListenerFromEachRepository(fRepoListener);
 			// Remove all the GitRepositories from memory!
 			if (fGitRepoManager != null)
+			{
 				fGitRepoManager.cleanup();
+			}
 		}
 		finally
 		{
@@ -147,12 +150,16 @@ public class GitPlugin extends Plugin
 
 	public IPath getSSH_ASKPASS()
 	{
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			return null;
-		} else if (Platform.OS_LINUX.equals(Platform.getOS())
-				|| Platform.OS_MACOSX.equals(Platform.getOS())) {
-			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/ssh-askpass.tcl"), null)); //$NON-NLS-1$
-			if (askpassFile.isFile()) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(),
+					Path.fromPortableString("$os$/ssh-askpass.tcl"), null)); //$NON-NLS-1$
+			if (askpassFile.isFile())
+			{
 				return Path.fromOSString(askpassFile.getAbsolutePath());
 			}
 		}
@@ -161,19 +168,23 @@ public class GitPlugin extends Plugin
 
 	public IPath getGIT_ASKPASS()
 	{
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			return getGIT_SSH();
-		} else if (Platform.OS_LINUX.equals(Platform.getOS())
-				|| Platform.OS_MACOSX.equals(Platform.getOS())) {
-			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/askpass.tcl"), null)); //$NON-NLS-1$
-			if (askpassFile.isFile()) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(),
+					Path.fromPortableString("$os$/askpass.tcl"), null)); //$NON-NLS-1$
+			if (askpassFile.isFile())
+			{
 				return Path.fromOSString(askpassFile.getAbsolutePath());
 			}
 		}
 		return null;
 	}
 
-	public IGitRepositoryManager getGitRepositoryManager()
+	public synchronized IGitRepositoryManager getGitRepositoryManager()
 	{
 		if (fGitRepoManager == null)
 		{

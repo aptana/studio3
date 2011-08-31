@@ -9,6 +9,7 @@ package com.aptana.configurations.processor;
 
 import java.util.Set;
 
+import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.runtime.IPath;
 
 /**
@@ -33,6 +34,22 @@ public interface IConfigurationProcessorDelegate
 	 * Uninstall command type
 	 */
 	public static final String UNINSTALL_COMMAND = "uninstall"; //$NON-NLS-1$
+
+	/**
+	 * Returns <code>true</code> if this delegate is enabled; <code>false</code> otherwise.
+	 * 
+	 * @return <code>true</code> if this delegate is enabled; <code>false</code> otherwise.
+	 */
+	public boolean isEnabled();
+
+	/**
+	 * Set the delegate's enablement {@link Expression}.
+	 * 
+	 * @param enablementExpression
+	 *            An {@link Expression} that will be evaluated to determine the enablement of this delegate. May be
+	 *            <code>null</code> to indicate that the delegate is always enabled.
+	 */
+	public void setEnablement(Expression enablementExpression);
 
 	/**
 	 * Returns a lower-case name of the application that this delegate supports.

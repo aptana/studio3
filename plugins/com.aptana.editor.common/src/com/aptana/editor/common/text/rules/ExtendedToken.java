@@ -37,7 +37,7 @@ public class ExtendedToken extends Token {
 	 * @return the contents
 	 */
 	public String getContents() {
-		return contents;
+		return contents != null ? contents : StringUtil.EMPTY;
 	}
 
 	/**

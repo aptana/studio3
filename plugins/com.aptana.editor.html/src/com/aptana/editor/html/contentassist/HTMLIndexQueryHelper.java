@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.html.contentassist;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,11 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
-import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -37,7 +34,7 @@ public class HTMLIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(HTMLIndexConstants.METADATA_INDEX_LOCATION));
+		return IndexManager.getInstance().getIndex(URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	private HTMLIndexReader _reader;
@@ -58,20 +55,12 @@ public class HTMLIndexQueryHelper
 	 */
 	private List<AttributeElement> getAttribute(String name)
 	{
-		List<AttributeElement> result = Collections.emptyList();
 		if (name != null && name.length() > 0)
 		{
-			try
-			{
-				result = this._reader.getAttribute(getIndex(), name);
-			}
-			catch (IOException e)
-			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
-			}
+			return this._reader.getAttribute(getIndex(), name);
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -131,18 +120,9 @@ public class HTMLIndexQueryHelper
 		List<AttributeElement> result = Collections.emptyList();
 		if (element != null)
 		{
-			List<AttributeElement> attributes = null;
+			List<AttributeElement> attributes = this._reader.getAttributes(getIndex(), element.getAttributes());
 
-			try
-			{
-				attributes = this._reader.getAttributes(getIndex(), element.getAttributes());
-			}
-			catch (IOException e)
-			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
-			}
-
-			if (attributes != null && attributes.isEmpty() == false)
+			if (attributes != null && !attributes.isEmpty())
 			{
 				String elementName = element.getName();
 				Map<String, AttributeElement> attributeMap = new HashMap<String, AttributeElement>();
@@ -171,8 +151,8 @@ public class HTMLIndexQueryHelper
 						}
 						else
 						{
-							boolean currentHasElement = StringUtil.isEmpty(owningElement) == false;
-							boolean previousHasElement = StringUtil.isEmpty(previousAttribute.getName()) == false;
+							boolean currentHasElement = !StringUtil.isEmpty(owningElement);
+							boolean previousHasElement = !StringUtil.isEmpty(previousAttribute.getName());
 
 							// xnor element names
 							if ((currentHasElement && previousHasElement)
@@ -217,25 +197,17 @@ public class HTMLIndexQueryHelper
 	 */
 	public ElementElement getElement(String name)
 	{
-		ElementElement result = null;
 		if (name != null && name.length() > 0)
 		{
-			try
-			{
-				List<ElementElement> elements = this._reader.getElements(getIndex(), name);
+			List<ElementElement> elements = this._reader.getElements(getIndex(), name);
 
-				if (elements.isEmpty() == false)
-				{
-					result = elements.get(0);
-				}
-			}
-			catch (IOException e)
+			if (!elements.isEmpty())
 			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
+				return elements.get(0);
 			}
 		}
 
-		return result;
+		return null;
 	}
 
 	/**
@@ -245,17 +217,7 @@ public class HTMLIndexQueryHelper
 	 */
 	public List<ElementElement> getElements()
 	{
-		List<ElementElement> result = Collections.emptyList();
-		try
-		{
-			result = this._reader.getElements(getIndex());
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e);
-		}
-
-		return result;
+		return this._reader.getElements(getIndex());
 	}
 
 	/**
@@ -265,17 +227,7 @@ public class HTMLIndexQueryHelper
 	 */
 	public List<EntityElement> getEntities()
 	{
-		List<EntityElement> result = Collections.emptyList();
-		try
-		{
-			result = this._reader.getEntities(getIndex());
-		}
-		catch (IOException e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e);
-		}
-
-		return result;
+		return this._reader.getEntities(getIndex());
 	}
 
 	/**
@@ -297,22 +249,13 @@ public class HTMLIndexQueryHelper
 	 */
 	public List<EventElement> getEvents(ElementElement element)
 	{
-		List<EventElement> result = Collections.emptyList();
 		if (element != null)
 		{
 			List<String> names = element.getEvents();
-
-			try
-			{
-				result = this._reader.getEvents(getIndex(), names);
-			}
-			catch (IOException e)
-			{
-				IdeLog.logError(HTMLPlugin.getDefault(), e);
-			}
+			return this._reader.getEvents(getIndex(), names);
 		}
 
-		return result;
+		return Collections.emptyList();
 	}
 
 	/**

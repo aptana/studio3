@@ -71,7 +71,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 	/*
 	 * Class to create a control that shows a categorized tree of wizard types.
 	 */
-	protected class CategorizedWizardSelectionTree
+	protected static class CategorizedWizardSelectionTree
 	{
 		private final static int SIZING_LISTS_HEIGHT = 200;
 
@@ -140,7 +140,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 			viewer.setLabelProvider(new WorkbenchLabelProvider());
 			viewer.setComparator(DataTransferWizardCollectionComparator.INSTANCE);
 
-			ArrayList<IWizardCategory> inputArray = new ArrayList<IWizardCategory>();
+			List<IWizardCategory> inputArray = new ArrayList<IWizardCategory>();
 			boolean expandTop = false;
 
 			if (wizardCategories != null)

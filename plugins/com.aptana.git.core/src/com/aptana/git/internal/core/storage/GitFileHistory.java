@@ -28,6 +28,8 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 public class GitFileHistory extends FileHistory
 {
 
+	private static final IFileRevision[] NO_FILE_REVISIONS = new IFileRevision[0];
+	private static final CommitFileRevision[] NO_COMMIT_FILE_REVISIONS = new CommitFileRevision[0];
 	private IResource resource;
 	private final CommitFileRevision[] revisions;
 
@@ -43,10 +45,14 @@ public class GitFileHistory extends FileHistory
 		try
 		{
 			if (resource == null || resource.getProject() == null)
-				return new CommitFileRevision[0];
+			{
+				return NO_COMMIT_FILE_REVISIONS;
+			}
 			GitRepository repo = getGitRepositoryManager().getAttached(this.resource.getProject());
 			if (repo == null)
-				return new CommitFileRevision[0];
+			{
+				return NO_COMMIT_FILE_REVISIONS;
+			}
 			// Need the repo relative path
 			IPath resourcePath = repo.relativePath(resource);
 			List<IFileRevision> revisions = new ArrayList<IFileRevision>();
@@ -56,7 +62,8 @@ public class GitFileHistory extends FileHistory
 			{
 				max = 1;
 			}
-			list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()), max, subMonitor.newChild(95));
+			list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()), max,
+					subMonitor.newChild(95));
 			List<GitCommit> commits = list.getCommits();
 			for (GitCommit gitCommit : commits)
 			{
@@ -78,7 +85,9 @@ public class GitFileHistory extends FileHistory
 	public IFileRevision[] getContributors(IFileRevision revision)
 	{
 		if (!(revision instanceof CommitFileRevision))
-			return new IFileRevision[0];
+		{
+			return NO_FILE_REVISIONS;
+		}
 		CommitFileRevision arg = (CommitFileRevision) revision;
 		List<IFileRevision> targets = new ArrayList<IFileRevision>();
 		if (revisions != null)
@@ -119,7 +128,9 @@ public class GitFileHistory extends FileHistory
 	public IFileRevision[] getTargets(IFileRevision revision)
 	{
 		if (!(revision instanceof CommitFileRevision))
-			return new IFileRevision[0];
+		{
+			return NO_FILE_REVISIONS;
+		}
 		List<IFileRevision> targets = new ArrayList<IFileRevision>();
 		if (revisions != null)
 		{

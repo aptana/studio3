@@ -11,7 +11,7 @@ abstract class RepositoryEvent
 {
 	private GitRepository repository;
 
-	RepositoryEvent(GitRepository repository)
+	protected RepositoryEvent(GitRepository repository)
 	{
 		this.repository = repository;
 	}

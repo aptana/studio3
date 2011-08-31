@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.compare.contentmergeviewer.TokenComparator;
+import org.eclipse.compare.rangedifferencer.IRangeComparator;
+import org.eclipse.compare.rangedifferencer.RangeDifference;
+import org.eclipse.compare.rangedifferencer.RangeDifferencer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -250,6 +254,58 @@ public class FormatterUtils
 					originalString);
 		}
 		return outputBuffer.toString();
+	}
+
+	/**
+	 * Compute and return an array of {@link RangeDifference}s for two given strings.
+	 * 
+	 * @param left
+	 * @param right
+	 * @return An array of {@link RangeDifference}s.
+	 */
+	public static RangeDifference[] getDiff(String left, String right)
+	{
+		IRangeComparator leftRangeComparator = new TokenComparator(left);
+		IRangeComparator rightRangeComparator = new TokenComparator(right);
+		return RangeDifferencer.findRanges(leftRangeComparator, rightRangeComparator);
+	}
+
+	/**
+	 * A utility function to log the first difference area that two strings have.<br>
+	 * The function scans char-by-char, and on the first difference it try to log 10 chars before and 40 chars after the
+	 * diff.
+	 * 
+	 * @param input
+	 *            - Expected content
+	 * @param output
+	 *            - Matched content
+	 */
+	public static void logDiff(String input, String output)
+	{
+		// find the first offset that has a change and log it.
+		int length = Math.min(input.length(), output.length());
+		int offset = 0;
+		for (; offset < length; offset++)
+		{
+			if (input.charAt(offset) != output.charAt(offset))
+			{
+				// Found a change
+				break;
+			}
+		}
+		// log 10 characters back and 40 ahead
+		StringBuilder message = new StringBuilder(100);
+		message.append("Formatted content differ around position "); //$NON-NLS-1$
+		message.append(offset);
+		message.append("\nINPUT:\n"); //$NON-NLS-1$
+		int start = Math.max(0, offset - 10);
+		int end = Math.min(offset + 40, input.length());
+		message.append(input.substring(start, end));
+		message.append("\nOUTPUT:\n"); //$NON-NLS-1$
+		start = Math.max(0, offset - 10);
+		end = Math.min(offset + 40, output.length());
+		message.append(output.substring(start, end));
+		IdeLog.logError(FormatterPlugin.getDefault(), message.toString());
 	}
 
 	/**

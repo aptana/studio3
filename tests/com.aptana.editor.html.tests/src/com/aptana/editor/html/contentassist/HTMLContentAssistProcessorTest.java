@@ -248,7 +248,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		// offset is outside document size
 		((BadDocument) fDocument).setThrowBadLocation(true);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 	}
 
 	public void testIMGProposal()

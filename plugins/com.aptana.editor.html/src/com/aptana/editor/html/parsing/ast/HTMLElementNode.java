@@ -20,6 +20,7 @@ import beaver.Symbol;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -40,12 +41,12 @@ public class HTMLElementNode extends HTMLNode
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
-		this(tagSymbol, new HTMLNode[0], start, end);
+		this(tagSymbol, HTMLParser.NO_HTML_NODES, start, end);
 	}
 
 	public HTMLElementNode(Symbol tagSymbol, HTMLNode[] children, int start, int end)
 	{
-		super(HTMLNodeTypes.ELEMENT, children, start, end);
+		super(IHTMLNodeTypes.ELEMENT, children, start, end);
 		String tag = tagSymbol.value.toString();
 		if (tag.length() > 0)
 		{

@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.html.parsing;
 
-public interface HTMLTagInfo
+public interface IHTMLTagInfo
 {
 	/**
 	 * tag info not defined

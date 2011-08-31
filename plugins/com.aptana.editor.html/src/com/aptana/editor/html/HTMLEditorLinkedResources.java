@@ -19,7 +19,7 @@ import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.IEditorLinkedResources;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
@@ -49,7 +49,7 @@ public class HTMLEditorLinkedResources implements IEditorLinkedResources {
 		if (targetEditorInput instanceof IFileEditorInput) {
 			IFile htmlFile = ((IFileEditorInput) targetEditorInput).getFile();
 			Index index = IndexManager.getInstance().getIndex(htmlFile.getProject().getLocationURI());
-			List<QueryResult> queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS, HTMLIndexConstants.RESOURCE_JS }, null, 0);
+			List<QueryResult> queryResults = index.query(new String[] { IHTMLIndexConstants.RESOURCE_CSS, IHTMLIndexConstants.RESOURCE_JS }, null, 0);
 			if (queryResults != null) {
 				String includedFileToCheck = uri.toString();
 				String includedFile;

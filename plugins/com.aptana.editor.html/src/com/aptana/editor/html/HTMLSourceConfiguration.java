@@ -108,7 +108,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	private HTMLSourceConfiguration() {
 	}
 
-	public static HTMLSourceConfiguration getDefault() {
+	public synchronized static HTMLSourceConfiguration getDefault()
+	{
 		if (instance == null) {
 			instance = new HTMLSourceConfiguration();
 		}

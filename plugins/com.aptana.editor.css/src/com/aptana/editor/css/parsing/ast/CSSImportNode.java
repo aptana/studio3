@@ -28,20 +28,12 @@ public class CSSImportNode extends CSSNode
 		fMediaList = mediaList;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
-	 */
 	@Override
 	public void accept(CSSTreeWalker walker)
 	{
 		walker.visit(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -51,7 +43,6 @@ public class CSSImportNode extends CSSNode
 		}
 
 		CSSImportNode other = (CSSImportNode) obj;
-
 		return fUriStr.equals(other.fUriStr) && Arrays.equals(fMediaList, other.fMediaList);
 	}
 
@@ -75,10 +66,6 @@ public class CSSImportNode extends CSSNode
 		return fUriStr;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
-	 */
 	@Override
 	public int hashCode()
 	{
@@ -90,27 +77,23 @@ public class CSSImportNode extends CSSNode
 		return hash;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 
-		text.append("@import ").append(fUriStr); //$NON-NLS-1$
+		text.append("@import ").append(getUri()); //$NON-NLS-1$
 
-		for (int i = 0; i < fMediaList.length; ++i)
+		CSSTextNode[] medias = getMedias();
+		for (int i = 0; i < medias.length; ++i)
 		{
-			text.append(' ').append(fMediaList[i]);
+			text.append(' ').append(medias[i]);
 
-			if (i < fMediaList.length - 1)
+			if (i < medias.length - 1)
 			{
 				text.append(',');
 			}
 		}
-
 		text.append(';');
 
 		return text.toString();

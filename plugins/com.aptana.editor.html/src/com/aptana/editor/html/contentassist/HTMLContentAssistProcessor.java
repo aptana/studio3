@@ -50,11 +50,11 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
+import com.aptana.editor.html.HTMLTagScanner;
 import com.aptana.editor.html.HTMLTagUtil;
 import com.aptana.editor.html.IHTMLEditorDebugScopes;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
@@ -673,6 +673,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				replaceOffset = this._replaceRange.getStartingOffset();
 				replaceLength = this._replaceRange.getLength();
 			}
+
 			CommonCompletionProposal proposal = new URIPathProposal(name, replaceOffset, replaceLength, isDir,
 					userAgentIcons);
 			proposals.add(proposal);
@@ -858,7 +859,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						}
 						if (addCloseTag && !TagUtil.tagClosed(doc, element.getName()))
 						{
-							replacement.append("></" + element.getName() + ">"); //$NON-NLS-1$ //$NON-NLS-2$
+							replacement.append("></").append(element.getName()).append('>'); //$NON-NLS-1$
 							positions.add(cursorPosition + 1);
 							positions.add(cursorPosition + 4 + element.getName().length());
 						}
@@ -961,7 +962,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			String name = entry.getKey();
 			CommonCompletionProposal proposal = createProposal(name, src, ELEMENT_ICON,
 					MessageFormat.format("&lt;!DOCTYPE {0}&gt;", src), userAgentIcons, //$NON-NLS-1$
-					HTMLIndexConstants.CORE, offset, src.length());
+					IHTMLIndexConstants.CORE, offset, src.length());
 			if (src.equalsIgnoreCase("HTML")) // Make HTML 5 the default //$NON-NLS-1$
 			{
 				proposal.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
@@ -1159,7 +1160,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, replaceOffset, replaceLength,
 				cursorPosition, ELEMENT_ICON, "/" + element.getName(), null, element.getDescription()); //$NON-NLS-1$
 
-		proposal.setFileLocation(HTMLIndexConstants.CORE);
+		proposal.setFileLocation(IHTMLIndexConstants.CORE);
 		proposal.setUserAgentImages(userAgentIcons);
 		proposal.setRelevance(relevance);
 		return proposal;
@@ -1178,7 +1179,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
 			Image[] userAgents, int offset)
 	{
-		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
+		this.addProposal(proposals, name, image, description, userAgents, IHTMLIndexConstants.CORE, offset);
 	}
 
 	/**
@@ -1239,7 +1240,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// tokenize the current document
 		this._document = viewer.getDocument();
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset > 0 ? offset - 1
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, (offset > 0) ? offset - 1
 				: offset);
 
 		// store a reference to the lexeme at the current position
@@ -1417,7 +1418,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLScopeScanner())
+		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLTagScanner())
 		{
 			@Override
 			protected HTMLTokenType getTypeFromData(Object data)
@@ -1588,7 +1589,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		try
 		{
-			ITypedRegion partition = document.getPartition(offset > 0 ? offset - 1 : offset);
+			ITypedRegion partition = document.getPartition((offset > 0) ? offset - 1 : offset);
 			String type = partition.getType();
 
 			if (locationMap.containsKey(type))

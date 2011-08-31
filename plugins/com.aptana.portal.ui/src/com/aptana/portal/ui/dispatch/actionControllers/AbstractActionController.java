@@ -7,6 +7,7 @@
  */
 package com.aptana.portal.ui.dispatch.actionControllers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -109,8 +110,13 @@ public abstract class AbstractActionController implements IActionController, ICo
 			catch (Exception e)
 			{
 				IdeLog.logError(PortalUIPlugin.getDefault(), e);
-				return BrowserNotifier
-						.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR, e.getMessage());
+				String message = e.getMessage();
+				if (e instanceof InvocationTargetException)
+				{
+					Throwable targetException = ((InvocationTargetException) e).getTargetException();
+					message = targetException.getMessage();
+				}
+				return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR, message);
 			}
 		}
 		return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_UNKNOWN_ACTION,

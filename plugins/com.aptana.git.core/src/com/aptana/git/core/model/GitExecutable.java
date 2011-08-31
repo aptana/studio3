@@ -43,7 +43,7 @@ public class GitExecutable
 	private static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
 	protected static final String GIT_EXECUTABLE_WIN32 = GIT_EXECUTABLE + ".exe"; //$NON-NLS-1$
 	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
-	private static ArrayList<IPath> fgLocations;
+	private static List<IPath> fgLocations;
 	private IPath gitPath;
 
 	static GitExecutable fgExecutable;

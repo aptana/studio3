@@ -33,7 +33,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
-import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -213,19 +212,10 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		// Display a status error
 		StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus, 3000L, true);
-		if (FormatterPlugin.getDefault().isDebugging())
-		{
-			// Log complete
-			IdeLog.logError(FormatterPlugin.getDefault(), FormatterMessages.Formatter_formatterError,
-					new DumpContentException("\nInput:\n\n" + input //$NON-NLS-1$
-							+ "\n<!----------------------------!> \nOutput:\n " + output), IDebugScopes.DEBUG); //$NON-NLS-1$
-		}
-		else
-		{
-			// Log basic
-			IdeLog.logError(FormatterPlugin.getDefault(), FormatterMessages.Formatter_basicLogFormatterError,
-					IDebugScopes.DEBUG);
-		}
+		// Log a basic error. It's up to the subclassing formatter implementation to log any advance information
+		// regarding the failure.
+		IdeLog.logError(FormatterPlugin.getDefault(), FormatterMessages.Formatter_basicLogFormatterError,
+				IDebugScopes.DEBUG);
 	}
 
 	private static int toInt(Object value)
@@ -455,23 +445,41 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		LineNumberReader input = new LineNumberReader(inputReader);
 		LineNumberReader output = new LineNumberReader(outputReader);
-		for (;;)
+		String inputLine = null;
+		String outputLine = null;
+		boolean result = true;
+		while (result)
 		{
-			final String inputLine = readLine(input);
-			final String outputLine = readLine(output);
+			inputLine = readLine(input);
+			outputLine = readLine(output);
 			if (inputLine == null)
 			{
-				return (outputLine == null);
+				result = (outputLine == null);
+				break;
 			}
 			else if (outputLine == null)
 			{
-				return false;
+				result = false;
 			}
 			else if (!inputLine.equals(outputLine))
 			{
-				return false;
+				result = false;
 			}
 		}
+		if (!result && FormatterPlugin.getDefault().isDebugging())
+		{
+			if (inputLine != null && outputLine != null)
+			{
+				FormatterUtils.logDiff(inputLine, outputLine);
+			}
+			else
+			{
+				IdeLog.logError(FormatterPlugin.getDefault(),
+						"Formatter Error - Input line does not match output line:\nINPUT:\n" + inputLine + "\nOUTPUT\n" //$NON-NLS-1$ //$NON-NLS-2$
+								+ outputLine);
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -490,7 +498,12 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		in = in.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		out = out.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		return in.equals(out);
+		boolean result = in.equals(out);
+		if (!result && FormatterPlugin.getDefault().isDebugging())
+		{
+			FormatterUtils.logDiff(in, out);
+		}
+		return result;
 	}
 
 	private String readLine(LineNumberReader reader)
