@@ -68,10 +68,11 @@ public class CSSValidator implements IValidator
 
 	// CSS3 properties that the validator doesn't recognize yet and need to be ignored
 	@SuppressWarnings("nls")
-	private static final String[] CSS3_PROPERTIES = { "behavior", "box-shadow", "column-count", "column-width",
-			"column-gap", "column-rule", "border-radius", "background-clip", "background-origin",
+	private static final String[] CSS3_PROPERTIES = { "behavior", "box-shadow", "box-sizing", "column-count",
+			"column-width", "column-gap", "column-rule", "border-radius", "background-clip", "background-origin",
 			"border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
-			"border-top-left-radius", "font-family", "font-weight", "font-style", "resize", "size", "src", "transition" };
+			"border-top-left-radius", "font-family", "font-weight", "font-style", "outline-offset", "resize", "size",
+			"src", "transform", "transition" };
 
 	@SuppressWarnings("nls")
 	private static final String[] CSS3_AT_RULES = { "@namespace" };
