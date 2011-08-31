@@ -30,8 +30,8 @@ import com.aptana.internal.index.core.MemoryIndex;
 
 public class Index implements IReadWriteMonitor
 {
-	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH | SearchPattern.PATTERN_MATCH
-		| SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
+	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
+			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
 	private static final Map<String, Pattern> PATTERNS = new HashMap<String, Pattern>();
 	// Separator to use after the container path
 	public static final char DEFAULT_SEPARATOR = '/';
@@ -53,7 +53,7 @@ public class Index implements IReadWriteMonitor
 
 			switch (c)
 			{
-				// the backslash
+			// the backslash
 				case '\\':
 					// the backslash is escape char in string matcher
 					if (!isEscaped)
@@ -311,9 +311,18 @@ public class Index implements IReadWriteMonitor
 
 		// Convert to a filename we can use for the actual index on disk
 		IPath diskIndexPath = computeIndexLocation(containerURI);
-		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath.toOSString();
-		this.diskIndex = new DiskIndex(diskIndexPathString);
-		this.diskIndex.initialize(reuseExistingFile);
+		String diskIndexPathString = diskIndexPath.getDevice() == null ? diskIndexPath.toString() : diskIndexPath
+				.toOSString();
+		this.enterWrite();
+		try
+		{
+			this.diskIndex = new DiskIndex(diskIndexPathString);
+			this.diskIndex.initialize(reuseExistingFile);
+		}
+		finally
+		{
+			this.exitWrite();
+		}
 	}
 
 	/**
@@ -326,8 +335,14 @@ public class Index implements IReadWriteMonitor
 	public void addEntry(String category, String key, URI containerRelativeURI)
 	{
 		this.enterWrite();
-		this.memoryIndex.addEntry(category, key, containerRelativeURI.toString());
-		this.exitWrite();
+		try
+		{
+			this.memoryIndex.addEntry(category, key, containerRelativeURI.toString());
+		}
+		finally
+		{
+			this.exitWrite();
+		}
 	}
 
 	/**
@@ -335,7 +350,8 @@ public class Index implements IReadWriteMonitor
 	 */
 	void deleteIndexFile()
 	{
-		IndexPlugin.logInfo(MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER);
+		// TODO Enter write?
+		IndexPlugin.logInfo(MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
 
 		File indexFile = this.getIndexFile();
 
@@ -429,10 +445,16 @@ public class Index implements IReadWriteMonitor
 	public List<String> getCategories()
 	{
 		Set<String> categories = new HashSet<String>();
-
-		categories.addAll(this.memoryIndex.getCategories());
-		categories.addAll(this.diskIndex.getCategories());
-
+		this.enterRead();
+		try
+		{
+			categories.addAll(this.memoryIndex.getCategories());
+			categories.addAll(this.diskIndex.getCategories());
+		}
+		finally
+		{
+			this.exitRead();
+		}
 		return new ArrayList<String>(categories);
 	}
 
@@ -488,6 +510,7 @@ public class Index implements IReadWriteMonitor
 
 			if (this.memoryIndex.shouldMerge() && this.exitReadEnterWrite())
 			{
+				// in write...
 				try
 				{
 					this.save(false);
@@ -497,7 +520,7 @@ public class Index implements IReadWriteMonitor
 					this.exitWriteEnterRead();
 				}
 			}
-
+			// We're in read mode for monitor here now matter what...
 			int rule = matchRule & MATCH_RULE_INDEX_MASK;
 
 			if (this.memoryIndex.hasChanged())
@@ -535,17 +558,23 @@ public class Index implements IReadWriteMonitor
 	public Set<String> queryDocumentNames(String substring) throws IOException
 	{
 		Set<String> results;
-
-		if (this.memoryIndex.hasChanged())
+		this.enterRead();
+		try
 		{
-			results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
-			results.addAll(this.memoryIndex.addDocumentNames(substring));
+			if (this.memoryIndex.hasChanged())
+			{
+				results = this.diskIndex.addDocumentNames(substring, this.memoryIndex);
+				results.addAll(this.memoryIndex.addDocumentNames(substring));
+			}
+			else
+			{
+				results = this.diskIndex.addDocumentNames(substring, null);
+			}
 		}
-		else
+		finally
 		{
-			results = this.diskIndex.addDocumentNames(substring, null);
+			this.exitRead();
 		}
-
 		return results;
 	}
 
@@ -558,21 +587,36 @@ public class Index implements IReadWriteMonitor
 	{
 		String documentName = containerRelativeURI.toString();
 
-		// TODO: Don't do any of this unless we are logging INFOs
-		if (memoryIndex.hasDocument(documentName))
+		this.enterRead();
+		try
 		{
-			// @formatter:off
-			String message = MessageFormat.format(
-				"Removing URI ''{0}'' from index ''{1}''",
-				containerRelativeURI,
-				this
-			);
-			// @formatter:on
+			// TODO: Don't do any of this unless we are logging INFOs
+			if (memoryIndex.hasDocument(documentName))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Removing URI ''{0}'' from index ''{1}''", //$NON-NLS-1$
+					containerRelativeURI,
+					this
+				);
+				// @formatter:on
 
-			IndexPlugin.logInfo(message, IDebugScopes.INDEXER);
+				IndexPlugin.logInfo(message, IDebugScopes.INDEXER);
+			}
 		}
-
-		this.memoryIndex.remove(documentName);
+		finally
+		{
+			this.exitRead();
+			this.enterWrite(); // we must wait for write! DO NOT CALL exitReadEnterWrite!
+		}
+		try
+		{
+			this.memoryIndex.remove(documentName);
+		}
+		finally
+		{
+			this.exitWrite();
+		}
 	}
 
 	/**
@@ -582,6 +626,7 @@ public class Index implements IReadWriteMonitor
 	 */
 	public void removeCategories(String... categoryNames)
 	{
+		this.enterWrite();
 		try
 		{
 			this.memoryIndex.removeCategories(categoryNames);
@@ -589,7 +634,11 @@ public class Index implements IReadWriteMonitor
 		}
 		catch (IOException e)
 		{
-			IndexPlugin.logError("An error occurred while remove categories from the index", e); //$NON-NLS-1$
+			IndexPlugin.logError("An error occurred while removing categories from the index", e); //$NON-NLS-1$
+		}
+		finally
+		{
+			this.exitWrite();
 		}
 	}
 
@@ -600,7 +649,7 @@ public class Index implements IReadWriteMonitor
 	 */
 	public void save() throws IOException
 	{
-		IndexPlugin.logInfo(MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER);
+		IndexPlugin.logInfo(MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
 
 		this.save(true);
 	}

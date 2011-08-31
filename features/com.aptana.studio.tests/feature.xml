@@ -66,6 +66,7 @@
       <import plugin="com.aptana.deploy.ftp"/>
       <import plugin="com.aptana.samples"/>
       <import plugin="com.aptana.browser"/>
+      <import plugin="com.aptana.index.core"/>
    </requires>
 
    <plugin
@@ -368,6 +369,14 @@
 
    <plugin
          id="com.aptana.browser.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.index.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

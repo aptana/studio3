@@ -53,7 +53,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.coffee,
  com.aptana.deploy.ftp,
  com.aptana.samples.tests,
- com.aptana.browser.tests
+ com.aptana.browser.tests,
+ com.aptana.index.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.studio.tests.all
