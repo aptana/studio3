@@ -64,6 +64,7 @@
       <import plugin="com.aptana.editor.coffee"/>
       <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.deploy.ftp"/>
+      <import plugin="com.aptana.index.core"/>
    </requires>
 
    <plugin
@@ -351,6 +352,14 @@
 
    <plugin
          id="com.aptana.deploy.ftp.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.index.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

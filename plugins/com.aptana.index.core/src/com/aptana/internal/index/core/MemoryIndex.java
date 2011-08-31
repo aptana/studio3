@@ -178,7 +178,10 @@ public class MemoryIndex
 
 		for (Map<String, Set<String>> value : documentsToTable.values())
 		{
-			categories.addAll(value.keySet());
+			if (value != null)
+			{
+				categories.addAll(value.keySet());
+			}
 		}
 
 		return new ArrayList<String>(categories);
