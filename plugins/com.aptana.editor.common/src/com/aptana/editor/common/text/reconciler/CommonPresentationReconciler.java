@@ -87,8 +87,20 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	
 	protected TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor) {
 		try {
+			int damageOffset = damage.getOffset();
+			int damageLength = damage.getLength();
+			if (damageOffset + damageLength > document.getLength()) {
+				int adjustedLength = document.getLength() - damageOffset;
+				synchronized (this) {
+					delayedRegions.remove(new Region(document.getLength(), damageLength - adjustedLength));
+				}
+				if (adjustedLength <= 0) {
+					return null;
+				}
+				damageLength = adjustedLength;
+			}
 			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT*5);
-			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damage.getOffset(), damage.getLength(), false);
+			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damageOffset, damageLength, false);
 			if (partitioning.length == 0) {
 				return presentation;
 			}
@@ -104,10 +116,10 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				}
 			}
 			synchronized (this) {
-				delayedRegions.remove(new Region(damage.getOffset(), partitioning[limit-1].getOffset()+partitioning[limit-1].getLength()-damage.getOffset()));
+				delayedRegions.remove(new Region(damageOffset, partitioning[limit-1].getOffset()+partitioning[limit-1].getLength()-damageOffset));
 				if (limit < partitioning.length) {
 					int offset = partitioning[limit].getOffset();
-					delayedRegions.append(new Region(offset, damage.getOffset() + damage.getLength() - offset));
+					delayedRegions.append(new Region(offset, damageOffset + damageLength - offset));
 				}
 			}
 			return presentation;
