@@ -43,7 +43,7 @@ public class TitaniumUpdatePopup extends PopupDialog
 	public TitaniumUpdatePopup(Shell parentShell, final Runnable updateAction)
 	{
 		super(parentShell, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE | SWT.MODELESS, false, true, true, false, false,
-				Messages.TitaniumUpdatePopup_update_title, null);
+				EplMessages.TitaniumUpdatePopup_update_title, null);
 
 		clickListener = new MouseAdapter()
 		{
@@ -67,7 +67,7 @@ public class TitaniumUpdatePopup extends PopupDialog
 
 		// The "click to update" label
 		Label infoLabel = new Label(dialogArea, SWT.NONE);
-		infoLabel.setText(Messages.TitaniumUpdatePopup_update_detail);
+		infoLabel.setText(EplMessages.TitaniumUpdatePopup_update_detail);
 		infoLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
 		infoLabel.addMouseListener(clickListener);
 

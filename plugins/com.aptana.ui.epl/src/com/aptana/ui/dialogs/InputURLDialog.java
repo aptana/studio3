@@ -117,7 +117,7 @@ public class InputURLDialog extends Dialog {
 				try {
 					new URI(newText).toURL();
 				} catch (Exception e) {
-					return Messages.InputURLDialog_InvalidURL;
+					return EplMessages.InputURLDialog_InvalidURL;
 				}
 				return null;
 			}
