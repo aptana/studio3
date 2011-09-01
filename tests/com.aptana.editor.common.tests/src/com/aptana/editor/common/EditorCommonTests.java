@@ -17,6 +17,7 @@ public class EditorCommonTests
 	{
 		TestSuite suite = new TestSuite(EditorCommonTests.class.getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(RegionsTest.class);
 		suite.addTestSuite(SequenceCharacterScannerTest.class);
 		suite.addTestSuite(TextUtilsTest.class);
 		//$JUnit-END$
