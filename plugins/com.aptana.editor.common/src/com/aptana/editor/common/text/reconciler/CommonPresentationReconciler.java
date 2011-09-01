@@ -27,6 +27,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.swt.custom.StyledText;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.Regions;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -38,9 +39,11 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	private static final int ITERATION_PARTITION_LIMIT = 10000;
 	private static final int BACKGROUND_RECONCILE_DELAY = 1000;
 	private static final int ITERATION_DELAY = 50;
+	private static final int MINIMAL_VISIBLE_LENGTH = 20000;
 	
 	private ITextViewer textViewer;
-	private IRegion delayedRegion;
+	private Regions delayedRegions = new Regions();
+	private IRegion viewerVisibleRegion;
 	private Job job;
 
 	/* (non-Javadoc)
@@ -49,7 +52,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	@Override
 	public void install(ITextViewer viewer) {
 		super.install(viewer);
-		delayedRegion = null;
+		delayedRegions.clear();
 		textViewer = viewer;
 	}
 
@@ -62,7 +65,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			job.cancel();
 			job = null;
 		}
-		delayedRegion = null;
+		delayedRegions.clear();
 		textViewer = null;
 		super.uninstall();
 	}
@@ -72,8 +75,11 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	 */
 	@Override
 	protected TextPresentation createPresentation(IRegion damage, IDocument document) {
+		synchronized (this) {
+			delayedRegions.append(damage);
+		}
 		try {
-			return createPresentation(damage, document, new NullProgressMonitor());
+			return createPresentation(nextDamagedRegion(), document, new NullProgressMonitor());
 		} finally {
 			triggerDelayedCreatePresentation();
 		}
@@ -81,8 +87,20 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	
 	protected TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor) {
 		try {
+			int damageOffset = damage.getOffset();
+			int damageLength = damage.getLength();
+			if (damageOffset + damageLength > document.getLength()) {
+				int adjustedLength = document.getLength() - damageOffset;
+				synchronized (this) {
+					delayedRegions.remove(new Region(document.getLength(), damageLength - adjustedLength));
+				}
+				if (adjustedLength <= 0) {
+					return null;
+				}
+				damageLength = adjustedLength;
+			}
 			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT*5);
-			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damage.getOffset(), damage.getLength(), false);
+			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damageOffset, damageLength, false);
 			if (partitioning.length == 0) {
 				return presentation;
 			}
@@ -97,36 +115,16 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 					repairer.createPresentation(presentation, r);
 				}
 			}
-			delayedExclude(damage.getOffset(), partitioning[limit-1].getOffset()+partitioning[limit-1].getLength());
-			if (limit < partitioning.length) {
-				int offset = partitioning[limit].getOffset();
-				delayedInclude(offset, damage.getOffset() + damage.getLength());
+			synchronized (this) {
+				delayedRegions.remove(new Region(damageOffset, partitioning[limit-1].getOffset()+partitioning[limit-1].getLength()-damageOffset));
+				if (limit < partitioning.length) {
+					int offset = partitioning[limit].getOffset();
+					delayedRegions.append(new Region(offset, damageOffset + damageLength - offset));
+				}
 			}
 			return presentation;
 		} catch (BadLocationException e) {
 			return null;
-		}
-	}
-
-	private synchronized void delayedInclude(int startOffset, int endOffset) {
-		if (delayedRegion != null) {
-			int offset = Math.min(delayedRegion.getOffset(), startOffset);
-			int length = Math.max(delayedRegion.getOffset()+delayedRegion.getLength(), endOffset) - offset;
-			delayedRegion = new Region(offset, length);
-		} else {
-			delayedRegion = new Region(startOffset, endOffset-startOffset);
-		}
-	}
-
-	private synchronized void delayedExclude(int startOffset, int endOffset) {
-		if (delayedRegion != null) {
-			if (delayedRegion.getOffset() >= startOffset) {
-				int length = delayedRegion.getLength() - (endOffset-delayedRegion.getOffset());
-				delayedRegion = length > 0 ? new Region(endOffset, length) : null;				
-			} else if (delayedRegion.getOffset()+delayedRegion.getLength() <= endOffset) {
-				int length = startOffset - delayedRegion.getOffset();
-				delayedRegion = length > 0 ? new Region(delayedRegion.getOffset(), length) : null;				
-			}
 		}
 	}
 
@@ -144,6 +142,10 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 							if (widget != null && !widget.isDisposed()) {
 								textViewer.changeTextPresentation(presentation[0], false);
 							}
+							// save visible region here since UI thread access required
+							int topOffset = textViewer.getTopIndexStartOffset();
+							int length = textViewer.getBottomIndexEndOffset() - topOffset;
+							viewerVisibleRegion = new Region(topOffset, Math.max(length, MINIMAL_VISIBLE_LENGTH));
 						}
 					}
 				});
@@ -158,18 +160,17 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			job = new Job("Delayed Presentation Reconciler") { //$NON-NLS-1$
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					IDocument document = textViewer.getDocument();
-					IRegion damage = delayedRegion;
-					while (damage != null && !monitor.isCanceled()) {
-						processDamage(damage, document, monitor);
+					while (!monitor.isCanceled()) {
+						IRegion damage = nextDamagedRegion();
+						if (damage == null) {
+							break;
+						}
+						processDamage(damage, textViewer.getDocument(), monitor);
 						System.gc();
 						try {
 							Thread.sleep(ITERATION_DELAY);
 						} catch (InterruptedException e) {
 							break;
-						}
-						synchronized (CommonPresentationReconciler.this) {
-							damage = delayedRegion;
 						}
 					}
 					return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
@@ -178,8 +179,31 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			job.setPriority(Job.DECORATE);
 			job.setSystem(!EclipseUtil.showSystemJobs());
 		}
-		if (delayedRegion != null) {
+		if (!delayedRegions.isEmpty()) {
 			job.schedule(BACKGROUND_RECONCILE_DELAY);
+		}
+	}
+
+	private IRegion nextDamagedRegion() {
+		if (viewerVisibleRegion == null) {
+			UIUtils.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					int topOffset = textViewer.getTopIndexStartOffset();
+					int length = textViewer.getBottomIndexEndOffset() - topOffset;
+					viewerVisibleRegion = new Region(topOffset, Math.max(length, MINIMAL_VISIBLE_LENGTH));
+				}
+			});
+		}
+		synchronized (this) {
+			if (delayedRegions.isEmpty()) {
+				return null;
+			}
+			IRegion visible = delayedRegions.overlap(viewerVisibleRegion);
+			viewerVisibleRegion = null;
+			if (visible != null) {
+				return visible;
+			}
+			return delayedRegions.iterator().next();
 		}
 	}
 
