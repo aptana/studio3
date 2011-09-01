@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -492,7 +491,7 @@ public class CommonOccurrencesUpdater implements IPropertyChangeListener {
 
 			if (document != null && annotationModel != null) {
 				findOccurrencesJob = new FindOccurrencesJob(document, textSelection, annotationModel);
-				findOccurrencesJob.run(new NullProgressMonitor());
+				findOccurrencesJob.schedule();
 			}
 		}
 	}
