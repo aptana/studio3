@@ -132,3 +132,9 @@ p strong {
     background:url('../images/arrow-rotate-clockwise.png');
     background-repeat:no-repeat;
 }
+
+.shadow {
+  -webkit-box-shadow: 0px 0px 8px #999; 
+     -moz-box-shadow: 0px 0px 8px #999; 
+          box-shadow: 0px 0px 8px #999; 
+}

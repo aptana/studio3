@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Aptana Portal UI Tests
+Bundle-SymbolicName: com.aptana.portal.ui.tests
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: Aptana
+Fragment-Host: com.aptana.portal.ui;bundle-version="3.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.5
+Import-Package: junit.framework
+Export-Package: com.aptana.portal.ui.tests
+Require-Bundle: com.aptana.editor.common;bundle-version="3.0.3"

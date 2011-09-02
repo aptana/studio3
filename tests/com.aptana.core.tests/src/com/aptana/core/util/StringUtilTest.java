@@ -452,4 +452,48 @@ public class StringUtilTest extends TestCase
 
 	}
 
+	public void testPad()
+	{
+		assertEquals("", StringUtil.pad(null, 0, ' '));
+		assertEquals(" ", StringUtil.pad(null, 1, ' '));
+		assertEquals("a", StringUtil.pad("a", 0, ' '));
+		assertEquals("a", StringUtil.pad("a", 1, ' '));
+		assertEquals(" a", StringUtil.pad("a", 2, ' '));
+	}
+
+	public void testfindPreviousWhitespaceOffset()
+	{
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset(null, 0));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("", 0));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("", 1));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("a", 0));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("a", 1));
+		assertEquals(0, StringUtil.findPreviousWhitespaceOffset(" a", 1));
+		assertEquals(0, StringUtil.findPreviousWhitespaceOffset(" a", 2));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("  a", 2));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("a b", 1));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("a b", 2));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("a b c", 2));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("a b c", 3));
+		assertEquals(3, StringUtil.findPreviousWhitespaceOffset("a b c", 4));
+	}
+
+	public void testfindNextWhitespaceOffset()
+	{
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset(null, 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("", 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("", 1));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a", 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a", 1));
+		assertEquals(0, StringUtil.findNextWhitespaceOffset(" a", 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset(" a", 1));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset(" a", 2));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("  a", 2));
+		assertEquals(1, StringUtil.findNextWhitespaceOffset("a b", 1));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b", 2));
+		assertEquals(3, StringUtil.findNextWhitespaceOffset("a b c", 2));
+		assertEquals(3, StringUtil.findNextWhitespaceOffset("a b c", 3));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b c", 4));
+	}
+
 }
