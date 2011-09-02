@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NavigableSet;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.Assert;
@@ -40,7 +40,7 @@ public final class Regions implements Iterable<IRegion> {
 			return diff;
 		}
 	};
-	private final NavigableSet<IRegion> regions = new TreeSet<IRegion>(COMPARATOR);
+	private final SortedSet<IRegion> regions = new TreeSet<IRegion>(COMPARATOR);
 
 	/**
 	 * Default constructor
@@ -102,8 +102,8 @@ public final class Regions implements Iterable<IRegion> {
 			boolean hasOverlaps;
 			do {
 				hasOverlaps = false;
-				IRegion left = regions.floor(r);
-				IRegion right = regions.ceiling(r);
+				IRegion left = NavigableSetFloor(regions, r);
+				IRegion right = NavigableSetCeiling(regions, r);
 				if (overlap(left, r)) {
 					regions.remove(left);
 					r = merge(left, r);
@@ -127,8 +127,8 @@ public final class Regions implements Iterable<IRegion> {
 		for (IRegion r : region) {
 			Assert.isLegal(r.getLength() >= 0, "Negative region length"); //$NON-NLS-1$
 			IRegion from = new Region(r.getOffset(), Integer.MAX_VALUE);
-			IRegion floor = regions.floor(from);
-			List<IRegion> list = new ArrayList<IRegion>(regions.tailSet(floor != null ? floor : from, true));
+			IRegion floor = NavigableSetFloor(regions, from);
+			List<IRegion> list = new ArrayList<IRegion>(NavigableSetTailSet(regions, floor != null ? floor : from, true));
 			for (IRegion current : list) {
 				if (overlap(current, r)) {
 					regions.remove(current);
@@ -154,8 +154,8 @@ public final class Regions implements Iterable<IRegion> {
 	public IRegion overlap(IRegion region) {
 		Assert.isLegal(region.getLength() >= 0, "Negative region length"); //$NON-NLS-1$
 		IRegion from = new Region(region.getOffset(), Integer.MAX_VALUE);
-		IRegion floor = regions.floor(from);
-		for (IRegion current : regions.tailSet(floor != null ? floor : from, true)) {
+		IRegion floor = NavigableSetFloor(regions, from);
+		for (IRegion current : NavigableSetTailSet(regions, floor != null ? floor : from, true)) {
 			IRegion overlap = intersection(current, region);
 			if (overlap != null) {
 				return overlap;
@@ -229,6 +229,33 @@ public final class Regions implements Iterable<IRegion> {
 			return o2;
 		}
 		return new Region(offset, length);
+	}
+
+	/** Workaround for NavigatableSet interface which is @since java 1.6
+	 */
+
+	private static <T> T NavigableSetFloor(SortedSet<T> sortedSet, T e) {
+		if (sortedSet.contains(e)) {
+			return e;
+		}
+		SortedSet<T> headSet = sortedSet.headSet(e);
+		if (headSet.isEmpty()) {
+			return null;
+		}
+		return headSet.last();
+	}
+
+	private static <T> T NavigableSetCeiling(SortedSet<T> sortedSet, T e) {
+		SortedSet<T> tailSet = sortedSet.tailSet(e);
+		if (tailSet.isEmpty()) {
+			return null;
+		}
+		return tailSet.first();
+	}
+
+	private static <T> SortedSet<T> NavigableSetTailSet(SortedSet<T> sortedSet, T fromElement, boolean inclusive) {
+		Assert.isTrue(inclusive);
+		return sortedSet.tailSet(fromElement);
 	}
 
 }
