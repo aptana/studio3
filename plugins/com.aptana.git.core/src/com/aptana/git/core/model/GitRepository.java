@@ -101,9 +101,9 @@ public class GitRepository
 	 */
 	private static final String PACKED_REFS = "packed-refs"; //$NON-NLS-1$
 	/**
-	 * The file used
+	 * The file used to write the commit message.
 	 */
-	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
+	static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	/**
 	 * File hoplding the concatenated commit messages from merge --squash
 	 */
@@ -1498,7 +1498,7 @@ public class GitRepository
 		return gitFile(MERGE_HEAD_FILENAME);
 	}
 
-	private File gitFile(String string)
+	File gitFile(String string)
 	{
 		return gitDirPath().append(string).toFile();
 	}
