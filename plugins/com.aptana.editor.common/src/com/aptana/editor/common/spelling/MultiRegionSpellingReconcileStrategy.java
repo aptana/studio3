@@ -58,7 +58,11 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 	 */
 	@Override
 	protected ISpellingProblemCollector createSpellingProblemCollector() {
-		return new SpellingProblemCollector(getAnnotationModel());
+		IAnnotationModel model = getAnnotationModel();
+		if (model == null) {
+			return null;
+		}
+		return new SpellingProblemCollector(model);
 	}
 
 	/* (non-Javadoc)
@@ -76,6 +80,9 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 	 */
 	@Override
 	public void reconcile(IRegion region) {
+		if (getAnnotationModel() == null) {
+			return;
+		}
 		try {
 			currentRegion = region;
 			if (region instanceof ITypedRegion && !contentTypes.contains(((ITypedRegion) region).getType())) {
