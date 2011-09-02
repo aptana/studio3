@@ -635,14 +635,15 @@ public class BundleCacher
 			}
 
 			/**
-			 * Grab the path from the mapping node and grab its value!
+			 * Grab the property value, assume it's a relative path and prepend the bundle's directory to make it an
+			 * absolute path.
 			 * 
 			 * @param node
 			 * @return
 			 */
-			protected String getPath(Node node, String path)
+			protected String getPath(Node node, String propertyName)
 			{
-				String newPath = null;
+				String relativePath = null;
 				if (node instanceof MappingNode)
 				{
 					MappingNode map = (MappingNode) node;
@@ -654,29 +655,29 @@ public class BundleCacher
 						{
 							ScalarNode scalar = (ScalarNode) keyNode;
 							String valueOfKey = scalar.getValue();
-							if (path.equals(valueOfKey))
+							if (propertyName.equals(valueOfKey))
 							{
 								Node valueNode = tuple.getValueNode();
 								if (valueNode instanceof ScalarNode)
 								{
 									ScalarNode scalarValue = (ScalarNode) valueNode;
-									newPath = scalarValue.getValue();
+									relativePath = scalarValue.getValue();
 									break;
 								}
 							}
 						}
 					}
 				}
-				if (newPath != null)
+				if (relativePath != null)
 				{
-					IPath pathObj = Path.fromOSString(newPath);
+					IPath pathObj = Path.fromOSString(relativePath);
 					if (!pathObj.isAbsolute())
 					{
 						// Prepend the bundle directory.
-						newPath = new File(bundleDirectory, newPath).getAbsolutePath();
+						relativePath = new File(bundleDirectory, relativePath).getAbsolutePath();
 					}
 				}
-				return newPath;
+				return relativePath;
 			}
 
 			/**
@@ -725,11 +726,14 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(BuildPathElement.class);
-				String path = getPath(node, "buildPath"); //$NON-NLS-1$
+
+				String path = getPath(node);
+				String buildPath = getPath(node, "buildPath"); //$NON-NLS-1$
 				BuildPathElement bpe = new BuildPathElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, bpe);
 				bpe.setPath(path);
+				bpe.setBuildPath(buildPath);
 				return bpe;
 			}
 		}
