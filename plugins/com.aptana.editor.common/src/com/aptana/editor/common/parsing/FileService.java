@@ -11,9 +11,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.IParseListener;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.parsing.IParseState;
@@ -31,6 +37,19 @@ public class FileService
 	private ValidationManager fValidationManager;
 	private boolean fHasValidParseResult;
 
+	private IPreferenceChangeListener fPreferenceListener = new IPreferenceChangeListener()
+	{
+
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (event.getKey().endsWith(IPreferenceConstants.PARSE_ERROR_ENABLED))
+			{
+				parse(true, new NullProgressMonitor());
+				validate();
+			}
+		}
+	};
+
 	public FileService(String contentType)
 	{
 		this(contentType, new ParseState());
@@ -41,10 +60,14 @@ public class FileService
 		this.contentType = contentType;
 		this.fParseState = parseState;
 		fValidationManager = new ValidationManager(this);
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(fPreferenceListener);
 	}
 
 	public void dispose()
 	{
+		EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
+				.removePreferenceChangeListener(fPreferenceListener);
 		fDocument = null;
 		fParseState.clearEditState();
 		fLastSourceHash = 0;
