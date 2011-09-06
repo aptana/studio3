@@ -8,6 +8,5 @@ Fragment-Host: com.aptana.editor.coffee;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit,
  org.eclipse.ui.ide,
- com.aptana.ui,
- com.windowtester.swt.runtime
+ com.aptana.ui
 Export-Package: com.aptana.editor.coffee.tests

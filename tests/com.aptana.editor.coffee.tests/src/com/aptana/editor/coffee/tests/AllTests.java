@@ -9,9 +9,9 @@ import com.aptana.editor.coffee.CoffeeDoubleClickStrategyTest;
 import com.aptana.editor.coffee.CoffeeSourcePartitionScannerTest;
 import com.aptana.editor.coffee.internal.index.CoffeeFileIndexingParticipantTest;
 import com.aptana.editor.coffee.internal.text.CoffeeFoldingComputerTest;
+import com.aptana.editor.coffee.outline.CoffeeOutlineProviderTest;
 import com.aptana.editor.coffee.parsing.CoffeeParserTest;
 import com.aptana.editor.coffee.parsing.lexer.CoffeeScannerTest;
-import com.aptana.editor.coffee.preferences.CoffeePreferencePageTest;
 
 public class AllTests extends TestCase
 {
@@ -26,9 +26,10 @@ public class AllTests extends TestCase
 		suite.addTestSuite(CoffeeDoubleClickStrategyTest.class);
 		suite.addTestSuite(CoffeeFileIndexingParticipantTest.class);
 		suite.addTestSuite(CoffeeCodeScannerTest.class);
+		suite.addTestSuite(CoffeeOutlineProviderTest.class);
 		suite.addTestSuite(CoffeeSourcePartitionScannerTest.class);
 		suite.addTestSuite(CoffeescriptScopesTest.class);
-		suite.addTestSuite(CoffeePreferencePageTest.class);
+		// suite.addTestSuite(CoffeePreferencePageTest.class);
 		// $JUnit-END$
 		return suite;
 	}
