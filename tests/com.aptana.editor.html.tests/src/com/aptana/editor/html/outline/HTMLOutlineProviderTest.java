@@ -18,6 +18,7 @@ import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -129,12 +130,11 @@ public class HTMLOutlineProviderTest extends TestCase
 		fParseState.setEditState(source, source, 0, 0);
 		IParseNode astRoot = fParser.parse(fParseState);
 
+		HTMLPreferenceUtil.setShowTextNodesInOutline(false);
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(0, outlineResult.length);
 
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
-		prefs.putBoolean(IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, true);
-
+		HTMLPreferenceUtil.setShowTextNodesInOutline(true);
 		outlineResult = fContentProvider.getElements(astRoot);
 		assertEquals(1, outlineResult.length);
 		assertEquals("some texts", fLabelProvider.getText(outlineResult[0]));
