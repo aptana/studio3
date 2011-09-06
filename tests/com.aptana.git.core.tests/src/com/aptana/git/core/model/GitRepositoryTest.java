@@ -8,6 +8,7 @@
 package com.aptana.git.core.model;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
@@ -133,6 +135,57 @@ public class GitRepositoryTest extends TestCase
 		index.commit("Initial commit");
 		// No more changed files now...
 		assertTrue(index.changedFiles().isEmpty());
+	}
+
+	public void testCommitMessageWithDoubleQuotes() throws Throwable
+	{
+		GitRepository repo = createRepo();
+		GitIndex index = repo.index();
+		assertTrue(index.changedFiles().isEmpty());
+
+		// Actually add a file to the location
+		FileWriter writer = new FileWriter(fileToAdd());
+		writer.write("Hello World!");
+		writer.close();
+		// refresh the index
+		index.refresh(new NullProgressMonitor());
+
+		// Now there should be a single file that's been changed!
+		List<ChangedFile> changed = index.changedFiles();
+		assertFalse(changed.isEmpty());
+		assertEquals(1, changed.size());
+
+		// Make sure it's shown as having unstaged changes only and is NEW
+		assertUnstaged(changed.get(0));
+		assertStatus(Status.NEW, changed.get(0));
+
+		// Stage the new file
+		assertFalse(changed.isEmpty());
+		assertTrue(index.stageFiles(changed));
+		assertStaged(changed.get(0));
+		assertStatus(Status.NEW, changed.get(0));
+
+		final String commitMessage = "Initial commit with \"double quotes\" inside the message!";
+		index.commit(commitMessage);
+		// No more changed files now...
+		assertTrue(index.changedFiles().isEmpty());
+
+		// now grab the resulting log to see if the message escaped the quotes too many times!
+		File file = repo.gitFile(GitRepository.COMMIT_EDITMSG);
+		FileInputStream stream = null;
+		try
+		{
+			stream = new FileInputStream(file);
+			String result = IOUtil.read(stream);
+			assertEquals(commitMessage + "\n", result);
+		}
+		finally
+		{
+			if (stream != null)
+			{
+				stream.close();
+			}
+		}
 	}
 
 	public void testDeleteFile() throws Throwable
@@ -391,7 +444,7 @@ public class GitRepositoryTest extends TestCase
 		// Assert that the new project is closed!
 		project = workspace.getRoot().getProject(projectName);
 		assertFalse(project.isOpen());
-		
+
 		// assert that there's no .project file stranded there
 		File dotProject = new File(projectDir, IProjectDescription.DESCRIPTION_FILE_NAME);
 		assertFalse(dotProject.exists());

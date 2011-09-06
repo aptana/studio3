@@ -646,7 +646,6 @@ public class GitIndex
 
 	private boolean doCommit(String commitMessage)
 	{
-		commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
 		return result != null && result.isOK();
 	}
