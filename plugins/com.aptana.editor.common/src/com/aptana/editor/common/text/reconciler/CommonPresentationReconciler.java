@@ -162,7 +162,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				protected IStatus run(IProgressMonitor monitor) {
 					while (!monitor.isCanceled()) {
 						IRegion damage = nextDamagedRegion();
-						if (damage == null) {
+						if (damage == null || monitor.isCanceled()) {
 							break;
 						}
 						processDamage(damage, textViewer.getDocument(), monitor);
@@ -188,6 +188,9 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		if (viewerVisibleRegion == null) {
 			UIUtils.getDisplay().syncExec(new Runnable() {
 				public void run() {
+					if (textViewer == null) {
+						return;
+					}
 					int topOffset = textViewer.getTopIndexStartOffset();
 					int length = textViewer.getBottomIndexEndOffset() - topOffset;
 					viewerVisibleRegion = new Region(topOffset, Math.max(length, MINIMAL_VISIBLE_LENGTH));
@@ -198,10 +201,12 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			if (delayedRegions.isEmpty()) {
 				return null;
 			}
-			IRegion visible = delayedRegions.overlap(viewerVisibleRegion);
-			viewerVisibleRegion = null;
-			if (visible != null) {
-				return visible;
+			if (viewerVisibleRegion != null) {
+				IRegion visible = delayedRegions.overlap(viewerVisibleRegion);
+				viewerVisibleRegion = null;
+				if (visible != null) {
+					return visible;
+				}
 			}
 			return delayedRegions.iterator().next();
 		}
