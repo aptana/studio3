@@ -29,7 +29,7 @@ public class AllTests extends TestCase
 		suite.addTestSuite(CoffeeOutlineProviderTest.class);
 		suite.addTestSuite(CoffeeSourcePartitionScannerTest.class);
 		suite.addTestSuite(CoffeescriptScopesTest.class);
-		// suite.addTestSuite(CoffeePreferencePageTest.class);
+		suite.addTestSuite(CoffeePreferencePageTest.class);
 		// $JUnit-END$
 		return suite;
 	}
