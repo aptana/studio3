@@ -12,6 +12,7 @@ import com.aptana.editor.coffee.internal.text.CoffeeFoldingComputerTest;
 import com.aptana.editor.coffee.outline.CoffeeOutlineProviderTest;
 import com.aptana.editor.coffee.parsing.CoffeeParserTest;
 import com.aptana.editor.coffee.parsing.lexer.CoffeeScannerTest;
+import com.aptana.editor.coffee.preferences.CoffeePreferencePageTest;
 
 public class AllTests extends TestCase
 {
