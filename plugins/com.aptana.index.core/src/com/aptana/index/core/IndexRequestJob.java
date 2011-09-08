@@ -22,9 +22,6 @@ import java.util.Set;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -34,6 +31,8 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 
 abstract class IndexRequestJob extends Job
 {
@@ -201,37 +200,24 @@ abstract class IndexRequestJob extends Job
 		{
 			fileContributors = new ArrayList<IIndexFileContributor>();
 
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-
-			if (registry != null)
-			{
-				IExtensionPoint extensionPoint = registry
-						.getExtensionPoint(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID);
-
-				if (extensionPoint != null)
-				{
-					for (IExtension extension : extensionPoint.getExtensions())
+			EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID,
+					new IConfigurationElementProcessor()
 					{
-						for (IConfigurationElement element : extension.getConfigurationElements())
-						{
-							if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
-							{
-								try
-								{
-									IIndexFileContributor participant = (IIndexFileContributor) element
-											.createExecutableExtension(ATTR_CLASS);
 
-									fileContributors.add(participant);
-								}
-								catch (CoreException e)
-								{
-									IdeLog.logError(IndexPlugin.getDefault(), e);
-								}
+						public void processElement(IConfigurationElement element)
+						{
+							try
+							{
+								IIndexFileContributor participant = (IIndexFileContributor) element
+										.createExecutableExtension(ATTR_CLASS);
+								fileContributors.add(participant);
+							}
+							catch (CoreException e)
+							{
+								IdeLog.logError(IndexPlugin.getDefault(), e);
 							}
 						}
-					}
-				}
-			}
+					}, ELEMENT_CONTRIBUTOR);
 		}
 
 		return fileContributors;
@@ -244,44 +230,28 @@ abstract class IndexRequestJob extends Job
 	 */
 	private Map<IConfigurationElement, Set<IContentType>> getFileIndexingParticipants()
 	{
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
-		if (registry == null)
-		{
-			return map;
-		}
+		final Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
+		final IContentTypeManager manager = Platform.getContentTypeManager();
 
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID,
-				FILE_INDEXING_PARTICIPANTS_ID);
-		if (extensionPoint == null)
-		{
-			return map;
-		}
-
-		IContentTypeManager manager = Platform.getContentTypeManager();
-
-		IExtension[] extensions = extensionPoint.getExtensions();
-		for (IExtension extension : extensions)
-		{
-			IConfigurationElement[] elements = extension.getConfigurationElements();
-
-			for (IConfigurationElement element : elements)
-			{
-				if (element.getName().equals(TAG_FILE_INDEXING_PARTICIPANT))
+		EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, FILE_INDEXING_PARTICIPANTS_ID,
+				new IConfigurationElementProcessor()
 				{
-					Set<IContentType> types = new HashSet<IContentType>();
 
-					IConfigurationElement[] contentTypes = element.getChildren(CONTENT_TYPE_BINDING);
-					for (IConfigurationElement contentTypeBinding : contentTypes)
+					public void processElement(IConfigurationElement element)
 					{
-						String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
-						IContentType type = manager.getContentType(contentTypeId);
-						types.add(type);
+						Set<IContentType> types = new HashSet<IContentType>();
+
+						IConfigurationElement[] contentTypes = element.getChildren(CONTENT_TYPE_BINDING);
+						for (IConfigurationElement contentTypeBinding : contentTypes)
+						{
+							String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
+							IContentType type = manager.getContentType(contentTypeId);
+							types.add(type);
+						}
+						map.put(element, types);
 					}
-					map.put(element, types);
-				}
-			}
-		}
+				}, TAG_FILE_INDEXING_PARTICIPANT);
+
 		return map;
 	}
 
@@ -292,44 +262,30 @@ abstract class IndexRequestJob extends Job
 	 */
 	private List<IIndexFilterParticipant> getFilterParticipants()
 	{
-		if (this.filterParticipants == null)
+		if (filterParticipants == null)
 		{
-			this.filterParticipants = new ArrayList<IIndexFilterParticipant>();
-
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-
-			if (registry != null)
-			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID,
-						INDEX_FILTER_PARTICIPANTS_ID);
-
-				if (extensionPoint != null)
-				{
-					for (IExtension extension : extensionPoint.getExtensions())
+			filterParticipants = new ArrayList<IIndexFilterParticipant>();
+			EclipseUtil.processConfigurationElements(IndexPlugin.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID,
+					new IConfigurationElementProcessor()
 					{
-						for (IConfigurationElement element : extension.getConfigurationElements())
-						{
-							if (ELEMENT_FILTER.equals(element.getName()))
-							{
-								try
-								{
-									IIndexFilterParticipant participant = (IIndexFilterParticipant) element
-											.createExecutableExtension(ATTR_CLASS);
 
-									this.filterParticipants.add(participant);
-								}
-								catch (CoreException e)
-								{
-									IdeLog.logError(IndexPlugin.getDefault(), e);
-								}
+						public void processElement(IConfigurationElement element)
+						{
+							try
+							{
+								IIndexFilterParticipant participant = (IIndexFilterParticipant) element
+										.createExecutableExtension(ATTR_CLASS);
+								filterParticipants.add(participant);
+							}
+							catch (CoreException e)
+							{
+								IdeLog.logError(IndexPlugin.getDefault(), e);
 							}
 						}
-					}
-				}
-			}
+					}, ELEMENT_FILTER);
 		}
 
-		return this.filterParticipants;
+		return filterParticipants;
 	}
 
 	/**

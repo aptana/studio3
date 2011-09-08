@@ -14,18 +14,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.browser.BrowserPlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
 
 public class BrowserConfigurationManager
 {
 
-	private static final String EXTENSION_POINT_ID = BrowserPlugin.PLUGIN_ID + ".configuration"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = "configuration"; //$NON-NLS-1$
 	private static final String ELEMENT_SIZE = "size"; //$NON-NLS-1$
 	private static final String ELEMENT_SIZE_CATEGORY = "sizeCategory"; //$NON-NLS-1$
 	private static final String ELEMENT_BACKGROUND_IMAGE = "backgroundImage"; //$NON-NLS-1$
@@ -68,30 +69,21 @@ public class BrowserConfigurationManager
 
 	private void readExtensionRegistry()
 	{
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
-				EXTENSION_POINT_ID);
-		// reads the category first, then the background images, then the individual size specifications
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_SIZE_CATEGORY);
-		}
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_BACKGROUND_IMAGE);
-		}
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_SIZE);
-		}
+		EclipseUtil.processConfigurationElements(BrowserPlugin.PLUGIN_ID, EXTENSION_POINT_ID,
+				new IConfigurationElementProcessor()
+				{
+
+					public void processElement(IConfigurationElement element)
+					{
+						readElement(element);
+					}
+				}, ELEMENT_SIZE_CATEGORY, ELEMENT_BACKGROUND_IMAGE, ELEMENT_SIZE);
 	}
 
-	private void readElement(IConfigurationElement element, String elementName)
+	private void readElement(IConfigurationElement element)
 	{
 		String name = element.getName();
-		if (!elementName.equals(name))
-		{
-			return;
-		}
+
 		if (ELEMENT_SIZE_CATEGORY.equals(name))
 		{
 			String categoryId = element.getAttribute(ATT_ID);

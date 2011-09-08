@@ -3,7 +3,7 @@
 <schema targetNamespace="com.aptana.explorer" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.explorer" id="com.aptana.explorer.filters" name="App Explorer Filter"/>
+         <meta.schema plugin="com.aptana.explorer" id="filters" name="App Explorer Filter"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]

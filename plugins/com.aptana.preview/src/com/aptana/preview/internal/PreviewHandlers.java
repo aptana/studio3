@@ -16,16 +16,17 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
-import com.aptana.preview.PreviewPlugin;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.preview.IPreviewHandler;
+import com.aptana.preview.PreviewPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class PreviewHandlers {
 
-	private static final String EXTENSION_POINT_ID = PreviewPlugin.PLUGIN_ID + ".previewHandlers"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = "previewHandlers"; //$NON-NLS-1$
 	private static final String TAG_HANDLER = "handler"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATT_CONTENTTYPE = "contentType"; //$NON-NLS-1$
@@ -48,17 +49,16 @@ public final class PreviewHandlers {
 	}
 
 	private void readExtensionRegistry() {
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
-				EXTENSION_POINT_ID);
-		for (int i = 0; i < elements.length; ++i) {
-			readElement(elements[i], TAG_HANDLER);
-		}
+		EclipseUtil.processConfigurationElements(PreviewPlugin.PLUGIN_ID, EXTENSION_POINT_ID,
+				new IConfigurationElementProcessor() {
+
+					public void processElement(IConfigurationElement element) {
+						readElement(element);
+					}
+				}, TAG_HANDLER);
 	}
 
-	private void readElement(IConfigurationElement element, String elementName) {
-		if (!elementName.equals(element.getName())) {
-			return;
-		}
+	private void readElement(IConfigurationElement element) {
 		if (TAG_HANDLER.equals(element.getName())) {
 			String clazz = element.getAttribute(ATT_CLASS);
 			if (clazz == null || clazz.length() == 0) {
@@ -87,5 +87,4 @@ public final class PreviewHandlers {
 		}
 		return null;
 	}
-
 }
