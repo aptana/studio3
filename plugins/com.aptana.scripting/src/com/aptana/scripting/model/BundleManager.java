@@ -544,31 +544,6 @@ public class BundleManager
 	}
 
 	/**
-	 * betterMatch
-	 * 
-	 * @param entry
-	 * @param scope
-	 * @param matchedPattern
-	 * @return
-	 */
-	private boolean betterMatch(IScopeSelector matchedScope, String scope, String matchedPattern)
-	{
-		if (matchedScope.matches(scope) == false)
-		{
-			return false;
-		}
-
-		// FIXME This assumes that the length of the scope selector is the best determination of which one is
-		// "most specific" to the scope we're trying to match, which is not necessarily true!
-		if (matchedPattern != null && matchedScope.toString().length() < matchedPattern.length())
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Fire a bundle-became-hidden visibility event to all listeners
 	 * 
 	 * @param bundle
@@ -1291,25 +1266,22 @@ public class BundleManager
 	 */
 	public RubyRegexp getDecreaseIndentRegexp(String scope)
 	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
+		Map<IScopeSelector, RubyRegexp> map = new HashMap<IScopeSelector, RubyRegexp>();
 		for (String bundleName : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getDecreaseIndentMarkers();
-
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry.getKey(), scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
+			map.putAll(bundleEntry.getDecreaseIndentMarkers());
 		}
-
-		return result;
+		if (map.isEmpty())
+		{
+			return null;
+		}
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		if (bestMatch == null)
+		{
+			return null;
+		}
+		return map.get(bestMatch);
 	}
 
 	/**
@@ -1383,25 +1355,22 @@ public class BundleManager
 	 */
 	public RubyRegexp getFoldingStartRegexp(String scope)
 	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
+		Map<IScopeSelector, RubyRegexp> map = new HashMap<IScopeSelector, RubyRegexp>();
 		for (String bundleName : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStartMarkers();
-
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry.getKey(), scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
+			map.putAll(bundleEntry.getFoldingStartMarkers());
 		}
-
-		return result;
+		if (map.isEmpty())
+		{
+			return null;
+		}
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		if (bestMatch == null)
+		{
+			return null;
+		}
+		return map.get(bestMatch);
 	}
 
 	/**
@@ -1412,25 +1381,22 @@ public class BundleManager
 	 */
 	public RubyRegexp getFoldingStopRegexp(String scope)
 	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
+		Map<IScopeSelector, RubyRegexp> map = new HashMap<IScopeSelector, RubyRegexp>();
 		for (String bundleName : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStopMarkers();
-
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry.getKey(), scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
+			map.putAll(bundleEntry.getFoldingStopMarkers());
 		}
-
-		return result;
+		if (map.isEmpty())
+		{
+			return null;
+		}
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		if (bestMatch == null)
+		{
+			return null;
+		}
+		return map.get(bestMatch);
 	}
 
 	/**
@@ -1441,25 +1407,22 @@ public class BundleManager
 	 */
 	public RubyRegexp getIncreaseIndentRegexp(String scope)
 	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
+		Map<IScopeSelector, RubyRegexp> map = new HashMap<IScopeSelector, RubyRegexp>();
 		for (String bundleName : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getIncreaseIndentMarkers();
-
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry.getKey(), scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
+			map.putAll(bundleEntry.getIncreaseIndentMarkers());
 		}
-
-		return result;
+		if (map.isEmpty())
+		{
+			return null;
+		}
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		if (bestMatch == null)
+		{
+			return null;
+		}
+		return map.get(bestMatch);
 	}
 
 	/**
