@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
+
 abstract class IndexRequestJob extends Job
 {
 	/**
@@ -119,11 +121,11 @@ abstract class IndexRequestJob extends Job
 			}
 			catch (NumberFormatException e)
 			{
-				// TODO: Adding logging once we fix the circular dependency from aptana.core
-				IndexPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(IndexPlugin.getDefault(), e);
 			}
 
-			IFileStoreIndexingParticipant result = (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
+			IFileStoreIndexingParticipant result = (IFileStoreIndexingParticipant) key
+					.createExecutableExtension(ATTR_CLASS);
 
 			result.setPriority(priority);
 
@@ -131,7 +133,7 @@ abstract class IndexRequestJob extends Job
 		}
 		catch (CoreException e)
 		{
-			IndexPlugin.logError(e);
+			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
 
 		return null;
@@ -203,7 +205,8 @@ abstract class IndexRequestJob extends Job
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID);
+				IExtensionPoint extensionPoint = registry
+						.getExtensionPoint(IndexPlugin.PLUGIN_ID, FILE_CONTRIBUTORS_ID);
 
 				if (extensionPoint != null)
 				{
@@ -215,13 +218,14 @@ abstract class IndexRequestJob extends Job
 							{
 								try
 								{
-									IIndexFileContributor participant = (IIndexFileContributor) element.createExecutableExtension(ATTR_CLASS);
+									IIndexFileContributor participant = (IIndexFileContributor) element
+											.createExecutableExtension(ATTR_CLASS);
 
 									fileContributors.add(participant);
 								}
 								catch (CoreException e)
 								{
-									IndexPlugin.logError(e);
+									IdeLog.logError(IndexPlugin.getDefault(), e);
 								}
 							}
 						}
@@ -247,7 +251,8 @@ abstract class IndexRequestJob extends Job
 			return map;
 		}
 
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID, FILE_INDEXING_PARTICIPANTS_ID);
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID,
+				FILE_INDEXING_PARTICIPANTS_ID);
 		if (extensionPoint == null)
 		{
 			return map;
@@ -295,7 +300,8 @@ abstract class IndexRequestJob extends Job
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID,
+						INDEX_FILTER_PARTICIPANTS_ID);
 
 				if (extensionPoint != null)
 				{
@@ -307,13 +313,14 @@ abstract class IndexRequestJob extends Job
 							{
 								try
 								{
-									IIndexFilterParticipant participant = (IIndexFilterParticipant) element.createExecutableExtension(ATTR_CLASS);
+									IIndexFilterParticipant participant = (IIndexFilterParticipant) element
+											.createExecutableExtension(ATTR_CLASS);
 
 									this.filterParticipants.add(participant);
 								}
 								catch (CoreException e)
 								{
-									IndexPlugin.logError(e);
+									IdeLog.logError(IndexPlugin.getDefault(), e);
 								}
 							}
 						}
@@ -371,7 +378,8 @@ abstract class IndexRequestJob extends Job
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	protected void indexFileStores(Index index, Set<IFileStore> fileStores, IProgressMonitor monitor) throws CoreException
+	protected void indexFileStores(Index index, Set<IFileStore> fileStores, IProgressMonitor monitor)
+			throws CoreException
 	{
 		fileStores = this.filterFileStores(fileStores);
 
@@ -424,7 +432,7 @@ abstract class IndexRequestJob extends Job
 					}
 					catch (CoreException e)
 					{
-						IndexPlugin.logError(e);
+						IdeLog.logError(IndexPlugin.getDefault(), e);
 					}
 				}
 			}
@@ -442,7 +450,8 @@ abstract class IndexRequestJob extends Job
 	 * @param fileStores
 	 * @return
 	 */
-	protected List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> mapParticipantsToFiles(Set<IFileStore> fileStores)
+	protected List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> mapParticipantsToFiles(
+			Set<IFileStore> fileStores)
 	{
 		Map<IFileStoreIndexingParticipant, Set<IFileStore>> participantMap = new HashMap<IFileStoreIndexingParticipant, Set<IFileStore>>();
 		Map<IConfigurationElement, Set<IContentType>> participants = getFileIndexingParticipants();
@@ -472,12 +481,13 @@ abstract class IndexRequestJob extends Job
 			}
 		}
 
-		List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> result =
-				new ArrayList<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>>(participantMap.entrySet());
+		List<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>> result = new ArrayList<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>>(
+				participantMap.entrySet());
 
 		Collections.sort(result, new Comparator<Map.Entry<IFileStoreIndexingParticipant, Set<IFileStore>>>()
 		{
-			public int compare(Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg0, Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg1)
+			public int compare(Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg0,
+					Entry<IFileStoreIndexingParticipant, Set<IFileStore>> arg1)
 			{
 				// sort higher first
 				return arg1.getKey().getPriority() - arg0.getKey().getPriority();

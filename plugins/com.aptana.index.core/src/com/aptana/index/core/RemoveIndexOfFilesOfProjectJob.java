@@ -18,6 +18,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
+
 public class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 {
 
@@ -67,11 +69,10 @@ public class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (IOException e)
 			{
-				IndexPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(IndexPlugin.getDefault(), e);
 			}
 			sub.done();
 		}
 		return Status.OK_STATUS;
 	}
-
 }

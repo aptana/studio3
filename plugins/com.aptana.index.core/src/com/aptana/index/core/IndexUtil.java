@@ -13,6 +13,8 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Convertible;
 
+import com.aptana.core.logging.IdeLog;
+
 /**
  * IndexUtil
  */
@@ -58,11 +60,11 @@ public class IndexUtil
 				}
 				catch (InstantiationException e)
 				{
-					IndexPlugin.logError(e.getMessage(), e);
+					IdeLog.logError(IndexPlugin.getDefault(), e);
 				}
 				catch (IllegalAccessException e)
 				{
-					IndexPlugin.logError(e.getMessage(), e);
+					IdeLog.logError(IndexPlugin.getDefault(), e);
 				}
 			}
 		}

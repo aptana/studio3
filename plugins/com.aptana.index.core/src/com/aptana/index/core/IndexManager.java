@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
+import com.aptana.core.logging.IdeLog;
+
 public class IndexManager
 {
 	private static IndexManager INSTANCE;
@@ -89,7 +91,7 @@ public class IndexManager
 				}
 				catch (IOException e1)
 				{
-					IndexPlugin.logError("An error occurred while trying to access an index", e1); //$NON-NLS-1$
+					IdeLog.logError(IndexPlugin.getDefault(), "An error occurred while trying to access an index", e1); //$NON-NLS-1$
 				}
 			}
 		}
