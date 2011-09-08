@@ -1,5 +1,6 @@
 package com.aptana.portal.ui.internal;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
@@ -51,12 +52,17 @@ public class PortalTest extends TestCase
 	 */
 	public void testGetDefaultURLOffline() throws Exception
 	{
+		URL localFileURL = new File("").toURI().toURL(); //$NON-NLS-1$
 		URL googleServer = new URL("http://www.google.com"); //$NON-NLS-1$
-		URL offlineServer = new URL("http://fff.appcelerator.com"); //$NON-NLS-1$
+		URL offlineServer = new URL("http://fff.appceler.com"); //$NON-NLS-1$
 		URL baseServer = new URL("http://www.msn.com"); //$NON-NLS-1$
 
 		Portal fixture = Portal.getInstance();
-		URL result = fixture.getDefaultURL(googleServer, baseServer);
+
+		URL result = fixture.getDefaultURL(localFileURL, baseServer);
+		assertEquals(localFileURL, result);
+
+		result = fixture.getDefaultURL(googleServer, baseServer);
 		assertEquals(googleServer, result);
 
 		result = fixture.getDefaultURL(offlineServer, baseServer);
