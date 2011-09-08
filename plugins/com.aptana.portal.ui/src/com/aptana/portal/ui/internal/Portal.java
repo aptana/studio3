@@ -249,7 +249,7 @@ public class Portal
 	{
 		if (fallbackUrl == null)
 		{
-			throw new IllegalArgumentException("Fallback URL must not be null");
+			throw new IllegalArgumentException("Fallback URL must not be null"); //$NON-NLS-1$
 		}
 
 		// Do a connection check
@@ -271,6 +271,11 @@ public class Portal
 		HttpURLConnection connection = null;
 		try
 		{
+			// If the URL is for a local file, return 'true'
+			if ("file".equalsIgnoreCase(url.getProtocol())) //$NON-NLS-1$
+			{
+				return true;
+			}
 			connection = (HttpURLConnection) url.openConnection();
 			// Give it a 4 seconds delay before deciding that it's a dead connection
 			connection.setConnectTimeout(4000);
