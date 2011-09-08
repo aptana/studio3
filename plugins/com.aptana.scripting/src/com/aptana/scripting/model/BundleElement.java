@@ -949,8 +949,8 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
-				&& endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && !startRegexp.isNil() && endRegexp != null
+				&& !endRegexp.isNil())
 		{
 			synchronized (increaseIndentMarkersLock)
 			{
