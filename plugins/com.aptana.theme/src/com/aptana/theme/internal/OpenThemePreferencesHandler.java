@@ -11,10 +11,16 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.theme.preferences.ThemePreferencePage;
+import com.aptana.ui.PopupSchedulingRule;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -26,15 +32,21 @@ public class OpenThemePreferencesHandler extends AbstractHandler implements IHan
 {
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(),
-				ThemePreferencePage.ID, null, null);
-		UIUtils.getDisplay().asyncExec(new Runnable()
+		UIJob job = new UIJob("Open Theme Preferences") //$NON-NLS-1$
 		{
-			public void run()
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
+				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(),
+						ThemePreferencePage.ID, null, null);
 				dialog.open();
+				return Status.OK_STATUS;
 			}
-		});
+		};
+		job.setPriority(Job.INTERACTIVE);
+		job.setRule(PopupSchedulingRule.INSTANCE);
+		job.schedule();
 		return null;
 	}
 }
