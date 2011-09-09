@@ -34,7 +34,7 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 {
 
 	private final IProject project;
-	private final Set<IFile> files;
+	protected final Set<IFile> files;
 
 	public IndexFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
@@ -92,7 +92,7 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 		return Status.OK_STATUS;
 	}
 
-	private Set<IFileStore> toFileStores(IProgressMonitor monitor)
+	protected Set<IFileStore> toFileStores(IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size());
 		Set<IFileStore> fileStores = new HashSet<IFileStore>(files.size());

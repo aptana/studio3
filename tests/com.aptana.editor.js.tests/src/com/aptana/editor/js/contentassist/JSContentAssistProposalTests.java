@@ -9,11 +9,32 @@ package com.aptana.editor.js.contentassist;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.tests.util.TestProject;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * JSContentAssistProposalTests
@@ -199,5 +220,136 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			"number"
 		);
 		// @formatter:on
+	}
+
+	/**
+	 * <pre>
+	 * - We create a file with a function
+	 * - open the JS editor on it
+	 * - make some unsaved changes
+	 * - let it reconcile
+	 * - invoke CA to see that the unsaved contents are reflected in the CA
+	 * - close the editor without saving those changes
+	 * - wait for re-index of the underlying file to occur
+	 * - verify that the index now reflects underlying file's contents and not the unsaved changes.
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	public void testAPSTUD2944() throws Exception
+	{
+		final String projectName = "APSTUD2944";
+		final String fileName = "apstud2944.js";
+		final String initialContents = "function delete_me() {}\n";
+		final String workingContents = "function foo() { var eight = 8; }";
+
+		TestProject project = null;
+		try
+		{
+			// Create a test project and file
+			project = new TestProject(projectName, new String[] { "com.aptana.projects.webnature" });
+			IFile file = project.createFile(fileName, initialContents);
+
+			// open JS editor on file
+			editor = (ITextEditor) IDE.openEditor(UIUtils.getActivePage(), file, "com.aptana.editor.js", true);
+
+			// Set the working copy contents to some valid JS
+			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			document.set(workingContents);
+			// force reconciling? It should get triggered automatically...
+			Thread.sleep(1500); // let reconciling finish...
+
+			// get proposals at end of document
+			this.processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+			ISourceViewer viewer = ((AbstractThemeableEditor) editor).getISourceViewer();
+			ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, 33, '\0', false);
+
+			// verify that CA contains elements from unsaved JS in document!
+			assertContains(proposals, "foo");
+			assertDoesntContain(proposals, "delete_me");
+
+			// TODO Verify "eight" is in CA inside foo?
+
+			// Close the editor without saving, make sure we end up indexing underlying content again!
+			UIUtils.getDisplay().syncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					editor.getSite().getPage().closeEditor(editor, false);
+					editor.dispose();
+				}
+			});
+			Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
+
+			// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.
+			Index index = IndexManager.getInstance().getIndex(project.getURI());
+			JSIndexQueryHelper _indexHelper = new JSIndexQueryHelper();
+			List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(index);
+			assertContainsFunctions(projectGlobals, "delete_me");
+			assertDoesntContainFunctions(projectGlobals, "foo");
+		}
+		finally
+		{
+			if (project != null)
+			{
+				project.delete();
+			}
+		}
+	}
+
+	protected void assertContainsFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
+	{
+		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
+		for (PropertyElement element : projectGlobals)
+		{
+			if (!(element instanceof FunctionElement))
+			{
+				continue;
+			}
+			if (uniqueFunctionNames.contains(element.getName()))
+			{
+				uniqueFunctionNames.remove(element.getName());
+			}
+		}
+
+		if (!uniqueFunctionNames.isEmpty())
+		{
+			// build a list of names
+			List<String> names = new ArrayList<String>();
+			for (PropertyElement element : projectGlobals)
+			{
+				if (!(element instanceof FunctionElement))
+				{
+					continue;
+				}
+				names.add(element.getName());
+			}
+			fail(MessageFormat.format(
+					"Functions do not contain an entry for expected name(s): {0}.\nFunction list: {1}",
+					uniqueFunctionNames, names));
+		}
+	}
+
+	protected void assertDoesntContainFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
+	{
+		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
+		Set<String> matches = new HashSet<String>(uniqueFunctionNames.size());
+		for (PropertyElement element : projectGlobals)
+		{
+			if (!(element instanceof FunctionElement))
+			{
+				continue;
+			}
+			if (uniqueFunctionNames.contains(element.getName()))
+			{
+				matches.add(element.getName());
+			}
+		}
+
+		if (!matches.isEmpty())
+		{
+			fail(MessageFormat.format("Functions contain an entry for disallowed name(s): {0}", matches));
+		}
 	}
 }

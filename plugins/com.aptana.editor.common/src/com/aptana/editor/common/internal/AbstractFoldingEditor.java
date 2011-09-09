@@ -10,11 +10,20 @@ package com.aptana.editor.common.internal;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -25,12 +34,15 @@ import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension;
 
 import com.aptana.editor.common.IFoldingEditor;
+import com.aptana.index.core.IndexFilesOfProjectJob;
+import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
 public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
 {
@@ -157,5 +169,58 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 			}
 		}
 		super.handleEditorInputChanged();
+	}
+
+	@Override
+	public void dispose()
+	{
+		try
+		{
+			// force re-indexing of the underlying file since reconciler has modified index entries for it.
+			if (isDirty())
+			{
+				final IFile file = getFile();
+				if (file != null)
+				{
+					new Job("Update index") //$NON-NLS-1$
+					{
+
+						@Override
+						protected IStatus run(IProgressMonitor monitor)
+						{
+							SubMonitor sub = SubMonitor.convert(monitor, 100);
+							// Wipe and re-index the file
+							IProject project = file.getProject();
+							Set<IFile> files = new HashSet<IFile>();
+							files.add(file);
+							if (sub.isCanceled())
+							{
+								return Status.CANCEL_STATUS;
+							}
+							// we're already in a job, so just run these subjobs in-line rather than schedule them.
+							new RemoveIndexOfFilesOfProjectJob(project, files).run(sub.newChild(10));
+							new IndexFilesOfProjectJob(project, files).run(sub.newChild(90));
+							sub.done();
+							return Status.OK_STATUS;
+						}
+					}.schedule();
+				}
+			}
+		}
+		finally
+		{
+			super.dispose();
+		}
+	}
+
+	private IFile getFile()
+	{
+		IEditorInput editorInput = getEditorInput();
+		if (editorInput instanceof IFileEditorInput)
+		{
+			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+			return fileEditorInput.getFile();
+		}
+		return null;
 	}
 }
