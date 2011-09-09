@@ -7,7 +7,6 @@
  */
 package com.aptana.core.build;
 
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
+import com.aptana.core.internal.build.BuildParticipantManager;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 
@@ -54,45 +54,19 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	protected void clean(IProgressMonitor monitor) throws CoreException
 	{
 		super.clean(monitor);
-		SubMonitor sub = SubMonitor.convert(monitor, 2);
+
+		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
+		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 1);
+
 		IProject project = getProject();
 		removeProblemsAndTasksFor(project);
 		sub.worked(1);
-		URI uri = getURI();
-		if (uri != null)
+
+		for (IBuildParticipant participant : participants)
 		{
-			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
-			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Cleaning index for project {0} ({1})", //$NON-NLS-1$
-					project.getName(),
-					uri
-				);
-				// @formatter:on
-				IdeLog.logInfo(CorePlugin.getDefault(), message, IDebugScopes.BUILDER);
-			}
-			List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
-			for (IBuildParticipant participant : participants)
-			{
-				participant.clean(uri, sub);
-			}
+			participant.clean(project, sub.newChild(1));
 		}
 		sub.done();
-	}
-
-	private URI getURI()
-	{
-		URI uri = getProject().getLocationURI();
-		if (uri != null)
-		{
-			return uri;
-		}
-		IdeLog.logError(CorePlugin.getDefault(),
-				MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
-						getProject().getRawLocationURI(), getProject().getFullPath()));
-		uri = getProject().getRawLocationURI();
-		return uri;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -170,7 +144,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
 		for (IBuildParticipant participant : participants)
 		{
-			participant.fullBuild(getURI(), monitor);
+			participant.fullBuild(getProject(), monitor);
 		}
 	}
 }

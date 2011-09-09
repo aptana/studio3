@@ -59,6 +59,13 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="priority" type="string" use="default" value="50">
+            <annotation>
+               <documentation>
+                  This defines at what priority this build participant should be used when a mix of build participants are going to be used at the same time. A higher value indicates a higher priority, meaning that this build participant will run before other participants at a lower priority. The order in which build participants run is undefined when their priority levels match.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

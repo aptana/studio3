@@ -8,6 +8,7 @@
 package com.aptana.index.core.build;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,10 +20,11 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
-import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexFilesOfProjectJob;
@@ -31,29 +33,45 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
-public class IndexBuildParticipant implements IBuildParticipant
+public class IndexBuildParticipant extends AbstractBuildParticipant
 {
 
-	public void clean(URI uri, IProgressMonitor monitor)
+	public void clean(IProject project, IProgressMonitor monitor)
 	{
-		IndexManager.getInstance().removeIndex(uri);
+		URI uri = getURI(project);
+		if (uri != null)
+		{
+			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
+			{
+				String message = MessageFormat.format("Cleaning index for project {0} ({1})", project.getName(), uri); //$NON-NLS-1$
+				IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.BUILDER);
+			}
+			IndexManager.getInstance().removeIndex(uri);
+		}
 	}
 
-	public void fullBuild(URI uri, IProgressMonitor monitor)
+	public void fullBuild(IProject project, IProgressMonitor monitor)
 	{
 		// FIXME Run rebuild index, or IndexProject?
-		RebuildIndexJob job = new RebuildIndexJob(uri);
-		job.schedule();
+		URI uri = getURI(project);
+		if (uri != null)
+		{
+			RebuildIndexJob job = new RebuildIndexJob(uri);
+			// run sync and report the progress in the provided monitor
+			job.run(monitor);
+		}
 	}
 
 	public void incrementalBuild(IResourceDelta delta, IProject project, IProgressMonitor monitor)
 	{
 		if (delta != null)
 		{
+			SubMonitor sub = SubMonitor.convert(monitor, 3);
 			ResourceCollector resourceCollector = new ResourceCollector();
 			try
 			{
 				delta.accept(resourceCollector);
+				sub.worked(1);
 
 				// TODO Pre-filter by removing any files from "to be indexed" that don't have an indexer?
 
@@ -74,21 +92,35 @@ public class IndexBuildParticipant implements IBuildParticipant
 				{
 					RemoveIndexOfFilesOfProjectJob removeJob = new RemoveIndexOfFilesOfProjectJob(project,
 							resourceCollector.filesToRemoveFromIndex);
-					removeJob.schedule();
+					removeJob.run(sub.newChild(1));
 				}
 
 				if (!resourceCollector.filesToIndex.isEmpty())
 				{
 					IndexFilesOfProjectJob indexJob = new IndexFilesOfProjectJob(project,
 							resourceCollector.filesToIndex);
-					indexJob.schedule();
+					indexJob.run(sub.newChild(1));
 				}
 			}
 			catch (CoreException e)
 			{
 				IdeLog.logError(IndexPlugin.getDefault(), e);
 			}
+			sub.done();
 		}
+	}
+
+	private static URI getURI(IProject project)
+	{
+		URI uri = project.getLocationURI();
+		if (uri != null)
+		{
+			return uri;
+		}
+		IdeLog.logError(IndexPlugin.getDefault(),
+				MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
+						project.getRawLocationURI(), project.getFullPath()));
+		return project.getRawLocationURI();
 	}
 
 	private static class ResourceCollector implements IResourceDeltaVisitor
