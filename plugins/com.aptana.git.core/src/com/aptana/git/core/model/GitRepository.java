@@ -202,7 +202,7 @@ public class GitRepository
 							{
 								firePullEvent(); // we're conflating the two events here because I don't have the ideas
 							}
-													// separated in the listeners yet.
+							// separated in the listeners yet.
 						}
 
 						@Override
@@ -740,7 +740,7 @@ public class GitRepository
 				beneathRepo.add(project);
 			}
 		}
-		// Unlikely this woudl ever happen, but if there are no projects under this repo, bail
+		// Unlikely this would ever happen, but if there are no projects under this repo, bail
 		if (beneathRepo.isEmpty())
 		{
 			return Collections.emptySet();
@@ -773,6 +773,21 @@ public class GitRepository
 				lineNum++;
 			}
 		}
+		// APSTUD-3399 We need to see if the projects that don't exist are untracked and therefore ok (we don't need to
+		// close them)
+		Set<IProject> workingCopies = new HashSet<IProject>();
+		for (IProject project : projectsNotExistingOnNewBranch)
+		{
+			String path = relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString();
+			result = execute(GitRepository.ReadWrite.READ, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+					"--exclude-standard", "-z", "--", path); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (result.isOK() && result.getMessage().trim().equals(path))
+			{
+				workingCopies.add(project);
+			}
+		}
+		projectsNotExistingOnNewBranch.removeAll(workingCopies);
+
 		return projectsNotExistingOnNewBranch;
 	}
 
