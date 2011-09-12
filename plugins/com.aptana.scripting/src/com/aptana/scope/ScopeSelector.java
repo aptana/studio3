@@ -113,6 +113,11 @@ public class ScopeSelector implements IScopeSelector
 
 	private ISelectorNode _root;
 	private List<Integer> matchResults;
+	/**
+	 * Lazily cache the toString() value solely for performance reasons. We call toString() in equals(), hashCode(),
+	 * some other locations - so this value is computed by concatenating children nodes repeatedly.
+	 */
+	private String fString;
 
 	/**
 	 * ScopeSelector
@@ -363,7 +368,11 @@ public class ScopeSelector implements IScopeSelector
 	@Override
 	public String toString()
 	{
-		return (this._root == null) ? StringUtil.EMPTY : this._root.toString();
+		if (fString == null)
+		{
+			fString = (this._root == null) ? StringUtil.EMPTY : this._root.toString();
+		}
+		return fString;
 	}
 
 	public List<Integer> matchResults()

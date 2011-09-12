@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 import org.mortbay.util.ajax.JSON;
 import org.mortbay.util.ajax.JSON.Convertible;
 
+import com.aptana.core.logging.IdeLog;
+
 /**
  * IndexReader
  */
@@ -144,7 +146,7 @@ public abstract class IndexReader
 					value //
 					);
 
-				IndexPlugin.logError(message, t);
+				IdeLog.logError(IndexPlugin.getDefault(), message, t);
 			}
 		}
 

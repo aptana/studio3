@@ -20,6 +20,8 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
@@ -32,8 +34,8 @@ import com.aptana.projects.ProjectsPlugin;
 public class ProjectTemplatesManager
 {
 
-	private static final String EXTENSION_POINT = ProjectsPlugin.PLUGIN_ID + ".projectTemplates"; //$NON-NLS-1$
-	private static final String ELEMENT_SAMPLESINFO = "templateInfo"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT = "projectTemplates"; //$NON-NLS-1$
+	private static final String ELEMENT_TEMPLATEINFO = "templateInfo"; //$NON-NLS-1$
 	private static final String ELEMENT_LOCAL = "local"; //$NON-NLS-1$
 	private static final String ELEMENT_REMOTE = "remote"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
@@ -63,21 +65,20 @@ public class ProjectTemplatesManager
 
 	private void readExtensionRegistry()
 	{
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT);
+		EclipseUtil.processConfigurationElements(ProjectsPlugin.PLUGIN_ID, EXTENSION_POINT,
+				new IConfigurationElementProcessor()
+				{
 
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_SAMPLESINFO);
-		}
+					public void processElement(IConfigurationElement element)
+					{
+						readElement(element);
+					}
+				}, ELEMENT_TEMPLATEINFO);
 	}
 
-	private void readElement(IConfigurationElement element, String elementName)
+	private void readElement(IConfigurationElement element)
 	{
-		if (!elementName.equals(element.getName()))
-		{
-			return;
-		}
-		if (ELEMENT_SAMPLESINFO.equals(elementName))
+		if (ELEMENT_TEMPLATEINFO.equals(element.getName()))
 		{
 			// either a local path or remote git url needs to be defined
 			String path = null;

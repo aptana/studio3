@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
+
 public abstract class AbstractFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 	private static final String EXTERNAL_URI = "uri"; //$NON-NLS-1$
@@ -71,7 +73,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			IndexPlugin.logError(e);
+			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
 	}
 
@@ -148,13 +150,13 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 
 			// @formatter:off
 			String message = MessageFormat.format(
-				"Add file ''{0}'' to index ''{1}''",
+				"Add file ''{0}'' to index ''{1}''", //$NON-NLS-1$
 				file,
 				index
 			);
 			// @formatter:on
 
-			IndexPlugin.logInfo(message, IDebugScopes.INDEXER);
+			IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.INDEXER);
 
 			indexFileStore(index, file, sub.newChild(100));
 		}
@@ -209,7 +211,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 					}
 					catch (CoreException e)
 					{
-						IndexPlugin.logError(e);
+						IdeLog.logError(IndexPlugin.getDefault(), e);
 					}
 				}
 			}
@@ -220,7 +222,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			IndexPlugin.logError(e);
+			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
 	}
 

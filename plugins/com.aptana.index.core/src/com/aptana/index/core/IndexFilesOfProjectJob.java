@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
+
 /**
  * This job updates/re-indexes the Set of IFiles passed in for a given IProject. This does _not_ filter the file set in
  * any way based on timestamps, it will force a re-index of each file!
@@ -32,7 +34,7 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 {
 
 	private final IProject project;
-	private final Set<IFile> files;
+	protected final Set<IFile> files;
 
 	public IndexFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
@@ -58,7 +60,8 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 		Index index = getIndex();
 		if (index == null)
 		{
-			IndexPlugin.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null); //$NON-NLS-1$
+			IdeLog.logError(IndexPlugin.getDefault(),
+					MessageFormat.format("Index is null for container: {0}", getContainerURI())); //$NON-NLS-1$
 			return Status.CANCEL_STATUS;
 		}
 		try
@@ -82,14 +85,14 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (IOException e)
 			{
-				IndexPlugin.logError("An error occurred while saving an index", e); //$NON-NLS-1$
+				IdeLog.logError(IndexPlugin.getDefault(), "An error occurred while saving an index", e); //$NON-NLS-1$
 			}
 			sub.done();
 		}
 		return Status.OK_STATUS;
 	}
 
-	private Set<IFileStore> toFileStores(IProgressMonitor monitor)
+	protected Set<IFileStore> toFileStores(IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size());
 		Set<IFileStore> fileStores = new HashSet<IFileStore>(files.size());
@@ -104,7 +107,7 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (CoreException e)
 			{
-				IndexPlugin.logError(e);
+				IdeLog.logError(IndexPlugin.getDefault(), e);
 			}
 			finally
 			{

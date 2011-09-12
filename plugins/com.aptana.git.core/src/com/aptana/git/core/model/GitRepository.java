@@ -497,7 +497,7 @@ public class GitRepository
 							addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
 							// Since we suddenly know about a new remote branch, we probably pulled.
 
-							Job job = new Job("Firing branche added and pull event") //$NON-NLS-1$
+							Job job = new Job("Firing branch added and pull event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
