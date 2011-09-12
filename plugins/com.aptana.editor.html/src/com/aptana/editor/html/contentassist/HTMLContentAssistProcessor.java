@@ -388,10 +388,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					// trim off the quotes
 					if (this._currentLexeme.getLength() >= 2)
 					{
-						int startingOffset = this._currentLexeme.getStartingOffset() + 1;
-						int endingOffset = this._currentLexeme.getEndingOffset() - 1;
+						Range range = null;
+						if ("id".equals(attributeName) || "class".equals(attributeName)) { //$NON-NLS-1$//$NON-NLS-2$
+							range = HTMLUtils.getAttributeValueRange(this._currentLexeme, offset);
+						}
+						if (range == null)
+						{
+							int startingOffset = this._currentLexeme.getStartingOffset() + 1;
+							int endingOffset = this._currentLexeme.getEndingOffset() - 1;
 
-						this._replaceRange = new Range(startingOffset, endingOffset);
+							range = new Range(startingOffset, endingOffset);
+						}
+						this._replaceRange = range;
 					}
 					break;
 
@@ -413,11 +421,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				proposals.addAll(this.addIDProposals(offset));
 			}
-			else if (attributeName.equals("class")) //$NON-NLS-1$
+			else if ("class".equals(attributeName)) //$NON-NLS-1$
 			{
 				proposals.addAll(this.addClassProposals(offset));
 			}
-			else if (attributeName.equals("src") || attributeName.equals("href")) //$NON-NLS-1$ //$NON-NLS-2$
+			else if ("src".equals(attributeName) || "href".equals(attributeName)) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				proposals.addAll(this.addURIPathProposals(offset));
 			}
