@@ -487,16 +487,7 @@ public class Index implements IReadWriteMonitor
 	 */
 	private boolean hasChanged()
 	{
-		this.enterRead();
-
-		try
-		{
-			return memoryIndex.hasChanged();
-		}
-		finally
-		{
-			this.exitRead();
-		}
+		return memoryIndex.hasChanged();
 	}
 
 	/**
