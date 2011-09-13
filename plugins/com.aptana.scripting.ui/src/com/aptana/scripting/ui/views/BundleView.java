@@ -236,7 +236,10 @@ public class BundleView extends ViewPart
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				treeViewer.refresh();
+				if (!treeViewer.getTree().isDisposed())
+				{
+					treeViewer.refresh();
+				}
 
 				return Status.OK_STATUS;
 			}
