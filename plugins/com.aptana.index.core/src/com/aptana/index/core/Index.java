@@ -54,7 +54,7 @@ public class Index implements IReadWriteMonitor
 
 			switch (c)
 			{
-				// the backslash
+			// the backslash
 				case '\\':
 					// the backslash is escape char in string matcher
 					if (!isEscaped)
@@ -487,7 +487,16 @@ public class Index implements IReadWriteMonitor
 	 */
 	private boolean hasChanged()
 	{
-		return memoryIndex.hasChanged();
+		this.enterRead();
+
+		try
+		{
+			return memoryIndex.hasChanged();
+		}
+		finally
+		{
+			this.exitRead();
+		}
 	}
 
 	/**
