@@ -31,6 +31,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 	}
 
 	protected void indexAndCheckProposals(String indexResource, String fileResource, String... proposals)
+			throws Exception
 	{
 		URI uri = null;
 
@@ -53,10 +54,6 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 			// check proposals
 			checkProposals(fileResource, proposals);
 		}
-		catch (Throwable t)
-		{
-			fail(t.getMessage());
-		}
 		finally
 		{
 			if (uri != null)
@@ -66,7 +63,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		}
 	}
 
-	public void assertStaticProperties_1_6_2(String fileResource)
+	public void assertStaticProperties_1_6_2(String fileResource) throws Exception
 	{
 		// @formatter:off
 		indexAndCheckProposals(
@@ -121,7 +118,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		// @formatter:on
 	}
 
-	public void assertInstanceProperties_1_6_2(String fileResource)
+	protected void assertInstanceProperties_1_6_2(String fileResource) throws Exception
 	{
 		// @formatter:off
 		indexAndCheckProposals(
@@ -269,22 +266,22 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		// @formatter:on
 	}
 
-	public void testJQuerySymbolStatics_1_6_2()
+	public void testJQuerySymbolStatics_1_6_2() throws Exception
 	{
 		assertStaticProperties_1_6_2("sdocml/jQuery-statics.js");
 	}
 
-	public void testDollarSymbolStatics_1_6_2()
+	public void testDollarSymbolStatics_1_6_2() throws Exception
 	{
 		assertStaticProperties_1_6_2("sdocml/$-statics.js");
 	}
 
-	public void testJQueryAddReturnValueProperties()
+	public void testJQueryAddReturnValueProperties() throws Exception
 	{
 		assertInstanceProperties_1_6_2("sdocml/jQuery-add-properties.js");
 	}
 
-	public void testDollarAddReturnValueProperties()
+	public void testDollarAddReturnValueProperties() throws Exception
 	{
 		assertInstanceProperties_1_6_2("sdocml/$-add-properties.js");
 	}
@@ -292,7 +289,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 	// @formatter:off
 	// Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389
 	/*
-	public void testDollarJQXHR()
+	public void testDollarJQXHR() throws Exception
 	{
 		indexAndCheckProposals(
 			"sdocml/jquery.1.6.2.sdocml",
@@ -318,7 +315,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		);
 	}
 
-	public void testDollarDeferred()
+	public void testDollarDeferred() throws Exception
 	{
 		indexAndCheckProposals(
 			"sdocml/jquery.1.6.2.sdocml",
@@ -338,7 +335,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		);
 	}
 
-	public void testPromise()
+	public void testPromise() throws Exception
 	{
 		// @formatter:off
 		indexAndCheckProposals(

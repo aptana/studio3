@@ -13,17 +13,21 @@ import org.eclipse.jface.text.rules.Token;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class CommonUtil {
+public final class CommonUtil
+{
 
 	/**
 	 * 
 	 */
-	private CommonUtil() {
+	private CommonUtil()
+	{
 	}
 
-	public static IToken getToken(String tokenName) {
+	// TODO Ideally we generate a cache of tokens. We'd need a map with weak keys and soft values. Ideally we'd also
+	// have some sort of reaper to clean up unused refs over time. Perhaps just use Google's Guava CacheBuilder?
+	public static IToken getToken(String tokenName)
+	{
 		return new Token(tokenName);
 	}
 

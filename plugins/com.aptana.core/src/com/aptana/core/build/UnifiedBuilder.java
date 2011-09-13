@@ -7,18 +7,13 @@
  */
 package com.aptana.core.build;
 
-import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,13 +21,9 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
+import com.aptana.core.internal.build.BuildParticipantManager;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
-import com.aptana.core.util.StringUtil;
-import com.aptana.index.core.IndexFilesOfProjectJob;
-import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.RebuildIndexJob;
-import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
 {
@@ -63,41 +54,19 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	protected void clean(IProgressMonitor monitor) throws CoreException
 	{
 		super.clean(monitor);
-		SubMonitor sub = SubMonitor.convert(monitor, 2);
+
+		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
+		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 1);
+
 		IProject project = getProject();
 		removeProblemsAndTasksFor(project);
 		sub.worked(1);
-		URI uri = getURI();
-		if (uri != null)
+
+		for (IBuildParticipant participant : participants)
 		{
-			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
-			{
-				// @formatter:off
-				String message = MessageFormat.format(
-					"Cleaning index for project {0} ({1})", //$NON-NLS-1$
-					project.getName(),
-					uri
-				);
-				// @formatter:on
-				IdeLog.logInfo(CorePlugin.getDefault(), message, IDebugScopes.BUILDER);
-			}
-			IndexManager.getInstance().removeIndex(uri);
+			participant.clean(project, sub.newChild(1));
 		}
 		sub.done();
-	}
-
-	private URI getURI()
-	{
-		URI uri = getProject().getLocationURI();
-		if (uri != null)
-		{
-			return uri;
-		}
-		IdeLog.logError(CorePlugin.getDefault(),
-				MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
-						getProject().getRawLocationURI(), getProject().getFullPath()));
-		uri = getProject().getRawLocationURI();
-		return uri;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -162,80 +131,20 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	private void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 4);
-		if (delta != null)
+		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
+		for (IBuildParticipant participant : participants)
 		{
-			ResourceCollector resourceCollector = new ResourceCollector();
-			try
-			{
-				delta.accept(resourceCollector);
-				sub.worked(1);
-				// TODO Pre-filter by removing any files from "to be indexed" that don't have an indexer?
-
-				if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
-				{
-					IFile[] toRemove = resourceCollector.filesToRemoveFromIndex
-							.toArray(new IFile[resourceCollector.filesToRemoveFromIndex.size()]);
-					IFile[] toIndex = resourceCollector.filesToIndex.toArray(new IFile[resourceCollector.filesToIndex
-							.size()]);
-					IdeLog.logInfo(
-							CorePlugin.getDefault(),
-							StringUtil.format(Messages.UnifiedBuilder_IndexingResourceDelta,
-									new Object[] { Arrays.deepToString(toRemove), Arrays.deepToString(toIndex) }),
-							IDebugScopes.BUILDER);
-				}
-
-				if (!resourceCollector.filesToRemoveFromIndex.isEmpty())
-				{
-					RemoveIndexOfFilesOfProjectJob removeJob = new RemoveIndexOfFilesOfProjectJob(getProject(),
-							resourceCollector.filesToRemoveFromIndex);
-					removeJob.run(sub.newChild(1));
-				}
-				sub.setWorkRemaining(2);
-				if (!resourceCollector.filesToIndex.isEmpty())
-				{
-					IndexFilesOfProjectJob indexJob = new IndexFilesOfProjectJob(getProject(),
-							resourceCollector.filesToIndex);
-					indexJob.run(sub.newChild(2));
-				}
-			}
-			catch (CoreException e)
-			{
-				IdeLog.logError(CorePlugin.getDefault(), e);
-			}
+			participant.incrementalBuild(delta, getProject(), monitor);
 		}
-		sub.done();
 	}
 
 	private void fullBuild(IProgressMonitor monitor) throws CoreException
 	{
 		// Remove all markers/tasks? Index participants seem to do this for themselves!
-		// FIXME Run rebuild index, or IndexProject?
-		RebuildIndexJob job = new RebuildIndexJob(getURI());
-		job.run(monitor);
-	}
-
-	private static class ResourceCollector implements IResourceDeltaVisitor
-	{
-		Set<IFile> filesToIndex = new HashSet<IFile>();
-		Set<IFile> filesToRemoveFromIndex = new HashSet<IFile>();
-
-		public boolean visit(IResourceDelta delta) throws CoreException
+		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
+		for (IBuildParticipant participant : participants)
 		{
-			IResource resource = delta.getResource();
-			if (resource instanceof IFile)
-			{
-				if (delta.getKind() == IResourceDelta.ADDED
-						|| (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.ENCODING)) != 0)))
-				{
-					filesToIndex.add((IFile) resource);
-				}
-				else if (delta.getKind() == IResourceDelta.REMOVED)
-				{
-					filesToRemoveFromIndex.add((IFile) resource);
-				}
-			}
-			return true;
+			participant.fullBuild(getProject(), monitor);
 		}
 	}
 }

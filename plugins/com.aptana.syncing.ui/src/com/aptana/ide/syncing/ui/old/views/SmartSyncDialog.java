@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -80,11 +79,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -1583,19 +1580,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 
 	private void savePermissions()
 	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CoreIOPlugin.PLUGIN_ID);
-		prefs.putLong(com.aptana.ide.core.io.preferences.IPreferenceConstants.FILE_PERMISSION,
-				filePermission.getPermissions());
-		prefs.putLong(com.aptana.ide.core.io.preferences.IPreferenceConstants.DIRECTORY_PERMISSION,
-				dirPermission.getPermissions());
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(SyncingUIPlugin.getDefault(), "Failed to save the permissions", e); //$NON-NLS-1$
-		}
+		PreferenceUtils.setFilePermissions(filePermission.getPermissions());
+		PreferenceUtils.setDirectoryPermissions(dirPermission.getPermissions());
 	}
 
 	/**

@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -67,6 +68,36 @@ public class URLUtil
 			}
 		}
 		return StringUtil.join("&", builder); //$NON-NLS-1$
+	}
+
+	/**
+	 * Appends a set of parameters onto a existing URL.. It will URL encode the new keys and values
+	 * 
+	 * @param url
+	 * @param parameters
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException
+	 */
+	public static URL appendParameters(URL url, String[] parameters) throws MalformedURLException,
+			UnsupportedEncodingException
+	{
+		if (parameters == null)
+		{
+			return url;
+		}
+
+		if (parameters.length % 2 != 0)
+		{
+			throw new IllegalArgumentException(Messages.URLUtil_EvenNumberUrlParameters);
+		}
+
+		Map<String, String> params = new HashMap<String, String>();
+		for (int i = 0; i < parameters.length; i = i + 2)
+		{
+			params.put(parameters[i], parameters[i + 1]);
+		}
+		return appendParameters(url, params, true);
 	}
 
 	/**

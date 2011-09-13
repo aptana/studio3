@@ -58,21 +58,20 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 	 */
 	@Override
 	protected ISpellingProblemCollector createSpellingProblemCollector() {
-		return new SpellingProblemCollector(getAnnotationModel());
+		IAnnotationModel model = getAnnotationModel();
+		if (model == null) {
+			return null;
+		}
+		return new SpellingProblemCollector(model);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.texteditor.spelling.SpellingReconcileStrategy#initialReconcile()
 	 */
 	@Override
-	public void initialReconcile()
-	{
-		for (ITypedRegion region : computePartitioning(0, getDocument().getLength()))
-		{
-			if (contentTypes.contains(region.getType()))
-			{
-				reconcile(region);
-			}
+	public void initialReconcile() {
+		for (ITypedRegion region : computePartitioning(0, getDocument().getLength())) {
+			reconcile(region);
 		}
 	}
 
@@ -81,9 +80,18 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 	 */
 	@Override
 	public void reconcile(IRegion region) {
+		if (getAnnotationModel() == null) {
+			return;
+		}
 		try {
 			currentRegion = region;
-			super.reconcile(region);
+			if (region instanceof ITypedRegion && !contentTypes.contains(((ITypedRegion) region).getType())) {
+				ISpellingProblemCollector collector = createSpellingProblemCollector();
+				collector.beginCollecting();
+				collector.endCollecting();
+			} else {
+				super.reconcile(region);
+			}
 		} finally {
 			currentRegion = null;
 		}

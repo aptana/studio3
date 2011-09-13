@@ -111,4 +111,36 @@ public class CSSValidatorTests extends AbstractValidatorTestCase
 		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
 		assertEquals(0, items.size());
 	}
+
+	public void testCSS3RgbaColor() throws CoreException
+	{
+		String text = "div {\nbackground-color: rgba(255, 255, 255, 0.5);\ncolor: rgba(255, 255, 255, 0.5);\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
+
+	public void testCSS3BoxSizingProperty() throws CoreException
+	{
+		String text = "div {\nbox-sizing: border-box;\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
+
+	public void testCSS3OutlineOffsetProperty() throws CoreException
+	{
+		String text = "div {\noutline-offset: 10px;\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
+
+	public void testCSS3TransformProperty() throws CoreException
+	{
+		String text = "div {\ntransform: scale(0.5) rotate(90deg) translate(10px, 10px) skew(45deg, 60deg);\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
 }

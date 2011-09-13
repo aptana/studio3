@@ -227,7 +227,30 @@ public class BundleCacher
 		return false;
 	}
 
+	/**
+	 * Load the cached file from disk
+	 * 
+	 * @param bundleDirectory
+	 * @param bundleFiles
+	 * @param monitor
+	 * @return
+	 */
 	public BundleElement load(final File bundleDirectory, List<File> bundleFiles, IProgressMonitor monitor)
+	{
+		return load(bundleDirectory, bundleFiles, monitor, false);
+	}
+
+	/**
+	 * Load the cached file from disk
+	 * 
+	 * @param bundleDirectory
+	 * @param bundleFiles
+	 * @param monitor
+	 * @param ignoreFileStatus
+	 * @return
+	 */
+	public BundleElement load(final File bundleDirectory, List<File> bundleFiles, IProgressMonitor monitor,
+			boolean ignoreFileStatus)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 120);
 		BundleElement be = null;
@@ -240,7 +263,7 @@ public class BundleCacher
 			}
 
 			// IF any file is newer, ignore the cache, it'll get rewritten
-			if (anyFilesNewer(cacheFile, bundleFiles, sub.newChild(10)))
+			if (!ignoreFileStatus && anyFilesNewer(cacheFile, bundleFiles, sub.newChild(10)))
 			{
 				return null;
 			}
@@ -262,7 +285,7 @@ public class BundleCacher
 				sub.worked(80);
 
 				// If any file has been deleted, ignore the cache, it'll get rewritten
-				if (anyFileDeleted(be, sub.newChild(10)))
+				if (!ignoreFileStatus && anyFileDeleted(be, sub.newChild(10)))
 				{
 					return null;
 				}
@@ -478,7 +501,7 @@ public class BundleCacher
 		{
 			if (javaBean instanceof AbstractElement)
 			{
-				if ("path".equals(property.getName())) //$NON-NLS-1$
+				if ("path".equals(property.getName()) || "buildPath".equals(property.getName())) //$NON-NLS-1$ //$NON-NLS-2$
 				{
 					String path = (String) propertyValue;
 					IPath relative = Path.fromOSString(path).makeRelativeTo(
@@ -601,14 +624,26 @@ public class BundleCacher
 		private abstract class AbstractBundleElementConstruct extends AbstractConstruct
 		{
 			/**
-			 * Grab the path from the mapping node and grab it's value!
+			 * Grab the path from the mapping node and grab its value!
 			 * 
 			 * @param node
 			 * @return
 			 */
 			protected String getPath(Node node)
 			{
-				String path = null;
+				return getPath(node, "path"); //$NON-NLS-1$
+			}
+
+			/**
+			 * Grab the property value, assume it's a relative path and prepend the bundle's directory to make it an
+			 * absolute path.
+			 * 
+			 * @param node
+			 * @return
+			 */
+			protected String getPath(Node node, String propertyName)
+			{
+				String relativePath = null;
 				if (node instanceof MappingNode)
 				{
 					MappingNode map = (MappingNode) node;
@@ -620,29 +655,29 @@ public class BundleCacher
 						{
 							ScalarNode scalar = (ScalarNode) keyNode;
 							String valueOfKey = scalar.getValue();
-							if ("path".equals(valueOfKey)) //$NON-NLS-1$
+							if (propertyName.equals(valueOfKey))
 							{
 								Node valueNode = tuple.getValueNode();
 								if (valueNode instanceof ScalarNode)
 								{
 									ScalarNode scalarValue = (ScalarNode) valueNode;
-									path = scalarValue.getValue();
+									relativePath = scalarValue.getValue();
 									break;
 								}
 							}
 						}
 					}
 				}
-				if (path != null)
+				if (relativePath != null)
 				{
-					IPath pathObj = Path.fromOSString(path);
+					IPath pathObj = Path.fromOSString(relativePath);
 					if (!pathObj.isAbsolute())
 					{
 						// Prepend the bundle directory.
-						path = new File(bundleDirectory, path).getAbsolutePath();
+						relativePath = new File(bundleDirectory, relativePath).getAbsolutePath();
 					}
 				}
-				return path;
+				return relativePath;
 			}
 
 			/**
@@ -691,11 +726,14 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(BuildPathElement.class);
+
 				String path = getPath(node);
+				String buildPath = getPath(node, "buildPath"); //$NON-NLS-1$
 				BuildPathElement bpe = new BuildPathElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, bpe);
 				bpe.setPath(path);
+				bpe.setBuildPath(buildPath);
 				return bpe;
 			}
 		}

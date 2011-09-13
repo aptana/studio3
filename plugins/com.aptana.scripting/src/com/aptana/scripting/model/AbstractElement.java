@@ -201,6 +201,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * ModelBase
 	 * 
 	 * @param path
+	 *            The absolute path to the file defining this element
 	 */
 	public AbstractElement(String path)
 	{
@@ -257,7 +258,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	protected abstract String getElementName();
 
 	/**
-	 * getPath
+	 * Returns the absolute path to the file defining this element
 	 * 
 	 * @return
 	 */
@@ -285,14 +286,14 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	}
 
 	/**
-	 * printBody
+	 * Prints the body of the element, choosing to include or ignore "block" and "invoke" sub-elements
 	 * 
 	 * @param printer
 	 */
 	abstract protected void printBody(SourcePrinter printer, boolean includeBlocks);
 
 	/**
-	 * put
+	 * Sets the specified property to the specified value
 	 * 
 	 * @param property
 	 * @param value
@@ -313,6 +314,11 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		}
 	}
 
+	/**
+	 * Returns a map of all property/value pairs
+	 * 
+	 * @return
+	 */
 	public Map<String, Object> getCustomProperties()
 	{
 		if (this._customProperties == null)
@@ -322,6 +328,11 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		return new HashMap<String, Object>(this._customProperties);
 	}
 
+	/**
+	 * Sets a group of property/value pairs
+	 * 
+	 * @param props
+	 */
 	public void setCustomProperties(Map<String, Object> props)
 	{
 		synchronized (propertyLock)
@@ -345,7 +356,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	}
 
 	/**
-	 * setPath
+	 * Sets the absolute path to the file defining this element. Not recommended to be modified manually.
 	 * 
 	 * @param path
 	 */
@@ -362,7 +373,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	}
 
 	/**
-	 * toSource
+	 * Prints the source of the element, including "block" and "invoke" sub-elements.
 	 * 
 	 * @return
 	 */
@@ -372,7 +383,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	}
 
 	/**
-	 * toSource
+	 * Prints the source of the element, optionally including "block" and "invoke" sub-elements.
 	 * 
 	 * @return
 	 */
@@ -386,7 +397,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	}
 
 	/**
-	 * toSource
+	 * Prints the source of the element, optionally including "block" and "invoke" sub-elements.
 	 * 
 	 * @param printer
 	 */

@@ -121,6 +121,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 {
 
 	/**
+	 * ID of the pref page to use when opening/referring to it programmatically.
+	 */
+	public static final String ID = "com.aptana.theme.preferencePage"; //$NON-NLS-1$
+
+	/**
 	 * Key to store the dialog settings for the initial directory to open when importing themes (saves last directory).
 	 */
 	private static final String THEME_DIRECTORY = "themeDirectory"; //$NON-NLS-1$

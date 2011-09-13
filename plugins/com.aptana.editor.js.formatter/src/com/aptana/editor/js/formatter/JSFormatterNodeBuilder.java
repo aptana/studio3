@@ -764,8 +764,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int endingOffset = node.getEndingOffset();
 			// pop the block node
 			checkedPop(blockNode, endingOffset);
-			int endWithSemicolon = locateColonOrSemicolonInLine(endingOffset + 1, document);
-			blockNode.setEnd(createTextNode(document, endingOffset, endWithSemicolon));
+			int end = endingOffset + 1;
+			if (node.getSemicolonIncluded())
+			{
+				end = locateColonOrSemicolonInLine(end, document);
+			}
+			blockNode.setEnd(createTextNode(document, endingOffset, end));
 		}
 
 		/*
@@ -929,7 +933,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// push the expression
 			visitTextNode(expression, true, 1);
 			int argumentsStartOffset = argumentsNode.getStartingOffset();
-			if (!arguments.isEmpty() || (document.getLength() > argumentsStartOffset && document.charAt(argumentsStartOffset) == '('))
+			if (!arguments.isEmpty()
+					|| (document.getLength() > argumentsStartOffset && document.charAt(argumentsStartOffset) == '('))
 			{
 				pushParametersInParentheses(argumentsNode.getStartingOffset(), argumentsNode.getEndingOffset(),
 						arguments, TypePunctuation.COMMA, false);

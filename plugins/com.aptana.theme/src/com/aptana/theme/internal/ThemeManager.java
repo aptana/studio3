@@ -13,16 +13,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.Assert;
@@ -35,6 +33,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
@@ -50,6 +49,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.MarkerAnnotationPreferences;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
@@ -62,17 +62,9 @@ import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
 import com.aptana.theme.preferences.IPreferenceConstants;
 import com.aptana.ui.util.UIUtils;
 
+@SuppressWarnings("restriction")
 public class ThemeManager implements IThemeManager
 {
-	/**
-	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
-	 */
-	private static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
-
-	/**
-	 * Preference key used to store the list of known themes.
-	 */
-	private static final String THEME_LIST_PREF_KEY = "themeList"; //$NON-NLS-1$
 
 	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
@@ -82,8 +74,8 @@ public class ThemeManager implements IThemeManager
 	// TODO Don't expose this node name. Fold saving/loading of themes into this impl
 
 	private volatile Theme fCurrentTheme;
-	private HashMap<String, Theme> fThemeMap;
-	private HashSet<String> fBuiltins;
+	private Set<String> fBuiltins;
+	private Set<String> fThemeNames;
 
 	private static ThemeManager fgInstance;
 
@@ -186,9 +178,9 @@ public class ThemeManager implements IThemeManager
 				if (fCurrentTheme == null)
 				{
 					// if we can't find the default theme, just use the first one in the list
-					if (!getThemeMap().values().isEmpty())
+					if (!getThemeNames().isEmpty())
 					{
-						fCurrentTheme = getThemeMap().values().iterator().next();
+						fCurrentTheme = getTheme(getThemeNames().iterator().next());
 					}
 				}
 				if (fCurrentTheme != null)
@@ -388,84 +380,63 @@ public class ThemeManager implements IThemeManager
 
 	public Theme getTheme(String name)
 	{
-		return getThemeMap().get(name);
-	}
-
-	private Map<String, Theme> getThemeMap()
-	{
-		if (fThemeMap == null)
-		{
-			loadThemes();
-		}
-		return fThemeMap;
-	}
-
-	public Set<String> getThemeNames()
-	{
-		return getThemeMap().keySet();
-	}
-
-	private void loadThemes()
-	{
-		fThemeMap = new HashMap<String, Theme>();
-		// Load builtin themes stored in properties files
-		loadBuiltinThemes();
-		// Load themes from the preferences
-		loadUserThemes();
-
-		saveThemeList();
-	}
-
-	private void saveThemeList()
-	{
-		StringBuilder builder = new StringBuilder();
-		for (String themeName : fThemeMap.keySet())
-		{
-			// FIXME What if the themeName contains our delimeter?!
-			builder.append(themeName).append(THEME_NAMES_DELIMETER);
-		}
-		builder.deleteCharAt(builder.length() - 1);
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID);
-		prefs.put(THEME_LIST_PREF_KEY, builder.toString());
+		// No, try to see if we have a copy in prefs as a user theme
+		Theme loaded = null;
 		try
 		{
-			prefs.flush();
+			loaded = loadUserTheme(name);
 		}
-		catch (BackingStoreException e)
+		catch (Exception e)
 		{
-			IdeLog.logError(ThemePlugin.getDefault(), e);
+			IdeLog.logError(ThemePlugin.getDefault(),
+					MessageFormat.format("Failed to load theme {0} from preferences.", name), e); //$NON-NLS-1$
 		}
+		if (loaded != null)
+		{
+			return loaded;
+		}
+		// Ok, no user theme by that name, load up the builtins. Loading them once should save a copy to prefs (user)
+		// for future...
+		try
+		{
+			return loadBuiltinTheme(name);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(),
+					MessageFormat.format("Failed to load theme {0} from builtins.", name), e); //$NON-NLS-1$
+		}
+		return null;
 	}
 
-	private void loadUserThemes()
+	public synchronized Set<String> getThemeNames()
 	{
-		String themeNames = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID, THEME_LIST_PREF_KEY,
-				null, null);
-		if (themeNames == null)
-			return;
-		StringTokenizer tokenizer = new StringTokenizer(themeNames, THEME_NAMES_DELIMETER);
-		while (tokenizer.hasMoreElements())
+		if (fThemeNames == null)
 		{
-			String themeName = tokenizer.nextToken();
-			try
+			fThemeNames = new HashSet<String>();
+			// Add names of themes from builtins...
+			fThemeNames.addAll(getBuiltinThemeNames());
+
+			// Look in prefs to see what user themes are stored there, garb their names
+			IScopeContext[] scopes = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
+			for (IScopeContext scope : scopes)
 			{
-				Theme theme = loadUserTheme(themeName);
-				if (theme == null)
+				IEclipsePreferences prefs = scope.getNode(ThemePlugin.PLUGIN_ID);
+				Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
+				try
 				{
-					continue;
+					String[] themeNames = preferences.keys();
+					fThemeNames.addAll(Arrays.asList(themeNames));
 				}
-				fThemeMap.put(theme.getName(), theme);
-			}
-			catch (IllegalStateException e)
-			{
-				// This theme may have failed deserialization, lets log it and move on
-				IdeLog.logError(ThemePlugin.getDefault(),
-						"User theme failed to de-serialize from preferences: " + themeName, e); //$NON-NLS-1$
+				catch (BackingStoreException e)
+				{
+					IdeLog.logError(ThemePlugin.getDefault(), e);
+				}
 			}
 		}
+		return fThemeNames;
 	}
 
-	@SuppressWarnings("restriction")
 	private Theme loadUserTheme(String themeName)
 	{
 		InputStream byteStream = null;
@@ -553,15 +524,14 @@ public class ThemeManager implements IThemeManager
 		return null;
 	}
 
-	private void loadBuiltinThemes()
+	private OrderedProperties getBuiltinThemeProperties(String themeName)
 	{
-		fBuiltins = new HashSet<String>();
 		Collection<URL> urls = getBuiltinThemeURLs();
 		if (urls == null || urls.isEmpty())
 		{
-			return;
+			return null;
 		}
-		Map<String, Properties> nameToThemeProperties = new HashMap<String, Properties>();
+
 		for (URL url : urls)
 		{
 			try
@@ -570,25 +540,38 @@ public class ThemeManager implements IThemeManager
 				InputStream stream = FileLocator.toFileURL(url).openStream();
 				try
 				{
-					Properties props = new OrderedProperties();
+					OrderedProperties props = new OrderedProperties();
 					props.load(stream);
-					String themeName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-					if (themeName != null)
+					String loadedName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+					if (!themeName.equals(loadedName))
 					{
-						if (!nameToThemeProperties.containsKey(themeName))
-						{
-							nameToThemeProperties.put(themeName, props);
-						}
-						else
-						{
-							throw new IllegalStateException(MessageFormat.format(
-									Messages.ThemeManager_ERR_DuplicateTheme, themeName));
-						}
+						continue;
 					}
-					else
+
+					String multipleThemeExtends = props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+					// If we extend one or more other themes, recursively load their properties...
+					if (multipleThemeExtends != null)
 					{
-						throw new IllegalStateException(Messages.ThemeManager_ERR_ThemeNoName);
+						OrderedProperties newProperties = new OrderedProperties();
+						String[] pieces = multipleThemeExtends.split(","); //$NON-NLS-1$
+						for (String themeExtends : pieces)
+						{
+							Properties extended = getBuiltinThemeProperties(themeExtends);
+							if (extended == null)
+							{
+								throw new IllegalStateException(MessageFormat.format(
+										Messages.ThemeManager_ERR_NoThemeFound, themeExtends, loadedName));
+							}
+							newProperties.putAll(extended);
+						}
+						newProperties.putAll(props);
+						// We don't want the final extends props in the properties.
+						newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
+						// Sanity check
+						Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(themeName));
+						return newProperties;
 					}
+					return props;
 				}
 				finally
 				{
@@ -601,68 +584,65 @@ public class ThemeManager implements IThemeManager
 						// ignore
 					}
 				}
-
 			}
 			catch (Exception e)
 			{
 				IdeLog.logError(ThemePlugin.getDefault(), url.toString(), e);
 			}
 		}
-
-		// Handle a theme extending another theme
-		for (Properties props : new ArrayList<Properties>(nameToThemeProperties.values())) // iterate in a copy!
-		{
-			try
-			{
-				String multipleThemeExtends = props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
-				if (multipleThemeExtends != null)
-				{
-					Properties newProperties = new OrderedProperties();
-					StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ","); //$NON-NLS-1$
-					String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-					while (tokenizer.hasMoreTokens())
-					{
-						String themeExtends = tokenizer.nextToken();
-						Properties extended = nameToThemeProperties.get(themeExtends);
-						if (extended == null)
-						{
-							throw new IllegalStateException(MessageFormat.format(
-									Messages.ThemeManager_ERR_NoThemeFound, themeExtends, name));
-						}
-						newProperties.putAll(extended);
-					}
-					newProperties.putAll(props);
-					// We don't want the final extends props in the properties.
-					newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
-					Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(name));
-					nameToThemeProperties.put(name, newProperties);
-				}
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(ThemePlugin.getDefault(), e);
-			}
-		}
-
-		for (Properties props : nameToThemeProperties.values())
-		{
-			String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
-			if (name.startsWith("abstract_theme")) //$NON-NLS-1$
-			{
-				continue;
-			}
-			try
-			{
-				loadTheme(props);
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(ThemePlugin.getDefault(), e);
-			}
-		}
+		return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	private synchronized Set<String> getBuiltinThemeNames()
+	{
+		if (fBuiltins == null)
+		{
+			fBuiltins = new HashSet<String>();
+			Collection<URL> urls = getBuiltinThemeURLs();
+			if (urls == null || urls.isEmpty())
+			{
+				return fBuiltins;
+			}
+
+			for (URL url : urls)
+			{
+				InputStream stream = null;
+				try
+				{
+					// Try forcing the file to be extracted out from zip before we try to read it
+					stream = FileLocator.toFileURL(url).openStream();
+					OrderedProperties props = new OrderedProperties();
+					props.load(stream);
+					String loadedName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
+					// Don't include the abstract themes in the list, they're meant just for extending
+					if (loadedName != null && !loadedName.startsWith("abstract_theme")) //$NON-NLS-1$
+					{
+						fBuiltins.add(loadedName);
+					}
+				}
+				catch (Exception e)
+				{
+					IdeLog.logError(ThemePlugin.getDefault(), e);
+				}
+				finally
+				{
+					try
+					{
+						if (stream != null)
+						{
+							stream.close();
+						}
+					}
+					catch (IOException e)
+					{
+						// ignore
+					}
+				}
+			}
+		}
+		return fBuiltins;
+	}
+
 	private Collection<URL> getBuiltinThemeURLs()
 	{
 		ThemePlugin themePlugin = ThemePlugin.getDefault();
@@ -684,18 +664,27 @@ public class ThemeManager implements IThemeManager
 		return collection;
 	}
 
-	private void loadTheme(Properties props)
+	private Theme loadBuiltinTheme(String themeName)
+	{
+		OrderedProperties properties = getBuiltinThemeProperties(themeName);
+		if (properties == null)
+		{
+			return null;
+		}
+		return loadBuiltinTheme(properties);
+	}
+
+	private Theme loadBuiltinTheme(Properties props)
 	{
 		try
 		{
-			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-			fThemeMap.put(theme.getName(), theme);
-			fBuiltins.add(theme.getName());
+			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
 		}
 		catch (Exception e)
 		{
 			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
+		return null;
 	}
 
 	public IToken getToken(String scope)
@@ -705,37 +694,37 @@ public class ThemeManager implements IThemeManager
 
 	public void addTheme(Theme newTheme)
 	{
-		getThemeMap().put(newTheme.getName(), newTheme);
 		newTheme.save();
-		saveThemeList();
+		getThemeNames().add(newTheme.getName());
 	}
 
 	public void removeTheme(Theme theme)
 	{
 		Theme activeTheme = getCurrentTheme();
-		getThemeMap().remove(theme.getName());
-		saveThemeList();
+		getThemeNames().remove(theme.getName());
 		// change active theme if we just removed it
 		if (activeTheme.getName().equals(theme.getName()))
 		{
-			setCurrentTheme(fThemeMap.values().iterator().next());
+			// load first theme from list of names
+			setCurrentTheme(getTheme(getThemeNames().iterator().next()));
 		}
 	}
 
 	public boolean isBuiltinTheme(String themeName)
 	{
-		return fBuiltins.contains(themeName);
+		return getBuiltinThemeNames().contains(themeName);
 	}
 
 	public IStatus validateThemeName(String name)
 	{
 		if (name == null || name.trim().length() == 0)
+		{
 			return new Status(IStatus.ERROR, ThemePlugin.PLUGIN_ID, Messages.ThemeManager_NameNonEmptyMsg);
+		}
 		if (getThemeNames().contains(name.trim()))
+		{
 			return new Status(IStatus.ERROR, ThemePlugin.PLUGIN_ID, Messages.ThemeManager_NameAlreadyExistsMsg);
-		if (name.contains(THEME_NAMES_DELIMETER))
-			return new Status(IStatus.ERROR, ThemePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.ThemeManager_InvalidCharInThemeName, THEME_NAMES_DELIMETER));
+		}
 		return Status.OK_STATUS;
 	}
 }

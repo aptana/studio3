@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="com.aptana.explorer" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="com.aptana.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.explorer" id="com.aptana.explorer.filters" name="App Explorer Filter"/>
+         <meta.schema plugin="com.aptana.core" id="buildParticipants" name="Build Participants"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -17,8 +17,8 @@
          </appinfo>
       </annotation>
       <complexType>
-         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="filter"/>
+         <sequence>
+            <element ref="participant" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="filter">
+   <element name="participant">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -55,24 +55,14 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter:"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="nature" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.resources.natures/@id"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.core.build.IBuildParticipant"/>
                </appinfo>
             </annotation>
          </attribute>
          <attribute name="priority" type="string" use="default" value="50">
             <annotation>
                <documentation>
-                  
+                  This defines at what priority this build participant should be used when a mix of build participants are going to be used at the same time. A higher value indicates a higher priority, meaning that this build participant will run before other participants at a lower priority. The order in which build participants run is undefined when their priority levels match.
                </documentation>
             </annotation>
          </attribute>

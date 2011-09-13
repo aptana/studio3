@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
-import com.aptana.scripting.model.BundleVisibilityListener;
 import com.aptana.scripting.model.BundleEntry;
+import com.aptana.scripting.model.BundleVisibilityListener;
 
 /**
  * This listener dynamically does the activation and removal of filetype associations between our editor and filename
@@ -106,6 +106,10 @@ class FileTypeAssociationListener implements BundleVisibilityListener
 	{
 		// Clean up the generic content type in bundle
 		IContentType type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
+		if (type == null)
+		{
+			return;
+		}
 		int[] specTypes = new int[] { IContentType.FILE_EXTENSION_SPEC, IContentType.FILE_NAME_SPEC };
 		for (int specType : specTypes)
 		{

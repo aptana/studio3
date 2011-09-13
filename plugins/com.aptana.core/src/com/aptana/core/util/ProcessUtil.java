@@ -293,7 +293,8 @@ public class ProcessUtil
 		if (isInfoLoggingEnabled())
 		{
 			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess,
-					new Object[] { StringUtil.join("\" \"", command), workingDirectory, map }));//$NON-NLS-1$
+					new Object[] { StringUtil.join("\" \"", command), //$NON-NLS-1$
+							processBuilder.directory().getAbsolutePath(), map }));
 		}
 		return startProcess(processBuilder);
 	}
@@ -361,7 +362,8 @@ public class ProcessUtil
 			catch (InterruptedException e)
 			{
 				Thread.interrupted();
-			} finally
+			}
+			finally
 			{
 				timeoutThread.interrupt();
 			}

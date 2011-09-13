@@ -16,14 +16,16 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.scripting.model");
 		// $JUnit-BEGIN$
+		suite.addTestSuite(BundleCacherTest.class);
+		// suite.addTestSuite(BundleLoadingPerformanceTest.class);
 		suite.addTestSuite(BundleTests.class);
-		suite.addTestSuite(CommandTests.class);
-		suite.addTestSuite(PlatformSpecificCommandTests.class);
-		suite.addTestSuite(ContextTests.class);
+		suite.addTestSuite(BundleVisibilityTests.class);
 		suite.addTestSuite(CommandBlockRunnerTests.class);
+		suite.addTestSuite(CommandTests.class);
+		suite.addTestSuite(ContextTests.class);
 		suite.addTestSuite(FilterTests.class);
 		suite.addTestSuite(KeyBindingTests.class);
-		suite.addTestSuite(BundleVisibilityTests.class);
+		suite.addTestSuite(PlatformSpecificCommandTests.class);
 		suite.addTestSuite(WithDefaultsTests.class);
 
 		// TODO: uncomment once timing issues are resolved. We're still getting

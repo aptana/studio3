@@ -11,17 +11,12 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.preferences.IPreferenceConstants;
+import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
@@ -33,16 +28,7 @@ public class ToggleTextNodesHandler extends AbstractHandler
 	{
 		Command command = event.getCommand();
 		boolean oldValue = HandlerUtil.toggleCommandState(command);
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
-		prefs.putBoolean(IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, !oldValue);
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), e);
-		}
+		HTMLPreferenceUtil.setShowTextNodesInOutline(!oldValue);
 
 		IEditorPart editor = HandlerUtil.getActiveEditor(event);
 		if (editor instanceof AbstractThemeableEditor)

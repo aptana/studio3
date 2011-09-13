@@ -15,6 +15,8 @@ import java.util.Set;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
@@ -27,14 +29,14 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 		{
 			public Object getPropertyValue(BundleEntryNode node)
 			{
-				return node.entry.getName();
+				return (node.entry == null) ? null : node.entry.getName();
 			}
 		},
 		CONTRIBUTOR_COUNT(Messages.BundleEntryNode_Bundle_Entry_Contributor_Count)
 		{
 			public Object getPropertyValue(BundleEntryNode node)
 			{
-				return node.entry.getBundles().size();
+				return (node.entry == null) ? null : node.entry.getBundles().size();
 			}
 		};
 
@@ -52,6 +54,7 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 	}
 
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
+
 	private BundleEntry entry;
 	private Action reloadAction;
 
@@ -95,6 +98,10 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 	 */
 	public Object[] getChildren()
 	{
+		if (entry == null)
+		{
+			return ArrayUtil.NO_STRINGS;
+		}
 		List<Object> result = new ArrayList<Object>();
 
 		// add bundle elements that contribute to this bundle
@@ -130,7 +137,7 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 	 */
 	public String getLabel()
 	{
-		return entry.getName();
+		return (entry == null) ? StringUtil.EMPTY : entry.getName();
 	}
 
 	/*
@@ -149,18 +156,19 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 	 */
 	public boolean hasChildren()
 	{
-		boolean result = false;
+		if (entry == null)
+		{
+			return false;
+		}
 
 		for (BundleElement bundle : entry.getBundles())
 		{
 			if (bundle.hasChildren())
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
-
-		return result;
+		return false;
 	}
 
 	/**

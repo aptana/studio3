@@ -84,4 +84,21 @@ public class HTMLNestedLanguageContentAssistTests extends HTMLEditorBasedTests
 	{
 		this.checkProposals("contentAssist/css-class-attribute.html", "testclass");
 	}
+
+	/**
+	 * testCSSClassAttributeDuplicated
+	 */
+	public void testCSSClassAttributeDuplicated()
+	{
+		this.checkProposals("contentAssist/css-class-attribute-duplicated.html", "testclass2");
+	}
+
+	/**
+	 * testCSSIDAttributeDuplicated
+	 */
+	public void testCSSIDAttributeDuplicated()
+	{
+		this.checkProposals("contentAssist/css-id-attribute-duplicated.html", "testid2");
+	}
+
 }
