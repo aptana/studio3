@@ -99,6 +99,12 @@ public class HTMLUtilsTest extends TestCase
 	{
 		assertFalse(HTMLUtils.isJavaScriptTag(""));
 		assertFalse(HTMLUtils.isJavaScriptTag(null));
+		assertTrue(HTMLUtils.isJavaScriptTag("<script type='javascript'>"));
+		assertTrue(HTMLUtils.isJavaScriptTag("<script type=javascript>"));
+		assertTrue(HTMLUtils.isJavaScriptTag("<script language=\"javascript\">"));
+		assertTrue(HTMLUtils.isJavaScriptTag("<script>"));
+		// FIXME This should not be correct.
+		assertTrue(HTMLUtils.isJavaScriptTag("<div>"));
 	}
 
 	/**
@@ -106,6 +112,9 @@ public class HTMLUtilsTest extends TestCase
 	public void testIsTagComplete() throws Exception
 	{
 		assertTrue(HTMLUtils.isTagComplete(">"));
+		assertTrue(HTMLUtils.isTagComplete("<>"));
+		assertTrue(HTMLUtils.isTagComplete("<div>"));
+		assertFalse(HTMLUtils.isTagComplete("<div> "));
 		assertFalse(HTMLUtils.isTagComplete(""));
 		assertFalse(HTMLUtils.isTagComplete(null));
 		assertFalse(HTMLUtils.isTagComplete("div"));
@@ -115,8 +124,10 @@ public class HTMLUtilsTest extends TestCase
 	 */
 	public void testIsTagSelfClosing() throws Exception
 	{
-		assertTrue(HTMLUtils.isTagSelfClosing("/>"));
-		assertFalse(HTMLUtils.isTagSelfClosing(""));
+		assertTrue(HTMLUtils.isTagSelfClosing("<br />"));
+		assertTrue(HTMLUtils.isTagSelfClosing("<script />"));
+		assertFalse(HTMLUtils.isTagSelfClosing("</script>"));
+		assertFalse(HTMLUtils.isTagSelfClosing("<br>"));
 	}
 
 	/**
