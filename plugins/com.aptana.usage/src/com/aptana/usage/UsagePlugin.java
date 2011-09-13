@@ -9,9 +9,7 @@ package com.aptana.usage;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -26,11 +24,12 @@ public class UsagePlugin extends Plugin
 
 	// The shared instance
 	private static UsagePlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public UsagePlugin() {
+	public UsagePlugin()
+	{
 	}
 
 	/*
@@ -59,26 +58,11 @@ public class UsagePlugin extends Plugin
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static UsagePlugin getDefault()
 	{
 		return plugin;
-	}
-
-	/**
-	 * Retrieves the plug-in's version.
-	 * 
-	 * @return the plug-in's version or null if it could not be retrieved
-	 */
-	public static String getPluginVersion()
-	{
-		Bundle bundle = getDefault().getBundle();
-		if (bundle == null)
-		{
-			return null;
-		}
-		return bundle.getHeaders().get(Constants.BUNDLE_VERSION).toString();
 	}
 }

@@ -103,7 +103,7 @@ public class PingStartup implements IStartup
 			}
 		}
 		add(keyValues, "id", getApplicationId()); //$NON-NLS-1$
-		add(keyValues, "version", UsagePlugin.getPluginVersion()); //$NON-NLS-1$
+		add(keyValues, "version", EclipseUtil.getPluginVersion(UsagePlugin.PLUGIN_ID)); //$NON-NLS-1$
 		add(keyValues, "product", System.getProperty("eclipse.product")); //$NON-NLS-1$ //$NON-NLS-2$
 		add(keyValues, "eclipse_version", System.getProperty("osgi.framework.version")); //$NON-NLS-1$ //$NON-NLS-2$
 		add(keyValues, "os_architecture", System.getProperty("os.arch")); //$NON-NLS-1$ //$NON-NLS-2$
