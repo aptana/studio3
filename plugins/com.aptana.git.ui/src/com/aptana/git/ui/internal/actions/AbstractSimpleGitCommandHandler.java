@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
@@ -78,6 +79,15 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 					try
 					{
 						ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);
+
+						if (launch.getProcesses() == null || launch.getProcesses().length < 1)
+						{
+							// If something went wrong and there's no process (like unsaved files and user cancelled
+							// dialog)
+							return Status.OK_STATUS;
+						}
+
+						IProcess process = launch.getProcesses()[0];
 						while (!launch.isTerminated())
 						{
 							Thread.yield();
@@ -89,7 +99,7 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 							sub.worked(1);
 						}
 
-						int exitValue = launch.getProcesses()[0].getExitValue();
+						int exitValue = process.getExitValue();
 						if (exitValue != 0)
 						{
 							String msg = MessageFormat
