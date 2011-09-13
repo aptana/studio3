@@ -70,9 +70,9 @@ public class CSSValidator implements IValidator
 	@SuppressWarnings("nls")
 	private static final String[] CSS3_PROPERTIES = { "behavior", "box-shadow", "box-sizing", "column-count",
 			"column-width", "column-gap", "column-rule", "border-radius", "background-clip", "background-origin",
-			"border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
-			"border-top-left-radius", "font-family", "font-weight", "font-style", "outline-offset", "resize", "size",
-			"src", "transform", "transition" };
+			"background-quantity", "background-size", "border-top-right-radius", "border-bottom-right-radius",
+			"border-bottom-left-radius", "border-top-left-radius", "font-family", "font-weight", "font-style",
+			"outline-offset", "resize", "size", "src", "transform", "transition" };
 
 	@SuppressWarnings("nls")
 	private static final String[] CSS3_AT_RULES = { "@namespace" };
