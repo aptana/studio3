@@ -10,7 +10,10 @@ package com.aptana.editor.common.tests.util;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -36,7 +39,18 @@ public class TestProject
 	 */
 	public TestProject(String projectNamePrefix, String[] projectNatures) throws CoreException
 	{
-		createProject(projectNamePrefix, projectNatures, new NullProgressMonitor());
+		createProject(projectNamePrefix, projectNatures, new String[0], new NullProgressMonitor());
+	}
+
+	/**
+	 * Creates a new project with the specified prefix name in the root or the workspace
+	 * 
+	 * @param projectNamePrefix
+	 * @throws CoreException
+	 */
+	public TestProject(String projectNamePrefix, String[] projectNatures, String[] buildSpecs) throws CoreException
+	{
+		createProject(projectNamePrefix, projectNatures, buildSpecs, new NullProgressMonitor());
 	}
 
 	/**
@@ -48,7 +62,19 @@ public class TestProject
 	public TestProject(String projectNamePrefix, String[] projectNatures, IProgressMonitor monitor)
 			throws CoreException
 	{
-		createProject(projectNamePrefix, projectNatures, monitor);
+		createProject(projectNamePrefix, projectNatures, new String[0], monitor);
+	}
+
+	/**
+	 * Creates a new project with the specified prefix name in the root or the workspace
+	 * 
+	 * @param projectNamePrefix
+	 * @throws CoreException
+	 */
+	public TestProject(String projectNamePrefix, String[] projectNatures, String[] buildSpecs, IProgressMonitor monitor)
+			throws CoreException
+	{
+		createProject(projectNamePrefix, projectNatures, buildSpecs, monitor);
 	}
 
 	/**
@@ -124,8 +150,8 @@ public class TestProject
 	 * @return
 	 * @throws CoreException
 	 */
-	protected void createProject(String projectNamePrefix, String[] projectNatures, IProgressMonitor monitor)
-			throws CoreException
+	protected void createProject(String projectNamePrefix, String[] projectNatures, String[] buildSpecs,
+			IProgressMonitor monitor) throws CoreException
 	{
 		// we pass in a prefix in order to make sure (and ensure) that we have no collisions in project names
 		SubMonitor subMonitor = SubMonitor.convert(monitor);
@@ -133,6 +159,19 @@ public class TestProject
 		project = workspace.getRoot().getProject(projectNamePrefix + "_" + System.currentTimeMillis());
 		IProjectDescription description = workspace.newProjectDescription(project.getName());
 		description.setNatureIds(projectNatures);
+
+		if (buildSpecs != null && buildSpecs.length > 0)
+		{
+			List<ICommand> builderCommands = new ArrayList<ICommand>(buildSpecs.length);
+			for (String builder : buildSpecs)
+			{
+				ICommand command = description.newCommand();
+				command.setBuilderName(builder);
+				builderCommands.add(command);
+			}
+			description.setBuildSpec(builderCommands.toArray(new ICommand[builderCommands.size()]));
+		}
+
 		if (!project.exists())
 		{
 			project.create(description, subMonitor);
