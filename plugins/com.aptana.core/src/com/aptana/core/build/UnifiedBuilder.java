@@ -132,9 +132,14 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	private void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor)
 	{
 		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
-		for (IBuildParticipant participant : participants)
+		if (participants != null && !participants.isEmpty())
 		{
-			participant.incrementalBuild(delta, getProject(), monitor);
+			SubMonitor sub = SubMonitor.convert(monitor, participants.size());
+			for (IBuildParticipant participant : participants)
+			{
+				participant.incrementalBuild(delta, getProject(), sub.newChild(1));
+			}
+			sub.done();
 		}
 	}
 
@@ -142,9 +147,14 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		// Remove all markers/tasks? Index participants seem to do this for themselves!
 		List<IBuildParticipant> participants = BuildParticipantManager.getInstance().getBuildParticipants();
-		for (IBuildParticipant participant : participants)
+		if (participants != null && !participants.isEmpty())
 		{
-			participant.fullBuild(getProject(), monitor);
+			SubMonitor sub = SubMonitor.convert(monitor, participants.size());
+			for (IBuildParticipant participant : participants)
+			{
+				participant.fullBuild(getProject(), sub.newChild(1));
+			}
+			sub.done();
 		}
 	}
 }
