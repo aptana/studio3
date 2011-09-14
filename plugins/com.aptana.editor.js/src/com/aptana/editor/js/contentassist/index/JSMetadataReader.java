@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -34,6 +35,7 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
 
@@ -528,6 +530,26 @@ public class JSMetadataReader extends MetadataReader
 		else if (this._currentType != null)
 		{
 			this._currentType.addSince(since);
+		}
+	}
+
+	/**
+	 * Processing a type map
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterTypeMap(String ns, String name, String qname, Attributes attributes)
+	{
+		Map<String, String> attrs = attributesToMap(attributes, true);
+		String sourceType = attrs.get("source-type"); //$NON-NLS-1$
+		String destinationType = attrs.get("destination-type"); //$NON-NLS-1$
+
+		if (!StringUtil.isEmpty(sourceType) && !StringUtil.isEmpty(destinationType))
+		{
+			JSTypeMapper.getInstance().addTypeMapping(sourceType, destinationType);
 		}
 	}
 

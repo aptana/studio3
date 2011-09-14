@@ -119,7 +119,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		// Use "Object" as parameter type if we didn't find types by other
 		// means
-		if (foundType == false)
+		if (!foundType)
 		{
 			this.addType(JSTypeConstants.DEFAULT_PARAMETER_TYPE);
 		}
@@ -139,7 +139,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				this._types = new ArrayList<String>();
 			}
 
-			if (this._types.contains(type) == false)
+			if (!this._types.contains(type))
 			{
 				this._types.add(type);
 			}
@@ -275,7 +275,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	@Override
 	public void visit(JSArrayNode node)
 	{
-		if (node.hasChildren() == false)
+		if (!node.hasChildren())
 		{
 			this.addType(JSTypeConstants.ARRAY_TYPE);
 		}
@@ -466,7 +466,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			IParseNode expression = returnValue.getExpression();
 
-			if (expression.isEmpty() == false)
+			if (!expression.isEmpty())
 			{
 				foundReturnExpression = true;
 
@@ -477,7 +477,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		String type;
 
 		// build function type, including return values
-		if (types.isEmpty() == false)
+		if (!types.isEmpty())
 		{
 			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(",", types); //$NON-NLS-1$
 		}
@@ -543,6 +543,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				// Fix up type names as might be necessary
 				typeName = JSTypeMapper.getInstance().getMappedType(typeName);
+
+				if ("Function:jQuery".equals(typeName) && lhs instanceof JSIdentifierNode && ("$".equals(lhs.getText()) || "jQuery".equals(lhs.getText()))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				{
+					typeName = "Class<jQuery>"; //$NON-NLS-1$
+				}
 
 				if (JSTypeUtil.isFunctionPrefix(typeName))
 				{
