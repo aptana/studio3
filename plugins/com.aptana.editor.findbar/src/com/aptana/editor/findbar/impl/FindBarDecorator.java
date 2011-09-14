@@ -81,16 +81,20 @@ import com.aptana.ui.util.UIUtils;
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
 
+	private static final EclipseFindSettings eclipseFindSettings = new EclipseFindSettings();
+	
 	/**
 	 * Yes, the configuration for the find bar is shared across all find bars (so, when some configuration changes in
 	 * one, all are updated)
 	 */
-	private static final FindBarConfiguration findBarConfiguration = new FindBarConfiguration();
+	/*default*/ static final FindBarConfiguration findBarConfiguration = new FindBarConfiguration(eclipseFindSettings);
 
 	/**
 	 * Yes, the entries in the combos are also always synchronized.
 	 */
-	private static final FindBarEntriesHelper findBarEntriesHelper = new FindBarEntriesHelper();
+	private static final FindBarEntriesHelper findBarEntriesHelper = new FindBarEntriesHelper(eclipseFindSettings);
+	
+
 
 	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
 	private static final String CLOSE_ENTER = "icons/close_enter.png"; //$NON-NLS-1$
@@ -109,8 +113,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private final ITextEditor textEditor;
 	private ISourceViewer sourceViewer;
 	final IEditorStatusLine statusLineManager;
-	private final String PREFERENCE_NAME_FIND = "FIND_BAR_DECORATOR_FIND_ENTRIES"; //$NON-NLS-1$
-	private final String PREFERENCE_NAME_REPLACE = "FIND_BAR_DECORATOR_REPLACE_ENTRIES"; //$NON-NLS-1$
 	private IAction fOriginalFindBarAction;
 
 	private List<FindBarOption> fFindBarOptions = new ArrayList<FindBarOption>();
@@ -273,9 +275,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		findButton = createButton(null, true);
 		findButton.setText(Messages.FindBarDecorator_LABEL_FInd);
 
-		combo = createCombo(PREFERENCE_NAME_FIND);
+		combo = createCombo(FindBarEntriesHelper.PREFERENCE_NAME_FIND);
 
-		comboReplace = createCombo(PREFERENCE_NAME_REPLACE);
+		comboReplace = createCombo(FindBarEntriesHelper.PREFERENCE_NAME_REPLACE);
 
 		ToolBar optionsToolBar = new ToolBar(findBar, SWT.NONE);
 		optionsToolBar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.CENTER, false, false));
@@ -889,12 +891,12 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private void setFindText(String findText)
 	{
-		setFindText(findText, combo, PREFERENCE_NAME_FIND);
+		setFindText(findText, combo, FindBarEntriesHelper.PREFERENCE_NAME_FIND);
 	}
 
 	private void setFindTextOnReplace(String findText)
 	{
-		setFindText(findText, comboReplace, PREFERENCE_NAME_REPLACE);
+		setFindText(findText, comboReplace, FindBarEntriesHelper.PREFERENCE_NAME_REPLACE);
 	}
 
 	private void setFindText(String findText, final Combo combo, String preferenceName)
@@ -1052,6 +1054,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				return false;
 		}
 		return true;
+	}
+	
+	public void updateFromEclipseFindSettings()
+	{
+		eclipseFindSettings.readConfiguration();
+
+		getConfiguration().updateFromEclipseFindSettings();
+		findBarEntriesHelper.updateFromEclipseFindSettings();
 	}
 
 	public FindBarConfiguration getConfiguration()

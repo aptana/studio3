@@ -20,6 +20,13 @@ import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 public class FindBarConfiguration
 {
 
+	private final EclipseFindSettings eclipseFindSettings;
+
+	public FindBarConfiguration(EclipseFindSettings eclipseFindSettings)
+	{
+		this.eclipseFindSettings = eclipseFindSettings;
+	}
+
 	private IPreferenceStore getPreferenceStore()
 	{
 		return FindBarPlugin.getDefault().getPreferenceStore();
@@ -52,21 +59,65 @@ public class FindBarConfiguration
 	public void setCaseSensitive(boolean enable)
 	{
 		getPreferenceStore().setValue(IPreferencesConstants.CASE_SENSITIVE_IN_FIND_BAR, enable);
+		eclipseFindSettings.fCase = enable;
+		eclipseFindSettings.writeConfiguration();
 	}
 
 	public void setWholeWord(boolean enable)
 	{
 		getPreferenceStore().setValue(IPreferencesConstants.WHOLE_WORD_IN_FIND_BAR, enable);
+		eclipseFindSettings.fWholeWord = enable;
+		eclipseFindSettings.writeConfiguration();
 	}
 
 	public void setRegularExpression(boolean enable)
 	{
 		getPreferenceStore().setValue(IPreferencesConstants.REGULAR_EXPRESSION_IN_FIND_BAR, enable);
+		eclipseFindSettings.fRegExSearch = enable;
+		eclipseFindSettings.writeConfiguration();
 	}
 
 	public void setSearchBackward(boolean enable)
 	{
 		getPreferenceStore().setValue(IPreferencesConstants.SEARCH_BACKWARD_IN_FIND_BAR, enable);
+		// Not saved in the Eclipse settings.
+	}
+
+	/**
+	 * Updates the settings in the preference store used by the find bar with the settings in the Eclipse find actions.
+	 */
+	public void updateFromEclipseFindSettings()
+	{
+		IPreferenceStore preferenceStore = getPreferenceStore();
+		preferenceStore.setValue(IPreferencesConstants.CASE_SENSITIVE_IN_FIND_BAR, eclipseFindSettings.fCase);
+		preferenceStore
+				.setValue(IPreferencesConstants.REGULAR_EXPRESSION_IN_FIND_BAR, eclipseFindSettings.fRegExSearch);
+		preferenceStore.setValue(IPreferencesConstants.WHOLE_WORD_IN_FIND_BAR, eclipseFindSettings.fWholeWord);
+	}
+
+	/**
+	 * Toggles the setting for the given preferences key.
+	 */
+	public void toggle(String preferencesKey)
+	{
+		IPreferenceStore preferenceStore = getPreferenceStore();
+		boolean b = !preferenceStore.getBoolean(preferencesKey);
+		if (preferencesKey.equals(IPreferencesConstants.REGULAR_EXPRESSION_IN_FIND_BAR))
+		{
+			setRegularExpression(b);
+		}
+		else if (preferencesKey.equals(IPreferencesConstants.WHOLE_WORD_IN_FIND_BAR))
+		{
+			setWholeWord(b);
+		}
+		else if (preferencesKey.equals(IPreferencesConstants.CASE_SENSITIVE_IN_FIND_BAR))
+		{
+			setCaseSensitive(b);
+		}
+		else
+		{
+			preferenceStore.setValue(preferencesKey, b);
+		}
 	}
 
 }

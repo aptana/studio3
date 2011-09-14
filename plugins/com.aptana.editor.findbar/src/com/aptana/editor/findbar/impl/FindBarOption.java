@@ -178,7 +178,7 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 		if (preferencesKey != null)
 		{
 			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-			preferenceStore.setValue(preferencesKey, !preferenceStore.getBoolean(preferencesKey));
+			FindBarDecorator.findBarConfiguration.toggle(preferencesKey);
 		}
 		execute();
 	}
@@ -215,8 +215,7 @@ abstract class FindBarOption extends SelectionAdapter implements SelectionListen
 			{
 				if (isCheckable())
 				{
-					IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-					preferenceStore.setValue(preferencesKey, !preferenceStore.getBoolean(preferencesKey));
+					FindBarDecorator.findBarConfiguration.toggle(preferencesKey);
 				}
 				else
 				{
