@@ -404,6 +404,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					this._replaceRange = null;
 					this._currentLexeme = lexemeProvider
 							.getLexemeFromOffset(this._currentLexeme.getStartingOffset() - 1);
+					// case where there is a prefix inside two parens, i.e. html:lang(f|)
+					if (this._currentLexeme != null && this._currentLexeme.getType() == CSSTokenType.IDENTIFIER)
+					{
+						this._replaceRange = this._currentLexeme;
+					}
 					break;
 
 				default:
@@ -413,7 +418,22 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (this._currentLexeme != null)
 		{
-			switch (this._currentLexeme.getType())
+			Lexeme<CSSTokenType> switchLexeme = this._currentLexeme;
+
+			// if we have an identifier, it's likely it's a prefix of a partially-completed proposal
+			// find the true position and proposals
+			if (switchLexeme.getType() == CSSTokenType.IDENTIFIER)
+			{
+				Lexeme<CSSTokenType> previous = lexemeProvider.getLexemeFromOffset(this._currentLexeme
+						.getStartingOffset() - 1);
+				if (previous != null
+						&& (previous.getType() == CSSTokenType.COLON || previous.getType() == CSSTokenType.LPAREN))
+				{
+					switchLexeme = previous;
+				}
+			}
+
+			switch (switchLexeme.getType())
 			{
 				case CLASS:
 					this.addClasses(proposals, offset);
@@ -425,8 +445,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 				case COLON:
 					// If previous is also a colon, it's syntax for pseudo elements. One colon means pseudo classes.
-					Lexeme<CSSTokenType> previous = lexemeProvider.getLexemeFromOffset(this._currentLexeme
-							.getStartingOffset() - 1);
+					Lexeme<CSSTokenType> previous = lexemeProvider
+							.getLexemeFromOffset(switchLexeme.getStartingOffset() - 1);
 					if (previous != null && previous.getType() == CSSTokenType.COLON)
 					{
 						this.addPseudoElementProposals(proposals, offset);
@@ -440,8 +460,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case LPAREN:
 					// Back up one, grab identifier as the pseudo-class name
 					String pseudoClassName = null;
-					Lexeme<CSSTokenType> lex = lexemeProvider.getLexemeFromOffset(this._currentLexeme
-							.getStartingOffset() - 1);
+					Lexeme<CSSTokenType> lex = lexemeProvider.getLexemeFromOffset(switchLexeme.getStartingOffset() - 1);
 					if (lex.getType() == CSSTokenType.IDENTIFIER)
 					{
 						pseudoClassName = lex.getText();
