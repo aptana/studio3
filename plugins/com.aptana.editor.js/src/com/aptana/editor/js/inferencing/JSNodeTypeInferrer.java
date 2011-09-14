@@ -20,6 +20,7 @@ import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -34,7 +35,6 @@ import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
@@ -546,6 +546,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				// Fix up type names as might be necessary
 				typeName = JSTypeMapper.getInstance().getMappedType(typeName);
+
+				if ("Function:jQuery".equals(typeName) && lhs instanceof JSIdentifierNode && ("$".equals(lhs.getText()) || "jQuery".equals(lhs.getText()))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				{
+					typeName = "Class<jQuery>"; //$NON-NLS-1$
+				}
 
 				if (JSTypeUtil.isFunctionPrefix(typeName))
 				{

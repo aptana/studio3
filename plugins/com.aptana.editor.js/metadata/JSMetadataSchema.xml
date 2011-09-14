@@ -5,11 +5,11 @@
 		<attribute name="name" />
 		<attribute name="type" />
 	</element>
-	
+
 	<element name="aliases">
 		<child-element name="alias" />
 	</element>
-	
+
 	<element name="availability">
 		<child-element name="specification" />
 	</element>
@@ -60,7 +60,7 @@
 		onEnter="startTextBuffer"
 		onExit="exitDeprecated"
 		hasText="yes" />
-		
+
 	<element
 		name="description"
 		onEnter="startTextBuffer"
@@ -97,6 +97,7 @@
 	<element name="javascript" type="root" onExit="exitJavaScript">
 		<child-element name="aliases"/>
 		<child-element name="class" />
+		<child-element name="type-maps"/>
 		<child-element name="overview"/>
 	</element>
 
@@ -127,12 +128,12 @@
 		<attribute name="scope" />
 		<child-element name="mixin" />
 	</element>
-	
+
 	<element name="mixin" onEnter="enterMixin">
 		<attribute name="scope" />
 		<attribute name="type" />
 	</element>
-	
+
 	<element name="overview"/>
 
 	<element name="parameter" onEnter="enterParameter" onExit="exitParameter">
@@ -189,7 +190,7 @@
 		onEnter="startTextBuffer"
 		onExit="exitReturnDescription"
 		hasText="yes" />
-		
+
 	<element name="return-type" onEnter="enterReturnType" onExit="exitReturnType">
 		<attribute name="type" />
 		<child-element name="description"/>
@@ -204,6 +205,15 @@
 		<attribute name="version" usage="optional" />	
 	</element>
 
+	<element name="type-map" onEnter="enterTypeMap">
+		<attribute name="source-type"/>
+		<attribute name="destination-type"/>
+	</element>
+
+	<element name="type-maps">
+		<child-element name="type-map"/>
+	</element>
+
 	<element name="values">
 		<child-element name="value" />
 	</element>
@@ -212,9 +222,9 @@
 		<attribute name="name" />	
 		<attribute name="description" usage="optional" />	
 	</element>
-	
+
 	<element name="description" onEnter="startTextBuffer" onExit="exitDescription" />
-		
+
 	<element name="browsers">
 		<child-element name="browser" />
 	</element>
