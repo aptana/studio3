@@ -21,7 +21,8 @@ public class CoffeeSourcePartitionScannerTest extends TestCase
 		{
 			type = CoffeeSourceConfiguration.DEFAULT;
 		}
-		char c = code.charAt(offset);
+		String c = code.substring(offset, offset + length);
+
 		assertEquals("Content type doesn't match expectations for: " + c, contentType, type);
 		assertEquals("Partition offset doesn't match expectations for: " + c, offset, actual.getOffset());
 		assertEquals("Parition length doesn't match expectations for: " + c, length, actual.getLength());
@@ -156,6 +157,13 @@ public class CoffeeSourcePartitionScannerTest extends TestCase
 
 		assertPartition(source, CoffeeSourceConfiguration.REGEXP, 0, 8);
 		assertPartition(source, CoffeeSourceConfiguration.DEFAULT, 8, 1);
+	}
+
+	public void testAPSTUD3246() throws Exception
+	{
+		String source = "var wallInitX = Math.round(screenWidth / 2) - Math.round(wallWidth / 2);\n";
+
+		assertPartition(source, CoffeeSourceConfiguration.DEFAULT, 0, source.length());
 	}
 
 }

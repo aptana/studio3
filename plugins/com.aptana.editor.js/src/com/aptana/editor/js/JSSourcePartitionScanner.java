@@ -12,7 +12,7 @@ import org.eclipse.jface.text.BadLocationException;
 
 import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
-public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IJSTokenScanner
+public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IRegexpDivisionDisambiguator
 {
 	/**
 	 * JSSourcePartitionScanner
@@ -27,7 +27,7 @@ public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanne
 	 * 
 	 * @return
 	 */
-	public boolean hasDivisionStart()
+	public boolean isValidDivisionStart()
 	{
 		// start backtracking one character before the current position
 		int offset = fOffset - 1;

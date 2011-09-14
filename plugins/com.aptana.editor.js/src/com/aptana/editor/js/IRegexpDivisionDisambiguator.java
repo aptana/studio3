@@ -7,12 +7,16 @@
  */
 package com.aptana.editor.js;
 
-public interface IJSTokenScanner
+/*
+ * @author cwilliams
+ */
+public interface IRegexpDivisionDisambiguator
 {
 	/**
-	 * Determine if the scanner's position is valid for a regular expression
+	 * Determine if the scanner's position is valid for division (to escape matching it as a regular expression).
+	 * Generically, we're determining lexer state to see if we're mid-expression or at the beginning of one.
 	 * 
 	 * @return
 	 */
-	public boolean hasDivisionStart();
+	public boolean isValidDivisionStart();
 }
