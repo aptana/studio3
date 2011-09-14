@@ -13,7 +13,7 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.js.IJSTokenScanner;
+import com.aptana.editor.js.IRegexpDivisionDisambiguator;
 
 public class JSRegExpRule implements IPredicateRule
 {
@@ -40,9 +40,9 @@ public class JSRegExpRule implements IPredicateRule
 	 */
 	public IToken evaluate(ICharacterScanner scanner)
 	{
-		if (scanner instanceof IJSTokenScanner)
+		if (scanner instanceof IRegexpDivisionDisambiguator)
 		{
-			if (((IJSTokenScanner) scanner).hasDivisionStart())
+			if (((IRegexpDivisionDisambiguator) scanner).isValidDivisionStart())
 			{
 				return Token.UNDEFINED;
 			}
