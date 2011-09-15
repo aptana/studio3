@@ -18,15 +18,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.ChangedFile.Status;
 import com.aptana.git.core.model.GitRepository;
 
 public class GitMoveDeleteHookTest extends TestCase
@@ -99,7 +100,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", Status.MODIFIED);
+				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.MODIFIED);
 				will(returnValue(changedFile));
 
 				// keep history
@@ -127,7 +128,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", Status.NEW);
+				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.NEW);
 				will(returnValue(changedFile));
 			}
 		});
@@ -170,7 +171,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(file).getProject();
 
 				oneOf(repo).getChangedFileForResource(file);
-				ChangedFile changedFile = new ChangedFile("fake_path.txt", Status.MODIFIED);
+				ChangedFile changedFile = new ChangedFile("fake_path.txt", ChangedFile.Status.MODIFIED);
 				will(returnValue(changedFile));
 
 				oneOf(repo).deleteFile(changedFile.getPath());
@@ -227,7 +228,8 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 				oneOf(folder).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator + "folder")));
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "folder")));
 
 				// check for committed files
 
@@ -245,7 +247,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
-	public void testDeleteFolderForcedChecksSynch()
+	public void testDeleteFolderForcedNeverChecksSynch()
 	{
 		hook = new GitMoveDeleteHook()
 		{
@@ -301,7 +303,8 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
 				oneOf(folder).getLocation();
-				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator + "folder")));
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "folder")));
 
 				// We don't try these because we punted
 				never(repo).deleteFolder(Path.fromOSString("folder"));
@@ -309,6 +312,49 @@ public class GitMoveDeleteHookTest extends TestCase
 			}
 		});
 		assertFalse(hook.deleteFolder(tree, folder, IResource.NONE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testCallsStandardDeleteFolderWhenFilesUnderneathAreCommittedButAlreadyDeletedFromDisk()
+	{
+		final IProgressMonitor monitor = new NullProgressMonitor();
+		context.checking(new Expectations()
+		{
+			{
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(folder, IResource.DEPTH_INFINITE);
+				will(returnValue(true));
+
+				// get Repo
+				oneOf(folder).getProject();
+
+				// check name for .git
+				oneOf(folder).getName();
+				will(returnValue("folder"));
+
+				// get repo root
+				oneOf(repo).workingDirectory();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root")));
+
+				// get folder location
+				oneOf(folder).getLocation();
+				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
+						+ "folder")));
+
+				// We try to delete the folder through git...
+				oneOf(repo).deleteFolder(Path.fromOSString("folder"));
+				// git returns an error that nothing matched the path
+				will(returnValue(new Status(IStatus.ERROR, GitPlugin.getPluginId(), 128,
+						"fatal: pathspec 'folder' did not match any files", null)));
+
+				// We fall back to standard deletion
+				oneOf(tree).standardDeleteFolder(folder, IResource.NONE, monitor);
+
+				// we never mark the folder deleted ourselves, because we punted...
+				never(tree).deletedFolder(folder);
+			}
+		});
+		assertTrue(hook.deleteFolder(tree, folder, IResource.NONE, monitor));
 		context.assertIsSatisfied();
 	}
 
@@ -377,27 +423,28 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(project).getLocation();
 				will(returnValue(Path.fromOSString(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
-								
+
 				// Don't ever delete .git folder!
 				never(tree).standardDeleteFolder(folder, IResource.DEPTH_INFINITE, null);
 
 				// We're forcing, so no need to check if file is synched
-				never(tree).isSynchronized(project, IResource.DEPTH_INFINITE);		
+				never(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
 
 				oneOf(project).isOpen();
 				will(returnValue(true));
 
 				// Now actually delete contents
 				never(repo).deleteFolder(Path.fromOSString("project"));
-				
+
 				// repo says we deleted ok, so we should mark that on the tree
 				oneOf(tree).deletedProject(project);
 			}
 		});
-		assertTrue(hook.deleteProject(tree, project, IResource.NEVER_DELETE_PROJECT_CONTENT | IResource.FORCE, new NullProgressMonitor()));
+		assertTrue(hook.deleteProject(tree, project, IResource.NEVER_DELETE_PROJECT_CONTENT | IResource.FORCE,
+				new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
-	
+
 	public void testDeleteProjectUnforcedSucceeds()
 	{
 		context.checking(new Expectations()

@@ -45,7 +45,8 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.IndexManager;
 
-public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
+public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
+		IBatchReconcilingStrategy
 {
 
 	private AbstractThemeableEditor fEditor;
@@ -84,15 +85,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	public void reconcile(IRegion partition)
 	{
-		// TODO Only recalculate the folding diff in the dirty region?
-		reconcile(false);
+		// we can't do incremental yet
 	}
 
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
-		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an
-		// "incremental reconciler" to get just dirty region
-		reconcile(false);
+		// we can't do incremental yet
 	}
 
 	public void setDocument(IDocument document)
@@ -148,8 +146,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			synchronized (fPositions)
 			{
 				fPositions.clear();
-			fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
-		}
+				fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -175,8 +173,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		// clear folding positions
 		synchronized (fPositions)
 		{
-		fPositions.clear();
-	}
+			fPositions.clear();
+		}
 	}
 
 	/**
@@ -205,15 +203,23 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			}
 			else
 			{
-			synchronized (fPositions)
-			{
-				fPositions.clear();
-			}
+				synchronized (fPositions)
+				{
+					fPositions.clear();
+				}
 				updatePositions();
+			}
+			if (fMonitor != null && fMonitor.isCanceled())
+			{
+				return;
 			}
 			fEditor.getFileService().validate();
 			if (fEditor.getFileService().hasValidParseResult())
 			{
+				if (fMonitor != null && fMonitor.isCanceled())
+				{
+					return;
+				}
 				updateIndexWithWorkingCopy();
 			}
 		}
@@ -320,5 +326,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		return null;
+	}
+
+	public void fullReconcile()
+	{
+		reconcile(false);
 	}
 }
