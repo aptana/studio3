@@ -11,6 +11,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -21,6 +24,10 @@ public class UsagePlugin extends Plugin
 	public static final String PLUGIN_ID = "com.aptana.usage"; //$NON-NLS-1$
 	// this is the incorrect id previously used; DO NOT USE it for future reference
 	public static final String OLD_PLUGIN_ID = "com.aptana.db"; //$NON-NLS-1$
+
+	// Events (since this is migrated from TiStudio, we will keep the constants as ti.*)
+	private static final String STUDIO_START = "ti.start"; //$NON-NLS-1$
+	private static final String STUDIO_END = "ti.end"; //$NON-NLS-1$
 
 	// The shared instance
 	private static UsagePlugin plugin;
@@ -40,6 +47,12 @@ public class UsagePlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
+
+		// Send ping when we start studio
+		if (!EclipseUtil.isTesting())
+		{
+			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_START, STUDIO_START, null));
+		}
 	}
 
 	/*
@@ -48,6 +61,11 @@ public class UsagePlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		// Send ping when we exit studio
+		if (!EclipseUtil.isTesting())
+		{
+			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_END, STUDIO_END, null));
+		}
 		if (!Platform.inDevelopmentMode())
 		{
 			AptanaDB.getInstance().shutdown();
@@ -64,5 +82,23 @@ public class UsagePlugin extends Plugin
 	public static UsagePlugin getDefault()
 	{
 		return plugin;
+	}
+
+	public static void logError(String message)
+	{
+		// Only logs analytics errors when in development
+		if (Platform.inDevelopmentMode())
+		{
+			IdeLog.logError(getDefault(), message);
+		}
+	}
+
+	public static void logError(Exception e)
+	{
+		// Only logs analytics errors when in development
+		if (Platform.inDevelopmentMode())
+		{
+			IdeLog.logError(getDefault(), e);
+		}
 	}
 }

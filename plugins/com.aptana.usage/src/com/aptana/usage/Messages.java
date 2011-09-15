@@ -25,6 +25,9 @@ public class Messages extends NLS
 	public static String PingStartup_ERR_IOException;
 	public static String PingStartup_ERR_MalformedURL;
 
+	public static String StudioAnalytics_connection_failed;
+	public static String StudioAnalytics_connection_unauthorized;
+
 	static
 	{
 		// initialize resource bundle
