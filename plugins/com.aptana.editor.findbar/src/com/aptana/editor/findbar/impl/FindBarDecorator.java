@@ -81,20 +81,20 @@ import com.aptana.ui.util.UIUtils;
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
 
-	private static final EclipseFindSettings eclipseFindSettings = new EclipseFindSettings();
-	
+	private static final FindBarVisibilityControl findBarVisibilityControl = new FindBarVisibilityControl();
+
+	/* default */static final EclipseFindSettings eclipseFindSettings = new EclipseFindSettings();
+
 	/**
 	 * Yes, the configuration for the find bar is shared across all find bars (so, when some configuration changes in
 	 * one, all are updated)
 	 */
-	/*default*/ static final FindBarConfiguration findBarConfiguration = new FindBarConfiguration(eclipseFindSettings);
+	/* default */static final FindBarConfiguration findBarConfiguration = new FindBarConfiguration(eclipseFindSettings);
 
 	/**
 	 * Yes, the entries in the combos are also always synchronized.
 	 */
 	private static final FindBarEntriesHelper findBarEntriesHelper = new FindBarEntriesHelper(eclipseFindSettings);
-	
-
 
 	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
 	private static final String CLOSE_ENTER = "icons/close_enter.png"; //$NON-NLS-1$
@@ -320,6 +320,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		gridLayout.verticalSpacing = 0;
 		findBar.setLayout(gridLayout);
 
+		findBarVisibilityControl.register(this);
 	}
 
 	/**
@@ -437,14 +438,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 */
 	public void setVisible(boolean visible)
 	{
-		if (visible)
-		{
-			showFindBar();
-		}
-		else
-		{
-			hideFindBar();
-		}
+		// Feature: the visibility should be done for all the find bars, not only for the current one.
+		findBarVisibilityControl.setVisible(visible);
 	}
 
 	/*
@@ -602,6 +597,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	public void dispose()
 	{
+		findBarVisibilityControl.unregister(this);
 		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
 		preferenceStore.removePropertyChangeListener(fFindBarActionOnPropertyChange);
 		fOriginalFindBarAction = null;
@@ -632,7 +628,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		if (source == close)
 		{
-			hideFindBar();
+			setVisible(false);
 		}
 		else if (source == countTotal)
 		{
@@ -773,6 +769,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		wholeWord.setEnabled(!EMPTY.equals(text) && !getConfiguration().getRegularExpression() && isWord(text));
 	}
 
+	/**
+	 * Note: this method should NEVER be called directly. Always use setVisible (the visibility control is the only
+	 * place that should reference this method).
+	 */
 	/* default */void hideFindBar()
 	{
 		if (findBarGridData.exclude == false)
@@ -805,6 +805,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		combo.removeModifyListener(modifyListener);
 	}
 
+	/**
+	 * Note: this method should NEVER be called directly. Always use setVisible (the visibility control is the only
+	 * place that should reference this method).
+	 */
 	/* default */void showFindBar()
 	{
 		if (disableWhenHidden != null)
@@ -1055,12 +1059,12 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		return true;
 	}
-	
-	public void updateFromEclipseFindSettings()
+
+	public static void updateFromEclipseFindSettings()
 	{
 		eclipseFindSettings.readConfiguration();
 
-		getConfiguration().updateFromEclipseFindSettings();
+		findBarConfiguration.updateFromEclipseFindSettings();
 		findBarEntriesHelper.updateFromEclipseFindSettings();
 	}
 

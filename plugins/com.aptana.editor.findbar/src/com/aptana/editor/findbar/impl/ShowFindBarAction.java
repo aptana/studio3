@@ -44,11 +44,7 @@ public class ShowFindBarAction extends FindReplaceAction
 			}
 			else
 			{
-				if (!findBarDecorator.isVisible())
-				{
-					findBarDecorator.updateFromEclipseFindSettings();
-					findBarDecorator.setVisible(true);
-				}
+				findBarDecorator.setVisible(true);
 			}
 		}
 		else

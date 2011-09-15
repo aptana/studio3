@@ -66,8 +66,4 @@ public interface IFindBarDecorator
 	 */
 	void dispose();
 
-	/**
-	 * Updates the configuration based on the configuration in the Eclipse settings.
-	 */
-	void updateFromEclipseFindSettings();
 }
