@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.contentassist;
 
 import java.io.File;
@@ -123,8 +123,8 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	public void testTypeSelectorsPostRParenNoSpace()
 	{
-		// FIXME: This should work. Currently inserting as html:lang()en, for example
-		// assertCompletionCorrect("html:lang()| { }", '\t', 0, null, "html:lang() { }", null);
+		// Currently inserting as html:lang()en, for example
+		assertCompletionCorrect("html:lang()| { }", '\t', 0, null, "html:lang() { }", null);
 	}
 
 	/*
@@ -145,8 +145,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 	public void testChildSelectorsNoSpace()
 	{
-		// FIXME: This should work
-		// assertCompletionCorrect("p>| {}", '\t', "table", "p>table {}");
+		assertCompletionCorrect("p>| {}", '\t', "table", "p>table {}");
 	}
 
 	public void testChildSelectorsDescendant()
@@ -298,8 +297,8 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	public void testLangPseduoClassPreviousElement()
 	{
-		// FIXME: currently reports pseduo-elements as proposals _before_ the colon
-		// assertCompletionCorrect("p {} |:", '\t', "div", "p {} div:");
+		// currently reports pseduo-elements as proposals _before_ the colon
+		assertCompletionCorrect("p {} |:", '\t', "div", "p {} div:");
 	}
 
 	/*
