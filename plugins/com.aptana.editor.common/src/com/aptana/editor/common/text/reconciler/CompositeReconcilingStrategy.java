@@ -15,11 +15,12 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 
 /**
- * A reconciling strategy consisting of a sequence of internal reconciling
- * strategies. By default, all requests are
+ * A reconciling strategy consisting of a sequence of internal reconciling strategies. By default, all requests are
  * passed on to the contained strategies.
  */
-public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
+public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
+		IBatchReconcilingStrategy
+{
 
 	/** The list of internal reconciling strategies. */
 	private IReconcilingStrategy[] fStrategies;
@@ -27,7 +28,8 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 	/**
 	 * Creates composite reconciling strategy.
 	 */
-	public CompositeReconcilingStrategy(IReconcilingStrategy... strategies ) {
+	public CompositeReconcilingStrategy(IReconcilingStrategy... strategies)
+	{
 		fStrategies = (strategies != null) ? strategies : new IReconcilingStrategy[0];
 	}
 
@@ -35,18 +37,24 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.IReconcilingStrategy#setDocument(org.eclipse.jface.text.IDocument)
 	 */
-	public void setDocument(IDocument document) {
-		for (IReconcilingStrategy strategy : fStrategies) {
+	public void setDocument(IDocument document)
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
 			strategy.setDocument(document);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.reconciler.IReconcilingStrategy#reconcile(org.eclipse.jface.text.reconciler.DirtyRegion, org.eclipse.jface.text.IRegion)
+	 * @see
+	 * org.eclipse.jface.text.reconciler.IReconcilingStrategy#reconcile(org.eclipse.jface.text.reconciler.DirtyRegion,
+	 * org.eclipse.jface.text.IRegion)
 	 */
-	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
-		for (IReconcilingStrategy strategy : fStrategies) {
+	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
 			strategy.reconcile(dirtyRegion, subRegion);
 		}
 	}
@@ -55,19 +63,25 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.IReconcilingStrategy#reconcile(org.eclipse.jface.text.IRegion)
 	 */
-	public void reconcile(IRegion partition) {
-		for (IReconcilingStrategy strategy : fStrategies) {
+	public void reconcile(IRegion partition)
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
 			strategy.reconcile(partition);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension#setProgressMonitor(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension#setProgressMonitor(org.eclipse.core.runtime.
+	 * IProgressMonitor)
 	 */
-	public void setProgressMonitor(IProgressMonitor monitor) {
-		for (IReconcilingStrategy strategy : fStrategies) {
-			if (strategy instanceof IReconcilingStrategyExtension) {
+	public void setProgressMonitor(IProgressMonitor monitor)
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
+			if (strategy instanceof IReconcilingStrategyExtension)
+			{
 				IReconcilingStrategyExtension extension = (IReconcilingStrategyExtension) strategy;
 				extension.setProgressMonitor(monitor);
 			}
@@ -78,11 +92,26 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension#initialReconcile()
 	 */
-	public void initialReconcile() {
-		for (IReconcilingStrategy strategy : fStrategies) {
-			if (strategy instanceof IReconcilingStrategyExtension) {
+	public void initialReconcile()
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
+			if (strategy instanceof IReconcilingStrategyExtension)
+			{
 				IReconcilingStrategyExtension extension = (IReconcilingStrategyExtension) strategy;
 				extension.initialReconcile();
+			}
+		}
+	}
+
+	public void fullReconcile()
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
+			if (strategy instanceof IBatchReconcilingStrategy)
+			{
+				IBatchReconcilingStrategy extension = (IBatchReconcilingStrategy) strategy;
+				extension.fullReconcile();
 			}
 		}
 	}
