@@ -105,11 +105,27 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		{
 			tree.deletedFolder(folder);
 		}
+		// Git reports that no files match the path specified. Let's punt and let the normal resource deletion happen...
+		else if (noMatchingFiles(status))
+		{
+			tree.standardDeleteFolder(folder, updateFlags, monitor);
+		}
 		else
 		{
 			tree.failed(status);
 		}
 		return true;
+	}
+
+	/**
+	 * Did git report that no files match?
+	 * 
+	 * @param status
+	 * @return
+	 */
+	protected boolean noMatchingFiles(IStatus status)
+	{
+		return status.getCode() == 128 && status.getMessage().endsWith("did not match any files"); //$NON-NLS-1$
 	}
 
 	public boolean deleteProject(final IResourceTree tree, final IProject project, int updateFlags, // NO_UCD
@@ -170,20 +186,21 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		boolean neverDeleteContent = (updateFlags & IResource.NEVER_DELETE_PROJECT_CONTENT) != 0;
 		boolean deleteContents = alwaysDeleteContent || (project.isOpen() && !neverDeleteContent);
 
-		IStatus status;
+		IStatus status = Status.OK_STATUS;
 		if (deleteContents)
 		{
 			// Delete the project through the repo
 			status = repo.deleteFolder(source);
 		}
-		else
-		{
-			status = Status.OK_STATUS;
-		}
 
 		if (status.isOK())
 		{
 			tree.deletedProject(project);
+		}
+		// Git reports that no files match the path specified. Let's punt and let the normal resource deletion happen...
+		else if (noMatchingFiles(status))
+		{
+			tree.standardDeleteProject(project, updateFlags, monitor);
 		}
 		else
 		{
@@ -279,6 +296,14 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return true;
 	}
 
+	/**
+	 * This checks to see if any files are in the index. But they may have been deleted on disk already, which results
+	 * in us getting a 128 error code running rm -rf later.
+	 * 
+	 * @param source
+	 * @param repo
+	 * @return
+	 */
 	protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 	{
 		IStatus result = repo.execute(GitRepository.ReadWrite.READ, "ls-tree", "-r", "HEAD:" + source.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
