@@ -25,7 +25,8 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.parsing.FileService;
 
-public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
+public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
+		IBatchReconcilingStrategy
 {
 
 	private AbstractThemeableEditor fEditor;
@@ -52,15 +53,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	public void reconcile(IRegion partition)
 	{
-		// TODO Only recalculate the folding diff in the dirty region?
-		reconcile(false);
+		// we can't do incremental yet
 	}
 
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
-		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an
-		// "incremental reconciler" to get just dirty region
-		reconcile(false);
+		// we can't do incremental yet
 	}
 
 	public void setDocument(IDocument document)
@@ -115,8 +113,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			synchronized (fPositions)
 			{
 				fPositions.clear();
-			fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
-		}
+				fPositions = folder.emitFoldingRegions(initialReconcile, monitor);
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -142,8 +140,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		// clear folding positions
 		synchronized (fPositions)
 		{
-		fPositions.clear();
-	}
+			fPositions.clear();
+		}
 	}
 
 	/**
@@ -167,13 +165,131 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			}
 			else
 			{
-			synchronized (fPositions)
-			{
-				fPositions.clear();
-			}
+				synchronized (fPositions)
+				{
+					fPositions.clear();
+				}
 				updatePositions();
 			}
+			if (fMonitor != null && fMonitor.isCanceled())
+			{
+				return;
+			}
 			fEditor.getFileService().validate();
+			if (fEditor.getFileService().hasValidParseResult())
+			{
+				if (fMonitor != null && fMonitor.isCanceled())
+				{
+					return;
+				}
+				updateIndexWithWorkingCopy();
+			}
 		}
+	}
+
+	/**
+	 * Take the working copy (editor buffer/document) and replace the index's entries for the underlying file with the
+	 * results of indexing the buffer. This allows us to pretend that the current contents (unsaved) are reflected for
+	 * the file in the index. This fixes APSTUD-2944. Eventually the user has to save or not - if they save, we'll end
+	 * up indexing and update. if they don't we'll need to re-index the file manually since the unsaved contenst will
+	 * still be in there!
+	 */
+	private void updateIndexWithWorkingCopy()
+	{
+		// Update the index with working copy!
+		final IFile file = getFile();
+		if (file == null)
+		{
+			return;
+		}
+		IProject project = file.getProject();
+		Index index = IndexManager.getInstance().getIndex(project.getLocationURI());
+		final URI fileURI = file.getLocationURI();
+		index.remove(fileURI);
+		Set<IFile> files = new HashSet<IFile>();
+		files.add(file);
+		IndexFilesOfProjectJob job = new IndexFilesOfProjectJob(project, files)
+		{
+			@Override
+			protected Set<IFileStore> toFileStores(IProgressMonitor monitor)
+			{
+				Set<IFileStore> fileStores = new HashSet<IFileStore>();
+				IFileStore fileStore = new FileStore()
+				{
+
+					public URI toURI()
+					{
+						return fileURI;
+					}
+
+					public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException
+					{
+						try
+						{
+							return new ByteArrayInputStream(fDocument.get().getBytes(file.getCharset()));
+						}
+						catch (UnsupportedEncodingException e)
+						{
+							IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+						}
+						return null;
+					}
+
+					@Override
+					public String[] childNames(int options, IProgressMonitor monitor) throws CoreException
+					{
+						return null;
+					}
+
+					@Override
+					public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException
+					{
+						return null;
+					}
+
+					@Override
+					public IFileStore getChild(String name)
+					{
+						return null;
+					}
+
+					@Override
+					public String getName()
+					{
+						return file.getName();
+					}
+
+					@Override
+					public IFileStore getParent()
+					{
+						return null;
+					}
+				};
+				fileStores.add(fileStore);
+				return fileStores;
+			}
+		};
+		job.setPriority(Job.SHORT);
+		job.setSystem(true);
+		job.schedule();
+	}
+
+	private IFile getFile()
+	{
+		if (fEditor != null)
+		{
+			IEditorInput editorInput = fEditor.getEditorInput();
+
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				return fileEditorInput.getFile();
+			}
+		}
+	}
+
+	public void fullReconcile()
+	{
+		reconcile(false);
 	}
 }

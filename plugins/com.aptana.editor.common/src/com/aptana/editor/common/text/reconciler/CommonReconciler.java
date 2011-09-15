@@ -11,36 +11,45 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.jface.text.TypedRegion;
+import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.reconciler.Reconciler;
 
-public class CommonReconciler extends Reconciler {
+public class CommonReconciler extends Reconciler
+{
 
 	private final IReconcilingStrategy defaultStrategy;
 	private final Set<IReconcilingStrategy> reconcilingStrategies = new HashSet<IReconcilingStrategy>();
 	private BundleChangeReconcileTrigger bundleChangeReconcileTrigger;
 
 	/**
-	 * Used for performance testing purposes so we can see if we've finished our
-	 * first reconcile!
+	 * Used for performance testing purposes so we can see if we've finished our first reconcile!
 	 */
 	@SuppressWarnings("unused")
 	private boolean fIninitalProcessDone = false;
 
-
 	/**
 	 * 
 	 */
-	public CommonReconciler(IReconcilingStrategy defaultStrategy) {
+	public CommonReconciler(IReconcilingStrategy defaultStrategy)
+	{
 		super();
 		this.defaultStrategy = defaultStrategy;
 		setReconcilingStrategy(defaultStrategy, String.valueOf(System.currentTimeMillis()));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.reconciler.Reconciler#setReconcilingStrategy(org.eclipse.jface.text.reconciler.IReconcilingStrategy, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.reconciler.Reconciler#setReconcilingStrategy(org.eclipse.jface.text.reconciler.
+	 * IReconcilingStrategy, java.lang.String)
 	 */
 	@Override
 	public void setReconcilingStrategy(IReconcilingStrategy strategy, String contentType)
@@ -50,7 +59,6 @@ public class CommonReconciler extends Reconciler {
 	}
 
 	/**
-	 * 
 	 * @param strategy
 	 * @param contentTypes
 	 */
@@ -62,37 +70,103 @@ public class CommonReconciler extends Reconciler {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.Reconciler#getReconcilingStrategy(java.lang.String)
 	 */
 	@Override
-	public IReconcilingStrategy getReconcilingStrategy(String contentType) {
+	public IReconcilingStrategy getReconcilingStrategy(String contentType)
+	{
 		IReconcilingStrategy strategy = super.getReconcilingStrategy(contentType);
-		if (strategy != null) {
+		if (strategy != null)
+		{
 			return strategy;
 		}
 		return defaultStrategy;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#install(org.eclipse.jface.text.ITextViewer)
 	 */
 	@Override
-	public void install(ITextViewer textViewer) {
+	public void install(ITextViewer textViewer)
+	{
 		super.install(textViewer);
 		bundleChangeReconcileTrigger = new BundleChangeReconcileTrigger(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#uninstall()
 	 */
 	@Override
-	public void uninstall() {
-		if (bundleChangeReconcileTrigger != null) {
+	public void uninstall()
+	{
+		if (bundleChangeReconcileTrigger != null)
+		{
 			bundleChangeReconcileTrigger.dispose();
 			bundleChangeReconcileTrigger = null;
 		}
 		super.uninstall();
+	}
+
+	@Override
+	protected void process(DirtyRegion dirtyRegion)
+	{
+		IRegion region = dirtyRegion;
+
+		if (region == null)
+		{
+			// TODO Can we cheat for strategies that do batch and incremental and just do the batch once?
+			region = new Region(0, getDocument().getLength());
+		}
+
+		Set<IBatchReconcilingStrategy> batch = new HashSet<IBatchReconcilingStrategy>();
+		ITypedRegion[] regions = computePartitioning(region.getOffset(), region.getLength());
+		for (int i = 0; i < regions.length; i++)
+		{
+			ITypedRegion r = regions[i];
+			IReconcilingStrategy s = getReconcilingStrategy(r.getType());
+			if (s == null)
+			{
+				continue;
+			}
+
+			if (s instanceof IBatchReconcilingStrategy)
+			{
+				batch.add((IBatchReconcilingStrategy) s);
+			}
+
+			if (dirtyRegion != null)
+			{
+				s.reconcile(dirtyRegion, r);
+			}
+			else
+			{
+				s.reconcile(r);
+			}
+		}
+		// Now run
+		for (IBatchReconcilingStrategy batcher : batch)
+		{
+			batcher.fullReconcile();
+		}
+	}
+
+	protected ITypedRegion[] computePartitioning(int offset, int length)
+	{
+		ITypedRegion[] regions = null;
+		try
+		{
+			regions = TextUtilities
+					.computePartitioning(getDocument(), getDocumentPartitioning(), offset, length, false);
+		}
+		catch (BadLocationException x)
+		{
+			regions = new TypedRegion[0];
+		}
+		return regions;
 	}
 
 	@Override
@@ -108,11 +182,13 @@ public class CommonReconciler extends Reconciler {
 		fIninitalProcessDone = true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.reconciler.AbstractReconciler#forceReconciling()
 	 */
 	@Override
-	public void forceReconciling() {
+	public void forceReconciling()
+	{
 		super.forceReconciling();
 	}
 }

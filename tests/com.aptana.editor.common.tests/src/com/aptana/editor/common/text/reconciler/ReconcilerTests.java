@@ -17,10 +17,12 @@ public class ReconcilerTests
 	{
 		TestSuite suite = new TestSuite(ReconcilerTests.class.getName());
 		// $JUnit-BEGIN$
+		suite.addTestSuite(CommonReconcilerTest.class);
+		suite.addTestSuite(CommonReconcilingStrategyTest.class);
 		suite.addTestSuite(RubyRegexpFolderTest.class);
-		// Please do not include ad-hoc performance test classes in here. 
+		// Please do not include ad-hoc performance test classes in here.
 		// They have no pass/fail and just slow down the build!
-//		suite.addTestSuite(RubyRegexpFolderPerformanceTest.class); 
+		// suite.addTestSuite(RubyRegexpFolderPerformanceTest.class);
 		// $JUnit-END$
 		return suite;
 	}
