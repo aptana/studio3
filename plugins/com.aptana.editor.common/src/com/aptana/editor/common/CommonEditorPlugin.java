@@ -109,6 +109,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				IEditorPart editorPart = (IEditorPart) part;
 				String id = editorPart.getEditorSite().getId();
 				Map<String, String> payload = new HashMap<String, String>();
+				payload.put("instance", part.toString()); //$NON-NLS-1$
 				if (UID != null)
 				{
 					payload.put("uid", UID); //$NON-NLS-1$
@@ -129,6 +130,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				IEditorPart editorPart = (IEditorPart) part;
 				String id = editorPart.getEditorSite().getId();
 				Map<String, String> payload = new HashMap<String, String>();
+				payload.put("instance", part.toString()); //$NON-NLS-1$
 				if (UID != null)
 				{
 					payload.put("uid", UID); //$NON-NLS-1$
