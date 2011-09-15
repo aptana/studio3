@@ -393,6 +393,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					this._replaceRange = null;
 					break;
 
+				case GREATER:
+					this._replaceRange = null;
+					break;
+
 				case LCURLY:
 				case RCURLY:
 					this._replaceRange = this._currentLexeme = null;
@@ -408,12 +412,15 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 				case RPAREN:
 					this._replaceRange = null;
-					this._currentLexeme = lexemeProvider
-							.getLexemeFromOffset(this._currentLexeme.getStartingOffset() - 1);
-					// case where there is a prefix inside two parens, i.e. html:lang(f|)
-					if (this._currentLexeme != null && this._currentLexeme.getType() == CSSTokenType.IDENTIFIER)
+					if (offset <= this._currentLexeme.getStartingOffset())
 					{
-						this._replaceRange = this._currentLexeme;
+						this._currentLexeme = lexemeProvider.getLexemeFromOffset(this._currentLexeme
+								.getStartingOffset() - 1);
+						// case where there is a prefix inside two parens, i.e. html:lang(f|)
+						if (this._currentLexeme != null && this._currentLexeme.getType() == CSSTokenType.IDENTIFIER)
+						{
+							this._replaceRange = this._currentLexeme;
+						}
 					}
 					break;
 
@@ -459,7 +466,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					}
 					else
 					{
-						this.addPseudoClassProposals(proposals, offset);
+						if (this._currentLexeme.getEndingOffset() < offset)
+						{
+							this.addPseudoClassProposals(proposals, offset);
+						}
+						else
+						{
+							this.addAllElementProposals(proposals, offset);
+						}
 					}
 					break;
 
@@ -472,6 +486,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						pseudoClassName = lex.getText();
 					}
 					this.addPseudoClassArguments(pseudoClassName, proposals, offset);
+					break;
+
+				case RPAREN:
 					break;
 
 				default:
