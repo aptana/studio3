@@ -152,12 +152,7 @@ public class ScriptingConsole
 	 */
 	MessageConsoleStream getErrorConsoleStream()
 	{
-		errorConsoleStream = getConsoleStream(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
-		
-		// bring console into view when errors occur
-		errorConsoleStream.setActivateOnWrite(true);
-		
-		return errorConsoleStream;
+		return errorConsoleStream = getConsoleStream(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
 	}
 
 	/**
