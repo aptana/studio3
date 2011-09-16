@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -63,7 +64,17 @@ public class NextPreviousEditorHandlerTest extends TestCase
 			for (ITextEditor editor : editors)
 			{
 				// Need to force the editor shut!
-				editor.close(false);
+				if (editor != null)
+				{
+					if (Display.getCurrent() != null)
+					{
+						editor.getSite().getPage().closeEditor(editor, false);
+					}
+					else
+					{
+						editor.close(false);
+					}
+				}
 			}
 			for (IFile file : files)
 			{

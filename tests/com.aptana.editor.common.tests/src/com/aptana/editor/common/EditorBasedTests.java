@@ -32,6 +32,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
@@ -376,7 +377,14 @@ public abstract class EditorBasedTests extends TestCase
 	{
 		if (editor != null)
 		{
-			editor.close(false);
+			if (Display.getCurrent() != null)
+			{
+				editor.getSite().getPage().closeEditor(editor, false);
+			}
+			else
+			{
+				editor.close(false);
+			}
 		}
 
 		if (fileUri != null)

@@ -10,6 +10,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.ide.IDE;
@@ -149,7 +150,17 @@ public class DocumentScopeManagerTest extends TestCase
 		{
 			if (editor != null)
 			{
-				editor.close(false);
+				if (editor != null)
+				{
+					if (Display.getCurrent() != null)
+					{
+						editor.getSite().getPage().closeEditor(editor, false);
+					}
+					else
+					{
+						editor.close(false);
+					}
+				}
 			}
 			if (file != null)
 			{
@@ -194,7 +205,18 @@ public class DocumentScopeManagerTest extends TestCase
 		{
 			if (editor != null)
 			{
-				editor.close(false);
+				if (editor != null)
+				{
+					if (Display.getCurrent() != null)
+					{
+						editor.getSite().getPage().closeEditor(editor, false);
+					}
+					else
+					{
+						editor.close(false);
+					}
+				}
+				editor = null;
 			}
 			if (file != null)
 			{
@@ -238,7 +260,18 @@ public class DocumentScopeManagerTest extends TestCase
 		{
 			if (editor != null)
 			{
-				editor.close(false);
+				if (editor != null)
+				{
+					if (Display.getCurrent() != null)
+					{
+						editor.getSite().getPage().closeEditor(editor, false);
+					}
+					else
+					{
+						editor.close(false);
+					}
+				}
+				editor = null;
 			}
 			if (file != null)
 			{
