@@ -87,6 +87,21 @@ public class UsagePlugin extends Plugin
 		return plugin;
 	}
 
+	public static void logError(String message, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
+	}
+
+	public static void logInfo(String message)
+	{
+		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+	}
+
+	public static void logWarning(String message)
+	{
+		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+	}
+
 	public static void logError(String message)
 	{
 		// Only logs analytics errors when in development
