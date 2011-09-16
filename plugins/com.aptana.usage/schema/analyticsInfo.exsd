@@ -120,7 +120,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.aptana.core.user.IUserManager"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.usage.IAnalyticsUserManager"/>
                </appinfo>
             </annotation>
          </attribute>

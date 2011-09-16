@@ -15,10 +15,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.user.IUserManager;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
+import com.aptana.usage.IAnalyticsUserManager;
 import com.aptana.usage.UsagePlugin;
 
 public class AnalyticsInfoManager
@@ -100,16 +100,16 @@ public class AnalyticsInfoManager
 							{
 								return;
 							}
-							IUserManager userManager = null;
+							IAnalyticsUserManager userManager = null;
 							String userManagerClass = element.getAttribute(ATTR_USER_MANAGER);
 							if (!StringUtil.isEmpty(userManagerClass))
 							{
 								try
 								{
 									Object clazz = element.createExecutableExtension(ATTR_USER_MANAGER);
-									if (clazz instanceof IUserManager)
+									if (clazz instanceof IAnalyticsUserManager)
 									{
-										userManager = (IUserManager) clazz;
+										userManager = (IAnalyticsUserManager) clazz;
 									}
 								}
 								catch (CoreException e)
