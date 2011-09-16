@@ -7,8 +7,15 @@
  */
 package com.aptana.usage;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -23,6 +30,39 @@ public class PingStartup implements IStartup
 {
 
 	private static final String STUDIO_FIRST_RUN = "studio.first-run"; //$NON-NLS-1$
+
+	@SuppressWarnings("nls")
+	private static final String[] STUDIO_NATURES = { "com.aptana.projects.webnature",
+			"com.aptana.editor.php.phpNature", "com.aptana.ruby.core.rubynature" };
+
+	private static IResourceChangeListener resourceListener = new IResourceChangeListener()
+	{
+
+		public void resourceChanged(IResourceChangeEvent event)
+		{
+			if (event.getType() == IResourceChangeEvent.PRE_DELETE)
+			{
+				// check if it is a studio project and then send the ping out
+				try
+				{
+					IProject project = event.getResource().getProject();
+					IProjectDescription description = project.getDescription();
+					for (String nature : STUDIO_NATURES)
+					{
+						if (description.hasNature(nature))
+						{
+							sendProjectDeleteEvent(project);
+							break;
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					UsagePlugin.logError(e);
+				}
+			}
+		}
+	};
 
 	public void earlyStartup()
 	{
@@ -51,6 +91,14 @@ public class PingStartup implements IStartup
 				}
 			}
 		}
+
+		// Hook up ping when we delete a project
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.PRE_DELETE);
+	}
+
+	public static void removeResourceListener()
+	{
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
 	}
 
 	public static String getApplicationId()
@@ -88,5 +136,13 @@ public class PingStartup implements IStartup
 			}
 		}
 		return id;
+	}
+
+	private static void sendProjectDeleteEvent(IProject project)
+	{
+		Map<String, String> payload = new HashMap<String, String>();
+		payload.put("name", project.getName()); //$NON-NLS-1$
+
+		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("project.delete", payload)); //$NON-NLS-1$
 	}
 }
