@@ -70,6 +70,7 @@ public class UsagePlugin extends Plugin
 		{
 			AptanaDB.getInstance().shutdown();
 		}
+		PingStartup.removeResourceListener();
 		plugin = null;
 		super.stop(context);
 	}
