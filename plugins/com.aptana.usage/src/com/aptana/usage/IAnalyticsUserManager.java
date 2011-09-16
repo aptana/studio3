@@ -5,16 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.user;
+package com.aptana.usage;
 
-public interface IUser
+public interface IAnalyticsUserManager
 {
 
-	public String getUsername();
-
-	public String getSessionID();
-
-	public String getCookie();
-
-	public boolean isOnline();
+	public IAnalyticsUser getUser();
 }

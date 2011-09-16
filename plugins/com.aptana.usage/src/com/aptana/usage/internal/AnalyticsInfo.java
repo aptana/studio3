@@ -7,7 +7,7 @@
  */
 package com.aptana.usage.internal;
 
-import com.aptana.core.user.IUserManager;
+import com.aptana.usage.IAnalyticsUserManager;
 
 public class AnalyticsInfo
 {
@@ -17,10 +17,10 @@ public class AnalyticsInfo
 	private final String appGuid;
 	private final String versionPluginId;
 	private final String userAgent;
-	private final IUserManager userManager;
+	private final IAnalyticsUserManager userManager;
 
 	public AnalyticsInfo(String appName, String appId, String appGuid, String versionPluginId, String userAgent,
-			IUserManager userManager)
+			IAnalyticsUserManager userManager)
 	{
 		this.appName = appName;
 		this.appId = appId;
@@ -67,7 +67,7 @@ public class AnalyticsInfo
 		return userAgent;
 	}
 
-	public IUserManager getUserManager()
+	public IAnalyticsUserManager getUserManager()
 	{
 		return userManager;
 	}

@@ -22,8 +22,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.user.IUser;
-import com.aptana.core.user.IUserManager;
 import com.aptana.core.util.EclipseUtil;
 
 public class StudioAnalytics
@@ -49,7 +47,7 @@ public class StudioAnalytics
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			return;
+			// return;
 		}
 
 		Job job = new Job("Sending Analytics Ping ...") //$NON-NLS-1$
@@ -58,7 +56,7 @@ public class StudioAnalytics
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IUserManager userManager = event.getUserManager();
+				IAnalyticsUserManager userManager = event.getUserManager();
 				if (userManager == null)
 				{
 					// send as anonymous user
@@ -70,7 +68,7 @@ public class StudioAnalytics
 					return Status.OK_STATUS;
 				}
 
-				IUser user = userManager.getUser();
+				IAnalyticsUser user = userManager.getUser();
 				// Only send ping if user is logged in. Otherwise, we log it to the database
 				if (user == null || !user.isOnline() || !isValidResponse(responseCode = sendPing(event, user)))
 				{
@@ -119,7 +117,7 @@ public class StudioAnalytics
 		return responseCode;
 	}
 
-	private int sendPing(AnalyticsEvent event, IUser user)
+	private int sendPing(AnalyticsEvent event, IAnalyticsUser user)
 	{
 		HttpURLConnection connection = null;
 		DataOutputStream output = null;

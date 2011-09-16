@@ -18,8 +18,6 @@ import org.eclipse.core.runtime.Platform;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.user.IUser;
-import com.aptana.core.user.IUserManager;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.usage.internal.AnalyticsInfo;
@@ -99,7 +97,7 @@ public class AnalyticsEvent
 		return APP_INFO.getUserAgent();
 	}
 
-	public IUserManager getUserManager()
+	public IAnalyticsUserManager getUserManager()
 	{
 		return APP_INFO.getUserManager();
 	}
@@ -108,8 +106,8 @@ public class AnalyticsEvent
 	{
 		// Setup full event string that will be used in ping
 		StringBuilder event = new StringBuilder();
-		IUserManager userManager = getUserManager();
-		IUser user = (userManager == null) ? null : userManager.getUser();
+		IAnalyticsUserManager userManager = getUserManager();
+		IAnalyticsUser user = (userManager == null) ? null : userManager.getUser();
 
 		addPostEntry(event, "event", eventName); //$NON-NLS-1$
 		addPostEntry(event, "type", eventType); //$NON-NLS-1$
