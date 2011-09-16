@@ -7,10 +7,23 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.provider.FileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -19,11 +32,16 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexFilesOfProjectJob;
+import com.aptana.index.core.IndexManager;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
 		IBatchReconcilingStrategy
@@ -40,6 +58,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	private IProgressMonitor fMonitor;
 
 	private IFoldingComputer folder;
+	private IDocument fDocument;
 
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
@@ -65,6 +84,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		folder = createFoldingComputer(document);
 		fEditor.getFileService().setDocument(document);
+		fDocument = document;
 	}
 
 	protected IFoldingComputer createFoldingComputer(IDocument document)
@@ -210,6 +230,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		files.add(file);
 		IndexFilesOfProjectJob job = new IndexFilesOfProjectJob(project, files)
 		{
+
 			@Override
 			protected Set<IFileStore> toFileStores(IProgressMonitor monitor)
 			{
@@ -286,6 +307,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 				return fileEditorInput.getFile();
 			}
 		}
+
+		return null;
 	}
 
 	public void fullReconcile()

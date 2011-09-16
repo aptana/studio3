@@ -89,7 +89,7 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 		return Status.OK_STATUS;
 	}
 
-	private Set<IFileStore> toFileStores(IProgressMonitor monitor)
+	protected Set<IFileStore> toFileStores(IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, files.size());
 		Set<IFileStore> fileStores = new HashSet<IFileStore>(files.size());
