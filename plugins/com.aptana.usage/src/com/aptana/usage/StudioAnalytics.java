@@ -47,7 +47,7 @@ public class StudioAnalytics
 	{
 		if (Platform.inDevelopmentMode())
 		{
-			// return;
+			return;
 		}
 
 		Job job = new Job("Sending Analytics Ping ...") //$NON-NLS-1$
