@@ -45,7 +45,7 @@ public class StudioAnalytics
 
 	public void sendEvent(final AnalyticsEvent event)
 	{
-		if (Platform.inDevelopmentMode())
+		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting())
 		{
 			return;
 		}
