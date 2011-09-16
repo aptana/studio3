@@ -89,6 +89,8 @@ import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ProjectTemplateElement;
 import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
 
 /**
  * New Web Project Wizard class.
@@ -167,6 +169,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		updatePerspective();
 		selectAndReveal(newProject);
 		openIndexFile();
+
+		Map<String, String> payload = new HashMap<String, String>();
+		payload.put("name", newProject.getName()); //$NON-NLS-1$
+		sendProjectCreateEvent(payload);
 
 		return true;
 	}
@@ -843,5 +849,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				}
 			}
 		}
+	}
+
+	protected void sendProjectCreateEvent(Map<String, String> payload)
+	{
+		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("project.create.web", payload)); //$NON-NLS-1$
 	}
 }
