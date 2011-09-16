@@ -88,6 +88,19 @@
       </primaryWizard>
    </extension>
    <extension
+     point="org.eclipse.ui.importWizards">
+  		<wizard
+          category="org.eclipse.ui.Basic"
+          class="com.aptana.projects.internal.wizards.PromoteToProjectWizard"
+          icon="platform:/plugin/org.eclipse.ui.ide/icons/full/etool16/newprj_wiz.gif"
+          id="com.aptana.projects.internal.wizards.PromoteToProjectWizard"
+          name="%ImportWizards.ExternalFolder">
+     	<description>
+        	%ImportWizards.ExternalFolderDescription
+     	</description>
+  		</wizard>
+	</extension>   
+   <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
