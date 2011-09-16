@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.apache.ant,
  org.eclipse.equinox.p2.core,
  com.aptana.filewatcher,
- com.aptana.index.core
+ com.aptana.index.core,
+ com.aptana.libraries
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.core,
@@ -20,5 +21,6 @@ Export-Package: com.aptana.core,
  com.aptana.core.logging,
  com.aptana.core.projects.templates,
  com.aptana.core.resources,
+ com.aptana.core.user,
  com.aptana.core.util
 Eclipse-ExtensibleAPI: true

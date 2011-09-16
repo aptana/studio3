@@ -15,6 +15,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -46,6 +47,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -55,7 +57,10 @@ import com.aptana.index.core.IndexPlugin;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.usage.EventLogger;
+import com.aptana.usage.FeatureEvent;
+import com.aptana.usage.StudioAnalytics;
+import com.aptana.usage.UsagePlugin;
+import com.aptana.usage.preferences.IPreferenceConstants;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -76,6 +81,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private static final String OUTLINE_VIEW_ID = "org.eclipse.ui.views.ContentOutline"; //$NON-NLS-1$
 	private static final String COMMAND_ID = "com.aptana.editor.common.commands.toggleOutline"; //$NON-NLS-1$
 	private static final String COMMAND_STATE = "org.eclipse.ui.commands.toggleState"; //$NON-NLS-1$
+
+	private static final String UID = Platform.getPreferencesService().getString(UsagePlugin.PLUGIN_ID,
+			IPreferenceConstants.P_IDE_ID, null, null);
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;
@@ -99,18 +107,14 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			if (part instanceof IEditorPart)
 			{
 				IEditorPart editorPart = (IEditorPart) part;
-				final String id = editorPart.getEditorSite().getId();
-				Job job = new Job("Recording editor close") //$NON-NLS-1$
+				String id = editorPart.getEditorSite().getId();
+				Map<String, String> payload = new HashMap<String, String>();
+				if (UID != null)
 				{
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						EventLogger.getInstance().logEvent("editor.closed", id); //$NON-NLS-1$
-						return Status.OK_STATUS;
-					}
-				};
-				job.setSystem(!EclipseUtil.showSystemJobs());
-				job.setPriority(Job.SHORT);
+					payload.put("uid", UID); //$NON-NLS-1$
+				}
+				StudioAnalytics.getInstance()
+						.sendEvent(new FeatureEvent("editor.closed" + getLastSegment(id), payload)); //$NON-NLS-1$
 			}
 		}
 
@@ -123,19 +127,25 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			if (part instanceof IEditorPart)
 			{
 				IEditorPart editorPart = (IEditorPart) part;
-				final String id = editorPart.getEditorSite().getId();
-				Job job = new Job("Recording editor open") //$NON-NLS-1$
+				String id = editorPart.getEditorSite().getId();
+				Map<String, String> payload = new HashMap<String, String>();
+				if (UID != null)
 				{
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						EventLogger.getInstance().logEvent("editor.opened", id); //$NON-NLS-1$
-						return Status.OK_STATUS;
-					}
-				};
-				job.setSystem(!EclipseUtil.showSystemJobs());
-				job.setPriority(Job.SHORT);
+					payload.put("uid", UID); //$NON-NLS-1$
+				}
+				StudioAnalytics.getInstance()
+						.sendEvent(new FeatureEvent("editor.opened" + getLastSegment(id), payload)); //$NON-NLS-1$
 			}
+		}
+
+		private String getLastSegment(String id)
+		{
+			if (id == null)
+			{
+				return StringUtil.EMPTY;
+			}
+			int index = id.lastIndexOf("."); //$NON-NLS-1$
+			return (index < 0) ? "." + id : id.substring(index); //$NON-NLS-1$
 		}
 	};
 
@@ -297,7 +307,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 				setOccurrenceColors();
 
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.addPreferenceChangeListener(fThemeChangeListener);
 
 				return Status.OK_STATUS;
 			}
@@ -317,7 +328,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			if (fThemeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.removePreferenceChangeListener(fThemeChangeListener);
 
 				fThemeChangeListener = null;
 			}
@@ -330,7 +342,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				fDocumentScopeManager.dispose();
 			}
-			if (spellingPreferences != null) {
+			if (spellingPreferences != null)
+			{
 				spellingPreferences.dispose();
 				spellingPreferences = null;
 			}
@@ -339,7 +352,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		{
 			fDocumentScopeManager = null;
 			differentiator = null;
-			plugin = null;			
+			plugin = null;
 			super.stop(context);
 		}
 	}
@@ -393,7 +406,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	/**
 	 * @return the spellingPreferences
 	 */
-	public SpellingPreferences getSpellingPreferences() {
+	public SpellingPreferences getSpellingPreferences()
+	{
 		return spellingPreferences;
 	}
 

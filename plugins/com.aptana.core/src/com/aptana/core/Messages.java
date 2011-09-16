@@ -47,4 +47,6 @@ public final class Messages extends NLS
 	public static String CoreStrings_On;
 	public static String CoreStrings_Off;
 
+	public static String CorePlugin_MD5_generation_error;
+
 }

@@ -7,7 +7,11 @@
  */
 package com.aptana.core;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +46,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.filewatcher.FileWatcher;
+import com.eaio.uuid.MACAddress;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -51,6 +56,10 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.core"; //$NON-NLS-1$
+
+	// The machine id
+	private static final String MID_SEPARATOR = "-"; //$NON-NLS-1$
+	private static String mid;
 
 	// The shared instance
 	private static CorePlugin plugin;
@@ -80,6 +89,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		super.start(context);
 
 		plugin = this;
+		initializeMID();
 
 		// Perhaps don't enable this if platform is already in -debug mode?
 		//
@@ -560,6 +570,37 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		if (ICorePreferenceConstants.PREF_DEBUG_LEVEL.equals(event.getKey()))
 		{
 			IdeLog.setCurrentSeverity(IdeLog.getSeverityPreference());
+		}
+	}
+
+	public static String getMID()
+	{
+		return mid;
+	}
+
+	private void initializeMID()
+	{
+		try
+		{
+			MessageDigest md = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
+			byte[] result = md.digest(MACAddress.getMACAddress().getBytes("UTF-8")); //$NON-NLS-1$
+			Formatter formatter = new Formatter();
+			for (byte b : result)
+			{
+				formatter.format("%02x", b); //$NON-NLS-1$
+			}
+			mid = formatter.toString();
+			// puts mid in 8-4-4-4-12 format
+			mid = mid.substring(0, 8) + MID_SEPARATOR + mid.substring(8, 12) + MID_SEPARATOR + mid.substring(12, 16)
+					+ MID_SEPARATOR + mid.substring(16, 20) + MID_SEPARATOR + mid.substring(20, 32);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			IdeLog.logError(getDefault(), Messages.CorePlugin_MD5_generation_error, e);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			IdeLog.logError(getDefault(), e);
 		}
 	}
 }

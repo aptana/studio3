@@ -15,6 +15,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -25,6 +28,10 @@ public class UsagePlugin extends Plugin
 	public static final String PLUGIN_ID = "com.aptana.usage"; //$NON-NLS-1$
 	// this is the incorrect id previously used; DO NOT USE it for future reference
 	public static final String OLD_PLUGIN_ID = "com.aptana.db"; //$NON-NLS-1$
+
+	// Events (since this is migrated from TiStudio, we will keep the constants as ti.*)
+	private static final String STUDIO_START = "ti.start"; //$NON-NLS-1$
+	private static final String STUDIO_END = "ti.end"; //$NON-NLS-1$
 
 	// The shared instance
 	private static UsagePlugin plugin;
@@ -43,6 +50,12 @@ public class UsagePlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
+
+		// Send ping when we start studio
+		if (!EclipseUtil.isTesting())
+		{
+			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_START, STUDIO_START, null));
+		}
 	}
 
 	/*
@@ -51,6 +64,11 @@ public class UsagePlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		// Send ping when we exit studio
+		if (!EclipseUtil.isTesting())
+		{
+			StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_END, STUDIO_END, null));
+		}
 		if (!Platform.inDevelopmentMode())
 		{
 			AptanaDB.getInstance().shutdown();
@@ -69,33 +87,21 @@ public class UsagePlugin extends Plugin
 		return plugin;
 	}
 
-	public static void logError(String message, Throwable e)
+	public static void logError(String message)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
-	}
-
-	public static void logInfo(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
-	}
-
-	public static void logWarning(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
-	}
-
-	/**
-	 * Retrieves the plug-in's version.
-	 * 
-	 * @return the plug-in's version or null if it could not be retrieved
-	 */
-	public static String getPluginVersion()
-	{
-		Bundle bundle = getDefault().getBundle();
-		if (bundle == null)
+		// Only logs analytics errors when in development
+		if (Platform.inDevelopmentMode())
 		{
-			return null;
+			IdeLog.logError(getDefault(), message);
 		}
-		return bundle.getHeaders().get(Constants.BUNDLE_VERSION).toString();
+	}
+
+	public static void logError(Exception e)
+	{
+		// Only logs analytics errors when in development
+		if (Platform.inDevelopmentMode())
+		{
+			IdeLog.logError(getDefault(), e);
+		}
 	}
 }

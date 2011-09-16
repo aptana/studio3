@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="analyticsInfo" name="%extension-point.analytics.name" schema="schema/analyticsInfo.exsd"/>
    <extension
          point="org.eclipse.ui.startup">
       <startup
             class="com.aptana.usage.PingStartup">
       </startup>
+   </extension>
+   <extension
+         point="com.aptana.usage.analyticsInfo">
+      <analytics
+            id="com.aptana.usage.analytics"
+            info="com.aptana.studio">
+      </analytics>
+      <info
+            appGuid="936afc9e-28ed-4618-88b8-f6e6e3869b09"
+            appId="com.aptana.studio"
+            appName="Aptana Studio"
+            userAgent="AptanaStudio/3.0"
+            versionPluginId="com.aptana.branding">
+      </info>
    </extension>
 
 </plugin>
