@@ -439,7 +439,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	public void setVisible(boolean visible)
 	{
 		// Feature: the visibility should be done for all the find bars, not only for the current one.
-		findBarVisibilityControl.setVisible(visible);
+		findBarVisibilityControl.setVisible(visible, this);
 	}
 
 	/*
@@ -808,8 +808,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	/**
 	 * Note: this method should NEVER be called directly. Always use setVisible (the visibility control is the only
 	 * place that should reference this method).
+	 * 
+	 * @param updateFindTextFromSelection determines whether the find text should be updated from the current text 
+	 * selection. 
 	 */
-	/* default */void showFindBar()
+	/* default */void showFindBar(boolean updateFindTextFromSelection)
 	{
 		if (disableWhenHidden != null)
 		{
@@ -826,7 +829,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			composite.layout();
 		}
 		Control focusControl = Display.getCurrent().getFocusControl();
-		if (wasExcluded || focusControl instanceof StyledText)
+		if (updateFindTextFromSelection && (wasExcluded || focusControl instanceof StyledText))
 		{
 			// Only change the text if it is not activated (otherwise it means it was
 			// already activated and the user was in another control in the find bar and used Ctrl+F, in which case we
