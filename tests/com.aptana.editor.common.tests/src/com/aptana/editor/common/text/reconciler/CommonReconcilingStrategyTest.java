@@ -3,7 +3,6 @@ package com.aptana.editor.common.text.reconciler;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.TypedRegion;
-import org.eclipse.ui.IPropertyListener;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -47,7 +46,7 @@ public class CommonReconcilingStrategyTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(editor).addPropertyListener(with(any(IPropertyListener.class)));
+				// oneOf(editor).addPropertyListener(with(any(IPropertyListener.class)));
 				// Make sure we never even try to get file service to parse
 				never(editor).getFileService();
 			}
