@@ -199,13 +199,11 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		catch (BadLocationException e1)
 		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
 		}
 		catch (BadPositionCategoryException e1)
 		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
 		}
 	}
 
