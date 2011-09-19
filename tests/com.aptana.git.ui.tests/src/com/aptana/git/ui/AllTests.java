@@ -12,6 +12,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.git.ui.hyperlink.HyperlinkDetectorTest;
 import com.aptana.git.ui.internal.DiffFormatterTest;
+import com.aptana.git.ui.internal.GitLightweightDecoratorTest;
 
 public class AllTests
 {
@@ -20,8 +21,9 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(HyperlinkDetectorTest.class);
 		suite.addTestSuite(DiffFormatterTest.class);
+		suite.addTestSuite(GitLightweightDecoratorTest.class);
+		suite.addTestSuite(HyperlinkDetectorTest.class);
 		// $JUnit-END$
 		return suite;
 	}
