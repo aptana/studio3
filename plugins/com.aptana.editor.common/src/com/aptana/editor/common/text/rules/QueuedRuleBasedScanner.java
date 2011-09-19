@@ -21,43 +21,55 @@ import org.eclipse.jface.text.rules.Token;
 /**
  * @author Max Stepanov
  */
-public abstract class QueuedRuleBasedScanner extends RuleBasedScanner {
+public abstract class QueuedRuleBasedScanner extends RuleBasedScanner
+{
 
-	protected static class Entry {
+	protected static class Entry
+	{
 		private final ITokenScanner tokenScanner;
 		private IToken token;
 		private final int offset;
 		private final int length;
 
-		public Entry(ITokenScanner tokenScanner, IToken token, int offset, int length) {
+		public Entry(ITokenScanner tokenScanner, IToken token, int offset, int length)
+		{
 			this.tokenScanner = tokenScanner;
 			this.token = token;
 			this.offset = offset;
 			this.length = length;
 		}
 
-		public IToken nextToken() {
-			if (tokenScanner != null) {
+		public IToken nextToken()
+		{
+			if (tokenScanner != null)
+			{
 				return tokenScanner.nextToken();
 			}
 
 			// return value then reset to EOF
-			try {
+			try
+			{
 				return token;
-			} finally {
+			}
+			finally
+			{
 				token = Token.EOF;
 			}
 		}
 
-		public int getTokenOffset() {
-			if (tokenScanner != null) {
+		public int getTokenOffset()
+		{
+			if (tokenScanner != null)
+			{
 				return tokenScanner.getTokenOffset();
 			}
 			return offset;
 		}
 
-		public int getTokenLength() {
-			if (tokenScanner != null) {
+		public int getTokenLength()
+		{
+			if (tokenScanner != null)
+			{
 				return tokenScanner.getTokenLength();
 			}
 			return length;
@@ -71,63 +83,79 @@ public abstract class QueuedRuleBasedScanner extends RuleBasedScanner {
 	}
 
 	protected final Queue<Entry> queue = new LinkedList<Entry>();
+	private Entry fCurrentEntry;
 
 	/**
 	 * Queue the specified token with offset:length for return by nextToken()
+	 * 
 	 * @param token
 	 * @param offset
 	 * @param length
 	 */
-	public void queueToken(IToken token, int offset, int length) {
+	public void queueToken(IToken token, int offset, int length)
+	{
 		queue.add(new Entry(null, token, offset, length));
 	}
 
 	/**
-	 * Queue the specified delegate token scanner with offset:length range for return by nextToken()
-	 * The given  delegate will be used until EOF token returned.
+	 * Queue the specified delegate token scanner with offset:length range for return by nextToken() The given delegate
+	 * will be used until EOF token returned.
+	 * 
 	 * @param tokenScanner
 	 * @param offset
 	 * @param length
 	 */
-	public void queueDelegate(ITokenScanner tokenScanner, int offset, int length) {
+	public void queueDelegate(ITokenScanner tokenScanner, int offset, int length)
+	{
 		tokenScanner.setRange(fDocument, offset, length);
 		queue.add(new Entry(tokenScanner, null, offset, length));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
 	 */
 	@Override
-	public void setRange(IDocument document, int offset, int length) {
+	public void setRange(IDocument document, int offset, int length)
+	{
 		queue.clear();
 		super.setRange(document, offset, length);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#nextToken()
 	 */
 	@Override
-	public IToken nextToken() {
-		while (!queue.isEmpty()) {
-			IToken token = queue.element().nextToken();
-			if (token != Token.EOF) {
+	public IToken nextToken()
+	{
+		while (!queue.isEmpty())
+		{
+			fCurrentEntry = queue.element();
+			IToken token = fCurrentEntry.nextToken();
+			if (token != Token.EOF)
+			{
 				return token;
 			}
 			queue.remove();
 		}
+		fCurrentEntry = null;
 		return super.nextToken();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenOffset()
 	 */
 	@Override
-	public int getTokenOffset() {
-		if (!queue.isEmpty()) {
+	public int getTokenOffset()
+	{
+		if (fCurrentEntry != null)
+		{
+			return fCurrentEntry.getTokenOffset();
+		}
+		if (!queue.isEmpty())
+		{
 			return queue.element().getTokenOffset();
 		}
 		return super.getTokenOffset();
@@ -135,12 +163,17 @@ public abstract class QueuedRuleBasedScanner extends RuleBasedScanner {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenLength()
 	 */
 	@Override
-	public int getTokenLength() {
-		if (!queue.isEmpty()) {
+	public int getTokenLength()
+	{
+		if (fCurrentEntry != null)
+		{
+			return fCurrentEntry.getTokenLength();
+		}
+		if (!queue.isEmpty())
+		{
 			return queue.element().getTokenLength();
 		}
 		return super.getTokenLength();

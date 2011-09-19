@@ -8,11 +8,14 @@
 package com.aptana.editor.common.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
+import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -20,6 +23,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ICommonConstants;
 import com.aptana.theme.ThemePlugin;
 
 public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
@@ -29,6 +33,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	private String scope = StringUtil.EMPTY;
 	private IRegion fLastLine;
 	private int fCountForLine;
+	private TypedPosition fLastPosition;
 
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
@@ -41,6 +46,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		try
 		{
 			fLastLine = null;
+			fLastPosition = null;
 			fCountForLine = 0;
 			int offset = region.getOffset();
 			scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
@@ -48,6 +54,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			{
 				scope = StringUtil.EMPTY;
 			}
+			wipeExistingScopes(region);
 		}
 		catch (BadLocationException e)
 		{
@@ -61,7 +68,52 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			}
 			scope = StringUtil.EMPTY;
 			fLastLine = null;
+			fLastPosition = null;
 			fCountForLine = 0;
+		}
+	}
+
+	/**
+	 * Given a partition region, iterate through all our scope positions and wipe any in that region.
+	 * 
+	 * @param region
+	 * @throws BadPositionCategoryException
+	 */
+	private void wipeExistingScopes(ITypedRegion region)
+	{
+		int offset = region.getOffset();
+		int end = offset + region.getLength();
+
+		try
+		{
+			synchronized (getLockObject(fDocument))
+			{
+				fDocument.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
+				int index = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
+				// Only loop over positions[index] to positions[positions.length - 1]!
+				Position[] positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
+				for (int i = index; i < positions.length; i++)
+				{
+					Position position = positions[i];
+					if (position.getOffset() <= end)
+					{
+						fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, position);
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+		}
+		catch (BadPositionCategoryException e)
+		{
+			// should never happen because we are explicitly adding the category before asking for positions inside it
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage());
+		}
+		catch (BadLocationException e)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage());
 		}
 	}
 
@@ -85,6 +137,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		if (data instanceof String)
 		{
 			String last = (String) data;
+			storeScope(last);
 			if (last.length() == 0)
 			{
 				last = scope;
@@ -106,22 +159,52 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		else if (token.isWhitespace())
 		{
-			try
-			{
-				int offset = fScanner.getTokenOffset();
-				String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-						.getScopeAtOffset(fDocument, offset);
-				IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(scope);
-				lastAttribute = super.getTokenTextAttribute(converted);
-				return lastAttribute;
-			}
-			catch (BadLocationException e)
-			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
-			}
+			// WHat the hell was I smoking here? Just return the previous scope? Empty string?
+			return lastAttribute;
 		}
 		lastAttribute = super.getTokenTextAttribute(token);
 		return lastAttribute;
+	}
+
+	private void storeScope(String tokenLevelScope)
+	{
+		// TODO Redcar stores the fragment pieces individually as overlapping positions which seems like it'd be much
+		// less objects/memory. Can we hack that here by looking at previous scope and diffing? We'd also have to keep
+		// expanding the parent scope positions...
+
+		// empty scope. Don't store a position for it, but do set last position to be null so we don't end up expanding
+		// it.
+		if (tokenLevelScope == null || tokenLevelScope.isEmpty())
+		{
+			// Wipe last position because we have an empty scope in between...
+			fLastPosition = null;
+			return;
+		}
+		try
+		{
+			int offset = fScanner.getTokenOffset();
+			int length = fScanner.getTokenLength();
+
+			// Continuing same scope as last position, expand to merge them
+			if (fLastPosition != null && fLastPosition.getType().equals(tokenLevelScope))
+			{
+				fLastPosition.setLength((offset + length) - fLastPosition.getOffset());
+			}
+			else
+			{
+				TypedPosition newPosition = new TypedPosition(offset, length, tokenLevelScope);
+				fLastPosition = newPosition;
+				fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPosition);
+			}
+		}
+		catch (BadLocationException e1)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+		}
+		catch (BadPositionCategoryException e1)
+		{
+                        IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+		}
 	}
 
 	@Override
