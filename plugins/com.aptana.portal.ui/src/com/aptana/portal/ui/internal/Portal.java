@@ -47,6 +47,7 @@ import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.PingStartup;
 
 /**
@@ -166,9 +167,12 @@ public class Portal
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				WebBrowserEditorInput input = new WebBrowserEditorInput(finalURL, 0, PortalUIPlugin.PORTAL_ID);
-
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
+				IWorkbenchPage page = UIUtils.getActivePage();
+				if (page == null)
+				{
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Cannot open Aptana Portal. No active workbench-page."); //$NON-NLS-1$
+					return Status.CANCEL_STATUS;
+				}
 				if (!bringToTop)
 				{
 					// In case the portal should not be opened as the top-editor, make sure we open it in a way it stays
