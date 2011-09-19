@@ -23,6 +23,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.usage.internal.AnalyticsInfo;
 import com.aptana.usage.internal.AnalyticsInfoManager;
+import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.eaio.uuid.MACAddress;
 
 public class AnalyticsEvent
@@ -31,8 +32,19 @@ public class AnalyticsEvent
 	private static final String SPEC_VERSION = "2"; //$NON-NLS-1$
 	private static final String EMPTY_JSON_PAYLOAD = "{}"; //$NON-NLS-1$
 
-	private static final AnalyticsInfo APP_INFO = AnalyticsInfoManager.getInstance().getInfo(
-			"com.aptana.usage.analytics"); //$NON-NLS-1$
+	private static final AnalyticsInfo APP_INFO;
+	static
+	{
+		AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+		if (info == null)
+		{
+			APP_INFO = new DefaultAnalyticsInfo();
+		}
+		else
+		{
+			APP_INFO = info;
+		}
+	}
 
 	private String dateTime;
 	private String eventType;
@@ -107,76 +119,14 @@ public class AnalyticsEvent
 		return eventString;
 	}
 
-	public String getUserAgent()
+	public static String getUserAgent()
 	{
-		if (APP_INFO != null)
-		{
-			return APP_INFO.getUserAgent();
-		}
-		else
-		{
-			return StringUtil.EMPTY;
-		}
+		return APP_INFO.getUserAgent();
 	}
 
-	public IAnalyticsUserManager getUserManager()
+	public static IAnalyticsUserManager getUserManager()
 	{
-		if (APP_INFO != null)
-		{
-			return APP_INFO.getUserManager();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public String getAppGuid()
-	{
-		if (APP_INFO != null)
-		{
-			return APP_INFO.getAppGuid();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public String getAppId()
-	{
-		if (APP_INFO != null)
-		{
-			return APP_INFO.getAppId();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public String getAppName()
-	{
-		if (APP_INFO != null)
-		{
-			return APP_INFO.getAppName();
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public String getVersionPluginId()
-	{
-		if (APP_INFO != null)
-		{
-			return APP_INFO.getVersionPluginId();
-		}
-		else
-		{
-			return null;
-		}
+		return APP_INFO.getUserManager();
 	}
 
 	private void init()
@@ -189,11 +139,11 @@ public class AnalyticsEvent
 		addPostEntry(event, "event", eventName); //$NON-NLS-1$
 		addPostEntry(event, "type", eventType); //$NON-NLS-1$
 		addPostEntry(event, "sid", (user == null) ? StringUtil.EMPTY : user.getSessionID()); //$NON-NLS-1$
-		addPostEntry(event, "guid", getAppGuid()); //$NON-NLS-1$
+		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
 		addPostEntry(event, "mid", CorePlugin.getMID()); //$NON-NLS-1$
-		addPostEntry(event, "app_id", getAppId()); //$NON-NLS-1$
-		addPostEntry(event, "app_name", getAppName()); //$NON-NLS-1$
-		addPostEntry(event, "app_version", EclipseUtil.getPluginVersion(getVersionPluginId())); //$NON-NLS-1$
+		addPostEntry(event, "app_id", APP_INFO.getAppId()); //$NON-NLS-1$
+		addPostEntry(event, "app_name", APP_INFO.getAppName()); //$NON-NLS-1$
+		addPostEntry(event, "app_version", EclipseUtil.getPluginVersion(APP_INFO.getVersionPluginId())); //$NON-NLS-1$
 		addPostEntry(event, "mac_addr", MACAddress.getMACAddress()); //$NON-NLS-1$
 		addPostEntry(event, "platform", Platform.OS_MACOSX.equals(Platform.getOS()) ? "osx" : Platform.getOS()); //$NON-NLS-1$ //$NON-NLS-2$
 		// This field was used for the versions of titanium sdk that developer was build on. This does not apply to
