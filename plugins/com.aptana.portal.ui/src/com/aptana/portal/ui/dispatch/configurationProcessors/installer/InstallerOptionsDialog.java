@@ -7,10 +7,12 @@
  */
 package com.aptana.portal.ui.dispatch.configurationProcessors.installer;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -131,11 +133,13 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 			public void keyReleased(org.eclipse.swt.events.KeyEvent e)
 			{
 				attributes.put(INSTALL_DIR_ATTR, path.getText());
+				validatePath();
 			}
 
 			public void keyPressed(org.eclipse.swt.events.KeyEvent e)
 			{
 				attributes.put(INSTALL_DIR_ATTR, path.getText());
+				validatePath();
 			}
 		});
 		Button browse = new Button(installLocation, SWT.PUSH);
@@ -151,10 +155,59 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 				{
 					path.setText(dir);
 					attributes.put(INSTALL_DIR_ATTR, dir);
+					validatePath();
 				}
 			}
 		});
+		validatePath();
 		return group;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	protected void createButtonsForButtonBar(Composite parent)
+	{
+		super.createButtonsForButtonBar(parent);
+		validatePath();
+	}
+
+	/**
+	 * Validate the path
+	 */
+	protected void validatePath()
+	{
+		String pathText = path.getText();
+		if (pathText.trim().length() == 0)
+		{
+			// empty path
+			setErrorMessage(Messages.InstallerOptionsDialog_emptyPathError);
+			return;
+		}
+		if (!new File(pathText).exists())
+		{
+			// non-existing path
+			setErrorMessage(Messages.InstallerOptionsDialog_nonExistingPathError);
+			return;
+		}
+		setErrorMessage(null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#setErrorMessage(java.lang.String)
+	 */
+	@Override
+	public void setErrorMessage(String newErrorMessage)
+	{
+		super.setErrorMessage(newErrorMessage);
+		Button button = getButton(IDialogConstants.OK_ID);
+		if (button != null)
+		{
+			button.setEnabled(newErrorMessage == null);
+		}
 	}
 
 	/**
