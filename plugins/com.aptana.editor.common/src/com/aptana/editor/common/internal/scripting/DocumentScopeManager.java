@@ -8,7 +8,6 @@
 
 package com.aptana.editor.common.internal.scripting;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -16,14 +15,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.IPresentationRepairer;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewer;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -163,54 +157,41 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 		try
 		{
-			Field f = SourceViewer.class.getDeclaredField("fPresentationReconciler"); //$NON-NLS-1$
-			f.setAccessible(true);
-			IPresentationReconciler reconciler = (IPresentationReconciler) f.get(viewer);
-			if (reconciler == null)
-			{
-				return null;
-			}
-			ITypedRegion region = document.getPartition(offset);
-			String contentType = region.getType();
-
-			IPresentationRepairer repairer = reconciler.getRepairer(contentType);
-			if (!(repairer instanceof DefaultDamagerRepairer))
-			{
-				return null;
-			}
-			f = DefaultDamagerRepairer.class.getDeclaredField("fScanner"); //$NON-NLS-1$
-			f.setAccessible(true);
-			ITokenScanner scanner = (ITokenScanner) f.get(repairer);
-			if (scanner == null)
-			{
-				return null;
-			}
+			Position[] scopes = null;
+			int index = 0;
 			synchronized (getLockObject(document))
 			{
-				scanner.setRange(document, region.getOffset(), region.getLength());
-				while (true)
+				scopes = document.getPositions(ICommonConstants.SCOPE_CATEGORY);
+				index = document.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
+			}
+			if (index >= scopes.length)
+			{
+				return null;
+			}
+			Position scope = scopes[index];
+			if (scope == null)
+			{
+				return null;
+			}
+			if (!scope.includes(offset))
+			{
+				if (index > 0)
 				{
-					IToken token = scanner.nextToken();
-					if (token == null || token.isEOF())
+					scope = scopes[--index];
+					if (scope == null || !scope.includes(offset))
 					{
-						// we unexpectedly hit EOF, stop looping
-						break;
-					}
-					int tokenOffset = scanner.getTokenOffset();
-					if (tokenOffset > offset) // we passed the offset, quit looping
-					{
-						break;
-					}
-					if (offset >= tokenOffset && offset < (tokenOffset + scanner.getTokenLength()))
-					{
-						// token spans the offset, should contain a String containing the token-level scope fragments
-						Object data = token.getData();
-						if (data instanceof String)
-						{
-							return (String) data;
-						}
+						return null;
 					}
 				}
+				else
+				{
+					return null;
+				}
+			}
+			if (scope instanceof TypedPosition)
+			{
+				TypedPosition pos = (TypedPosition) scope;
+				return pos.getType();
 			}
 		}
 		catch (Exception e)

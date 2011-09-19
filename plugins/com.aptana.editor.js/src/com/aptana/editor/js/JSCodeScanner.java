@@ -274,14 +274,7 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 		// If we did lookaheads, use the right length from before lookahead...
 		if (fLength != null)
 		{
-			try
-			{
-				return fLength;
-			}
-			finally
-			{
-				fLength = null;
-			}
+			return fLength;
 		}
 		return super.getTokenLength();
 	}
@@ -292,14 +285,7 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 		// If we did lookaheads, use the right offset from before lookahead...
 		if (fOrigOffset != null)
 		{
-			try
-			{
-				return fOrigOffset;
-			}
-			finally
-			{
-				fOrigOffset = null;
-			}
+			return fOrigOffset;
 		}
 		return super.getTokenOffset();
 	}
@@ -314,6 +300,8 @@ public class JSCodeScanner extends QueuedRuleBasedScanner
 	{
 		lastToken = null;
 		inFunctionDefinition = false;
+		fOrigOffset = null;
+		fLength = null;
 		super.setRange(document, offset, length);
 	}
 }

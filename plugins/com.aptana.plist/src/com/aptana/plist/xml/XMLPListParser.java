@@ -31,10 +31,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXParseException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.plist.IPListParser;
 import com.aptana.plist.PListPlugin;
 
@@ -70,7 +70,7 @@ public class XMLPListParser implements IPListParser
 
 				d = builder.parse(file);
 			}
-			catch (SAXParseException e)
+			catch (Exception e)
 			{
 				// May have failed due to invalid characters in XML, which happens often with TM themes,
 				// So let's sanitize the XML
@@ -84,10 +84,6 @@ public class XMLPListParser implements IPListParser
 				{
 					IdeLog.logError(PListPlugin.getDefault(), e1);
 				}
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(PListPlugin.getDefault(), e);
 			}
 			if (d != null)
 			{
@@ -104,9 +100,9 @@ public class XMLPListParser implements IPListParser
 
 	private static String stripNonValidXMLCharacters(String in)
 	{
-		if (in == null || ("".equals(in))) //$NON-NLS-1$
+		if (in == null || (StringUtil.EMPTY.equals(in)))
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		StringBuffer out = new StringBuffer();
 		for (int i = 0; i < in.length(); i++)
@@ -119,7 +115,7 @@ public class XMLPListParser implements IPListParser
 			}
 			else
 			{
-				// out.append("&#").append((int) current).append(";"); // Broken, can we insert them in some way that
+				// out.append("&#").append((int) current).append(';'); // Broken, can we insert them in some way that
 				// does work?
 			}
 		}

@@ -46,14 +46,14 @@ public class CoffeePreferencePageTest extends UITestCaseSWT
 		IUIContext ui = getUI();
 
 		openPreferencesDialog(ui);
-		ui.click(new FilteredTreeItemLocator("Aptana Studio/Editors/Coffeescript"));
+		ui.click(new FilteredTreeItemLocator("(Aptana|Titanium) Studio/Editors/Coffeescript"));
 		ui.click(new ComboItemLocator("Use Global Editor Defaults"));
 		ui.click(new ButtonLocator("OK"));
 		ui.wait(new ShellDisposedCondition("Preferences"));
 
 		// Re-open and verify that the settings took hold
 		openPreferencesDialog(ui);
-		ui.click(new FilteredTreeItemLocator("Aptana Studio/Editors/Coffeescript"));
+		ui.click(new FilteredTreeItemLocator("(Aptana|Titanium) Studio/Editors/Coffeescript"));
 		// Check the combo value!
 		ui.assertThat(new ComboLocator().hasText("Use Global Editor Defaults"));
 		ui.click(new ButtonLocator("Cancel"));
