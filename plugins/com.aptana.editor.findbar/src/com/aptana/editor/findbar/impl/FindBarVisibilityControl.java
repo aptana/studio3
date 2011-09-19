@@ -35,7 +35,7 @@ public class FindBarVisibilityControl
 	{
 		if (visible)
 		{
-			findBarDecorator.showFindBar();
+			findBarDecorator.showFindBar(false);
 		}
 		decs.add(findBarDecorator);
 	}
@@ -51,8 +51,11 @@ public class FindBarVisibilityControl
 	/**
 	 * Updates the visibility for all the find bar decorators (and updates the settings from the eclipse settings --
 	 * saving to the eclipse settings is done during the find action or some other change).
+	 * 
+	 * @param findBarDecorator this is the caller of the set visible (only the passed find bar will actually update
+	 * the find text based on the text selected). 
 	 */
-	public void setVisible(boolean enable)
+	public void setVisible(boolean enable, FindBarDecorator findBarDecorator)
 	{
 		try
 		{
@@ -65,7 +68,7 @@ public class FindBarVisibilityControl
 
 				for (FindBarDecorator d : decs)
 				{
-					d.showFindBar();
+					d.showFindBar(d==findBarDecorator);
 				}
 			}
 			else

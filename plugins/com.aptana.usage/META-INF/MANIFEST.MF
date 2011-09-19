@@ -6,6 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.usage.UsagePlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
  org.eclipse.ui,
  com.aptana.core,
  com.aptana.libraries,
