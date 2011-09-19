@@ -56,7 +56,7 @@ public class StudioAnalytics
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IAnalyticsUserManager userManager = event.getUserManager();
+				IAnalyticsUserManager userManager = AnalyticsEvent.getUserManager();
 				if (userManager == null)
 				{
 					// send as anonymous user
@@ -130,7 +130,7 @@ public class StudioAnalytics
 			{
 				connection.setRequestProperty("Cookie", user.getCookie()); //$NON-NLS-1$
 			}
-			connection.setRequestProperty("User-Agent", event.getUserAgent()); //$NON-NLS-1$
+			connection.setRequestProperty("User-Agent", AnalyticsEvent.getUserAgent()); //$NON-NLS-1$
 			connection.setDoOutput(true);
 			connection.setReadTimeout(TIMEOUT);
 			connection.setConnectTimeout(TIMEOUT);
