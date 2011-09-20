@@ -104,10 +104,11 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	}
 
 	private IPreferenceChangeListener fThemeChangeListener;
-	private Map<RepoBranch, TimestampedString> cache = new HashMap<RepoBranch, TimestampedString>();
+	private Map<RepoBranch, TimestampedString> cache;
 
 	public GitLightweightDecorator()
 	{
+		cache = new HashMap<RepoBranch, TimestampedString>();
 		getGitRepositoryManager().addListener(this);
 		getGitRepositoryManager().addListenerToEachRepository(this);
 		fThemeChangeListener = new IPreferenceChangeListener()
@@ -136,12 +137,11 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			return;
 
 		// Don't decorate if the workbench is not running
-		if (!PlatformUI.isWorkbenchRunning())
+		if (!isWorkbenchRunning())
 			return;
 
 		// Don't decorate if UI plugin is not running
-		GitUIPlugin activator = GitUIPlugin.getDefault();
-		if (activator == null)
+		if (!isGitUIPluginActive())
 			return;
 
 		// Don't decorate the workspace root
@@ -164,6 +164,16 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 				decorateFile(decoration, resource);
 				break;
 		}
+	}
+
+	protected boolean isGitUIPluginActive()
+	{
+		return GitUIPlugin.getDefault() != null;
+	}
+
+	protected boolean isWorkbenchRunning()
+	{
+		return PlatformUI.isWorkbenchRunning();
 	}
 
 	private void decorateFolder(IDecoration decoration, IResource resource)
@@ -228,7 +238,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	{
 		GitRepository repo = getRepo(resource);
 		if (repo == null)
+		{
 			return;
+		}
 
 		String branch = repo.currentBranch();
 		// Adds a temporal cache per repo/branch for this data so we
@@ -248,7 +260,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		String[] commits = repo.commitsAhead(branch);
 		if (commits != null && commits.length > 0)
 		{
-			builder.append("+").append(commits.length); //$NON-NLS-1$
+			builder.append('+').append(commits.length);
 		}
 		else
 		{
@@ -256,9 +268,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			// when you pull on one branch and then switch back to another that had changes not yet merged in yet)
 			commits = repo.commitsBehind(branch);
 			if (commits != null && commits.length > 0)
-				builder.append("-").append(commits.length); //$NON-NLS-1$
+				builder.append('-').append(commits.length);
 		}
-		builder.append("]"); //$NON-NLS-1$
+		builder.append(']');
 		String value = builder.toString();
 		cache.put(repoBranch, new TimestampedString(value));
 		decoration.addSuffix(value);
@@ -271,10 +283,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			getGitRepositoryManager().removeListener(this);
 			getGitRepositoryManager().removeListenerFromEachRepository(this);
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fThemeChangeListener);
 			cache.clear();
-			cache = null;
 		}
 		finally
 		{

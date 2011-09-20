@@ -19,6 +19,12 @@ public interface ICommonConstants
 	public String DEFAULT_PARTITIONING = "com.aptana.editor.default_partitioning"; //$NON-NLS-1$
 
 	/**
+	 * The position category used to manage positions for scopes. We sadd/remove TypedPositions under this category to
+	 * query and update the scopes in the file.
+	 */
+	public String SCOPE_CATEGORY = "scopes"; //$NON-NLS-1$
+
+	/**
 	 * Code formatter action definition ID, as defined in the plugin.xml ("com.aptana.editor.commands.Format")
 	 */
 	public String FORMATTER_ACTION_DEFINITION_ID = "com.aptana.editor.commands.Format"; //$NON-NLS-1$

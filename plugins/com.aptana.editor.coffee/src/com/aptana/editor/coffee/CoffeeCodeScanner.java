@@ -415,6 +415,8 @@ public class CoffeeCodeScanner extends QueuedRuleBasedScanner
 		this.inFunctionDefinition = false;
 		this.inClassDecl = false;
 		this.inFunctionArgs = false;
+		this.fOrigOffset = null;
+		this.fLength = null;
 		super.setRange(document, offset, length);
 	}
 
@@ -433,14 +435,7 @@ public class CoffeeCodeScanner extends QueuedRuleBasedScanner
 		// If we did lookaheads, use the right length from before lookahead...
 		if (fLength != null)
 		{
-			try
-			{
-				return fLength;
-			}
-			finally
-			{
-				fLength = null;
-			}
+			return fLength;
 		}
 		return super.getTokenLength();
 	}
@@ -451,14 +446,7 @@ public class CoffeeCodeScanner extends QueuedRuleBasedScanner
 		// If we did lookaheads, use the right offset from before lookahead...
 		if (fOrigOffset != null)
 		{
-			try
-			{
-				return fOrigOffset;
-			}
-			finally
-			{
-				fOrigOffset = null;
-			}
+			return fOrigOffset;
 		}
 		return super.getTokenOffset();
 	}
