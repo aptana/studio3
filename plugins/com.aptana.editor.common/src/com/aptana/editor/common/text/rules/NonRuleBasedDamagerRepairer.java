@@ -9,13 +9,17 @@ package com.aptana.editor.common.text.rules;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
+import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.presentation.IPresentationDamager;
 import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.rules.IToken;
@@ -23,6 +27,7 @@ import org.eclipse.swt.custom.StyleRange;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ICommonConstants;
 import com.aptana.theme.ThemePlugin;
 
 public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPresentationRepairer
@@ -124,7 +129,81 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	 */
 	public void createPresentation(TextPresentation presentation, ITypedRegion region)
 	{
+		wipeExistingScopes(region);
+		synchronized (getLockObject(fDocument))
+		{
+			try
+			{
+				fDocument.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
+				fDocument.addPosition(
+						ICommonConstants.SCOPE_CATEGORY,
+						new TypedPosition(region.getOffset(), region.getLength(), (String) fDefaultTextAttribute
+								.getData()));
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			}
+		}
+
 		addRange(presentation, region.getOffset(), region.getLength(), getTextAttribute(region));
+	}
+
+	/**
+	 * Given a partition region, iterate through all our scope positions and wipe any in that region.
+	 * 
+	 * @param region
+	 * @throws BadPositionCategoryException
+	 */
+	private void wipeExistingScopes(ITypedRegion region)
+	{
+		int offset = region.getOffset();
+		int end = offset + region.getLength();
+
+		try
+		{
+			synchronized (getLockObject(fDocument))
+			{
+				fDocument.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
+				int index = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
+				// Only loop over positions[index] to positions[positions.length - 1]!
+				Position[] positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
+				for (int i = index; i < positions.length; i++)
+				{
+					Position position = positions[i];
+					if (position.getOffset() <= end)
+					{
+						fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, position);
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+		}
+		catch (BadPositionCategoryException e)
+		{
+			// should never happen because we are explicitly adding the category before asking for positions inside it
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage());
+		}
+		catch (BadLocationException e)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage());
+		}
+	}
+
+	private static Object getLockObject(Object object)
+	{
+		if (object instanceof ISynchronizable)
+		{
+			Object lock = ((ISynchronizable) object).getLockObject();
+			if (lock != null)
+			{
+				return lock;
+			}
+		}
+		return object;
 	}
 
 	protected TextAttribute getTextAttribute(ITypedRegion region)
