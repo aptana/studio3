@@ -161,6 +161,8 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			int index = 0;
 			synchronized (getLockObject(document))
 			{
+				// Force adding the category in case it doesn't exist yet...
+				document.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
 				scopes = document.getPositions(ICommonConstants.SCOPE_CATEGORY);
 				index = document.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
 			}
