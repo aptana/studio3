@@ -18,7 +18,7 @@ public class DiskIndexTest extends TestCase
 	public void testAPSTUD3393() throws Exception
 	{
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.index.core.tests"),
-				Path.fromPortableString("apstud3393.index"), null);
+				Path.fromPortableString("files/apstud3393.index"), null);
 		File file = ResourceUtil.resourcePathToFile(url);
 
 		try
