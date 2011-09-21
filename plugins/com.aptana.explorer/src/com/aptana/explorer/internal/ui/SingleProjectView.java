@@ -117,7 +117,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		TO_REMOVE.add("compareWithMenu"); //$NON-NLS-1$
 		TO_REMOVE.add("replaceWithMenu"); //$NON-NLS-1$
 		TO_REMOVE.add("org.eclipse.ui.framelist.goInto"); //$NON-NLS-1$
-		TO_REMOVE.add("addFromHistoryAction"); //$NON-NLS-1$
 		TO_REMOVE.add("org.radrails.rails.ui.actions.RunScriptServerAction"); //$NON-NLS-1$
 		TO_REMOVE.add("org.radrails.rails.ui.actions.DebugScriptServerAction"); //$NON-NLS-1$
 	};
