@@ -174,7 +174,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 
 		// empty scope. Don't store a position for it, but do set last position to be null so we don't end up expanding
 		// it.
-		if (tokenLevelScope == null || tokenLevelScope.isEmpty())
+		if (tokenLevelScope == null || tokenLevelScope.length() == 0)
 		{
 			// Wipe last position because we have an empty scope in between...
 			fLastPosition = null;
