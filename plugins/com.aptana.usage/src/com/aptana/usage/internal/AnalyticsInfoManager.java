@@ -148,7 +148,7 @@ public class AnalyticsInfoManager
 		for (String key : keys)
 		{
 			analytics = analyticsMap.get(key);
-			if (analyticsMap.containsKey(analytics.overridesId))
+			if (analytics.overridesId != null && analyticsMap.containsKey(analytics.overridesId))
 			{
 				// replaces the overridden analytics info
 				analyticsMap.put(analytics.overridesId, analytics);
