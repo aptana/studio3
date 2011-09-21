@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.UTFDataFormatException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1318,6 +1319,10 @@ public class DiskIndex
 	{
 		// must be same order as writeHeaderInfo()
 		this.numberOfChunks = readStreamInt(stream);
+		if (this.numberOfChunks < 0)
+		{
+			throw new IOException(MessageFormat.format("Corrupt index file, reported {0} chunks", numberOfChunks)); //$NON-NLS-1$
+		}
 		this.sizeOfLastChunk = read(stream) & 0xFF;
 		this.documentReferenceSize = read(stream) & 0xFF;
 		this.separator = (char) (read(stream) & 0xFF);
