@@ -190,8 +190,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			protected boolean canCreateItem()
 			{
 				// Cannot create it if it's not supported.
-				IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor
-						.getAdapter(IFindReplaceTarget.class);
+				IFindReplaceTarget findReplaceTarget = getFindReplaceTarget();
 				return findReplaceTarget instanceof IFindReplaceTargetExtension3;
 			}
 
@@ -438,8 +437,34 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 */
 	public void setVisible(boolean visible)
 	{
+		String selectedFindText = null;
+		if (visible)
+		{
+			// Note: we have to get the text selection at this point (not after calling
+			// findBarVisibilityControl.setVisible,
+			// as the focus may have change
+			Control focusControl = Display.getCurrent().getFocusControl();
+			boolean wasExcluded = findBarGridData.exclude;
+			if (wasExcluded || focusControl instanceof StyledText)
+			{
+				// Only change the text if it is not activated (otherwise it means it was
+				// already activated and the user was in another control in the find bar and used Ctrl+F, in which case
+				// we don't want to change it -- other cases mean that Ctrl+F was used from the editor or somewhere
+				// else, which means we have to update it).
+				ISelection selection = sourceViewer.getSelectionProvider().getSelection();
+				if (selection instanceof ITextSelection)
+				{
+					ITextSelection textSelection = (ITextSelection) selection;
+					String text = textSelection.getText();
+					if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1 && text.length() > 0) { //$NON-NLS-1$ //$NON-NLS-2$
+						selectedFindText = text;
+					}
+				}
+			}
+		}
+
 		// Feature: the visibility should be done for all the find bars, not only for the current one.
-		findBarVisibilityControl.setVisible(visible, this);
+		findBarVisibilityControl.setVisible(visible, this, selectedFindText);
 	}
 
 	/*
@@ -453,6 +478,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private final UpdateFindBarActionOnPropertyChange fFindBarActionOnPropertyChange = new UpdateFindBarActionOnPropertyChange();
 	private Color fStringNotFoundColor;
+
+	private IFindReplaceTarget fFindReplaceTarget;
+
+	private CopiedFromFindReplaceDialog fFindReplaceDialog;
 
 	/**
 	 * Do searches when we're modifying the text in the combo -- i.e.: incremental search.
@@ -667,50 +696,68 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		showCountTotal();
 	}
 
+	private IFindReplaceTarget getFindReplaceTarget()
+	{
+		if (fFindReplaceTarget == null)
+		{
+			fFindReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
+		}
+		return fFindReplaceTarget;
+	}
+
+	private CopiedFromFindReplaceDialog getFindReplaceDialog()
+	{
+		if (fFindReplaceDialog == null)
+		{
+			fFindReplaceDialog = new CopiedFromFindReplaceDialog(getFindReplaceTarget(), statusLineManager);
+		}
+		return fFindReplaceDialog;
+	}
+
 	private void replace(boolean newFind)
 	{
-		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
-		CopiedFromFindReplaceDialog findReplaceDialog = new CopiedFromFindReplaceDialog(findReplaceTarget,
-				statusLineManager);
-
-		setFindText(combo.getText());
+		ISelectionProvider selectionProvider = this.textEditor.getSelectionProvider();
+		ISelection selection = selectionProvider.getSelection();
+		if (!(selection instanceof ITextSelection))
+		{
+			FindBarPlugin.log(new AssertionError("Expected text editor selection to be an ITextSelection. Was: " //$NON-NLS-1$
+					+ selection));
+			return;
+		}
+		ITextSelection textSelection = (ITextSelection) selection;
+		String currentSelectedText = textSelection.getText();
+		String comboText = combo.getText();
+		if (comboText.length() == 0)
+		{
+			return;
+		}
+		if (!currentSelectedText.equals(comboText))
+		{
+			statusLineManager.setMessage(true, Messages.FindBarDecorator_MSG_ReplaceNeedsToMatchSelectedText, null);
+			return;
+		}
+		setFindText(comboText);
 		setFindTextOnReplace(comboReplace.getText());
-		PatternSyntaxException exception = null;
+
+		selectionProvider.setSelection(new TextSelection(this.textEditor.getDocumentProvider().getDocument(
+				this.textEditor.getEditorInput()), textSelection.getOffset(), 0));
+		
+		// Do initial search before replace (always forward search as we just selected the initial offset).
+		if(!findBarFinder.find(true, false, false)){
+			return; //The messages (why the find didn't work) should be set already.
+		}
 		try
 		{
-			findReplaceDialog.replaceSelection(comboReplace.getText(), getConfiguration().getRegularExpression());
+			getFindReplaceDialog().replaceSelection(comboReplace.getText(), getConfiguration().getRegularExpression());
 			showCountTotal();
 		}
-		catch (PatternSyntaxException e1)
+		catch (Exception e1)
 		{
-			// Don't log it now, there's still a chance that doing a find will get us to the proper state.
-			exception = e1;
+			statusLineManager.setMessage(true, "Error: " + e1.getMessage(), null);
+			FindBarPlugin.log(e1);
+			return;
 		}
-		catch (IllegalStateException e1)
-		{
-			if (findBarFinder.find(true, true, true, false, true))
-			{
-				try
-				{
-					findReplaceDialog.replaceSelection(comboReplace.getText(), getConfiguration()
-							.getRegularExpression());
-					showCountTotal();
-				}
-				catch (IllegalStateException e2)
-				{
-					// ignore
-				}
-				catch (PatternSyntaxException e3)
-				{
-					exception = e3;
-				}
-			}
-			else
-			{
-				statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_ReplaceNeedsFind, null);
-				return;
-			}
-		}
+
 		if (newFind)
 		{
 			if (getConfiguration().getSearchBackward())
@@ -724,28 +771,17 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		else
 		{
-			if (exception != null)
-			{
-				statusLineManager.setMessage(true, exception.getMessage(), null);
-			}
-			else
-			{
-				statusLineManager.setMessage(false, EMPTY, null);
-			}
+			statusLineManager.setMessage(false, EMPTY, null);
 		}
 	}
 
 	private void replaceAll()
 	{
-		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
-		CopiedFromFindReplaceDialog findReplaceDialog = new CopiedFromFindReplaceDialog(findReplaceTarget,
-				statusLineManager);
-
 		setFindText(combo.getText());
 		setFindTextOnReplace(comboReplace.getText());
 		try
 		{
-			int replaced = findReplaceDialog.replaceAll(combo.getText(), comboReplace.getText(), true,
+			int replaced = getFindReplaceDialog().replaceAll(combo.getText(), comboReplace.getText(), true,
 					getConfiguration().getCaseSensitive(), getWholeWord(), getConfiguration().getRegularExpression());
 			showCountTotal();
 			statusLineManager.setMessage(false, String.format(Messages.FindBarDecorator_MSG_Replaced, replaced), null);
@@ -809,10 +845,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 * Note: this method should NEVER be called directly. Always use setVisible (the visibility control is the only
 	 * place that should reference this method).
 	 * 
-	 * @param updateFindTextFromSelection determines whether the find text should be updated from the current text 
-	 * selection. 
+	 * @param updateFocus
+	 *            determines whether the focus show be given to the combo.
 	 */
-	/* default */void showFindBar(boolean updateFindTextFromSelection)
+	/* default */void showFindBar(boolean updateFocus)
 	{
 		if (disableWhenHidden != null)
 		{
@@ -827,24 +863,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			findBarGridData.exclude = false;
 			composite.layout();
-		}
-		Control focusControl = Display.getCurrent().getFocusControl();
-		if (updateFindTextFromSelection && (wasExcluded || focusControl instanceof StyledText))
-		{
-			// Only change the text if it is not activated (otherwise it means it was
-			// already activated and the user was in another control in the find bar and used Ctrl+F, in which case we
-			// don't want to
-			// change it -- other cases mean that Ctrl+F was used from the editor or somewhere else, which means
-			// we have to update it).
-			ISelection selection = sourceViewer.getSelectionProvider().getSelection();
-			if (selection instanceof ITextSelection)
-			{
-				ITextSelection textSelection = (ITextSelection) selection;
-				String text = textSelection.getText();
-				if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1 && text.length() > 0) { //$NON-NLS-1$ //$NON-NLS-2$
-					setFindText(text);
-				}
-			}
 		}
 		if (wasExcluded)
 		{
@@ -867,14 +885,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	/* default */void findPrevious()
 	{
-		findBarFinder.find(false);
 		setFindText(combo.getText());
+		findBarFinder.find(false);
 	}
 
 	/* default */void findNext()
 	{
-		findBarFinder.find(true);
 		setFindText(combo.getText());
+		findBarFinder.find(true);
 	}
 
 	/* default */void findNextOrPrev()
@@ -896,7 +914,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				&& !getConfiguration().getRegularExpression();
 	}
 
-	private void setFindText(String findText)
+	void setFindText(String findText)
 	{
 		setFindText(findText, combo, FindBarEntriesHelper.PREFERENCE_NAME_FIND);
 	}
