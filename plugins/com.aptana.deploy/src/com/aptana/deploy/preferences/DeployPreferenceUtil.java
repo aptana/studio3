@@ -25,7 +25,16 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 public class DeployPreferenceUtil
 {
 
-	private static final QualifiedName DEPLOY_TYPE_QUALIFIED_KEY = new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"); //$NON-NLS-1$
+	// Note: extracting these constants made a huge difference when just switching editors.
+	// (around 98% of the time it was in com.aptana.deploy.preferences.DeployPreferenceUtil.getDeployProviderId
+	// as it's called a bazzilion times from com.aptana.deploy.internal.ProjectPropertyTester.test)
+	private static final QualifiedName DEPLOY_TYPE_QUALIFIED_KEY = new QualifiedName(
+			DeployPlugin.getPluginIdentifier(), "provider"); //$NON-NLS-1$
+	private static final String RED_HAT_STRING = DeployType.RED_HAT.toString();
+	private static final String ENGINEYARD_STRING = DeployType.ENGINEYARD.toString();
+	private static final String CAPISTRANO_STRING = DeployType.CAPISTRANO.toString();
+	private static final String FTP_STRING = DeployType.FTP.toString();
+	private static final String HEROKU_STRING = DeployType.HEROKU.toString();
 
 	/**
 	 * Should only use for compatibility.
@@ -39,28 +48,27 @@ public class DeployPreferenceUtil
 		{
 			return DeployType.NONE;
 		}
-		String type = Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
-				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), null, //$NON-NLS-1$
-				null);
+		String key = MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()); //$NON-NLS-1$
+		String type = Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(), key, null, null);
 		if (type != null)
 		{
-			if (type.equals(DeployType.HEROKU.toString()))
+			if (type.equals(HEROKU_STRING))
 			{
 				return DeployType.HEROKU;
 			}
-			if (type.equals(DeployType.FTP.toString()))
+			if (type.equals(FTP_STRING))
 			{
 				return DeployType.FTP;
 			}
-			if (type.equals(DeployType.CAPISTRANO.toString()))
+			if (type.equals(CAPISTRANO_STRING))
 			{
 				return DeployType.CAPISTRANO;
 			}
-			if (type.equals(DeployType.ENGINEYARD.toString()))
+			if (type.equals(ENGINEYARD_STRING))
 			{
 				return DeployType.ENGINEYARD;
 			}
-			if (type.equals(DeployType.RED_HAT.toString()))
+			if (type.equals(RED_HAT_STRING))
 			{
 				return DeployType.RED_HAT;
 			}
@@ -82,6 +90,9 @@ public class DeployPreferenceUtil
 						container.getFullPath()), null, null);
 	}
 
+	/**
+	 * Note: this method MUST be fast (it's called over and over again when switching an editor).
+	 */
 	public static String getDeployProviderId(IContainer container)
 	{
 		if (container == null)
@@ -139,8 +150,7 @@ public class DeployPreferenceUtil
 	{
 		try
 		{
-			container.setPersistentProperty(
-					new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
+			container.setPersistentProperty(DEPLOY_TYPE_QUALIFIED_KEY, providerId);
 		}
 		catch (CoreException e)
 		{
