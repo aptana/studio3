@@ -1225,6 +1225,10 @@ public class GitRepository
 		{
 			args.add("--track"); //$NON-NLS-1$
 		}
+		else
+		{
+			args.add("--no-track"); //$NON-NLS-1$
+		}
 		args.add(branchName);
 		if (startPoint != null && startPoint.trim().length() > 0)
 		{
@@ -1918,5 +1922,11 @@ public class GitRepository
 			// ignore
 		}
 		return StringUtil.EMPTY;
+	}
+
+	public boolean autoSetupMerge()
+	{
+		IStatus status = execute(ReadWrite.READ, "config", "branch.autosetupmerge"); //$NON-NLS-1$ //$NON-NLS-2$
+		return status != null && status.isOK() && Boolean.valueOf(status.getMessage().trim());
 	}
 }
