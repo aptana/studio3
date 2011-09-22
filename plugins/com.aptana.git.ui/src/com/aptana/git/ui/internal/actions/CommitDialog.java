@@ -895,6 +895,10 @@ class CommitDialog extends StatusDialog
 		{
 			label = Messages.CommitDialog_CommitButton_Label;
 		}
+		else if (id == IDialogConstants.CANCEL_ID)
+		{
+			label = Messages.CommitDialog_CloseButton_Label;
+		}
 		return super.createButton(parent, id, label, defaultButton);
 	}
 
