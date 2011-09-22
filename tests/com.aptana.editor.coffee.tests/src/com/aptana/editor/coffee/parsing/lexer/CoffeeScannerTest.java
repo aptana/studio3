@@ -586,6 +586,22 @@ public class CoffeeScannerTest extends TestCase
 		assertTokenList(source, expected);
 	}
 
+	public void testSlashNewlineContinuation() throws Exception
+	{
+		// @formatter:off
+		String source = 
+		  "isLeech: (card) ->\n" +
+	      "  _no = card.noCount\n" +
+	      "  fmax = @getInt(\"leechFails\")\n" +
+	      "  return false  unless fmax\n" +
+	      "  not card.successive and _no >= fmax and \\\n" +
+	      "    (fmax - _no) % (Math.max(fmax / 2, 1)) == 0";
+        // @formatter:on
+
+		String expected = "[{ {] [IDENTIFIER isLeech] [: :] [PARAM_START (] [IDENTIFIER card] [PARAM_END )] [-> ->] [INDENT 2] [IDENTIFIER _no] [= =] [IDENTIFIER card] [. .] [IDENTIFIER noCount] [TERMINATOR \\n] [IDENTIFIER fmax] [= =] [@ @] [IDENTIFIER getInt] [CALL_START (] [STRING \"leechFails\"] [CALL_END )] [TERMINATOR \\n] [RETURN return] [BOOL false] [POST_IF unless] [IDENTIFIER fmax] [TERMINATOR \\n] [UNARY !] [IDENTIFIER card] [. .] [IDENTIFIER successive] [LOGIC &&] [IDENTIFIER _no] [COMPARE >=] [IDENTIFIER fmax] [LOGIC &&] [( (] [IDENTIFIER fmax] [- -] [IDENTIFIER _no] [) )] [MATH %] [( (] [IDENTIFIER Math] [. .] [IDENTIFIER max] [CALL_START (] [IDENTIFIER fmax] [MATH /] [NUMBER 2] [, ,] [NUMBER 1] [CALL_END )] [) )] [COMPARE ==] [NUMBER 0] [OUTDENT 2] [} }] [TERMINATOR \\n]";
+		assertTokenList(source, expected);
+	}
+
 	/**
 	 * Used to compare the token list we have versus the output of running "coffee -t" on the same code.
 	 * 
