@@ -56,13 +56,39 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployable"
-                        value="true">
-                  </test>
-               </iterate>
+               <or>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployable"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <and>
+                     <with
+                           variable="activePart">
+                        <instanceof
+                              value="org.eclipse.ui.IEditorPart">
+                        </instanceof>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployable"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
+               </or>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -75,82 +101,29 @@
                   checkEnabled="false">
                <or>
                   <with
-                        variable="activePartId">
-                     <or>
-                        <equals
-                              value="com.aptana.explorer.view">
-                        </equals>
-                        <equals
-                              value="org.eclipse.ui.navigator.ProjectExplorer">
-                        </equals>
-                     </or>
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                        </adapt>
+                     </iterate>
                   </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                     </adapt>
-                  </with>
+                  <and>
+                     <with
+                           variable="activePart">
+                        <instanceof
+                              value="org.eclipse.ui.IEditorPart">
+                        </instanceof>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                        </adapt>
+                     </with>
+                  </and>
                </or>
-            </visibleWhen>
-         </dynamic>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
-         <command
-               commandId="com.aptana.deploy.commands.deployApp"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <with
-                        variable="activePart">
-                     <instanceof
-                           value="org.eclipse.ui.IEditorPart">
-                     </instanceof>
-                  </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="com.aptana.deploy.project.isDeployable"
-                              value="true">
-                        </test>
-                     </adapt>
-                  </with>
-               </and>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?before=additions">
-         <dynamic
-               class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
-               id="com.aptana.deploy.popup.other">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <with
-                        variable="activePartId">
-                     <not>
-                        <or>
-                           <equals
-                                 value="com.aptana.explorer.view">
-                           </equals>
-                           <equals
-                                 value="org.eclipse.ui.navigator.ProjectExplorer">
-                           </equals>
-                        </or>
-                     </not>
-                  </with>
-                  <iterate
-                        ifEmpty="false">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                     </adapt>
-                  </iterate>
-               </and>
             </visibleWhen>
          </dynamic>
       </menuContribution>
