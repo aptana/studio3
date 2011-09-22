@@ -25,12 +25,15 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 public class DeployPreferenceUtil
 {
 
+	private static final QualifiedName DEPLOY_TYPE_QUALIFIED_KEY = new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"); //$NON-NLS-1$
+
 	/**
-	 * @deprecated Please only use for compatibility layer internal to this plugin!
+	 * Should only use for compatibility.
+	 * 
 	 * @param project
 	 * @return
 	 */
-	public static DeployType getDeployType(IProject project)
+	private static DeployType getDeployType(IProject project)
 	{
 		if (project == null)
 		{
@@ -88,7 +91,7 @@ public class DeployPreferenceUtil
 		String id = null;
 		try
 		{
-			id = container.getPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider")); //$NON-NLS-1$
+			id = container.getPersistentProperty(DEPLOY_TYPE_QUALIFIED_KEY);
 			if (id == null)
 			{
 				// Add a compatibility layer with old stuff here

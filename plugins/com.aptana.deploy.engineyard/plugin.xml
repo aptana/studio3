@@ -26,44 +26,39 @@
                id="com.aptana.explorer.deploy.engineyard">
             <visibleWhen
                   checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="com.aptana.deploy.engineyard.provider">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </dynamic>
-      </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
-         <dynamic
-               class="com.aptana.deploy.engineyard.ui.EngineYardContributionItem"
-               id="com.aptana.explorer.deploy.engineyard">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
+               <or>
                   <with
-                        variable="activePart">
-                     <instanceof
-                           value="org.eclipse.ui.IEditorPart">
-                     </instanceof>
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.engineyard.provider">
+                           </test>
+                        </adapt>
+                     </iterate>
                   </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="com.aptana.deploy.project.isDeployType"
-                              value="com.aptana.deploy.engineyard.provider">
-                        </test>
-                     </adapt>
-                  </with>
-               </and>
+                  <and>
+                     <with
+                           variable="activePart">
+                        <instanceof
+                              value="org.eclipse.ui.IEditorPart">
+                        </instanceof>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="com.aptana.deploy.project.isDeployType"
+                                 value="com.aptana.deploy.engineyard.provider">
+                           </test>
+                        </adapt>
+                     </with>
+                  </and>
+               </or>
             </visibleWhen>
          </dynamic>
       </menuContribution>

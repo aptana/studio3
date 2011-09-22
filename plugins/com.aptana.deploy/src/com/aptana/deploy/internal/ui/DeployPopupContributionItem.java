@@ -22,6 +22,7 @@ public class DeployPopupContributionItem extends ContributionItem implements IWo
 {
 
 	private IServiceLocator serviceLocator;
+	private MenuManager menuManager;
 
 	public DeployPopupContributionItem()
 	{
@@ -35,12 +36,23 @@ public class DeployPopupContributionItem extends ContributionItem implements IWo
 	@Override
 	public void fill(Menu menu, int index)
 	{
-		MenuManager menuManager = new MenuManager(Messages.DeployPopupContributionItem_Text,
+		menuManager = new MenuManager(Messages.DeployPopupContributionItem_Text,
 				AbstractUIPlugin.imageDescriptorFromPlugin(DeployPlugin.getPluginIdentifier(),
 						DeployPlugin.DEPLOY_MENU_ICON), DeployPlugin.DEPLOY_MENU_ID);
 		IMenuService menuService = (IMenuService) serviceLocator.getService(IMenuService.class);
 		menuService.populateContributionManager(menuManager, MenuUtil.menuUri(menuManager.getId()));
 		menuManager.fill(menu, index);
+	}
+
+	@Override
+	public void dispose()
+	{
+		if (menuManager != null)
+		{
+			menuManager.dispose();
+			menuManager.removeAll();
+			menuManager = null;
+		}
 	}
 
 	public void initialize(IServiceLocator serviceLocator)
