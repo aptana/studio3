@@ -24,22 +24,24 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
+import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
@@ -55,14 +57,20 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+	private static final String APPLICATION_BUNDLE_PATHS_ID = "applicationBundlePaths"; //$NON-NLS-1$
+	private static final String TAG_BUNDLE_PATH = "bundlePath"; //$NON-NLS-1$
+	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
+
 	/**
 	 * System property that holds the OS name
 	 */
 	private static final String OS_NAME = "os.name"; //$NON-NLS-1$
+
 	/**
 	 * OS name fragment to use to match against Linux
 	 */
-	private static final String OS_NAME_LINUX = "inux"; //$NON-NLS-1$
+	private static final String OS_NAME_LINUX = "linux"; //$NON-NLS-1$
+
 	/**
 	 * OS name fragment to use to match against Macs
 	 */
@@ -270,95 +278,16 @@ public class BundleManager
 		{
 			// create new instance
 			INSTANCE = new BundleManager();
-
-			// setup default application bundles path
-			URL url = null;
-			if (ScriptingActivator.getDefault() != null) // For when run outside the IDE...
-			{
-				url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-				if (url != null)
-				{
-					INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
-				}
-			}
-
-			// get possible user override
-			boolean validUserBundlePath = false;
-			String userBundlePathOverride = System.getProperty(IScriptingSystemProperties.RUBLE_USER_LOCATION);
-
-			if (userBundlePathOverride != null)
-			{
-				File f = new File(userBundlePathOverride);
-
-				if (f.exists())
-				{
-					if (f.isDirectory())
-					{
-						if (f.canRead() && f.canWrite())
-						{
-							validUserBundlePath = true;
-						}
-						else
-						{
-							ScriptingActivator.logError(
-									Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
-						}
-					}
-					else
-					{
-						ScriptingActivator.logError(
-								Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
-					}
-				}
-				else
-				{
-					// try to create the path
-					validUserBundlePath = f.mkdirs();
-				}
-
-				if (validUserBundlePath)
-				{
-					INSTANCE.userBundlesPath = f.getAbsolutePath();
-				}
-			}
-
-			if (validUserBundlePath == false)
-			{
-				String OS = null;
-				if (Platform.isRunning())
-				{
-					OS = Platform.getOS();
-				}
-				else
-				{
-					OS = System.getProperty(OS_NAME);
-					if (OS.contains(OS_NAME_MAC))
-					{
-						OS = Platform.OS_MACOSX;
-					}
-					else if (OS.contains(OS_NAME_LINUX))
-					{
-						OS = Platform.OS_LINUX;
-					}
-				}
-				String userHome = System.getProperty(USER_HOME_PROPERTY);
-
-				// setup default user bundles path
-				if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
-				{
-					INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
-				}
-				else
-				{
-					INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
-				}
-			}
+			INSTANCE.initializeBundlePaths();
 		}
 
 		// setup application bundles path
 		if (applicationBundlesPath != null && applicationBundlesPath.length() > 0)
 		{
-			INSTANCE.applicationBundlesPath = applicationBundlesPath;
+			// NOTE: setting the application bundles path directly is done for testing purposes only, so we wipe any
+			// loaded application bundle paths and store the specified path only
+			INSTANCE.applicationBundlesPaths = new ArrayList<String>();
+			INSTANCE.applicationBundlesPaths.add(applicationBundlesPath);
 		}
 
 		// setup user bundles path
@@ -368,6 +297,130 @@ public class BundleManager
 		}
 
 		return INSTANCE;
+	}
+
+	/**
+	 * initializeBundlePaths
+	 */
+	private void initializeBundlePaths()
+	{
+		if (ScriptingActivator.getDefault() != null) // For when run outside the IDE...
+		{
+			final List<String> paths = new ArrayList<String>();
+
+			// @formatter:off
+			EclipseUtil.processConfigurationElements(
+				ScriptingActivator.PLUGIN_ID,
+				APPLICATION_BUNDLE_PATHS_ID,
+				new IConfigurationElementProcessor()
+				{
+					public void processElement(IConfigurationElement element)
+					{
+						String path = element.getAttribute(ATTR_PATH);
+
+						IExtension declaring = element.getDeclaringExtension();
+						String declaringPluginID = declaring.getNamespaceIdentifier();
+						Bundle bundle = Platform.getBundle(declaringPluginID);
+						URL url = bundle.getEntry(path);
+						String urlAsPath = ResourceUtil.resourcePathToString(url);
+
+						if (urlAsPath != null && urlAsPath.length() > 0)
+						{
+							paths.add(urlAsPath);
+						}
+						else
+						{
+							String message = MessageFormat.format(
+								"Unable to convert resource URL in plugin {0} to a string: {1}", //$NON-NLS-1$
+								declaringPluginID,
+								url
+							);
+
+							IdeLog.logError(ScriptingActivator.getDefault(), message);
+						}
+					}
+				},
+				TAG_BUNDLE_PATH
+			);
+			// @formatter:on
+
+			this.applicationBundlesPaths = paths;
+		}
+
+		// get possible user override
+		boolean validUserBundlePath = false;
+		String userBundlePathOverride = System.getProperty(IScriptingSystemProperties.RUBLE_USER_LOCATION);
+
+		if (userBundlePathOverride != null)
+		{
+			File f = new File(userBundlePathOverride);
+
+			if (f.exists())
+			{
+				if (f.isDirectory())
+				{
+					if (f.canRead() && f.canWrite())
+					{
+						validUserBundlePath = true;
+					}
+					else
+					{
+						ScriptingActivator.logError(
+								Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+					}
+				}
+				else
+				{
+					ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(),
+							null);
+				}
+			}
+			else
+			{
+				// try to create the path
+				validUserBundlePath = f.mkdirs();
+			}
+
+			if (validUserBundlePath)
+			{
+				this.userBundlesPath = f.getAbsolutePath();
+			}
+		}
+
+		if (validUserBundlePath == false)
+		{
+			String OS = null;
+
+			if (Platform.isRunning())
+			{
+				OS = Platform.getOS();
+			}
+			else
+			{
+				OS = System.getProperty(OS_NAME).toLowerCase();
+
+				if (OS.contains(OS_NAME_MAC))
+				{
+					OS = Platform.OS_MACOSX;
+				}
+				else if (OS.contains(OS_NAME_LINUX))
+				{
+					OS = Platform.OS_LINUX;
+				}
+			}
+
+			String userHome = System.getProperty(USER_HOME_PROPERTY);
+
+			// setup default user bundles path
+			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			{
+				this.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+			}
+			else
+			{
+				this.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+			}
+		}
 	}
 
 	/**
@@ -400,7 +453,7 @@ public class BundleManager
 	 */
 	private int counter = 0;
 
-	private String applicationBundlesPath;
+	private List<String> applicationBundlesPaths;
 	private String userBundlesPath;
 
 	private Map<File, List<BundleElement>> _bundlesByPath;
@@ -725,34 +778,39 @@ public class BundleManager
 	 */
 	public List<BundleElement> getApplicationBundles()
 	{
-		String applicationBundlesPath = this.getApplicationBundlesPath();
 		List<BundleElement> result = new ArrayList<BundleElement>();
 
-		// make local copy of active keys (files)
-		Set<File> keys;
-
-		synchronized (this._bundlesByPath)
+		if (applicationBundlesPaths != null)
 		{
-			keys = new HashSet<File>(this._bundlesByPath.keySet());
-		}
+			// make local copy of active keys (files)
+			Set<File> keys;
 
-		// filter set
-		Set<File> applicationKeys = new HashSet<File>();
-
-		for (File key : keys)
-		{
-			String path = key.getAbsolutePath();
-
-			if (path.startsWith(applicationBundlesPath))
+			synchronized (this._bundlesByPath)
 			{
-				applicationKeys.add(key);
+				keys = new HashSet<File>(this._bundlesByPath.keySet());
 			}
-		}
 
-		// build result list
-		for (File key : applicationKeys)
-		{
-			result.add(this.getBundleFromPath(key));
+			// filter set
+			Set<File> applicationKeys = new HashSet<File>();
+
+			for (File key : keys)
+			{
+				String path = key.getAbsolutePath();
+
+				for (String applicationBundlesPath : applicationBundlesPaths)
+				{
+					if (path.startsWith(applicationBundlesPath))
+					{
+						applicationKeys.add(key);
+					}
+				}
+			}
+
+			// build result list
+			for (File key : applicationKeys)
+			{
+				result.add(this.getBundleFromPath(key));
+			}
 		}
 
 		return result;
@@ -763,9 +821,9 @@ public class BundleManager
 	 * 
 	 * @return
 	 */
-	public String getApplicationBundlesPath()
+	List<String> getApplicationBundlesPaths()
 	{
-		return this.applicationBundlesPath;
+		return this.applicationBundlesPaths;
 	}
 
 	/**
@@ -1120,13 +1178,18 @@ public class BundleManager
 	{
 		BundlePrecedence result = BundlePrecedence.PROJECT;
 
-		if (path != null)
+		if (path != null && applicationBundlesPaths != null)
 		{
-			if (path.startsWith(this.applicationBundlesPath))
+			for (String applicationBundlesPath : applicationBundlesPaths)
 			{
-				result = BundlePrecedence.APPLICATION;
+				if (path.startsWith(applicationBundlesPath))
+				{
+					result = BundlePrecedence.APPLICATION;
+					break;
+				}
 			}
-			else if (path.startsWith(this.userBundlesPath))
+
+			if (result == BundlePrecedence.PROJECT && path.startsWith(this.userBundlesPath))
 			{
 				result = BundlePrecedence.USER;
 			}
@@ -1705,15 +1768,16 @@ public class BundleManager
 	 */
 	protected void loadApplicationBundles()
 	{
-		String applicationBundles = this.getApplicationBundlesPath();
-
-		if (applicationBundles != null)
+		if (applicationBundlesPaths != null)
 		{
-			File applicationBundlesDirectory = new File(applicationBundles);
-
-			for (File bundle : this.getBundleDirectories(applicationBundlesDirectory))
+			for (String applicationBundle : applicationBundlesPaths)
 			{
-				this.loadBundle(bundle);
+				File applicationBundlesDirectory = new File(applicationBundle);
+
+				for (File bundle : this.getBundleDirectories(applicationBundlesDirectory))
+				{
+					this.loadBundle(bundle);
+				}
 			}
 		}
 	}

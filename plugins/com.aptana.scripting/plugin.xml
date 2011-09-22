@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="com.aptana.scripting.loadPaths" name="%extension-point.name" schema="schema/loadPaths.exsd"/>
-   <extension-point id="com.aptana.scripting.frameworkFiles" name="%extension-point.name.0" schema="schema/frameworkFiles.exsd"/>
-   <extension-point id="com.aptana.scripting.contextContributors" name="%extension-point.name.1" schema="schema/contextContributors.exsd"/>
+   <extension-point id="com.aptana.scripting.loadPaths" name="%scripting.load.paths.extension.point" schema="schema/loadPaths.exsd"/>
+   <extension-point id="com.aptana.scripting.frameworkFiles" name="%scripting.framework.files.extension.point" schema="schema/frameworkFiles.exsd"/>
+   <extension-point id="com.aptana.scripting.contextContributors" name="%context.contributors.extension.point" schema="schema/contextContributors.exsd"/>
+   <extension-point id="com.aptana.scripting.applicationBundlePaths" name="%application.bundles.path.extension.point" schema="schema/applicationBundlePaths.exsd"/>
    <extension
          point="org.eclipse.ui.startup">
       <startup
@@ -83,6 +84,13 @@
             id="com.aptana.scripting.buildPath.contributor"
             name="Scripting Build Path Contributor">
       </contributor>
+   </extension>
+   <extension
+         point="com.aptana.scripting.applicationBundlePaths">
+      <bundlePath
+            name="Default Application Bundles"
+            path="bundles/">
+      </bundlePath>
    </extension>
 
 </plugin>

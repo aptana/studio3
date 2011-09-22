@@ -52,9 +52,9 @@ public abstract class BundleMonitorTests extends TestCase
 		this._manager.reset();
 
 		// setup application and user bundles paths
-		String applicationBundlesPath = this._manager.getApplicationBundlesPath();
+		List<String> applicationBundlesPaths = this._manager.getApplicationBundlesPaths();
 		String userBundlesPath = new File(new File(System.getProperty("java.io.tmpdir")), "bundles").getAbsolutePath();
-		BundleManager.getInstance(applicationBundlesPath, userBundlesPath);
+		BundleManager.getInstance(applicationBundlesPaths.get(0), userBundlesPath);
 
 		// monitoring is turned on by an early startup job, so let's make sure it
 		// has been turned off before turning it on; otherwise, we'll end up
