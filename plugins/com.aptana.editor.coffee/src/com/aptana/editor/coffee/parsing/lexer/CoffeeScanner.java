@@ -141,7 +141,6 @@ public class CoffeeScanner extends Scanner
 	private static final Pattern WHITESPACE = Pattern.compile("^[^\\n\\S]+");
 	private static final Pattern COMMENT = Pattern
 			.compile("^###([^#][\\s\\S]*?)(?:###[^\\n\\S]*|(?:###)?$)|^(?:\\s*#(?!##[^#]).*)+");
-	private static final Pattern CODE = Pattern.compile("^[-=]>");
 	private static final Pattern MULTI_DENT = Pattern.compile("^(?:\\n[^\\n\\S]*)+");
 	private static final Pattern SIMPLESTR = Pattern.compile("^'[^\\\\']*(?:\\\\.[^\\\\']*)*'");
 	private static final Pattern JSTOKEN = Pattern.compile("^`[^\\\\`]*(?:\\\\.[^\\\\`]*)*`");
@@ -164,12 +163,8 @@ public class CoffeeScanner extends Scanner
 	private static final Pattern MULTILINER = Pattern.compile("\\n");
 	private static final Pattern HEREDOC_INDENT = Pattern.compile("\\n+([^\\n\\S]*)");
 	private static final Pattern HEREDOC_ILLEGAL = Pattern.compile("\\*\\/");
-	private static final Pattern ASSIGNED = Pattern
-			.compile("^\\s*@?([$A-Za-z_][$\\w\\x7f-\\uffff]*|['\"].*['\"])[^\\n\\S]*?[:=][^:=>]");
 	private static final Pattern LINE_CONTINUER = Pattern.compile("^\\s*(?:,|\\??\\.(?![.\\d])|::)");
 	private static final Pattern TRAILING_SPACES = Pattern.compile("\\s+$");
-	private static final Pattern NO_NEWLINE = Pattern
-			.compile("^(?:[-+*&|\\/%=<>!.\\\\][<>=&|]*|and|or|is(?:nt)?|n(?:ot|ew)|delete|typeof|instanceof)$");
 
 	private static final Set<String> COMPOUND_ASSIGN = new HashSet<String>();
 	static
@@ -302,10 +297,10 @@ public class CoffeeScanner extends Scanner
 	private int fIndent;
 	private int fIndebt;
 	private int fOutdebt;
-	private Stack<CoffeeSymbol> fTokens;
+	private List<CoffeeSymbol> fTokens;
 	private String fChunk;
 	private boolean fSeenFor;
-	private Stack<Integer> fIndents;
+	private List<Integer> fIndents;
 	private List<CoffeeCommentNode> fComments;
 	private int fOffset;
 
@@ -323,7 +318,7 @@ public class CoffeeScanner extends Scanner
 		return this.fTokens.remove(0);
 	}
 
-	private Stack<CoffeeSymbol> tokenize(String code, Map<String, Object> opts) throws SyntaxError
+	private List<CoffeeSymbol> tokenize(String code, Map<String, Object> opts) throws SyntaxError
 	{
 		if (opts == null)
 		{
@@ -358,12 +353,12 @@ public class CoffeeScanner extends Scanner
 		this.fIndent = 0;
 		this.fIndebt = 0;
 		this.fOutdebt = 0;
-		this.fIndents = new Stack<Integer>();
-		this.fTokens = new Stack<CoffeeSymbol>();
+		this.fIndents = new ArrayList<Integer>();
+		this.fTokens = new ArrayList<CoffeeSymbol>();
 		this.fComments = new ArrayList<CoffeeCommentNode>();
 		this.fOffset = 0;
 
-		while (fOffset < code.length() && (this.fChunk = new String(code.substring(fOffset))).length() > 0)
+		while (fOffset < code.length() && (this.fChunk = code.substring(fOffset)).length() > 0)
 		{
 			int value = this.identifierToken();
 			if (value > 0)
@@ -428,19 +423,31 @@ public class CoffeeScanner extends Scanner
 		}
 		this.closeIndentation();
 		this.fTokens = new CoffeeRewriter().rewrite(this.fTokens);
+
+		// Let GC reclaim the memory from the last chunk and the underlying source code.
+		this.fChunk = null;
+		this.fCode = null;
+		this.fIndents = null;
+
 		return this.fTokens;
 	}
 
 	private int identifierToken() throws SyntaxError
 	{
+		// PERF fix, check first char to be sure it's letter, $, _ or unicode points defined in regexp
+		char c = this.fChunk.charAt(0);
+		if (!Character.isLetter(c) && c != '$' && c != '_' && (((int) c > 65535) || ((int) c < 127)))
+		{
+			return 0;
+		}
+
 		Matcher m = IDENTIFIER.matcher(this.fChunk);
 		if (!m.find())
 		{
 			return 0;
 		}
-		String input = m.group(0); // raw match
+
 		String id = m.group(1); // token string value
-		String colon = m.group(2); // is there a colon?
 
 		if ("own".equals(id) && Terminals.FOR == this.tag())
 		{
@@ -448,6 +455,7 @@ public class CoffeeScanner extends Scanner
 			return id.length();
 		}
 
+		String colon = m.group(2); // is there a colon?
 		boolean forcedIdentifier = colon != null;
 		if (!forcedIdentifier)
 		{
@@ -494,7 +502,7 @@ public class CoffeeScanner extends Scanner
 					tag = Terminals.RELATION;
 					if ("!".equals(this.value()))
 					{
-						this.fTokens.pop();
+						this.fTokens.remove(this.fTokens.size() - 1);
 						id = '!' + id;
 					}
 				}
@@ -541,6 +549,7 @@ public class CoffeeScanner extends Scanner
 				tag = Terminals.STATEMENT;
 			}
 		}
+		String input = m.group(0); // raw match
 		this.token(tag, id, colon == null ? input.length() : input.length() - 1);
 		if (colon != null)
 		{
@@ -669,6 +678,13 @@ public class CoffeeScanner extends Scanner
 
 	private int numberToken()
 	{
+		// PERF fix, check for digit as first char before we try the regexp
+		char c = this.fChunk.charAt(0);
+		if (!Character.isDigit(c))
+		{
+			return 0;
+		}
+
 		Matcher m = NUMBER.matcher(this.fChunk);
 		if (!m.find())
 		{
@@ -717,6 +733,13 @@ public class CoffeeScanner extends Scanner
 
 	private int heredocToken() throws SyntaxError
 	{
+		// PERF Fix, check first char before doing expensive regexp
+		char c = this.fChunk.charAt(0);
+		if (c != '"' && c != '\'')
+		{
+			return 0;
+		}
+
 		Matcher m = HEREDOC.matcher(this.fChunk);
 		if (!m.find())
 		{
@@ -740,6 +763,26 @@ public class CoffeeScanner extends Scanner
 
 	private int commentToken()
 	{
+		// PERF fix, check first char for space or # before trying to match the regexp
+		char c = this.fChunk.charAt(0);
+		if (!Character.isWhitespace(c) && c != '#')
+		{
+			return 0;
+		}
+		// Must be a '#' somewhere or we're definitely not at a comment.
+		int index = this.fChunk.indexOf('#');
+		if (index == -1)
+		{
+			return 0;
+		}
+		// if it's not just whitespace before '#', also not a comment.
+		String leading = fChunk.substring(0, index);
+		if (leading.trim().length() != 0)
+		{
+			return 0;
+		}
+		// END PERF fix.
+
 		Matcher m = COMMENT.matcher(this.fChunk);
 		if (!m.find())
 		{
@@ -755,6 +798,7 @@ public class CoffeeScanner extends Scanner
 		}
 		int addOffset = comment.indexOf('#');
 		int startOffset = this.fOffset + addOffset;
+		// TODO Does this properly chop down the source chunk so it doesn't point to underlying char array from fCode?
 		this.fComments.add(new CoffeeCommentNode(comment.substring(addOffset), startOffset, this.fOffset
 				+ comment.length()));
 		this.fLine += count(comment, "\n");
@@ -773,8 +817,13 @@ public class CoffeeScanner extends Scanner
 
 	private int jsToken()
 	{
-		Matcher match;
-		if (!(this.fChunk.charAt(0) == '`' && ((match = JSTOKEN.matcher(this.fChunk)).find())))
+		if (this.fChunk.charAt(0) != '`')
+		{
+			return 0;
+		}
+
+		Matcher match = JSTOKEN.matcher(this.fChunk);
+		if (!match.find())
 		{
 			return 0;
 		}
@@ -825,7 +874,7 @@ public class CoffeeScanner extends Scanner
 			return heregex.length();
 		}
 		this.token(Terminals.IDENTIFIER, "RegExp");
-		this.fTokens.push(new CoffeeSymbol(Terminals.CALL_START, "("));
+		this.fTokens.add(new CoffeeSymbol(Terminals.CALL_START, "("));
 		Stack<CoffeeSymbol> tmpTokens = new Stack<CoffeeSymbol>();
 		Stack<CoffeeSymbol> interpolatedNodes = this.interpolateString(body, false, true);
 		int _len = interpolatedNodes.size();
@@ -853,14 +902,14 @@ public class CoffeeScanner extends Scanner
 		tmpTokens.pop();
 		if (!tmpTokens.isEmpty() && tmpTokens.get(0) != null && tmpTokens.get(0).getId() != Terminals.STRING)
 		{
-			this.fTokens.push(new CoffeeSymbol(Terminals.STRING, "\"\""));
-			this.fTokens.push(new CoffeeSymbol(Terminals.PLUS, "+"));
+			this.fTokens.add(new CoffeeSymbol(Terminals.STRING, "\"\""));
+			this.fTokens.add(new CoffeeSymbol(Terminals.PLUS, "+"));
 		}
 		this.fTokens.addAll(tmpTokens);
 		if (flags != null && flags.length() > 0)
 		{
-			this.fTokens.push(new CoffeeSymbol(Terminals.COMMA, ","));
-			this.fTokens.push(new CoffeeSymbol(Terminals.STRING, "\"" + flags + "\""));
+			this.fTokens.add(new CoffeeSymbol(Terminals.COMMA, ","));
+			this.fTokens.add(new CoffeeSymbol(Terminals.STRING, "\"" + flags + "\""));
 		}
 		this.token(Terminals.RPAREN, ")");
 		return heregex.length();
@@ -868,6 +917,12 @@ public class CoffeeScanner extends Scanner
 
 	private int lineToken()
 	{
+		// PERF Fix, check char before doing expensive regexp...
+		if (this.fChunk.charAt(0) != '\n')
+		{
+			return 0;
+		}
+
 		Matcher m = MULTI_DENT.matcher(this.fChunk);
 		if (!m.find())
 		{
@@ -900,7 +955,7 @@ public class CoffeeScanner extends Scanner
 			}
 			int diff = size - this.fIndent + this.fOutdebt;
 			this.token(Terminals.INDENT, diff, 0);
-			this.fIndents.push(diff);
+			this.fIndents.add(diff);
 			this.fOutdebt = this.fIndebt = 0;
 		}
 		else
@@ -934,7 +989,7 @@ public class CoffeeScanner extends Scanner
 			}
 			else
 			{
-				dent = this.fIndents.pop() - this.fOutdebt;
+				dent = this.fIndents.remove(this.fIndents.size() - 1) - this.fOutdebt;
 				moveOut -= dent;
 				this.fOutdebt = 0;
 				this.token(Terminals.OUTDENT, dent, 0);
@@ -953,6 +1008,13 @@ public class CoffeeScanner extends Scanner
 
 	private int whitespaceToken()
 	{
+		// PERF Fix, check first character before doing expensive regexp
+		char c = this.fChunk.charAt(0);
+		if (!Character.isWhitespace(c) || c == '\n')
+		{
+			return 0;
+		}
+
 		Matcher match = WHITESPACE.matcher(this.fChunk);
 		boolean nline = (this.fChunk.length() > 0 && this.fChunk.charAt(0) == '\n');
 		boolean matched = match.find();
@@ -992,7 +1054,7 @@ public class CoffeeScanner extends Scanner
 	{
 		if ("\\".equals(this.value()))
 		{
-			this.fTokens.pop();
+			this.fTokens.remove(this.fTokens.size() - 1);
 		}
 		// return this;
 	}
@@ -1004,15 +1066,15 @@ public class CoffeeScanner extends Scanner
 		if (match.find())
 		{
 			value = match.group(0);
-			Matcher codeMatcher = CODE.matcher(value);
-			if (codeMatcher.find())
+			// checking for "->" or "=>"
+			if (value.length() == 2 && (value.charAt(0) == '-' || value.charAt(0) == '=') && value.charAt(1) == '>')
 			{
 				this.tagParameters();
 			}
 		}
 		else
 		{
-			value = "" + this.fChunk.charAt(0);
+			value = Character.toString(this.fChunk.charAt(0));
 		}
 		short tag = terminal(value);
 		CoffeeSymbol prev = last(this.fTokens);
@@ -1251,8 +1313,8 @@ public class CoffeeScanner extends Scanner
 				Map<String, Object> newOptions = new HashMap<String, Object>();
 				newOptions.put("fLine", this.fLine);
 				newOptions.put("rewrite", false);
-				Stack<CoffeeSymbol> nested = new CoffeeScanner().tokenize(inner, newOptions);
-				nested.pop();
+				List<CoffeeSymbol> nested = new CoffeeScanner().tokenize(inner, newOptions);
+				nested.remove(nested.size() - 1);
 				if (nested.get(0) != null && nested.get(0).getId() == Terminals.TERMINATOR)
 				{
 					nested.remove(0);
@@ -1262,7 +1324,7 @@ public class CoffeeScanner extends Scanner
 					if (nested.size() > 1)
 					{
 						nested.add(0, new CoffeeSymbol(Terminals.LPAREN, "("));
-						nested.push(new CoffeeSymbol(Terminals.RPAREN, ")"));
+						nested.add(new CoffeeSymbol(Terminals.RPAREN, ")"));
 					}
 					tmpTokens.push(new CoffeeSymbol(TOKENS, nested));
 				}
@@ -1303,7 +1365,7 @@ public class CoffeeScanner extends Scanner
 			}
 			if (tag == TOKENS)
 			{
-				this.fTokens.addAll((Stack<CoffeeSymbol>) value);
+				this.fTokens.addAll((List<CoffeeSymbol>) value);
 			}
 			else
 			{
@@ -1326,7 +1388,9 @@ public class CoffeeScanner extends Scanner
 	private CoffeeSymbol token(short tokenType, Object value)
 	{
 		// FIXME Need to record the offsets!
-		return this.fTokens.push(new CoffeeSymbol(tokenType, value));
+		CoffeeSymbol symbol = new CoffeeSymbol(tokenType, value);
+		this.fTokens.add(symbol);
+		return symbol;
 	}
 
 	private CoffeeSymbol token(short tokenType, Object value, int length)
@@ -1336,7 +1400,9 @@ public class CoffeeScanner extends Scanner
 
 	private CoffeeSymbol token(short tokenType, Object value, int offset, int length)
 	{
-		return this.fTokens.push(new CoffeeSymbol(tokenType, offset, offset + length, value));
+		CoffeeSymbol symbol = new CoffeeSymbol(tokenType, offset, offset + length, value);
+		this.fTokens.add(symbol);
+		return symbol;
 	}
 
 	private short tag()
@@ -1365,11 +1431,38 @@ public class CoffeeScanner extends Scanner
 		{
 			return true;
 		}
-		CoffeeSymbol prev = last(this.fTokens, 1);
+
 		CoffeeSymbol value = last(this.fTokens);
-		return (prev != null && prev.getId() == Terminals.DOT && value != null && !value.reserved
-				&& NO_NEWLINE.matcher((String) value.getValue()).find()
-				&& !CODE.matcher((String) value.getValue()).find() && !ASSIGNED.matcher(this.fChunk).find());
+		if (value == null)
+		{
+			return false;
+		}
+		// @tag() in ['\\', '.', '?.', 'UNARY', 'MATH', '+', '-', 'SHIFT', 'RELATION'
+		// 'COMPARE', 'LOGIC', 'COMPOUND_ASSIGN', 'THROW', 'EXTENDS']
+		switch (value.getId())
+		{
+			case Terminals.DOT:
+			case Terminals.QUESTION_DOT:
+			case Terminals.UNARY:
+			case Terminals.MATH:
+			case Terminals.PLUS:
+			case Terminals.MINUS:
+			case Terminals.SHIFT:
+			case Terminals.RELATION:
+			case Terminals.COMPARE:
+			case Terminals.LOGIC:
+			case Terminals.COMPOUND_ASSIGN:
+			case Terminals.THROW:
+			case Terminals.EXTENDS:
+				return true;
+			default:
+				return "\\".equals(value.getValue());
+		}
+		// CoffeeSymbol prev = last(this.fTokens, 1);
+		// CoffeeSymbol value = last(this.fTokens);
+		// return (prev != null && prev.getId() == Terminals.DOT && value != null && !value.reserved
+		// && NO_NEWLINE.matcher((String) value.getValue()).find()
+		// && !CODE.matcher((String) value.getValue()).find() && !ASSIGNED.matcher(this.fChunk).find());
 	}
 
 	private String escapeLines(String string)

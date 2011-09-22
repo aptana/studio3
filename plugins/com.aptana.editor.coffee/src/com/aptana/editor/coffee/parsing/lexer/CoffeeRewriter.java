@@ -22,7 +22,6 @@ import com.aptana.editor.coffee.parsing.Terminals;
 public class CoffeeRewriter
 {
 
-	// FIXME Does order matter here?
 	private static Map<Short, Short> BALANCED_PAIRS = new HashMap<Short, Short>();
 	static
 	{
@@ -163,10 +162,46 @@ public class CoffeeRewriter
 		LINEBREAKS.add(Terminals.OUTDENT);
 	}
 
-	private Stack<CoffeeSymbol> fTokens;
+	private static Set<Short> CHECK_FOR_IMPLICIT_INDENTATION = new HashSet<Short>();
+	static
+	{
+		CHECK_FOR_IMPLICIT_INDENTATION.add(Terminals.OUTDENT);
+		CHECK_FOR_IMPLICIT_INDENTATION.add(Terminals.TERMINATOR);
+		CHECK_FOR_IMPLICIT_INDENTATION.add(Terminals.FINALLY);
+	}
+
+	private static Set<Short> IMPLICIT_PARENS_CHECK_1 = new HashSet<Short>();
+	static
+	{
+		IMPLICIT_PARENS_CHECK_1.add(Terminals.IF);
+		IMPLICIT_PARENS_CHECK_1.add(Terminals.ELSE);
+		IMPLICIT_PARENS_CHECK_1.add(Terminals.FUNC_ARROW);
+		IMPLICIT_PARENS_CHECK_1.add(Terminals.BOUND_FUNC_ARROW);
+	}
+
+	private static Set<Short> IMPLICIT_PARENS_CHECK_2 = new HashSet<Short>();
+	static
+	{
+		IMPLICIT_PARENS_CHECK_2.add(Terminals.DOT);
+		IMPLICIT_PARENS_CHECK_2.add(Terminals.QUESTION_DOT);
+		IMPLICIT_PARENS_CHECK_2.add(Terminals.DOUBLE_COLON);
+	}
+
+	private static Set<Short> IMPLICIT_BRACES = new HashSet<Short>();
+	static
+	{
+		IMPLICIT_BRACES.add(Terminals.IDENTIFIER);
+		IMPLICIT_BRACES.add(Terminals.NUMBER);
+		IMPLICIT_BRACES.add(Terminals.STRING);
+		IMPLICIT_BRACES.add(Terminals.AT_SIGIL);
+		IMPLICIT_BRACES.add(Terminals.TERMINATOR);
+		IMPLICIT_BRACES.add(Terminals.OUTDENT);
+	}
+
+	private List<CoffeeSymbol> fTokens;
 	private boolean seenSingle;
 
-	Stack<CoffeeSymbol> rewrite(Stack<CoffeeSymbol> tokens)
+	List<CoffeeSymbol> rewrite(List<CoffeeSymbol> tokens)
 	{
 		this.fTokens = tokens;
 		removeLeadingNewlines();
@@ -327,21 +362,26 @@ public class CoffeeRewriter
 			{
 				endOfStack = stack.get(stack.size() - 1).getId();
 			}
-			if (!(Terminals.COLON == token.getId() && ((Terminals.COLON == this.fTokens.get(i - 2).getId()) || (Terminals.LCURLY != endOfStack))))
+			if (!(Terminals.COLON == token.getId() && ((i >= 2 && Terminals.COLON == this.fTokens.get(i - 2).getId()) || (Terminals.LCURLY != endOfStack))))
 			{
 				i++;
 				continue;
 			}
 			stack.push(new CoffeeSymbol(Terminals.LCURLY, "{"));
 
-			int idx = (Terminals.AT_SIGIL == this.fTokens.get(i - 2).getId() ? i - 2 : i - 1);
-			while (this.fTokens.get(idx - 2).getId() == Terminals.HERECOMMENT)
+			int idx = ((i >= 2 && Terminals.AT_SIGIL == this.fTokens.get(i - 2).getId()) ? i - 2 : i - 1);
+			while (idx >= 2 && this.fTokens.get(idx - 2).getId() == Terminals.HERECOMMENT)
 			{
 				idx -= 2;
 			}
 			// Grab the end of the token before this implicit curly, and use that as our offset
-			CoffeeSymbol replacing = this.fTokens.get(idx - 1);
-			CoffeeSymbol tok = new CoffeeSymbol(Terminals.LCURLY, replacing.getEnd(), replacing.getEnd(), "{");
+			int offsetToUse = 0;
+			if (idx >= 1)
+			{
+				CoffeeSymbol replacing = this.fTokens.get(idx - 1);
+				offsetToUse = replacing.getEnd();
+			}
+			CoffeeSymbol tok = new CoffeeSymbol(Terminals.LCURLY, offsetToUse, offsetToUse, "{");
 			tok.generated = true;
 			this.fTokens.add(idx, tok);
 
@@ -391,14 +431,6 @@ public class CoffeeRewriter
 			return false;
 		}
 		short tag = token.getId();
-		Set<Short> check = new HashSet<Short>();
-		check.add(Terminals.IDENTIFIER);
-		check.add(Terminals.NUMBER);
-		check.add(Terminals.STRING);
-		check.add(Terminals.AT_SIGIL);
-		check.add(Terminals.TERMINATOR);
-		check.add(Terminals.OUTDENT);
-
 		Short twoId = -2;
 		if (i + 2 < this.fTokens.size())
 		{
@@ -409,12 +441,14 @@ public class CoffeeRewriter
 		{
 			threeId = this.fTokens.get(i + 3).getId();
 		}
-		return ( //
-				(Terminals.TERMINATOR == tag || Terminals.OUTDENT == tag) && //
-				!(Terminals.COLON == twoId || Terminals.AT_SIGIL == oneId && Terminals.COLON == threeId) //
-				) //
-				|| //
-				(Terminals.COMMA == tag && !check.contains(oneId)); //
+		// @formatter:off
+		return (
+				(Terminals.TERMINATOR == tag || Terminals.OUTDENT == tag) &&
+				!(Terminals.COLON == twoId || Terminals.AT_SIGIL == oneId && Terminals.COLON == threeId)
+				)
+				||
+				(Terminals.COMMA == tag && !IMPLICIT_BRACES.contains(oneId));
+		// @formatter:on
 	}
 
 	private List<CoffeeSymbol> indentation(CoffeeSymbol token)
@@ -445,11 +479,7 @@ public class CoffeeRewriter
 				continue;
 			}
 
-			Set<Short> toCheck = new HashSet<Short>();
-			toCheck.add(Terminals.OUTDENT);
-			toCheck.add(Terminals.TERMINATOR);
-			toCheck.add(Terminals.FINALLY);
-			if (Terminals.CATCH == tag && toCheck.contains(this.fTokens.get(i + 2).getId()))
+			if (Terminals.CATCH == tag && CHECK_FOR_IMPLICIT_INDENTATION.contains(this.fTokens.get(i + 2).getId()))
 			{
 				this.fTokens.addAll(i + 2, indentation(token));
 				i += 4;
@@ -622,13 +652,7 @@ public class CoffeeRewriter
 			return true;
 		}
 		short tag = token.getId();
-
-		Set<Short> toCheck = new HashSet<Short>();
-		toCheck.add(Terminals.IF);
-		toCheck.add(Terminals.ELSE);
-		toCheck.add(Terminals.FUNC_ARROW);
-		toCheck.add(Terminals.BOUND_FUNC_ARROW);
-		if (toCheck.contains(tag))
+		if (IMPLICIT_PARENS_CHECK_1.contains(tag))
 		{
 			seenSingle = true;
 		}
@@ -639,11 +663,7 @@ public class CoffeeRewriter
 			prev = this.fTokens.get(i - 1);
 		}
 
-		Set<Short> toCheck2 = new HashSet<Short>();
-		toCheck2.add(Terminals.DOT);
-		toCheck2.add(Terminals.QUESTION_DOT);
-		toCheck2.add(Terminals.DOUBLE_COLON);
-		if (toCheck2.contains(tag) && prev != null && Terminals.OUTDENT == prev.getId())
+		if (IMPLICIT_PARENS_CHECK_2.contains(tag) && prev != null && Terminals.OUTDENT == prev.getId())
 		{
 			return true;
 		}
@@ -811,8 +831,7 @@ public class CoffeeRewriter
 
 			// Use start offset of next token as our start and end offset
 			CoffeeSymbol val = new CoffeeSymbol(oppos, token.getStart(), token.getStart(),
-					Terminals.INDENT == mtag ? match.getValue()
-					: Terminals.getValue(oppos));
+					Terminals.INDENT == mtag ? match.getValue() : Terminals.getValue(oppos));
 
 			if (mtag == this.fTokens.get(i + 2).getId())
 			{
