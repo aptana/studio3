@@ -293,106 +293,136 @@ public class CopyFilesOperation {
 				return false;
 			}
 		}
-        try {
-        	SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
-        } catch (CoreException e) {
-			IOUIPlugin.logError(MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopy, sourceStore,
-					destinationStore), e);
-            success = false;
-        }
-        return success;
-    }
 
-    /**
-     * @param sourceStore
-     *            the file to be copied
-     * @param sourceRoot
-     *            the source root
-     * @param destinationRoot
-     *            the destination root
-     * @param monitor
-     *            the progress monitor
-     * @return true if the file is successfully copied, false if the operation
-     *         did not go through for any reason
-     */
-    protected boolean copyFile(IFileStore sourceStore, IFileStore sourceRoot,
-            IFileStore destinationRoot, IProgressMonitor monitor) {
-        if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore)) {
-            return false;
-        }
+		try
+		{
+			SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
+			// copy the children recursively
+			IFileStore[] childStores = sourceStore.childStores(EFS.NONE, monitor);
+			IFileStore destChildStore;
+			for (IFileStore childStore : childStores)
+			{
+				destChildStore = destinationStore.getChild(childStore.getName());
+				copyFile(childStore, destChildStore, monitor);
+			}
+		}
+		catch (CoreException e)
+		{
+			IOUIPlugin.logError(
+					MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopy, sourceStore, destinationStore),
+					e);
+			success = false;
+		}
+		return success;
+	}
 
-        boolean success = true;
-        IFileStore[] sourceStores = null, targetStores = null;
-        try {
-            if (sourceStore.equals(sourceRoot)) {
-                // copying the whole source
-                sourceStores = sourceRoot.childStores(EFS.NONE, monitor);
-                targetStores = new IFileStore[sourceStores.length];
-                for (int i = 0; i < targetStores.length; ++i) {
-                    targetStores[i] = destinationRoot.getChild(sourceStores[i].getName());
-                }
-            } else if (sourceRoot.isParentOf(sourceStore)) {
-                // finds the relative path of the file to be copied and maps to
-                // the destination target
-                sourceStores = new IFileStore[1];
-                sourceStores[0] = sourceStore;
+	/**
+	 * @param sourceStore
+	 *            the file to be copied
+	 * @param sourceRoot
+	 *            the source root
+	 * @param destinationRoot
+	 *            the destination root
+	 * @param monitor
+	 *            the progress monitor
+	 * @return true if the file is successfully copied, false if the operation did not go through for any reason
+	 */
+	protected boolean copyFile(IFileStore sourceStore, IFileStore sourceRoot, IFileStore destinationRoot,
+			IProgressMonitor monitor)
+	{
+		if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore))
+		{
+			return false;
+		}
 
-                targetStores = new IFileStore[1];
-                String sourceRootPath = sourceRoot.toString();
-                String sourcePath = sourceStore.toString();
-                int index = sourcePath.indexOf(sourceRootPath);
-                if (index > -1) {
-                    String relativePath = sourcePath.substring(index + sourceRootPath.length());
-                    targetStores[0] = destinationRoot.getFileStore(new Path(relativePath));
-                    // makes sure the parent folder is created on the
-                    // destination side
-                    IFileStore parent = getFolderStore(targetStores[0]);
-                    if (parent != targetStores[0]) {
-                        parent.mkdir(EFS.NONE, monitor);
-                    }
-                }
-            }
-            if (sourceStores == null) {
-                // the file to be copied is not a child of the source root;
-                // cannot copy
-                success = false;
-                sourceStores = new IFileStore[0];
-                targetStores = new IFileStore[0];
-            }
+		boolean success = true;
+		IFileStore[] sourceStores = null, targetStores = null;
+		try
+		{
+			if (sourceStore.equals(sourceRoot))
+			{
+				// copying the whole source
+				sourceStores = sourceRoot.childStores(EFS.NONE, monitor);
+				targetStores = new IFileStore[sourceStores.length];
+				for (int i = 0; i < targetStores.length; ++i)
+				{
+					targetStores[i] = destinationRoot.getChild(sourceStores[i].getName());
+				}
+			}
+			else if (sourceRoot.isParentOf(sourceStore))
+			{
+				// finds the relative path of the file to be copied and maps to
+				// the destination target
+				sourceStores = new IFileStore[1];
+				sourceStores[0] = sourceStore;
 
-            for (int i = 0; i < sourceStores.length; ++i) {
-                success = copyFile(sourceStores[i], targetStores[i], monitor) && success;
-            }
-        } catch (CoreException e) {
-			IOUIPlugin.logError(MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopyToDest, sourceStore,
-					destinationRoot), e);
-            success = false;
-        }
-        return success;
-    }
+				targetStores = new IFileStore[1];
+				String sourceRootPath = sourceRoot.toString();
+				String sourcePath = sourceStore.toString();
+				int index = sourcePath.indexOf(sourceRootPath);
+				if (index > -1)
+				{
+					String relativePath = sourcePath.substring(index + sourceRootPath.length());
+					targetStores[0] = destinationRoot.getFileStore(new Path(relativePath));
+					// makes sure the parent folder is created on the
+					// destination side
+					IFileStore parent = getFolderStore(targetStores[0]);
+					if (parent != targetStores[0])
+					{
+						parent.mkdir(EFS.NONE, monitor);
+					}
+				}
+			}
+			if (sourceStores == null)
+			{
+				// the file to be copied is not a child of the source root;
+				// cannot copy
+				success = false;
+				sourceStores = new IFileStore[0];
+				targetStores = new IFileStore[0];
+			}
 
-    private void copyFiles(final IFileStore[] sources, final IFileStore destination,
-            IJobChangeListener listener) {
-        Job job = new Job(Messages.CopyFilesOperation_CopyJob_Title) {
+			for (int i = 0; i < sourceStores.length; ++i)
+			{
+				success = copyFile(sourceStores[i], targetStores[i], monitor) && success;
+			}
+		}
+		catch (CoreException e)
+		{
+			IOUIPlugin.logError(MessageFormat.format(
+					Messages.CopyFilesOperation_ERR_FailedToCopyToDest, sourceStore, destinationRoot), e);
+			success = false;
+		}
+		return success;
+	}
 
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                return copyFiles(sources, destination, monitor);
-            }
+	private void copyFiles(final IFileStore[] sources, final IFileStore destination, IJobChangeListener listener)
+	{
+		Job job = new Job(Messages.CopyFilesOperation_CopyJob_Title)
+		{
 
-            public boolean belongsTo(Object family) {
-                if (Messages.CopyFilesOperation_CopyJob_Title.equals(family)) {
-                    return true;
-                }
-                return super.belongsTo(family);
-            }
-        };
-        if (listener != null) {
-            job.addJobChangeListener(listener);
-        }
-        job.setUser(true);
-        job.schedule();
-    }
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				return copyFiles(sources, destination, monitor);
+			}
+
+			public boolean belongsTo(Object family)
+			{
+				if (Messages.CopyFilesOperation_CopyJob_Title.equals(family))
+				{
+					return true;
+				}
+				return super.belongsTo(family);
+			}
+		};
+		if (listener != null)
+		{
+			job.addJobChangeListener(listener);
+		}
+		job.setUser(true);
+		job.schedule();
+	}
 
 	private void copyFiles(final IFileStore[] sources, final IFileStore sourceRoot, final IFileStore destinationRoot,
 			IJobChangeListener listener)
