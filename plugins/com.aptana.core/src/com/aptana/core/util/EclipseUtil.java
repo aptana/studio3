@@ -473,9 +473,9 @@ public class EclipseUtil
 				{
 					for (IExtension extension : extensionPoint.getExtensions())
 					{
-						for (IConfigurationElement element : extension.getConfigurationElements())
+						for (String elementName : elementNames)
 						{
-							for (String elementName : elementNames)
+							for (IConfigurationElement element : extension.getConfigurationElements())
 							{
 								if (element.getName().equals(elementName))
 								{
