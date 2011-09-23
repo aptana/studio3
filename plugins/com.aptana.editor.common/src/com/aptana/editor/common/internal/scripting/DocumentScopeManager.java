@@ -166,6 +166,10 @@ public class DocumentScopeManager implements IDocumentScopeManager
 				scopes = document.getPositions(ICommonConstants.SCOPE_CATEGORY);
 				index = document.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
 			}
+			if (scopes == null || scopes.length == 0)
+			{
+				return null;
+			}
 			if (index >= scopes.length)
 			{
 				index = scopes.length - 1;
