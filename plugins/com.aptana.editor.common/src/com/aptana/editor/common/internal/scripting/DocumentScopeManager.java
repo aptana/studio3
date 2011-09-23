@@ -168,7 +168,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			}
 			if (index >= scopes.length)
 			{
-				return null;
+				index = scopes.length - 1;
 			}
 			Position scope = scopes[index];
 			if (scope == null)
