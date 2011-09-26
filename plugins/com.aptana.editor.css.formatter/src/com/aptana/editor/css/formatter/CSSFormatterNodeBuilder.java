@@ -19,6 +19,7 @@ import com.aptana.editor.css.formatter.nodes.FormatterCSSPunctuationNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSErrorDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSExpressionNode;
 import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
 import com.aptana.editor.css.parsing.ast.CSSMediaNode;
@@ -422,6 +423,17 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			CSSDeclarationNode declarationNode = declarations[i];
 			CSSExpressionNode expressionNode = declarationNode.getAssignedValue();
 
+			// If we run into a CSSErrorDeclarationNode, we just create a text node and move on to the next declaration
+			// node
+			if (declarationNode instanceof CSSErrorDeclarationNode)
+			{
+				formatterBlockNode.addChild(createTextNode(document, declarationNode.getStartingOffset(),
+						declarationNode.getEndingOffset() + 1));
+				// Create text nodes for comments between declaration
+				findAndPushCommentsBetweenDeclarations(parentEndOffset, declarations, formatterBlockNode, i);
+				continue;
+			}
+
 			// push the property
 			FormatterBlockWithBeginNode formatterDeclarationPropertyNode = new FormatterCSSDeclarationPropertyNode(
 					document);
@@ -464,20 +476,26 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 
 			// Create text nodes for comments between declaration
-			if (i + 1 < declarations.length)
+			findAndPushCommentsBetweenDeclarations(parentEndOffset, declarations, formatterBlockNode, i);
+		}
+	}
+
+	private void findAndPushCommentsBetweenDeclarations(int parentEndOffset, CSSDeclarationNode[] declarations,
+			FormatterBlockWithBeginEndNode formatterBlockNode, int currentDeclarationIndex)
+	{
+		if (currentDeclarationIndex + 1 < declarations.length)
+		{
+			if (getBeginWithoutWhiteSpaces(declarations[currentDeclarationIndex].getEndingOffset() + 1, document) < declarations[currentDeclarationIndex + 1]
+					.getStartingOffset())
 			{
-				if (getBeginWithoutWhiteSpaces(declarations[i].getEndingOffset() + 1, document) < declarations[i + 1]
-						.getStartingOffset())
-				{
-					formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
-							declarations[i + 1].getStartingOffset()));
-				}
+				formatterBlockNode.addChild(createTextNode(document, declarations[currentDeclarationIndex].getEndingOffset() + 1,
+						declarations[currentDeclarationIndex + 1].getStartingOffset()));
 			}
-			else if (getBeginWithoutWhiteSpaces(declarations[i].getEndingOffset() + 1, document) < parentEndOffset)
-			{
-				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
-						parentEndOffset));
-			}
+		}
+		else if (getBeginWithoutWhiteSpaces(declarations[currentDeclarationIndex].getEndingOffset() + 1, document) < parentEndOffset)
+		{
+			formatterBlockNode.addChild(createTextNode(document, declarations[currentDeclarationIndex].getEndingOffset() + 1,
+					parentEndOffset));
 		}
 	}
 
