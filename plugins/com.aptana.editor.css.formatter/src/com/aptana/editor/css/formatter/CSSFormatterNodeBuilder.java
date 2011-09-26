@@ -409,7 +409,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		pushFormatterDeclarationNodes(ruleNode.getEndingOffset(), declarations, formatterBlockNode);
-		checkedPop(formatterBlockNode, -1);
+		checkedPop(formatterBlockNode, ruleNode.getEndingOffset());
 		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 
 	}
@@ -488,14 +488,15 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (getBeginWithoutWhiteSpaces(declarations[currentDeclarationIndex].getEndingOffset() + 1, document) < declarations[currentDeclarationIndex + 1]
 					.getStartingOffset())
 			{
-				formatterBlockNode.addChild(createTextNode(document, declarations[currentDeclarationIndex].getEndingOffset() + 1,
+				formatterBlockNode.addChild(createTextNode(document,
+						declarations[currentDeclarationIndex].getEndingOffset() + 1,
 						declarations[currentDeclarationIndex + 1].getStartingOffset()));
 			}
 		}
 		else if (getBeginWithoutWhiteSpaces(declarations[currentDeclarationIndex].getEndingOffset() + 1, document) < parentEndOffset)
 		{
-			formatterBlockNode.addChild(createTextNode(document, declarations[currentDeclarationIndex].getEndingOffset() + 1,
-					parentEndOffset));
+			formatterBlockNode.addChild(createTextNode(document,
+					declarations[currentDeclarationIndex].getEndingOffset() + 1, parentEndOffset));
 		}
 	}
 
