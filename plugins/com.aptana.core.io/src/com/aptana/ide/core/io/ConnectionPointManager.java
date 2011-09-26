@@ -34,6 +34,7 @@ import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 
@@ -529,7 +530,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 
 			String categoryId = element.getAttribute(ATT_CATEGORY);
 			if (categoryId == null || categoryId.length() == 0) {
-				categoryId = ""; //$NON-NLS-1$
+				categoryId = StringUtil.EMPTY;
 			}
 
 			String clazz = element.getAttribute(ATT_CLASS);

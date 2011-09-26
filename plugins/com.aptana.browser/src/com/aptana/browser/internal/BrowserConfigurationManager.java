@@ -206,7 +206,7 @@ public class BrowserConfigurationManager
 			String categoryId = element.getAttribute(ATT_CATEGORY);
 			if (StringUtil.isEmpty(categoryId))
 			{
-				categoryId = ""; //$NON-NLS-1$
+				categoryId = StringUtil.EMPTY;
 			}
 			String imageId = element.getAttribute(ATT_IMAGE);
 

@@ -205,9 +205,9 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public static String serializeList(String[] list) {
 		if (list == null) {
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (int i = 0; i < list.length; i++) {
 			if (i > 0) {
 				buffer.append(',');

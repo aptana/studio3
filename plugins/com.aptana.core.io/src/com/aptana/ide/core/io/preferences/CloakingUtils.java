@@ -134,7 +134,7 @@ public class CloakingUtils {
         String extensions = Platform.getPreferencesService().getString(CoreIOPlugin.PLUGIN_ID,
                 IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS,
                 PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS, null);
-        if (extensions.equals("")) { //$NON-NLS-1$
+        if (StringUtil.EMPTY.equals(extensions)) {
             return ArrayUtil.NO_STRINGS;
         }
         return extensions.split(";"); //$NON-NLS-1$

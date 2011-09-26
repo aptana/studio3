@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.ProgressMonitorInterrupter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.PermissionDeniedException;
 
@@ -66,7 +67,7 @@ public final class SyncUtils {
 		try {
 			monitor = (monitor == null) ? new NullProgressMonitor() : monitor;
 			checkCanceled(monitor);
-			monitor.beginTask("", (sourceInfo == null) ? 3 : 2); //$NON-NLS-1$
+			monitor.beginTask(StringUtil.EMPTY, (sourceInfo == null) ? 3 : 2);
 			if (sourceInfo == null) {
 				sourceInfo = source.fetchInfo(IExtendedFileStore.DETAILED, subMonitorFor(monitor, 1));
 			}

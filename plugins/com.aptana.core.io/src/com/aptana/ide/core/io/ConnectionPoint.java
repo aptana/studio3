@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.vfs.VirtualConnectionManager;
+import com.aptana.core.util.StringUtil;
 
 /**
  * Base class for all connection points
@@ -51,7 +52,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	 * 
 	 */
 	protected ConnectionPoint() {
-		this(""); //$NON-NLS-1$
+		this(StringUtil.EMPTY);
 	}
 
 	/* (non-Javadoc)

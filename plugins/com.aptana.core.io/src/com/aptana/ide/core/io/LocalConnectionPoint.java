@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -127,11 +128,11 @@ public class LocalConnectionPoint extends ConnectionPoint {
             return false;
         }
 
-        if (items[0] == null || items[0].equals("")) { //$NON-NLS-1$
+        if (items[0] == null || StringUtil.EMPTY.equals(items[0])) {
             return false;
         }
         setName(items[0]);
-        if (items[1] == null || items[1].equals("")) { //$NON-NLS-1$
+        if (items[1] == null || StringUtil.EMPTY.equals(items[1])) {
             setPath(Path.ROOT);
         } else {
             Path path = new Path(items[1]);

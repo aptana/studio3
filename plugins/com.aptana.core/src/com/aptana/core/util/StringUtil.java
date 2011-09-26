@@ -79,7 +79,7 @@ public class StringUtil
 		}
 
 		int length = items.length;
-		String result = ""; //$NON-NLS-1$
+		String result = EMPTY;
 
 		if (length > 0)
 		{
@@ -219,7 +219,7 @@ public class StringUtil
 			String value = entry.getValue();
 			if (value == null)
 			{
-				value = ""; //$NON-NLS-1$
+				value = EMPTY;
 			}
 			else
 			{

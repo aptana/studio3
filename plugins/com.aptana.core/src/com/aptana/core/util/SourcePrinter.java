@@ -36,7 +36,7 @@ public class SourcePrinter
 	{
 		this._buffer = new StringBuffer();
 		this._indentText = indent;
-		this._currentIndent = ""; //$NON-NLS-1$
+		this._currentIndent = StringUtil.EMPTY;
 		this._newLine = DEFAULT_NEWLINE;
 	}
 	
@@ -171,7 +171,7 @@ public class SourcePrinter
 	 */
 	public SourcePrinter println()
 	{
-		this.println(""); //$NON-NLS-1$
+		this.println(StringUtil.EMPTY);
 
 		return this;
 	}

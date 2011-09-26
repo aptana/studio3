@@ -40,6 +40,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.core.util.ProgressMonitorInterrupter;
 import com.aptana.core.util.ProgressMonitorInterrupter.InterruptDelegate;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.PermissionDeniedException;
@@ -54,7 +55,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected static final int CACHE_TTL = 60000; /* 1min */
 
 	private static final int RETRIES_AFTER_FAILURE = 2;
-	protected static final char[] EMPTY_PASSWORD = "".toCharArray(); //$NON-NLS-1$
+	protected static final char[] EMPTY_PASSWORD = StringUtil.EMPTY.toCharArray();
 	protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 	protected static final byte[] EMPTY_BYTES = new byte[0];
 	protected static final IExtendedFileInfo[] EMPTY_FILEINFO_ARRAY = new IExtendedFileInfo[0];

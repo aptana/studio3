@@ -498,7 +498,7 @@ public final class PlatformUtil
 					}
 				}
 			}
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		return null;
 	}
