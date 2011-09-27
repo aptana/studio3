@@ -159,8 +159,8 @@ public abstract class AbstractPortalBrowserEditor extends EditorPart
 	{
 		if (Platform.ARCH_X86.equals(Platform.getOSArch()))
 		{
-			return Platform.OS_WIN32.equals(Platform.getOS()) /* || Platform.OS_MACOSX.equals(Platform.getOS()) */
-					|| Platform.OS_LINUX.equals(Platform.getOS());
+			return /*Platform.OS_WIN32.equals(Platform.getOS())  || Platform.OS_MACOSX.equals(Platform.getOS()) 
+					||*/ Platform.OS_LINUX.equals(Platform.getOS());
 		}
 		else if (Platform.ARCH_X86_64.equals(Platform.getOSArch()))
 		{
