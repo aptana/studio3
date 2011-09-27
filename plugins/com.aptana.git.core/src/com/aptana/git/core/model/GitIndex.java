@@ -100,12 +100,12 @@ public class GitIndex
 					return Status.OK_STATUS;
 				}
 			};
+			indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
 		}
 		else
 		{
 			indexRefreshJob.cancel();
 		}
-		indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
 		indexRefreshJob.schedule(250);
 	}
 
