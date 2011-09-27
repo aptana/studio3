@@ -15,12 +15,12 @@ import com.aptana.git.core.GitCoreTests;
 import com.aptana.git.core.model.CoreModelTests;
 import com.aptana.git.internal.core.storage.CoreStorageTests;
 
-public class AllTests
+public class AllGitCoreTests
 {
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllTests.class.getName())
+		TestSuite suite = new TestSuite(AllGitCoreTests.class.getName())
 		{
 			@Override
 			public void runTest(Test test, TestResult result)

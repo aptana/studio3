@@ -41,13 +41,13 @@ public class DeleteBranchItem extends AbstractDynamicBranchItem
 		IResource resource = getSelectedResource();
 		if (resource == null)
 		{
-			return new IContributionItem[0];
+			return NO_CONTRIBUTION_ITEMS;
 		}
 
 		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 		{
-			return new IContributionItem[0];
+			return NO_CONTRIBUTION_ITEMS;
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
@@ -58,7 +58,7 @@ public class DeleteBranchItem extends AbstractDynamicBranchItem
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 
-	private class DeleteBranchContributionItem extends ContributionItem
+	private static class DeleteBranchContributionItem extends ContributionItem
 	{
 
 		private GitRepository repo;

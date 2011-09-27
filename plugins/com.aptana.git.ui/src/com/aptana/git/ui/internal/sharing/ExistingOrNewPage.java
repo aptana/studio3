@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitExecutable;
@@ -91,9 +92,13 @@ class ExistingOrNewPage extends WizardPage
 			treeItem.setText(1, project.getLocation().toOSString());
 			URI gitDir = getGitRepositoryManager().gitDirForURL(project.getLocationURI());
 			if (gitDir == null)
-				treeItem.setText(2, ""); //$NON-NLS-1$
+			{
+				treeItem.setText(2, StringUtil.EMPTY);
+			}
 			else
+			{
 				treeItem.setText(2, gitDir.getPath());
+			}
 		}
 
 		button = new Button(g, SWT.PUSH);
@@ -130,7 +135,8 @@ class ExistingOrNewPage extends WizardPage
 				catch (CoreException e2)
 				{
 					IdeLog.logError(GitUIPlugin.getDefault(),
-							NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir), e2, IDebugScopes.DEBUG);
+							NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir), e2,
+							IDebugScopes.DEBUG);
 				}
 				for (TreeItem ti : tree.getSelection())
 				{
@@ -189,14 +195,17 @@ class ExistingOrNewPage extends WizardPage
 		for (TreeItem ti : tree.getSelection())
 		{
 			String path = ti.getText(2);
-			if (!path.equals("")) { //$NON-NLS-1$
+			if (path.length() != 0)
+			{
 				p = null;
 				break;
 			}
 			String gitDirParentCandidate = ti.getText(1);
 			IPath thisPath = Path.fromOSString(gitDirParentCandidate);
 			if (p == null)
+			{
 				p = thisPath;
+			}
 			else
 			{
 				int n = p.matchingFirstSegments(thisPath);
@@ -210,7 +219,7 @@ class ExistingOrNewPage extends WizardPage
 		}
 		else
 		{
-			repositoryToCreate.setText(""); //$NON-NLS-1$
+			repositoryToCreate.setText(StringUtil.EMPTY);
 		}
 		button.setEnabled(p != null);
 		repositoryToCreate.setEnabled(p != null);
@@ -224,7 +233,8 @@ class ExistingOrNewPage extends WizardPage
 		{
 			TreeItem ti = tree.getItem(0);
 			String path = ti.getText(2);
-			if (path.equals("")) { //$NON-NLS-1$
+			if (path.length() == 0)
+			{
 				return false;
 			}
 		}
@@ -235,7 +245,8 @@ class ExistingOrNewPage extends WizardPage
 			for (TreeItem ti : tree.getSelection())
 			{
 				String path = ti.getText(2);
-				if (path.equals("")) { //$NON-NLS-1$
+				if (path.length() == 0)
+				{
 					return false;
 				}
 			}
@@ -252,7 +263,9 @@ class ExistingOrNewPage extends WizardPage
 		}
 		IProject[] ret = new IProject[tree.getSelection().length];
 		for (int i = 0; i < ret.length; ++i)
+		{
 			ret[i] = (IProject) tree.getSelection()[i].getData();
+		}
 		return ret;
 	}
 }

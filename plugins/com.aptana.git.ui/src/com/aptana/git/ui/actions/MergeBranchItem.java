@@ -41,13 +41,13 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 		IResource resource = getSelectedResource();
 		if (resource == null)
 		{
-			return new IContributionItem[0];
+			return NO_CONTRIBUTION_ITEMS;
 		}
 
 		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 		{
-			return new IContributionItem[0];
+			return NO_CONTRIBUTION_ITEMS;
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
@@ -58,12 +58,7 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 
-	private void mergeBranch(final GitRepository repo, final String branchName)
-	{
-		MergeBranchHandler.mergeBranch(repo, branchName);
-	}
-
-	private class MergeBranchContributionItem extends ContributionItem
+	private static class MergeBranchContributionItem extends ContributionItem
 	{
 		private GitRepository repo;
 		private String branchName;
@@ -88,6 +83,11 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 					mergeBranch(repo, branchName);
 				}
 			});
+		}
+
+		private void mergeBranch(final GitRepository repo, final String branchName)
+		{
+			MergeBranchHandler.mergeBranch(repo, branchName);
 		}
 	}
 }

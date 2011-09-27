@@ -145,7 +145,7 @@ public class GitHistoryPage extends HistoryPage
 	private IWorkbenchPartSite getWorkbenchSite()
 	{
 		final IWorkbenchPart part = getHistoryPageSite().getPart();
-		return part != null ? part.getSite() : null;
+		return (part != null) ? part.getSite() : null;
 	}
 
 	private void schedule(final Job j)
@@ -461,9 +461,12 @@ public class GitHistoryPage extends HistoryPage
 
 	private String pad(String string, int desiredLength, char padChar)
 	{
-		while (string.length() < desiredLength)
-			string = padChar + string;
-		return string;
+		StringBuilder builder = new StringBuilder(string);
+		while (builder.length() < desiredLength)
+		{
+			builder.insert(0, padChar);
+		}
+		return builder.toString();
 	}
 
 	@Override

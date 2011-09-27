@@ -179,13 +179,14 @@ public class CloneJob extends Job
 		return Status.OK_STATUS;
 	}
 
-	private class CloneRunnable implements Runnable
+	private static class CloneRunnable implements Runnable
 	{
+		private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 		private Process p;
 		private IProgressMonitor monitor;
 		private IStatus status;
 
-		public CloneRunnable(Process p, IProgressMonitor monitor)
+		CloneRunnable(Process p, IProgressMonitor monitor)
 		{
 			this.p = p;
 			this.monitor = monitor;
@@ -202,15 +203,14 @@ public class CloneJob extends Job
 			SubMonitor sub = SubMonitor.convert(monitor, 100);
 			// Only sniff for "receiving objects", which is the meat of the operation
 			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
-			InputStreamReader isr = null;
+			BufferedReader br = null;
 			int lastPercent = 0;
 			try
 			{
-				isr = new InputStreamReader(p.getErrorStream(), "UTF-8"); //$NON-NLS-1$
 				StringBuilder builder = new StringBuilder();
-				BufferedReader br = new BufferedReader(isr);
+				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), UTF_8));
 				String line = null;
-				while ((line = br.readLine()) != null)
+				while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 				{
 					if (monitor.isCanceled())
 					{
@@ -219,7 +219,7 @@ public class CloneJob extends Job
 						return;
 					}
 					sub.subTask(line);
-					builder.append(line).append("\n"); //$NON-NLS-1$
+					builder.append(line).append('\n');
 					// Else, read in the line and see if we can sniff progress
 					Matcher m = percentPattern.matcher(line);
 					if (m.find())
@@ -234,7 +234,7 @@ public class CloneJob extends Job
 					}
 				}
 
-				String stdout = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
+				String stdout = IOUtil.read(p.getInputStream(), UTF_8);
 				this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
 			}
 			catch (Exception e)
@@ -244,11 +244,11 @@ public class CloneJob extends Job
 			}
 			finally
 			{
-				if (isr != null)
+				if (br != null)
 				{
 					try
 					{
-						isr.close();
+						br.close();
 					}
 					catch (Exception e)
 					{
@@ -427,7 +427,7 @@ public class CloneJob extends Job
 		}
 	}
 
-	private class ProjectRecord
+	private static class ProjectRecord
 	{
 
 		File projectSystemFile;

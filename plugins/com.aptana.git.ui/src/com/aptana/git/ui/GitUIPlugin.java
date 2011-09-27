@@ -60,7 +60,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 	/**
 	 * The constructor
 	 */
-	public GitUIPlugin()
+	public GitUIPlugin() // $codepro.audit.disable
+							// com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 	{
 	}
 
@@ -68,7 +69,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception
+	public void start(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		super.start(context);
 		plugin = this;
@@ -112,7 +113,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception
+	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		try
 		{

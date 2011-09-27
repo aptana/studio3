@@ -40,6 +40,8 @@ import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 public class CompareWithRevisionHandler extends AbstractCompareRevisionHandler
 {
 
+	private static final GitCommit[] NO_COMMITS = new GitCommit[0];
+
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
@@ -83,7 +85,7 @@ public class CompareWithRevisionHandler extends AbstractCompareRevisionHandler
 			}
 		});
 		dialog.setContentProvider(ArrayContentProvider.getInstance());
-		dialog.setInput(commits.toArray(new GitCommit[0]));
+		dialog.setInput(commits.toArray(NO_COMMITS));
 
 		// InputDialog dialog = new InputDialog(getShell(), "Select Revision", "Enter revision SHA", "", null);
 		if (dialog.open() == Window.CANCEL)

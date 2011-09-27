@@ -303,9 +303,13 @@ class CommitDialog extends StatusDialog
 			table = createTable(tableComp, false);
 		}
 		if (staged)
+		{
 			stagedTable = table;
+		}
 		else
+		{
 			unstagedTable = table;
+		}
 		return tableComp;
 	}
 
@@ -395,9 +399,13 @@ class CommitDialog extends StatusDialog
 		{
 			boolean match = false;
 			if (staged && file.hasStagedChanges())
+			{
 				match = true;
+			}
 			else if (!staged && file.hasUnstagedChanges())
+			{
 				match = true;
+			}
 
 			if (match)
 			{
@@ -1111,9 +1119,13 @@ class CommitDialog extends StatusDialog
 			Point doSelectionSize = doSelectionBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			Point bigger = null;
 			if (doAllSize.x > doSelectionSize.x)
+			{
 				bigger = doAllSize;
+			}
 			else
+			{
 				bigger = doSelectionSize;
+			}
 			GridData data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 			data.widthHint = bigger.x + 10;
 			comp.setLayoutData(data);

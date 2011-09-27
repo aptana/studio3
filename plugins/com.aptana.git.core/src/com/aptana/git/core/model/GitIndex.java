@@ -43,7 +43,6 @@ import com.aptana.git.core.IDebugScopes;
 
 public class GitIndex
 {
-
 	/**
 	 * File extensions we check against and use to assume if a file may be binary (to not show a diff/content in various
 	 * UI views)
@@ -66,8 +65,8 @@ public class GitIndex
 	 * always contains the full listing from last finished refresh call.
 	 */
 	private List<ChangedFile> changedFiles;
+	private Object changedFilesLock = new Object();
 
-	private int refreshStatus = 0;
 	private boolean notify;
 
 	private Job indexRefreshJob;
@@ -77,9 +76,7 @@ public class GitIndex
 		super();
 
 		Assert.isNotNull(repository, "GitIndex requires a repository"); //$NON-NLS-1$
-
 		this.repository = repository;
-		this.changedFiles = new ArrayList<ChangedFile>();
 	}
 
 	/**
@@ -103,12 +100,12 @@ public class GitIndex
 					return Status.OK_STATUS;
 				}
 			};
-			indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
 		}
 		else
 		{
 			indexRefreshJob.cancel();
 		}
+		indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
 		indexRefreshJob.schedule(250);
 	}
 
@@ -131,6 +128,8 @@ public class GitIndex
 		}
 	}
 
+	// FIXME this is a very ugly way of generating our index of files. Can we do less commands? Or possibly even read
+	// the index itself?
 	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
@@ -138,8 +137,10 @@ public class GitIndex
 			return Status.CANCEL_STATUS;
 		}
 		this.notify = notify;
-		refreshStatus = 0;
 
+		// TODO Is this command really necessary? I don't think it is anymore... Can we avoid calling sync refresh from
+		// commands like merge/rebase? Also can we have them hook launch terminate listeners and exit write of repo
+		// then, rather than loop checking launch terminate status?
 		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null) // couldn't even execute!
@@ -151,74 +152,45 @@ public class GitIndex
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getMessage());
 		}
 
+		// FIXME Can we just do something like a "git status --porcelain" to grab all three at once and parse the
+		// changed files out? It doesn't include sha/blob mode in that output, so I think we'd need to lazily get that
+		// info later when it's needed in indexInfo() for unstageFiles
 		Set<Job> jobs = new HashSet<Job>();
-		jobs.add(new Job("other files") //$NON-NLS-1$
-		{
+		jobs.add(new UntrackedFilesRefreshJob(this));
+		jobs.add(new UnstagedFilesRefreshJob(this));
+		jobs.add(new StagedFilesRefreshJob(this));
 
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				// index vs working tree (HEAD?)
-				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
-						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (result != null && result.isOK())
-				{
-					readOtherFiles(result.getMessage());
-				}
-				return Status.OK_STATUS;
-			}
-		});
-		jobs.add(new Job("unstaged files") //$NON-NLS-1$
+		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
+		Collection<ChangedFile> preRefreshFiles;
+		synchronized (this.changedFilesLock)
 		{
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
+			if (this.changedFiles != null)
 			{
-				// index vs filesystem
-				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (result != null && result.isOK())
+				preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
+				for (ChangedFile file : this.changedFiles)
 				{
-					readUnstagedFiles(result.getMessage());
+					preRefreshFiles.add(new ChangedFile(file));
 				}
-				return Status.OK_STATUS;
 			}
-		});
-		jobs.add(new Job("staged files") //$NON-NLS-1$
-		{
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
+			else
 			{
-				// HEAD vs filesystem
-				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-						"-z", GitRepository.HEAD); //$NON-NLS-1$
-				if (result != null && result.isOK())
-				{
-					readStagedFiles(result.getMessage());
-				}
-				return Status.OK_STATUS;
+				preRefreshFiles = new ArrayList<ChangedFile>(0);
 			}
-		});
+		}
+		// Now create a new temporary list so we can build it up...
+		this.files = new Vector<ChangedFile>(preRefreshFiles.size());
+
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
 		}
 
-		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
-		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
-		for (ChangedFile file : this.changedFiles)
-		{
-			preRefreshFiles.add(new ChangedFile(file));
-		}
-		// Now create a new temporary list so we can built it up...
-		this.files = new Vector<ChangedFile>();
-
 		// Schedule all the jobs
+		boolean setSystem = !EclipseUtil.showSystemJobs();
 		for (Job toSchedule : jobs)
 		{
-			refreshStatus++;
-			toSchedule.setSystem(!EclipseUtil.showSystemJobs());
+			toSchedule.setSystem(setSystem);
 			toSchedule.setPriority(Job.SHORT);
 			toSchedule.schedule();
 		}
@@ -252,234 +224,25 @@ public class GitIndex
 		{
 			for (ChangedFile file : deleteFiles)
 			{
-				files.remove(file);
+				this.files.remove(file);
 			}
 		}
 
 		// Now make the "final" list a copy of the temporary one we were just building up
-		synchronized (changedFiles)
+		synchronized (this.changedFilesLock)
 		{
-			changedFiles.clear();
+			this.changedFiles = new ArrayList<ChangedFile>(this.files.size());
+
 			for (ChangedFile file : this.files)
 			{
-				changedFiles.add(new ChangedFile(file));
+				this.changedFiles.add(new ChangedFile(file));
 			}
 		}
 		// Don't hold onto temp list in memory!
 		this.files = null;
 
 		postIndexChange(preRefreshFiles, toRefresh);
-
 		return Status.OK_STATUS;
-	}
-
-	private void readOtherFiles(String string)
-	{
-		List<String> lines = linesFromNotification(string);
-		Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size());
-		// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
-		// The line below is not used at all, as for these files the commitBlob isn't set
-		List<String> fileStatus = new ArrayList<String>();
-		fileStatus.add(":000000"); // for new file //$NON-NLS-1$
-		fileStatus.add("100644"); //$NON-NLS-1$
-		fileStatus.add("0000000000000000000000000000000000000000"); // SHA //$NON-NLS-1$
-		fileStatus.add("0000000000000000000000000000000000000000"); //$NON-NLS-1$
-		fileStatus.add("A"); // A for Add, D for delete //$NON-NLS-1$
-		fileStatus.add(null);
-		for (String path : lines)
-		{
-			if (path.length() == 0)
-			{
-				continue;
-			}
-			dictionary.put(path, fileStatus);
-		}
-
-		addFilesFromDictionary(dictionary, false, false);
-	}
-
-	private void readStagedFiles(String string)
-	{
-		List<String> lines = linesFromNotification(string);
-		Map<String, List<String>> dic = dictionaryForLines(lines);
-		addFilesFromDictionary(dic, true, true);
-	}
-
-	private void readUnstagedFiles(String string)
-	{
-		List<String> lines = linesFromNotification(string);
-		Map<String, List<String>> dic = dictionaryForLines(lines);
-		addFilesFromDictionary(dic, false, true);
-	}
-
-	private List<String> linesFromNotification(String string)
-	{
-		// FIXME: throw an error?
-		if (string == null)
-		{
-			return Collections.emptyList();
-		}
-
-		// Strip trailing null
-		if (string.endsWith("\0")) //$NON-NLS-1$
-		{
-			string = string.substring(0, string.length() - 1);
-		}
-
-		if (string.length() == 0)
-		{
-			return Collections.emptyList();
-		}
-
-		return StringUtil.tokenize(string, "\0"); //$NON-NLS-1$
-	}
-
-	private Map<String, List<String>> dictionaryForLines(List<String> lines)
-	{
-		Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size() / 2);
-
-		// Fill the dictionary with the new information. These lines are in the form of:
-		// :00000 :0644 OTHER INDEX INFORMATION
-		// Filename
-		Assert.isTrue(lines.size() % 2 == 0, "Lines must have an even number of lines: " + lines); //$NON-NLS-1$
-		Iterator<String> iter = lines.iterator();
-		while (iter.hasNext())
-		{
-			String fileStatus = iter.next();
-			String fileName = iter.next();
-			dictionary.put(fileName, StringUtil.tokenize(fileStatus, " ")); //$NON-NLS-1$
-		}
-
-		return dictionary;
-	}
-
-	private void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
-	{
-		if (this.files == null)
-		{
-			return;
-		}
-		// Iterate over all existing files
-		synchronized (this.files)
-		{
-			for (ChangedFile file : this.files)
-			{
-				synchronized (dictionary)
-				{
-					List<String> fileStatus = dictionary.get(file.path);
-					// Object found, this is still a cached / uncached thing
-					if (fileStatus != null)
-					{
-						if (tracked)
-						{
-							String mode = fileStatus.get(0).substring(1);
-							String sha = fileStatus.get(2);
-							file.commitBlobSHA = sha;
-							file.commitBlobMode = mode;
-
-							if (staged)
-							{
-								file.hasStagedChanges = true;
-							}
-							else
-							{
-								file.hasUnstagedChanges = true;
-							}
-							if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
-							{
-								file.status = ChangedFile.Status.DELETED;
-							}
-							else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
-							{
-								file.status = ChangedFile.Status.UNMERGED;
-							}
-						}
-						else
-						{
-							// Untracked file, set status to NEW, only unstaged changes
-							file.hasStagedChanges = false;
-							file.hasUnstagedChanges = true;
-							file.status = ChangedFile.Status.NEW;
-						}
-
-						// We handled this file, remove it from the dictionary
-						dictionary.remove(file.path);
-					}
-					else
-					{
-						// Object not found in the dictionary, so let's reset its appropriate
-						// change (stage or untracked) if necessary.
-
-						// Staged dictionary, so file does not have staged changes
-						if (staged)
-						{
-							file.hasStagedChanges = false;
-						}
-						// Tracked file does not have unstaged changes, file is not new,
-						// so we can set it to No. (If it would be new, it would not
-						// be in this dictionary, but in the "other dictionary").
-						else if (tracked && file.status != ChangedFile.Status.NEW)
-						{
-							file.hasUnstagedChanges = false;
-						}
-						// Unstaged, untracked dictionary ("Other" files), and file
-						// is indicated as new (which would be untracked), so let's
-						// remove it
-						else if (!tracked && file.status == ChangedFile.Status.NEW)
-						{
-							file.hasUnstagedChanges = false;
-						}
-					}
-				}
-			}
-		}
-		// Do new files only if necessary
-		if (dictionary.isEmpty())
-		{
-			return;
-		}
-
-		// All entries left in the dictionary haven't been accounted for
-		// above, so we need to add them to the "files" array
-		synchronized (dictionary)
-		{
-			for (String path : dictionary.keySet())
-			{
-				List<String> fileStatus = dictionary.get(path);
-
-				ChangedFile.Status status = ChangedFile.Status.MODIFIED;
-				if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
-				{
-					status = ChangedFile.Status.DELETED;
-				}
-				else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
-				{
-					status = ChangedFile.Status.UNMERGED;
-				}
-				else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
-				{
-					status = ChangedFile.Status.NEW;
-				}
-				else
-				{
-					status = ChangedFile.Status.MODIFIED;
-				}
-
-				ChangedFile file = new ChangedFile(path, status);
-				if (tracked)
-				{
-					file.commitBlobMode = fileStatus.get(0).substring(1);
-					file.commitBlobSHA = fileStatus.get(2);
-				}
-
-				file.hasStagedChanges = staged;
-				file.hasUnstagedChanges = !staged;
-				synchronized (this.files)
-				{
-					this.files.add(file);
-				}
-			}
-		}
 	}
 
 	private void postIndexChange(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> postChangeFiles)
@@ -497,14 +260,20 @@ public class GitIndex
 	/**
 	 * Makes a copy of the internal list of changed files so that iterating won't ever result in a
 	 * ConcurrentModificationException. try to avoid use if possible, since a deep copy is made which can be expensive.
+	 * This method populates the changedFiles collection lazily on first demand.
 	 * 
 	 * @return
 	 */
 	public List<ChangedFile> changedFiles()
 	{
-		synchronized (changedFiles)
+		synchronized (this.changedFilesLock)
 		{
-			List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles.size());
+			if (this.changedFiles == null)
+			{
+				refresh(false, new NullProgressMonitor()); // Don't want to call back to fireIndexChangeEvent yet!
+			}
+
+			List<ChangedFile> copy = new ArrayList<ChangedFile>(this.changedFiles.size());
 			for (ChangedFile file : this.changedFiles)
 			{
 				copy.add(new ChangedFile(file));
@@ -767,71 +536,62 @@ public class GitIndex
 	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
 	 * 
 	 * @param resource
-	 * @param changedFiles
 	 * @return
 	 */
 	protected boolean resourceOrChildHasChanges(IResource resource)
 	{
-		synchronized (changedFiles)
+		List<ChangedFile> changedFiles = changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
 		{
-			if (changedFiles == null || changedFiles.isEmpty())
-			{
-				return false;
-			}
+			return false;
+		}
 
-			IPath workingDirectory = repository.workingDirectory();
-			IPath resourcePath = resource.getLocation();
-			for (ChangedFile changedFile : changedFiles)
+		IPath workingDirectory = repository.workingDirectory();
+		IPath resourcePath = resource.getLocation();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+			if (resourcePath.isPrefixOf(fullPath))
 			{
-				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
-				if (resourcePath.isPrefixOf(fullPath))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
+
 		return false;
 	}
 
 	public boolean isDirty()
 	{
-		synchronized (changedFiles)
-		{
-			return !changedFiles.isEmpty();
-		}
+		return !changedFiles().isEmpty();
 	}
 
 	protected boolean hasUnresolvedMergeConflicts()
 	{
-		synchronized (changedFiles)
+		List<ChangedFile> changedFiles = changedFiles();
+		if (changedFiles.isEmpty())
 		{
-			if (changedFiles.isEmpty())
-			{
-				return false;
-			}
-			for (ChangedFile changedFile : changedFiles)
-			{
-				if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
-				{
-					return true;
-				}
-			}
 			return false;
 		}
+		for (ChangedFile changedFile : changedFiles)
+		{
+			if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public Set<IResource> getChangedResources()
 	{
 		Set<IResource> resources = new HashSet<IResource>();
-		synchronized (changedFiles)
+		List<ChangedFile> changedFiles = changedFiles();
+		for (ChangedFile changedFile : changedFiles)
 		{
-			for (ChangedFile changedFile : changedFiles)
+			IResource resource = getResourceForChangedFile(changedFile);
+			if (resource != null)
 			{
-				IResource resource = getResourceForChangedFile(changedFile);
-				if (resource != null)
-				{
-					resources.add(resource);
-				}
+				resources.add(resource);
 			}
 		}
 		return resources;
@@ -849,18 +609,18 @@ public class GitIndex
 		{
 			return null;
 		}
+
 		IPath resourcePath = resource.getLocation();
-		synchronized (changedFiles)
+		List<ChangedFile> changedFiles = changedFiles();
+		for (ChangedFile changedFile : changedFiles)
 		{
-			for (ChangedFile changedFile : changedFiles)
+			IPath fullPath = workingDirectory().append(changedFile.getPath());
+			if (resourcePath.equals(fullPath))
 			{
-				IPath fullPath = workingDirectory().append(changedFile.getPath());
-				if (resourcePath.equals(fullPath))
-				{
-					return changedFile;
-				}
+				return changedFile;
 			}
 		}
+
 		return null;
 	}
 
@@ -882,25 +642,309 @@ public class GitIndex
 			return Collections.emptyList();
 		}
 
+		List<ChangedFile> changedFiles = changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+		{
+			return Collections.emptyList();
+		}
+
 		IPath resourcePath = container.getLocation();
 		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
 		IPath workingDirectory = repository.workingDirectory();
-
-		synchronized (changedFiles)
+		for (ChangedFile changedFile : changedFiles)
 		{
-			if (changedFiles == null || changedFiles.isEmpty())
+			IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
+			if (resourcePath.isPrefixOf(fullPath))
+			{
+				filtered.add(changedFile);
+			}
+		}
+
+		return filtered;
+	}
+
+	private abstract static class FilesRefreshJob extends Job
+	{
+		protected GitRepository repo;
+		protected GitIndex index;
+
+		private FilesRefreshJob(String name, GitIndex index)
+		{
+			super(name);
+			this.index = index;
+			this.repo = index.repository;
+		}
+
+		protected List<String> linesFromNotification(String string)
+		{
+			// FIXME: throw an error?
+			if (string == null)
 			{
 				return Collections.emptyList();
 			}
-			for (ChangedFile changedFile : changedFiles)
+
+			// Strip trailing null
+			if (string.endsWith("\0")) //$NON-NLS-1$
 			{
-				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
-				if (resourcePath.isPrefixOf(fullPath))
+				string = string.substring(0, string.length() - 1);
+			}
+
+			if (string.length() == 0)
+			{
+				return Collections.emptyList();
+			}
+
+			return StringUtil.tokenize(string, "\0"); //$NON-NLS-1$
+		}
+
+		protected Map<String, List<String>> dictionaryForLines(List<String> lines)
+		{
+			Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size() / 2);
+
+			// Fill the dictionary with the new information. These lines are in the form of:
+			// :00000 :0644 OTHER INDEX INFORMATION
+			// Filename
+			Assert.isTrue(lines.size() % 2 == 0, "Lines must have an even number of lines: " + lines); //$NON-NLS-1$
+			Iterator<String> iter = lines.iterator();
+			while (iter.hasNext())
+			{
+				String fileStatus = iter.next();
+				String fileName = iter.next();
+				dictionary.put(fileName, StringUtil.tokenize(fileStatus, " ")); //$NON-NLS-1$
+			}
+
+			return dictionary;
+		}
+
+		protected void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
+		{
+			if (index.files == null)
+			{
+				return;
+			}
+			// Iterate over all existing files
+			synchronized (index.files)
+			{
+				for (ChangedFile file : index.files)
 				{
-					filtered.add(changedFile);
+					synchronized (dictionary)
+					{
+						List<String> fileStatus = dictionary.get(file.path);
+						// Object found, this is still a cached / uncached thing
+						if (fileStatus != null)
+						{
+							if (tracked)
+							{
+								String mode = fileStatus.get(0).substring(1);
+								String sha = fileStatus.get(2);
+								file.commitBlobSHA = sha;
+								file.commitBlobMode = mode;
+
+								if (staged)
+								{
+									file.hasStagedChanges = true;
+								}
+								else
+								{
+									file.hasUnstagedChanges = true;
+								}
+								if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
+								{
+									file.status = ChangedFile.Status.DELETED;
+								}
+								else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
+								{
+									file.status = ChangedFile.Status.UNMERGED;
+								}
+							}
+							else
+							{
+								// Untracked file, set status to NEW, only unstaged changes
+								file.hasStagedChanges = false;
+								file.hasUnstagedChanges = true;
+								file.status = ChangedFile.Status.NEW;
+							}
+
+							// We handled this file, remove it from the dictionary
+							dictionary.remove(file.path);
+						}
+						else
+						{
+							// Object not found in the dictionary, so let's reset its appropriate
+							// change (stage or untracked) if necessary.
+
+							// Staged dictionary, so file does not have staged changes
+							if (staged)
+							{
+								file.hasStagedChanges = false;
+							}
+							// Tracked file does not have unstaged changes, file is not new,
+							// so we can set it to No. (If it would be new, it would not
+							// be in this dictionary, but in the "other dictionary").
+							else if (tracked && file.status != ChangedFile.Status.NEW)
+							{
+								file.hasUnstagedChanges = false;
+							}
+							// Unstaged, untracked dictionary ("Other" files), and file
+							// is indicated as new (which would be untracked), so let's
+							// remove it
+							else if (!tracked && file.status == ChangedFile.Status.NEW)
+							{
+								file.hasUnstagedChanges = false;
+							}
+						}
+					}
+				}
+			}
+			// Do new files only if necessary
+			if (dictionary.isEmpty())
+			{
+				return;
+			}
+
+			// All entries left in the dictionary haven't been accounted for
+			// above, so we need to add them to the "files" array
+			synchronized (dictionary)
+			{
+				for (String path : dictionary.keySet())
+				{
+					List<String> fileStatus = dictionary.get(path);
+
+					ChangedFile.Status status = ChangedFile.Status.MODIFIED;
+					if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
+					{
+						status = ChangedFile.Status.DELETED;
+					}
+					else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
+					{
+						status = ChangedFile.Status.UNMERGED;
+					}
+					else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
+					{
+						status = ChangedFile.Status.NEW;
+					}
+					else
+					{
+						status = ChangedFile.Status.MODIFIED;
+					}
+
+					ChangedFile file = new ChangedFile(path, status);
+					if (tracked)
+					{
+						file.commitBlobMode = fileStatus.get(0).substring(1);
+						file.commitBlobSHA = fileStatus.get(2);
+					}
+
+					file.hasStagedChanges = staged;
+					file.hasUnstagedChanges = !staged;
+					synchronized (index.files)
+					{
+						index.files.add(file);
+					}
 				}
 			}
 		}
-		return filtered;
+
+	}
+
+	private static final class StagedFilesRefreshJob extends FilesRefreshJob
+	{
+		private StagedFilesRefreshJob(GitIndex index)
+		{
+			super("staged files", index); //$NON-NLS-1$
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor)
+		{
+			// HEAD vs filesystem
+			IStatus result = repo.execute(GitRepository.ReadWrite.READ, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+					"-z", GitRepository.HEAD); //$NON-NLS-1$
+			if (result != null && result.isOK())
+			{
+				readStagedFiles(result.getMessage());
+			}
+			return Status.OK_STATUS;
+		}
+
+		private void readStagedFiles(String string)
+		{
+			List<String> lines = linesFromNotification(string);
+			Map<String, List<String>> dic = dictionaryForLines(lines);
+			addFilesFromDictionary(dic, true, true);
+		}
+	}
+
+	private static final class UnstagedFilesRefreshJob extends FilesRefreshJob
+	{
+		private UnstagedFilesRefreshJob(GitIndex index)
+		{
+			super("unstaged files", index); //$NON-NLS-1$
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor)
+		{
+			// index vs filesystem
+			IStatus result = repo.execute(GitRepository.ReadWrite.READ, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (result != null && result.isOK())
+			{
+				readUnstagedFiles(result.getMessage());
+			}
+			return Status.OK_STATUS;
+		}
+
+		private void readUnstagedFiles(String string)
+		{
+			List<String> lines = linesFromNotification(string);
+			Map<String, List<String>> dic = dictionaryForLines(lines);
+			addFilesFromDictionary(dic, false, true);
+		}
+	}
+
+	private static final class UntrackedFilesRefreshJob extends FilesRefreshJob
+	{
+		private UntrackedFilesRefreshJob(GitIndex index)
+		{
+			super("untracked files", index); //$NON-NLS-1$
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor)
+		{
+			// index vs working tree (HEAD?)
+			IStatus result = repo.execute(GitRepository.ReadWrite.READ, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+					"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (result != null && result.isOK())
+			{
+				readOtherFiles(result.getMessage());
+			}
+			return Status.OK_STATUS;
+		}
+
+		private void readOtherFiles(String string)
+		{
+			List<String> lines = linesFromNotification(string);
+			Map<String, List<String>> dictionary = new HashMap<String, List<String>>(lines.size());
+			// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
+			// The line below is not used at all, as for these files the commitBlob isn't set
+			List<String> fileStatus = new ArrayList<String>();
+			fileStatus.add(":000000"); // for new file //$NON-NLS-1$
+			fileStatus.add("100644"); //$NON-NLS-1$
+			fileStatus.add("0000000000000000000000000000000000000000"); // SHA //$NON-NLS-1$
+			fileStatus.add("0000000000000000000000000000000000000000"); //$NON-NLS-1$
+			fileStatus.add("A"); // A for Add, D for delete //$NON-NLS-1$
+			fileStatus.add(null);
+			for (String path : lines)
+			{
+				if (path.length() == 0)
+				{
+					continue;
+				}
+				dictionary.put(path, fileStatus);
+			}
+
+			addFilesFromDictionary(dictionary, false, false);
+		}
 	}
 }

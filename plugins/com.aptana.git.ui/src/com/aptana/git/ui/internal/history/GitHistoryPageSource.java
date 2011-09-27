@@ -18,6 +18,8 @@ import org.eclipse.ui.part.Page;
  */
 public class GitHistoryPageSource extends HistoryPageSource
 {
+	private static final IResource[] NO_RESOURCES = new IResource[0];
+
 	public boolean canShowHistoryFor(final Object object)
 	{
 		return GitHistoryPage.canShowHistoryFor(object);
@@ -28,11 +30,17 @@ public class GitHistoryPageSource extends HistoryPageSource
 		final IResource[] input;
 
 		if (object instanceof IResource[])
+		{
 			input = (IResource[]) object;
+		}
 		else if (object instanceof IResource)
+		{
 			input = new IResource[] { (IResource) object };
+		}
 		else
-			input = new IResource[0];
+		{
+			input = NO_RESOURCES;
+		}
 
 		final GitHistoryPage pg = new GitHistoryPage();
 		pg.setInput(input);

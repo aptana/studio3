@@ -77,7 +77,7 @@ class RepositorySelectionPage extends WizardPage
 					{
 						index = sourceURI.length();
 					}
-					int slash = sourceURI.lastIndexOf("/", index); //$NON-NLS-1$
+					int slash = sourceURI.lastIndexOf('/', index);
 					if (slash != -1)
 					{
 						workspacePath += File.separator + sourceURI.substring(slash + 1, index);

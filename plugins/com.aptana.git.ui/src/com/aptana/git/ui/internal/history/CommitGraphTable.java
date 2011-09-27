@@ -213,7 +213,7 @@ class CommitGraphTable extends TableViewer
 		private Color refYellow; // tag
 		private Color[] refColors;
 
-		public BranchPainter(Display d)
+		BranchPainter(Display d)
 		{
 			blue = new Color(d, 41, 94, 153);
 			yellow = new Color(d, 207, 173, 0);
@@ -260,7 +260,7 @@ class CommitGraphTable extends TableViewer
 		{
 			if (commit == null)
 				return;
-			GraphCellInfo info = (decorations == null ? null : decorations.get(commit));
+			GraphCellInfo info = ((decorations == null) ? null : decorations.get(commit));
 			int myLaneX = LANE_WIDTH + (LANE_WIDTH / 2);
 			int maxCenter = myLaneX;
 			if (info != null)
@@ -280,7 +280,9 @@ class CommitGraphTable extends TableViewer
 					if (line.getTo() == info.getPosition())
 					{
 						if (x1 == x2)
+						{
 							myLaneX = x1 + (LINE_WIDTH / 2);
+						}
 						else
 						{
 							myLaneX = Math.min(x1, x2) + (LINE_WIDTH / 2);

@@ -10,6 +10,7 @@ package com.aptana.git.ui.actions;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
@@ -26,6 +27,8 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 
 abstract class AbstractDynamicBranchItem extends CompoundContributionItem implements IWorkbenchContribution
 {
+
+	protected static final IContributionItem[] NO_CONTRIBUTION_ITEMS = new IContributionItem[0];
 
 	private IServiceLocator serviceLocator;
 

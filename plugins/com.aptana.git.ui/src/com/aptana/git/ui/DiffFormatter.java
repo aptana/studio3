@@ -50,7 +50,9 @@ public abstract class DiffFormatter
 	private static String convertDiff(String title, String diff)
 	{
 		if (title == null)
-			title = ""; //$NON-NLS-1$
+		{
+			title = StringUtil.EMPTY;
+		}
 		StringBuilder html = new StringBuilder();
 		html.append("<div class=\"file\">"); //$NON-NLS-1$
 		html.append("<div class=\"fileHeader\">").append(title).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -153,7 +155,7 @@ public abstract class DiffFormatter
 		catch (Exception e)
 		{
 			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
-			return html.toString();
+			return html;
 		}
 	}
 
@@ -167,12 +169,12 @@ public abstract class DiffFormatter
 	{
 		if (diffs == null)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		StringBuilder combined = new StringBuilder();
 		for (Map.Entry<String, String> diffMap : diffs.entrySet())
 		{
-			combined.append(convertDiff(diffMap.getKey(), diffMap.getValue())).append("\n"); //$NON-NLS-1$
+			combined.append(convertDiff(diffMap.getKey(), diffMap.getValue())).append('\n');
 		}
 		return injectIntoTemplate(combined.toString());
 	}

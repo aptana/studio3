@@ -71,7 +71,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 
 		ImageData data;
 
-		public CachedImageDescriptor(ImageDescriptor descriptor)
+		CachedImageDescriptor(ImageDescriptor descriptor)
 		{
 			this.descriptor = descriptor;
 		}
@@ -157,7 +157,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			case IResource.PROJECT:
 				decorateProject(decoration, resource);
 				// fall through intentionally!
-			case IResource.FOLDER:
+			case IResource.FOLDER: // $codepro.audit.disable nonTerminatedCaseClause
 				decorateFolder(decoration, resource);
 				break;
 			case IResource.FILE:
@@ -352,7 +352,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null && repo.equals(e.getRepository()))
+			{
 				resources.add(project);
+			}
 		}
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
@@ -364,10 +366,12 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			IResource child = resource;
 			IContainer parent = null;
-			while ((parent = child.getParent()) != null)
+			while ((parent = child.getParent()) != null) // $codepro.audit.disable assignmentInCondition
 			{
 				if (parent.getType() == IResource.PROJECT || parent.getType() == IResource.ROOT)
+				{
 					break;
+				}
 				ancestors.add(parent);
 				child = parent;
 			}
@@ -458,7 +462,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		String string;
 		Long timestamp;
 
-		public TimestampedString(String value)
+		TimestampedString(String value)
 		{
 			this.string = value;
 			this.timestamp = System.currentTimeMillis();
@@ -472,8 +476,14 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		@Override
 		public boolean equals(Object obj)
 		{
+			if (obj == this)
+			{
+				return true;
+			}
 			if (!(obj instanceof TimestampedString))
+			{
 				return false;
+			}
 			TimestampedString other = (TimestampedString) obj;
 			return other.string.equals(string) && other.timestamp.equals(timestamp);
 		}
@@ -499,8 +509,14 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		@Override
 		public boolean equals(Object obj)
 		{
+			if (obj == this)
+			{
+				return true;
+			}
 			if (!(obj instanceof RepoBranch))
+			{
 				return false;
+			}
 			RepoBranch other = (RepoBranch) obj;
 			return other.repo.equals(repo) && other.branch.equals(branch);
 		}

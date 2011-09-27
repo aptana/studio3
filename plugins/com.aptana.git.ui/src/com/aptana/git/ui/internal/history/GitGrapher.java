@@ -164,19 +164,29 @@ class GitGrapher
 
 		previous = new GraphCellInfo(newPos, lines);
 		if (lines.size() > maxLines)
+		{
 			log("Number of lines: " + lines.size() + " vs allocated: " + maxLines); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		// If a parent was added, we have room to not indent.
 		if (addedParent)
+		{
 			previous.numColumns = currentLanes.size() - 1;
+		}
 		else
+		{
 			previous.numColumns = currentLanes.size();
+		}
 
 		// Update the current lane to point to the new parent
 		if (currentLane != null && commit.parentCount() > 0)
+		{
 			currentLane.setSha(commit.parents().get(0));
+		}
 		else
+		{
 			currentLanes.remove(currentLane);
+		}
 
 		previousLanes.clear();
 
@@ -187,8 +197,12 @@ class GitGrapher
 	private void log(String string)
 	{
 		if (GitUIPlugin.getDefault() != null)
+		{
 			IdeLog.logWarning(GitUIPlugin.getDefault(), string);
+		}
 		else
+		{
 			System.out.println(string);
+		}
 	}
 }

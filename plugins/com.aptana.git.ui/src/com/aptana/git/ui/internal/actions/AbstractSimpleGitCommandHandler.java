@@ -50,21 +50,21 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 		{
 			return null;
 		}
-		String baseJobName = "git"; //$NON-NLS-1$
+		StringBuilder baseJobName = new StringBuilder("git"); //$NON-NLS-1$
 		for (String string : command)
 		{
-			baseJobName += " " + string; //$NON-NLS-1$
+			baseJobName.append(' ').append(string);
 		}
 
 		// Run one job per repo
 		for (final GitRepository currentRepo : repos)
 		{
-			String jobName = baseJobName;
+			StringBuilder jobName = new StringBuilder(baseJobName.toString());
 			if (repos.size() > 1)
 			{
-				jobName += " (" + currentRepo.workingDirectory() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+				jobName.append(" (").append(currentRepo.workingDirectory()).append(')'); //$NON-NLS-1$
 			}
-			Job job = new Job(jobName)
+			Job job = new Job(jobName.toString())
 			{
 				@Override
 				protected IStatus run(IProgressMonitor monitor)

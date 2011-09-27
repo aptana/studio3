@@ -48,7 +48,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -89,6 +88,16 @@ public class GitRepository
 			return o1.compareTo(o2);
 		}
 	}
+
+	/**
+	 * Extension of temporary git lock files.
+	 */
+	private static final String DOT_LOCK = ".lock"; //$NON-NLS-1$
+
+	/**
+	 * Filename of git config.
+	 */
+	private static final String CONFIG_FILENAME = "config"; //$NON-NLS-1$
 
 	private static final String GITHUB_COM = "github.com"; //$NON-NLS-1$
 
@@ -141,7 +150,7 @@ public class GitRepository
 	 */
 	private ReadWriteMonitor monitor = new ReadWriteMonitor();
 
-	private List<GitRevSpecifier> branches;
+	private Set<GitRevSpecifier> branches;
 	Map<String, List<GitRef>> refs;
 	private URI fileURL;
 	private GitRevSpecifier _headRef;
@@ -155,7 +164,7 @@ public class GitRepository
 	GitRepository(URI fileURL)
 	{
 		this.fileURL = fileURL;
-		this.branches = new ArrayList<GitRevSpecifier>();
+		this.branches = new HashSet<GitRevSpecifier>();
 		reloadRefs();
 		readCurrentBranch();
 		try
@@ -334,13 +343,16 @@ public class GitRepository
 				@Override
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
-					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+					if (name == null || name.endsWith(DOT_LOCK))
 					{
 						return;
 					}
 					// Remove branch in model!
 					final GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
-					branches.remove(rev);
+					synchronized (branches)
+					{
+						branches.remove(rev);
+					}
 
 					Job job = new Job("Handle branch removal") //$NON-NLS-1$
 					{
@@ -350,7 +362,12 @@ public class GitRepository
 							// the branch may in fact still exists
 							reloadRefs();
 							// only fires the event if the branch is indeed removed
-							if (!branches.contains(rev))
+							boolean contains = false;
+							synchronized (branches)
+							{
+								contains = branches.contains(rev);
+							}
+							if (!contains)
 							{
 								fireBranchRemovedEvent(name);
 							}
@@ -364,7 +381,7 @@ public class GitRepository
 				@Override
 				public void fileCreated(int wd, String rootPath, final String name)
 				{
-					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+					if (name == null || name.endsWith(DOT_LOCK))
 					{
 						return;
 					}
@@ -438,7 +455,7 @@ public class GitRepository
 					// Determine if filename is referring to a remote branch, and not the remote itself.
 					private boolean isProbablyBranch(String newName)
 					{
-						return newName != null && newName.indexOf(File.separator) != -1 && !newName.endsWith(".lock"); //$NON-NLS-1$
+						return newName != null && newName.indexOf(File.separator) != -1 && !newName.endsWith(DOT_LOCK);
 					}
 
 					public void fileModified(int wd, String rootPath, String name)
@@ -473,7 +490,10 @@ public class GitRepository
 						// pulled.
 						if (isProbablyBranch(name))
 						{
-							branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+							synchronized (branches)
+							{
+								branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+							}
 							Job job = new Job("Firing branch removed and pull event") //$NON-NLS-1$
 							{
 								@Override
@@ -562,7 +582,7 @@ public class GitRepository
 		monitor.enterRead();
 		try
 		{
-			File configFile = gitFile("config"); //$NON-NLS-1$
+			File configFile = gitFile(CONFIG_FILENAME);
 			String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
 			Matcher m = fgRemoteNamePattern.matcher(contents);
 			while (m.find())
@@ -603,34 +623,37 @@ public class GitRepository
 		// Sort branches. Make sure local ones always come before remote
 		SortedSet<String> allBranches = new TreeSet<String>(new BranchNameComparator());
 
-		for (GitRevSpecifier revSpec : branches)
+		synchronized (branches)
 		{
-			if (!revSpec.isSimpleRef())
+			for (GitRevSpecifier revSpec : branches)
 			{
-				continue;
-			}
-			GitRef ref = revSpec.simpleRef();
-			if (ref == null || ref.type() == null)
-			{
-				continue;
-			}
-			for (GitRef.TYPE string : types)
-			{
-				if (ref.type().equals(string))
+				if (!revSpec.isSimpleRef())
 				{
-					break;
+					continue;
 				}
+				GitRef ref = revSpec.simpleRef();
+				if (ref == null || ref.type() == null)
+				{
+					continue;
+				}
+				for (GitRef.TYPE string : types)
+				{
+					if (ref.type().equals(string))
+					{
+						break;
+					}
+				}
+				if (!validTypes.contains(ref.type()))
+				{
+					continue;
+				}
+				// Skip these magical "*.lock" files
+				if (ref.type() == TYPE.HEAD && ref.shortName().endsWith(DOT_LOCK))
+				{
+					continue;
+				}
+				allBranches.add(ref.shortName());
 			}
-			if (!validTypes.contains(ref.type()))
-			{
-				continue;
-			}
-			// Skip these magical "*.lock" files
-			if (ref.type() == TYPE.HEAD && ref.shortName().endsWith(".lock")) //$NON-NLS-1$
-			{
-				continue;
-			}
-			allBranches.add(ref.shortName());
 		}
 		return allBranches;
 	}
@@ -845,16 +868,10 @@ public class GitRepository
 			rev = headRef();
 		}
 
-		// First check if the branch doesn't exist already
-		for (GitRevSpecifier r : branches)
+		synchronized (branches)
 		{
-			if (rev.equals(r))
-			{
-				return r;
-			}
+			branches.add(rev);
 		}
-
-		branches.add(rev);
 		// TODO Fire a branchAddedEvent?
 		return rev;
 	}
@@ -946,7 +963,6 @@ public class GitRepository
 		if (index == null)
 		{
 			index = new GitIndex(this, workingDirectory());
-			index.refresh(false, new NullProgressMonitor()); // Don't want to call back to fireIndexChangeEvent yet!
 		}
 		return index;
 	}
@@ -1127,7 +1143,7 @@ public class GitRepository
 	{
 		// Given a local branch name (/refs/head/*), we need to track back to the remote + branch.
 		// TODO Store the config contents and only read it again when last mod changes?
-		File configFile = gitFile("config"); //$NON-NLS-1$
+		File configFile = gitFile(CONFIG_FILENAME);
 		String contents = ""; //$NON-NLS-1$
 		try
 		{
@@ -1189,7 +1205,7 @@ public class GitRepository
 		monitor.enterRead();
 		try
 		{
-			File configFile = gitFile("config"); //$NON-NLS-1$
+			File configFile = gitFile(CONFIG_FILENAME);
 			String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
 			Matcher m = fgRemoteURLPattern.matcher(contents);
 			while (m.find())
@@ -1270,7 +1286,10 @@ public class GitRepository
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
 		// Remove branch in model!
-		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		synchronized (branches)
+		{
+			branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		}
 		fireBranchRemovedEvent(branchName);
 		return Status.OK_STATUS;
 	}
@@ -1420,18 +1439,21 @@ public class GitRepository
 	public Set<String> allSimpleRefs()
 	{
 		Set<String> allRefs = new HashSet<String>();
-		for (GitRevSpecifier revSpec : branches)
+		synchronized (branches)
 		{
-			if (!revSpec.isSimpleRef())
+			for (GitRevSpecifier revSpec : branches)
 			{
-				continue;
+				if (!revSpec.isSimpleRef())
+				{
+					continue;
+				}
+				GitRef ref = revSpec.simpleRef();
+				if (ref == null || ref.type() == null)
+				{
+					continue;
+				}
+				allRefs.add(ref.shortName());
 			}
-			GitRef ref = revSpec.simpleRef();
-			if (ref == null || ref.type() == null)
-			{
-				continue;
-			}
-			allRefs.add(ref.shortName());
 		}
 		return allRefs;
 	}
@@ -1557,7 +1579,6 @@ public class GitRepository
 	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
 	 * 
 	 * @param resource
-	 * @param changedFiles
 	 * @return
 	 */
 	public boolean resourceOrChildHasChanges(IResource resource)
