@@ -199,11 +199,11 @@ public class StudioAnalytics
 		{
 			String eventName = event.getEventName();
 
-			if (eventName.equals(PROJECT_CREATE))
+			if (eventName.startsWith(PROJECT_CREATE))
 			{
 				return -1;
 			}
-			if (eventName.equals(PROJECT_DELETE))
+			if (eventName.startsWith(PROJECT_DELETE))
 			{
 				return 1;
 			}
