@@ -536,7 +536,6 @@ public class JSParser extends Parser implements IParser {
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.RPAREN, ")", JSTokenType.SEMICOLON, ";"));
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.SEMICOLON, ";", JSTokenType.DOT, JSTokenType.NEW, JSTokenType.EQUAL));
 		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.IDENTIFIER, "", JSTokenType.DOT, JSTokenType.NEW, JSTokenType.EQUAL));
-		recoveryStrategies.add(new JSInsertionRecoveryStrategy(JSTokenType.LCURLY, "{", JSTokenType.RCURLY, "}", JSTokenType.RPAREN));
 		recoveryStrategies.add(new IRecoveryStrategy()
 		{
 			public boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException
