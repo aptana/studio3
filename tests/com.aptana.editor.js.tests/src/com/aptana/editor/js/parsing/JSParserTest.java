@@ -958,16 +958,6 @@ public class JSParserTest extends TestCase
 		parseTest("function foo() { if(i--==y) alert('test'); }" + EOL, "function foo () {if (i-- == y) alert('test');}" + EOL);
 	}
 
-	/**
-	 * Test fix for TISTUD-627
-	 * 
-	 * @throws Exception
-	 */
-	public void testFunctionWithoutBody() throws Exception
-	{
-		parseTest("function abc(s1, s2, s3)", "function abc (s1, s2, s3) {}" + EOL);
-	}
-
 	// utility methods
 
 	protected void parseTest(String source) throws Exception
