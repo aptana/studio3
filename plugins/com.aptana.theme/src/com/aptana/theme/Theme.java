@@ -364,6 +364,60 @@ public class Theme
 		{
 			return new DelayedTextAttribute(new RGBa(255, 255, 255), new RGBa(52, 103, 209), SWT.NORMAL);
 		}
+		if (hasDarkBG())
+		{
+			if (new ScopeSelector("console.error").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.input").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(95, 175, 176), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.prompt").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(131, 132, 161), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(255, 215, 0), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(255, 236, 139), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(84, 143, 160), null, SWT.NORMAL);
+			}
+		}
+		else
+		{
+			if (new ScopeSelector("console.error").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(255, 0, 0), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.input").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(63, 127, 95), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.prompt").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(42, 0, 255), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(227, 192, 0), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(255, 236, 139), null, SWT.NORMAL);
+			}
+			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
+			{
+				return new DelayedTextAttribute(new RGBa(29, 212, 125), null, SWT.NORMAL);
+			}
+		}
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
@@ -637,6 +691,11 @@ public class Theme
 
 	protected void storeDefaults()
 	{
+		// Don't store builtin themes default copy in prefs!
+		if (getThemeManager().isBuiltinTheme(getName()))
+		{
+			return;
+		}
 		// Only save to defaults if it has never been saved there. Basically take a snapshot of first version and
 		// use that as the "default"
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
@@ -705,62 +764,70 @@ public class Theme
 	public void loadFromDefaults() throws InvalidPropertiesFormatException, UnsupportedEncodingException, IOException
 	{
 		Properties props = null;
-		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
-		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
-		ByteArrayInputStream byteStream = null;
-		try
+		if (getThemeManager().isBuiltinTheme(getName()))
 		{
-			byte[] array = preferences.getByteArray(getName(), null);
-			if (array == null)
-			{
-				return;
-			}
-			props = new OrderedProperties();
-			byteStream = new ByteArrayInputStream(array);
-			props.load(byteStream);
+			Theme builtin = ((ThemeManager) getThemeManager()).loadBuiltinTheme(getName());
+			props = builtin.toProps();
 		}
-		catch (IllegalArgumentException iae)
+		else
 		{
-			// Fallback to load theme that was saved in prefs as XML string
-			String xml = preferences.get(getName(), null);
-			if (xml == null)
-			{
-				return;
-			}
-			ByteArrayInputStream xmlStream = null;
+			IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(ThemePlugin.PLUGIN_ID);
+			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
+			ByteArrayInputStream byteStream = null;
 			try
 			{
-				xmlStream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
+				byte[] array = preferences.getByteArray(getName(), null);
+				if (array == null)
+				{
+					return;
+				}
 				props = new OrderedProperties();
-				props.loadFromXML(xmlStream);
-				save(EclipseUtil.defaultScope());
+				byteStream = new ByteArrayInputStream(array);
+				props.load(byteStream);
+			}
+			catch (IllegalArgumentException iae)
+			{
+				// Fallback to load theme that was saved in prefs as XML string
+				String xml = preferences.get(getName(), null);
+				if (xml == null)
+				{
+					return;
+				}
+				ByteArrayInputStream xmlStream = null;
+				try
+				{
+					xmlStream = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
+					props = new OrderedProperties();
+					props.loadFromXML(xmlStream);
+					save(EclipseUtil.defaultScope());
+				}
+				finally
+				{
+					if (xmlStream != null)
+					{
+						try
+						{
+							xmlStream.close();
+						}
+						catch (Exception e)
+						{
+							// ignore
+						}
+					}
+				}
 			}
 			finally
 			{
-				if (xmlStream != null)
+				if (byteStream != null)
 				{
 					try
 					{
-						xmlStream.close();
+						byteStream.close();
 					}
 					catch (Exception e)
 					{
 						// ignore
 					}
-				}
-			}
-		}
-		finally
-		{
-			if (byteStream != null)
-			{
-				try
-				{
-					byteStream.close();
-				}
-				catch (Exception e)
-				{
-					// ignore
 				}
 			}
 		}

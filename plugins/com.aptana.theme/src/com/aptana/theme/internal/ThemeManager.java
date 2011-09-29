@@ -664,7 +664,7 @@ public class ThemeManager implements IThemeManager
 		return collection;
 	}
 
-	private Theme loadBuiltinTheme(String themeName)
+	public Theme loadBuiltinTheme(String themeName)
 	{
 		OrderedProperties properties = getBuiltinThemeProperties(themeName);
 		if (properties == null)
