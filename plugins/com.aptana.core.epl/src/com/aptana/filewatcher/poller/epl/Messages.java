@@ -8,13 +8,13 @@
  *  Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.filewatcher.poller;
+package com.aptana.filewatcher.poller.epl;
 
 import org.eclipse.osgi.util.NLS;
 
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "com.aptana.filewatcher.poller.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.filewatcher.poller.epl.messages"; //$NON-NLS-1$
 
 	public static String error_main_loop;
 	public static String error_processing;

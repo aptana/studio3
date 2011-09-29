@@ -9,7 +9,7 @@
  *  aQute - initial implementation and ideas 
  *  IBM Corporation - initial adaptation to Equinox provisioning use
  *******************************************************************************/
-package com.aptana.filewatcher.poller;
+package com.aptana.filewatcher.poller.epl;
 
 import java.io.File;
 import java.util.HashSet;

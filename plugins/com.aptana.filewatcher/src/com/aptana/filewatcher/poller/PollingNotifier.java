@@ -20,6 +20,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.filewatcher.poller.epl.DirectoryChangeListener;
+import com.aptana.filewatcher.poller.epl.DirectoryWatcher;
+
 /**
  * An implementation to fallback to using a 2 second polling mechanism to scan the directories using the Java File API.
  * 
