@@ -19,11 +19,11 @@ public class AnalyticsInfo
 	private final String userAgent;
 	private final IAnalyticsUserManager userManager;
 
-	public AnalyticsInfo(String appName, String appId, String appGuid, String versionPluginId, String userAgent,
+	public AnalyticsInfo(String appId, String appName, String appGuid, String versionPluginId, String userAgent,
 			IAnalyticsUserManager userManager)
 	{
-		this.appName = appName;
 		this.appId = appId;
+		this.appName = appName;
 		this.appGuid = appGuid;
 		this.versionPluginId = versionPluginId;
 		this.userAgent = userAgent;
