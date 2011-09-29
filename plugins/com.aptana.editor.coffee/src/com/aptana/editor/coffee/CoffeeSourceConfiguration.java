@@ -16,7 +16,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -29,6 +28,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.SingleTokenScanner;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
@@ -238,23 +238,17 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 
 	private ITokenScanner getCommandScanner()
 	{
-		RuleBasedScanner scanner = new RuleBasedScanner();
-		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.COMMAND));
-		return scanner;
+		return new SingleTokenScanner(getToken(ICoffeeScopeConstants.COMMAND));
 	}
 
 	private ITokenScanner getSingleQuotedStringScanner()
 	{
-		RuleBasedScanner scanner = new RuleBasedScanner();
-		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.STRING_SINGLE));
-		return scanner;
+		return new SingleTokenScanner(getToken(ICoffeeScopeConstants.STRING_SINGLE));
 	}
 
 	private ITokenScanner getHeredocScanner()
 	{
-		RuleBasedScanner scanner = new RuleBasedScanner();
-		scanner.setDefaultReturnToken(getToken(ICoffeeScopeConstants.STRING_HEREDOC_SINGLE));
-		return scanner;
+		return new SingleTokenScanner(getToken(ICoffeeScopeConstants.STRING_HEREDOC_SINGLE));
 	}
 
 	private ITokenScanner getBlockCommentScanner()

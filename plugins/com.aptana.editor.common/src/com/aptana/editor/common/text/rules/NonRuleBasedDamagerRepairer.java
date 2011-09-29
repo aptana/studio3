@@ -8,6 +8,7 @@
 package com.aptana.editor.common.text.rules;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -166,19 +167,33 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 			{
 				fDocument.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
 				int index = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
-				// Only loop over positions[index] to positions[positions.length - 1]!
-				Position[] positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
-				for (int i = index; i < positions.length; i++)
+				int endIndex = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, end);
+				if (endIndex == index)
 				{
-					Position position = positions[i];
-					if (position.getOffset() <= end)
-					{
-						fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, position);
-					}
-					else
-					{
-						break;
-					}
+					// there should be nothing to wipe!
+					return;
+				}
+				// Only loop over positions[index] to positions[endIndex - 1]!
+				int start;
+				int stop;
+				Position[] positions;
+				if (fDocument instanceof AbstractDocument)
+				{
+					AbstractDocument abDoc = (AbstractDocument) fDocument;
+					positions = abDoc.getPositions(ICommonConstants.SCOPE_CATEGORY, offset, region.getLength(), false,
+							false);
+					start = 0;
+					stop = positions.length;
+				}
+				else
+				{
+					positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
+					start = index;
+					stop = endIndex;
+				}
+				for (int i = start; i < stop; i++)
+				{
+					fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, positions[i]);
 				}
 			}
 		}

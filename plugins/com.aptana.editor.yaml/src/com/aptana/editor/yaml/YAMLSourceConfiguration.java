@@ -16,7 +16,6 @@ import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -28,6 +27,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.SingleTokenScanner;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
@@ -186,23 +186,17 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private ITokenScanner getStringScanner()
 	{
-		RuleBasedScanner stringScanner = new RuleBasedScanner();
-		stringScanner.setDefaultReturnToken(getToken(IYAMLConstants.YAML_STRING_SINGLE_SCOPE));
-		return stringScanner;
+		return new SingleTokenScanner(getToken(IYAMLConstants.YAML_STRING_SINGLE_SCOPE));
 	}
 
 	private ITokenScanner getDoubleStringScanner()
 	{
-		RuleBasedScanner stringScanner = new RuleBasedScanner();
-		stringScanner.setDefaultReturnToken(getToken(IYAMLConstants.YAML_STRING_DOUBLE_SCOPE));
-		return stringScanner;
+		return new SingleTokenScanner(getToken(IYAMLConstants.YAML_STRING_DOUBLE_SCOPE));
 	}
 
 	private ITokenScanner getInterpolatedScanner()
 	{
-		RuleBasedScanner stringScanner = new RuleBasedScanner();
-		stringScanner.setDefaultReturnToken(getToken(IYAMLConstants.YAML_INTERPOLATED_STRING_SCOPE));
-		return stringScanner;
+		return new SingleTokenScanner(getToken(IYAMLConstants.YAML_INTERPOLATED_STRING_SCOPE));
 	}
 
 	private IToken getToken(String name)

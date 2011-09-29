@@ -16,16 +16,17 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.CommonUtil;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.xml.internal.IXMLScopes;
 import com.aptana.editor.xml.text.rules.XMLTagStartRule;
 
-public class XMLTagScanner extends RuleBasedScanner
+public class XMLTagScanner extends RuleBasedScanner implements IXMLScopes
 {
 
 	public XMLTagScanner()
@@ -33,10 +34,10 @@ public class XMLTagScanner extends RuleBasedScanner
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add rule for double quotes
-		rules.add(new MultiLineRule("\"", "\"", createToken("string.quoted.double.xml"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("\"", "\"", createToken(STRING_QUOTED_DOUBLE_XML), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add a rule for single quotes
-		rules.add(new MultiLineRule("'", "'", createToken("string.quoted.single.xml"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("'", "'", createToken(STRING_QUOTED_SINGLE_XML), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
@@ -55,7 +56,8 @@ public class XMLTagScanner extends RuleBasedScanner
 				return Character.isLetter(c);
 			}
 
-		}, createToken("entity.other.attribute-name.xml"), true) {//$NON-NLS-1$
+		}, createToken(ENTITY_OTHER_ATTRIBUTE_NAME_XML), true)
+		{
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
@@ -67,22 +69,22 @@ public class XMLTagScanner extends RuleBasedScanner
 		rules.add(wordRule);
 
 		CharacterMapRule rule = new CharacterMapRule();
-		rule.add('>', createToken("punctuation.definition.tag.xml")); //$NON-NLS-1$
-		rule.add('=', createToken("punctuation.separator.key-value.xml")); //$NON-NLS-1$
+		rule.add('>', createToken(PUNCTUATION_DEFINITION_TAG_XML));
+		rule.add('=', createToken(PUNCTUATION_SEPARATOR_KEY_VALUE_XML));
 		rules.add(rule);
 
-		rules.add(new XMLTagStartRule(createToken("punctuation.definition.tag.xml"))); //$NON-NLS-1$
+		rules.add(new XMLTagStartRule(createToken(PUNCTUATION_DEFINITION_TAG_XML)));
 
 		// Tag names
-		rules.add(new WordRule(new WordDetector(), createToken("entity.name.tag.xml"), true)); //$NON-NLS-1$
+		rules.add(new WordRule(new WordDetector(), createToken(ENTITY_NAME_TAG_XML), true));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
-		setDefaultReturnToken(createToken("text")); //$NON-NLS-1$
+		setDefaultReturnToken(createToken(TEXT));
 	}
 
 	protected IToken createToken(String string)
 	{
-		return new Token(string);
+		return CommonUtil.getToken(string);
 	}
 
 	/**
