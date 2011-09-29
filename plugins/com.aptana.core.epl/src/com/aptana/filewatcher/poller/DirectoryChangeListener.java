@@ -16,7 +16,7 @@ import java.io.File;
  * Abstract class which contains stub methods. Sub-classes to over-ride
  * methods which they are interested in.
  */
-abstract class DirectoryChangeListener
+public abstract class DirectoryChangeListener
 {
 
 	public void startPoll()

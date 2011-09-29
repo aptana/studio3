@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.epl.CoreEPLPlugin;
 
-class DirectoryWatcher
+public class DirectoryWatcher
 {
 
 	private class WatcherThread extends Thread
