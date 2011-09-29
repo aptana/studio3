@@ -16,7 +16,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -28,6 +27,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.SingleTokenScanner;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
@@ -35,12 +35,14 @@ import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.dtd.DTDSourceConfiguration;
 import com.aptana.editor.dtd.IDTDConstants;
+import com.aptana.editor.xml.internal.IXMLScopes;
 import com.aptana.editor.xml.internal.text.rules.DocTypeRule;
 
 /**
  * @author Max Stepanov
  */
-public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
 	public final static String PREFIX = "__xml_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
@@ -56,34 +58,39 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 			{ IXMLConstants.CONTENT_TYPE_XML, IDTDConstants.CONTENT_TYPE_DTD } };
 
 	private final IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new MultiLineRule("<?", "?>", getToken(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("<!--", "-->", getToken(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-		new MultiLineRule("<![CDATA[", "]]>", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
-		new DocTypeRule(new ExtendedToken(getToken(DOCTYPE)), true),
-		new TagRule("/", getToken(TAG)), //$NON-NLS-1$
-		new TagRule(new ExtendedToken(getToken(TAG))), //
+	new MultiLineRule("<?", "?>", getToken(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<!--", "-->", getToken(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<![CDATA[", "]]>", getToken(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
+			new DocTypeRule(new ExtendedToken(getToken(DOCTYPE)), true), new TagRule("/", getToken(TAG)), //$NON-NLS-1$
+			new TagRule(new ExtendedToken(getToken(TAG))), //
 	};
 
 	private static XMLSourceConfiguration instance;
 
-	private XMLSourceConfiguration() {
+	private XMLSourceConfiguration()
+	{
 	}
 
 	public synchronized static XMLSourceConfiguration getDefault()
 	{
-		if (instance == null) {
+		if (instance == null)
+		{
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			// Embedded DTD
 			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML, IDTDConstants.CONTENT_TYPE_DTD),
-					new QualifiedContentType("text.xml", "source.dtd.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
+					new QualifiedContentType(IXMLScopes.TEXT_XML, IXMLScopes.SOURCE_DTD_EMBEDDED_XML));
 
-			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML), new QualifiedContentType("text.xml")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(COMMENT), new QualifiedContentType("comment.block.xml")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(PRE_PROCESSOR), new QualifiedContentType("meta.tag.preprocessor.xml")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(TAG), new QualifiedContentType("meta.tag.xml")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(CDATA), new QualifiedContentType("string.unquoted.cdata.xml")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType("meta.tag.sgml.doctype.xml")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(IXMLConstants.CONTENT_TYPE_XML), new QualifiedContentType(
+					IXMLScopes.TEXT_XML));
+			c.addTranslation(new QualifiedContentType(COMMENT), new QualifiedContentType(IXMLScopes.COMMENT_BLOCK_XML));
+			c.addTranslation(new QualifiedContentType(PRE_PROCESSOR), new QualifiedContentType(
+					IXMLScopes.META_TAG_PREPROCESSOR_XML));
+			c.addTranslation(new QualifiedContentType(TAG), new QualifiedContentType(IXMLScopes.META_TAG_XML));
+			c.addTranslation(new QualifiedContentType(CDATA), new QualifiedContentType(
+					IXMLScopes.STRING_UNQUOTED_CDATA_XML));
+			c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType(
+					IXMLScopes.META_TAG_SGML_DOCTYPE_XML));
 
 			instance = new XMLSourceConfiguration();
 		}
@@ -95,7 +102,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
+	public String[] getContentTypes()
+	{
 		return TextUtils.combine(new String[][] { CONTENT_TYPES, DTDSourceConfiguration.CONTENT_TYPES });
 	}
 
@@ -103,7 +111,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -111,7 +120,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
@@ -119,7 +129,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new XMLSubPartitionScanner();
 	}
 
@@ -127,8 +138,10 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentContentType(java.lang.String)
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return IXMLConstants.CONTENT_TYPE_XML;
 		}
 		return null;
@@ -136,9 +149,12 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
+	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
 		DTDSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getXMLScanner());
@@ -167,37 +183,43 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.
+	 * AbstractThemeableEditor, java.lang.String)
 	 */
-	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
-		if (contentType.startsWith(DTDSourceConfiguration.PREFIX)) {
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		if (contentType.startsWith(DTDSourceConfiguration.PREFIX))
+		{
 			return DTDSourceConfiguration.getDefault().getContentAssistProcessor(editor, contentType);
 		}
 		return new CommonContentAssistProcessor(editor);
 	}
 
-	private ITokenScanner getCommentScanner() {
-		return new CommentScanner(getToken("comment.block.xml")); //$NON-NLS-1$
+	private ITokenScanner getCommentScanner()
+	{
+		return new CommentScanner(getToken(IXMLScopes.COMMENT_BLOCK_XML));
 	}
 
-	private ITokenScanner getPreProcessorScanner() {
+	private ITokenScanner getPreProcessorScanner()
+	{
 		XMLTagScanner preProcessorScanner = new XMLTagScanner();
-		preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
+		preProcessorScanner.setDefaultReturnToken(getToken(IXMLScopes.META_TAG_PREPROCESSOR_XML));
 		return preProcessorScanner;
 	}
 
-	private ITokenScanner getCDATAScanner() {
-		RuleBasedScanner cdataScanner = new RuleBasedScanner();
-		cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		return cdataScanner;
+	private ITokenScanner getCDATAScanner()
+	{
+		return new SingleTokenScanner(getToken(IXMLScopes.STRING_UNQUOTED_CDATA_XML));
 	}
 
-	private ITokenScanner getXMLScanner() {
+	private ITokenScanner getXMLScanner()
+	{
 		return new XMLScanner();
 	}
 
-	private ITokenScanner getXMLTagScanner() {
-		return  new XMLTagScanner();
+	private ITokenScanner getXMLTagScanner()
+	{
+		return new XMLTagScanner();
 	}
 
 	private static IToken getToken(String tokenName)

@@ -16,7 +16,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -27,6 +26,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.SingleTokenScanner;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
@@ -135,11 +135,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	private ITokenScanner getCDATAScanner()
 	{
-		RuleBasedScanner cdataScanner = new RuleBasedScanner();
-
-		cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml.svg")); //$NON-NLS-1$
-
-		return cdataScanner;
+		return new SingleTokenScanner(getToken("string.unquoted.cdata.xml.svg")); //$NON-NLS-1$
 	}
 
 	/**

@@ -20,7 +20,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.PatternRule;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -32,6 +31,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.SingleTokenScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -290,10 +290,7 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private ITokenScanner getOneTokenScanner(String token)
 	{
-		RuleBasedScanner multilineCommentScanner = new RuleBasedScanner();
-		multilineCommentScanner.setDefaultReturnToken(getToken(token));
-
-		return multilineCommentScanner;
+		return new SingleTokenScanner(getToken(token));
 	}
 
 	private static IToken getToken(String tokenName)
