@@ -25,6 +25,7 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 
 /**
@@ -69,7 +70,10 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
 
             @Override
             public void done(IJobChangeEvent event) {
-                IOUIPlugin.refreshNavigatorView(getStructuredSelection().getFirstElement());
+            	for (IFileStore fileStore : fDestFileStores)
+            	{
+            		IOUIPlugin.refreshNavigatorView(fileStore);
+            	}
             }
         };
         if (fClipboardData != null && fClipboardData.length > 0 && fDestFileStores.size() > 0) {
@@ -105,6 +109,10 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
         for (Object element : elements) {
             fileStore = FileSystemUtils.getFileStore(element);
             if (fileStore != null) {
+            	if (!Utils.isDirectory(fileStore))
+            	{
+            		fileStore = fileStore.getParent();
+            	}
                 fDestFileStores.add(fileStore);
             }
         }
