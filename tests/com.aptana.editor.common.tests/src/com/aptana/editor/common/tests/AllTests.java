@@ -16,7 +16,7 @@ import com.aptana.editor.common.internal.scripting.DocumentScopeManagerTest;
 import com.aptana.editor.common.scripting.ScriptingInputOutputTest;
 import com.aptana.editor.common.scripting.commands.ScriptingCommandsTests;
 import com.aptana.editor.common.scripting.snippets.SnippetsTests;
-import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategyTest;
+import com.aptana.editor.common.text.TextTests;
 import com.aptana.editor.common.text.reconciler.ReconcilerTests;
 import com.aptana.editor.common.text.rules.RulesTests;
 import com.aptana.editor.common.util.UtilTests;
@@ -36,11 +36,11 @@ public class AllTests
 		suite.addTest(SnippetsTests.suite());
 		suite.addTest(ReconcilerTests.suite());
 		suite.addTest(ScriptingCommandsTests.suite());
+		suite.addTest(TextTests.suite());
 		suite.addTest(UtilTests.suite());
 		suite.addTest(ValidationTests.suite());
 		suite.addTest(ViewerTests.suite());
 		suite.addTestSuite(ScriptingInputOutputTest.class);
-		suite.addTestSuite(RubyRegexpAutoIndentStrategyTest.class);
 		suite.addTestSuite(DocumentScopeManagerTest.class);
 		// $JUnit-END$
 		return suite;
