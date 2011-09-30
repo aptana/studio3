@@ -9,19 +9,18 @@ package com.aptana.editor.common.text;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
+
+import com.aptana.editor.common.text.rules.QueuedTokenScanner;
 
 /**
  * This always returns a single token spanning the entire range it was set for.
  * 
  * @author cwilliams
  */
-public class SingleTokenScanner implements ITokenScanner
+public class SingleTokenScanner extends QueuedTokenScanner
 {
 
 	private IToken fToken;
-	private int fOffset;
-	private int fLength;
 
 	public SingleTokenScanner(IToken token)
 	{
@@ -30,23 +29,7 @@ public class SingleTokenScanner implements ITokenScanner
 
 	public void setRange(IDocument document, int offset, int length)
 	{
-		this.fOffset = offset;
-		this.fLength = length;
+		super.setRange(document, offset, length);
+		queueToken(fToken, offset, length);
 	}
-
-	public IToken nextToken()
-	{
-		return fToken;
-	}
-
-	public int getTokenOffset()
-	{
-		return fOffset;
-	}
-
-	public int getTokenLength()
-	{
-		return fLength;
-	}
-
 }
