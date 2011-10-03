@@ -52,7 +52,7 @@ public class NaturesLabelProvider extends LabelProvider implements IFontProvider
 		}
 		if (isPrimary(element.toString()))
 		{
-			description += Messages.ProjectNaturesPage_LBL_Primary;
+			description += EplMessages.ProjectNaturesPage_LBL_Primary;
 		}
 		return description;
 	}

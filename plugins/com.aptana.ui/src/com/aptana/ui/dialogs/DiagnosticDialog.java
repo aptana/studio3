@@ -9,15 +9,13 @@ package com.aptana.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TrayDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
-import com.aptana.ui.Messages;
 
 public class DiagnosticDialog extends TrayDialog
 {
@@ -54,18 +52,14 @@ public class DiagnosticDialog extends TrayDialog
 		}
 	}
 
-	/**
-	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-	 */
+	@Override
 	protected void configureShell(Shell newShell)
 	{
 		super.configureShell(newShell);
 		newShell.setText(Messages.DiagnosticDialog_run_diagnostic_title);
 	}
 
-	/**
-	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected void createButtonsForButtonBar(Composite parent)
 	{
 		// creates the Copy to Clipboard and Close buttons
@@ -73,28 +67,21 @@ public class DiagnosticDialog extends TrayDialog
 		createButton(parent, IDialogConstants.OK_ID, Messages.DiagnosticDialog_close_label, true);
 	}
 
-	/**
-	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(new GridLayout());
-		main.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+		main.setLayout(GridLayoutFactory.swtDefaults().create());
+		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		fText = new Text(main, SWT.BORDER | SWT.MULTI | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
 		fText.setBackground(fText.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
-		gridData.widthHint = 500;
-		gridData.heightHint = 500;
-		fText.setLayoutData(gridData);
+		fText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(500, 500).create());
 
 		return main;
 	}
 
-	/**
-	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
-	 */
+	@Override
 	protected void buttonPressed(int buttonId)
 	{
 		if (buttonId == COPY_ID)
@@ -108,5 +95,4 @@ public class DiagnosticDialog extends TrayDialog
 			super.buttonPressed(buttonId);
 		}
 	}
-
 }

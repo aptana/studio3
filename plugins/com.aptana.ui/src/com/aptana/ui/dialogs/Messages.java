@@ -12,6 +12,14 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.ui.dialogs.messages"; //$NON-NLS-1$
+
+	public static String DiagnosticDialog_close_label;
+	public static String DiagnosticDialog_copy_clipboard_label;
+	public static String DiagnosticDialog_run_diagnostic_title;
+
+	public static String ProjectSelectionDialog_Message;
+	public static String ProjectSelectionDialog_Title;
+
 	static
 	{
 		// initialize resource bundle
@@ -21,7 +29,4 @@ public class Messages extends NLS
 	private Messages()
 	{
 	}
-
-	public static String ProjectSelectionDialog_Message;
-	public static String ProjectSelectionDialog_Title;
 }

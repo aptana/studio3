@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -24,7 +23,6 @@ import com.aptana.core.ICorePreferenceConstants;
 import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.ui.Messages;
 import com.aptana.ui.UIPlugin;
 
 public class AptanaPreferencePage extends GenericRootPreferencePage
@@ -50,9 +48,8 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	 */
 	public static Composite createGroup(Composite appearanceComposite, String string)
 	{
-		Font font = appearanceComposite.getFont();
 		Group group = new Group(appearanceComposite, SWT.NONE);
-		group.setFont(font);
+		group.setFont(appearanceComposite.getFont());
 		group.setText(string);
 
 		group.setLayout(GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).create());

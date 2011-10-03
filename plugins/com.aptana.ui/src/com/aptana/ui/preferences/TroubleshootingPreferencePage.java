@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
@@ -61,8 +62,8 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	{
 		super(GRID);
 
-		IPreferenceStore preferenceStore = new org.eclipse.ui.preferences.ScopedPreferenceStore(
-				EclipseUtil.instanceScope(), CorePlugin.getDefault().getBundle().getSymbolicName());
+		IPreferenceStore preferenceStore = new ScopedPreferenceStore(EclipseUtil.instanceScope(), CorePlugin
+				.getDefault().getBundle().getSymbolicName());
 		setPreferenceStore(preferenceStore);
 		setDescription(Messages.TroubleshootingPreferencePage_TroubleshootingPageHeader);
 	}
@@ -81,19 +82,18 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 
 		Composite debugComp = new Composite(group, SWT.NONE);
 		debugComp.setLayout(GridLayoutFactory.fillDefaults().margins(0, 5).numColumns(3).create());
-		debugComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		debugComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		Label less = new Label(debugComp, SWT.LEFT);
-
 		less.setText(Messages.TroubleshootingPreferencePage_LBL_Errors);
 		debugSlider = new Scale(debugComp, SWT.HORIZONTAL);
 		debugSlider.setIncrement(1);
 		debugSlider.setMinimum(1);
 		debugSlider.setMaximum(3);
 		debugSlider.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
-
 		debugSlider.setSelection(parseStatusLevel(getPreferenceStore().getString(
-				com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL)));
+				ICorePreferenceConstants.PREF_DEBUG_LEVEL)));
+
 		Label more = new Label(debugComp, SWT.LEFT);
 		more.setText(Messages.TroubleshootingPreferencePage_LBL_All);
 
@@ -104,6 +104,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 
 		debugSlider.addSelectionListener(new SelectionListener()
 		{
+
 			public void widgetDefaultSelected(SelectionEvent selectionevent)
 			{
 				currentValue.setText(getValueLabel(debugSlider.getSelection()));
@@ -113,7 +114,6 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 			{
 				currentValue.setText(getValueLabel(debugSlider.getSelection()));
 			}
-
 		});
 
 		toggleComponents = new BooleanFieldEditor(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS,
@@ -202,8 +202,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	 */
 	protected void performDefaults()
 	{
-		debugSlider.setSelection(getPreferenceStore().getDefaultInt(
-				com.aptana.core.ICorePreferenceConstants.PREF_DEBUG_LEVEL));
+		debugSlider.setSelection(getPreferenceStore().getDefaultInt(ICorePreferenceConstants.PREF_DEBUG_LEVEL));
 		categoryViewer.setCheckedElements(ArrayUtil.NO_OBJECTS);
 		super.performDefaults();
 	}
@@ -305,5 +304,4 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 			}
 		}
 	}
-
 }

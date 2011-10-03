@@ -114,19 +114,18 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	{
 		return new ViewerComparator()
 		{
+
 			public int compare(Viewer viewer, Object e1, Object e2)
 			{
-				int result = 0;
-
 				if (e1 instanceof BuildPathEntry && e2 instanceof BuildPathEntry)
 				{
 					BuildPathEntry bpe1 = (BuildPathEntry) e1;
 					BuildPathEntry bpe2 = (BuildPathEntry) e2;
 
-					result = bpe1.getDisplayName().compareTo(bpe2.getDisplayName());
+					return bpe1.getDisplayName().compareTo(bpe2.getDisplayName());
 				}
 
-				return result;
+				return 0;
 			}
 		};
 	}
@@ -139,9 +138,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 */
 	private Set<BuildPathEntry> getBuildPathEntries(IProject project)
 	{
-		BuildPathManager manager = BuildPathManager.getInstance();
-
-		return manager.getBuildPaths();
+		return BuildPathManager.getInstance().getBuildPaths();
 	}
 
 	/**
@@ -152,9 +149,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	 */
 	private Set<BuildPathEntry> getSelectedBuildPathEntries(IProject project)
 	{
-		BuildPathManager manager = BuildPathManager.getInstance();
-
-		return manager.getBuildPaths(project);
+		return BuildPathManager.getInstance().getBuildPaths(project);
 	}
 
 	/**
@@ -177,10 +172,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 				{
 					return ((Set<?>) element).toArray();
 				}
-				else
-				{
-					return super.getChildren(element);
-				}
+				return super.getChildren(element);
 			}
 		};
 	}
@@ -194,6 +186,7 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 	{
 		return new ITableLabelProvider()
 		{
+
 			public void addListener(ILabelProviderListener listener)
 			{
 			}
@@ -218,8 +211,6 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 
 			public String getColumnText(Object element, int columnIndex)
 			{
-				String result = null;
-
 				if (element instanceof BuildPathEntry)
 				{
 					BuildPathEntry entry = (BuildPathEntry) element;
@@ -227,23 +218,20 @@ public class ProjectBuildPathPropertyPage extends PropertyPage implements IWorkb
 					switch (columnIndex)
 					{
 						case 0:
-							result = entry.getDisplayName();
-							break;
-
+							return entry.getDisplayName();
 						case 1:
-							result = entry.getPath().toString();
+							String result = entry.getPath().toString();
 
 							if (result != null && result.startsWith("file:")) //$NON-NLS-1$
 							{
 								File f = new File(entry.getPath());
-
-								result = f.getAbsolutePath();
+								return f.getAbsolutePath();
 							}
-							break;
+							return result;
 					}
 				}
 
-				return result;
+				return null;
 			}
 		};
 	}

@@ -128,7 +128,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_RetrieveNatures, e);
+			IdeLog.logError(UIEplPlugin.getDefault(), EplMessages.ProjectNaturesPage_ERR_RetrieveNatures, e);
 			fCurrentProjectNatures = new String[0];
 		}
 		fLabelProvider = new NaturesLabelProvider(fNatureDescriptions);
@@ -137,7 +137,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		fInitialPrimaryNature = fCurrentProjectNatures.length == 0 ? null : fCurrentProjectNatures[0];
 		updatePrimaryNature(fInitialPrimaryNature);
 
-		setDescription(MessageFormat.format(Messages.ProjectNaturesPage_Description, fProject.getName()));
+		setDescription(MessageFormat.format(EplMessages.ProjectNaturesPage_Description, fProject.getName()));
 		Label description = createDescriptionLabel(composite);
 		description.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
@@ -177,7 +177,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		Composite buttons = new Composite(tableComposite, SWT.NONE);
 		buttons.setLayout(GridLayoutFactory.fillDefaults().create());
 		buttons.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
-		fMakePrimaryButton = createButton(Messages.ProjectNaturesPage_LBL_MakePrimary, buttons);
+		fMakePrimaryButton = createButton(EplMessages.ProjectNaturesPage_LBL_MakePrimary, buttons);
 		updateButtons();
 
 		noDefaultAndApplyButton();
@@ -234,7 +234,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		}
 		catch (InvocationTargetException e)
 		{
-			IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_SetNatures, e);
+			IdeLog.logError(UIEplPlugin.getDefault(), EplMessages.ProjectNaturesPage_ERR_SetNatures, e);
 			return false;
 		}
 		resetProject();
@@ -302,7 +302,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	{
 		Menu menu = new Menu(table);
 		fSetPrimaryMenuItem = new MenuItem(menu, SWT.PUSH);
-		fSetPrimaryMenuItem.setText(Messages.ProjectNaturesPage_LBL_SetAsPrimary);
+		fSetPrimaryMenuItem.setText(EplMessages.ProjectNaturesPage_LBL_SetAsPrimary);
 		fSetPrimaryMenuItem.addSelectionListener(this);
 		return menu;
 	}
@@ -323,8 +323,8 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	 */
 	protected void resetProject()
 	{
-		boolean reset = MessageDialog.openQuestion(getControl().getShell(), Messages.ProjectNaturesPage_ResetTitle,
-				Messages.ProjectNaturesPage_ResetMessage);
+		boolean reset = MessageDialog.openQuestion(getControl().getShell(), EplMessages.ProjectNaturesPage_ResetTitle,
+				EplMessages.ProjectNaturesPage_ResetMessage);
 		if (reset)
 		{
 			// close the project
@@ -336,7 +336,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 					// use the CloseResourceAction to provide a file saving
 					// dialog in case the project has some unsaved
 					// files
-					UIJob job = new UIJob(Messages.ProjectNaturesPage_CloseProjectJob_Title + "...") //$NON-NLS-1$
+					UIJob job = new UIJob(EplMessages.ProjectNaturesPage_CloseProjectJob_Title + "...") //$NON-NLS-1$
 					{
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor)
@@ -376,7 +376,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			}
 			catch (InvocationTargetException e)
 			{
-				IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_CloseProject, e);
+				IdeLog.logError(UIEplPlugin.getDefault(), EplMessages.ProjectNaturesPage_ERR_CloseProject, e);
 			}
 
 			// re-open the project
@@ -404,7 +404,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			}
 			catch (InvocationTargetException e)
 			{
-				IdeLog.logError(UIEplPlugin.getDefault(), Messages.ProjectNaturesPage_ERR_OpenProject, e);
+				IdeLog.logError(UIEplPlugin.getDefault(), EplMessages.ProjectNaturesPage_ERR_OpenProject, e);
 			}
 		}
 	}
