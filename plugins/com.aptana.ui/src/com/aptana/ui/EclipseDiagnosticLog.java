@@ -9,6 +9,9 @@ package com.aptana.ui;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.ui.diagnostic.IDiagnosticLog;
+
 public class EclipseDiagnosticLog implements IDiagnosticLog
 {
 
@@ -62,7 +65,7 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 		// VM arguments
 		buf.append(Messages.EclipseDiagnosticLog_vm_args);
 		property = System.getProperty("eclipse.vmargs"); //$NON-NLS-1$
-		buf.append((property == null) ? "" : property); //$NON-NLS-1$
+		buf.append((property == null) ? StringUtil.EMPTY : property);
 		buf.append(NEW_LINE);
 
 		// workspace area

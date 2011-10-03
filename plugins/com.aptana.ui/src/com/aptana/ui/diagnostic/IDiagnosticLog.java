@@ -5,15 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui;
+package com.aptana.ui.diagnostic;
 
 public interface IDiagnosticLog
 {
+
 	/**
-	 * Returns the log that should be added to the diagnostic dialog
+	 * Returns the diagnostic log.
 	 * 
 	 * @return
 	 */
 	public String getLog();
-
 }
