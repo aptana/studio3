@@ -264,6 +264,20 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 */
 	protected void finalizeInstallation(String installDir)
 	{
+		deleteDownloadedPaths();
+		// Cache the version and the location of the installed app.
+		// We assume here that the version of app is specified in the install URL!
+		if (installDir != null)
+		{
+			cacheVersion(installDir, urls[0], getApplicationName());
+		}
+	}
+
+	/**
+	 * Mark the downloaded paths to be deleted on exit.
+	 */
+	protected void deleteDownloadedPaths()
+	{
 		if (downloadedPaths != null)
 		{
 			for (String f : downloadedPaths)
@@ -274,12 +288,6 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 					toDelete.deleteOnExit();
 				}
 			}
-		}
-		// Cache the version and the location of the installed app.
-		// We assume here that the version of app is specified in the install URL!
-		if (installDir != null)
-		{
-			cacheVersion(installDir, urls[0], getApplicationName());
 		}
 	}
 }
