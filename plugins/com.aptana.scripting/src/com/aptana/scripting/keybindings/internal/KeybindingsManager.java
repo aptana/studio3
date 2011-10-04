@@ -60,7 +60,6 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.keys.WorkbenchKeyboard;
-import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
@@ -300,7 +299,7 @@ public class KeybindingsManager implements LoadCycleListener
 					final BindingService theBindingService = (BindingService) bindingService;
 					Display display = PlatformUI.getWorkbench().getDisplay();
 					final WorkbenchKeyboard keyboard = theBindingService.getKeyboard();
-					KeyDownFilter keyDownFilter = keyboard.getKeyDownFilter();
+					Listener keyDownFilter = keyboard.getKeyDownFilter();
 					try
 					{
 						if (keyDownFilter != null)
