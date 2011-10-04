@@ -29,11 +29,11 @@ module Ruble
     end
     
     alias :empty? :isEmpty
-    alias :text, :getText
-    alias :start_line, :getStartLine
-    alias :end_line, :getEndLine
-    alias :length, :getlength
-    alias :offset, :getOffset
+    alias :text :getText
+    alias :start_line :getStartLine
+    alias :end_line :getEndLine
+    alias :length :getlength
+    alias :offset :getOffset
   end
   
   class Editor
