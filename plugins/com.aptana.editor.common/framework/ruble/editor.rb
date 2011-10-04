@@ -2,6 +2,40 @@ require "java"
 require "ruble/ui"
 
 module Ruble
+  # Due to classloading bugs, we can't reach TextSelection.emptySelection, so we create our own here.
+  class EmptySelection
+    def getOffset
+      -1
+    end
+    
+    def getLength
+      -1
+    end
+    
+    def getEndLine
+      -1
+    end
+    
+    def getStartLine
+      -1
+    end
+    
+    def getText
+      nil
+    end
+    
+    def isEmpty
+      true
+    end
+    
+    alias :empty? :isEmpty
+    alias :text, :getText
+    alias :start_line, :getStartLine
+    alias :end_line, :getEndLine
+    alias :length, :getlength
+    alias :offset, :getOffset
+  end
+  
   class Editor
     class << self
       
@@ -169,7 +203,7 @@ module Ruble
       if editor_part.respond_to? :selection_provider
         editor_part.selection_provider.selection
       else
-        org.eclipse.jface.text.TextSelection.emptySelection
+        Ruble::EmptySelection.new
       end
     end
     
