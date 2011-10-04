@@ -11,8 +11,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -58,13 +60,13 @@ public class GitLaunchDelegate extends LaunchConfigurationDelegate
 				(workingDir == null) ? null : workingDir.toFile(), env);
 		// FIXME Build a label from args?
 		String label = commandList.get(0);
-		IProcess p = DebugPlugin.newProcess(launch, process, label);
 		// Set process type to "git" so our linetracker hyperlink stuff works
-		p.setAttribute(IProcess.ATTR_PROCESS_TYPE, IGitLaunchConfigurationConstants.PROCESS_TYPE);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(IProcess.ATTR_PROCESS_TYPE, IGitLaunchConfigurationConstants.PROCESS_TYPE);
+		DebugPlugin.newProcess(launch, process, label, map);
 	}
 
-	private Collection<? extends String> arguments(ILaunchConfiguration configuration)
-			throws CoreException
+	private Collection<? extends String> arguments(ILaunchConfiguration configuration) throws CoreException
 	{
 		String interpreterArgs = configuration.getAttribute(IGitLaunchConfigurationConstants.ATTR_ARGUMENTS,
 				(String) null);
@@ -95,8 +97,7 @@ public class GitLaunchDelegate extends LaunchConfigurationDelegate
 		IPath workingDirectory = Path.fromOSString(workingDirVal);
 		if (!workingDirectory.toFile().isDirectory())
 		{
-			abort(MessageFormat.format(Messages.GitLaunchDelegate_InvalidWorkingDir,
-					workingDirVal), null);
+			abort(MessageFormat.format(Messages.GitLaunchDelegate_InvalidWorkingDir, workingDirVal), null);
 		}
 		return workingDirectory;
 	}
