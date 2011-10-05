@@ -24,6 +24,7 @@ import beaver.Parser;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -105,7 +106,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				removeTasks(file, sub.newChild(10));
 
 				// grab the source of the file we're going to parse
-				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)), getCharset(file));
 
 				// minor optimization when creating a new empty file
 				if (source != null && source.trim().length() > 0)
@@ -266,7 +267,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			text = text.toLowerCase();
 		}
 		int lastOffset = 0;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+		String[] lines = StringUtil.LINE_SPLITTER.split(text);
 		for (String line : lines)
 		{
 			int offset = text.indexOf(line, lastOffset);
@@ -296,7 +297,8 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					message = message.substring(0, message.length() - 2).trim();
 				}
 				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
+				createTask(store, message, entry.getPriority(), getLineNumber(start, source), start,
+						start + message.length());
 			}
 
 			lastOffset = offset;

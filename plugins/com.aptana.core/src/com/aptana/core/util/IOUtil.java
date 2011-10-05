@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -27,6 +26,8 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 
 public abstract class IOUtil
 {
@@ -59,16 +60,30 @@ public abstract class IOUtil
 			return null;
 		}
 
-		// lookup up default charset if none was provided. We use this value later to possibly detect a UTF-8 BOM
-		if (charset == null)
-		{
-			charset = Charset.defaultCharset().name();
-		}
-
 		BufferedReader reader = null;
 		try
 		{
-			reader = new BufferedReader(new InputStreamReader(stream, charset));
+			if (charset == null)
+			{
+				if (stream.markSupported())
+				{
+					// Try to detect the charset!
+					CharsetDetector detector = new CharsetDetector();
+					CharsetMatch match = detector.setText(stream).detect();
+					charset = match.getName();
+					reader = new BufferedReader(match.getReader());
+				}
+				else
+				{
+					// Now what? Assume UTF-8?
+					charset = "UTF-8"; //$NON-NLS-1$
+					reader = new BufferedReader(new InputStreamReader(stream, charset));
+				}
+			}
+			else
+			{
+				reader = new BufferedReader(new InputStreamReader(stream, charset));
+			}
 			StringBuilder output = new StringBuilder();
 
 			// Some editors emit a BOM (EF BB BF) for UTF-8 encodings which the JVM converts to \uFEFF. For lots of

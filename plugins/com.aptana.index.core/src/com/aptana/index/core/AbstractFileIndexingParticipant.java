@@ -11,6 +11,7 @@ import java.io.File;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -25,9 +26,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
+
 	private static final String EXTERNAL_URI = "uri"; //$NON-NLS-1$
 
 	private int priority;
@@ -75,6 +78,37 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		{
 			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
+	}
+
+	/**
+	 * If the underlying resource is a local file in the workspace, we try to grab the encoding. Otherwise return null,
+	 * so that we attempt to sniff the charset in IOUtil.read.
+	 * 
+	 * @param fileStore
+	 * @return
+	 */
+	protected String getCharset(IFileStore fileStore)
+	{
+		URI uri = fileStore.toURI();
+		if ("file".equals(uri.getScheme())) //$NON-NLS-1$
+		{
+			IFile theFile = ResourcesPlugin.getWorkspace().getRoot()
+					.getFileForLocation(Path.fromOSString(new File(uri).getAbsolutePath()));
+			if (theFile != null)
+			{
+				try
+				{
+					return theFile.getCharset();
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(IndexPlugin.getDefault(), e);
+					// It's in the workspace, but we couldn't grab the encoding, fall back to workspace encoding.
+					return ResourcesPlugin.getEncoding();
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -233,5 +267,30 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	public void setPriority(int priority)
 	{
 		this.priority = priority;
+	}
+
+	protected int getLineNumber(int start, String source)
+	{
+		if (start < 0 || start >= source.length())
+		{
+			return -1;
+		}
+		if (start == 0)
+		{
+			return 1;
+		}
+
+		Matcher m = StringUtil.LINE_SPLITTER.matcher(source.substring(0, start));
+		int line = 1;
+		while (m.find())
+		{
+			int offset = m.start();
+			if (offset > start)
+			{
+				break;
+			}
+			line++;
+		}
+		return line;
 	}
 }
