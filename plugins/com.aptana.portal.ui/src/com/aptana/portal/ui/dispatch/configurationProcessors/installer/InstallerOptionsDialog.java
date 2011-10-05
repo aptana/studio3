@@ -218,16 +218,13 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		if (createInstallDir)
 		{
 			File f = new File(path.getText());
-			if (!f.exists())
+			if (!f.exists() && !f.mkdirs())
 			{
-				if (!f.mkdirs())
-				{
-					// Display an error message about the problem and return here to prevent a dialog close.
-					MessageDialog.openError(getParentShell(),
-							Messages.InstallerOptionsDialog_creatingDirectoriesErrorTitle,
-							Messages.InstallerOptionsDialog_creatingDirectoriesErrorMessage);
-					return;
-				}
+				// Display an error message about the problem and return here to prevent a dialog close.
+				MessageDialog.openError(getParentShell(),
+						Messages.InstallerOptionsDialog_creatingDirectoriesErrorTitle,
+						Messages.InstallerOptionsDialog_creatingDirectoriesErrorMessage);
+				return;
 			}
 		}
 		super.okPressed();
