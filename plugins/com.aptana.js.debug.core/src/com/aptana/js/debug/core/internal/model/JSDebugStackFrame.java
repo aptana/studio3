@@ -25,7 +25,7 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
 public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 
 	private static final String FRAME_0 = "frame[{0,number,integer}]"; //$NON-NLS-1$
-	
+
 	private final JSDebugThread thread;
 	private int frameId;
 	private final String function;
@@ -33,8 +33,8 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	private int sourceLine;
 	private IVariable[] variables;
 
-	/* package */ long pc;
-	/* package */ int scriptTag;
+	/* package */long pc;
+	/* package */int scriptTag;
 
 	/**
 	 * JSDebugStackFrame
@@ -295,29 +295,29 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 		return getJSDebugTarget().findVariable(variableName, this);
 	}
 
-	/* package */ int getFrameId() {
+	/* package */int getFrameId() {
 		return frameId;
 	}
 
-	/* package */ boolean isSameAs(JSDebugStackFrame other) {
+	/* package */boolean isSameAs(JSDebugStackFrame other) {
 		return (scriptTag == other.scriptTag) && (pc == other.pc) && (sourceLine == other.sourceLine);
 	}
 
-	/* package */ void invalidate() {
+	/* package */void invalidate() {
 		frameId = -1;
 	}
 
-	/* package */ void invalidate(int frameId, int sourceLine, long pc) {
+	/* package */void invalidate(int frameId, int sourceLine, long pc) {
 		this.frameId = frameId;
 		this.sourceLine = sourceLine;
 		this.pc = pc;
 		variables = null;
 	}
-	
-	/* package */ String getThreadId() {
+
+	/* package */String getThreadId() {
 		return thread.getThreadId();
 	}
-	
+
 	private JSDebugTarget getJSDebugTarget() {
 		return (JSDebugTarget) getDebugTarget();
 	}

@@ -18,7 +18,6 @@ import com.aptana.js.debug.ui.internal.StartPageManager;
 
 /**
  * Start as Start Page action
- * 
  */
 public class DefaultWebPreviewActionDelegate implements IObjectActionDelegate {
 	private IResource resource;

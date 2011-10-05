@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -35,7 +33,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
-import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -215,19 +212,10 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		// Display a status error
 		StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus, 3000L, true);
-		if (FormatterPlugin.getDefault().isDebugging())
-		{
-			// Log complete
-			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
-					FormatterMessages.Formatter_formatterError, new DumpContentException("\nInput:\n\n" + input //$NON-NLS-1$
-							+ "\n<!----------------------------!> \nOutput:\n " + output))); //$NON-NLS-1$
-		}
-		else
-		{
-			// Log basic
-			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
-					FormatterMessages.Formatter_basicLogFormatterError, null));
-		}
+		// Log a basic error. It's up to the subclassing formatter implementation to log any advance information
+		// regarding the failure.
+		IdeLog.logError(FormatterPlugin.getDefault(), FormatterMessages.Formatter_basicLogFormatterError,
+				IDebugScopes.DEBUG);
 	}
 
 	private static int toInt(Object value)
@@ -333,7 +321,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		catch (Exception e)
 		{
 			IdeLog.logError(FormatterPlugin.getDefault(),
-					"Error while computing the formatter's output OFF/ON regions", e); //$NON-NLS-1$
+					"Error while computing the formatter's output OFF/ON regions", e, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 		return onOffRegions;
 	}
@@ -457,23 +445,41 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		LineNumberReader input = new LineNumberReader(inputReader);
 		LineNumberReader output = new LineNumberReader(outputReader);
-		for (;;)
+		String inputLine = null;
+		String outputLine = null;
+		boolean result = true;
+		while (result)
 		{
-			final String inputLine = readLine(input);
-			final String outputLine = readLine(output);
+			inputLine = readLine(input);
+			outputLine = readLine(output);
 			if (inputLine == null)
 			{
-				return (outputLine == null);
+				result = (outputLine == null);
+				break;
 			}
 			else if (outputLine == null)
 			{
-				return false;
+				result = false;
 			}
 			else if (!inputLine.equals(outputLine))
 			{
-				return false;
+				result = false;
 			}
 		}
+		if (!result && FormatterPlugin.getDefault().isDebugging())
+		{
+			if (inputLine != null && outputLine != null)
+			{
+				FormatterUtils.logDiff(inputLine, outputLine);
+			}
+			else
+			{
+				IdeLog.logError(FormatterPlugin.getDefault(),
+						"Formatter Error - Input line does not match output line:\nINPUT:\n" + inputLine + "\nOUTPUT\n" //$NON-NLS-1$ //$NON-NLS-2$
+								+ outputLine);
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -492,7 +498,12 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		in = in.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		out = out.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		return in.equals(out);
+		boolean result = in.equals(out);
+		if (!result && FormatterPlugin.getDefault().isDebugging())
+		{
+			FormatterUtils.logDiff(in, out);
+		}
+		return result;
 	}
 
 	private String readLine(LineNumberReader reader)
@@ -603,7 +614,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		catch (BadLocationException e)
 		{
-			FormatterPlugin.logError(e);
+			IdeLog.logError(FormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return 0;
 	}

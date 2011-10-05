@@ -77,7 +77,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 			if ("\\`".equals(matched)) //$NON-NLS-1$
 			{
 				// escaped reverse tick
-				buffer.append("`"); //$NON-NLS-1$
+				buffer.append('`');
 			}
 			else if ("\\$".equals(matched)) //$NON-NLS-1$
 			{
@@ -125,7 +125,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 							{
 								if (defaultValues.startsWith(":")) //$NON-NLS-1$
 									defaultValues = defaultValues.substring(1);
-								buffer.append("("); //$NON-NLS-1$
+								buffer.append('(');
 								boolean first = true;
 								// We want to split on non-escaped '/'
 								String[] values = defaultValues.split("(?<!\\\\)/"); //$NON-NLS-1$
@@ -137,13 +137,13 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 									}
 									else
 									{
-										buffer.append(","); //$NON-NLS-1$
+										buffer.append(',');
 									}
 									buffer.append(SINGLE_QUOTE);
 									buffer.append(value.replaceAll(Pattern.quote("\\$"), Matcher.quoteReplacement("$")).replaceAll("\\\\/", "/").replaceAll("\\\\}", "\\}").replaceAll("'", "''").replaceAll("\\\\`", "`")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 									buffer.append(SINGLE_QUOTE);
 								}
-								buffer.append(")"); //$NON-NLS-1$
+								buffer.append(')');
 							}
 							else
 							{

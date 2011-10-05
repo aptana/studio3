@@ -26,7 +26,7 @@ public class HTMLIndexWriter extends IndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(HTMLIndexConstants.METADATA_INDEX_LOCATION);
+		return URI.create(IHTMLIndexConstants.METADATA_INDEX_LOCATION);
 	}
 
 	/**
@@ -40,12 +40,12 @@ public class HTMLIndexWriter extends IndexWriter
 		if (index != null && attribute != null)
 		{
 			String key = StringUtil.join( //
-				HTMLIndexConstants.DELIMITER, //
+				IHTMLIndexConstants.DELIMITER, //
 				attribute.getName(), //
 				this.serialize(attribute) //
 				);
 
-			index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
+			index.addEntry(IHTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
 		}
 	}
 
@@ -60,12 +60,12 @@ public class HTMLIndexWriter extends IndexWriter
 		if (index != null && element != null)
 		{
 			String key = StringUtil.join( //
-				HTMLIndexConstants.DELIMITER, //
+				IHTMLIndexConstants.DELIMITER, //
 				element.getName(), //
 				this.serialize(element) //
 				);
 
-			index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
+			index.addEntry(IHTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
 		}
 	}
 
@@ -80,12 +80,12 @@ public class HTMLIndexWriter extends IndexWriter
 		if (index != null && entity != null)
 		{
 			String key = StringUtil.join( //
-				HTMLIndexConstants.DELIMITER, //
+				IHTMLIndexConstants.DELIMITER, //
 				entity.getName(), //
 				this.serialize(entity) //
 				);
 
-			index.addEntry(HTMLIndexConstants.ENTITY, key, this.getDocumentPath());
+			index.addEntry(IHTMLIndexConstants.ENTITY, key, this.getDocumentPath());
 		}
 	}
 
@@ -100,12 +100,12 @@ public class HTMLIndexWriter extends IndexWriter
 		if (index != null && event != null)
 		{
 			String key = StringUtil.join( //
-				HTMLIndexConstants.DELIMITER, //
+				IHTMLIndexConstants.DELIMITER, //
 				event.getName(), //
 				this.serialize(event) //
 				);
 
-			index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
+			index.addEntry(IHTMLIndexConstants.EVENT, key, this.getDocumentPath());
 		}
 	}
 }

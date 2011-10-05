@@ -10,13 +10,12 @@ package com.aptana.ide.syncing.core.events;
 
 import java.util.EventListener;
 
-
 /**
  * @author Max Stepanov
- *
  */
-public interface ISiteConnectionListener extends EventListener {
+public interface ISiteConnectionListener extends EventListener
+{
 
 	public void siteConnectionChanged(SiteConnectionEvent event);
-	
+
 }

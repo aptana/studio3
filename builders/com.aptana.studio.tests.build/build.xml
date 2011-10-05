@@ -173,7 +173,7 @@
 		</java>
 	</target>
 
-	<target name="-pre-test" depends="build" description="Install test features and do pre-test setup.">
+	<target name="-pre-test" description="Install test features and do pre-test setup.">
 		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />

@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.browser.WebBrowserViewer;
+import com.aptana.core.util.StringUtil;
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
@@ -46,7 +47,7 @@ public class WebBrowserView extends ViewPart {
 				if (event.current == 0) {
 					IProgressMonitor progressMonitor = getStatusBarProgressMonitor();
 					progressMonitor.done();
-					progressMonitor.beginTask("", event.total); //$NON-NLS-1$
+					progressMonitor.beginTask(StringUtil.EMPTY, event.total);
 					progressWorked = 0;
 				}
 				if (progressWorked < event.current) {

@@ -24,13 +24,13 @@ import com.aptana.editor.css.parsing.ast.CSSExpressionNode;
 import com.aptana.editor.css.parsing.ast.CSSFontFaceNode;
 import com.aptana.editor.css.parsing.ast.CSSMediaNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
 import com.aptana.editor.css.parsing.ast.CSSPageNode;
 import com.aptana.editor.css.parsing.ast.CSSPageSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSTermListNode;
 import com.aptana.editor.css.parsing.ast.CSSTextNode;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
@@ -106,20 +106,20 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		switch (type)
 		{
-			case CSSNodeTypes.RULE:
+			case ICSSNodeTypes.RULE:
 				pushFormatterRuleNode((CSSRuleNode) cssNode);
 				break;
-			case CSSNodeTypes.PAGE:
+			case ICSSNodeTypes.PAGE:
 				pushFormatterPageNode((CSSPageNode) cssNode);
 				break;
-			case CSSNodeTypes.FONTFACE:
+			case ICSSNodeTypes.FONTFACE:
 				pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
 				break;
-			case CSSNodeTypes.MEDIA:
+			case ICSSNodeTypes.MEDIA:
 				pushFormatterMediaNode((CSSMediaNode) cssNode);
 				break;
-			case CSSNodeTypes.AT_RULE:
-			case CSSNodeTypes.IMPORT:
+			case ICSSNodeTypes.AT_RULE:
+			case ICSSNodeTypes.IMPORT:
 				// Custom at-rule and import nodes currently fall under the same formatting case. This may need to
 				// change once the parser returns the url part as a textnode
 				pushAtRuleNode(cssNode);
@@ -409,7 +409,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		pushFormatterDeclarationNodes(ruleNode.getEndingOffset(), declarations, formatterBlockNode);
-		checkedPop(formatterBlockNode, -1);
+		checkedPop(formatterBlockNode, ruleNode.getEndingOffset());
 		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 
 	}
@@ -488,14 +488,15 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (getBeginWithoutWhiteSpaces(declarations[currentDeclarationIndex].getEndingOffset() + 1, document) < declarations[currentDeclarationIndex + 1]
 					.getStartingOffset())
 			{
-				formatterBlockNode.addChild(createTextNode(document, declarations[currentDeclarationIndex].getEndingOffset() + 1,
+				formatterBlockNode.addChild(createTextNode(document,
+						declarations[currentDeclarationIndex].getEndingOffset() + 1,
 						declarations[currentDeclarationIndex + 1].getStartingOffset()));
 			}
 		}
 		else if (getBeginWithoutWhiteSpaces(declarations[currentDeclarationIndex].getEndingOffset() + 1, document) < parentEndOffset)
 		{
-			formatterBlockNode.addChild(createTextNode(document, declarations[currentDeclarationIndex].getEndingOffset() + 1,
-					parentEndOffset));
+			formatterBlockNode.addChild(createTextNode(document,
+					declarations[currentDeclarationIndex].getEndingOffset() + 1, parentEndOffset));
 		}
 	}
 

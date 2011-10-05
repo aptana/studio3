@@ -18,6 +18,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.samples.ISamplesManager;
@@ -28,7 +30,7 @@ import com.aptana.samples.model.SamplesReference;
 public class SamplesManager implements ISamplesManager
 {
 
-	private static final String EXTENSION_POINT = SamplesPlugin.PLUGIN_ID + ".samplespath"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT = "samplespath"; //$NON-NLS-1$
 	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String ELEMENT_CATEGORY = "category"; //$NON-NLS-1$
 	private static final String ELEMENT_SAMPLESINFO = "samplesinfo"; //$NON-NLS-1$
@@ -75,24 +77,20 @@ public class SamplesManager implements ISamplesManager
 
 	private void readExtensionRegistry()
 	{
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT);
+		EclipseUtil.processConfigurationElements(SamplesPlugin.PLUGIN_ID, EXTENSION_POINT,
+				new IConfigurationElementProcessor()
+				{
 
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_CATEGORY);
-		}
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_SAMPLESINFO);
-		}
+					public void processElement(IConfigurationElement element)
+					{
+						readElement(element);
+					}
+				}, ELEMENT_CATEGORY, ELEMENT_SAMPLESINFO);
 	}
 
-	private void readElement(IConfigurationElement element, String elementName)
+	private void readElement(IConfigurationElement element)
 	{
-		if (!elementName.equals(element.getName()))
-		{
-			return;
-		}
+		String elementName = element.getName();
 
 		if (ELEMENT_CATEGORY.equals(elementName))
 		{
@@ -218,6 +216,7 @@ public class SamplesManager implements ISamplesManager
 					}
 				}
 			}
+			samplesRef.setIncludePaths(includePaths.toArray(new String[includePaths.size()]));
 		}
 	}
 }

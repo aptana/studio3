@@ -24,6 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
@@ -34,8 +35,7 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
  */
 public class JSLaunchShortcut implements ILaunchShortcut {
 	/**
-	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.jface.viewers.ISelection,
-	 *      java.lang.String)
+	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.jface.viewers.ISelection, java.lang.String)
 	 */
 	public void launch(ISelection selection, String mode) {
 		if (selection instanceof IStructuredSelection) {
@@ -47,8 +47,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 	}
 
 	/**
-	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.ui.IEditorPart,
-	 *      java.lang.String)
+	 * @see org.eclipse.debug.ui.ILaunchShortcut#launch(org.eclipse.ui.IEditorPart, java.lang.String)
 	 */
 	public void launch(IEditorPart editor, String mode) {
 		IEditorInput input = editor.getEditorInput();
@@ -108,7 +107,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 				}
 			}
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return createConfiguration(current ? null : path);
 	}
@@ -127,7 +126,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 			ILaunchConfigurationWorkingCopy wc = configType.newInstance(
 					null,
 					DebugPlugin.getDefault().getLaunchManager()
-							.generateUniqueLaunchConfigurationNameFrom(path != null ? path.lastSegment() : "Default")); //$NON-NLS-1$
+							.generateUniqueLaunchConfigurationNameFrom((path != null) ? path.lastSegment() : "Default")); //$NON-NLS-1$
 			JSLaunchConfigurationHelper.setDefaults(wc, null);
 			if (path != null) {
 				wc.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
@@ -136,7 +135,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 			}
 			config = wc.doSave();
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log(e);
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 		return config;
 	}

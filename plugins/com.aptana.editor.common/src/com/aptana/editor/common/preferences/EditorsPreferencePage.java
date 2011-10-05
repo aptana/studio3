@@ -73,7 +73,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		 */
 		public Image getColumnImage(Object element, int columnIndex)
 		{
-			return ((UserAgentManager.UserAgent) element).enabledIcon;
+			return UserAgentManager.getInstance().getImage(((UserAgentManager.UserAgent) element).enabledIconPath);
 		}
 
 		/**

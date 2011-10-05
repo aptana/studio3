@@ -24,7 +24,7 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 
 	public String getLabel()
 	{
-		return fReferenceNode == null ? "" : fReferenceNode.getText(); //$NON-NLS-1$
+		return (fReferenceNode == null) ? "" : fReferenceNode.getText(); //$NON-NLS-1$
 	}
 
 	public int compareTo(IRange o)

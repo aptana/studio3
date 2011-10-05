@@ -34,27 +34,26 @@ public class FindBarFinder
 	{
 		this.textEditor = textEditor;
 		this.sourceViewer = sourceViewer;
-		//Don't create cycles...
+		// Don't create cycles...
 		this.findBarDecorator = new WeakReference<FindBarDecorator>(findBarDecorator);
 	}
 
-	/* default */void find(boolean forward)
+	/* default */boolean find(boolean forward)
 	{
-		find(forward, false);
+		return find(forward, false);
 	}
 
-	/* default */void find(boolean forward, boolean incremental)
+	/* default */boolean find(boolean forward, boolean incremental)
 	{
-		find(forward, incremental, true);
+		return find(forward, incremental, true);
 	}
 
-	/* default */void find(boolean forward, boolean incremental, boolean wrap)
+	/* default */boolean find(boolean forward, boolean incremental, boolean wrap)
 	{
-		find(forward, incremental, wrap, false, false);
+		return find(forward, incremental, wrap, false);
 	}
 
-	/* default */boolean find(boolean forward, boolean incremental, boolean wrap, boolean wrapping,
-			boolean initialSearchBeforeReplace)
+	/* default */boolean find(boolean forward, boolean incremental, boolean wrap, boolean wrapping)
 	{
 		FindBarDecorator dec = findBarDecorator.get();
 		if (dec == null)
@@ -116,26 +115,14 @@ public class FindBarFinder
 					}
 				}
 				int newOffset = -1;
-				if (initialSearchBeforeReplace)
-				{
-					String selectionText = textWidget.getSelectionText();
-					if (selectionText.equals(dec.combo.getText()))
-					{
-						offset -= (selection.y - selection.x);
-					}
-					else
-					{
-						return false;
-					}
-				}
 				if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
 				{
 					try
 					{
 						// When searching backward, we have to get the offset-1 (otherwise it doesn't work properly)
 						newOffset = ((IFindReplaceTargetExtension3) findReplaceTarget).findAndSelect(forward ? offset
-								: offset - 1, findText, forward, dec.getConfiguration().getCaseSensitive(), dec.getWholeWord(),
-								dec.getConfiguration().getRegularExpression());
+								: offset - 1, findText, forward, dec.getConfiguration().getCaseSensitive(), dec
+								.getWholeWord(), dec.getConfiguration().getRegularExpression());
 					}
 					catch (PatternSyntaxException e)
 					{
@@ -145,8 +132,8 @@ public class FindBarFinder
 				}
 				else
 				{
-					newOffset = findReplaceTarget.findAndSelect(offset, findText, forward,
-							dec.getConfiguration().getCaseSensitive(), dec.getWholeWord());
+					newOffset = findReplaceTarget.findAndSelect(offset, findText, forward, dec.getConfiguration()
+							.getCaseSensitive(), dec.getWholeWord());
 				}
 
 				if (newOffset != -1)
@@ -172,7 +159,7 @@ public class FindBarFinder
 					{
 						if (!wrapping)
 						{
-							return find(forward, incremental, wrap, true, initialSearchBeforeReplace);
+							return find(forward, incremental, wrap, true);
 						}
 					}
 					dec.combo.setBackground(dec.getfStringNotFoundColor());

@@ -15,12 +15,16 @@ import beaver.Symbol;
 public interface IRecoveryStrategy
 {
 	/**
-	 * recover
+	 * This method is used to attempt to recover from a parse error encountered in a Beaver parser.
 	 * 
 	 * @param parser
+	 *            The parser where the error occurred
 	 * @param lastToken
+	 *            The last token that has been successfully consumed by the parser
 	 * @param currentToken
+	 *            The current token where the error occurred
 	 * @param in
+	 *            The token stream used by the parser
 	 * @return
 	 */
 	boolean recover(IParser parser, Symbol lastToken, Symbol currentToken, TokenStream in) throws IOException;

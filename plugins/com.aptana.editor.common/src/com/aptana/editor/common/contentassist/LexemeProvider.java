@@ -38,7 +38,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	 * @param offset
 	 * @param scanner
 	 */
-	public LexemeProvider(IDocument document, int offset, ITokenScanner scanner)
+	protected LexemeProvider(IDocument document, int offset, ITokenScanner scanner)
 	{
 		this(document, offset, offset, scanner);
 	}
@@ -52,7 +52,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	 * @param includeOffset
 	 * @param scanner
 	 */
-	public LexemeProvider(IDocument document, int offset, int includeOffset, ITokenScanner scanner)
+	protected LexemeProvider(IDocument document, int offset, int includeOffset, ITokenScanner scanner)
 	{
 		int start = offset;
 		int end = offset;
@@ -82,7 +82,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	 * @param length
 	 * @param scanner
 	 */
-	public LexemeProvider(IDocument document, IRange range, ITokenScanner scanner)
+	protected LexemeProvider(IDocument document, IRange range, ITokenScanner scanner)
 	{
 		this.createLexemeList(document, range.getStartingOffset(), range.getLength(), scanner);
 	}
@@ -137,7 +137,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				{
 					if (data != null)
 					{
-						if (type == null || type.isDefined() == false)
+						if (type == null || !type.isDefined())
 						{
 							System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
@@ -146,7 +146,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 					{
 						Matcher m = WHITESPACE.matcher(text);
 
-						if (m.matches() == false)
+						if (!m.matches())
 						{
 							System.out.println("Possible missed token type for text: ~" + text + "~"); //$NON-NLS-1$ //$NON-NLS-2$
 						}

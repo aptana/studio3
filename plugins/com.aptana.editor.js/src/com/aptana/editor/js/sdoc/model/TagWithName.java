@@ -10,14 +10,14 @@ package com.aptana.editor.js.sdoc.model;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
-public abstract class TagWithName extends Tag
+public class TagWithName extends Tag
 {
 	private String _name;
 
 	/**
 	 * TagWithName
 	 */
-	public TagWithName(TagType type, String name, String text)
+	protected TagWithName(TagType type, String name, String text)
 	{
 		super(type, text);
 
@@ -49,14 +49,14 @@ public abstract class TagWithName extends Tag
 		}
 		else
 		{
-			writer.print(type.toString()).print(" {").print(this._name).print("}"); //$NON-NLS-1$ //$NON-NLS-2$
+			writer.print(type.toString()).print(" {").print(this._name).print('}'); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		String text = this.getText();
 
-		if (text != null && StringUtil.isEmpty(text) == false)
+		if (text != null && !StringUtil.isEmpty(text))
 		{
-			writer.print(" ").print(text); //$NON-NLS-1$
+			writer.print(' ').print(text); //$NON-NLS-1$
 		}
 	}
 }

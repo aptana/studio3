@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
 
 package com.aptana.ide.core.io;
 
@@ -18,6 +19,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
@@ -91,7 +93,7 @@ public class LocalConnectionPoint extends ConnectionPoint {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-	    if (adapter == File.class) {
+	    if (File.class.equals(adapter)) {
 	        return getFile();
 	    }
 	    return super.getAdapter(adapter);
@@ -126,11 +128,11 @@ public class LocalConnectionPoint extends ConnectionPoint {
             return false;
         }
 
-        if (items[0] == null || items[0].equals("")) { //$NON-NLS-1$
+        if (items[0] == null || StringUtil.EMPTY.equals(items[0])) {
             return false;
         }
         setName(items[0]);
-        if (items[1] == null || items[1].equals("")) { //$NON-NLS-1$
+        if (items[1] == null || StringUtil.EMPTY.equals(items[1])) {
             setPath(Path.ROOT);
         } else {
             Path path = new Path(items[1]);

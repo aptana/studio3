@@ -31,7 +31,7 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.XMLSourceConfiguration;
-import com.aptana.editor.xml.contentassist.index.XMLIndexConstants;
+import com.aptana.editor.xml.contentassist.index.IXMLIndexConstants;
 import com.aptana.editor.xml.contentassist.model.AttributeElement;
 import com.aptana.editor.xml.contentassist.model.ElementElement;
 import com.aptana.editor.xml.contentassist.model.ValueElement;
@@ -263,99 +263,102 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<ICompletionProposal> addElementProposals(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		List<ElementElement> elements = this._queryHelper.getElements();
-
-		if (elements != null)
+		// return early if no elements
+		if (elements == null)
 		{
-			boolean close = true;
-			int replaceLength = 0;
+			return Collections.emptyList();
+		}
 
-			if (this._currentLexeme.getType() == XMLTokenType.END_TAG) // '|>
+		boolean close = true;
+		int replaceLength = 0;
+		if (this._currentLexeme.getType() == XMLTokenType.END_TAG) // '|>
+		{
+			replaceLength = 1; // replace the '>'
+		}
+		else if (this._currentLexeme.getType() != XMLTokenType.START_TAG) // as long as it's not: "<|<"
+		{
+			// We're on element name, replace it
+			int index = lexemeProvider.getLexemeCeilingIndex(_currentLexeme.getEndingOffset() + 1);
+
+			if (index == -1 || index >= lexemeProvider.size())
 			{
-				replaceLength = 1; // replace the '>'
-			}
-			else if (this._currentLexeme.getType() != XMLTokenType.START_TAG) // as long as it's not: "<|<"
-			{
-				// We're on element name, replace it
-				int index = lexemeProvider.getLexemeCeilingIndex(_currentLexeme.getEndingOffset() + 1);
-
-				if (index == -1 || index >= lexemeProvider.size())
-				{
-					index = lexemeProvider.size() - 1;
-				}
-
-				Lexeme<XMLTokenType> nextLexeme = lexemeProvider.getLexeme(index);
-
-				if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
-				{
-					offset = _currentLexeme.getStartingOffset();
-					replaceLength = _currentLexeme.getLength();
-
-					if (nextLexeme.equals(this._currentLexeme) == false)
-					{
-						if (nextLexeme.getType() == XMLTokenType.END_TAG)
-						{
-							// Followed by '>', so replace spaces plus end
-							replaceLength += nextLexeme.getEndingOffset() - _currentLexeme.getEndingOffset();
-						}
-						else if (nextLexeme.getType() != XMLTokenType.START_TAG)
-						{
-							// If there's an attribute we don't want to add ">" or close tag!
-							close = false;
-						}
-					}
-				}
+				index = lexemeProvider.size() - 1;
 			}
 
-			for (ElementElement element : elements)
+			Lexeme<XMLTokenType> nextLexeme = lexemeProvider.getLexeme(index);
+
+			if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
 			{
-				String replaceString = element.getName();
-				int cursorPosition = replaceString.length();
+				offset = _currentLexeme.getStartingOffset();
+				replaceLength = _currentLexeme.getLength();
 
-				if (close)
+				if (!nextLexeme.equals(this._currentLexeme))
 				{
-					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
+					if (nextLexeme.getType() == XMLTokenType.END_TAG)
 					{
-						replaceString += " >"; //$NON-NLS-1$
-						cursorPosition += 1;
+						// Followed by '>', so replace spaces plus end
+						replaceLength += nextLexeme.getEndingOffset() - _currentLexeme.getEndingOffset();
 					}
-					else
+					else if (nextLexeme.getType() != XMLTokenType.START_TAG)
 					{
-						// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
-						// document and insert the tag into it
-						IDocument doc = new Document(_document.get());
-
-						try
-						{
-							doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
-						}
-						catch (BadLocationException e)
-						{
-							// ignore
-						}
-
-						// if (!OpenTagCloser.tagClosed(doc, element.getName()))
-						// {
-						//							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-						// // TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
-						// cursorPosition += 1;
-						// }
-						// else
-						// {
-						//							replaceString += ">"; //$NON-NLS-1$
-						// cursorPosition += 1;
-						// }
+						// If there's an attribute we don't want to add ">" or close tag!
+						close = false;
 					}
 				}
-
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
-
-				proposal.setFileLocation(this.getCoreLocation());
-				proposals.add(proposal);
 			}
 		}
+
+		// Generate proposals.
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		for (ElementElement element : elements)
+		{
+			String replaceString = element.getName();
+			int cursorPosition = replaceString.length();
+
+			if (close)
+			{
+				if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
+				{
+					replaceString += " >"; //$NON-NLS-1$
+					cursorPosition += 1;
+				}
+				else
+				{
+					// If the tag doesn't exist in the doc, we get back that it's closed. We need to copy the
+					// document and insert the tag into it
+					IDocument doc = new Document(_document.get());
+
+					try
+					{
+						doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
+					}
+					catch (BadLocationException e)
+					{
+						// ignore
+					}
+
+					// if (!OpenTagCloser.tagClosed(doc, element.getName()))
+					// {
+					//							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+					// // TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
+					// cursorPosition += 1;
+					// }
+					// else
+					// {
+					//							replaceString += ">"; //$NON-NLS-1$
+					// cursorPosition += 1;
+					// }
+				}
+			}
+
+			CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+					cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
+
+			proposal.setFileLocation(this.getCoreLocation());
+			proposals.add(proposal);
+		}
+
 		return proposals;
 	}
 
@@ -780,7 +783,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected String getCoreLocation()
 	{
-		return XMLIndexConstants.CORE;
+		return IXMLIndexConstants.CORE;
 	}
 
 	/**

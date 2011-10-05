@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
@@ -108,7 +109,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 			} else {
 				setValuesFrom(new ScopedPreferenceStore(EclipseUtil.instanceScope(), JSDebugPlugin.PLUGIN_ID));
 			}
-		} catch (CoreException ignore) {
+		} catch (CoreException e) {
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 		}
 	}
 
@@ -118,8 +120,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 			suspendOnFirstLine.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
 			suspendOnExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
 			suspendOnErrors.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
-			suspendOnDebuggerKeyword
-					.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+			suspendOnDebuggerKeyword.setSelection(preferences
+					.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 		} else if (object instanceof ILaunchConfiguration) {
 			ILaunchConfiguration configuration = (ILaunchConfiguration) object;
 			suspendOnFirstLine.setSelection(configuration.getAttribute(
@@ -150,7 +152,7 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 					ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false));
 			setValuesFrom(configuration);
 		} catch (CoreException e) {
-			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
 		} finally {
 			updateEnablement();
 		}

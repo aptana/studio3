@@ -30,7 +30,7 @@ public class CSSNamespaceNode extends CSSNode
 	 */
 	public CSSNamespaceNode(String prefix, String uri)
 	{
-		super(CSSNodeTypes.NAMESPACE);
+		super(ICSSNodeTypes.NAMESPACE);
 
 		fPrefix = prefix;
 		fUriStr = uri;
@@ -86,11 +86,11 @@ public class CSSNamespaceNode extends CSSNode
 
 		if (fPrefix != null)
 		{
-			text.append(fPrefix).append(" "); //$NON-NLS-1$
+			text.append(fPrefix).append(' ');
 		}
 
 		text.append(fUriStr);
-		text.append(";"); //$NON-NLS-1$
+		text.append(';');
 
 		return text.toString();
 	}

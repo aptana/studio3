@@ -198,7 +198,7 @@ public final class UIUtils
 	 * @return the view part
 	 * @throws PartInitException
 	 */
-	public static IViewPart findView(String viewID) throws PartInitException
+	public static IViewPart findView(String viewID)
 	{
 		IWorkbenchPage page = getActivePage();
 		if (page != null)
@@ -210,7 +210,7 @@ public final class UIUtils
 
 	public static void showErrorMessage(String title, String message)
 	{
-		showErrorMessage(title != null ? title : Messages.UIUtils_Error, message, null);
+		showErrorMessage((title != null) ? title : Messages.UIUtils_Error, message, null);
 	}
 
 	public static void showErrorMessage(String message, Throwable exception)

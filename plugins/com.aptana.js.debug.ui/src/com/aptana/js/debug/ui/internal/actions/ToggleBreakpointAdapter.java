@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal.actions;
 
 import org.eclipse.core.resources.IFile;
@@ -85,7 +87,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
 	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
-		return (selection instanceof ITextSelection);
+		return selection instanceof ITextSelection;
 	}
 
 	private boolean canToggleLineBreakpoint(IWorkbenchPart part, ISelection selection) {
@@ -107,8 +109,8 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 					}
 				}
 				/**
-				 * Commented by Ingo request due need to apply some fix to
-				 * #PHP-15 (It's not possible to set breakpoints in PHP editor)
+				 * Commented by Ingo request due need to apply some fix to #PHP-15 (It's not possible to set breakpoints
+				 * in PHP editor)
 				 */
 				// UnifiedEditor unifiedEditor = (UnifiedEditor)
 				// part.getAdapter(UnifiedEditor.class);

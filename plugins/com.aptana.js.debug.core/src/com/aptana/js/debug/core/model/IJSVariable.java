@@ -14,7 +14,7 @@ import org.eclipse.debug.core.model.IVariable;
  * @author Max Stepanov
  */
 public interface IJSVariable extends IVariable {
-	
+
 	/**
 	 * Returns if this variable is a constant
 	 * 

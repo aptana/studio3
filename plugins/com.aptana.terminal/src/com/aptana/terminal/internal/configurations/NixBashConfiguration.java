@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable platformSpecificLineSeparator
 
 package com.aptana.terminal.internal.configurations;
 
@@ -19,18 +20,18 @@ import com.aptana.core.ShellExecutable;
 
 /**
  * @author Max Stepanov
- *
  */
 public class NixBashConfiguration extends AbstractProcessConfiguration {
 
 	private static final String EXECUTABLE = "$os$/redtty"; //$NON-NLS-1$
-	
+
 	@Override
 	protected IPath getExecutablePath() {
 		return Path.fromPortableString(EXECUTABLE);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
 	 */
 	public List<String> getCommandLine() {
@@ -38,12 +39,13 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 		list.add(getExecutable().getAbsolutePath());
 		list.add("/bin/bash"); //$NON-NLS-1$
 		// newline is a delimiter in redtty
-		list.add("bash\n--rcfile\n"+ShellExecutable.getShellRCPath().toOSString()+"\n-i"); //$NON-NLS-1$ //$NON-NLS-2$
+		list.add("bash\n--rcfile\n" + ShellExecutable.getShellRCPath().toOSString() + "\n-i"); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
 		return list;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.internal.configurations.AbstractProcessConfiguration#getEnvironment()
 	 */
 	@Override

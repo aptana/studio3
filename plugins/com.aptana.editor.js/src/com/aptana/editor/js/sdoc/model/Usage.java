@@ -18,23 +18,23 @@ public enum Usage
 	OPTIONAL("optional"), //$NON-NLS-1$
 	ZERO_OR_MORE("zero-or-more"), //$NON-NLS-1$
 	ONE_OR_MORE("one-or-more"); //$NON-NLS-1$
-	
+
 	private static final Map<String, Usage> NAME_MAP;
 	private String _name;
-	
+
 	/**
 	 * static initializer
 	 */
 	static
 	{
 		NAME_MAP = new HashMap<String, Usage>();
-		
+
 		for (Usage usage : EnumSet.allOf(Usage.class))
 		{
 			NAME_MAP.put(usage.getName(), usage);
 		}
 	}
-	
+
 	/**
 	 * Usage
 	 * 

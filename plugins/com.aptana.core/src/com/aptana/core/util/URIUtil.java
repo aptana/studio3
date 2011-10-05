@@ -40,7 +40,7 @@ public class URIUtil
 		{
 			try
 			{
-				result = URLDecoder.decode(uri.toString(), "utf-8"); //$NON-NLS-1$
+				result = URLDecoder.decode(uri, "utf-8"); //$NON-NLS-1$
 			}
 			catch (UnsupportedEncodingException e)
 			{

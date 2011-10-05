@@ -52,7 +52,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	/**
 	 * EditorsPreferencePage
 	 */
-	public CommonEditorPreferencePage()
+	protected CommonEditorPreferencePage()
 	{
 		super(GRID);
 		setDescription(Messages.CommonEditorPreferencePage_Editor_Preferences);
@@ -243,7 +243,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return super.performOk();
 	}
@@ -265,7 +265,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -350,7 +350,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 
@@ -374,7 +374,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 

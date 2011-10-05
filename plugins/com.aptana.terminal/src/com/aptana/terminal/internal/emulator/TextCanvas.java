@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
 
 package com.aptana.terminal.internal.emulator;
 
@@ -34,14 +35,13 @@ import com.aptana.terminal.TerminalPlugin;
 import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 
 /**
- * @author Chris Williams
  * @author Max Stepanov
- *
+ * @author Chris Williams
  */
 public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.TextCanvas {
 
 	private static final String HYPERLINK_DETECTOR_EXT_PT = TerminalPlugin.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$
-	
+
 	private Map<Integer, IHyperlink[]> fLinks = new HashMap<Integer, IHyperlink[]>();
 	private int fLastHash;
 	private IHyperlinkDetector[] fDetectors;
@@ -56,7 +56,8 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		super(parent, model, style, cellRenderer);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.TextCanvas#searchLineForHyperlinks(int)
 	 */
 	@Override
@@ -80,7 +81,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 				}
 			}
 			IHyperlink[] oldLinks = fLinks.remove(line);
-			IHyperlink[] newLinks = list.toArray(new IHyperlink[0]);
+			IHyperlink[] newLinks = list.toArray(new IHyperlink[list.size()]);
 			// Update map
 			fLinks.put(Integer.valueOf(line), newLinks);
 			// Only modify underlines if regions changed in any way...
@@ -103,7 +104,8 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.TextCanvas#findHyperlink(org.eclipse.swt.graphics.Point)
 	 */
 	@Override
@@ -115,7 +117,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		for (int i = 0; i < links.length; i++) {
 			IHyperlink link = links[i];
 			IRegion region = link.getHyperlinkRegion();
-			
+
 			int col = region.getOffset();
 			int endCol = region.getOffset() + region.getLength() - 1;
 			// clicked between start and end col
@@ -134,7 +136,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 			Field f = text.getClass().getDeclaredField("fTerminal"); //$NON-NLS-1$
 			f.setAccessible(true);
 			ITerminalTextData data = (ITerminalTextData) f.get(text);
-			
+
 			for (int col = startCol; col <= endCol; col++) {
 				char c = data.getChar(line, col);
 				Style style = data.getStyle(line, col);
@@ -173,10 +175,9 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 		return ""; //$NON-NLS-1$
 	}
 
-
 	private boolean regionsChanged(IHyperlink[] oldLinks, IHyperlink[] newLinks) {
-		int oldLinkLength = oldLinks == null ? 0 : oldLinks.length;
-		int newLinkLength = newLinks == null ? 0 : newLinks.length;
+		int oldLinkLength = (oldLinks == null) ? 0 : oldLinks.length;
+		int newLinkLength = (newLinks == null) ? 0 : newLinks.length;
 		// size changed, so we definitely have changes
 		if (oldLinkLength != newLinkLength) {
 			return true;

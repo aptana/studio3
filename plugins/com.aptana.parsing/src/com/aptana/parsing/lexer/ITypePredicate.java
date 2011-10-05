@@ -17,7 +17,7 @@ public interface ITypePredicate
 	short getIndex();
 
 	/**
-	 * Return true if this is not an UNDEFINED enumaration value
+	 * Return true if this is not an UNDEFINED enumeration value
 	 * 
 	 * @return
 	 */

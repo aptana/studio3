@@ -9,19 +9,19 @@ package com.aptana.editor.html.validator;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.w3c.tidy.Tidy;
 
 import com.aptana.core.logging.IdeLog;
@@ -45,75 +45,113 @@ public class HTMLTidyValidator implements IValidator
 			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
 			"source>", "summary>", "time>", "video>", "wbr>" };
 	@SuppressWarnings("nls")
-	private static final String[] FILTERED = { "lacks \"type\" attribute", "replacing illegal character code" };
+	private static final String[] FILTERED = { "lacks \"type\" attribute", "lacks \"summary\" attribute",
+			"replacing illegal character code" };
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		manager.addParseErrors(items, IHTMLConstants.CONTENT_TYPE_HTML);
-		String report = parseWithTidy(source);
-		if (!StringUtil.isEmpty(report))
+		if (!StringUtil.isEmpty(source))
 		{
-			BufferedReader reader = null;
-			try
+			runTidy(path, manager, source, items);
+		}
+		return items;
+	}
+
+	private List<IValidationItem> runTidy(URI path, IValidationManager manager, final String source,
+			List<IValidationItem> items)
+	{
+		final int numberOfLines = new Document(source).getNumberOfLines();
+
+		// Set up our pipes
+		PipedInputStream inPipe = new PipedInputStream();
+		BufferedReader reader = null;
+		try
+		{
+			final PrintWriter out = new PrintWriter(new PipedOutputStream(inPipe), true);
+			reader = new BufferedReader(new InputStreamReader(inPipe));
+
+			// Now set up tidy
+			final Tidy tidy = new Tidy();
+			tidy.setErrout(out);
+
+			// parse via tidy in another Thread, so that we can parse it's output in main thread as it's running
+			new Thread(new Runnable()
 			{
-				reader = new BufferedReader(new StringReader(report));
-				String line;
-				while ((line = reader.readLine()) != null)
+				public void run()
 				{
-					if (line.startsWith("line")) //$NON-NLS-1$
-					{
-						parseTidyOutput(line, path, manager, items, source);
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_ParseErrors, e);
-			}
-			finally
-			{
-				if (reader != null)
-				{
+					ByteArrayInputStream in = null;
 					try
 					{
-						reader.close();
+						in = new ByteArrayInputStream(source.getBytes("UTF-8")); //$NON-NLS-1$
+						tidy.parse(in, null);
 					}
-					catch (IOException e)
+					catch (UnsupportedEncodingException e)
 					{
-						// ignores
+						// ignore, shouldn't even happen...
 					}
+					finally
+					{
+						if (in != null)
+						{
+							try
+							{
+								in.close();
+							}
+							catch (IOException e)
+							{
+								// ignore
+							}
+						}
+						if (out != null)
+						{
+							out.close();
+						}
+					}
+				}
+			}).start();
+
+			// Parse the output stream as we get it!
+			String line = null;
+			while ((line = reader.readLine()) != null) // $codepro.audit.disable assignmentInCondition
+			{
+				parseTidyOutput(line, path, manager, items, numberOfLines);
+			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_Tidy, e);
+		}
+		finally
+		{
+			if (reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
 				}
 			}
 		}
 		return items;
 	}
 
-	private static String parseWithTidy(String source)
-	{
-		Tidy tidy = new Tidy();
-		ByteArrayOutputStream bout = new ByteArrayOutputStream();
-		PrintWriter out = new PrintWriter(bout);
-		tidy.setErrout(out);
-		try
-		{
-			tidy.parse(new ByteArrayInputStream(source.getBytes("UTF-8")), null); //$NON-NLS-1$
-		}
-		catch (Exception e)
-		{
-			IdeLog.logError(HTMLPlugin.getDefault(), Messages.HTMLTidyValidator_ERR_Tidy, e);
-		}
-		out.flush();
-
-		return bout.toString();
-	}
-
+	// FIXME This takes in a collection and adds elements to it, which is bad! But necessary for now since we skip
+	// errors based on it's contents right now...
+	// Probably should return a collection of IValidationItems and then post-filter in caller!
 	private static void parseTidyOutput(String report, URI path, IValidationManager manager,
-			List<IValidationItem> items, String source) throws BadLocationException
+			List<IValidationItem> items, int numberOfLines)
 	{
-		Matcher matcher = PATTERN.matcher(report);
-		IDocument document = new Document(source);
+		if (StringUtil.isEmpty(report) || !report.startsWith("line")) //$NON-NLS-1$
+		{
+			return;
+		}
 
+		Matcher matcher = PATTERN.matcher(report);
 		while (matcher.find())
 		{
 			int lineNumber = Integer.parseInt(matcher.group(1));
@@ -127,13 +165,13 @@ public class HTMLTidyValidator implements IValidator
 			// "missing </div>" will appear on the last line, which is normally caught by the parser and displayed on a
 			// different line
 			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber)
-					|| (document.getNumberOfLines() == lineNumber && !items.isEmpty()))
+					|| (numberOfLines == lineNumber && !items.isEmpty()))
 			{
 				continue;
 			}
 
-			if (message != null && !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML)
-					&& !containsHTML5Element(message) && !isAutoFiltered(message))
+			if (message != null && !containsHTML5Element(message) && !isAutoFiltered(message)
+					&& !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{

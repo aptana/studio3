@@ -12,81 +12,102 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.core.Identifiable;
 import com.aptana.core.util.ClassUtil;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class ImageAssociations {
+public final class ImageAssociations
+{
 
-	protected static final String TAG_OBJECT_IMAGE = "objectImage"; //$NON-NLS-1$
-	protected static final String TAG_IMAGE = "image"; //$NON-NLS-1$
-	protected static final String ATT_ID = "id"; //$NON-NLS-1$
-	protected static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
-	protected static final String ATT_ICON = "icon"; //$NON-NLS-1$
+	private static final String TAG_OBJECT_IMAGE = "objectImage"; //$NON-NLS-1$
+	private static final String TAG_IMAGE = "image"; //$NON-NLS-1$
+	private static final String ATT_ID = "id"; //$NON-NLS-1$
+	private static final String ATT_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
+	private static final String ATT_ICON = "icon"; //$NON-NLS-1$
 
-	private static final String EXTENSION_POINT_ID = UIPlugin.PLUGIN_ID + ".imageAssociations"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = "imageAssociations"; //$NON-NLS-1$
 
 	private static ImageAssociations instance;
-	
+
 	private Map<String, ImageDescriptor> idToImageMap = new HashMap<String, ImageDescriptor>();
 	private Map<String, ImageDescriptor> classNameToImageMap = new HashMap<String, ImageDescriptor>();
 	private Map<Class<?>, ImageDescriptor> classToImageMap = new HashMap<Class<?>, ImageDescriptor>();
-	
+
 	/**
 	 * 
 	 */
-	private ImageAssociations() {
+	private ImageAssociations()
+	{
 		readExtensionRegistry();
 	}
 
-	public static ImageAssociations getInstance() {
-		if (instance == null) {
+	public static ImageAssociations getInstance()
+	{
+		if (instance == null)
+		{
 			instance = new ImageAssociations();
 		}
 		return instance;
 	}
-	
-	private void readExtensionRegistry() {
-		IConfigurationElement[] elements = Platform.getExtensionRegistry()
-							.getConfigurationElementsFor(EXTENSION_POINT_ID);
-		for (int i = 0; i < elements.length; ++i) {
-			readElement(elements[i]);
-		}
+
+	private void readExtensionRegistry()
+	{
+		EclipseUtil.processConfigurationElements(UIPlugin.PLUGIN_ID, EXTENSION_POINT_ID,
+				new IConfigurationElementProcessor()
+				{
+
+					public void processElement(IConfigurationElement element)
+					{
+						readElement(element);
+					}
+				}, TAG_IMAGE, TAG_OBJECT_IMAGE);
 	}
-	
-	private void readElement(IConfigurationElement element) {
-		if (TAG_IMAGE.equals(element.getName())) {
+
+	private void readElement(IConfigurationElement element)
+	{
+		if (TAG_IMAGE.equals(element.getName()))
+		{
 			String id = element.getAttribute(ATT_ID);
-			if (id == null || id.length() == 0) {
+			if (id == null || id.length() == 0)
+			{
 				return;
 			}
 			String icon = element.getAttribute(ATT_ICON);
-			if (icon == null || icon.length() == 0) {
+			if (icon == null || icon.length() == 0)
+			{
 				return;
 			}
-			ImageDescriptor imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(element.getContributor().getName(), icon);
-			if (imageDescriptor == null) {
+			ImageDescriptor imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(element.getContributor()
+					.getName(), icon);
+			if (imageDescriptor == null)
+			{
 				return;
 			}
 			idToImageMap.put(id, imageDescriptor);
-		} else if (TAG_OBJECT_IMAGE.equals(element.getName())) {
+		}
+		else if (TAG_OBJECT_IMAGE.equals(element.getName()))
+		{
 			String clazz = element.getAttribute(ATT_OBJECT_CLASS);
-			if (clazz == null || clazz.length() == 0) {
+			if (clazz == null || clazz.length() == 0)
+			{
 				return;
 			}
 			String icon = element.getAttribute(ATT_ICON);
-			if (icon == null || icon.length() == 0) {
+			if (icon == null || icon.length() == 0)
+			{
 				return;
 			}
-			ImageDescriptor imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(element.getContributor().getName(), icon);
-			if (imageDescriptor == null) {
+			ImageDescriptor imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(element.getContributor()
+					.getName(), icon);
+			if (imageDescriptor == null)
+			{
 				return;
 			}
 			classNameToImageMap.put(clazz, imageDescriptor);
@@ -95,27 +116,35 @@ public final class ImageAssociations {
 
 	/**
 	 * getImageDescriptor
+	 * 
 	 * @param id
 	 * @return
 	 */
-	public ImageDescriptor getImageDescriptor(String id) {
+	public ImageDescriptor getImageDescriptor(String id)
+	{
 		return idToImageMap.get(id);
 	}
 
 	/**
 	 * getImageDescriptor
+	 * 
 	 * @param clazz
 	 * @return
 	 */
-	public ImageDescriptor getImageDescriptor(Class<?> clazz) {
+	public ImageDescriptor getImageDescriptor(Class<?> clazz)
+	{
 		ImageDescriptor imageDescriptor = classToImageMap.get(clazz);
-		if (imageDescriptor == null && !classToImageMap.containsKey(clazz)) {
-			for (Class<?> i : ClassUtil.getClassesTree(clazz)) {
+		if (imageDescriptor == null && !classToImageMap.containsKey(clazz))
+		{
+			for (Class<?> i : ClassUtil.getClassesTree(clazz))
+			{
 				imageDescriptor = classToImageMap.get(i);
-				if (imageDescriptor == null) {
+				if (imageDescriptor == null)
+				{
 					imageDescriptor = classNameToImageMap.get(i.getName());
 				}
-				if (imageDescriptor != null) {
+				if (imageDescriptor != null)
+				{
 					break;
 				}
 			}
@@ -123,14 +152,18 @@ public final class ImageAssociations {
 		}
 		return imageDescriptor;
 	}
-	
-	public ImageDescriptor getImageDescriptor(Object element) {
-		if (element == null) {
+
+	public ImageDescriptor getImageDescriptor(Object element)
+	{
+		if (element == null)
+		{
 			return null;
 		}
-		if (element instanceof Identifiable) {
+		if (element instanceof Identifiable)
+		{
 			ImageDescriptor imageDescriptor = getImageDescriptor(((Identifiable) element).getId());
-			if (imageDescriptor != null) {
+			if (imageDescriptor != null)
+			{
 				return imageDescriptor;
 			}
 		}

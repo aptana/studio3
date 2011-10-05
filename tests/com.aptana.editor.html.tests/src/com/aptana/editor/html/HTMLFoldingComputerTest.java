@@ -105,16 +105,4 @@ public class HTMLFoldingComputerTest extends TestCase
 		Map<ProjectionAnnotation, Position> annotations = folder.emitFoldingRegions(false, new NullProgressMonitor());
 		return annotations;
 	}
-
-	private ProjectionAnnotation getByPosition(Map<ProjectionAnnotation, Position> annotations, Position position)
-	{
-		for (Map.Entry<ProjectionAnnotation, Position> entry : annotations.entrySet())
-		{
-			if (entry.getValue().equals(position))
-			{
-				return entry.getKey();
-			}
-		}
-		return null;
-	}
 }

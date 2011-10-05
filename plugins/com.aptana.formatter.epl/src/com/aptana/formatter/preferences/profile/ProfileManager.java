@@ -29,8 +29,10 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.formatter.IContributedExtension;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.epl.FormatterPlugin;
@@ -120,8 +122,9 @@ public class ProfileManager implements IProfileManager
 		}
 		else
 		{
-			FormatterPlugin.logError(NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_noBuiltInProfiles,
-					APTANA_CODE_FORMATTER_ID));
+			IdeLog.logError(FormatterPlugin.getDefault(), NLS.bind(
+					FormatterMessages.AbstractFormatterSelectionBlock_noBuiltInProfiles, APTANA_CODE_FORMATTER_ID),
+					IDebugScopes.DEBUG);
 		}
 		profiles.addAll(getCustomProfiles());
 
@@ -192,7 +195,7 @@ public class ProfileManager implements IProfileManager
 				}
 				catch (CoreException e)
 				{
-					FormatterPlugin.logError(e);
+					IdeLog.logError(FormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 				}
 			}
 		}

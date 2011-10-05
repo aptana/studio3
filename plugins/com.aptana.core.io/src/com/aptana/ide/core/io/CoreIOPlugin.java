@@ -5,9 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declareAsInterface
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 
 package com.aptana.ide.core.io;
 
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.internal.resources.DelayedSnapshotJob;
@@ -42,7 +48,7 @@ public class CoreIOPlugin extends Plugin {
 	// The shared instance
 	private static CoreIOPlugin plugin;
 
-	private WeakHashMap<Object, ConnectionContext> connectionContexts = new WeakHashMap<Object, ConnectionContext>();
+	private Map<Object, ConnectionContext> connectionContexts = new WeakHashMap<Object, ConnectionContext>();
 
 	private IConnectionPointListener listener = new IConnectionPointListener() {
 

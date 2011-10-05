@@ -68,8 +68,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 	 */
 	public void testTypeSelectorsListNoSpace()
 	{
-		// FIXME: This should work
-		// assertCompletionCorrect("p,| {}", '\t', "table", "p,table {}");
+		assertCompletionCorrect("p,| {}", '\t', "table", "p,table {}");
 	}
 
 	/*
@@ -567,7 +566,6 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-		// FIXME: should work
 		AssertUtil.assertProposalFound(".testclass", proposals);
 	}
 
@@ -603,7 +601,6 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		ICompletionProposal[] proposals = processor.doComputeCompletionProposals(viewer, offset, '\t', false);
 
-		// FIXME: should works
 		AssertUtil.assertProposalFound("#testid", proposals);
 	}
 

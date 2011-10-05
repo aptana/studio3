@@ -12,7 +12,6 @@ import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IBaseFTPConnectionPoint extends IBaseRemoteConnectionPoint {
 
@@ -24,7 +23,8 @@ public interface IBaseFTPConnectionPoint extends IBaseRemoteConnectionPoint {
 	public boolean isPassiveMode();
 
 	/**
-	 * @param passiveMode the passiveMode to set
+	 * @param passiveMode
+	 *            the passiveMode to set
 	 */
 	public void setPassiveMode(boolean passiveMode);
 
@@ -34,7 +34,8 @@ public interface IBaseFTPConnectionPoint extends IBaseRemoteConnectionPoint {
 	public String getEncoding();
 
 	/**
-	 * @param encoding the encoding to set
+	 * @param encoding
+	 *            the encoding to set
 	 */
 	public void setEncoding(String encoding);
 
@@ -44,7 +45,8 @@ public interface IBaseFTPConnectionPoint extends IBaseRemoteConnectionPoint {
 	public String getTimezone();
 
 	/**
-	 * @param timezone the timezone to set
+	 * @param timezone
+	 *            the timezone to set
 	 */
 	public void setTimezone(String timezone);
 

@@ -9,7 +9,7 @@ package com.aptana.filesystem.ftp.internal;
 
 import org.eclipse.osgi.util.NLS;
 
-/* package */ class Messages extends NLS {
+/* package */class Messages extends NLS {
 
 	private static final String BUNDLE_NAME = "com.aptana.filesystem.ftp.internal.messages"; //$NON-NLS-1$
 

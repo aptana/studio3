@@ -16,7 +16,7 @@ import com.aptana.ide.core.io.LocalRoot;
 public class LocalRootAdapterFactory implements IAdapterFactory {
 
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adapterType == IFileStore.class
+		if (IFileStore.class.equals(adapterType)
 				&& adaptableObject instanceof LocalRoot) {
 			return ((LocalRoot) adaptableObject).getAdapter(IFileStore.class);
 		}

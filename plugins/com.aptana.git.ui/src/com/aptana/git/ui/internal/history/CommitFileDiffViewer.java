@@ -36,6 +36,7 @@ import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.Diff;
 import com.aptana.git.core.model.GitCommit;
@@ -128,7 +129,7 @@ class CommitFileDiffViewer extends TableViewer
 				GitCommit commit = (GitCommit) inputElement;
 				return commit.getDiff().toArray();
 			}
-			return new Object[0];
+			return ArrayUtil.NO_OBJECTS;
 		}
 
 		public void dispose()

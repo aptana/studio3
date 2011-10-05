@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.js.debug.ui.internal;
 
 import java.text.MessageFormat;
@@ -29,14 +32,13 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
  * @author Max Stepanov
  */
 public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
-	
+
 	private static final String URL_INSTALL_PDM = "http://www.aptana.com/pro/pdm.php"; //$NON-NLS-1$
 	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://wiki.appcelerator.org/display/tis/Installing+the+JavaScript+debugger"; //$NON-NLS-1$
 	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://wiki.appcelerator.org/display/tis/Installing+the+Internet+Explorer+debugger"; //$NON-NLS-1$
 
 	/**
-	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus,
-	 *      java.lang.Object)
+	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus, java.lang.Object)
 	 */
 	public Object handleStatus(IStatus status, Object source) throws CoreException {
 		Shell shell = UIUtils.getActiveShell();
@@ -56,18 +58,16 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 					new String[] { StringUtil.ellipsify(Messages.InstallDebuggerPromptStatusHandler_Download),
 							CoreStrings.CONTINUE, CoreStrings.CANCEL, CoreStrings.HELP }, 0);
 			switch (md.open()) {
-			case 0:
-				WorkbenchBrowserUtil.launchExternalBrowser(
-						URL_INSTALL_PDM, "org.eclipse.ui.browser.ie"); //$NON-NLS-1$
-				return Boolean.TRUE;
-			case 1:
-				return Boolean.TRUE;
-			case 3:
-				WorkbenchBrowserUtil
-						.launchExternalBrowser(URL_DOCS_INSTALL_IE_DEBUGGER); 
-				return Boolean.TRUE;
-			default:
-				break;
+				case 0:
+					WorkbenchBrowserUtil.launchExternalBrowser(URL_INSTALL_PDM, "org.eclipse.ui.browser.ie"); //$NON-NLS-1$
+					return Boolean.TRUE;
+				case 1:
+					return Boolean.TRUE;
+				case 3:
+					WorkbenchBrowserUtil.launchExternalBrowser(URL_DOCS_INSTALL_IE_DEBUGGER);
+					return Boolean.TRUE;
+				default:
+					break;
 			}
 			return null;
 		} else if (source instanceof String && ((String) source).startsWith("quit_")) { //$NON-NLS-1$
@@ -89,13 +89,14 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 							IDialogConstants.OK_LABEL, CoreStrings.HELP }, 0);
 			while (true) {
 				switch (md.open()) {
-				case IDialogConstants.OK_ID:
-					return null;
-				default:
-					break;
+					case IDialogConstants.OK_ID:
+						return null;
+					default:
+						break;
 				}
-				String urlString = ((String) source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
-					? URL_DOCS_INSTALL_IE_DEBUGGER : URL_DOCS_INSTALL_DEBUGGER;
+				String urlString = (((String) source).indexOf("Internet Explorer") != -1) //$NON-NLS-1$
+				? URL_DOCS_INSTALL_IE_DEBUGGER
+						: URL_DOCS_INSTALL_DEBUGGER;
 				WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 			}
 		}
@@ -118,15 +119,16 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 
 		while (true) {
 			switch (dialog.open()) {
-			case IDialogConstants.YES_ID:
-				return Boolean.TRUE;
-			case IDialogConstants.NO_ID:
-				return Boolean.FALSE;
-			default:
-				break;
+				case IDialogConstants.YES_ID:
+					return Boolean.TRUE;
+				case IDialogConstants.NO_ID:
+					return Boolean.FALSE;
+				default:
+					break;
 			}
-			String urlString = ((String) source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
-				? URL_DOCS_INSTALL_IE_DEBUGGER : URL_DOCS_INSTALL_DEBUGGER;
+			String urlString = (((String) source).indexOf("Internet Explorer") != -1) //$NON-NLS-1$
+			? URL_DOCS_INSTALL_IE_DEBUGGER
+					: URL_DOCS_INSTALL_DEBUGGER;
 			WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 		}
 	}

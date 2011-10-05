@@ -29,6 +29,7 @@ public class Messages extends NLS
 	public static String CommitDialog_UnstageSelectedMarker;
 	public static String CommitDialog_CannotMerge_Error;
 	public static String CommitDialog_CommitButton_Label;
+	public static String CommitDialog_CloseButton_Label;
 	public static String CommitDialog_EnterMessage_Error;
 	public static String CommitDialog_MessageLabel;
 	public static String CommitDialog_PathColumnLabel;

@@ -10,6 +10,8 @@
       </documentation>
    </annotation>
 
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
    <element name="extension">
       <annotation>
          <appinfo>
@@ -55,6 +57,9 @@
          </documentation>
       </annotation>
       <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="enablement"/>
+         </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
@@ -97,6 +102,9 @@ Although optional, it is very recommended to set a category, as a user of this p
          </documentation>
       </annotation>
       <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="enablement"/>
+         </sequence>
          <attribute name="targetID" type="string" use="required">
             <annotation>
                <documentation>
@@ -131,6 +139,24 @@ Although optional, it is very recommended to set a category, as a user of this p
                </documentation>
             </annotation>
          </attribute>
+      </complexType>
+   </element>
+
+   <element name="enablement">
+      <annotation>
+         <documentation>
+            A core expression that controls the enablement of the given processor/delegate
+         </documentation>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="1">
+            <element ref="not"/>
+            <element ref="or"/>
+            <element ref="and"/>
+            <element ref="test"/>
+            <element ref="systemTest"/>
+            <element ref="iterate"/>
+         </choice>
       </complexType>
    </element>
 

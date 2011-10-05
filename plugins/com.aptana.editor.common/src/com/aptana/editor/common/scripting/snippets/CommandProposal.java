@@ -104,7 +104,7 @@ public class CommandProposal extends SnippetTemplateProposal
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 				}
 			}
 			CommandExecutionUtils.processCommandResult(commandElement, commandResult, viewer);

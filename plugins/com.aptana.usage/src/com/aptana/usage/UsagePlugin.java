@@ -7,13 +7,9 @@
  */
 package com.aptana.usage;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
@@ -35,11 +31,12 @@ public class UsagePlugin extends Plugin
 
 	// The shared instance
 	private static UsagePlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public UsagePlugin() {
+	public UsagePlugin()
+	{
 	}
 
 	/*
@@ -80,27 +77,12 @@ public class UsagePlugin extends Plugin
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static UsagePlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void logError(String message, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
-	}
-
-	public static void logInfo(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
-	}
-
-	public static void logWarning(String message)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
 	}
 
 	public static void logError(String message)
@@ -119,5 +101,14 @@ public class UsagePlugin extends Plugin
 		{
 			IdeLog.logError(getDefault(), e);
 		}
+	}
+
+	public static void logError(Exception e)
+	{
+		// Only logs analytics errors when in development
+		if (Platform.inDevelopmentMode())
+		{
+			IdeLog.logError(getDefault(), e);
+}
 	}
 }

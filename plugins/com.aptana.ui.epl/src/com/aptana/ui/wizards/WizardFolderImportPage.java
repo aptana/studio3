@@ -192,7 +192,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	{
 		super(pageName);
 		setPageComplete(false);
-		setTitle(Messages.WizardFolderImportPage_ExistingFolderAsNewProject);
+		setTitle(EplMessages.WizardFolderImportPage_ExistingFolderAsNewProject);
 		fNatureDescriptions = new HashMap<String, String>();
 
 	}
@@ -244,7 +244,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		updatePrimaryNature(APTANA_WEB_NATURE);
 
 		Label l = new Label(workArea, SWT.NONE);
-		l.setText(Messages.WizardFolderImportPage_project_type_title);
+		l.setText(EplMessages.WizardFolderImportPage_project_type_title);
 
 		// Table for project natures
 
@@ -279,7 +279,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 		Composite buttons = new Composite(tableComposite, SWT.NONE);
 		buttons.setLayout(GridLayoutFactory.fillDefaults().create());
 		buttons.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
-		fMakePrimaryButton = createButton(Messages.WizardFolderImportPage_make_primary_label, buttons);
+		fMakePrimaryButton = createButton(EplMessages.WizardFolderImportPage_make_primary_label, buttons);
 		updateButtons();
 
 		setPageComplete(validate());
@@ -305,7 +305,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 
 		// project location entry field
 		Label l = new Label(projectGroup, SWT.NONE);
-		l.setText(Messages.WizardFolderImportPage_SelectFolder);
+		l.setText(EplMessages.WizardFolderImportPage_SelectFolder);
 		this.directoryPathField = new Text(projectGroup, SWT.BORDER);
 		this.directoryPathField.addModifyListener(modifyListener);
 		this.directoryPathField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
@@ -330,7 +330,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 
 		// project name entry field
 		l = new Label(projectGroup, SWT.NONE);
-		l.setText(Messages.WizardFolderImportPage_ProjectName);
+		l.setText(EplMessages.WizardFolderImportPage_ProjectName);
 		projectNameField = new Text(projectGroup, SWT.BORDER);
 		projectNameField.addModifyListener(modifyListener);
 		projectNameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
@@ -343,12 +343,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	{
 		if (directoryPathField.getText().trim().length() == 0)
 		{
-			setErrorMessage(Messages.WizardFolderImportPage_ERR_NoFolderSelected);
+			setErrorMessage(EplMessages.WizardFolderImportPage_ERR_NoFolderSelected);
 			return false;
 		}
 		else if (!new File(directoryPathField.getText()).exists())
 		{
-			setErrorMessage(Messages.WizardFolderImportPage_ERR_FolderNotExist);
+			setErrorMessage(EplMessages.WizardFolderImportPage_ERR_FolderNotExist);
 			return false;
 		}
 		else
@@ -356,12 +356,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 			String name = projectNameField.getText().trim();
 			if (name.length() == 0)
 			{
-				setErrorMessage(Messages.WizardFolderImportPage_ERR_NoProjectName);
+				setErrorMessage(EplMessages.WizardFolderImportPage_ERR_NoProjectName);
 				return false;
 			}
 			if (projectsNames.contains(name))
 			{
-				setErrorMessage(Messages.WizardFolderImportPage_ERR_ProjectNameExists);
+				setErrorMessage(EplMessages.WizardFolderImportPage_ERR_ProjectNameExists);
 				return false;
 			}
 		}
@@ -845,7 +845,7 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	{
 		Menu menu = new Menu(table);
 		fSetPrimaryMenuItem = new MenuItem(menu, SWT.PUSH);
-		fSetPrimaryMenuItem.setText(Messages.WizardFolderImportPage_set_primary_label);
+		fSetPrimaryMenuItem.setText(EplMessages.WizardFolderImportPage_set_primary_label);
 		fSetPrimaryMenuItem.addSelectionListener(this);
 		return menu;
 	}

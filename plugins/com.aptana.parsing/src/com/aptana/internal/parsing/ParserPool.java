@@ -9,6 +9,7 @@ package com.aptana.internal.parsing;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ReapingObjectPool;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -21,21 +22,20 @@ public class ParserPool extends ReapingObjectPool<IParser> implements IParserPoo
 
 	public ParserPool(IConfigurationElement parserExtension)
 	{
-		super();
 		this.parserExtension = parserExtension;
 		start();
 	}
 
 	@Override
 	public IParser create()
-	{		
+	{
 		try
 		{
 			return (IParser) parserExtension.createExecutableExtension("class"); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
-			ParsingPlugin.logError(e);
+			IdeLog.logError(ParsingPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -52,5 +52,4 @@ public class ParserPool extends ReapingObjectPool<IParser> implements IParserPoo
 	{
 		// no need to clean the parser up
 	}
-
 }

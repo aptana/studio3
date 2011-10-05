@@ -34,6 +34,8 @@ import com.aptana.core.logging.IdeLog;
 public final class PlatformUtil
 {
 	
+	private static final ProcessItem[] NO_PROCESS_ITEMS = new ProcessItem[0];
+
 	public static class ProcessItem {
 		private String executableName;
 		private int pid;
@@ -109,7 +111,7 @@ public final class PlatformUtil
 					return list.toArray(new ProcessItem[list.size()]);
 				}
 			} catch (UnsatisfiedLinkError e) {
-				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS())) {
 			Process process = null;
@@ -220,7 +222,7 @@ public final class PlatformUtil
 				}
 			}
 		}
-		return new ProcessItem[0];
+		return NO_PROCESS_ITEMS;
 	}
 
 	/**
@@ -235,7 +237,7 @@ public final class PlatformUtil
 			try {
 				currentPid = CoreNatives.GetCurrentProcessId();
 			} catch (UnsatisfiedLinkError e) {
-				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			Process process = null;
@@ -285,7 +287,7 @@ public final class PlatformUtil
 			return list.toArray(new ProcessItem[list.size()]);
 		}
 
-		return new ProcessItem[0];
+		return NO_PROCESS_ITEMS;
 	}
 
 	public static void killProcess(int pid) {
@@ -296,7 +298,7 @@ public final class PlatformUtil
 			try {
 				CoreNatives.KillProcess(pid);
 			} catch (UnsatisfiedLinkError e) {
-				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e, null);
+				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			try {
@@ -347,7 +349,8 @@ public final class PlatformUtil
 				}
 			}
 		}
-		if (path.startsWith("~")) { //$NON-NLS-1$
+		if (path.length() > 0 && path.charAt(0) == '~')
+		{
 			String home = System.getProperty("user.home"); //$NON-NLS-1$
 			if (home != null) {
 				return home + path.substring(1);
@@ -484,7 +487,7 @@ public final class PlatformUtil
 						}
 					} catch (IOException e) {
 						IdeLog.logError(CorePlugin.getDefault(),
-								MessageFormat.format("Reading {0} fails", plist.getAbsolutePath()), e, null); //$NON-NLS-1$
+								MessageFormat.format("Reading {0} fails", plist.getAbsolutePath()), e); //$NON-NLS-1$
 					} finally {
 						if (r != null) {
 							try {
@@ -495,7 +498,7 @@ public final class PlatformUtil
 					}
 				}
 			}
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		return null;
 	}

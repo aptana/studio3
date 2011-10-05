@@ -16,6 +16,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.editor.json.preferences.IPreferenceConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
@@ -25,7 +26,6 @@ import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
-import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -155,7 +155,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
 					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(e);
+			IdeLog.logError(JSONPlugin.getDefault(), e);
 		}
 
 		return null;

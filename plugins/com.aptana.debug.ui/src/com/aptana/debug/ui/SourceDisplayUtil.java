@@ -31,6 +31,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.resources.UniformResourceStorage;
@@ -42,7 +43,7 @@ import com.aptana.ui.util.UIUtils;
  */
 @SuppressWarnings("restriction")
 public final class SourceDisplayUtil {
-	
+
 	private SourceDisplayUtil() {
 	}
 
@@ -60,9 +61,9 @@ public final class SourceDisplayUtil {
 			IMarker marker = ((ILineBreakpoint) element).getMarker();
 			if (marker instanceof IUniformResourceMarker) {
 				IUniformResource resource = ((IUniformResourceMarker) marker).getUniformResource();
-				element = resource.getAdapter(IStorage.class);
+				element = resource.getAdapter(IStorage.class); // $codepro.audit.disable questionableAssignment
 				if (element == null) {
-					element = resource;
+					element = resource; // $codepro.audit.disable questionableAssignment
 				}
 			} else {
 				return new FileEditorInput((IFile) marker.getResource());
@@ -74,6 +75,7 @@ public final class SourceDisplayUtil {
 		if (element instanceof UniformResourceStorage) {
 			if (((UniformResourceStorage) element).getFullPath() != null) {
 				// TODO return new LocalFileStorageEditorInput((UniformResourceStorage) element);
+				element.hashCode();
 			}
 			if (((UniformResourceStorage) element).exists()) {
 				return new UniformResourceStorageEditorInput((UniformResourceStorage) element);
@@ -165,6 +167,7 @@ public final class SourceDisplayUtil {
 					IRegion line = document.getLineInformation(lineNumber - 1); // documents start at 0
 					textEditor.selectAndReveal(line.getOffset(), line.getLength());
 				} catch (BadLocationException e) {
+					IdeLog.logWarning(DebugUiPlugin.getDefault(), e);
 				} finally {
 					provider.disconnect(document);
 				}

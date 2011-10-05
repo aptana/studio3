@@ -16,6 +16,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.text.reconciler.Messages;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 /**
@@ -31,7 +32,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	private ArrayList<Integer> fLines;
 	private boolean initialReconcile;
 
-	public AbstractFoldingComputer(AbstractThemeableEditor editor, IDocument document)
+	protected AbstractFoldingComputer(AbstractThemeableEditor editor, IDocument document)
 	{
 		super();
 		this.fEditor = editor;
@@ -77,9 +78,9 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 				return Collections.emptyMap();
 			}
 			int length = parseNode.getChildCount();
-			if (parseNode instanceof ParseRootNode)
+			if (parseNode instanceof IParseRootNode)
 			{
-				ParseRootNode prn = (ParseRootNode) parseNode;
+				IParseRootNode prn = (IParseRootNode) parseNode;
 				IParseNode[] comments = prn.getCommentNodes();
 				if (comments != null && comments.length > 0)
 				{
@@ -102,9 +103,9 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 	protected IParseNode[] getChildren(IParseNode parseNode)
 	{
 		IParseNode[] children = parseNode.getChildren();
-		if (parseNode instanceof ParseRootNode)
+		if (parseNode instanceof IParseRootNode)
 		{
-			ParseRootNode prn = (ParseRootNode) parseNode;
+			IParseRootNode prn = (IParseRootNode) parseNode;
 			IParseNode[] comments = prn.getCommentNodes();
 			if (comments != null && comments.length > 0)
 			{

@@ -19,7 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IProcess;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -48,21 +50,21 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 		{
 			return null;
 		}
-		String baseJobName = "git"; //$NON-NLS-1$
+		StringBuilder baseJobName = new StringBuilder("git"); //$NON-NLS-1$
 		for (String string : command)
 		{
-			baseJobName += " " + string; //$NON-NLS-1$
+			baseJobName.append(' ').append(string);
 		}
 
 		// Run one job per repo
 		for (final GitRepository currentRepo : repos)
 		{
-			String jobName = baseJobName;
+			StringBuilder jobName = new StringBuilder(baseJobName.toString());
 			if (repos.size() > 1)
 			{
-				jobName += " (" + currentRepo.workingDirectory() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+				jobName.append(" (").append(currentRepo.workingDirectory()).append(')'); //$NON-NLS-1$
 			}
-			Job job = new Job(jobName)
+			Job job = new Job(jobName.toString())
 			{
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
@@ -77,6 +79,15 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 					try
 					{
 						ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);
+
+						if (launch.getProcesses() == null || launch.getProcesses().length < 1)
+						{
+							// If something went wrong and there's no process (like unsaved files and user cancelled
+							// dialog)
+							return Status.OK_STATUS;
+						}
+
+						IProcess process = launch.getProcesses()[0];
 						while (!launch.isTerminated())
 						{
 							Thread.yield();
@@ -88,12 +99,12 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 							sub.worked(1);
 						}
 
-						int exitValue = launch.getProcesses()[0].getExitValue();
+						int exitValue = process.getExitValue();
 						if (exitValue != 0)
 						{
 							String msg = MessageFormat
 									.format("command returned non-zero exit value. wd: {0}, command: {1}", currentRepo.workingDirectory(), StringUtil.join(" ", command)); //$NON-NLS-1$ //$NON-NLS-2$
-							GitUIPlugin.logWarning(msg);
+							IdeLog.logWarning(GitUIPlugin.getDefault(), msg);
 						}
 					}
 					catch (CoreException e)

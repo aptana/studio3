@@ -57,12 +57,12 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_Download;
 	public static String SmartSyncDialog_DownloadAll;
 	public static String SmartSyncDialog_Endpoints;
-
 	public static String SmartSyncDialog_ErrorMessage;
 	public static String SmartSyncDialog_ErrorSmartSync;
 	public static String SmartSyncDialog_ErrorSync;
 	public static String SmartSyncDialog_FlatView;
 	public static String SmartSyncDialog_InSync;
+	public static String SmartSyncDialog_LBL_MultipleFiles;
 	public static String SmartSyncDialog_LocalTime;
 	public static String SmartSyncDialog_Modified;
 	public static String SmartSyncDialog_New;
@@ -78,7 +78,6 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_RemoteTime;
 	public static String SmartSyncDialog_Retry;
 	public static String SmartSyncDialog_RunInBackground;
-
 	public static String SmartSyncDialog_searchText;
 	public static String SmartSyncDialog_ShowDates;
 	public static String SmartSyncDialog_ShowDiffs;
@@ -97,7 +96,6 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_ViewOptions;
 
 	public static String SmartSyncEventManager_ERR_ErrorNotifyingSmartSyncListener;
-
 	public static String SmartSyncEventManager_ERR_ExceptionNotifyingSmartSyncListener;
 
 	public static String SmartSyncViewer_ColumnResourcesTooltip;

@@ -9,6 +9,7 @@ package com.aptana.deploy.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -21,22 +22,31 @@ public abstract class AbstractDeployWizard extends Wizard implements IDeployWiza
 
 	private static final ImageDescriptor fgDefaultImage = DeployPlugin.imageDescriptorFromPlugin(
 			DeployPlugin.getPluginIdentifier(), "icons/blank.png"); //$NON-NLS-1$
+
 	private IProject project;
 
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
 		Object element = selection.getFirstElement();
+		IResource resource = null;
 		if (element instanceof IResource)
 		{
-			IResource resource = (IResource) element;
-			this.project = resource.getProject();
+			resource = (IResource) element;
 		}
+		else if (element instanceof IAdaptable)
+		{
+			resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+		}
+		if (resource != null)
+		{
+			project = resource.getProject();
+		}
+
 		setDefaultPageImageDescriptor(fgDefaultImage);
 	}
 
 	public IProject getProject()
 	{
-		return this.project;
+		return project;
 	}
-
 }

@@ -7,6 +7,8 @@
  */
 package com.aptana.git.ui.dialogs;
 
+import java.util.Set;
+
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -31,6 +33,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitRepository;
 
 public class CreateBranchDialog extends InputDialog
@@ -42,27 +45,42 @@ public class CreateBranchDialog extends InputDialog
 	private boolean track;
 	private String startPoint;
 
+	/**
+	 * Should we auto-turn on tracking? Look at the git repo's config value in constructor to determine the default
+	 * value here.
+	 */
+	private boolean autoTrack = true;
+
 	public CreateBranchDialog(final Shell parentShell, final GitRepository repo)
 	{
 		super(parentShell, Messages.CreateBranchDialog_CreateBranchDialog_Title,
-				Messages.CreateBranchDialog_CreateBranchDialog_Message, "", //$NON-NLS-1$
+				Messages.CreateBranchDialog_CreateBranchDialog_Message, StringUtil.EMPTY,
 				new IInputValidator()
 				{
 
 					public String isValid(String newText)
 					{
 						if (newText == null || newText.trim().length() == 0)
+						{
 							return Messages.CreateBranchDialog_NonEmptyBranchNameMessage;
+						}
 						if (newText.trim().contains(" ") || newText.trim().contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
+						{
 							return Messages.CreateBranchDialog_NoWhitespaceBranchNameMessage;
+						}
 						if (repo.localBranches().contains(newText.trim()))
+						{
 							return Messages.CreateBranchDialog_BranchAlreadyExistsMessage;
+						}
 						if (!repo.validBranchName(newText.trim()))
+						{
 							return Messages.CreateBranchDialog_InvalidBranchNameMessage;
+						}
 						return null;
 					}
 				});
 		this.repo = repo;
+		this.autoTrack = repo.autoSetupMerge();
 	}
 
 	@Override
@@ -90,35 +108,49 @@ public class CreateBranchDialog extends InputDialog
 			{
 				startPoint = startPointText.getText();
 				// TODO Validate the start point. Must be branch name, commit id or tag ref
-				// TODO If name is a remote branch, turn on track by default?
+
+				if (startPoint.indexOf('/') != -1 && autoTrack)
+				{
+					// If name is a remote branch, turn on track by default?
+					for (String remoteName : repo.remotes())
+					{
+						if (startPoint.startsWith(remoteName + '/'))
+						{
+							trackButton.setSelection(true);
+							track = true;
+							break;
+						}
+					}
+				}
 			}
 		});
 
-		String[] proposals = repo.allSimpleRefs().toArray(new String[0]);
+		Set<String> simpleRefs = repo.allSimpleRefs();
+		String[] proposals = simpleRefs.toArray(new String[simpleRefs.size()]);
 
 		new AutoCompleteField(startPointText, new TextContentAdapter(), proposals);
-		
-		//Have CTRL+SPACE also trigger content assist
+
+		// Have CTRL+SPACE also trigger content assist
 		SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(proposals);
 		proposalProvider.setFiltering(true);
 		ContentProposalAdapter adapter = new ContentProposalAdapter(startPointText, new TextContentAdapter(),
 				proposalProvider, KeyStroke.getInstance(SWT.CONTROL, ' '), null);
 		adapter.setPropagateKeys(true);
 		adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-		
+
 		ControlDecoration decoration = new ControlDecoration(startPointText, SWT.LEFT);
-		decoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(
-				FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+		decoration.setImage(FieldDecorationRegistry.getDefault()
+				.getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
 
 		trackButton = new Button(group, SWT.CHECK);
 		trackButton.setText(Messages.CreateBranchDialog_Track_label);
 		trackButton.addSelectionListener(new SelectionAdapter()
 		{
-
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				track = trackButton.getSelection();
+				autoTrack = false; // don't change the value since user modified it here.
 			}
 		});
 		return composite;

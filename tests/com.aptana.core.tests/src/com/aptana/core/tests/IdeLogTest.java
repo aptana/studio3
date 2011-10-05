@@ -89,9 +89,9 @@ public class IdeLogTest extends TestCase
 		assertFalse(IdeLog.isWarningEnabled(plugin, null));
 		assertFalse(IdeLog.isInfoEnabled(plugin, null));
 
-		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR));
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING));
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO));
 		assertEquals("[OFF] should find 0 messages. Found " + StringUtil.join(",", listener.getMessages()), 0,
 				listener.getMessageCount());
 
@@ -103,9 +103,9 @@ public class IdeLogTest extends TestCase
 		assertFalse(IdeLog.isWarningEnabled(plugin, null));
 		assertFalse(IdeLog.isInfoEnabled(plugin, null));
 
-		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), (String) null);
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), (String) null);
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null);
 		assertEquals("[OFF] should find 1 messages. Found " + StringUtil.join(",", listener.getMessages()), 1,
 				listener.getMessageCount());
 
@@ -131,9 +131,9 @@ public class IdeLogTest extends TestCase
 		assertTrue(IdeLog.isWarningEnabled(plugin, null));
 		assertTrue(IdeLog.isInfoEnabled(plugin, null));
 
-		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR), null, null);
-		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING), null, null);
-		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO), null, null);
+		IdeLog.logError(plugin, getCustomMesssage(IdeLog.StatusLevel.ERROR));
+		IdeLog.logWarning(plugin, getCustomMesssage(IdeLog.StatusLevel.WARNING));
+		IdeLog.logInfo(plugin, getCustomMesssage(IdeLog.StatusLevel.INFO));
 		assertEquals("[OFF] should find 3 messages. Found " + StringUtil.join(",", listener.getMessages()), 3,
 				listener.getMessageCount());
 
@@ -315,7 +315,7 @@ public class IdeLogTest extends TestCase
 
 		public String[] getMessages()
 		{
-			return logMessages.toArray(new String[0]);
+			return logMessages.toArray(new String[logMessages.size()]);
 		}
 
 		public int getMessageCount()

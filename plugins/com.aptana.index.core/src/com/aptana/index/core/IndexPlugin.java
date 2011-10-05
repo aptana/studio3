@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -23,6 +22,7 @@ public class IndexPlugin extends Plugin
 {
 
 	public static final String PLUGIN_ID = "com.aptana.index.core"; //$NON-NLS-1$
+
 	private static IndexPlugin plugin;
 
 	/**
@@ -33,27 +33,6 @@ public class IndexPlugin extends Plugin
 	public static IndexPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void logError(CoreException e)
-	{
-		getDefault().getLog().log(e.getStatus());
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
 	/**
@@ -92,7 +71,7 @@ public class IndexPlugin extends Plugin
 	public static boolean isDebugOptionEnabled(String option)
 	{
 		return Boolean.valueOf(Platform.getDebugOption(option));
-	}
+}
 
 	/**
 	 * Logs an informational message

@@ -1,3 +1,4 @@
+// $codepro.audit.disable
 package com.aptana.editor.css.parsing;
 
 /**

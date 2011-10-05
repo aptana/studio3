@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
@@ -31,7 +32,17 @@ public class CSSEditorTest extends TestCase
 	{
 		if (editor != null)
 		{
-			editor.close(false);
+			if (editor != null)
+			{
+				if (Display.getCurrent() != null)
+				{
+					editor.getSite().getPage().closeEditor(editor, false);
+				}
+				else
+				{
+					editor.close(false);
+				}
+			}
 			editor = null;
 		}
 	}

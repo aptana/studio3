@@ -26,7 +26,7 @@ import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -64,7 +64,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			while (tokenizer.hasMoreTokens())
 			{
-				addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
+				addIndex(index, file, ICSSIndexConstants.CLASS, tokenizer.nextToken());
 			}
 		}
 
@@ -72,7 +72,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 		if (id != null && id.trim().length() > 0)
 		{
-			addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
+			addIndex(index, file, ICSSIndexConstants.IDENTIFIER, id);
 		}
 
 		if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
@@ -86,7 +86,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				if (resolved != null)
 				{
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, resolved.toString());
+					addIndex(index, file, IHTMLIndexConstants.RESOURCE_CSS, resolved.toString());
 				}
 			}
 		}
@@ -126,7 +126,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				if (resolved != null)
 				{
-					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
+					addIndex(index, file, IHTMLIndexConstants.RESOURCE_JS, resolved.toString());
 				}
 			}
 			else if (child != null && IJSConstants.CONTENT_TYPE_JS.equals(child.getLanguage()))
@@ -216,7 +216,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			// prime queue
 			queue.offer(parent);
 
-			while (queue.isEmpty() == false)
+			while (!queue.isEmpty())
 			{
 				IParseNode current = queue.poll();
 

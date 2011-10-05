@@ -17,14 +17,17 @@ import com.aptana.parsing.ast.ParseRootNode;
  */
 public class CSSParseRootNode extends ParseRootNode
 {
+
+	private static final Symbol[] NO_SYMBOLS = new Symbol[0];
+
 	/**
 	 * CSSParseRootNode
 	 */
 	public CSSParseRootNode()
 	{
-		this(new Symbol[0]);
+		this(NO_SYMBOLS);
 	}
-	
+
 	/**
 	 * CSSParseRootNode
 	 * 
@@ -33,12 +36,12 @@ public class CSSParseRootNode extends ParseRootNode
 	public CSSParseRootNode(Symbol[] children)
 	{
 		super( //
-			ICSSConstants.CONTENT_TYPE_CSS, //
-			(children != null) ? children : new Symbol[0], //
-			(children != null && children.length > 0) ? children[0].getStart() : 0, //
-			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
+				ICSSConstants.CONTENT_TYPE_CSS, //
+				(children != null) ? children : NO_SYMBOLS, //
+				(children != null && children.length > 0) ? children[0].getStart() : 0, //
+				(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
 	}
-	
+
 	public void accept(CSSTreeWalker walker)
 	{
 		walker.visit(this);

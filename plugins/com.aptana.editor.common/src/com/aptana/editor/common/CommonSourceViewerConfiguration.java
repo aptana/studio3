@@ -98,7 +98,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private IPreferenceChangeListener fThemeChangeListener;
 	private IPreferenceChangeListener fAutoActivationListener;
 	private CommonReconciler fReconciler;
-	ArrayList<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
+	List<IContentAssistProcessor> fCAProcessors = new ArrayList<IContentAssistProcessor>();
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -146,17 +146,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			}
 			fCAProcessors = null;
 		}
-	}
-
-	/**
-	 * getAbstractThemeableEditor
-	 * 
-	 * @deprecated Use {@link #getEditor()}
-	 * @return
-	 */
-	protected AbstractThemeableEditor getAbstractThemeableEditor()
-	{
-		return getEditor();
 	}
 
 	/*
@@ -390,7 +379,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 			for (int i = 0; i < tabWidth; ++i)
 			{
-				buf.append(" "); //$NON-NLS-1$
+				buf.append(' ');
 			}
 
 			return buf.toString();
@@ -549,12 +538,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		if (fTextEditor != null && fTextEditor.isEditable())
 		{
 			IReconcilingStrategy reconcilingStrategy = new CommonReconcilingStrategy(fTextEditor);
-			CommonReconciler reconciler = new CommonReconciler(reconcilingStrategy);
-			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-			reconciler.setIsIncrementalReconciler(false);
-			reconciler.setIsAllowedToModifyDocument(false);
-			reconciler.setProgressMonitor(new NullProgressMonitor());
-			reconciler.setDelay(500);
 			if (EditorsUI.getPreferenceStore().getBoolean(SpellingService.PREFERENCE_SPELLING_ENABLED))
 			{
 				SpellingService spellingService = EditorsUI.getSpellingService();
@@ -562,12 +545,17 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 				if (spellingService.getActiveSpellingEngineDescriptor(fPreferenceStore) != null
 						&& !spellingContentTypes.isEmpty())
 				{
-					reconciler.setReconcilingStrategy(
-							new CompositeReconcilingStrategy(reconcilingStrategy,
-									new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService, reconciler
-											.getDocumentPartitioning(), spellingContentTypes)), spellingContentTypes);
+					reconcilingStrategy = new CompositeReconcilingStrategy(reconcilingStrategy,
+							new MultiRegionSpellingReconcileStrategy(sourceViewer, spellingService,
+									getConfiguredDocumentPartitioning(sourceViewer), spellingContentTypes));
 				}
 			}
+			CommonReconciler reconciler = new CommonReconciler(reconcilingStrategy);
+			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+			reconciler.setIsIncrementalReconciler(false);
+			reconciler.setIsAllowedToModifyDocument(false);
+			reconciler.setProgressMonitor(new NullProgressMonitor());
+			reconciler.setDelay(500);
 			return fReconciler = reconciler;
 		}
 		return null;

@@ -7,10 +7,12 @@
  */
 package com.aptana.portal.ui.dispatch.configurationProcessors.installer;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -41,7 +43,7 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 {
 	public static final String INSTALL_DIR_ATTR = "install_dir"; //$NON-NLS-1$
 	protected Map<String, Object> attributes;
-	private Text path;
+	protected Text path;
 	private String installerName;
 
 	public InstallerOptionsDialog(Shell parentShell, String installerName)
@@ -110,6 +112,16 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 	}
 
 	/**
+	 * Returns the message that will be displayed in the installer dialog.
+	 * 
+	 * @return An installer message.
+	 */
+	protected String getInstallerMessage()
+	{
+		return NLS.bind(Messages.InstallProcessor_installerMessage, installerName);
+	}
+
+	/**
 	 * Creates the components inside the 'Installer' group. <br>
 	 * The default creation is only for the installation path. This can be overwritten, or extended, by a subclass.
 	 * 
@@ -119,7 +131,7 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 	protected Composite createInstallerGroupControls(Composite group)
 	{
 		Label l = new Label(group, SWT.WRAP);
-		l.setText(NLS.bind(Messages.InstallProcessor_installerMessage, installerName));
+		l.setText(getInstallerMessage());
 		Composite installLocation = new Composite(group, SWT.NONE);
 		installLocation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		installLocation.setLayout(new GridLayout(2, false));
@@ -131,11 +143,13 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 			public void keyReleased(org.eclipse.swt.events.KeyEvent e)
 			{
 				attributes.put(INSTALL_DIR_ATTR, path.getText());
+				validatePath();
 			}
 
 			public void keyPressed(org.eclipse.swt.events.KeyEvent e)
 			{
 				attributes.put(INSTALL_DIR_ATTR, path.getText());
+				validatePath();
 			}
 		});
 		Button browse = new Button(installLocation, SWT.PUSH);
@@ -151,10 +165,59 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 				{
 					path.setText(dir);
 					attributes.put(INSTALL_DIR_ATTR, dir);
+					validatePath();
 				}
 			}
 		});
+		validatePath();
 		return group;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	protected void createButtonsForButtonBar(Composite parent)
+	{
+		super.createButtonsForButtonBar(parent);
+		validatePath();
+	}
+
+	/**
+	 * Validate the path
+	 */
+	protected void validatePath()
+	{
+		String pathText = path.getText();
+		if (pathText.trim().length() == 0)
+		{
+			// empty path
+			setErrorMessage(Messages.InstallerOptionsDialog_emptyPathError);
+			return;
+		}
+		if (!new File(pathText).exists())
+		{
+			// non-existing path
+			setErrorMessage(Messages.InstallerOptionsDialog_nonExistingPathError);
+			return;
+		}
+		setErrorMessage(null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#setErrorMessage(java.lang.String)
+	 */
+	@Override
+	public void setErrorMessage(String newErrorMessage)
+	{
+		super.setErrorMessage(newErrorMessage);
+		Button button = getButton(IDialogConstants.OK_ID);
+		if (button != null)
+		{
+			button.setEnabled(newErrorMessage == null);
+		}
 	}
 
 	/**

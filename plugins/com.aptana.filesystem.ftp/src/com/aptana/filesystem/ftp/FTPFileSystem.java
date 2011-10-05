@@ -5,9 +5,12 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.filesystem.ftp;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -27,7 +30,7 @@ public class FTPFileSystem extends FileSystem
 	/**
 	 * used to retain a cache of connection managers for the same host/username/password/port
 	 */
-	private static WeakHashMap<String, IFTPConnectionFileManager> fgConnectionManagers = new WeakHashMap<String, IFTPConnectionFileManager>();
+	private static Map<String, IFTPConnectionFileManager> fgConnectionManagers = new WeakHashMap<String, IFTPConnectionFileManager>();
 
 	public FTPFileSystem()
 	{
@@ -41,7 +44,7 @@ public class FTPFileSystem extends FileSystem
 		String path = uri.getPath();
 		String userInfo = uri.getUserInfo();
 		String login = StringUtil.EMPTY;
-		char[] password = new char[0];
+		char[] password = StringUtil.EMPTY.toCharArray();
 		if (userInfo != null && userInfo.length() > 0)
 		{
 			if (userInfo.contains(":")) //$NON-NLS-1$

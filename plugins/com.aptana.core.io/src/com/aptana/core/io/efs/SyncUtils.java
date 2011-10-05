@@ -5,6 +5,10 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable exceptionUsage.exceptionCreation
+
 package com.aptana.core.io.efs;
 
 import java.io.IOException;
@@ -25,6 +29,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.ProgressMonitorInterrupter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.PermissionDeniedException;
 
@@ -62,7 +67,7 @@ public final class SyncUtils {
 		try {
 			monitor = (monitor == null) ? new NullProgressMonitor() : monitor;
 			checkCanceled(monitor);
-			monitor.beginTask("", sourceInfo == null ? 3 : 2); //$NON-NLS-1$
+			monitor.beginTask(StringUtil.EMPTY, (sourceInfo == null) ? 3 : 2);
 			if (sourceInfo == null) {
 				sourceInfo = source.fetchInfo(IExtendedFileStore.DETAILED, subMonitorFor(monitor, 1));
 			}
@@ -82,12 +87,13 @@ public final class SyncUtils {
 					IProgressMonitor subMonitor = subMonitorFor(monitor, 2);
 					subMonitor
 							.beginTask(MessageFormat.format(Messages.SyncUtils_Copying, source.toString()), totalWork);
+					int bytesRead;
 					while (true) {
 						checkCanceled(monitor);
-						int bytesRead = -1;
 						try {
 							bytesRead = in.read(buffer);
 						} catch (IOException e) {
+							bytesRead = -1;
 							checkCanceled(monitor);
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Reading, source.toString()), e);
 						}
@@ -146,9 +152,10 @@ public final class SyncUtils {
 	private static void safeClose(InputStream in) {
 		try {
 			if (in != null) {
-				in.close();
+				in.close(); 
 			}
 		} catch (IOException ignore) {
+			ignore.getCause();
 		}
 	}
 

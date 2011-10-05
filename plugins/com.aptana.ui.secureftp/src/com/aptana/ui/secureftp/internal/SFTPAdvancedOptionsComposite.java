@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.secureftp.ISFTPConnectionPoint;
 import com.aptana.filesystem.secureftp.ISFTPConstants;
@@ -35,7 +36,7 @@ import com.aptana.ui.ftp.internal.NumberVerifyListener;
  */
 public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsComposite {
 	
-	private Listener listener;
+	private IListener listener;
 	private Combo compressionCombo;
 	private Text portText;
 	private Combo encodingCombo;
@@ -46,7 +47,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 	 * @param parent
 	 * @param style
 	 */
-	public SFTPAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
+	public SFTPAdvancedOptionsComposite(Composite parent, int style, IListener listener) {
 		super(parent, style);
 		this.listener = listener;
 		
@@ -93,7 +94,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setText(StringUtil.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Encoding));
 
 		encodingCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(new String[0]));
+		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(ArrayUtil.NO_STRINGS));
 		encodingCombo.setLayoutData(GridDataFactory.swtDefaults().hint(
 				encodingCombo.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x, SWT.DEFAULT)
 				.span(4, 1).create());
@@ -160,6 +161,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		try {
 			port = Integer.parseInt(portText.getText());
 		} catch (NumberFormatException e) {
+			e.getCause();
 		}
 		if (port <= 0) {
 			return Messages.SFTPAdvancedOptionsComposite_InvalidPort;

@@ -1,7 +1,15 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.hyperlink;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +29,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -86,14 +95,14 @@ public class HyperlinkDetector implements IHyperlinkDetector
 		return NO_HYPERLINKS;
 	}
 
-	private class GitHyperlink implements IHyperlink
+	private static class GitHyperlink implements IHyperlink
 	{
 
 		private IRegion region;
 		private String filepath;
-		private HashSet<IPath> reposTried;
+		private Set<IPath> reposTried;
 
-		public GitHyperlink(IRegion region, String filepath)
+		GitHyperlink(IRegion region, String filepath)
 		{
 			this.region = region;
 			this.filepath = filepath;
@@ -138,7 +147,7 @@ public class HyperlinkDetector implements IHyperlinkDetector
 			}
 			catch (CoreException e)
 			{
-				GitUIPlugin.logError(e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e);
 			}
 			finally
 			{

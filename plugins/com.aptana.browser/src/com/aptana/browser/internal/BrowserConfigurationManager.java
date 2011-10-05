@@ -14,16 +14,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.browser.BrowserPlugin;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.IConfigurationElementProcessor;
+import com.aptana.core.util.StringUtil;
 
 public class BrowserConfigurationManager
 {
 
-	private static final String EXTENSION_POINT_ID = BrowserPlugin.PLUGIN_ID + ".configuration"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = "configuration"; //$NON-NLS-1$
 	private static final String ELEMENT_SIZE = "size"; //$NON-NLS-1$
 	private static final String ELEMENT_SIZE_CATEGORY = "sizeCategory"; //$NON-NLS-1$
 	private static final String ELEMENT_BACKGROUND_IMAGE = "backgroundImage"; //$NON-NLS-1$
@@ -66,61 +69,57 @@ public class BrowserConfigurationManager
 
 	private void readExtensionRegistry()
 	{
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
-				EXTENSION_POINT_ID);
-		// reads the category first, then the background images, then the individual size specifications
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_SIZE_CATEGORY);
-		}
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_BACKGROUND_IMAGE);
-		}
-		for (IConfigurationElement element : elements)
-		{
-			readElement(element, ELEMENT_SIZE);
-		}
+		EclipseUtil.processConfigurationElements(BrowserPlugin.PLUGIN_ID, EXTENSION_POINT_ID,
+				new IConfigurationElementProcessor()
+				{
+
+					public void processElement(IConfigurationElement element)
+					{
+						readElement(element);
+					}
+				}, ELEMENT_SIZE_CATEGORY, ELEMENT_BACKGROUND_IMAGE, ELEMENT_SIZE);
 	}
 
-	private void readElement(IConfigurationElement element, String elementName)
+	private void readElement(IConfigurationElement element)
 	{
 		String name = element.getName();
-		if (!elementName.equals(name))
-		{
-			return;
-		}
+
 		if (ELEMENT_SIZE_CATEGORY.equals(name))
 		{
 			String categoryId = element.getAttribute(ATT_ID);
-			if (isEmpty(categoryId))
+			if (StringUtil.isEmpty(categoryId))
 			{
 				return;
 			}
 			String categoryName = element.getAttribute(ATT_NAME);
-			if (isEmpty(categoryName))
+			if (StringUtil.isEmpty(categoryName))
 			{
 				return;
 			}
 			int order = Byte.MAX_VALUE;
-			try
+			String orderStr = element.getAttribute(ATT_ORDER);
+			if (!StringUtil.isEmpty(orderStr))
 			{
-				order = Integer.parseInt(element.getAttribute(ATT_ORDER));
-			}
-			catch (NumberFormatException e)
-			{
+				try
+				{
+					order = Integer.parseInt(orderStr);
+				}
+				catch (NumberFormatException e)
+				{
+					IdeLog.logWarning(BrowserPlugin.getDefault(), e);
+				}
 			}
 			sizeCategories.put(categoryId, new BrowserSizeCategory(categoryId, categoryName, order));
 		}
 		else if (ELEMENT_BACKGROUND_IMAGE.equals(name))
 		{
 			String imageId = element.getAttribute(ATT_ID);
-			if (isEmpty(imageId))
+			if (StringUtil.isEmpty(imageId))
 			{
 				return;
 			}
 			String imagePath = element.getAttribute(ATT_PATH);
-			if (isEmpty(imagePath))
+			if (StringUtil.isEmpty(imagePath))
 			{
 				return;
 			}
@@ -132,11 +131,12 @@ public class BrowserConfigurationManager
 				horizontalIndent = Integer.parseInt(element.getAttribute(ATT_HOR_INDENT));
 				if (horizontalIndent < 0)
 				{
-					throw new NumberFormatException();
+					horizontalIndent = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			int verticalIndent = 0;
 			try
@@ -144,15 +144,16 @@ public class BrowserConfigurationManager
 				verticalIndent = Integer.parseInt(element.getAttribute(ATT_VER_INDENT));
 				if (verticalIndent < 0)
 				{
-					throw new NumberFormatException();
+					verticalIndent = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			boolean blackBackground = false;
 			String bgcolor = element.getAttribute(ATT_BG_COLOR);
-			if (!isEmpty(bgcolor))
+			if (!StringUtil.isEmpty(bgcolor))
 			{
 				blackBackground = Boolean.parseBoolean(bgcolor);
 			}
@@ -162,12 +163,12 @@ public class BrowserConfigurationManager
 		else if (ELEMENT_SIZE.equals(element.getName()))
 		{
 			String sizeName = element.getAttribute(ATT_NAME);
-			if (isEmpty(sizeName))
+			if (StringUtil.isEmpty(sizeName))
 			{
 				return;
 			}
 			String widthStr = element.getAttribute(ATT_WIDTH);
-			if (isEmpty(widthStr))
+			if (StringUtil.isEmpty(widthStr))
 			{
 				return;
 			}
@@ -177,14 +178,15 @@ public class BrowserConfigurationManager
 				width = Integer.parseInt(widthStr);
 				if (width < 0)
 				{
-					throw new NumberFormatException();
+					width = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			String heightStr = element.getAttribute(ATT_HEIGHT);
-			if (isEmpty(heightStr))
+			if (StringUtil.isEmpty(heightStr))
 			{
 				return;
 			}
@@ -194,16 +196,17 @@ public class BrowserConfigurationManager
 				height = Integer.parseInt(heightStr);
 				if (height < 0)
 				{
-					throw new NumberFormatException();
+					height = 0;
 				}
 			}
 			catch (NumberFormatException e)
 			{
+				IdeLog.logWarning(BrowserPlugin.getDefault(), e);
 			}
 			String categoryId = element.getAttribute(ATT_CATEGORY);
-			if (isEmpty(categoryId))
+			if (StringUtil.isEmpty(categoryId))
 			{
-				categoryId = ""; //$NON-NLS-1$
+				categoryId = StringUtil.EMPTY;
 			}
 			String imageId = element.getAttribute(ATT_IMAGE);
 
@@ -223,10 +226,5 @@ public class BrowserConfigurationManager
 			sizes.add(size);
 			category.addSize(size);
 		}
-	}
-
-	private static boolean isEmpty(String text)
-	{
-		return text == null || text.trim().length() == 0;
 	}
 }

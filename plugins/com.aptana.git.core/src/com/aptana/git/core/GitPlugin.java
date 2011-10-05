@@ -12,7 +12,6 @@ import java.io.File;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -52,7 +51,8 @@ public class GitPlugin extends Plugin
 	/**
 	 * The constructor
 	 */
-	public GitPlugin()
+	public GitPlugin() // $codepro.audit.disable
+						// com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 	{
 	}
 
@@ -60,7 +60,7 @@ public class GitPlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception
+	public void start(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		super.start(context);
 		plugin = this;
@@ -87,7 +87,7 @@ public class GitPlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception
+	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		try
 		{
@@ -96,7 +96,9 @@ public class GitPlugin extends Plugin
 			getGitRepositoryManager().removeListenerFromEachRepository(fRepoListener);
 			// Remove all the GitRepositories from memory!
 			if (fGitRepoManager != null)
+			{
 				fGitRepoManager.cleanup();
+			}
 		}
 		finally
 		{
@@ -119,34 +121,6 @@ public class GitPlugin extends Plugin
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
-	}
-
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
-	}
-
-	protected static void logError(CoreException e)
-	{
-		getDefault().getLog().log(e.getStatus());
-	}
-
-	public static void logWarning(String warning)
-	{
-		if (getDefault() != null)
-			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
-	}
-
-	public static void logError(Exception e)
-	{
-		if (getDefault() != null)
-			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), "", e)); //$NON-NLS-1$
-	}
-
-	public static void logInfo(String string)
-	{
-		if (getDefault() != null && getDefault().isDebugging())
-			getDefault().getLog().log(new Status(IStatus.INFO, getPluginId(), string));
 	}
 
 	/**
@@ -176,12 +150,16 @@ public class GitPlugin extends Plugin
 
 	public IPath getSSH_ASKPASS()
 	{
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			return null;
-		} else if (Platform.OS_LINUX.equals(Platform.getOS())
-				|| Platform.OS_MACOSX.equals(Platform.getOS())) {
-			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/ssh-askpass.tcl"), null)); //$NON-NLS-1$
-			if (askpassFile.isFile()) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(),
+					Path.fromPortableString("$os$/ssh-askpass.tcl"), null)); //$NON-NLS-1$
+			if (askpassFile.isFile())
+			{
 				return Path.fromOSString(askpassFile.getAbsolutePath());
 			}
 		}
@@ -190,19 +168,23 @@ public class GitPlugin extends Plugin
 
 	public IPath getGIT_ASKPASS()
 	{
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			return getGIT_SSH();
-		} else if (Platform.OS_LINUX.equals(Platform.getOS())
-				|| Platform.OS_MACOSX.equals(Platform.getOS())) {
-			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(), Path.fromPortableString("$os$/askpass.tcl"), null)); //$NON-NLS-1$
-			if (askpassFile.isFile()) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			File askpassFile = ResourceUtil.resourcePathToFile(FileLocator.find(getBundle(),
+					Path.fromPortableString("$os$/askpass.tcl"), null)); //$NON-NLS-1$
+			if (askpassFile.isFile())
+			{
 				return Path.fromOSString(askpassFile.getAbsolutePath());
 			}
 		}
 		return null;
 	}
 
-	public IGitRepositoryManager getGitRepositoryManager()
+	public synchronized IGitRepositoryManager getGitRepositoryManager()
 	{
 		if (fGitRepoManager == null)
 		{

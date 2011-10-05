@@ -11,7 +11,7 @@ package com.aptana.debug.core;
  * @author Max Stepanov
  */
 public interface IDetailFormattersChangeListener {
-	
+
 	/**
 	 * Notifies listener about changes in detail formatters
 	 */

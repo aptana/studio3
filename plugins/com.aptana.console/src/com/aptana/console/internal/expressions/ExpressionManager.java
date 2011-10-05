@@ -19,9 +19,8 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 
 import com.aptana.console.ConsolePlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -108,7 +107,8 @@ public final class ExpressionManager {
 				int id = Integer.valueOf(child.getAttribute(ATT_ID));
 				scope = child.getAttribute(ATT_SCOPE);
 				groupScopes.put(id, scope);
-			} catch (NumberFormatException ignore) {
+			} catch (NumberFormatException e) {
+				IdeLog.logWarning(ConsolePlugin.getDefault(), e);
 			}
 		}
 		expressions.add(new Expression(name, pattern, groupScopes));
@@ -116,10 +116,6 @@ public final class ExpressionManager {
 
 	private void loadExpressions() {
 		// TODO: load user customized expressions here
-	}
-
-	private static Theme getCurrentTheme() {
-		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
 }

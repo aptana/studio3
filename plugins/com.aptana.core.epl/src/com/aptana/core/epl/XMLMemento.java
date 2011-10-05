@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,16 @@
  *     IBM Corporation - initial API and implementation
  *     Appcelerator, Inc - non-UI adoption
  *******************************************************************************/
+// $codepro.audit.disable appendString
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable parenthesizeCondition
+// $codepro.audit.disable variableDeclaredInLoop
+// $codepro.audit.disable platformSpecificLineSeparator
+// $codepro.audit.disable thrownExceptions
+// $codepro.audit.disable reusableImmutables
+// $codepro.audit.disable declareAsInterface
+// $codepro.audit.disable exceptionUsage.exceptionCreation
+
 package com.aptana.core.epl;
 
 import java.io.IOException;
@@ -30,8 +40,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 
 /**
  * This class represents the default implementation of the
@@ -91,6 +104,27 @@ public final class XMLMemento implements IMemento {
             if (baseDir != null) {
 				source.setSystemId(baseDir);
 			}
+
+			parser.setErrorHandler(new ErrorHandler() {
+				/**
+				 * @throws SAXException
+				 */
+				public void warning(SAXParseException exception) throws SAXException {
+					// ignore
+				}
+
+				/**
+				 * @throws SAXException
+				 */
+				public void error(SAXParseException exception) throws SAXException {
+					// ignore
+				}
+
+				public void fatalError(SAXParseException exception) throws SAXException {
+					throw exception;
+				}
+			});
+
             Document document = parser.parse(source);
             NodeList list = document.getChildNodes();
             for (int i = 0; i < list.getLength(); i++) {

@@ -14,25 +14,10 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSPageNode extends CSSNode
 {
+
 	private static final String PAGE = "@page"; //$NON-NLS-1$
 
 	private CSSPageSelectorNode fPageSelector;
-
-	/**
-	 * CSSPageNode
-	 * 
-	 * @param pageSelector
-	 * @param declarations
-	 */
-	public CSSPageNode(List<CSSDeclarationNode> declarations)
-	{
-		super(CSSNodeTypes.PAGE);
-
-		if (declarations != null)
-		{
-			setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
-		}
-	}
 
 	/**
 	 * CSSPageNode
@@ -42,20 +27,27 @@ public class CSSPageNode extends CSSNode
 		this(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	/**
+	 * CSSPageNode
+	 * 
+	 * @param declarations
 	 */
+	public CSSPageNode(List<CSSDeclarationNode> declarations)
+	{
+		super(ICSSNodeTypes.PAGE);
+
+		if (declarations != null)
+		{
+			setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
+		}
+	}
+
 	@Override
 	public void accept(CSSTreeWalker walker)
 	{
 		walker.visit(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -93,21 +85,12 @@ public class CSSPageNode extends CSSNode
 	{
 		StringBuilder text = new StringBuilder();
 		text.append(PAGE);
-		if (fPageSelector != null)
+		CSSPageSelectorNode selector = getSelector();
+		if (selector != null)
 		{
-			text.append(" :").append(fPageSelector); //$NON-NLS-1$
+			text.append(" :").append(selector); //$NON-NLS-1$
 		}
 		return text.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	public void setSelector(CSSPageSelectorNode selector)
@@ -115,19 +98,22 @@ public class CSSPageNode extends CSSNode
 		fPageSelector = selector;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
+	}
+
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 
 		text.append(PAGE);
-		if (fPageSelector != null)
+		CSSPageSelectorNode selector = getSelector();
+		if (selector != null)
 		{
-			text.append(" :").append(fPageSelector); //$NON-NLS-1$
+			text.append(" :").append(selector); //$NON-NLS-1$
 		}
 
 		text.append(" {"); //$NON-NLS-1$
@@ -139,10 +125,10 @@ public class CSSPageNode extends CSSNode
 
 			if (i < size - 1)
 			{
-				text.append(" "); //$NON-NLS-1$
+				text.append(' ');
 			}
 		}
-		text.append("}"); //$NON-NLS-1$
+		text.append('}');
 
 		return text.toString();
 	}

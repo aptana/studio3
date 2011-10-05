@@ -8,9 +8,14 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
@@ -19,7 +24,8 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexDocument;
 import com.aptana.index.core.IndexUtil;
 
-public class BaseElement implements Convertible, IndexDocument
+public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? extends BaseElement<P>>> implements
+		Convertible, IndexDocument, IPropertySource
 {
 	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
 	private static final String SINCE_PROPERTY = "since"; //$NON-NLS-1$
@@ -31,13 +37,6 @@ public class BaseElement implements Convertible, IndexDocument
 	private List<UserAgentElement> _userAgents;
 	private List<SinceElement> _sinceList;
 	private List<String> _documents;
-
-	/**
-	 * BaseElement
-	 */
-	public BaseElement()
-	{
-	}
 
 	/**
 	 * addDocument
@@ -127,6 +126,25 @@ public class BaseElement implements Convertible, IndexDocument
 		return CollectionsUtil.getListValue(this._documents);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+	 */
+	public Object getEditableValue()
+	{
+		return null;
+	}
+
+	/**
+	 * getPropertyInfoSet
+	 * 
+	 * @return Set
+	 */
+	protected Set<P> getPropertyInfoSet()
+	{
+		return Collections.emptySet();
+	}
+
 	/**
 	 * getName
 	 * 
@@ -135,6 +153,39 @@ public class BaseElement implements Convertible, IndexDocument
 	public String getName()
 	{
 		return StringUtil.getStringValue(this._name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+	 */
+	public IPropertyDescriptor[] getPropertyDescriptors()
+	{
+		List<IPropertyDescriptor> result = new ArrayList<IPropertyDescriptor>();
+
+		for (P p : getPropertyInfoSet())
+		{
+			result.add(new PropertyDescriptor(p, p.getHeader()));
+		}
+
+		return result.toArray(new IPropertyDescriptor[result.size()]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getPropertyValue(Object id)
+	{
+		Object result = null;
+
+		if (id instanceof IPropertyInformation)
+		{
+			result = ((IPropertyInformation<BaseElement<P>>) id).getPropertyValue(this);
+		}
+
+		return result;
 	}
 
 	/**
@@ -174,6 +225,23 @@ public class BaseElement implements Convertible, IndexDocument
 		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.Object)
+	 */
+	public boolean isPropertySet(Object id)
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.lang.Object)
+	 */
+	public void resetPropertyValue(Object id)
+	{
+	}
+
 	/**
 	 * setDescription
 	 * 
@@ -192,6 +260,14 @@ public class BaseElement implements Convertible, IndexDocument
 	public void setName(String name)
 	{
 		this._name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.lang.Object, java.lang.Object)
+	 */
+	public void setPropertyValue(Object id, Object value)
+	{
 	}
 
 	/*

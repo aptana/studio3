@@ -50,6 +50,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.ui.epl.scripting.snippets.PositionBasedCompletionProposal;
 
 @SuppressWarnings("restriction")
 public class SnippetTemplateProposal extends TemplateProposal implements ICommonCompletionProposal,
@@ -261,41 +262,42 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					{
 						first = new LinkedPosition(document, offsets[0] + start, length, sequenceNumber);
 					}
+				}
 
-					for (int j = 0; j != offsets.length; j++)
+				for (int j = 0; j != offsets.length; j++)
+				{
+					if (j == 0)
 					{
-						if (j == 0)
-						{
-							group.addPosition(first);
-						}
-						else
-						{
-							group.addPosition(new LinkedPosition(document, offsets[j] + start, length));
-						}
+						group.addPosition(first);
 					}
-
-					model.addGroup(group);
-					hasPositions = true;
+					else
+					{
+						group.addPosition(new LinkedPosition(document, offsets[j] + start, length));
+					}
 				}
 
-				if (hasPositions)
-				{
-					model.forceInstall();
-					LinkedModeUI ui = new LinkedModeUI(model, viewer);
-
-					// Do not cycle
-					ui.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
-					ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
-					ui.enter();
-
-					fSelectedRegion = ui.getSelectedRegion();
-				}
-				else
-				{
-					ensurePositionCategoryRemoved(document);
-					fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
-				}
+				model.addGroup(group);
+				hasPositions = true;
 			}
+
+			if (hasPositions)
+			{
+				model.forceInstall();
+				LinkedModeUI ui = new LinkedModeUI(model, viewer);
+
+				// Do not cycle
+				ui.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
+				ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
+				ui.enter();
+
+				fSelectedRegion = ui.getSelectedRegion();
+			}
+			else
+			{
+				ensurePositionCategoryRemoved(document);
+				fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
+			}
+		}
 		}
 		catch (BadLocationException e)
 		{
@@ -527,7 +529,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 			Template template = getTemplate();
 			styledActivationString = new StyledString(String.format("%1$10.10s ", //$NON-NLS-1$
 					template.getName() + " \u00bb") //$NON-NLS-1$
-					+ (triggerChar == '\000' ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
+					+ ((triggerChar == '\000') ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
 					// Need padding on windows to work around the width computation
 					+ (Platform.OS_WIN32.equals(Platform.getOS()) ? "                                " : ""), //$NON-NLS-1$ //$NON-NLS-2$ 
 					styler);

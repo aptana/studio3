@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="3.0.4.qualifier"
+      version="3.1.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -655,13 +655,6 @@
 
    <plugin
          id="com.aptana.deploy.heroku"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.deploy.redhat"
          download-size="0"
          install-size="0"
          version="0.0.0"

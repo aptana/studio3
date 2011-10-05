@@ -10,6 +10,7 @@ package com.aptana.portal.ui.dispatch.configurationProcessors;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
@@ -79,7 +81,8 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		{
 			String err = Messages.InstallerConfigurationProcessor_missingDownloadTargets;
 			applyErrorAttributes(err);
-			PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(),
+					"We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, err);
 		}
 		downloadedPaths = null;
@@ -93,7 +96,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			}
 			catch (MalformedURLException mue)
 			{
-				PortalUIPlugin.logError(mue);
+				IdeLog.logError(PortalUIPlugin.getDefault(), mue);
 			}
 		}
 		try
@@ -108,7 +111,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 		}
 		return Status.CANCEL_STATUS;
 	}
@@ -150,8 +153,9 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		}
 		else
 		{
-			PortalUIPlugin.logError("Could not cache the location and version for " + appName + ". Install dir: " //$NON-NLS-1$ //$NON-NLS-2$
-					+ installDir + ", versionedFileLocation: " + versionedFileLocation, new Exception()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), MessageFormat.format(
+					"Could not cache the location and version for {0}. Install dir: {1}, versionedFileLocation: {2}", //$NON-NLS-1$
+					appName, installDir, versionedFileLocation), new Exception());
 		}
 	}
 
@@ -169,20 +173,21 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 				Messages.InstallerConfigurationProcessor_unableToExtractZip);
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			PortalUIPlugin
-					.logError(
-							"Unable to extract the Zip file. A Windows OS extractor was called for a non-Windows platform.", new Exception()); //$NON-NLS-1$
+			IdeLog.logError(
+					PortalUIPlugin.getDefault(),
+					"Unable to extract the Zip file. A Windows OS extractor was called for a non-Windows platform.", new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
 		if (sfxZip == null || targetFolder == null)
 		{
-			PortalUIPlugin.logError("Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), "Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
 		File destinationFolder = new File(targetFolder);
 		if (!destinationFolder.exists() && !destinationFolder.mkdirs())
 		{
-			PortalUIPlugin.logError("Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(),
+					"Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
 		ProcessBuilder processBuilder = new ProcessBuilder(sfxZip, "-o" + targetFolder, //$NON-NLS-1$
@@ -212,22 +217,22 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			}
 			else
 			{
-				PortalUIPlugin
-						.logError(
-								"Zip extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
+				IdeLog.logError(
+						PortalUIPlugin.getDefault(),
+						"Zip extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
 				return errorStatus;
 			}
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return errorStatus;
 		}
 		finally
 		{
 			if (output != null)
 			{
-				PortalUIPlugin.logInfo(output, null);
+				IdeLog.logInfo(PortalUIPlugin.getDefault(), output);
 			}
 		}
 	}
@@ -259,6 +264,20 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	 */
 	protected void finalizeInstallation(String installDir)
 	{
+		deleteDownloadedPaths();
+		// Cache the version and the location of the installed app.
+		// We assume here that the version of app is specified in the install URL!
+		if (installDir != null)
+		{
+			cacheVersion(installDir, urls[0], getApplicationName());
+		}
+	}
+
+	/**
+	 * Mark the downloaded paths to be deleted on exit.
+	 */
+	protected void deleteDownloadedPaths()
+	{
 		if (downloadedPaths != null)
 		{
 			for (String f : downloadedPaths)
@@ -269,12 +288,6 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 					toDelete.deleteOnExit();
 				}
 			}
-		}
-		// Cache the version and the location of the installed app.
-		// We assume here that the version of app is specified in the install URL!
-		if (installDir != null)
-		{
-			cacheVersion(installDir, urls[0], getApplicationName());
 		}
 	}
 }

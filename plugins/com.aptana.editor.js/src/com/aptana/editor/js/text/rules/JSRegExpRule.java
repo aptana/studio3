@@ -1,3 +1,4 @@
+// $codepro.audit.disable platformSpecificLineSeparator
 /**
  * Aptana Studio
  * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
@@ -12,7 +13,7 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.js.IJSTokenScanner;
+import com.aptana.editor.js.IRegexpDivisionDisambiguator;
 
 public class JSRegExpRule implements IPredicateRule
 {
@@ -39,9 +40,9 @@ public class JSRegExpRule implements IPredicateRule
 	 */
 	public IToken evaluate(ICharacterScanner scanner)
 	{
-		if (scanner instanceof IJSTokenScanner)
+		if (scanner instanceof IRegexpDivisionDisambiguator)
 		{
-			if (((IJSTokenScanner) scanner).hasDivisionStart())
+			if (((IRegexpDivisionDisambiguator) scanner).isValidDivisionStart())
 			{
 				return Token.UNDEFINED;
 			}
@@ -72,7 +73,7 @@ public class JSRegExpRule implements IPredicateRule
 
 							case '/':
 								// We allow stray slashes inside of character classes
-								if (inCharacterClass == false)
+								if (!inCharacterClass)
 								{
 									if (unreadCount > 1)
 									{
@@ -135,7 +136,7 @@ public class JSRegExpRule implements IPredicateRule
 		// we always read at least one character too many, so push that back
 		scanner.unread();
 
-		if (state == State.OPTIONS && this.token != null && this.token.isUndefined() == false)
+		if (state == State.OPTIONS && this.token != null && !this.token.isUndefined())
 		{
 			return this.token;
 		}

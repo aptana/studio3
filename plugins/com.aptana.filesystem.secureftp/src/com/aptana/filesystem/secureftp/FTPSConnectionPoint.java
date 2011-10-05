@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declareAsInterface
 
 package com.aptana.filesystem.secureftp;
 
@@ -51,7 +52,7 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 	private boolean validateCertificate = true;
 	private boolean noSSLSessionResumption = false;
 	private boolean passiveMode = true;
-	private String transferType = IFTPSConstants.TRANSFER_TYPE_BINARY;
+	private String transferType = IFTPSConstants.TRANSFER_TYPE_AUTO;
 	private String encoding = IFTPSConstants.ENCODING_DEFAULT;
 	private String timezone = null;
 	
@@ -78,7 +79,8 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 		if (child != null) {
 			try {
 				port = Integer.parseInt(child.getTextData());
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException ignore) {
+				ignore.getCause();
 			}
 		}
 		child = memento.getChild(ELEMENT_PATH);
@@ -411,7 +413,7 @@ public class FTPSConnectionPoint extends ConnectionPoint implements IFTPSConnect
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (IConnectionFileManager.class == adapter) {
+		if (IConnectionFileManager.class.equals(adapter)) {
 			return getConnectionFileManager();
 		}
 		return super.getAdapter(adapter);

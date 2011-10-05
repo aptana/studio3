@@ -33,11 +33,7 @@ public class CommitHandler extends AbstractGitHandler
 		CommitDialog dialog = new CommitDialog(getShell(), theRepo);
 		if (dialog.open() == Window.OK)
 		{
-			boolean success = theRepo.index().commit(dialog.getCommitMessage());
-			if (!success)
-			{
-				// TODO Open an error dialog?
-			}
+			theRepo.index().commit(dialog.getCommitMessage());
 		}
 		return null;
 	}

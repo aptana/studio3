@@ -311,7 +311,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 									if (delta.getKind() == IResourceDelta.ADDED
 											|| (delta.getKind() == IResourceDelta.CHANGED
 													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-														.isAccessible()))
+													.isAccessible()))
 									{
 										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 										{
@@ -459,7 +459,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			}
 			catch (JNotifyException e)
 			{
-				IdeLog.logError(getDefault(), e.getMessage(), e, null);
+				IdeLog.logError(getDefault(), e);
 			}
 		}
 
@@ -479,7 +479,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			}
 			catch (JNotifyException e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e, null);
+				IdeLog.logError(CorePlugin.getDefault(), e);
 			}
 		}
 

@@ -29,7 +29,7 @@ import com.aptana.ide.ui.io.CoreIOImages;
  */
 public class DeferredTreeContentManager extends org.eclipse.ui.progress.DeferredTreeContentManager {
 
-	private AbstractTreeViewer treeViewer;
+	private AbstractTreeViewer treeViewer; // $codepro.audit.disable hidingInheritedFields
 	
 	/**
 	 * @param viewer
@@ -117,7 +117,7 @@ public class DeferredTreeContentManager extends org.eclipse.ui.progress.Deferred
 		 */
 		@Override
 		public Object getParent(Object o) {
-			if (o == this) {
+			if (this.equals(o)) {
 				return parent;
 			}
 			return super.getParent(o);

@@ -75,14 +75,14 @@ public abstract class QueuedTokenScanner implements ITokenScanner {
 	 * @see org.eclipse.jface.text.rules.ITokenScanner#getTokenOffset()
 	 */
 	public final int getTokenOffset() {
-		return current != null ? current.offset : 0;
+		return (current != null) ? current.offset : 0;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.ITokenScanner#getTokenLength()
 	 */
 	public final int getTokenLength() {
-		return current != null ? current.length : 0;
+		return (current != null) ? current.length : 0;
 	}
 
 }

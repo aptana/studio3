@@ -56,8 +56,15 @@ class GitGraphLine
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (obj == this)
+		{
+			return true;
+		}
+
 		if (!(obj instanceof GitGraphLine))
+		{
 			return false;
+		}
 
 		GitGraphLine other = (GitGraphLine) obj;
 		return upper == other.upper && from == other.from && to == other.to; // FIXME What about index?

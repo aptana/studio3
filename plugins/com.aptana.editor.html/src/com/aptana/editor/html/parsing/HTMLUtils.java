@@ -12,8 +12,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.model.EventElement;
+import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.parsing.lexer.Lexeme;
+import com.aptana.parsing.lexer.Range;
 
 public class HTMLUtils
 {
@@ -109,6 +113,10 @@ public class HTMLUtils
 	 */
 	public static boolean isTagComplete(String tagContents)
 	{
+		if (tagContents == null)
+		{
+			return false;
+		}
 		return tagContents.endsWith(">"); //$NON-NLS-1$
 	}
 
@@ -137,6 +145,11 @@ public class HTMLUtils
 		return type == null && language == null;
 	}
 
+	/**
+	 * @param tagContents
+	 * @param attributeName
+	 * @return
+	 */
 	private static String getTagAttribute(String tagContents, String attributeName)
 	{
 		Matcher matcher = Pattern
@@ -146,5 +159,56 @@ public class HTMLUtils
 			return matcher.group(1);
 		}
 		return null;
+	}
+
+	/**
+	 * @param lexeme
+	 * @param offset
+	 * @return
+	 */
+	public static Range getAttributeValueRange(Lexeme<HTMLTokenType> lexeme, int offset)
+	{
+		if (lexeme == null || lexeme.getType() == null)
+		{
+			return null;
+		}
+
+		switch (lexeme.getType())
+		{
+			case SINGLE_QUOTED_STRING:
+			case DOUBLE_QUOTED_STRING:
+
+				// if offset is at the start or the end of the quoted string, return null range
+				if (offset <= lexeme.getStartingOffset() || offset > lexeme.getEndingOffset())
+				{
+					return null;
+				}
+
+				if (lexeme.getLength() >= 2)
+				{
+					// trim off the quotes
+					int startingOffset = lexeme.getStartingOffset() + 1;
+					String text = lexeme.getText().substring(1, lexeme.getLength() - 1);
+
+					int start = StringUtil.findPreviousWhitespaceOffset(text, offset - startingOffset);
+					int end = StringUtil.findNextWhitespaceOffset(text, offset - startingOffset);
+					if (start < 0)
+					{
+						start = 0;
+					}
+					else
+					{
+						start++; // start includes whitespace char. Need to advance
+					}
+					if (end < 0)
+					{
+						end = text.length();
+					}
+					return new Range(start + startingOffset, end + startingOffset - 1);
+				}
+
+			default:
+				return new Range(lexeme.getStartingOffset(), lexeme.getEndingOffset());
+		}
 	}
 }

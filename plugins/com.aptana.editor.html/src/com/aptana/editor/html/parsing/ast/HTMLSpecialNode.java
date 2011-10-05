@@ -18,7 +18,7 @@ public class HTMLSpecialNode extends HTMLElementNode
 	{
 		super(tag, start, end);
 		setChildren(children);
-		setType(HTMLNodeTypes.SPECIAL);
+		setType(IHTMLNodeTypes.SPECIAL);
 	}
 
 	@Override

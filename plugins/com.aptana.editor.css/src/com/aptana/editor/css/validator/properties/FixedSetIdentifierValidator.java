@@ -33,7 +33,7 @@ public class FixedSetIdentifierValidator implements ICSSValueValidator
 
 	public boolean canValidate(CssValue value)
 	{
-		return (value instanceof CssIdent);
+		return value instanceof CssIdent;
 	}
 
 	public boolean isValid(CssValue value)

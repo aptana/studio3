@@ -80,7 +80,7 @@ public class JSPropertyCollector extends JSTreeWalker
 	 */
 	public void addPropertyValues(String name, List<JSNode> values)
 	{
-		if (name != null && name.length() > 0 && values != null && values.isEmpty() == false)
+		if (name != null && name.length() > 0 && values != null && !values.isEmpty())
 		{
 			JSPropertyCollection property;
 

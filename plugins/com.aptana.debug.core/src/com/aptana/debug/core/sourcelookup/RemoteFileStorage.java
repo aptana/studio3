@@ -21,7 +21,7 @@ import com.aptana.debug.core.DebugCorePlugin;
  * @author Max Stepanov
  */
 public class RemoteFileStorage extends UniformResourceStorage {
-	
+
 	private URI fURI;
 	private IFileContentRetriever fRetriever;
 	private InputStream fIn;
@@ -82,7 +82,7 @@ public class RemoteFileStorage extends UniformResourceStorage {
 					fIn.reset();
 				}
 			} catch (IOException e) {
-				IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(DebugCorePlugin.getDefault(), e);
 			}
 			return fIn;
 		}

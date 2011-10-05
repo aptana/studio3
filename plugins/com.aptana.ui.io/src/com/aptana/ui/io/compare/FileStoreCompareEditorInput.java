@@ -5,6 +5,8 @@
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.ui.io.compare;
 
 import java.lang.reflect.InvocationTargetException;
@@ -52,7 +54,7 @@ public class FileStoreCompareEditorInput extends CompareEditorInput
 		private ITypedElement fLastId;
 		private String fLastName;
 
-		public MyDiffNode(IDiffContainer parent, int description, ITypedElement ancestor, ITypedElement left,
+		protected MyDiffNode(IDiffContainer parent, int description, ITypedElement ancestor, ITypedElement left,
 				ITypedElement right)
 		{
 			super(parent, description, ancestor, left, right);

@@ -41,13 +41,13 @@ public class RebaseBranchItem extends AbstractDynamicBranchItem
 		IResource resource = getSelectedResource();
 		if (resource == null)
 		{
-			return new IContributionItem[0];
+			return NO_CONTRIBUTION_ITEMS;
 		}
 
 		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 		{
-			return new IContributionItem[0];
+			return NO_CONTRIBUTION_ITEMS;
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
@@ -58,12 +58,7 @@ public class RebaseBranchItem extends AbstractDynamicBranchItem
 		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 
-	private void rebaseBranch(final GitRepository repo, final String branchName)
-	{
-		RebaseBranchHandler.rebaseBranch(repo, branchName);
-	}
-
-	private class RebaseBranchContributionItem extends ContributionItem
+	private static class RebaseBranchContributionItem extends ContributionItem
 	{
 		private GitRepository repo;
 		private String branchName;
@@ -85,7 +80,7 @@ public class RebaseBranchItem extends AbstractDynamicBranchItem
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					rebaseBranch(repo, branchName);
+					RebaseBranchHandler.rebaseBranch(repo, branchName);
 				}
 			});
 		}

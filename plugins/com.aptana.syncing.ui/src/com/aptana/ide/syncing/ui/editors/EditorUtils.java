@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ui.util.UIUtils;
@@ -22,57 +23,69 @@ import com.aptana.ui.util.UIUtils;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class EditorUtils {
+public class EditorUtils
+{
 
-    /**
-     * Opens the connection editor on a specific site connection.
-     * 
-     * @param site
-     *            the connection
-     */
-    public static void openConnectionEditor(final ISiteConnection site) {
-        UIUtils.getDisplay().asyncExec(new Runnable() {
+	/**
+	 * Opens the connection editor on a specific site connection.
+	 * 
+	 * @param site
+	 *            the connection
+	 */
+	public static void openConnectionEditor(final ISiteConnection site)
+	{
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
 
-            public void run() {
-                IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                if (window != null) {
-                    IWorkbenchPage page = window.getActivePage();
-                    try {
-                        IEditorPart editorPart = page.openEditor(new ConnectionEditorInput(site),
-                                ConnectionEditor.ID);
-                        if (editorPart instanceof ConnectionEditor) {
-                            // in case the site information has changed
-                            ((ConnectionEditor) editorPart).setSelectedSite(site);
-                        }
-                    } catch (PartInitException e) {
-                        SyncingUIPlugin.logError(MessageFormat.format(
-                                Messages.EditorUtils_FailedToOpenEditor, site.getName()), e);
-                    }
-                }
-            }
-        });
-    }
+			public void run()
+			{
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				if (window != null)
+				{
+					IWorkbenchPage page = window.getActivePage();
+					try
+					{
+						IEditorPart editorPart = page.openEditor(new ConnectionEditorInput(site), ConnectionEditor.ID);
+						if (editorPart instanceof ConnectionEditor)
+						{
+							// in case the site information has changed
+							((ConnectionEditor) editorPart).setSelectedSite(site);
+						}
+					}
+					catch (PartInitException e)
+					{
+						IdeLog.logError(SyncingUIPlugin.getDefault(),
+								MessageFormat.format(Messages.EditorUtils_FailedToOpenEditor, site.getName()), e);
+					}
+				}
+			}
+		});
+	}
 
-    /**
-     * Closes the connection editor corresponding to the specific site
-     * connection.
-     * 
-     * @param site
-     *            the connection
-     */
-    public static void closeConnectionEditor(final ISiteConnection site) {
-        UIUtils.getDisplay().asyncExec(new Runnable() {
+	/**
+	 * Closes the connection editor corresponding to the specific site connection.
+	 * 
+	 * @param site
+	 *            the connection
+	 */
+	public static void closeConnectionEditor(final ISiteConnection site)
+	{
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
 
-            public void run() {
-                IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                if (window != null) {
-                    IWorkbenchPage page = window.getActivePage();
-                    IEditorPart editor = page.findEditor(new ConnectionEditorInput(site));
-                    if (editor != null) {
-                        page.closeEditor(editor, false);
-                    }
-                }
-            }
-        });
-    }
+			public void run()
+			{
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				if (window != null)
+				{
+					IWorkbenchPage page = window.getActivePage();
+					IEditorPart editor = page.findEditor(new ConnectionEditorInput(site));
+					if (editor != null)
+					{
+						page.closeEditor(editor, false);
+					}
+				}
+			}
+		});
+	}
 }

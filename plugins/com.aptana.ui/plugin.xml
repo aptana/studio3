@@ -310,13 +310,6 @@
       </category>
    </extension>
    <extension
-         point="com.aptana.ui.diagnostic">
-      <diagnostic
-            class="com.aptana.ui.EclipseDiagnosticLog"
-            ordinal="100">
-      </diagnostic>
-   </extension>
-   <extension
          point="org.eclipse.ui.importWizards">
       <category
             id="com.aptana.ui.wizards.import.category"
@@ -361,5 +354,12 @@
             </and>
          </enabledWhen>
       </page>
+   </extension>
+   <extension
+         point="com.aptana.ui.diagnostic">
+      <diagnosticLog
+            class="com.aptana.ui.EclipseDiagnosticLog"
+            priority="0">
+      </diagnosticLog>
    </extension>
 </plugin>

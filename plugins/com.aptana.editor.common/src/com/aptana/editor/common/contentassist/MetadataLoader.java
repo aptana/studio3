@@ -42,7 +42,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * 
 	 * @param name
 	 */
-	public MetadataLoader(String name)
+	protected MetadataLoader(String name)
 	{
 		super(name);
 

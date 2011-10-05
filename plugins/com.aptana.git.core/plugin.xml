@@ -23,4 +23,14 @@
             class="com.aptana.git.internal.core.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="com.aptana.git.internal.core.launching.GitLaunchDelegate"
+            id="com.aptana.git.core.launchConfigurationType"
+            modes="run"
+            name="%LaunchConfigurationTypeGit.name"
+            public="false">
+      </launchConfigurationType>
+   </extension>
 </plugin>

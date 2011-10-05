@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 /**
@@ -50,7 +51,7 @@ public class FetchFileInfoJob extends Job {
 		try {
 			fileInfo = fileStore.fetchInfo(options, monitor);
 		} catch (CoreException e) {
-			IOUIPlugin.logImportant(Messages.FetchFileInfoJob_FailedToFetch, e);
+			IdeLog.logWarning(IOUIPlugin.getDefault(), Messages.FetchFileInfoJob_FailedToFetch, e);
 			return e.getStatus();
 		}
 		return new FetchFileInfoStatus(fileInfo);

@@ -24,7 +24,7 @@ public abstract class ParseNodeIterator implements Iterator<Object>
 	 * 
 	 * @param node
 	 */
-	public ParseNodeIterator(IParseNode node)
+	protected ParseNodeIterator(IParseNode node)
 	{
 		this._node = this.getFirstNode(node);
 	}
@@ -34,7 +34,7 @@ public abstract class ParseNodeIterator implements Iterator<Object>
 	 */
 	public void remove()
 	{
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 	}
 
 	/**
@@ -42,7 +42,7 @@ public abstract class ParseNodeIterator implements Iterator<Object>
 	 */
 	public boolean hasNext()
 	{
-		return (this._node != null);
+		return this._node != null;
 	}
 
 	/**
@@ -54,7 +54,7 @@ public abstract class ParseNodeIterator implements Iterator<Object>
 
 		if (this._node == null)
 		{
-			throw new NoSuchElementException();
+			throw new NoSuchElementException(); // $codepro.audit.disable exceptionUsage.exceptionCreation
 		}
 		else
 		{

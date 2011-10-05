@@ -38,7 +38,7 @@ import com.aptana.editor.common.contentassist.CompletionProposalComparator;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
@@ -50,6 +50,12 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 
+/**
+ * Supplies proposals for content assist in the CSS editor.
+ * 
+ * @author Kevin Lindsey
+ * @author Chris Williams
+ */
 public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
@@ -258,7 +264,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						break;
 
 					default:
-						if (this._currentLexeme.contains(offset) == false
+						if (!this._currentLexeme.contains(offset)
 								&& this._currentLexeme.getEndingOffset() != offset - 1)
 						{
 							this._replaceRange = this._currentLexeme = null;
@@ -600,7 +606,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
 			int offset)
 	{
-		return createProposal(name, image, description, userAgents, CSSIndexConstants.CORE, offset);
+		return createProposal(name, image, description, userAgents, ICSSIndexConstants.CORE, offset);
 	}
 
 	/**
@@ -634,7 +640,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
 			Image[] userAgents, int offset)
 	{
-		return createProposal(displayName, name, image, description, userAgents, CSSIndexConstants.CORE, offset);
+		return createProposal(displayName, name, image, description, userAgents, ICSSIndexConstants.CORE, offset);
 	}
 
 	/**
@@ -938,7 +944,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				case PROPERTY:
 					boolean afterColon = false;
 
-					COLON_LOOP: for (int i = index - 1; i >= 0; i--)
+					COLON_LOOP: for (int i = index - 1; i >= 0; i--) // $codepro.audit.disable nonCaseLabelInSwitch
 					{
 						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
 
@@ -955,7 +961,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						}
 					}
 
-					if (afterColon == false)
+					if (!afterColon)
 					{
 						if (lexeme.contains(offset) || lexeme.getEndingOffset() == offset - 1)
 						{
@@ -1025,7 +1031,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> previousLexeme = (i > 0) ? lexemeProvider.getLexeme(i - 1) : null;
 
-				if (this.isValueDelimiter(currentLexeme) || previousLexeme.isContiguousWith(currentLexeme) == false)
+				if (this.isValueDelimiter(currentLexeme) || !previousLexeme.isContiguousWith(currentLexeme))
 				{
 					// the current lexeme is a natural delimiter or there's a space between this lexeme and the previous
 					// lexeme, so treat the previous lexeme like it is the delimiter
@@ -1057,7 +1063,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// get the staring lexeme
 		Lexeme<CSSTokenType> startingLexeme = lexemeProvider.getLexeme(index);
 
-		if (startingLexeme != null && this.isValueDelimiter(startingLexeme) == false)
+		if (startingLexeme != null && !this.isValueDelimiter(startingLexeme))
 		{
 			Lexeme<CSSTokenType> endingLexeme = startingLexeme;
 
@@ -1068,7 +1074,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> candidateLexeme = lexemeProvider.getLexeme(index);
 
-				if (this.isValueDelimiter(candidateLexeme) || endingLexeme.isContiguousWith(candidateLexeme) == false)
+				if (this.isValueDelimiter(candidateLexeme) || !endingLexeme.isContiguousWith(candidateLexeme))
 				{
 					// we've hit a delimiting lexeme or have passed over whitespace, so we're done
 					break;
@@ -1286,7 +1292,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					case RCURLY:
 						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexemeFromOffset(offset - 1);
 
-						if (candidate != null && this.isValueDelimiter(candidate) == false)
+						if (candidate != null && !this.isValueDelimiter(candidate))
 						{
 							this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
 						}

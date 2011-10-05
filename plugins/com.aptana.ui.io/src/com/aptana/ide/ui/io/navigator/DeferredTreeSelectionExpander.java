@@ -74,7 +74,7 @@ public class DeferredTreeSelectionExpander extends JobChangeAdapter {
 			}
 		} else {
 			viewer.setSelection(new TreeSelection(treePath));
-			treePath = null;
+			treePath = null; // $codepro.audit.disable questionableAssignment
 		}
 	}
 	

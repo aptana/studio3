@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.ui.io.navigator;
 
@@ -35,6 +36,8 @@ public class LocalFileSystems implements IWorkbenchAdapter {
 	private static final String DESKTOP = PlatformUtil
 			.expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
     
+	private static final File[] NO_FILES = new File[0];
+
 	private static LocalFileSystems instance;
 	
 	/**
@@ -97,7 +100,7 @@ public class LocalFileSystems implements IWorkbenchAdapter {
     private static File[] getWindowsRootFiles() {
         File desktop = getWindowsDesktopFile();
         if (desktop == null) {
-            return new File[0];
+            return NO_FILES;
         }
         List<File> roots = new ArrayList<File>();
         File[] files = FileSystemView.getFileSystemView().getFiles(desktop, false);

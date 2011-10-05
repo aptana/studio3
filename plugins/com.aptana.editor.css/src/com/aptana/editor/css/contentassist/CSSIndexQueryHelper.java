@@ -16,7 +16,7 @@ import java.util.Set;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexReader;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
@@ -34,7 +34,7 @@ public class CSSIndexQueryHelper
 	 */
 	public static Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
+		return IndexManager.getInstance().getIndex(URI.create(ICSSIndexConstants.METADATA_INDEX_LOCATION));
 	}
 
 	private CSSIndexReader _reader;
@@ -54,7 +54,7 @@ public class CSSIndexQueryHelper
 	 */
 	public Map<String, String> getClasses(Index index)
 	{
-		return this._reader.getValues(index, CSSIndexConstants.CLASS);
+		return this._reader.getValues(index, ICSSIndexConstants.CLASS);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class CSSIndexQueryHelper
 
 		if (index != null)
 		{
-			Map<String, String> colorMap = this._reader.getValues(index, CSSIndexConstants.COLOR);
+			Map<String, String> colorMap = this._reader.getValues(index, ICSSIndexConstants.COLOR);
 
 			if (colorMap != null)
 			{
@@ -95,14 +95,14 @@ public class CSSIndexQueryHelper
 			try
 			{
 				List<ElementElement> elements = this._reader.getElements(getIndex(), name);
-				if (elements.isEmpty() == false)
+				if (!elements.isEmpty())
 				{
 					result = elements.get(0);
 				}
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CSSPlugin.getDefault(), e);
 			}
 		}
 
@@ -123,7 +123,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -137,7 +137,7 @@ public class CSSIndexQueryHelper
 	 */
 	public Map<String, String> getIDs(Index index)
 	{
-		return this._reader.getValues(index, CSSIndexConstants.IDENTIFIER);
+		return this._reader.getValues(index, ICSSIndexConstants.IDENTIFIER);
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -174,14 +174,14 @@ public class CSSIndexQueryHelper
 			{
 				List<PropertyElement> properties = this._reader.getProperties(getIndex(), name);
 
-				if (properties.isEmpty() == false)
+				if (!properties.isEmpty())
 				{
 					result = properties.get(0);
 				}
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CSSPlugin.getDefault(), e);
 			}
 		}
 
@@ -202,7 +202,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;
@@ -222,7 +222,7 @@ public class CSSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 
 		return result;

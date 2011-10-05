@@ -26,7 +26,9 @@ import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserView;
 import org.eclipse.ui.part.WorkbenchPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 
@@ -60,7 +62,7 @@ public class GithubNetworkHandler extends AbstractGitHandler
 			}
 			catch (Exception e)
 			{
-				GitUIPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 
 			try
@@ -85,12 +87,12 @@ public class GithubNetworkHandler extends AbstractGitHandler
 			}
 			catch (Exception e)
 			{
-				GitUIPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		catch (CoreException e)
 		{
-			GitUIPlugin.logError(e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return null;
 	}
@@ -129,7 +131,7 @@ public class GithubNetworkHandler extends AbstractGitHandler
 			}
 			catch (IOException e)
 			{
-				GitUIPlugin.logError(e.getMessage(), e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 		}
 		return fgGithubJS;

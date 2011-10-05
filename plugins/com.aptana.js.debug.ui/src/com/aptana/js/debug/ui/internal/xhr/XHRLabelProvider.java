@@ -22,49 +22,47 @@ import com.aptana.js.debug.core.model.xhr.IXHRTransfer.IHeader;
  */
 class XHRLabelProvider extends LabelProvider implements ITableLabelProvider {
 	/**
-	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
-	 *      int)
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
 	 */
 	public Image getColumnImage(Object element, int columnIndex) {
 		return null;
 	}
 
 	/**
-	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
-	 *      int)
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
 	 */
 	public String getColumnText(Object element, int columnIndex) {
 		if (element instanceof IXHRTransfer) {
 			IXHRTransfer xhr = (IXHRTransfer) element;
 			switch (columnIndex) {
-			case 1:
-				return xhr.getURL();
-			case 2:
-				return xhr.getMethod();
-			case 3: {
-				Date date = xhr.getRequestDate();
-				if (date != null) {
-					return date.toString();
+				case 1:
+					return xhr.getURL();
+				case 2:
+					return xhr.getMethod();
+				case 3: {
+					Date date = xhr.getRequestDate();
+					if (date != null) {
+						return date.toString();
+					}
+					return StringUtil.EMPTY;
 				}
-				return StringUtil.EMPTY;
-			}
-			case 4: {
-				Date date = xhr.getResponseDate();
-				if (date != null) {
-					return date.toString();
+				case 4: {
+					Date date = xhr.getResponseDate();
+					if (date != null) {
+						return date.toString();
+					}
+					return StringUtil.EMPTY;
 				}
-				return StringUtil.EMPTY;
-			}
-			default:
+				default:
 			}
 		} else if (element instanceof IHeader) {
 			IHeader header = (IHeader) element;
 			switch (columnIndex) {
-			case 0:
-				return header.getName();
-			case 1:
-				return header.getValue();
-			default:
+				case 0:
+					return header.getName();
+				case 1:
+					return header.getValue();
+				default:
 			}
 		}
 		return null;

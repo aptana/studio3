@@ -12,10 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.configurations.ConfigurationsUtil;
 import com.aptana.core.ShellExecutable;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ProcessUtil;
 
 /**
@@ -27,6 +31,7 @@ import com.aptana.core.util.ProcessUtil;
 public abstract class AbstractProcessorDelegate implements IConfigurationProcessorDelegate
 {
 	protected Map<String, String> supportedCommands;
+	protected Expression enablementExpression;
 
 	/**
 	 * Constructs a new processor delegate.
@@ -45,6 +50,26 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 		return Collections.unmodifiableSet(supportedCommands.keySet());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.configurations.processor.IConfigurationProcessorDelegate#setEnablement(org.eclipse.core.expressions
+	 * .Expression)
+	 */
+	public void setEnablement(Expression enablementExpression)
+	{
+		this.enablementExpression = enablementExpression;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.IConfigurationProcessorDelegate#isEnabled()
+	 */
+	public boolean isEnabled()
+	{
+		return ConfigurationsUtil.evaluateEnablement(enablementExpression);
+	}
+
 	/**
 	 * Provides a common implementation of validating the command type and executing the command on a shell.
 	 * 
@@ -58,6 +83,10 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 	 */
 	public Object runCommand(String commandType, IPath workingDir)
 	{
+		if (!isEnabled())
+		{
+			throw new IllegalStateException("Command not enabled - " + commandType); //$NON-NLS-1$
+		}
 		String command = supportedCommands.get(commandType);
 		if (command == null)
 		{
@@ -68,15 +97,16 @@ public abstract class AbstractProcessorDelegate implements IConfigurationProcess
 		{
 			throw new IllegalArgumentException("Shell command path is null"); //$NON-NLS-1$
 		}
-		String commandSwitch = "-c"; //$NON-NLS-1$
-		if (shellCommandPath.equals("cmd")) { //$NON-NLS-1$
-			// Treat it differently
-			commandSwitch = "/C"; //$NON-NLS-1$
+		String versionOutput = null;
+		try
+		{
+			versionOutput = ProcessUtil.outputForProcess(ShellExecutable.run(getSupportedApplication(), workingDir,
+					null, command));
 		}
-		command = getSupportedApplication() + ' ' + command;
-		// System.out.println(ShellExecutable.getEnvironment());
-		String versionOutput = ProcessUtil.outputForCommand(shellCommandPath, workingDir, ShellExecutable.getEnvironment(), new String[] { commandSwitch,
-				command });
+		catch (Exception e)
+		{
+			IdeLog.logError(ConfigurationsPlugin.getDefault(), e, null);
+		}
 		return versionOutput;
 	}
 

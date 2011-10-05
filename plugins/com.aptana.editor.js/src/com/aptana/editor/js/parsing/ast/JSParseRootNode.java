@@ -16,6 +16,8 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSParseRootNode extends ParseRootNode
 {
+	private static final Symbol[] NO_SYMBOLS = new Symbol[0];
+
 	private JSScope _globals;
 
 	/**
@@ -23,7 +25,7 @@ public class JSParseRootNode extends ParseRootNode
 	 */
 	public JSParseRootNode()
 	{
-		this(new Symbol[0]);
+		this(NO_SYMBOLS);
 	}
 
 	/**
@@ -35,10 +37,13 @@ public class JSParseRootNode extends ParseRootNode
 	 */
 	public JSParseRootNode(Symbol[] children)
 	{
-		super( //
-			IJSConstants.CONTENT_TYPE_JS, children, //
-			(children != null && children.length > 0) ? children[0].getStart() : 0, //
-			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
+		// @formatter:off
+		super(
+			IJSConstants.CONTENT_TYPE_JS, children,
+			(children != null && children.length > 0) ? children[0].getStart() : 0,
+			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0
+		);
+		// @formatter:on
 	}
 
 	/**

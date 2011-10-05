@@ -17,7 +17,7 @@ import com.aptana.js.debug.core.model.xhr.IXHRTransfer;
  * @author Max Stepanov
  */
 class XHRTransfer implements IXHRTransfer {
-	
+
 	private String method;
 	private String url;
 	private boolean auth;
@@ -130,7 +130,6 @@ class XHRTransfer implements IXHRTransfer {
 
 	/*
 	 * addRequestHeader
-	 * 
 	 * @param name
 	 * @param value
 	 */
@@ -140,7 +139,6 @@ class XHRTransfer implements IXHRTransfer {
 
 	/*
 	 * addResponseHeader
-	 * 
 	 * @param name
 	 * @param value
 	 */
@@ -150,7 +148,6 @@ class XHRTransfer implements IXHRTransfer {
 
 	/*
 	 * setRequestBody
-	 * 
 	 * @param body
 	 */
 	protected void setRequestBody(String body) {
@@ -160,7 +157,6 @@ class XHRTransfer implements IXHRTransfer {
 
 	/*
 	 * setResponseBody
-	 * 
 	 * @param body
 	 */
 	protected void setResponseBody(String body) {
@@ -170,7 +166,6 @@ class XHRTransfer implements IXHRTransfer {
 
 	/*
 	 * setResponseStatus
-	 * 
 	 * @param statusCode
 	 * @param statusText
 	 */
@@ -181,7 +176,6 @@ class XHRTransfer implements IXHRTransfer {
 
 	/*
 	 * setError
-	 * 
 	 * @param error
 	 */
 	protected void setError(boolean error) {

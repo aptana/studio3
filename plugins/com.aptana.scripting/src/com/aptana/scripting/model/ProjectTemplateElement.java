@@ -95,6 +95,16 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		return fType;
 	}
 
+	/**
+	 * getTypeString
+	 * 
+	 * @return
+	 */
+	public String getTypeString()
+	{
+		return fType.toString();
+	}
+
 	@Override
 	public int hashCode()
 	{

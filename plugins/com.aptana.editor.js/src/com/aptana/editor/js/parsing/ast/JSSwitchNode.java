@@ -28,10 +28,11 @@ public class JSSwitchNode extends JSNode
 	 * @param rightBrace
 	 * @param children
 	 */
-	public JSSwitchNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis, Symbol leftBrace, Symbol rightBrace, JSNode... children)
+	public JSSwitchNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis, Symbol leftBrace,
+			Symbol rightBrace, JSNode... children)
 	{
-		super(JSNodeTypes.SWITCH, expression);
-		
+		super(IJSNodeTypes.SWITCH, expression);
+
 		for (JSNode child : children)
 		{
 			this.addChild(child);

@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.core.io.auth;
 
@@ -71,7 +72,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 					return password.toCharArray();
 				}
 			} catch (StorageException e) {
-				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.AuthenticationManager_FailedGetSecurePreference, e, null);
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.AuthenticationManager_FailedGetSecurePreference, e);
 			}
 		}
 		if (sessionPasswords.containsKey(authId)) {
@@ -126,7 +127,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 			}
 			getSecurePreferences().flush();
 		} catch (Exception e) {
-			IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.AuthenticationManager_FailedSaveSecurePreference, e, null);
+			IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.AuthenticationManager_FailedSaveSecurePreference, e);
 		}
 	}
 

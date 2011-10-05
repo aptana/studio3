@@ -12,7 +12,6 @@ import java.io.OutputStream;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IFTPCommandLog {
 

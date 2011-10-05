@@ -280,7 +280,7 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.hideFindBar();
+				dec.setVisible(false);
 			}
 			return null;
 		}

@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
@@ -45,7 +46,17 @@ public class CoffeescriptScopesTest extends TestCase
 		{
 			if (editor != null)
 			{
-				editor.close(false);
+				if (editor != null)
+				{
+					if (Display.getCurrent() != null)
+					{
+						editor.getSite().getPage().closeEditor(editor, false);
+					}
+					else
+					{
+						editor.close(false);
+					}
+				}
 				editor = null;
 			}
 			if (file != null)

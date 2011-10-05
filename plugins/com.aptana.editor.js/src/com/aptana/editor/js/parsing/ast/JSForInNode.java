@@ -16,16 +16,17 @@ public class JSForInNode extends JSNode
 	private Symbol _leftParenthesis;
 	private Symbol _in;
 	private Symbol _rightParenthesis;
-	
+
 	/**
 	 * JSForInNode
 	 * 
 	 * @param children
 	 */
-	public JSForInNode(Symbol leftParenthesis, JSNode initializer, Symbol in, JSNode expression, Symbol rightParenthesis, JSNode body)
+	public JSForInNode(Symbol leftParenthesis, JSNode initializer, Symbol in, JSNode expression,
+			Symbol rightParenthesis, JSNode body)
 	{
-		super(JSNodeTypes.FOR_IN, initializer, expression, body);
-		
+		super(IJSNodeTypes.FOR_IN, initializer, expression, body);
+
 		this._leftParenthesis = leftParenthesis;
 		this._in = in;
 		this._rightParenthesis = rightParenthesis;
@@ -70,7 +71,7 @@ public class JSForInNode extends JSNode
 	{
 		return this._in;
 	}
-	
+
 	/**
 	 * getInitialization
 	 * 
@@ -80,7 +81,7 @@ public class JSForInNode extends JSNode
 	{
 		return this.getChild(0);
 	}
-	
+
 	/**
 	 * getLeftParenthesis
 	 * 
@@ -90,7 +91,7 @@ public class JSForInNode extends JSNode
 	{
 		return this._leftParenthesis;
 	}
-	
+
 	/**
 	 * getRightParenthesis
 	 * 

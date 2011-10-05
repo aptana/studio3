@@ -25,6 +25,7 @@ import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessorDelegate;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -47,7 +48,9 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 {
 	/**
 	 * Compute the versions of the given items in the attributes instance. Items that are not in the supported list of
-	 * programs are set to an 'unknown' state, just as they are not installed.
+	 * programs are set to an 'unknown' state, just as they are not installed.<br>
+	 * The computation expects an attributes array with three items - <appName><appVersion><appInstallerURL> (this
+	 * specific call don't use the installer-URL, but it needs to be there for the Portal's functionalities)
 	 */
 	@Override
 	public ConfigurationStatus computeStatus(IProgressMonitor progressMonitor, Object attributes)
@@ -56,8 +59,9 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 		clearErrorAttributes();
 		if (attributes == null || !(attributes instanceof Object[]))
 		{
-			applyErrorAttributes(Messages.SystemConfigurationProcessor_missingConfigurationItems);
-			PortalUIPlugin.logError(new Exception(Messages.SystemConfigurationProcessor_missingConfigurationItems));
+			String message = Messages.SystemConfigurationProcessor_missingConfigurationItems;
+			applyErrorAttributes(message);
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 			return configurationStatus;
 		}
 		// Place the array values into a hash.
@@ -68,9 +72,9 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 			Object[] def = null;
 			if (!(itemDef instanceof Object[]) || (def = (Object[]) itemDef).length != 3)
 			{
-				applyErrorAttributes(Messages.SystemConfigurationProcessor_wrongConfigurationAttributesStructure);
-				PortalUIPlugin.logError(new Exception(
-						Messages.SystemConfigurationProcessor_wrongConfigurationAttributesStructure));
+				String message = Messages.SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
+				applyErrorAttributes(message);
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 				return configurationStatus;
 			}
 			// We only use the first two arguments. The third is the installation site URL.

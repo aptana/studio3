@@ -45,6 +45,32 @@ import com.aptana.core.ICorePreferenceConstants;
 public class EclipseUtil
 {
 
+	protected static final class LauncherFilter implements FilenameFilter
+	{
+
+		public boolean accept(File dir, String name)
+		{
+			IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
+			name = path.removeFileExtension().lastSegment();
+			String ext = path.getFileExtension();
+			if (Platform.OS_MACOSX.equals(Platform.getOS()))
+			{
+				if (!"app".equals(ext)) //$NON-NLS-1$
+				{
+					return false;
+				}
+			}
+			for (String launcherName : LAUNCHER_NAMES)
+			{
+				if (launcherName.equalsIgnoreCase(name))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
 
 	@SuppressWarnings("nls")
@@ -56,6 +82,8 @@ public class EclipseUtil
 	@SuppressWarnings("nls")
 	static final String[] LAUNCHER_NAMES = { "Eclipse", "AptanaStudio3", "Aptana Studio 3", "TitaniumStudio",
 			"Titanium Studio" };
+
+	private static Boolean isTesting;
 
 	private EclipseUtil()
 	{
@@ -91,6 +119,10 @@ public class EclipseUtil
 	 */
 	public static String getSystemProperty(String option)
 	{
+		if (option == null)
+		{
+			return null;
+		}
 		return System.getProperty(option);
 	}
 
@@ -118,7 +150,8 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
+		return plugin.getBundle().getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
+																											// com.instantiations.assist.eclipse.analysis.unnecessaryToString
 	}
 
 	/**
@@ -140,7 +173,8 @@ public class EclipseUtil
 		{
 			return null;
 		}
-		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
+		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString(); // $codepro.audit.disable
+																								// com.instantiations.assist.eclipse.analysis.unnecessaryToString
 	}
 
 	/**
@@ -196,6 +230,10 @@ public class EclipseUtil
 	 */
 	public static boolean isTesting()
 	{
+		if (isTesting != null)
+		{
+			return isTesting;
+		}
 		String application = System.getProperty("eclipse.application"); //$NON-NLS-1$
 		if (application != null)
 		{
@@ -203,12 +241,14 @@ public class EclipseUtil
 			{
 				if (id.equals(application))
 				{
-					return true;
+					isTesting = Boolean.TRUE;
+					return isTesting;
 				}
 			}
 		}
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
-		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
+		isTesting = Boolean.valueOf((commands != null) ? commands.toString().contains("-testLoaderClass") : false); //$NON-NLS-1$
+		return isTesting;
 	}
 
 	/**
@@ -250,29 +290,7 @@ public class EclipseUtil
 				launcher = new Path(location.getURL().getFile());
 				if (launcher.toFile().isDirectory())
 				{
-					String[] executableFiles = launcher.toFile().list(new FilenameFilter()
-					{
-						public boolean accept(File dir, String name)
-						{
-							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
-							name = path.removeFileExtension().lastSegment();
-							String ext = path.getFileExtension();
-							if (Platform.OS_MACOSX.equals(Platform.getOS()))
-							{
-								if (!"app".equals(ext)) { //$NON-NLS-1$
-									return false;
-								}
-							}
-							for (String launcherName : LAUNCHER_NAMES)
-							{
-								if (launcherName.equalsIgnoreCase(name))
-								{
-									return true;
-								}
-							}
-							return false;
-						}
-					});
+					String[] executableFiles = launcher.toFile().list(new LauncherFilter());
 					if (executableFiles.length > 0)
 					{
 						launcher = launcher.append(executableFiles[0]);
@@ -408,7 +426,7 @@ public class EclipseUtil
 		Map<String, BundleContext> bundles = getCurrentBundleContexts();
 		for (String key : currentOptions)
 		{
-			String symbolicName = key.substring(0, key.indexOf("/")); //$NON-NLS-1$
+			String symbolicName = key.substring(0, key.indexOf('/'));
 			BundleContext bundleContext = bundles.get(symbolicName);
 			if (bundleContext == null)
 			{
@@ -446,7 +464,7 @@ public class EclipseUtil
 		{
 			return checked.split(","); //$NON-NLS-1$
 		}
-		return new String[0];
+		return ArrayUtil.NO_STRINGS;
 	}
 
 	/**
@@ -473,9 +491,10 @@ public class EclipseUtil
 				{
 					for (IExtension extension : extensionPoint.getExtensions())
 					{
+						IConfigurationElement[] elements = extension.getConfigurationElements();
 						for (String elementName : elementNames)
 						{
-							for (IConfigurationElement element : extension.getConfigurationElements())
+							for (IConfigurationElement element : elements)
 							{
 								if (element.getName().equals(elementName))
 								{

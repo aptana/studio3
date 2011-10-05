@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable unnecessaryExceptions
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ide.core.io;
 
@@ -21,6 +23,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.io.efs.WorkspaceFileSystem;
+import com.aptana.core.util.StringUtil;
 
 
 /**
@@ -47,7 +50,7 @@ public final class WorkspaceConnectionPoint extends ConnectionPoint {
 	/**
 	 * 
 	 */
-	protected WorkspaceConnectionPoint(IContainer resource) {
+	/* package */ WorkspaceConnectionPoint(IContainer resource) {
 		super(TYPE);
 		this.path = resource.getFullPath();
 	}
@@ -137,11 +140,11 @@ public final class WorkspaceConnectionPoint extends ConnectionPoint {
             return false;
         }
 
-        if (items[0] == null || items[0].equals("")) { //$NON-NLS-1$
+        if (items[0] == null || StringUtil.EMPTY.equals(items[0])) {
             return false;
         }
         setName(items[0]);
-        if (items[1] == null || items[1].equals("")) { //$NON-NLS-1$
+        if (items[1] == null || StringUtil.EMPTY.equals(items[1])) {
             return false;
         } else {
             IResource resource = workspaceRoot.findMember(items[1]);

@@ -49,9 +49,11 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
@@ -143,7 +145,7 @@ public class GitHistoryPage extends HistoryPage
 	private IWorkbenchPartSite getWorkbenchSite()
 	{
 		final IWorkbenchPart part = getHistoryPageSite().getPart();
-		return part != null ? part.getSite() : null;
+		return (part != null) ? part.getSite() : null;
 	}
 
 	private void schedule(final Job j)
@@ -197,8 +199,7 @@ public class GitHistoryPage extends HistoryPage
 
 		setTheme(false);
 		commentViewer.setText("<html><head></head><body style=\"background-color: " //$NON-NLS-1$
-				+ toHex(getBackground())
-				+ ";\"></body></html>"); //$NON-NLS-1$
+				+ toHex(getBackground()) + ";\"></body></html>"); //$NON-NLS-1$
 	}
 
 	protected RGB getBackground()
@@ -341,8 +342,7 @@ public class GitHistoryPage extends HistoryPage
 	{
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.put("\\{sha\\}", commit.sha()); //$NON-NLS-1$
-		variables.put(
-				"\\{themeBG\\}", toHex(getBackground())); //$NON-NLS-1$
+		variables.put("\\{themeBG\\}", toHex(getBackground())); //$NON-NLS-1$
 		variables.put("\\{date\\}", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
 		variables.put("\\{author\\}", commit.getAuthor()); //$NON-NLS-1$
 		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$
@@ -381,8 +381,8 @@ public class GitHistoryPage extends HistoryPage
 		}
 		catch (IOException e)
 		{
-			GitUIPlugin.logError(e.getMessage(), e);
-			return ""; //$NON-NLS-1$
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			return StringUtil.EMPTY;
 		}
 	}
 
@@ -461,9 +461,12 @@ public class GitHistoryPage extends HistoryPage
 
 	private String pad(String string, int desiredLength, char padChar)
 	{
-		while (string.length() < desiredLength)
-			string = padChar + string;
-		return string;
+		StringBuilder builder = new StringBuilder(string);
+		while (builder.length() < desiredLength)
+		{
+			builder.insert(0, padChar);
+		}
+		return builder.toString();
 	}
 
 	@Override

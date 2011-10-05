@@ -20,6 +20,7 @@ import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -34,7 +35,6 @@ import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNumberNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
@@ -86,7 +86,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		IParseNode grandparent = (parent != null) ? parent.getParent() : null;
 		boolean foundType = false;
 
-		if (grandparent != null && grandparent.getNodeType() == JSNodeTypes.FUNCTION)
+		if (grandparent != null && grandparent.getNodeType() == IJSNodeTypes.FUNCTION)
 		{
 			DocumentationBlock docs = ((JSNode) grandparent).getDocumentation();
 
@@ -299,11 +299,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	{
 		switch (node.getNodeType())
 		{
-			case JSNodeTypes.ASSIGN:
+			case IJSNodeTypes.ASSIGN:
 				this.addTypes(node.getRightHandSide());
 				break;
 
-			case JSNodeTypes.ADD_AND_ASSIGN:
+			case IJSNodeTypes.ADD_AND_ASSIGN:
 				String type = JSTypeConstants.NUMBER_TYPE;
 				List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
 				List<String> rhsTypes = this.getTypes(node.getRightHandSide());
@@ -332,13 +332,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	{
 		String type = JSTypeConstants.NUMBER_TYPE;
 
-		if (node.getNodeType() == JSNodeTypes.ADD)
+		if (node.getNodeType() == IJSNodeTypes.ADD)
 		{
 			IParseNode lhs = node.getLeftHandSide();
 			IParseNode rhs = node.getRightHandSide();
 
 			// NOTE: Iterate down the tree until we find the first non-addition node or the first string
-			while (lhs.getNodeType() == JSNodeTypes.ADD)
+			while (lhs.getNodeType() == IJSNodeTypes.ADD)
 			{
 				rhs = lhs.getLastChild();
 				lhs = lhs.getFirstChild();
@@ -427,7 +427,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : returnTypes)
 			{
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, JSTypeConstants.PROTOTYPE_PROPERTY);
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName,
+						JSTypeConstants.PROTOTYPE_PROPERTY);
 
 				if (property != null)
 				{
@@ -479,13 +480,15 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		// build function type, including return values
 		if (!types.isEmpty())
 		{
-			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(",", types); //$NON-NLS-1$
+			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER
+					+ StringUtil.join(",", types); //$NON-NLS-1$
 		}
 		else if (foundReturnExpression)
 		{
 			// If we couldn't infer a return type and we had a return
 			// expression, then have it return Object
-			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + JSTypeConstants.OBJECT_TYPE;
+			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER
+					+ JSTypeConstants.OBJECT_TYPE;
 		}
 		else
 		{
@@ -606,7 +609,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			IParseNode parent = node.getParent();
 
-			if (parent != null && parent.getNodeType() == JSNodeTypes.PARAMETERS)
+			if (parent != null && parent.getNodeType() == IJSNodeTypes.PARAMETERS)
 			{
 				// special handling of parameters to potentially get the type
 				// from documentation and to prevent an infinite loop since
@@ -737,16 +740,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 	{
 		switch (node.getNodeType())
 		{
-			case JSNodeTypes.DELETE:
-			case JSNodeTypes.LOGICAL_NOT:
+			case IJSNodeTypes.DELETE:
+			case IJSNodeTypes.LOGICAL_NOT:
 				this.addType(JSTypeConstants.BOOLEAN_TYPE);
 				break;
 
-			case JSNodeTypes.TYPEOF:
+			case IJSNodeTypes.TYPEOF:
 				this.addType(JSTypeConstants.STRING_TYPE);
 				break;
 
-			case JSNodeTypes.VOID:
+			case IJSNodeTypes.VOID:
 				// technically this returns 'undefined', but we return nothing
 				// for both types
 				break;

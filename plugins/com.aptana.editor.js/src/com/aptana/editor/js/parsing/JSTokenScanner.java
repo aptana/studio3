@@ -25,7 +25,7 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.editor.js.IJSTokenScanner;
+import com.aptana.editor.js.IRegexpDivisionDisambiguator;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.text.rules.JSIdentifierDetector;
@@ -38,7 +38,7 @@ import com.aptana.editor.js.text.rules.JSRegExpRule;
  * @author Kevin Lindsey
  * @author cwilliams
  */
-public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
+public class JSTokenScanner extends RuleBasedScanner implements IRegexpDivisionDisambiguator
 {
 	private static String VAR_CONST = "const"; //$NON-NLS-1$
 
@@ -80,9 +80,9 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.IJSTokenScanner#hasDivisionStart()
+	 * @see com.aptana.editor.js.IRegexpDivisionDisambiguator#isValidDivisionStart()
 	 */
-	public boolean hasDivisionStart()
+	public boolean isValidDivisionStart()
 	{
 		if (fToken == null || fToken.getData() == null)
 		{
@@ -146,7 +146,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 				{
 					boolean result = false;
 
-					if (this._closed == false)
+					if (!this._closed)
 					{
 						if (c == '/')
 						{
@@ -264,7 +264,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 		IToken result = super.nextToken();
 
 		// NOTE: Only save the last token if it is not whitespace
-		if (result.isWhitespace() == false)
+		if (!result.isWhitespace())
 		{
 			fToken = result;
 		}

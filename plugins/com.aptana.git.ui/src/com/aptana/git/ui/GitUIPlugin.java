@@ -9,11 +9,9 @@ package com.aptana.git.ui;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -26,11 +24,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.StringConverter;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
@@ -39,7 +33,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.PlatformUtil;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
@@ -66,7 +60,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 	/**
 	 * The constructor
 	 */
-	public GitUIPlugin()
+	public GitUIPlugin() // $codepro.audit.disable
+							// com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 	{
 	}
 
@@ -74,7 +69,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception
+	public void start(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		super.start(context);
 		plugin = this;
@@ -103,11 +98,10 @@ public class GitUIPlugin extends AbstractUIPlugin
 							}
 							catch (BackingStoreException e)
 							{
-								GitUIPlugin.logError(e.getMessage(), e);
+								IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
 							}
 						}
 					});
-
 				}
 			}
 		};
@@ -119,13 +113,14 @@ public class GitUIPlugin extends AbstractUIPlugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception
+	public void stop(BundleContext context) throws Exception // $codepro.audit.disable declaredExceptions
 	{
 		try
 		{
 			if (themeChangeListener != null)
 			{
-				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
+				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+						.removePreferenceChangeListener(themeChangeListener);
 			}
 			themeChangeListener = null;
 		}
@@ -146,41 +141,46 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			if (GitExecutable.instance() == null)
 			{
-				UIJob job = new UIJob(Messages.GitUIPlugin_0)
+				UIJob job = new UIJob(Messages.GitUIPlugin_GitInstallationValidator)
 				{
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
+
 						while (true)
 						{
 							MessageDialogWithToggle dlg = new MessageDialogWithToggle(PlatformUI.getWorkbench()
-									.getActiveWorkbenchWindow().getShell(), Messages.GitUIPlugin_1, null,
-									Messages.GitUIPlugin_2, MessageDialog.WARNING, new String[] {
-											IDialogConstants.SKIP_LABEL, Messages.GitUIPlugin_3,
-											IDialogConstants.BROWSE_LABEL }, IDialogConstants.INTERNAL_ID + 1,
+									.getActiveWorkbenchWindow().getShell(), Messages.GitUIPlugin_ConfiguringGitSupportTitle, null,
+									Messages.GitUIPlugin_ConfigureGitPluginMessage, MessageDialog.INFORMATION,
+									new String[] { IDialogConstants.OK_LABEL }, IDialogConstants.OK_ID,
 									Messages.GitUIPlugin_ToggleMessage, false);
-							switch (dlg.open())
+							int code = dlg.open();
+
+							boolean toggleState = dlg.getToggleState();
+							if (toggleState)
 							{
-								case SWT.DEFAULT:
-									return Status.OK_STATUS;
-								case 5:
-									getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT,
-											dlg.getToggleState());
-									return Status.OK_STATUS;
-								case IDialogConstants.INTERNAL_ID:
+								getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT, dlg.getToggleState());
+							}
+
+							switch (code)
+							{
+								case IDialogConstants.OK_ID:
+
 									if (installPortableGit(monitor))
 									{
 										return Status.OK_STATUS;
 									}
-									break;
-								case IDialogConstants.INTERNAL_ID + 1:
-									if (browseGitLocation())
+
+									if (toggleState)
 									{
 										return Status.OK_STATUS;
 									}
+
+									// assuming install failed and we didn't toggle out, we'll go through the loop
+									// again.
 									break;
 								default:
-									break;
+									return Status.OK_STATUS;
 							}
 						}
 					}
@@ -204,7 +204,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 				{
 					try
 					{
-						monitor.beginTask(Messages.GitUIPlugin_4, IProgressMonitor.UNKNOWN);
+						monitor.beginTask(Messages.GitUIPlugin_ConfiguringGitSupport, IProgressMonitor.UNKNOWN);
 						monitor.worked(1);
 						PortableGit.install();
 					}
@@ -217,7 +217,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		}
 		catch (InvocationTargetException e)
 		{
-			logError(e);
+			IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
 		}
 		catch (InterruptedException e)
 		{
@@ -231,43 +231,9 @@ public class GitUIPlugin extends AbstractUIPlugin
 		else
 		{
 			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					Messages.GitUIPlugin_5, Messages.GitUIPlugin_6);
+					Messages.GitUIPlugin_GitInstallError, Messages.GitUIPlugin_GitConfigurationIncomplete);
 		}
 		return false;
-	}
-
-	private boolean browseGitLocation()
-	{
-		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		while (true)
-		{
-			FileDialog dlg = new FileDialog(shell, SWT.APPLICATION_MODAL | SWT.OPEN);
-			String gitExecutable = "git.exe"; //$NON-NLS-1$
-			dlg.setFilterExtensions(new String[] { gitExecutable });
-			dlg.setFilterNames(new String[] { Messages.GitUIPlugin_7 });
-			dlg.setFileName(gitExecutable);
-			dlg.setFilterPath(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin")); //$NON-NLS-1$
-			dlg.setText(Messages.GitUIPlugin_8);
-			String result = dlg.open();
-			if (result != null)
-			{
-				IPath path = Path.fromOSString(result);
-				if (GitExecutable.acceptBinary(path))
-				{
-					GitExecutable.setPreferenceGitPath(path);
-					return true;
-				}
-				else
-				{
-					MessageDialog.openWarning(shell, Messages.GitUIPlugin_9,
-							NLS.bind(Messages.GitUIPlugin_10, GitExecutable.MIN_GIT_VERSION));
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
 	}
 
 	/**
@@ -283,43 +249,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
-	}
-
-	/**
-	 * @deprecated
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		IdeLog.logError(getDefault(), msg, e);
-	}
-
-	/**
-	 * @deprecated
-	 * @param e
-	 */
-	public static void logError(CoreException e)
-	{
-		IdeLog.log(getDefault(), e.getStatus());
-	}
-
-	/**
-	 * @deprecated
-	 * @param e
-	 */
-	public static void logError(Exception e)
-	{
-		IdeLog.logError(getDefault(), e.getLocalizedMessage(), e);
-	}
-
-	/**
-	 * @deprecated
-	 * @param msg
-	 */
-	public static void logWarning(String msg)
-	{
-		IdeLog.logWarning(getDefault(), msg);
 	}
 
 	public static Image getImage(String string)

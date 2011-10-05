@@ -10,15 +10,16 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.ResourceUtil;
+
 public class DiskIndexTest extends TestCase
 {
 
 	public void testAPSTUD3393() throws Exception
 	{
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.index.core.tests"),
-				Path.fromPortableString("apstud3393.index"), null);
-		URL fileURL = FileLocator.toFileURL(url);
-		File file = new File(fileURL.toURI());
+				Path.fromPortableString("files/apstud3393.index"), null);
+		File file = ResourceUtil.resourcePathToFile(url);
 
 		try
 		{

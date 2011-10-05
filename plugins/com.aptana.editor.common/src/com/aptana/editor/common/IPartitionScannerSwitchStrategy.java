@@ -16,10 +16,10 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
  */
 public interface IPartitionScannerSwitchStrategy {
 
-	public interface SequenceBypassHandler {
+	public interface ISequenceBypassHandler {
 		public boolean bypassSequence(ICharacterScanner characterScanner, char[] sequenceFound);
 	}
 	
 	public char[][] getSwitchSequences();
-	public SequenceBypassHandler getSequenceBypassHandler();
+	public ISequenceBypassHandler getSequenceBypassHandler();
 }

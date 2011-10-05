@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.debug.ui.internal;
 
 import java.io.File;
@@ -48,7 +50,7 @@ public class UniformResourceStorageEditorInput extends StorageEditorInput {
 	 */
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
-		if (ILocationProvider.class == adapter) {
+		if (ILocationProvider.class.equals(adapter)) {
 			return locationProvider;
 		}
 		return super.getAdapter(adapter);
@@ -110,12 +112,12 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				}
 			}
 		} catch (CoreException e) {
-			IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(DebugUiPlugin.getDefault(), e);
 		}
 		return null;
 	}
 
-	/* package */ void validate(UniformResourceStorageEditorInput editorInput) {
+	/* package */void validate(UniformResourceStorageEditorInput editorInput) {
 		IStorage storage = editorInput.getStorage();
 		IPath path = ((UniformResourceStorage) storage).getFullPath();
 		if (path != null) {
@@ -127,7 +129,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				try {
 					loadRemoteFileStorage((UniformResourceStorage) storage, new File(filePath));
 				} catch (CoreException e) {
-					IdeLog.logError(DebugUiPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(DebugUiPlugin.getDefault(), e);
 				}
 			}
 		}
@@ -147,6 +149,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 				return file;
 			}
 		} catch (IOException e) {
+			IdeLog.logError(DebugUiPlugin.getDefault(), e);
 		}
 		if (file != null) {
 			if (!file.delete()) {
@@ -168,19 +171,19 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 			out = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];
 			int n;
-			while ((n = in.read(buffer)) > 0) {
+			while ((n = in.read(buffer)) > 0) { // $codepro.audit.disable assignmentInCondition
 				out.write(buffer, 0, n);
 			}
-			out.close();
-			out = null;
 			file.setReadOnly();
 			return true;
 		} catch (IOException e) {
+			IdeLog.logWarning(DebugUiPlugin.getDefault(), e);
 		} finally {
 			if (out != null) {
 				try {
 					out.close();
 				} catch (IOException ignore) {
+					ignore.getCause();
 				}
 			}
 		}

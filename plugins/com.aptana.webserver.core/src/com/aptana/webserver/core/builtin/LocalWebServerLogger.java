@@ -14,6 +14,9 @@ import org.apache.http.HttpException;
 import org.apache.http.nio.NHttpConnection;
 import org.apache.http.nio.protocol.EventListener;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.webserver.core.WebServerCorePlugin;
+
 /**
  * @author Max Stepanov
  *
@@ -24,14 +27,14 @@ import org.apache.http.nio.protocol.EventListener;
 	 * @see org.apache.http.nio.protocol.EventListener#fatalIOException(java.io.IOException, org.apache.http.nio.NHttpConnection)
 	 */
 	public void fatalIOException(IOException ex, NHttpConnection conn) {
-		System.out.println("fatalIOException "+ex.getMessage()); //$NON-NLS-1$
+		IdeLog.logWarning(WebServerCorePlugin.getDefault(), ex);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#fatalProtocolException(org.apache.http.HttpException, org.apache.http.nio.NHttpConnection)
 	 */
 	public void fatalProtocolException(HttpException ex, NHttpConnection conn) {
-		System.out.println("fatalProtocolException "+ex.getMessage()); //$NON-NLS-1$
+		IdeLog.logWarning(WebServerCorePlugin.getDefault(), ex);
 	}
 
 	/* (non-Javadoc)

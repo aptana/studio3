@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.js.debug.core.internal.browsers;
 
 import java.io.File;
@@ -31,7 +33,6 @@ import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class BrowserUtil {
 
@@ -40,15 +41,13 @@ public final class BrowserUtil {
 	 */
 	public static final String DEBUGGER_LAUNCH_URL = "http://www.aptana.com/?debugger=true&port="; //$NON-NLS-1$
 
-	private static final String[] EXTENSION_ID = {
-		"debugger@aptana.com", //$NON-NLS-1$
-		"firebug@software.joehewitt.com" //$NON-NLS-1$
+	private static final String[] EXTENSION_ID = { "debugger@aptana.com", //$NON-NLS-1$
+			"firebug@software.joehewitt.com" //$NON-NLS-1$
 	};
 
-	private static final String[] EXTENSION_LOCAL_PATH = {
-		"/res/firefox/aptanadebugger.xpi", //$NON-NLS-1$
-		"/res/firefox/firebug.xpi", //$NON-NLS-1$
-		"/res/ie/AptanaDebugger.dll" //$NON-NLS-1$
+	private static final String[] EXTENSION_LOCAL_PATH = { "/res/firefox/aptanadebugger.xpi", //$NON-NLS-1$
+			"/res/firefox/firebug.xpi", //$NON-NLS-1$
+			"/res/ie/AptanaDebugger.dll" //$NON-NLS-1$
 	};
 
 	private static final String FIREBUG_MIN_VERSION = "1.2.0"; //$NON-NLS-1$
@@ -59,7 +58,8 @@ public final class BrowserUtil {
 
 	private static final Map<String, Boolean> browserCache = new HashMap<String, Boolean>(4);
 
-	private static final IStatus installDebuggerPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 301, StringUtil.EMPTY, null);
+	private static final IStatus installDebuggerPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 301,
+			StringUtil.EMPTY, null);
 
 	private BrowserUtil() {
 	}
@@ -224,7 +224,8 @@ public final class BrowserUtil {
 
 					}
 				} catch (IOException e) {
-					JSDebugPlugin.log(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, e.getMessage(), e));
+					JSDebugPlugin
+							.log(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, e.getMessage(), e));
 				}
 			}
 
@@ -309,20 +310,20 @@ public final class BrowserUtil {
 					try {
 						String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 						if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) {
-							prompter
-									.handleStatus(
-											installDebuggerPromptStatus,
-											"warning_" + Messages.BrowserUtil_PreviousVersionFound_Message); //$NON-NLS-1$
+							prompter.handleStatus(installDebuggerPromptStatus,
+									"warning_" + Messages.BrowserUtil_PreviousVersionFound_Message); //$NON-NLS-1$
 							return false;
 						}
 
 						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) == null) {
-							installed = FirefoxUtil.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
-									EXTENSION_LOCAL_PATH[0]), EXTENSION_ID[0], profile.append(EXTENSIONS).toFile());
+							installed = FirefoxUtil.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID)
+									.getEntry(EXTENSION_LOCAL_PATH[0]), EXTENSION_ID[0], profile.append(EXTENSIONS)
+									.toFile());
 						}
 						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile) == null) {
-							installed = FirefoxUtil.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
-									EXTENSION_LOCAL_PATH[1]), EXTENSION_ID[1], profile.append(EXTENSIONS).toFile());
+							installed = FirefoxUtil.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID)
+									.getEntry(EXTENSION_LOCAL_PATH[1]), EXTENSION_ID[1], profile.append(EXTENSIONS)
+									.toFile());
 						}
 
 						if (installed) {
@@ -341,8 +342,7 @@ public final class BrowserUtil {
 				if (installed && Platform.OS_MACOSX.equals(Platform.getOS())) {
 					/* workaround for FF install bug on Mac */
 					try {
-						execProcess(new String[] {
-								"/usr/bin/open", //$NON-NLS-1$
+						execProcess(new String[] { "/usr/bin/open", //$NON-NLS-1$
 								"-b", //$NON-NLS-1$
 								getMacOSXApplicationIdentifier(browserExecutable) }, -1);
 						try {
@@ -389,15 +389,14 @@ public final class BrowserUtil {
 							&& !PlatformUtil.isUserAdmin()) {
 						PlatformUtil.runAsAdmin("regsvr32.exe", new String[] { //$NON-NLS-1$
 								"/s", //$NON-NLS-1$
-								dllPath.toOSString() });
+										dllPath.toOSString() });
 						// Delay to let dll be registered
 						try {
 							Thread.sleep(2000);
 						} catch (InterruptedException e) {
 						}
 					} else {
-						execProcess(new String[] {
-								"regsvr32.exe", //$NON-NLS-1$
+						execProcess(new String[] { "regsvr32.exe", //$NON-NLS-1$
 								"/s", //$NON-NLS-1$
 								dllPath.toOSString() }, -1);
 					}

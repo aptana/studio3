@@ -60,7 +60,7 @@ public class CSSModelFormatter
 					buffer.append(", "); //$NON-NLS-1$
 				}
 				
-				buffer.append(userAgent.getPlatform()).append(" ").append(userAgent.getVersion()); //$NON-NLS-1$
+				buffer.append(userAgent.getPlatform()).append(' ').append(userAgent.getVersion());
 			}
 		}
 		

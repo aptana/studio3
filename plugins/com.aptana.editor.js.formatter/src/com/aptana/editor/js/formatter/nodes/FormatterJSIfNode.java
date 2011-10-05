@@ -9,7 +9,7 @@ package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -31,7 +31,7 @@ public class FormatterJSIfNode extends FormatterJSDeclarationNode
 		super(document, hasBlockedChild, node, hasCommentBefore);
 		// Check if this node is located in the 'false' block of a parent 'if'. In that case, we can say for sure that
 		// this 'if' arrives right after an 'else'.
-		if (node.getParent().getNodeType() == JSNodeTypes.IF)
+		if (node.getParent().getNodeType() == IJSNodeTypes.IF)
 		{
 			JSIfNode parentIfNode = (JSIfNode) node.getParent();
 			inElseIf = parentIfNode.getFalseBlock() == node;

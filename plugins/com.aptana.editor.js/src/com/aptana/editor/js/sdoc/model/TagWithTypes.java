@@ -12,14 +12,14 @@ import java.util.List;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
-public abstract class TagWithTypes extends Tag
+public class TagWithTypes extends Tag
 {
 	private List<Type> _types;
 
 	/**
 	 * ExceptionTag
 	 */
-	public TagWithTypes(TagType type, List<Type> types, String text)
+	protected TagWithTypes(TagType type, List<Type> types, String text)
 	{
 		super(type, text);
 
@@ -44,7 +44,7 @@ public abstract class TagWithTypes extends Tag
 	public void toSource(SourcePrinter writer)
 	{
 		TagType tagType = this.getType();
-		
+
 		if (tagType != null)
 		{
 			writer.print(tagType);
@@ -57,7 +57,7 @@ public abstract class TagWithTypes extends Tag
 		writer.print(" {"); //$NON-NLS-1$
 
 		boolean first = true;
-		
+
 		if (this._types != null)
 		{
 			for (Type type : this._types)
@@ -68,20 +68,20 @@ public abstract class TagWithTypes extends Tag
 				}
 				else
 				{
-					writer.print(","); //$NON-NLS-1$
+					writer.print(','); //$NON-NLS-1$
 				}
-				
+
 				type.toSource(writer);
 			}
 		}
 
-		writer.print("}"); //$NON-NLS-1$
+		writer.print('}'); //$NON-NLS-1$
 
 		String text = this.getText();
 
-		if (text != null && StringUtil.isEmpty(text) == false)
+		if (text != null && !StringUtil.isEmpty(text))
 		{
-			writer.print(" ").print(text); //$NON-NLS-1$
+			writer.print(' ').print(text); //$NON-NLS-1$
 		}
 	}
 }

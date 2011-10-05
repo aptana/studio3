@@ -13,29 +13,34 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ui.IPropertyDialog;
 
 /**
- * 
  * @author Max Stepanov
- *
  */
-public class SitePropertyDialog extends SiteConnectionsEditorDialog implements IPropertyDialog {
+public class SitePropertyDialog extends SiteConnectionsEditorDialog implements IPropertyDialog
+{
 
-    public SitePropertyDialog(Shell parentShell) {
-        super(parentShell);
-    }
+	public SitePropertyDialog(Shell parentShell)
+	{
+		super(parentShell);
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.ui.IPropertyDialog#setPropertySource(java.lang.Object)
 	 */
-	public void setPropertySource(Object element) {
-        if (element instanceof ISiteConnection) {
-            setSelection((ISiteConnection) element);
-        }
-    }
+	public void setPropertySource(Object element)
+	{
+		if (element instanceof ISiteConnection)
+		{
+			setSelection((ISiteConnection) element);
+		}
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.ui.IPropertyDialog#getPropertySource()
 	 */
-	public Object getPropertySource() {
+	public Object getPropertySource()
+	{
 		return null;
 	}
 }

@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -218,12 +219,14 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 			}
 			catch (MalformedTreeException e)
 			{
-				FormatterPlugin.warn(FormatterMessages.ScriptFormattingStrategy_formattingError, e);
+				IdeLog.logWarning(FormatterPlugin.getDefault(),
+						FormatterMessages.ScriptFormattingStrategy_formattingError, e, IDebugScopes.DEBUG);
 			}
 			catch (BadLocationException e)
 			{
 				// Can only happen on concurrent document modification
-				FormatterPlugin.warn(FormatterMessages.ScriptFormattingStrategy_formattingError, e);
+				IdeLog.logWarning(FormatterPlugin.getDefault(),
+						FormatterMessages.ScriptFormattingStrategy_formattingError, e, IDebugScopes.DEBUG);
 			}
 			catch (FormatterException fe)
 			{
@@ -231,9 +234,9 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 			}
 			catch (Exception e)
 			{
-				final String msg = NLS.bind(FormatterMessages.ScriptFormattingStrategy_unexpectedFormatterError,
-						e.toString());
-				FormatterPlugin.logError(msg, e);
+				String msg = NLS
+						.bind(FormatterMessages.ScriptFormattingStrategy_unexpectedFormatterError, e.toString());
+				IdeLog.logError(FormatterPlugin.getDefault(), msg, e, IDebugScopes.DEBUG);
 			}
 			finally
 			{

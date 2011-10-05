@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="com.aptana.browser.configuration" name="%extension-point.browserconfiguration.name" schema="schema/com.aptana.browser.configuration.exsd"/>
+   <extension-point id="configuration" name="%extension-point.browserconfiguration.name" schema="schema/configuration.exsd"/>
    <extension
          point="org.eclipse.ui.views">
       <view

@@ -8,6 +8,7 @@
 package com.aptana.git.ui.internal.wizards;
 
 import java.io.File;
+import java.text.MessageFormat;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.wizard.WizardPage;
@@ -55,6 +56,12 @@ class RepositorySelectionPage extends WizardPage
 		data.horizontalSpan = 2;
 		data.widthHint = 300;
 		source.setLayoutData(data);
+		String username = System.getProperty("user.name"); //$NON-NLS-1$
+		if (username == null || username.length() == 0)
+		{
+			username = "user"; //$NON-NLS-1$
+		}
+		source.setMessage(MessageFormat.format("git://github.com/{0}/example.git", username)); //$NON-NLS-1$
 		source.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(final ModifyEvent e)
@@ -70,7 +77,7 @@ class RepositorySelectionPage extends WizardPage
 					{
 						index = sourceURI.length();
 					}
-					int slash = sourceURI.lastIndexOf("/", index); //$NON-NLS-1$
+					int slash = sourceURI.lastIndexOf('/', index);
 					if (slash != -1)
 					{
 						workspacePath += File.separator + sourceURI.substring(slash + 1, index);
@@ -118,7 +125,6 @@ class RepositorySelectionPage extends WizardPage
 		});
 
 		setControl(composite);
-		checkPage();
 	}
 
 	/**

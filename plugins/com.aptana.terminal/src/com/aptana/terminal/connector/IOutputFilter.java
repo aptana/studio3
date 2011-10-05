@@ -10,9 +10,8 @@ package com.aptana.terminal.connector;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ interface IOutputFilter {
+/* package */interface IOutputFilter {
 
 	public char[] filterOutput(char[] output);
 

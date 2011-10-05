@@ -18,6 +18,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.navigator.ILinkHelper;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
 
@@ -46,11 +47,15 @@ public class FilesystemLinkHelper implements ILinkHelper
 		{
 			FileSystemObject file = (FileSystemObject) element;
 			IFileStore fileStore = file.getFileStore();
-			try {
-				IEditorPart editorPart = aPage.findEditor(UniformFileStoreEditorInputFactory.getUniformEditorInput(fileStore, new NullProgressMonitor()));
+			try
+			{
+				IEditorPart editorPart = aPage.findEditor(UniformFileStoreEditorInputFactory.getUniformEditorInput(
+						fileStore, new NullProgressMonitor()));
 				aPage.bringToTop(editorPart);
-			} catch (CoreException e) {
-				IOUIPlugin.logError(e);
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(IOUIPlugin.getDefault(), e);
 			}
 		}
 	}

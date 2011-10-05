@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.debug.core;
 
 import java.net.URI;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
@@ -39,12 +42,12 @@ import com.aptana.core.util.StringUtil;
  * @author Max Stepanov
  */
 public final class DebugOptionsManager implements IDebugEventSetListener {
-	
+
 	/**
 	 * DEBUGGER_ACTIVE_SUFFIX
 	 */
 	private static final String DEBUGGER_ACTIVE_SUFFIX = ".debuggerActive"; //$NON-NLS-1$
-	
+
 	/**
 	 * DETAIL_FORMATTER_IS_ENABLED
 	 */
@@ -60,10 +63,9 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	private IPreferenceChangeListener preferenceChangeListener;
 
 	/**
-	 * Map of types to the associated formatter (code snippet). (
-	 * <code>String</code> -> <code>String</code>)
+	 * Map of types to the associated formatter (code snippet). ( <code>String</code> -> <code>String</code>)
 	 */
-	private HashMap<String, DetailFormatter> fDetailFormattersMap;
+	private Map<String, DetailFormatter> fDetailFormattersMap;
 
 	public DebugOptionsManager(String modelIdentifier) {
 		this.modelIdentifier = modelIdentifier;
@@ -75,14 +77,15 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	public void startup() {
 		DebugPlugin.getDefault().addDebugEventListener(this);
 		populateDetailFormattersMap();
-		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener = new IPreferenceChangeListener() {
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (getDetailFormattersPrefName().equals(event.getKey())) {
-					populateDetailFormattersMap();
-					notifyChangeListeners();
-				}
-			}
-		});
+		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(preferenceChangeListener = new IPreferenceChangeListener() {
+					public void preferenceChange(PreferenceChangeEvent event) {
+						if (getDetailFormattersPrefName().equals(event.getKey())) {
+							populateDetailFormattersMap();
+							notifyChangeListeners();
+						}
+					}
+				});
 	}
 
 	/**
@@ -90,11 +93,12 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public void shutdown() {
 		DebugPlugin.getDefault().removeDebugEventListener(this);
-		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
+		EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID)
+				.removePreferenceChangeListener(preferenceChangeListener);
 	}
-	
+
 	public static boolean isDebuggerActive(String modelIdentifier) {
-		return "true".equals(System.getProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
+		return "true".equals(System.getProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
 	}
 
 	/**
@@ -187,8 +191,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		List<String> list = new ArrayList<String>(10);
 		StringTokenizer tokenizer = new StringTokenizer(listString, ","); //$NON-NLS-1$
 		while (tokenizer.hasMoreTokens()) {
-			String token = tokenizer.nextToken();
-			list.add(token);
+			list.add(tokenizer.nextToken());
 		}
 		return (String[]) list.toArray(new String[list.size()]);
 	}
@@ -202,9 +205,9 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public static String serializeList(String[] list) {
 		if (list == null) {
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (int i = 0; i < list.length; i++) {
 			if (i > 0) {
 				buffer.append(',');
@@ -213,17 +216,17 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		}
 		return buffer.toString();
 	}
-	
+
 	private String getDetailFormattersPrefName() {
-		return modelIdentifier+IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST;
+		return modelIdentifier + IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST;
 	}
 
 	/**
 	 * Populate the detail formatters map with data from preferences.
 	 */
 	private void populateDetailFormattersMap() {
-		String[] detailFormattersList = DebugOptionsManager.parseList(
-				EclipseUtil.instanceScope().getNode(DebugCorePlugin.PLUGIN_ID).get(getDetailFormattersPrefName(), StringUtil.EMPTY));
+		String[] detailFormattersList = DebugOptionsManager.parseList(EclipseUtil.instanceScope()
+				.getNode(DebugCorePlugin.PLUGIN_ID).get(getDetailFormattersPrefName(), StringUtil.EMPTY));
 		fDetailFormattersMap = new HashMap<String, DetailFormatter>(detailFormattersList.length / 3);
 		for (int i = 0, length = detailFormattersList.length; i < length;) {
 			String typeName = detailFormattersList[i++];
@@ -247,7 +250,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
-			IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(DebugCorePlugin.getDefault(), e);
 		}
 	}
 
@@ -262,17 +265,18 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
 		for (DebugEvent event : events) {
-			if (event.getSource() instanceof IDebugTarget && modelIdentifier.equals(((IDebugTarget) event.getSource()).getModelIdentifier())) {
+			if (event.getSource() instanceof IDebugTarget
+					&& modelIdentifier.equals(((IDebugTarget) event.getSource()).getModelIdentifier())) {
 				switch (event.getKind()) {
-				case DebugEvent.CREATE:
-					System.setProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
-					break;
-				case DebugEvent.TERMINATE:
-					System.getProperties().remove(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX);
-					cleanupBreakpoints();
-					break;
-				default:
-					break;
+					case DebugEvent.CREATE:
+						System.setProperty(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX, "true"); //$NON-NLS-1$
+						break;
+					case DebugEvent.TERMINATE:
+						System.getProperties().remove(modelIdentifier + DEBUGGER_ACTIVE_SUFFIX);
+						cleanupBreakpoints();
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -299,7 +303,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 					breakpoint.delete();
 				}
 			} catch (CoreException e) {
-				IdeLog.logError(DebugCorePlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(DebugCorePlugin.getDefault(), e);
 			}
 		}
 	}

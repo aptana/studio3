@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable assignmentInCondition
+// $codepro.audit.disable closeWhereCreated
+// $codepro.audit.disable closeInFinally
 
 package com.aptana.webserver.core.builtin;
 
@@ -17,10 +20,10 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
-
-import junit.framework.TestCase;
 
 /**
  * @author Max Stepanov

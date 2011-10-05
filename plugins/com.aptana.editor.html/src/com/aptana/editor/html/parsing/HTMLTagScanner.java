@@ -33,7 +33,7 @@ class HTMLTagScanner extends RuleBasedScanner
 		ATTR_NAME, ATTR_VALUE, OTHER
 	}
 
-	public HTMLTagScanner()
+	HTMLTagScanner()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 

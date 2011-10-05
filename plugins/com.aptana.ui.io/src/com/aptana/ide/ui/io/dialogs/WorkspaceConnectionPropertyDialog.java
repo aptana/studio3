@@ -38,6 +38,7 @@ import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
@@ -175,8 +176,8 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 				workspaceConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.WorkspaceConnectionPropertyDialog_FailedToCreate, e);
-				close();
+				IdeLog.logError(IOUIPlugin.getDefault(), Messages.WorkspaceConnectionPropertyDialog_FailedToCreate, e);
+				close(); // $codepro.audit.disable closeInFinally
 			}
 		}
 		loadPropertiesFrom(workspaceConnectionPoint);
@@ -213,6 +214,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		}
 		if (savePropertiesTo(workspaceConnectionPoint)) {
 			/* TODO: notify */
+			workspaceConnectionPoint.hashCode();
 		}
 		if (isNew) {
 			CoreIOPlugin.getConnectionPointManager().addConnectionPoint(workspaceConnectionPoint);
@@ -237,7 +239,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		try {
 			nameText.setText(valueOrEmpty(connectionPoint.getName()));
 			IContainer resource = connectionPoint.getResource();
-			workspacePathText.setText(resource != null ? resource.getFullPath().toPortableString() : ""); //$NON-NLS-1$
+			workspacePathText.setText((resource != null) ? resource.getFullPath().toPortableString() : ""); //$NON-NLS-1$
 		} finally {
 			addListeners();
 		}

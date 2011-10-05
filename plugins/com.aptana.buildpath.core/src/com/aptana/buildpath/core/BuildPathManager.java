@@ -358,7 +358,7 @@ public class BuildPathManager
 								pluginId
 							);
 
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
 						}
 					}
 					else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
@@ -383,7 +383,7 @@ public class BuildPathManager
 									pluginId
 								);
 
-								IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
+								IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
 							}
 						}
 						catch (CoreException e)
@@ -397,7 +397,7 @@ public class BuildPathManager
 								pluginId
 							);
 
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, (Throwable) null);
+							IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
 						}
 					}
 				}

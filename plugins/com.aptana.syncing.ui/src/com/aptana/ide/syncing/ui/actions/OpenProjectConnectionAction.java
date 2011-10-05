@@ -22,27 +22,34 @@ import com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection;
  * 
  * @author Michael Xia (mxia@aptana.com)
  */
-public class OpenProjectConnectionAction implements IObjectActionDelegate {
+public class OpenProjectConnectionAction implements IObjectActionDelegate
+{
 
 	private ISiteConnection fConnection;
 
-    public OpenProjectConnectionAction() {
-    }
+	public OpenProjectConnectionAction()
+	{
+	}
 
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    }
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
+	}
 
-    public void run(IAction action) {
-    	EditorUtils.openConnectionEditor(fConnection);
-    }
+	public void run(IAction action)
+	{
+		EditorUtils.openConnectionEditor(fConnection);
+	}
 
-    public void selectionChanged(IAction action, ISelection selection) {
-        fConnection = null;
-        if (selection instanceof IStructuredSelection) {
-            Object element = ((IStructuredSelection) selection).getFirstElement();
-            if (element instanceof ProjectSiteConnection) {
-            	fConnection = ((ProjectSiteConnection) element).getSiteConnection();
-            }
-        }
-    }
+	public void selectionChanged(IAction action, ISelection selection)
+	{
+		fConnection = null;
+		if (selection instanceof IStructuredSelection)
+		{
+			Object element = ((IStructuredSelection) selection).getFirstElement();
+			if (element instanceof ProjectSiteConnection)
+			{
+				fConnection = ((ProjectSiteConnection) element).getSiteConnection();
+			}
+		}
+	}
 }

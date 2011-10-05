@@ -32,6 +32,6 @@ public class SchemaString extends SchemaPrimitive
 	@Override
 	protected boolean validValue(Object value)
 	{
-		return (value instanceof String);
+		return value instanceof String;
 	}
 }

@@ -194,11 +194,6 @@ public class ExplorerPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(e.getStatus());
 	}
 
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
-	}
-
 	private void addPartListener()
 	{
 		IWorkbench workbench = null;

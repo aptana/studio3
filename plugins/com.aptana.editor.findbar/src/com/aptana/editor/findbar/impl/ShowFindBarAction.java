@@ -16,28 +16,39 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 
-public class ShowFindBarAction extends FindReplaceAction {
+public class ShowFindBarAction extends FindReplaceAction
+{
 
 	private final ITextEditor textEditor;
 
-	public ShowFindBarAction(ITextEditor textEditor) {
-		super(ResourceBundle.getBundle(ShowFindBarAction.class.getName()), ShowFindBarAction.class.getSimpleName()+".", textEditor); //$NON-NLS-1$
+	public ShowFindBarAction(ITextEditor textEditor)
+	{
+		super(ResourceBundle.getBundle(ShowFindBarAction.class.getName()), ShowFindBarAction.class.getSimpleName()
+				+ ".", textEditor); //$NON-NLS-1$
 		this.textEditor = textEditor;
-		setActionDefinitionId(ActionFactory.FIND.create(textEditor.getSite().getWorkbenchWindow()).getActionDefinitionId());
+		setActionDefinitionId(ActionFactory.FIND.create(textEditor.getSite().getWorkbenchWindow())
+				.getActionDefinitionId());
 	}
 
 	@Override
-	public void run() {
-		
+	public void run()
+	{
+
 		IFindBarDecorated findBarDecorated = (IFindBarDecorated) textEditor.getAdapter(IFindBarDecorated.class);
-		if (findBarDecorated != null) {
+		if (findBarDecorated != null)
+		{
 			IFindBarDecorator findBarDecorator = findBarDecorated.getFindBarDecorator();
-			if (((FindBarDecorator)findBarDecorator).isActive()) {
+			if (((FindBarDecorator) findBarDecorator).isActive())
+			{
 				super.run();
-			} else {
+			}
+			else
+			{
 				findBarDecorator.setVisible(true);
 			}
-		} else {
+		}
+		else
+		{
 			super.run();
 		}
 	}

@@ -43,8 +43,9 @@ public class FileSystemObjectPropertyTester extends PropertyTester {
             } else if (PROPERTY_IS_LOCAL.equals(property)) {
                 try {
                     return (fileStore.toLocalFile(EFS.NONE, null) != null) == value;
-                } catch (CoreException e) {
+                } catch (CoreException ignore) {
                     // ignores the exception
+                	ignore.getCause();
                 }
                 return false;
             }

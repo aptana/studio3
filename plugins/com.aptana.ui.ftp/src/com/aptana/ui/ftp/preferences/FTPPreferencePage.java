@@ -23,22 +23,21 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.preferences.FTPPreferenceInitializer;
 import com.aptana.filesystem.ftp.preferences.IFTPPreferenceConstants;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.preferences.IPreferenceConstants;
 import com.aptana.ide.core.io.preferences.PreferenceInitializer;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
+import com.aptana.ui.ftp.FTPUIPlugin;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
  */
-public class FTPPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
-{
+public class FTPPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private PermissionsGroup fFilePermissions;
 	private PermissionsGroup fDirectoryPermissions;
@@ -47,44 +46,31 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 	/**
 	 * Constructor.
 	 */
-	public FTPPreferencePage()
-	{
+	public FTPPreferencePage() {
 	}
 
-	public void init(IWorkbench workbench)
-	{
+	public void init(IWorkbench workbench) {
 		setDescription(Messages.FTPPreferencePage_Notes);
 	}
 
 	@Override
-	public boolean performOk()
-	{
-		IEclipsePreferences prefs = (EclipseUtil.instanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
-		prefs.putLong(IPreferenceConstants.FILE_PERMISSION, fFilePermissions.getPermissions());
-		prefs.putLong(IPreferenceConstants.DIRECTORY_PERMISSION, fDirectoryPermissions.getPermissions());
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-		}
+	public boolean performOk() {
+		PreferenceUtils.setFilePermissions(fFilePermissions.getPermissions());
+		PreferenceUtils.setDirectoryPermissions(fDirectoryPermissions.getPermissions());
 
-		prefs = (EclipseUtil.instanceScope()).getNode(FTPPlugin.PLUGIN_ID);
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(FTPPlugin.PLUGIN_ID);
 		prefs.putInt(IFTPPreferenceConstants.KEEP_ALIVE_TIME, Integer.parseInt(fKeepAliveText.getText()));
-		try
-		{
+		try {
 			prefs.flush();
 		}
-		catch (BackingStoreException e)
-		{
+		catch (BackingStoreException e) {
+			IdeLog.logError(FTPUIPlugin.getDefault(), e);
 		}
 		return super.performOk();
 	}
 
 	@Override
-	protected Control createContents(Composite parent)
-	{
+	protected Control createContents(Composite parent) {
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(GridLayoutFactory.fillDefaults().create());
 
@@ -110,11 +96,9 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		fKeepAliveText.setText(String.valueOf(initialTime));
 		fKeepAliveText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.create());
-		fKeepAliveText.addModifyListener(new ModifyListener()
-		{
+		fKeepAliveText.addModifyListener(new ModifyListener() {
 
-			public void modifyText(ModifyEvent e)
-			{
+			public void modifyText(ModifyEvent e) {
 				validate();
 			}
 		});
@@ -123,8 +107,7 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	@Override
-	protected void performDefaults()
-	{
+	protected void performDefaults() {
 		fFilePermissions.setPermissions(PreferenceInitializer.DEFAULT_FILE_PERMISSIONS);
 		fDirectoryPermissions.setPermissions(PreferenceInitializer.DEFAULT_DIRECTORY_PERMISSIONS);
 		fKeepAliveText.setText(String.valueOf(FTPPreferenceInitializer.DEFAULT_KEEP_ALIVE_MINUTES));
@@ -132,27 +115,21 @@ public class FTPPreferencePage extends PreferencePage implements IWorkbenchPrefe
 		super.performDefaults();
 	}
 
-	private void validate()
-	{
+	private void validate() {
 		String error = null;
 		String keepAliveMins = fKeepAliveText.getText();
-		if (StringUtil.isEmpty(keepAliveMins))
-		{
+		if (StringUtil.isEmpty(keepAliveMins)) {
 			error = Messages.FTPPreferencePage_ERR_Invalid_KeepAlive_Time;
 		}
-		else
-		{
+		else {
 			// makes sure the keep-alive time is a positive integer
-			try
-			{
+			try {
 				int mins = Integer.parseInt(keepAliveMins);
-				if (mins <= 0)
-				{
-					throw new NumberFormatException();
+				if (mins <= 0) {
+					throw new NumberFormatException("negative"); //$NON-NLS-1$
 				}
 			}
-			catch (NumberFormatException e)
-			{
+			catch (NumberFormatException e) {
 				error = Messages.FTPPreferencePage_ERR_Invalid_KeepAlive_Time;
 			}
 		}

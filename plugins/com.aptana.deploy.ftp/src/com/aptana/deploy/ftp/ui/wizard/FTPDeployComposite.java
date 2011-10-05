@@ -28,7 +28,7 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 	private Button downloadButton;
 	private Button syncButton;
 
-	public FTPDeployComposite(Composite parent, int style, IBaseRemoteConnectionPoint connectionPoint, Listener listener)
+	public FTPDeployComposite(Composite parent, int style, IBaseRemoteConnectionPoint connectionPoint, IListener listener)
 	{
 		super(parent, style, connectionPoint, listener);
 

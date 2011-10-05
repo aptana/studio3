@@ -107,6 +107,7 @@ module Ruble
         dialog.filter_path = options[:directory] if options[:directory]
         dialog.open
         # FIXME Handle when block is given
+        # FIXME WHen user selects multiple files we don't return all of them here...
       end
       
       # Post a confirmation alert
@@ -172,10 +173,10 @@ module Ruble
         request_string_core('Enter password:', true, options, &block)
       end
       
-      # Show Tooltip using current cursor location. +content+ is shown as bold text at tp of tooltip.
+      # Show Tooltip using current cursor location. +content+ is shown as bold text at top of tooltip.
       # Possible options:
       # :balloon => true - pop up a balloon style tooltip
-      # :icon => :error, :info, or :warning add an image icon in upper left of tooltip. Only used with baloon tooltips
+      # :icon => :error, :info, or :warning add an image icon in upper left of tooltip. Only used with balloon tooltips
       # :message => String, an optional explanatory string that is shown below the content
       def tool_tip(content, options={})
         style = org.eclipse.swt.SWT::NONE
@@ -202,7 +203,7 @@ module Ruble
 
       # pop up a menu on screen
       # +options+ may be an Array of Strings, or an Array of Hashes
-      # If it's an Array of Hashes, it's expected that each Hash willl contain:
+      # If it's an Array of Hashes, it's expected that each Hash will contain:
       # 'display' => String - entry to show in menu
       # 'image' = > String - image to show alongside the entry
       # 'insert' => String - a snippet to insert when the entry is chosen

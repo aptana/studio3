@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable thrownExceptions
+// $codepro.audit.disable exceptionUsage.exceptionCreation
 
 package com.aptana.core.io.efs;
 
@@ -50,7 +53,7 @@ public class WorkspaceFileSystem extends FileSystem {
 			try {
 				instance = EFS.getFileSystem(SCHEME_WORKSPACE);
 			} catch (CoreException e) {
-				throw new Error(e);
+				throw new RuntimeException(e);
 			}
 		}
 		return instance;
@@ -137,7 +140,7 @@ public class WorkspaceFileSystem extends FileSystem {
 			} catch (CoreException e) {
 				// TODO: this exception could be thrown after 3.6M1
 				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=280944
-				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.WorkspaceFileSystem_FetchingTreeError, e, null);
+				IdeLog.logWarning(CoreIOPlugin.getDefault(), Messages.WorkspaceFileSystem_FetchingTreeError, e);
 			}
 		}
 		return null;

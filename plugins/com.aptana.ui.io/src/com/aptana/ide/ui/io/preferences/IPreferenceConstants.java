@@ -7,7 +7,7 @@
  */
 package com.aptana.ide.ui.io.preferences;
 
-public class IPreferenceConstants
+public interface IPreferenceConstants
 {
 
 	public static final String COPY_OVERWRITE = "COPY_OVERWRITE"; //$NON-NLS-1$

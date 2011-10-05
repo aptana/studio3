@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.js.debug.ui.internal;
 
 import java.util.ArrayList;
@@ -22,12 +24,12 @@ import org.eclipse.ui.internal.browser.IBrowserDescriptor;
  */
 @SuppressWarnings({ "rawtypes", "restriction" })
 public class WebBrowserEnumeratorAdapterFactory implements IAdapterFactory {
-	
+
 	/*
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adapterType == Enumeration.class) {
+		if (Enumeration.class.equals(adapterType)) {
 			return Collections.enumeration(getWebBrowsers());
 		}
 		return null;
@@ -50,7 +52,7 @@ public class WebBrowserEnumeratorAdapterFactory implements IAdapterFactory {
 			if (location == null) {
 				continue;
 			}
-			if (desc == current) {
+			if (desc.equals(current)) {
 				browsers.add(0, location);
 			} else {
 				browsers.add(location);

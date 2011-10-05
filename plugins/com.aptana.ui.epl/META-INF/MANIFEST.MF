@@ -15,10 +15,10 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
- com.aptana.editor.common.scripting.snippets,
  com.aptana.editor.common.text.rules,
  com.aptana.ui.dialogs,
  com.aptana.ui.epl,
+ com.aptana.ui.epl.scripting.snippets;x-friends:="com.aptana.editor.common",
  com.aptana.ui.preferences,
  com.aptana.ui.properties,
  com.aptana.ui.util,

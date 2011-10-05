@@ -21,7 +21,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IDebugScopes;
 
 public class GitRevList
 {
@@ -77,18 +79,26 @@ public class GitRevList
 		arguments.add("--topo-order"); //$NON-NLS-1$
 		arguments.add("--children"); //$NON-NLS-1$
 		if (max > 0)
+		{
 			arguments.add("-" + max); // only last N revs //$NON-NLS-1$
+		}
 		arguments.add(formatString);
 
 		if (rev == null)
+		{
 			arguments.add("HEAD"); //$NON-NLS-1$
+		}
 		else
+		{
 			arguments.addAll(rev.parameters());
+		}
 
 		IPath directory = repository.workingDirectory();
 
 		if (subMonitor.isCanceled())
+		{
 			return Status.CANCEL_STATUS;
+		}
 		try
 		{
 			// FIXME Move this into GitRepository, so we can set up lock/monitor on it!
@@ -100,11 +110,15 @@ public class GitRevList
 			while (true)
 			{
 				if (subMonitor.isCanceled())
+				{
 					return Status.CANCEL_STATUS;
+				}
 
 				String sha = getline(stream, '\1');
 				if (sha == null)
+				{
 					break;
+				}
 
 				// We reached the end of some temporary output. Show what we have
 				// until now, and then start again. The sha of the next thing is still
@@ -117,7 +131,9 @@ public class GitRevList
 
 					// If the length is < 40, then there are no commits.. quit now
 					if (sha.length() < 40)
+					{
 						break;
+					}
 
 					int startIndex = sha.length() - 40;
 					sha = sha.substring(startIndex, startIndex + 40);
@@ -135,7 +151,8 @@ public class GitRevList
 				{
 					if (((parentString.length() + 1) % 41) != 0)
 					{
-						GitPlugin.logError(MessageFormat.format("invalid parents: {0}", parentString.length()), null); //$NON-NLS-1$
+						IdeLog.logError(GitPlugin.getDefault(),
+								MessageFormat.format("invalid parents: {0}", parentString.length()), IDebugScopes.DEBUG); //$NON-NLS-1$
 						continue;
 					}
 					int nParents = (parentString.length() + 1) / 41;
@@ -162,20 +179,28 @@ public class GitRevList
 					stream.read(); // Remove separator
 					char c = (char) stream.read();
 					if (c != '>' && c != '<' && c != '^' && c != '-')
-						GitPlugin.logError("Error loading commits: sign not correct", null); //$NON-NLS-1$
-					// newCommit.setSign(c);
+					{
+						IdeLog.logError(GitPlugin.getDefault(),
+								"Error loading commits: sign not correct", IDebugScopes.DEBUG); //$NON-NLS-1$
+						// newCommit.setSign(c);
+					}
+
 				}
 
 				int read = stream.read();
 				if (read != 0 && read != -1)
-					GitPlugin.logError("Error", null); //$NON-NLS-1$
+				{
+					IdeLog.logError(GitPlugin.getDefault(), "Error", IDebugScopes.DEBUG); //$NON-NLS-1$
+				}
 
 				revisions.add(newCommit);
 
 				subMonitor.worked(1);
 
 				if (read == -1)
+				{
 					break;
+				}
 
 				if (++num % 1000 == 0)
 				{
@@ -204,9 +229,13 @@ public class GitRevList
 	private void logInfo(String string)
 	{
 		if (GitPlugin.getDefault() != null)
-			GitPlugin.logInfo(string);
+		{
+			IdeLog.logInfo(GitPlugin.getDefault(), string);
+		}
 		else
+		{
 			System.out.println(string);
+		}
 	}
 
 	private long readLong(InputStream stream)
@@ -218,10 +247,14 @@ public class GitRevList
 			{
 				int read = stream.read();
 				if (read == -1)
+				{
 					break;
+				}
 				builder.append((char) read);
 				if (builder.length() == 10)
+				{
 					break;
+				}
 			}
 			catch (IOException e)
 			{
@@ -252,21 +285,27 @@ public class GitRevList
 			revisions = null;
 		}
 		else
+		{
 			this.commits = revisions;
+		}
 	}
 
 	private String getline(InputStream stream, char c)
 	{
 		byte[] bytes = read(stream, c);
 		if (bytes == null || bytes.length == 0)
+		{
 			return null;
+		}
 		return new String(bytes);
 	}
 
 	private String getline(InputStream stream, char c, String encoding) throws UnsupportedEncodingException
 	{
 		if (encoding == null || encoding.length() == 0)
+		{
 			return getline(stream, c);
+		}
 		byte[] bytes = read(stream, c);
 		return new String(bytes, encoding);
 	}
@@ -280,10 +319,14 @@ public class GitRevList
 			{
 				int read = stream.read();
 				if (read == -1)
+				{
 					break;
+				}
 				char readC = (char) read;
 				if (readC == c)
+				{
 					break;
+				}
 				list.add((byte) read);
 			}
 			catch (IOException e)

@@ -63,7 +63,7 @@ public class FileTreeContentProvider implements ITreeContentProvider {
 	 */
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof IWorkspaceRoot) {
-			inputElement = CoreIOPlugin.getConnectionPointManager();
+			inputElement = CoreIOPlugin.getConnectionPointManager(); // $codepro.audit.disable questionableAssignment
 		}
 		if (delegateContentProvider != null) {
 			return delegateContentProvider.getElements(inputElement);

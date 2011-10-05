@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable variableDeclaredInLoop
+
 package com.aptana.js.debug.core.internal.browsers;
 
 import java.io.BufferedWriter;
@@ -31,7 +33,6 @@ import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
 public final class FirebugUtil {
 
@@ -132,14 +133,15 @@ public final class FirebugUtil {
 				}
 			}
 			if (doWrite) {
-				writer = new PrintWriter(
-						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(prefs.toFile()), "UTF8"))); //$NON-NLS-1$
+				writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+						new FileOutputStream(prefs.toFile()), "UTF8"))); //$NON-NLS-1$
 				for (String string : lines) {
 					writer.println(string);
 				}
 			}
 		} catch (IOException e) {
-			IdeLog.logError(JSDebugPlugin.getDefault(), MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
+			IdeLog.logError(JSDebugPlugin.getDefault(),
+					MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
 		} finally {
 			if (reader != null) {
 				try {

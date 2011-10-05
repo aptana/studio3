@@ -52,7 +52,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	 * Separates original filename from disambiguating name(s)
 	 */
 	private static final String SEPARATOR = " | "; //$NON-NLS-1$
-	private HashMap<String, Set<IEditorPart>> baseNames;
+	private Map<String, Set<IEditorPart>> baseNames;
 
 	public FilenameDifferentiator()
 	{
@@ -173,7 +173,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 

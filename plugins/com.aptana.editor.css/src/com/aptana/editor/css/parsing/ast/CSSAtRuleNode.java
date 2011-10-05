@@ -18,34 +18,17 @@ public class CSSAtRuleNode extends CSSNode
 	/**
 	 * CSSAtRuleNode
 	 * 
-	 * @param encoding
-	 * @param start
-	 * @param end
-	 */
-	public CSSAtRuleNode(String name)
-	{
-		this(name, null);
-	}
-
-	/**
-	 * CSSAtRuleNode
-	 * 
-	 * @param encoding
-	 * @param start
-	 * @param end
+	 * @param name
+	 * @param id
 	 */
 	public CSSAtRuleNode(String name, String id)
 	{
-		super(CSSNodeTypes.AT_RULE);
+		super(ICSSNodeTypes.AT_RULE);
 
 		fName = name;
 		fId = id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
-	 */
 	@Override
 	public void accept(CSSTreeWalker walker)
 	{
@@ -59,7 +42,7 @@ public class CSSAtRuleNode extends CSSNode
 	 */
 	public String getName()
 	{
-		return this.fName;
+		return fName;
 	}
 
 	/**
@@ -69,13 +52,9 @@ public class CSSAtRuleNode extends CSSNode
 	 */
 	public String getRuleId()
 	{
-		return this.fId;
+		return fId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
 	@Override
 	public String toString()
 	{
@@ -84,11 +63,12 @@ public class CSSAtRuleNode extends CSSNode
 			StringBuilder buf = new StringBuilder();
 
 			// TODO: take into acct semicolon vs. block (curly braces)
-			buf.append(fName);
+			buf.append(getName());
 
-			if (StringUtil.isEmpty(fId) == false)
+			String id = getRuleId();
+			if (!StringUtil.isEmpty(id))
 			{
-				buf.append(" ").append(fId).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
+				buf.append(' ').append(id).append(';');
 			}
 
 			fText = buf.toString();

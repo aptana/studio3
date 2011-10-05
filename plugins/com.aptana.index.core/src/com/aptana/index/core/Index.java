@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.epl.IReadWriteMonitor;
 import com.aptana.core.epl.ReadWriteMonitor;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.internal.index.core.DiskIndex;
 import com.aptana.internal.index.core.MemoryIndex;
 
@@ -351,7 +352,8 @@ public class Index implements IReadWriteMonitor
 	void deleteIndexFile()
 	{
 		// TODO Enter write?
-		IndexPlugin.logInfo(MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
+		IdeLog.logInfo(IndexPlugin.getDefault(),
+				MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
 
 		File indexFile = this.getIndexFile();
 
@@ -508,7 +510,7 @@ public class Index implements IReadWriteMonitor
 			// the call to exitReadEnterWrite below
 			this.enterRead();
 
-			if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
+			if (this.memoryIndex.shouldMerge() && this.exitReadEnterWrite())
 			{
 				// in write...
 				try
@@ -517,7 +519,7 @@ public class Index implements IReadWriteMonitor
 				}
 				finally
 				{
-					monitor.exitWriteEnterRead();
+					this.exitWriteEnterRead();
 				}
 			}
 			// We're in read mode for monitor here now matter what...
@@ -539,7 +541,7 @@ public class Index implements IReadWriteMonitor
 			{
 				e.printStackTrace();
 			}
-			IndexPlugin.logError(e.getMessage(), e);
+			IdeLog.logError(IndexPlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -601,7 +603,7 @@ public class Index implements IReadWriteMonitor
 				);
 				// @formatter:on
 
-				IndexPlugin.logInfo(message, IDebugScopes.INDEXER);
+				IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.INDEXER);
 			}
 		}
 		finally
@@ -634,7 +636,7 @@ public class Index implements IReadWriteMonitor
 		}
 		catch (IOException e)
 		{
-			IndexPlugin.logError("An error occurred while removing categories from the index", e); //$NON-NLS-1$
+			IdeLog.logError(IndexPlugin.getDefault(), "An error occurred while removing categories from the index", e); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -649,7 +651,8 @@ public class Index implements IReadWriteMonitor
 	 */
 	public void save() throws IOException
 	{
-		IndexPlugin.logInfo(MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
+		IdeLog.logInfo(IndexPlugin.getDefault(),
+				MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
 
 		this.save(true);
 	}

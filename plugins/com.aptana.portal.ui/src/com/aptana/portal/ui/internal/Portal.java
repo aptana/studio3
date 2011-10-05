@@ -41,6 +41,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
@@ -64,14 +65,14 @@ public class Portal
 	// For debugging, do NOT check in with these uncommented:
 	// public static final String BASE_URL_PREFIX = Platform.inDevelopmentMode() ? System.getProperty(
 	//			"toolboxURL", "http://localhost:3000/toolbox") : "http://173.45.232.197/toolbox"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	private static final String BASE_REMOTE_URL = BASE_URL_PREFIX;
-	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
+	protected static final String BASE_REMOTE_URL = BASE_URL_PREFIX;
+	protected static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 
 	public static final String ACTIVE_PROJECT_KEY = "activeProject"; //$NON-NLS-1$
-	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
-	private static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
-	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
-	private static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
+	protected static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
+	protected static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
+	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
+	protected static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
 
 	private static Portal instance;
 	private AbstractPortalBrowserEditor portalBrowser;
@@ -145,11 +146,19 @@ public class Portal
 			{
 				url = getDefaultURL();
 			}
+			else
+			{
+				if (!isConnected(url))
+				{
+					URL localURL = FileLocator.toFileURL(Portal.class.getResource(BASE_LOCAL_URL));
+					url = URLUtil.appendParameters(localURL, new String[] { "url", url.toString() }); //$NON-NLS-1$
+				}
+			}
 			url = URLUtil.appendParameters(url, getURLParametersForProject(PortalUIPlugin.getActiveProject()), false);
 		}
 		catch (IOException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return;
 		}
 		if (portalBrowser != null && !portalBrowser.isDisposed())
@@ -212,7 +221,7 @@ public class Portal
 				}
 				catch (PartInitException e)
 				{
-					PortalUIPlugin.logError("Cannot open Aptana Portal", e); //$NON-NLS-1$
+					IdeLog.logError(PortalUIPlugin.getDefault(), "Cannot open Aptana Portal", e); //$NON-NLS-1$
 				}
 				return Status.OK_STATUS;
 			}
@@ -230,12 +239,29 @@ public class Portal
 	 */
 	protected URL getDefaultURL() throws IOException
 	{
-		// Do a connection check
-		if (isConnected())
+		return getDefaultURL(new URL(BASE_REMOTE_URL), Portal.class.getResource(BASE_LOCAL_URL));
+	}
+
+	/**
+	 * Returns the default URL for the portal.<br>
+	 * In case we have a live Internet connection, return the remote content. Otherwise, return the local content.
+	 * 
+	 * @return A default URL (can be null)
+	 * @throws IOException
+	 */
+	protected URL getDefaultURL(URL desiredUrl, URL fallbackUrl) throws IOException
+	{
+		if (fallbackUrl == null)
 		{
-			return new URL(BASE_REMOTE_URL);
+			throw new IllegalArgumentException("Fallback URL must not be null"); //$NON-NLS-1$
 		}
-		return FileLocator.toFileURL(Portal.class.getResource(BASE_LOCAL_URL));
+
+		// Do a connection check
+		if (isConnected(desiredUrl))
+		{
+			return desiredUrl;
+		}
+		return FileLocator.toFileURL(fallbackUrl);
 	}
 
 	/**
@@ -243,13 +269,18 @@ public class Portal
 	 * 
 	 * @return True, if and only if the remote server is alive.
 	 */
-	private boolean isConnected()
+	private boolean isConnected(URL url)
 	{
 		boolean connected = false;
 		HttpURLConnection connection = null;
 		try
 		{
-			connection = (HttpURLConnection) new URL(BASE_REMOTE_URL).openConnection();
+			// If the URL is for a local file, return 'true'
+			if ("file".equalsIgnoreCase(url.getProtocol())) //$NON-NLS-1$
+			{
+				return true;
+			}
+			connection = (HttpURLConnection) url.openConnection();
 			// Give it a 4 seconds delay before deciding that it's a dead connection
 			connection.setConnectTimeout(4000);
 			connection.setRequestMethod("HEAD"); // Don't ask for content //$NON-NLS-1$
@@ -261,8 +292,8 @@ public class Portal
 		catch (Exception e)
 		{
 			connected = false;
-			PortalUIPlugin
-					.logWarning("Could not establish a connection to the remote Aptana Dev Toolbox portal. Using the local portal content."); //$NON-NLS-1$
+			IdeLog.logWarning(PortalUIPlugin.getDefault(),
+					"Could not establish a connection to the remote portal. Using the local content."); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -389,7 +420,7 @@ public class Portal
 			}
 			catch (CoreException e)
 			{
-				PortalUIPlugin.logError(e);
+				IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			}
 		}
 		return 'O';
@@ -398,17 +429,9 @@ public class Portal
 	private String toHex(RGB rgb)
 	{
 		// FIXME This and pad are copy-pasted from Theme class
-		return MessageFormat.format("{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
-				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
-	}
-
-	private String pad(String string, int desiredLength, char padChar)
-	{
-		while (string.length() < desiredLength)
-		{
-			string = padChar + string;
-		}
-		return string;
+		return MessageFormat.format(
+				"{0}{1}{2}", StringUtil.pad(Integer.toHexString(rgb.red), 2, '0'), StringUtil.pad(Integer //$NON-NLS-1$
+						.toHexString(rgb.green), 2, '0'), StringUtil.pad(Integer.toHexString(rgb.blue), 2, '0'));
 	}
 
 	/**

@@ -12,7 +12,6 @@ import com.enterprisedt.net.ftp.FTPClientInterface;
 
 /**
  * @author Max Stepanov
- *
  */
 public interface IPoolConnectionManager {
 

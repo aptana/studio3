@@ -64,10 +64,10 @@ public class FileSystemActionFilter implements IActionFilter {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IActionFilter.class) {
+			if (IActionFilter.class.equals(adapterType)) {
 				return new FileSystemActionFilter();
 			}
-			if (adapterType == IFileStore.class) {
+			if (IFileStore.class.equals(adapterType)) {
 				return ((IAdaptable) adaptableObject).getAdapter(adapterType);
 			}
 			return null;

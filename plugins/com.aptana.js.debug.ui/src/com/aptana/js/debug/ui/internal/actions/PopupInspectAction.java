@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.js.debug.core.model.IJSInspectExpression;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -39,9 +40,8 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	private IJSInspectExpression expression;
 
 	/**
-	 * see
-	 * org.eclipse.jface.text.information.IInformationProvider#getInformation
-	 * (org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+	 * see org.eclipse.jface.text.information.IInformationProvider#getInformation (org.eclipse.jface.text.ITextViewer,
+	 * org.eclipse.jface.text.IRegion)
 	 * 
 	 * @param textViewer
 	 * @param subject
@@ -55,8 +55,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	}
 
 	/**
-	 * @see org.eclipse.jface.text.information.IInformationProvider#getSubject(org.eclipse.jface.text.ITextViewer,
-	 *      int)
+	 * @see org.eclipse.jface.text.information.IInformationProvider#getSubject(org.eclipse.jface.text.ITextViewer, int)
 	 */
 	public IRegion getSubject(ITextViewer textViewer, int offset) {
 		return getRegion();
@@ -83,7 +82,8 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 		IWorkbenchPart part = getTargetPart();
 		viewer = (ISourceViewer) part.getAdapter(ISourceViewer.class);
 		if (viewer == null) {
-			JSDebugUIPlugin.log("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()"); //$NON-NLS-1$
+			IdeLog.logInfo(JSDebugUIPlugin.getDefault(),
+					"TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()"); //$NON-NLS-1$
 		}
 		if (viewer == null) {
 			super.displayResult(result);
@@ -123,7 +123,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	private static Point getPopupAnchor(ITextViewer viewer) {
 		StyledText textWidget = viewer.getTextWidget();
 		Point docRange = textWidget.getSelectionRange();
-		int midOffset = docRange.x + (docRange.y / 2);
+		int midOffset = docRange.x + (docRange.y >> 1);
 		Point point = textWidget.getLocationAtOffset(midOffset);
 		point = textWidget.toDisplay(point);
 

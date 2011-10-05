@@ -75,6 +75,7 @@ import org.eclipse.ui.views.properties.PropertySheet;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.IControlThemerFactory;
@@ -131,7 +132,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			}
 			sub.setWorkRemaining(3);
 
-			applyThemeToJDTEditor(getCurrentTheme(), false, sub.newChild(1));
+			applyThemeToEclipseEditors(getCurrentTheme(), false, sub.newChild(1));
 			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
@@ -155,7 +156,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			}
 			sub.setWorkRemaining(3);
 
-			applyThemeToJDTEditor(getCurrentTheme(), true, sub.newChild(1));
+			applyThemeToEclipseEditors(getCurrentTheme(), true, sub.newChild(1));
 			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
@@ -204,7 +205,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -534,15 +535,17 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
+	protected void applyThemeToEclipseEditors(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
 		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 		setHyperlinkValues(theme, EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
-		setGitAndMercurialValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
+		setGitAndMercurialValues(theme,
+				EclipseUtil.instanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 
-		setGeneralEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
+		setGeneralEditorValues(theme,
+				EclipseUtil.instanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
 		setEditorValues(theme, EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
 
 		if (monitor.isCanceled())
@@ -570,6 +573,166 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			return;
 		}
 
+		// JDT
+		applyThemetoJDT(theme, revertToDefaults);
+
+		// WST
+		applyThemetoWST(theme, revertToDefaults);
+	}
+
+	protected void applyThemetoWST(Theme theme, boolean revertToDefaults)
+	{
+		// Adapted from
+		// https://github.com/eclipse-color-theme/eclipse-color-theme/blob/master/com.github.eclipsecolortheme/mappings
+		applyToWST_JSDTEditor(theme, revertToDefaults);
+		applyToWST_CSSEditor(theme, revertToDefaults);
+		applyToWST_HTMLEditor(theme, revertToDefaults);
+		applyToWST_XMLEditor(theme, revertToDefaults);
+	}
+
+	private void applyToWST_HTMLEditor(Theme theme, boolean revertToDefaults)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.html.ui"); //$NON-NLS-1$
+		setGeneralEditorValues(theme, prefs, revertToDefaults);
+		// TODO Add SCRIPT_AREA and SCRIPT_AREA_BORDER
+		setWSTToken(prefs, theme, "punctuation.definition.tag.html", "tagBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.name.tag.html", "tagName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.other.attribute-name.html", "tagAttributeName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.separator.key-value.html", "tagAttributeEquals", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "string.quoted.html", "tagAttributeValue", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "text.html", "xmlContent", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "comment.block.html", "commentBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "comment.block.html", "commentText", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "constant.character.entity.html", "entityReference", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.name.tag.doctype.html", "doctypeName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "text.html", "doctypeExternalPubref", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "text.html", "doctypeExtrenalSysref", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "text.html", "doctypeExternalId", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.definition.tag.html", "declBoder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	protected void applyToWST_JSDTEditor(Theme theme, boolean revertToDefaults)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.jsdt.ui"); //$NON-NLS-1$
+		setGeneralEditorValues(theme, prefs, revertToDefaults);
+
+		// TODO Add mapping for parameter variables, "functions" (which might be function calls)?
+		setToken(prefs, theme, "source.js", "java_default", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.line.double-slash.js", "java_single_line_comment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.block", "java_multi_line_comment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "string.quoted.double.js", "java_string", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword", "java_keyword", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword.operator", "java_operator", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword.control.js", "java_keyword_return", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "punctuation.bracket.js", "java_bracket", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword.other.documentation.task", "commentTaskTag", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// JSdoc
+		setToken(prefs, theme, "keyword.other.documentation.js", "java_doc_keyword", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "entity.name.tag.inline.any.html", "java_doc_tag", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "markup.underline.link.javadoc", "java_doc_link", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.block.documentation.javadoc", "java_doc_default", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "meta.tag.documentation.js", "tagName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Semantic
+		setSemanticToken(prefs, theme, "entity.name.function.js", "methodDeclarationName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.js", "localVariable", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.js", "localVariableDeclaration", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	protected void applyToWST_CSSEditor(Theme theme, boolean revertToDefaults)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.css.ui"); //$NON-NLS-1$
+		setGeneralEditorValues(theme, prefs, revertToDefaults);
+
+		setWSTToken(prefs, theme,
+				"meta.property-name.css support.type.property-name.css", "PROPERTY_NAME", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.other.attribute-name.class.css", "CLASS", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "ATTRIBUTE_VALUE", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "UNIVERSAL", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.css", "COMBINATOR", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.terminator.rule.css", "SEMI_COLON", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.bracket.css", "ATTRIBUTE_DELIM", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.name.tag.css", "SELECTOR", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "URI", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "ATTRIBUTE_NAME", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.separator.key-value.css", "COLON", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.other.attribute-name.id.css", "ID", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "NORMAL", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "string.quoted.css", "STRING", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.section.property-list.css", "CURLY_BRACE", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "PSEUDO", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "comment.block.css", "COMMENT", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "support.constant.property-value.css", "PROPERTY_VALUE", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "keyword.control.at-rule.css", "ATMARK_RULE", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.css", "ATTRIBUTE_OPERATOR", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "support.constant.media.css", "MEDIA", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	protected void applyToWST_XMLEditor(Theme theme, boolean revertToDefaults)
+	{
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.wst.xml.ui"); //$NON-NLS-1$
+		setGeneralEditorValues(theme, prefs, revertToDefaults);
+
+		// FIXME These were adapted from our scopes for DTD, but those don't appear correct to me!
+		setWSTToken(prefs, theme, "punctuation.definition.tag.xml", "tagBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.name.tag.xml", "tagName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "entity.other.attribute-name.xml", "tagAttributeName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "punctuation.separator.key-value.xml", "tagAttributeEquals", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "string.quoted.xml", "tagAttributeValue", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "text.xml", "xmlContent", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "comment.block.xml", "commentBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "comment.block.xml", "commentText", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "constant.character.entity.xml", "entityReference", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.dtd", "doctypeName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "keyword.operator.dtd", "doctypeExternalPubref", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "keyword.operator.dtd", "doctypeExtrenalSysref", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "keyword.operator.dtd", "doctypeExternalId", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "source.dtd", "declBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "string.unquoted.cdata.xml", "cdataBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "string.unquoted.cdata.xml", "cdataText", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "meta.tag.preprocessor.xml", "piBorder", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setWSTToken(prefs, theme, "meta.tag.preprocessor.xml", "piContent", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(ThemePlugin.getDefault(), e);
+		}
+	}
+
+	protected void applyThemetoJDT(Theme theme, boolean revertToDefaults)
+	{
 		// Now set for JDT...
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.jdt.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
@@ -639,7 +802,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 
 		// Override JDT editor font
@@ -777,7 +940,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -852,7 +1015,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -908,7 +1071,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -943,7 +1106,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 		}
 		catch (BackingStoreException e)
 		{
-			ThemePlugin.logError(e);
+			IdeLog.logError(ThemePlugin.getDefault(), e);
 		}
 	}
 
@@ -966,6 +1129,36 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener2, IPre
 			prefs.putBoolean(jdtToken + "_italic", (attr.getStyle() & SWT.ITALIC) != 0); //$NON-NLS-1$
 			prefs.putBoolean(jdtToken + "_underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0); //$NON-NLS-1$
 			prefs.putBoolean(jdtToken + "_strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0); //$NON-NLS-1$
+		}
+	}
+
+	protected void setWSTToken(IEclipsePreferences prefs, Theme theme, String ourEquivalentScope, String prefKey,
+			boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove(prefKey);
+		}
+		else
+		{
+			TextAttribute attr = theme.getTextAttribute(ourEquivalentScope);
+			boolean bold = (attr.getStyle() & SWT.BOLD) != 0;
+			boolean italic = (attr.getStyle() & SWT.ITALIC) != 0;
+			boolean strikethrough = (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0;
+			boolean underline = (attr.getStyle() & TextAttribute.UNDERLINE) != 0;
+			StringBuilder value = new StringBuilder();
+			value.append(Theme.toHex(attr.getForeground().getRGB()));
+			value.append('|');
+			value.append(Theme.toHex(attr.getBackground().getRGB()));
+			value.append('|');
+			value.append(bold);
+			value.append('|');
+			value.append(italic);
+			value.append('|');
+			value.append(strikethrough);
+			value.append('|');
+			value.append(underline);
+			prefs.put(prefKey, value.toString());
 		}
 	}
 

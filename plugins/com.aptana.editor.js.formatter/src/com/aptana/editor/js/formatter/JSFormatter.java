@@ -74,12 +74,14 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
@@ -214,7 +216,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			StatusLineMessageTimerManager.setErrorMessage(e.getMessage()
 					+ " - " + FormatterMessages.Formatter_formatterErrorStatus, //$NON-NLS-1$
 					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(e);
+			IdeLog.logError(JSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
 			// indentation level as much as we can.
 			return indent(source, input, inputOffset, length - (inputOffset - offset), indentationLevel);
@@ -255,7 +257,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		{
 			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
 					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(e);
+			IdeLog.logError(JSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return null;
 	}
@@ -292,7 +294,14 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		// Flatten the AST's and do a string compare
 		// The toString() of the JSParseRootNode calls the JSFormatWalker,
 		// which should generate the same string for the input and the output.
-		return outputParseResult.toString().equals(inputParseResult.toString());
+		String flattenOutputAST = outputParseResult.toString();
+		String flattenInputAST = inputParseResult.toString();
+		boolean equals = flattenOutputAST.equals(flattenInputAST);
+		if (!equals && FormatterPlugin.getDefault().isDebugging())
+		{
+			FormatterUtils.logDiff(flattenInputAST, flattenOutputAST);
+		}
+		return equals;
 	}
 
 	/*

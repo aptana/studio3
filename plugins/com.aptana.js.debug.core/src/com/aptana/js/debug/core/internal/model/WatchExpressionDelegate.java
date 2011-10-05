@@ -30,7 +30,7 @@ public class WatchExpressionDelegate implements IWatchExpressionDelegate {
 	 * Evaluation job
 	 */
 	private final class EvaluationJob extends Job {
-		
+
 		private JSDebugTarget target;
 		private String expression;
 		private IDebugElement context;
@@ -68,16 +68,15 @@ public class WatchExpressionDelegate implements IWatchExpressionDelegate {
 			}
 			listener.watchEvaluationFinished(watchResult);
 			DebugPlugin.getDefault().fireDebugEventSet(
-					new DebugEvent[] {
-							new DebugEvent(WatchExpressionDelegate.this, DebugEvent.SUSPEND, DebugEvent.EVALUATION_IMPLICIT) });
+					new DebugEvent[] { new DebugEvent(WatchExpressionDelegate.this, DebugEvent.SUSPEND,
+							DebugEvent.EVALUATION_IMPLICIT) });
 			return Status.OK_STATUS;
 		}
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IWatchExpressionDelegate#evaluateExpression(java.lang.String,
-	 *      org.eclipse.debug.core.model.IDebugElement,
-	 *      org.eclipse.debug.core.model.IWatchExpressionListener)
+	 * org.eclipse.debug.core.model.IDebugElement, org.eclipse.debug.core.model.IWatchExpressionListener)
 	 */
 	public void evaluateExpression(String expression, IDebugElement context, IWatchExpressionListener listener) {
 		ISuspendResume suspendResume = context.getDebugTarget();

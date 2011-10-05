@@ -19,12 +19,13 @@ import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ class ThemedStyleMap extends StyleMap {
+/* package */class ThemedStyleMap extends StyleMap {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map,
+	 * org.eclipse.tm.terminal.model.StyleColor)
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -42,12 +43,13 @@ import com.aptana.theme.ThemePlugin;
 				return theme.getForeground(ansiName);
 			}
 		}
-		boolean isForeground = map == fColorMapForeground;
+		boolean isForeground = map == fColorMapForeground; // $codepro.audit.disable useEquals
 		if (StyleMap.BLACK.equals(colorName)) {
 			return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
 		}
 		if (StyleMap.WHITE.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
+			return ThemePlugin.getDefault().getColorManager()
+					.getColor(isForeground ? theme.getForeground() : theme.getBackground());
 		}
 
 		// fall back to defaults...
@@ -58,6 +60,5 @@ import com.aptana.theme.ThemePlugin;
 		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
 	}
-
 
 }

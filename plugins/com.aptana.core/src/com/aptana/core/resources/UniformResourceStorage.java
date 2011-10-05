@@ -131,7 +131,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 				}
 			}
 		} catch (IOException e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return false;
 	}
@@ -172,7 +172,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 				}
 			}
 		} catch (IOException e) {
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		return false;
 	}

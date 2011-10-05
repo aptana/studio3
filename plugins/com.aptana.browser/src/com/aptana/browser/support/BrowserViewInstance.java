@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable closeInFinally
 
 package com.aptana.browser.support;
 
@@ -54,7 +55,7 @@ public class BrowserViewInstance extends InternalBrowserInstance {
 		}
 		if (view != null) {
 			workbenchPage.bringToTop(view);
-			view.setURL(url != null ? url.toExternalForm() : null);
+			view.setURL((url != null) ? url.toExternalForm() : null);
 		}
 	}
 

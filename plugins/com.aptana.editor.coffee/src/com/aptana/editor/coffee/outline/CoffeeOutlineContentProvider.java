@@ -25,16 +25,23 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 {
+
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
 			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
-			if (rootNode != null)
+			return getChildren(rootNode);
+		}
+		if (parentElement instanceof IParseRootNode)
+		{
+			IParseNode rootNode = (IParseRootNode) parentElement;
+			if (rootNode.hasChildren())
 			{
 				if (rootNode.hasChildren())
 				{
@@ -46,10 +53,11 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 					return EMPTY;
 				}
 			}
+			return EMPTY;
 		}
 		if (parentElement instanceof CoffeeValueNode)
 		{
-			CoffeeNode firstChild = (CoffeeNode) ((CoffeeValueNode) parentElement).getChild(0);
+			IParseNode firstChild = ((CoffeeValueNode) parentElement).getChild(0);
 			if (firstChild instanceof CoffeeObjNode)
 			{
 				getChildren(firstChild);
@@ -124,6 +132,7 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 		// Sort within this level of the hierarchy
 		Collections.sort(list, new Comparator<CoffeeNode>()
 		{
+
 			public int compare(CoffeeNode o1, CoffeeNode o2)
 			{
 				return sortPriority(o1) - sortPriority(o2);
@@ -133,39 +142,39 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 			{
 				switch (element.getNodeType())
 				{
-				// case CoffeeNodeTypes.SCRIPT:
-				// return -2;
-				// case CoffeeNodeTypes.GLOBAL:
-				// return -1;
-				// case CoffeeNodeTypes.IMPORT_CONTAINER:
-				// return 0;
-				// case CoffeeNodeTypes.IMPORT_DECLARATION:
-				// return 1;
-				// case CoffeeNodeTypes.TYPE:
-				// return 2;
-				// case CoffeeNodeTypes.CONSTANT:
-				// return 3;
-				// case CoffeeNodeTypes.CLASS_VAR:
-				// return 4;
-				// case CoffeeNodeTypes.INSTANCE_VAR:
-				// case CoffeeNodeTypes.FIELD:
-				// return 5;
-				// case CoffeeNodeTypes.METHOD:
-				// IRubyMethod method = (IRubyMethod) element;
-				// if (method.isSingleton())
-				// {
-				// return 6;
-				// }
-				// if (method.isConstructor())
-				// {
-				// return 7;
-				// }
-				// return 8;
-				// case CoffeeNodeTypes.LOCAL_VAR:
-				// return 9;
-				// case CoffeeNodeTypes.BLOCK:
-				// case CoffeeNodeTypes.DYNAMIC_VAR:
-				// return 10;
+					// case CoffeeNodeTypes.SCRIPT:
+					// return -2;
+					// case CoffeeNodeTypes.GLOBAL:
+					// return -1;
+					// case CoffeeNodeTypes.IMPORT_CONTAINER:
+					// return 0;
+					// case CoffeeNodeTypes.IMPORT_DECLARATION:
+					// return 1;
+					// case CoffeeNodeTypes.TYPE:
+					// return 2;
+					// case CoffeeNodeTypes.CONSTANT:
+					// return 3;
+					// case CoffeeNodeTypes.CLASS_VAR:
+					// return 4;
+					// case CoffeeNodeTypes.INSTANCE_VAR:
+					// case CoffeeNodeTypes.FIELD:
+					// return 5;
+					// case CoffeeNodeTypes.METHOD:
+					// IRubyMethod method = (IRubyMethod) element;
+					// if (method.isSingleton())
+					// {
+					// return 6;
+					// }
+					// if (method.isConstructor())
+					// {
+					// return 7;
+					// }
+					// return 8;
+					// case CoffeeNodeTypes.LOCAL_VAR:
+					// return 9;
+					// case CoffeeNodeTypes.BLOCK:
+					// case CoffeeNodeTypes.DYNAMIC_VAR:
+					// return 10;
 					default:
 						return 5;
 				}

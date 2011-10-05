@@ -68,12 +68,10 @@ public class ConsoleHyperlink implements IHyperlink {
 				SourceDisplayUtil.openInEditor(editorInput, fLineNumber);
 				return;
 			}
-			MessageDialog
-					.openInformation(
-							UIUtils.getActiveShell(),
-							Messages.ConsoleHyperlink_SourceNotFound_Title, MessageFormat.format(Messages.ConsoleHyperlink_SourceNotFound_Message, fFilename));
+			MessageDialog.openInformation(UIUtils.getActiveShell(), Messages.ConsoleHyperlink_SourceNotFound_Title,
+					MessageFormat.format(Messages.ConsoleHyperlink_SourceNotFound_Message, fFilename));
 		} catch (CoreException e) {
-			DebugUiPlugin.errorDialog("An exception occurred while following link.", e);  //$NON-NLS-1$
+			DebugUiPlugin.errorDialog("An exception occurred while following link.", e); //$NON-NLS-1$
 		}
 	}
 

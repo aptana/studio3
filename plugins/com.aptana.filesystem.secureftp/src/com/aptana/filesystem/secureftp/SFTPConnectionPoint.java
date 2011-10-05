@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable declareAsInterface
 
 package com.aptana.filesystem.secureftp;
 
@@ -47,7 +48,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	private String login = ""; //$NON-NLS-1$
 	private IPath privateKeyFile;
 	private char[] password;
-	private String transferType = ISFTPConstants.TRANSFER_TYPE_BINARY;
+	private String transferType = ISFTPConstants.TRANSFER_TYPE_AUTO;
 	private String encoding = ISFTPConstants.ENCODING_DEFAULT;
 	private String compression = ISFTPConstants.COMPRESSION_AUTO;
 	
@@ -74,7 +75,8 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 		if (child != null) {
 			try {
 				port = Integer.parseInt(child.getTextData());
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException ignore) {
+				ignore.getCause();
 			}
 		}
 		child = memento.getChild(ELEMENT_PATH);
@@ -330,7 +332,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (IConnectionFileManager.class == adapter) {
+		if (IConnectionFileManager.class.equals(adapter)) {
 			return getConnectionFileManager();
 		}
 		return super.getAdapter(adapter);
@@ -355,7 +357,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 			if (context != null) {
 				CoreIOPlugin.setConnectionContext(connectionFileManager, context);
 			}
-			IPath keyFilePath = privateKeyFile != null && !privateKeyFile.isEmpty() ? privateKeyFile : null;
+			IPath keyFilePath = (privateKeyFile != null && !privateKeyFile.isEmpty()) ? privateKeyFile : null;
 			connectionFileManager.init(host, port, path, keyFilePath, login, password, transferType, encoding, compression);
 		}
 		return connectionFileManager;

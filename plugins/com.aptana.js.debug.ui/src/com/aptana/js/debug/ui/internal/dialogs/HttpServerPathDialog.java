@@ -40,7 +40,6 @@ import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
- * 
  */
 @SuppressWarnings("restriction")
 public class HttpServerPathDialog extends StatusDialog {
@@ -61,10 +60,7 @@ public class HttpServerPathDialog extends StatusDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets .Composite)
 	 */
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);

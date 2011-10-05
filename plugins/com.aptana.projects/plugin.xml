@@ -42,7 +42,7 @@
             id="com.aptana.contenttype.jsca">
       </content-type>
       <content-type
-            id="com.aptana.contenttype.jss">
+            id="com.appcelerator.titanium.contenttype.jss">
       </content-type>
       <content-type
             id="com.aptana.contenttype.markdown">

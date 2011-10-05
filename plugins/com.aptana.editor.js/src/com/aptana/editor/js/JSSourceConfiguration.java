@@ -40,7 +40,8 @@ import com.aptana.editor.js.text.rules.JSRegExpRule;
  * @author Max Stepanov
  * @author cwilliams
  */
-public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
 	public final static String PREFIX = "__js_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
@@ -65,9 +66,10 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new MultiLineRule("/*", "*/", getToken(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new JSRegExpRule(getToken(JS_REGEXP)) };
 
-	private static JSSourceConfiguration instance;
+	private static JSSourceConfiguration INSTANCE;
 
-	static {
+	static
+	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
@@ -79,21 +81,25 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.documentation.js")); //$NON-NLS-1$
 	}
 
-	private JSSourceConfiguration() {
+	private JSSourceConfiguration()
+	{
 	}
 
-	public static JSSourceConfiguration getDefault() {
-		if (instance == null) {
-			instance = new JSSourceConfiguration();
+	public static JSSourceConfiguration getDefault()
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new JSSourceConfiguration();
 		}
-		return instance;
+		return INSTANCE;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
+	public String[] getContentTypes()
+	{
 		return CONTENT_TYPES;
 	}
 
@@ -101,7 +107,8 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -109,7 +116,8 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
@@ -117,7 +125,8 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, getToken(DEFAULT));
 	}
 
@@ -125,8 +134,10 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentContentType(java.lang.String)
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return IJSConstants.CONTENT_TYPE_JS;
 		}
 		return null;
@@ -134,9 +145,12 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see
+	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
+	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -171,44 +185,55 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.AbstractThemeableEditor, java.lang.String)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#getContentAssistProcessor(com.aptana.editor.common.
+	 * AbstractThemeableEditor, java.lang.String)
 	 */
-	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType) {
-		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || JSSourceConfiguration.DEFAULT.equals(contentType)) {
+	public IContentAssistProcessor getContentAssistProcessor(AbstractThemeableEditor editor, String contentType)
+	{
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || JSSourceConfiguration.DEFAULT.equals(contentType))
+		{
 			return new JSContentAssistProcessor(editor);
 		}
 		return null;
 	}
 
-	private ITokenScanner getMultiLineCommentScanner() {
+	private ITokenScanner getMultiLineCommentScanner()
+	{
 		return new CommentScanner(getToken("comment.block.js")); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getSingleLineCommentScanner() {
+	private ITokenScanner getSingleLineCommentScanner()
+	{
 		return new CommentScanner(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getRegexpScanner() {
+	private ITokenScanner getRegexpScanner()
+	{
 		return new JSEscapeSequenceScanner("string.regexp.js"); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getDoubleQuotedStringScanner() {
+	private ITokenScanner getDoubleQuotedStringScanner()
+	{
 		return new JSEscapeSequenceScanner("string.quoted.double.js"); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getSingleQuotedStringScanner() {
+	private ITokenScanner getSingleQuotedStringScanner()
+	{
 		return new JSEscapeSequenceScanner("string.quoted.single.js"); //$NON-NLS-1$
 	}
 
-	private ITokenScanner getJSDocScanner() {
+	private ITokenScanner getJSDocScanner()
+	{
 		return new JSDocScanner();
 	}
 
-	private ITokenScanner getCodeScanner() {
+	private ITokenScanner getCodeScanner()
+	{
 		return new JSCodeScanner();
 	}
 
-	private IToken getToken(String tokenName) {
+	private IToken getToken(String tokenName)
+	{
 		return CommonUtil.getToken(tokenName);
 	}
 }

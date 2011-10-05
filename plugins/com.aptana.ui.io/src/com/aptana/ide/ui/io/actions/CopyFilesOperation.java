@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.ide.ui.io.actions;
 
@@ -31,6 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.io.efs.SyncUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -41,109 +43,123 @@ import com.aptana.ui.util.UIUtils;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class CopyFilesOperation {
+public class CopyFilesOperation
+{
 
-    /**
-     * The parent shell used to show any dialogs
-     */
-    private Shell fShell;
+	/**
+	 * The parent shell used to show any dialogs
+	 */
+	private Shell fShell;
 
-    /**
-     * Flag to indicate if the operation has been canceled by the user
-     */
-    private boolean fCancelled;
+	/**
+	 * Flag to indicate if the operation has been canceled by the user
+	 */
+	private boolean fCancelled;
 
-    /**
-     * Overwrite-all flag
-     */
-    private boolean fAlwaysOverwrite;
+	/**
+	 * Overwrite-all flag
+	 */
+	private boolean fAlwaysOverwrite;
 
-    /**
-     * Constructor.
-     * 
-     * @param shell
-     *            the active shell
-     */
-    public CopyFilesOperation(Shell shell) {
-        if (shell == null) {
-            fShell = UIUtils.getActiveShell();
-        } else {
-            fShell = shell;
-        }
-    }
+	/**
+	 * Constructor.
+	 * 
+	 * @param shell
+	 *            the active shell
+	 */
+	public CopyFilesOperation(Shell shell)
+	{
+		if (shell == null)
+		{
+			fShell = UIUtils.getActiveShell();
+		}
+		else
+		{
+			fShell = shell;
+		}
+	}
 
-    /**
-     * Copies an array of sources to the destination location.
-     * 
-     * @param sources
-     *            the array of IAdaptable objects
-     * @param destination
-     *            the destination file store
-     * @param listener
-     *            an optional job listener
-     */
-    public void copyFiles(IAdaptable[] sources, IFileStore destination, IJobChangeListener listener) {
-        IFileStore[] fileStores = new IFileStore[sources.length];
-        for (int i = 0; i < fileStores.length; ++i) {
-            fileStores[i] = Utils.getFileStore(sources[i]);
-        }
-        copyFiles(fileStores, destination, listener);
-    }
+	/**
+	 * Copies an array of sources to the destination location.
+	 * 
+	 * @param sources
+	 *            the array of IAdaptable objects
+	 * @param destination
+	 *            the destination file store
+	 * @param listener
+	 *            an optional job listener
+	 */
+	public void copyFiles(IAdaptable[] sources, IFileStore destination, IJobChangeListener listener)
+	{
+		IFileStore[] fileStores = new IFileStore[sources.length];
+		for (int i = 0; i < fileStores.length; ++i)
+		{
+			fileStores[i] = Utils.getFileStore(sources[i]);
+		}
+		copyFiles(fileStores, destination, listener);
+	}
 
-    /**
-     * Copies an array of sources to the destination location.
-     * 
-     * @param sources
-     *            the array of filenames
-     * @param destination
-     *            the destination file store
-     * @param listener
-     *            an optional job listener
-     */
-    public void copyFiles(String[] filenames, IFileStore destination, IJobChangeListener listener) {
-        copyFiles(getFileStores(filenames), destination, listener);
-    }
+	/**
+	 * Copies an array of sources to the destination location.
+	 * 
+	 * @param sources
+	 *            the array of filenames
+	 * @param destination
+	 *            the destination file store
+	 * @param listener
+	 *            an optional job listener
+	 */
+	public void copyFiles(String[] filenames, IFileStore destination, IJobChangeListener listener)
+	{
+		copyFiles(getFileStores(filenames), destination, listener);
+	}
 
-    /**
-     * Copies an array of sources to the destination location.
-     * 
-     * @param sources
-     *            the array of source file stores
-     * @param destination
-     *            the file store representing the destination folder
-     * @param monitor
-     *            an optional progress monitor
-     */
-    public IStatus copyFiles(IFileStore[] sources, IFileStore destination, IProgressMonitor monitor) {
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-        fShell.getDisplay().syncExec(new Runnable() {
+	/**
+	 * Copies an array of sources to the destination location.
+	 * 
+	 * @param sources
+	 *            the array of source file stores
+	 * @param destination
+	 *            the file store representing the destination folder
+	 * @param monitor
+	 *            an optional progress monitor
+	 */
+	public IStatus copyFiles(IFileStore[] sources, IFileStore destination, IProgressMonitor monitor)
+	{
+		if (monitor == null)
+		{
+			monitor = new NullProgressMonitor();
+		}
+		fShell.getDisplay().syncExec(new Runnable()
+		{
 
-            public void run() {
-                int retCode = DialogUtils.openIgnoreMessageDialogConfirm(fShell,
-                        Messages.CopyFilesOperation_OverwriteTitle,
-                        Messages.CopyFilesOperation_OverwriteWarning, IOUIPlugin.getDefault()
-                                .getPreferenceStore(), IPreferenceConstants.COPY_OVERWRITE);
-                fAlwaysOverwrite = (retCode == Window.OK);
-            }
-        });
-        if (!fAlwaysOverwrite) {
-            return Status.CANCEL_STATUS;
-        }
+			public void run()
+			{
+				int retCode = DialogUtils.openIgnoreMessageDialogConfirm(fShell,
+						Messages.CopyFilesOperation_OverwriteTitle, Messages.CopyFilesOperation_OverwriteWarning,
+						IOUIPlugin.getDefault().getPreferenceStore(), IPreferenceConstants.COPY_OVERWRITE);
+				fAlwaysOverwrite = (retCode == Window.OK);
+			}
+		});
+		if (!fAlwaysOverwrite)
+		{
+			return Status.CANCEL_STATUS;
+		}
 
-        int successCount = 0;
-        for (IFileStore source : sources) {
-            if (copyFile(source, destination.getChild(source.getName()), monitor)) {
-                successCount++;
-            }
-            if (fCancelled || monitor.isCanceled()) {
-                return Status.CANCEL_STATUS;
-            }
-        }
-        return new Status(IStatus.OK, IOUIPlugin.PLUGIN_ID, successCount,
-                Messages.CopyFilesOperation_Status_OK, null);
-    }
+		int successCount = 0;
+		for (IFileStore source : sources)
+		{
+			if (copyFile(source, destination.getChild(source.getName()), monitor))
+			{
+				successCount++;
+			}
+			if (fCancelled || monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+		}
+		return new Status(IStatus.OK, IOUIPlugin.PLUGIN_ID, successCount, Messages.CopyFilesOperation_Status_OK, null);
+	}
 
 	/**
 	 * Copies an array of files from the source to the destination.
@@ -186,104 +202,109 @@ public class CopyFilesOperation {
 		copyFiles(getFileStores(filenames), sourceRoot, destinationRoot, listener);
 	}
 
-    /**
-     * Copies an array of files from the source to the destination.
-     * 
-     * @param sources
-     *            the array of source file stores
-     * @param sourceRoot
-     *            the file store representing the root of source connection
-     * @param destinationRoot
-     *            the file store representing the root of target connection
-     * @param monitor
-     *            an optional progress monitor
-     */
-    public IStatus copyFiles(IFileStore[] sources, IFileStore sourceRoot,
-            IFileStore destinationRoot, IProgressMonitor monitor) {
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-        fShell.getDisplay().syncExec(new Runnable() {
+	/**
+	 * Copies an array of files from the source to the destination.
+	 * 
+	 * @param sources
+	 *            the array of source file stores
+	 * @param sourceRoot
+	 *            the file store representing the root of source connection
+	 * @param destinationRoot
+	 *            the file store representing the root of target connection
+	 * @param monitor
+	 *            an optional progress monitor
+	 */
+	public IStatus copyFiles(IFileStore[] sources, IFileStore sourceRoot, IFileStore destinationRoot,
+			IProgressMonitor monitor)
+	{
+		if (monitor == null)
+		{
+			monitor = new NullProgressMonitor();
+		}
+		fShell.getDisplay().syncExec(new Runnable()
+		{
 
-            public void run() {
-                int retCode = DialogUtils.openIgnoreMessageDialogConfirm(fShell,
-                        Messages.CopyFilesOperation_OverwriteTitle,
-                        Messages.CopyFilesOperation_OverwriteWarning, IOUIPlugin.getDefault()
-                                .getPreferenceStore(), IPreferenceConstants.COPY_OVERWRITE);
-                fAlwaysOverwrite = (retCode == Window.OK);
-            }
-        });
+			public void run()
+			{
+				int retCode = DialogUtils.openIgnoreMessageDialogConfirm(fShell,
+						Messages.CopyFilesOperation_OverwriteTitle, Messages.CopyFilesOperation_OverwriteWarning,
+						IOUIPlugin.getDefault().getPreferenceStore(), IPreferenceConstants.COPY_OVERWRITE);
+				fAlwaysOverwrite = (retCode == Window.OK);
+			}
+		});
 
-        if (!fAlwaysOverwrite) {
-            return Status.CANCEL_STATUS;
-        }
+		if (!fAlwaysOverwrite)
+		{
+			return Status.CANCEL_STATUS;
+		}
 
-        int successCount = 0;
-        for (IFileStore source : sources) {
-            if (copyFile(source, sourceRoot, destinationRoot, monitor)) {
-                successCount++;
-            }
-            if (fCancelled || monitor.isCanceled()) {
-                return Status.CANCEL_STATUS;
-            }
-        }
-        return new Status(IStatus.OK, IOUIPlugin.PLUGIN_ID, successCount,
-                Messages.CopyFilesOperation_Status_OK, null);
-    }
+		int successCount = 0;
+		for (IFileStore source : sources)
+		{
+			if (copyFile(source, sourceRoot, destinationRoot, monitor))
+			{
+				successCount++;
+			}
+			if (fCancelled || monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+		}
+		return new Status(IStatus.OK, IOUIPlugin.PLUGIN_ID, successCount, Messages.CopyFilesOperation_Status_OK, null);
+	}
 
-    /**
-     * Checks if there is structural conflict for transferring the sources to
-     * the destination.
-     * 
-     * @param destination
-     *            the destination adaptable
-     * @param sources
-     *            the array of source adaptables
-     * @return a descriptive error message if the validation fails, and null
-     *         otherwise
-     */
-    public static String validateDestination(IAdaptable destination, IAdaptable[] sources) {
-        IFileStore[] sourceStores = new IFileStore[sources.length];
-        for (int i = 0; i < sourceStores.length; ++i) {
-            sourceStores[i] = Utils.getFileStore(sources[i]);
-        }
-        return validateDestination(destination, sourceStores);
-    }
+	/**
+	 * Checks if there is structural conflict for transferring the sources to the destination.
+	 * 
+	 * @param destination
+	 *            the destination adaptable
+	 * @param sources
+	 *            the array of source adaptables
+	 * @return a descriptive error message if the validation fails, and null otherwise
+	 */
+	public static String validateDestination(IAdaptable destination, IAdaptable[] sources)
+	{
+		IFileStore[] sourceStores = new IFileStore[sources.length];
+		for (int i = 0; i < sourceStores.length; ++i)
+		{
+			sourceStores[i] = Utils.getFileStore(sources[i]);
+		}
+		return validateDestination(destination, sourceStores);
+	}
 
-    /**
-     * Checks if there is structural conflict for transferring the sources to
-     * the destination.
-     * 
-     * @param destination
-     *            the destination adaptable
-     * @param sourceNames
-     *            the array of source filenames
-     * @return a descriptive error message if the validation fails, and null
-     *         otherwise
-     */
-    public static String validateDestination(IAdaptable destination, String[] sourceNames) {
-        return validateDestination(destination, getFileStores(sourceNames));
-    }
+	/**
+	 * Checks if there is structural conflict for transferring the sources to the destination.
+	 * 
+	 * @param destination
+	 *            the destination adaptable
+	 * @param sourceNames
+	 *            the array of source filenames
+	 * @return a descriptive error message if the validation fails, and null otherwise
+	 */
+	public static String validateDestination(IAdaptable destination, String[] sourceNames)
+	{
+		return validateDestination(destination, getFileStores(sourceNames));
+	}
 
-    /**
-     * @param sourceStore
-     *            the file to be copied
-     * @param destinationStore
-     *            the destination location
-     * @param monitor
-     *            the progress monitor
-     * @return true if the file is successfully copied, false if the operation
-     *         did not go through for any reason
-     */
-    protected boolean copyFile(IFileStore sourceStore, IFileStore destinationStore,
-            IProgressMonitor monitor) {
-        if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore)) {
-            return false;
-        }
+	/**
+	 * @param sourceStore
+	 *            the file to be copied
+	 * @param destinationStore
+	 *            the destination location
+	 * @param monitor
+	 *            the progress monitor
+	 * @return true if the file is successfully copied, false if the operation did not go through for any reason
+	 */
+	protected boolean copyFile(IFileStore sourceStore, IFileStore destinationStore, IProgressMonitor monitor)
+	{
+		if (sourceStore == null || CloakingUtils.isFileCloaked(sourceStore))
+		{
+			return false;
+		}
 
-        boolean success = true;
-        monitor.subTask(MessageFormat.format(Messages.CopyFilesOperation_Copy_Subtask, sourceStore
-                .getName(), destinationStore.getName()));
+		boolean success = true;
+		monitor.subTask(MessageFormat.format(Messages.CopyFilesOperation_Copy_Subtask, sourceStore.getName(),
+				destinationStore.getName()));
 
 		if (destinationStore.equals(sourceStore))
 		{
@@ -293,22 +314,24 @@ public class CopyFilesOperation {
 				return false;
 			}
 		}
-
 		try
 		{
 			SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
-			// copy the children recursively
-			IFileStore[] childStores = sourceStore.childStores(EFS.NONE, monitor);
-			IFileStore destChildStore;
-			for (IFileStore childStore : childStores)
+			if (Utils.isDirectory(sourceStore))
 			{
-				destChildStore = destinationStore.getChild(childStore.getName());
-				copyFile(childStore, destChildStore, monitor);
+				// copy the children recursively
+				IFileStore[] childStores = sourceStore.childStores(EFS.NONE, monitor);
+				IFileStore destChildStore;
+				for (IFileStore childStore : childStores)
+				{
+					destChildStore = destinationStore.getChild(childStore.getName());
+					copyFile(childStore, destChildStore, monitor);
+				}
 			}
 		}
 		catch (CoreException e)
 		{
-			IOUIPlugin.logError(
+			IdeLog.logError(IOUIPlugin.getDefault(),
 					MessageFormat.format(Messages.CopyFilesOperation_ERR_FailedToCopy, sourceStore, destinationStore),
 					e);
 			success = false;
@@ -389,7 +412,7 @@ public class CopyFilesOperation {
 		}
 		catch (CoreException e)
 		{
-			IOUIPlugin.logError(MessageFormat.format(
+			IdeLog.logError(IOUIPlugin.getDefault(), MessageFormat.format(
 					Messages.CopyFilesOperation_ERR_FailedToCopyToDest, sourceStore, destinationRoot), e);
 			success = false;
 		}
@@ -463,7 +486,7 @@ public class CopyFilesOperation {
 	private IFileStore getNewNameFor(final IFileStore originalFile)
 	{
 		final IFileStore parent = originalFile.getParent();
-		final String returnValue[] = { "" }; //$NON-NLS-1$
+		final String[] returnValue = { "" }; //$NON-NLS-1$
 
 		fShell.getDisplay().syncExec(new Runnable()
 		{
@@ -493,8 +516,8 @@ public class CopyFilesOperation {
 				};
 
 				InputDialog dialog = new InputDialog(fShell, Messages.CopyFilesOperation_NameConflictDialog_Title,
-						MessageFormat.format(Messages.CopyFilesOperation_NameConflictDialog_Message, originalFile
-								.getName()), getAutoNewNameFor(originalFile), validator);
+						MessageFormat.format(Messages.CopyFilesOperation_NameConflictDialog_Message,
+								originalFile.getName()), getAutoNewNameFor(originalFile), validator);
 				dialog.setBlockOnOpen(true);
 				dialog.open();
 				if (dialog.getReturnCode() == Window.CANCEL)
@@ -539,77 +562,87 @@ public class CopyFilesOperation {
 		}
 	}
 
-    /**
-     * Checks if there is structural conflict for transferring the sources to
-     * the destination.
-     * 
-     * @param destination
-     *            the destination adaptable
-     * @param sourceStores
-     *            the array of source stores
-     * @return a descriptive error message if the validation fails, and null
-     *         otherwise
-     */
-    private static String validateDestination(IAdaptable destination, IFileStore[] sourceStores) {
-    	if (destination instanceof IResource && !((IResource) destination).isAccessible()) {
-    		return Messages.CopyFilesOperation_DestinationNotAccessible;
-    	}
-        IFileStore destinationStore = getFolderStore(destination);
-        IFileStore sourceParentStore;
-        for (IFileStore sourceStore : sourceStores) {
-            sourceParentStore = sourceStore.getParent();
-            if (destinationStore.equals(sourceStore)
-                    || (sourceParentStore != null && destinationStore.equals(sourceParentStore))) {
-                return Messages.CopyFilesOperation_ERR_SourceInDestination;
-            }
+	/**
+	 * Checks if there is structural conflict for transferring the sources to the destination.
+	 * 
+	 * @param destination
+	 *            the destination adaptable
+	 * @param sourceStores
+	 *            the array of source stores
+	 * @return a descriptive error message if the validation fails, and null otherwise
+	 */
+	private static String validateDestination(IAdaptable destination, IFileStore[] sourceStores)
+	{
+		if (destination instanceof IResource && !((IResource) destination).isAccessible())
+		{
+			return Messages.CopyFilesOperation_DestinationNotAccessible;
+		}
+		IFileStore destinationStore = getFolderStore(destination);
+		IFileStore sourceParentStore;
+		for (IFileStore sourceStore : sourceStores)
+		{
+			sourceParentStore = sourceStore.getParent();
+			if (destinationStore.equals(sourceStore)
+					|| (sourceParentStore != null && destinationStore.equals(sourceParentStore)))
+			{
+				return Messages.CopyFilesOperation_ERR_SourceInDestination;
+			}
 
-            if (sourceStore.isParentOf(destinationStore)) {
-                return Messages.CopyFilesOperation_ERR_DestinationInSource;
-            }
-        }
-        return null;
-    }
+			if (sourceStore.isParentOf(destinationStore))
+			{
+				return Messages.CopyFilesOperation_ERR_DestinationInSource;
+			}
+		}
+		return null;
+	}
 
-    /**
-     * @param filename
-     *            the filename
-     * @return the corresponding file store, or null if it could not be found
-     */
-    private static IFileStore getFileStore(String filename) {
-        try {
-            return EFS.getStore((new Path(filename).toFile().toURI()));
-        } catch (CoreException e) {
-        }
-        return null;
-    }
+	/**
+	 * @param filename
+	 *            the filename
+	 * @return the corresponding file store, or null if it could not be found
+	 */
+	private static IFileStore getFileStore(String filename)
+	{
+		try
+		{
+			return EFS.getStore((new Path(filename).toFile().toURI()));
+		}
+		catch (CoreException e)
+		{
+		}
+		return null;
+	}
 
-    /**
-     * @param filenames
-     *            an array of filenames
-     * @return the array of corresponding file stores
-     */
-    private static IFileStore[] getFileStores(String[] filenames) {
-        IFileStore[] fileStores = new IFileStore[filenames.length];
-        for (int i = 0; i < fileStores.length; ++i) {
-            fileStores[i] = getFileStore(filenames[i]);
-        }
-        return fileStores;
-    }
+	/**
+	 * @param filenames
+	 *            an array of filenames
+	 * @return the array of corresponding file stores
+	 */
+	private static IFileStore[] getFileStores(String[] filenames)
+	{
+		IFileStore[] fileStores = new IFileStore[filenames.length];
+		for (int i = 0; i < fileStores.length; ++i)
+		{
+			fileStores[i] = getFileStore(filenames[i]);
+		}
+		return fileStores;
+	}
 
-    /**
-     * Gets the folder the file belongs in. If the file is a directory, returns
-     * itself.
-     * 
-     * @param adaptable
-     *            an IAdaptable that could adapt to an IFileStore
-     * @return the folder file store
-     */
-    private static IFileStore getFolderStore(IAdaptable adaptable) {
-        IFileStore store = Utils.getFileStore(adaptable);
-        IFileInfo info = Utils.getFileInfo(adaptable, IExtendedFileStore.EXISTENCE);
-        if (store != null && info != null && !info.isDirectory()) {
-            store = store.getParent();
-        }
-        return store;
-    }
+	/**
+	 * Gets the folder the file belongs in. If the file is a directory, returns itself.
+	 * 
+	 * @param adaptable
+	 *            an IAdaptable that could adapt to an IFileStore
+	 * @return the folder file store
+	 */
+	private static IFileStore getFolderStore(IAdaptable adaptable)
+	{
+		IFileStore store = Utils.getFileStore(adaptable);
+		IFileInfo info = Utils.getFileInfo(adaptable, IExtendedFileStore.EXISTENCE);
+		if (store != null && info != null && !info.isDirectory())
+		{
+			store = store.getParent();
+		}
+		return store;
+	}
 }

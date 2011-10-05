@@ -7,7 +7,6 @@
  */
 package com.aptana.editor.js.parsing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,7 +85,7 @@ public class JSScanner extends Scanner
 	{
 		return fMultiLineComments;
 	}
-	
+
 	/**
 	 * getSDocComments
 	 * 
@@ -106,7 +105,7 @@ public class JSScanner extends Scanner
 	{
 		return fSingleLineComments;
 	}
-	
+
 	/**
 	 * getVSDocComments
 	 * 
@@ -151,7 +150,7 @@ public class JSScanner extends Scanner
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Symbol nextToken() throws IOException, Exception
+	public Symbol nextToken() throws Exception
 	{
 		Symbol vsdoc = null;
 
@@ -170,11 +169,11 @@ public class JSScanner extends Scanner
 					case SINGLELINE_COMMENT:
 						fSingleLineComments.add(createSymbol(data));
 						break;
-						
+
 					case MULTILINE_COMMENT:
 						fMultiLineComments.add(createSymbol(data));
 						break;
-						
+
 					case SDOC:
 						fSDocComments.add(createSymbol(data));
 						break;
@@ -185,7 +184,8 @@ public class JSScanner extends Scanner
 
 						if (vsdoc == null)
 						{
-							vsdoc = new Symbol(JSTokenType.VSDOC.getIndex(), offset, offset + length - 1, new LinkedList<Symbol>());
+							vsdoc = new Symbol(JSTokenType.VSDOC.getIndex(), offset, offset + length - 1,
+									new LinkedList<Symbol>());
 						}
 
 						((List<Symbol>) vsdoc.value).add(createSymbol(data));

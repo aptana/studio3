@@ -18,6 +18,7 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.browser.BrowserPlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
@@ -51,7 +52,7 @@ public class ShowBrowserEditorAction implements IWorkbenchWindowActionDelegate {
 				}
 			}
 		} catch (PartInitException e) {
-			BrowserPlugin.log(e);
+			IdeLog.logError(BrowserPlugin.getDefault(), e);
 		}
 	}
 
@@ -60,5 +61,4 @@ public class ShowBrowserEditorAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
-
 }

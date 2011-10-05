@@ -12,6 +12,9 @@ import junit.framework.TestSuite;
 
 import org.kohsuke.junit.ParallelTestSuite;
 
+import com.aptana.filesystem.secureftp.FTPSConnectionPointTest;
+import com.aptana.filesystem.secureftp.SFTPConnectionPointTest;
+
 public class AllTests
 {
 
@@ -19,20 +22,22 @@ public class AllTests
 	{
 		TestSuite suite;
 		// Run in parallel locally, not on unit test build...
-//		String user = System.getenv("USER");
-//		if (user != null && user.equals("hudson"))
-//		{
-//			suite = new TestSuite(AllTests.class.getName());
-//		}
-//		else
-//		{
-			suite = new ParallelTestSuite(AllTests.class.getName(), 2);
-//		}
+		// String user = System.getenv("USER");
+		// if (user != null && user.equals("hudson"))
+		// {
+		// suite = new TestSuite(AllTests.class.getName());
+		// }
+		// else
+		// {
+		suite = new ParallelTestSuite(AllTests.class.getName(), 2);
+		// }
 		// $JUnit-BEGIN$
+		suite.addTestSuite(SFTPConnectionPointTest.class);
 		suite.addTestSuite(SFTPConnectionTest.class);
-		suite.addTestSuite(FTPSConnectionTest.class);
-		suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
-		suite.addTestSuite(ImplicitFTPSConnectionTest.class);
+		suite.addTestSuite(FTPSConnectionPointTest.class);
+		// suite.addTestSuite(FTPSConnectionTest.class);
+		// suite.addTestSuite(FTPSConnectionWithBasePathTest.class);
+		// suite.addTestSuite(ImplicitFTPSConnectionTest.class);
 		// $JUnit-END$
 		return suite;
 	}

@@ -25,7 +25,7 @@ public class Schema
 {
 	private Map<String, ISchemaElement> _elementsByName;
 	private SchemaElement _rootElement;
-	private Stack<ISchemaElement> _elementStack;
+	private Stack<ISchemaElement> _elementStack; // $codepro.audit.disable declareAsInterface
 	private ISchemaElement _currentElement;
 
 	private Object _handler;
@@ -200,7 +200,7 @@ public class Schema
 			throws InvalidTransitionException, IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException, SAXException
 	{
-		if (this._currentElement.isValidTransition(localName) == false)
+		if (!this._currentElement.isValidTransition(localName))
 		{
 			Object[] messageArgs = new Object[] { localName, this._currentElement.getName() };
 			String message = MessageFormat.format(Messages.Schema_Invalid_Child, messageArgs);
@@ -226,7 +226,7 @@ public class Schema
 		// fire the associated onEnter method
 		if (this._handler != null && this._currentElement.hasOnEnterMethod())
 		{
-			this._currentElement.getOnEnterMethod().invoke(this._handler,
+			this._currentElement.getOnEnterMethod().invoke(this._handler, // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.preferInterfacesToReflection
 					new Object[] { namespaceURI, localName, qualifiedName, attributes });
 		}
 	}
@@ -244,7 +244,7 @@ public class Schema
 
 		for (int i = 0; i < Messages.Schema_Element_Stack_Trace.length(); i++)
 		{
-			writer.print("="); //$NON-NLS-1$
+			writer.print('=');
 		}
 
 		writer.println();
@@ -258,7 +258,7 @@ public class Schema
 		}
 
 		// print parent
-		if (localName.equals(this._currentElement.getName()) == false)
+		if (!localName.equals(this._currentElement.getName()))
 		{
 			writer.printlnWithIndent(this._currentElement.toString()).increaseIndent();
 		}
@@ -267,14 +267,14 @@ public class Schema
 		writer.printWithIndent("<").print(localName); //$NON-NLS-1$
 		for (int i = 0; i < attributes.getLength(); i++)
 		{
-			writer.print(" ").print(attributes.getLocalName(i)).print("=\"").print(attributes.getValue(i)).print("\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			writer.print(' ').print(attributes.getLocalName(i)).print("=\"").print(attributes.getValue(i)).print('"'); //$NON-NLS-1$
 		}
 		writer.println("/>"); //$NON-NLS-1$
 
 		// close parent
-		if (localName.equals(this._currentElement.getName()) == false)
+		if (!localName.equals(this._currentElement.getName()))
 		{
-			writer.decreaseIndent().printWithIndent("</").print(this._currentElement.getName()).println(">"); //$NON-NLS-1$ //$NON-NLS-2$
+			writer.decreaseIndent().printWithIndent("</").print(this._currentElement.getName()).println('>'); //$NON-NLS-1$
 		}
 
 		// close element stack
@@ -282,7 +282,7 @@ public class Schema
 		{
 			ISchemaElement element = this._elementStack.get(i);
 
-			writer.decreaseIndent().printWithIndent("</").print(element.getName()).println(">"); //$NON-NLS-1$ //$NON-NLS-2$
+			writer.decreaseIndent().printWithIndent("</").print(element.getName()).println('>'); //$NON-NLS-1$
 		}
 	}
 
@@ -302,7 +302,8 @@ public class Schema
 		// fire the associated onExit method
 		if (this._handler != null && this._currentElement.hasOnExitMethod())
 		{
-			this._currentElement.getOnExitMethod().invoke(this._handler,
+			this._currentElement.getOnExitMethod().invoke(this._handler, // $codepro.audit.disable
+																			// com.instantiations.assist.eclipse.analysis.audit.rule.preferInterfacesToReflection
 					new Object[] { namespaceURI, localName, qualifiedName });
 		}
 

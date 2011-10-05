@@ -17,8 +17,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.IDebugScopes;
 
 /**
  * Used to share common code for formatting Diffs for display.
@@ -48,14 +50,17 @@ public abstract class DiffFormatter
 	private static String convertDiff(String title, String diff)
 	{
 		if (title == null)
-			title = ""; //$NON-NLS-1$
+		{
+			title = StringUtil.EMPTY;
+		}
 		StringBuilder html = new StringBuilder();
 		html.append("<div class=\"file\">"); //$NON-NLS-1$
 		html.append("<div class=\"fileHeader\">").append(title).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 		html.append("<div class=\"diffContent\">"); //$NON-NLS-1$
 		if (!diff.startsWith("diff")) //$NON-NLS-1$
 		{
-			// New file, no "diff", all lines are added. TODO Maybe split all lines and pretend like they have a + in front?
+			// New file, no "diff", all lines are added. TODO Maybe split all lines and pretend like they have a + in
+			// front?
 			if (diff.length() == 0)
 			{
 				diff = Messages.DiffFormatter_NoContent;
@@ -149,8 +154,8 @@ public abstract class DiffFormatter
 		}
 		catch (Exception e)
 		{
-			GitUIPlugin.logError(e.getMessage(), e);
-			return html.toString();
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			return html;
 		}
 	}
 
@@ -164,12 +169,12 @@ public abstract class DiffFormatter
 	{
 		if (diffs == null)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		StringBuilder combined = new StringBuilder();
 		for (Map.Entry<String, String> diffMap : diffs.entrySet())
 		{
-			combined.append(convertDiff(diffMap.getKey(), diffMap.getValue())).append("\n"); //$NON-NLS-1$
+			combined.append(convertDiff(diffMap.getKey(), diffMap.getValue())).append('\n');
 		}
 		return injectIntoTemplate(combined.toString());
 	}

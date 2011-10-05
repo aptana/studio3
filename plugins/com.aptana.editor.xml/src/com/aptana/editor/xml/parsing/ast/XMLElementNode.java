@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseNodeAttribute;
@@ -47,7 +48,7 @@ public class XMLElementNode extends XMLNode
 	 */
 	public XMLElementNode(String tag, int start, int end)
 	{
-		this(tag, new XMLNode[0], start, end);
+		this(tag, XMLParser.NO_XML_NODES, start, end);
 	}
 
 	/**
@@ -237,8 +238,8 @@ public class XMLElementNode extends XMLNode
 
 		if (name.length() > 0)
 		{
-			text.append("<").append(name); //$NON-NLS-1$
-			text.append(">"); //$NON-NLS-1$
+			text.append('<').append(name);
+			text.append('>');
 
 			IParseNode[] children = getChildren();
 
@@ -247,7 +248,7 @@ public class XMLElementNode extends XMLNode
 				text.append(child);
 			}
 
-			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
+			text.append("</").append(name).append('>'); //$NON-NLS-1$
 		}
 
 		return text.toString();

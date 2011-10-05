@@ -14,7 +14,6 @@ import beaver.Symbol;
 
 public class ParseRootNode extends ParseNode implements IParseRootNode
 {
-
 	private IParseNode[] fComments;
 
 	public ParseRootNode(String language, Symbol[] children, int start, int end)
@@ -33,7 +32,7 @@ public class ParseRootNode extends ParseNode implements IParseRootNode
 		}
 		setChildren(nodes.toArray(new IParseNode[nodes.size()]));
 
-		fComments = new IParseNode[0];
+		fComments = NO_CHILDREN;
 	}
 
 	public IParseNode[] getCommentNodes()

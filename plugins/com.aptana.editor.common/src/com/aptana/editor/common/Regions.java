@@ -21,6 +21,10 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 
 /**
+ * An implementation of a set non-overlapping segments of a line, as it referred in Computational Geometry.
+ * The set holds segments and ensures that the set is consistent/non-overlapping at all times.
+ * The operations included appending/removing a segment to/from the set.
+ * 
  * @author Max Stepanov
  */
 public final class Regions implements Iterable<IRegion> {

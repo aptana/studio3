@@ -7,6 +7,7 @@
  */
 package com.aptana.core.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,11 +25,16 @@ public class StringUtilTest extends TestCase
 		assertEquals("a4c4da98a897d052baf31d4e5c0cce55", StringUtil.md5("cwilliams@aptana.com"));
 
 		assertNull(StringUtil.md5(null));
+
 	}
 
 	public void testSanitizeHTML()
 	{
 		assertEquals("Heckle &amp; Jeckle", StringUtil.sanitizeHTML("Heckle & Jeckle"));
+	}
+
+	public void testSanitizeHTML2()
+	{
 		assertEquals("&lt;html>Heckle &amp; Jeckle&lt;/html>", StringUtil.sanitizeHTML("<html>Heckle & Jeckle</html>"));
 	}
 
@@ -39,6 +45,17 @@ public class StringUtilTest extends TestCase
 		variables.put("_replace_", "Pass");
 		String result = StringUtil.replaceAll(template, variables);
 		assertEquals("Pass me", result);
+
+	}
+
+	public void testReplaceWithNull()
+	{
+		String template = "_replace_ me";
+		Map<String, String> variables = new HashMap<String, String>();
+
+		variables.put("_replace_ ", null);
+		String result = StringUtil.replaceAll(template, variables);
+		assertEquals("me", result);
 	}
 
 	public void testReplaceAllHandlesDollarSignsInValues()
@@ -88,51 +105,164 @@ public class StringUtilTest extends TestCase
 		assertEquals(0, StringUtil.tokenize(null, "\0").size());
 	}
 
-	public void testAreNotEqual()
+	public void testAreNotEqual1()
 	{
 		assertFalse(StringUtil.areNotEqual(null, null));
+	}
+
+	public void testAreNotEqual2()
+	{
 		assertTrue(StringUtil.areNotEqual(null, "test"));
+	}
+
+	public void testAreNotEqual3()
+	{
 		assertTrue(StringUtil.areNotEqual("test", null));
-		assertFalse(StringUtil.areNotEqual("test", "test"));
+	}
+
+	public void testAreNotEqual4()
+	{
 		assertTrue(StringUtil.areNotEqual("test", "tes"));
 	}
 
-	public void testAreEqual()
+	public void testAreNotEqual5()
+	{
+		assertFalse(StringUtil.areNotEqual("test", "test"));
+
+	}
+
+	public void testAreEqual1()
 	{
 		assertTrue(StringUtil.areEqual(null, null));
+	}
+
+	public void testAreEqual2()
+	{
 		assertFalse(StringUtil.areEqual(null, "test"));
+	}
+
+	public void testAreEqual3()
+	{
 		assertFalse(StringUtil.areEqual("test", null));
+	}
+
+	public void testAreEqual4()
+	{
 		assertTrue(StringUtil.areEqual("test", "test"));
+	}
+
+	public void testAreEqual5()
+	{
 		assertFalse(StringUtil.areEqual("test", "tes"));
 	}
 
-	public void testCompare()
+	public void testCompare1()
 	{
 		assertTrue(StringUtil.compare(null, null) == 0);
+	}
+
+	public void testCompare2()
+	{
 		assertTrue(StringUtil.compare(null, "a") < 0);
+	}
+
+	public void testCompare3()
+	{
 		assertTrue(StringUtil.compare("", "a") < 0);
+	}
+
+	public void testCompare4()
+	{
 		assertTrue(StringUtil.compare("a", null) > 0);
+	}
+
+	public void testCompare5()
+	{
 		assertTrue(StringUtil.compare("a", "") > 0);
+	}
+
+	public void testCompare6()
+	{
 		assertTrue(StringUtil.compare("A", "A") == 0);
+	}
+
+	public void testCompare7()
+	{
 		assertTrue(StringUtil.compare("A", "a") < 0);
+	}
+
+	public void testCompare8()
+	{
 		assertTrue(StringUtil.compare("a", "a") == 0);
-		assertTrue(StringUtil.compare("a", "A") > 0);
+	}
+
+	public void testCompare9()
+	{
 		assertTrue(StringUtil.compare("b", "A") > 0);
+	}
+
+	public void testCompare10()
+	{
 		assertTrue(StringUtil.compare("A", "b") < 0);
 	}
 
-	public void testCompareCaseInsensitive()
+	public void testCompare11()
+	{
+		assertTrue(StringUtil.compare("a", "A") > 0);
+	}
+
+	public void testCompareCaseInsensitive1()
 	{
 		assertTrue(StringUtil.compareCaseInsensitive(null, null) == 0);
+	}
+
+	public void testCompareCaseInsensitive2()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive(null, "a") < 0);
+	}
+
+	public void testCompareCaseInsensitive3()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("", "a") < 0);
+	}
+
+	public void testCompareCaseInsensitive4()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", null) > 0);
+	}
+
+	public void testCompareCaseInsensitive5()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", "") > 0);
+	}
+
+	public void testCompareCaseInsensitive6()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("A", "A") == 0);
+	}
+
+	public void testCompareCaseInsensitive7()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("A", "a") == 0);
+	}
+
+	public void testCompareCaseInsensitive8()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", "a") == 0);
+	}
+
+	public void testCompareCaseInsensitive9()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("a", "A") == 0);
+	}
+
+	public void testCompareCaseInsensitive10()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("b", "A") > 0);
+	}
+
+	public void testCompareCaseInsensitive11()
+	{
 		assertTrue(StringUtil.compareCaseInsensitive("A", "b") < 0);
 	}
 
@@ -288,4 +418,82 @@ public class StringUtilTest extends TestCase
 		assertEquals(text, StringUtil.truncate(text, 14));
 		assertNull(StringUtil.truncate(null, 8));
 	}
+
+	public void testEmptyString()
+	{
+		assertTrue(StringUtil.isEmpty(null));
+	}
+
+	public void testVoidString()
+	{
+		assertTrue(StringUtil.isEmpty(""));
+		assertTrue(StringUtil.isEmpty(StringUtil.EMPTY));
+	}
+
+	public void testFormatString()
+	{
+		String text = "This is a test for {0}";
+		assertEquals("This is a test for some file", StringUtil.format(text, "some file"));
+	}
+
+	public void testFormatObject()
+	{
+		String text = "This is a test for {0}";
+		File file = new File("testfile");
+		assertEquals("This is a test for testfile", StringUtil.format(text, file));
+	}
+
+	public void testFormatObjectArray()
+	{
+		String text = "This is a test for {0} {1}";
+		File file = new File("testfile");
+		File file2 = new File("testfile2");
+		assertEquals("This is a test for testfile testfile2", StringUtil.format(text, new Object[] { file, file2 }));
+
+	}
+
+	public void testPad()
+	{
+		assertEquals("", StringUtil.pad(null, 0, ' '));
+		assertEquals(" ", StringUtil.pad(null, 1, ' '));
+		assertEquals("a", StringUtil.pad("a", 0, ' '));
+		assertEquals("a", StringUtil.pad("a", 1, ' '));
+		assertEquals(" a", StringUtil.pad("a", 2, ' '));
+	}
+
+	public void testfindPreviousWhitespaceOffset()
+	{
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset(null, 0));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("", 0));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("", 1));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("a", 0));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("a", 1));
+		assertEquals(0, StringUtil.findPreviousWhitespaceOffset(" a", 1));
+		assertEquals(0, StringUtil.findPreviousWhitespaceOffset(" a", 2));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("  a", 2));
+		assertEquals(-1, StringUtil.findPreviousWhitespaceOffset("a b", 1));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("a b", 2));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("a b c", 2));
+		assertEquals(1, StringUtil.findPreviousWhitespaceOffset("a b c", 3));
+		assertEquals(3, StringUtil.findPreviousWhitespaceOffset("a b c", 4));
+	}
+
+	public void testfindNextWhitespaceOffset()
+	{
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset(null, 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("", 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("", 1));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a", 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a", 1));
+		assertEquals(0, StringUtil.findNextWhitespaceOffset(" a", 0));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset(" a", 1));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset(" a", 2));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("  a", 2));
+		assertEquals(1, StringUtil.findNextWhitespaceOffset("a b", 1));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b", 2));
+		assertEquals(3, StringUtil.findNextWhitespaceOffset("a b c", 2));
+		assertEquals(3, StringUtil.findNextWhitespaceOffset("a b c", 3));
+		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b c", 4));
+	}
+
 }

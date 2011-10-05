@@ -27,8 +27,6 @@ import com.aptana.core.io.efs.EFSUtils;
  * @author Max Stepanov
  */
 public class LocalFileSourceContainer extends AbstractSourceContainer {
-	
-	private static final Object[] EMPTY = new Object[0];
 
 	/*
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
@@ -40,7 +38,8 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 			if (uri.getScheme() == null) {
 				uri = null;
 			}
-		} catch (URISyntaxException e) {
+		} catch (URISyntaxException ignore) {
+			ignore.getCause();
 		}
 		if (uri == null) {
 			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(uriString));
@@ -81,7 +80,6 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 
 	/*
 	 * Not persisted via the launch configuration
-	 * 
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#getType()
 	 */
 	public ISourceContainerType getType() {

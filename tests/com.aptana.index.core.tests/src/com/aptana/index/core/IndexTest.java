@@ -13,6 +13,7 @@ public class IndexTest extends TestCase
 {
 
 	private Index index;
+	private File indexDir;
 
 	protected void setUp() throws Exception
 	{
@@ -23,6 +24,11 @@ public class IndexTest extends TestCase
 	{
 		try
 		{
+			if (indexDir != null)
+			{
+				indexDir.delete();
+				indexDir = null;
+			}
 			if (index != null)
 			{
 				IndexManager.getInstance().removeIndex(index.getRoot());
@@ -38,8 +44,9 @@ public class IndexTest extends TestCase
 	protected void createIndex(String name) throws IOException
 	{
 		File tmpFile = File.createTempFile(name, ".index");
+		tmpFile.deleteOnExit();
 		File parent = tmpFile.getParentFile();
-		File indexDir = new File(parent, name);
+		indexDir = new File(parent, name);
 		indexDir.mkdirs();
 		URI path = indexDir.toURI();
 		index = IndexManager.getInstance().getIndex(path);

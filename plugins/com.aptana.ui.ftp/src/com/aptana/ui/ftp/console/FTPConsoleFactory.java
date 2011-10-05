@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.ui.ftp.console;
 
@@ -12,9 +13,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleFactory;
@@ -38,12 +36,6 @@ public class FTPConsoleFactory implements IConsoleFactory {
 	 * @see org.eclipse.ui.console.IConsoleFactory#openConsole()
 	 */
 	public void openConsole() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if (window != null) {
-            IWorkbenchPage page = window.getActivePage();
-            if (page != null) {
-            }
-        }
     	ConsolePlugin.getDefault().getConsoleManager().showConsoleView(getOrcreateConsole());
 	}
 

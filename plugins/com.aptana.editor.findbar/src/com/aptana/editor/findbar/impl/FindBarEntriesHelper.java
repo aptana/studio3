@@ -33,6 +33,8 @@ import com.aptana.editor.findbar.FindBarPlugin;
  */
 public class FindBarEntriesHelper
 {
+	/* default */static final String PREFERENCE_NAME_FIND = "FIND_BAR_DECORATOR_FIND_ENTRIES"; //$NON-NLS-1$
+	/* default */static final String PREFERENCE_NAME_REPLACE = "FIND_BAR_DECORATOR_REPLACE_ENTRIES"; //$NON-NLS-1$
 
 	/**
 	 * Keep the items that we're controlling so that we can update the combo when the preferences change. Note that it's
@@ -56,7 +58,14 @@ public class FindBarEntriesHelper
 	/**
 	 * Map from the preference name > combos to be updated when the preference changes.
 	 */
-	private Map<String, Set<EntriesControlHandle>> preferenceToComboAndListener = new HashMap<String, Set<EntriesControlHandle>>();
+	private final Map<String, Set<EntriesControlHandle>> preferenceToComboAndListener = new HashMap<String, Set<EntriesControlHandle>>();
+	
+	private final EclipseFindSettings eclipseFindSettings;
+
+	public FindBarEntriesHelper(EclipseFindSettings eclipseFindSettings)
+	{
+		this.eclipseFindSettings = eclipseFindSettings;
+	}
 
 	private Properties createPropertiesFromString(String asPortableString)
 	{
@@ -134,12 +143,16 @@ public class FindBarEntriesHelper
 			List<String> items = loadEntries(preferenceName);
 			items.remove(entry); // Remove it if it already existed
 			items.add(0, entry); // And always add it as the first
-			while (items.size() > 50)
-			{ // Hold at most 50 entries in the cache
+			while (items.size() > 20)
+			{ // Hold at most 20 entries in the cache
 				items.remove(items.size() - 1); // remove the last
 			}
 			Properties props = createPropertiesFromList(items);
 			preferenceStore.setValue(preferenceName, createStringFromProperties(props));
+			if (preferenceName.equals(PREFERENCE_NAME_FIND))
+			{
+				eclipseFindSettings.addEntry(entry);
+			}
 		}
 	}
 
@@ -155,7 +168,12 @@ public class FindBarEntriesHelper
 			if (current.trim().length() > 0)
 			{
 				Properties props = createPropertiesFromString(current);
-				return createListFromProperties(props);
+				List<String> items = createListFromProperties(props);
+				while (items.size() > 20)
+				{ // Hold at most 20 entries in the cache
+					items.remove(items.size() - 1); // remove the last
+				}
+				return items;
 			}
 			return new ArrayList<String>();
 		}
@@ -232,6 +250,15 @@ public class FindBarEntriesHelper
 				set.remove(entriesControlHandle);
 			}
 		}
+	}
+
+
+	public void updateFromEclipseFindSettings()
+	{
+		List<String> items = eclipseFindSettings.fFindHistory;
+		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+		Properties props = createPropertiesFromList(items);
+		preferenceStore.setValue(PREFERENCE_NAME_FIND, createStringFromProperties(props));
 	}
 
 }

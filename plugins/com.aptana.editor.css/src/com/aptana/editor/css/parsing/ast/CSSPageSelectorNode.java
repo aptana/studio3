@@ -20,7 +20,7 @@ public class CSSPageSelectorNode extends CSSNode
 	 */
 	public CSSPageSelectorNode(String identifier)
 	{
-		super(CSSNodeTypes.PAGE_SELECTOR);
+		super(ICSSNodeTypes.PAGE_SELECTOR);
 
 		fText = identifier;
 	}

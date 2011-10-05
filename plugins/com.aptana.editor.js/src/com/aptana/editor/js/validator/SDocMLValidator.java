@@ -21,7 +21,7 @@ import com.aptana.sax.IValidatingReaderLogger;
 
 public class SDocMLValidator implements IValidator
 {
-	private class LogCollector implements IValidatingReaderLogger
+	private static class LogCollector implements IValidatingReaderLogger
 	{
 		private URI path;
 		private IValidationManager manager;
@@ -33,7 +33,7 @@ public class SDocMLValidator implements IValidator
 		 * @param manager
 		 * @param path
 		 */
-		public LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
+		private LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
 		{
 			this.path = path;
 			this.manager = manager;
@@ -87,7 +87,7 @@ public class SDocMLValidator implements IValidator
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		JSMetadataReader reader = new JSMetadataReader();
-		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes());
+		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes()); // $codepro.audit.disable closeWhereCreated
 		LogCollector collector = new LogCollector(manager, path, items);
 
 		manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);

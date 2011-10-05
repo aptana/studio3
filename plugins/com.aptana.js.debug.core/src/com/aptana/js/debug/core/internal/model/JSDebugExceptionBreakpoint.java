@@ -34,11 +34,10 @@ import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
  * @author Max Stepanov
  */
 public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExceptionBreakpoint {
-	
+
 	/**
-	 * Default constructor is required for the breakpoint manager to re-create
-	 * persisted breakpoints. After instantiating a breakpoint, the
-	 * <code>setMarker(...)</code> method is called to restore this breakpoint's
+	 * Default constructor is required for the breakpoint manager to re-create persisted breakpoints. After
+	 * instantiating a breakpoint, the <code>setMarker(...)</code> method is called to restore this breakpoint's
 	 * attributes.
 	 */
 	public JSDebugExceptionBreakpoint() {
@@ -46,8 +45,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	}
 
 	/**
-	 * Constructs a exception breakpoint on the given resource for the given
-	 * exception type name.
+	 * Constructs a exception breakpoint on the given resource for the given exception type name.
 	 * 
 	 * @param resource
 	 *            file on which to set the breakpoint
@@ -71,8 +69,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	}
 
 	/**
-	 * Constructs a exception breakpoint on the given resource for the given
-	 * exception type name.
+	 * Constructs a exception breakpoint on the given resource for the given exception type name.
 	 * 
 	 * @param resource
 	 *            file on which to set the breakpoint
@@ -84,8 +81,8 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
-	public JSDebugExceptionBreakpoint(final IResource resource, final String exceptionTypeName, final Map<String, Object> attributes,
-			final boolean register) throws CoreException {
+	public JSDebugExceptionBreakpoint(final IResource resource, final String exceptionTypeName,
+			final Map<String, Object> attributes, final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IMarker marker = resource.createMarker(IDebugCoreConstants.ID_EXCEPTION_BREAKPOINT_MARKER);
@@ -94,8 +91,8 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 				attributes.put(IJSDebugConstants.EXCEPTION_TYPE_NAME, exceptionTypeName);
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(
-						Messages.JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1,
-								resource.getFullPath().lastSegment(), exceptionTypeName));
+						Messages.JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1, resource.getFullPath()
+								.lastSegment(), exceptionTypeName));
 				ensureMarker().setAttributes(attributes);
 
 				register(register);
@@ -123,8 +120,9 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
 				attributes.put(IJSDebugConstants.EXCEPTION_TYPE_NAME, exceptionTypeName);
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
-				attributes.put(IMarker.MESSAGE, MessageFormat.format(
-						Messages.JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1,
+				attributes.put(
+						IMarker.MESSAGE,
+						MessageFormat.format(Messages.JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1,
 								DebugUtil.getPath(resource), exceptionTypeName));
 				ensureMarker().setAttributes(attributes);
 				register(register);
@@ -145,8 +143,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	}
 
 	/*
-	 * Add this breakpoint to the breakpoint manager, or sets it as
-	 * unregistered.
+	 * Add this breakpoint to the breakpoint manager, or sets it as unregistered.
 	 */
 	private void register(boolean register) throws CoreException {
 		if (register) {

@@ -42,7 +42,7 @@ public class LauncherServer
 		}
 		catch (IOException e)
 		{
-			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 		}
 	}
 
@@ -139,7 +139,7 @@ public class LauncherServer
 				}
 				catch (IOException e)
 				{
-					IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e.getMessage(), e);
+					IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
 				}
 				finally
 				{

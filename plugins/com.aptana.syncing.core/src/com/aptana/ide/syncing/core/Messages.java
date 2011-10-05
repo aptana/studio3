@@ -12,7 +12,8 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Messages
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.syncing.core.messages"; //$NON-NLS-1$
 
@@ -23,11 +24,13 @@ public final class Messages extends NLS {
 
 	public static String SiteConnectionManager_ERR_FailedToLoadConnections;
 
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
+	private Messages()
+	{
 	}
 }

@@ -217,11 +217,11 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		catch (BadLocationException e1)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
 		}
 		catch (BadPositionCategoryException e1)
 		{
-                        IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
 		}
 	}
 
@@ -259,7 +259,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		super.addRange(presentation, offset, length, attr);
 	}

@@ -199,16 +199,6 @@ public class MemoryIndex
 	}
 
 	/**
-	 * getDocumentNames
-	 * 
-	 * @return
-	 */
-	public List<String> getDocumentNames()
-	{
-		return new ArrayList<String>(documentsToTable.keySet());
-	}
-
-	/**
 	 * getDocumentsToReferences
 	 * 
 	 * @return
@@ -226,6 +216,17 @@ public class MemoryIndex
 	public boolean hasChanged()
 	{
 		return numberOfChanges() > 0;
+	}
+
+	/**
+	 * hasDocument
+	 * 
+	 * @param documentName
+	 * @return
+	 */
+	public boolean hasDocument(String documentName)
+	{
+		return documentsToTable.get(documentName) != null;
 	}
 
 	/**

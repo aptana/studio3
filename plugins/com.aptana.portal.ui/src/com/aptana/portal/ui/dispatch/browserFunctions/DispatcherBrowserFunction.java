@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserInteractionRegistry;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
@@ -49,7 +50,7 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 	 * @see IBrowserNotificationConstants#JSON_ERROR_UNKNOWN_CONTROLLER
 	 * @see IBrowserNotificationConstants#JSON_ERROR_UNKNOWN_ACTION
 	 */
-	@SuppressWarnings( { "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public Object function(Object[] arguments)
 	{
 		if (arguments == null || arguments.length != 1 || arguments[0] == null)
@@ -98,16 +99,17 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 		}
 		catch (IllegalStateException ise)
 		{
-			PortalUIPlugin.logError("The dispatch arguments were probably not passed as a valid JSON." //$NON-NLS-1$
-					+ " Please check your JavaScript code.", ise); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(),
+					"The dispatch arguments were probably not passed as a valid JSON." //$NON-NLS-1$
+							+ " Please check your JavaScript code.", ise); //$NON-NLS-1$
 			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
 					ise.getMessage());
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError(e);
-			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS, e
-					.getMessage());
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
+			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
+					e.getMessage());
 		}
 		// OK... Done with the checks. Now dispatch.
 		return dispatch(controller, action, args);

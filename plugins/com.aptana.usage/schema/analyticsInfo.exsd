@@ -18,8 +18,8 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="analytics"/>
             <element ref="info"/>
+            <element ref="analytics"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -43,35 +43,6 @@
                <appinfo>
                   <meta.attribute translatable="true"/>
                </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="analytics">
-      <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="info" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="com.aptana.usage.analyticsInfo/info/@appId"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="overrides" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
             </annotation>
          </attribute>
       </complexType>
@@ -122,6 +93,35 @@
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.usage.IAnalyticsUserManager"/>
                </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="analytics">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="info" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.usage.analyticsInfo/info/@appId"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="overrides" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

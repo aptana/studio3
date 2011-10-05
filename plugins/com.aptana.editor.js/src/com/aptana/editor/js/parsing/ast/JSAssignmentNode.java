@@ -33,40 +33,40 @@ public class JSAssignmentNode extends JSNode
 		switch (token)
 		{
 			case EQUAL:
-				type = JSNodeTypes.ASSIGN;
+				type = IJSNodeTypes.ASSIGN;
 				break;
 			case PLUS_EQUAL:
-				type = JSNodeTypes.ADD_AND_ASSIGN;
+				type = IJSNodeTypes.ADD_AND_ASSIGN;
 				break;
 			case GREATER_GREATER_GREATER_EQUAL:
-				type = JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN;
+				type = IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN;
 				break;
 			case AMPERSAND_EQUAL:
-				type = JSNodeTypes.BITWISE_AND_AND_ASSIGN;
+				type = IJSNodeTypes.BITWISE_AND_AND_ASSIGN;
 				break;
 			case PIPE_EQUAL:
-				type = JSNodeTypes.BITWISE_OR_AND_ASSIGN;
+				type = IJSNodeTypes.BITWISE_OR_AND_ASSIGN;
 				break;
 			case CARET_EQUAL:
-				type = JSNodeTypes.BITWISE_XOR_AND_ASSIGN;
+				type = IJSNodeTypes.BITWISE_XOR_AND_ASSIGN;
 				break;
 			case FORWARD_SLASH_EQUAL:
-				type = JSNodeTypes.DIVIDE_AND_ASSIGN;
+				type = IJSNodeTypes.DIVIDE_AND_ASSIGN;
 				break;
 			case PERCENT_EQUAL:
-				type = JSNodeTypes.MOD_AND_ASSIGN;
+				type = IJSNodeTypes.MOD_AND_ASSIGN;
 				break;
 			case STAR_EQUAL:
-				type = JSNodeTypes.MULTIPLY_AND_ASSIGN;
+				type = IJSNodeTypes.MULTIPLY_AND_ASSIGN;
 				break;
 			case LESS_LESS_EQUAL:
-				type = JSNodeTypes.SHIFT_LEFT_AND_ASSIGN;
+				type = IJSNodeTypes.SHIFT_LEFT_AND_ASSIGN;
 				break;
 			case GREATER_GREATER_EQUAL:
-				type = JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN;
+				type = IJSNodeTypes.SHIFT_RIGHT_AND_ASSIGN;
 				break;
 			case MINUS_EQUAL:
-				type = JSNodeTypes.SUBTRACT_AND_ASSIGN;
+				type = IJSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
 		}
 

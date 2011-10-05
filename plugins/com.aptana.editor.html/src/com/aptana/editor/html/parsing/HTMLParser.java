@@ -8,6 +8,7 @@
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -28,7 +29,7 @@ import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
-import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
+import com.aptana.editor.html.parsing.ast.IHTMLNodeTypes;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
@@ -46,6 +47,7 @@ import com.aptana.parsing.lexer.IRange;
 
 public class HTMLParser implements IParser
 {
+	public static final HTMLNode[] NO_HTML_NODES = new HTMLNode[0];
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
 
@@ -97,7 +99,7 @@ public class HTMLParser implements IParser
 
 		ParseRootNode root = new ParseRootNode( //
 				IHTMLConstants.CONTENT_TYPE_HTML, //
-				new HTMLNode[0], //
+				NO_HTML_NODES, //
 				startingOffset, //
 				startingOffset + source.length() - 1 //
 		);
@@ -386,10 +388,10 @@ public class HTMLParser implements IParser
 
 	private void addMissingEndTagError(HTMLElementNode node)
 	{
-		if (fParseState.getCloseTagType(node.getName()) != HTMLTagInfo.END_OPTIONAL)
+		if (fParseState.getCloseTagType(node.getName()) != IHTMLTagInfo.END_OPTIONAL)
 		{
-			fParseState.addError(new ParseError(node.getEndingOffset(), Messages.HTMLParser_missing_end_tag_error
-					+ node.getName() + ">", IParseError.Severity.WARNING)); //$NON-NLS-1$
+			fParseState.addError(new ParseError(node.getEndingOffset(), MessageFormat.format(
+					Messages.HTMLParser_missing_end_tag_error, node.getName()), IParseError.Severity.WARNING));
 		}
 	}
 
@@ -502,7 +504,7 @@ public class HTMLParser implements IParser
 		// checks if the last child of the current node is also a HTML text node. If so, we should unify both to one
 		// node with a larger offset.
 		if (!previousSymbolSkipped
-				&& (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == HTMLNodeTypes.TEXT))
+				&& (fCurrentElement.getChildCount() > 0 && fCurrentElement.getLastChild().getNodeType() == IHTMLNodeTypes.TEXT))
 		{
 			HTMLTextNode node = (HTMLTextNode) fCurrentElement.getLastChild();
 			int start = node.getStartingOffset(), end = fCurrentSymbol.getEnd();
@@ -527,7 +529,7 @@ public class HTMLParser implements IParser
 		int closeTagType = fParseState.getCloseTagType(tagName);
 		// tag with optional end could not be nested, so if we see another instance of the same start tag, close the
 		// previous one
-		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null
+		if (closeTagType == IHTMLTagInfo.END_OPTIONAL && fCurrentElement != null
 				&& tagName.equals(fCurrentElement.getNameNode().getName()))
 		{
 			// adjusts the ending offset of current element to include the entire block up to the start of the new tag
@@ -542,7 +544,7 @@ public class HTMLParser implements IParser
 			fCurrentElement.addChild(element);
 		}
 
-		if (closeTagType != HTMLTagInfo.END_FORBIDDEN && !element.isSelfClosing())
+		if (closeTagType != IHTMLTagInfo.END_FORBIDDEN && !element.isSelfClosing())
 		{
 			fElementStack.push(fCurrentElement);
 			fCurrentElement = element;

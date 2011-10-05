@@ -125,7 +125,7 @@ public class URIResolver implements IPathResolver
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 
 		return null;

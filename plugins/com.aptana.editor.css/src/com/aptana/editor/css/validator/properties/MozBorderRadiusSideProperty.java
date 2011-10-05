@@ -27,7 +27,7 @@ public abstract class MozBorderRadiusSideProperty extends CustomCSSProperty
 
 	private final List<CssValue> values;
 
-	public MozBorderRadiusSideProperty(String propertyName)
+	protected MozBorderRadiusSideProperty(String propertyName)
 	{
 		super(propertyName);
 		values = null;
@@ -45,7 +45,7 @@ public abstract class MozBorderRadiusSideProperty extends CustomCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public MozBorderRadiusSideProperty(String propertyName, ApplContext context, CssExpression expression, boolean check)
+	protected MozBorderRadiusSideProperty(String propertyName, ApplContext context, CssExpression expression, boolean check)
 			throws InvalidParamException
 	{
 		super(propertyName);
@@ -87,7 +87,7 @@ public abstract class MozBorderRadiusSideProperty extends CustomCSSProperty
 	 * @throws InvalidParamException
 	 *             if expression is invalid
 	 */
-	public MozBorderRadiusSideProperty(String propertyName, ApplContext context, CssExpression expression)
+	protected MozBorderRadiusSideProperty(String propertyName, ApplContext context, CssExpression expression)
 			throws InvalidParamException
 	{
 		this(propertyName, context, expression, false);

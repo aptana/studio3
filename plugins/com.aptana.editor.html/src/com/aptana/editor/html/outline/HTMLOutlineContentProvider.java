@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -41,6 +40,7 @@ import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
+import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
@@ -64,8 +64,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		{
 			if (IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES.equals(event.getKey()))
 			{
-				showTextNode = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
-						IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
+				showTextNode = HTMLPreferenceUtil.getShowTextNodesInOutline();
 			}
 		}
 	};
@@ -75,8 +74,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineContentProvider());
 		addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineContentProvider());
 
-		showTextNode = Platform.getPreferencesService().getBoolean(HTMLPlugin.PLUGIN_ID,
-				IPreferenceConstants.HTML_OUTLINE_SHOW_TEXT_NODES, false, null);
+		showTextNode = HTMLPreferenceUtil.getShowTextNodesInOutline();
 		EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceListener);
 	}
 
@@ -310,7 +308,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 
 					public void run()
 					{
-						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
+						treeViewer.add(getOutlineItem(parent), finalElements);
 					}
 				});
 				sub.done();

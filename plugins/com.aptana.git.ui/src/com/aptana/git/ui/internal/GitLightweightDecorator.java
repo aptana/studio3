@@ -71,7 +71,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 
 		ImageData data;
 
-		public CachedImageDescriptor(ImageDescriptor descriptor)
+		CachedImageDescriptor(ImageDescriptor descriptor)
 		{
 			this.descriptor = descriptor;
 		}
@@ -104,10 +104,11 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	}
 
 	private IPreferenceChangeListener fThemeChangeListener;
-	private Map<RepoBranch, TimestampedString> cache = new HashMap<RepoBranch, TimestampedString>();
+	private Map<RepoBranch, TimestampedString> cache;
 
 	public GitLightweightDecorator()
 	{
+		cache = new HashMap<RepoBranch, TimestampedString>();
 		getGitRepositoryManager().addListener(this);
 		getGitRepositoryManager().addListenerToEachRepository(this);
 		fThemeChangeListener = new IPreferenceChangeListener()
@@ -136,12 +137,11 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			return;
 
 		// Don't decorate if the workbench is not running
-		if (!PlatformUI.isWorkbenchRunning())
+		if (!isWorkbenchRunning())
 			return;
 
 		// Don't decorate if UI plugin is not running
-		GitUIPlugin activator = GitUIPlugin.getDefault();
-		if (activator == null)
+		if (!isGitUIPluginActive())
 			return;
 
 		// Don't decorate the workspace root
@@ -157,13 +157,23 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			case IResource.PROJECT:
 				decorateProject(decoration, resource);
 				// fall through intentionally!
-			case IResource.FOLDER:
+			case IResource.FOLDER: // $codepro.audit.disable nonTerminatedCaseClause
 				decorateFolder(decoration, resource);
 				break;
 			case IResource.FILE:
 				decorateFile(decoration, resource);
 				break;
 		}
+	}
+
+	protected boolean isGitUIPluginActive()
+	{
+		return GitUIPlugin.getDefault() != null;
+	}
+
+	protected boolean isWorkbenchRunning()
+	{
+		return PlatformUI.isWorkbenchRunning();
 	}
 
 	private void decorateFolder(IDecoration decoration, IResource resource)
@@ -228,7 +238,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	{
 		GitRepository repo = getRepo(resource);
 		if (repo == null)
+		{
 			return;
+		}
 
 		String branch = repo.currentBranch();
 		// Adds a temporal cache per repo/branch for this data so we
@@ -248,7 +260,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		String[] commits = repo.commitsAhead(branch);
 		if (commits != null && commits.length > 0)
 		{
-			builder.append("+").append(commits.length); //$NON-NLS-1$
+			builder.append('+').append(commits.length);
 		}
 		else
 		{
@@ -256,9 +268,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			// when you pull on one branch and then switch back to another that had changes not yet merged in yet)
 			commits = repo.commitsBehind(branch);
 			if (commits != null && commits.length > 0)
-				builder.append("-").append(commits.length); //$NON-NLS-1$
+				builder.append('-').append(commits.length);
 		}
-		builder.append("]"); //$NON-NLS-1$
+		builder.append(']');
 		String value = builder.toString();
 		cache.put(repoBranch, new TimestampedString(value));
 		decoration.addSuffix(value);
@@ -271,10 +283,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			getGitRepositoryManager().removeListener(this);
 			getGitRepositoryManager().removeListenerFromEachRepository(this);
-			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fThemeChangeListener);
+			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
+					.removePreferenceChangeListener(fThemeChangeListener);
 			cache.clear();
-			cache = null;
 		}
 		finally
 		{
@@ -341,7 +352,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null && repo.equals(e.getRepository()))
+			{
 				resources.add(project);
+			}
 		}
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
@@ -353,10 +366,12 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			IResource child = resource;
 			IContainer parent = null;
-			while ((parent = child.getParent()) != null)
+			while ((parent = child.getParent()) != null) // $codepro.audit.disable assignmentInCondition
 			{
 				if (parent.getType() == IResource.PROJECT || parent.getType() == IResource.ROOT)
+				{
 					break;
+				}
 				ancestors.add(parent);
 				child = parent;
 			}
@@ -447,7 +462,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		String string;
 		Long timestamp;
 
-		public TimestampedString(String value)
+		TimestampedString(String value)
 		{
 			this.string = value;
 			this.timestamp = System.currentTimeMillis();
@@ -461,8 +476,14 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		@Override
 		public boolean equals(Object obj)
 		{
+			if (obj == this)
+			{
+				return true;
+			}
 			if (!(obj instanceof TimestampedString))
+			{
 				return false;
+			}
 			TimestampedString other = (TimestampedString) obj;
 			return other.string.equals(string) && other.timestamp.equals(timestamp);
 		}
@@ -488,8 +509,14 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		@Override
 		public boolean equals(Object obj)
 		{
+			if (obj == this)
+			{
+				return true;
+			}
 			if (!(obj instanceof RepoBranch))
+			{
 				return false;
+			}
 			RepoBranch other = (RepoBranch) obj;
 			return other.repo.equals(repo) && other.branch.equals(branch);
 		}

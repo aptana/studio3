@@ -87,7 +87,8 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	 * @param label
 	 * @param attributes
 	 */
-	public JSDebugProcess(ILaunch launch, Process process, boolean killProcessOnTerminate, String label, Map<String, Object> attributes) {
+	public JSDebugProcess(ILaunch launch, Process process, boolean killProcessOnTerminate, String label,
+			Map<String, Object> attributes) {
 		this.launch = launch;
 		this.process = process;
 		this.killProcessOnTerminate = killProcessOnTerminate;
@@ -156,8 +157,7 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 	}
 
 	/*
-	 * @see org.eclipse.debug.core.model.IProcess#setAttribute(java.lang.String,
-	 *      java.lang.String)
+	 * @see org.eclipse.debug.core.model.IProcess#setAttribute(java.lang.String, java.lang.String)
 	 */
 	public void setAttribute(String key, String value) {
 		if (fAttributes == null) {
@@ -250,18 +250,17 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 		return super.getAdapter(adapter);
 	}
 
-	/* package */ OutputStream getStream(String streamIdentifier) {
+	/* package */OutputStream getStream(String streamIdentifier) {
 		return streams.get(streamIdentifier);
 	}
 
-	/* package */ void setDebugTarget(IDebugTarget debugTarget) {
+	/* package */void setDebugTarget(IDebugTarget debugTarget) {
 		this.debugTarget = debugTarget;
 	}
 
-	/* package */ void setXHRService(IXHRService xhrService) {
+	/* package */void setXHRService(IXHRService xhrService) {
 		this.xhrService = xhrService;
 	}
-
 
 	private void fireCreationEvent() {
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
@@ -311,8 +310,8 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 				} catch (InterruptedException e) {
 				}
 			}
-			throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, DebugException.TARGET_REQUEST_FAILED,
-					Messages.JSDebugProcess_Terminate_Failed, null));
+			throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID,
+					DebugException.TARGET_REQUEST_FAILED, Messages.JSDebugProcess_Terminate_Failed, null));
 		}
 	}
 
@@ -333,33 +332,32 @@ public final class JSDebugProcess extends PlatformObject implements IProcess {
 		return debugTarget;
 	}
 
-	
 	private class DebugEventSetListener implements IDebugEventSetListener {
 
 		public void handleDebugEvents(DebugEvent[] events) {
 			for (DebugEvent event : events) {
 				switch (event.getKind()) {
-				case DebugEvent.TERMINATE: {
-					Object source = event.getSource();
-					if (source.equals(getDebugTarget())) {
-						closeStreams();
-						fireTerminateEvent();
-						DebugPlugin.getDefault().removeDebugEventListener(this);
-						try {
-							terminateProcess();
-						} catch (DebugException e) {
-							JSDebugPlugin.log(e);
+					case DebugEvent.TERMINATE: {
+						Object source = event.getSource();
+						if (source.equals(getDebugTarget())) {
+							closeStreams();
+							fireTerminateEvent();
+							DebugPlugin.getDefault().removeDebugEventListener(this);
+							try {
+								terminateProcess();
+							} catch (DebugException e) {
+								JSDebugPlugin.log(e);
+							}
 						}
+						break;
 					}
-					break;
-				}
-				default:
+					default:
 				}
 			}
 		}
-		
+
 	}
-	
+
 	private class ProcessMonitorThread extends Thread {
 
 		public ProcessMonitorThread() {

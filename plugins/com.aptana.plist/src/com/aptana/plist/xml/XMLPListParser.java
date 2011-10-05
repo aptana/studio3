@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.plist.IPListParser;
@@ -59,7 +60,7 @@ public class XMLPListParser implements IPListParser
 		}
 		catch (ParserConfigurationException e)
 		{
-			PListPlugin.logError(e);
+			IdeLog.logError(PListPlugin.getDefault(), e);
 		}
 		if (builder != null)
 		{
@@ -81,7 +82,7 @@ public class XMLPListParser implements IPListParser
 				}
 				catch (Exception e1)
 				{
-					PListPlugin.logError(e1);
+					IdeLog.logError(PListPlugin.getDefault(), e1);
 				}
 			}
 			if (d != null)
@@ -154,7 +155,7 @@ public class XMLPListParser implements IPListParser
 			}
 			catch (Exception e)
 			{
-				PListPlugin.logError(e);
+				IdeLog.logError(PListPlugin.getDefault(), e);
 			}
 			return new Date();
 		}
@@ -168,7 +169,7 @@ public class XMLPListParser implements IPListParser
 			}
 			catch (UnsupportedEncodingException e)
 			{
-				PListPlugin.logError(e);
+				IdeLog.logError(PListPlugin.getDefault(), e);
 			}
 			return new byte[0];
 		}

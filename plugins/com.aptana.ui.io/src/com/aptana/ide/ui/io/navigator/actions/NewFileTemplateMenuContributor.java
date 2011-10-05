@@ -5,22 +5,23 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.ide.ui.io.navigator.actions;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -37,12 +38,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
-import org.jruby.embed.io.ReaderInputStream;
 
-import com.aptana.editor.common.internal.scripting.NewFileWizard;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.internal.scripting.NewTemplateFileWizard;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.BundlePrecedence;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.TemplateElement;
 import com.aptana.scripting.model.filters.IModelFilter;
@@ -81,7 +82,15 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			aptanaEditors = getAptanaEditorFiletypeMap();
 		}
 
-		Set<String> editors = new TreeSet<String>(aptanaEditors.keySet());
+		List<String> editors = new ArrayList<String>(aptanaEditors.keySet());
+		Collections.sort(editors, new Comparator<String>()
+		{
+
+			public int compare(String o1, String o2)
+			{
+				return o1.compareToIgnoreCase(o2);
+			}
+		});
 
 		// constructs the menus
 		Map<String, List<TemplateElement>> templatesByBundle = getNewFileTemplates();
@@ -96,10 +105,35 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			editorItem.setMenu(editorMenu);
 
 			templates = templatesByBundle.get(filetype);
-			if (templates != null)
+			boolean hasTemplates = templates != null && templates.size() > 0;
+			if (hasTemplates)
 			{
-				for (final TemplateElement template : templates)
+				// sorts by precedence first
+				Collections.sort(templates, new Comparator<TemplateElement>()
 				{
+
+					public int compare(TemplateElement e1, TemplateElement e2)
+					{
+						BundlePrecedence p1 = e1.getOwningBundle().getBundlePrecedence();
+						BundlePrecedence p2 = e2.getOwningBundle().getBundlePrecedence();
+						return p1.compareTo(p2);
+					}
+				});
+
+				boolean userLevel = true;
+				int size = templates.size();
+				for (int i = 0; i < size; ++i)
+				{
+					final TemplateElement template = templates.get(i);
+					if (userLevel && template.getOwningBundle().getBundlePrecedence() != BundlePrecedence.USER)
+					{
+						userLevel = false;
+						if (i > 0)
+						{
+							// adds a separator between the user templates and system templates
+							new MenuItem(editorMenu, SWT.SEPARATOR);
+						}
+					}
 					MenuItem templateItem = new MenuItem(editorMenu, SWT.PUSH);
 					templateItem.setText(template.getDisplayName());
 					templateItem.addSelectionListener(new SelectionAdapter()
@@ -112,6 +146,8 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 						}
 					});
 				}
+				// adds a separator if there are built-in templates
+				new MenuItem(editorMenu, SWT.SEPARATOR);
 			}
 
 			// adds a "Blank File" item
@@ -120,7 +156,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 			{
 				fileExtension = templates.get(0).getFiletype();
 				// strips the leading *. if there is one
-				int dotIndex = fileExtension.lastIndexOf("."); //$NON-NLS-1$
+				int dotIndex = fileExtension.lastIndexOf('.');
 				if (dotIndex > -1)
 				{
 					fileExtension = fileExtension.substring(dotIndex + 1);
@@ -165,25 +201,12 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 					// this is a non-workspace selection
 					String filetype = template.getFiletype();
 					// strips the leading * before . if there is one
-					int index = filetype.lastIndexOf("."); //$NON-NLS-1$
+					int index = filetype.lastIndexOf('.');
 					if (index > -1)
 					{
 						filetype = filetype.substring(index);
 					}
-					NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(), "new_file" + filetype) //$NON-NLS-1$
-					{
-
-						@Override
-						protected InputStream getInitialContents(IPath path)
-						{
-							String templateContent = NewFileWizard.getTemplateContent(template, path);
-							if (templateContent != null)
-							{
-								return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
-							}
-							return super.getInitialContents(path);
-						}
-					};
+					NewFileAction action = new NewFileAction("new_file" + filetype, template); //$NON-NLS-1$
 					action.updateSelection(selection);
 					action.run();
 					return;
@@ -211,14 +234,14 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 				if (fileStore != null)
 				{
 					// this is a non-workspace selection
-					NewFileAction action = new NewFileAction(UIUtils.getActiveWorkbenchWindow(), initialFileName)
+					NewFileAction action = new NewFileAction(initialFileName)
 					{
 
 						@Override
-						protected InputStream getInitialContents(IPath path)
+						protected InputStream getInitialContents()
 						{
-							// blank content
-							return null;
+							// empty content
+							return new ByteArrayInputStream(ArrayUtil.NO_BYTES);
 						}
 					};
 					action.updateSelection(selection);

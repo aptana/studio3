@@ -33,7 +33,9 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPropertyListener;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -63,6 +65,17 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
+		fEditor.addPropertyListener(new IPropertyListener()
+		{
+
+			public void propertyChanged(Object source, int propId)
+			{
+				if (propId == IEditorPart.PROP_INPUT)
+				{
+					reconcile(false, true);
+				}
+			}
+		});
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -138,7 +151,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
 		// early because of cancel...
@@ -174,9 +187,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile)
 	{
+		reconcile(initialReconcile, false);
+	}
+
+	private void reconcile(boolean initialReconcile, boolean force)
+	{
 		FileService fileService = fEditor.getFileService();
 		// doing a full parse at the moment
-		if (fileService.parse(fMonitor))
+		if (force || fileService.parse(fMonitor))
 		{
 			// only do folding and validation when the source was changed
 			if (fEditor.isFoldingEnabled())
@@ -230,7 +248,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		files.add(file);
 		IndexFilesOfProjectJob job = new IndexFilesOfProjectJob(project, files)
 		{
-
 			@Override
 			protected Set<IFileStore> toFileStores(IProgressMonitor monitor)
 			{

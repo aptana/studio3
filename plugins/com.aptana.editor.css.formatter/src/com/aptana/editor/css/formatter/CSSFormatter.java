@@ -20,6 +20,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
@@ -27,6 +28,7 @@ import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
@@ -154,7 +156,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.getDefault().isDebugging())
 			{
-				FormatterPlugin.logError(e);
+				IdeLog.logError(CSSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			}
 
 		}
@@ -162,7 +164,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		{
 			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
 					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(e);
+			IdeLog.logError(CSSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 		return null;
 	}
@@ -301,7 +303,12 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 
 		in = whiteSpaceAsterisk.matcher(in).replaceAll(StringUtil.EMPTY);
 		out = whiteSpaceAsterisk.matcher(out).replaceAll(StringUtil.EMPTY);
-		return in.equals(out);
+		boolean result = in.equals(out);
+		if (!result && FormatterPlugin.getDefault().isDebugging())
+		{
+			FormatterUtils.logDiff(in, out);
+		}
+		return result;
 	}
 
 }

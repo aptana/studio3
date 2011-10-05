@@ -20,6 +20,7 @@ import beaver.Symbol;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -40,12 +41,12 @@ public class HTMLElementNode extends HTMLNode
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
-		this(tagSymbol, new HTMLNode[0], start, end);
+		this(tagSymbol, HTMLParser.NO_HTML_NODES, start, end);
 	}
 
 	public HTMLElementNode(Symbol tagSymbol, HTMLNode[] children, int start, int end)
 	{
-		super(HTMLNodeTypes.ELEMENT, children, start, end);
+		super(IHTMLNodeTypes.ELEMENT, children, start, end);
 		String tag = tagSymbol.value.toString();
 		if (tag.length() > 0)
 		{
@@ -152,7 +153,7 @@ public class HTMLElementNode extends HTMLNode
 				String id = getID();
 				if (id != null)
 				{
-					text.append("#").append(id); //$NON-NLS-1$
+					text.append('#').append(id);
 				}
 			}
 			else if (CLASS.equals(attribute))
@@ -160,7 +161,7 @@ public class HTMLElementNode extends HTMLNode
 				String cssClass = getCSSClass();
 				if (cssClass != null)
 				{
-					text.append(".").append(cssClass); //$NON-NLS-1$
+					text.append('.').append(cssClass);
 				}
 			}
 			else
@@ -168,7 +169,7 @@ public class HTMLElementNode extends HTMLNode
 				String value = fAttributes.get(attribute);
 				if (value != null)
 				{
-					text.append(" ").append(value); //$NON-NLS-1$
+					text.append(' ').append(value);
 				}
 			}
 		}
@@ -248,22 +249,22 @@ public class HTMLElementNode extends HTMLNode
 		String name = getName();
 		if (name.length() > 0)
 		{
-			text.append("<").append(name); //$NON-NLS-1$
+			text.append('<').append(name);
 			Iterator<String> iter = fAttributes.keySet().iterator();
 			String key, value;
 			while (iter.hasNext())
 			{
 				key = iter.next();
 				value = fAttributes.get(key);
-				text.append(" ").append(key).append("=\"").append(value).append("\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				text.append(' ').append(key).append("=\"").append(value).append('"'); //$NON-NLS-1$
 			}
-			text.append(">"); //$NON-NLS-1$
+			text.append('>');
 			IParseNode[] children = getChildren();
 			for (IParseNode child : children)
 			{
 				text.append(child);
 			}
-			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
+			text.append("</").append(name).append('>'); //$NON-NLS-1$
 		}
 		return text.toString();
 	}

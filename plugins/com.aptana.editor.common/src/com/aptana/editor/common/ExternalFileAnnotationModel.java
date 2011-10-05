@@ -38,7 +38,7 @@ public class ExternalFileAnnotationModel extends AbstractMarkerAnnotationModel
 	}
 
 	@Override
-	protected IMarker[] retrieveMarkers() throws CoreException
+	protected IMarker[] retrieveMarkers()
 	{
 		return MarkerUtils.findMarkers(resource, IMarker.MARKER, true);
 	}

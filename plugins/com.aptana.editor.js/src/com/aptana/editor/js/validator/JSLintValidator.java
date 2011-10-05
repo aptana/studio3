@@ -38,7 +38,7 @@ public class JSLintValidator implements IValidator
 {
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
-	private static Script jsLintScript;
+	private static Script JS_LINT_SCRIPT;
 
 	public JSLintValidator()
 	{
@@ -66,7 +66,12 @@ public class JSLintValidator implements IValidator
 			List<IValidationItem> items)
 	{
 		Scriptable scope = context.initStandardObjects();
-		getJSLintScript().exec(context, scope);
+		Script script = getJSLintScript();
+		if (script == null)
+		{
+			return;
+		}
+		script.exec(context, scope);
 
 		Object functionObj = scope.get("JSLINT", scope); //$NON-NLS-1$
 		if (functionObj instanceof Function)
@@ -97,15 +102,18 @@ public class JSLintValidator implements IValidator
 				}
 
 				NativeObject object;
+				int line;
+				String reason;
+				int character;
 				for (int i = 0; i < ids.length; ++i)
 				{
 
 					object = (NativeObject) errorArray.get(Integer.parseInt(ids[i].toString()), scope);
 					if (object != null)
 					{
-						int line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
-						String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
-						int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
+						line = (int) Double.parseDouble(object.get("line", scope).toString()); //$NON-NLS-1$
+						reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
+						character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
 
 						// Don't attempt to add errors or warnings if there are already errors on this line
 						if (ValidationManager.hasErrorOrWarningOnLine(items, line))
@@ -132,7 +140,7 @@ public class JSLintValidator implements IValidator
 
 	private static synchronized Script getJSLintScript()
 	{
-		if (jsLintScript == null)
+		if (JS_LINT_SCRIPT == null)
 		{
 			URL url = Platform.getBundle("org.mozilla.rhino").getEntry("/" + JSLINT_FILENAME); //$NON-NLS-1$ //$NON-NLS-2$
 			if (url != null)
@@ -144,14 +152,15 @@ public class JSLintValidator implements IValidator
 				}
 				catch (IOException e)
 				{
+					IdeLog.logError(JSPlugin.getDefault(), Messages.JSLintValidator_ERR_FailToGetJSLint, e);
 				}
 				if (source != null)
 				{
-					jsLintScript = getJSLintScript(source);
+					JS_LINT_SCRIPT = getJSLintScript(source);
 				}
 			}
 		}
-		return jsLintScript;
+		return JS_LINT_SCRIPT;
 	}
 
 	private static Script getJSLintScript(String source)

@@ -11,10 +11,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 
-
 /**
- * JS source lookup director. For JS source lookup there is one source lookup
- * participant.
+ * JS source lookup director. For JS source lookup there is one source lookup participant.
  */
 public class JSSourceLookupDirector extends AbstractSourceLookupDirector {
 

@@ -5,6 +5,9 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable unnecessaryExceptions
+
 package com.aptana.debug.core.internal;
 
 import java.io.IOException;
@@ -14,15 +17,13 @@ import java.net.URLStreamHandler;
 
 /**
  * @author Max Stepanov
- * 
  */
 public class DbgSourceURLStreamHandler extends URLStreamHandler {
-	
+
 	private static DbgSourceURLStreamHandler instance;
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.net.URLStreamHandler#openConnection(java.net.URL)
 	 */
 	protected URLConnection openConnection(URL u) throws IOException {

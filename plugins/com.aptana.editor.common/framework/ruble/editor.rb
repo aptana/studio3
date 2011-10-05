@@ -2,6 +2,53 @@ require "java"
 require "ruble/ui"
 
 module Ruble
+  # Due to classloading bugs, we can't reach TextSelection.emptySelection, so we create our own here.
+  class EmptySelection
+    def getOffset
+      -1
+    end
+    
+    def getLength
+      -1
+    end
+    
+    def getEndLine
+      -1
+    end
+    
+    def getStartLine
+      -1
+    end
+    
+    def getText
+      nil
+    end
+    
+    def isEmpty
+      true
+    end
+    
+    alias :empty? :isEmpty
+    alias :is_empty? :isEmpty
+    alias :isempty :isEmpty
+    alias :is_empty :isEmpty
+    alias :text :getText
+    alias :gettext :getText
+    alias :get_text :getText
+    alias :start_line :getStartLine
+    alias :getstartline :getStartLine
+    alias :get_start_line :getStartLine
+    alias :end_line :getEndLine
+    alias :getendline :getEndLine
+    alias :get_end_line :getEndLine
+    alias :length :getLength
+    alias :getlength :getLength
+    alias :get_length :getLength
+    alias :offset :getOffset
+    alias :getoffset :getOffset
+    alias :get_offset :getOffset
+  end
+  
   class Editor
     class << self
       
@@ -169,7 +216,7 @@ module Ruble
       if editor_part.respond_to? :selection_provider
         editor_part.selection_provider.selection
       else
-        org.eclipse.jface.text.TextSelection.emptySelection
+        Ruble::EmptySelection.new
       end
     end
     
@@ -195,7 +242,11 @@ module Ruble
     end
     
     def scope_at_offset(offset)
-      com.aptana.editor.common.CommonEditorPlugin.getDefault.get_document_scope_manager.get_scope_at_offset(editor_part.source_viewer, offset)
+      if editor_part.respond_to? :source_viewer
+        com.aptana.editor.common.CommonEditorPlugin.getDefault.get_document_scope_manager.get_scope_at_offset(editor_part.source_viewer, offset)
+      else
+        ''
+      end
     end
     
     def caret_column

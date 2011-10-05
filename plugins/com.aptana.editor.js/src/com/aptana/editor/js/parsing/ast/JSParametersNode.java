@@ -16,7 +16,7 @@ public class JSParametersNode extends JSNode
 	 */
 	public JSParametersNode(JSNode... children)
 	{
-		super(JSNodeTypes.PARAMETERS, children);
+		super(IJSNodeTypes.PARAMETERS, children);
 	}
 
 	/*

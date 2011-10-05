@@ -32,11 +32,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -49,6 +49,7 @@ import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.ui.util.UIUtils;
 
 public abstract class EditorBasedTests extends TestCase
 {
@@ -93,7 +94,7 @@ public abstract class EditorBasedTests extends TestCase
 	 */
 	protected ITextEditor createEditor(IEditorInput editorInput, String editorId)
 	{
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = UIUtils.getActivePage();
 		ITextEditor editor = null;
 
 		try
@@ -376,7 +377,14 @@ public abstract class EditorBasedTests extends TestCase
 	{
 		if (editor != null)
 		{
-			editor.close(false);
+			if (Display.getCurrent() != null)
+			{
+				editor.getSite().getPage().closeEditor(editor, false);
+			}
+			else
+			{
+				editor.close(false);
+			}
 		}
 
 		if (fileUri != null)

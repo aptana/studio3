@@ -21,10 +21,10 @@ import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
@@ -54,11 +54,11 @@ public class ASTUtil
 
 		if (targetNode != null)
 		{
-			if (targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			if (targetNode.getNodeType() == IJSNodeTypes.GET_PROPERTY)
 			{
 				propertyNode = (JSGetPropertyNode) targetNode;
 			}
-			else if (targetNode.getNodeType() == JSNodeTypes.ARGUMENTS)
+			else if (targetNode.getNodeType() == IJSNodeTypes.ARGUMENTS)
 			{
 				IParseNode candidate = targetNode.getParent().getFirstChild();
 
@@ -71,7 +71,7 @@ public class ASTUtil
 			{
 				IParseNode parentNode = targetNode.getParent();
 
-				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				if (parentNode != null && parentNode.getNodeType() == IJSNodeTypes.GET_PROPERTY)
 				{
 					propertyNode = (JSGetPropertyNode) parentNode;
 				}
@@ -80,7 +80,7 @@ public class ASTUtil
 
 		if (propertyNode == null && statementNode != null)
 		{
-			if (statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			if (statementNode.getNodeType() == IJSNodeTypes.GET_PROPERTY)
 			{
 				propertyNode = (JSGetPropertyNode) statementNode;
 			}
@@ -88,7 +88,7 @@ public class ASTUtil
 			{
 				IParseNode child = statementNode.getFirstChild();
 
-				if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
+				if (child != null && child.getNodeType() == IJSNodeTypes.GET_PROPERTY)
 				{
 					propertyNode = (JSGetPropertyNode) child;
 				}

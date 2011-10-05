@@ -18,26 +18,20 @@ import com.aptana.terminal.Utils;
  * Shows the terminal editor.
  * 
  * @author schitale
- *
  */
-public class ShowTerminalEditorAction implements IWorkbenchWindowActionDelegate
-{
+public class ShowTerminalEditorAction implements IWorkbenchWindowActionDelegate {
 
-	public void dispose()
-	{
+	public void dispose() {
 	}
 
-	public void init(IWorkbenchWindow workbenchWindow)
-	{
+	public void init(IWorkbenchWindow workbenchWindow) {
 	}
 
-	public void run(IAction action)
-	{
+	public void run(IAction action) {
 		Utils.openTerminalEditor(TerminalEditor.ID, true);
 	}
 
-	public void selectionChanged(IAction action, ISelection selection)
-	{
+	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
 }

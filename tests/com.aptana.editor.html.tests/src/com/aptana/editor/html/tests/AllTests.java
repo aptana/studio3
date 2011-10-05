@@ -18,6 +18,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.html.tests");
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.editor.html.HTMLEditorTests.suite());
+		suite.addTest(com.aptana.editor.html.parsing.HTMLParsingTests.suite());
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
 		// $JUnit-END$

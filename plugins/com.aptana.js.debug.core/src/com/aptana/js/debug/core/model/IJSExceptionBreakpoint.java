@@ -14,7 +14,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
  * @author Max Stepanov
  */
 public interface IJSExceptionBreakpoint extends IBreakpoint {
-	
+
 	/**
 	 * Returns exception type name
 	 * 

@@ -31,7 +31,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	private String _additionalProposalInformation;
 	private IContextInformation _contextInformation;
 	private String _displayString;
-	private Image _image;
+	protected Image _image;
 	protected int _cursorPosition;
 	protected int _replacementOffset;
 	protected int _replacementLength;
@@ -361,7 +361,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		if (validated && event != null)
 		{
 			// make sure that we change the replacement length as the document content changes
-			int delta = (event.fText == null ? 0 : event.fText.length()) - event.fLength;
+			int delta = ((event.fText == null) ? 0 : event.fText.length()) - event.fLength;
 			final int newLength = Math.max(_replacementLength + delta, 0);
 			_replacementLength = newLength;
 		}

@@ -1,7 +1,19 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
+// $codepro.audit.disable declaredExceptions
+// $codepro.audit.disable staticFieldNamingConvention
+// $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
+
 package com.aptana.js.debug.ui;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +35,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
@@ -31,7 +44,6 @@ import com.aptana.js.debug.core.internal.browsers.FirebugUtil;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.ui.internal.DebugUIImages;
 import com.aptana.js.debug.ui.internal.LaunchConfigurationsHelper;
-import com.aptana.ui.CommonMessages;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -98,7 +110,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static JSDebugUIPlugin getDefault() {
@@ -106,8 +118,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
 	 * @param path
 	 *            the path
@@ -122,22 +133,6 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	protected ImageRegistry createImageRegistry() {
 		return DebugUIImages.getImageRegistry();
-	}
-
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
-	}
-
-	public static void log(String msg) {
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
-	}
-
-	public static void log(String msg, Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
 	}
 
 	/**
@@ -155,7 +150,8 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	private void registerAsFirebugEditor() {
 		IPath launcher = EclipseUtil.getApplicationLauncher();
 		if (launcher != null) {
-			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher, StringUtil.EMPTY);
+			FirebugUtil.registerEditor(CommonMessages.ProductShortName, CommonMessages.ProductName, launcher,
+					StringUtil.EMPTY);
 		}
 	}
 
@@ -163,7 +159,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 		IWorkbenchPage page = UIUtils.getActivePage();
 		if (page != null) {
 			IEditorReference[] editorRefs = page.getEditorReferences();
-			ArrayList<IEditorReference> closeEditors = new ArrayList<IEditorReference>();
+			List<IEditorReference> closeEditors = new ArrayList<IEditorReference>();
 			for (IEditorReference ref : editorRefs) {
 				try {
 					IEditorInput input = ref.getEditorInput();
@@ -176,7 +172,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 						}
 					}
 				} catch (PartInitException e) {
-					log(e.getStatus());
+					IdeLog.logError(getDefault(), e);
 				}
 			}
 			if (!closeEditors.isEmpty()) {
@@ -184,7 +180,5 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 						false);
 			}
 		}
-
 	}
-
 }

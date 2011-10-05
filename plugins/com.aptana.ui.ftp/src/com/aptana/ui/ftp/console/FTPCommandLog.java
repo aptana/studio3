@@ -34,7 +34,7 @@ public class FTPCommandLog implements IFTPCommandLog {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IFTPCommandLog.class) {
+			if (IFTPCommandLog.class.equals(adapterType)) {
 				return new FTPCommandLog();
 			}
 			return null;

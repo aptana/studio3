@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -256,10 +257,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		finally
 		{
-			if (stats != null)
-			{
-
-			}
 		}
 	}
 
@@ -289,7 +286,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		catch (BadLocationException e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return proposals;
 	}
@@ -355,7 +352,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
 			if (element instanceof RubyHash)
 			{
-				RubyHash hash = (RubyHash) element;
+				Map hash = (RubyHash) element;
 				if (!hash.containsKey(insertSymbol))
 				{
 					continue;
@@ -395,7 +392,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 							}
 							catch (MalformedURLException e1)
 							{
-								IdeLog.logError(CommonEditorPlugin.getDefault(), e1.getMessage(), e1);
+								IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
 							}
 						}
 						if (imageURL != null)

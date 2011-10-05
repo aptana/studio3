@@ -26,12 +26,12 @@ import com.aptana.parsing.lexer.ITypePredicate;
  */
 public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRecoveryStrategy
 {
-	private class CandidateToken
+	private class CandidateToken // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.favorStaticMemberClassesOverNonStatic
 	{
 		public final T tokenType;
 		public final String tokenText;
 
-		public CandidateToken(T tokenType, String tokenText)
+		private CandidateToken(T tokenType, String tokenText)
 		{
 			this.tokenType = tokenType;
 			this.tokenText = tokenText;
@@ -46,8 +46,12 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	 * InsertionRecoveryStrategy
 	 * 
 	 * @param type
+	 *            The type of the token to be inserted when attempting to recover from a failed parse
 	 * @param text
+	 *            The text of the token to be inserted when attempting to recover from a failed parse
 	 * @param lastTokenTypes
+	 *            An array of token types. The last token that was consumed by the parser must match an item in this
+	 *            array. If no items are in this array, then any token type is valid for this recover strategy
 	 */
 	public InsertionRecoveryStrategy(T type, String text, T... lastTokenTypes)
 	{
@@ -59,10 +63,16 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	 * InsertionRecoveryStrategy
 	 * 
 	 * @param type1
+	 *            The type of the first token to be inserted when attempting to recover from a failed parse
 	 * @param text1
+	 *            The text of the first token to be inserted when attempting to recover from a failed parse
 	 * @param type2
+	 *            The type of the second token to be inserted when attempting to recover from a failed parse
 	 * @param text2
+	 *            The text of the second token to be inserted when attempting to recover from a failed parse
 	 * @param lastTokenTypes
+	 *            An array of token types. The last token that was consumed by the parser must match an item in this
+	 *            array. If no items are in this array, then any token type is valid for this recover strategy
 	 */
 	public InsertionRecoveryStrategy(T type1, String text1, T type2, String text2, T... lastTokenTypes)
 	{
@@ -72,9 +82,10 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	}
 
 	/**
-	 * addCurrentTokenTypes
+	 * Add a token type to the list of current token types that are considered valid for this recovery strategy
 	 * 
 	 * @param tokenTypes
+	 *            An array of zero or more token types
 	 */
 	public void addCurrentTokenTypes(T... tokenTypes)
 	{
@@ -85,9 +96,10 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	}
 
 	/**
-	 * addLastTokenTypes
+	 * Add a token type to the list of last token type that are considered valid for this recovery strategy
 	 * 
 	 * @param tokenTypes
+	 *            An array of zero or more token types
 	 */
 	public void addLastTokenTypes(T... tokenTypes)
 	{
@@ -98,10 +110,12 @@ public class InsertionRecoveryStrategy<T extends ITypePredicate> implements IRec
 	}
 
 	/**
-	 * addToken
+	 * Add a new token type and associate text to the list of tokens to try when performing this recovery
 	 * 
 	 * @param tokenType
+	 *            The token type
 	 * @param text
+	 *            The token's text value
 	 */
 	public void addToken(T tokenType, String text)
 	{

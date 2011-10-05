@@ -28,6 +28,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.mortbay.util.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
@@ -86,9 +87,9 @@ public class RecentFilesActionController extends AbstractActionController
 		// ReopenEditorMenu class.
 		if (!(arguments instanceof Object[]))
 		{
-			PortalUIPlugin.logError(new Exception(
-					"Wrong argument type passed to RecentFilesActionController::openRecentFile. Expected Object[] and got " //$NON-NLS-1$
-							+ ((arguments == null) ? "null" : arguments.getClass().getName()))); //$NON-NLS-1$
+			String message = "Wrong argument type passed to RecentFilesActionController::openRecentFile. Expected Object[] and got " //$NON-NLS-1$
+					+ ((arguments == null) ? "null" : arguments.getClass().getName()); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 
 			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
 					null);

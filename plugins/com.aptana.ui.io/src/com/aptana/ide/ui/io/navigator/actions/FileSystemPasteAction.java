@@ -25,6 +25,7 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 
 /**
@@ -37,6 +38,7 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
      */
     public static final String ID = IOUIPlugin.PLUGIN_ID + ".PasteAction"; //$NON-NLS-1$
 
+    private static final IFileStore[] NO_FILES = new IFileStore[0];
     /**
      * The shell in which to show any dialogs
      */
@@ -68,7 +70,10 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
 
             @Override
             public void done(IJobChangeEvent event) {
-                IOUIPlugin.refreshNavigatorView(getStructuredSelection().getFirstElement());
+            	for (IFileStore fileStore : fDestFileStores)
+            	{
+            		IOUIPlugin.refreshNavigatorView(fileStore);
+            	}
             }
         };
         if (fClipboardData != null && fClipboardData.length > 0 && fDestFileStores.size() > 0) {
@@ -90,7 +95,7 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
     @Override
     protected boolean updateSelection(IStructuredSelection selection) {
         fDestFileStores.clear();
-        fClipboardData = new IFileStore[0];
+        fClipboardData = NO_FILES;
         if (!super.updateSelection(selection)) {
             return false;
         }
@@ -104,6 +109,10 @@ public class FileSystemPasteAction extends BaseSelectionListenerAction {
         for (Object element : elements) {
             fileStore = FileSystemUtils.getFileStore(element);
             if (fileStore != null) {
+            	if (!Utils.isDirectory(fileStore))
+            	{
+            		fileStore = fileStore.getParent();
+            	}
                 fDestFileStores.add(fileStore);
             }
         }

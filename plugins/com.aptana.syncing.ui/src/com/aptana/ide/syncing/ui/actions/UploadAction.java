@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -132,7 +133,7 @@ public class UploadAction extends BaseSyncAction
 				}
 				catch (Exception e)
 				{
-					SyncingUIPlugin.logError(Messages.UploadAction_ERR_FailToUpload, e);
+					IdeLog.logError(SyncingUIPlugin.getDefault(), Messages.UploadAction_ERR_FailToUpload, e);
 					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.UploadAction_ERR_FailToUpload,
 							e);
 				}

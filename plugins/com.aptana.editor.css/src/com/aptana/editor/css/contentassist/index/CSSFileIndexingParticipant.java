@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
@@ -71,7 +72,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(CSSPlugin.getDefault(), e.getMessage(), e, null);
+			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -119,13 +120,13 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			CSSAttributeSelectorNode cssAttributeSelectorNode = (CSSAttributeSelectorNode) parent;
 			String text = cssAttributeSelectorNode.getText();
-			if (text != null && text.startsWith(".")) //$NON-NLS-1$
+			if (!StringUtil.isEmpty(text) && text.charAt(0) == '.')
 			{
-				addIndex(index, file, CSSIndexConstants.CLASS, text.substring(1));
+				addIndex(index, file, ICSSIndexConstants.CLASS, text.substring(1));
 			}
-			else if (text != null && text.startsWith("#")) //$NON-NLS-1$
+			else if (!StringUtil.isEmpty(text) && text.charAt(0) == '#')
 			{
-				addIndex(index, file, CSSIndexConstants.IDENTIFIER, text.substring(1));
+				addIndex(index, file, ICSSIndexConstants.IDENTIFIER, text.substring(1));
 			}
 		}
 
@@ -135,7 +136,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			String value = term.getText();
 			if (isColor(value))
 			{
-				addIndex(index, file, CSSIndexConstants.COLOR, CSSColors.to6CharHexWithLeadingHash(value.trim()));
+				addIndex(index, file, ICSSIndexConstants.COLOR, CSSColors.to6CharHexWithLeadingHash(value.trim()));
 			}
 		}
 
@@ -169,7 +170,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			text = text.toLowerCase();
 		}
 		int lastOffset = 0;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
 		for (String line : lines)
 		{
 			int offset = text.indexOf(line, lastOffset);
@@ -203,11 +204,11 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	private static boolean isColor(String value)
 	{
-		if (value == null || value.trim().length() == 0)
+		if (StringUtil.isEmpty(value))
 			return false;
 		if (CSSColors.namedColorExists(value))
 			return true;
-		if (value.startsWith("#") && (value.length() == 4 || value.length() == 7)) //$NON-NLS-1$
+		if (value.charAt(0) == '#' && (value.length() == 4 || value.length() == 7))
 			return true; // FIXME Check to make sure it's hex values!
 		return false;
 	}

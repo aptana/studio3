@@ -18,71 +18,92 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public final class ProjectSiteConnection extends PlatformObject {
+public final class ProjectSiteConnection extends PlatformObject
+{
 
-    private final IProject project;
-    private final ISiteConnection siteConnection;
+	private final IProject project;
+	private final ISiteConnection siteConnection;
 
-    private int hashCode;
+	private int hashCode;
 
-    public ProjectSiteConnection(IProject project, ISiteConnection siteConnection) {
-        this.project = project;
-        this.siteConnection = siteConnection;
-    }
+	public ProjectSiteConnection(IProject project, ISiteConnection siteConnection)
+	{
+		this.project = project;
+		this.siteConnection = siteConnection;
+	}
 
-    public IProject getProject() {
-        return project;
-    }
+	public IProject getProject()
+	{
+		return project;
+	}
 
-    public ISiteConnection getSiteConnection() {
-        return siteConnection;
-    }
+	public ISiteConnection getSiteConnection()
+	{
+		return siteConnection;
+	}
 
-    public boolean canDisconnect() {
-    	IConnectionPoint connectionPoint = siteConnection.getDestination();
-    	return connectionPoint == null ? false : connectionPoint.canDisconnect();
-    }
+	public boolean canDisconnect()
+	{
+		IConnectionPoint connectionPoint = siteConnection.getDestination();
+		return (connectionPoint == null) ? false : connectionPoint.canDisconnect();
+	}
 
-    @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class adapter) {
-        if (adapter == IProject.class) {
-            return project;
-        } else if (adapter == ISiteConnection.class) {
-            return siteConnection;
-        } else if (adapter == IConnectionPoint.class) {
-            return siteConnection.getDestination();
-        } else if (adapter == IFileStore.class) {
-            IConnectionPoint destination = siteConnection.getDestination();
-            try {
-                return destination == null ? null : destination.getRoot();
-            } catch (CoreException e) {
-                // falls through on error
-            }
-        }
-        return super.getAdapter(adapter);
-    }
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Class adapter)
+	{
+		if (adapter == IProject.class)
+		{
+			return project;
+		}
+		else if (adapter == ISiteConnection.class)
+		{
+			return siteConnection;
+		}
+		else if (adapter == IConnectionPoint.class)
+		{
+			return siteConnection.getDestination();
+		}
+		else if (adapter == IFileStore.class)
+		{
+			IConnectionPoint destination = siteConnection.getDestination();
+			try
+			{
+				return (destination == null) ? null : destination.getRoot();
+			}
+			catch (CoreException e)
+			{
+				// falls through on error
+			}
+		}
+		return super.getAdapter(adapter);
+	}
 
-    @Override
-    public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = 7;
-            hashCode = 31 * hashCode + project.hashCode();
-            hashCode = 31 * hashCode + siteConnection.hashCode();
-        }
-        return hashCode;
-    }
+	@Override
+	public int hashCode()
+	{
+		if (hashCode == 0)
+		{
+			hashCode = 7;
+			hashCode = 31 * hashCode + project.hashCode();
+			hashCode = 31 * hashCode + siteConnection.hashCode();
+		}
+		return hashCode;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ProjectSiteConnection)) {
-            return false;
-        }
-        ProjectSiteConnection connection = (ProjectSiteConnection) o;
-        return project == connection.project && siteConnection == connection.siteConnection;
-    }
+	@Override
+	public boolean equals(Object o)
+	{
+		if (!(o instanceof ProjectSiteConnection))
+		{
+			return false;
+		}
+		ProjectSiteConnection connection = (ProjectSiteConnection) o;
+		return project == connection.project && siteConnection == connection.siteConnection;
+	}
 
-    @Override
-    public String toString() {
-        return getSiteConnection().toString();
-    }
+	@Override
+	public String toString()
+	{
+		return getSiteConnection().toString();
+	}
 }

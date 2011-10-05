@@ -8,10 +8,9 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.expressions,
+ org.eclipse.core.filesystem,
  org.apache.ant,
- org.eclipse.equinox.p2.core,
  com.aptana.filewatcher,
- com.aptana.index.core,
  com.aptana.libraries
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

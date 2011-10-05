@@ -13,12 +13,15 @@ import org.eclipse.jface.action.IAction;
 
 import com.aptana.ide.syncing.core.ISiteConnection;
 
-public class SynchronizeAction extends BaseSyncAction {
+public class SynchronizeAction extends BaseSyncAction
+{
 
-    public void run(IAction action) {
-        openConnectionEditor();
-    }
+	public void run(IAction action)
+	{
+		openConnectionEditor();
+	}
 
-    protected void performAction(IAdaptable[] files, ISiteConnection site) throws CoreException {
-    }
+	protected void performAction(IAdaptable[] files, ISiteConnection site) throws CoreException
+	{
+	}
 }

@@ -7,8 +7,8 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
@@ -45,55 +45,55 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 	{
 		switch (invocationNode.getParent().getNodeType())
 		{
-			case JSNodeTypes.ASSIGN:
-			case JSNodeTypes.DECLARATION:
-			case JSNodeTypes.CONDITIONAL:
-			case JSNodeTypes.LOGICAL_AND:
-			case JSNodeTypes.LOGICAL_OR:
-			case JSNodeTypes.ELEMENTS:
-			case JSNodeTypes.IF:
-			case JSNodeTypes.WHILE:
-			case JSNodeTypes.FOR:
-			case JSNodeTypes.FOR_IN:
-			case JSNodeTypes.ADD:
-			case JSNodeTypes.MULTIPLY:
-			case JSNodeTypes.MOD:
-			case JSNodeTypes.DIVIDE:
-			case JSNodeTypes.BITWISE_AND:
-			case JSNodeTypes.BITWISE_OR:
-			case JSNodeTypes.BITWISE_XOR:
-			case JSNodeTypes.PRE_INCREMENT:
-			case JSNodeTypes.PRE_DECREMENT:
-			case JSNodeTypes.NEGATIVE:
-			case JSNodeTypes.POSITIVE:
-			case JSNodeTypes.EQUAL:
-			case JSNodeTypes.GREATER_THAN:
-			case JSNodeTypes.GREATER_THAN_OR_EQUAL:
-			case JSNodeTypes.IDENTITY:
-			case JSNodeTypes.LESS_THAN:
-			case JSNodeTypes.LESS_THAN_OR_EQUAL:
-			case JSNodeTypes.NOT_EQUAL:
-			case JSNodeTypes.NOT_IDENTITY:
-			case JSNodeTypes.ADD_AND_ASSIGN:
-			case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
-			case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
-			case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
-			case JSNodeTypes.DIVIDE_AND_ASSIGN:
-			case JSNodeTypes.MOD_AND_ASSIGN:
-			case JSNodeTypes.MULTIPLY_AND_ASSIGN:
-			case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
-			case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
-			case JSNodeTypes.SHIFT_RIGHT:
-			case JSNodeTypes.SHIFT_LEFT:
-			case JSNodeTypes.SUBTRACT_AND_ASSIGN:
-			case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT:
-			case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
-			case JSNodeTypes.NAME_VALUE_PAIR:
-			case JSNodeTypes.COMMA:
-			case JSNodeTypes.RETURN:
-			case JSNodeTypes.THROW:
-			case JSNodeTypes.ARGUMENTS:
-			case JSNodeTypes.SUBTRACT:
+			case IJSNodeTypes.ASSIGN:
+			case IJSNodeTypes.DECLARATION:
+			case IJSNodeTypes.CONDITIONAL:
+			case IJSNodeTypes.LOGICAL_AND:
+			case IJSNodeTypes.LOGICAL_OR:
+			case IJSNodeTypes.ELEMENTS:
+			case IJSNodeTypes.IF:
+			case IJSNodeTypes.WHILE:
+			case IJSNodeTypes.FOR:
+			case IJSNodeTypes.FOR_IN:
+			case IJSNodeTypes.ADD:
+			case IJSNodeTypes.MULTIPLY:
+			case IJSNodeTypes.MOD:
+			case IJSNodeTypes.DIVIDE:
+			case IJSNodeTypes.BITWISE_AND:
+			case IJSNodeTypes.BITWISE_OR:
+			case IJSNodeTypes.BITWISE_XOR:
+			case IJSNodeTypes.PRE_INCREMENT:
+			case IJSNodeTypes.PRE_DECREMENT:
+			case IJSNodeTypes.NEGATIVE:
+			case IJSNodeTypes.POSITIVE:
+			case IJSNodeTypes.EQUAL:
+			case IJSNodeTypes.GREATER_THAN:
+			case IJSNodeTypes.GREATER_THAN_OR_EQUAL:
+			case IJSNodeTypes.IDENTITY:
+			case IJSNodeTypes.LESS_THAN:
+			case IJSNodeTypes.LESS_THAN_OR_EQUAL:
+			case IJSNodeTypes.NOT_EQUAL:
+			case IJSNodeTypes.NOT_IDENTITY:
+			case IJSNodeTypes.ADD_AND_ASSIGN:
+			case IJSNodeTypes.BITWISE_AND_AND_ASSIGN:
+			case IJSNodeTypes.BITWISE_OR_AND_ASSIGN:
+			case IJSNodeTypes.BITWISE_XOR_AND_ASSIGN:
+			case IJSNodeTypes.DIVIDE_AND_ASSIGN:
+			case IJSNodeTypes.MOD_AND_ASSIGN:
+			case IJSNodeTypes.MULTIPLY_AND_ASSIGN:
+			case IJSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
+			case IJSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
+			case IJSNodeTypes.SHIFT_RIGHT:
+			case IJSNodeTypes.SHIFT_LEFT:
+			case IJSNodeTypes.SUBTRACT_AND_ASSIGN:
+			case IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT:
+			case IJSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
+			case IJSNodeTypes.NAME_VALUE_PAIR:
+			case IJSNodeTypes.COMMA:
+			case IJSNodeTypes.RETURN:
+			case IJSNodeTypes.THROW:
+			case IJSNodeTypes.ARGUMENTS:
+			case IJSNodeTypes.SUBTRACT:
 				return true;
 			default:
 				return false;
@@ -107,7 +107,17 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return hasCommentBefore;
+		if (hasCommentBefore)
+		{
+			return true;
+		}
+		switch (invocationNode.getParent().getNodeType())
+		{
+			// APSTUD-3313
+			case IJSNodeTypes.STATEMENTS:
+				return true;
+		}
+		return false;
 	}
 
 }

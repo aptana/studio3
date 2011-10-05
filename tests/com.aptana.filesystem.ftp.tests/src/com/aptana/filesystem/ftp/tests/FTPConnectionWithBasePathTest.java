@@ -22,17 +22,14 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  * @author Max Stepanov
  */
 @SuppressWarnings("nls")
-public class FTPConnectionWithBasePathTest extends CommonConnectionTest
-{
+public class FTPConnectionWithBasePathTest extends CommonConnectionTest {
 
-	private static FTPConnectionPoint setupConnection()
-	{
+	private static FTPConnectionPoint setupConnection() {
 		FTPConnectionPoint ftpcp = new FTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("ftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
-		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
-				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
-		
+		ftpcp.setHost(getConfig().getProperty("ftp.host")); //$NON-NLS-1$
+		ftpcp.setLogin(getConfig().getProperty("ftp.username")); //$NON-NLS-1$
+		ftpcp.setPassword(getConfig().getProperty("ftp.password").toCharArray());
+
 		ConnectionContext context = new ConnectionContext();
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
 		CoreIOPlugin.setConnectionContext(ftpcp, context);
@@ -41,8 +38,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	@Override
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		initBasePath();
 		FTPConnectionPoint ftpcp = setupConnection();
 		ftpcp.setPath(constructBasePath());
@@ -57,59 +53,64 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	}
 
 	public static IPath constructBasePath() {
-		return new Path(getConfig().getProperty("ftp.path", "/home/ftpuser")).append(FTPConnectionWithBasePathTest.class.getSimpleName());
+		return new Path(getConfig().getProperty("ftp.path"))
+				.append(FTPConnectionWithBasePathTest.class.getSimpleName());
 	}
-	
-	public static void initBasePath() throws CoreException
-	{
+
+	public static void initBasePath() throws CoreException {
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
 		try {
-			if (!fs.fetchInfo().exists())
-			{
+			if (!fs.fetchInfo().exists()) {
 				fs.mkdir(EFS.NONE, null);
 			}
-		} finally {
+		}
+		finally {
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
 	}
 
-	public static void cleanupBasePath() throws CoreException
-	{
+	public static void cleanupBasePath() throws CoreException {
 		FTPConnectionPoint ftpcp = setupConnection();
 		IFileStore fs = ftpcp.getRoot().getFileStore(constructBasePath());
 		assertNotNull(fs);
 		try {
-			if (fs.fetchInfo().exists())
-			{
+			if (fs.fetchInfo().exists()) {
 				fs.delete(EFS.NONE, null);
 			}
-		} finally {
+		}
+		finally {
 			ftpcp.disconnect(null);
 		}
 		assertFalse(ftpcp.isConnected());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsSetModificationTime()
 	 */
 	@Override
-	protected boolean supportsSetModificationTime()
-	{
-		return true;
+	protected boolean supportsSetModificationTime() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.setmodtime"));
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsFolderSetModificationTime()
+	 */
+	@Override
+	protected boolean supportsFolderSetModificationTime() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.foldersetmodtime"));
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
-	protected boolean supportsChangeGroup()
-	{
-		return false;
+	protected boolean supportsChangeGroup() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.changegroup"));
 	}
 
 	/*
@@ -117,8 +118,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
-	protected boolean supportsChangePermissions()
-	{
-		return true;
+	protected boolean supportsChangePermissions() {
+		return Boolean.parseBoolean(getConfig().getProperty("ftp.supports.permissions"));
 	}
 }

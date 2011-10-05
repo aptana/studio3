@@ -17,11 +17,12 @@ import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.formatter.IDebugScopes;
 import com.aptana.formatter.ui.epl.FormatterUIEplPlugin;
 import com.aptana.formatter.ui.epl.UIEplMessages;
 import com.aptana.ui.util.UIUtils;
@@ -36,15 +37,6 @@ public class ExceptionHandler
 {
 
 	private static ExceptionHandler fgInstance = new ExceptionHandler();
-
-	/**
-	 * Logs the given exception using the platform's logging mechanism. The exception is logged as an error with the
-	 * error code <code>ModelStatusConstants.INTERNAL_ERROR</code>.
-	 */
-	public static void log(Throwable t, String message)
-	{
-		FormatterUIEplPlugin.log(new Status(IStatus.ERROR, FormatterUIEplPlugin.PLUGIN_ID, FormatterUIEplPlugin.INTERNAL_ERROR, message, t));
-	}
 
 	/**
 	 * Handles the given <code>CoreException</code>. The workbench shell is used as a parent for the dialog window.
@@ -120,7 +112,7 @@ public class ExceptionHandler
 		 * if (!Activator.getDefault().getPreferenceStore().getBoolean(
 		 * PreferenceConstants.RESOURCE_SHOW_ERROR_INVALID_RESOURCE_NAME) && isInvalidResouceName(e)) { return; }
 		 */
-		FormatterUIEplPlugin.logError(e);
+		IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		IStatus status = e.getStatus();
 		if (status != null)
 		{
@@ -180,7 +172,7 @@ public class ExceptionHandler
 		}
 		else
 		{
-			FormatterUIEplPlugin.logError(e);
+			IdeLog.logError(FormatterUIEplPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			if (e.getMessage() != null && e.getMessage().length() > 0)
 			{
 				displayMessageDialog(e, e.getMessage(), shell, title, message);

@@ -18,7 +18,7 @@ import org.eclipse.debug.core.model.IVariable;
  * @author Max Stepanov
  */
 public class JSDebugValue extends JSDebugElement implements IValue {
-	
+
 	private final String threadId;
 	private final String qualifier;
 	private final String typeName;
@@ -35,7 +35,8 @@ public class JSDebugValue extends JSDebugElement implements IValue {
 	 * @param hasVariables
 	 * @param valueString
 	 */
-	public JSDebugValue(IDebugTarget target, String threadId, String qualifier, String typeName, boolean hasVariables, String valueString) {
+	public JSDebugValue(IDebugTarget target, String threadId, String qualifier, String typeName, boolean hasVariables,
+			String valueString) {
 		super(target);
 		this.threadId = threadId;
 		this.qualifier = qualifier;
@@ -82,11 +83,11 @@ public class JSDebugValue extends JSDebugElement implements IValue {
 		return hasVariables;
 	}
 
-	/* package */ String getQualifier() {
+	/* package */String getQualifier() {
 		return qualifier;
 	}
 
-	/* package */ String getThreadId() {
+	/* package */String getThreadId() {
 		return threadId;
 	}
 

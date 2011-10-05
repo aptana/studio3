@@ -1,4 +1,4 @@
-#Mon Sep 27 17:10:16 PDT 2010
+#Tue Aug 23 14:35:02 PDT 2011
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
 org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.5
@@ -72,3 +72,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
 org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
 org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
 org.eclipse.jdt.core.compiler.source=1.5
+org.eclipse.jdt.core.formatter.comment.preserve_white_space_between_code_and_line_comments=false
+org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_field=insert
+org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_method=insert
+org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_package=insert
+org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_type=insert

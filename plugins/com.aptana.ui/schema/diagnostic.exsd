@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="diagnostic"/>
+            <element ref="diagnosticLog" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,22 +47,22 @@
       </complexType>
    </element>
 
-   <element name="diagnostic">
+   <element name="diagnosticLog">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The diagnostic class that should be contributed to correctly display the diagnostic logs.  Class must be of type IDiagnosticLog, or it will be omitted.
+                  The class that contributes to what is displayed in the diagnostic logs.  Class must be of type IDiagnosticLog, or it will be omitted.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.ui.IDiagnosticLog"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="ordinal" type="string">
+         <attribute name="priority" type="string" use="default" value="50">
             <annotation>
                <documentation>
-                  The ordinal used to sort the diagnostic log entries.
+                  The priority is used to sort the diagnostic log entries.
                </documentation>
             </annotation>
          </attribute>

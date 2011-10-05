@@ -65,4 +65,5 @@ public interface IFindBarDecorator
 	 * Disposes of the find bar.
 	 */
 	void dispose();
+
 }

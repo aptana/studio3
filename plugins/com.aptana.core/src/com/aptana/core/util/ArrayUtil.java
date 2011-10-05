@@ -15,6 +15,7 @@ public class ArrayUtil
 	 */
 	public static final String[] NO_STRINGS = new String[0];
 	public static final Object[] NO_OBJECTS = new Object[0];
+	public static final byte[] NO_BYTES = new byte[0];
 
 	private ArrayUtil()
 	{

@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
 
 package com.aptana.terminal.internal.emulator;
 
@@ -18,39 +19,33 @@ import com.aptana.theme.ThemePlugin;
 /**
  * @author Max Stepanov
  */
-/* package */class ThemedTextLineRenderer extends TextLineRenderer
-{
+/* package */class ThemedTextLineRenderer extends TextLineRenderer {
 
 	private static ThemedStyleMap sThemedStyleMap = null;
 
 	/**
 	 * @param model
 	 */
-	public ThemedTextLineRenderer(ITextCanvasModel model)
-	{
+	protected ThemedTextLineRenderer(ITextCanvasModel model) {
 		super(null, model);
 		fStyleMap = getStyleMap();
 	}
 
-	static ThemedStyleMap getStyleMap()
-	{
-		if (sThemedStyleMap == null)
-		{
+	static ThemedStyleMap getStyleMap() {
+		if (sThemedStyleMap == null) {
 			sThemedStyleMap = new ThemedStyleMap();
 		}
 		return sThemedStyleMap;
 	}
 
 	@Override
-	protected Color getSelectionBackground()
-	{
+	protected Color getSelectionBackground() {
 		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		return ThemePlugin.getDefault().getColorManager().getColor(theme.getSelectionAgainstBG());
 	}
 
 	@Override
-	protected Color getSelectionForeground()
-	{
+	protected Color getSelectionForeground() {
 		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
 	}

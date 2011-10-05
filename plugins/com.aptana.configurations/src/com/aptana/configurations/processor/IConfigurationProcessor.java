@@ -9,7 +9,6 @@ package com.aptana.configurations.processor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-
 /**
  * A configuration processor interface.
  * 
@@ -30,6 +29,13 @@ public interface IConfigurationProcessor
 	 * @return The configuration processor name, as specified in the extension that contributed it.
 	 */
 	public String getName();
+
+	/**
+	 * Returns <code>true</code> if this processor is enabled; <code>false</code> otherwise.
+	 * 
+	 * @return <code>true</code> if this processor is enabled; <code>false</code> otherwise.
+	 */
+	public boolean isEnabled();
 
 	/**
 	 * Returns the configuration state.<br>

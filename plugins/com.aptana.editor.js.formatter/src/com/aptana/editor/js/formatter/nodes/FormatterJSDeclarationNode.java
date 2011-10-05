@@ -10,7 +10,7 @@ package com.aptana.editor.js.formatter.nodes;
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
-import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -70,13 +70,13 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 		}
 		switch (node.getNodeType())
 		{
-			case JSNodeTypes.CATCH:
+			case IJSNodeTypes.CATCH:
 				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
-			case JSNodeTypes.FINALLY:
+			case IJSNodeTypes.FINALLY:
 				return !hasBlockedChild
 						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
-			case JSNodeTypes.FUNCTION:
-			case JSNodeTypes.VAR:
+			case IJSNodeTypes.FUNCTION:
+			case IJSNodeTypes.VAR:
 				return !isLoopOrExpressionNode(node.getParent());
 		}
 		return true;
@@ -97,16 +97,16 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 		}
 		switch (node.getNodeType())
 		{
-			case JSNodeTypes.DECLARATION:
-			case JSNodeTypes.ASSIGN:
-			case JSNodeTypes.RETURN:
-			case JSNodeTypes.INVOKE:
-			case JSNodeTypes.GROUP:
-			case JSNodeTypes.ARGUMENTS:
-			case JSNodeTypes.CONDITIONAL:
-			case JSNodeTypes.NAME_VALUE_PAIR:
-			case JSNodeTypes.GET_PROPERTY:
-			case JSNodeTypes.CONSTRUCT:
+			case IJSNodeTypes.DECLARATION:
+			case IJSNodeTypes.ASSIGN:
+			case IJSNodeTypes.RETURN:
+			case IJSNodeTypes.INVOKE:
+			case IJSNodeTypes.GROUP:
+			case IJSNodeTypes.ARGUMENTS:
+			case IJSNodeTypes.CONDITIONAL:
+			case IJSNodeTypes.NAME_VALUE_PAIR:
+			case IJSNodeTypes.GET_PROPERTY:
+			case IJSNodeTypes.CONSTRUCT:
 				return true;
 		}
 		return false;
@@ -121,11 +121,11 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	{
 		// TODO add preferences
 		short parentNodeType = node.getParent().getNodeType();
-		if (parentNodeType == JSNodeTypes.GROUP)
+		if (parentNodeType == IJSNodeTypes.GROUP)
 		{
 			return 0;
 		}
-		if (parentNodeType == JSNodeTypes.ARGUMENTS)
+		if (parentNodeType == IJSNodeTypes.ARGUMENTS)
 		{
 			// Set to zero only if it's the first argument
 			JSArgumentsNode argumentsNode = (JSArgumentsNode) node.getParent();
@@ -135,7 +135,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 			}
 		}
 		short nodeType = node.getNodeType();
-		if (nodeType == JSNodeTypes.VAR)
+		if (nodeType == IJSNodeTypes.VAR)
 		{
 			if (isLoopOrExpressionNode(node.getParent()))
 			{
@@ -169,9 +169,9 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	{
 		switch (iParseNode.getNodeType())
 		{
-			case JSNodeTypes.WHILE:
-			case JSNodeTypes.FOR:
-			case JSNodeTypes.FOR_IN:
+			case IJSNodeTypes.WHILE:
+			case IJSNodeTypes.FOR:
+			case IJSNodeTypes.FOR_IN:
 				return true;
 		}
 		return isPartOfExpression(iParseNode);

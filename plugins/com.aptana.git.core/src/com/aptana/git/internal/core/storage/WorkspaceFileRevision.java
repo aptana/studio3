@@ -12,7 +12,6 @@ package com.aptana.git.internal.core.storage;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.team.core.history.IFileRevision;
 
@@ -32,7 +31,7 @@ class WorkspaceFileRevision extends GitFileRevision
 		rsrc = resource;
 	}
 
-	public IStorage getStorage(IProgressMonitor monitor) throws CoreException
+	public IStorage getStorage(IProgressMonitor monitor)
 	{
 		return rsrc instanceof IStorage ? (IStorage) rsrc : null;
 	}
@@ -42,7 +41,7 @@ class WorkspaceFileRevision extends GitFileRevision
 		return false;
 	}
 
-	public IFileRevision withAllProperties(IProgressMonitor monitor) throws CoreException
+	public IFileRevision withAllProperties(IProgressMonitor monitor)
 	{
 		return null;
 	}

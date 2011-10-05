@@ -21,7 +21,7 @@ import org.w3c.css.values.CssIdent;
 public abstract class TypeOrFixedCSSProperty extends PlugableCSSProperty
 {
 
-	public TypeOrFixedCSSProperty(String propertyName)
+	protected TypeOrFixedCSSProperty(String propertyName)
 	{
 		super(propertyName);
 	}
@@ -44,7 +44,7 @@ public abstract class TypeOrFixedCSSProperty extends PlugableCSSProperty
 	 * @throws InvalidParamException
 	 *             if the expression is invalid
 	 */
-	public TypeOrFixedCSSProperty(String propertyName, Class[] types, ICSSValueTypeConverter[] converters,
+	protected TypeOrFixedCSSProperty(String propertyName, Class[] types, ICSSValueTypeConverter[] converters,
 			String[] values, ApplContext context, CssExpression expression, boolean check) throws InvalidParamException
 	{
 		super(propertyName, getPropertyTypes(types), converters,
@@ -67,7 +67,7 @@ public abstract class TypeOrFixedCSSProperty extends PlugableCSSProperty
 	 * @throws InvalidParamException
 	 *             if the expression is invalid
 	 */
-	public TypeOrFixedCSSProperty(String propertyName, Class[] types, ICSSValueTypeConverter[] converters,
+	protected TypeOrFixedCSSProperty(String propertyName, Class[] types, ICSSValueTypeConverter[] converters,
 			String[] values, ApplContext context, CssExpression expression) throws InvalidParamException
 	{
 		this(propertyName, types, converters, values, context, expression, false);

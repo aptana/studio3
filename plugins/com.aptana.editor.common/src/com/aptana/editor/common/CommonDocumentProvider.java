@@ -17,7 +17,7 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-public class CommonDocumentProvider extends TextFileDocumentProvider {
+public abstract class CommonDocumentProvider extends TextFileDocumentProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -81,7 +81,5 @@ public class CommonDocumentProvider extends TextFileDocumentProvider {
 	 * @param filename
 	 * @return
 	 */
-	protected String getDefaultContentType(String filename) {
-		return "source"; //$NON-NLS-1$
-	}
+	protected abstract String getDefaultContentType(String filename);
 }

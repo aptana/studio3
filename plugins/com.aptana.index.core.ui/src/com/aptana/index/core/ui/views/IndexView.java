@@ -201,7 +201,7 @@ public class IndexView extends ViewPart
 	{
 		IStructuredSelection ss = (IStructuredSelection) selection;
 
-		if (ss != null)
+		if (ss != null && treeViewer != null && !treeViewer.getTree().isDisposed())
 		{
 			Iterator<?> items = ss.iterator();
 

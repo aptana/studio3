@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
@@ -85,7 +86,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String err = "The XAMPP installer processor is designed to work on Windows."; //$NON-NLS-1$
-			PortalUIPlugin.logError(err, new Exception());
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 			applyErrorAttributes(err);
 			installationInProgress = false;
 			return configurationStatus;
@@ -99,8 +100,9 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			IStatus loadingStatus = loadAttributes(attributes);
 			if (!loadingStatus.isOK())
 			{
-				applyErrorAttributes(loadingStatus.getMessage());
-				PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
+				String message = loadingStatus.getMessage();
+				applyErrorAttributes(message);
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 				return configurationStatus;
 			}
 
@@ -111,7 +113,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { XAMPP, 1,
 						urls.length });
 				applyErrorAttributes(err);
-				PortalUIPlugin.logError(new Exception(err));
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 				return configurationStatus;
 			}
 			// Try to get the default install directory from the optional attributes
@@ -132,9 +134,9 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				case IStatus.OK:
 				case IStatus.INFO:
 				case IStatus.WARNING:
-					displayMessageInUIThread(MessageDialog.INFORMATION, NLS.bind(
-							Messages.InstallProcessor_installerTitle, XAMPP), NLS.bind(
-							Messages.InstallProcessor_installationSuccessful, XAMPP));
+					displayMessageInUIThread(MessageDialog.INFORMATION,
+							NLS.bind(Messages.InstallProcessor_installerTitle, XAMPP),
+							NLS.bind(Messages.InstallProcessor_installationSuccessful, XAMPP));
 					configurationStatus.setStatus(ConfigurationStatus.OK);
 					break;
 				case IStatus.ERROR:
@@ -227,14 +229,14 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 			{
 				return status;
 			}
-			PortalUIPlugin.logInfo(
-					"Successfully installed XAMPP into " + installDir[0] + ". XAMPP installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+			IdeLog.logInfo(PortalUIPlugin.getDefault(),
+					"Successfully installed XAMPP into " + installDir[0] + ". XAMPP installation completed."); //$NON-NLS-1$ //$NON-NLS-2$
 			// note that we called the finalizeInstallation from the installXAMPP Job.
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError("Error while installing XAMPP", e); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), "Error while installing XAMPP", e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 					Messages.InstallProcessor_errorWhileInstalling, XAMPP));
 		}
@@ -269,7 +271,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					SubMonitor subMonitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
 					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, XAMPP),
 							IProgressMonitor.UNKNOWN);
-					PortalUIPlugin.logInfo("Installing XAMPP into " + installDir, null); //$NON-NLS-1$
+					IdeLog.logInfo(PortalUIPlugin.getDefault(), "Installing XAMPP into " + installDir); //$NON-NLS-1$
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
@@ -294,23 +296,24 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					int res = process.waitFor();
 					if (res == XAMPP_INSTALLER_PROCESS_CANCEL_CODE)
 					{
-						PortalUIPlugin.logInfo("XAMPP installation cancelled", null); //$NON-NLS-1$
+						IdeLog.logInfo(PortalUIPlugin.getDefault(), "XAMPP installation cancelled"); //$NON-NLS-1$
 						return Status.CANCEL_STATUS;
 					}
 					if (res != 0)
 					{
 						// We had an error while installing
-						PortalUIPlugin
-								.logError(
-										"Failed to install XAMPP. The XAMPP installer process returned a termination code of " + res, null); //$NON-NLS-1$
+						IdeLog.logError(
+								PortalUIPlugin.getDefault(),
+								"Failed to install XAMPP. The XAMPP installer process returned a termination code of " + res); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationErrorMessage, XAMPP, XAMPP), null);
 					}
 					else if (!new File(installDir).exists())
 					{
 						// Just to be sure that we got everything in place
-						PortalUIPlugin.logError(
-								"Failed to install XAMPP. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
+						IdeLog.logError(
+								PortalUIPlugin.getDefault(),
+								"Failed to install XAMPP. The " + installDir + " directory was not created"); //$NON-NLS-1$ //$NON-NLS-2$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationError_installDirMissing, XAMPP), null);
 					}
@@ -324,7 +327,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 				}
 				catch (Exception e)
 				{
-					PortalUIPlugin.logError(e);
+					IdeLog.logError(PortalUIPlugin.getDefault(), e);
 					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 							Messages.InstallProcessor_failedToInstallSeeLog, XAMPP), e);
 				}
@@ -342,7 +345,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		}
 		catch (InterruptedException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 			return Status.CANCEL_STATUS;
 		}
 		return job.getResult();
@@ -392,13 +395,13 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 					while (attempts > 0);
 					if (lastException != null)
 					{
-						PortalUIPlugin.logError(lastException);
+						IdeLog.logError(PortalUIPlugin.getDefault(), lastException);
 					}
 				}
 				catch (Throwable t)
 				{
 					// Just log any error here, but don't display any error message
-					PortalUIPlugin.logError(t);
+					IdeLog.logError(PortalUIPlugin.getDefault(), t);
 				}
 				return Status.OK_STATUS;
 			}
@@ -426,7 +429,7 @@ public class XAMPPInstallProcessor extends InstallerConfigurationProcessor
 		}
 		catch (IOException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 		}
 		finally
 		{

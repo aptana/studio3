@@ -13,12 +13,14 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.ui.util.UIUtils;
 
 @SuppressWarnings("restriction")
 public class JSEditorTest extends TestCase
@@ -31,14 +33,24 @@ public class JSEditorTest extends TestCase
 	{
 		if (editor != null)
 		{
-			editor.close(false);
+			if (editor != null)
+			{
+				if (Display.getCurrent() != null)
+				{
+					editor.getSite().getPage().closeEditor(editor, false);
+				}
+				else
+				{
+					editor.close(false);
+				}
+			}
 			editor = null;
 		}
 	}
 
 	public void testExecute() throws Exception
 	{
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = UIUtils.getActivePage();
 		editor = (ITextEditor) page.openEditor(new FileStoreEditorInput(getFileStore()), getEditorId());
 		assertNotNull(editor);
 		assertEquals(getClassName(), editor.getClass().getName());

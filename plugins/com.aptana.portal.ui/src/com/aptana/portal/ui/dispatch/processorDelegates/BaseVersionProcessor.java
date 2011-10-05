@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractProcessorDelegate;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.portal.ui.PortalUIPlugin;
 
 /**
@@ -55,7 +56,7 @@ public abstract class BaseVersionProcessor extends AbstractProcessorDelegate
 			catch (IllegalArgumentException iae)
 			{
 				// Should never happen, since the matcher found it. But just in case.
-				PortalUIPlugin.logError("Error parsing the version string - " + version, iae); //$NON-NLS-1$
+				IdeLog.logError(PortalUIPlugin.getDefault(), "Error parsing the version string - " + version, iae); //$NON-NLS-1$
 			}
 		}
 		return null;

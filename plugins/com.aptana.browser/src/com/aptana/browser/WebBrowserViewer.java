@@ -5,6 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.browser;
 
@@ -255,8 +256,8 @@ public class WebBrowserViewer extends Composite {
 				});
 		menuManager.add(sizeMenuManager);
 
-		BrowserSizeCategory[] categories = BrowserPlugin
-				.getBrowserConfigurationManager().getSizeCategories();
+		BrowserSizeCategory[] categories = BrowserPlugin.getDefault().getBrowserConfigurationManager()
+				.getSizeCategories();
 		Arrays.sort(categories);
 		MenuManager categoryMenuManager;
 		BrowserSize[] sizes;

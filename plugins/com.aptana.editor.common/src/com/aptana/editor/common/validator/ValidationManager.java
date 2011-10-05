@@ -136,34 +136,33 @@ public class ValidationManager implements IValidationManager
 		}
 
 		List<ValidatorReference> validatorRefs = getValidatorRefs(contentType);
-		if (validatorRefs.isEmpty())
+		if (!validatorRefs.isEmpty())
 		{
-			// Skip doing any real work if there are no validators for this file type!
-			return;
-		}
-		for (ValidatorReference validatorRef : validatorRefs)
-		{
-			if (fResourceUri == null)
+			for (ValidatorReference validatorRef : validatorRefs)
 			{
-				continue;
-			}
-			List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
+				if (fResourceUri == null)
+				{
+					continue;
+				}
+				List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
 
-			String type = validatorRef.getMarkerType();
-			List<IValidationItem> items = fItemsByType.get(type);
-			if (items == null)
-			{
-				items = Collections.synchronizedList(new ArrayList<IValidationItem>());
-				fItemsByType.put(type, items);
-			}
-			items.addAll(newItems);
+				String type = validatorRef.getMarkerType();
+				List<IValidationItem> items = fItemsByType.get(type);
+				if (items == null)
+				{
+					items = Collections.synchronizedList(new ArrayList<IValidationItem>());
+					fItemsByType.put(type, items);
+				}
+				items.addAll(newItems);
 
-			// checks nested languages
-			for (String nestedLanguage : fNestedLanguages)
-			{
-				processNestedLanguage(nestedLanguage, fItemsByType);
+				// checks nested languages
+				for (String nestedLanguage : fNestedLanguages)
+				{
+					processNestedLanguage(nestedLanguage, fItemsByType);
+				}
 			}
 		}
+		// needs to update the markers regardless if any validator is selected
 		update(fItemsByType);
 	}
 
@@ -270,9 +269,15 @@ public class ValidationManager implements IValidationManager
 		return false;
 	}
 
-	public Collection<List<IValidationItem>> getValidationItems()
+	public List<IValidationItem> getValidationItems()
 	{
-		return fItemsByType.values();
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
+		Set<String> types = fItemsByType.keySet();
+		for (String type : types)
+		{
+			items.addAll(fItemsByType.get(type));
+		}
+		return items;
 	}
 
 	private IValidationItem addItem(int severity, String message, int lineNumber, int lineOffset, int length,
@@ -398,7 +403,7 @@ public class ValidationManager implements IValidationManager
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
 		}
 	}

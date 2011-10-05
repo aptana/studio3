@@ -44,6 +44,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
@@ -168,7 +169,7 @@ public class CloneJob extends Job
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 		}
 		finally
@@ -178,13 +179,14 @@ public class CloneJob extends Job
 		return Status.OK_STATUS;
 	}
 
-	private class CloneRunnable implements Runnable
+	private static class CloneRunnable implements Runnable
 	{
+		private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 		private Process p;
 		private IProgressMonitor monitor;
 		private IStatus status;
 
-		public CloneRunnable(Process p, IProgressMonitor monitor)
+		CloneRunnable(Process p, IProgressMonitor monitor)
 		{
 			this.p = p;
 			this.monitor = monitor;
@@ -201,15 +203,14 @@ public class CloneJob extends Job
 			SubMonitor sub = SubMonitor.convert(monitor, 100);
 			// Only sniff for "receiving objects", which is the meat of the operation
 			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
-			InputStreamReader isr = null;
+			BufferedReader br = null;
 			int lastPercent = 0;
 			try
 			{
-				isr = new InputStreamReader(p.getErrorStream(), "UTF-8"); //$NON-NLS-1$
 				StringBuilder builder = new StringBuilder();
-				BufferedReader br = new BufferedReader(isr);
+				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), UTF_8));
 				String line = null;
-				while ((line = br.readLine()) != null)
+				while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 				{
 					if (monitor.isCanceled())
 					{
@@ -218,7 +219,7 @@ public class CloneJob extends Job
 						return;
 					}
 					sub.subTask(line);
-					builder.append(line).append("\n"); //$NON-NLS-1$
+					builder.append(line).append('\n');
 					// Else, read in the line and see if we can sniff progress
 					Matcher m = percentPattern.matcher(line);
 					if (m.find())
@@ -233,21 +234,21 @@ public class CloneJob extends Job
 					}
 				}
 
-				String stdout = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
+				String stdout = IOUtil.read(p.getInputStream(), UTF_8);
 				this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(GitUIPlugin.getDefault(), e.getMessage(), e);
+				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 			}
 			finally
 			{
-				if (isr != null)
+				if (br != null)
 				{
 					try
 					{
-						isr.close();
+						br.close();
 					}
 					catch (Exception e)
 					{
@@ -297,7 +298,7 @@ public class CloneJob extends Job
 			}
 			catch (IOException exception)
 			{
-				IdeLog.logError(GitUIPlugin.getDefault(), exception.getMessage(), exception);
+				IdeLog.logError(GitUIPlugin.getDefault(), exception, IDebugScopes.DEBUG);
 				StatusManager.getManager()
 						.handle(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(),
 								exception));
@@ -341,7 +342,7 @@ public class CloneJob extends Job
 					}
 					catch (IOException exception)
 					{
-						IdeLog.logError(GitUIPlugin.getDefault(), exception.getMessage(), exception);
+						IdeLog.logError(GitUIPlugin.getDefault(), exception, IDebugScopes.DEBUG);
 						StatusManager.getManager().handle(
 								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), exception.getLocalizedMessage(),
 										exception));
@@ -426,7 +427,7 @@ public class CloneJob extends Job
 		}
 	}
 
-	private class ProjectRecord
+	private static class ProjectRecord
 	{
 
 		File projectSystemFile;

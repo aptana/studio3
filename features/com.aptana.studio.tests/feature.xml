@@ -64,7 +64,10 @@
       <import plugin="com.aptana.editor.coffee"/>
       <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.deploy.ftp"/>
+      <import plugin="com.aptana.samples"/>
+      <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.index.core"/>
+      <import plugin="com.aptana.portal.ui"/>
    </requires>
 
    <plugin
@@ -359,7 +362,30 @@
          unpack="false"/>
 
    <plugin
+         id="com.aptana.samples.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.browser.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
          id="com.aptana.index.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.portal.ui.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -14,7 +14,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSVarNode extends JSNode
 {
 	private Symbol _var;
-	
+
 	/**
 	 * JSVarNode
 	 * 
@@ -22,10 +22,10 @@ public class JSVarNode extends JSNode
 	 */
 	public JSVarNode(Symbol var, JSNode... children)
 	{
-		super(JSNodeTypes.VAR, children);
-		
+		super(IJSNodeTypes.VAR, children);
+
 		this._var = var;
-		
+
 		// NOTE: we set the range here to simplify JSParser, specifically when
 		// var-declarations are used within for-declarations. This is not needed
 		// for statement level var-declarations, but it doesn't hurt to do this
@@ -62,7 +62,7 @@ public class JSVarNode extends JSNode
 	{
 		return this.getChildren();
 	}
-	
+
 	/**
 	 * getVar
 	 * 

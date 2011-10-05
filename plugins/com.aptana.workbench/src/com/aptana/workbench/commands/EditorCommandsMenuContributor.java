@@ -350,7 +350,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 								IdeLog.logError(WorkbenchPlugin.getDefault(), StringUtil.format(
 										Messages.EditorCommandsMenuContributor_ErrorExecutingCommandNullResult,
 										new String[] { command.getDisplayName(),
-												command.getOwningBundle().getDisplayName() }), (String) null);
+												command.getOwningBundle().getDisplayName() }));
 							}
 							else
 							{

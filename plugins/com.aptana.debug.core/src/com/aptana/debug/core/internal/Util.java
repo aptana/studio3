@@ -15,7 +15,6 @@ import java.net.URLDecoder;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class Util {
 
@@ -35,14 +34,16 @@ public final class Util {
 		try {
 			return URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
 		} catch (Exception ignore) {
+			ignore.getCause();
 		}
 		try {
 			return URLDecoder.decode(url, "ASCII"); //$NON-NLS-1$
 		} catch (UnsupportedEncodingException ignore) {
+			ignore.getCause();
 		}
 		return url;
 	}
-	
+
 	public static URL toURL(URI uri) throws MalformedURLException {
 		if (uri != null) {
 			return uri.toURL();

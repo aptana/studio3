@@ -89,9 +89,9 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 		return lineExtent;
 	}
 
-	/* package */ void insertElement(JSDebugScriptElement scriptElement) {
+	/* package */void insertElement(JSDebugScriptElement scriptElement) {
 		for (IJSScriptElement i : children) {
-			JSDebugScriptElement element = (JSDebugScriptElement) i; 
+			JSDebugScriptElement element = (JSDebugScriptElement) i;
 			if (element.isScriptElementInside(scriptElement)) {
 				element.insertElement(scriptElement);
 				return;
@@ -105,20 +105,20 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 		scriptElement.setParent(this);
 	}
 
-	/* package */ void removeElement(JSDebugScriptElement scriptElement) {
+	/* package */void removeElement(JSDebugScriptElement scriptElement) {
 		/* TODO: remove element */
 	}
 
-	/* package */ boolean isScriptElementInside(JSDebugScriptElement element) {
+	/* package */boolean isScriptElementInside(JSDebugScriptElement element) {
 		return baseLine < /* ! */element.getBaseLine()
 				&& (element.getBaseLine() + element.getLineExtent()) <= (baseLine + lineExtent);
 	}
 
-	/* package */ void setParent(IJSScriptElement parent) {
+	/* package */void setParent(IJSScriptElement parent) {
 		this.parent = parent;
 	}
 
-	/* package */ void setName(String name) {
+	/* package */void setName(String name) {
 		this.name = name;
 	}
 }

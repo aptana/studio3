@@ -13,7 +13,7 @@ import beaver.Symbol;
  * @author ayeung
  *
  */
-public class ParseError implements IParseError
+public class ParseError implements IParseError // $codepro.audit.disable consistentSuffixUsage
 {
 	private Symbol fSymbol;
 	private String fMessage;

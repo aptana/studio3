@@ -15,8 +15,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.IActionFilter;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
+import com.aptana.ide.ui.io.IOUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -38,13 +40,15 @@ public class ConnectionActionFilter implements IActionFilter {
 			if ( "isLocal".equals(name)) { //$NON-NLS-1$
 				try {
 					return ((IConnectionPoint) target).getRoot().getAdapter(File.class) != null;
-				} catch (CoreException ignore) {
+				} catch (CoreException e) {
+					IdeLog.logWarning(IOUIPlugin.getDefault(), e);
 				}
 			}			
 			if ( "isWorkspace".equals(name)) { //$NON-NLS-1$
 				try {
 					return ((IConnectionPoint) target).getRoot().getAdapter(IResource.class) != null;
-				} catch (CoreException ignore) {
+				} catch (CoreException e) {
+					IdeLog.logWarning(IOUIPlugin.getDefault(), e);
 				}
 			}			
 		} else if (target instanceof IConnectionPointCategory) {
@@ -71,7 +75,7 @@ public class ConnectionActionFilter implements IActionFilter {
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == IActionFilter.class) {
+			if (IActionFilter.class.equals(adapterType)) {
 				return new ConnectionActionFilter();
 			}
 			return null;

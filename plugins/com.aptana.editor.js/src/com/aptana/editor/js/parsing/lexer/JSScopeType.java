@@ -118,7 +118,7 @@ public enum JSScopeType implements ITypePredicate
 	 */
 	public boolean isDefined()
 	{
-		return (this != UNDEFINED);
+		return this != UNDEFINED;
 	}
 
 	/**

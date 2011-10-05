@@ -780,9 +780,10 @@ public class CompletionProposalPopup implements IContentAssistListener
 			fProposalTable.setRedraw(true);
 			fProposalShell.pack(true);
 		}
-		catch (java.lang.ArrayIndexOutOfBoundsException e)
+		catch (ArrayIndexOutOfBoundsException e)
 		{
-			UIEplPlugin.log(JFaceTextMessages.getString("CompletionProposalPopup.Error_Resizing_Popup"), e); //$NON-NLS-1$
+			IdeLog.logError(UIEplPlugin.getDefault(),
+					JFaceTextMessages.getString("CompletionProposalPopup.Error_Resizing_Popup"), e); //$NON-NLS-1$
 		}
 	}
 

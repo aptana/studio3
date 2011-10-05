@@ -57,16 +57,12 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final String STEP_TO_FRAME_0_V2 = "stepToFrame*{0}*{1,number,integer}"; //$NON-NLS-1$
 
 	private enum State {
-		STARTING,
-		RUNNING,
-		SUSPENDED,
-		SUSPENDING,
-		STEPPPING
+		STARTING, RUNNING, SUSPENDED, SUSPENDING, STEPPPING
 	}
 
 	private static final IStackFrame[] emptyStack = new IStackFrame[0];
 	private static final IBreakpoint[] emptyBreakpoints = new IBreakpoint[0];
-	
+
 	private final String threadId;
 	private final String label;
 	private IStackFrame[] stackFrames = emptyStack;
@@ -129,10 +125,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		String name = (label != null) ? label : (threadId == JSDebugTarget.DEFAULT_THREAD_ID) ? Messages.JSDebugThread_main_label : threadId;
+		String name = (label != null) ? label
+				: (threadId == JSDebugTarget.DEFAULT_THREAD_ID) ? Messages.JSDebugThread_main_label : threadId;
 		return MessageFormat.format(Messages.JSDebugThread_Thread_Label, name,
-				(runningState == State.SUSPENDING
-						? MessageFormat.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
+				(runningState == State.SUSPENDING ? MessageFormat.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
 						: StringUtil.EMPTY));
 	}
 
@@ -258,7 +254,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		JSDebugTarget target = getJSDebugTarget();
-		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_RETURN_V2 : STEP_RETURN, threadId);
+		String command = MessageFormat
+				.format(target.getProtocolVersion() >= 2 ? STEP_RETURN_V2 : STEP_RETURN, threadId);
 		target.getConnection().sendCommand(command);
 	}
 
@@ -283,7 +280,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		getDebugTarget().terminate();
 	}
 
-	/* package */ void handleMessage(String[] args) {
+	/* package */void handleMessage(String[] args) {
 		String action = args[0];
 		int details = DebugEvent.UNSPECIFIED;
 		if (SUSPENDED.equals(action)) {
@@ -352,7 +349,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 	}
 
-	/* package */ void stepToFrame(IStackFrame frame) throws DebugException {
+	/* package */void stepToFrame(IStackFrame frame) throws DebugException {
 		if (runningState != State.SUSPENDED) {
 			return;
 		}
@@ -360,18 +357,19 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		JSDebugTarget target = getJSDebugTarget();
-		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_TO_FRAME_0_V2 : STEP_TO_FRAME_0, threadId, targetFrameId);
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_TO_FRAME_0_V2 : STEP_TO_FRAME_0,
+				threadId, targetFrameId);
 		target.getConnection().sendCommand(command);
 	}
-	
-	/* package */ boolean isInSuspendState() {
+
+	/* package */boolean isInSuspendState() {
 		return runningState == State.SUSPENDED || runningState == State.SUSPENDING;
 	}
-	
-	/* package */ String getThreadId() {
+
+	/* package */String getThreadId() {
 		return threadId;
 	}
-	
+
 	private JSDebugTarget getJSDebugTarget() {
 		return (JSDebugTarget) getDebugTarget();
 	}

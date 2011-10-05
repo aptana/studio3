@@ -21,8 +21,9 @@ import com.aptana.js.debug.core.model.xhr.IXHRTransfer;
  * @author Max Stepanov
  */
 public class XHRService implements IXHRService {
-	
-	private Map<String, IXHRTransfer> transfers = new LinkedHashMap<String, IXHRTransfer>(); // preserver insertion order
+
+	private Map<String, IXHRTransfer> transfers = new LinkedHashMap<String, IXHRTransfer>(); // preserver insertion
+																								// order
 
 	/**
 	 * XHRService

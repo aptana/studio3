@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
 
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener
@@ -72,11 +73,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public IProjectTemplate getSelectedTemplate()
 	{
-		if (fUseTemplateButton.getSelection())
-		{
-			return fSelectedTemplate;
-		}
-		return null;
+		return fUseTemplateButton.getSelection() ? fSelectedTemplate : null;
 	}
 
 	public void createControl(Composite parent)
@@ -84,6 +81,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		defaultTemplateImage = wizardDesc.createImage();
 		parent.addDisposeListener(new DisposeListener()
 		{
+
 			public void widgetDisposed(DisposeEvent e)
 			{
 				if (defaultTemplateImage != null)
@@ -125,8 +123,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 		Dialog.applyDialogFont(main);
 		setControl(main);
-
-		updatePageControls();
 	}
 
 	public void widgetSelected(SelectionEvent e)
@@ -134,7 +130,19 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		Object source = e.getSource();
 		if (source == fUseTemplateButton)
 		{
-			updatePageControls();
+			boolean selected = fUseTemplateButton.getSelection();
+			if (selected)
+			{
+				if (fTemplates.length > 0)
+				{
+					fTemplateSelectionViewer.setSelection(new StructuredSelection(fTemplates[0]));
+				}
+			}
+			else
+			{
+				fTemplateSelectionViewer.getTable().deselectAll();
+				fPreviewText.setText(StringUtil.EMPTY);
+			}
 		}
 	}
 
@@ -144,6 +152,11 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public void selectionChanged(SelectionChangedEvent event)
 	{
+		if (!fUseTemplateButton.getSelection())
+		{
+			fUseTemplateButton.setSelection(true);
+		}
+
 		// change the preview text according to the template selection
 		fSelectedTemplate = null;
 		StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -153,7 +166,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 			fSelectedTemplate = (IProjectTemplate) selection.getFirstElement();
 			text = fSelectedTemplate.getDescription();
 		}
-		fPreviewText.setText(text == null ? "" : text); //$NON-NLS-1$
+		fPreviewText.setText(text == null ? StringUtil.EMPTY : text);
 	}
 
 	/**
@@ -168,30 +181,6 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		fUseTemplateButton.setText(Messages.ProjectTemplateSelectionPage_UseTemplate_TXT);
 		fUseTemplateButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		fUseTemplateButton.addSelectionListener(this);
-	}
-
-	/**
-	 * Update the template page messages and component enablement by the checkbox selection status.
-	 */
-	private void updatePageControls()
-	{
-		boolean enabled = fUseTemplateButton.getSelection();
-		fTemplateSelectionViewer.getControl().setEnabled(enabled);
-		fPreviewText.setEnabled(enabled);
-		setMessage(null);
-		if (enabled)
-		{
-			setDescription(Messages.ProjectTemplateSelectionPage_Description);
-			if (fTemplates.length > 0)
-			{
-				fTemplateSelectionViewer.setSelection(new StructuredSelection(fTemplates[0]));
-			}
-		}
-		else
-		{
-			setDescription(""); //$NON-NLS-1$
-			fTemplateSelectionViewer.setSelection(null);
-		}
 	}
 
 	/**

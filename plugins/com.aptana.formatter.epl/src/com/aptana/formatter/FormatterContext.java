@@ -14,6 +14,7 @@ package com.aptana.formatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterNode;
 
@@ -59,7 +60,7 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 		}
 		catch (CloneNotSupportedException e)
 		{
-			FormatterPlugin.logError("FormatterContext.copy() error", e); //$NON-NLS-1$
+			IdeLog.logError(FormatterPlugin.getDefault(), "FormatterContext.copy() error", e, IDebugScopes.DEBUG); //$NON-NLS-1$
 			throw new IllegalStateException();
 		}
 	}

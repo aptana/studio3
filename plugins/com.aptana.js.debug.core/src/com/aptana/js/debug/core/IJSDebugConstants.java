@@ -13,14 +13,12 @@ package com.aptana.js.debug.core;
 public interface IJSDebugConstants {
 
 	/**
-	 * Unique identifier for the JS debug model (value
-	 * <code>com.aptana.debug.core</code>).
+	 * Unique identifier for the JS debug model (value <code>com.aptana.debug.core</code>).
 	 */
 	String ID_DEBUG_MODEL = JSDebugPlugin.PLUGIN_ID;
 
 	/**
-	 * Unique identifier for the JS breakpoints location (value
-	 * <code>com.aptana.debug.core.breakpointLocation</code>).
+	 * Unique identifier for the JS breakpoints location (value <code>com.aptana.debug.core.breakpointLocation</code>).
 	 */
 	String BREAKPOINT_LOCATION = ID_DEBUG_MODEL + ".breakpointLocation"; //$NON-NLS-1$
 
@@ -31,14 +29,13 @@ public interface IJSDebugConstants {
 	String RUN_TO_LINE = ID_DEBUG_MODEL + ".runToLineBreakpoint"; //$NON-NLS-1$
 
 	/**
-	 * Unique identifier for the JS breakpoints hit count (value
-	 * <code>com.aptana.debug.core.breakpointHitCount</code>).
+	 * Unique identifier for the JS breakpoints hit count (value <code>com.aptana.debug.core.breakpointHitCount</code>).
 	 */
 	String BREAKPOINT_HIT_COUNT = ID_DEBUG_MODEL + ".breakpointHitCount"; //$NON-NLS-1$
 
 	/**
-	 * Unique identifier for the JS breakpoints condition (value
-	 * <code>com.aptana.debug.core.breakpointCondition</code>).
+	 * Unique identifier for the JS breakpoints condition (value <code>com.aptana.debug.core.breakpointCondition</code>
+	 * ).
 	 */
 	String BREAKPOINT_CONDITION = ID_DEBUG_MODEL + ".breakpointCondition"; //$NON-NLS-1$
 
@@ -68,8 +65,7 @@ public interface IJSDebugConstants {
 
 	/**
 	 * Unique fill accessor for the JS watchpoint variable name (value
-	 * <code>com.aptana.debug.core.watchpointVariableAccessor</code>).
-	 * Internal use only.
+	 * <code>com.aptana.debug.core.watchpointVariableAccessor</code>). Internal use only.
 	 */
 	String WATCHPOINT_VARIABLE_ACCESSOR = ID_DEBUG_MODEL + ".watchpointVariableAccessor"; //$NON-NLS-1$
 

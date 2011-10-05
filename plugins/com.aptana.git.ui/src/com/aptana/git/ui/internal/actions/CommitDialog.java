@@ -82,6 +82,8 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
@@ -301,9 +303,13 @@ class CommitDialog extends StatusDialog
 			table = createTable(tableComp, false);
 		}
 		if (staged)
+		{
 			stagedTable = table;
+		}
 		else
+		{
 			unstagedTable = table;
+		}
 		return tableComp;
 	}
 
@@ -393,9 +399,13 @@ class CommitDialog extends StatusDialog
 		{
 			boolean match = false;
 			if (staged && file.hasStagedChanges())
+			{
 				match = true;
+			}
 			else if (!staged && file.hasUnstagedChanges())
+			{
 				match = true;
+			}
 
 			if (match)
 			{
@@ -780,7 +790,7 @@ class CommitDialog extends StatusDialog
 		}
 		catch (Throwable t)
 		{
-			GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+			IdeLog.logError(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
 		}
 		updateDiff(file, diff);
 	}
@@ -892,6 +902,10 @@ class CommitDialog extends StatusDialog
 		if (id == IDialogConstants.OK_ID)
 		{
 			label = Messages.CommitDialog_CommitButton_Label;
+		}
+		else if (id == IDialogConstants.CANCEL_ID)
+		{
+			label = Messages.CommitDialog_CloseButton_Label;
 		}
 		return super.createButton(parent, id, label, defaultButton);
 	}
@@ -1105,9 +1119,13 @@ class CommitDialog extends StatusDialog
 			Point doSelectionSize = doSelectionBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			Point bigger = null;
 			if (doAllSize.x > doSelectionSize.x)
+			{
 				bigger = doAllSize;
+			}
 			else
+			{
 				bigger = doSelectionSize;
+			}
 			GridData data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 			data.widthHint = bigger.x + 10;
 			comp.setLayoutData(data);

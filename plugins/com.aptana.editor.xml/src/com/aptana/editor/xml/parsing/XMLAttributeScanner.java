@@ -30,7 +30,7 @@ class XMLAttributeScanner extends RuleBasedScanner
 	/**
 	 * XMLAttributeScanner
 	 */
-	public XMLAttributeScanner()
+	XMLAttributeScanner()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 

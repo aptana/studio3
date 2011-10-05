@@ -14,33 +14,23 @@ public class CSSFunctionNode extends CSSExpressionNode
 	/**
 	 * CSSFunctionNode
 	 * 
+	 * @param name
 	 * @param expression
-	 * @param start
-	 * @param end
 	 */
 	public CSSFunctionNode(String name, CSSExpressionNode expression)
 	{
-		super(CSSNodeTypes.FUNCTION);
-
+		super(ICSSNodeTypes.FUNCTION);
 		fName = name;
 
-		this.setChildren(new CSSNode[] { expression });
+		setChildren(new CSSNode[] { expression });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
-	 */
 	@Override
 	public void accept(CSSTreeWalker walker)
 	{
 		walker.visit(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -50,7 +40,6 @@ public class CSSFunctionNode extends CSSExpressionNode
 		}
 
 		CSSFunctionNode other = (CSSFunctionNode) obj;
-
 		return toString().equals(other.toString());
 	}
 
@@ -74,27 +63,19 @@ public class CSSFunctionNode extends CSSExpressionNode
 		return fName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
-	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + toString().hashCode();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 
-		text.append(fName);
-		text.append("(").append(getExpression()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		text.append(getName());
+		text.append('(').append(getExpression()).append(')');
 
 		return text.toString();
 	}

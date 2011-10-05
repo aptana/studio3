@@ -79,7 +79,7 @@ public class StringUtil
 		}
 
 		int length = items.length;
-		String result = ""; //$NON-NLS-1$
+		String result = EMPTY;
 
 		if (length > 0)
 		{
@@ -219,7 +219,7 @@ public class StringUtil
 			String value = entry.getValue();
 			if (value == null)
 			{
-				value = ""; //$NON-NLS-1$
+				value = EMPTY;
 			}
 			else
 			{
@@ -467,4 +467,82 @@ public class StringUtil
 		}
 		return new String(ellipsify(text.substring(0, length)));
 	}
+
+	/**
+	 * @param string
+	 * @param desiredLength
+	 * @param padChar
+	 * @return
+	 */
+	public static String pad(String string, int desiredLength, char padChar)
+	{
+		if (string == null)
+		{
+			string = EMPTY;
+		}
+
+		while (string.length() < desiredLength)
+		{
+			string = padChar + string;
+		}
+		return string;
+	}
+
+	/**
+	 * Walk backwards through the string to find the previous whitespace character.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	public static int findPreviousWhitespaceOffset(String string, int offset)
+	{
+		int i = -1;
+
+		if (string == null || EMPTY.equals(string) || offset > string.length())
+			return i;
+
+		int j = offset;
+		while (j > 0)
+		{
+			char ch = string.charAt(j - 1);
+			if (Character.isWhitespace(ch))
+			{
+				i = j - 1;
+				break;
+			}
+			j--;
+		}
+		return i;
+	}
+
+	/**
+	 * Walk forwards through the string to find the next whitespace character. If the current char is a whitespace char,
+	 * return the current offset
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	public static int findNextWhitespaceOffset(String string, int offset)
+	{
+		int i = -1;
+
+		if (string == null || EMPTY.equals(string) || offset > string.length())
+			return i;
+
+		int j = offset;
+		while (j < string.length())
+		{
+			char ch = string.charAt(j);
+			if (Character.isWhitespace(ch))
+			{
+				i = j;
+				break;
+			}
+			j++;
+		}
+		return i;
+	}
+
 }

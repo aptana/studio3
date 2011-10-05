@@ -31,6 +31,8 @@ import com.aptana.core.logging.IdeLog;
 public abstract class IOUtil
 {
 
+	private static final int BUFFER_SIZE = 4096;
+
 	/**
 	 * Reads an InputStream into a String. Safely closes the stream after reading, or if any exceptions occur. Returns
 	 * null if the stream is null or an exception occurs reading in the stream.
@@ -63,10 +65,10 @@ public abstract class IOUtil
 			charset = Charset.defaultCharset().name();
 		}
 
+		BufferedReader reader = null;
 		try
 		{
-			InputStreamReader inReader = new InputStreamReader(stream, charset);
-			BufferedReader reader = new BufferedReader(inReader);
+			reader = new BufferedReader(new InputStreamReader(stream, charset));
 			StringBuilder output = new StringBuilder();
 
 			// Some editors emit a BOM (EF BB BF) for UTF-8 encodings which the JVM converts to \uFEFF. For lots of
@@ -85,7 +87,7 @@ public abstract class IOUtil
 			}
 
 			// emit the rest of the stream into the output buffer
-			char[] buffer = new char[1024 * 4];
+			char[] buffer = new char[BUFFER_SIZE];
 			int read = 0;
 
 			while ((read = reader.read(buffer)) != -1)
@@ -103,7 +105,14 @@ public abstract class IOUtil
 		{
 			try
 			{
-				stream.close();
+				if (reader != null)
+				{
+					reader.close();
+				}
+				else if (stream != null)
+				{
+					stream.close();
+				}
 			}
 			catch (IOException e)
 			{
@@ -120,7 +129,7 @@ public abstract class IOUtil
 		{
 			return;
 		}
-		IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+		IdeLog.logError(CorePlugin.getDefault(), e);
 	}
 
 	/**
@@ -179,7 +188,7 @@ public abstract class IOUtil
 						error //
 						);
 
-				IdeLog.logError(CorePlugin.getDefault(), message, (Throwable) null);
+				IdeLog.logError(CorePlugin.getDefault(), message);
 			}
 		}
 		else
@@ -254,6 +263,12 @@ public abstract class IOUtil
 		URL url = FileLocator.find(Platform.getBundle(bundleId), path, null);
 		InputStream in = null;
 		FileOutputStream out = null;
+
+		if (url == null)
+		{
+			return;
+		}
+
 		try
 		{
 			in = url.openStream();
@@ -295,6 +310,11 @@ public abstract class IOUtil
 		if (stream == null)
 		{
 			return;
+		}
+
+		if (rawSource == null)
+		{
+			rawSource = StringUtil.EMPTY;
 		}
 
 		Writer writer = null;

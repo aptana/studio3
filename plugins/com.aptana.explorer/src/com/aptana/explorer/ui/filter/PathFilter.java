@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.core.util.URLEncoder;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
@@ -286,7 +286,7 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 
 	protected String[] indexCategories()
 	{
-		return new String[] { HTMLIndexConstants.RESOURCE_CSS, HTMLIndexConstants.RESOURCE_JS };
+		return new String[] { IHTMLIndexConstants.RESOURCE_CSS, IHTMLIndexConstants.RESOURCE_JS };
 	}
 
 	private String getFilterResourceURI()

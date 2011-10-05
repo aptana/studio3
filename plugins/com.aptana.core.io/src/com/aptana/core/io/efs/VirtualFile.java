@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable questionableAssignment
+// $codepro.audit.disable questionableAssignment
 
 package com.aptana.core.io.efs;
 
@@ -96,7 +98,7 @@ public class VirtualFile extends FileStore implements IExtendedFileStore {
 	 */
 	@Override
 	public String getName() {
-		return path.segmentCount() == 0 ? path.toPortableString() : path.lastSegment();
+		return (path.segmentCount() == 0) ? path.toPortableString() : path.lastSegment();
 	}
 
 	/* (non-Javadoc)
@@ -183,7 +185,7 @@ public class VirtualFile extends FileStore implements IExtendedFileStore {
 				//nothing to do
 				return;
 			}
-			if (((VirtualFile) destination).fileManager == fileManager) {
+			if (((VirtualFile) destination).fileManager == fileManager) { // $codepro.audit.disable useEquals
 				fileManager.move(path, ((VirtualFile) destination).path, options, monitor);
 				return;
 			}

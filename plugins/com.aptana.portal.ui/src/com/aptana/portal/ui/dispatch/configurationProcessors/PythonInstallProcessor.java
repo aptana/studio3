@@ -10,6 +10,7 @@ package com.aptana.portal.ui.dispatch.configurationProcessors;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
@@ -83,7 +85,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String err = "The Python installer processor is designed to work on Windows."; //$NON-NLS-1$
-			PortalUIPlugin.logError(err, new Exception());
+			IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 			applyErrorAttributes(err);
 			installationInProgress = false;
 			return configurationStatus;
@@ -97,8 +99,9 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 			IStatus loadingStatus = loadAttributes(attributes);
 			if (!loadingStatus.isOK())
 			{
-				applyErrorAttributes(loadingStatus.getMessage());
-				PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
+				String message = loadingStatus.getMessage();
+				applyErrorAttributes(message);
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(message));
 				return configurationStatus;
 			}
 
@@ -109,7 +112,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { PYTHON, 1,
 						urls.length });
 				applyErrorAttributes(err);
-				PortalUIPlugin.logError(new Exception(err));
+				IdeLog.logError(PortalUIPlugin.getDefault(), new Exception(err));
 				return configurationStatus;
 			}
 			// Try to get the default install directory from the optional attributes
@@ -225,14 +228,14 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 			{
 				return status;
 			}
-			PortalUIPlugin.logInfo(
-					"Successfully installed PYTHON into " + installDir[0] + ". PYTHON installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+			IdeLog.logInfo(PortalUIPlugin.getDefault(), MessageFormat.format(
+					"Successfully installed PYTHON into {0}. PYTHON installation completed.", installDir[0])); //$NON-NLS-1$
 			// note that we called the finalizeInstallation from the installPYTHON Job.
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
 		{
-			PortalUIPlugin.logError("Error while installing PYTHON", e); //$NON-NLS-1$
+			IdeLog.logError(PortalUIPlugin.getDefault(), "Error while installing PYTHON", e); //$NON-NLS-1$
 			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 					Messages.InstallProcessor_errorWhileInstalling, PYTHON));
 		}
@@ -264,11 +267,11 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 					String installDir = (String) installationAttributes.get(InstallerOptionsDialog.INSTALL_DIR_ATTR);
 					// This installer requires Windows path slashes style (backslashes)
 					installDir = installDir.replaceAll("/", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
-					
+
 					SubMonitor subMonitor = SubMonitor.convert(monitor, IProgressMonitor.UNKNOWN);
 					subMonitor.beginTask(NLS.bind(Messages.InstallProcessor_installingTaskName, PYTHON),
 							IProgressMonitor.UNKNOWN);
-					PortalUIPlugin.logInfo("Installing Python into " + installDir, null); //$NON-NLS-1$
+					IdeLog.logInfo(PortalUIPlugin.getDefault(), "Installing Python into " + installDir); //$NON-NLS-1$
 
 					// Try to get a file lock first, before running the process. This file was just downloaded, so there
 					// is a chance it's still being held by the OS or by the downloader.
@@ -299,23 +302,24 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 					int res = process.waitFor();
 					if (res == PYTHON_INSTALLER_PROCESS_CANCEL_CODE)
 					{
-						PortalUIPlugin.logInfo("Python installation cancelled", null); //$NON-NLS-1$
+						IdeLog.logInfo(PortalUIPlugin.getDefault(), "Python installation cancelled"); //$NON-NLS-1$
 						return Status.CANCEL_STATUS;
 					}
 					if (res != 0)
 					{
 						// We had an error while installing
-						PortalUIPlugin
-								.logError(
-										"Failed to install Python. The PYTHON installer process returned a termination code of " + res, null); //$NON-NLS-1$
+						IdeLog.logError(
+								PortalUIPlugin.getDefault(),
+								"Failed to install Python. The PYTHON installer process returned a termination code of " + res); //$NON-NLS-1$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationErrorMessage, PYTHON, PYTHON), null);
 					}
 					else if (!new File(installDir).exists())
 					{
 						// Just to be sure that we got everything in place
-						PortalUIPlugin.logError(
-								"Failed to install Python. The " + installDir + " directory was not created", null); //$NON-NLS-1$ //$NON-NLS-2$
+						IdeLog.logError(
+								PortalUIPlugin.getDefault(),
+								"Failed to install Python. The " + installDir + " directory was not created", (Throwable) null); //$NON-NLS-1$ //$NON-NLS-2$
 						return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, res, NLS.bind(
 								Messages.InstallProcessor_installationError_installDirMissing, PYTHON), null);
 					}
@@ -325,7 +329,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 				}
 				catch (Exception e)
 				{
-					PortalUIPlugin.logError(e);
+					IdeLog.logError(PortalUIPlugin.getDefault(), e.getMessage(), e);
 					return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, NLS.bind(
 							Messages.InstallProcessor_failedToInstallSeeLog, PYTHON), e);
 				}
@@ -343,7 +347,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 		}
 		catch (InterruptedException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e.getMessage(), e);
 			return Status.CANCEL_STATUS;
 		}
 		return job.getResult();
@@ -368,7 +372,7 @@ public class PythonInstallProcessor extends InstallerConfigurationProcessor
 		}
 		catch (IOException e)
 		{
-			PortalUIPlugin.logError(e);
+			IdeLog.logError(PortalUIPlugin.getDefault(), e);
 		}
 		finally
 		{

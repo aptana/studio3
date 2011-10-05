@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 
 public class FileDeltaRefreshAdapter extends JNotifyAdapter
@@ -208,7 +209,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage(), e);
+			IdeLog.logError(CorePlugin.getDefault(), e);
 		}
 		finally
 		{
@@ -219,7 +220,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 	@Override
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
-		String pathString = rootPath + (name.length() > 0 ? Path.SEPARATOR + name : ""); //$NON-NLS-1$
+		String pathString = rootPath + ((name.length() > 0) ? Path.SEPARATOR + name : StringUtil.EMPTY);
 		IResource resource = ResourcesPlugin.getWorkspace().getRoot()
 				.getContainerForLocation(new Path(pathString).removeLastSegments(1));
 		addToRefreshList(resource, IResource.DEPTH_ONE);
@@ -249,7 +250,9 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 	{
 		// If the names are the same, call to fileModified
 		if (oldName != null && newName != null && oldName.equals(newName))
+		{
 			fileModified(wd, rootPath, oldName);
+		}
 		else
 		{
 			if (oldName != null)

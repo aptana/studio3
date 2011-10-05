@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
 import com.aptana.webserver.core.WebServerCorePlugin;
@@ -73,6 +74,7 @@ public class WebServerPreferences {
 						portsEnd = end;
 					}
 				} catch (NumberFormatException e) {
+					IdeLog.logWarning(WebServerCorePlugin.getDefault(), e);
 				}				
 			}
 		}

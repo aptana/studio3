@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.TimeZoneUtil;
 import com.aptana.filesystem.secureftp.IFTPSConnectionPoint;
@@ -44,7 +45,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	
 	private static final String EMPTY = ""; //$NON-NLS-1$
 	
-	private Listener listener;
+	private IListener listener;
 	private Combo securityMethodCombo;
 	private Button validateCertificateCheckbox;
 	private Button noSSLSessionResumptionCheckbox;
@@ -60,7 +61,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	 * @param parent
 	 * @param style
 	 */
-	public FTPSAdvancedOptionsComposite(Composite parent, int style, Listener listener) {
+	public FTPSAdvancedOptionsComposite(Composite parent, int style, IListener listener) {
 		super(parent, style);
 		this.listener = listener;
 		
@@ -130,7 +131,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setText(StringUtil.makeFormLabel(Messages.FTPSAdvancedOptionsComposite_Encoding));
 
 		encodingCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(new String[0]));
+		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(ArrayUtil.NO_STRINGS));
 		encodingCombo.setLayoutData(GridDataFactory.swtDefaults().hint(
 				encodingCombo.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x, SWT.DEFAULT)
 				.span(4, 1).create());
@@ -258,7 +259,8 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		if (EMPTY.equals(timezone)) {
 			timezone = null;
 		}
-		if (ftpsConnectionPoint.getTimezone() != timezone && (timezone == null || !timezone.equals(ftpsConnectionPoint.getTimezone()))) {
+		// compare both not null
+		if (ftpsConnectionPoint.getTimezone() != timezone && (timezone == null || !timezone.equals(ftpsConnectionPoint.getTimezone()))) { // $codepro.audit.disable useEquals, stringComparison
 			ftpsConnectionPoint.setTimezone(timezone);
 			updated = true;
 		}
@@ -273,6 +275,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		try {
 			port = Integer.parseInt(portText.getText());
 		} catch (NumberFormatException e) {
+			e.getCause();
 		}
 		if (port <= 0) {
 			return Messages.FTPSAdvancedOptionsComposite_InvalidPort;

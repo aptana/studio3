@@ -5,6 +5,8 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+// $codepro.audit.disable staticFieldNamingConvention
+
 package com.aptana.js.debug.ui.internal.sourcelookup;
 
 import java.text.MessageFormat;
@@ -35,6 +37,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.debug.ui.SourceDisplayUtil;
 import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.ISourceLink;
@@ -48,6 +51,8 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 	private static final String DEFAULT_SOURCE_LOCATOR_ID = "com.aptana.js.debug.core.sourceLookupDirector"; //$NON-NLS-1$
 	private static final String DEFAULT_SOURCE_PATH_COMPUTER_ID = "com.aptana.debug.core.sourcePathComputer"; //$NON-NLS-1$
+
+	private static final ISourceContainer[] EMPTY_CONTAINERS = new ISourceContainer[0];
 
 	private static SourceDisplayAdapter fInstance;
 
@@ -66,8 +71,8 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	}
 
 	/*
-	 * 
-	 * @see org.eclipse.debug.ui.sourcelookup.ISourceDisplay#displaySource(java.lang.Object, org.eclipse.ui.IWorkbenchPage, boolean)
+	 * @see org.eclipse.debug.ui.sourcelookup.ISourceDisplay#displaySource(java.lang.Object,
+	 * org.eclipse.ui.IWorkbenchPage, boolean)
 	 */
 	public void displaySource(Object element, IWorkbenchPage page, boolean forceSourceLookup) {
 		fSourceLookupJob.setLookupInfo(element,
@@ -102,7 +107,6 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 						/*
 						 * (non-Javadoc)
-						 * 
 						 * @see org.eclipse.debug.core.sourcelookup.containers.
 						 * DefaultSourceContainer#createSourceContainers()
 						 */
@@ -117,7 +121,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 								return sourcePathComputer.computeSourceContainers(null, null);
 							}
 
-							return new ISourceContainer[0];
+							return EMPTY_CONTAINERS;
 						}
 
 					} });
@@ -126,7 +130,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 					sourceLookupDirector.setSourcePathComputer(sourcePathComputer);
 				}
 			} catch (CoreException e) {
-				JSDebugUIPlugin.log(e);
+				IdeLog.logError(JSDebugUIPlugin.getDefault(), e);
 			}
 		}
 		return fDefaultSourceLocator;
@@ -141,7 +145,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		/**
 		 * Constructs a new source lookup job.
 		 */
-		public SourceLookupJob() {
+		protected SourceLookupJob() {
 			super("Debug Source Lookup"); //$NON-NLS-1$
 			setPriority(Job.INTERACTIVE);
 			setSystem(true);
@@ -155,9 +159,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
-		 * IProgressMonitor)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 		 */
 		protected IStatus run(IProgressMonitor monitor) {
 			if (!monitor.isCanceled()) {
@@ -186,7 +188,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 		private ISourceLookupResult fResult;
 		private IWorkbenchPage fPage;
 
-		public SourceDisplayJob() {
+		protected SourceDisplayJob() {
 			super("Debug Source Display"); //$NON-NLS-1$
 			setSystem(true);
 			setPriority(Job.INTERACTIVE);
@@ -202,10 +204,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime
-		 * .IProgressMonitor)
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime .IProgressMonitor)
 		 */
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			ISourceLookupResult result = null;
@@ -256,11 +255,10 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 	public static class Factory implements IAdapterFactory {
 
 		/*
-		 * @see
-		 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == ISourceDisplay.class) {
+			if (ISourceDisplay.class.equals(adapterType)) {
 				return SourceDisplayAdapter.getInstance();
 			}
 			return null;

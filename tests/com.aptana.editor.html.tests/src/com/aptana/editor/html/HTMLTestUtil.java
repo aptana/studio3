@@ -90,7 +90,7 @@ public class HTMLTestUtil
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLScopeScanner())
+		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLTagScanner())
 		{
 			@Override
 			protected HTMLTokenType getTypeFromData(Object data)

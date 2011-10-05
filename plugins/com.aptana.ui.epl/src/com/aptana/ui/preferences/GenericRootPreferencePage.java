@@ -44,7 +44,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 {
 
 	protected static HashMap<String, String> pageNameToId;
-	protected static final String DEFAULT_MESSAGE = Messages.GenericRootPage_genericPerferencesPageMessage;
+	protected static final String DEFAULT_MESSAGE = EplMessages.GenericRootPage_genericPerferencesPageMessage;
 
 	/**
 	 * Constructs a new GenericRootPreferencePage.
@@ -96,13 +96,13 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 		group.setLayout(new GridLayout(1, false));
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		group.setLayoutData(gd);
-		group.setText(Messages.GenericRootPage_preferences);
+		group.setText(EplMessages.GenericRootPage_preferences);
 		List<String> pagesNames = new ArrayList<String>(pageNameToId.keySet());
 		// In case there are no pages to link to, add a label that will indicate that there are no settings
 		if (pagesNames.isEmpty())
 		{
 			Label label = new Label(group, SWT.NONE);
-			label.setText(Messages.GenericRootPage_noAvailablePages);
+			label.setText(EplMessages.GenericRootPage_noAvailablePages);
 			label.setLayoutData(new GridData());
 		}
 		else
