@@ -58,7 +58,10 @@ public class Messages extends NLS
 	public static String InstallProcessor_wrongNumberOfInstallLinks;
 	public static String InstallerConfigurationProcessor_missingAttributeMap;
 	public static String InstallerConfigurationProcessor_missingDownloadTargets;
+	public static String InstallerOptionsDialog_creatingDirectoriesErrorMessage;
+	public static String InstallerOptionsDialog_creatingDirectoriesErrorTitle;
 	public static String InstallerOptionsDialog_emptyPathError;
+	public static String InstallerOptionsDialog_inputDirectoryWillBeCreated;
 	public static String InstallerOptionsDialog_nonExistingPathError;
 	public static String JSLibraryInstallProcessor_directoriesCreationFailed;
 	public static String JSLibraryInstallProcessor_directorySelection;
