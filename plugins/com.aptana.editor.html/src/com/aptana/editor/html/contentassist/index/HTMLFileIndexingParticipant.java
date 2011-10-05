@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.css.ICSSConstants;
@@ -110,8 +111,8 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			if (ICSSConstants.CONTENT_TYPE_CSS.equals(language))
 			{
 				// process inline code
-				CSSFileIndexingParticipant cssIndex = new CSSFileIndexingParticipant();
-				cssIndex.processParseResults(file, index, child, new NullProgressMonitor());
+				CSSFileIndexingParticipant cssIndex = createCSSIndexer();
+				cssIndex.processParseResults(file, index, source, child, new NullProgressMonitor());
 			}
 		}
 
@@ -132,10 +133,20 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			else if (child != null && IJSConstants.CONTENT_TYPE_JS.equals(child.getLanguage()))
 			{
 				// process inline code
-				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
+				JSFileIndexingParticipant jsIndex = createJSIndexer();
 				jsIndex.processParseResults(file, source, index, child, new NullProgressMonitor());
 			}
 		}
+	}
+
+	protected JSFileIndexingParticipant createJSIndexer()
+	{
+		return new JSFileIndexingParticipant();
+	}
+
+	protected CSSFileIndexingParticipant createCSSIndexer()
+	{
+		return new CSSFileIndexingParticipant();
 	}
 
 	/**
@@ -157,11 +168,11 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		else if (current instanceof HTMLCommentNode)
 		{
-			processHTMLCommentNode(file, (HTMLCommentNode) current);
+			processHTMLCommentNode(file, source, (HTMLCommentNode) current);
 		}
 	}
 
-	private void processHTMLCommentNode(IFileStore store, HTMLCommentNode commentNode)
+	private void processHTMLCommentNode(IFileStore store, String source, HTMLCommentNode commentNode)
 	{
 		String text = commentNode.getText();
 		if (!TaskTag.isCaseSensitive())
@@ -169,7 +180,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 			text = text.toLowerCase();
 		}
 		int offset = 0;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+		String[] lines = StringUtil.LINE_SPLITTER.split(text);
 		for (String line : lines)
 		{
 			for (TaskTag entry : TaskTag.getTaskTags())
@@ -192,7 +203,8 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 					message = message.substring(0, message.length() - 3).trim();
 				}
 				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
+				createTask(store, message, entry.getPriority(), getLineNumber(start, source), start,
+						start + message.length());
 			}
 			// FIXME This doesn't take the newline into account from split!
 			offset += line.length();
@@ -248,7 +260,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 				removeTasks(file, sub.newChild(10));
 
 				// grab the source of the file we're going to parse
-				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)), getCharset(file));
 
 				// minor optimization when creating a new empty file
 				if (fileContents != null && fileContents.trim().length() > 0)
