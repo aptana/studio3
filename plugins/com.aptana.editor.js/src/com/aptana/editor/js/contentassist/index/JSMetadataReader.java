@@ -551,26 +551,6 @@ public class JSMetadataReader extends MetadataReader
 	}
 
 	/**
-	 * Processing a type map
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 * @param attributes
-	 */
-	public void enterTypeMap(String ns, String name, String qname, Attributes attributes)
-	{
-		Map<String, String> attrs = attributesToMap(attributes, true);
-		String sourceType = attrs.get("source-type"); //$NON-NLS-1$
-		String destinationType = attrs.get("destination-type"); //$NON-NLS-1$
-
-		if (!StringUtil.isEmpty(sourceType) && !StringUtil.isEmpty(destinationType))
-		{
-			JSTypeMapper.getInstance().addTypeMapping(sourceType, destinationType);
-		}
-	}
-
-	/**
 	 * start processing a value element
 	 * 
 	 * @param ns

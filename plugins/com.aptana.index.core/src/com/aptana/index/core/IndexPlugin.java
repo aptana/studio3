@@ -9,10 +9,10 @@ package com.aptana.index.core;
 
 import java.text.MessageFormat;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -71,7 +71,7 @@ public class IndexPlugin extends Plugin
 	public static boolean isDebugOptionEnabled(String option)
 	{
 		return Boolean.valueOf(Platform.getDebugOption(option));
-}
+	}
 
 	/**
 	 * Logs an informational message

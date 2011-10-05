@@ -412,6 +412,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 			{
 				return file.getRawLocationURI();
 			}
+		};
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertEquals(0, proposals.length);
@@ -724,8 +725,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 			assertEquals(0, proposals.length);
 		}
-
-	private void assertHREFProposal(String source, String expected, String proposalToChoose) throws Exception
+		finally
 		{
 			if (project != null)
 			{

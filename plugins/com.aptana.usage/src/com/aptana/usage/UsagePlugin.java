@@ -102,13 +102,4 @@ public class UsagePlugin extends Plugin
 			IdeLog.logError(getDefault(), e);
 		}
 	}
-
-	public static void logError(Exception e)
-	{
-		// Only logs analytics errors when in development
-		if (Platform.inDevelopmentMode())
-		{
-			IdeLog.logError(getDefault(), e);
-}
-	}
 }

@@ -298,7 +298,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 				fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
 			}
 		}
-		}
 		catch (BadLocationException e)
 		{
 			openErrorDialog(viewer.getTextWidget().getShell(), e);
