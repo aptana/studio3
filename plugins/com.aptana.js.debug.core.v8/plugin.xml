@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="com.aptana.js.debug.core.v8.test.V8LaunchConfigurationDelegate"
+            id="com.aptana.js.debug.core.v8.launchConfigurationType"
+            modes="debug"
+            name="V8 Test"
+            public="true"
+            sourceLocatorId="com.aptana.js.debug.core.sourceLookupDirector"
+            sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="com.aptana.js.debug.core.v8.test.ui.LaunchConfigurationTabGroup"
+            id="com.aptana.js.debug.core.v8.launchConfigurationTabGroup"
+            type="com.aptana.js.debug.core.v8.launchConfigurationType">
+      </launchConfigurationTabGroup>
+   </extension>
+
+</plugin>
