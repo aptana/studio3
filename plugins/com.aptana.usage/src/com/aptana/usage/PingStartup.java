@@ -31,9 +31,15 @@ public class PingStartup implements IStartup
 
 	private static final String STUDIO_FIRST_RUN = "studio.first-run"; //$NON-NLS-1$
 
-	@SuppressWarnings("nls")
-	private static final String[] STUDIO_NATURES = { "com.aptana.projects.webnature",
-			"com.aptana.editor.php.phpNature", "com.aptana.ruby.core.rubynature" };
+	private static final Map<String, String> STUDIO_NATURE_MAP;
+	static
+	{
+		STUDIO_NATURE_MAP = new HashMap<String, String>();
+		STUDIO_NATURE_MAP.put("com.aptana.projects.webnature", "web"); //$NON-NLS-1$ //$NON-NLS-2$
+		STUDIO_NATURE_MAP.put("com.aptana.editor.php.phpNature", "php"); //$NON-NLS-1$ //$NON-NLS-2$
+		STUDIO_NATURE_MAP.put("com.aptana.ruby.core.rubynature", "ruby"); //$NON-NLS-1$ //$NON-NLS-2$
+		STUDIO_NATURE_MAP.put("org.radrails.rails.core.railsnature", "rails"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 	private static IResourceChangeListener resourceListener = new IResourceChangeListener()
 	{
@@ -47,11 +53,14 @@ public class PingStartup implements IStartup
 				{
 					IProject project = event.getResource().getProject();
 					IProjectDescription description = project.getDescription();
-					for (String nature : STUDIO_NATURES)
+					String[] natures = description.getNatureIds();
+					String projectType;
+					for (String nature : natures)
 					{
-						if (description.hasNature(nature))
+						projectType = STUDIO_NATURE_MAP.get(nature);
+						if (projectType != null)
 						{
-							sendProjectDeleteEvent(project);
+							sendProjectDeleteEvent(project, projectType);
 							break;
 						}
 					}
@@ -138,11 +147,11 @@ public class PingStartup implements IStartup
 		return id;
 	}
 
-	private static void sendProjectDeleteEvent(IProject project)
+	private static void sendProjectDeleteEvent(IProject project, String projectType)
 	{
 		Map<String, String> payload = new HashMap<String, String>();
 		payload.put("name", project.getName()); //$NON-NLS-1$
 
-		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("project.delete", payload)); //$NON-NLS-1$
+		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("project.delete." + projectType, payload)); //$NON-NLS-1$
 	}
 }
