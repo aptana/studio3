@@ -11,16 +11,15 @@ import java.util.EventObject;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class ServerConfigurationChangeEvent extends EventObject {
+public final class ServerChangeEvent extends EventObject
+{
 
-	public enum Kind {
-		ADDED,
-		REMOVED,
-		UPDATED
+	public enum Kind
+	{
+		ADDED, REMOVED, UPDATED
 	}
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private Kind kind;
@@ -28,23 +27,26 @@ public final class ServerConfigurationChangeEvent extends EventObject {
 	/**
 	 * 
 	 */
-	public ServerConfigurationChangeEvent(Kind kind, AbstractWebServerConfiguration configuration) {
-		super(configuration);
+	public ServerChangeEvent(Kind kind, IServer server)
+	{
+		super(server);
 		this.kind = kind;
 	}
 
 	/**
 	 * @return the kind
 	 */
-	public Kind getKind() {
+	public Kind getKind()
+	{
 		return kind;
 	}
 
 	/**
-	 * @return the serverConfiguration
+	 * @return the server
 	 */
-	public AbstractWebServerConfiguration getServerConfiguration() {
-		return (AbstractWebServerConfiguration) getSource();
+	public IServer getServer()
+	{
+		return (IServer) getSource();
 	}
 
 }

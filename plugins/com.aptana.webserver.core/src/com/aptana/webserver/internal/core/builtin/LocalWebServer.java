@@ -8,7 +8,7 @@
 // $codepro.audit.disable disallowSleepInsideWhile
 // $codepro.audit.disable disallowYieldUsage
 
-package com.aptana.webserver.core.builtin;
+package com.aptana.webserver.internal.core.builtin;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -48,83 +48,105 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
-import com.aptana.webserver.core.preferences.WebServerPreferences;
+import com.aptana.webserver.internal.core.preferences.WebServerPreferences;
 
 /**
  * @author Max Stepanov
- *
  */
-public class LocalWebServer {
+public class LocalWebServer
+{
 
 	private static final int SOCKET_TIMEOUT = 10000;
 	private static final long STARTUP_TIMEOUT = 10000;
 	private static final long SHUTDOWN_TIMEOUT = 2000;
-	private static final int SOCKET_BUFFER_SIZE = 16*1024; // $codepro.audit.disable multiplicationOrDivisionByPowersOf2
+	private static final int SOCKET_BUFFER_SIZE = 16 * 1024; // $codepro.audit.disable
+																// multiplicationOrDivisionByPowersOf2
 	private static final int WORKER_COUNT = 2;
-	
+
 	private final EFSWebServerConfiguration configuration;
 	private Thread thread;
 	private ListeningIOReactor reactor;
-	
-	public LocalWebServer(URI documentRoot) throws CoreException {
+
+	public LocalWebServer(URI documentRoot) throws CoreException
+	{
 		this(createConfigurationForDocumentRoot(documentRoot));
 	}
-	
-	public LocalWebServer(EFSWebServerConfiguration configuration) throws CoreException {
+
+	public LocalWebServer(EFSWebServerConfiguration configuration) throws CoreException
+	{
 		Assert.isLegal(configuration.getDocumentRoot() != null, "DocumentRoot should be set"); //$NON-NLS-1$
 		this.configuration = configuration;
 		InetAddress host = WebServerPreferences.getServerAddress();
 		int[] portRange = WebServerPreferences.getPortRange();
 		int port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);
-		if (port <= 0) {
+		if (port <= 0)
+		{
 			port = SocketUtil.findFreePort(host); // default to any free port
 		}
-		try {
+		try
+		{
 			configuration.setBaseURL(new URL("http", host.getHostAddress(), port, "/")); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (MalformedURLException e) {
+		}
+		catch (MalformedURLException e)
+		{
 			WebServerCorePlugin.log(e);
 		}
 		startServer(host, port, configuration);
 		testConnection(configuration.getBaseURL());
 	}
-	
+
 	/**
 	 * Stop the server and dispose any resources associated with it
 	 */
-	public void dispose() {
+	public void dispose()
+	{
 		stopServer();
 	}
-	
-	public EFSWebServerConfiguration getConfiguration() {
+
+	public EFSWebServerConfiguration getConfiguration()
+	{
 		return configuration;
 	}
-	
-	private void testConnection(URL url) throws CoreException {
+
+	private void testConnection(URL url) throws CoreException
+	{
 		CoreException exception = null;
-		for (int trial = 0; trial < 3; ++trial) {
-			try {
+		for (int trial = 0; trial < 3; ++trial)
+		{
+			try
+			{
 				URLConnection connection = url.openConnection(); // $codepro.audit.disable variableDeclaredInLoop
 				connection.connect();
 				connection.getContentType();
 				return;
-			} catch (IOException e) {
-				exception = new CoreException(new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Testing WebServer connection failed", e)); //$NON-NLS-1$
 			}
-			try {
+			catch (IOException e)
+			{
+				exception = new CoreException(new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID,
+						"Testing WebServer connection failed", e)); //$NON-NLS-1$
+			}
+			try
+			{
 				Thread.sleep(1000);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				break;
 			}
 		}
-		if (exception != null) {
+		if (exception != null)
+		{
 			throw exception;
 		}
 	}
-	
-	private void startServer(final InetAddress host, final int port, final EFSWebServerConfiguration configuration) {
-		thread = new Thread() {
+
+	private void startServer(final InetAddress host, final int port, final EFSWebServerConfiguration configuration)
+	{
+		thread = new Thread()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(configuration));
 			}
 		};
@@ -132,76 +154,97 @@ public class LocalWebServer {
 		thread.start();
 		Thread.yield();
 		long startTime = System.currentTimeMillis();
-		while( thread.isAlive() && (System.currentTimeMillis() - startTime) < STARTUP_TIMEOUT ) {
-			if (reactor != null && reactor.getStatus() == IOReactorStatus.ACTIVE) {
+		while (thread.isAlive() && (System.currentTimeMillis() - startTime) < STARTUP_TIMEOUT)
+		{
+			if (reactor != null && reactor.getStatus() == IOReactorStatus.ACTIVE)
+			{
 				break;
 			}
-			try {
+			try
+			{
 				Thread.sleep(10);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				break;
 			}
 		}
 	}
-	
-	private void stopServer() {
-		if (thread != null && thread.isAlive()) {
-			if (reactor != null) {
-				try {
+
+	private void stopServer()
+	{
+		if (thread != null && thread.isAlive())
+		{
+			if (reactor != null)
+			{
+				try
+				{
 					reactor.shutdown(SHUTDOWN_TIMEOUT);
-				} catch (IOException ignore) {
+				}
+				catch (IOException ignore)
+				{
 					ignore.getCause();
 				}
 			}
 			thread.interrupt();
-			try {
+			try
+			{
 				thread.join(SHUTDOWN_TIMEOUT);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				e.getCause();
 			}
 		}
 	}
-	
-	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler) {
+
+	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler)
+	{
 		HttpParams params = new BasicHttpParams();
 		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
-			.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
-			.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, SOCKET_BUFFER_SIZE)
-			.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
-			.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/"+EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+				.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
+				.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, SOCKET_BUFFER_SIZE)
+				.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
+				.setParameter(CoreProtocolPNames.ORIGIN_SERVER,
+						"HttpComponents/" + EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore")); //$NON-NLS-1$ //$NON-NLS-2$
+
 		BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
 		httpProcessor.addInterceptor(new ResponseDate());
 		httpProcessor.addInterceptor(new ResponseServer());
 		httpProcessor.addInterceptor(new ResponseContent());
 		httpProcessor.addInterceptor(new ResponseConnControl());
 
-        HttpRequestHandlerRegistry handlerRegistry = new HttpRequestHandlerRegistry();
-        handlerRegistry.register("*", httpRequestHandler); //$NON-NLS-1$
+		HttpRequestHandlerRegistry handlerRegistry = new HttpRequestHandlerRegistry();
+		handlerRegistry.register("*", httpRequestHandler); //$NON-NLS-1$
 
-        BufferingHttpServiceHandler serviceHandler = new BufferingHttpServiceHandler(
-                httpProcessor,
-                new DefaultHttpResponseFactory(),
-                new DefaultConnectionReuseStrategy(),
-                params);
-        serviceHandler.setHandlerResolver(handlerRegistry);
-        serviceHandler.setEventListener(new LocalWebServerLogger());
-        
-        IOEventDispatch eventDispatch = new DefaultServerIOEventDispatch(serviceHandler, params);
-        try {
+		BufferingHttpServiceHandler serviceHandler = new BufferingHttpServiceHandler(httpProcessor,
+				new DefaultHttpResponseFactory(), new DefaultConnectionReuseStrategy(), params);
+		serviceHandler.setHandlerResolver(handlerRegistry);
+		serviceHandler.setEventListener(new LocalWebServerLogger());
+
+		IOEventDispatch eventDispatch = new DefaultServerIOEventDispatch(serviceHandler, params);
+		try
+		{
 			reactor = new DefaultListeningIOReactor(WORKER_COUNT, params);
 			reactor.listen(socketAddress);
 			reactor.execute(eventDispatch);
-        } catch (InterruptedIOException e) {
-        	return;
-		} catch (IOReactorException e) {
+		}
+		catch (InterruptedIOException e)
+		{
+			return;
+		}
+		catch (IOReactorException e)
+		{
 			WebServerCorePlugin.log(e);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			WebServerCorePlugin.log(e);
 		}
 	}
 
-	private static EFSWebServerConfiguration createConfigurationForDocumentRoot(URI documentRoot) {
+	private static EFSWebServerConfiguration createConfigurationForDocumentRoot(URI documentRoot)
+	{
 		EFSWebServerConfiguration configuration = new EFSWebServerConfiguration();
 		configuration.setDocumentRoot(documentRoot);
 		return configuration;

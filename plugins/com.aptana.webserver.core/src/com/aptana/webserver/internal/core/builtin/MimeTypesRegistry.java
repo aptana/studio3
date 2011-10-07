@@ -4,18 +4,18 @@
  * Proprietary and Confidential - This source code is not for redistribution
  */
 
-package com.aptana.webserver.core.builtin;
+package com.aptana.webserver.internal.core.builtin;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("nls")
-public class MimeTypesRegistry {
-	
+public class MimeTypesRegistry
+{
+
 	private final static String TEXT_HTML = "text/html"; //$NON-NLS-1$
 
 	public static final MimeTypesRegistry INSTANCE = new MimeTypesRegistry();
@@ -25,7 +25,8 @@ public class MimeTypesRegistry {
 	/**
 	 * 
 	 */
-	private MimeTypesRegistry() {
+	private MimeTypesRegistry()
+	{
 		map(TEXT_HTML, "html", "htm", "xhtml", "stm");
 		map("image/bmp", "bmp");
 		map("image/cis-cod", "cod");
@@ -153,21 +154,26 @@ public class MimeTypesRegistry {
 		map("application/ynd.ms-pkipko", "pko");
 		map("application/zip", "zip");
 	}
-	
-	private void map(String mimeType, String...extensions) {
-		for (String extension : extensions) {
+
+	private void map(String mimeType, String... extensions)
+	{
+		for (String extension : extensions)
+		{
 			map.put(extension, mimeType);
 		}
 	}
 
 	/**
 	 * Returns mime type for the given extension
+	 * 
 	 * @param extension
 	 * @return
 	 */
-	public String getMimeType(String extension) {
+	public String getMimeType(String extension)
+	{
 		String mimeType = map.get(extension);
-		if (mimeType != null) {
+		if (mimeType != null)
+		{
 			return mimeType;
 		}
 		return TEXT_HTML;

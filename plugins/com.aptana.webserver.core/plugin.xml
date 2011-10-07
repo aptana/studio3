@@ -14,7 +14,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.webserver.core.preferences.WebServerPreferenceInitializer">
+            class="com.aptana.webserver.internal.core.preferences.WebServerPreferenceInitializer">
       </initializer>
    </extension>
 

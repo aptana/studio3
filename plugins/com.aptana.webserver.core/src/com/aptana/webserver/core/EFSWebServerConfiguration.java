@@ -25,9 +25,9 @@ import com.aptana.core.io.efs.EFSUtils;
 
 /**
  * @author Max Stepanov
- *
  */
-public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
+public class EFSWebServerConfiguration extends AbstractWebServerConfiguration
+{
 
 	private static final String ELEMENT_BASE_URL = "baseURL"; //$NON-NLS-1$
 	private static final String ELEMENT_DOCUMENT_ROOT = "documentRoot"; //$NON-NLS-1$
@@ -35,136 +35,181 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 	private URL baseURL;
 	protected URI documentRoot;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.webserver.core.AbstractWebServerConfiguration#resolve(org.eclipse.core.filesystem.IFileStore)
 	 */
 	@Override
-	public URI resolve(IFileStore file) {
-		if (!isValid()) {
+	public URI resolve(IFileStore file)
+	{
+		if (!isValid())
+		{
 			return null;
 		}
-		try {
+		try
+		{
 			IPath relativePath = EFSUtils.getRelativePath(EFS.getStore(documentRoot), file);
-			if (relativePath != null) {
-				try {
+			if (relativePath != null)
+			{
+				try
+				{
 					return URIUtil.append(baseURL.toURI(), relativePath.toPortableString());
-				} catch (URISyntaxException e) {
+				}
+				catch (URISyntaxException e)
+				{
 					WebServerCorePlugin.log(e);
 				}
 			}
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			WebServerCorePlugin.log(e);
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.webserver.core.AbstractWebServerConfiguration#resolve(java.net.URL)
 	 */
 	@Override
-	public IFileStore resolve(URI uri) {
-		if (!isValid()) {
+	public IFileStore resolve(URI uri)
+	{
+		if (!isValid())
+		{
 			return null;
 		}
-		try {
+		try
+		{
 			return resolve(Path.fromPortableString(baseURL.toURI().relativize(uri).getPath()));
-		} catch (URISyntaxException e) {
-			WebServerCorePlugin.log(e);
-			return null;
 		}
-	}
-	
-	/**
-	 * Resolves URI relative to server base URL
-	 * @param uri
-	 * @return
-	 */
-	public IFileStore resolve(IPath path) {
-		if (!isValid()) {
-			return null;
-		}
-		try {
-			return EFS.getStore(documentRoot).getFileStore(path);
-		} catch (CoreException e) {
+		catch (URISyntaxException e)
+		{
 			WebServerCorePlugin.log(e);
 			return null;
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Resolves URI relative to server base URL
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	public IFileStore resolve(IPath path)
+	{
+		if (!isValid())
+		{
+			return null;
+		}
+		try
+		{
+			return EFS.getStore(documentRoot).getFileStore(path);
+		}
+		catch (CoreException e)
+		{
+			WebServerCorePlugin.log(e);
+			return null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.webserver.core.AbstractWebServerConfiguration#loadState(com.aptana.core.epl.IMemento)
 	 */
 	@Override
-	protected void loadState(IMemento memento) {
+	public void loadState(IMemento memento)
+	{
 		super.loadState(memento);
 		IMemento child = memento.getChild(ELEMENT_BASE_URL);
-		if (child != null) {
-			try {
+		if (child != null)
+		{
+			try
+			{
 				baseURL = new URL(child.getTextData());
-			} catch (MalformedURLException e) {
+			}
+			catch (MalformedURLException e)
+			{
 				WebServerCorePlugin.log(e);
 			}
 		}
 		child = memento.getChild(ELEMENT_DOCUMENT_ROOT);
-		if (child != null) {
+		if (child != null)
+		{
 			String text = child.getTextData();
-			if (text != null) {
-				try {
+			if (text != null)
+			{
+				try
+				{
 					documentRoot = URI.create(text);
-				} catch (IllegalArgumentException e) {
+				}
+				catch (IllegalArgumentException e)
+				{
 					WebServerCorePlugin.log(e);
 				}
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.webserver.core.AbstractWebServerConfiguration#saveState(com.aptana.core.epl.IMemento)
 	 */
 	@Override
-	protected void saveState(IMemento memento) {
+	public void saveState(IMemento memento)
+	{
 		super.saveState(memento);
-		if (baseURL != null) {
+		if (baseURL != null)
+		{
 			memento.createChild(ELEMENT_BASE_URL).putTextData(baseURL.toExternalForm());
 		}
-		if (documentRoot != null) {
+		if (documentRoot != null)
+		{
 			memento.createChild(ELEMENT_DOCUMENT_ROOT).putTextData(documentRoot.toASCIIString());
 		}
 	}
 
-	private boolean isValid() {
+	private boolean isValid()
+	{
 		return baseURL != null && documentRoot != null;
 	}
 
 	/**
 	 * @return the baseURL
 	 */
-	public URL getBaseURL() {
+	public URL getBaseURL()
+	{
 		return baseURL;
 	}
 
 	/**
-	 * @param baseURL the baseURL to set
+	 * @param baseURL
+	 *            the baseURL to set
 	 */
-	public void setBaseURL(URL baseURL) {
+	public void setBaseURL(URL baseURL)
+	{
 		this.baseURL = baseURL;
 	}
 
 	/**
 	 * @return the documentRoot
 	 */
-	public URI getDocumentRoot() {
+	public URI getDocumentRoot()
+	{
 		return documentRoot;
 	}
 
 	/**
-	 * @param documentRoot the documentRoot to set
+	 * @param documentRoot
+	 *            the documentRoot to set
 	 */
-	public void setDocumentRoot(URI documentRoot) {
+	public void setDocumentRoot(URI documentRoot)
+	{
 		this.documentRoot = documentRoot;
 	}
-	
-	public static EFSWebServerConfiguration create(URL baseURL, URI documentRoot) {
+
+	public static EFSWebServerConfiguration create(URL baseURL, URI documentRoot)
+	{
 		EFSWebServerConfiguration configuration = new EFSWebServerConfiguration();
 		configuration.setBaseURL(baseURL);
 		configuration.setDocumentRoot(documentRoot);

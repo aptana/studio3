@@ -486,7 +486,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		EFSWebServerConfiguration server = new EFSWebServerConfiguration();
 		server.setDocumentRoot(project.getURI());
 		server.setBaseURL(new URL("http://www.test.com/"));
-		WebServerCorePlugin.getDefault().getServerConfigurationManager().addServerConfiguration(server);
+		WebServerCorePlugin.getDefault().getServerManager().add(server);
 
 		int offset = this.cursorOffsets.get(0);
 		ITextViewer viewer = AssertUtil.createTextViewer(document);
@@ -498,7 +498,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder/' />", document, "folder/", proposals,
 				offset, new Point(0, 0));
 
-		WebServerCorePlugin.getDefault().getServerConfigurationManager().removeServerConfiguration(server);
+		WebServerCorePlugin.getDefault().getServerManager().remove(server);
 		project.delete();
 
 	}

@@ -507,8 +507,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 					if (serverConfiguration == null)
 					{
-						for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
-								.getServerConfigurations())
+						for (IURIMapper server : WebServerCorePlugin.getDefault().getServerManager()
+								.getServers())
 						{
 							if (server.resolve(editorStore) != null)
 							{

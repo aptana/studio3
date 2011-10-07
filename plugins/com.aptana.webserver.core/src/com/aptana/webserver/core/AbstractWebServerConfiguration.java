@@ -20,77 +20,95 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import com.aptana.core.IURIMapper;
 import com.aptana.core.Identifiable;
 import com.aptana.core.epl.IMemento;
+import com.aptana.webserver.internal.core.ServerManager;
+import com.aptana.webserver.internal.core.ServerType;
 
 /**
  * @author Max Stepanov
- * 
  */
-public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable, IURIMapper {
+abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable, IURIMapper, IServer
+{
 
 	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
-	private String type;
+	private IServerType type;
 	private String name;
 
 	/**
 	 * 
 	 */
-	protected AbstractWebServerConfiguration() {
+	protected AbstractWebServerConfiguration()
+	{
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.webserver.core.IURLMapper#resolve(org.eclipse.core.filesystem.IFileStore)
 	 */
 	public abstract URI resolve(IFileStore file);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.webserver.core.IURLMapper#resolve(java.net.URL)
 	 */
 	public abstract IFileStore resolve(URI uri);
 
 	public abstract URL getBaseURL();
-	
-	protected void loadState(IMemento memento) {
+
+	public void loadState(IMemento memento)
+	{
 		IMemento child = memento.getChild(ELEMENT_NAME);
-		if (child != null) {
+		if (child != null)
+		{
 			name = child.getTextData();
 		}
 	}
 
-	protected void saveState(IMemento memento) {
+	public void saveState(IMemento memento)
+	{
 		memento.createChild(ELEMENT_NAME).putTextData(name);
 	}
 
-	/**
-	 * Returns true if this type of configurations should be persistent by manager
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.webserver.core.Iserver#isPersistent()
 	 */
-	protected boolean isPersistent() {
+	public boolean isPersistent()
+	{
 		return true;
 	}
 
 	/*
-	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+	 * @see
+	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement
+	 * , java.lang.String, java.lang.Object)
 	 */
-	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
-		type = config.getAttribute(ServerConfigurationManager.ATT_ID);
+	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException
+	{
+		type = new ServerType(config.getAttribute(ServerManager.ATT_ID),
+				config.getAttribute(ServerManager.ATT_NAME));
 	}
 
-	/* package */final String getType() {
+	public final IServerType getType()
+	{
 		return type;
 	}
 
 	/*
 	 * @see com.aptana.core.Identifiable#getId()
 	 */
-	public final String getId() {
-		return type;
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.webserver.core.Iserver#getId()
+	 */
+	public final String getId()
+	{
+		return type.getId();
 	}
 
-	/**
-	 * @return the name
-	 */
-	public final String getName() {
+	public final String getName()
+	{
 		return name;
 	}
 
@@ -98,7 +116,8 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	 * @param name
 	 *            the name to set
 	 */
-	public final void setName(String name) {
+	public final void setName(String name)
+	{
 		this.name = name;
 	}
 }

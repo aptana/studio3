@@ -38,65 +38,72 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.ListDialog;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
-import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
+import com.aptana.webserver.core.IServer;
+import com.aptana.webserver.core.IServerManager;
+import com.aptana.webserver.core.IServerType;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.ui.WebServerUIPlugin;
 
 /**
  * @author Max Stepanov
- * 
  */
-public class ServersPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class ServersPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
+{
 
 	private ListViewer viewer;
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
-	 * .swt.widgets.Composite)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse .swt.widgets.Composite)
 	 */
 	@Override
-	protected Control createContents(Composite parent) {
+	protected Control createContents(Composite parent)
+	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setFont(parent.getFont());
 		composite.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
 
 		viewer = new ListViewer(composite, SWT.SINGLE | SWT.BORDER);
 		viewer.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		viewer.setContentProvider(new ArrayContentProvider() {
+		viewer.setContentProvider(new ArrayContentProvider()
+		{
 			@Override
-			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof ServerConfigurationManager) {
-					inputElement = ((ServerConfigurationManager) inputElement).getServerConfigurations(); // $codepro.audit.disable questionableAssignment
+			public Object[] getElements(Object inputElement)
+			{
+				if (inputElement instanceof IServerManager)
+				{
+					inputElement = ((IServerManager) inputElement).getServers(); // $codepro.audit.disable
+																					// questionableAssignment
 				}
 				return super.getElements(inputElement);
 			}
 
 		});
-		viewer.setLabelProvider(new LabelProvider() {
+		viewer.setLabelProvider(new LabelProvider()
+		{
 			@Override
-			public Image getImage(Object element) {
+			public Image getImage(Object element)
+			{
 				return null; // TODO: use ImageAssociations
 			}
 
 			@Override
-			public String getText(Object element) {
-				if (element instanceof AbstractWebServerConfiguration) {
-					return ((AbstractWebServerConfiguration) element).getName();
+			public String getText(Object element)
+			{
+				if (element instanceof IServer)
+				{
+					return ((IServer) element).getName();
 				}
 				return super.getText(element);
 			}
 
 		});
-		viewer.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager());
+		viewer.setInput(WebServerCorePlugin.getDefault().getServerManager());
 
 		Composite buttonContainer = new Composite(composite, SWT.NONE);
 		buttonContainer.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
@@ -104,8 +111,10 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 
 		Button newButton = new Button(buttonContainer, SWT.PUSH);
 		newButton.setText(StringUtil.ellipsify(CoreStrings.NEW));
-		newButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).hint(
-				Math.max(newButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
+		newButton.setLayoutData(GridDataFactory
+				.swtDefaults()
+				.align(SWT.FILL, SWT.CENTER)
+				.hint(Math.max(newButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
 						convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH)), SWT.DEFAULT).create());
 
 		final Button editButton = new Button(buttonContainer, SWT.PUSH);
@@ -116,83 +125,103 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 		deleteButton.setText(CoreStrings.DELETE);
 		deleteButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).create());
 
-		newButton.addSelectionListener(new SelectionAdapter() {
+		newButton.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(SelectionEvent event)
+			{
 				ListDialog dlg = new ListDialog(getShell());
 				dlg.setContentProvider(new ArrayContentProvider());
-				dlg.setLabelProvider(new LabelProvider() {
+				dlg.setLabelProvider(new LabelProvider()
+				{
 					@Override
-					public Image getImage(Object element) {
+					public Image getImage(Object element)
+					{
 						return null; // TODO: use ImageAssociations
 					}
 
 					@Override
-					public String getText(Object element) {
-						if (element instanceof ConfigurationType) {
-							return ((ConfigurationType) element).getName();
+					public String getText(Object element)
+					{
+						if (element instanceof IServerType)
+						{
+							return ((IServerType) element).getName();
 						}
 						return super.getText(element);
 					}
 				});
-				dlg.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getConfigurationTypes());
+				dlg.setInput(WebServerCorePlugin.getDefault().getServerManager().getServerTypes());
 				dlg.setTitle(Messages.ServersPreferencePage_Title);
 				Object[] result;
-				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) { // $codepro.audit.disable assignmentInCondition
-					String typeId = ((ConfigurationType) result[0]).getId();
-					try {
-						AbstractWebServerConfiguration newConfiguration = WebServerCorePlugin.getDefault().getServerConfigurationManager()
-								.createServerConfiguration(typeId);
-						if (newConfiguration != null) {
-							if (editServerConfiguration(newConfiguration)) {
-								WebServerCorePlugin.getDefault().getServerConfigurationManager().addServerConfiguration(newConfiguration);
+				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1)
+				{ // $codepro.audit.disable assignmentInCondition
+					String typeId = ((IServerType) result[0]).getId();
+					try
+					{
+						IServer newConfiguration = WebServerCorePlugin.getDefault().getServerManager()
+								.createServer(typeId);
+						if (newConfiguration != null)
+						{
+							if (editServerConfiguration(newConfiguration))
+							{
+								WebServerCorePlugin.getDefault().getServerManager().add(newConfiguration);
 								viewer.refresh();
 							}
 						}
-					} catch (CoreException e) {
-						WebServerUIPlugin.log(e);
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(WebServerUIPlugin.getDefault(), e);
 					}
 				}
 			}
 
 		});
-		editButton.addSelectionListener(new SelectionAdapter() {
+		editButton.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
-						.getSelection()).getFirstElement();
-				if (selection != null && editServerConfiguration(selection)) {
+			public void widgetSelected(SelectionEvent e)
+			{
+				IServer selection = (IServer) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				if (selection != null && editServerConfiguration(selection))
+				{
 					viewer.refresh();
 				}
 			}
 
 		});
-		deleteButton.addSelectionListener(new SelectionAdapter() {
+		deleteButton.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
-						.getSelection()).getFirstElement();
+			public void widgetSelected(SelectionEvent e)
+			{
+				IServer selection = (IServer) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 				if (selection != null
 						&& MessageDialog.openQuestion(getShell(), Messages.ServersPreferencePage_DeletePrompt_Title,
-								Messages.ServersPreferencePage_DeletePrompt_Message)) {
-					WebServerCorePlugin.getDefault().getServerConfigurationManager().removeServerConfiguration(selection);
+								Messages.ServersPreferencePage_DeletePrompt_Message))
+				{
+					WebServerCorePlugin.getDefault().getServerManager().remove(selection);
 					viewer.refresh();
 				}
 			}
 
 		});
 
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
-						.getSelection()).getFirstElement();
-				if (selection != null && editServerConfiguration(selection)) {
+		viewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+			public void doubleClick(DoubleClickEvent event)
+			{
+				IServer selection = (IServer) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				if (selection != null && editServerConfiguration(selection))
+				{
 					viewer.refresh();
 				}
 			}
 		});
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+		viewer.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			public void selectionChanged(SelectionChangedEvent event)
+			{
 				boolean hasSelection = !event.getSelection().isEmpty();
 				editButton.setEnabled(hasSelection);
 				deleteButton.setEnabled(hasSelection);
@@ -203,17 +232,23 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 		return composite;
 	}
 
-	private boolean editServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
-		try {
+	private boolean editServerConfiguration(IServer serverConfiguration)
+	{
+		try
+		{
 			Dialog dlg = PropertyDialogsRegistry.getInstance().createPropertyDialog(serverConfiguration,
 					new SameShellProvider(getShell()));
-			if (dlg != null) {
-				if (dlg instanceof IPropertyDialog) {
+			if (dlg != null)
+			{
+				if (dlg instanceof IPropertyDialog)
+				{
 					((IPropertyDialog) dlg).setPropertySource(serverConfiguration);
 				}
 				return dlg.open() == Window.OK;
 			}
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			UIUtils.showErrorMessage("Failed to open server preferences dialog", e); //$NON-NLS-1$
 		}
 		return false;
@@ -221,11 +256,10 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 		setPreferenceStore(WebServerUIPlugin.getDefault().getPreferenceStore());
 	}
 

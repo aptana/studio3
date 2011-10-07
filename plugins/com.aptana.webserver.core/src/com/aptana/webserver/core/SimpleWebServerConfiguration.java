@@ -14,24 +14,28 @@ import org.eclipse.core.runtime.Path;
 
 /**
  * @author Max Stepanov
- *
  */
-public class SimpleWebServerConfiguration extends EFSWebServerConfiguration {
+public class SimpleWebServerConfiguration extends EFSWebServerConfiguration
+{
 
 	/**
 	 * @return the documentRoot
 	 */
-	public IPath getDocumentRootPath() {
-		if (documentRoot == null) {
+	public IPath getDocumentRootPath()
+	{
+		if (documentRoot == null)
+		{
 			return null;
 		}
 		return Path.fromPortableString(documentRoot.getSchemeSpecificPart());
 	}
 
 	/**
-	 * @param documentRoot the documentRoot to set
+	 * @param documentRoot
+	 *            the documentRoot to set
 	 */
-	public void setDocumentRootPath(IPath documentRoot) {
+	public void setDocumentRootPath(IPath documentRoot)
+	{
 		this.documentRoot = EFS.getLocalFileSystem().getStore(documentRoot).toURI();
 	}
 }

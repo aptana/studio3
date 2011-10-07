@@ -10,13 +10,13 @@ package com.aptana.preview;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class ProjectPreviewUtil
 {
 
-	public static AbstractWebServerConfiguration getServerConfiguration(IProject project)
+	public static IServer getServerConfiguration(IProject project)
 	{
 		if (project != null)
 		{
@@ -25,7 +25,7 @@ public class ProjectPreviewUtil
 				String name = project.getPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER);
 				if (name != null)
 				{
-					return WebServerCorePlugin.getDefault().getServerConfigurationManager().findServerConfiguration(name);
+					return WebServerCorePlugin.getDefault().getServerManager().findServerByName(name);
 				}
 			}
 			catch (CoreException e)
@@ -35,7 +35,7 @@ public class ProjectPreviewUtil
 		return null;
 	}
 
-	public static void setServerConfiguration(IProject project, AbstractWebServerConfiguration serverConfig)
+	public static void setServerConfiguration(IProject project, IServer serverConfig)
 	{
 		if (project != null)
 		{

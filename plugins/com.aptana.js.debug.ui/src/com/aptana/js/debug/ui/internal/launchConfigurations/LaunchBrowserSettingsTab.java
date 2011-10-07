@@ -57,7 +57,7 @@ import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.ui.IWebServerUIConstants;
 
@@ -228,14 +228,14 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		managedServersView.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				if (element instanceof AbstractWebServerConfiguration) {
-					return ((AbstractWebServerConfiguration) element).getName();
+				if (element instanceof IServer) {
+					return ((IServer) element).getName();
 				}
 				return super.getText(element);
 			}
 		});
-		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager()
-				.getServerConfigurations());
+		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerManager()
+				.getServers());
 
 		Link configureLink = new Link(group, SWT.NONE);
 		configureLink.setText(MessageFormat.format("<a>{0}</a>", Messages.LaunchBrowserSettingsTab_Configure_Label)); //$NON-NLS-1$
@@ -249,8 +249,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 						PreferencesUtil.OPTION_FILTER_LOCKED);
 				dlg.open();
 				ISelection selection = managedServersView.getSelection();
-				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager()
-						.getServerConfigurations());
+				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerManager()
+						.getServers());
 				managedServersView.setSelection(selection);
 			}
 		});
@@ -372,10 +372,10 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			fbaseUrlText.setText(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY));
 			rbManagedServer.setSelection(serverType == ILaunchConfigurationConstants.SERVER_MANAGED);
-			AbstractWebServerConfiguration server = WebServerCorePlugin
+			IServer server = WebServerCorePlugin
 					.getDefault()
-					.getServerConfigurationManager()
-					.findServerConfiguration(
+					.getServerManager()
+					.findServerByName(
 							configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
 									StringUtil.EMPTY));
 			if (server != null) {
@@ -428,7 +428,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		value = fbaseUrlText.getText();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, value);
 
-		AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView
+		IServer serverSelection = (IServer) ((IStructuredSelection) managedServersView
 				.getSelection()).getFirstElement();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
 				(serverSelection != null) ? serverSelection.getName() : null);
@@ -483,7 +483,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		if (rbManagedServer.getSelection()) {
-			AbstractWebServerConfiguration serverSelection = (AbstractWebServerConfiguration) ((IStructuredSelection) managedServersView
+			IServer serverSelection = (IServer) ((IStructuredSelection) managedServersView
 					.getSelection()).getFirstElement();
 			if (serverSelection == null) {
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_ServerNotSelected);

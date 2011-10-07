@@ -7,11 +7,21 @@
  */
 package com.aptana.webserver.core;
 
-/**
- * @author Max Stepanov
- *
- */
-public interface IServerConfigurationChangeListener {
+public interface IServerType
+{
 
-	public void configurationChanged(ServerConfigurationChangeEvent event);
+	/**
+	 * Unique identifier from the extension.
+	 * 
+	 * @return
+	 */
+	public abstract String getId();
+
+	/**
+	 * A human-readbale name for this type of server.
+	 * 
+	 * @return
+	 */
+	public abstract String getName();
+
 }

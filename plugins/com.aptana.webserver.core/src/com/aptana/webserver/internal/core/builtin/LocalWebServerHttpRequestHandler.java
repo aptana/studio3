@@ -7,7 +7,7 @@
  */
 // $codepro.audit.disable unnecessaryExceptions
 
-package com.aptana.webserver.core.builtin;
+package com.aptana.webserver.internal.core.builtin;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,99 +42,134 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ class LocalWebServerHttpRequestHandler implements HttpRequestHandler {
+/* package */class LocalWebServerHttpRequestHandler implements HttpRequestHandler
+{
 
 	private static final String METHOD_GET = "GET"; //$NON-NLS-1$
 	private static final String METHOD_POST = "POST"; //$NON-NLS-1$
 	private static final String METHOD_HEAD = "HEAD"; //$NON-NLS-1$
-	
-    private final static String HTML_TEXT_TYPE = "text/html"; //$NON-NLS-1$
 
-    private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?"); //$NON-NLS-1$
-    
+	private final static String HTML_TEXT_TYPE = "text/html"; //$NON-NLS-1$
+
+	private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?"); //$NON-NLS-1$
+
 	private EFSWebServerConfiguration configuration;
-	
+
 	/**
 	 * @param documentRoot
 	 */
-	protected LocalWebServerHttpRequestHandler(EFSWebServerConfiguration configuration) {
+	protected LocalWebServerHttpRequestHandler(EFSWebServerConfiguration configuration)
+	{
 		this.configuration = configuration;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.http.protocol.HttpRequestHandler#handle(org.apache.http.HttpRequest, org.apache.http.HttpResponse, org.apache.http.protocol.HttpContext)
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.http.protocol.HttpRequestHandler#handle(org.apache.http.HttpRequest,
+	 * org.apache.http.HttpResponse, org.apache.http.protocol.HttpContext)
 	 */
-	public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
-		try {
+	public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
+			IOException
+	{
+		try
+		{
 			String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
-			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
+			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method))
+			{
 				String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
 				URI uri = URIUtil.fromString(target);
 				IFileStore fileStore = configuration.resolve(Path.fromPortableString(uri.getPath()));
 				IFileInfo fileInfo = fileStore.fetchInfo();
-				if (fileInfo.isDirectory()) {
+				if (fileInfo.isDirectory())
+				{
 					fileInfo = getIndex(fileStore);
-					if (fileInfo.exists()) {
+					if (fileInfo.exists())
+					{
 						fileStore = fileStore.getChild(fileInfo.getName());
 					}
 				}
-				if (!fileInfo.exists()) {
+				if (!fileInfo.exists())
+				{
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-					response.setEntity(createTextEntity(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
-				} else if (fileInfo.isDirectory()) {
+					response.setEntity(createTextEntity(MessageFormat.format(
+							Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
+				}
+				else if (fileInfo.isDirectory())
+				{
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 					response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_FORBIDDEN));
-				} else {
+				}
+				else
+				{
 					response.setStatusCode(HttpStatus.SC_OK);
-					if (METHOD_GET.equals(method)) {
+					if (METHOD_GET.equals(method))
+					{
 						File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
-						final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor()) : null;
-						response.setEntity(new NFileEntity((file != null) ? file : temporaryFile,  getMimeType(fileStore.getName())) {
+						final File temporaryFile = (file == null) ? fileStore.toLocalFile(EFS.CACHE,
+								new NullProgressMonitor()) : null;
+						response.setEntity(new NFileEntity((file != null) ? file : temporaryFile, getMimeType(fileStore
+								.getName()))
+						{
 							@Override
-							public void finish() {
+							public void finish()
+							{
 								super.finish();
-								if (temporaryFile != null && !temporaryFile.delete()) {
+								if (temporaryFile != null && !temporaryFile.delete())
+								{
 									temporaryFile.deleteOnExit();
 								}
 							}
 						});
-					} else {
+					}
+					else
+					{
 						response.setEntity(null);
 					}
 				}
-			} else if (METHOD_POST.equals(method)) {
-				// TODO
-				throw new MethodNotSupportedException(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
-			} else {
-				throw new MethodNotSupportedException(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
 			}
-		} catch (Exception e) {
+			else if (METHOD_POST.equals(method))
+			{
+				// TODO
+				throw new MethodNotSupportedException(MessageFormat.format(
+						Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
+			}
+			else
+			{
+				throw new MethodNotSupportedException(MessageFormat.format(
+						Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
+			}
+		}
+		catch (Exception e)
+		{
 			WebServerCorePlugin.log(e);
 			response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 			response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_INTERNAL_SERVER_ERROR));
 		}
 	}
-	
-	private static HttpEntity createTextEntity(String text) throws UnsupportedEncodingException {
-		NStringEntity entity = new NStringEntity(
-				MessageFormat.format("<html><body><h1>{0}</h1></body></html>", text), //$NON-NLS-1$
+
+	private static HttpEntity createTextEntity(String text) throws UnsupportedEncodingException
+	{
+		NStringEntity entity = new NStringEntity(MessageFormat.format("<html><body><h1>{0}</h1></body></html>", text), //$NON-NLS-1$
 				HTTP.UTF_8);
-		entity.setContentType(HTML_TEXT_TYPE+HTTP.CHARSET_PARAM+HTTP.UTF_8);
+		entity.setContentType(HTML_TEXT_TYPE + HTTP.CHARSET_PARAM + HTTP.UTF_8);
 		return entity;
 	}
-	
-	private static IFileInfo getIndex(IFileStore parent) throws CoreException {
-		for (IFileInfo fileInfo : parent.childInfos(EFS.NONE, new NullProgressMonitor())) {
-			if (fileInfo.exists() && PATTERN_INDEX.matcher(fileInfo.getName()).matches()) {
+
+	private static IFileInfo getIndex(IFileStore parent) throws CoreException
+	{
+		for (IFileInfo fileInfo : parent.childInfos(EFS.NONE, new NullProgressMonitor()))
+		{
+			if (fileInfo.exists() && PATTERN_INDEX.matcher(fileInfo.getName()).matches())
+			{
 				return fileInfo;
 			}
 		}
 		return EFS.getNullFileSystem().getStore(Path.EMPTY).fetchInfo();
 	}
-	
-	private static String getMimeType(String fileName) {
+
+	private static String getMimeType(String fileName)
+	{
 		return MimeTypesRegistry.INSTANCE.getMimeType(Path.fromPortableString(fileName).getFileExtension());
 	}
 

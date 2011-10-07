@@ -9,7 +9,7 @@
 // $codepro.audit.disable closeWhereCreated
 // $codepro.audit.disable closeInFinally
 
-package com.aptana.webserver.core.builtin;
+package com.aptana.webserver.internal.core.builtin;
 
 import java.io.File;
 import java.io.FileOutputStream;

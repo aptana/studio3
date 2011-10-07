@@ -193,8 +193,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				String serverName = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
 						(String) null);
 				if (serverName != null) {
-					urlMapper = WebServerCorePlugin.getDefault().getServerConfigurationManager()
-							.findServerConfiguration(serverName);
+					urlMapper = WebServerCorePlugin.getDefault().getServerManager()
+							.findServerByName(serverName);
 				}
 				if (urlMapper == null) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
