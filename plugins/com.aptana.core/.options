@@ -2,3 +2,4 @@ com.aptana.core/debug=true
 com.aptana.core/debug/logger=true
 com.aptana.core/debug/builder=true
 com.aptana.core/debug/shell=true
+com.aptana.core/debug/ziputil=true
