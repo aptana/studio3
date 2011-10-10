@@ -12,6 +12,16 @@
 
 package com.aptana.ide.ui.io;
 
+import java.text.MessageFormat;
+
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -25,9 +35,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
@@ -39,9 +52,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
+import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.io.efs.SyncUtils;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -50,8 +66,10 @@ import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
+import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.navigator.FileSystemElementComparer;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
+import com.aptana.ide.ui.io.navigator.actions.Messages;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
@@ -147,6 +165,10 @@ public class IOUIPlugin extends AbstractUIPlugin
 						}
 					}
 				});
+			}
+			else if (part instanceof IEditorPart)
+			{
+				attachSaveListener((IEditorPart) part);
 			}
 		}
 	};
@@ -404,5 +426,86 @@ public class IOUIPlugin extends AbstractUIPlugin
 			}
 			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 		}
+	}
+
+	/**
+	 * Watches the local file for changes and saves it back to the original remote file when the editor is saved.
+	 * 
+	 * @param editorPart
+	 *            the editor part the file is opened on
+	 */
+	private static void attachSaveListener(final IEditorPart editorPart)
+	{
+		final IEditorInput editorInput = editorPart.getEditorInput();
+		if (!(editorInput instanceof UniformFileStoreEditorInput)
+				|| !((UniformFileStoreEditorInput) editorInput).isRemote())
+		{
+			// the original is a local file; no need to re-save it
+			return;
+		}
+
+		editorPart.addPropertyListener(new IPropertyListener()
+		{
+
+			public void propertyChanged(Object source, int propId)
+			{
+				if (propId == EditorPart.PROP_DIRTY && source instanceof EditorPart)
+				{
+					EditorPart ed = (EditorPart) source;
+					if (ed.isDirty())
+					{
+						return;
+					}
+
+					Job job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName())
+					{
+
+						protected IStatus run(IProgressMonitor monitor)
+						{
+							UniformFileStoreEditorInput input = (UniformFileStoreEditorInput) editorInput;
+							IFileStore localCacheFile = input.getLocalFileStore();
+							IFileStore originalFile = input.getFileStore();
+							IFileInfo originalFileInfo = input.getFileInfo();
+							try
+							{
+								IFileInfo currentFileInfo = originalFile.fetchInfo(EFS.NONE, monitor);
+								if (currentFileInfo.exists()
+										&& (currentFileInfo.getLastModified() != originalFileInfo.getLastModified() || currentFileInfo
+												.getLength() != originalFileInfo.getLength()))
+								{
+									if (!UIUtils.showPromptDialog(Messages.EditorUtils_OverwritePrompt_Title,
+											MessageFormat.format(Messages.EditorUtils_OverwritePrompt_Message,
+													originalFile.getName())))
+									{
+										return Status.CANCEL_STATUS;
+									}
+								}
+								SyncUtils.copy(localCacheFile, null, originalFile, EFS.NONE, monitor);
+							}
+							catch (CoreException e)
+							{
+								UIUtils.showErrorMessage(
+										MessageFormat.format(Messages.EditorUtils_ERR_SavingRemoteFile,
+												originalFile.getName()), e);
+							}
+							finally
+							{
+								// update cached remote file info
+								try
+								{
+									input.setFileInfo(originalFile.fetchInfo(EFS.NONE, monitor));
+								}
+								catch (CoreException e)
+								{
+									IdeLog.logError(IOUIPlugin.getDefault(), e);
+								}
+							}
+							return Status.OK_STATUS;
+						}
+					};
+					job.schedule();
+				}
+			}
+		});
 	}
 }
