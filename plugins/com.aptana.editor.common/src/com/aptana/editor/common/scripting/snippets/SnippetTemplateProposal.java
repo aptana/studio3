@@ -277,24 +277,24 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 					model.addGroup(group);
 					hasPositions = true;
 				}
+			}
+			
+			if (hasPositions)
+			{
+				model.forceInstall();
+				LinkedModeUI ui = new LinkedModeUI(model, viewer);
 
-				if (hasPositions)
-				{
-					model.forceInstall();
-					LinkedModeUI ui = new LinkedModeUI(model, viewer);
+				// Do not cycle
+				ui.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
+				ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
+				ui.enter();
 
-					// Do not cycle
-					ui.setCyclingMode(LinkedModeUI.CYCLE_NEVER);
-					ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
-					ui.enter();
-
-					fSelectedRegion = ui.getSelectedRegion();
-				}
-				else
-				{
-					ensurePositionCategoryRemoved(document);
-					fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
-				}
+				fSelectedRegion = ui.getSelectedRegion();
+			}
+			else
+			{
+				ensurePositionCategoryRemoved(document);
+				fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
 			}
 		}
 		catch (BadLocationException e)
