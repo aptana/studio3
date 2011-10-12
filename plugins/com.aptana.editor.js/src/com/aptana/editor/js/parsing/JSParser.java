@@ -419,43 +419,41 @@ public class JSParser extends Parser implements IParser {
 			// store results in the parse state
 			fParseState.setParseResult(result);
 
-			// TODO: We probably don't need documentation nodes in all cases. For
-			// example, the outline view probably doesn't rely on them. We should
-			// include a flag (maybe in the parseState) that makes this step
-			// optional.
+			JSParseRootNode root = (JSParseRootNode) result;
 
-			// attach documentation
-			if (result instanceof JSParseRootNode)
+			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).getAttachComments())
 			{
-				JSParseRootNode root = (JSParseRootNode) result;
-
+				// attach documentation
 				attachPreDocumentationBlocks(root, source);
 				attachPostDocumentationBlocks(root, source);
+			}
 
+			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).getCollectComments())
+			{
 				// create a list of all comments and attach to root node
 				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
 
 				for (Symbol symbol : fScanner.getSDocComments())
-                {
-                    comments.add(new JSCommentNode(IJSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
+				{
+					comments.add(new JSCommentNode(IJSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+				}
 
-                for (Symbol symbol : fScanner.getVSDocComments())
-                {
-                    comments.add(new JSCommentNode(IJSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
+				for (Symbol symbol : fScanner.getVSDocComments())
+				{
+					comments.add(new JSCommentNode(IJSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+				}
 
-                for (Symbol symbol : fScanner.getSingleLineComments())
-                {
-                    comments.add(new JSCommentNode(IJSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
+				for (Symbol symbol : fScanner.getSingleLineComments())
+				{
+					comments.add(new JSCommentNode(IJSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+				}
 
-                for (Symbol symbol : fScanner.getMultiLineComments())
-                {
-                    comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
+				for (Symbol symbol : fScanner.getMultiLineComments())
+				{
+					comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+				}
 
-                root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
+				root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
 			}
 
 			return result;
