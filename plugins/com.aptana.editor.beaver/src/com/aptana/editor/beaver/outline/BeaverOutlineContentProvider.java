@@ -19,6 +19,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Range;
 
@@ -127,7 +128,7 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 
 			fListener = new IParseListener()
 			{
-				public void parseFinished()
+				public void parseCompletedSuccessfully()
 				{
 					Display.getDefault().asyncExec(new Runnable()
 					{
@@ -146,6 +147,14 @@ public class BeaverOutlineContentProvider implements ITreeContentProvider
 							}
 						}
 					});
+				}
+
+				public void beforeParse(IParseState parseState)
+				{
+				}
+
+				public void afterParse(IParseState parseState)
+				{
 				}
 			};
 

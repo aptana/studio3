@@ -7,9 +7,27 @@
  */
 package com.aptana.editor.common.outline;
 
+import com.aptana.parsing.IParseState;
+
 public interface IParseListener
 {
+	/**
+	 * An event indicating that parsing has completed. Any setting that may need to be reversed can be done here. This
+	 * even will fire if the parse is successful or not
+	 * 
+	 * @param parseState
+	 */
+	public void afterParse(IParseState parseState);
 
-	public void parseFinished();
+	/**
+	 * An event indicating that a parse is about to be initiated. This can be used to configure the parse state before a
+	 * parse occurs
+	 */
+	public void beforeParse(IParseState parseState);
 
+	/**
+	 * An event indicating that parsing has completed successfully. This event can be used to further process the
+	 * results of the parse.
+	 */
+	public void parseCompletedSuccessfully();
 }

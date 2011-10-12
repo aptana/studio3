@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Display;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.resolver.IPathResolver;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CommonOutlineContentProvider implements ITreeContentProvider
@@ -93,7 +94,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 			final AbstractThemeableEditor editor = (AbstractThemeableEditor) newInput;
 			fListener = new IParseListener()
 			{
-				public void parseFinished()
+				public void parseCompletedSuccessfully()
 				{
 					Display.getDefault().asyncExec(new Runnable()
 					{
@@ -120,6 +121,14 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 							}
 						}
 					});
+				}
+
+				public void beforeParse(IParseState parseState)
+				{
+				}
+
+				public void afterParse(IParseState parseState)
+				{
 				}
 			};
 			editor.getFileService().addListener(fListener);

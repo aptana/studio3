@@ -168,21 +168,35 @@ public class FileService
 
 			try
 			{
+				// fire pre-parse listeners
+				for (IParseListener listener : listeners)
+				{
+					listener.beforeParse(fParseState);
+				}
+
 				ParserPoolFactory.parse(contentType, fParseState);
 
 				// indicate current parse result is now valid
 				this.fHasValidParseResult = true;
 
-				// fire listeners
+				// fire successful-parse listeners
 				for (IParseListener listener : listeners)
 				{
-					listener.parseFinished();
+					listener.parseCompletedSuccessfully();
 				}
 			}
 			catch (Exception e)
 			{
 				// not logging the parsing error here since the source could be in an intermediate state of being
 				// edited by the user
+			}
+			finally
+			{
+				// fire post-parse listeners
+				for (IParseListener listener : listeners)
+				{
+					listener.afterParse(fParseState);
+				}
 			}
 		}
 		else
