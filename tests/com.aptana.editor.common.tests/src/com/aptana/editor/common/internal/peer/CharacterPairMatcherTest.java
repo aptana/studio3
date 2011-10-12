@@ -13,6 +13,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 public class CharacterPairMatcherTest extends TestCase
@@ -25,10 +27,19 @@ public class CharacterPairMatcherTest extends TestCase
 	{
 		matcher = new CharacterPairMatcher(pairs)
 		{
-			protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
+			@Override
+			protected ITypedRegion getPartition(IDocument doc, int charOffset) throws BadLocationException
 			{
-				return "source.ruby";
-			};
+				ITypedRegion[] partitions = computePartitioning(doc, charOffset, 1);
+				for (ITypedRegion region : partitions)
+				{
+					if (charOffset >= region.getOffset() && charOffset < (region.getOffset() + region.getLength()))
+					{
+						return region;
+					}
+				}
+				return null;
+			}
 		};
 		super.setUp();
 	}
@@ -85,15 +96,35 @@ public class CharacterPairMatcherTest extends TestCase
 
 	public void testDoesntPairMatchInComments()
 	{
-		String source = "# ( { [ `ruby command`, 'single quoted string', \"double quoted string\" ] } )";
+		final String source = "# ( { [ `ruby command`, 'single quoted string', \"double quoted string\" ] } )";
 		IDocument document = new Document(source);
 		matcher = new CharacterPairMatcher(pairs)
 		{
-			protected String getScopeAtOffset(IDocument doc, int charOffset)
-					throws org.eclipse.jface.text.BadLocationException
+			protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
 			{
 				return "source.ruby comment.line.hash";
-			};
+			}
+
+			@Override
+			protected ITypedRegion getPartition(IDocument doc, int charOffset) throws BadLocationException
+			{
+				ITypedRegion[] partitions = computePartitioning(doc, charOffset, 1);
+				for (ITypedRegion region : partitions)
+				{
+					if (charOffset >= region.getOffset() && charOffset < (region.getOffset() + region.getLength()))
+					{
+						return region;
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected ITypedRegion[] computePartitioning(IDocument doc, int offset, int length)
+					throws BadLocationException
+			{
+				return new TypedRegion[] { new TypedRegion(0, source.length(), "__rb_singleline_comment") };
+			}
 		};
 		assertNull(matcher.match(document, 2));
 		assertNull(matcher.match(document, 4));
@@ -114,7 +145,30 @@ public class CharacterPairMatcherTest extends TestCase
 				if (charOffset >= 2 && charOffset <= 5)
 					return "source.ruby comment.line.hash";
 				return "source.ruby";
-			};
+			}
+
+			@Override
+			protected ITypedRegion getPartition(IDocument doc, int charOffset) throws BadLocationException
+			{
+				ITypedRegion[] partitions = computePartitioning(doc, charOffset, 1);
+				for (ITypedRegion region : partitions)
+				{
+					if (charOffset >= region.getOffset() && charOffset < (region.getOffset() + region.getLength()))
+					{
+						return region;
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected ITypedRegion[] computePartitioning(IDocument doc, int offset, int length)
+					throws BadLocationException
+			{
+				return new TypedRegion[] { new TypedRegion(0, 2, "__rb__dftl_partition_content_type"),
+						new TypedRegion(2, 4, "__rb_singleline_comment"),
+						new TypedRegion(6, 1, "__rb__dftl_partition_content_type") };
+			}
 		};
 		IRegion region = matcher.match(document, 0);
 		assertNotNull(region);
@@ -124,42 +178,39 @@ public class CharacterPairMatcherTest extends TestCase
 		assertNull(matcher.match(document, 4));
 	}
 
+	/**
+	 * Assumes a symmetrical document where the offset given is the offset from the doc start to the left side of the
+	 * pair, and doc.length - 1 - offset is the right side of the pair.
+	 * 
+	 * @param document
+	 * @param source
+	 * @param offset
+	 */
+	private void assertMatch(IDocument document, String source, int offset)
+	{
+		int j = source.length() - offset - 1;
+		assertMatch(document, source, offset, j);
+	}
+
+	private void assertMatch(IDocument document, String source, int leftPairOffset, int rightPairOffset)
+	{
+		int length = (rightPairOffset - leftPairOffset) + 1;
+		assertRawMatch(document, leftPairOffset, rightPairOffset, leftPairOffset, length);
+	}
+
 	private void assertRawMatch(IDocument document, int leftOffsetToMatch, int rightOffsetToMatch, int offset,
 			int length)
 	{
 		// left
 		IRegion region = matcher.match(document, leftOffsetToMatch);
-		assertNotNull(region);
+		assertNotNull("Failed to match forwards from left side of pair", region);
 		assertEquals("offset", offset, region.getOffset());
 		assertEquals("length", length, region.getLength());
 		assertEquals(ICharacterPairMatcher.LEFT, matcher.getAnchor());
 		// right
 		region = matcher.match(document, rightOffsetToMatch);
-		assertNotNull(region);
+		assertNotNull("Failed to match backwards from right side of pair", region);
 		assertEquals("offset", offset, region.getOffset());
-		assertEquals("length", length, region.getLength());
-		assertEquals(ICharacterPairMatcher.RIGHT, matcher.getAnchor());
-	}
-
-	private void assertMatch(IDocument document, String source, int i)
-	{
-		int j = source.length() - i - 1;
-		assertMatch(document, source, i, j);
-	}
-
-	private void assertMatch(IDocument document, String source, int i, int j)
-	{
-		int length = (j - i) + 1;
-		// left
-		IRegion region = matcher.match(document, i + 1);
-		assertNotNull(region);
-		assertEquals("offset", i, region.getOffset());
-		assertEquals("length", length, region.getLength());
-		assertEquals(ICharacterPairMatcher.LEFT, matcher.getAnchor());
-		// right
-		region = matcher.match(document, j + 1);
-		assertNotNull(region);
-		assertEquals("offset", i, region.getOffset());
 		assertEquals("length", length, region.getLength());
 		assertEquals(ICharacterPairMatcher.RIGHT, matcher.getAnchor());
 	}
