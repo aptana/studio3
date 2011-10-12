@@ -17,8 +17,6 @@ import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ParseState;
 
 public class JSParserPerformanceTest extends PerformanceTestCase
 {
@@ -187,8 +185,10 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	private void timeParse(String resourceName, String src, int numRuns) throws Exception
 	{
 		// apply to parse state
-		IParseState parseState = new ParseState();
+		JSParseState parseState = new JSParseState();
 		parseState.setEditState(src, src, 0, 0);
+		parseState.setAttachComments(false);
+		parseState.setCollectComments(false);
 
 		for (int i = 0; i < numRuns; i++)
 		{
