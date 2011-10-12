@@ -421,14 +421,14 @@ public class JSParser extends Parser implements IParser {
 
 			JSParseRootNode root = (JSParseRootNode) result;
 
-			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).getAttachComments())
+			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).attachComments())
 			{
 				// attach documentation
 				attachPreDocumentationBlocks(root, source);
 				attachPostDocumentationBlocks(root, source);
 			}
 
-			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).getCollectComments())
+			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).collectComments())
 			{
 				// create a list of all comments and attach to root node
 				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();

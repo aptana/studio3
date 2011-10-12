@@ -49,21 +49,21 @@ public class JSParseState extends ParseState
 	}
 
 	/**
-	 * getAttachComments
+	 * attachComments
 	 * 
 	 * @return
 	 */
-	public boolean getAttachComments()
+	public boolean attachComments()
 	{
 		return getCurrentCommentContext().attachComments;
 	}
 
 	/**
-	 * getCollectComments
+	 * collectComments
 	 * 
 	 * @return
 	 */
-	public boolean getCollectComments()
+	public boolean collectComments()
 	{
 		return getCurrentCommentContext().attachComments;
 	}
@@ -89,7 +89,7 @@ public class JSParseState extends ParseState
 		}
 		else
 		{
-			IdeLog.logError(JSPlugin.getDefault(), "Tried to pop an empty comment context stack in JSParseState");
+			IdeLog.logError(JSPlugin.getDefault(), "Tried to pop an empty comment context stack in JSParseState"); //$NON-NLS-1$
 		}
 	}
 
