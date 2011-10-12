@@ -26,6 +26,7 @@ import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
+import org.eclipse.jface.text.source.IAnnotationModelExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.texteditor.spelling.ISpellingProblemCollector;
 import org.eclipse.ui.texteditor.spelling.SpellingAnnotation;
@@ -175,12 +176,21 @@ public class MultiRegionSpellingReconcileStrategy extends SpellingReconcileStrat
 			List<Annotation> toRemove = new ArrayList<Annotation>();
 
 			synchronized (fLockObject) {
-				for (Iterator iter = fAnnotationModel.getAnnotationIterator(); iter.hasNext(); ) {
-					Annotation annotation = (Annotation) iter.next();
-					if (SpellingAnnotation.TYPE.equals(annotation.getType())) {
-						Position pos = fAnnotationModel.getPosition(annotation);
-						if (currentRegion == null || pos.overlapsWith(currentRegion.getOffset(), currentRegion.getLength())) {
+				if (fAnnotationModel instanceof IAnnotationModelExtension2 && currentRegion != null) {
+					for (Iterator iter = ((IAnnotationModelExtension2) fAnnotationModel).getAnnotationIterator(currentRegion.getOffset(), currentRegion.getLength(), true, true); iter.hasNext(); ) {
+						Annotation annotation = (Annotation) iter.next();
+						if (SpellingAnnotation.TYPE.equals(annotation.getType())) {
 							toRemove.add(annotation);
+						}
+					}
+				} else {
+					for (Iterator iter = fAnnotationModel.getAnnotationIterator(); iter.hasNext(); ) {
+						Annotation annotation = (Annotation) iter.next();
+						if (SpellingAnnotation.TYPE.equals(annotation.getType())) {
+							Position pos = currentRegion != null ? fAnnotationModel.getPosition(annotation) : null;
+							if (currentRegion == null || pos.overlapsWith(currentRegion.getOffset(), currentRegion.getLength())) {
+								toRemove.add(annotation);
+							}
 						}
 					}
 				}
