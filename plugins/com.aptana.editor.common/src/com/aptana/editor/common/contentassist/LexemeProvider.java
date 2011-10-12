@@ -103,6 +103,8 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	 */
 	private void createLexemeList(IDocument document, int offset, int length, ITokenScanner scanner)
 	{
+		System.out.println("offset:length = " + offset + "," + length);
+
 		this._lexemes = new ArrayList<Lexeme<T>>();
 
 		try
