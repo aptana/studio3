@@ -26,9 +26,11 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.tests.util.TestProject;
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.scripting.model.BundleElement;
@@ -351,5 +353,15 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		{
 			fail(MessageFormat.format("Functions contain an entry for disallowed name(s): {0}", matches));
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	 */
+	@Override
+	protected IFileStoreIndexingParticipant createIndexer()
+	{
+		return new JSFileIndexingParticipant();
 	}
 }
