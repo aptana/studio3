@@ -15,13 +15,16 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
+import beaver.Symbol;
+
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseState;
 
-public class JSParserPerformanceTest extends PerformanceTestCase
+public class JSScannerPerformanceTest extends PerformanceTestCase
 {
-
-	private JSParser fParser;
+	private JSScanner fScanner;
 
 	/**
 	 * getSource
@@ -57,7 +60,8 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		fParser = new JSParser();
+
+		fScanner = new JSScanner();
 	}
 
 	/*
@@ -67,7 +71,8 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		fParser = null;
+		fScanner = null;
+
 		super.tearDown();
 	}
 
@@ -78,7 +83,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		assertParse(10, "performance/dojo.js.uncompressed.js");
+		assertScan(10, "performance/dojo.js.uncompressed.js");
 	}
 
 	/**
@@ -88,7 +93,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		assertParse(15, "performance/ext-core.js");
+		assertScan(15, "performance/ext-core.js");
 	}
 
 	/**
@@ -98,7 +103,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		assertParse(10, "performance/timobile.js");
+		assertScan(10, "performance/timobile.js");
 	}
 
 	/**
@@ -108,7 +113,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		assertParse(10, "performance/tiny_mce.js");
+		assertScan(10, "performance/tiny_mce.js");
 	}
 
 	/**
@@ -118,7 +123,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertParse(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
+		assertScan(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
 				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
 				"performance/jaxer/ComposerCommands.js", "performance/jaxer/DBAPI.js",
 				"performance/jaxer/DOMTestCase.js", "performance/jaxer/Microformats.js",
@@ -154,11 +159,11 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void assertParse(int numRuns, String... resources) throws Exception
+	private void assertScan(int numRuns, String... resources) throws Exception
 	{
 		for (String resourceName : resources)
 		{
-			timeParse(resourceName, numRuns);
+			timeScan(resourceName, numRuns);
 		}
 		commitMeasurements();
 		assertPerformance();
@@ -171,9 +176,9 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param numRuns
 	 * @throws Exception
 	 */
-	private void timeParse(String resourceName, int numRuns) throws Exception
+	private void timeScan(String resourceName, int numRuns) throws Exception
 	{
-		this.timeParse(resourceName, getSource(resourceName), numRuns);
+		this.timeScan(resourceName, getSource(resourceName), numRuns);
 	}
 
 	/**
@@ -182,25 +187,25 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 * @param resourceName
 	 * @throws Exception
 	 */
-	private void timeParse(String resourceName, String src, int numRuns) throws Exception
+	private void timeScan(String resourceName, String src, int numRuns) throws Exception
 	{
 		// apply to parse state
-		JSParseState parseState = new JSParseState();
+		IParseState parseState = new ParseState();
 		parseState.setEditState(src, src, 0, 0);
-		parseState.setAttachComments(false);
-		parseState.setCollectComments(false);
 
 		for (int i = 0; i < numRuns; i++)
 		{
 			startMeasuring();
-			try
+
+			fScanner.setSource(src);
+
+			Symbol symbol = fScanner.nextToken();
+
+			while (symbol != null && symbol.getId() != 0)
 			{
-				fParser.parse(parseState);
+				symbol = fScanner.nextToken();
 			}
-			catch (Exception e)
-			{
-				fail(e.getMessage());
-			}
+
 			stopMeasuring();
 		}
 	}
