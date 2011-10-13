@@ -13,7 +13,8 @@ import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
@@ -40,8 +41,9 @@ public class WebServerPreferences
 	 */
 	public static InetAddress getServerAddress()
 	{
-		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
-		String address = node.get(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, null);
+		String address = Platform.getPreferencesService().getString(WebServerCorePlugin.PLUGIN_ID,
+				IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, null,
+				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
 		for (InetAddress i : SocketUtil.getLocalAddresses())
 		{
 			if (i.getHostAddress().equals(address))
@@ -66,10 +68,11 @@ public class WebServerPreferences
 	 */
 	public static int[] getPortRange()
 	{
-		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
+		String portsString = Platform.getPreferencesService().getString(WebServerCorePlugin.PLUGIN_ID,
+				IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, null,
+				new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
 		int portsStart = IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[0];
 		int portsEnd = IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1];
-		String portsString = node.get(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, null);
 		if (portsString != null && portsString.length() > 0)
 		{
 			Matcher matcher = Pattern.compile(PORTS_PATTERN).matcher(portsString);
