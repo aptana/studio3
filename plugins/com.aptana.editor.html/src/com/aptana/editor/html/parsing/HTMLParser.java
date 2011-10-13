@@ -533,8 +533,12 @@ public class HTMLParser implements IParser
 				&& tagName.equals(fCurrentElement.getNameNode().getName()))
 		{
 			// adjusts the ending offset of current element to include the entire block up to the start of the new tag
-			((HTMLNode) fCurrentElement)
-					.setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			int end = fCurrentSymbol.getStart() - 1;
+			((HTMLNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), end);
+			if (fCurrentElement instanceof HTMLElementNode)
+			{
+				((HTMLElementNode) fCurrentElement).setEndNode(end, end);
+			}
 			closeElement();
 		}
 
