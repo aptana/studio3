@@ -43,7 +43,7 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.html.tests.HTMLEditorBasedTests;
 import com.aptana.projects.WebProjectNature;
-import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
@@ -483,7 +483,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		final IFile file = project.createFile("test.html", "<link rel='stylesheet' href='/|' />");
 		this.setupTestContext(file);
 
-		EFSWebServerConfiguration server = new EFSWebServerConfiguration();
+		SimpleWebServer server = new SimpleWebServer();
 		server.setDocumentRoot(project.getURI());
 		server.setBaseURL(new URL("http://www.test.com/"));
 		WebServerCorePlugin.getDefault().getServerManager().add(server);

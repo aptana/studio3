@@ -5,7 +5,6 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.webserver.ui.internal;
 
 import java.io.File;
@@ -39,7 +38,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.IPropertyDialogProvider;
-import com.aptana.webserver.core.SimpleWebServerConfiguration;
+import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.ui.WebServerUIPlugin;
 
@@ -51,7 +50,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 
 	private static final int LABEL_WIDTH = 70;
 
-	private SimpleWebServerConfiguration source;
+	private SimpleWebServer source;
 
 	private Text nameText;
 	private Text baseUrlText;
@@ -83,9 +82,9 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 	public void setPropertySource(Object element)
 	{
 		source = null;
-		if (element instanceof SimpleWebServerConfiguration)
+		if (element instanceof SimpleWebServer)
 		{
-			source = (SimpleWebServerConfiguration) element;
+			source = (SimpleWebServer) element;
 		}
 	}
 
@@ -234,6 +233,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 
 	private boolean isValid()
 	{
+		// TODO Ensure name is unique!
 		String message = null;
 		if (nameText.getText().length() == 0)
 		{

@@ -41,19 +41,27 @@ import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.model.IProcess;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
-import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IServer;
+import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.internal.core.preferences.WebServerPreferences;
 
 /**
+ * Local HTTP server used for preview, JS debugging?
+ * 
  * @author Max Stepanov
  */
-public class LocalWebServer
+public class LocalWebServer extends SimpleWebServer
 {
 
 	private static final int SOCKET_TIMEOUT = 10000;
@@ -63,49 +71,40 @@ public class LocalWebServer
 																// multiplicationOrDivisionByPowersOf2
 	private static final int WORKER_COUNT = 2;
 
-	private final EFSWebServerConfiguration configuration;
 	private Thread thread;
 	private ListeningIOReactor reactor;
 
-	public LocalWebServer(URI documentRoot) throws CoreException
+	private int port;
+	private String hostName;
+	private State state;
+	private InetAddress host;
+
+	public LocalWebServer(URI documentRoot)
 	{
-		this(createConfigurationForDocumentRoot(documentRoot));
+		this(WebServerPreferences.getServerAddress(), WebServerPreferences.getPortRange(), documentRoot);
 	}
 
-	public LocalWebServer(EFSWebServerConfiguration configuration) throws CoreException
+	public LocalWebServer(InetAddress host, int[] portRange, URI documentRoot)
 	{
-		Assert.isLegal(configuration.getDocumentRoot() != null, "DocumentRoot should be set"); //$NON-NLS-1$
-		this.configuration = configuration;
-		InetAddress host = WebServerPreferences.getServerAddress();
-		int[] portRange = WebServerPreferences.getPortRange();
-		int port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);
-		if (port <= 0)
+		super();
+		Assert.isLegal(documentRoot != null, "DocumentRoot should be set"); //$NON-NLS-1$
+		setDocumentRoot(documentRoot);
+		this.state = IServer.State.STOPPED;
+		this.host = host;
+		this.port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);
+		if (this.port <= 0)
 		{
-			port = SocketUtil.findFreePort(host); // default to any free port
+			this.port = SocketUtil.findFreePort(host); // default to any free port
 		}
 		try
 		{
-			configuration.setBaseURL(new URL("http", host.getHostAddress(), port, "/")); //$NON-NLS-1$ //$NON-NLS-2$
+			this.hostName = host.getHostAddress();
+			setBaseURL(new URL("http", hostName, port, "/")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (MalformedURLException e)
 		{
 			WebServerCorePlugin.log(e);
 		}
-		startServer(host, port, configuration);
-		testConnection(configuration.getBaseURL());
-	}
-
-	/**
-	 * Stop the server and dispose any resources associated with it
-	 */
-	public void dispose()
-	{
-		stopServer();
-	}
-
-	public EFSWebServerConfiguration getConfiguration()
-	{
-		return configuration;
 	}
 
 	private void testConnection(URL url) throws CoreException
@@ -140,14 +139,15 @@ public class LocalWebServer
 		}
 	}
 
-	private void startServer(final InetAddress host, final int port, final EFSWebServerConfiguration configuration)
+	private void startServer(final InetAddress host, final int port)
 	{
+		state = State.STARTING;
 		thread = new Thread()
 		{
 			@Override
 			public void run()
 			{
-				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(configuration));
+				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(LocalWebServer.this));
 			}
 		};
 		thread.setDaemon(true);
@@ -158,6 +158,7 @@ public class LocalWebServer
 		{
 			if (reactor != null && reactor.getStatus() == IOReactorStatus.ACTIVE)
 			{
+				state = State.STARTED;
 				break;
 			}
 			try
@@ -166,34 +167,8 @@ public class LocalWebServer
 			}
 			catch (InterruptedException e)
 			{
+				state = State.UNKNOWN;
 				break;
-			}
-		}
-	}
-
-	private void stopServer()
-	{
-		if (thread != null && thread.isAlive())
-		{
-			if (reactor != null)
-			{
-				try
-				{
-					reactor.shutdown(SHUTDOWN_TIMEOUT);
-				}
-				catch (IOException ignore)
-				{
-					ignore.getCause();
-				}
-			}
-			thread.interrupt();
-			try
-			{
-				thread.join(SHUTDOWN_TIMEOUT);
-			}
-			catch (InterruptedException e)
-			{
-				e.getCause();
 			}
 		}
 	}
@@ -243,10 +218,88 @@ public class LocalWebServer
 		}
 	}
 
-	private static EFSWebServerConfiguration createConfigurationForDocumentRoot(URI documentRoot)
+	public IStatus stop(boolean force, IProgressMonitor monitor)
 	{
-		EFSWebServerConfiguration configuration = new EFSWebServerConfiguration();
-		configuration.setDocumentRoot(documentRoot);
-		return configuration;
+		if (thread != null && thread.isAlive())
+		{
+			if (reactor != null)
+			{
+				try
+				{
+					reactor.shutdown(SHUTDOWN_TIMEOUT);
+				}
+				catch (IOException ignore)
+				{
+					IdeLog.logWarning(WebServerCorePlugin.getDefault(),
+							"An error occurred shutting down the built-in preview server", ignore); //$NON-NLS-1$
+				}
+			}
+			thread.interrupt();
+			try
+			{
+				thread.join(SHUTDOWN_TIMEOUT);
+			}
+			catch (InterruptedException e)
+			{
+				// ignore
+			}
+		}
+		return Status.OK_STATUS;
+	}
+
+	public IStatus start(String mode, IProgressMonitor monitor)
+	{
+		if (!ILaunchManager.RUN_MODE.equals(mode))
+		{
+			return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Cannot start server in any mode but 'run'");
+		}
+		try
+		{
+			startServer(host, port);
+			testConnection(getBaseURL());
+		}
+		catch (CoreException e)
+		{
+			return e.getStatus();
+		}
+		return Status.OK_STATUS;
+	}
+
+	public boolean isPersistent()
+	{
+		return false;
+	}
+
+	public String getMode()
+	{
+		// We only support run mode...
+		return ILaunchManager.RUN_MODE;
+	}
+
+	public State getState()
+	{
+		return state;
+	}
+
+	public ILaunch getLaunch()
+	{
+		// This server doesn't use launches.
+		return null;
+	}
+
+	public IProcess[] getProcesses()
+	{
+		// We don't use launches or IProcesses.
+		return new IProcess[0];
+	}
+
+	public String getHostname()
+	{
+		return hostName;
+	}
+
+	public int getPort()
+	{
+		return port;
 	}
 }

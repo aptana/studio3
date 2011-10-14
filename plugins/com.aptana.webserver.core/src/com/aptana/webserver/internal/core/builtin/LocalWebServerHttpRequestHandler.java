@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
 
-import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.core.IURIMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -54,14 +54,14 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 
 	private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?"); //$NON-NLS-1$
 
-	private EFSWebServerConfiguration configuration;
+	private IURIMapper uriMapper;
 
 	/**
 	 * @param documentRoot
 	 */
-	protected LocalWebServerHttpRequestHandler(EFSWebServerConfiguration configuration)
+	protected LocalWebServerHttpRequestHandler(IURIMapper uriMapper)
 	{
-		this.configuration = configuration;
+		this.uriMapper = uriMapper;
 	}
 
 	/*
@@ -79,7 +79,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			{
 				String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
 				URI uri = URIUtil.fromString(target);
-				IFileStore fileStore = configuration.resolve(Path.fromPortableString(uri.getPath()));
+				IFileStore fileStore = uriMapper.resolve(uri);
 				IFileInfo fileInfo = fileStore.fetchInfo();
 				if (fileInfo.isDirectory())
 				{

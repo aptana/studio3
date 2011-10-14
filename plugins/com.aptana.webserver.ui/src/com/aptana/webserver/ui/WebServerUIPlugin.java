@@ -8,7 +8,6 @@
 // $codepro.audit.disable declaredExceptions
 // $codepro.audit.disable com.instantiations.assist.eclipse.analysis.audit.rule.effectivejava.enforceTheSingletonPropertyWithAPrivateConstructor
 // $codepro.audit.disable staticFieldNamingConvention
-
 package com.aptana.webserver.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -27,6 +26,9 @@ public class WebServerUIPlugin extends AbstractUIPlugin
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.webserver.ui"; //$NON-NLS-1$
+
+	// Generic server icon
+	public static final String SERVER_ICON = "icons/obj16/server.png"; //$NON-NLS-1$
 
 	// The shared instance
 	private static WebServerUIPlugin plugin;
@@ -99,11 +101,7 @@ public class WebServerUIPlugin extends AbstractUIPlugin
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg)
 	{
-		String[] paths = new String[] { "icons/obj16/server.png" }; //$NON-NLS-1$
-		for (String path : paths)
-		{
-			reg.put(path, imageDescriptorFromPlugin(PLUGIN_ID, path));
-		}
+		reg.put(SERVER_ICON, imageDescriptorFromPlugin(PLUGIN_ID, SERVER_ICON));
 	}
 
 	public static Image getImage(String iconPath)

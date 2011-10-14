@@ -218,6 +218,11 @@ public final class ServerManager implements IServerManager
 		}
 	}
 
+	public void fireServerChangeEvent(IServer server)
+	{
+		notifyListeners(Kind.UPDATED, server);
+	}
+
 	public List<IServerType> getServerTypes()
 	{
 		return Collections.unmodifiableList(types);

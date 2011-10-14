@@ -6,7 +6,7 @@
    <extension
          point="com.aptana.webserver.core.webServerTypes">
       <type
-            class="com.aptana.webserver.core.SimpleWebServerConfiguration"
+            class="com.aptana.webserver.core.SimpleWebServer"
             id="com.aptana.webserver.simple"
             name="%type.webserver.name">
       </type>

@@ -20,6 +20,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -77,7 +78,7 @@ public class WebServerCorePlugin extends Plugin
 		serverManager = null;
 		if (defaultWebServer != null)
 		{
-			defaultWebServer.dispose();
+			defaultWebServer.stop(true, new NullProgressMonitor());
 		}
 		super.stop(context);
 	}
@@ -134,29 +135,19 @@ public class WebServerCorePlugin extends Plugin
 		new DelayedSnapshotJob(((Workspace) ResourcesPlugin.getWorkspace()).getSaveManager()).schedule();
 	}
 
-	public IServer getDefaultWebServerConfiguration()
+	public IServer getBuiltinWebServer()
 	{
 		ensureDefaultWebServer();
-		if (defaultWebServer != null)
-		{
-			return defaultWebServer.getConfiguration();
-		}
-		return null;
+		return defaultWebServer;
 	}
 
-	public synchronized void ensureDefaultWebServer()
+	private synchronized void ensureDefaultWebServer()
 	{
 		if (defaultWebServer == null)
 		{
-			try
-			{
-				defaultWebServer = new LocalWebServer(EFSUtils.getFileStore(ResourcesPlugin.getWorkspace().getRoot())
-						.toURI());
-			}
-			catch (CoreException e)
-			{
-				log(e);
-			}
+
+			defaultWebServer = new LocalWebServer(EFSUtils.getFileStore(ResourcesPlugin.getWorkspace().getRoot())
+					.toURI());
 		}
 	}
 

@@ -7,7 +7,9 @@
  */
 package com.aptana.webserver.core;
 
-public interface IServerType
+import com.aptana.core.Identifiable;
+
+public interface IServerType extends Identifiable
 {
 
 	/**

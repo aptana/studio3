@@ -24,16 +24,18 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 /**
  * @author Max Stepanov
- * 
  */
-public class LocalWebServerTest extends TestCase {
+public class LocalWebServerTest extends TestCase
+{
 
 	private static final String PAGE_CONTENTS = "<html><head><title>Test</title></head><body><h1>Test Page</h1></body>"; //$NON-NLS-1$
 
-	public void testBasicGet() throws IOException, CoreException {
+	public void testBasicGet() throws IOException, CoreException
+	{
 		File dir = File.createTempFile(getClass().getSimpleName(), "temp"); //$NON-NLS-1$
 		assertTrue(dir.delete());
 		assertTrue(dir.mkdir());
@@ -44,9 +46,10 @@ public class LocalWebServerTest extends TestCase {
 		w.close();
 
 		LocalWebServer webServer = null;
-		try {
+		try
+		{
 			webServer = new LocalWebServer(EFS.getLocalFileSystem().fromLocalFile(dir).toURI());
-			URL url = webServer.getConfiguration().getBaseURL();
+			URL url = webServer.getBaseURL();
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setAllowUserInteraction(false);
 			connection.setInstanceFollowRedirects(true);
@@ -55,14 +58,18 @@ public class LocalWebServerTest extends TestCase {
 			StringBuffer sb = new StringBuffer();
 			int n;
 			char[] cbuf = new char[1024];
-			while ((n = in.read(cbuf)) > 0) {
+			while ((n = in.read(cbuf)) > 0)
+			{
 				sb.append(new String(cbuf, 0, n));
 			}
 			in.close();
 			assertEquals(PAGE_CONTENTS, sb.toString());
-		} finally {
-			if (webServer != null) {
-				webServer.dispose();
+		}
+		finally
+		{
+			if (webServer != null)
+			{
+				webServer.stop(true, new NullProgressMonitor());
 			}
 		}
 	}

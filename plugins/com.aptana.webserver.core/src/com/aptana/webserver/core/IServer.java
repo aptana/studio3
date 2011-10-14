@@ -7,20 +7,39 @@
  */
 package com.aptana.webserver.core;
 
+import java.net.URI;
+import java.net.URL;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IProcess;
+
 import com.aptana.core.IURIMapper;
+import com.aptana.core.Identifiable;
 import com.aptana.core.epl.IMemento;
 
 /**
- * An instance of a server. This extends IRUIMapper so that we can resolve files to URIs and URIs to files based on the
+ * An instance of a server. This extends IURIMapper so that we can resolve files to URIs and URIs to files based on the
  * document root and base URL.
  * 
  * @author cwilliams
  */
-public interface IServer extends IURIMapper
+public interface IServer extends IURIMapper, Identifiable
 {
 
 	/**
-	 * Returns true if this type of configurations should be persistent by manager
+	 * Server state.
+	 * 
+	 * @author cwilliams
+	 */
+	public enum State
+	{
+		UNKNOWN, STARTING, STARTED, STOPPING, STOPPED, NOT_APPLICABLE
+	}
+
+	/**
+	 * Returns true if this server instance should be persisted by manager
 	 * 
 	 * @return
 	 */
@@ -30,11 +49,6 @@ public interface IServer extends IURIMapper
 	 * @return
 	 */
 	public IServerType getType();
-
-	/*
-	 * @see com.aptana.core.Identifiable#getId()
-	 */
-	public String getId();
 
 	/**
 	 * @return the name
@@ -55,4 +69,92 @@ public interface IServer extends IURIMapper
 	 */
 	public void loadState(IMemento memento);
 
+	/**
+	 * This method runs synchronously. Wrap calls in a Job if you want async behavior.
+	 * 
+	 * @param force
+	 * @param monitor
+	 *            optional progress monitor
+	 */
+	public IStatus stop(boolean force, IProgressMonitor monitor);
+
+	/**
+	 * This method runs synchronously. Wrap calls in a Job if you want async behavior.
+	 * 
+	 * @param mode
+	 * @param monitor
+	 *            optional progress monitor
+	 */
+	public IStatus restart(String mode, IProgressMonitor monitor);
+
+	/**
+	 * This method runs synchronously. Wrap calls in a Job if you want async behavior.
+	 * 
+	 * @param mode
+	 * @param monitor
+	 *            optional progress monitor
+	 */
+	public IStatus start(String mode, IProgressMonitor monitor);
+
+	/**
+	 * Returns the ILaunchManager mode that the server is in. This method will return null if the server is not running.
+	 * 
+	 * @return the mode in which a server is running, one of the mode constants defined by
+	 *         {@link org.eclipse.debug.core.ILaunchManager}, or <code>null</code> if the server is stopped.
+	 */
+	public String getMode();
+
+	/**
+	 * Returns the current state of this server.
+	 * 
+	 * @return one of the server {@link State} enum values declared on IServer
+	 */
+	public State getState();
+
+	/**
+	 * Returns the launch that was used to start the server, if available. If the server is not running, or does not
+	 * uses launches will return <code>null</code>.
+	 * 
+	 * @return the launch used to start the currently running server, or <code>null</code> if the launch is unavailable
+	 *         or could not be found
+	 */
+	public ILaunch getLaunch();
+
+	/**
+	 * Returns the IProcesses related to the server if applicable.
+	 * 
+	 * @return - array of processes
+	 */
+	public IProcess[] getProcesses();
+
+	/**
+	 * Gets the hostname of this server.
+	 * 
+	 * @return - just the hostname
+	 */
+	public String getHostname();
+
+	/**
+	 * Gets the port of this server FIXME We need to separate out local versus remote port here. What port did we start
+	 * it on locally and what port is it serving up on.
+	 * 
+	 * @return - just the port
+	 */
+	public int getPort();
+
+	/**
+	 * Gets the document root for this server. Typically this will be a file URI to a location on local disk, but can
+	 * map to a remote location over SFTP/FTP/etc
+	 * 
+	 * @return - path of document root
+	 */
+	public URI getDocumentRoot();
+
+	/**
+	 * Returns the URL to the base of the server out on the web. To be used for opening browsers up to the server
+	 * output.
+	 * 
+	 * @return
+	 */
+	public URL getBaseURL();
 }
