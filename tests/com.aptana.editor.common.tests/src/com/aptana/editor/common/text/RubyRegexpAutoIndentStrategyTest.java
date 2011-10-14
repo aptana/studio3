@@ -194,7 +194,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	/**
 	 * APSTUD-1218
 	 */
-	public void testDontAddStarAfterBlockComment()
+	public void testDontAddStarAfterBlockComment() throws Exception
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
@@ -209,8 +209,13 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		// After end of block comment, don't add a star
 		DocumentCommand command = createNewlineCommand(12);
 		strategy.customizeDocumentCommand(document, command);
-		assertEquals("\n ", command.text);
 		assertTrue(command.doit);
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("/**\n * \n **/\nfunction name() {\n}\n", document.get());
+
 	}
 
 	/**
@@ -432,6 +437,26 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			document.replace(command.offset, command.length, command.text);
 		}
 		assertEquals("/*\n * \n */", document.get());
+	}
+
+	/**
+	 * APSTUD3640
+	 * 
+	 * @throws Exception
+	 */
+	public void testDontAddLeadingSpaceAfterBlockCOmmentCloseBeforeNextLineContent() throws Exception
+	{
+		RubyRegexpAutoIndentStrategy strategy = new CSSRubleRubyRegexpAutoIndentStrategy();
+		IDocument document = new Document("/*\n * \n */body {}");
+
+		DocumentCommand command = createNewlineCommand(10);
+		strategy.customizeDocumentCommand(document, command);
+		assertTrue(command.doit);
+		if (command.doit)
+		{
+			document.replace(command.offset, command.length, command.text);
+		}
+		assertEquals("/*\n * \n */\nbody {}", document.get());
 	}
 
 	protected DocumentCommand createNewlineCommand(int offset)
