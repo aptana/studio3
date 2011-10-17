@@ -201,7 +201,7 @@ this.setHook("init",function(debuggr)
 		
 		showContext: function(_browser, context)
 		{
-			var show = (context == currentContext && currentContext != null) || "__aptanaAttached" in _browser;
+			var show = (context == currentContext && currentContext != null) || _browser.__aptanaAttached;
 			if (show && Firebug.getSuspended()) {
 				Firebug.resume();
 			}
@@ -499,9 +499,6 @@ this.setHook("openURL",function(url)
 
 this.setHook("suspend",function()
 {
-	if (fb18p) {
-		Firebug.Debugger.unSuspend(currentContext);
-	}
 	Firebug.Debugger.suspend(currentContext);
 });
 
