@@ -291,6 +291,10 @@ public final class PlatformUtil
 	}
 
 	public static void killProcess(int pid) {
+		killProcess(pid, 9);
+	}
+
+	public static void killProcess(int pid, int signal) {
 		if (pid == 0) {
 			return;
 		}
@@ -302,7 +306,7 @@ public final class PlatformUtil
 			}
 		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 			try {
-				Runtime.getRuntime().exec("/bin/kill -9 " + (((long) pid) & 0xFFFFFFFF)); //$NON-NLS-1$
+				Runtime.getRuntime().exec(MessageFormat.format("/bin/kill -{0} {1}", Integer.toString(signal & 0x0F), Long.toString((((long) pid) & 0xFFFFFFFF)))); //$NON-NLS-1$
 			} catch (IOException e) {
 			}
 		}
