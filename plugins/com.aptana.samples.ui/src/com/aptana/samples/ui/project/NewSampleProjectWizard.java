@@ -60,7 +60,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
-import com.aptana.projects.internal.wizards.NewProjectWizard;
+import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.ISample;
 import com.aptana.samples.model.SampleEntry;
@@ -70,7 +70,7 @@ import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Ingo Muschenetz
- * @author Michael Xia
+ * @author Michael Xia TODO Extend from {@link AbstractNewProjectWizard}
  */
 public class NewSampleProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -198,7 +198,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				if (rootEntry.getFile().getName().endsWith(".zip")) //$NON-NLS-1$
 				{
 					Set<IPath> emptySet = Collections.emptySet();
-					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true, emptySet, false);
+					AbstractNewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true, emptySet, false);
 				}
 				else
 				{

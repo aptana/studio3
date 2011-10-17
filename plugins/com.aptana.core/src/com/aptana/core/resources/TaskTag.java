@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import com.aptana.core.ICorePreferenceConstants;
@@ -30,6 +32,14 @@ public class TaskTag
 	public static final String LOW = "Low"; //$NON-NLS-1$
 
 	private static final Pattern fgCommaSplitter = Pattern.compile(","); //$NON-NLS-1$
+
+	/**
+	 * Cache the values so we don't look them up in prefs every time!
+	 */
+	private static boolean fgCaseSensitive;
+	private static IEclipsePreferences.IPreferenceChangeListener fgPrefListener;
+
+	private static List<TaskTag> fgTaskTags;
 
 	private int fPriority;
 	private String fName;
@@ -83,19 +93,56 @@ public class TaskTag
 
 	public static boolean isCaseSensitive()
 	{
-		IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
-		return Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
-				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+		initializeValues();
+		return fgCaseSensitive;
+	}
+
+	/**
+	 * Add a pref change listener for changes to values, set up starting values. This is a performance change so we
+	 * don't lookup the preference values repeatedly.
+	 */
+	protected synchronized static void initializeValues()
+	{
+		if (fgPrefListener == null)
+		{
+			final IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(),
+					EclipseUtil.defaultScope() };
+			fgPrefListener = new IEclipsePreferences.IPreferenceChangeListener()
+			{
+
+				public void preferenceChange(PreferenceChangeEvent event)
+				{
+					if (ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE.equals(event.getKey()))
+					{
+						fgCaseSensitive = Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
+								ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+					}
+					else if (ICorePreferenceConstants.TASK_TAG_PRIORITIES.equals(event.getKey())
+							|| ICorePreferenceConstants.TASK_TAG_NAMES.equals(event.getKey()))
+					{
+						String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
+								ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
+						String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
+								ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
+						fgTaskTags = createTaskTags(rawTagNames, rawTagPriorities);
+					}
+				}
+			};
+			EclipseUtil.instanceScope().getNode(PREF_PLUGIN_ID).addPreferenceChangeListener(fgPrefListener);
+			fgCaseSensitive = Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
+					ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+			String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
+					ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
+			String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
+					ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
+			fgTaskTags = createTaskTags(rawTagNames, rawTagPriorities);
+		}
 	}
 
 	public static Collection<TaskTag> getTaskTags()
 	{
-		IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() };
-		String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
-				ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
-		String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
-				ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
-		return createTaskTags(rawTagNames, rawTagPriorities);
+		initializeValues();
+		return fgTaskTags;
 	}
 
 	private static List<TaskTag> createTaskTags(String rawTagNames, String rawTagPriorities)

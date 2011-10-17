@@ -91,9 +91,9 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		if (isCU && fListener == null)
 		{
 			final AbstractThemeableEditor editor = (AbstractThemeableEditor) newInput;
-			fListener = new IParseListener()
+			fListener = new ParseAdapter()
 			{
-				public void parseFinished()
+				public void parseCompletedSuccessfully()
 				{
 					Display.getDefault().asyncExec(new Runnable()
 					{

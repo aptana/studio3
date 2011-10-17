@@ -43,7 +43,7 @@ public class IOUtilTest extends TestCase
 		}
 	};
 
-	public void testRead() throws Exception
+	public void testReadClosesStreamWhenIOExceptionThrown() throws Exception
 	{
 		final byte[] b = new byte[8192];
 		final int off = 0;
@@ -52,7 +52,71 @@ public class IOUtilTest extends TestCase
 		context.checking(new Expectations()
 		{
 			{
+				oneOf(stream).markSupported();
+				will(returnValue(false));
 				oneOf(stream).read(b, off, len);
+				will(throwException(new IOException("")));
+				oneOf(stream).close();
+			}
+		});
+		IOUtil.read(stream);
+		context.assertIsSatisfied();
+	}
+
+	public void testReadWithNoCharsetAndStreamDoesntSupportMarkAssumesUTF8() throws Exception
+	{
+		final byte[] b = new byte[8192];
+		final int off = 0;
+		final int len = 8192;
+		final InputStream stream = context.mock(InputStream.class);
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(stream).markSupported();
+				will(returnValue(false));
+
+				// Read a single byte/char to check for BOM
+				oneOf(stream).read(b, off, len);
+				will(returnValue(1));
+				oneOf(stream).available();
+				will(returnValue(-1));
+				// Read content, but return empty
+				oneOf(stream).read(b, off, len);
+				will(returnValue(-1));
+				// Close stream
+				oneOf(stream).close();
+			}
+		});
+		String result = IOUtil.read(stream);
+		assertNotNull(result);
+		// Returned one single 0 byte because we allowed reading of one...
+		assertEquals(1, result.length());
+		context.assertIsSatisfied();
+	}
+
+	// TODO Add tests for reading a known charset and for reading a BOM
+
+	public void testReadWithNoCharsetAndMarkSupportedSniffsCharset() throws Exception
+	{
+		final byte[] b = new byte[8192];
+		final int off = 0;
+		final int len = 8192;
+		final InputStream stream = context.mock(InputStream.class);
+		context.checking(new Expectations()
+		{
+			{
+				// charset sniffing
+				oneOf(stream).markSupported();
+				will(returnValue(true));
+				oneOf(stream).mark(8000);
+				oneOf(stream).read(new byte[8000], 0, 8000);
+				will(returnValue(-1));
+				oneOf(stream).reset();
+				oneOf(stream).reset();
+
+				// Now do the reading
+				oneOf(stream).read(b, off, len);
+				// FIXME Read back actual bytes/chars/etc
 				will(throwException(new IOException("")));
 				oneOf(stream).close();
 			}

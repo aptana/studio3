@@ -7,7 +7,9 @@
  */
 package com.aptana.editor.common.parsing;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -166,23 +168,41 @@ public class FileService
 			fParseState.setEditState(source, null, 0, 0);
 			fParseState.setProgressMonitor(monitor);
 
+			// make a local copy to avoid potential concurrent modification errors.
+			List<IParseListener> listenersCopy = new ArrayList<IParseListener>(this.listeners);
+
 			try
 			{
+
+				// fire pre-parse listeners
+				for (IParseListener listener : listenersCopy)
+				{
+					listener.beforeParse(fParseState);
+				}
+
 				ParserPoolFactory.parse(contentType, fParseState);
 
 				// indicate current parse result is now valid
 				this.fHasValidParseResult = true;
 
-				// fire listeners
-				for (IParseListener listener : listeners)
+				// fire successful-parse listeners
+				for (IParseListener listener : listenersCopy)
 				{
-					listener.parseFinished();
+					listener.parseCompletedSuccessfully();
 				}
 			}
 			catch (Exception e)
 			{
 				// not logging the parsing error here since the source could be in an intermediate state of being
 				// edited by the user
+			}
+			finally
+			{
+				// fire post-parse listeners
+				for (IParseListener listener : listenersCopy)
+				{
+					listener.afterParse(fParseState);
+				}
 			}
 		}
 		else

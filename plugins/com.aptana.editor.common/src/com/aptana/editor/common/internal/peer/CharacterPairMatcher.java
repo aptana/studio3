@@ -11,7 +11,9 @@
  *******************************************************************************/
 package com.aptana.editor.common.internal.peer;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -25,6 +27,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.scope.IScopeSelector;
@@ -46,6 +49,11 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;
+
+	/**
+	 * Avoid looking up scopes and matching scopes all the time by caching if a given partition type is a comment.
+	 */
+	private static Map<String, Boolean> partitionIsComment = new HashMap<String, Boolean>();
 
 	/**
 	 * Creates a new character pair matcher that matches the specified characters within the specified partitioning. The
@@ -109,7 +117,9 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 	public IRegion match(IDocument doc, int offset)
 	{
 		if (doc == null || offset < 0 || offset > doc.getLength())
+		{
 			return null;
+		}
 		try
 		{
 			return performMatch(doc, offset);
@@ -143,24 +153,24 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 
-		String currentScope = getScopeAtOffset(doc, charOffset);
+		ITypedRegion partition = getPartition(doc, charOffset);
 		// FIXME if we're inside a string or comment, we should limit our search to just this particular partition!
 		// Drop out if the char is inside a comment
-		if (fgCommentSelector.matches(currentScope))
+		if (isComment(doc, partition))
 		{
 			return null;
 		}
 
 		boolean isForward = fPairs.isStartCharacter(prevChar);
-		final String partition = TextUtilities.getContentType(doc, fPartitioning, charOffset, false);
+		String contentType = partition.getType();
 		if (fPairs.isAmbiguous(prevChar))
 		{
 			// If this is common start tag, look forward, if common end tag look backwards!
-			if (partition.equals(CompositePartitionScanner.START_SWITCH_TAG))
+			if (CompositePartitionScanner.START_SWITCH_TAG.equals(contentType))
 			{
 				isForward = true;
 			}
-			else if (partition.equals(CompositePartitionScanner.END_SWITCH_TAG))
+			else if (CompositePartitionScanner.END_SWITCH_TAG.equals(contentType))
 			{
 				isForward = false;
 			}
@@ -169,7 +179,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 				// Need to look at partition transition to tell if we're at end or beginning!
 				String partitionAhead = TextUtilities.getContentType(doc, fPartitioning, charOffset + 1, false);
 				String partitionBehind = TextUtilities.getContentType(doc, fPartitioning, charOffset - 1, false);
-				if (partition.equals(partitionBehind) && !partition.equals(partitionAhead))
+				if (contentType.equals(partitionBehind) && !contentType.equals(partitionAhead))
 				{
 					// End because we're transitioning out of a partition on this character
 					isForward = false;
@@ -181,18 +191,150 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
-		final int searchStartPosition = isForward ? charOffset + 1 : caretOffset - 2;
-		final int adjustedOffset = isForward ? charOffset : caretOffset;
+		int searchStartPosition = isForward ? charOffset + 1 : caretOffset - 2;
+		char endChar = fPairs.getMatching(prevChar);
 
-		final DocumentPartitionAccessor partDoc = new DocumentPartitionAccessor(doc, fPartitioning, partition);
-		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward,
-				isForward ? doc.getLength() : -1, searchStartPosition);
+		int endOffset = -1;
+		if (isForward)
+		{
+			endOffset = searchForward(doc, searchStartPosition, prevChar, endChar, contentType);
+		}
+		else
+		{
+			endOffset = searchBackwards(doc, searchStartPosition, prevChar, endChar, contentType);
+		}
+
 		if (endOffset == -1)
+		{
 			return null;
+		}
+		final int adjustedOffset = isForward ? charOffset : caretOffset;
 		final int adjustedEndOffset = isForward ? endOffset + 1 : endOffset;
 		if (adjustedEndOffset == adjustedOffset)
+		{
 			return null;
+		}
 		return new Region(Math.min(adjustedOffset, adjustedEndOffset), Math.abs(adjustedEndOffset - adjustedOffset));
+	}
+
+	protected ITypedRegion getPartition(IDocument doc, int charOffset) throws BadLocationException
+	{
+		return TextUtilities.getPartition(doc, fPartitioning, charOffset, false);
+	}
+
+	private int searchBackwards(IDocument doc, int searchStartPosition, char startChar, char endChar,
+			String partitionType) throws BadLocationException
+	{
+		int stack = 0;
+		ITypedRegion[] partitions = computePartitioning(doc, 0, searchStartPosition);
+		// reverse the partitions
+		partitions = ArrayUtil.reverse(partitions);
+		for (ITypedRegion p : partitions)
+		{
+			// skip other partitions that don't match our source partition
+			if (skipPartition(p.getType(), partitionType))
+			{
+				continue;
+			}
+			int partitionOffset = p.getOffset();
+			int partitionEnd = partitionOffset + p.getLength() - 1;
+			int startOffset = Math.min(searchStartPosition, partitionEnd);
+			int length = startOffset - partitionOffset;
+			String contents = doc.get(partitionOffset, length + 1);
+			// Now search backwards through the partition for the end char
+			for (int i = length; i >= 0; i--)
+			{
+				char c = contents.charAt(i);
+				if (c == endChar) // found end char!
+				{
+					if (stack == 0)
+					{
+						return partitionOffset + i;
+					}
+					else
+					{
+						stack--;
+					}
+				}
+				else if (c == startChar)
+				{
+					stack++;
+				}
+			}
+		}
+		return -1;
+	}
+
+	protected ITypedRegion[] computePartitioning(IDocument doc, int offset, int length) throws BadLocationException
+	{
+		return doc.computePartitioning(offset, length);
+	}
+
+	private int searchForward(IDocument doc, int searchStartPosition, char startChar, char endChar,
+			String startPartition) throws BadLocationException
+	{
+		int stack = 0;
+		ITypedRegion[] partitions = computePartitioning(doc, searchStartPosition, doc.getLength() - searchStartPosition);
+		for (ITypedRegion p : partitions)
+		{
+			// skip other partitions that don't match our source partition
+			if (skipPartition(p.getType(), startPartition))
+			{
+				continue;
+			}
+			// Now search through the partition for the end char
+			int partitionLength = p.getLength();
+			int partitionEnd = p.getOffset() + partitionLength;
+			int startOffset = Math.max(searchStartPosition, p.getOffset());
+			int length = partitionEnd - startOffset;
+			String partitionContents = doc.get(startOffset, length);
+			for (int i = 0; i < length; i++)
+			{
+				char c = partitionContents.charAt(i);
+				if (c == endChar)
+				{
+					if (stack == 0)
+					{
+						// it's a match
+						return i + startOffset;
+					}
+					else
+					{
+						// need to close nested pair
+						stack--;
+					}
+				}
+				else if (c == startChar)
+				{
+					// open nested pair
+					stack++;
+				}
+			}
+		}
+		return -1;
+	}
+
+	private boolean areSwitchPartitions(String partition1, String partition2)
+	{
+		return (CompositePartitionScanner.START_SWITCH_TAG.equals(partition1) || CompositePartitionScanner.END_SWITCH_TAG
+				.equals(partition1))
+				&& (CompositePartitionScanner.START_SWITCH_TAG.equals(partition2) || CompositePartitionScanner.END_SWITCH_TAG
+						.equals(partition2));
+	}
+
+	private boolean skipPartition(String toCheck, String originalPartition)
+	{
+		if (toCheck == null)
+		{
+			return true;
+		}
+		// don't skip same partition
+		if (toCheck.equals(originalPartition))
+		{
+			return false;
+		}
+		// If they're both language switch partitions, don't skip.
+		return !areSwitchPartitions(toCheck, originalPartition);
 	}
 
 	protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
@@ -230,202 +372,16 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		return open;
 	}
 
-	/**
-	 * Searches <code>doc</code> for the specified end character, <code>end</code>.
-	 * 
-	 * @param doc
-	 *            the document to search
-	 * @param start
-	 *            the opening matching character
-	 * @param end
-	 *            the end character to search for
-	 * @param searchForward
-	 *            search forwards or backwards?
-	 * @param boundary
-	 *            a boundary at which the search should stop
-	 * @param startPos
-	 *            the start offset
-	 * @return the index of the end character if it was found, otherwise -1
-	 * @throws BadLocationException
-	 *             if the document is accessed with invalid offset or line
-	 */
-	private int findMatchingPeer(DocumentPartitionAccessor doc, char start, char end, boolean searchForward,
-			int boundary, int startPos) throws BadLocationException
+	protected boolean isComment(IDocument doc, ITypedRegion partition) throws BadLocationException
 	{
-		int pos = startPos;
-		while (pos != boundary)
+		if (partitionIsComment.containsKey(partition.getType()))
 		{
-			final char c = doc.getChar(pos);
-			if (doc.isMatch(pos, end) && !fgCommentSelector.matches(getScopeAtOffset(doc.fDocument, pos)))
-			{
-				return pos;
-			}
-			else if (c == start && doc.inPartition(pos))
-			{
-				pos = findMatchingPeer(doc, start, end, searchForward, boundary,
-						doc.getNextPosition(pos, searchForward));
-				if (pos == -1)
-					return -1;
-			}
-			pos = doc.getNextPosition(pos, searchForward);
+			return partitionIsComment.get(partition.getType());
 		}
-		return -1;
-	}
-
-	/**
-	 * Utility class that wraps a document and gives access to partitioning information. A document is tied to a
-	 * particular partition and, when considering whether or not a position is a valid match, only considers position
-	 * within its partition.
-	 */
-	private static class DocumentPartitionAccessor
-	{
-
-		private final IDocument fDocument;
-		private final String fPartitioning, fPartition;
-		private ITypedRegion fCachedPartition;
-
-		/**
-		 * Creates a new partitioned document for the specified document.
-		 * 
-		 * @param doc
-		 *            the document to wrap
-		 * @param partitioning
-		 *            the partitioning used
-		 * @param partition
-		 *            the partition managed by this document
-		 */
-		public DocumentPartitionAccessor(IDocument doc, String partitioning, String partition)
-		{
-			fDocument = doc;
-			fPartitioning = partitioning;
-			fPartition = partition;
-		}
-
-		/**
-		 * Returns the character at the specified position in this document.
-		 * 
-		 * @param pos
-		 *            an offset within this document
-		 * @return the character at the offset
-		 * @throws BadLocationException
-		 *             if the offset is invalid in this document
-		 */
-		public char getChar(int pos) throws BadLocationException
-		{
-			return fDocument.getChar(pos);
-		}
-
-		/**
-		 * Returns true if the character at the specified position is a valid match for the specified end character. To
-		 * be a valid match, it must be in the appropriate partition and equal to the end character.
-		 * 
-		 * @param pos
-		 *            an offset within this document
-		 * @param end
-		 *            the end character to match against
-		 * @return true exactly if the position represents a valid match
-		 * @throws BadLocationException
-		 *             if the offset is invalid in this document
-		 */
-		public boolean isMatch(int pos, char end) throws BadLocationException
-		{
-			return getChar(pos) == end && inPartition(pos);
-		}
-
-		/**
-		 * Returns true if the specified offset is within the partition managed by this document.
-		 * 
-		 * @param pos
-		 *            an offset within this document
-		 * @return true if the offset is within this document's partition
-		 */
-		public boolean inPartition(int pos)
-		{
-			final ITypedRegion partition = getPartition(pos);
-			return samePartitions(partition);
-		}
-
-		private boolean samePartitions(ITypedRegion partition)
-		{
-			return partition != null
-					&& (partition.getType().equals(fPartition) || areSwitchPartitions(fPartition, partition.getType()));
-		}
-
-		/**
-		 * Returns the next position to query in the search. The position is not guaranteed to be in this document's
-		 * partition.
-		 * 
-		 * @param pos
-		 *            an offset within the document
-		 * @param searchForward
-		 *            the direction of the search
-		 * @return the next position to query
-		 */
-		public int getNextPosition(int pos, boolean searchForward)
-		{
-			final ITypedRegion partition = getPartition(pos);
-			if (partition == null || samePartitions(partition))
-			{
-				return simpleIncrement(pos, searchForward);
-			}
-			if (searchForward)
-			{
-				int end = partition.getOffset() + partition.getLength();
-				if (pos < end)
-					return end;
-			}
-			else
-			{
-				int offset = partition.getOffset();
-				if (pos > offset)
-					return offset - 1;
-			}
-			return simpleIncrement(pos, searchForward);
-		}
-
-		private boolean areSwitchPartitions(String partition1, String partition2)
-		{
-			return (partition1.equals(CompositePartitionScanner.START_SWITCH_TAG) || partition1
-					.equals(CompositePartitionScanner.END_SWITCH_TAG))
-					&& (partition2.equals(CompositePartitionScanner.START_SWITCH_TAG) || partition2
-							.equals(CompositePartitionScanner.END_SWITCH_TAG));
-		}
-
-		private int simpleIncrement(int pos, boolean searchForward)
-		{
-			return pos + (searchForward ? 1 : -1);
-		}
-
-		/**
-		 * Returns partition information about the region containing the specified position.
-		 * 
-		 * @param pos
-		 *            a position within this document.
-		 * @return positioning information about the region containing the position
-		 */
-		private ITypedRegion getPartition(int pos)
-		{
-			if (fCachedPartition == null || !contains(fCachedPartition, pos))
-			{
-				Assert.isTrue(pos >= 0 && pos <= fDocument.getLength());
-				try
-				{
-					fCachedPartition = TextUtilities.getPartition(fDocument, fPartitioning, pos, false);
-				}
-				catch (BadLocationException e)
-				{
-					fCachedPartition = null;
-				}
-			}
-			return fCachedPartition;
-		}
-
-		private static boolean contains(IRegion region, int pos)
-		{
-			int offset = region.getOffset();
-			return offset <= pos && pos < offset + region.getLength();
-		}
-
+		String scope = getScopeAtOffset(doc, partition.getOffset());
+		boolean isComment = fgCommentSelector.matches(scope);
+		partitionIsComment.put(partition.getType(), isComment);
+		return isComment;
 	}
 
 	/**
@@ -488,7 +444,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 				if (searchForward && getStartChar(i) == c)
 				{
 					return true;
-				} else if (!searchForward && getEndChar(i) == c)
+				}
+				else if (!searchForward && getEndChar(i) == c)
 				{
 					return true;
 				}
@@ -541,7 +498,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 				if (getStartChar(i) == c)
 				{
 					return getEndChar(i);
-				} else if (getEndChar(i) == c)
+				}
+				else if (getEndChar(i) == c)
 				{
 					return getStartChar(i);
 				}

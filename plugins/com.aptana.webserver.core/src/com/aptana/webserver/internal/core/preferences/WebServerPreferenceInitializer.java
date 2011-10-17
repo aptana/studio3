@@ -6,29 +6,34 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.webserver.core.preferences;
+package com.aptana.webserver.internal.core.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.core.preferences.IWebServerPreferenceConstants;
 
 /**
  * @author Max Stepanov
- *
  */
-public class WebServerPreferenceInitializer extends AbstractPreferenceInitializer {
+public class WebServerPreferenceInitializer extends AbstractPreferenceInitializer
+{
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	@Override
-	public void initializeDefaultPreferences() {
+	public void initializeDefaultPreferences()
+	{
 		IEclipsePreferences node = EclipseUtil.defaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
-		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_ADDRESS);
+		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS,
+				IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_ADDRESS);
 		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS,
-				IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[0] + "-" + IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1]); //$NON-NLS-1$
+				IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[0]
+						+ "-" + IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1]); //$NON-NLS-1$
 	}
 
 }

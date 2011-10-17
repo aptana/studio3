@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.webserver.core.builtin;
+package com.aptana.webserver.internal.core.builtin;
 
 import java.io.IOException;
 
@@ -19,40 +19,52 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ class LocalWebServerLogger implements EventListener {
+/* package */class LocalWebServerLogger implements EventListener
+{
 
-	/* (non-Javadoc)
-	 * @see org.apache.http.nio.protocol.EventListener#fatalIOException(java.io.IOException, org.apache.http.nio.NHttpConnection)
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.http.nio.protocol.EventListener#fatalIOException(java.io.IOException,
+	 * org.apache.http.nio.NHttpConnection)
 	 */
-	public void fatalIOException(IOException ex, NHttpConnection conn) {
+	public void fatalIOException(IOException ex, NHttpConnection conn)
+	{
 		IdeLog.logWarning(WebServerCorePlugin.getDefault(), ex);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.http.nio.protocol.EventListener#fatalProtocolException(org.apache.http.HttpException, org.apache.http.nio.NHttpConnection)
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.http.nio.protocol.EventListener#fatalProtocolException(org.apache.http.HttpException,
+	 * org.apache.http.nio.NHttpConnection)
 	 */
-	public void fatalProtocolException(HttpException ex, NHttpConnection conn) {
+	public void fatalProtocolException(HttpException ex, NHttpConnection conn)
+	{
 		IdeLog.logWarning(WebServerCorePlugin.getDefault(), ex);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionOpen(org.apache.http.nio.NHttpConnection)
 	 */
-	public void connectionOpen(NHttpConnection conn) {
+	public void connectionOpen(NHttpConnection conn)
+	{
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionClosed(org.apache.http.nio.NHttpConnection)
 	 */
-	public void connectionClosed(NHttpConnection conn) {
+	public void connectionClosed(NHttpConnection conn)
+	{
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionTimeout(org.apache.http.nio.NHttpConnection)
 	 */
-	public void connectionTimeout(NHttpConnection conn) {
+	public void connectionTimeout(NHttpConnection conn)
+	{
 	}
 
 }

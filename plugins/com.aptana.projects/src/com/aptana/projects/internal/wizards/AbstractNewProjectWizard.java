@@ -17,7 +17,6 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -30,13 +29,11 @@ import java.util.zip.ZipFile;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -46,19 +43,17 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -75,51 +70,81 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.ui.CloneJob;
-import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.ProjectsPlugin;
-import com.aptana.projects.WebProjectNature;
 import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ProjectTemplateElement;
 import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
 
 /**
- * New Web Project Wizard class.
+ * New Project Wizard base class.
  */
-public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
+public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
 
-	/**
-	 * The wizard ID
-	 */
-	public static final String ID = "com.aptana.ui.wizards.NewWebProject"; //$NON-NLS-1$
+	public static final String TEMPLATE_SELECTION_PAGE_NAME = "templateSelectionPage"; //$NON-NLS-1$
 
-	private static final String IMAGE = "icons/web_project_wiz.png"; //$NON-NLS-1$
-
+	// The pages in the wizard. DO NOT ACCESS VALUES FROM THEM OUTSIDE performFinish()!
 	protected IWizardProjectCreationPage mainPage;
 	protected ProjectTemplateSelectionPage templatesPage;
 	protected WizardNewProjectReferencePage referencePage;
 
-	protected IProject newProject;
 	protected IConfigurationElement configElement;
+
+	// Values we grab from the UI before launching our project creation.
+	protected IProject newProject;
+	private IProjectTemplate selectedTemplate;
+	private URI location; // null if defaults are used (under workspace)
+	private IPath destPath; // absolute path to project we're creating.
+	private IProject[] refProjects;
 
 	/**
 	 * Constructs a new Web Project Wizard.
 	 */
-	public NewProjectWizard()
+	public AbstractNewProjectWizard()
 	{
 		initDialogSettings();
 	}
+
+	/**
+	 * Returns the project nature-id's.
+	 * 
+	 * @return The natures to be set to the project.
+	 */
+	protected abstract String[] getProjectNatures();
+
+	/**
+	 * Returns the project builder-id's.
+	 * 
+	 * @return The builders to be set to the project.
+	 */
+	protected abstract String[] getProjectBuilders();
+
+	/**
+	 * Returns a description string for the project creation operation.
+	 * 
+	 * @return a description string
+	 */
+	protected abstract String getProjectCreationDescription();
+
+	/**
+	 * Return an array of the template types that should be displayed for this wizard.
+	 * 
+	 * @return
+	 */
+	protected abstract TemplateType[] getProjectTemplateTypes();
 
 	/**
 	 * Initialize the wizard's dialog-settings.<br>
@@ -147,35 +172,127 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	{
 		super.addPages();
 
-		mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
-		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
-		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
-		addPage(mainPage);
-		List<IProjectTemplate> templates = getProjectTemplates(new TemplateType[] { TemplateType.WEB, TemplateType.ALL });
+		addPage(mainPage = createMainPage());
+		List<IProjectTemplate> templates = getProjectTemplates(getProjectTemplateTypes());
 		if (templates.size() > 0)
 		{
-			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
+			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
 		}
+	}
+
+	protected IWizardProjectCreationPage createMainPage()
+	{
+		CommonWizardNewProjectCreationPage mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
+		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
+		return mainPage;
 	}
 
 	@Override
 	public boolean performFinish()
 	{
-		createNewProject();
-		if (newProject == null)
+		newProject = mainPage.getProjectHandle();
+		destPath = mainPage.getLocationPath();
+		location = null;
+		if (!mainPage.useDefaults())
+		{
+			location = mainPage.getLocationURI();
+		}
+		else
+		{
+			destPath = destPath.append(newProject.getName());
+		}
+
+		if (templatesPage != null)
+		{
+			selectedTemplate = templatesPage.getSelectedTemplate();
+		}
+
+		if (referencePage != null)
+		{
+			refProjects = referencePage.getReferencedProjects();
+		}
+
+		boolean success = false;
+		try
+		{
+			getContainer().run(true, true, new IRunnableWithProgress()
+			{
+
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+				{
+					createNewProject(monitor);
+				}
+			});
+			success = true;
+		}
+		catch (InterruptedException e)
+		{
+			StatusManager.getManager().handle(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, e.getMessage(), e),
+					StatusManager.BLOCK);
+		}
+		catch (InvocationTargetException e)
+		{
+			Throwable t = e.getTargetException();
+			if (t instanceof ExecutionException && t.getCause() instanceof CoreException)
+			{
+				CoreException cause = (CoreException) t.getCause();
+				StatusAdapter status;
+				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
+				{
+					status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, NLS.bind(
+							Messages.NewProjectWizard_Warning_DirectoryExists, mainPage.getProjectHandle().getName()),
+							cause));
+				}
+				else
+				{
+					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID,
+							Messages.NewProjectWizard_CreationProblem, cause));
+				}
+				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
+				StatusManager.getManager().handle(status, StatusManager.BLOCK);
+			}
+			else
+			{
+				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
+						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
+				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
+				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
+			}
+		}
+
+		if (!success)
 		{
 			return false;
 		}
 
+		// TODO Run all of this in a job?
 		updatePerspective();
 		selectAndReveal(newProject);
 		openIndexFile();
-
-		Map<String, String> payload = new HashMap<String, String>();
-		payload.put("name", newProject.getName()); //$NON-NLS-1$
-		sendProjectCreateEvent(payload);
+		sendProjectCreateEvent();
 
 		return true;
+	}
+
+	protected abstract String getProjectCreateEventName();
+
+	protected void sendProjectCreateEvent()
+	{
+		Map<String, String> payload = generatePayload();
+		StudioAnalytics.getInstance().sendEvent(new FeatureEvent(getProjectCreateEventName(), payload));
+	}
+
+	/**
+	 * Generates the payload used for analytics on project creation events.
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> generatePayload()
+	{
+		Map<String, String> payload = new HashMap<String, String>();
+		payload.put("name", newProject.getName()); //$NON-NLS-1$
+		return payload;
 	}
 
 	/*
@@ -200,20 +317,9 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	{
 		super.init(workbench, currentSelection);
 		setNeedsProgressMonitor(true);
-		setWindowTitle(Messages.NewProjectWizard_Title);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#initializeDefaultPageImageDescriptor()
-	 */
-	@Override
-	protected void initializeDefaultPageImageDescriptor()
-	{
-		setDefaultPageImageDescriptor(ProjectsPlugin.getImageDescriptor(IMAGE));
-	}
-
-	protected void updatePerspective()
+	private void updatePerspective()
 	{
 		BasicNewProjectResourceWizard.updatePerspective(configElement);
 	}
@@ -229,28 +335,16 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 * this method will answer the same project resource without attempting to create it again.
 	 * </p>
 	 * 
+	 * @param monitor
+	 *            TODO
 	 * @return the created project resource, or <code>null</code> if the project was not created
 	 */
-	private IProject createNewProject()
+	protected IProject createNewProject(IProgressMonitor monitor) throws InvocationTargetException
 	{
-		if (newProject != null)
-		{
-			return newProject;
-		}
-
-		// get a project handle
-		final IProject newProjectHandle = mainPage.getProjectHandle();
-
-		// get a project descriptor
-		URI location = null;
-		if (!mainPage.useDefaults())
-		{
-			location = mainPage.getLocationURI();
-		}
-
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		// Project description creation
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
+		IProjectDescription description = workspace.newProjectDescription(newProject.getName());
 		description.setLocationURI(location);
 		// Set the natures
 		description.setNatureIds(getProjectNatures());
@@ -260,57 +354,31 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			ResourceUtil.addBuilder(description, builder);
 		}
 		// Update the referenced project in case it was initialized.
-		if (referencePage != null)
+		if (refProjects != null && refProjects.length > 0)
 		{
-			IProject[] refProjects = referencePage.getReferencedProjects();
-			if (refProjects.length > 0)
+			description.setReferencedProjects(refProjects);
+		}
+		sub.worked(10);
+
+		if (isCloneFromGit())
+		{
+			cloneFromGit(newProject, description, sub.newChild(90));
+		}
+		else
+		{
+			doBasicCreateProject(newProject, description, sub.newChild(75));
+			if (selectedTemplate != null)
 			{
-				description.setReferencedProjects(refProjects);
+				extractZip(selectedTemplate, newProject, true);
 			}
 		}
 
-		boolean fromGit = isCloneFromGit();
-		if (fromGit)
-		{
-			cloneFromGit(newProjectHandle, description);
-		}
-		if (!fromGit)
-		{
-			try
-			{
-				doBasicCreateProject(newProjectHandle, description);
-				if (templatesPage != null)
-				{
-					IProjectTemplate template = templatesPage.getSelectedTemplate();
-					if (template != null)
-					{
-						extractZip(template, newProjectHandle, true);
-					}
-				}
-			}
-			catch (CoreException e)
-			{
-				return null;
-			}
-		}
-
-		newProject = newProjectHandle;
 		return newProject;
 	}
 
-	/**
-	 * Returns true if the project should be cloned from a GIT repository.
-	 * 
-	 * @return True, if the project should be cloned from a GIT; False, otherwise.
-	 */
 	protected boolean isCloneFromGit()
 	{
-		if (templatesPage != null)
-		{
-			IProjectTemplate template = templatesPage.getSelectedTemplate();
-			return template != null && !template.getLocation().endsWith(".zip"); //$NON-NLS-1$
-		}
-		return false;
+		return selectedTemplate != null && !selectedTemplate.getLocation().endsWith(".zip"); //$NON-NLS-1$
 	}
 
 	/**
@@ -318,41 +386,13 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 * 
 	 * @param newProjectHandle
 	 * @param description
+	 * @param monitor
+	 * @throws InvocationTargetException
 	 */
-	protected void cloneFromGit(IProject newProjectHandle, IProjectDescription description)
+	protected void cloneFromGit(IProject newProjectHandle, IProjectDescription description, IProgressMonitor monitor)
+			throws InvocationTargetException
 	{
-		IProjectTemplate template = templatesPage.getSelectedTemplate();
-		doCloneFromGit(template.getLocation(), newProjectHandle, description);
-	}
-
-	/**
-	 * Returns the project nature-id's.
-	 * 
-	 * @return The natures to be set to the project.
-	 */
-	protected String[] getProjectNatures()
-	{
-		return new String[] { WebProjectNature.ID };
-	}
-
-	/**
-	 * Returns the project builder-id's.
-	 * 
-	 * @return The builders to be set to the project.
-	 */
-	protected String[] getProjectBuilders()
-	{
-		return new String[] { UnifiedBuilder.ID };
-	}
-
-	/**
-	 * Returns a description string for the project creation operation.
-	 * 
-	 * @return a description string
-	 */
-	protected String getProjectCreationDescription()
-	{
-		return Messages.NewProjectWizard_CreateOp_Title;
+		doCloneFromGit(selectedTemplate.getLocation(), newProjectHandle, description, monitor);
 	}
 
 	/**
@@ -360,67 +400,24 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 * 
 	 * @param project
 	 * @param description
+	 * @param subMonitor
 	 * @throws CoreException
 	 */
-	protected void doBasicCreateProject(IProject project, final IProjectDescription description) throws CoreException
+	private void doBasicCreateProject(IProject project, final IProjectDescription description, IProgressMonitor monitor)
+			throws InvocationTargetException
 	{
-		// create the new project operation
-		IRunnableWithProgress op = new IRunnableWithProgress()
-		{
-			public void run(IProgressMonitor monitor) throws InvocationTargetException
-			{
-				CreateProjectOperation op = new CreateProjectOperation(description, getProjectCreationDescription());
-				try
-				{
-					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-					// directly execute the operation so that the undo state is
-					// not preserved. Making this undoable resulted in too many
-					// accidental file deletions.
-					op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
-				}
-				catch (ExecutionException e)
-				{
-					throw new InvocationTargetException(e);
-				}
-			}
-		};
-
-		// run the new project creation operation
+		CreateProjectOperation op = new CreateProjectOperation(description, getProjectCreationDescription());
 		try
 		{
-			getContainer().run(true, true, op);
+			// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+			// directly execute the operation so that the undo state is
+			// not preserved. Making this undoable resulted in too many
+			// accidental file deletions.
+			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
 		}
-		catch (InterruptedException e)
+		catch (ExecutionException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, e.getMessage(), e));
-		}
-		catch (InvocationTargetException e)
-		{
-			Throwable t = e.getTargetException();
-			if (t instanceof ExecutionException && t.getCause() instanceof CoreException)
-			{
-				CoreException cause = (CoreException) t.getCause();
-				StatusAdapter status;
-				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
-				{
-					status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, NLS.bind(
-							Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
-				}
-				else
-				{
-					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID,
-							Messages.NewProjectWizard_CreationProblem, cause));
-				}
-				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
-				StatusManager.getManager().handle(status, StatusManager.BLOCK);
-			}
-			else
-			{
-				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
-						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
-				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
-				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
-			}
+			throw new InvocationTargetException(e);
 		}
 	}
 
@@ -434,6 +431,11 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 */
 	public static List<IProjectTemplate> getProjectTemplates(final TemplateType[] templateTypes)
 	{
+		if (templateTypes == null || templateTypes.length == 0)
+		{
+			return Collections.emptyList();
+		}
+
 		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
 			public boolean include(AbstractElement element)
@@ -499,55 +501,51 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	public static void extractZip(final File zipPath, final IProject project, boolean promptForOverwrite,
 			Set<IPath> preExistingResources, final boolean isReplacingParameters)
 	{
-		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
-		if (zipPath.exists())
+		if (!zipPath.exists())
 		{
-			ZipFile zipFile = null;
-			try
-			{
-				zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
-				Enumeration<? extends ZipEntry> entries = zipFile.entries();
-				ZipEntry entry;
-				while (entries.hasMoreElements())
-				{
-					entry = entries.nextElement();
+			return;
+		}
 
-					if (entry.isDirectory())
+		ZipFile zipFile = null;
+		try
+		{
+			final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
+			zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			ZipEntry entry;
+			while (entries.hasMoreElements())
+			{
+				entry = entries.nextElement();
+
+				if (entry.isDirectory())
+				{
+					IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
+					if (!newFolder.exists())
 					{
-						IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
-						if (!newFolder.exists())
-						{
-							newFolder.create(true, true, null);
-						}
+						newFolder.create(true, true, null);
 					}
-					else
+				}
+				else
+				{
+					IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
+					if (newFile.exists())
 					{
-						IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
-						if (newFile.exists())
+						if (promptForOverwrite)
 						{
-							if (promptForOverwrite)
+							// Add to the list of conflicts only when we didn't get any pre-existing list of
+							// possible conflicting files, or when the pre-existing list of paths contains the
+							// current file path.
+							if (preExistingResources == null || preExistingResources.isEmpty()
+									|| preExistingResources.contains(newFile.getLocation()))
 							{
-								// Add to the list of conflicts only when we didn't get any pre-existing list of
-								// possible conflicting files, or when the pre-existing list of paths contains the
-								// current file path.
-								if (preExistingResources == null || preExistingResources.isEmpty()
-										|| preExistingResources.contains(newFile.getLocation()))
-								{
-									conflicts.put(newFile, entry);
-									// Remove the file for now. We will add it again if the user agrees the
-									// overwrite it.
-								}
-								else
-								{
-									// The file exists right now, but was not in the pre-existing resources we check
-									// against, so we just need to set it with the new content.
-									newFile.setContents(
-											getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
-											true, true, null);
-								}
+								conflicts.put(newFile, entry);
+								// Remove the file for now. We will add it again if the user agrees the
+								// overwrite it.
 							}
 							else
 							{
+								// The file exists right now, but was not in the pre-existing resources we check
+								// against, so we just need to set it with the new content.
 								newFile.setContents(
 										getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
 										true, null);
@@ -555,93 +553,98 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 						}
 						else
 						{
+							newFile.setContents(
+									getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
+									true, null);
+						}
+					}
+					else
+					{
+						try
+						{
+							// makes sure the parent path is created
+							(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
+							newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
+									true, null);
+						}
+						catch (CoreException re)
+						{
+							if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
+									&& re.getStatus() instanceof IResourceStatus)
+							{
+								IResourceStatus rs = (IResourceStatus) re.getStatus();
+								IFile newVariantFile = project.getParent().getFile(rs.getPath());
+								newVariantFile.setContents(
+										getInputStream(zipFile, entry, newVariantFile, project, isReplacingParameters),
+										true, true, null);
+							}
+							else
+							{
+								IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ZipFailure, re);
+							}
+						}
+					}
+				}
+			}
+			// Check if we had any conflicts. If so, display a dialog to let the user mark which
+			// files he/she wishes to keep, and which would be overwritten by the Zip's content.
+			if (!conflicts.isEmpty())
+			{
+				final ZipFile finalZipFile = zipFile;
+				UIJob openDialogJob = new UIJob(Messages.OverwriteFilesSelectionDialog_overwriteFilesTitle)
+				{
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
+						OverwriteFilesSelectionDialog overwriteFilesSelectionDialog = new OverwriteFilesSelectionDialog(
+								conflicts.keySet(), Messages.NewProjectWizard_filesOverwriteMessage);
+						if (overwriteFilesSelectionDialog.open() == Window.OK)
+						{
 							try
 							{
-								// makes sure the parent path is created
-								(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
-								newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
-										true, null);
-							}
-							catch (CoreException re)
-							{
-								if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
-										&& re.getStatus() instanceof IResourceStatus)
+								Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
+								// Overwrite the selected files only.
+								for (Object file : overwrittenFiles)
 								{
-									IResourceStatus rs = (IResourceStatus) re.getStatus();
-									IFile newVariantFile = project.getParent().getFile(rs.getPath());
-									newVariantFile.setContents(
-											getInputStream(zipFile, entry, newVariantFile, project,
+									IFile iFile = (IFile) file;
+									iFile.setContents(
+											getInputStream(finalZipFile, conflicts.get(file), iFile, project,
 													isReplacingParameters), true, true, null);
 								}
-								else
-								{
-									IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ZipFailure,
-											re);
-								}
 							}
-						}
-					}
-				}
-				// Check if we had any conflicts. If so, display a dialog to let the user mark which
-				// files he/she wishes to keep, and which would be overwritten by the Zip's content.
-				if (!conflicts.isEmpty())
-				{
-					final ZipFile finalZipFile = zipFile;
-					UIJob openDialogJob = new UIJob(Messages.OverwriteFilesSelectionDialog_overwriteFilesTitle)
-					{
-						public IStatus runInUIThread(IProgressMonitor monitor)
-						{
-							OverwriteFilesSelectionDialog overwriteFilesSelectionDialog = new OverwriteFilesSelectionDialog(
-									conflicts.keySet(), Messages.NewProjectWizard_filesOverwriteMessage);
-							if (overwriteFilesSelectionDialog.open() == Window.OK)
+							catch (Exception e)
 							{
-								try
-								{
-									Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
-									// Overwrite the selected files only.
-									for (Object file : overwrittenFiles)
-									{
-										IFile iFile = (IFile) file;
-										iFile.setContents(
-												getInputStream(finalZipFile, conflicts.get(file), iFile, project,
-														isReplacingParameters), true, true, null);
-									}
-								}
-								catch (Exception e)
-								{
-									IdeLog.logError(ProjectsPlugin.getDefault(),
-											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
-								}
+								IdeLog.logError(ProjectsPlugin.getDefault(),
+										MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 							}
-							return Status.OK_STATUS;
 						}
-					};
-					openDialogJob.setSystem(true);
-					openDialogJob.schedule();
-					openDialogJob.join();
-				}
+						return Status.OK_STATUS;
+					}
+				};
+				openDialogJob.setSystem(true);
+				openDialogJob.schedule();
+				openDialogJob.join();
 			}
-			catch (CoreException e)
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(ProjectsPlugin.getDefault(), e);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(ProjectsPlugin.getDefault(),
+					MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
+		}
+		finally
+		{
+			if (zipFile != null)
 			{
-				IdeLog.logError(ProjectsPlugin.getDefault(), e);
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(ProjectsPlugin.getDefault(),
-						MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
-			}
-			finally
-			{
-				if (zipFile != null)
+				try
 				{
-					try
-					{
-						zipFile.close();
-					}
-					catch (IOException e)
-					{
-						// ignores
-					}
+					zipFile.close();
+				}
+				catch (IOException e)
+				{
+					// ignores
 				}
 			}
 		}
@@ -772,74 +775,55 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 * @param sourceURI
 	 * @param projectHandle
 	 * @param projectDescription
+	 * @param monitor
+	 * @throws InvocationTargetException
 	 */
 	protected void doCloneFromGit(String sourceURI, final IProject projectHandle,
-			final IProjectDescription projectDescription)
+			final IProjectDescription projectDescription, IProgressMonitor monitor) throws InvocationTargetException
 	{
-		IPath path = mainPage.getLocationPath();
-		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name
-		// to the path
-		if (mainPage.useDefaults())
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		CloneJob job = new CloneJob(sourceURI, destPath.toOSString(), true, true);
+		// We're executing inside the wizard's container already, run sync.
+		IStatus status = job.run(sub.newChild(95));
+		if (!status.isOK())
 		{
-			path = path.append(projectDescription.getName());
-		}
-		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
-		Job job = new CloneJob(sourceURI, path.toOSString(), true, true);
-		job.addJobChangeListener(new JobChangeAdapter()
-		{
-
-			@Override
-			public void done(IJobChangeEvent event)
+			if (status instanceof ProcessStatus)
 			{
-				try
+				ProcessStatus ps = (ProcessStatus) status;
+				String stderr = ps.getStdErr();
+				throw new InvocationTargetException(new CoreException(new Status(status.getSeverity(),
+						status.getPlugin(), stderr)));
+			}
+			throw new InvocationTargetException(new CoreException(status));
+		}
+		else
+		{
+			try
+			{
+				projectHandle.setDescription(projectDescription, sub.newChild(2));
+				// Ensure that we disconnect our git support in case it auto-attached
+				RepositoryProvider.unmap(projectHandle);
+				GitPlugin.getDefault().getGitRepositoryManager().removeRepository(projectHandle);
+				IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
+				if (gitFolder.exists())
 				{
-					projectHandle.setDescription(projectDescription, null);
-				}
-				catch (CoreException e)
-				{
-				}
-
-				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
-				{
-
-					@Override
-					public void done(IJobChangeEvent event)
-					{
-						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
-						if (gitFolder.exists())
-						{
-							try
-							{
-								gitFolder.delete(true, new NullProgressMonitor());
-							}
-							catch (CoreException e)
-							{
-							}
-						}
-					}
-				});
-				List<IResource> selection = new ArrayList<IResource>();
-				selection.add(projectHandle);
-				disconnect.setSelectedResources(selection);
-				try
-				{
-					disconnect.execute(new ExecutionEvent());
-				}
-				catch (ExecutionException e)
-				{
-					IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ERR_FailToDisconnect, e);
+					gitFolder.delete(true, sub.newChild(3));
 				}
 			}
-		});
-		job.schedule();
+			catch (CoreException e)
+			{
+				throw new InvocationTargetException(e);
+			}
+		}
+		sub.done();
 	}
 
-	private void openIndexFile()
+	protected void openIndexFile()
 	{
 		IFile indexFile = newProject.getFile("index.html"); //$NON-NLS-1$
 		if (indexFile.exists())
 		{
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			IWorkbenchPage page = UIUtils.getActivePage();
 			if (page != null)
 			{
 				try
@@ -852,10 +836,5 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				}
 			}
 		}
-	}
-
-	protected void sendProjectCreateEvent(Map<String, String> payload)
-	{
-		StudioAnalytics.getInstance().sendEvent(new FeatureEvent("project.create.web", payload)); //$NON-NLS-1$
 	}
 }

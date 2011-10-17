@@ -21,6 +21,7 @@ public class AllTests
 		suite.addTest(com.aptana.editor.html.parsing.HTMLParsingTests.suite());
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
+		suite.addTestSuite(com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipantTest.class);
 		// $JUnit-END$
 		return suite;
 	}

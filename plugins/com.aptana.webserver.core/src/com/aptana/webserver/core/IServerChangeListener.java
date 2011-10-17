@@ -9,9 +9,9 @@ package com.aptana.webserver.core;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IServerConfigurationChangeListener {
+public interface IServerChangeListener
+{
 
-	public void configurationChanged(ServerConfigurationChangeEvent event);
+	public void configurationChanged(ServerChangeEvent event);
 }

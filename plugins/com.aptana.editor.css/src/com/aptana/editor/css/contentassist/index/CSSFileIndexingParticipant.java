@@ -49,7 +49,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				removeTasks(file, sub.newChild(10));
 
 				// grab the source of the file we're going to parse
-				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)), getCharset(file));
 
 				// minor optimization when creating a new empty file
 				if (fileContents != null && fileContents.trim().length() > 0)
@@ -65,7 +65,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					}
 					if (ast != null)
 					{
-						this.processParseResults(file, index, ast, sub.newChild(20));
+						this.processParseResults(file, index, fileContents, ast, sub.newChild(20));
 					}
 				}
 			}
@@ -80,19 +80,20 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	public void processParseResults(IFileStore file, Index index, IParseNode ast, IProgressMonitor monitor)
+	public void processParseResults(IFileStore file, Index index, String source, IParseNode ast,
+			IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		walkNode(index, file, ast);
 		sub.worked(70);
 		if (ast instanceof IParseRootNode)
 		{
-			processComments(file, ast, sub.newChild(30));
+			processComments(file, source, ast, sub.newChild(30));
 		}
 		sub.done();
 	}
 
-	private void processComments(IFileStore file, IParseNode parseResult, IProgressMonitor monitor)
+	private void processComments(IFileStore file, String source, IParseNode parseResult, IProgressMonitor monitor)
 	{
 		if (parseResult instanceof IParseRootNode)
 		{
@@ -103,7 +104,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				if (commentNode instanceof CSSCommentNode)
 				{
-					processCommentNode(file, (CSSCommentNode) commentNode);
+					processCommentNode(file, source, (CSSCommentNode) commentNode);
 				}
 				sub.worked(1);
 			}
@@ -162,7 +163,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	}
 
-	private void processCommentNode(IFileStore store, CSSCommentNode commentNode)
+	private void processCommentNode(IFileStore store, String source, CSSCommentNode commentNode)
 	{
 		String text = commentNode.getText();
 		if (!TaskTag.isCaseSensitive())
@@ -170,7 +171,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			text = text.toLowerCase();
 		}
 		int lastOffset = 0;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$ // $codepro.audit.disable platformSpecificLineSeparator
+		String[] lines = StringUtil.LINE_SPLITTER.split(text);
 		for (String line : lines)
 		{
 			int offset = text.indexOf(line, lastOffset);
@@ -195,7 +196,8 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					message = message.substring(0, message.length() - 2).trim();
 				}
 				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
+				createTask(store, message, entry.getPriority(), getLineNumber(start, source), start,
+						start + message.length());
 			}
 
 			lastOffset = offset;

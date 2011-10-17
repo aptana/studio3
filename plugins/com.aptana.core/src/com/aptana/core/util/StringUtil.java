@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -28,6 +29,11 @@ public class StringUtil
 	 * EMPTY
 	 */
 	public static final String EMPTY = ""; //$NON-NLS-1$
+
+	/**
+	 * regexp for counting lines and splitting strings by lines.
+	 */
+	public static final Pattern LINE_SPLITTER = Pattern.compile("\r?\n|\r"); //$NON-NLS-1$
 
 	private StringUtil()
 	{

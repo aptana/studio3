@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -26,6 +27,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+
+import com.aptana.core.CorePlugin;
+import com.aptana.core.IDebugScopes;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
@@ -99,10 +104,12 @@ public final class ZipUtil {
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
 				if (entry.isDirectory() && !file.exists()) {
+					IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL);
 					file.mkdirs();
 				} else if (name.indexOf('/') != -1) {
 					File parent = file.getParentFile();
 					if (!parent.exists()) {
+						IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Creating directory {0}", parent.getAbsolutePath()), IDebugScopes.ZIPUTIL);
 						parent.mkdirs();
 					}
 				}
@@ -117,14 +124,17 @@ public final class ZipUtil {
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
+				IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL);
 				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
 				subMonitor.worked(1);
 				if (!entry.isDirectory() && !file.exists()) {
+					file.getParentFile().mkdirs();
 					if (!file.createNewFile()) {
 						continue;
 					}
 					boolean symlink = isSymlink(entry);
 					if (symlink) {
+						IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Deleting symlink {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL);
 						file.delete();
 					}
 					OutputStream out = symlink ? new ByteArrayOutputStream() : new FileOutputStream(file);
