@@ -19,12 +19,6 @@ public class Messages extends NLS
 
 	public static String SamplesView_ERR_UnableToOpenFile;
 	public static String SamplesView_ERR_UnableToOpenHelp;
-	public static String SamplesView_LBL_ImportSample;
-	public static String SamplesView_LBL_PreviewSample;
-	public static String SamplesView_LBL_ViewHelp;
-	public static String SamplesView_LBL_CollapseAll;
-	public static String SamplesView_LBL_Open;
-	public static String SamplesView_TTP_PreviewSample;
 
 	static
 	{

@@ -8,7 +8,8 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- com.aptana.core
+ com.aptana.core,
+ org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.samples,
  com.aptana.samples.handlers,
