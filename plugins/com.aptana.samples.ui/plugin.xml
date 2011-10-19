@@ -20,6 +20,11 @@
             categoryId="com.aptana.samples.ui.category"
             id="com.aptana.samples.ui.commands.import"
             name="%command.import.name">
+         <commandParameter
+               id="id"
+               name="%commandParameter.sample.id.name"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             categoryId="com.aptana.samples.ui.category"

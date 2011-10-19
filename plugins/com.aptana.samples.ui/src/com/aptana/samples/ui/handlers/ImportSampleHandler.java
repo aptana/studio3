@@ -14,6 +14,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.LocalSample;
 import com.aptana.samples.model.RemoteSample;
 import com.aptana.samples.model.SampleEntry;
@@ -24,33 +26,47 @@ import com.aptana.samples.ui.project.SampleProjectCreator;
 public class ImportSampleHandler extends AbstractHandler
 {
 
+	private static final String PARAMETER_ID = "id"; //$NON-NLS-1$
+
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if (selection instanceof IStructuredSelection)
+		String id = event.getParameter(PARAMETER_ID);
+		if (StringUtil.isEmpty(id))
 		{
-			Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-
-			if (firstElement instanceof SamplesReference)
+			ISelection selection = HandlerUtil.getCurrentSelection(event);
+			if (selection instanceof IStructuredSelection)
 			{
-				SamplesReference samplesRef = (SamplesReference) firstElement;
-				if (samplesRef.isRemote())
+				Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+
+				if (firstElement instanceof SamplesReference)
 				{
-					// imports from git
-					SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
+					SamplesReference samplesRef = (SamplesReference) firstElement;
+					if (samplesRef.isRemote())
+					{
+						// imports from git
+						SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
+					}
+				}
+				else
+				{
+					SampleEntry sampleEntry = null;
+					if (firstElement instanceof SampleEntry)
+					{
+						sampleEntry = SampleEntryUtil.getRootSample((SampleEntry) firstElement);
+					}
+					if (sampleEntry != null)
+					{
+						SampleProjectCreator.createSampleProject(new LocalSample(sampleEntry));
+					}
 				}
 			}
-			else
+		}
+		else
+		{
+			SamplesReference samplesRef = SamplesPlugin.getDefault().getSamplesManager().getSample(id);
+			if (samplesRef != null)
 			{
-				SampleEntry sampleEntry = null;
-				if (firstElement instanceof SampleEntry)
-				{
-					sampleEntry = SampleEntryUtil.getRootSample((SampleEntry) firstElement);
-				}
-				if (sampleEntry != null)
-				{
-					SampleProjectCreator.createSampleProject(new LocalSample(sampleEntry));
-				}
+				SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
 			}
 		}
 		return null;
