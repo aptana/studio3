@@ -22,13 +22,13 @@ public class JSParserTest extends TestCase
 	private static final String EOL = "\n";
 
 	private JSParser fParser;
-	private JSScanner fScanner;
+	private JSFlexScanner fScanner;
 
 	@Override
 	protected void setUp() throws Exception
 	{
 		fParser = new JSParser();
-		fScanner = new JSScanner();
+		fScanner = new JSFlexScanner();
 	}
 
 	public void testEmptyStatement() throws Exception

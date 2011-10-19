@@ -107,9 +107,11 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 
 		try
 		{
-			scanner.setRange(document, offset, length);
+			// grab source once to avoid repeated calls to document.get()
+			String source = document.get(offset, length);
 
 			// prime scanner
+			scanner.setRange(document, offset, length);
 			IToken token = scanner.nextToken();
 
 			while (token != Token.EOF)
@@ -117,10 +119,10 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				Object data = token.getData();
 
 				// grab the lexeme particulars
-				int tokenOffset = scanner.getTokenOffset();
+				int tokenOffset = scanner.getTokenOffset() - offset;
 				int tokenLength = scanner.getTokenLength();
 				int endingOffset = tokenOffset + tokenLength;
-				String text = document.get(tokenOffset, tokenLength);
+				String text = source.substring(tokenOffset, tokenOffset + tokenLength);
 				T type = null;
 				// skip tokens with null data (typically whitespace)
 				if (data != null)
