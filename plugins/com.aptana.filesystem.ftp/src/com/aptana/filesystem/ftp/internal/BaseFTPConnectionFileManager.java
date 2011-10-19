@@ -61,7 +61,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 			// test if using temporary file for existing file may cause any differences on remote side
 			if (defaultOwner == null || defaultGroup == null) {
 				IPath tempFile = basePath.append(path).removeLastSegments(1)
-						.append(System.currentTimeMillis() + TMP_UPLOAD_SUFFIX);
+						.append(System.currentTimeMillis() + TMP_UPLOAD_SUFFIX + ".txt"); //$NON-NLS-1$
 				ExtendedFileInfo tempFileInfo = null;
 				monitor.beginTask(Messages.BaseFTPConnectionFileManager_GetheringServerDetails, 3);
 				try {

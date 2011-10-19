@@ -925,6 +925,10 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	private static String generateTempFileName(String base) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(base).append(TMP_UPLOAD_SUFFIX);
+		String ext = Path.fromPortableString(base).getFileExtension();
+		if (ext != null) {
+			sb.append(ext);
+		}
 		return sb.toString();
 	}
 }

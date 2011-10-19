@@ -1231,6 +1231,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	private static String generateTempFileName(String base) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(base).append(TMP_UPLOAD_SUFFIX);
+		String ext = Path.fromPortableString(base).getFileExtension();
+		if (ext != null) {
+			sb.append(ext);
+		}
 		return sb.toString();
 	}
 
