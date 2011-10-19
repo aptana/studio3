@@ -25,6 +25,7 @@ public class JSScanner extends Scanner
 {
 	private JSTokenScanner fTokenScanner;
 	private IDocument fDocument;
+	private boolean fCollectComments = true;
 	private List<Symbol> fSDocComments;
 	private List<Symbol> fVSDocComments;
 	private List<Symbol> fSingleLineComments;
@@ -167,28 +168,40 @@ public class JSScanner extends Scanner
 				switch (type)
 				{
 					case SINGLELINE_COMMENT:
-						fSingleLineComments.add(createSymbol(data));
+						if (fCollectComments)
+						{
+							fSingleLineComments.add(createSymbol(data));
+						}
 						break;
 
 					case MULTILINE_COMMENT:
-						fMultiLineComments.add(createSymbol(data));
+						if (fCollectComments)
+						{
+							fMultiLineComments.add(createSymbol(data));
+						}
 						break;
 
 					case SDOC:
-						fSDocComments.add(createSymbol(data));
+						if (fCollectComments)
+						{
+							fSDocComments.add(createSymbol(data));
+						}
 						break;
 
 					case VSDOC:
-						int offset = fTokenScanner.getTokenOffset();
-						int length = fTokenScanner.getTokenLength();
-
-						if (vsdoc == null)
+						if (fCollectComments)
 						{
-							vsdoc = new Symbol(JSTokenType.VSDOC.getIndex(), offset, offset + length - 1,
-									new LinkedList<Symbol>());
-						}
+							int offset = fTokenScanner.getTokenOffset();
+							int length = fTokenScanner.getTokenLength();
 
-						((List<Symbol>) vsdoc.value).add(createSymbol(data));
+							if (vsdoc == null)
+							{
+								vsdoc = new Symbol(JSTokenType.VSDOC.getIndex(), offset, offset + length - 1,
+										new LinkedList<Symbol>());
+							}
+
+							((List<Symbol>) vsdoc.value).add(createSymbol(data));
+						}
 						break;
 
 					default:
@@ -207,6 +220,16 @@ public class JSScanner extends Scanner
 		}
 
 		return createSymbol(data);
+	}
+
+	/**
+	 * setCollectComments
+	 * 
+	 * @param flag
+	 */
+	public void setCollectComments(boolean flag)
+	{
+		fCollectComments = flag;
 	}
 
 	/**
