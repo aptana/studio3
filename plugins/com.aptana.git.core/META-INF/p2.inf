@@ -4,4 +4,4 @@
     chmod(targetDir:@artifact,targetFile:os/macosx/askpass.tcl,permissions:755);\
     chmod(targetDir:@artifact,targetFile:os/macosx/ssh-askpass.tcl,permissions:755);
  instructions.install.import= \
-    org.eclipse.equinox.p2.touchpoint.natives.chmod
+    org.eclipse.equinox.p2.touchpoint.eclipse.chmod
