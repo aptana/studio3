@@ -18,7 +18,10 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.samples,
  com.aptana.theme,
  com.aptana.git.ui,
- com.aptana.projects
+ com.aptana.projects,
+ org.mortbay.jetty.util,
+ com.aptana.configurations,
+ com.aptana.portal.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-LazyStart: true
 Bundle-Localization: plugin
