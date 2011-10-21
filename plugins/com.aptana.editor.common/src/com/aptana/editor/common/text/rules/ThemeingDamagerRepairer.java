@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import java.text.MessageFormat;
+
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -25,6 +27,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.theme.ThemePlugin;
 
 public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
@@ -46,6 +49,9 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		try
 		{
+			IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+					"Creating presentation for region at offset {0}, length {1} in document of length {2}", //$NON-NLS-1$
+					region.getOffset(), region.getLength(), fDocument.getLength()), IDebugScopes.PRESENTATION);
 			fLastLine = null;
 			fLastPosition = null;
 			fCountForLine = 0;

@@ -8,10 +8,13 @@
 
 package com.aptana.editor.common.text.reconciler;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -70,76 +73,113 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		super.uninstall();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.presentation.PresentationReconciler#createPresentation(org.eclipse.jface.text.IRegion, org.eclipse.jface.text.IDocument)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.presentation.PresentationReconciler#createPresentation(org.eclipse.jface.text.IRegion,
+	 * org.eclipse.jface.text.IDocument)
 	 */
 	@Override
-	protected TextPresentation createPresentation(IRegion damage, IDocument document) {
-		synchronized (this) {
+	protected TextPresentation createPresentation(IRegion damage, IDocument document)
+	{
+		synchronized (this)
+		{
 			delayedRegions.append(damage);
 		}
-		try {
+		try
+		{
 			return createPresentation(nextDamagedRegion(), document, new NullProgressMonitor());
-		} finally {
+		}
+		finally
+		{
 			triggerDelayedCreatePresentation();
 		}
 	}
-	
-	protected TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor) {
-		try {
+
+	protected TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor)
+	{
+		try
+		{
 			int damageOffset = damage.getOffset();
 			int damageLength = damage.getLength();
-			if (damageOffset + damageLength > document.getLength()) {
+			if (damageOffset + damageLength > document.getLength())
+			{
 				int adjustedLength = document.getLength() - damageOffset;
-				synchronized (this) {
+				synchronized (this)
+				{
 					delayedRegions.remove(new Region(document.getLength(), damageLength - adjustedLength));
 				}
-				if (adjustedLength <= 0) {
+				if (adjustedLength <= 0)
+				{
 					return null;
 				}
 				damageLength = adjustedLength;
 			}
-			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT*5);
-			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damageOffset, damageLength, false);
-			if (partitioning.length == 0) {
+			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT * 5);
+			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(),
+					damageOffset, damageLength, false);
+			if (partitioning.length == 0)
+			{
 				return presentation;
 			}
 			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
-			for (int i = 0; i < limit; ++i) {
+
+			for (int i = 0; i < limit; ++i)
+			{
 				ITypedRegion r = partitioning[i];
 				IPresentationRepairer repairer = getRepairer(r.getType());
-				if (monitor.isCanceled()) {
+				if (monitor.isCanceled())
+				{
 					return null;
 				}
-				if (repairer != null) {
+				if (repairer != null)
+				{
 					repairer.createPresentation(presentation, r);
 				}
 			}
-			synchronized (this) {
-				delayedRegions.remove(new Region(damageOffset, partitioning[limit-1].getOffset()+partitioning[limit-1].getLength()-damageOffset));
-				if (limit < partitioning.length) {
+
+			synchronized (this)
+			{
+				delayedRegions.remove(new Region(damageOffset, partitioning[limit - 1].getOffset()
+						+ partitioning[limit - 1].getLength() - damageOffset));
+				if (limit < partitioning.length)
+				{
 					int offset = partitioning[limit].getOffset();
 					delayedRegions.append(new Region(offset, damageOffset + damageLength - offset));
 				}
 			}
 			return presentation;
-		} catch (BadLocationException e) {
+		}
+		catch (BadLocationException e)
+		{
 			return null;
 		}
 	}
 
-	private void processDamage(IRegion damage, IDocument document, IProgressMonitor monitor) {
-		if (damage != null && damage.getLength() > 0) {
+	private void processDamage(IRegion damage, IDocument document, IProgressMonitor monitor)
+	{
+		if (damage != null && damage.getLength() > 0)
+		{
+			SubMonitor sub = SubMonitor.convert(monitor, MessageFormat.format(
+					"Processing region at offset {0}, length {1} in document of length {2}", damage.getOffset(), //$NON-NLS-1$
+					damage.getLength(), document.getLength()), 2);
 			final TextPresentation[] presentation = new TextPresentation[1];
-			synchronized (getLockObject(document)) {
-				presentation[0] = createPresentation(damage, document, monitor);
+			synchronized (getLockObject(document))
+			{
+				presentation[0] = createPresentation(damage, document, sub);
 			}
-			if (presentation[0] != null) {
-				UIUtils.getDisplay().syncExec(new Runnable() {
-					public void run() {
-						if (textViewer != null) {
+			sub.worked(1);
+			if (presentation[0] != null)
+			{
+				UIUtils.getDisplay().syncExec(new Runnable()
+				{
+					public void run()
+					{
+						if (textViewer != null)
+						{
 							StyledText widget = textViewer.getTextWidget();
-							if (widget != null && !widget.isDisposed()) {
+							if (widget != null && !widget.isDisposed())
+							{
 								textViewer.changeTextPresentation(presentation[0], false);
 							}
 							// save visible region here since UI thread access required
@@ -150,26 +190,36 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 					}
 				});
 			}
+			sub.done();
 		}
 	}
 
-	private synchronized void triggerDelayedCreatePresentation() {
-		if (job != null) {
+	private synchronized void triggerDelayedCreatePresentation()
+	{
+		if (job != null)
+		{
 			job.cancel();
-		} else {
+		}
+		else
+		{
 			job = new Job("Delayed Presentation Reconciler") { //$NON-NLS-1$
 				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					while (!monitor.isCanceled()) {
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					while (!monitor.isCanceled())
+					{
 						IRegion damage = nextDamagedRegion();
 						if (damage == null || monitor.isCanceled()) {
 							break;
 						}
 						processDamage(damage, textViewer.getDocument(), monitor);
 						System.gc();
-						try {
+						try
+						{
 							Thread.sleep(ITERATION_DELAY);
-						} catch (InterruptedException e) {
+						}
+						catch (InterruptedException e)
+						{
 							break;
 						}
 					}
@@ -179,7 +229,8 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			job.setPriority(Job.DECORATE);
 			job.setSystem(!EclipseUtil.showSystemJobs());
 		}
-		if (!delayedRegions.isEmpty()) {
+		if (!delayedRegions.isEmpty())
+		{
 			job.schedule(BACKGROUND_RECONCILE_DELAY);
 		}
 	}
@@ -197,25 +248,31 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				}
 			});
 		}
-		synchronized (this) {
-			if (delayedRegions.isEmpty()) {
+		synchronized (this)
+		{
+			if (delayedRegions.isEmpty())
+			{
 				return null;
 			}
 			if (viewerVisibleRegion != null) {
-				IRegion visible = delayedRegions.overlap(viewerVisibleRegion);
-				viewerVisibleRegion = null;
-				if (visible != null) {
-					return visible;
-				}
+			IRegion visible = delayedRegions.overlap(viewerVisibleRegion);
+			viewerVisibleRegion = null;
+			if (visible != null)
+			{
+				return visible;
+			}
 			}
 			return delayedRegions.iterator().next();
 		}
 	}
 
-	private static Object getLockObject(Object object) {
-		if (object instanceof ISynchronizable) {
+	private static Object getLockObject(Object object)
+	{
+		if (object instanceof ISynchronizable)
+		{
 			Object lock = ((ISynchronizable) object).getLockObject();
-			if (lock != null) {
+			if (lock != null)
+			{
 				return lock;
 			}
 		}
