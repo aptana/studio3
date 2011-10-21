@@ -10,6 +10,7 @@
       </category>
       <samplesinfo
             category="com.aptana.samples.tests.category"
+            id="com.aptana.samples.tests.local"
             infoFile="samples/info.txt"
             name="Local">
          <local
@@ -28,6 +29,7 @@
       </samplesinfo>
       <samplesinfo
             category="com.aptana.samples.tests.category"
+            id="com.aptana.samples.test.remote"
             name="Remote">
          <remote
                description="Testing remote sample"
@@ -35,6 +37,7 @@
          </remote>
       </samplesinfo>
       <samplesinfo
+            id="com.aptana.samples.tests.nocategory"
             name="Sample without a category">
          <remote
                url="sample_with_no_category">
