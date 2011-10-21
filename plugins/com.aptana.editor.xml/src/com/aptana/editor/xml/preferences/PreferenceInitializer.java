@@ -21,7 +21,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(XMLPlugin.PLUGIN_ID);
-		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		// prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.putBoolean(IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);
 
@@ -30,6 +30,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				"."); //$NON-NLS-1$
 
 		// mark occurrences
-		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 	}
 }
