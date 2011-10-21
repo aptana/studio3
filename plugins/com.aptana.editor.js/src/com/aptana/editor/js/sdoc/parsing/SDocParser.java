@@ -16,7 +16,6 @@ import beaver.ParsingTables;
 import beaver.Scanner;
 import beaver.Symbol;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.sdoc.model.AdvancedTag;
 import com.aptana.editor.js.sdoc.model.AliasTag;
 import com.aptana.editor.js.sdoc.model.ArrayType;
@@ -128,7 +127,8 @@ public class SDocParser extends Parser {
 	 */
 	public Object parse(String source, int offset) throws java.lang.Exception
 	{
-		SDocScanner fScanner = new SDocScanner();
+		// SDocScanner fScanner = new SDocScanner();
+		SDocFlexScanner fScanner = new SDocFlexScanner();
 
 		fScanner.setOffset(offset);
 		fScanner.setSource(source);
@@ -145,15 +145,18 @@ public class SDocParser extends Parser {
 	 */
 	public List<Type> parseType(String source) throws java.lang.Exception
 	{
-		SDocScanner fScanner = new SDocScanner();
+		// SDocScanner fScanner = new SDocScanner();
+		SDocFlexScanner fScanner = new SDocFlexScanner();
 
 		fScanner.setOffset(0);
 		fScanner.setSource(source);
-		fScanner.queueTypeTokens(0, source.length());
+		// fScanner.queueTypeTokens(0, source.length());
 
 		// NOTE: we need to clear the scanner source since queueTypeTokens doesn't set the offset of one of the inner
 		// scanners resulting in double scanning
-		fScanner.setSource(StringUtil.EMPTY);
+		// fScanner.setSource(StringUtil.EMPTY);
+
+		fScanner.yybegin(SDocFlexScanner.TYPES);
 
 		Object result = parse(fScanner, AltGoals.Types);
 

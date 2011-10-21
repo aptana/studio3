@@ -14,9 +14,21 @@ package com.aptana.editor.js.parsing;
 public interface ITestFiles
 {
 	static final String[] DOJO_FILES = new String[] { "performance/dojo.js.uncompressed.js" };
-	static final String[] EXT_FILES = new String[] { "performance/ext-core.js" };
 	static final String[] TIMOBILE_FILES = new String[] { "performance/timobile.js" };
 	static final String[] TINY_MCE_FILES = new String[] { "performance/tiny_mce.js" };
+
+	// @formatter:off
+	static final String[] EXT_FILES = new String[] {
+		"performance/ext/ext-all-debug-w-comments.js",
+		"performance/ext/ext-all-debug.js",
+		"performance/ext/ext-all-dev.js",
+		"performance/ext/ext-all.js",
+		"performance/ext/ext-core.js",
+		"performance/ext/ext-debug.js",
+		"performance/ext/ext-dev.js",
+		"performance/ext/ext.js"
+	};
+	// @formatter:on
 
 	// @formatter:off
 	static final String[] JAXER_FILES = new String[] {

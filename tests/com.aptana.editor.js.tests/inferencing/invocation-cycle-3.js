@@ -6,7 +6,7 @@ function abc() {
  * @return {Number}
  */
 function def() {
-	return abc{}
+	return abc();
 }
 
 abc();

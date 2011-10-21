@@ -8,5 +8,5 @@ var xyz = {
 	 * @return {Boolean}
 	 */
 	callback: function (abc) { return true; },
-	flag: true;
+	flag: true
 };
