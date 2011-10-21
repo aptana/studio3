@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -38,9 +37,9 @@ import com.aptana.ui.util.UIUtils;
  */
 public class CommonPresentationReconciler extends PresentationReconciler {
 
-	private static final int ITERATION_PARTITION_LIMIT = 10000;
-	private static final int BACKGROUND_RECONCILE_DELAY = 1000;
-	private static final int ITERATION_DELAY = 50;
+	private static final int ITERATION_PARTITION_LIMIT = 4000;
+	private static final int BACKGROUND_RECONCILE_DELAY = 2000;
+	private static final int ITERATION_DELAY = 500;
 	private static final int MINIMAL_VISIBLE_LENGTH = 20000;
 
 	private ITextViewer textViewer;
@@ -113,6 +112,12 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				return presentation;
 			}
 			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
+			int processingLength = partitioning[limit - 1].getOffset() + partitioning[limit - 1].getLength() - damageOffset;
+			if (EclipseUtil.showSystemJobs() || true) {
+				monitor.subTask(MessageFormat.format(
+						"processing region at offset {0}, length {1} in document of length {2}", damageOffset, //$NON-NLS-1$
+						processingLength, document.getLength()));
+			}
 
 			for (int i = 0; i < limit; ++i) {
 				ITypedRegion r = partitioning[i];
@@ -123,11 +128,11 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				if (repairer != null) {
 					repairer.createPresentation(presentation, r);
 				}
+				monitor.worked(r.getLength());
 			}
 
 			synchronized (this) {
-				delayedRegions.remove(new Region(damageOffset, partitioning[limit - 1].getOffset()
-						+ partitioning[limit - 1].getLength() - damageOffset));
+				delayedRegions.remove(new Region(damageOffset, processingLength));
 				if (limit < partitioning.length) {
 					int offset = partitioning[limit].getOffset();
 					delayedRegions.append(new Region(offset, damageOffset + damageLength - offset));
@@ -141,14 +146,10 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 
 	private void processDamage(IRegion damage, IDocument document, IProgressMonitor monitor) {
 		if (damage != null && damage.getLength() > 0) {
-			SubMonitor sub = SubMonitor.convert(monitor, MessageFormat.format(
-					"Processing region at offset {0}, length {1} in document of length {2}", damage.getOffset(), //$NON-NLS-1$
-					damage.getLength(), document.getLength()), 2);
 			final TextPresentation[] presentation = new TextPresentation[1];
 			synchronized (getLockObject(document)) {
-				presentation[0] = createPresentation(damage, document, sub);
+				presentation[0] = createPresentation(damage, document, monitor);
 			}
-			sub.worked(1);
 			if (presentation[0] != null) {
 				UIUtils.getDisplay().syncExec(new Runnable() {
 					public void run() {
@@ -165,7 +166,6 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 					}
 				});
 			}
-			sub.done();
 		}
 	}
 
@@ -178,6 +178,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				protected IStatus run(IProgressMonitor monitor) {
 					int priority = Thread.currentThread().getPriority();
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+					monitor.beginTask("Reconciling document", textViewer.getDocument().getLength()); //$NON-NLS-1$
 					while (!monitor.isCanceled()) {
 						IRegion damage = nextDamagedRegion();
 						if (damage == null || monitor.isCanceled()) {
@@ -191,6 +192,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 							break;
 						}
 					}
+					monitor.done();
 					Thread.currentThread().setPriority(priority);
 					return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
 				}
