@@ -7,12 +7,12 @@
  */
 package com.aptana.editor.js.vsdoc.parsing;
 
-import com.aptana.editor.js.sdoc.parsing.SDocNodeAttachmentTests;
+import com.aptana.editor.js.sdoc.parsing.DocNodeAttachementTestBase;
 
 /**
  * VSDocNodeAttachmentTests
  */
-public class VSDocNodeAttachmentTests extends SDocNodeAttachmentTests
+public class VSDocNodeAttachmentTests extends DocNodeAttachementTestBase
 {
 	public void testVDocOnFunction()
 	{

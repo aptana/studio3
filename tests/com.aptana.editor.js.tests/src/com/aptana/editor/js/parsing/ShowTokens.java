@@ -76,7 +76,7 @@ public class ShowTokens extends TestCase
 	 */
 	public void testSnippet() throws Exception
 	{
-		String source = this.getSource("unrecognized-regex.js");
+		String source = this.getSource("formatting-issue.js");
 		
 		this._scanner.setSource(source);
 
