@@ -113,7 +113,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			}
 			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
 			int processingLength = partitioning[limit - 1].getOffset() + partitioning[limit - 1].getLength() - damageOffset;
-			if (EclipseUtil.showSystemJobs() || true) {
+			if (EclipseUtil.showSystemJobs()) {
 				monitor.subTask(MessageFormat.format(
 						"processing region at offset {0}, length {1} in document of length {2}", damageOffset, //$NON-NLS-1$
 						processingLength, document.getLength()));
