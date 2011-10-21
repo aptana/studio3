@@ -166,21 +166,14 @@
       <handler
             class="com.aptana.samples.ui.handlers.ImportSampleHandler"
             commandId="com.aptana.samples.ui.commands.import">
-         <enabledWhen>
-            <with
-                  variable="selection">
-               <iterate
-                     ifEmpty="false">
-                  <or>
-                     <instanceof
-                           value="com.aptana.samples.model.SampleEntry">
-                     </instanceof>
-                     <instanceof
-                           value="com.aptana.samples.model.SamplesReference">
-                     </instanceof>
-                  </or>
-               </iterate>
-            </with></enabledWhen>
       </handler>
+   </extension>
+   <extension
+         point="com.aptana.portal.ui.browserInteractions">
+      <actionController
+            class="com.aptana.samples.ui.portal.actionController.SamplesActionController"
+            id="portal.samples"
+            name="Samples Actions">
+      </actionController>
    </extension>
 </plugin>
