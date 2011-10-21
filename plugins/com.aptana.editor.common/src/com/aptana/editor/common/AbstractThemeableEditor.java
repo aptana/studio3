@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -198,6 +200,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private ControlListener fWordWrapControlListener;
 
 	private CommonOccurrencesUpdater occurrencesUpdater;
+
+	private Job linkWithEditorJob;
 
 	/**
 	 * AbstractThemeableEditor
@@ -850,13 +854,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				if (hasOutlinePageCreated() && isLinkedWithEditor())
 				{
 					final int caretOffset = getCaretOffset();
-					// runs the computation of which node in the outline corresponds to the caret offset in a non-UI
-					// thread
-					Thread thread = new Thread()
+					// runs the computation of which node in the outline tp select in a non-UI job
+					if (linkWithEditorJob != null)
+					{
+						linkWithEditorJob.cancel();
+					}
+
+					linkWithEditorJob = new Job("Computing Outline node to select...") //$NON-NLS-1$
 					{
 
 						@Override
-						public void run()
+						protected IStatus run(IProgressMonitor monitor)
 						{
 							final Object outlineNode = computeHighlightedOutlineNode(caretOffset);
 							UIUtils.getDisplay().asyncExec(new Runnable()
@@ -866,11 +874,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 								{
 									getOutlinePage().select(outlineNode);
 								}
-
 							});
+							return Status.OK_STATUS;
 						}
 					};
-					thread.start();
+					linkWithEditorJob.setSystem(true);
+					linkWithEditorJob.schedule();
 				}
 			}
 			else
