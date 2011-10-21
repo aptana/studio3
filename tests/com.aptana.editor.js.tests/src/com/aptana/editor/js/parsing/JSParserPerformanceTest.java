@@ -88,7 +88,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		assertParse(15, ITestFiles.EXT_FILES);
+		assertParse(10, ITestFiles.EXT_FILES);
 	}
 
 	/**
