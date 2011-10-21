@@ -61,6 +61,7 @@ public class SamplesManagerTest extends TestCase
 		assertFalse(localSample.isRemote());
 
 		assertEquals(samplesManager.getCategories().get(0), localSample.getCategory());
+		assertEquals("com.aptana.samples.tests.local", localSample.getId());
 		assertEquals("Local", localSample.getName());
 		assertNull(localSample.getDescriptionText());
 		assertEquals(getFullPath("samples/info.txt"), localSample.getInfoFile());
