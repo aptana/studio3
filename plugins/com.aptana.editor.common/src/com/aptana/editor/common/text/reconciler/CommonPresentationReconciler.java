@@ -28,7 +28,10 @@ import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.swt.custom.StyledText;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.Regions;
 import com.aptana.ui.util.UIUtils;
 
@@ -81,6 +84,9 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	 */
 	@Override
 	protected TextPresentation createPresentation(IRegion damage, IDocument document) {
+		IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+				"Initiating presentation reconciling for region at offset {0}, length {1} in document of length {2}", //$NON-NLS-1$
+				damage.getOffset(), damage.getLength(), document.getLength()), IDebugScopes.PRESENTATION);
 		synchronized (this) {
 			delayedRegions.append(damage);
 		}
