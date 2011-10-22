@@ -8,6 +8,7 @@
 
 package com.aptana.console.process;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.eclipse.debug.core.ILaunch;
@@ -17,7 +18,7 @@ import org.eclipse.debug.core.model.RuntimeProcess;
  * @author Max Stepanov
  *
  */
-/* package */ class ConsoleProcess extends RuntimeProcess {
+/* package */ class TTYConsoleProcess extends RuntimeProcess {
 	
 	private Process proxyProcess = null;
 	
@@ -28,7 +29,7 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 	 * @param attributes
 	 */
 	@SuppressWarnings("rawtypes")
-	protected ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
+	protected TTYConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
 		super(launch, process, name, attributes);
 	}
 
@@ -38,7 +39,12 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 	@Override
 	protected Process getSystemProcess() {
 		if (proxyProcess == null) {
-			proxyProcess = new ProxyProcess(super.getSystemProcess());
+			proxyProcess = new ProxyProcess(super.getSystemProcess()) {
+				@Override
+				protected InputStream createInputStream(InputStream in) {
+					return new ESCSequnceFilterInputStream(in);
+				}			
+			};
 		}
 		return proxyProcess;
 	}
