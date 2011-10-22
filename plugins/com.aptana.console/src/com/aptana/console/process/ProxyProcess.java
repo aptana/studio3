@@ -16,11 +16,11 @@ import java.io.OutputStream;
  * @author Max Stepanov
  *
  */
-public class ProxyProcess extends Process {
+public abstract class ProxyProcess extends Process {
 
 	private Process process;
-	private ESCSequnceFilterInputStream errorStream;
-	private ESCSequnceFilterInputStream inputStream;
+	private InputStream errorStream;
+	private InputStream inputStream;
 	
 	/**
 	 * 
@@ -49,9 +49,9 @@ public class ProxyProcess extends Process {
 	 * @see java.lang.Process#getErrorStream()
 	 */
 	@Override
-	public InputStream getErrorStream() {
+	public final InputStream getErrorStream() {
 		if (errorStream == null) {
-			errorStream = new ESCSequnceFilterInputStream(process.getErrorStream());
+			errorStream = createInputStream(process.getErrorStream());
 		}
 		return errorStream;
 	}
@@ -60,9 +60,9 @@ public class ProxyProcess extends Process {
 	 * @see java.lang.Process#getInputStream()
 	 */
 	@Override
-	public InputStream getInputStream() {
+	public final InputStream getInputStream() {
 		if (inputStream == null) {
-			inputStream = new ESCSequnceFilterInputStream(process.getInputStream());
+			inputStream = createInputStream(process.getInputStream());
 		}
 		return inputStream;
 	}
@@ -82,5 +82,7 @@ public class ProxyProcess extends Process {
 	public int waitFor() throws InterruptedException {
 		return process.waitFor();
 	}
+
+	protected abstract InputStream createInputStream(InputStream in);
 
 }

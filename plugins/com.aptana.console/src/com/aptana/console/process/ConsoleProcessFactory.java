@@ -29,7 +29,7 @@ public class ConsoleProcessFactory implements IProcessFactory {
 	 */
 	@SuppressWarnings("rawtypes")
 	public IProcess newProcess(ILaunch launch, Process process, String label, Map attributes) {
-		return new ConsoleProcess(launch, process, label, attributes);
+		return new TTYConsoleProcess(launch, process, label, attributes);
 	}
 
 }
