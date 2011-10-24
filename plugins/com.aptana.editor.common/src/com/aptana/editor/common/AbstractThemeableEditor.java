@@ -37,7 +37,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
-import org.eclipse.jface.text.source.IOverviewRuler;
+import org.eclipse.jface.text.source.IChangeRulerColumn;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
@@ -53,8 +53,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -1120,55 +1118,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		StyledText textWidget = getSourceViewer().getTextWidget();
 		textWidget.setWordWrap(enabled);
-		if (enabled)
-		{
-			if (fWordWrapControlListener == null)
-			{
-				fWordWrapControlListener = new ControlAdapter()
-				{
-
-					public void controlResized(ControlEvent e)
-					{
-						if (fLineNumberRulerColumn != null)
-						{
-							fLineNumberRulerColumn.redraw();
-						}
-						IOverviewRuler overviewRuler = getOverviewRuler();
-						if (overviewRuler != null)
-						{
-							overviewRuler.update();
-						}
-					}
-				};
-			}
-			textWidget.addControlListener(fWordWrapControlListener);
-		}
-		else
-		{
-			textWidget.removeControlListener(fWordWrapControlListener);
-		}
+		fLineNumberRulerColumn.redraw();
 	}
 
 	@Override
 	protected IVerticalRulerColumn createLineNumberRulerColumn()
 	{
-		if (isWordWrapEnabled())
-		{
-			ISourceViewer sourceViewer = getSourceViewer();
-			CommonLineNumberChangeRulerColumn column = new CommonLineNumberChangeRulerColumn(getSharedColors());
-			if (sourceViewer != null)
-			{
-				column.setSourceViewer(sourceViewer);
-			}
-			if (isPrefQuickDiffAlwaysOn())
-			{
-				column.setHover(createChangeHover());
-			}
-			fLineNumberRulerColumn = column;
-			initializeLineNumberRulerColumn(fLineNumberRulerColumn);
-			return fLineNumberRulerColumn;
-		}
-		return super.createLineNumberRulerColumn();
+		fLineNumberRulerColumn = new CommonLineNumberChangeRulerColumn(getSharedColors());
+		((IChangeRulerColumn) fLineNumberRulerColumn).setHover(createChangeHover());
+		initializeLineNumberRulerColumn(fLineNumberRulerColumn);
+		return fLineNumberRulerColumn;
 	}
 
 	private boolean isWordWrapEnabled()

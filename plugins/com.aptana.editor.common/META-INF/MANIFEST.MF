@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.views,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.scripting,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.ui.epl,
  com.aptana.parsing,
  com.aptana.editor.findbar,
@@ -26,7 +26,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.theme,
  com.aptana.formatter.epl,
  org.eclipse.core.expressions,
- com.aptana.editor.epl
+ com.aptana.editor.epl;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
