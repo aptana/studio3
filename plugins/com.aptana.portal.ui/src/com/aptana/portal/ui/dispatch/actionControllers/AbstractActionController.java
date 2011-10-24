@@ -194,17 +194,40 @@ public abstract class AbstractActionController implements IActionController, ICo
 
 	/**
 	 * Returns the IConfigurationProcessor attached to this action controller. Null, if none was defined in the
-	 * extension.
+	 * extension.<br>
+	 * This method may force the returned processor to be a new instance, or return a processor that was returned
+	 * before. Note that in some cases where multiple called are made to the same processor, a new instance should be
+	 * created to avoid synchronization issues.
 	 * 
+	 * @param createNewInstance
+	 *            indicate that a new processor instance should be created and returned.
 	 * @return An IConfigurationProcessor instance, or null.
 	 */
-	protected IConfigurationProcessor getProcessor()
+	protected IConfigurationProcessor getProcessor(boolean createNewInstance)
 	{
+		if (createNewInstance)
+		{
+			return ConfigurationProcessorsRegistry.getInstance().getConfigurationProcessor(
+					getConfigurationProcessorId());
+		}
 		if (processor == null)
 		{
 			processor = ConfigurationProcessorsRegistry.getInstance().getConfigurationProcessor(
 					getConfigurationProcessorId());
 		}
 		return processor;
+	}
+
+	/**
+	 * Returns the IConfigurationProcessor attached to this action controller. Null, if none was defined in the
+	 * extension.<br>
+	 * The returned instance may have been in used by a previous call. See {@link #getProcessor(boolean)} in case a new
+	 * instance is needed.
+	 * 
+	 * @return An IConfigurationProcessor instance, or null.
+	 */
+	protected IConfigurationProcessor getProcessor()
+	{
+		return getProcessor(false);
 	}
 }
