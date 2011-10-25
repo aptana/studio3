@@ -239,6 +239,12 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertCompletionCorrect("<div>&a|acute;</div>", '\t', ENTITY_PROPOSAL_COUNT, "&amp;", "<div>&amp;</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testEntityDoesntReplaceNonEntityText()
+	{
+		assertCompletionCorrect(
+				"<div>ind&u|stria</div>", '\t', ENTITY_PROPOSAL_COUNT, "&uacute;", "<div>ind&uacute;stria</div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	public void testProposalsBadLocation()
 	{
 		String document = "<body>&|";
