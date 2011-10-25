@@ -19,4 +19,6 @@ public interface IDialogConstants extends org.eclipse.jface.dialogs.IDialogConst
     
     public static final String APPLY_LABEL = Messages.IDialogConstants_LBL_Apply;
     public static final String BROWSE_LABEL = Messages.IDialogConstants_LBL_Browse;
+    public static final String OVERWRITE_LABEL = Messages.IDialogConstants_LBL_Overwrite;
+    public static final String RENAME_LABEL = Messages.IDialogConstants_LBL_Rename;
 }

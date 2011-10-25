@@ -29,6 +29,7 @@ public class AllTests
 		suite.addTestSuite(EFSUtilsTest.class);
 		suite.addTestSuite(WorkspaceFileSystemTest.class);
 		suite.addTestSuite(WorkspaceConnectionPointTest.class);
+		suite.addTestSuite(ConnectionPointManagerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

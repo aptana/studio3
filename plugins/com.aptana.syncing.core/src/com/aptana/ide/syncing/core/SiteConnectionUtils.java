@@ -298,4 +298,23 @@ public final class SiteConnectionUtils
 	{
 		return container.getFullPath().isPrefixOf(resource.getFullPath());
 	}
+
+	/**
+	 * Returns the uniqueness of the site name
+	 * 
+	 * @param siteName
+	 * @return whether or not the name is unique among current sites
+	 */
+	public static boolean isSiteNameUnique(String siteName)
+	{
+		ISiteConnection[] siteConnections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
+		for (ISiteConnection connection : siteConnections)
+		{
+			if (connection.getName().equalsIgnoreCase(siteName))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }

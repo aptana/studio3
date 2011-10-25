@@ -41,6 +41,10 @@ public class Messages extends NLS
 	public static String ImportConnectionsWizard_Info_Message;
 	public static String ImportConnectionsWizard_Info_Title;
 	public static String ImportConnectionsWizard_Title;
+	public static String ImportConnectionsWizard_Conflict_Title;
+	public static String ImportConnectionsWizard_Conflict_Message;
+	public static String ImportConnectionsWizard_Conflict_Renamed;
+	public static String ImportConnectionsWizard_Conflict_LBL_Apply;
 
 	static
 	{
