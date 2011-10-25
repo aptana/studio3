@@ -20,7 +20,8 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
  * on 10/17/11 10:40 AM from the specification file
  * <tt>JS.flex</tt>
  */
-class JSFlexScanner extends Scanner {
+public class JSFlexScanner extends Scanner
+{
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;

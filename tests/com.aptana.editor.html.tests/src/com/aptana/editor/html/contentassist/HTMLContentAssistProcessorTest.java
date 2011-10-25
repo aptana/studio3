@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.tests.util.AssertUtil;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.editor.html.BadDocument;
@@ -895,7 +895,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		int offset = HTMLTestUtil.findCursorOffset(document);
 		fDocument = HTMLTestUtil.createDocument(document, true);
 
-		LexemeProvider<HTMLTokenType> lexemeProvider = HTMLTestUtil.createLexemeProvider(fDocument, offset);
+		ILexemeProvider<HTMLTokenType> lexemeProvider = HTMLTestUtil.createLexemeProvider(fDocument, offset);
 		LocationType l = fProcessor.getOpenTagLocationType(lexemeProvider, offset);
 
 		assertEquals(location, l);

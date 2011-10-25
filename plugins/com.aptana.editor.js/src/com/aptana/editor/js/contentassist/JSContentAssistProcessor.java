@@ -23,12 +23,14 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
+import beaver.Scanner;
+
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.editor.common.parsing.FileService;
@@ -41,15 +43,15 @@ import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
+import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.JSParseState;
-import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
-import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParseState;
@@ -429,22 +431,27 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
+	ILexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		LexemeProvider<JSTokenType> result;
+		// ITokenScanner scanner = new JSTokenScanner();
+		Scanner scanner = new JSFlexScanner();
+		ILexemeProvider<JSTokenType> result;
 
-		// NOTE: temp until we get proper partitions for JS inside of HTML
+		// NOTE: use active range temporarily until we get proper partitions for JS inside of HTML
 		if (this._activeRange != null)
 		{
-			result = new JSLexemeProvider(document, this._activeRange, new JSTokenScanner());
+			// result = new JSLexemeProvider(document, this._activeRange, scanner);
+			result = new JSFlexLexemeProvider(document, _activeRange, scanner);
 		}
 		else if (this._statementNode != null)
 		{
-			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
+			// result = new JSLexemeProvider(document, this._statementNode, scanner);
+			result = new JSFlexLexemeProvider(document, this._statementNode, scanner);
 		}
 		else
 		{
-			result = new JSLexemeProvider(document, offset, new JSTokenScanner());
+			// result = new JSLexemeProvider(document, offset, scanner);
+			result = new JSFlexLexemeProvider(document, offset, scanner);
 		}
 
 		return result;
@@ -718,7 +725,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	LocationType getLocationByLexeme(IDocument document, int offset)
 	{
 		// grab relevant lexemes around the current offset
-		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		ILexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// assume we can't determine the location type
 		LocationType result = LocationType.UNKNOWN;
@@ -870,7 +877,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		JSTokenType[] types = new JSTokenType[] { JSTokenType.LPAREN, JSTokenType.COMMA };
 		Arrays.sort(types);
-		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		ILexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		if (offset > 0)
 		{
 			Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);

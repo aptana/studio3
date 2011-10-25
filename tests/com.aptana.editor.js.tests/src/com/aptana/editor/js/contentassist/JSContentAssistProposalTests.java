@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -363,5 +364,21 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	protected IFileStoreIndexingParticipant createIndexer()
 	{
 		return new JSFileIndexingParticipant();
+	}
+
+	public void testIsValidAutoActivationLocationIdentifier()
+	{
+		String source = "a|(|abc,|";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+
+		int offset1 = cursorOffsets.get(0);
+		int offset2 = cursorOffsets.get(1);
+		int offset3 = cursorOffsets.get(2);
+
+		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, offset1));
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, offset2));
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, offset3));
 	}
 }
