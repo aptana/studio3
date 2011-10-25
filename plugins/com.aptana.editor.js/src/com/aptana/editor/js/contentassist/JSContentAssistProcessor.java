@@ -433,24 +433,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	ILexemeProvider<JSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		// ITokenScanner scanner = new JSTokenScanner();
 		Scanner scanner = new JSFlexScanner();
 		ILexemeProvider<JSTokenType> result;
 
 		// NOTE: use active range temporarily until we get proper partitions for JS inside of HTML
 		if (this._activeRange != null)
 		{
-			// result = new JSLexemeProvider(document, this._activeRange, scanner);
 			result = new JSFlexLexemeProvider(document, _activeRange, scanner);
 		}
 		else if (this._statementNode != null)
 		{
-			// result = new JSLexemeProvider(document, this._statementNode, scanner);
 			result = new JSFlexLexemeProvider(document, this._statementNode, scanner);
 		}
 		else
 		{
-			// result = new JSLexemeProvider(document, offset, scanner);
 			result = new JSFlexLexemeProvider(document, offset, scanner);
 		}
 
