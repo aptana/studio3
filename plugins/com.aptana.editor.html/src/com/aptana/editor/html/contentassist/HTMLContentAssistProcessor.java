@@ -1824,7 +1824,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				if (Character.isWhitespace(c) || c == '<')
 				{
-					end = i - 1;
+					end = offset - 1;
 					break;
 				}
 			}
