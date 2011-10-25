@@ -27,7 +27,7 @@ public class Messages extends NLS
 	public static String UIPlugin_ResetPerspective_Description;
 	public static String UIPlugin_ResetPerspective_Title;
 
-	public static String EclipseDiagnosticLog_eclipse_version;
+	public static String EclipseDiagnosticLog_version;
 	public static String EclipseDiagnosticLog_host_os;
 	public static String EclipseDiagnosticLog_install_dir;
 	public static String EclipseDiagnosticLog_jre_home;

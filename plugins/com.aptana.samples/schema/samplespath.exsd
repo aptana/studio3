@@ -49,11 +49,6 @@
    </element>
 
    <element name="samplesinfo">
-      <annotation>
-         <documentation>
-            Adds an additional location to the set of locations to search for samples This only supports samples at the root level of the supplied folder. Nested directories are not supported.
-         </documentation>
-      </annotation>
       <complexType>
          <sequence>
             <element ref="nature" minOccurs="0" maxOccurs="unbounded"/>
@@ -63,6 +58,13 @@
                <element ref="remote" minOccurs="0" maxOccurs="1"/>
             </choice>
          </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="category" type="string">
             <annotation>
                <documentation>

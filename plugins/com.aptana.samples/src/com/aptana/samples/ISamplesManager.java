@@ -30,4 +30,13 @@ public interface ISamplesManager
 	 * @return the list of samples that belongs to the category
 	 */
 	public List<SamplesReference> getSamplesForCategory(String categoryId);
+
+	/**
+	 * Gets the sample with the specific id.
+	 * 
+	 * @param id
+	 *            the id of the sample
+	 * @return the sample with the id
+	 */
+	public SamplesReference getSample(String id);
 }

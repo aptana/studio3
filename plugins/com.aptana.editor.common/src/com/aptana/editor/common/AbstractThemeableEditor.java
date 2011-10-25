@@ -22,7 +22,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -35,7 +37,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.CommonLineNumberChangeRulerColumn;
-import org.eclipse.jface.text.source.IOverviewRuler;
+import org.eclipse.jface.text.source.IChangeRulerColumn;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
@@ -51,8 +53,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -198,6 +198,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private ControlListener fWordWrapControlListener;
 
 	private CommonOccurrencesUpdater occurrencesUpdater;
+
+	private Job linkWithEditorJob;
 
 	/**
 	 * AbstractThemeableEditor
@@ -850,13 +852,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				if (hasOutlinePageCreated() && isLinkedWithEditor())
 				{
 					final int caretOffset = getCaretOffset();
-					// runs the computation of which node in the outline corresponds to the caret offset in a non-UI
-					// thread
-					Thread thread = new Thread()
+					// runs the computation of which node in the outline tp select in a non-UI job
+					if (linkWithEditorJob != null)
+					{
+						linkWithEditorJob.cancel();
+					}
+
+					linkWithEditorJob = new Job("Computing Outline node to select...") //$NON-NLS-1$
 					{
 
 						@Override
-						public void run()
+						protected IStatus run(IProgressMonitor monitor)
 						{
 							final Object outlineNode = computeHighlightedOutlineNode(caretOffset);
 							UIUtils.getDisplay().asyncExec(new Runnable()
@@ -866,11 +872,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 								{
 									getOutlinePage().select(outlineNode);
 								}
-
 							});
+							return Status.OK_STATUS;
 						}
 					};
-					thread.start();
+					linkWithEditorJob.setSystem(true);
+					linkWithEditorJob.schedule();
 				}
 			}
 			else
@@ -1111,55 +1118,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		StyledText textWidget = getSourceViewer().getTextWidget();
 		textWidget.setWordWrap(enabled);
-		if (enabled)
-		{
-			if (fWordWrapControlListener == null)
-			{
-				fWordWrapControlListener = new ControlAdapter()
-				{
-
-					public void controlResized(ControlEvent e)
-					{
-						if (fLineNumberRulerColumn != null)
-						{
-							fLineNumberRulerColumn.redraw();
-						}
-						IOverviewRuler overviewRuler = getOverviewRuler();
-						if (overviewRuler != null)
-						{
-							overviewRuler.update();
-						}
-					}
-				};
-			}
-			textWidget.addControlListener(fWordWrapControlListener);
-		}
-		else
-		{
-			textWidget.removeControlListener(fWordWrapControlListener);
-		}
+		fLineNumberRulerColumn.redraw();
 	}
 
 	@Override
 	protected IVerticalRulerColumn createLineNumberRulerColumn()
 	{
-		if (isWordWrapEnabled())
-		{
-			ISourceViewer sourceViewer = getSourceViewer();
-			CommonLineNumberChangeRulerColumn column = new CommonLineNumberChangeRulerColumn(getSharedColors());
-			if (sourceViewer != null)
-			{
-				column.setSourceViewer(sourceViewer);
-			}
-			if (isPrefQuickDiffAlwaysOn())
-			{
-				column.setHover(createChangeHover());
-			}
-			fLineNumberRulerColumn = column;
-			initializeLineNumberRulerColumn(fLineNumberRulerColumn);
-			return fLineNumberRulerColumn;
-		}
-		return super.createLineNumberRulerColumn();
+		fLineNumberRulerColumn = new CommonLineNumberChangeRulerColumn(getSharedColors());
+		((IChangeRulerColumn) fLineNumberRulerColumn).setHover(createChangeHover());
+		initializeLineNumberRulerColumn(fLineNumberRulerColumn);
+		return fLineNumberRulerColumn;
 	}
 
 	private boolean isWordWrapEnabled()
