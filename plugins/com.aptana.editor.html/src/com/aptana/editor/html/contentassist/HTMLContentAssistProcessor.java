@@ -75,7 +75,6 @@ import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
-;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
