@@ -20,6 +20,8 @@ import org.jmock.api.Action;
 import org.jmock.api.Invocation;
 import org.jmock.lib.legacy.ClassImposteriser;
 
+import com.aptana.core.logging.IdeLog;
+
 public class ProcessUtilTest extends TestCase
 {
 
@@ -75,6 +77,9 @@ public class ProcessUtilTest extends TestCase
 		final Map<String, String> env = new HashMap<String, String>();
 		env.put("custom_key", "custom_value");
 
+		IdeLog.StatusLevel level = IdeLog.getCurrentSeverity();
+		IdeLog.setCurrentSeverity(IdeLog.StatusLevel.INFO);
+
 		ProcessUtil pu = new ProcessUtil()
 		{
 			@Override
@@ -92,6 +97,8 @@ public class ProcessUtilTest extends TestCase
 		};
 
 		pu.doRun(command, workingDir, env);
+
+		IdeLog.setCurrentSeverity(level);
 	}
 
 	public void testDoRunWithNullWorkingDirandNoCustomEnv() throws Exception
