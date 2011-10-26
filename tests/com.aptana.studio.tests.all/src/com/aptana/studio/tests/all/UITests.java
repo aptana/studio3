@@ -21,6 +21,7 @@ public class UITests
 		TestSuite suite = new TestSuite(UITests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.browser.tests.AllTests.suite());
+		suite.addTest(com.aptana.console.tests.AllTests.suite());
 		suite.addTest(com.aptana.deploy.ftp.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.coffee.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());

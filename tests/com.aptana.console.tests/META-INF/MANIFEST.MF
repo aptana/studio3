@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.console.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: %providerName
+Fragment-Host: com.aptana.console;bundle-version="3.0.0"
+Require-Bundle: org.eclipse.core.runtime,
+ org.junit,
+ com.aptana.testing.mocks
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Export-Package: com.aptana.console.tests
