@@ -66,7 +66,7 @@ import com.aptana.core.util.ArrayUtil;
 			}
 		}
 		while (line == null);
-		lineBuffer = new ByteArrayInputStream(line != null ? (line + CR).getBytes(charset) : ArrayUtil.NO_BYTES);
+		lineBuffer = new ByteArrayInputStream(line != null ? (line + CR).getBytes(charset.name()) : ArrayUtil.NO_BYTES);
 	}
 
 }
