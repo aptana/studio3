@@ -65,6 +65,7 @@
       <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.deploy.ftp"/>
       <import plugin="com.aptana.samples"/>
+      <import plugin="com.aptana.console"/>
       <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.index.core"/>
       <import plugin="com.aptana.portal.ui"/>

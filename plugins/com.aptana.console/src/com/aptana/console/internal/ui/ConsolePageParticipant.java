@@ -22,7 +22,7 @@ import org.eclipse.ui.part.IPageBookViewPage;
 public class ConsolePageParticipant extends PlatformObject implements IConsolePageParticipant {
 
 	private ConsoleStyledTextListener listener;
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.console.IConsolePageParticipant#init(org.eclipse.ui.part.IPageBookViewPage, org.eclipse.ui.console.IConsole)
 	 */
