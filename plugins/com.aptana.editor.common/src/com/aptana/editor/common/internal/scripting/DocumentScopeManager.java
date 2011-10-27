@@ -13,13 +13,13 @@ import java.util.WeakHashMap;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IPartitioningConfiguration;
@@ -128,7 +128,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	{
 		if (viewer == null)
 		{
-			return ""; //$NON-NLS-1$
+			return StringUtil.EMPTY;
 		}
 		IDocument document = viewer.getDocument();
 		String partitionFragment = getPartitionScopeFragmentsAtOffset(document, offset);
@@ -142,7 +142,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 			if (!partitionFragment.endsWith(tokenPortion))
 			{
-				return partitionFragment + " " + tokenPortion; //$NON-NLS-1$
+				return partitionFragment + ' ' + tokenPortion;
 			}
 		}
 		return partitionFragment;
@@ -157,15 +157,11 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 		try
 		{
-			Position[] scopes = null;
-			int index = 0;
-			synchronized (getLockObject(document))
-			{
-				// Force adding the category in case it doesn't exist yet...
-				document.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
-				scopes = document.getPositions(ICommonConstants.SCOPE_CATEGORY);
-				index = document.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
-			}
+			// Force adding the category in case it doesn't exist yet...
+			document.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
+			Position[] scopes = document.getPositions(ICommonConstants.SCOPE_CATEGORY);
+			int index = document.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
+
 			if (scopes == null || scopes.length == 0)
 			{
 				return null;
@@ -205,19 +201,6 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
-	}
-
-	private static Object getLockObject(Object object)
-	{
-		if (object instanceof ISynchronizable)
-		{
-			Object lock = ((ISynchronizable) object).getLockObject();
-			if (lock != null)
-			{
-				return lock;
-			}
-		}
-		return object;
 	}
 
 	public String getPartitionScopeFragmentsAtOffset(IDocument document, int offset) throws BadLocationException
