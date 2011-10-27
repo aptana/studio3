@@ -10,31 +10,15 @@
       </category>
       <samplesinfo
             category="com.aptana.samples.tests.category"
-            id="com.aptana.samples.tests.local"
-            infoFile="samples/info.txt"
-            name="Local">
-         <local
-               directory="samples/">
-            <localDescription
-                  description="Testing local sample"
-                  name="test">
-            </localDescription>
-         </local>
-         <include
-               path="libs/">
-         </include>
-         <nature
-               id="com.aptana.projects.webnature">
-         </nature>
-      </samplesinfo>
-      <samplesinfo
-            category="com.aptana.samples.tests.category"
-            id="com.aptana.samples.test.remote"
+            id="com.aptana.samples.tests.remote"
             name="Remote">
          <remote
                description="Testing remote sample"
                url="git://github.com/aptana/remote_sample.git">
          </remote>
+         <nature
+               id="com.aptana.projects.webnature">
+         </nature>
       </samplesinfo>
       <samplesinfo
             id="com.aptana.samples.tests.nocategory"
