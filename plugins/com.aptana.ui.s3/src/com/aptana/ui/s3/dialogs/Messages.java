@@ -20,6 +20,7 @@ public class Messages extends NLS {
     public static String S3ConnectionPointPropertyDialog_ERR_FailedCreate;
     public static String S3ConnectionPointPropertyDialog_ERR_InvalidHost;
     public static String S3ConnectionPointPropertyDialog_ERR_NameEmpty;
+    public static String S3ConnectionPointPropertyDialog_ERR_NameExists;
     public static String S3ConnectionPointPropertyDialog_ERR_NoAccessKey;
     public static String S3ConnectionPointPropertyDialog_ErrorTitle;
     public static String S3ConnectionPointPropertyDialog_LBL_Edit;

@@ -9,6 +9,7 @@ package com.aptana.ui;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.diagnostic.IDiagnosticLog;
 
@@ -52,19 +53,17 @@ public class EclipseDiagnosticLog implements IDiagnosticLog
 		buf.append(NEW_LINE);
 
 		// Eclipse version
-		buf.append(Messages.EclipseDiagnosticLog_eclipse_version);
-		String property = System.getProperty("osgi.framework.version"); //$NON-NLS-1$
-		int index = property.indexOf(".v"); //$NON-NLS-1$
-		if (index > -1)
+		buf.append(Messages.EclipseDiagnosticLog_version);
+		String version = EclipseUtil.getProductVersion();
+		if (!StringUtil.isEmpty(version))
 		{
-			property = property.substring(0, index);
+			buf.append(version);
 		}
-		buf.append(property);
 		buf.append(NEW_LINE);
 
 		// VM arguments
 		buf.append(Messages.EclipseDiagnosticLog_vm_args);
-		property = System.getProperty("eclipse.vmargs"); //$NON-NLS-1$
+		String property = System.getProperty("eclipse.vmargs"); //$NON-NLS-1$
 		buf.append((property == null) ? StringUtil.EMPTY : property);
 		buf.append(NEW_LINE);
 

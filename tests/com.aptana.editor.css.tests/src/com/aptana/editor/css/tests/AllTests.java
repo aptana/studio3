@@ -23,14 +23,15 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.tests");
 		// $JUnit-BEGIN$
-		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
 		suite.addTestSuite(CSSCodeScannerTest.class);
 		suite.addTestSuite(CSSEditorTest.class);
 		suite.addTestSuite(CSSFoldingComputerTest.class);
+		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
 		suite.addTestSuite(CSSValidatorTests.class);
 		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.contentassist.AllTests.suite());
+		suite.addTest(com.aptana.editor.css.contentassist.index.IndexTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

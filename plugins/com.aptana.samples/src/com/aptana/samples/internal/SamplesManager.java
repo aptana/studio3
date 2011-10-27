@@ -49,12 +49,14 @@ public class SamplesManager implements ISamplesManager
 	private static final String ATTR_CATEGORY = "category"; //$NON-NLS-1$
 
 	private Map<String, SampleCategory> categories;
-	private Map<String, List<SamplesReference>> samplesRefs;
+	private Map<String, List<SamplesReference>> sampleRefsByCategory;
+	private Map<String, SamplesReference> samplesById;
 
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
-		samplesRefs = new HashMap<String, List<SamplesReference>>();
+		sampleRefsByCategory = new HashMap<String, List<SamplesReference>>();
+		samplesById = new HashMap<String, SamplesReference>();
 		readExtensionRegistry();
 	}
 
@@ -67,12 +69,17 @@ public class SamplesManager implements ISamplesManager
 
 	public List<SamplesReference> getSamplesForCategory(String categoryId)
 	{
-		List<SamplesReference> samples = samplesRefs.get(categoryId);
+		List<SamplesReference> samples = sampleRefsByCategory.get(categoryId);
 		if (samples == null)
 		{
 			return Collections.emptyList();
 		}
 		return Collections.unmodifiableList(samples);
+	}
+
+	public SamplesReference getSample(String id)
+	{
+		return samplesById.get(id);
 	}
 
 	private void readExtensionRegistry()
@@ -121,6 +128,7 @@ public class SamplesManager implements ISamplesManager
 			boolean isRemote = false;
 			String path = null;
 			Map<String, String> descriptions = new HashMap<String, String>();
+
 			Bundle bundle = Platform.getBundle(element.getNamespaceIdentifier());
 			IConfigurationElement[] localPaths = element.getChildren(ELEMENT_LOCAL);
 			if (localPaths.length > 0)
@@ -151,6 +159,12 @@ public class SamplesManager implements ISamplesManager
 				return;
 			}
 
+			String id = element.getAttribute(ATTR_ID);
+			if (StringUtil.isEmpty(id))
+			{
+				return;
+			}
+
 			String categoryId = element.getAttribute(ATTR_CATEGORY);
 			SampleCategory category = categories.get(categoryId);
 			if (category == null)
@@ -163,15 +177,16 @@ public class SamplesManager implements ISamplesManager
 				}
 			}
 
-			List<SamplesReference> samples = samplesRefs.get(categoryId);
+			List<SamplesReference> samples = sampleRefsByCategory.get(categoryId);
 			if (samples == null)
 			{
 				samples = new ArrayList<SamplesReference>();
-				samplesRefs.put(categoryId, samples);
+				sampleRefsByCategory.put(categoryId, samples);
 			}
 
-			SamplesReference samplesRef = new SamplesReference(category, path, isRemote, element, descriptions);
+			SamplesReference samplesRef = new SamplesReference(category, id, path, isRemote, element, descriptions);
 			samples.add(samplesRef);
+			samplesById.put(id, samplesRef);
 
 			String name = element.getAttribute(ATTR_NAME);
 			if (!StringUtil.isEmpty(name))

@@ -20,4 +20,8 @@ public interface IDebugScopes
 	 */
 	String PARTITIONER = CommonEditorPlugin.PLUGIN_ID + "/debug/partitioner"; //$NON-NLS-1$
 
+	/**
+	 * Items related to the partitioning process
+	 */
+	String PRESENTATION = CommonEditorPlugin.PLUGIN_ID + "/debug/presentation"; //$NON-NLS-1$
 }

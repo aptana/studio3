@@ -32,66 +32,86 @@ import com.aptana.webserver.ui.WebServerUIPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
-public class LocalWebServerPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class LocalWebServerPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
+{
 
 	private static final Pattern PORTS_PATTERN = Pattern.compile("^(\\d+)(-(\\d+))?$"); //$NON-NLS-1$
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 		setMessage(Messages.LocalWebServerPreferencePage_Message);
-		setDescription("Note: restart required on changes."); //$NON-NLS-1$
+		setDescription(Messages.LocalWebServerPreferencePage_Description);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
 	 */
 	@Override
-	protected void createFieldEditors() {
+	protected void createFieldEditors()
+	{
 		List<String[]> addresses = new ArrayList<String[]>();
-		for (InetAddress i : SocketUtil.getLocalAddresses()) {
+		for (InetAddress i : SocketUtil.getLocalAddresses())
+		{
 			addresses.add(new String[] { i.getHostAddress(), i.getHostAddress() });
 		}
-		addField(new ComboFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, StringUtil.makeFormLabel(Messages.LocalWebServerPreferencePage_Address_Label), addresses.toArray(new String[addresses.size()][]), getFieldEditorParent()));
-		addField(new StringFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, StringUtil.makeFormLabel(Messages.LocalWebServerPreferencePage_Port_Label), 11, getFieldEditorParent()) {
+		addField(new ComboFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS,
+				StringUtil.makeFormLabel(Messages.LocalWebServerPreferencePage_Address_Label),
+				addresses.toArray(new String[addresses.size()][]), getFieldEditorParent()));
+		addField(new StringFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS,
+				StringUtil.makeFormLabel(Messages.LocalWebServerPreferencePage_Port_Label), 11, getFieldEditorParent())
+		{
 			{
 				setErrorMessage(Messages.LocalWebServerPreferencePage_PortError_Message);
 				setEmptyStringAllowed(true);
 			}
+
 			@Override
-			protected boolean doCheckState() {
+			protected boolean doCheckState()
+			{
 				Matcher matcher = PORTS_PATTERN.matcher(getStringValue());
-				if (matcher.matches()) {
-					try {
+				if (matcher.matches())
+				{
+					try
+					{
 						int start = Integer.parseInt(matcher.group(1));
-						if ( matcher.group(2) != null ) {
+						if (matcher.group(2) != null)
+						{
 							int end = Integer.parseInt(matcher.group(3));
-							if ( start < end ) {
+							if (start < end)
+							{
 								return true;
 							}
-						} else {
+						}
+						else
+						{
 							return true;
 						}
-					} catch (NumberFormatException e) {
+					}
+					catch (NumberFormatException e)
+					{
 						IdeLog.logError(WebServerUIPlugin.getDefault(), e);
-					}					
+					}
 				}
 				return false;
 			}
-			
+
 		});
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#doGetPreferenceStore()
 	 */
 	@Override
-	protected IPreferenceStore doGetPreferenceStore() {
+	protected IPreferenceStore doGetPreferenceStore()
+	{
 		return new ScopedPreferenceStore(EclipseUtil.instanceScope(), WebServerCorePlugin.PLUGIN_ID);
 	}
-
 
 }

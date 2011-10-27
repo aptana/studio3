@@ -40,6 +40,7 @@ module Ruble
       
       # show the system color picker and return a hex-format color (#RRGGBB).
       # If the input string is a recognizable hex string, the default color will be set to it.
+      # If the dialog is dismissed, we return nil
       def request_color(string = nil)
         string = '#999' unless string.to_s.match(/#?[0-9A-F]{3,6}/i)
         color  = string
@@ -51,8 +52,12 @@ module Ruble
         value = org.eclipse.swt.graphics.RGB.new(r, g, b)
         color_dialog = org.eclipse.swt.widgets.ColorDialog.new(shell)
 		    color_dialog.setRGB(value)
-		    new_rgb = color_dialog.open    
-        "#{prefix}#{new_rgb.red.to_s(16).rjust(2, '0')}#{new_rgb.green.to_s(16).rjust(2, '0')}#{new_rgb.blue.to_s(16).rjust(2, '0')}"
+		    new_rgb = color_dialog.open
+		    if new_rgb.nil?
+		      nil
+		    else
+          "#{prefix}#{new_rgb.red.to_s(16).rjust(2, '0')}#{new_rgb.green.to_s(16).rjust(2, '0')}#{new_rgb.blue.to_s(16).rjust(2, '0')}"
+        end
       end
       
       # Opens a simple info alert

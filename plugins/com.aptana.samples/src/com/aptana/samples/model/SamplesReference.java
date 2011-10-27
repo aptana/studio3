@@ -31,6 +31,7 @@ public class SamplesReference
 	private final String path;
 	private final IConfigurationElement configElement;
 
+	private final String id;
 	private String name;
 	private Map<String, String> descriptions;
 	private boolean isRemote;
@@ -42,10 +43,11 @@ public class SamplesReference
 
 	private List<SampleEntry> samples;
 
-	public SamplesReference(SampleCategory category, String path, boolean isRemote, IConfigurationElement element,
-			Map<String, String> toolTipText)
+	public SamplesReference(SampleCategory category, String id, String path, boolean isRemote,
+			IConfigurationElement element, Map<String, String> toolTipText)
 	{
 		this.category = category;
+		this.id = id;
 		this.path = path;
 		this.isRemote = isRemote;
 		this.descriptions = toolTipText;
@@ -73,6 +75,11 @@ public class SamplesReference
 	public SampleCategory getCategory()
 	{
 		return category;
+	}
+
+	public String getId()
+	{
+		return id;
 	}
 
 	public String getName()

@@ -58,6 +58,7 @@ import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -339,8 +340,13 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 
 	public boolean isValid() {
 		String message = null;
-		if (nameText.getText().length() == 0) {
+		String name = nameText.getText().trim();
+		if (name.length() == 0) {
 			message = Messages.FTPConnectionPointPropertyDialog_ERR_NameEmpty;
+		}
+		else if ((originalFtpConnectionPoint == null || !name.equalsIgnoreCase(originalFtpConnectionPoint.getName()))
+				&& !ConnectionPointUtils.isConnectionPointNameUnique(nameText.getText())) {
+			message = MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_ERR_NameExists, name);
 		}
 		else if (!HOST_PATTERN.matcher(hostText.getText()).matches()) {
 			message = Messages.FTPConnectionPointPropertyDialog_ERR_InvalidHost;
@@ -555,7 +561,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 
 	protected boolean savePropertiesTo(IBaseRemoteConnectionPoint connectionPoint) {
 		boolean updated = false;
-		String name = nameText.getText();
+		String name = nameText.getText().trim();
 		if (!name.equals(connectionPoint.getName())) {
 			connectionPoint.setName(name);
 			updated = true;

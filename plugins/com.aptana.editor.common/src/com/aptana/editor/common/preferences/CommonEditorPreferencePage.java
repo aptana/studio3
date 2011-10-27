@@ -197,21 +197,18 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	private void setTabSpaceCombo()
 	{
-		if (!getPreferenceStore().contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		IEclipsePreferences store = getPluginPreferenceStore();
+
+		if (store.getBoolean(IPreferenceConstants.USE_GLOBAL_DEFAULTS, false))
 		{
 			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
 		}
 		else
 		{
-			if (getChainedEditorPreferenceStore().getBoolean(
-					AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
-			{
-				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
-			}
-			else
-			{
-				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
-			}
+			boolean useSpaces = store.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
+					true);
+			tabSpaceCombo.setText(useSpaces ? Messages.CommonEditorPreferencePage_UseSpacesOption
+					: Messages.CommonEditorPreferencePage_UseTabOption);
 		}
 	}
 

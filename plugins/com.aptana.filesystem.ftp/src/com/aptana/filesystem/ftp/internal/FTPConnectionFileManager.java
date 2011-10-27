@@ -1152,7 +1152,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 
 	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {
 		FTPFile[] ftpFiles = null;
-		if (!Boolean.FALSE.equals(statSupported)) {
+		if (!Boolean.FALSE.equals(statSupported) && dirPath.toPortableString().indexOf(' ') == -1) {
 			try {
 				ftpFiles = ftpSTAT(dirPath.addTrailingSeparator().toPortableString());
 			} catch (MalformedReplyException e) {
@@ -1231,6 +1231,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	private static String generateTempFileName(String base) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(base).append(TMP_UPLOAD_SUFFIX);
+		String ext = Path.fromPortableString(base).getFileExtension();
+		if (ext != null) {
+			sb.append(ext);
+		}
 		return sb.toString();
 	}
 

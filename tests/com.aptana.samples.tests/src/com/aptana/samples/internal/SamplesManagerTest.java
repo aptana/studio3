@@ -7,7 +7,6 @@
  */
 package com.aptana.samples.internal;
 
-import java.io.File;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -18,7 +17,6 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
-import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 
 public class SamplesManagerTest extends TestCase
@@ -55,49 +53,29 @@ public class SamplesManagerTest extends TestCase
 	public void testGetSamplesForCategory()
 	{
 		List<SamplesReference> samples = samplesManager.getSamplesForCategory("com.aptana.samples.tests.category");
-		assertEquals(2, samples.size());
+		assertEquals(1, samples.size());
 
-		SamplesReference localSample = samples.get(0);
-		assertFalse(localSample.isRemote());
-
-		assertEquals(samplesManager.getCategories().get(0), localSample.getCategory());
-		assertEquals("Local", localSample.getName());
-		assertNull(localSample.getDescriptionText());
-		assertEquals(getFullPath("samples/info.txt"), localSample.getInfoFile());
-		assertEquals(getFullPath("samples/"), localSample.getPath());
-		assertNull(localSample.getPreviewHandler());
-		assertNull(localSample.getProjectHandler());
-
-		String[] natures = localSample.getNatures();
-		assertEquals(1, natures.length);
-		assertEquals("com.aptana.projects.webnature", natures[0]);
-		String[] includes = localSample.getIncludePaths();
-		assertEquals(1, includes.length);
-		assertEquals(getFullPath("libs/"), includes[0]);
-
-		List<SampleEntry> entries = localSample.getSamples();
-		assertEquals(1, entries.size());
-
-		SampleEntry entry = entries.get(0);
-		assertEquals(localSample, entry.getParent());
-		assertEquals(new File(getFullPath("samples/test")), entry.getFile());
-		assertEquals("Testing local sample", entry.getDescription());
-		assertTrue(entry.isRoot());
-
-		SampleEntry[] subentries = entry.getSubEntries();
-		assertEquals(1, subentries.length);
-		assertEquals(new File(getFullPath("samples/test/index.html")), subentries[0].getFile());
-		assertFalse(subentries[0].isRoot());
-
-		SamplesReference remoteSample = samples.get(1);
+		SamplesReference remoteSample = samples.get(0);
 		assertTrue(remoteSample.isRemote());
+		assertEquals("com.aptana.samples.tests.remote", remoteSample.getId());
 		assertEquals("Remote", remoteSample.getName());
 		assertEquals("Testing remote sample", remoteSample.getDescriptionText());
 		assertEquals("git://github.com/aptana/remote_sample.git", remoteSample.getPath());
+
+		assertEquals(samplesManager.getCategories().get(0), remoteSample.getCategory());
+		assertNull(remoteSample.getInfoFile());
+		assertNull(remoteSample.getPreviewHandler());
+		assertNull(remoteSample.getProjectHandler());
+
+		String[] natures = remoteSample.getNatures();
+		assertEquals(1, natures.length);
+		assertEquals("com.aptana.projects.webnature", natures[0]);
+		String[] includes = remoteSample.getIncludePaths();
+		assertEquals(0, includes.length);
 	}
 
 	private static String getFullPath(String entryPath)
 	{
-		return ResourceUtil.resourcePathToString(Platform.getBundle("com.aptana.samples.tests").getEntry(entryPath));
+		return ResourceUtil.resourcePathToString(Platform.getBundle("com.aptana.samples").getEntry(entryPath));
 	}
 }

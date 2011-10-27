@@ -23,7 +23,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	{
 		IEclipsePreferences prefs = (EclipseUtil.defaultScope()).getNode(HTMLPlugin.PLUGIN_ID);
 
-		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.HTML_INDEX_VERSION, 0);
 		prefs.put(
 				com.aptana.editor.common.contentassist.IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS,
@@ -36,6 +36,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.put(IPreferenceConstants.HTML_OUTLINE_TAG_ATTRIBUTES_TO_SHOW, DEFAULT_TAG_ATTRIBUTES_TO_SHOW);
 
 		// mark occurrences
-		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 	}
 }

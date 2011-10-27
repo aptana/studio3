@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -45,8 +47,29 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 	protected Map<String, Object> attributes;
 	protected Text path;
 	private String installerName;
+	private boolean createInstallDir;
 
+	/**
+	 * Constructs a new InstallerOptionsDialog
+	 * 
+	 * @param parentShell
+	 * @param installerName
+	 */
 	public InstallerOptionsDialog(Shell parentShell, String installerName)
+	{
+		this(parentShell, installerName, false);
+	}
+
+	/**
+	 * Constructs a new InstallerOptionsDialog.
+	 * 
+	 * @param parentShell
+	 * @param installerName
+	 * @param createInstallDir
+	 *            - In case it's <code>true</code>, an input directory that does not exist will be created when the user
+	 *            clicks OK.
+	 */
+	public InstallerOptionsDialog(Shell parentShell, String installerName, boolean createInstallDir)
 	{
 		super(Display.getDefault().getActiveShell());
 		this.installerName = installerName;
@@ -54,6 +77,7 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		setHelpAvailable(false);
 		attributes = new HashMap<String, Object>();
 		setAttributes();
+		this.createInstallDir = createInstallDir;
 	}
 
 	/**
@@ -184,6 +208,28 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		validatePath();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
+	@Override
+	protected void okPressed()
+	{
+		if (createInstallDir)
+		{
+			File f = new File(path.getText());
+			if (!f.exists() && !f.mkdirs())
+			{
+				// Display an error message about the problem and return here to prevent a dialog close.
+				MessageDialog.openError(getParentShell(),
+						Messages.InstallerOptionsDialog_creatingDirectoriesErrorTitle,
+						Messages.InstallerOptionsDialog_creatingDirectoriesErrorMessage);
+				return;
+			}
+		}
+		super.okPressed();
+	}
+
 	/**
 	 * Validate the path
 	 */
@@ -198,9 +244,17 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 		}
 		if (!new File(pathText).exists())
 		{
-			// non-existing path
-			setErrorMessage(Messages.InstallerOptionsDialog_nonExistingPathError);
-			return;
+			if (createInstallDir)
+			{
+				setMessage(Messages.InstallerOptionsDialog_inputDirectoryWillBeCreated, IMessageProvider.INFORMATION);
+			}
+			else
+			{
+				// non-existing path
+				setErrorMessage(Messages.InstallerOptionsDialog_nonExistingPathError);
+				return;
+			}
+
 		}
 		setErrorMessage(null);
 	}

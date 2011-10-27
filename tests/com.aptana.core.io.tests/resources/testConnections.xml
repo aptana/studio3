@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connections>
+<connection id="8da399fa-bf55-4e16-b562-193db924e063" type="ftp">
+<name>FTP1</name>
+<host>FTP1</host>
+<path>/FTP1</path>
+<login>tester</login>
+<passive>true</passive>
+</connection>
+<connection id="89deecbf-0c19-44e4-b2c6-549b8d0a12e6" type="sftp">
+<name>SFTP1</name>
+<host>SFTP1</host>
+<path>/SFTP1</path>
+<login>tester</login>
+<compression>AUTO</compression>
+</connection>
+<connection id="ab96e9dc-b38b-47bf-9afd-fd753f73d4b3" type="s3">
+<name>S3</name>
+<host>s3.amazonaws.com</host>
+<path>/S3</path>
+<accessKey>tester</accessKey>
+</connection>
+<connection id="a1df2047-0bf0-4642-9f06-ed89e11feca5" type="ftps">
+<name>FTPS1</name>
+<host>FTPS1</host>
+<path>/FTPS1</path>
+<login>tester</login>
+<explicit>true</explicit>
+<validateCertificate>true</validateCertificate>
+<passive>true</passive>
+</connection>
+<connection id="5acceb19-03f7-4f79-bf06-e7fbafff2364" type="local">
+<name>Sample</name>
+<path>/test</path>
+</connection>
+</connections>

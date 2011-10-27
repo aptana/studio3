@@ -69,7 +69,7 @@ public class BrowserConfigurationManagerTest extends TestCase
 		assertEquals(150, browserImage.getVerticalIndent());
 		assertEquals("iPhone Vertical", size.toString());
 		assertTrue(browserImage.isBlackBackground());
-		assertEquals(AbstractUIPlugin.imageDescriptorFromPlugin("com.aptana.browser.tests", "images/iphone_ver.png"),
+		assertEquals(AbstractUIPlugin.imageDescriptorFromPlugin("com.aptana.browser", "images/iphone_ver.png"),
 				browserImage.getImageDescriptor());
 
 		BrowserSizeCategory orderedCategory = categories[3];

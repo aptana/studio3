@@ -8,6 +8,7 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.core.expressions,
  org.eclipse.core.filesystem,
  org.eclipse.ui.browser,
  org.eclipse.ui.ide,
@@ -17,7 +18,10 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.samples,
  com.aptana.theme,
  com.aptana.git.ui,
- com.aptana.projects
+ com.aptana.projects,
+ org.mortbay.jetty.util,
+ com.aptana.configurations,
+ com.aptana.portal.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-LazyStart: true
 Bundle-Localization: plugin

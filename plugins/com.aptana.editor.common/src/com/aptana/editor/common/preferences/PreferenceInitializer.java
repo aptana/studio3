@@ -25,7 +25,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING, true);
 		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, "128,128,128"); //$NON-NLS-1$
-		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, false);
 
 		// Tasks
 		prefs.put(ICorePreferenceConstants.TASK_TAG_NAMES, "TODO,FIXME,XXX"); //$NON-NLS-1$

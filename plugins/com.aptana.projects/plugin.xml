@@ -72,7 +72,7 @@
          point="org.eclipse.ui.newWizards">
       <wizard
             category="com.aptana.ui.wizards.category"
-            class="com.aptana.projects.internal.wizards.NewProjectWizard"
+            class="com.aptana.projects.internal.wizards.NewWebProjectWizard"
             finalPerspective="com.aptana.ui.WebPerspective"
             icon="icons/new_web_project.png"
             id="com.aptana.ui.wizards.NewWebProject"

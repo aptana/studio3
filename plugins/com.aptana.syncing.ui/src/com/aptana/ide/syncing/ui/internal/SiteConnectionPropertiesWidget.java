@@ -61,7 +61,7 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SyncingPlugin;
+import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.ftp.internal.FTPPropertyDialogProvider;
 
@@ -223,18 +223,10 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			{
 				message = MessageFormat.format(Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
 			}
-			else
+			else if ((siteConnection == null || !name.equalsIgnoreCase(siteConnection.getName()))
+					&& !SiteConnectionUtils.isSiteNameUnique(name))
 			{
-				ISiteConnection[] connections = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-				for (ISiteConnection connection : connections)
-				{
-					if (connection != siteConnection && name.equals(connection.getName()))
-					{
-						message = MessageFormat
-								.format(Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
-						break;
-					}
-				}
+				message = MessageFormat.format(Messages.SiteConnectionPropertiesWidget_ERR_DuplicateNames, name);
 			}
 			if (message == null)
 			{

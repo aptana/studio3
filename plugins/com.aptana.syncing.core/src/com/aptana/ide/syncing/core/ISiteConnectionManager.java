@@ -38,4 +38,6 @@ public interface ISiteConnectionManager
 	public void removeListener(ISiteConnectionListener listener);
 
 	public List<ISiteConnection> addConnectionsFrom(IPath path);
+
+	public List<ISiteConnection> readConnectionsFrom(IPath path);
 }

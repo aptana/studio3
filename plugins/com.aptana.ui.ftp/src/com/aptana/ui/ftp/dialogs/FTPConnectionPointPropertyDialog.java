@@ -33,9 +33,9 @@ import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 /**
  * @author Max Stepanov
- *
  */
-public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements IPropertyDialog, FTPConnectionPropertyComposite.IListener {
+public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements IPropertyDialog,
+		FTPConnectionPropertyComposite.IListener {
 
 	private Image titleImage;
 	private FTPConnectionPropertyComposite ftpComposite;
@@ -56,7 +56,8 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.ui.IPropertyDialog#setPropertyElement(java.lang.Object)
 	 */
 	public void setPropertySource(Object element) {
@@ -69,7 +70,8 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.ui.IPropertyDialog#getPropertySource()
 	 */
 	public Object getPropertySource() {
@@ -82,8 +84,9 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 		return CoreIOPlugin.getConnectionPointManager().getType(IBaseFTPConnectionPoint.TYPE_FTP);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
@@ -96,23 +99,27 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 				dispose();
 			}
 		});
-		
+
 		setTitleImage(titleImage);
 		if (ftpConnectionPoint != null) {
-			setTitle(MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_MessageTitle_Edit, getConnectionPointType().getName()));
+			setTitle(MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_MessageTitle_Edit,
+					getConnectionPointType().getName()));
 			getShell().setText(Messages.FTPConnectionPointPropertyDialog_Title_Edit);
-		} else {
-			setTitle(MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_MessageTitle_New, getConnectionPointType().getName()));
+		}
+		else {
+			setTitle(MessageFormat.format(Messages.FTPConnectionPointPropertyDialog_MessageTitle_New,
+					getConnectionPointType().getName()));
 			getShell().setText(Messages.FTPConnectionPointPropertyDialog_Title_New);
 		}
-		
+
 		ftpComposite = createConnectionComposite(dialogArea, ftpConnectionPoint);
 		ftpComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		
+
 		return dialogArea;
 	}
-	
-	protected FTPConnectionPropertyComposite createConnectionComposite(Composite parent, IBaseRemoteConnectionPoint connectionPoint) {
+
+	protected FTPConnectionPropertyComposite createConnectionComposite(Composite parent,
+			IBaseRemoteConnectionPoint connectionPoint) {
 		return new FTPConnectionPropertyComposite(parent, SWT.NONE, connectionPoint, this);
 	}
 
@@ -125,10 +132,11 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 			setTitleImage(null);
 			titleImage.dispose();
 			titleImage = null;
-		}		
+		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.window.Window#canHandleShellCloseEvent()
 	 */
 	@Override
@@ -136,7 +144,8 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		return !lockedUI && super.canHandleShellCloseEvent();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
 	@Override
@@ -150,7 +159,8 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#cancelPressed()
 	 */
 	@Override
@@ -161,32 +171,35 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createContents(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		try {
 			return super.createContents(parent);
-		} finally {
+		}
+		finally {
 			if (ftpComposite != null) {
 				ftpComposite.validate();
 			}
 		}
 	}
-	
+
 	public void setValid(boolean valid) {
 		Button button = getButton(OK);
 		if (button != null) {
 			button.setEnabled(valid);
 		}
 	}
-	
+
 	public void error(String message) {
 		if (message == null) {
 			setErrorMessage(null);
 			setMessage(null);
-		} else {
+		}
+		else {
 			setErrorMessage(message);
 		}
 	}

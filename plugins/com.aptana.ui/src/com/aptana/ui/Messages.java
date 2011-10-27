@@ -18,6 +18,8 @@ public class Messages extends NLS
 
 	public static String IDialogConstants_LBL_Apply;
 	public static String IDialogConstants_LBL_Browse;
+	public static String IDialogConstants_LBL_Overwrite;
+	public static String IDialogConstants_LBL_Rename;
 
 	public static String QuickMenuDialog_NoMatchesFound;
 
@@ -25,7 +27,7 @@ public class Messages extends NLS
 	public static String UIPlugin_ResetPerspective_Description;
 	public static String UIPlugin_ResetPerspective_Title;
 
-	public static String EclipseDiagnosticLog_eclipse_version;
+	public static String EclipseDiagnosticLog_version;
 	public static String EclipseDiagnosticLog_host_os;
 	public static String EclipseDiagnosticLog_install_dir;
 	public static String EclipseDiagnosticLog_jre_home;

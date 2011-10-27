@@ -333,6 +333,10 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		terminalComposite.sendInput(text);
 	}
 
+	public void clear() {
+		terminalComposite.clear();
+	}
+
 	/**
 	 * hookContextMenu
 	 */
@@ -390,11 +394,12 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 	}
 
 	private void updateActions() {
-		fActionEditCut.updateAction(true);
-		fActionEditCopy.updateAction(true);
-		fActionEditPaste.updateAction(true);
-		fActionEditSelectAll.updateAction(true);
-		fActionEditClearAll.updateAction(true);
+		boolean aboutToShow = true;
+		fActionEditCut.updateAction(aboutToShow);
+		fActionEditCopy.updateAction(aboutToShow);
+		fActionEditPaste.updateAction(aboutToShow);
+		fActionEditSelectAll.updateAction(aboutToShow);
+		fActionEditClearAll.updateAction(aboutToShow);
 	}
 
 	/**
@@ -404,8 +409,20 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		fActionEditCopy = new TerminalActionCopy(terminalComposite.getTerminalViewControl());
 		fActionEditCut = new TerminalActionCut(terminalComposite.getTerminalViewControl());
 		fActionEditPaste = new TerminalActionPaste(terminalComposite.getTerminalViewControl());
-		fActionEditClearAll = new TerminalActionClearAll(terminalComposite.getTerminalViewControl());
-		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
+		fActionEditClearAll = new TerminalActionClearAll(terminalComposite.getTerminalViewControl()) {
+			@Override
+			public void run() {
+				super.run();
+				updateActions();
+			}
+		};
+		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl()) {
+			@Override
+			public void run() {
+				super.run();
+				updateActions();
+			}
+		};
 
 		// open view action
 		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View,

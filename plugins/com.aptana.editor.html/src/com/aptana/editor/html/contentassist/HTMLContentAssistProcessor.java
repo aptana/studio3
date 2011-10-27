@@ -38,7 +38,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.core.IURIMapper;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -72,7 +71,7 @@ import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.ui.util.UIUtils;
-import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -504,11 +503,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					baseStore = EFS.getStore(projectUri);
 
 					// Get the project webroot
-					IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
+					IServer serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 					if (serverConfiguration == null)
 					{
-						for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
-								.getServerConfigurations())
+						for (IServer server : WebServerCorePlugin.getDefault().getServerManager()
+								.getServers())
 						{
 							if (server.resolve(editorStore) != null)
 							{
@@ -517,9 +516,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							}
 						}
 					}
-					if (serverConfiguration != null && serverConfiguration instanceof EFSWebServerConfiguration)
+					if (serverConfiguration != null)
 					{
-						URI documentRoot = ((EFSWebServerConfiguration) serverConfiguration).getDocumentRoot();
+						URI documentRoot = serverConfiguration.getDocumentRoot();
 						if (documentRoot != null)
 						{
 							baseStore = EFS.getStore(documentRoot);
@@ -1831,7 +1830,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				if (Character.isWhitespace(c) || c == '<')
 				{
-					end = i - 1;
+					end = offset - 1;
 					break;
 				}
 			}

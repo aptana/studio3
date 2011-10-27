@@ -2,4 +2,21 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="samplespath" name="%extension-point.samples.name" schema="schema/samplespath.exsd"/>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.aptana.samples.internal.SamplesReferencePropertyTester"
+            id="com.aptana.samples.samplesReferencePropertyTester"
+            namespace="com.aptana.samples.reference"
+            properties="canPreview, hasHelp"
+            type="com.aptana.samples.model.SamplesReference">
+      </propertyTester>
+      <propertyTester
+            class="com.aptana.samples.internal.SampleEntryPropertyTester"
+            id="com.aptana.samples.sampleEntryPropertyTester"
+            namespace="com.aptana.samples.entry"
+            properties="canPreview, hasHelp"
+            type="com.aptana.samples.model.SampleEntry">
+      </propertyTester>
+   </extension>
 </plugin>

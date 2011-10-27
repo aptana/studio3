@@ -6,16 +6,16 @@
 		<RDF:Seq>
 			<RDF:li>
 				<RDF:Description>
-					<em:version>1.7.1</em:version>
+					<em:version>1.7.2</em:version>
 					
 					<em:targetApplication>
 						<RDF:Description>
 							<!-- Mozilla Firefox, version 1.5 to 3.6+ -->
 							<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 							<em:minVersion>3.6</em:minVersion>
-							<em:maxVersion>6.9.*</em:maxVersion>
+							<em:maxVersion>8.*</em:maxVersion>
 							<em:updateLink>http://firefox.aptana.com/update/aptanadebugger.xpi</em:updateLink>
-							<em:updateHash>sha256:27a9f5affdb7f5010a145f0c7e46ad1ad7049f07c561cca35e14b0983fe2eeb2</em:updateHash>
+							<em:updateHash>sha256:d1f08bc4dec249436d54b6c6960864f4ec43fe14c479fba6f5a9602e52cdb872</em:updateHash>
 						</RDF:Description>
 					</em:targetApplication>
 				</RDF:Description>
@@ -24,9 +24,9 @@
 	</em:updates>
 	
 	<em:signature>
-		MIGTMA0GCSqGSIb3DQEBDQUAA4GBADa0WNbxtoZB8apTXKnWWhxAqcWkD2N9jOdNKU6
-		6mjdQCrl04L+7hrZzCS+acpUmZh0iKHo1ZRg+zq/WW4nw6k+liQlFH1seiB08lFOtaM
-		KXFJh5tCzJONeZDgwhJl32dgxWuN5OV4qVJznrCIUCmsV8lngsD6GSWydFMggEmxy1
+		MIGTMA0GCSqGSIb3DQEBDQUAA4GBABHkN7GTHvMH3o2oIh5gmv7LN7nEyOYSf0Od0UF
+		KB/lLwPvlIEBziEC3t0m3Aif+sXl79zYmHwbrF+SxZKCDatI4YfmIOpEUinuMZ6WgUf
+		RhVEaVQkJji2PAP8M5eLF2HMRS6JkJo/igWThNv5PL07LXyRPDkpvQCIJer/O5Jt3y
 	</em:signature>
 
 </RDF:Description> 

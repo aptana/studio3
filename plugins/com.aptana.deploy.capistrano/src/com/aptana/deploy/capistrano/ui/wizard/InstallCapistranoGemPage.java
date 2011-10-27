@@ -7,13 +7,10 @@
  */
 package com.aptana.deploy.capistrano.ui.wizard;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
@@ -30,7 +27,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.util.ExecutableUtil;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.terminal.widget.TerminalComposite;
 
 public class InstallCapistranoGemPage extends WizardPage
@@ -74,25 +70,10 @@ public class InstallCapistranoGemPage extends WizardPage
 				}
 
 				// Need to check to see if we should run under sudo to install gem...
-				if (!Platform.getOS().equals(Platform.OS_WIN32))
+				if (!ExecutableUtil.isGemInstallable())
 				{
-					// TODO This code is pretty blase about possible nulls/errors/etc. Should probably try and make it
-					// more bullet-proof.
-
-					// grab the path to the gem executable dir
-					IPath gemBin = ExecutableUtil.find("gem", true, null); //$NON-NLS-1$
-					String output = ProcessUtil.outputForCommand(gemBin.toOSString(), null, "environment"); //$NON-NLS-1$
-					final String searchString = "EXECUTABLE DIRECTORY:"; //$NON-NLS-1$
-					int index = output.indexOf(searchString);
-					output = output.substring(index + searchString.length());
-					// find first newline...
-					output = output.split("\r\n|\r|\n")[0].trim(); //$NON-NLS-1$
-					// Now see if user has rights to write to this dir to determine if we need to run under sudo
-					if (!new File(output).canWrite())
-					{
-						// Does not have permission
-						terminalComposite.sendInput("sudo "); //$NON-NLS-1$
-					}
+					// Does not have permission
+					terminalComposite.sendInput("sudo "); //$NON-NLS-1$
 				}
 
 				// install gem

@@ -7,14 +7,10 @@
  */
 package com.aptana.editor.coffee.internal.index;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
@@ -31,7 +27,6 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
-	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\r\n|\r|\n"); //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -53,7 +48,7 @@ public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipa
 			removeTasks(store, sub.newChild(10));
 
 			// grab the source of the file we're going to parse
-			String source = IOUtil.read(store.openInputStream(EFS.NONE, sub.newChild(20)));
+			String source = IOUtil.read(store.openInputStream(EFS.NONE, sub.newChild(20)), getCharset(store));
 
 			// minor optimization when creating a new empty file
 			if (StringUtil.isEmpty(source))
@@ -119,7 +114,7 @@ public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipa
 			text = text.toLowerCase();
 		}
 		int offset = initialOffset;
-		String[] lines = NEWLINE_PATTERN.split(text);
+		String[] lines = StringUtil.LINE_SPLITTER.split(text);
 		for (String line : lines)
 		{
 			for (TaskTag entry : TaskTag.getTaskTags())
@@ -146,18 +141,6 @@ public class CoffeeFileIndexingParticipant extends AbstractFileIndexingParticipa
 			}
 			// FIXME This doesn't take the newline into account from split!
 			offset += line.length();
-		}
-	}
-
-	private int getLineNumber(int start, String source)
-	{
-		try
-		{
-			return new Document(source).getLineOfOffset(start) + 1;
-		}
-		catch (BadLocationException e)
-		{
-			return -1;
 		}
 	}
 }

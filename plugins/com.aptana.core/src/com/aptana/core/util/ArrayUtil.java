@@ -7,6 +7,10 @@
  */
 package com.aptana.core.util;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class ArrayUtil
 {
 
@@ -51,5 +55,13 @@ public class ArrayUtil
 			start += arr.length;
 		}
 		return returnArray;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T[] reverse(T[] array)
+	{
+		List<T> list = Arrays.asList(array);
+		Collections.reverse(list);
+		return (T[]) list.toArray();
 	}
 }

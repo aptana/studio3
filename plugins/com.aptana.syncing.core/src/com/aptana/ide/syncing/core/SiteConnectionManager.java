@@ -128,6 +128,17 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 
 	public List<ISiteConnection> addConnectionsFrom(IPath path)
 	{
+		List<ISiteConnection> newConnections = readConnectionsFrom(path);
+		for (ISiteConnection connection : newConnections)
+		{
+			connections.add((SiteConnection) connection);
+		}
+
+		return newConnections;
+	}
+
+	public List<ISiteConnection> readConnectionsFrom(IPath path)
+	{
 		List<ISiteConnection> newConnections = new ArrayList<ISiteConnection>();
 		File file = path.toFile();
 		if (file.exists())
@@ -142,7 +153,6 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 					SiteConnection siteConnection = restoreConnection(child);
 					if (siteConnection != null && siteConnection.isValid())
 					{
-						connections.add(siteConnection);
 						newConnections.add(siteConnection);
 					}
 				}

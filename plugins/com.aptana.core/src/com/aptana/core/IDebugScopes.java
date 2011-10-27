@@ -30,4 +30,9 @@ public interface IDebugScopes
 	 */
 	String SHELL = CorePlugin.PLUGIN_ID + "/debug/shell"; //$NON-NLS-1$
 
+	/**
+	 * Items related to zip utils
+	 */
+	String ZIPUTIL = CorePlugin.PLUGIN_ID + "/debug/ziputil"; //$NON-NLS-1$
+
 }
