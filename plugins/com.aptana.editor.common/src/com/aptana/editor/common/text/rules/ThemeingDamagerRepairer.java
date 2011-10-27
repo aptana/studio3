@@ -7,11 +7,14 @@
  */
 package com.aptana.editor.common.text.rules;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextAttribute;
@@ -25,6 +28,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.theme.ThemePlugin;
 
 public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
@@ -35,6 +39,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	private IRegion fLastLine;
 	private int fCountForLine;
 	private TypedPosition fLastPosition;
+	private List<Position> newPositions;
+	private Position[] oldPositions;
 
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
@@ -46,6 +52,12 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		try
 		{
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PRESENTATION))
+			{
+				IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+						"Creating presentation for region at offset {0}, length {1} in document of length {2}", //$NON-NLS-1$
+						region.getOffset(), region.getLength(), fDocument.getLength()), IDebugScopes.PRESENTATION);
+			}
 			fLastLine = null;
 			fLastPosition = null;
 			fCountForLine = 0;
@@ -55,7 +67,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			{
 				scope = StringUtil.EMPTY;
 			}
-			wipeExistingScopes(region);
+			oldPositions = getExistingScopes(region);
+			newPositions = new ArrayList<Position>();
 		}
 		catch (BadLocationException e)
 		{
@@ -63,10 +76,12 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
-			synchronized (getLockObject(fDocument))
-			{
-				super.createPresentation(presentation, region);
-			}
+			// Do coloring and collect all the scopes
+			super.createPresentation(presentation, region);
+			updateScopePositions();
+
+			oldPositions = null;
+			newPositions = null;
 			scope = StringUtil.EMPTY;
 			fLastLine = null;
 			fLastPosition = null;
@@ -75,50 +90,123 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	}
 
 	/**
-	 * Given a partition region, iterate through all our scope positions and wipe any in that region.
+	 * This attempts to do minimal add/remove calls for positions on IDocument, since each call synchronizes on the
+	 * document, which adds up very quickly.
+	 */
+	private void updateScopePositions()
+	{
+		try
+		{
+			int oldIndex = 0;
+			int newIndex = 0;
+			int oldLength = oldPositions.length;
+			int newLength = newPositions.size();
+			while (newIndex < newLength && oldIndex < oldLength)
+			{
+				Position newPosition = newPositions.get(newIndex);
+				Position oldPosition = oldPositions[oldIndex];
+				if (newPosition.equals(oldPosition))
+				{
+					// a match, move on
+					oldIndex++;
+					newIndex++;
+					continue;
+				}
+				// uh oh, no match. figure out if we need to remove old / add new
+				else if (newPosition.offset + newPosition.length < oldPosition.offset)
+				{
+					// new Position is before old, so just add the new one
+					fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPosition);
+					newIndex++;
+					continue;
+				}
+				if (oldPosition.offset + oldPosition.length < newPosition.offset)
+				{
+					// old Position is before new, so just remove the old one
+					oldPosition.delete();
+					fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, oldPosition);
+					oldIndex++;
+					continue;
+				}
+				else
+				{
+					// same scope, but offset/length has changed. Update them on position
+					if (((TypedPosition) oldPosition).getType().equals(((TypedPosition) newPosition).getType()))
+					{
+						oldPosition.offset = newPosition.offset;
+						oldPosition.length = newPosition.length;
+					}
+					else
+					{
+						// scope has changed, remove old, add new
+						oldPosition.delete();
+						fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, oldPosition);
+						fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPosition);
+					}
+					oldIndex++;
+					newIndex++;
+					continue;
+				}
+			}
+			// if we went off the end of one list, but not the other - We still need to add or remove!
+			for (int i = oldIndex; i < oldLength; i++)
+			{
+				oldPositions[i].delete();
+				fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, oldPositions[i]);
+			}
+			for (int i = newIndex; i < newLength; i++)
+			{
+				fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPositions.get(i));
+			}
+		}
+		catch (BadLocationException e1)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
+		}
+		catch (BadPositionCategoryException e1)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
+		}
+	}
+
+	/**
+	 * Grab the set of scopes stored for this document in this region.
 	 * 
 	 * @param region
 	 * @throws BadPositionCategoryException
 	 */
-	private void wipeExistingScopes(ITypedRegion region)
+	private Position[] getExistingScopes(ITypedRegion region)
 	{
 		int offset = region.getOffset();
 		int end = offset + region.getLength();
 
 		try
 		{
-			synchronized (getLockObject(fDocument))
+			fDocument.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
+			int index = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
+			int endIndex = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, end);
+			if (endIndex == index)
 			{
-				fDocument.addPositionCategory(ICommonConstants.SCOPE_CATEGORY);
-				int index = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, offset);
-				int endIndex = fDocument.computeIndexInCategory(ICommonConstants.SCOPE_CATEGORY, end);
-				if (endIndex == index)
-				{
-					// there should be nothing to wipe!
-					return;
-				}
-				// Only loop over positions[index] to positions[endIndex - 1]!
-				int start;
-				int stop;
-				Position[] positions;
-				if (fDocument instanceof AbstractDocument)
-				{
-					AbstractDocument abDoc = (AbstractDocument) fDocument;
-					positions = abDoc.getPositions(ICommonConstants.SCOPE_CATEGORY, offset, region.getLength(), false,
-							false);
-					start = 0;
-					stop = positions.length;
-				}
-				else
-				{
-					positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
-					start = index;
-					stop = endIndex;
-				}
-				for (int i = start; i < stop; i++)
-				{
-					fDocument.removePosition(ICommonConstants.SCOPE_CATEGORY, positions[i]);
-				}
+				// there should be nothing to wipe!
+				return new Position[0];
+			}
+			if (fDocument instanceof AbstractDocument)
+			{
+				AbstractDocument abDoc = (AbstractDocument) fDocument;
+				Position[] positions = abDoc.getPositions(ICommonConstants.SCOPE_CATEGORY, offset, region.getLength(),
+						false, false);
+				return positions;
+			}
+			else
+			{
+				Position[] positions = fDocument.getPositions(ICommonConstants.SCOPE_CATEGORY);
+				int start = index;
+				int stop = endIndex;
+
+				int length = stop - start;
+				Position[] sub = new Position[length];
+				System.arraycopy(positions, start, sub, 0, length);
+				return sub;
 			}
 		}
 		catch (BadPositionCategoryException e)
@@ -130,19 +218,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage());
 		}
-	}
-
-	private static Object getLockObject(Object object)
-	{
-		if (object instanceof ISynchronizable)
-		{
-			Object lock = ((ISynchronizable) object).getLockObject();
-			if (lock != null)
-			{
-				return lock;
-			}
-		}
-		return object;
+		return new Position[0];
 	}
 
 	@Override
@@ -165,7 +241,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 				}
 				else
 				{
-					last = scope + " " + last; //$NON-NLS-1$
+					last = scope + ' ' + last;
 				}
 			}
 			IToken converted = ThemePlugin.getDefault().getThemeManager().getToken(last);
@@ -195,33 +271,20 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			fLastPosition = null;
 			return;
 		}
-		try
-		{
-			int offset = fScanner.getTokenOffset();
-			int length = fScanner.getTokenLength();
 
-			// Continuing same scope as last position, expand to merge them
-			if (fLastPosition != null && fLastPosition.getType().equals(tokenLevelScope))
-			{
-				fLastPosition.setLength((offset + length) - fLastPosition.getOffset());
-			}
-			else
-			{
-				TypedPosition newPosition = new TypedPosition(offset, length, tokenLevelScope);
-				fLastPosition = newPosition;
-				synchronized (getLockObject(fDocument))
-				{
-					fDocument.addPosition(ICommonConstants.SCOPE_CATEGORY, newPosition);
-				}
-			}
-		}
-		catch (BadLocationException e1)
+		int offset = fScanner.getTokenOffset();
+		int length = fScanner.getTokenLength();
+
+		// Continuing same scope as last position, expand to merge them
+		if (fLastPosition != null && fLastPosition.getType().equals(tokenLevelScope))
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
+			fLastPosition.setLength((offset + length) - fLastPosition.getOffset());
 		}
-		catch (BadPositionCategoryException e1)
+		else
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e1);
+			TypedPosition newPosition = new TypedPosition(offset, length, tokenLevelScope);
+			fLastPosition = newPosition;
+			newPositions.add(newPosition);
 		}
 	}
 
