@@ -366,19 +366,57 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		return new JSFileIndexingParticipant();
 	}
 
-	public void testIsValidAutoActivationLocationIdentifier()
+	public void testAutoActivationIdentifier()
 	{
-		String source = "a|(|abc,|";
+		String source = "a|(abc,";
 		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
 
 		setupTestContext(fileStore);
+		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
 
-		int offset1 = cursorOffsets.get(0);
-		int offset2 = cursorOffsets.get(1);
-		int offset3 = cursorOffsets.get(2);
+	public void testAutoActivationLeftParen()
+	{
+		String source = "a(|abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
 
-		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, offset1));
-		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, offset2));
-		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, offset3));
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationComma()
+	{
+		String source = "a(abc,|";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationIdentifierWithSpace()
+	{
+		String source = "a \t\r\n|(abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationLeftParenWithSpace()
+	{
+		String source = "a( \t\r\n|abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoAactivationCommaWithSpace()
+	{
+		String source = "a(abc, \t\r\n|";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
 	}
 }

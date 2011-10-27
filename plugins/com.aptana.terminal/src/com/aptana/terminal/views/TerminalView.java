@@ -333,6 +333,10 @@ public class TerminalView extends ViewPart implements ISaveablePart2, IProcessLi
 		terminalComposite.sendInput(text);
 	}
 
+	public void clear() {
+		terminalComposite.clear();
+	}
+
 	/**
 	 * hookContextMenu
 	 */

@@ -9,7 +9,6 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +17,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
@@ -36,6 +36,7 @@ import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -67,6 +68,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	private static String[] KEYWORDS = ArrayUtil.flatten(JSLanguageConstants.KEYWORD_OPERATORS,
 			JSLanguageConstants.GRAMMAR_KEYWORDS, JSLanguageConstants.KEYWORD_CONTROL);
+
+	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES;
+
+	{
+		AUTO_ACTIVATION_PARTITION_TYPES = new HashSet<String>();
+		AUTO_ACTIVATION_PARTITION_TYPES.add(JSSourceConfiguration.DEFAULT);
+		AUTO_ACTIVATION_PARTITION_TYPES.add(IDocument.DEFAULT_CONTENT_TYPE);
+	}
 
 	private JSIndexQueryHelper _indexHelper;
 	private IParseNode _targetNode;
@@ -871,15 +880,46 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
-		JSTokenType[] types = new JSTokenType[] { JSTokenType.LPAREN, JSTokenType.COMMA };
-		Arrays.sort(types);
-		ILexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		if (offset > 0)
+		// NOTE: If auto-activation logic changes it may be necessary to change this logic
+		// to continue walking backwards through partitions until a) a valid activation character
+		// or b) a non-whitespace non-valid activation character is encountered. That implementation
+		// would need to skip partitions that are effectively whitespace, for example, comment
+		// partitions
+		boolean result = false;
+
+		try
 		{
-			Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
-			return (lexeme != null) ? Arrays.binarySearch(types, lexeme.getType()) >= 0 : false;
+			ITypedRegion partition = document.getPartition(offset);
+
+			if (partition != null && AUTO_ACTIVATION_PARTITION_TYPES.contains(partition.getType()))
+			{
+				int start = partition.getOffset();
+				int index = offset - 1;
+
+				while (index >= start)
+				{
+					char candidate = document.getChar(index);
+
+					if (candidate == ',' || candidate == '(')
+					{
+						result = true;
+						break;
+					}
+					else if (!Character.isWhitespace(candidate))
+					{
+						break;
+					}
+
+					index--;
+				}
+			}
 		}
-		return false;
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+
+		return result;
 	}
 
 	/*

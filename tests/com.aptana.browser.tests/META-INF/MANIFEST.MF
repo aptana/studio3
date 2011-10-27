@@ -4,9 +4,7 @@ Bundle-Name: Browser Tests
 Bundle-SymbolicName: com.aptana.browser.tests;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: Aptana
+Fragment-Host: com.aptana.browser
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit
 Export-Package: com.aptana.browser.tests
-Require-Bundle: org.junit,
- com.aptana.browser;visibility:=reexport,
- org.eclipse.ui,
- org.eclipse.core.runtime
