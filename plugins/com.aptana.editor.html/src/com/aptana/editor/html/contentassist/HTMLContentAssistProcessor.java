@@ -1754,8 +1754,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				case DOUBLE_QUOTED_STRING:
 					if (lexeme.getEndingOffset() < offset && lexeme.getLength() > 1)
 					{
-						result = LocationType.IN_ATTRIBUTE_NAME;
-						this._replaceRange = null;
+						String text = lexeme.getText();
+						char lastChar = (StringUtil.isEmpty(text)) ? '\0' : text.charAt(text.length() - 1);
+
+						if (lastChar == '"' || lastChar == '\'')
+						{
+							result = LocationType.IN_ATTRIBUTE_NAME;
+							this._replaceRange = null;
+						}
+						else
+						{
+							// unclosed attribute value, occurs at EOF
+							result = LocationType.IN_ATTRIBUTE_VALUE;
+						}
 					}
 					else
 					{
