@@ -7,7 +7,7 @@
  */
 package com.aptana.portal.ui.dispatch;
 
-import org.mortbay.util.ajax.JSON;
+import java.text.MessageFormat;
 
 /**
  * Constants to be used when creating JSON strings that will be passes to the browser when we need to notify the its
@@ -85,21 +85,21 @@ public interface IBrowserNotificationConstants
 	 * OK string
 	 */
 	public static final String OK_STRING = "ok"; //$NON-NLS-1$
-	
+
 	/**
 	 * Indicate a successful action dispatch.
 	 */
-	public static final Object JSON_OK = JSON.parse(OK_STRING);
+	public static final Object JSON_OK = MessageFormat.format("\"{0}\"", OK_STRING); //$NON-NLS-1$
 
 	/**
 	 * Error string
 	 */
 	public static final String ERROR_STRING = "error"; //$NON-NLS-1$
-	
+
 	/**
 	 * Indicate an unsuccessful action dispatch.
 	 */
-	public static final Object JSON_ERROR = JSON.parse(ERROR_STRING);
+	public static final Object JSON_ERROR = MessageFormat.format("\"{0}\"", ERROR_STRING); //$NON-NLS-1$
 
 	/**
 	 * Indicate that the returned JSON object contains extra error details that the Studio provided.
