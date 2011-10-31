@@ -21,7 +21,12 @@ import java.util.TreeMap;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeMatcher;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -272,11 +277,36 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 		Map<String, String> editorMap = new TreeMap<String, String>();
 		IFileEditorMapping[] mappings = PlatformUI.getWorkbench().getEditorRegistry().getFileEditorMappings();
 		IEditorDescriptor[] editors;
+		IContentTypeMatcher matcher = null;
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		if (projects != null && projects.length > 0)
+		{
+			try
+			{
+				matcher = projects[0].getContentTypeMatcher();
+			}
+			catch (CoreException e)
+			{
+				// ignore
+			}
+		}
 		String extension;
 		for (IFileEditorMapping mapping : mappings)
 		{
 			editors = mapping.getEditors();
 			extension = mapping.getExtension();
+			if (matcher != null)
+			{
+				IContentType type = matcher.findContentTypeFor("new_file." + extension);
+				if (type != null)
+				{
+					String[] extensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
+					if (extensions != null && extensions.length > 0)
+					{
+						extension = extensions[0];
+					}
+				}
+			}
 			for (IEditorDescriptor editor : editors)
 			{
 				if (editor.getId().startsWith(APTANA_EDITOR_PREFIX))
