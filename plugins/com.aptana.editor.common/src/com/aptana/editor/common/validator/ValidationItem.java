@@ -87,4 +87,27 @@ public class ValidationItem implements IValidationItem
 	{
 		this.lineNumber = lineNumber;
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof ValidationItem))
+		{
+			return false;
+		}
+		ValidationItem other = (ValidationItem) obj;
+		return severity == other.severity && offset == other.offset && length == other.length
+				&& message.equals(other.message) && sourcePath.equals(other.sourcePath);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = severity;
+		hash = hash * 31 + offset;
+		hash = hash * 31 + length;
+		hash = hash * 31 + message.hashCode();
+		hash = hash * 31 + sourcePath.hashCode();
+		return hash;
+	}
 }
