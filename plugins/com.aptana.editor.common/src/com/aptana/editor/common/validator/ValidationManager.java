@@ -9,7 +9,6 @@ package com.aptana.editor.common.validator;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +32,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
@@ -57,7 +55,7 @@ public class ValidationManager implements IValidationManager
 	private IParseState fParseState;
 	// the nested languages that need to be validated as well
 	private Set<String> fNestedLanguages;
-	private Map<String, List<IValidationItem>> fItemsByType;
+	private Map<String, List<IValidationItem>> fExistingItemsByType;
 
 	private IPropertyChangeListener fPropertyListener = new IPropertyChangeListener()
 	{
@@ -87,7 +85,7 @@ public class ValidationManager implements IValidationManager
 		fFileService = fileService;
 		fParseState = fileService.getParseState();
 		fNestedLanguages = new HashSet<String>();
-		fItemsByType = new HashMap<String, List<IValidationItem>>();
+		fExistingItemsByType = new HashMap<String, List<IValidationItem>>();
 		CommonEditorPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
 	}
 
@@ -97,7 +95,7 @@ public class ValidationManager implements IValidationManager
 		fResource = null;
 		fResourceUri = null;
 		fParseState = null;
-		fItemsByType.clear();
+		fExistingItemsByType.clear();
 		CommonEditorPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
 	}
 
@@ -129,12 +127,7 @@ public class ValidationManager implements IValidationManager
 	{
 		fCurrentContentType = contentType;
 
-		Collection<List<IValidationItem>> values = fItemsByType.values();
-		for (List<IValidationItem> items : values)
-		{
-			items.clear();
-		}
-
+		Map<String, List<IValidationItem>> allItems = new HashMap<String, List<IValidationItem>>();
 		List<ValidatorReference> validatorRefs = getValidatorRefs(contentType);
 		if (!validatorRefs.isEmpty())
 		{
@@ -147,23 +140,23 @@ public class ValidationManager implements IValidationManager
 				List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
 
 				String type = validatorRef.getMarkerType();
-				List<IValidationItem> items = fItemsByType.get(type);
+				List<IValidationItem> items = allItems.get(type);
 				if (items == null)
 				{
 					items = Collections.synchronizedList(new ArrayList<IValidationItem>());
-					fItemsByType.put(type, items);
+					allItems.put(type, items);
 				}
 				items.addAll(newItems);
 
 				// checks nested languages
 				for (String nestedLanguage : fNestedLanguages)
 				{
-					processNestedLanguage(nestedLanguage, fItemsByType);
+					processNestedLanguage(nestedLanguage, allItems);
 				}
 			}
 		}
 		// needs to update the markers regardless if any validator is selected
-		update(fItemsByType);
+		update(allItems);
 	}
 
 	private void processNestedLanguage(String nestedLanguage, Map<String, List<IValidationItem>> itemsByType)
@@ -272,10 +265,10 @@ public class ValidationManager implements IValidationManager
 	public List<IValidationItem> getValidationItems()
 	{
 		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		Set<String> types = fItemsByType.keySet();
+		Set<String> types = fExistingItemsByType.keySet();
 		for (String type : types)
 		{
-			items.addAll(fItemsByType.get(type));
+			items.addAll(fExistingItemsByType.get(type));
 		}
 		return items;
 	}
@@ -325,11 +318,6 @@ public class ValidationManager implements IValidationManager
 
 	private synchronized void updateValidation(Map<String, List<IValidationItem>> itemsByType)
 	{
-		if (fResource == null)
-		{
-			return;
-		}
-
 		IResource workspaceResource = null;
 		IUniformResource externalResource = null;
 		boolean isExternal = false;
@@ -353,58 +341,106 @@ public class ValidationManager implements IValidationManager
 			return;
 		}
 
-		Set<String> markerTypes = itemsByType.keySet();
-		List<IValidationItem> items;
+		// checks each marker type that we had items for to see if we need to completely delete the markers of this type
+		// and re-add or if we need only to add the new items that didn't exist before
+		Set<String> markerTypes = fExistingItemsByType.keySet();
+		List<IValidationItem> oldItems, newItems;
+		Set<String> markerTypesInNewOnly = new HashSet<String>(itemsByType.keySet());
 		for (String markerType : markerTypes)
 		{
+			oldItems = fExistingItemsByType.get(markerType);
+			newItems = itemsByType.get(markerType);
+			List<IValidationItem> itemsInNewOnly = new ArrayList<IValidationItem>();
+			markerTypesInNewOnly.remove(markerType);
+
+			// checks if each item in the old list still exists in the new one; if so, we don't need to delete the old
+			// markers
+			boolean needDelete = false;
+			if (newItems == null)
+			{
+				needDelete = true;
+			}
+			else
+			{
+				itemsInNewOnly.addAll(newItems);
+				for (IValidationItem item : oldItems)
+				{
+					if (newItems.contains(item))
+					{
+						itemsInNewOnly.remove(item);
+					}
+					else
+					{
+						needDelete = true;
+						break;
+					}
+				}
+			}
+
 			try
 			{
-				// deletes the old markers
-				if (isExternal)
+				if (needDelete)
 				{
-					MarkerUtils.deleteMarkers(externalResource, markerType, true);
-					// this is to remove "Aptana Problem" markers
-					if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
+					// deletes the old markers
+					if (isExternal)
 					{
-						MarkerUtils.deleteMarkers(externalResource, IMarkerConstants.PROBLEM_MARKER, false);
+						MarkerUtils.deleteMarkers(externalResource, markerType, true);
+					}
+					else
+					{
+						workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+					}
+
+					// adds the new ones
+					if (newItems != null)
+					{
+						addMarkers(newItems, markerType, isExternal, workspaceResource, externalResource);
 					}
 				}
 				else
 				{
-					workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
-					// this is to remove "Aptana Problem" markers
-					if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
-					{
-						workspaceResource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, false,
-								IResource.DEPTH_INFINITE);
-					}
-				}
-
-				// adds the new ones
-				items = itemsByType.get(markerType);
-				IMarker marker;
-				synchronized (items)
-				{
-					for (IValidationItem item : items)
-					{
-						if (isExternal)
-						{
-							marker = MarkerUtils.createMarker(externalResource, null, markerType);
-							// don't persist on external file
-							marker.setAttribute(IMarker.TRANSIENT, true);
-						}
-						else
-						{
-							marker = workspaceResource.createMarker(markerType);
-						}
-						marker.setAttributes(item.createMarkerAttributes());
-					}
+					// just needs to add the items that didn't exist before
+					addMarkers(itemsInNewOnly, markerType, isExternal, workspaceResource, externalResource);
 				}
 			}
 			catch (CoreException e)
 			{
 				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 			}
+		}
+
+		// now checks for the new marker types that didn't exist previously
+		for (String markerType : markerTypesInNewOnly)
+		{
+			try
+			{
+				addMarkers(itemsByType.get(markerType), markerType, isExternal, workspaceResource, externalResource);
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			}
+		}
+		fExistingItemsByType = itemsByType;
+	}
+
+	private void addMarkers(List<IValidationItem> items, String markerType, boolean isExternal,
+			IResource workspaceResource, IUniformResource externalResource) throws CoreException
+	{
+		for (IValidationItem item : items)
+		{
+			IMarker marker;
+			if (isExternal)
+			{
+				marker = MarkerUtils.createMarker(externalResource, null, markerType);
+				// don't persist on external file
+				marker.setAttribute(IMarker.TRANSIENT, true);
+			}
+			else
+			{
+				marker = workspaceResource.createMarker(markerType);
+			}
+			marker.setAttributes(item.createMarkerAttributes());
 		}
 	}
 
