@@ -1,4 +1,8 @@
 # This file is here so we can turn on tracing for the plugin to have debug logs
+com.aptana.editor.common/debug=true
+com.aptana.editor.common/debug/content_assist=true
+com.aptana.editor.common/debug/partitioner=true
+com.aptana.editor.common/debug/presentation=true
 com.aptana.editor.common/perf/content_assist=300
 com.aptana.editor.common/perf/content_assist/rubles=200
 com.aptana.editor.common/perf/content_assist/snippets=50

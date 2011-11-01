@@ -11,14 +11,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
-
 import junit.framework.TestCase;
 import beaver.Symbol;
 
+import com.aptana.editor.js.parsing.lexer.JSTokenType;
+
 public class ShowTokens extends TestCase
 {
-	private JSScanner _scanner;
+	private JSFlexScanner _scanner;
 
 	/**
 	 * getSource
@@ -54,7 +54,7 @@ public class ShowTokens extends TestCase
 	{
 		super.setUp();
 
-		this._scanner = new JSScanner();
+		this._scanner = new JSFlexScanner();
 	}
 
 	/*
@@ -76,7 +76,7 @@ public class ShowTokens extends TestCase
 	 */
 	public void testSnippet() throws Exception
 	{
-		String source = this.getSource("unrecognized-regex.js");
+		String source = this.getSource("formatting-issue.js");
 		
 		this._scanner.setSource(source);
 

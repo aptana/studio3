@@ -205,7 +205,7 @@ public final class ExecutableUtil
 
 	public static boolean isGemInstallable()
 	{
-		if (!Platform.getOS().equals(Platform.OS_WIN32))
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			// TODO This code is pretty blase about possible nulls/errors/etc. Should probably try and make it
 			// more bullet-proof.

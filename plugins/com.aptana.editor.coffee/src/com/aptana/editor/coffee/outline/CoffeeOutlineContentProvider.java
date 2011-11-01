@@ -43,8 +43,15 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 			IParseNode rootNode = (IParseRootNode) parentElement;
 			if (rootNode.hasChildren())
 			{
-				// Flatten toplevel block that is child of root!
-				return filter(rootNode.getChild(0).getChildren());
+				if (rootNode.hasChildren())
+				{
+					// Flatten toplevel block that is child of root!
+					return filter(rootNode.getChild(0).getChildren());
+				}
+				else
+				{
+					return EMPTY;
+				}
 			}
 			return EMPTY;
 		}

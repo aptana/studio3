@@ -7,20 +7,68 @@
  */
 package com.aptana.editor.js.sdoc.parsing;
 
-import org.eclipse.jface.text.rules.RuleBasedScanner;
+import java.io.IOException;
+
+import junit.framework.TestCase;
+import beaver.Symbol;
 
 import com.aptana.editor.js.sdoc.lexer.SDocTokenType;
-import com.aptana.editor.js.sdoc.parsing.SDocTokenScanner;
 
-public class SDocTokenScannerTests extends SDocScannerTestBase
+public class SDocTokenScannerTests extends TestCase
 {
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.js.SDocScannerTestBase#createScanner()
+	private SDocFlexScanner _scanner;
+
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
-	protected RuleBasedScanner createScanner()
+	protected void setUp() throws Exception
 	{
-		return new SDocTokenScanner();
+		super.setUp();
+
+		_scanner = new SDocFlexScanner();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception
+	{
+		_scanner = null;
+
+		super.tearDown();
+	}
+
+	/**
+	 * lexemeTypeTests
+	 * 
+	 * @param source
+	 * @param types
+	 * @throws beaver.Scanner.Exception
+	 * @throws IOException
+	 */
+	protected void lexemeTypeTests(String source, SDocTokenType... types)
+	{
+		this._scanner.setSource(source);
+
+		for (int i = 0; i < types.length; i++)
+		{
+			try
+			{
+				SDocTokenType targetType = types[i];
+				Symbol token = this._scanner.nextToken();
+				SDocTokenType actualType = SDocTokenType.get(token.getId());
+
+				assertEquals("at index " + i, targetType, actualType);
+			}
+			catch (Throwable t)
+			{
+				fail(t.getMessage());
+			}
+		}
 	}
 
 	/**
@@ -29,374 +77,300 @@ public class SDocTokenScannerTests extends SDocScannerTestBase
 	public void testNoTypes()
 	{
 		String source = "{}";
-		
+
+		// @formatter:off
 		lexemeTypeTests(
 			source,
-			SDocTokenType.TYPES
+			SDocTokenType.LCURLY,
+			SDocTokenType.RCURLY
 		);
+		// @formatter:on
 	}
-	
+
 	/**
 	 * testTypes
 	 */
 	public void testTypes()
 	{
 		String source = "{Number}";
-		
+
+		// @formatter:off
 		lexemeTypeTests(
 			source,
-			SDocTokenType.TYPES
+			SDocTokenType.LCURLY,
+			SDocTokenType.IDENTIFIER,
+			SDocTokenType.RCURLY
 		);
+		// @formatter:on
 	}
-	
+
 	/**
 	 * testLeftBracket
 	 */
 	public void testLeftBracket()
 	{
 		String source = "[";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LBRACKET
-		);
+
+		lexemeTypeTests(source, SDocTokenType.LBRACKET);
 	}
-	
+
 	/**
 	 * testRightBracket
 	 */
 	public void testRightBracket()
 	{
 		String source = "]";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.RBRACKET
-		);
+
+		lexemeTypeTests(source, SDocTokenType.RBRACKET);
 	}
-	
+
 	/**
 	 * testStartDocumentation
 	 */
 	public void testStartDocumentation()
 	{
 		String source = "/**";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.START_DOCUMENTATION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.START_DOCUMENTATION);
 	}
-	
+
 	/**
 	 * testEndDocumentation
 	 */
 	public void testEndDocumentation()
 	{
 		String source = "*/";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.END_DOCUMENTATION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.END_DOCUMENTATION);
 	}
-	
+
 	/**
 	 * testAdvanced
 	 */
 	public void testAdvanced()
 	{
 		String source = "@advanced";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.ADVANCED
-		);
+
+		lexemeTypeTests(source, SDocTokenType.ADVANCED);
 	}
-	
+
 	/**
 	 * testAlias
 	 */
 	public void testAlias()
 	{
 		String source = "@alias";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.ALIAS
-		);
+
+		lexemeTypeTests(source, SDocTokenType.ALIAS);
 	}
-	
+
 	/**
 	 * testAuthor
 	 */
 	public void testAuthor()
 	{
 		String source = "@author";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.AUTHOR
-		);
+
+		lexemeTypeTests(source, SDocTokenType.AUTHOR);
 	}
-	
+
 	/**
 	 * testClassDescription
 	 */
 	public void testClassDescription()
 	{
 		String source = "@classDescription";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.CLASS_DESCRIPTION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.CLASS_DESCRIPTION);
 	}
-	
+
 	/**
 	 * testConstructor
 	 */
 	public void testConstructor()
 	{
 		String source = "@constructor";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.CONSTRUCTOR
-		);
+
+		lexemeTypeTests(source, SDocTokenType.CONSTRUCTOR);
 	}
-	
+
 	/**
 	 * testExample
 	 */
 	public void testExample()
 	{
 		String source = "@example";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.EXAMPLE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EXAMPLE);
 	}
-	
+
 	/**
 	 * testException
 	 */
 	public void testException()
 	{
 		String source = "@exception";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.EXCEPTION
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EXCEPTION);
 	}
-	
+
 	/**
 	 * testExtends
 	 */
 	public void testExtends()
 	{
 		String source = "@extends";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.EXTENDS
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EXTENDS);
 	}
-	
+
 	/**
 	 * testInternal
 	 */
 	public void testInternal()
 	{
 		String source = "@internal";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.INTERNAL
-		);
+
+		lexemeTypeTests(source, SDocTokenType.INTERNAL);
 	}
-	
+
 	/**
 	 * testMethod
 	 */
 	public void testMethod()
 	{
 		String source = "@method";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.METHOD
-		);
+
+		lexemeTypeTests(source, SDocTokenType.METHOD);
 	}
-	
+
 	/**
 	 * testNamespace
 	 */
 	public void testNamespace()
 	{
 		String source = "@namespace";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.NAMESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.NAMESPACE);
 	}
-	
+
 	/**
 	 * testOverview
 	 */
 	public void testOverview()
 	{
 		String source = "@overview";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.OVERVIEW
-		);
+
+		lexemeTypeTests(source, SDocTokenType.OVERVIEW);
 	}
-	
+
 	/**
 	 * testParam
 	 */
 	public void testParam()
 	{
 		String source = "@param";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PARAM
-		);
+
+		lexemeTypeTests(source, SDocTokenType.PARAM);
 	}
-	
+
 	/**
 	 * testPrivate
 	 */
 	public void testPrivate()
 	{
 		String source = "@private";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PRIVATE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.PRIVATE);
 	}
-	
+
 	/**
 	 * testProperty
 	 */
 	public void testProperty()
 	{
 		String source = "@property";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.PROPERTY
-		);
+
+		lexemeTypeTests(source, SDocTokenType.PROPERTY);
 	}
-	
+
 	/**
 	 * testReturn
 	 */
 	public void testReturn()
 	{
 		String source = "@return";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.RETURN
-		);
+
+		lexemeTypeTests(source, SDocTokenType.RETURN);
 	}
-	
+
 	/**
 	 * testSee
 	 */
 	public void testSee()
 	{
 		String source = "@see";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.SEE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.SEE);
 	}
-	
+
 	/**
 	 * testUserTag
 	 */
 	public void testUserTag()
 	{
 		String source = "@myCustomTag";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.UNKNOWN
-		);
+
+		lexemeTypeTests(source, SDocTokenType.UNKNOWN);
 	}
-	
+
 	/**
 	 * testCR
 	 */
 	public void testCR()
 	{
 		String source = "\r";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.WHITESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EOF);
 	}
-	
+
 	/**
 	 * testLF
 	 */
 	public void testLF()
 	{
 		String source = "\n";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.WHITESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EOF);
 	}
-	
+
 	/**
 	 * testCRLF
 	 */
 	public void testCRLF()
 	{
 		String source = "\r\n";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.WHITESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EOF);
 	}
-	
+
 	/**
 	 * testSpace
 	 */
 	public void testSpace()
 	{
 		String source = " ";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.WHITESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EOF);
 	}
-	
+
 	/**
 	 * testTab
 	 */
 	public void testTab()
 	{
 		String source = "\t";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.WHITESPACE
-		);
+
+		lexemeTypeTests(source, SDocTokenType.EOF);
 	}
 }

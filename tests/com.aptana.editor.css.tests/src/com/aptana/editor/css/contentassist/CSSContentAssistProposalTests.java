@@ -20,9 +20,10 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Point;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.tests.util.AssertUtil;
 import com.aptana.editor.css.parsing.CSSTokenScanner;
+import com.aptana.editor.css.parsing.lexer.CSSLexemeProvider;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.editor.css.tests.CSSEditorBasedTests;
 import com.aptana.parsing.lexer.IRange;
@@ -814,15 +815,7 @@ public class CSSContentAssistProposalTests extends CSSEditorBasedTests
 
 		// tokenize the document
 		IRange range = new Range(0, document.getLength() - 1);
-		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, range,
-				new CSSTokenScanner())
-		{
-			@Override
-			protected CSSTokenType getTypeFromData(Object data)
-			{
-				return (CSSTokenType) data;
-			}
-		};
+		ILexemeProvider<CSSTokenType> lexemeProvider = new CSSLexemeProvider(document, range, new CSSTokenScanner());
 
 		// based on the particular token we are testing, is this a valid activation location?
 		for (Lexeme<CSSTokenType> lexeme : lexemeProvider)

@@ -54,7 +54,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 				if (propId == IEditorPart.PROP_INPUT)
 				{
 					reconcile(false, true);
-				}
+	}
 			}
 		});
 	}

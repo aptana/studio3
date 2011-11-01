@@ -45,7 +45,8 @@ public class UITests
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		suite.addTest(com.aptana.portal.ui.tests.AllTests.suite());
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
-		suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite());
+		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // commenting out for the moment to reduce unit
+		// test times
 		suite.addTest(com.aptana.theme.tests.AllTests.suite());
 		suite.addTest(org.eclipse.tm.terminal.test.AllTests.suite());
 		// $JUnit-END$

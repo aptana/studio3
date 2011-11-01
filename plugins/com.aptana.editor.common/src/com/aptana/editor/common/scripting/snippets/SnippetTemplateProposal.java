@@ -297,7 +297,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 				ensurePositionCategoryRemoved(document);
 				fSelectedRegion = new Region(getCaretOffset(templateBuffer) + start, 0);
 			}
-
 		}
 		catch (BadLocationException e)
 		{

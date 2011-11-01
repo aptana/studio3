@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CoarseLocationTests extends TestCase
@@ -35,7 +35,7 @@ public class CoarseLocationTests extends TestCase
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				ILexemeProvider<CSSTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
 				LocationType location = processor.getCoarseLocationType(lexemeProvider, offset);
 				String message = MessageFormat.format(
 					"Expected {0} at location {1} of ''{2}''",

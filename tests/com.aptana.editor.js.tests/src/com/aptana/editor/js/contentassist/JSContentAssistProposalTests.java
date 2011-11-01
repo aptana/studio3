@@ -10,7 +10,13 @@ package com.aptana.editor.js.contentassist;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.filesystem.IFileStore;
+
+import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
@@ -199,5 +205,124 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			"number"
 		);
 		// @formatter:on
+	}
+
+	protected void assertContainsFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
+	{
+		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
+		for (PropertyElement element : projectGlobals)
+		{
+			if (!(element instanceof FunctionElement))
+			{
+				continue;
+			}
+			if (uniqueFunctionNames.contains(element.getName()))
+			{
+				uniqueFunctionNames.remove(element.getName());
+			}
+		}
+
+		if (!uniqueFunctionNames.isEmpty())
+		{
+			// build a list of names
+			List<String> names = new ArrayList<String>();
+			for (PropertyElement element : projectGlobals)
+			{
+				if (!(element instanceof FunctionElement))
+				{
+					continue;
+				}
+				names.add(element.getName());
+			}
+			fail(MessageFormat.format(
+					"Functions do not contain an entry for expected name(s): {0}.\nFunction list: {1}",
+					uniqueFunctionNames, names));
+		}
+	}
+
+	protected void assertDoesntContainFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
+	{
+		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
+		Set<String> matches = new HashSet<String>(uniqueFunctionNames.size());
+		for (PropertyElement element : projectGlobals)
+		{
+			if (!(element instanceof FunctionElement))
+			{
+				continue;
+			}
+			if (uniqueFunctionNames.contains(element.getName()))
+			{
+				matches.add(element.getName());
+			}
+		}
+
+		if (!matches.isEmpty())
+		{
+			fail(MessageFormat.format("Functions contain an entry for disallowed name(s): {0}", matches));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	 */
+	@Override
+	protected IFileStoreIndexingParticipant createIndexer()
+	{
+		return new JSFileIndexingParticipant();
+	}
+
+	public void testAutoActivationIdentifier()
+	{
+		String source = "a|(abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationLeftParen()
+	{
+		String source = "a(|abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationComma()
+	{
+		String source = "a(abc,|";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationIdentifierWithSpace()
+	{
+		String source = "a \t\r\n|(abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoActivationLeftParenWithSpace()
+	{
+		String source = "a( \t\r\n|abc,";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+	}
+
+	public void testAutoAactivationCommaWithSpace()
+	{
+		String source = "a(abc, \t\r\n|";
+		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+
+		setupTestContext(fileStore);
+		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
 	}
 }
