@@ -8,19 +8,22 @@
 
 package com.aptana.console.process;
 
+import java.io.InputStream;
 import java.util.Map;
 
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.RuntimeProcess;
 
+
 /**
  * @author Max Stepanov
- *
  */
-/* package */ class ConsoleProcess extends RuntimeProcess {
-	
+public class FilterConsoleProcess extends RuntimeProcess {
+
 	private Process proxyProcess = null;
-	
+	private IProcessOutputFilter processOutputFilter;
+
 	/**
 	 * @param launch
 	 * @param process
@@ -28,17 +31,32 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 	 * @param attributes
 	 */
 	@SuppressWarnings("rawtypes")
-	protected ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
+	public FilterConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
 		super(launch, process, name, attributes);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * @param processOutputFilter
+	 *            the processOutputFilter to set
+	 */
+	public void setProcessOutputFilter(IProcessOutputFilter processOutputFilter) {
+		this.processOutputFilter = processOutputFilter;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.RuntimeProcess#getSystemProcess()
 	 */
 	@Override
 	protected Process getSystemProcess() {
 		if (proxyProcess == null) {
-			proxyProcess = new ProxyProcess(super.getSystemProcess());
+			proxyProcess = new ProxyProcess(super.getSystemProcess()) {
+				@Override
+				protected InputStream createInputStream(InputStream in) {
+					String encoding = getLaunch().getAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING);
+					return new FilterProxyInputStream(in, encoding, processOutputFilter);
+				}
+			};
 		}
 		return proxyProcess;
 	}

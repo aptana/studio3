@@ -29,7 +29,23 @@ public class ConsoleProcessFactory implements IProcessFactory {
 	 */
 	@SuppressWarnings("rawtypes")
 	public IProcess newProcess(ILaunch launch, Process process, String label, Map attributes) {
-		return new ConsoleProcess(launch, process, label, attributes);
+		return new TTYConsoleProcess(launch, process, label, attributes);
+	}
+
+	/**
+	 * Returns the process which output/error streams can be filtered.
+	 * @param launch
+	 * @param process
+	 * @param label
+	 * @param attributes
+	 * @param processOutputFilter
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static IProcess newFilterConsoleProcess(ILaunch launch, Process process, String label, Map attributes, IProcessOutputFilter processOutputFilter) {
+		FilterConsoleProcess filterConsoleProcess = new FilterConsoleProcess(launch, process, label, attributes);
+		filterConsoleProcess.setProcessOutputFilter(processOutputFilter);
+		return filterConsoleProcess;
 	}
 
 }
