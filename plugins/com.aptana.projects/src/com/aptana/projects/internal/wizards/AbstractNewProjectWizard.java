@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -90,6 +91,8 @@ import com.aptana.usage.StudioAnalytics;
 
 /**
  * New Project Wizard base class.
+ * 
+ * @author Nam Le <nle@appcelerator.com>
  */
 public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -109,6 +112,9 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	private URI location; // null if defaults are used (under workspace)
 	private IPath destPath; // absolute path to project we're creating.
 	private IProject[] refProjects;
+
+	// Specifies the steps to use in step indicator composite
+	protected String[] stepNames;
 
 	/**
 	 * Constructs a new Web Project Wizard.
@@ -173,10 +179,31 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		super.addPages();
 
 		addPage(mainPage = createMainPage());
+
+		List<String> steps = new ArrayList<String>();
+		List<IStepIndicatorWizardPage> stepPages = new ArrayList<IStepIndicatorWizardPage>();
+
+		if (mainPage instanceof IStepIndicatorWizardPage)
+		{
+			stepPages.add((IStepIndicatorWizardPage) mainPage);
+			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
+		}
+
 		List<IProjectTemplate> templates = getProjectTemplates(getProjectTemplateTypes());
 		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
+			if (templatesPage instanceof IStepIndicatorWizardPage)
+			{
+				stepPages.add((IStepIndicatorWizardPage) templatesPage);
+				steps.add(((IStepIndicatorWizardPage) templatesPage).getStepName());
+			}
+		}
+
+		stepNames = steps.toArray(new String[steps.size()]);
+		for (IStepIndicatorWizardPage page : stepPages)
+		{
+			page.initStepIndicator(stepNames);
 		}
 	}
 
