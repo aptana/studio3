@@ -758,6 +758,30 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		project.delete();
 	}
 
+	public void testAttributeNameAtSpace()
+	{
+		String document = "<p | align=\"\"></p>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
+		AssertUtil.assertProposalFound("class", proposals);
+	}
+
+	public void testAttributeNameAtSpace2()
+	{
+		String document = "<p align=\"\" | ></p>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
+		AssertUtil.assertProposalFound("class", proposals);
+	}
+
 	public void testAttributeAfterElementName()
 	{
 		String document = "<body s|></body>";

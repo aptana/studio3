@@ -181,15 +181,10 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 			List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 			Collection<? extends ICompletionProposal> rubleProposals = addRubleProposals(viewer, offset);
-			IdeLog.logInfo(CommonEditorPlugin.getDefault(),
-					MessageFormat.format("Generated {0} ruble proposals", rubleProposals.size()),
-					IDebugScopes.CONTENT_ASSIST);
+
 			proposals.addAll(rubleProposals);
 
 			Collection<? extends ICompletionProposal> snippetProposals = addSnippetProposals(viewer, offset);
-			IdeLog.logInfo(CommonEditorPlugin.getDefault(),
-					MessageFormat.format("Generated {0} snippet proposals", snippetProposals.size()),
-					IDebugScopes.CONTENT_ASSIST);
 			proposals.addAll(snippetProposals);
 			ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar,
 					autoActivated);
@@ -200,17 +195,24 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				others = new ICompletionProposal[0];
 			}
 
-			IdeLog.logInfo(CommonEditorPlugin.getDefault(),
-					MessageFormat.format("Generated {0} language proposals", others.length),
-					IDebugScopes.CONTENT_ASSIST);
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			{
+				IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+						"Generated {0} ruble proposals, {0} snippet proposals, and {0} language proposals", //$NON-NLS-1$
+						rubleProposals.size(), snippetProposals.size(), others.length), IDebugScopes.CONTENT_ASSIST);
+			}
 
 			// Combine the two
 			ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
 			proposals.toArray(combined);
 			System.arraycopy(others, 0, combined, proposals.size(), others.length);
 
-			IdeLog.logInfo(CommonEditorPlugin.getDefault(),
-					MessageFormat.format("Combined {0} total proposals", combined.length), IDebugScopes.CONTENT_ASSIST);
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			{
+				IdeLog.logInfo(CommonEditorPlugin.getDefault(),
+						MessageFormat.format("Combined {0} total proposals", combined.length), //$NON-NLS-1$
+						IDebugScopes.CONTENT_ASSIST);
+			}
 
 			// sort proposals using default mechanism
 			sortProposals(combined);

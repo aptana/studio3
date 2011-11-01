@@ -53,6 +53,7 @@ import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.HTMLTagScanner;
 import com.aptana.editor.html.HTMLTagUtil;
+import com.aptana.editor.html.IDebugScopes;
 import com.aptana.editor.html.IHTMLEditorDebugScopes;
 import com.aptana.editor.html.contentassist.index.IHTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
@@ -300,6 +301,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
+			if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			{
+				IdeLog.logInfo(
+						HTMLPlugin.getDefault(),
+						MessageFormat
+								.format("Current element: {0}, Current lexeme: {1}, Replace offset: {2}. Replace length: {3}", elementName, _currentLexeme, offset, replaceLength), //$NON-NLS-1$
+						IDebugScopes.CONTENT_ASSIST);
+			}
+
 			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
 				String name = attribute.getName();
@@ -335,6 +345,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						replaceLength, positions);
 				proposals.add(p);
 			}
+		}
+		else
+		{
+			IdeLog.logInfo(HTMLPlugin.getDefault(),
+					MessageFormat.format("Current element: {0}, Current lexeme: {1}", elementName, _currentLexeme),
+					IDebugScopes.CONTENT_ASSIST);
 		}
 
 		return proposals;
@@ -605,10 +621,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			if (lastSlash != -1)
 			{
 				IFileStore possibleChild = baseStore.getChild(valuePrefix.substring(0, lastSlash));
-					if (possibleChild.fetchInfo().exists())
-					{
-						baseStore = possibleChild;
-					}
+				if (possibleChild.fetchInfo().exists())
+				{
+					baseStore = possibleChild;
+				}
 				offset += lastSlash + 1;
 				valuePrefix = valuePrefix.substring(lastSlash + 1);
 			}
@@ -935,8 +951,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 */
 	private void addDoctypeProposals(List<ICompletionProposal> proposals,
-			ILexemeProvider<HTMLTokenType> lexemeProvider,
-			int offset)
+			ILexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		this._replaceRange = null;
 		// Replace all the way until we hit the end of the doctype tag!
@@ -1247,7 +1262,16 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				: offset);
 
 		// store a reference to the lexeme at the current position
-		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+		Lexeme<HTMLTokenType> tempLexeme = lexemeProvider.getLexemeFromOffset(offset);
+		if (tempLexeme != null)
+		{
+			this._replaceRange = this._currentLexeme = tempLexeme;
+		}
+		else
+		{
+			this._replaceRange = null;
+			this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+		}
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
 		LocationType location = this.getCoarseLocationType(_document, lexemeProvider, offset);
@@ -1325,6 +1349,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
+
+		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		{
+			IdeLog.logInfo(HTMLPlugin.getDefault(), MessageFormat.format("Generated {0} proposals", proposals.length), //$NON-NLS-1$
+					IDebugScopes.CONTENT_ASSIST);
+		}
 
 		// select the current proposal based on the current lexeme
 		if (this._replaceRange != null)
@@ -1646,6 +1676,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					IHTMLEditorDebugScopes.CONTENT_ASSIST);
 		}
 
+		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		{
+			IdeLog.logInfo(HTMLPlugin.getDefault(), MessageFormat.format("Coarse location: {0}", result), //$NON-NLS-1$
+					IDebugScopes.CONTENT_ASSIST);
+		}
+
 		return result;
 	}
 
@@ -1786,6 +1822,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				index--;
 			}
+		}
+
+		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		{
+			IdeLog.logInfo(HTMLPlugin.getDefault(),
+					MessageFormat.format("Fine location: {0}", result), IDebugScopes.CONTENT_ASSIST); //$NON-NLS-1$
 		}
 
 		return result;
