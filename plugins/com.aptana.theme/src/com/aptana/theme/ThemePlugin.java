@@ -10,7 +10,11 @@ package com.aptana.theme;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.resource.StringConverter;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.util.EclipseUtil;
@@ -24,6 +28,59 @@ import com.aptana.theme.preferences.IPreferenceConstants;
  */
 public class ThemePlugin extends AbstractUIPlugin
 {
+
+	/**
+	 * This listens for changes to the editor FG/BG/line highlight/selection colors from Eclipse's pref page. if
+	 * invasive theming is on, we'll apply changes onto our current Aptana theme.
+	 * 
+	 * @author cwilliams
+	 */
+	private final class EditorColorSyncher implements IPreferenceChangeListener
+	{
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (!invasiveThemesEnabled())
+			{
+				return;
+			}
+			if (AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND.equals(event.getKey()))
+			{
+				RGB value = StringConverter.asRGB((String) event.getNewValue());
+				RGB existing = getThemeManager().getCurrentTheme().getForeground();
+				if (!value.equals(existing))
+				{
+					getThemeManager().getCurrentTheme().updateFG(value);
+				}
+			}
+			else if (AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND.equals(event.getKey()))
+			{
+				RGB value = StringConverter.asRGB((String) event.getNewValue());
+				RGB existing = getThemeManager().getCurrentTheme().getBackground();
+				if (!value.equals(existing))
+				{
+					getThemeManager().getCurrentTheme().updateBG(value);
+				}
+			}
+			else if (AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND.equals(event.getKey()))
+			{
+				RGB value = StringConverter.asRGB((String) event.getNewValue());
+				RGB existing = getThemeManager().getCurrentTheme().getSelectionAgainstBG();
+				if (!value.equals(existing))
+				{
+					getThemeManager().getCurrentTheme().updateSelection(value);
+				}
+			}
+			else if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR.equals(event.getKey()))
+			{
+				RGB value = StringConverter.asRGB((String) event.getNewValue());
+				RGB existing = getThemeManager().getCurrentTheme().getLineHighlightAgainstBG();
+				if (!value.equals(existing))
+				{
+					getThemeManager().getCurrentTheme().updateLineHighlight(value);
+				}
+			}
+		}
+	}
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.theme"; //$NON-NLS-1$
@@ -39,6 +96,7 @@ public class ThemePlugin extends AbstractUIPlugin
 	// Store latest value of whether invasive theme is on so we don't need to query platform prefs every time.
 	private Boolean fInvasiveThemesEnabled;
 	private IPreferenceChangeListener fThemeChangeListener;
+	private IPreferenceChangeListener fEclipseColorsListener;
 
 	/**
 	 * The constructor
@@ -74,6 +132,11 @@ public class ThemePlugin extends AbstractUIPlugin
 
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.apply();
+
+		// Listen for changes to eclipse editor colors and synch them back to our theme
+		fEclipseColorsListener = new EditorColorSyncher();
+		EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
+				.addPreferenceChangeListener(fEclipseColorsListener);
 	}
 
 	/*
@@ -88,6 +151,14 @@ public class ThemePlugin extends AbstractUIPlugin
 			{
 				EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID)
 						.removePreferenceChangeListener(fThemeChangeListener);
+				fThemeChangeListener = null;
+			}
+
+			if (fEclipseColorsListener != null)
+			{
+				EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors") //$NON-NLS-1$
+						.removePreferenceChangeListener(fEclipseColorsListener);
+				fEclipseColorsListener = null;
 			}
 
 			if (themeHijacker != null)
