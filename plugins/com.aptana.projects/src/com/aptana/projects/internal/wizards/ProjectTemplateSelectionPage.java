@@ -8,6 +8,7 @@
 package com.aptana.projects.internal.wizards;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,15 @@ import org.eclipse.swt.widgets.Label;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
+import com.aptana.ui.widgets.StepIndicatorComposite;
 
-public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener
+/**
+ * Wizard page used to select a project template for new projects
+ * 
+ * @author Nam Le <nle@appcelerator.com>
+ */
+public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener,
+		IStepIndicatorWizardPage
 {
 
 	private Button fUseTemplateButton;
@@ -53,6 +61,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private static ImageDescriptor wizardDesc = ProjectsPlugin.getImageDescriptor("/icons/protect_template_blank.png"); //$NON-NLS-1$
 	private Image defaultTemplateImage = null;
 	private Map<Object, Image> templateImages;
+
+	protected StepIndicatorComposite stepIndicatorComposite;
+	protected String[] stepNames;
 
 	public ProjectTemplateSelectionPage(String pageName, List<IProjectTemplate> templates)
 	{
@@ -101,8 +112,11 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		});
 
 		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(GridLayoutFactory.fillDefaults().spacing(5, 10).create());
+		main.setLayout(GridLayoutFactory.fillDefaults().spacing(5, 5).create());
 		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		stepIndicatorComposite = new StepIndicatorComposite(main, stepNames);
+		stepIndicatorComposite.setSelection(getStepName());
 
 		createTop(main);
 
@@ -275,5 +289,15 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 			}
 			return super.getText(element);
 		}
+	}
+
+	public void initStepIndicator(String[] stepNames)
+	{
+		this.stepNames = Arrays.copyOf(stepNames, stepNames.length);
+	}
+
+	public String getStepName()
+	{
+		return getTitle();
 	}
 }
