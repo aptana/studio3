@@ -5,8 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common;
-
+package com.aptana.editor.html;
 
 /**
  * A interface to capture the various scopes available during debugging. These need to match the items in the .options
@@ -17,18 +16,7 @@ package com.aptana.editor.common;
 public interface IDebugScopes
 {
 	/**
-	 * Items related to the presentation process
-	 */
-	String PARTITIONER = CommonEditorPlugin.PLUGIN_ID + "/debug/partitioner"; //$NON-NLS-1$
-
-	/**
-	 * Items related to the partitioning process
-	 */
-	String PRESENTATION = CommonEditorPlugin.PLUGIN_ID + "/debug/presentation"; //$NON-NLS-1$
-
-	/**
 	 * Items related to the content assist process
 	 */
-	String CONTENT_ASSIST = CommonEditorPlugin.PLUGIN_ID + "/debug/content_assist"; //$NON-NLS-1$
-
+	String CONTENT_ASSIST = HTMLPlugin.PLUGIN_ID + "/debug/content_assist"; //$NON-NLS-1$
 }
