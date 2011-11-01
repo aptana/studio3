@@ -131,7 +131,9 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 				IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				Messages.EditorsPreferencePage_Content_Assist_Auto_Display,
 				new String[][] {
-						{ CoreStrings.ON,
+						{ Messages.EditorsPreferencePage_Instant,
+								Integer.toString(CommonSourceViewerConfiguration.NO_CONTENT_ASSIST_DELAY) },
+						{ Messages.EditorsPreferencePage_DefaultDelay,
 								Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) },
 						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
 								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },

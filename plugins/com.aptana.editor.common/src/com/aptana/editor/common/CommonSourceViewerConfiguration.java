@@ -88,6 +88,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 {
 
 	public static final int CONTENT_ASSIST_OFF_DELAY = -1;
+	public static final int NO_CONTENT_ASSIST_DELAY = 0;
 	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 200;
 	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
 

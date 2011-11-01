@@ -58,6 +58,8 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_Content_Assist_Auto_Display;
 	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
 	public static String EditorsPreferencePage_Content_Assist_Auto_Insert;
+
+	public static String EditorsPreferencePage_DefaultDelay;
 	public static String EditorsPreferencePage_Enable_WordWrap;
 	public static String EditorsPreferencePage_Formatting;
 	public static String EditorsPreferencePage_HomeEndBehavior;
@@ -67,6 +69,8 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_ToggleBetween;
 	public static String EditorsPreferencePage_Typing;
 	public static String EditorsPreferencePage_GeneralTextEditorPrefLink;
+
+	public static String EditorsPreferencePage_Instant;
 	public static String EditorsPreferencePage_Wrap_Selection;
 
 	public static String ValidationPreferencePage_enable_parse_errors_label;
