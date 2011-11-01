@@ -7,6 +7,7 @@
  */
 package com.aptana.portal.ui.dispatch.browserFunctions;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON;
@@ -18,6 +19,8 @@ import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IActionController;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.internal.IBrowserFunctionHandler;
+import com.aptana.usage.AnalyticsEvent;
+import com.aptana.usage.StudioAnalytics;
 
 /**
  * This class is the main functions dispatcher for all the registered IActionControllers.
@@ -26,6 +29,7 @@ import com.aptana.portal.ui.internal.IBrowserFunctionHandler;
  */
 public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 {
+	private static final String PORTAL_ANALYTICS_TYPE = "portal"; //$NON-NLS-1$
 
 	/**
 	 * This function should always get a single argument of a JSON request, which can be transformed into a {@link Map}
@@ -111,6 +115,9 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
 					e.getMessage());
 		}
+		// Send an Analytics ping
+		StudioAnalytics.getInstance().sendEvent(
+				new AnalyticsEvent(PORTAL_ANALYTICS_TYPE, MessageFormat.format("{0}.{1}", controllerID, action), null)); //$NON-NLS-1$
 		// OK... Done with the checks. Now dispatch.
 		return dispatch(controller, action, args);
 	}
