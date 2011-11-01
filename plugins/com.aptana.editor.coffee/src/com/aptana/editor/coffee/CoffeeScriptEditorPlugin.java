@@ -12,6 +12,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.osgi.framework.BundleContext;
 
+@SuppressWarnings("restriction")
 public class CoffeeScriptEditorPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.coffee"; //$NON-NLS-1$

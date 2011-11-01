@@ -292,6 +292,25 @@ public class HTMLParserTest extends TestCase
 		assertEquals(IHTMLConstants.CONTENT_TYPE_HTML, textNode.getLanguage());
 	}
 
+	public void testNestedOptionalEndTag() throws Exception
+	{
+		String source = "<li>item 1<li>item 2";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(2, children.length);
+
+		assertEquals(9, children[0].getEndingOffset());
+		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
+		assertNotNull(endTag);
+		assertEquals(new Range(9, 9), endTag.getNameRange());
+
+		assertEquals(19, children[1].getEndingOffset());
+		endTag = ((HTMLElementNode) children[1]).getEndNode();
+		assertNotNull(endTag);
+		assertEquals(new Range(19, 19), endTag.getNameRange());
+	}
+
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);

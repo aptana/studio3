@@ -26,7 +26,7 @@ public interface IDebugScopes
 	String BUILDER = CorePlugin.PLUGIN_ID + "/debug/builder"; //$NON-NLS-1$
 
 	/**
-	 * Items related to running things on hte command line
+	 * Items related to running things on the command line
 	 */
 	String SHELL = CorePlugin.PLUGIN_ID + "/debug/shell"; //$NON-NLS-1$
 
@@ -34,5 +34,10 @@ public interface IDebugScopes
 	 * Items related to zip utils
 	 */
 	String ZIPUTIL = CorePlugin.PLUGIN_ID + "/debug/ziputil"; //$NON-NLS-1$
+
+	/**
+	 * Items related to firefox-specific configuration
+	 */
+	String FIREFOX = CorePlugin.PLUGIN_ID + "/debug/firefox"; //$NON-NLS-1$
 
 }

@@ -1,2 +1,3 @@
 com.aptana.ui.epl/debug=true
+com.aptana.ui.epl/debug/content_assist=true
 com.aptana.ui.epl/debug/relevance=true

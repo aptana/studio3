@@ -35,7 +35,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.CompletionProposalComparator;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
@@ -45,6 +45,7 @@ import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.editor.css.parsing.CSSTokenScanner;
+import com.aptana.editor.css.parsing.lexer.CSSLexemeProvider;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -234,7 +235,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 */
 	protected void addAllPropertyProposals(List<ICompletionProposal> proposals,
-			LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+			ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		List<PropertyElement> properties = this._queryHelper.getProperties();
 
@@ -345,7 +346,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 */
 	private void addInsideRuleProposals(List<ICompletionProposal> proposals,
-			LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+			ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		LocationType location = this.getInsideLocationType(lexemeProvider, offset);
 
@@ -379,7 +380,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 */
 	private void addOutsideRuleProposals(List<ICompletionProposal> proposals,
-			LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+			ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		if (this._currentLexeme != null)
 		{
@@ -509,7 +510,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	private void addPropertyValues(List<ICompletionProposal> proposals, LexemeProvider<CSSTokenType> lexemeProvider,
+	private void addPropertyValues(List<ICompletionProposal> proposals, ILexemeProvider<CSSTokenType> lexemeProvider,
 			int offset)
 	{
 		// get property name
@@ -688,7 +689,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		ILexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 
 		// store a reference to the lexeme at the current position
 		this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset);
@@ -791,31 +792,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
+	ILexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		// NOTE: temp until we get proper partitions for CSS inside of HTML
 		if (this._activeRange != null)
 		{
-			return new LexemeProvider<CSSTokenType>(document, this._activeRange, new CSSTokenScanner())
-			{
-				@Override
-				protected CSSTokenType getTypeFromData(Object data)
-				{
-					return (CSSTokenType) data;
-				}
-			};
+			return new CSSLexemeProvider(document, this._activeRange, new CSSTokenScanner());
 		}
 		else
 		{
 			IRange range = getLexemeRange(document, offset);
-			return new LexemeProvider<CSSTokenType>(document, range, new CSSTokenScanner())
-			{
-				@Override
-				protected CSSTokenType getTypeFromData(Object data)
-				{
-					return (CSSTokenType) data;
-				}
-			};
+
+			return new CSSLexemeProvider(document, range, new CSSTokenScanner());
 		}
 	}
 
@@ -841,7 +829,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private int getIndexOfPreviousColon(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	private int getIndexOfPreviousColon(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
 		int result = -1;
@@ -867,7 +855,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getInsideLocationType(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	LocationType getInsideLocationType(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		LocationType location = LocationType.ERROR;
 
@@ -1013,7 +1001,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private int getLexemeAfterDelimiter(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	private int getLexemeAfterDelimiter(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		int index = lexemeProvider.getLexemeIndex(offset);
 
@@ -1056,7 +1044,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param index
 	 * @return
 	 */
-	private Lexeme<CSSTokenType> getLexemeBeforeDelimiter(LexemeProvider<CSSTokenType> lexemeProvider, int index)
+	private Lexeme<CSSTokenType> getLexemeBeforeDelimiter(ILexemeProvider<CSSTokenType> lexemeProvider, int index)
 	{
 		Lexeme<CSSTokenType> result = null;
 
@@ -1103,7 +1091,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getCoarseLocationType(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	LocationType getCoarseLocationType(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		LocationType result = LocationType.ERROR;
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
@@ -1211,7 +1199,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private String getPropertyName(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	private String getPropertyName(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		String result = null;
 		int index = this.getIndexOfPreviousColon(lexemeProvider, offset);
@@ -1260,7 +1248,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	private void setPropertyValueRange(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	private void setPropertyValueRange(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		int index = this.getLexemeAfterDelimiter(lexemeProvider, offset);
 
@@ -1328,7 +1316,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		EnumSet<CSSTokenType> types = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
 				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID);
 
-		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		ILexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		if (offset > 0)
 		{
 			Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);

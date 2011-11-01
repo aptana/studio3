@@ -28,7 +28,7 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 import com.aptana.editor.xml.contentassist.index.IXMLIndexConstants;
@@ -36,6 +36,7 @@ import com.aptana.editor.xml.contentassist.model.AttributeElement;
 import com.aptana.editor.xml.contentassist.model.ElementElement;
 import com.aptana.editor.xml.contentassist.model.ValueElement;
 import com.aptana.editor.xml.parsing.XMLParserScanner;
+import com.aptana.editor.xml.parsing.lexer.XMLLexemeProvider;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -92,7 +93,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	protected List<ICompletionProposal> addAttributeProposals(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	protected List<ICompletionProposal> addAttributeProposals(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		String elementName = this.getElementName(lexemeProvider, offset);
@@ -178,7 +179,8 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	private List<ICompletionProposal> addAttributeValueProposals(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	private List<ICompletionProposal> addAttributeValueProposals(ILexemeProvider<XMLTokenType> lexemeProvider,
+			int offset)
 	{
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		String attributeName = this.getAttributeName(lexemeProvider, offset);
@@ -221,7 +223,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private List<ICompletionProposal> addCloseTagProposals(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	private List<ICompletionProposal> addCloseTagProposals(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		Set<String> unclosedElements = getUnclosedTagNames(offset);
@@ -261,7 +263,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param lexemeProvider
 	 * @param offset
 	 */
-	protected List<ICompletionProposal> addElementProposals(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	protected List<ICompletionProposal> addElementProposals(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		List<ElementElement> elements = this._queryHelper.getElements();
 		// return early if no elements
@@ -369,7 +371,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<XMLTokenType> lexemeProvider,
+	private void addOpenTagPropsals(List<ICompletionProposal> proposals, ILexemeProvider<XMLTokenType> lexemeProvider,
 			int offset)
 	{
 		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
@@ -469,21 +471,14 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
+	ILexemeProvider<XMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new LexemeProvider<XMLTokenType>(document, lexemeProviderOffset, new XMLParserScanner())
-		{
-			@Override
-			protected XMLTokenType getTypeFromData(Object data)
-			{
-				return (XMLTokenType) data;
-			}
-		};
+		return new XMLLexemeProvider(document, lexemeProviderOffset, new XMLParserScanner());
 	}
 
 	/**
@@ -552,7 +547,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 		// tokenize the current document
 		this._document = viewer.getDocument();
 
-		LexemeProvider<XMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
+		ILexemeProvider<XMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
 
 		// store a reference to the lexeme at the current position
 		this._replaceRange = this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
@@ -614,7 +609,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private String getAttributeName(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	private String getAttributeName(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		String name = null;
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
@@ -653,7 +648,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getCoarseLocationType(IDocument document, LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	LocationType getCoarseLocationType(IDocument document, ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		LocationType result = LocationType.ERROR;
 
@@ -793,7 +788,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	private String getElementName(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	private String getElementName(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		String result = null;
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
@@ -821,7 +816,7 @@ public class XMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	LocationType getOpenTagLocationType(LexemeProvider<XMLTokenType> lexemeProvider, int offset)
+	LocationType getOpenTagLocationType(ILexemeProvider<XMLTokenType> lexemeProvider, int offset)
 	{
 		LocationType result = LocationType.ERROR;
 

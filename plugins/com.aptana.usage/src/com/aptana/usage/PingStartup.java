@@ -8,6 +8,7 @@
 package com.aptana.usage;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,13 +24,18 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ui.IStartup;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.usage.internal.AnalyticsInfo;
+import com.aptana.usage.internal.AnalyticsInfoManager;
+import com.aptana.usage.internal.DefaultAnalyticsInfo;
 import com.aptana.usage.preferences.IPreferenceConstants;
 
 public class PingStartup implements IStartup
 {
 
 	private static final String STUDIO_FIRST_RUN = "studio.first-run"; //$NON-NLS-1$
+	private static final String STUDIO_ENROLL = "ti.enroll"; //$NON-NLS-1$
 
 	private static final Map<String, String> STUDIO_NATURE_MAP;
 	static
@@ -98,6 +104,34 @@ public class PingStartup implements IStartup
 				{
 					UsagePlugin.logError(e);
 				}
+			}
+		}
+
+		boolean hasEnrolled = Platform.getPreferencesService().getBoolean(UsagePlugin.PLUGIN_ID,
+				IPreferenceConstants.HAS_ENROLLED, false, new IScopeContext[] { scope });
+		if (!hasEnrolled)
+		{
+			AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+			String guid = info.getAppGuid();
+			// only sends the enroll ping if it's Aptana Studio
+			if ((new DefaultAnalyticsInfo()).getAppGuid().equals(guid))
+			{
+				Map<String, String> payload = new LinkedHashMap<String, String>();
+				payload.put("guid", guid); //$NON-NLS-1$
+				payload.put("mid", CorePlugin.getMID()); //$NON-NLS-1$
+
+				StudioAnalytics.getInstance().sendEvent(new AnalyticsEvent(STUDIO_ENROLL, STUDIO_ENROLL, payload));
+			}
+
+			IEclipsePreferences store = scope.getNode(UsagePlugin.PLUGIN_ID);
+			store.putBoolean(IPreferenceConstants.HAS_ENROLLED, true);
+			try
+			{
+				store.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				UsagePlugin.logError(e);
 			}
 		}
 

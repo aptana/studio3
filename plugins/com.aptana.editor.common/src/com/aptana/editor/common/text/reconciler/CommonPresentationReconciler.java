@@ -8,6 +8,8 @@
 
 package com.aptana.editor.common.text.reconciler;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -26,27 +28,30 @@ import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.swt.custom.StyledText;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.Regions;
 import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
- *
  */
 public class CommonPresentationReconciler extends PresentationReconciler {
 
-	private static final int ITERATION_PARTITION_LIMIT = 10000;
-	private static final int BACKGROUND_RECONCILE_DELAY = 1000;
-	private static final int ITERATION_DELAY = 50;
+	private static final int ITERATION_PARTITION_LIMIT = 4000;
+	private static final int BACKGROUND_RECONCILE_DELAY = 2000;
+	private static final int ITERATION_DELAY = 500;
 	private static final int MINIMAL_VISIBLE_LENGTH = 20000;
-	
+
 	private ITextViewer textViewer;
 	private Regions delayedRegions = new Regions();
 	private IRegion viewerVisibleRegion;
 	private Job job;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.presentation.PresentationReconciler#install(org.eclipse.jface.text.ITextViewer)
 	 */
 	@Override
@@ -56,7 +61,8 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		textViewer = viewer;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.presentation.PresentationReconciler#uninstall()
 	 */
 	@Override
@@ -70,11 +76,17 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		super.uninstall();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.presentation.PresentationReconciler#createPresentation(org.eclipse.jface.text.IRegion, org.eclipse.jface.text.IDocument)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.presentation.PresentationReconciler#createPresentation(org.eclipse.jface.text.IRegion,
+	 * org.eclipse.jface.text.IDocument)
 	 */
 	@Override
 	protected TextPresentation createPresentation(IRegion damage, IDocument document) {
+		IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+				"Initiating presentation reconciling for region at offset {0}, length {1} in document of length {2}", //$NON-NLS-1$
+				damage.getOffset(), damage.getLength(), document.getLength()), IDebugScopes.PRESENTATION);
 		synchronized (this) {
 			delayedRegions.append(damage);
 		}
@@ -84,7 +96,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			triggerDelayedCreatePresentation();
 		}
 	}
-	
+
 	protected TextPresentation createPresentation(IRegion damage, IDocument document, IProgressMonitor monitor) {
 		try {
 			int damageOffset = damage.getOffset();
@@ -99,12 +111,20 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				}
 				damageLength = adjustedLength;
 			}
-			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT*5);
-			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(), damageOffset, damageLength, false);
+			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT * 5);
+			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(),
+					damageOffset, damageLength, false);
 			if (partitioning.length == 0) {
 				return presentation;
 			}
 			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
+			int processingLength = partitioning[limit - 1].getOffset() + partitioning[limit - 1].getLength() - damageOffset;
+			if (EclipseUtil.showSystemJobs()) {
+				monitor.subTask(MessageFormat.format(
+						"processing region at offset {0}, length {1} in document of length {2}", damageOffset, //$NON-NLS-1$
+						processingLength, document.getLength()));
+			}
+
 			for (int i = 0; i < limit; ++i) {
 				ITypedRegion r = partitioning[i];
 				IPresentationRepairer repairer = getRepairer(r.getType());
@@ -114,9 +134,11 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				if (repairer != null) {
 					repairer.createPresentation(presentation, r);
 				}
+				monitor.worked(r.getLength());
 			}
+
 			synchronized (this) {
-				delayedRegions.remove(new Region(damageOffset, partitioning[limit-1].getOffset()+partitioning[limit-1].getLength()-damageOffset));
+				delayedRegions.remove(new Region(damageOffset, processingLength));
 				if (limit < partitioning.length) {
 					int offset = partitioning[limit].getOffset();
 					delayedRegions.append(new Region(offset, damageOffset + damageLength - offset));
@@ -160,6 +182,9 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			job = new Job("Delayed Presentation Reconciler") { //$NON-NLS-1$
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
+					int priority = Thread.currentThread().getPriority();
+					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+					monitor.beginTask("Reconciling document", textViewer.getDocument().getLength()); //$NON-NLS-1$
 					while (!monitor.isCanceled()) {
 						IRegion damage = nextDamagedRegion();
 						if (damage == null || monitor.isCanceled()) {
@@ -173,6 +198,8 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 							break;
 						}
 					}
+					monitor.done();
+					Thread.currentThread().setPriority(priority);
 					return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
 				}
 			};

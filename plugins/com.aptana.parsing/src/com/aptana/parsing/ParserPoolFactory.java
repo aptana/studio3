@@ -229,7 +229,7 @@ public class ParserPoolFactory
 			else
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
-				IdeLog.logError(ParsingPlugin.getDefault(), message);
+				IdeLog.logError(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
 			}
 		}
 		else
@@ -238,7 +238,7 @@ public class ParserPoolFactory
 			{
 				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
 						contentTypeId);
-				IdeLog.logInfo(ParsingPlugin.getDefault(), message);
+				IdeLog.logInfo(ParsingPlugin.getDefault(), message, IDebugScopes.PARSING);
 			}
 		}
 

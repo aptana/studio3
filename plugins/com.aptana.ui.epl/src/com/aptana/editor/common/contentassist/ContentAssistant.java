@@ -1340,9 +1340,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		if (line.length() > 0)
 		{
 			return cp.isValidActivationCharacter(line.charAt(0), keyCode)
-					|| cp.isValidAutoActivationLocation(c, keyCode,
-					fContentAssistSubjectControlAdapter.getDocument(),
-					offset);
+					|| cp.isValidAutoActivationLocation(c, keyCode, fContentAssistSubjectControlAdapter.getDocument(),
+							offset);
 		}
 		else
 		{

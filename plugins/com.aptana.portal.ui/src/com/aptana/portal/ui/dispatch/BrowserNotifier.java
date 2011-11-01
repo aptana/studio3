@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.progress.UIJob;
@@ -160,14 +161,14 @@ public class BrowserNotifier
 		String json = null;
 		if (detailedMessage == null)
 		{
-			json = toJSONNotification(IBrowserNotificationConstants.JSON_ERROR, errorType, null);
+			json = toJSONNotification(IBrowserNotificationConstants.ERROR_STRING, errorType, null);
 		}
 		else
 		{
 			// Wrap this error message in as a JSON map
 			Map<String, String> error = new HashMap<String, String>();
 			error.put(IBrowserNotificationConstants.ERROR_DETAILS, detailedMessage);
-			json = toJSONNotification(IBrowserNotificationConstants.JSON_ERROR, errorType, JSON.toString(error));
+			json = toJSONNotification(IBrowserNotificationConstants.ERROR_STRING, errorType, JSON.toString(error));
 		}
 		return json;
 	}

@@ -7,7 +7,12 @@
  */
 package com.aptana.index.core;
 
+import java.text.MessageFormat;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -55,5 +60,32 @@ public class IndexPlugin extends Plugin
 	{
 		plugin = null;
 		super.stop(context);
+	}
+
+	/**
+	 * Determines if the specified debug option is on and set to true
+	 * 
+	 * @param option
+	 * @return
+	 */
+	public static boolean isDebugOptionEnabled(String option)
+	{
+		return Boolean.valueOf(Platform.getDebugOption(option));
+	}
+
+	/**
+	 * Logs an informational message
+	 * 
+	 * @param message
+	 * @param scope
+	 */
+	public static void logInfo(String message, String scope)
+	{
+		if (scope != null && Platform.inDebugMode() && isDebugOptionEnabled(scope))
+		{
+			getDefault().getLog().log(
+					new Status(IStatus.INFO, PLUGIN_ID, MessageFormat
+							.format(Messages.IndexPlugin_IndexingFile, message), null));
+		}
 	}
 }

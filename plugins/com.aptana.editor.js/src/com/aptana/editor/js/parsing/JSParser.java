@@ -240,7 +240,7 @@ public class JSParser extends Parser implements IParser {
 	}
 
 	private final List<IRecoveryStrategy> recoveryStrategies;
-	private JSScanner fScanner;
+	private JSFlexScanner fScanner;
 
 	/**
 	 * attachPostDocumentationBlocks
@@ -403,9 +403,25 @@ public class JSParser extends Parser implements IParser {
 		String source = (characters != null) ? new String(characters) : "";
 
 		// create scanner and send source to it
-		fScanner = new JSScanner();
+		fScanner = new JSFlexScanner();
 		fScanner.setSource(source);
 
+		// determine if we need to collect and/or attach comments
+		boolean attachComments = true;
+		boolean collectComments = true;
+
+		if (parseState instanceof JSParseState)
+		{
+			JSParseState jsParseState = (JSParseState) parseState;
+
+			// NOTE: In order to attach comments, we have to collect them, hence the OR in collectComments
+			attachComments = jsParseState.attachComments();
+			collectComments = jsParseState.attachComments() || jsParseState.collectComments();
+		}
+
+		fScanner.setCollectComments(collectComments);
+
+		// reset any errors we may have had from the last parse
 		fParseState.clearErrors();
 
 		try
@@ -421,14 +437,14 @@ public class JSParser extends Parser implements IParser {
 
 			JSParseRootNode root = (JSParseRootNode) result;
 
-			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).attachComments())
+			if (attachComments)
 			{
 				// attach documentation
 				attachPreDocumentationBlocks(root, source);
 				attachPostDocumentationBlocks(root, source);
 			}
 
-			if (!(parseState instanceof JSParseState) || ((JSParseState) parseState).collectComments())
+			if (collectComments)
 			{
 				// create a list of all comments and attach to root node
 				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();

@@ -161,7 +161,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int end = comment.getEndingOffset();
 			if (commentType == IJSNodeTypes.SINGLE_LINE_COMMENT)
 			{
-				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end));
+				singleLinecommentEndOffsets.add(getNextNonWhiteCharOffset(document, end + 1));
 			}
 			else if (commentType == IJSNodeTypes.MULTI_LINE_COMMENT || commentType == IJSNodeTypes.SDOC_COMMENT
 					|| commentType == IJSNodeTypes.VSDOC_COMMENT)

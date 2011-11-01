@@ -23,6 +23,7 @@ public class AllTests
 		suite.addTestSuite(CommandBlockRunnerTests.class);
 		suite.addTestSuite(CommandTests.class);
 		suite.addTestSuite(ContextTests.class);
+		suite.addTestSuite(CommandBlockRunnerTests.class);
 		suite.addTestSuite(FilterTests.class);
 		suite.addTestSuite(KeyBindingTests.class);
 		suite.addTestSuite(PlatformSpecificCommandTests.class);

@@ -11,6 +11,11 @@ import com.aptana.ui.epl.UIEplPlugin;
 public interface IUiEplScopes
 {
 	/**
+	 * Items related to the content assist process
+	 */
+	String CONTENT_ASSIST = UIEplPlugin.PLUGIN_ID + "/debug/content_assist"; //$NON-NLS-1$
+
+	/**
 	 * Items related to computing relevance of elements
 	 */
 	String RELEVANCE = UIEplPlugin.PLUGIN_ID + "/debug/relevance"; //$NON-NLS-1$

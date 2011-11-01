@@ -7,17 +7,28 @@
  */
 package com.aptana.editor.common;
 
+
 /**
  * A interface to capture the various scopes available during debugging. These need to match the items in the .options
  * file at the root of the plugin
  * 
- * @author Max Stepanov
+ * @author Ingo Muschenetz
  */
 public interface IDebugScopes
 {
 	/**
-	 * Items related to the partitioning process
+	 * Items related to the presentation process
 	 */
 	String PARTITIONER = CommonEditorPlugin.PLUGIN_ID + "/debug/partitioner"; //$NON-NLS-1$
+
+	/**
+	 * Items related to the partitioning process
+	 */
+	String PRESENTATION = CommonEditorPlugin.PLUGIN_ID + "/debug/presentation"; //$NON-NLS-1$
+
+	/**
+	 * Items related to the content assist process
+	 */
+	String CONTENT_ASSIST = CommonEditorPlugin.PLUGIN_ID + "/debug/content_assist"; //$NON-NLS-1$
 
 }
