@@ -7,7 +7,7 @@
  */
 package com.aptana.samples.handlers;
 
-import com.aptana.samples.model.SampleEntry;
+import com.aptana.samples.model.SamplesReference;
 
 public interface ISamplePreviewHandler
 {
@@ -18,5 +18,5 @@ public interface ISamplePreviewHandler
 	 * @param sample
 	 *            the sample entry
 	 */
-	public void previewRequested(SampleEntry sample);
+	public void previewRequested(SamplesReference sample);
 }
