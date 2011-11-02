@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
@@ -99,6 +100,11 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		ftpsClient.setImplicitFTPS(true);
 		ftpsClient.setCustomValidator(new SSLHostValidator());
 		ftpsClient.setValidateServer(validateCertificate);
+		try {
+			ftpsClient.getRootCertificateStore().importDefaultKeyStore();
+		} catch (Exception e) {
+			IdeLog.logWarning(SecureFTPPlugin.getDefault(), "Loading default root certificates failed.", e); //$NON-NLS-1$
+		}
 		ftpsClient.setImplicitFTPS(!explicit);
 		ftpsClient.setConfigFlags(ConfigFlags.START_WITH_CLEAR_DATA_CHANNELS | (noSSLSessionResumption ? ConfigFlags.DISABLE_SESSION_RESUMPTION : 0));
 	}
