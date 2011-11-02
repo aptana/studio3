@@ -91,6 +91,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	public static final int NO_CONTENT_ASSIST_DELAY = 0;
 	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 200;
 	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
+	private boolean disableBackgroundReconciler = false;
 
 	public static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 
@@ -110,8 +111,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	protected CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
 	{
 		super(preferenceStore);
-
 		fTextEditor = editor;
+		disableBackgroundReconciler = Boolean.parseBoolean(EclipseUtil
+				.getSystemProperty(ICommonEditorSystemProperties.DISABLE_BACKGROUND_RECONCILER));
 	}
 
 	/**
@@ -398,9 +400,16 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
 	{
-		PresentationReconciler reconciler = new CommonPresentationReconciler();
-		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-		return reconciler;
+		if (disableBackgroundReconciler)
+		{
+			return super.getPresentationReconciler(sourceViewer);
+		}
+		else
+		{
+			PresentationReconciler reconciler = new CommonPresentationReconciler();
+			reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+			return reconciler;
+		}
 	}
 
 	private final Collection<String> getSpellingContentTypes(ISourceViewer sourceViewer)
