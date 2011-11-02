@@ -40,6 +40,12 @@ public class PathUtil
 		{
 			return rawPATH;
 		}
+		// Handle if path didn't come from bash/mingw/cygwin, but from system env instead.
+		if (rawPATH.indexOf(';') != -1)
+		{
+			return rawPATH;
+		}
+
 		// Cygwin - http://www.cygwin.com/cygwin-ug-net/using-utils.html
 		if (rawPATH.contains("/cygdrive/")) //$NON-NLS-1$
 		{
