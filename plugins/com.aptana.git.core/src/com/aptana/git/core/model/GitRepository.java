@@ -114,9 +114,13 @@ public class GitRepository
 	 */
 	static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	/**
-	 * File hoplding the concatenated commit messages from merge --squash
+	 * File holding the concatenated commit messages from merge --squash
 	 */
 	private static final String SQUASH_MSG = "SQUASH_MSG"; //$NON-NLS-1$
+	/**
+	 * File holding the pre-pulated commit messages from merge (w/conflicts)
+	 */
+	private static final String MERGE_MSG = "MERGE_MSG"; //$NON-NLS-1$
 	/**
 	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
 	 * repo has changed.
@@ -1932,6 +1936,13 @@ public class GitRepository
 	{
 		try
 		{
+			// Look for MERGE_MSG, then SQUASH_MSG. See https://raw.github.com/git/git/master/builtin/commit.c,
+			// prepare_to_commit
+			File mergeMsg = gitFile(MERGE_MSG);
+			if (mergeMsg.exists())
+			{
+				return IOUtil.read(new FileInputStream(mergeMsg)); // $codepro.audit.disable closeWhereCreated
+			}
 			File squashMsg = gitFile(SQUASH_MSG);
 			if (squashMsg.exists())
 			{
