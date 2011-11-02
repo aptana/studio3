@@ -107,6 +107,7 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.UIPlugin;
@@ -305,6 +306,16 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				else
 				{
 					end1 = MessageFormat.format("{0} ({1})", end1, path); //$NON-NLS-1$
+					if (destFilesToBeSynced == null || destFilesToBeSynced.length == 0)
+					{
+						// checks if the path exists on remote also
+						IFileStore fileStore = destConnectionPoint.getRoot().getFileStore(path);
+						if (Utils.exists(fileStore))
+						{
+							this.destFilesToBeSynced = new IFileStore[] { fileStore };
+							return;
+						}
+					}
 				}
 			}
 		}
