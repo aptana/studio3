@@ -407,15 +407,15 @@ public class Theme
 			}
 			if (new ScopeSelector("console.warning").matches(scope)) //$NON-NLS-1$
 			{
-				return new DelayedTextAttribute(new RGBa(227, 192, 0), null, SWT.NORMAL);
+				return new DelayedTextAttribute(new RGBa(205, 102, 0), null, SWT.NORMAL);
 			}
 			if (new ScopeSelector("console.debug").matches(scope)) //$NON-NLS-1$
 			{
-				return new DelayedTextAttribute(new RGBa(255, 236, 139), null, SWT.NORMAL);
+				return new DelayedTextAttribute(new RGBa(93, 102, 102), null, SWT.NORMAL);
 			}
 			if (new ScopeSelector("hyperlink").matches(scope)) //$NON-NLS-1$
 			{
-				return new DelayedTextAttribute(new RGBa(29, 212, 125), null, SWT.NORMAL);
+				return new DelayedTextAttribute(new RGBa(13, 17, 113), null, SWT.NORMAL);
 			}
 		}
 		return new DelayedTextAttribute(new RGBa(defaultFG));
