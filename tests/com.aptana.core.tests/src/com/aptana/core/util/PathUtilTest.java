@@ -21,7 +21,7 @@ public class PathUtilTest extends TestCase
 		ShellExecutable.setPreferenceShellPath(null);
 		super.tearDown();
 	}
-	
+
 	public void testCygwinPath() throws Exception
 	{
 		ShellExecutable.setPreferenceShellPath(Path.fromOSString("C:\\cygwin\\bin\\sh.exe"));
@@ -29,6 +29,13 @@ public class PathUtilTest extends TestCase
 		String actual = PathUtil.convertPATH(rawPATH);
 		String expected = "C:\\cygwin\\usr\\local\\bin;C:\\cygwin\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\apache-ant-1.7.1\\bin;C:\\RailsInstaller\\Git\\cmd;C:\\RailsInstaller\\Ruby1.8.7\\bin;C:\\Program Files (x86)\\CVSNT";
 		assertEquals(expected, actual);
+	}
+
+	public void testNormalWindowsPath() throws Exception
+	{
+		String rawPATH = "C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\apache-ant-1.7.1\\bin;C:\\RailsInstaller\\Git\\cmd;C:\\RailsInstaller\\Ruby1.8.7\\bin;C:\\Program Files (x86)\\CVSNT";
+		String actual = PathUtil.convertPATH(rawPATH);
+		assertEquals(rawPATH, actual);
 	}
 
 }
