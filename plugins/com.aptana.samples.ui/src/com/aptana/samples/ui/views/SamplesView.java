@@ -7,19 +7,11 @@
  */
 package com.aptana.samples.ui.views;
 
-import java.io.File;
-
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -28,11 +20,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
-import com.aptana.core.logging.IdeLog;
-import com.aptana.ide.ui.io.navigator.actions.EditorUtils;
 import com.aptana.samples.SamplesPlugin;
-import com.aptana.samples.model.SampleEntry;
-import com.aptana.samples.ui.SamplesUIPlugin;
 import com.aptana.theme.ThemePlugin;
 
 /**
@@ -52,32 +40,6 @@ public class SamplesView extends ViewPart
 	public void createPartControl(Composite parent)
 	{
 		treeViewer = createTreeViewer(parent);
-		treeViewer.addDoubleClickListener(new IDoubleClickListener()
-		{
-
-			public void doubleClick(DoubleClickEvent event)
-			{
-				ISelection selection = treeViewer.getSelection();
-				Object firstElement = ((IStructuredSelection) selection).getFirstElement();
-
-				if (firstElement instanceof SampleEntry)
-				{
-					File file = ((SampleEntry) firstElement).getFile();
-
-					if (file != null && file.isFile())
-					{
-						try
-						{
-							EditorUtils.openFileInEditor(EFS.getStore(file.toURI()), null);
-						}
-						catch (CoreException e)
-						{
-							IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.SamplesView_ERR_UnableToOpenFile, e);
-						}
-					}
-				}
-			}
-		});
 
 		getSite().setSelectionProvider(treeViewer);
 		hookContextMenu();

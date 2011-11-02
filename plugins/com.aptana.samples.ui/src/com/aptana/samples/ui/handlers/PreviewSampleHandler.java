@@ -15,8 +15,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.samples.handlers.ISamplePreviewHandler;
-import com.aptana.samples.model.SampleEntry;
-import com.aptana.samples.model.SampleEntryUtil;
 import com.aptana.samples.model.SamplesReference;
 
 public class PreviewSampleHandler extends AbstractHandler
@@ -29,14 +27,10 @@ public class PreviewSampleHandler extends AbstractHandler
 		{
 			Object firstElement = ((IStructuredSelection) selection).getFirstElement();
 
-			SampleEntry sample = null;
-			if (firstElement instanceof SampleEntry)
+			if (firstElement instanceof SamplesReference)
 			{
-				sample = SampleEntryUtil.getRootSample((SampleEntry) firstElement);
-			}
-			if (sample != null)
-			{
-				ISamplePreviewHandler handler = ((SamplesReference) sample.getParent()).getPreviewHandler();
+				SamplesReference sample = (SamplesReference) firstElement;
+				ISamplePreviewHandler handler = sample.getPreviewHandler();
 				if (handler != null)
 				{
 					handler.previewRequested(sample);

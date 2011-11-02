@@ -59,8 +59,8 @@ public class SamplesManagerTest extends TestCase
 		assertTrue(remoteSample.isRemote());
 		assertEquals("com.aptana.samples.tests.remote", remoteSample.getId());
 		assertEquals("Remote", remoteSample.getName());
-		assertEquals("Testing remote sample", remoteSample.getDescriptionText());
-		assertEquals("git://github.com/aptana/remote_sample.git", remoteSample.getPath());
+		assertEquals("Testing remote sample", remoteSample.getDescription());
+		assertEquals("git://github.com/aptana/remote_sample.git", remoteSample.getLocation());
 
 		assertEquals(samplesManager.getCategories().get(0), remoteSample.getCategory());
 		assertNull(remoteSample.getInfoFile());
