@@ -17,7 +17,6 @@ import com.aptana.core.util.ArrayUtil;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
-import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 
 /**
@@ -48,22 +47,9 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 			List<Object> children = new ArrayList<Object>();
 			for (SamplesReference ref : samplesRefs)
 			{
-				if (ref.isRemote())
-				{
-					// uses the reference directly
-					children.add(ref);
-				}
-				else
-				{
-					// uses the folders the root contains
-					children.addAll(ref.getSamples());
-				}
+				children.add(ref);
 			}
 			return children.toArray(new Object[children.size()]);
-		}
-		if (parentElement instanceof SampleEntry)
-		{
-			return ((SampleEntry) parentElement).getSubEntries();
 		}
 		return ArrayUtil.NO_STRINGS;
 	}
@@ -81,15 +67,6 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 	 */
 	public Object getParent(Object element)
 	{
-		if (element instanceof SampleEntry)
-		{
-			Object parent = ((SampleEntry) element).getParent();
-			if (parent instanceof SamplesReference)
-			{
-				return ((SamplesReference) parent).getCategory();
-			}
-			return parent;
-		}
 		if (element instanceof SamplesReference)
 		{
 			return ((SamplesReference) element).getCategory();
