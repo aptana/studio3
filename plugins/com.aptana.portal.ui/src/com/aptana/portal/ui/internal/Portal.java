@@ -122,7 +122,7 @@ public class Portal
 	 */
 	public void openPortal(URL url, final String browserEditorId)
 	{
-		openPortal(url, browserEditorId, true);
+		openPortal(url, browserEditorId, true, null);
 	}
 
 	/**
@@ -137,8 +137,11 @@ public class Portal
 	 *            point.
 	 * @param bringToTop
 	 *            Indicate whether the opened portal should be brought to the top when opened.
+	 * @param additionalParameters
+	 *            An optional map that may hold additional GET parameters that will be appended to the opened URL.
 	 */
-	public void openPortal(URL url, final String browserEditorId, final boolean bringToTop)
+	public void openPortal(URL url, final String browserEditorId, final boolean bringToTop,
+			Map<String, String> additionalParameters)
 	{
 		try
 		{
@@ -154,7 +157,12 @@ public class Portal
 					url = URLUtil.appendParameters(localURL, new String[] { "url", url.toString() }); //$NON-NLS-1$
 				}
 			}
-			url = URLUtil.appendParameters(url, getURLParametersForProject(PortalUIPlugin.getActiveProject()), false);
+			Map<String, String> parameters = getURLParametersForProject(PortalUIPlugin.getActiveProject());
+			if (additionalParameters != null)
+			{
+				parameters.putAll(additionalParameters);
+			}
+			url = URLUtil.appendParameters(url, parameters, false);
 		}
 		catch (IOException e)
 		{
