@@ -120,14 +120,26 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	 */
 	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
-		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
-		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(this.isReplacingParameters())); //$NON-NLS-1$
+		printBody(printer, includeBlocks, this);
+	}
 
-		if (this.getDescription() != null)
+	/**
+	 * Prints the interior body of the template element
+	 * 
+	 * @param printer
+	 * @param includeBlocks
+	 * @param template
+	 */
+	public static void printBody(SourcePrinter printer, boolean includeBlocks, IProjectTemplate template)
+	{
+		printer.printWithIndent("path: ").println(template.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(template.getDisplayName()); //$NON-NLS-1$
+		printer.printWithIndent("location: ").println(template.getLocation()); //$NON-NLS-1$
+		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(template.isReplacingParameters())); //$NON-NLS-1$
+
+		if (template.getDescription() != null)
 		{
-			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
+			printer.printWithIndent("description: ").println(template.getDescription()); //$NON-NLS-1$
 		}
 	}
 

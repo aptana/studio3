@@ -18,6 +18,13 @@ import java.net.URL;
 public interface IProjectTemplate
 {
 	/**
+	 * getPath
+	 * 
+	 * @return
+	 */
+	public String getPath();
+
+	/**
 	 * getDisplayName
 	 * 
 	 * @return
