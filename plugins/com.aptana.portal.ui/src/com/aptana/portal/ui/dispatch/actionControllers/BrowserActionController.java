@@ -45,7 +45,7 @@ public class BrowserActionController extends AbstractActionController
 		{
 			url = getURL(attributes);
 		}
-		Portal.getInstance().openPortal(url, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, false);
+		Portal.getInstance().openPortal(url, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID, false, null);
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 
