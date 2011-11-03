@@ -19,7 +19,6 @@ public class SamplesReference implements IProjectSample
 
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 	private static final String ATTR_PREVIEW_HANDLER = "previewHandler"; //$NON-NLS-1$
-	public static final String REMOTE_DESCRIPTION_KEY = "remoteDescription"; //$NON-NLS-1$
 
 	private final SampleCategory category;
 	private final String location;
@@ -92,7 +91,7 @@ public class SamplesReference implements IProjectSample
 				// ignores the exception since it's optional
 			}
 		}
-		return projectHandler;
+		return (projectHandler == null) ? category.getProjectHandler() : projectHandler;
 	}
 
 	public ISamplePreviewHandler getPreviewHandler()
