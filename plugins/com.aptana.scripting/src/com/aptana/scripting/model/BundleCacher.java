@@ -591,6 +591,7 @@ public class BundleCacher
 			this.yamlConstructors.put(new Tag(TemplateElement.class), new ConstructTemplateElement());
 			this.yamlConstructors.put(new Tag(SmartTypingPairsElement.class), new ConstructSmartTypingPairsElement());
 			this.yamlConstructors.put(new Tag(ProjectTemplateElement.class), new ConstructProjectTemplateElement());
+			this.yamlConstructors.put(new Tag(ProjectSampleElement.class), new ConstructProjectSampleElement());
 			this.yamlConstructors.put(new Tag(EnvironmentElement.class), new ConstructEnvironmentElement());
 			this.yamlConstructors.put(new Tag(BuildPathElement.class), new ConstructBuildPathElement());
 
@@ -822,6 +823,20 @@ public class BundleCacher
 				node.setType(ProjectTemplateElement.class);
 				String path = getPath(node);
 				ProjectTemplateElement be = new ProjectTemplateElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
+				return be;
+			}
+		}
+
+		private class ConstructProjectSampleElement extends AbstractBundleElementConstruct
+		{
+			public Object construct(Node node)
+			{
+				node.setType(ProjectSampleElement.class);
+				String path = getPath(node);
+				ProjectSampleElement be = new ProjectSampleElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);

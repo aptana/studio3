@@ -80,7 +80,7 @@ public class SamplesReference implements IProjectSample
 
 	public ISampleProjectHandler getProjectHandler()
 	{
-		if (projectHandler == null)
+		if (projectHandler == null && configElement != null)
 		{
 			try
 			{
@@ -96,7 +96,7 @@ public class SamplesReference implements IProjectSample
 
 	public ISamplePreviewHandler getPreviewHandler()
 	{
-		if (previewHandler == null)
+		if (previewHandler == null && configElement != null)
 		{
 			try
 			{
