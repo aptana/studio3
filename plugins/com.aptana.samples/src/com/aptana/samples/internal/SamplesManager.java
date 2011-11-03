@@ -116,7 +116,7 @@ public class SamplesManager implements ISamplesManager
 			{
 				return;
 			}
-			SampleCategory category = new SampleCategory(id, name);
+			SampleCategory category = new SampleCategory(id, name, element);
 			categories.put(id, category);
 
 			String iconFile = element.getAttribute(ATTR_ICON);
@@ -174,7 +174,7 @@ public class SamplesManager implements ISamplesManager
 				category = categories.get(categoryId);
 				if (category == null)
 				{
-					category = new SampleCategory(categoryId, Messages.SamplesManager_DefaultCategory_Name);
+					category = new SampleCategory(categoryId, Messages.SamplesManager_DefaultCategory_Name, element);
 				}
 			}
 

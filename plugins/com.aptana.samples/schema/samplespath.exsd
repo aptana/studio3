@@ -77,6 +77,16 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="projectHandler" type="string">
+            <annotation>
+               <documentation>
+                  A handler for adding custom steps as the sample project is getting created.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISampleProjectHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
