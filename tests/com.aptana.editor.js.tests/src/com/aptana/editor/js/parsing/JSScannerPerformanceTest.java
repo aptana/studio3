@@ -24,7 +24,7 @@ import com.aptana.parsing.ParseState;
 
 public class JSScannerPerformanceTest extends PerformanceTestCase
 {
-	private JSScanner fScanner;
+	private JSFlexScanner fScanner;
 
 	/**
 	 * getSource
@@ -61,7 +61,8 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	{
 		super.setUp();
 
-		fScanner = new JSScanner();
+		fScanner = new JSFlexScanner();
+		fScanner.setCollectComments(false);
 	}
 
 	/*
@@ -83,7 +84,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testDojo() throws Exception
 	{
-		assertScan(10, "performance/dojo.js.uncompressed.js");
+		assertScan(10, ITestFiles.DOJO_FILES);
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testExt() throws Exception
 	{
-		assertScan(15, "performance/ext-core.js");
+		assertScan(15, ITestFiles.EXT_FILES);
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTiMobile() throws Exception
 	{
-		assertScan(10, "performance/timobile.js");
+		assertScan(10, ITestFiles.TIMOBILE_FILES);
 	}
 
 	/**
@@ -113,7 +114,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testTinyMce() throws Exception
 	{
-		assertScan(10, "performance/tiny_mce.js");
+		assertScan(10, ITestFiles.TINY_MCE_FILES);
 	}
 
 	/**
@@ -123,34 +124,7 @@ public class JSScannerPerformanceTest extends PerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertScan(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
-				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
-				"performance/jaxer/ComposerCommands.js", "performance/jaxer/DBAPI.js",
-				"performance/jaxer/DOMTestCase.js", "performance/jaxer/Microformats.js",
-				"performance/jaxer/MochiKit_packed.js", "performance/jaxer/SimpleTest.js",
-				"performance/jaxer/TestCachePerformance.js", "performance/jaxer/UDDITypes.js",
-				"performance/jaxer/browser_bug_411172.js", "performance/jaxer/clientBothProperty.js",
-				"performance/jaxer/commands.js", "performance/jaxer/crlManager.js", "performance/jaxer/dojo.js",
-				"performance/jaxer/dom.js", "performance/jaxer/editor.js", "performance/jaxer/effects.js",
-				"performance/jaxer/file-utils.js", "performance/jaxer/head_urlformatter.js",
-				"performance/jaxer/httpd.js", "performance/jaxer/ifaceinfotest.js", "performance/jaxer/irc.js",
-				"performance/jaxer/jquery-1.2.1.js", "performance/jaxer/jquery-1.2.6.min.js",
-				"performance/jaxer/jquery-stable.js", "performance/jaxer/jquery.js",
-				"performance/jaxer/lexical-008.js", "performance/jaxer/messages.js",
-				"performance/jaxer/narcissus-exec.js", "performance/jaxer/nsDragAndDrop.js",
-				"performance/jaxer/packed.js", "performance/jaxer/perlstress-001.js",
-				"performance/jaxer/perlstress-002.js", "performance/jaxer/property_database.js",
-				"performance/jaxer/prototype.js", "performance/jaxer/publishprefs.js",
-				"performance/jaxer/regress-100199.js", "performance/jaxer/regress-111557.js",
-				"performance/jaxer/regress-155081-2.js", "performance/jaxer/regress-192226.js",
-				"performance/jaxer/regress-244470.js", "performance/jaxer/regress-309925-02.js",
-				"performance/jaxer/regress-76054.js", "performance/jaxer/regress-98901.js",
-				"performance/jaxer/scriptaculous.js", "performance/jaxer/split-002.js",
-				"performance/jaxer/test_413784.js", "performance/jaxer/test_423515_forceCopyShortcuts.js",
-				"performance/jaxer/test_bug364285-1.js", "performance/jaxer/test_bug374754.js",
-				"performance/jaxer/test_multi_statements.js", "performance/jaxer/test_prepare_insert_update.js",
-				"performance/jaxer/tip_followscroll.js", "performance/jaxer/tree-utils.js",
-				"performance/jaxer/utils.js", "performance/jaxer/xpath.js", "performance/jaxer/xslt_script.js");
+		assertScan(5, ITestFiles.JAXER_FILES);
 	}
 
 	/**

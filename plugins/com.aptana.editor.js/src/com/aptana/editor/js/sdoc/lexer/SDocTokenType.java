@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.js.sdoc.lexer;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.aptana.editor.js.sdoc.parsing.Terminals;
 
 public enum SDocTokenType
@@ -60,7 +64,22 @@ public enum SDocTokenType
 	TYPES(1025),
 	VALUE(1026);
 
+	private static Map<Short, SDocTokenType> ID_MAP;
+
 	private short _index;
+
+	/**
+	 * static initializer
+	 */
+	static
+	{
+		ID_MAP = new HashMap<Short, SDocTokenType>();
+
+		for (SDocTokenType type : EnumSet.allOf(SDocTokenType.class))
+		{
+			ID_MAP.put(type.getIndex(), type);
+		}
+	}
 
 	private SDocTokenType(short beaverId)
 	{
@@ -70,6 +89,18 @@ public enum SDocTokenType
 	private SDocTokenType(int index)
 	{
 		this((short) index);
+	}
+
+	public static SDocTokenType get(short id)
+	{
+		SDocTokenType result = UNDEFINED;
+
+		if (ID_MAP.containsKey(id))
+		{
+			result = ID_MAP.get(id);
+		}
+
+		return result;
 	}
 
 	/**

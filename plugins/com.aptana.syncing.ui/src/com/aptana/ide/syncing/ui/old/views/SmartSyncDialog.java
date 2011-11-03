@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -79,6 +80,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.logging.IdeLog;
@@ -105,6 +107,7 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.UIPlugin;
@@ -303,6 +306,16 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				else
 				{
 					end1 = MessageFormat.format("{0} ({1})", end1, path); //$NON-NLS-1$
+					if (destFilesToBeSynced == null || destFilesToBeSynced.length == 0)
+					{
+						// checks if the path exists on remote also
+						IFileStore fileStore = destConnectionPoint.getRoot().getFileStore(path);
+						if (Utils.exists(fileStore))
+						{
+							this.destFilesToBeSynced = new IFileStore[] { fileStore };
+							return;
+						}
+					}
 				}
 			}
 		}

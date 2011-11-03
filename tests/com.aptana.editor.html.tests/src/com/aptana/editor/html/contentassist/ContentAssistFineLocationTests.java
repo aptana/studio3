@@ -67,6 +67,21 @@ public class ContentAssistFineLocationTests extends LocationTestCase
 	}
 	
 	/**
+	 * testUnclosedOpenTagWithIncompleteAttribute3
+	 */
+	public void testUnclosedOpenTagWithIncompleteAttribute3()
+	{
+		String source = "<img src=\"img/";
+
+		this.fineLocationTests(
+			source,
+			new LocationTypeRange(LocationType.IN_ELEMENT_NAME, 1, 4),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_NAME, 5, 8),
+			new LocationTypeRange(LocationType.IN_ATTRIBUTE_VALUE, 9, 13)
+		);
+	}
+
+	/**
 	 * testUnclosedOpenTagWithAttribute
 	 */
 	public void testUnclosedOpenTagWithAttribute()

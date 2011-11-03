@@ -14,9 +14,10 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.html.parsing.lexer.HTMLLexemeProvider;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 
 public class HTMLTestUtil
@@ -83,21 +84,14 @@ public class HTMLTestUtil
 	 * @param offset
 	 * @return
 	 */
-	public static LexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
+	public static ILexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new LexemeProvider<HTMLTokenType>(document, lexemeProviderOffset, new HTMLTagScanner())
-		{
-			@Override
-			protected HTMLTokenType getTypeFromData(Object data)
-			{
-				return HTMLTokenType.get((String) data);
-			}
-		};
+		return new HTMLLexemeProvider(document, lexemeProviderOffset, new HTMLTagScanner());
 	}
 
 	/**

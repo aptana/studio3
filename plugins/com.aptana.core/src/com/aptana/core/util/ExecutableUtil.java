@@ -97,29 +97,20 @@ public final class ExecutableUtil
 			return null;
 		}
 
+		// Grab PATH from shell if possible
 		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
-		String[] paths;
-
+		String pathENV;
 		if (env != null && env.containsKey(PATH))
 		{
-			paths = env.get(PATH).split(ShellExecutable.PATH_SEPARATOR);
-			if (Platform.OS_WIN32.equals(Platform.getOS()))
-			{
-				for (int i = 0; i < paths.length; ++i)
-				{
-					if (paths[i].matches("^/(.)/.*")) { //$NON-NLS-1$
-						paths[i] = paths[i].replaceFirst("^/(.)/", "$1:/"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				}
-			}
+			pathENV = PathUtil.convertPATH(env.get(PATH));
 		}
 		else
 		{
-			String pathENV = System.getenv(PATH);
-			paths = pathENV.split(File.pathSeparator);
+			pathENV = System.getenv(PATH);
 		}
 
 		// Grab PATH and search it!
+		String[] paths = pathENV.split(File.pathSeparator);
 		for (String pathString : paths)
 		{
 			IPath path = Path.fromOSString(pathString).append(executableName);
@@ -214,7 +205,7 @@ public final class ExecutableUtil
 
 	public static boolean isGemInstallable()
 	{
-		if (!Platform.getOS().equals(Platform.OS_WIN32))
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			// TODO This code is pretty blase about possible nulls/errors/etc. Should probably try and make it
 			// more bullet-proof.

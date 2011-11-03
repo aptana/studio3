@@ -110,7 +110,7 @@ public class ProcessUtil
 		}
 		return result.getMessage();
 	}
-	
+
 	/**
 	 * reads the stdout and stderr from process, returns an IStatus with the exit code, and results. Cast to
 	 * ProcessStatus to get at each stream's output separately.
@@ -292,9 +292,14 @@ public class ProcessUtil
 		}
 		if (isInfoLoggingEnabled())
 		{
+			String path = null;
+			if (processBuilder.directory() != null)
+			{
+				path = processBuilder.directory().getAbsolutePath();
+			}
 			logInfo(StringUtil.format(Messages.ProcessUtil_RunningProcess,
 					new Object[] { StringUtil.join("\" \"", command), //$NON-NLS-1$
-							processBuilder.directory().getAbsolutePath(), map }));
+							path, map }));
 		}
 		return startProcess(processBuilder);
 	}

@@ -423,7 +423,7 @@ public class CommandExecutionUtils
 		Point selectionRange = textWidget.getSelectedRange();
 		switch (inputType)
 		{
-			// TODO Move this logic into the enum itself
+		// TODO Move this logic into the enum itself
 			case UNDEFINED:
 			case NONE:
 				return CommandExecutionUtils.EOF;
@@ -507,7 +507,7 @@ public class CommandExecutionUtils
 		// separate out the commands that require a text editor and the ones that do not
 		switch (commandResult.getOutputType())
 		{
-			// TODO Move this logic into the enum itself!
+		// TODO Move this logic into the enum itself!
 			case DISCARD:
 			case UNDEFINED:
 				break;

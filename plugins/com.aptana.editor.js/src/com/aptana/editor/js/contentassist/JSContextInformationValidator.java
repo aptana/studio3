@@ -18,9 +18,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 
-import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.js.parsing.JSTokenScanner;
-import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
+import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
+import com.aptana.editor.js.parsing.JSFlexScanner;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.theme.ColorManager;
@@ -44,8 +44,8 @@ public class JSContextInformationValidator implements IContextInformationValidat
 
 			// grab lexemes
 			IDocument document = _viewer.getDocument();
-			LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, _startingOffset,
-					new JSTokenScanner());
+			ILexemeProvider<JSTokenType> lexemeProvider = new JSFlexLexemeProvider(document, offset, _startingOffset,
+					new JSFlexScanner());
 
 			// get starting index based on the initial offset provided to this validator
 			int index = lexemeProvider.getLexemeFloorIndex(_startingOffset);

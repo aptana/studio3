@@ -13,6 +13,7 @@ package com.aptana.editor.common.contentassist;
  * available at http://www.eclipse.org/legal/epl-v10.html Contributors: IBM Corporation - initial API and implementation
  **********************************************************************************************************************/
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1777,6 +1778,9 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 			}
 		}
+
+		IdeLog.logInfo(UIEplPlugin.getDefault(),
+				MessageFormat.format("Filtered list to {0} proposals", filtered.size()), IUiEplScopes.CONTENT_ASSIST);
 
 		return filtered.toArray(new ICompletionProposal[filtered.size()]);
 	}

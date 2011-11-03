@@ -437,6 +437,7 @@ public class ThemeManager implements IThemeManager
 		return fThemeNames;
 	}
 
+	@SuppressWarnings("restriction")
 	private Theme loadUserTheme(String themeName)
 	{
 		InputStream byteStream = null;

@@ -116,7 +116,7 @@ public abstract class AbstractActionController implements IActionController, ICo
 					Throwable targetException = ((InvocationTargetException) e).getTargetException();
 					message = targetException.getMessage();
 				}
-				return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR, message);
+				return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.ERROR_STRING, message);
 			}
 		}
 		return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_UNKNOWN_ACTION,
@@ -188,7 +188,7 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 */
 	protected Object createInternalErrorNotification()
 	{
-		return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR,
+		return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.ERROR_STRING,
 				Messages.ActionController_internalError);
 	}
 

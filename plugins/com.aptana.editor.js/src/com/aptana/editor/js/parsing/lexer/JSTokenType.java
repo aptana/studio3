@@ -105,6 +105,7 @@ public enum JSTokenType implements ITypePredicate
 	VSDOC("VSDOC", 1027); //$NON-NLS-1$
 
 	private static Map<String, JSTokenType> NAME_MAP;
+	private static Map<Short, JSTokenType> ID_MAP;
 
 	private String _name;
 	private short _index;
@@ -115,10 +116,12 @@ public enum JSTokenType implements ITypePredicate
 	static
 	{
 		NAME_MAP = new HashMap<String, JSTokenType>();
+		ID_MAP = new HashMap<Short, JSTokenType>();
 
 		for (JSTokenType type : EnumSet.allOf(JSTokenType.class))
 		{
 			NAME_MAP.put(type.getName(), type);
+			ID_MAP.put(type.getIndex(), type);
 		}
 	}
 
@@ -151,6 +154,18 @@ public enum JSTokenType implements ITypePredicate
 		if (NAME_MAP.containsKey(name))
 		{
 			result = NAME_MAP.get(name);
+		}
+
+		return result;
+	}
+
+	public static JSTokenType get(short id)
+	{
+		JSTokenType result = UNDEFINED;
+
+		if (ID_MAP.containsKey(id))
+		{
+			result = ID_MAP.get(id);
 		}
 
 		return result;

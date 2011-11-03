@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -49,7 +49,7 @@ public abstract class LocationTestCase extends TestCase
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				ILexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
 				LocationType LocationType = processor.getCoarseLocationType(document, lexemeProvider, offset);
 				String message = MessageFormat.format(
 					"Expected {0} at LocationType {1} of ''{2}''",
@@ -79,7 +79,7 @@ public abstract class LocationTestCase extends TestCase
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset); 
+				ILexemeProvider<HTMLTokenType> lexemeProvider = processor.createLexemeProvider(document, offset);
 				LocationType LocationType = processor.getOpenTagLocationType(lexemeProvider, offset);
 				String message = MessageFormat.format(
 					"Expected {0} at LocationType {1} of ''{2}''",

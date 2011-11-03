@@ -7,6 +7,8 @@
  */
 package com.aptana.portal.ui.dispatch;
 
+import java.text.MessageFormat;
+
 /**
  * Constants to be used when creating JSON strings that will be passes to the browser when we need to notify the its
  * observers.
@@ -78,15 +80,26 @@ public interface IBrowserNotificationConstants
 	/*
 	 * JSON response constants that are use to signal error/success states to the browser side.
 	 */
+
+	/**
+	 * OK string
+	 */
+	public static final String OK_STRING = "ok"; //$NON-NLS-1$
+
 	/**
 	 * Indicate a successful action dispatch.
 	 */
-	public static final String JSON_OK = "ok"; //$NON-NLS-1$
+	public static final Object JSON_OK = MessageFormat.format("\"{0}\"", OK_STRING); //$NON-NLS-1$
+
+	/**
+	 * Error string
+	 */
+	public static final String ERROR_STRING = "error"; //$NON-NLS-1$
 
 	/**
 	 * Indicate an unsuccessful action dispatch.
 	 */
-	public static final String JSON_ERROR = "error"; //$NON-NLS-1$
+	public static final Object JSON_ERROR = MessageFormat.format("\"{0}\"", ERROR_STRING); //$NON-NLS-1$
 
 	/**
 	 * Indicate that the returned JSON object contains extra error details that the Studio provided.
@@ -123,12 +136,12 @@ public interface IBrowserNotificationConstants
 	 * An event id for notifying a change in the Gems list.
 	 */
 	public static final String EVENT_ID_GEM_LIST = "gemList"; //$NON-NLS-1$
-	
+
 	/**
 	 * An event id for notifying a change in the plugins list.
 	 */
 	public static final String EVENT_ID_PLUGINS = "plugins"; //$NON-NLS-1$
-	
+
 	/**
 	 * An event id for notifying a change in the applications versions list.
 	 */
