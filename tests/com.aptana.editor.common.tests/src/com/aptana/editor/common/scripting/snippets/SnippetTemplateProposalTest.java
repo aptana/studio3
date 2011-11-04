@@ -14,6 +14,9 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.TextViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -62,6 +65,35 @@ public class SnippetTemplateProposalTest extends TestCase
 		p.apply(viewer, '\t', 0, 9);
 		assertEquals("<div>Yahoo!\n", document.get());
 		context.assertIsSatisfied();
+	}
+
+	public void testSnippetLinkedMode()
+	{
+		// Create the snippet we want to apply
+		SnippetElement se = new SnippetElement("/some/fake/path.rb");
+		se.setDisplayName("if...");
+		se.setExpansion("if (${1:condition}) {\n\t${0:// code...}\n}");
+		SnippetTemplate template = new SnippetTemplate(se, "if", "source.php");
+
+		// Set up the document we're operating on
+		final IDocument document = new Document("<?php\nif?>");
+
+		// Create snippet proposal, then apply it to the document
+		DocumentSnippetTemplateContext tc = new DocumentSnippetTemplateContext(new SnippetTemplateContextType(
+				"source.php"), document, 2, 6);
+		SnippetTemplateProposal p = new SnippetTemplateProposal(template, tc, new Region(6, 2), null, 0);
+
+		// Make sure the snippet validates
+		DocumentEvent event = new DocumentEvent(document, 8, 0, "");
+		assertTrue("Snippet proposal incorrectly failed validation!", p.validate(document, 8, event));
+
+		// Now make sure the snippet gets applied correctly
+		ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
+		viewer.setDocument(document);
+
+		p.apply(viewer, '\t', 0, 8);
+		p.apply(viewer, '\t', 0, 26);
+		assertEquals("<?php\nif (condition) {\n\t\n}?>", document.get());
 	}
 
 	public void testAPSTUD2445()
