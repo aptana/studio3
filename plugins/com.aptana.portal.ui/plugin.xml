@@ -170,6 +170,13 @@
             id="com.aptana.portal.ui.command.openStartPage"
             name="%openStudioStartPage.name">
       </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.portal.ui.internal.command.NewProjectFromTemplateCommandHandler"
+            description="%newProjectFromTemplate.description"
+            id="com.aptana.portal.ui.command.newProjectFromTemplate"
+            name="%newProjectFromTemplate.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">

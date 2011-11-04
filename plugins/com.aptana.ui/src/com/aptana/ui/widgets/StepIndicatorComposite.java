@@ -203,6 +203,10 @@ public class StepIndicatorComposite extends Composite
 		{
 			createSteps(stepNames);
 		}
+		else
+		{
+			setVisible(false);
+		}
 
 		addPaintListener(new PaintListener()
 		{

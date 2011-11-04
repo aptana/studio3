@@ -111,6 +111,9 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	protected ProjectTemplateSelectionPage templatesPage;
 	protected WizardNewProjectReferencePage referencePage;
 
+	protected String projectTemplateName;
+	protected IProjectTemplate selectedTemplate;
+
 	protected IProject newProject;
 	protected IConfigurationElement configElement;
 
@@ -148,12 +151,14 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	{
 		super.addPages();
 
-		mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		validateProjectTemplate(new TemplateType[] { TemplateType.WEB, TemplateType.ALL });
+
+		mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage", selectedTemplate); //$NON-NLS-1$
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 		List<IProjectTemplate> templates = getProjectTemplates(new TemplateType[] { TemplateType.WEB, TemplateType.ALL });
-		if (templates.size() > 0)
+		if (templates.size() > 0 && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
 		}
@@ -189,6 +194,33 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			throws CoreException
 	{
 		configElement = config;
+
+		if (ProjectTemplateSelectionPage.COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME.equals(propertyName))
+		{
+			if (data instanceof String)
+			{
+				projectTemplateName = (String) data;
+			}
+		}
+	}
+
+	protected void validateProjectTemplate(TemplateType[] templateType)
+	{
+		selectedTemplate = null;
+
+		if (projectTemplateName != null)
+		{
+			List<IProjectTemplate> templates = getProjectTemplates(templateType);
+
+			for (IProjectTemplate template : templates)
+			{
+				if (template.getDisplayName().equals(projectTemplateName))
+				{
+					selectedTemplate = template;
+					return;
+				}
+			}
+		}
 	}
 
 	/*

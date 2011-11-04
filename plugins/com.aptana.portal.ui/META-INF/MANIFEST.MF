@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.explorer,
  com.aptana.core.io,
  com.aptana.browser;visibility:=reexport,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ com.aptana.projects
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
