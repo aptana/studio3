@@ -24,11 +24,14 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.ProjectSampleElement;
 
 public class SamplesManager implements ISamplesManager
@@ -57,6 +60,28 @@ public class SamplesManager implements ISamplesManager
 	private Map<String, List<SamplesReference>> bundleSamplesByCategory;
 	private Map<String, SamplesReference> bundleSamplesById;
 
+	private List<ISampleListener> sampleListeners;
+
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				removeSample((ProjectSampleElement) element);
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				addSample((ProjectSampleElement) element);
+			}
+		}
+	};
+
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
@@ -64,9 +89,12 @@ public class SamplesManager implements ISamplesManager
 		samplesById = new HashMap<String, SamplesReference>();
 		bundleSamplesByCategory = new HashMap<String, List<SamplesReference>>();
 		bundleSamplesById = new HashMap<String, SamplesReference>();
+		sampleListeners = new ArrayList<ISampleListener>();
 
 		readExtensionRegistry();
 		loadBundleSampleElements();
+
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
 	public List<SampleCategory> getCategories()
@@ -98,15 +126,20 @@ public class SamplesManager implements ISamplesManager
 		return (sample == null) ? bundleSamplesById.get(id) : sample;
 	}
 
-	public void update()
+	public void addSampleListener(ISampleListener listener)
 	{
-		// reload the samples from the bundles
-		bundleSamplesByCategory.clear();
-		bundleSamplesById.clear();
-		loadBundleSampleElements();
+		if (!sampleListeners.contains(listener))
+		{
+			sampleListeners.add(listener);
+		}
 	}
 
-	public void addSample(ProjectSampleElement sampleElement)
+	public void removeSampleListener(ISampleListener listener)
+	{
+		sampleListeners.remove(listener);
+	}
+
+	private void addSample(ProjectSampleElement sampleElement)
 	{
 		String categoryId = sampleElement.getCategory();
 		SampleCategory category = categories.get(categoryId);
@@ -133,10 +166,12 @@ public class SamplesManager implements ISamplesManager
 			}
 			samples.add(sample);
 			bundleSamplesById.put(id, sample);
+
+			fireSampleAdded(sample);
 		}
 	}
 
-	public void removeSample(ProjectSampleElement sampleElement)
+	private void removeSample(ProjectSampleElement sampleElement)
 	{
 		String categoryId = sampleElement.getCategory();
 		SampleCategory category = categories.get(categoryId);
@@ -147,6 +182,8 @@ public class SamplesManager implements ISamplesManager
 			{
 				List<SamplesReference> samples = bundleSamplesByCategory.get(categoryId);
 				samples.remove(sample);
+
+				fireSampleRemoved(sample);
 			}
 		}
 	}
@@ -306,6 +343,22 @@ public class SamplesManager implements ISamplesManager
 		for (ProjectSampleElement element : elements)
 		{
 			addSample(element);
+		}
+	}
+
+	private void fireSampleAdded(SamplesReference sample)
+	{
+		for (ISampleListener listener : sampleListeners)
+		{
+			listener.sampleAdded(sample);
+		}
+	}
+
+	private void fireSampleRemoved(SamplesReference sample)
+	{
+		for (ISampleListener listener : sampleListeners)
+		{
+			listener.sampleRemoved(sample);
 		}
 	}
 }

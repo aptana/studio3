@@ -11,7 +11,6 @@ import java.util.List;
 
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
-import com.aptana.scripting.model.ProjectSampleElement;
 
 public interface ISamplesManager
 {
@@ -42,23 +41,18 @@ public interface ISamplesManager
 	public SamplesReference getSample(String id);
 
 	/**
-	 * Updates the list of contributing samples.
+	 * Adds a listener to get notified when a sample is added or removed.
+	 * 
+	 * @param listener
+	 *            the listener
 	 */
-	public void update();
+	public void addSampleListener(ISampleListener listener);
 
 	/**
-	 * Adds a project sample.
+	 * Removes a listener from getting notified when a sample is added or removed.
 	 * 
-	 * @param sampleElement
-	 *            a bundle element representing a project sample
+	 * @param listener
+	 *            the listener
 	 */
-	public void addSample(ProjectSampleElement sampleElement);
-
-	/**
-	 * Removes a project sample.
-	 * 
-	 * @param sampleElement
-	 *            a bundle element representing a project sample
-	 */
-	public void removeSample(ProjectSampleElement sampleElement);
+	public void removeSampleListener(ISampleListener listener);
 }

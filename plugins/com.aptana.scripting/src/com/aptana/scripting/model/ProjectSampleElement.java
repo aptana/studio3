@@ -144,13 +144,35 @@ public class ProjectSampleElement extends AbstractBundleElement
 	@Override
 	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
-		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
+		printer.printWithIndent("id: ").println(getId()); //$NON-NLS-1$
+		printer.printlnWithIndent("category: ").println(getCategory()); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(getDisplayName()); //$NON-NLS-1$
+		printer.printWithIndent("location: ").println(getLocation()); //$NON-NLS-1$
 
-		if (this.getDescription() != null)
+		String description = getDescription();
+		if (description != null)
 		{
-			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
+			printer.printWithIndent("description: ").println(description); //$NON-NLS-1$
+		}
+		String[] natures = getNatures();
+		if (natures != null)
+		{
+			int count = natures.length;
+			if (count > 0)
+			{
+				StringBuilder natureStr = new StringBuilder();
+				natureStr.append('[');
+				for (int i = 0; i < count; ++i)
+				{
+					natureStr.append(natures[i]);
+					if (i < count - 1)
+					{
+						natureStr.append(", "); //$NON-NLS-1$
+					}
+				}
+				natureStr.append(']');
+				printer.printWithIndent("natures: ").println(natureStr.toString()); //$NON-NLS-1$
+			}
 		}
 	}
 }
