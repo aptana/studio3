@@ -20,12 +20,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
-import com.aptana.scripting.model.AbstractElement;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.ElementVisibilityListener;
-import com.aptana.scripting.model.ProjectSampleElement;
+import com.aptana.samples.model.SamplesReference;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -42,28 +40,20 @@ public class SamplesView extends ViewPart
 
 	private TreeViewer treeViewer;
 
-	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	private ISampleListener sampleListener = new ISampleListener()
 	{
 
-		public void elementBecameHidden(AbstractElement element)
+		public void sampleAdded(SamplesReference sample)
 		{
-			if (element instanceof ProjectSampleElement)
-			{
-				getSamplesManager().removeSample((ProjectSampleElement) element);
-				refreshView();
-			}
+			refresh();
 		}
 
-		public void elementBecameVisible(AbstractElement element)
+		public void sampleRemoved(SamplesReference sample)
 		{
-			if (element instanceof ProjectSampleElement)
-			{
-				getSamplesManager().addSample((ProjectSampleElement) element);
-				refreshView();
-			}
+			refresh();
 		}
 
-		private void refreshView()
+		private void refresh()
 		{
 			UIUtils.getDisplay().asyncExec(new Runnable()
 			{
@@ -85,7 +75,7 @@ public class SamplesView extends ViewPart
 		hookContextMenu();
 		applyTheme();
 
-		BundleManager.getInstance().addElementVisibilityListener(elementListener);
+		getSamplesManager().addSampleListener(sampleListener);
 	}
 
 	@Override
@@ -96,7 +86,7 @@ public class SamplesView extends ViewPart
 	@Override
 	public void dispose()
 	{
-		BundleManager.getInstance().removeElementVisibilityListener(elementListener);
+		getSamplesManager().removeSampleListener(sampleListener);
 		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 		super.dispose();
 	}
