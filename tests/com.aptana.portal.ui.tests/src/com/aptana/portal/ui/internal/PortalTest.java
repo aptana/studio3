@@ -245,7 +245,7 @@ public class PortalTest extends TestCase
 		String browserEditorId = StringUtil.EMPTY;
 		boolean bringToTop = true;
 
-		fixture.openPortal(url, browserEditorId, bringToTop);
+		fixture.openPortal(url, browserEditorId, bringToTop, null);
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class PortalTest extends TestCase
 		String browserEditorId = StringUtil.EMPTY;
 		boolean bringToTop = true;
 
-		fixture.openPortal(null, browserEditorId, bringToTop);
+		fixture.openPortal(null, browserEditorId, bringToTop, null);
 	}
 
 	/**
