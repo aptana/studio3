@@ -199,7 +199,7 @@ module Ruble
         log_info("loading bundle #{name}")
         path = $0
         path = block.binding.eval("__FILE__") if block
-        if File.basename(path) != "bundle.rb" || File.basename(File.dirname(path)) =~ /^(?:commands|snippets|templates)$/
+        if File.basename(path) != "bundle.rb" || File.basename(File.dirname(path)) =~ /^(?:commands|snippets|templates|samples)$/
           log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{path}")
         else
           # try to grab a cached bundle

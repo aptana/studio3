@@ -35,12 +35,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	// @formatter:off
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
 	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates|samples)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/(?:commands|snippets|templates)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 
 	private static final Pattern BUNDLE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets|templates)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	// @formatter:on
 
 	private static BundleMonitor INSTANCE;

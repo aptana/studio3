@@ -20,8 +20,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.scripting.model.AbstractElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
+import com.aptana.scripting.model.ProjectSampleElement;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Kevin Lindsey
@@ -36,6 +42,40 @@ public class SamplesView extends ViewPart
 
 	private TreeViewer treeViewer;
 
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				getSamplesManager().removeSample((ProjectSampleElement) element);
+				refreshView();
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				getSamplesManager().addSample((ProjectSampleElement) element);
+				refreshView();
+			}
+		}
+
+		private void refreshView()
+		{
+			UIUtils.getDisplay().asyncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					treeViewer.refresh();
+				}
+			});
+		}
+	};
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -44,6 +84,8 @@ public class SamplesView extends ViewPart
 		getSite().setSelectionProvider(treeViewer);
 		hookContextMenu();
 		applyTheme();
+
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
 	@Override
@@ -54,6 +96,7 @@ public class SamplesView extends ViewPart
 	@Override
 	public void dispose()
 	{
+		BundleManager.getInstance().removeElementVisibilityListener(elementListener);
 		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 		super.dispose();
 	}
@@ -68,7 +111,7 @@ public class SamplesView extends ViewPart
 		TreeViewer treeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		treeViewer.setContentProvider(new SamplesViewContentProvider());
 		treeViewer.setLabelProvider(new SamplesViewLabelProvider());
-		treeViewer.setInput(SamplesPlugin.getDefault().getSamplesManager());
+		treeViewer.setInput(getSamplesManager());
 		treeViewer.setComparator(new ViewerComparator());
 		ColumnViewerToolTipSupport.enableFor(treeViewer);
 
@@ -96,5 +139,10 @@ public class SamplesView extends ViewPart
 	private void applyTheme()
 	{
 		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
+	}
+
+	private static ISamplesManager getSamplesManager()
+	{
+		return SamplesPlugin.getDefault().getSamplesManager();
 	}
 }

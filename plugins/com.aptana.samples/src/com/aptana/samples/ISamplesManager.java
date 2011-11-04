@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.scripting.model.ProjectSampleElement;
 
 public interface ISamplesManager
 {
@@ -39,4 +40,25 @@ public interface ISamplesManager
 	 * @return the sample with the id
 	 */
 	public SamplesReference getSample(String id);
+
+	/**
+	 * Updates the list of contributing samples.
+	 */
+	public void update();
+
+	/**
+	 * Adds a project sample.
+	 * 
+	 * @param sampleElement
+	 *            a bundle element representing a project sample
+	 */
+	public void addSample(ProjectSampleElement sampleElement);
+
+	/**
+	 * Removes a project sample.
+	 * 
+	 * @param sampleElement
+	 *            a bundle element representing a project sample
+	 */
+	public void removeSample(ProjectSampleElement sampleElement);
 }
