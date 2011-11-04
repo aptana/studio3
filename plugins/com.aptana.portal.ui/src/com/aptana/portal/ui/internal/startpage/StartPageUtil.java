@@ -49,6 +49,16 @@ public class StartPageUtil
 	 * Show the Start-Page.
 	 * 
 	 * @param bringToTop
+	 */
+	public static void showStartPage(boolean bringToTop)
+	{
+		showStartPage(bringToTop, null);
+	}
+
+	/**
+	 * Show the Start-Page.
+	 * 
+	 * @param bringToTop
 	 * @param additionalParameters
 	 *            - Additional GET parameters that will be added to the URL (may be <code>null</code>)
 	 */
