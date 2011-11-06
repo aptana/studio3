@@ -72,7 +72,7 @@ public class CSSValidator implements IValidator
 			"column-width", "column-gap", "column-rule", "border-radius", "background-clip", "background-origin",
 			"background-quantity", "background-size", "border-top-right-radius", "border-bottom-right-radius",
 			"border-bottom-left-radius", "border-top-left-radius", "font-family", "font-weight", "font-style",
-			"outline-offset", "resize", "size", "src", "transform", "transition" };
+			"outline-offset", "resize", "size", "src", "transform", "transition", "word-break" };
 
 	@SuppressWarnings("nls")
 	private static final String[] CSS3_AT_RULES = { "@namespace" };
