@@ -65,4 +65,10 @@ public class SampleCategory
 	{
 		this.iconFile = iconFile;
 	}
+
+	@Override
+	public String toString()
+	{
+		return getName();
+	}
 }
