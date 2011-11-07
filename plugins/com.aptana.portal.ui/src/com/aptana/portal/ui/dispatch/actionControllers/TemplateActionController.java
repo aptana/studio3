@@ -45,6 +45,7 @@ public class TemplateActionController extends AbstractActionController
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@ControllerAction
 	public Object getTemplateTypes()
 	{
@@ -56,6 +57,7 @@ public class TemplateActionController extends AbstractActionController
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@ControllerAction
 	public Object getTemplates(Object templateTypes)
 	{
