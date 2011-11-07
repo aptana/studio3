@@ -13,6 +13,7 @@ import java.net.URL;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 
 public class ProjectTemplateElement extends AbstractBundleElement implements IProjectTemplate
 {
@@ -233,5 +234,16 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	public String getId()
 	{
 		return fId;
+	}
+
+	@Override
+	public void setDisplayName(String displayName)
+	{
+		super.setDisplayName(displayName);
+
+		if (StringUtil.EMPTY.equals(getId()))
+		{
+			setId(displayName);
+		}
 	}
 }
