@@ -33,7 +33,6 @@ import com.aptana.projects.ProjectsPlugin;
  */
 public class ProjectTemplatesManager
 {
-
 	private static final String EXTENSION_POINT = "projectTemplates"; //$NON-NLS-1$
 	private static final String ELEMENT_TEMPLATEINFO = "templateInfo"; //$NON-NLS-1$
 	private static final String ELEMENT_LOCAL = "local"; //$NON-NLS-1$
@@ -43,6 +42,7 @@ public class ProjectTemplatesManager
 	private static final String ATTR_DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_REPLACE_PARAMETERS = "replaceParameters"; //$NON-NLS-1$
 
 	private Map<TemplateType, List<IProjectTemplate>> projectTemplates;
@@ -128,9 +128,15 @@ public class ProjectTemplatesManager
 				iconURL = bundle.getEntry(icon);
 			}
 
+			String id = element.getAttribute(ATTR_ID);
+			if (id == null)
+			{
+				id = StringUtil.EMPTY;
+			}
+
 			boolean replacingParameters = Boolean.parseBoolean(element.getAttribute(ATTR_REPLACE_PARAMETERS));
 			IProjectTemplate projectTemplate = new ProjectTemplate(path, type, name, replacingParameters, description,
-					iconURL);
+					iconURL, id);
 			templates.add(projectTemplate);
 		}
 	}

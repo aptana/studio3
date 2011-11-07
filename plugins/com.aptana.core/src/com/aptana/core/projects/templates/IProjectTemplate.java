@@ -25,6 +25,13 @@ public interface IProjectTemplate
 	public String getPath();
 
 	/**
+	 * Get the id associated with the template
+	 * 
+	 * @return
+	 */
+	public String getId();
+
+	/**
 	 * getDisplayName
 	 * 
 	 * @return

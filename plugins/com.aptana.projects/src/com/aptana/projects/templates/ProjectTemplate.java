@@ -29,6 +29,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private String path;
 	private String description;
 	private String name;
+	private String id;
 	private URL iconPath;
 	private boolean isReplacingParameters;
 
@@ -41,9 +42,10 @@ public class ProjectTemplate implements IProjectTemplate
 	 * @param isReplacingParameters
 	 * @param description
 	 * @param iconPath
+	 * @param id
 	 */
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
-			String description, URL iconPath)
+			String description, URL iconPath, String id)
 	{
 		this.type = type;
 		this.path = path;
@@ -51,6 +53,7 @@ public class ProjectTemplate implements IProjectTemplate
 		this.isReplacingParameters = isReplacingParameters;
 		this.description = description;
 		this.iconPath = iconPath;
+		this.id = id;
 	}
 
 	/*
@@ -143,5 +146,14 @@ public class ProjectTemplate implements IProjectTemplate
 		// close element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 		return printer.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getId()
+	 */
+	public String getId()
+	{
+		return id;
 	}
 }

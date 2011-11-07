@@ -111,7 +111,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	protected ProjectTemplateSelectionPage templatesPage;
 	protected WizardNewProjectReferencePage referencePage;
 
-	protected String projectTemplateName;
+	protected String projectTemplateId;
 	protected IProjectTemplate selectedTemplate;
 
 	protected IProject newProject;
@@ -199,7 +199,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			if (data instanceof String)
 			{
-				projectTemplateName = (String) data;
+				projectTemplateId = (String) data;
 			}
 		}
 	}
@@ -208,13 +208,13 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	{
 		selectedTemplate = null;
 
-		if (projectTemplateName != null)
+		if (projectTemplateId != null)
 		{
 			List<IProjectTemplate> templates = getProjectTemplates(templateType);
 
 			for (IProjectTemplate template : templates)
 			{
-				if (template.getDisplayName().equals(projectTemplateName))
+				if (template.getId().equals(projectTemplateId))
 				{
 					selectedTemplate = template;
 					return;
