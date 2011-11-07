@@ -7,20 +7,12 @@
  */
 package com.aptana.git.ui;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -38,12 +30,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.osgi.framework.Version;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
@@ -95,40 +83,8 @@ public class CloneJob extends Job
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
 
-			IPath gitPath = GitExecutable.instance().path();
-			Version version = GitExecutable.instance().version();
-			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
-
-			Map<String, String> env = GitExecutable.getEnvironment();
-			List<String> args = new ArrayList<String>();
-			args.add("clone"); //$NON-NLS-1$
-			if (shallowClone)
-			{
-				args.add("--depth"); //$NON-NLS-1$
-				args.add("1"); //$NON-NLS-1$
-			}
-			// Use --progress switch if git version is 1.7+!
-			if (includeProgress)
-			{
-				args.add("--progress"); //$NON-NLS-1$
-			}
-			args.add("--"); //$NON-NLS-1$
-			args.add(sourceURI);
-			args.add(dest);
-			// Now run it!
-			Process p = ProcessUtil.run(gitPath.toOSString(), null, env, args.toArray(new String[args.size()]));
-			if (p == null)
-			{
-				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
-						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
-			}
-
-			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
-			Thread t = new Thread(runnable);
-			t.start();
-			t.join();
-
-			IStatus result = runnable.getResult();
+			IStatus result = GitExecutable.instance().clone(sourceURI, Path.fromOSString(dest), shallowClone,
+					subMonitor);
 			if (!result.isOK())
 			{
 				return result;
@@ -177,86 +133,6 @@ public class CloneJob extends Job
 			subMonitor.done();
 		}
 		return Status.OK_STATUS;
-	}
-
-	private static class CloneRunnable implements Runnable
-	{
-		private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
-		private Process p;
-		private IProgressMonitor monitor;
-		private IStatus status;
-
-		CloneRunnable(Process p, IProgressMonitor monitor)
-		{
-			this.p = p;
-			this.monitor = monitor;
-			this.status = Status.OK_STATUS;
-		}
-
-		public IStatus getResult()
-		{
-			return status;
-		}
-
-		public void run()
-		{
-			SubMonitor sub = SubMonitor.convert(monitor, 100);
-			// Only sniff for "receiving objects", which is the meat of the operation
-			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
-			BufferedReader br = null;
-			int lastPercent = 0;
-			try
-			{
-				StringBuilder builder = new StringBuilder();
-				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), UTF_8));
-				String line = null;
-				while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
-				{
-					if (monitor.isCanceled())
-					{
-						p.destroy();
-						this.status = Status.CANCEL_STATUS;
-						return;
-					}
-					sub.subTask(line);
-					builder.append(line).append('\n');
-					// Else, read in the line and see if we can sniff progress
-					Matcher m = percentPattern.matcher(line);
-					if (m.find())
-					{
-						String percent = m.group(1);
-						int percentInt = Integer.parseInt(percent);
-						if (percentInt > lastPercent)
-						{
-							sub.worked(percentInt - lastPercent);
-							lastPercent = percentInt;
-						}
-					}
-				}
-
-				String stdout = IOUtil.read(p.getInputStream(), UTF_8);
-				this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
-				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
-			}
-			finally
-			{
-				if (br != null)
-				{
-					try
-					{
-						br.close();
-					}
-					catch (Exception e)
-					{
-					}
-				}
-				sub.done();
-			}
-		}
 	}
 
 	/**

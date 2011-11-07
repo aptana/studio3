@@ -13,7 +13,6 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.wizards.messages"; //$NON-NLS-1$
 	public static String CloneJob_UnableToFindGitExecutableError;
-	public static String CloneJob_UnableToLaunchGitError;
 	public static String CloneWizard_CloneFailedTitle;
 	public static String CloneWizard_Job_title;
 	public static String RepositorySelectionPage_Browse_Label;
