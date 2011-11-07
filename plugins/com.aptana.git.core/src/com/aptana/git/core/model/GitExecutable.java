@@ -7,21 +7,29 @@
  */
 package com.aptana.git.core.model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.osgi.framework.Version;
@@ -31,7 +39,9 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
@@ -49,7 +59,7 @@ public class GitExecutable
 	static GitExecutable fgExecutable;
 	private static boolean fgAddedPrefListener;
 
-	private GitExecutable(IPath gitPath)
+	protected GitExecutable(IPath gitPath)
 	{
 		this.gitPath = gitPath;
 	}
@@ -116,7 +126,7 @@ public class GitExecutable
 					GitPlugin.getDefault(),
 					MessageFormat
 							.format("You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
-							MIN_GIT_VERSION), IDebugScopes.DEBUG);
+									MIN_GIT_VERSION), IDebugScopes.DEBUG);
 		}
 		return null;
 	}
@@ -394,6 +404,175 @@ public class GitExecutable
 					StringUtil.format(Messages.GitExecutable_UnableToParseGitVersion, versionString), ex,
 					IDebugScopes.DEBUG);
 			return Version.emptyVersion;
+		}
+	}
+
+	/**
+	 * Clones a git repo to a local location.
+	 * 
+	 * @param sourceURI
+	 *            The "uri" that you would typically pass as your first arg after "git clone" on the command line. This
+	 *            can be something like "git@github.com:username/repo_name.git" or
+	 *            http[s]://host.xz[:port]/path/to/repo.git/ See http://linux.die.net/man/1/git-clone
+	 * @param dest
+	 *            Where should the clone be located locally? An absolute IPath is expected.
+	 * @param shallow
+	 *            a boolean indicating whether or not we want the full history of the repo. If the clone is going to be
+	 *            temporary, discarded or disconnected from git you should specify a shallow clone.
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus clone(String sourceURI, IPath dest, boolean shallow, IProgressMonitor monitor)
+	{
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
+		try
+		{
+			Version version = version();
+			boolean includeProgress = version.compareTo(new Version(1, 7, 0)) >= 0;
+
+			Map<String, String> env = GitExecutable.getEnvironment();
+			List<String> args = new ArrayList<String>();
+			args.add("clone"); //$NON-NLS-1$
+			if (shallow)
+			{
+				args.add("--depth"); //$NON-NLS-1$
+				args.add("1"); //$NON-NLS-1$
+			}
+			// Use --progress switch if git version is 1.7+!
+			if (includeProgress)
+			{
+				args.add("--progress"); //$NON-NLS-1$
+			}
+			args.add("--"); //$NON-NLS-1$
+			args.add(sourceURI);
+			args.add(dest.toOSString());
+			// Now run it!
+			Process p = run(env, args.toArray(new String[args.size()]));
+			if (p == null)
+			{
+				return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
+						Messages.GitExecutable_UnableToLaunchCloneError, sourceURI, dest));
+			}
+
+			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
+			Thread t = new Thread(runnable);
+			t.start();
+			subMonitor.worked(100);
+			t.join();
+
+			return runnable.getResult();
+		}
+		catch (CoreException e)
+		{
+			IdeLog.log(GitPlugin.getDefault(), e.getStatus());
+			return e.getStatus();
+		}
+		catch (Throwable e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e);
+		}
+		finally
+		{
+			subMonitor.done();
+		}
+	}
+
+	protected Process run(Map<String, String> env, String... args) throws IOException, CoreException
+	{
+		return ProcessUtil.run(path().toOSString(), null, env, args);
+	}
+
+	/**
+	 * A Runnable which sniffs the output of a git clone operation to provide progress for an IProgressMonitor.
+	 * 
+	 * @author cwilliams
+	 */
+	static class CloneRunnable implements Runnable
+	{
+		private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
+		private Process p;
+		private IProgressMonitor monitor;
+		private IStatus status;
+
+		CloneRunnable(Process p, IProgressMonitor monitor)
+		{
+			this.p = p;
+			this.monitor = monitor;
+			if (this.monitor == null)
+			{
+				this.monitor = new NullProgressMonitor();
+			}
+			this.status = Status.OK_STATUS;
+		}
+
+		public IStatus getResult()
+		{
+			return status;
+		}
+
+		public void run()
+		{
+			// Only sniff for "receiving objects", which is the meat of the operation
+			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
+			BufferedReader br = null;
+			int lastPercent = 0;
+			try
+			{
+				StringBuilder builder = new StringBuilder();
+				br = new BufferedReader(new InputStreamReader(p.getErrorStream(), UTF_8));
+				String line = null;
+				while ((line = br.readLine()) != null) // $codepro.audit.disable assignmentInCondition
+				{
+					if (monitor.isCanceled())
+					{
+						p.destroy();
+						this.status = Status.CANCEL_STATUS;
+						return;
+					}
+					monitor.subTask(line);
+					builder.append(line).append('\n');
+					// Else, read in the line and see if we can sniff progress
+					Matcher m = percentPattern.matcher(line);
+					if (m.find())
+					{
+						String percent = m.group(1);
+						int percentInt = Integer.parseInt(percent);
+						if (percentInt > lastPercent)
+						{
+							monitor.worked(percentInt - lastPercent);
+							lastPercent = percentInt;
+						}
+					}
+				}
+
+				String stdout = IOUtil.read(p.getInputStream(), UTF_8);
+				if (builder.length() > 0)
+				{
+					builder.deleteCharAt(builder.length() - 1);
+				}
+				this.status = new ProcessStatus(p.waitFor(), stdout, builder.toString());
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+				this.status = new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e);
+			}
+			finally
+			{
+				if (br != null)
+				{
+					try
+					{
+						br.close();
+					}
+					catch (Exception e)
+					{
+					}
+				}
+				monitor.done();
+			}
 		}
 	}
 }
