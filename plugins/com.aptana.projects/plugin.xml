@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="projectTemplates" name="Project Templates" schema="schema/projectTemplates.exsd"/>
+   <extension-point id="projectTemplates" name="%extension-point.project.templates.name" schema="schema/projectTemplates.exsd"/>
    <extension
          id="webnature"
          name="%extension.webnature.name"
@@ -114,7 +114,7 @@
       <commonFilter
             activeByDefault="true"
             id="com.aptana.projects.filters.projectFilesFilter"
-            name="Project Files">
+            name="%commonFilter.projectfiles.name">
          <filterExpression>
            <and>
               <adapt
@@ -201,4 +201,11 @@
          </command>
    </menuContribution>
 	</extension>
+   <extension
+         point="com.aptana.samples.samplespath">
+      <category
+            id="com.aptana.projects.samples.web.category"
+            name="%category.sample.web.name">
+      </category>
+   </extension>
 </plugin>

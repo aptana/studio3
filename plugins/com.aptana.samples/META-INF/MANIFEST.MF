@@ -9,7 +9,8 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  com.aptana.core,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ com.aptana.scripting
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.samples,
  com.aptana.samples.handlers,

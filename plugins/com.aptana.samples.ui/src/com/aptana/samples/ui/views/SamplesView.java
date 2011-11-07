@@ -20,8 +20,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.samples.ISampleListener;
+import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.SamplesReference;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Kevin Lindsey
@@ -36,6 +40,32 @@ public class SamplesView extends ViewPart
 
 	private TreeViewer treeViewer;
 
+	private ISampleListener sampleListener = new ISampleListener()
+	{
+
+		public void sampleAdded(SamplesReference sample)
+		{
+			refresh();
+		}
+
+		public void sampleRemoved(SamplesReference sample)
+		{
+			refresh();
+		}
+
+		private void refresh()
+		{
+			UIUtils.getDisplay().asyncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					treeViewer.refresh();
+				}
+			});
+		}
+	};
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -44,6 +74,8 @@ public class SamplesView extends ViewPart
 		getSite().setSelectionProvider(treeViewer);
 		hookContextMenu();
 		applyTheme();
+
+		getSamplesManager().addSampleListener(sampleListener);
 	}
 
 	@Override
@@ -54,6 +86,7 @@ public class SamplesView extends ViewPart
 	@Override
 	public void dispose()
 	{
+		getSamplesManager().removeSampleListener(sampleListener);
 		ThemePlugin.getDefault().getControlThemerFactory().dispose(treeViewer);
 		super.dispose();
 	}
@@ -68,7 +101,7 @@ public class SamplesView extends ViewPart
 		TreeViewer treeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		treeViewer.setContentProvider(new SamplesViewContentProvider());
 		treeViewer.setLabelProvider(new SamplesViewLabelProvider());
-		treeViewer.setInput(SamplesPlugin.getDefault().getSamplesManager());
+		treeViewer.setInput(getSamplesManager());
 		treeViewer.setComparator(new ViewerComparator());
 		ColumnViewerToolTipSupport.enableFor(treeViewer);
 
@@ -96,5 +129,10 @@ public class SamplesView extends ViewPart
 	private void applyTheme()
 	{
 		ThemePlugin.getDefault().getControlThemerFactory().apply(treeViewer);
+	}
+
+	private static ISamplesManager getSamplesManager()
+	{
+		return SamplesPlugin.getDefault().getSamplesManager();
 	}
 }

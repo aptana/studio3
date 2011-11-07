@@ -7,9 +7,9 @@
  */
 package com.aptana.samples.internal;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +22,15 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.samples.ISampleListener;
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.scripting.model.AbstractElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
+import com.aptana.scripting.model.ProjectSampleElement;
 
 public class SamplesManager implements ISamplesManager
 {
@@ -50,12 +55,44 @@ public class SamplesManager implements ISamplesManager
 	private Map<String, List<SamplesReference>> sampleRefsByCategory;
 	private Map<String, SamplesReference> samplesById;
 
+	private Map<String, List<SamplesReference>> bundleSamplesByCategory;
+	private Map<String, SamplesReference> bundleSamplesById;
+
+	private List<ISampleListener> sampleListeners;
+
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				removeSample((ProjectSampleElement) element);
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectSampleElement)
+			{
+				addSample((ProjectSampleElement) element);
+			}
+		}
+	};
+
 	public SamplesManager()
 	{
 		categories = new HashMap<String, SampleCategory>();
 		sampleRefsByCategory = new HashMap<String, List<SamplesReference>>();
 		samplesById = new HashMap<String, SamplesReference>();
+		bundleSamplesByCategory = new HashMap<String, List<SamplesReference>>();
+		bundleSamplesById = new HashMap<String, SamplesReference>();
+		sampleListeners = new ArrayList<ISampleListener>();
+
 		readExtensionRegistry();
+		loadBundleSampleElements();
+
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
 	public List<SampleCategory> getCategories()
@@ -67,17 +104,86 @@ public class SamplesManager implements ISamplesManager
 
 	public List<SamplesReference> getSamplesForCategory(String categoryId)
 	{
+		List<SamplesReference> result = new ArrayList<SamplesReference>();
 		List<SamplesReference> samples = sampleRefsByCategory.get(categoryId);
-		if (samples == null)
+		if (samples != null)
 		{
-			return Collections.emptyList();
+			result.addAll(samples);
 		}
-		return Collections.unmodifiableList(samples);
+		samples = bundleSamplesByCategory.get(categoryId);
+		if (samples != null)
+		{
+			result.addAll(samples);
+		}
+		return result;
 	}
 
 	public SamplesReference getSample(String id)
 	{
-		return samplesById.get(id);
+		SamplesReference sample = samplesById.get(id);
+		return (sample == null) ? bundleSamplesById.get(id) : sample;
+	}
+
+	public void addSampleListener(ISampleListener listener)
+	{
+		if (!sampleListeners.contains(listener))
+		{
+			sampleListeners.add(listener);
+		}
+	}
+
+	public void removeSampleListener(ISampleListener listener)
+	{
+		sampleListeners.remove(listener);
+	}
+
+	private void addSample(ProjectSampleElement sampleElement)
+	{
+		String categoryId = sampleElement.getCategory();
+		SampleCategory category = categories.get(categoryId);
+		if (category != null)
+		{
+			String id = sampleElement.getId();
+			String name = sampleElement.getDisplayName();
+			String location = sampleElement.getLocation();
+			boolean isRemote = !location.toLowerCase().endsWith(".zip"); //$NON-NLS-1$
+			if (!isRemote)
+			{
+				// retrieves the absolute location
+				location = (new File(sampleElement.getDirectory(), location)).getAbsolutePath();
+			}
+			String description = sampleElement.getDescription();
+			SamplesReference sample = new SamplesReference(category, id, name, location, isRemote, description, null);
+			sample.setNatures(sampleElement.getNatures());
+
+			List<SamplesReference> samples = bundleSamplesByCategory.get(categoryId);
+			if (samples == null)
+			{
+				samples = new ArrayList<SamplesReference>();
+				bundleSamplesByCategory.put(categoryId, samples);
+			}
+			samples.add(sample);
+			bundleSamplesById.put(id, sample);
+
+			fireSampleAdded(sample);
+		}
+	}
+
+	private void removeSample(ProjectSampleElement sampleElement)
+	{
+		String categoryId = sampleElement.getCategory();
+		SampleCategory category = categories.get(categoryId);
+		if (category != null)
+		{
+			SamplesReference sample = bundleSamplesById.remove(sampleElement.getId());
+			if (sample != null)
+			{
+				List<SamplesReference> samples = bundleSamplesByCategory.get(categoryId);
+				samples.remove(sample);
+
+				fireSampleRemoved(sample);
+			}
+		}
 	}
 
 	private void readExtensionRegistry()
@@ -221,6 +327,31 @@ public class SamplesManager implements ISamplesManager
 				}
 			}
 			samplesRef.setIncludePaths(includePaths.toArray(new String[includePaths.size()]));
+		}
+	}
+
+	private void loadBundleSampleElements()
+	{
+		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
+		for (ProjectSampleElement element : elements)
+		{
+			addSample(element);
+		}
+	}
+
+	private void fireSampleAdded(SamplesReference sample)
+	{
+		for (ISampleListener listener : sampleListeners)
+		{
+			listener.sampleAdded(sample);
+		}
+	}
+
+	private void fireSampleRemoved(SamplesReference sample)
+	{
+		for (ISampleListener listener : sampleListeners)
+		{
+			listener.sampleRemoved(sample);
 		}
 	}
 }

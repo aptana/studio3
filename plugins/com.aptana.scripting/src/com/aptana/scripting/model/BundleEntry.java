@@ -149,6 +149,7 @@ public class BundleEntry
 		private ChildVisibilityContext<MenuElement> menus;
 		private ChildVisibilityContext<SmartTypingPairsElement> pairs;
 		private ChildVisibilityContext<ProjectTemplateElement> projectTemplates;
+		private ChildVisibilityContext<ProjectSampleElement> projectSamples;
 		private ChildVisibilityContext<BuildPathElement> buildPaths;
 
 		/**
@@ -233,6 +234,17 @@ public class BundleEntry
 				};
 			}
 
+			if (elementClass == null || elementClass == ProjectSampleElement.class)
+			{
+				projectSamples = new ChildVisibilityContext<ProjectSampleElement>()
+				{
+					public List<ProjectSampleElement> getElements()
+					{
+						return getProjectSamples();
+					}
+				};
+			}
+
 			if (elementClass == null || elementClass == BuildPathElement.class)
 			{
 				buildPaths = new ChildVisibilityContext<BuildPathElement>()
@@ -306,6 +318,7 @@ public class BundleEntry
 			this.fireElementVisibilityEvents(menus);
 			this.fireElementVisibilityEvents(pairs);
 			this.fireElementVisibilityEvents(projectTemplates);
+			this.fireElementVisibilityEvents(projectSamples);
 			this.fireElementVisibilityEvents(buildPaths);
 		}
 
@@ -349,6 +362,7 @@ public class BundleEntry
 			this.updateElementContext(menus);
 			this.updateElementContext(pairs);
 			this.updateElementContext(projectTemplates);
+			this.updateElementContext(projectSamples);
 			this.updateElementContext(buildPaths);
 		}
 
@@ -822,6 +836,24 @@ public class BundleEntry
 			protected List<ProjectTemplateElement> getElements(BundleElement bundle)
 			{
 				return bundle.getProjectTemplates();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
+	 * @return the list of project samples contributed
+	 */
+	public List<ProjectSampleElement> getProjectSamples()
+	{
+		NameBasedProcessor<ProjectSampleElement> processor = new NameBasedProcessor<ProjectSampleElement>()
+		{
+			protected List<ProjectSampleElement> getElements(BundleElement bundle)
+			{
+				return bundle.getProjectSamples();
 			}
 		};
 

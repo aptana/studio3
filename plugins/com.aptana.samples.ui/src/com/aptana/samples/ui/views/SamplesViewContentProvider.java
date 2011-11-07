@@ -37,8 +37,19 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 	{
 		if (parentElement instanceof ISamplesManager)
 		{
-			List<SampleCategory> categories = ((ISamplesManager) parentElement).getCategories();
-			return categories.toArray(new SampleCategory[categories.size()]);
+			ISamplesManager manager = (ISamplesManager) parentElement;
+			List<SampleCategory> categories = manager.getCategories();
+			// filters out the categories that don't have a sample yet
+			List<SampleCategory> result = new ArrayList<SampleCategory>();
+			for (SampleCategory category : categories)
+			{
+				List<SamplesReference> samples = manager.getSamplesForCategory(category.getId());
+				if (samples != null && samples.size() > 0)
+				{
+					result.add(category);
+				}
+			}
+			return result.toArray(new SampleCategory[result.size()]);
 		}
 		if (parentElement instanceof SampleCategory)
 		{

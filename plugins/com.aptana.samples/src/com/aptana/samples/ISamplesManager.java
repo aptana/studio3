@@ -39,4 +39,20 @@ public interface ISamplesManager
 	 * @return the sample with the id
 	 */
 	public SamplesReference getSample(String id);
+
+	/**
+	 * Adds a listener to get notified when a sample is added or removed.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
+	public void addSampleListener(ISampleListener listener);
+
+	/**
+	 * Removes a listener from getting notified when a sample is added or removed.
+	 * 
+	 * @param listener
+	 *            the listener
+	 */
+	public void removeSampleListener(ISampleListener listener);
 }
