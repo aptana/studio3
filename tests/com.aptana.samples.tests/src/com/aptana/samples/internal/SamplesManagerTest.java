@@ -42,9 +42,14 @@ public class SamplesManagerTest extends TestCase
 	{
 		List<SampleCategory> categories = samplesManager.getCategories();
 
-		assertEquals(1, categories.size());
+		assertEquals(2, categories.size());
 
 		SampleCategory category = categories.get(0);
+		assertEquals("com.aptana.projects.samples.web.category", category.getId());
+		assertEquals("Web", category.getName());
+		assertNull(category.getIconFile());
+
+		category = categories.get(1);
 		assertEquals("com.aptana.samples.tests.category", category.getId());
 		assertEquals("Test Samples", category.getName());
 		assertEquals(getFullPath("icons/category.png"), category.getIconFile());
@@ -62,7 +67,7 @@ public class SamplesManagerTest extends TestCase
 		assertEquals("Testing remote sample", remoteSample.getDescription());
 		assertEquals("git://github.com/aptana/remote_sample.git", remoteSample.getLocation());
 
-		assertEquals(samplesManager.getCategories().get(0), remoteSample.getCategory());
+		assertEquals(samplesManager.getCategories().get(1), remoteSample.getCategory());
 		assertNull(remoteSample.getInfoFile());
 		assertNull(remoteSample.getPreviewHandler());
 		assertNull(remoteSample.getProjectHandler());
