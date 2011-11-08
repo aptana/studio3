@@ -31,6 +31,8 @@ import java.util.zip.ZipFile;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -78,6 +80,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.templates.ProjectTemplatesManager;
@@ -387,20 +390,31 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 		sub.worked(10);
 
-		if (isCloneFromGit())
+		if (!cloneAfterProjectCreated() && isCloneFromGit())
 		{
 			cloneFromGit(newProject, description, sub.newChild(90));
 		}
 		else
 		{
 			doBasicCreateProject(newProject, description, sub.newChild(75));
-			if (selectedTemplate != null)
+			if (selectedTemplate != null && !isCloneFromGit())
 			{
 				extractZip(selectedTemplate, newProject, true);
 			}
 		}
 
 		return newProject;
+	}
+
+	/**
+	 * If a wizard needs to run git clone after a project has been generated (say by a script/process), this should
+	 * return true.
+	 * 
+	 * @return
+	 */
+	protected boolean cloneAfterProjectCreated()
+	{
+		return false;
 	}
 
 	protected boolean isCloneFromGit()
@@ -420,6 +434,40 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			throws InvocationTargetException
 	{
 		doCloneFromGit(selectedTemplate.getLocation(), newProjectHandle, description, monitor);
+	}
+
+	/**
+	 * Performs a git clone to a temporary location and then copies the files over top the already generated project.
+	 * This is because git cannot clone into an existing directory.
+	 * 
+	 * @param monitor
+	 * @throws Exception
+	 */
+	protected void cloneAfter(IProgressMonitor monitor) throws Exception
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, Messages.AbstractNewProjectWizard_CloningFromGitMsg, 100);
+		// clone to tmp dir then copy files over top the project!
+		File tmpFile = File.createTempFile("delete_me", "tmp"); //$NON-NLS-1$ //$NON-NLS-2$
+		File dest = new File(tmpFile.getParent(), "git_clone_tmp"); //$NON-NLS-1$
+		GitExecutable.instance().clone(selectedTemplate.getLocation(), Path.fromOSString(dest.getAbsolutePath()), true,
+				sub.newChild(85));
+
+		IFileStore tmpClone = EFS.getStore(dest.toURI());
+		// Wipe the .git folder before copying? Wipe the .project file before copying?
+		IFileStore dotGit = tmpClone.getChild(".git"); //$NON-NLS-1$
+		dotGit.delete(EFS.NONE, sub.newChild(2));
+
+		IFileStore dotProject = tmpClone.getChild(IProjectDescription.DESCRIPTION_FILE_NAME);
+		if (dotProject.fetchInfo().exists())
+		{
+			dotProject.delete(EFS.NONE, sub.newChild(1));
+		}
+		// OK, copy the cloned template's contents over
+		IFileStore projectStore = EFS.getStore(newProject.getLocationURI());
+		tmpClone.copy(projectStore, EFS.OVERWRITE, sub.newChild(9));
+		// Now get rid of the temp clone!
+		tmpClone.delete(EFS.NONE, sub.newChild(3));
+		sub.done();
 	}
 
 	/**
