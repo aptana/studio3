@@ -19,8 +19,9 @@ public class Messages extends NLS
 	public static String SingleProjectView_Wildcard;
 
 	public static String SelectedTemplateGroup_Label;
-	public static String SelectedTemplateName_Label;
-	public static String SelectedTemplateDesc_Label;
+
+	public static String SelectedTemplateDesc_More_Label;
+	public static String SelectedTemplateDesc_Less_Label;
 
 	static
 	{

@@ -304,7 +304,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	{
 		super.setDisplayName(displayName);
 
-		if (StringUtil.EMPTY.equals(getId()))
+		if (StringUtil.EMPTY.equals(getId()) || getId() == null)
 		{
 			setId(displayName);
 		}
