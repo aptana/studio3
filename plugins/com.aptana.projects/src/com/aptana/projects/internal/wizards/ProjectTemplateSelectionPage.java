@@ -49,8 +49,8 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener,
 		IStepIndicatorWizardPage
 {
-	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId";
-	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId";
+	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId"; //$NON-NLS-1$
+	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId"; //$NON-NLS-1$
 
 	private Button fUseTemplateButton;
 	private TableViewer fTemplateSelectionViewer;
@@ -239,7 +239,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 				{
 					// Resolve and load the image
 					IProjectTemplate template = (IProjectTemplate) element;
-					URL iconPath = template.getIconPath();
+					URL iconPath = template.getIconURL();
 					if (iconPath != null)
 					{
 						ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
