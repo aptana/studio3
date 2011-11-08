@@ -13,6 +13,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.scripting.ui.views.messages"; //$NON-NLS-1$
 
+	public static String ProjectTemplateNode_Project_Template_Icon_Path;
+
 	public static String BuildPathNode_All_Scopes;
 
 	public static String BuildPathNode_Build_Path_Build_Path;
