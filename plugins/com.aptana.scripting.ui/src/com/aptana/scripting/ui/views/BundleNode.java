@@ -156,6 +156,7 @@ class BundleNode extends BaseNode<BundleNode.Property>
 		addNode(items, new BuildPathsNode(bundle));
 		addNode(items, new EnvsNode(bundle));
 		addNode(items, new ProjectTemplatesNode(bundle));
+		addNode(items, new ProjectSamplesNode(bundle));
 
 		return items.toArray(new Object[items.size()]);
 	}
