@@ -11,12 +11,18 @@ package com.aptana.js.debug.core.v8;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 
 import org.chromium.sdk.BrowserFactory;
 import org.chromium.sdk.CallFrame;
@@ -27,8 +33,14 @@ import org.chromium.sdk.DebugContext.StepAction;
 import org.chromium.sdk.DebugEventListener;
 import org.chromium.sdk.ExceptionData;
 import org.chromium.sdk.JavascriptVm.ScriptsCallback;
+import org.chromium.sdk.JsEvaluateContext.EvaluateCallback;
+import org.chromium.sdk.JsObject;
+import org.chromium.sdk.JsScope;
+import org.chromium.sdk.JsScope.Type;
+import org.chromium.sdk.JsValue;
+import org.chromium.sdk.JsVariable;
+import org.chromium.sdk.JsVariable.SetValueCallback;
 import org.chromium.sdk.Script;
-import org.chromium.sdk.Script.Type;
 import org.chromium.sdk.StandaloneVm;
 import org.chromium.sdk.TextStreamPosition;
 import org.eclipse.core.runtime.CoreException;
@@ -42,9 +54,9 @@ import com.aptana.js.debug.core.internal.model.AbstractDebugHost;
  * @author Max Stepanov
  */
 public class V8DebugHost extends AbstractDebugHost {
-
+	
 	private enum EventType {
-		SUSPENDED,
+		SUSPENDED, TERMINATE
 	}
 
 	private final SocketAddress v8SocketAddress;
@@ -54,13 +66,16 @@ public class V8DebugHost extends AbstractDebugHost {
 	private DebugContext currentContext;
 	private List<? extends CallFrame> currentFrames;
 
-	private Queue<EventType> eventQueue = new LinkedList<EventType>();
+	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
 	private final Callback callback = new Callback();
 	
 	private Map<String, String> detailFormatters = new HashMap<String, String>();
 	private Map<String, Script> loadedScripts = new HashMap<String, Script>();
 	private Map<String, Integer> scriptFunctionIds = new HashMap<String, Integer>();
 	private int nextScriptFunctionId = 1;
+	private boolean initialized = false;
+	private Map<Integer, JsVariable> evalResults = new HashMap<Integer, JsVariable>();
+	private int evalResultsLastId = 0;
 
 	public static V8DebugHost createDebugHost(int port) throws CoreException {
 		V8DebugHost debugHost = new V8DebugHost(new InetSocketAddress("127.0.0.1", port));
@@ -81,11 +96,8 @@ public class V8DebugHost extends AbstractDebugHost {
 						return;
 					}
 				}
-				synchronized (eventQueue) {
-					currentContext = context;
-					eventQueue.add(EventType.SUSPENDED);
-					eventQueue.notify();
-				}
+				currentContext = context;
+				eventQueue.offer(EventType.SUSPENDED);
 			}
 
 			public void scriptLoaded(Script newScript) {
@@ -126,7 +138,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	 */
 	@Override
 	protected Object getSyncObject() {
-		return eventQueue;
+		return this;
 	}
 
 	/* (non-Javadoc)
@@ -184,6 +196,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		if (reason != null) {
 			resumeReason = reason;
 		}
+		evalResults.clear();
 		if (vm.isAttached()) {
 			if (STEP_INTO.equals(resumeReason)) {
 				continueVm(StepAction.IN, 1);
@@ -205,12 +218,20 @@ public class V8DebugHost extends AbstractDebugHost {
 		resumeReason = null;
 	}
 
-	private void processEvents() throws IOException {
-		while (!eventQueue.isEmpty()) {
-			switch (eventQueue.poll()) {
+	private void processEvents() throws IOException, InterruptedException {
+		EventType event;
+		while ((event = eventQueue.poll(500, TimeUnit.MILLISECONDS)) != null) {
+			switch (event) {
 				case SUSPENDED:
-					handleSuspended();
+					if (enabled) {
+						handleSuspended();
+					} else {
+						eventQueue.offer(event);
+						return;
+					}
 					break;
+				case TERMINATE:
+					handleTerminate();
 				default:
 					break;
 			}
@@ -218,6 +239,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 
 	private void handleSuspended() throws IOException {
+		checkInitialized();
 		switch (currentContext.getState()) {
 			case NORMAL:
 				if (!currentContext.getBreakpointsHit().isEmpty()) {
@@ -229,6 +251,21 @@ public class V8DebugHost extends AbstractDebugHost {
 				break;
 		}
 		startDebugging();
+	}
+	
+	private void handleTerminate() {
+		if (currentContext != null) {
+			try {
+				stopDebugging(ABORT);
+			} catch (IOException e) {
+				logError(e);
+			}
+		}
+		if (vm != null) {
+			vm.detach();
+			System.out.println("term reason="+vm.getDisconnectReason());
+		}
+		closeLogger();
 	}
 
 	private boolean suspendOnException(ExceptionData exception) {
@@ -271,7 +308,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			framesData[i] = StringUtil.join(SUBARGS_DELIMITER, new String[] {
 					Integer.toString(i), Util.encodeData(functionName), Util.encodeData(listArguments(frame)),
 					Util.encodeData(fileName), Integer.toString(position.getLine()),
-					Boolean.toString(script.getType() == Type.NATIVE), Long.toString(position.getOffset()), Integer.toString(getScriptFunctionId(script, functionName))
+					Boolean.toString(script.getType() == Script.Type.NATIVE), Long.toString(position.getOffset()), Integer.toString(getScriptFunctionId(script, functionName))
 			});
 		}
 		return StringUtil.join(ARGS_DELIMITER, framesData);
@@ -283,6 +320,309 @@ public class V8DebugHost extends AbstractDebugHost {
 //			argsData[i] = args[i].getName();
 //		}
 		return StringUtil.join(", ", argsData); //$NON-NLS-1$
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#listVariables(java.lang.String)
+	 */
+	@Override
+	protected String listVariables(String variableName) {
+		if (currentFrames == null) {
+			return null;
+		}
+		CallFrame frame = null;
+		JsVariable evalResult = null;
+		Matcher matcher = VARIABLE_FRAME_PATTERN.matcher(variableName);
+		if (matcher.matches()) {
+			try {
+				int frameId = Integer.parseInt(matcher.group(1));
+				frame = currentFrames.get(frameId);
+				variableName = matcher.group(2);
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException(ARG_FRAME_ID);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new IllegalArgumentException(ARG_FRAME_ID);
+			}
+		} else {
+			matcher = VARIABLE_EVAL_PATTERN.matcher(variableName);
+			if (matcher.matches()) {
+				try {
+					int evalId = Integer.parseInt(matcher.group(1));
+					evalResult = evalResults.get(Integer.valueOf(evalId));
+					if (evalResult == null) {
+						throw new IllegalArgumentException(ARG_EVAL_ID);
+					}
+					variableName = matcher.group(2);
+				} catch (NumberFormatException e) {
+					throw new IllegalArgumentException(ARG_EVAL_ID);
+				}		
+			} else {
+				return null;
+			}
+		}
+		List<String> data = new ArrayList<String>();
+		if (variableName.length() == 0) {
+			if (frame != null) {
+				generateVariablesData(data, Arrays.asList(frame.getReceiverVariable()));
+				for (JsScope scope : frame.getVariableScopes()) {
+					if (scope.getType() == Type.LOCAL) {
+						continue;
+					}
+					data.add(generateVariableData(
+							new VariableProperties(MessageFormat.format("<{0}>", scope.getType().name()), String.valueOf('o'), JsValue.Type.TYPE_OBJECT, StringUtil.EMPTY, StringUtil.EMPTY, null),
+							StringUtil.EMPTY));
+				}
+				generateVariablesData(data, getScopeVariables(frame, JsScope.Type.LOCAL), String.valueOf('l'));
+			} else if (evalResult != null) {
+				generateValueData(data, evalResult);
+			}
+		} else {
+			if (frame != null) {
+				generateValueData(data, findVariable(frame, variableName));
+			} else if (evalResult != null) {
+				generateValueData(data, findVariable(evalResult, variableName));
+			}
+		}
+		return StringUtil.join(ARGS_DELIMITER, data.toArray(new String[data.size()]));
+	}
+
+	private static JsScope getScope(CallFrame frame, JsScope.Type type) {
+		for (JsScope scope : frame.getVariableScopes()) {
+			if (scope.getType() == type) {
+				return scope;
+			}
+		}
+		return null;
+	}
+
+	private static Collection<? extends JsVariable> getScopeVariables(CallFrame frame, JsScope.Type type) {
+		JsScope scope = getScope(frame, type);
+		if (scope != null) {
+			return scope.getVariables();
+		}
+		return Collections.emptyList();
+	}
+
+	private Object findVariable(CallFrame frame, String variableName) {
+		if (THIS.equals(variableName)) {
+			return frame.getReceiverVariable();
+		} else if (variableName.startsWith(THIS_DOT)) {
+			return findVariable(frame.getReceiverVariable(), variableName.substring(THIS_DOT.length()));
+		} else if (variableName.startsWith("<")) {
+			int index = variableName.indexOf('>');
+			if (index > 0) {
+				String scopeName = variableName.substring(1, index);
+				variableName = variableName.substring(index+1);
+				try {
+					if (variableName.length() == 0) {
+						return getScope(frame, JsScope.Type.valueOf(scopeName));
+					}
+					if (variableName.charAt(0) == '.') {
+						variableName = variableName.substring(1);
+					}
+					String name = variableName.split(VARIABLE_PARTS_SPLIT)[0];
+					for (JsVariable v : getScopeVariables(frame, JsScope.Type.valueOf(scopeName))) {
+						if (name.equals(v.getName())) {
+							return findVariable(v, variableName.length() == name.length() ? StringUtil.EMPTY : variableName.substring(name.length()+1));
+						}
+					}
+				} catch (IllegalArgumentException e) {
+				}
+			}
+		} else {
+			String name = variableName.split(VARIABLE_PARTS_SPLIT)[0];
+			for (JsVariable v : getScopeVariables(frame, JsScope.Type.LOCAL)) {
+				if (name.equals(v.getName())) {
+					return findVariable(v, variableName.length() == name.length() ? StringUtil.EMPTY : variableName.substring(name.length()+1));
+				}
+			}
+		}
+		return null;
+	}
+	
+	private JsVariable findVariable(JsVariable variable, String variableName) {
+		if (variableName.length()  > 0) {
+			String[] names = variableName.split(VARIABLE_PARTS_SPLIT);
+			for (int i = 0; variable != null && i < names.length; ++i) {
+				JsObject valueObject = variable.getValue().asObject();
+				if ("__proto__".equals(names[i])) {
+					variable = findNamedProperty(valueObject.getInternalProperties(), names[i]);
+				} else {
+					variable = valueObject.getProperty(names[i]);					
+				}
+			}
+		}
+		return variable;
+	}
+	
+	private static JsVariable findNamedProperty(Collection<? extends JsVariable> properties, String name) {
+		for (JsVariable v : properties) {
+			if (name.equals(v.getName())) {
+				return v;
+			}
+		}
+		return null;
+	}
+
+	private static String generateVariableData(VariableProperties props, String extraFlags) {
+		return StringUtil.join(SUBARGS_DELIMITER, new String[] {
+				Util.encodeData(props.name),
+				Util.encodeData(props.displayType),
+				combineFlags(props.flags, extraFlags),
+				Util.encodeData(props.displayValue)
+		});
+	}
+
+	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables) {
+		generateVariablesData(data, variables, StringUtil.EMPTY);
+	}
+
+	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables, String extraFlags) {
+		for (JsVariable variable : variables) {
+			VariableProperties props = getVariableProperties(variable, false);
+			if (props != null) {
+				data.add(generateVariableData(props, extraFlags));
+			}
+		}		
+	}
+	
+	private void generateValueData(List<String> data, Object object) {
+		if (object instanceof JsVariable) {
+			JsVariable variable = (JsVariable) object;
+			JsValue value;
+			if ((value = variable.getValue()) != null && JsValue.Type.isObjectType(value.getType())) {
+				generateVariablesData(data, value.asObject().getProperties());
+				generateVariablesData(data, value.asObject().getInternalProperties());
+			}
+		} else if (object instanceof JsScope) {
+			JsScope scope = (JsScope) object;
+			generateVariablesData(data, scope.getVariables(), "");
+		}
+	}
+
+	private VariableProperties getVariableProperties(JsVariable variable, boolean computeDetails) {
+		if (variable == null) {
+			return null;
+		}
+		String name = variable.getName();
+		return getValueProperties(variable, variable.getValue(), name, computeDetails);
+	}
+	
+	private VariableProperties getValueProperties(JsVariable variable, JsValue value, String name, boolean computeDetails) {
+		String flags = StringUtil.EMPTY;
+		JsValue.Type valueType = value.getType();
+		String displayType;
+		String displayValue;
+		String detailValue = null;
+
+		//if (variable != null && variable.isMutable()) {
+			flags = addFlag(flags, 'w');
+		//}
+		
+		switch (valueType) {
+		case TYPE_NUMBER:
+			displayType = NUMBER;
+			displayValue = value.getValueString();
+			break;
+		case TYPE_BOOLEAN:
+			displayType = BOOLEAN;
+			displayValue = value.getValueString();
+			break;
+		case TYPE_UNDEFINED:
+			displayType = UNDEFINED;
+			displayValue = value.getValueString();
+			break;
+		case TYPE_STRING:
+			displayValue = StringUtil.format(QUOTES_0, value.getValueString());
+			displayType = STRING;
+			break;
+		case TYPE_NULL:
+			displayValue = NULL;
+			displayType = NULL;
+			break;
+		case TYPE_FUNCTION:
+			flags = removeFlag(flags, 'w');
+			displayValue = value.asObject().asFunction().getValueString();
+			displayType = FUNCTION;
+			break;
+		case TYPE_OBJECT:
+//			if (THIS.equals(name)
+//					|| value.getTypeName().endsWith("Constructor")) { //$NON-NLS-1$
+//				flags = removeFlag(flags, 'w');
+//			}
+			flags = addFlag(flags, 'o');
+			displayValue = StringUtil.format(OBJECT_0, value.asObject().getClassName());
+			displayType = value.asObject().getClassName();
+			if (computeDetails) {
+				detailValue = getObjectDetail(value);
+			}
+			break;
+		case TYPE_ARRAY:
+		default:
+			displayType = value.asObject().getClassName();
+			displayType = StringUtil.format("Unknown <{0}>", displayType); //$NON-NLS-1$
+			displayValue = value.getValueString();
+			break;
+		}
+		if (computeDetails && detailValue == null) {
+			detailValue = displayValue;
+		}
+		return new VariableProperties(name, flags, valueType, displayType, displayValue, detailValue);
+	}
+
+	private VariableProperties getObjectProperties(Object object, boolean computeDetails) {
+		if (object instanceof JsVariable) {
+			return getVariableProperties((JsVariable) object, computeDetails);
+		} else if (object instanceof JsValue) {
+			return getValueProperties(null, (JsValue) object, null, computeDetails);
+		} else if (object instanceof String) {
+			return new VariableProperties(null, StringUtil.EMPTY, JsValue.Type.TYPE_STRING, STRING, (String) object,
+					computeDetails ? (String) object : null);
+		} else if (object instanceof Boolean) {
+			return new VariableProperties(null, StringUtil.EMPTY, JsValue.Type.TYPE_BOOLEAN, BOOLEAN, Boolean.toString(((Boolean) object).booleanValue()),
+					computeDetails ? Boolean.toString(((Boolean) object).booleanValue()) : null);			
+		} else if (object instanceof Number) {
+			return new VariableProperties(null, StringUtil.EMPTY, JsValue.Type.TYPE_NUMBER, NUMBER, String.valueOf(object),
+					computeDetails ? String.valueOf(object) : null);
+		} else if (object == null) {
+			return new VariableProperties(null, StringUtil.EMPTY, JsValue.Type.TYPE_NULL, NULL, String.valueOf(object),
+					computeDetails ? String.valueOf(object) : null);			
+		}
+		return null;
+	}
+
+	private String getObjectDetail(JsValue value) {
+//		String type = value.getTypeName();
+//		if (detailFormatters.containsKey(type)) {
+//			return getValueDetail(type, value);
+//		} else {
+//			String[] classes = value.getClassHierarchy(true);
+//			if (classes != null) {
+//				for (int i = 0; i < classes.length; ++i) {
+//					type = classes[i];
+//					if (detailFormatters.containsKey(type)) {
+//						return getValueDetail(type, value);
+//					}
+//				}
+//			}
+//		}
+		return null;
+	}
+	
+	private String getValueDetail(String type, JsValue value) {
+//		ValueExp expression = detailFormatters.get(type);
+//		if (expression != null) {
+//			try {
+//				Object result = expression.evaluate(new ExpressionContext(session, value));
+//				VariableProperties props = getObjectProperties(result, false);
+//				if (props != null) {
+//					return props.displayValue;
+//				}
+//			} catch (Exception e) {
+//				return e.getMessage();
+//			}
+//		}
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -299,10 +639,226 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#processLoadedScripts()
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#doEval(java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected void processLoadedScripts() {
+	protected String doEval(String variableName, String expression) {
+		if (currentFrames == null) {
+			return null;
+		}
+		CallFrame frame = null;
+		Matcher matcher = VARIABLE_FRAME_PATTERN.matcher(variableName);
+		if (matcher.matches()) {
+			try {
+				int frameId = Integer.parseInt(matcher.group(1));
+				frame = currentFrames.get(frameId);
+				variableName = matcher.group(2);
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException(ARG_FRAME_ID);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new IllegalArgumentException(ARG_FRAME_ID);
+			}
+		} else {
+			return null;
+		}
+		try {
+//			matcher = SCOPE_CHAIN_PATTERN.matcher(expression);
+//			if (matcher.matches()) {
+//				expression = StringUtils.format("{0}[{1}].{2}", new Object[] { ExpressionContext.SCOPE, matcher.group(1), matcher.group(2) }); //$NON-NLS-1$
+//			}
+			JsVariable value = eval(frame, expression);
+			if (value == null) {
+				throw new Exception("evaluation failed"); //$NON-NLS-1$
+			}
+			Integer evalId = Integer.valueOf(evalResultsLastId++);
+			evalResults.put(evalId, value);
+			
+			VariableProperties props = getObjectProperties(value, false);
+			if (props == null) {
+				return null;
+			}
+			String valueData = StringUtil.join(SUBARGS_DELIMITER, new String[] {
+					Util.encodeData(props.displayType),
+					props.flags,
+					Util.encodeData(props.displayValue)
+			});				
+			return StringUtil.join(ARGS_DELIMITER, new String[] { RESULT, Integer.toString(evalId.intValue()), valueData });
+		} catch (Exception e) {
+			return StringUtil.join(ARGS_DELIMITER, new String[] { EXCEPTION, Util.encodeData(e.getMessage())});
+		}
+	}
+
+	private JsVariable eval(CallFrame frame, String expressionString) throws Exception {
+		final Exception[] exception = new Exception[1];
+		final JsVariable[] result = new JsVariable[1];
+		try {
+			frame.getEvaluateContext().evaluateSync(expressionString, new HashMap<String, String>(), new Callback() {
+				@Override
+				public void success(JsVariable variable) {
+					result[0] = variable;
+					System.out.println("success");
+				}
+
+				@Override
+				public void failure(String errorMessage) {
+					exception[0] = new Exception(errorMessage);
+					System.out.println("failure:"+errorMessage);
+				}
+				
+			});
+		} catch (Exception e) {
+			logError(e);
+			throw new IllegalStateException("Invalid expression"); //$NON-NLS-1$
+		}
+		if (exception[0] != null) {
+			throw exception[0];
+		}
+		return result[0];
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#doSetValue(java.lang.String, java.lang.String)
+	 */
+	@Override
+	protected String doSetValue(String variableName, String valueRef) {
+		if (currentFrames == null) {
+			return null;
+		}
+		CallFrame frame = null;
+		JsVariable evalResult = null;
+		Matcher matcher = VARIABLE_FRAME_PATTERN.matcher(variableName);
+		if (matcher.matches()) {
+			try {
+				int frameId = Integer.parseInt(matcher.group(1));
+				frame = currentFrames.get(frameId);
+				variableName = matcher.group(2);
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException(ARG_FRAME_ID);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new IllegalArgumentException(ARG_FRAME_ID);
+			}
+		} else {
+			matcher = VARIABLE_EVAL_PATTERN.matcher(variableName);
+			if (matcher.matches()) {
+				try {
+					int evalId = Integer.parseInt(matcher.group(1));
+					evalResult = evalResults.get(Integer.valueOf(evalId));
+					if (evalResult == null) {
+						throw new IllegalArgumentException(ARG_EVAL_ID);
+					}
+					variableName = matcher.group(2);
+				} catch (NumberFormatException e) {
+					throw new IllegalArgumentException(ARG_EVAL_ID);
+				}		
+			} else {
+				return null;
+			}
+		}
+		JsVariable variable = null;
+		if (variableName.length() > 0) {
+			if (frame != null) {
+				Object object = findVariable(frame, variableName);
+				if (object instanceof JsVariable) {
+					variable = (JsVariable) object;
+				}
+			} else if (evalResult != null) {
+				variable = findVariable(evalResult, variableName);
+			}
+		}
+		if (variable == null) {
+			throw new IllegalArgumentException(ARG_VARIABLE_NAME);
+		}
+		JsVariable value = null;
+		matcher = VARIABLE_EVAL_PATTERN.matcher(valueRef);
+		if (matcher.matches()) {
+			try {
+				int evalId = Integer.parseInt(matcher.group(1));
+				JsVariable evalValue = evalResults.get(Integer.valueOf(evalId));
+				if (evalValue != null && evalValue.getValue() != null) {
+					value = evalValue;
+				}
+			} catch (NumberFormatException ignore) {
+			}	
+		}
+		if (value == null) {
+			throw new IllegalArgumentException("valueRef"); //$NON-NLS-1$
+		}
+		String failure = setVariableValue(frame, variable, value);
+		if (failure != null) {
+			return StringUtil.join(ARGS_DELIMITER, new String[] { EXCEPTION, Util.encodeData(failure) });
+		}
+		/* re-fetch variable again to get updated value */
+		currentContext.getDefaultRemoteValueMapping().clearCaches();
+		variable = null;
+		if (frame != null) {
+			Object object = findVariable(frame, variableName);
+			if (object instanceof JsVariable) {
+				variable = (JsVariable) object;
+			}
+		} else if (evalResult != null) {
+			variable = findVariable(evalResult, variableName);
+		}
+		if (variable == null) {
+			return null;
+		}
+		VariableProperties props = getVariableProperties(variable, false);
+		String valueData = StringUtil.join(SUBARGS_DELIMITER, new String[] {
+				Util.encodeData(props.displayType),
+				props.flags,
+				Util.encodeData(props.displayValue)
+		});
+		return StringUtil.join(ARGS_DELIMITER, new String[] { RESULT, valueData });
+	}
+	
+	private String setVariableValue(CallFrame frame, JsVariable variable, JsVariable value) {
+		final String[] failure = new String[1];
+		String stringValue;
+		boolean objectType = false;
+		JsValue v = value.getValue();
+		if (JsValue.Type.isObjectType(v.getType())) {
+			stringValue = v.asObject().getRefId();
+			objectType = true;
+		} else {
+			stringValue = v.getValueString();
+			if (v.getType() == JsValue.Type.TYPE_STRING) {
+				stringValue = StringUtil.quote(stringValue);
+			}
+		}
+		if (variable.isMutable()) {
+			variable.setValue(stringValue, new Callback() {
+				@Override
+				public void failure(String errorMessage) {
+					failure[0] = errorMessage;
+				}
+			});
+		} else {
+			String valueName = "value"+System.currentTimeMillis();
+			frame.getEvaluateContext().evaluateSync(MessageFormat.format("{0}={1}", variable.getFullyQualifiedName(), objectType ? valueName : stringValue), objectType ? Collections.singletonMap(valueName, stringValue) : null, new Callback() {
+				/* (non-Javadoc)
+				 * @see com.aptana.js.debug.core.v8.V8DebugHost.Callback#success(org.chromium.sdk.JsVariable)
+				 */
+				@Override
+				public void success(JsVariable variable) {
+				}
+
+				@Override
+				public void failure(String errorMessage) {
+					failure[0] = errorMessage;
+				}
+			});
+		}
+		return failure[0];
+	}
+
+	private void checkInitialized() {
+		if (initialized) {
+			return;
+		}
+		initialized = true;
+		processLoadedScripts();
+	}
+		
+	private void processLoadedScripts() {
 		vm.getScripts(new Callback() {
 			public void success(Collection<Script> scripts) {
 				synchronized (loadedScripts) {
@@ -387,17 +943,14 @@ public class V8DebugHost extends AbstractDebugHost {
 	protected void initSession() throws CoreException {
 		initLogger(V8DebugPlugin.getDefault(), "v8hostdebugger");
 		try {
-			vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, null);
+			vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
 			vm.attach(debugEventListener);
 			if (vm.isAttached()) {
 				new Thread("Aptana: V8 Debug Host") { //$NON-NLS-1$
 					public void run() {
 						try {
-							synchronized (eventQueue) {
-								while (vm != null && vm.isAttached()) {
-									processEvents();
-									eventQueue.wait(500);
-								}
+							while (vm != null && vm.isAttached()) {
+								processEvents();
 							}
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -406,7 +959,7 @@ public class V8DebugHost extends AbstractDebugHost {
 							e.printStackTrace();
 							logError(e);
 						} finally {
-							handleTerminate();
+							terminate();
 						}
 					}
 				}.start();
@@ -425,23 +978,10 @@ public class V8DebugHost extends AbstractDebugHost {
 	 */
 	@Override
 	protected void terminateSession() {
-		synchronized(eventQueue) {
-			if (currentContext != null) {
-				try {
-					stopDebugging(ABORT);
-				} catch (IOException e) {
-					logError(e);
-				}
-			}
-		}
-		if (vm != null) {
-			vm.detach();
-			System.out.println("term reason="+vm.getDisconnectReason());
-		}
-		closeLogger();
+		eventQueue.offer(EventType.TERMINATE);
 	}
 
-	private class Callback implements ContinueCallback, ScriptsCallback {
+	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback {
 
 		/*
 		 * (non-Javadoc)
@@ -456,6 +996,12 @@ public class V8DebugHost extends AbstractDebugHost {
 		public void success(Collection<Script> scripts) {
 		}
 
+		/* (non-Javadoc)
+		 * @see org.chromium.sdk.JsEvaluateContext.EvaluateCallback#success(org.chromium.sdk.JsVariable)
+		 */
+		public void success(JsVariable variable) {
+		}
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.chromium.sdk.DebugContext.ContinueCallback#failure(java.lang.String)
@@ -464,6 +1010,24 @@ public class V8DebugHost extends AbstractDebugHost {
 			logError(errorMessage);
 		}
 
+	}
+
+	private class VariableProperties {
+		String name;
+		String flags;
+		JsValue.Type valueType;
+		String displayType;
+		String displayValue;
+		String detailValue;
+		
+		VariableProperties(String name, String flags, JsValue.Type valueType, String displayType, String displayValue, String detailValue) {
+			this.name = name;
+			this.flags = flags;
+			this.valueType = valueType;
+			this.displayType = displayType;
+			this.displayValue = displayValue;
+			this.detailValue = detailValue;
+		}
 	}
 
 }

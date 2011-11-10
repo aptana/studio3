@@ -34,6 +34,7 @@ public class V8DebugConnection extends DebugConnection {
 			debugHost.start(listenSocket.getLocalSocketAddress());
 			Socket socket = listenSocket.accept();
 			if (socket != null) {
+				socket.setSoTimeout(V8DebugHost.SOCKET_TIMEOUT);
 				return new V8DebugConnection(socket,
 						new InputStreamReader(socket.getInputStream()),
 						new OutputStreamWriter(socket.getOutputStream()),

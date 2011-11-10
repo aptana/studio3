@@ -20,12 +20,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -56,8 +58,6 @@ public abstract class AbstractDebugHost {
 	protected static final String RESULT = "result"; //$NON-NLS-1$
 	protected static final String THIS = "this"; //$NON-NLS-1$
 	protected static final String THIS_DOT = THIS + "."; //$NON-NLS-1$
-	protected static final String SCOPE_CHAIN = "<scope chain>"; //$NON-NLS-1$
-	protected static final String SCOPE_CHAIN_DOT = SCOPE_CHAIN + "."; //$NON-NLS-1$
 	protected static final String VARIABLES = "variables"; //$NON-NLS-1$
 	protected static final String OPTION = "option"; //$NON-NLS-1$
 	protected static final String ENABLE = "enable"; //$NON-NLS-1$
@@ -92,6 +92,7 @@ public abstract class AbstractDebugHost {
 	protected static final String STRING = "String"; //$NON-NLS-1$
 	protected static final String BOOLEAN = "Boolean"; //$NON-NLS-1$
 	protected static final String NUMBER = "Number"; //$NON-NLS-1$
+	protected static final String FUNCTION = "Function"; //$NON-NLS-1$
 	protected static final String BREAKPOINT = "breakpoint"; //$NON-NLS-1$
 	protected static final String WATCHPOINT = "watchpoint"; //$NON-NLS-1$
 	protected static final String SCRIPTS = "scripts"; //$NON-NLS-1$
@@ -117,9 +118,13 @@ public abstract class AbstractDebugHost {
 	protected static final String _RW = "rw"; //$NON-NLS-1$
 	protected static final String ARG_FRAME_ID = "frameId"; //$NON-NLS-1$
 	protected static final String ARG_VARIABLE_NAME = "variableName"; //$NON-NLS-1$
-	protected static final String ARG_EVAL_ID = "evalId"; //$NON-NLS-1$
+	protected static final String ARG_EVAL_ID = "evalId"; //$NON-NLS-1$	
+
+	protected static Pattern VARIABLE_FRAME_PATTERN = Pattern.compile("^frame\\[(\\d+)\\]\\.?(.*)$"); //$NON-NLS-1$
+	protected static Pattern VARIABLE_EVAL_PATTERN = Pattern.compile("^eval\\[(\\d+)\\]\\.?(.*)$"); //$NON-NLS-1$
 
 	protected static final String PROTOCOL_VERSION = "1"; //$NON-NLS-1$
+	public static final int SOCKET_TIMEOUT = 1000;
 
 	private Socket socket;
 	private Reader reader;
@@ -183,7 +188,7 @@ public abstract class AbstractDebugHost {
 						logError(e);
 					}
 				}
-				handleTerminate();
+				terminate();
 			}
 		}.start();
 		initSession();
@@ -249,11 +254,11 @@ public abstract class AbstractDebugHost {
 			if (FRAMES.equals(command)) {
 				sendResponse(listFrames());
 			} else if (VARIABLES.equals(command)) {
-				//sendResponse(listVariables(Util.decodeData(args[2])));
+				sendResponse(listVariables(Util.decodeData(args[2])));
 			} else if (DETAILS.equals(command)) {
 				//sendResponse(doGetDetails(Util.decodeData(args[2])));
 			} else if (EVAL.equals(command)) {
-				//sendResponse(doEval(Util.decodeData(args[2]), Util.decodeData(args[3])));
+				sendResponse(doEval(Util.decodeData(args[2]), Util.decodeData(args[3])));
 			} else if (STEP_INTO.equals(command)
 					|| STEP_OVER.equals(command)
 					|| STEP_RETURN.equals(command)
@@ -342,11 +347,11 @@ public abstract class AbstractDebugHost {
 				System.arraycopy(args, 2, df, 0, df.length);
 				sendResponse(processDetailFormatters(df));
 			} else if (SET_VALUE.equals(command)) {
-				//sendResponse(doSetValue(Util.decodeData(args[2]), Util.decodeData(args[3])));
+				sendResponse(doSetValue(Util.decodeData(args[2]), Util.decodeData(args[3])));
 			} else if (GET_SOURCE.equals(command)) {
 				sendResponse(getSource(Util.decodeData(args[2])));
 			} else if (TERMINATE.equals(command)) {
-				handleTerminate();
+				terminate();
 			} else if (VERSION.equals(command)) {
 				sendResponse(MessageFormat.format(_0_1, PROTOCOL_VERSION, getVersion()));
 			} else if (UPDATE.equals(command)) {
@@ -388,11 +393,14 @@ public abstract class AbstractDebugHost {
 			message = MessageFormat.format(_0_1, Integer.toString(data.length()), data);
 		}
 		writer.write(message);
-		writer.flush();
+		try {
+			writer.flush();
+		} catch (SocketException ignore) {
+		}
 		logger.log(false, message);
 	}
 
-	protected final void handleTerminate() {
+	protected final void terminate() {
 		terminateSession();
 		if (socket != null) {
 			try {
@@ -407,15 +415,16 @@ public abstract class AbstractDebugHost {
 	protected abstract void startDebugging() throws IOException;
 	protected abstract void stopDebugging(String reason) throws IOException;
 	protected abstract String listFrames();
+	protected abstract String listVariables(String variableName);
+	protected abstract String doEval(String variableName, String expression);
+	protected abstract String doSetValue(String variableName, String valueRef);
 	protected abstract void suspend(String reason);
 	protected abstract String processDetailFormatters(String[] list);
-	protected abstract void processLoadedScripts();
 	protected abstract String getSource(String uri);
 
-	private void enable() throws IOException {
+	protected void enable() throws IOException {
 		enabled = true;
-		processLoadedScripts();
-		sendData(new String[] { RESUMED, START });
+		sendData(new String[] { RESUMED, START });		
 	}
 	
 	private void disable() throws IOException {
