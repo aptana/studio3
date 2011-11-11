@@ -330,7 +330,7 @@ public class Portal
 	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
 	{
 		final Map<String, String> builder = new HashMap<String, String>();
-		builder.put("v", getVersion());
+		builder.put("v", getStudioVersion());
 
 		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
 		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
@@ -387,11 +387,9 @@ public class Portal
 	}
 
 	/**
-	 * Returns the portal plugin version
-	 * 
-	 * @return
+	 * Returns the Studio version
 	 */
-	protected String getVersion()
+	public String getStudioVersion()
 	{
 		return STUDIO_VERSION;
 	}
