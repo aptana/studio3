@@ -624,6 +624,13 @@ public class CommandElement extends AbstractBundleElement
 	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
 	{
 		environment.putAll(ShellExecutable.getEnvironment());
+		if (org.eclipse.core.runtime.Platform.OS_WIN32.equals(org.eclipse.core.runtime.Platform.getOS()))
+		{
+			environment.remove("PATH"); //$NON-NLS-1$
+			environment.remove("PWD"); //$NON-NLS-1$
+			String path = System.getenv("Path"); //$NON-NLS-1$
+			environment.put("PATH", path); //$NON-NLS-1$
+		}
 		for (Map.Entry<String, Object> entry : contextMap.entrySet())
 		{
 			Object valueObject = entry.getValue();
