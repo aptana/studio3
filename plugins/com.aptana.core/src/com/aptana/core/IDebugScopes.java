@@ -35,4 +35,9 @@ public interface IDebugScopes
 	 */
 	String FIREFOX = CorePlugin.PLUGIN_ID + "/debug/firefox"; //$NON-NLS-1$
 
+	/**
+	 * Items related to extension points configuration
+	 */
+	String EXTENSION_POINTS = CorePlugin.PLUGIN_ID + "/debug/extension_points"; //$NON-NLS-1$
+
 }

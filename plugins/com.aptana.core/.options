@@ -3,3 +3,4 @@ com.aptana.core/debug/logger=true
 com.aptana.core/debug/builder=true
 com.aptana.core/debug/shell=true
 com.aptana.core/debug/firefox=true
+com.aptana.core/debug/extension_points=true
