@@ -172,7 +172,7 @@ public class JSModelFormatter
 
 				if (version != null && version.length() > 0)
 				{
-					buffer.append(' ').append(since.getVersion()); //$NON-NLS-1$
+					buffer.append(' ').append(since.getVersion());
 				}
 
 				buffer.append(NEW_LINE);
@@ -225,7 +225,7 @@ public class JSModelFormatter
 		// function name with argument names
 		List<String> paramNameAndType = new ArrayList<String>();
 		buffer.append(function.getName());
-		buffer.append('('); //$NON-NLS-1$
+		buffer.append('(');
 
 		for (ParameterElement parameter : function.getParameters())
 		{
@@ -233,7 +233,7 @@ public class JSModelFormatter
 		}
 
 		buffer.append(StringUtil.join(", ", paramNameAndType)); //$NON-NLS-1$
-		buffer.append(')'); //$NON-NLS-1$
+		buffer.append(')');
 		buffer.append(formatTypes(function.getReturnTypeNames()));
 
 		return buffer.toString();
@@ -262,11 +262,11 @@ public class JSModelFormatter
 				String description = parameter.getDescription();
 
 				buffer.setLength(0);
-				buffer.append(' ').append(BULLET).append('\t').append(parameter.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+				buffer.append(' ').append(BULLET).append('\t').append(parameter.getName());
 
 				if (!StringUtil.isEmpty(description))
 				{
-					buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$ //$NON-NLS-2$
+					buffer.append(':').append(FileUtil.NEW_LINE).append(" \t").append(description); //$NON-NLS-1$
 				}
 
 				result.add(buffer.toString());
@@ -288,7 +288,7 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append(function.getName());
-		buffer.append('(').append(StringUtil.join(", ", function.getParameterTypes())).append(')'); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		buffer.append('(').append(StringUtil.join(", ", function.getParameterTypes())).append(')'); //$NON-NLS-1$
 
 		buffer.append(formatTypes(function.getReturnTypeNames()));
 		buffer.append(formatDescription(function));
@@ -402,7 +402,7 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 
 		buffer.append(function.getName());
-		buffer.append('(').append(StringUtil.join(", ", function.getParameterTypes())).append(')'); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		buffer.append('(').append(StringUtil.join(", ", function.getParameterTypes())).append(')'); //$NON-NLS-1$
 
 		return buffer.toString();
 	}
