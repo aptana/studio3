@@ -42,6 +42,7 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.PopupSchedulingRule;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -73,39 +74,11 @@ public class GitUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+
 		// Listen for theme changes and force the quick diff colors to match our git diff colors.
-		themeChangeListener = new IPreferenceChangeListener()
-		{
-
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-					{
-
-						public void run()
-						{
-							IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
-							// Quick Diff colors
-							prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-							prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-							prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
-
-							try
-							{
-								prefs.flush();
-							}
-							catch (BackingStoreException e)
-							{
-								IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
-							}
-						}
-					});
-				}
-			}
-		};
+		themeChangeListener = new QuickDiffColorer();
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
+
 		checkHasGit();
 	}
 
@@ -137,103 +110,13 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			return;
 		}
-		if (Platform.WS_WIN32.equals(Platform.getOS()))
+		if (Platform.OS_WIN32.equals(Platform.getOS()) && GitExecutable.instance() == null)
 		{
-			if (GitExecutable.instance() == null)
-			{
-				UIJob job = new UIJob(Messages.GitUIPlugin_GitInstallationValidator)
-				{
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor)
-					{
-
-						while (true)
-						{
-							MessageDialogWithToggle dlg = new MessageDialogWithToggle(PlatformUI.getWorkbench()
-									.getActiveWorkbenchWindow().getShell(), Messages.GitUIPlugin_ConfiguringGitSupportTitle, null,
-									Messages.GitUIPlugin_ConfigureGitPluginMessage, MessageDialog.INFORMATION,
-									new String[] { IDialogConstants.OK_LABEL }, IDialogConstants.OK_ID,
-									Messages.GitUIPlugin_ToggleMessage, false);
-							int code = dlg.open();
-
-							boolean toggleState = dlg.getToggleState();
-							if (toggleState)
-							{
-								getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT, dlg.getToggleState());
-							}
-
-							switch (code)
-							{
-								case IDialogConstants.OK_ID:
-
-									if (installPortableGit(monitor))
-									{
-										return Status.OK_STATUS;
-									}
-
-									if (toggleState)
-									{
-										return Status.OK_STATUS;
-									}
-
-									// assuming install failed and we didn't toggle out, we'll go through the loop
-									// again.
-									break;
-								default:
-									return Status.OK_STATUS;
-							}
-						}
-					}
-				};
-				job.setPriority(Job.INTERACTIVE);
-				job.setRule(PopupSchedulingRule.INSTANCE);
-				job.schedule();
-			}
+			UIJob job = new GitInstallationValidatorJob(Messages.GitUIPlugin_GitInstallationValidator);
+			job.setPriority(Job.INTERACTIVE);
+			job.setRule(PopupSchedulingRule.INSTANCE);
+			job.schedule();
 		}
-	}
-
-	private boolean installPortableGit(IProgressMonitor monitor)
-	{
-		ProgressMonitorDialog dlg = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell());
-		try
-		{
-			dlg.run(true, false, new IRunnableWithProgress()
-			{
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
-				{
-					try
-					{
-						monitor.beginTask(Messages.GitUIPlugin_ConfiguringGitSupport, IProgressMonitor.UNKNOWN);
-						monitor.worked(1);
-						PortableGit.install();
-					}
-					finally
-					{
-						monitor.done();
-					}
-				}
-			});
-		}
-		catch (InvocationTargetException e)
-		{
-			IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
-		}
-		catch (InterruptedException e)
-		{
-		}
-		IPath path = PortableGit.getLocation();
-		if (path != null)
-		{
-			GitExecutable.setPreferenceGitPath(path);
-			return true;
-		}
-		else
-		{
-			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					Messages.GitUIPlugin_GitInstallError, Messages.GitUIPlugin_GitConfigurationIncomplete);
-		}
-		return false;
 	}
 
 	/**
@@ -257,9 +140,147 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			ImageDescriptor id = imageDescriptorFromPlugin(getPluginId(), string);
 			if (id != null)
+			{
 				getDefault().getImageRegistry().put(string, id);
+			}
 		}
 		return getDefault().getImageRegistry().get(string);
 	}
 
+	private final class GitInstallationValidatorJob extends UIJob
+	{
+		private GitInstallationValidatorJob(String name)
+		{
+			super(name);
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor)
+		{
+
+			while (true)
+			{
+				MessageDialogWithToggle dlg = new MessageDialogWithToggle(PlatformUI.getWorkbench()
+						.getActiveWorkbenchWindow().getShell(), Messages.GitUIPlugin_ConfiguringGitSupportTitle, null,
+						Messages.GitUIPlugin_ConfigureGitPluginMessage, MessageDialog.INFORMATION,
+						new String[] { IDialogConstants.OK_LABEL }, IDialogConstants.OK_ID,
+						Messages.GitUIPlugin_ToggleMessage, false);
+				int code = dlg.open();
+
+				boolean toggleState = dlg.getToggleState();
+				if (toggleState)
+				{
+					getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT, dlg.getToggleState());
+				}
+
+				switch (code)
+				{
+					case IDialogConstants.OK_ID:
+
+						if (installPortableGit(monitor))
+						{
+							return Status.OK_STATUS;
+						}
+
+						if (toggleState)
+						{
+							return Status.OK_STATUS;
+						}
+
+						// assuming install failed and we didn't toggle out, we'll go through the loop
+						// again.
+						break;
+					default:
+						return Status.OK_STATUS;
+				}
+			}
+		}
+
+		private boolean installPortableGit(IProgressMonitor monitor)
+		{
+			ProgressMonitorDialog dlg = new ProgressMonitorDialog(UIUtils.getActiveShell());
+			try
+			{
+				dlg.run(true, false, new IRunnableWithProgress()
+				{
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+					{
+						try
+						{
+							monitor.beginTask(Messages.GitUIPlugin_ConfiguringGitSupport, IProgressMonitor.UNKNOWN);
+							monitor.worked(1);
+							PortableGit.install();
+						}
+						finally
+						{
+							monitor.done();
+						}
+					}
+				});
+			}
+			catch (InvocationTargetException e)
+			{
+				IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
+			}
+			catch (InterruptedException e)
+			{
+			}
+			IPath path = PortableGit.getLocation();
+			if (path != null)
+			{
+				GitExecutable.setPreferenceGitPath(path);
+				return true;
+			}
+
+			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					Messages.GitUIPlugin_GitInstallError, Messages.GitUIPlugin_GitConfigurationIncomplete);
+			return false;
+		}
+	}
+
+	/**
+	 * Sets the preference values for quick diff coloring to be same as our git stage/unstaged colors (for our editors).
+	 * If invasive theming is turned on we set it for all editors.
+	 * 
+	 * @author cwilliams
+	 */
+	private final class QuickDiffColorer implements IPreferenceChangeListener
+	{
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (!event.getKey().equals(IThemeManager.THEME_CHANGED))
+			{
+				return;
+			}
+
+			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					setQuickDiffColors(EclipseUtil.instanceScope().getNode("com.aptana.editor.common")); //$NON-NLS-1$
+					if (ThemePlugin.invasiveThemesEnabled())
+					{
+						setQuickDiffColors(EclipseUtil.instanceScope().getNode("org.eclipse.ui.editors")); //$NON-NLS-1$
+					}
+				}
+
+				protected void setQuickDiffColors(IEclipsePreferences prefs)
+				{
+					prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+					prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+					prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
+
+					try
+					{
+						prefs.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						IdeLog.logError(getDefault(), e, IDebugScopes.DEBUG);
+					}
+				}
+			});
+		}
+	}
 }
