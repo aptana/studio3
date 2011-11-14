@@ -43,7 +43,7 @@ public class AllTests
 		suite.addTest(ViewerTests.suite());
 		suite.addTestSuite(ScriptingInputOutputTest.class);
 		suite.addTestSuite(DocumentScopeManagerTest.class);
-		suite.addTestSuite(ContentAssistTests.class);
+		suite.addTest(ContentAssistTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
