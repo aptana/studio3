@@ -8,13 +8,12 @@
 package com.aptana.editor.common.contentassist;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
  * AllTests
  */
-public class ContentAssistTests extends TestCase
+public class ContentAssistTests
 {
 	public static Test suite()
 	{
