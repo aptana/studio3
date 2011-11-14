@@ -22,14 +22,20 @@ public interface ICommonContentAssistProcessor
 	 * @param autoActivated
 	 * @return
 	 */
-	ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated);
-	
+	ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated);
+
 	/**
 	 * Is the current position a valid place to show content assist?
-	 * @param c Character
-	 * @param keyCode Key code
-	 * @param document The current document
-	 * @param offset Offset into the document
+	 * 
+	 * @param c
+	 *            Character
+	 * @param keyCode
+	 *            Key code
+	 * @param document
+	 *            The current document
+	 * @param offset
+	 *            Offset into the document
 	 * @return
 	 */
 	boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset);
@@ -59,4 +65,11 @@ public interface ICommonContentAssistProcessor
 	 */
 	void dispose();
 
+	/**
+	 * Return a list of all user agent ids that are active in the project associated whit this processor
+	 * 
+	 * @return Returns an array of user agent ids. These ids can be used with the UserAgentManager to retrieve UserAgent
+	 *         instances and icons
+	 */
+	String[] getActiveUserAgentIds();
 }

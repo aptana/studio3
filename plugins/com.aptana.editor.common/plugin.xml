@@ -587,6 +587,32 @@
              id="Chrome"
              name="Chrome">
        </user-agent>
+       <default-user-agents
+             name="Default User Agents for the Web Nature"
+             nature-id="com.aptana.projects.webnature">
+          <user-agent-ref
+                user-agent-id="IE">
+          </user-agent-ref>
+          <user-agent-ref
+                user-agent-id="Mozilla">
+          </user-agent-ref>
+          <user-agent-ref
+                user-agent-id="Chrome">
+          </user-agent-ref>
+       </default-user-agents>
+       <default-user-agents
+             name="Default User Agents for Unknown Natures"
+             nature-id="&lt;other&gt;">
+          <user-agent-ref
+                user-agent-id="IE">
+          </user-agent-ref>
+          <user-agent-ref
+                user-agent-id="Mozilla">
+          </user-agent-ref>
+          <user-agent-ref
+                user-agent-id="Chrome">
+          </user-agent-ref>
+       </default-user-agents>
     </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -663,6 +689,12 @@
          <keywordReference
                id="org.eclipse.ui.editors.spelling">
          </keywordReference>
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
+            id="com.aptana.editor.common.contentassist"
+            name="%content.assist.pref.page.title">
       </page>
    </extension>
    <extension

@@ -75,17 +75,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * 
 	 * @param editor
 	 */
-	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
-	{
-		this(editor);
-		this._activeRange = activeRange;
-	}
-
-	/**
-	 * CSSContentAssistProcessor
-	 * 
-	 * @param editor
-	 */
 	public CSSContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		super(editor);
@@ -93,12 +82,13 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * The currently active range
+	 * CSSContentAssistProcessor
 	 * 
-	 * @param activeRange
+	 * @param editor
 	 */
-	public void setActiveRange(IRange activeRange)
+	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
 	{
+		this(editor);
 		this._activeRange = activeRange;
 	}
 
@@ -117,113 +107,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			for (ElementElement element : elements)
 			{
 				String description = CSSModelFormatter.getDescription(element);
-				List<String> userAgents = element.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+				List<String> userAgentIdList = element.getUserAgentNames();
+				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
-				proposals.add(createProposal(element.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
-			}
-		}
-	}
-
-	/**
-	 * addPseudoClassArguments
-	 * 
-	 * @param pseudoClassName
-	 * @param proposals
-	 * @param offset
-	 */
-	protected void addPseudoClassArguments(String pseudoClassName, List<ICompletionProposal> proposals, int offset)
-	{
-		if (pseudoClassName == null)
-		{
-			return;
-		}
-		List<PseudoClassElement> classes = this._queryHelper.getPseudoClasses();
-		if (classes != null)
-		{
-			for (PseudoClassElement pseudoClass : classes)
-			{
-				if (!pseudoClass.getName().equals(pseudoClassName))
-				{
-					continue;
-				}
-				List<ValueElement> values = pseudoClass.getValues();
-				if (values != null)
-				{
-					for (ValueElement value : values)
-					{
-						// String description = CSSModelFormatter.getDescription(value);
-						List<String> userAgents = pseudoClass.getUserAgentNames();
-						Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-
-						proposals.add(createProposal(value.getName(), ELEMENT_ICON, value.getDescription(),
-								userAgentIcons, offset));
-					}
-				}
-				break;
-			}
-		}
-	}
-
-	/**
-	 * addPseudoClassProposals
-	 * 
-	 * @param proposals
-	 * @param offset
-	 */
-	protected void addPseudoClassProposals(List<ICompletionProposal> proposals, int offset)
-	{
-		List<PseudoClassElement> classes = this._queryHelper.getPseudoClasses();
-		if (classes != null)
-		{
-			for (PseudoClassElement pseudoClass : classes)
-			{
-				String description = CSSModelFormatter.getDescription(pseudoClass);
-				List<String> userAgents = pseudoClass.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-
-				proposals.add(createProposal(pseudoClass.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
-			}
-		}
-
-		List<PseudoElementElement> elements = this._queryHelper.getPseudoElements();
-		if (elements != null)
-		{
-			for (PseudoElementElement pseudoElement : elements)
-			{
-				if (!pseudoElement.allowPseudoClassSyntax())
-				{
-					continue;
-				}
-				String description = CSSModelFormatter.getDescription(pseudoElement);
-				List<String> userAgents = pseudoElement.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-
-				proposals
-						.add(createProposal(pseudoElement.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
-			}
-		}
-	}
-
-	/**
-	 * addPseudoElementProposals
-	 * 
-	 * @param proposals
-	 * @param offset
-	 */
-	protected void addPseudoElementProposals(List<ICompletionProposal> proposals, int offset)
-	{
-		List<PseudoElementElement> elements = this._queryHelper.getPseudoElements();
-		if (elements != null)
-		{
-			for (PseudoElementElement pseudoElement : elements)
-			{
-				String description = CSSModelFormatter.getDescription(pseudoElement);
-				List<String> userAgents = pseudoElement.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-
-				proposals
-						.add(createProposal(pseudoElement.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
+				addProposal(proposals, element.getName(), ELEMENT_ICON, description, userAgentIds, offset);
 			}
 		}
 	}
@@ -277,11 +164,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			for (PropertyElement property : properties)
 			{
 				String description = CSSModelFormatter.getDescription(property);
-				List<String> userAgents = property.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+				List<String> userAgentIdList = property.getUserAgentNames();
+				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
-				proposals.add(createProposal(property.getName(), property.getName() + postfix, PROPERTY_ICON,
-						description, userAgentIcons, offset));
+				addProposal(proposals, property.getName(), property.getName() + postfix, PROPERTY_ICON, description,
+						userAgentIds, offset);
 			}
 		}
 	}
@@ -299,15 +186,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (classes != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
-			Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+			String[] userAgentIds = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
 				String name = "." + entry.getKey(); //$NON-NLS-1$
 				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
 
-				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset));
+				addProposal(proposals, name, ELEMENT_ICON, null, userAgentIds, location, offset);
 			}
 		}
 	}
@@ -325,15 +211,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (ids != null)
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
-			Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+			String[] userAgentIds = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
 				String name = "#" + entry.getKey(); //$NON-NLS-1$
 				String location = CSSModelFormatter.getDocumentDisplayName(entry.getValue());
 
-				proposals.add(createProposal(name, ELEMENT_ICON, null, userAgentIcons, location, offset));
+				addProposal(proposals, name, ELEMENT_ICON, null, userAgentIds, location, offset);
 			}
 		}
 	}
@@ -525,14 +410,13 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (property != null)
 			{
-				Image[] userAgentIcons = UserAgentManager.getInstance()
-						.getUserAgentImages(property.getUserAgentNames());
+				List<String> userAgentIdList = property.getUserAgentNames();
+				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
 
 				// build proposals from value list
 				for (ValueElement value : property.getValues())
 				{
-					proposals.add(createProposal(value.getName(), PROPERTY_ICON, value.getDescription(),
-							userAgentIcons, offset));
+					addProposal(proposals, value.getName(), PROPERTY_ICON, value.getDescription(), userAgentIds, offset);
 				}
 			}
 
@@ -542,8 +426,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				Set<String> colors = this._queryHelper.getColors(getIndex());
 				if (colors != null && !colors.isEmpty())
 				{
-					Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(
-							UserAgentManager.getInstance().getActiveUserAgentIDs());
+					String[] userAgentIds = getActiveUserAgentIds();
+
 					for (String color : colors)
 					{
 						ImageRegistry reg = CSSPlugin.getDefault().getImageRegistry();
@@ -565,7 +449,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							img = new Image(Display.getCurrent(), data);
 							reg.put(color, img);
 						}
-						proposals.add(createProposal(color, img, null, userAgentIcons, offset));
+
+						addProposal(proposals, color, img, null, userAgentIds, offset);
 					}
 				}
 			}
@@ -573,75 +458,200 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * supportsColorValues
+	 * Add proposal where name is also the display name. The proposal will be marked as coming from the CSS core.
 	 * 
-	 * @param property
-	 * @return
-	 */
-	@SuppressWarnings("nls")
-	private boolean supportsColorValues(PropertyElement property)
-	{
-		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for
-		// values!
-		if (property == null)
-			return false;
-		String propertyName = property.getName();
-		if (propertyName.equals("background") || propertyName.equals("border-bottom")
-				|| propertyName.equals("border-left") || propertyName.equals("border-right")
-				|| propertyName.equals("border-top") || propertyName.equals("border")
-				|| propertyName.equals("column-rule"))
-			return true;
-		return propertyName.endsWith("color");
-	}
-
-	/**
-	 * createProposal
-	 * 
+	 * @param proposals
 	 * @param name
 	 * @param image
 	 * @param description
 	 * @param userAgents
 	 * @param offset
-	 * @return
 	 */
-	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
-			int offset)
+	protected void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			String[] userAgentIds, int offset)
 	{
-		return createProposal(name, image, description, userAgents, ICSSIndexConstants.CORE, offset);
+		addProposal(proposals, name, image, description, userAgentIds, ICSSIndexConstants.CORE, offset);
 	}
 
 	/**
-	 * createProposal
+	 * Add proposal where name is also the display name.
 	 * 
+	 * @param proposals
 	 * @param name
 	 * @param image
 	 * @param description
 	 * @param userAgents
-	 * @param fileLocatoin
+	 * @param fileLocation
 	 * @param offset
-	 * @return
 	 */
-	protected CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
-			String fileLocation, int offset)
+	protected void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
+			String[] userAgentIds, String fileLocation, int offset)
 	{
-		return createProposal(name, name, image, description, userAgents, fileLocation, offset);
+		addProposal(proposals, name, name, image, description, userAgentIds, fileLocation, offset);
 	}
 
 	/**
-	 * createProposal
+	 * Add proposal where the location will be marked as coming from the CSS core.
 	 * 
+	 * @param proposals
 	 * @param displayName
 	 * @param name
 	 * @param image
 	 * @param description
 	 * @param userAgents
 	 * @param offset
+	 */
+	protected void addProposal(List<ICompletionProposal> proposals, String displayName, String name, Image image,
+			String description, String[] userAgentIds, int offset)
+	{
+		addProposal(proposals, displayName, name, image, description, userAgentIds, ICSSIndexConstants.CORE, offset);
+	}
+
+	/**
+	 * Add proposal
+	 * 
+	 * @param proposals
+	 * @param displayName
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 */
+	protected void addProposal(List<ICompletionProposal> proposals, String displayName, String name, Image image,
+			String description, String[] userAgentIds, String fileLocation, int offset)
+	{
+		if (isActiveByUserAgent(userAgentIds))
+		{
+			ICompletionProposal proposal = createProposal(displayName, name, image, description, userAgentIds,
+					fileLocation, offset);
+
+			proposals.add(proposal);
+		}
+	}
+
+	/**
+	 * addPseudoClassArguments
+	 * 
+	 * @param pseudoClassName
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addPseudoClassArguments(String pseudoClassName, List<ICompletionProposal> proposals, int offset)
+	{
+		if (pseudoClassName == null)
+		{
+			return;
+		}
+		List<PseudoClassElement> classes = this._queryHelper.getPseudoClasses();
+		if (classes != null)
+		{
+			for (PseudoClassElement pseudoClass : classes)
+			{
+				if (!pseudoClass.getName().equals(pseudoClassName))
+				{
+					continue;
+				}
+				List<ValueElement> values = pseudoClass.getValues();
+				if (values != null)
+				{
+					for (ValueElement value : values)
+					{
+						// String description = CSSModelFormatter.getDescription(value);
+						List<String> userAgentIdList = pseudoClass.getUserAgentNames();
+						String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
+
+						addProposal(proposals, value.getName(), ELEMENT_ICON, value.getDescription(), userAgentIds,
+								offset);
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * addPseudoClassProposals
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addPseudoClassProposals(List<ICompletionProposal> proposals, int offset)
+	{
+		List<PseudoClassElement> classes = this._queryHelper.getPseudoClasses();
+		if (classes != null)
+		{
+			for (PseudoClassElement pseudoClass : classes)
+			{
+				String description = CSSModelFormatter.getDescription(pseudoClass);
+				List<String> userAgentIdList = pseudoClass.getUserAgentNames();
+				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
+
+				addProposal(proposals, pseudoClass.getName(), ELEMENT_ICON, description, userAgentIds, offset);
+			}
+		}
+
+		List<PseudoElementElement> elements = this._queryHelper.getPseudoElements();
+		if (elements != null)
+		{
+			for (PseudoElementElement pseudoElement : elements)
+			{
+				if (!pseudoElement.allowPseudoClassSyntax())
+				{
+					continue;
+				}
+				String description = CSSModelFormatter.getDescription(pseudoElement);
+				List<String> userAgentIdList = pseudoElement.getUserAgentNames();
+				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
+
+				addProposal(proposals, pseudoElement.getName(), ELEMENT_ICON, description, userAgentIds, offset);
+			}
+		}
+	}
+
+	/**
+	 * addPseudoElementProposals
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addPseudoElementProposals(List<ICompletionProposal> proposals, int offset)
+	{
+		List<PseudoElementElement> elements = this._queryHelper.getPseudoElements();
+		if (elements != null)
+		{
+			for (PseudoElementElement pseudoElement : elements)
+			{
+				String description = CSSModelFormatter.getDescription(pseudoElement);
+				List<String> userAgentIdList = pseudoElement.getUserAgentNames();
+				String[] userAgentIds = userAgentIdList.toArray(new String[userAgentIdList.size()]);
+
+				addProposal(proposals, pseudoElement.getName(), ELEMENT_ICON, description, userAgentIds, offset);
+			}
+		}
+	}
+
+	/**
+	 * createLexemeProvider
+	 * 
+	 * @param document
+	 * @param offset
 	 * @return
 	 */
-	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
-			Image[] userAgents, int offset)
+	ILexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		return createProposal(displayName, name, image, description, userAgents, ICSSIndexConstants.CORE, offset);
+		// NOTE: temp until we get proper partitions for CSS inside of HTML
+		if (this._activeRange != null)
+		{
+			return new CSSLexemeProvider(document, this._activeRange, new CSSTokenScanner());
+		}
+		else
+		{
+			IRange range = getLexemeRange(document, offset);
+
+			return new CSSLexemeProvider(document, range, new CSSTokenScanner());
+		}
 	}
 
 	/**
@@ -657,7 +667,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @return
 	 */
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
-			Image[] userAgents, String fileLocation, int offset)
+			String[] userAgentIds, String fileLocation, int offset)
 	{
 		int length = name.length();
 		IContextInformation contextInfo = null;
@@ -670,6 +680,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		// build proposal
+		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
+
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
 				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
@@ -753,58 +765,111 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * Return the range required to properly select appropriate lexemes
+	 * getLocation
 	 * 
-	 * @param document
+	 * @param lexemeProvider
 	 * @param offset
 	 * @return
 	 */
-	protected IRange getLexemeRange(IDocument document, int offset)
+	LocationType getCoarseLocationType(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
-		int startOffset = 0;
-		try
+		LocationType result = LocationType.ERROR;
+		int index = lexemeProvider.getLexemeFloorIndex(offset);
+
+		LOOP: while (index >= 0)
 		{
-			int testOffset = document.get(0, offset).lastIndexOf('}', offset);
-			// add one because we don't want to include the closing brace
-			startOffset = (testOffset < 0) ? 0 : testOffset + 1;
-		}
-		catch (BadLocationException e)
-		{
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
+
+			switch (lexeme.getType())
+			{
+				case LCURLY:
+					if (lexeme.getEndingOffset() < offset)
+					{
+						result = LocationType.INSIDE_RULE;
+						this._replaceRange = this._currentLexeme = null;
+					}
+					else
+					{
+						result = LocationType.OUTSIDE_RULE;
+						this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
+					}
+					break LOOP;
+
+				case RCURLY:
+					result = (lexeme.getEndingOffset() < offset) ? LocationType.OUTSIDE_RULE : LocationType.INSIDE_RULE;
+					break LOOP;
+
+				case COLON:
+					// try walking left
+					for (int i = index - 1; i >= 0; i--)
+					{
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
+						{
+							case COLOR:
+							case SEMICOLON:
+							case LCURLY:
+								result = LocationType.INSIDE_RULE;
+								break LOOP;
+
+							case CLASS:
+							case ID:
+							case RCURLY:
+								result = LocationType.OUTSIDE_RULE;
+								break LOOP;
+						}
+					}
+
+					// try walking right
+					for (int i = index + 1; i < lexemeProvider.size(); i++)
+					{
+						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
+
+						switch (candidate.getType())
+						{
+							case COLOR:
+							case SEMICOLON:
+								result = LocationType.INSIDE_RULE;
+								break LOOP;
+
+							case CLASS:
+							case ID:
+							case LCURLY:
+								result = LocationType.OUTSIDE_RULE;
+								break LOOP;
+						}
+					}
+					result = LocationType.OUTSIDE_RULE;
+					break LOOP;
+
+				case PROPERTY:
+				case VALUE:
+					result = LocationType.INSIDE_RULE;
+					break LOOP;
+
+				case MINUS:
+				case IDENTIFIER:
+					if (lexeme.getText().charAt(0) == '-')
+					{
+						result = LocationType.INSIDE_RULE;
+						break LOOP;
+					}
+					break;
+
+				default:
+					break;
+			}
+
+			index--;
 		}
 
-		int endOffset = offset;
-		try
+		if (index < 0 && result == LocationType.ERROR)
 		{
-			ITypedRegion region = document.getPartition(offset);
-			endOffset = Math.max(startOffset, region.getOffset() + region.getLength() - 1);
-		}
-		catch (BadLocationException e)
-		{
+			result = LocationType.OUTSIDE_RULE;
 		}
 
-		return new Range(startOffset, endOffset);
-	}
-
-	/**
-	 * createLexemeProvider
-	 * 
-	 * @param document
-	 * @param offset
-	 * @return
-	 */
-	ILexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
-	{
-		// NOTE: temp until we get proper partitions for CSS inside of HTML
-		if (this._activeRange != null)
-		{
-			return new CSSLexemeProvider(document, this._activeRange, new CSSTokenScanner());
-		}
-		else
-		{
-			IRange range = getLexemeRange(document, offset);
-
-			return new CSSLexemeProvider(document, range, new CSSTokenScanner());
-		}
+		return result;
 	}
 
 	/*
@@ -1085,111 +1150,45 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getLocation
+	 * Return the range required to properly select appropriate lexemes
 	 * 
-	 * @param lexemeProvider
+	 * @param document
 	 * @param offset
 	 * @return
 	 */
-	LocationType getCoarseLocationType(ILexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	protected IRange getLexemeRange(IDocument document, int offset)
 	{
-		LocationType result = LocationType.ERROR;
-		int index = lexemeProvider.getLexemeFloorIndex(offset);
-
-		LOOP: while (index >= 0)
+		int startOffset = 0;
+		try
 		{
-			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
-
-			switch (lexeme.getType())
-			{
-				case LCURLY:
-					if (lexeme.getEndingOffset() < offset)
-					{
-						result = LocationType.INSIDE_RULE;
-						this._replaceRange = this._currentLexeme = null;
-					}
-					else
-					{
-						result = LocationType.OUTSIDE_RULE;
-						this._replaceRange = this._currentLexeme = lexemeProvider.getLexemeFromOffset(offset - 1);
-					}
-					break LOOP;
-
-				case RCURLY:
-					result = (lexeme.getEndingOffset() < offset) ? LocationType.OUTSIDE_RULE : LocationType.INSIDE_RULE;
-					break LOOP;
-
-				case COLON:
-					// try walking left
-					for (int i = index - 1; i >= 0; i--)
-					{
-						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
-
-						switch (candidate.getType())
-						{
-							case COLOR:
-							case SEMICOLON:
-							case LCURLY:
-								result = LocationType.INSIDE_RULE;
-								break LOOP;
-
-							case CLASS:
-							case ID:
-							case RCURLY:
-								result = LocationType.OUTSIDE_RULE;
-								break LOOP;
-						}
-					}
-
-					// try walking right
-					for (int i = index + 1; i < lexemeProvider.size(); i++)
-					{
-						Lexeme<CSSTokenType> candidate = lexemeProvider.getLexeme(i);
-
-						switch (candidate.getType())
-						{
-							case COLOR:
-							case SEMICOLON:
-								result = LocationType.INSIDE_RULE;
-								break LOOP;
-
-							case CLASS:
-							case ID:
-							case LCURLY:
-								result = LocationType.OUTSIDE_RULE;
-								break LOOP;
-						}
-					}
-					result = LocationType.OUTSIDE_RULE;
-					break LOOP;
-
-				case PROPERTY:
-				case VALUE:
-					result = LocationType.INSIDE_RULE;
-					break LOOP;
-
-				case MINUS:
-				case IDENTIFIER:
-					if (lexeme.getText().charAt(0) == '-')
-					{
-						result = LocationType.INSIDE_RULE;
-						break LOOP;
-					}
-					break;
-
-				default:
-					break;
-			}
-
-			index--;
+			int testOffset = document.get(0, offset).lastIndexOf('}', offset);
+			// add one because we don't want to include the closing brace
+			startOffset = (testOffset < 0) ? 0 : testOffset + 1;
+		}
+		catch (BadLocationException e)
+		{
 		}
 
-		if (index < 0 && result == LocationType.ERROR)
+		int endOffset = offset;
+		try
 		{
-			result = LocationType.OUTSIDE_RULE;
+			ITypedRegion region = document.getPartition(offset);
+			endOffset = Math.max(startOffset, region.getOffset() + region.getLength() - 1);
+		}
+		catch (BadLocationException e)
+		{
 		}
 
-		return result;
+		return new Range(startOffset, endOffset);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return CSSPlugin.PLUGIN_ID;
 	}
 
 	/**
@@ -1212,6 +1211,44 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
+	{
+		return Character.isWhitespace(c);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		EnumSet<CSSTokenType> types = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
+				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID);
+
+		ILexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		if (offset > 0)
+		{
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
+			return (lexeme != null) ? types.contains(lexeme.getType()) : false;
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return ('A' <= keyCode && keyCode <= 'Z') || ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#'
+				|| c == '.' || c == '-';
 	}
 
 	/**
@@ -1240,6 +1277,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result;
+	}
+
+	/**
+	 * The currently active range
+	 * 
+	 * @param activeRange
+	 */
+	public void setActiveRange(IRange activeRange)
+	{
+		this._activeRange = activeRange;
 	}
 
 	/**
@@ -1306,53 +1353,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
-	 * org.eclipse.jface.text.IDocument, int)
-	 */
-	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
-	{
-		EnumSet<CSSTokenType> types = EnumSet.of(CSSTokenType.LCURLY, CSSTokenType.COMMA, CSSTokenType.COLON,
-				CSSTokenType.SEMICOLON, CSSTokenType.CLASS, CSSTokenType.ID);
-
-		ILexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		if (offset > 0)
-		{
-			Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset - 1);
-			return (lexeme != null) ? types.contains(lexeme.getType()) : false;
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int)
-	 */
-	public boolean isValidIdentifier(char c, int keyCode)
-	{
-		return ('A' <= keyCode && keyCode <= 'Z') || ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#'
-				|| c == '.' || c == '-';
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
-	 */
-	public boolean isValidActivationCharacter(char c, int keyCode)
-	{
-		return Character.isWhitespace(c);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
-	 */
-	protected String getPreferenceNodeQualifier()
-	{
-		return CSSPlugin.PLUGIN_ID;
-	}
-
 	/**
 	 * Sorts the completion proposals (by default, by display string). This inclusion is temporary as the only reason we
 	 * want to interleave proposals in CSS is because the activation characters are poorly constructed.
@@ -1364,6 +1364,28 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// Sort by relevance first, descending, and then alphabetically, ascending
 		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
 				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
+	}
+
+	/**
+	 * supportsColorValues
+	 * 
+	 * @param property
+	 * @return
+	 */
+	@SuppressWarnings("nls")
+	private boolean supportsColorValues(PropertyElement property)
+	{
+		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for
+		// values!
+		if (property == null)
+			return false;
+		String propertyName = property.getName();
+		if (propertyName.equals("background") || propertyName.equals("border-bottom")
+				|| propertyName.equals("border-left") || propertyName.equals("border-right")
+				|| propertyName.equals("border-top") || propertyName.equals("border")
+				|| propertyName.equals("column-rule"))
+			return true;
+		return propertyName.endsWith("color");
 	}
 
 }
