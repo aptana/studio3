@@ -14,13 +14,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IProjectNatureDescriptor;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -442,6 +446,29 @@ public class ResourceUtil
 		}
 
 		return newNatures.toArray(new String[newNatures.size()]);
+	}
+
+	/**
+	 * Return a map of Aptana nature name to nature id
+	 * 
+	 * @return
+	 */
+	public static Map<String, String> getAptanaNaturesMap()
+	{
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProjectNatureDescriptor[] natureDescriptors = workspace.getNatureDescriptors();
+		Map<String, String> result = new HashMap<String, String>();
+
+		// collect Studio-only natures
+		for (IProjectNatureDescriptor natureDescriptor : natureDescriptors)
+		{
+			if (isAptanaNature(natureDescriptor.getNatureId()))
+			{
+				result.put(natureDescriptor.getLabel(), natureDescriptor.getNatureId());
+			}
+		}
+
+		return result;
 	}
 
 	/**

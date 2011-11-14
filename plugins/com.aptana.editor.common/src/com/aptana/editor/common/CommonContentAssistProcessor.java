@@ -17,15 +17,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.BadLocationException;
@@ -36,6 +40,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -54,6 +60,7 @@ import com.aptana.editor.common.contentassist.CompletionProposalComparator;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.IPreferenceConstants;
+import com.aptana.editor.common.contentassist.UserAgentFilterType;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
@@ -90,9 +97,13 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	private static final String RUBLE_PERF = PERFORMANCE_EVENT_PREFIX + "/rubles"; //$NON-NLS-1$
 	private static final String SNIPPET_PERF = PERFORMANCE_EVENT_PREFIX + "/snippets"; //$NON-NLS-1$
 
+	private static final String[] NO_STRINGS = new String[0];
+
 	private char[] _completionProposalChars = null;
 	private char[] _contextInformationChars = null;
 	private char[] _proposalTriggerChars = null;
+
+	private UserAgentFilterType _filterType = UserAgentFilterType.NO_FILTER;
 
 	protected final AbstractThemeableEditor editor;
 
@@ -108,6 +119,21 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
 		_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
 		_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
+
+		IPreferenceStore commonPreferences = CommonEditorPlugin.getDefault().getPreferenceStore();
+		String filterTypeString = commonPreferences
+				.getString(IPreferenceConstants.CONTENT_ASSIST_USER_AGENT_FILTER_TYPE);
+		_filterType = UserAgentFilterType.get(filterTypeString);
+		commonPreferences.addPropertyChangeListener(new IPropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (IPreferenceConstants.CONTENT_ASSIST_USER_AGENT_FILTER_TYPE.equals(event.getProperty()))
+				{
+					_filterType = UserAgentFilterType.get(event.getNewValue().toString());
+				}
+			}
+		});
 
 		if (getPreferenceNodeQualifier() != null)
 		{
@@ -140,174 +166,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text
-	 * .ITextViewer, int)
-	 */
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
-	{
-		List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
-		Index index = this.getIndex();
-
-		if (index != null)
-		{
-			this.computeCompletionProposalsUsingIndex(viewer, offset, index, completionProposals);
-		}
-
-		return completionProposals.toArray(new ICompletionProposal[completionProposals.size()]);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
-	 * , int, char, boolean)
-	 */
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
-			boolean autoActivated)
-	{
-		PerformanceStats stats = null;
-		try
-		{
-			if (PerformanceStats.isEnabled(PERFORMANCE_EVENT_PREFIX))
-			{
-				stats = PerformanceStats.getStats(PERFORMANCE_EVENT_PREFIX, this);
-				stats.startRun();
-			}
-
-			List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-			Collection<? extends ICompletionProposal> rubleProposals = addRubleProposals(viewer, offset);
-
-			proposals.addAll(rubleProposals);
-
-			Collection<? extends ICompletionProposal> snippetProposals = addSnippetProposals(viewer, offset);
-			proposals.addAll(snippetProposals);
-			ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar,
-					autoActivated);
-
-			// create empty array to simplify logic
-			if (others == null)
-			{
-				others = new ICompletionProposal[0];
-			}
-
-			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
-			{
-				IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
-						"Generated {0} ruble proposals, {0} snippet proposals, and {0} language proposals", //$NON-NLS-1$
-						rubleProposals.size(), snippetProposals.size(), others.length), IDebugScopes.CONTENT_ASSIST);
-			}
-
-			// Combine the two
-			ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
-			proposals.toArray(combined);
-			System.arraycopy(others, 0, combined, proposals.size(), others.length);
-
-			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
-			{
-				IdeLog.logInfo(CommonEditorPlugin.getDefault(),
-						MessageFormat.format("Combined {0} total proposals", combined.length), //$NON-NLS-1$
-						IDebugScopes.CONTENT_ASSIST);
-			}
-
-			// sort proposals using default mechanism
-			sortProposals(combined);
-
-			// selection currently is set to first item in list
-			return combined;
-		}
-		finally
-		{
-			if (stats != null)
-			{
-				stats.endRun();
-			}
-		}
-	}
-
-	/**
-	 * Sorts the completion proposals (by default, by display string)
-	 * 
-	 * @param proposals
-	 */
-	protected void sortProposals(ICompletionProposal[] proposals)
-	{
-		// Sort by relevance first, descending, and then alphabetically, ascending
-		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
-				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
-	}
-
-	/**
-	 * Calls the SnippetsCompletionProcessor to contribute any relevant snippets for the offset.
-	 * 
-	 * @param viewer
-	 * @param offset
-	 * @return
-	 */
-	protected Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
-	{
-		PerformanceStats stats = null;
-		try
-		{
-			if (viewer != null && viewer.getSelectionProvider() != null)
-			{
-				if (PerformanceStats.isEnabled(SNIPPET_PERF))
-				{
-					stats = PerformanceStats.getStats(SNIPPET_PERF, "SnippetsCompletionProcessor"); //$NON-NLS-1$
-					stats.startRun();
-				}
-				ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
-						offset);
-				if (stats != null)
-				{
-					stats.endRun();
-				}
-				if (snippets == null)
-				{
-					return Collections.emptyList();
-				}
-				return Arrays.asList(snippets);
-			}
-			return Collections.emptyList();
-		}
-		finally
-		{
-		}
-	}
-
-	/**
-	 * This hooks our Ruble scripting up to Content Assist, allowing them to contribute possible proposals. Experimental
-	 * right now as the way to return results is... interesting.
-	 * 
-	 * @param viewer
-	 * @param offset
-	 * @return
-	 */
-	protected List<ICompletionProposal> addRubleProposals(ITextViewer viewer, int offset)
-	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-		try
-		{
-			String scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
-			List<ContentAssistElement> commands = getBundleManager().getContentAssists(new ScopeFilter(scope));
-			if (commands != null && commands.size() > 0)
-			{
-				Ruby ruby = Ruby.newInstance();
-				for (ContentAssistElement ce : commands)
-				{
-					proposals.addAll(addRubleCAProposals(viewer, offset, ruby, ce));
-				}
-			}
-		}
-		catch (BadLocationException e)
-		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
-		}
-		return proposals;
 	}
 
 	/**
@@ -452,22 +310,160 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return proposals;
 	}
 
-	protected BundleManager getBundleManager()
+	/**
+	 * This hooks our Ruble scripting up to Content Assist, allowing them to contribute possible proposals. Experimental
+	 * right now as the way to return results is... interesting.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	protected List<ICompletionProposal> addRubleProposals(ITextViewer viewer, int offset)
 	{
-		return BundleManager.getInstance();
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		try
+		{
+			String scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
+			List<ContentAssistElement> commands = getBundleManager().getContentAssists(new ScopeFilter(scope));
+			if (commands != null && commands.size() > 0)
+			{
+				Ruby ruby = Ruby.newInstance();
+				for (ContentAssistElement ce : commands)
+				{
+					proposals.addAll(addRubleCAProposals(viewer, offset, ruby, ce));
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+		}
+		return proposals;
 	}
 
-	protected IDocumentScopeManager getDocumentScopeManager()
+	/**
+	 * Calls the SnippetsCompletionProcessor to contribute any relevant snippets for the offset.
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	protected Collection<? extends ICompletionProposal> addSnippetProposals(ITextViewer viewer, int offset)
 	{
-		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
+		PerformanceStats stats = null;
+		try
+		{
+			if (viewer != null && viewer.getSelectionProvider() != null)
+			{
+				if (PerformanceStats.isEnabled(SNIPPET_PERF))
+				{
+					stats = PerformanceStats.getStats(SNIPPET_PERF, "SnippetsCompletionProcessor"); //$NON-NLS-1$
+					stats.startRun();
+				}
+				ICompletionProposal[] snippets = new SnippetsCompletionProcessor().computeCompletionProposals(viewer,
+						offset);
+				if (stats != null)
+				{
+					stats.endRun();
+				}
+				if (snippets == null)
+				{
+					return Collections.emptyList();
+				}
+				return Arrays.asList(snippets);
+			}
+			return Collections.emptyList();
+		}
+		finally
+		{
+		}
 	}
 
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text
+	 * .ITextViewer, int)
+	 */
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
+	{
+		List<ICompletionProposal> completionProposals = new ArrayList<ICompletionProposal>();
+		Index index = this.getIndex();
+
+		if (index != null)
+		{
+			this.computeCompletionProposalsUsingIndex(viewer, offset, index, completionProposals);
+		}
+
+		return completionProposals.toArray(new ICompletionProposal[completionProposals.size()]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
+	 */
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
-		// NOTE: This is the default implementation. Specific language CA processors
-		// should override this method
-		return computeCompletionProposals(viewer, offset);
+		PerformanceStats stats = null;
+		try
+		{
+			if (PerformanceStats.isEnabled(PERFORMANCE_EVENT_PREFIX))
+			{
+				stats = PerformanceStats.getStats(PERFORMANCE_EVENT_PREFIX, this);
+				stats.startRun();
+			}
+
+			List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+			Collection<? extends ICompletionProposal> rubleProposals = addRubleProposals(viewer, offset);
+
+			proposals.addAll(rubleProposals);
+
+			Collection<? extends ICompletionProposal> snippetProposals = addSnippetProposals(viewer, offset);
+			proposals.addAll(snippetProposals);
+			ICompletionProposal[] others = this.doComputeCompletionProposals(viewer, offset, activationChar,
+					autoActivated);
+
+			// create empty array to simplify logic
+			if (others == null)
+			{
+				others = new ICompletionProposal[0];
+			}
+
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			{
+				IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+						"Generated {0} ruble proposals, {0} snippet proposals, and {0} language proposals", //$NON-NLS-1$
+						rubleProposals.size(), snippetProposals.size(), others.length), IDebugScopes.CONTENT_ASSIST);
+			}
+
+			// Combine the two
+			ICompletionProposal[] combined = new ICompletionProposal[proposals.size() + others.length];
+			proposals.toArray(combined);
+			System.arraycopy(others, 0, combined, proposals.size(), others.length);
+
+			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			{
+				IdeLog.logInfo(CommonEditorPlugin.getDefault(),
+						MessageFormat.format("Combined {0} total proposals", combined.length), //$NON-NLS-1$
+						IDebugScopes.CONTENT_ASSIST);
+			}
+
+			// sort proposals using default mechanism
+			sortProposals(combined);
+
+			// selection currently is set to first item in list
+			return combined;
+		}
+		finally
+		{
+			if (stats != null)
+			{
+				stats.endRun();
+			}
+		}
 	}
 
 	/**
@@ -495,6 +491,45 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 
 	/**
+	 * dispose
+	 */
+	public void dispose()
+	{
+		if (getPreferenceNodeQualifier() != null)
+		{
+			EclipseUtil.instanceScope().getNode(getPreferenceNodeQualifier()).removePreferenceChangeListener(this);
+		}
+	}
+
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
+	{
+		// NOTE: This is the default implementation. Specific language CA processors
+		// should override this method
+		return computeCompletionProposals(viewer, offset);
+	}
+
+	/**
+	 * getActiveUserAgentIds
+	 * 
+	 * @return
+	 */
+	public String[] getActiveUserAgentIds()
+	{
+		return UserAgentManager.getInstance().getActiveUserAgentIDs(getNatureIds());
+	}
+
+	/**
+	 * getAllUserAgentIcons
+	 * 
+	 * @return
+	 */
+	protected Image[] getAllUserAgentIcons()
+	{
+		return UserAgentManager.getInstance().getUserAgentImages(getActiveUserAgentIds());
+	}
+
+	/**
 	 * getAST
 	 * 
 	 * @return
@@ -502,6 +537,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	protected IParseNode getAST()
 	{
 		return editor.getFileService().getParseResult();
+	}
+
+	/**
+	 * getBundleManager
+	 * 
+	 * @return
+	 */
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
 	}
 
 	/*
@@ -523,40 +568,17 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 
 	/*
-	 * return the characters to insert proposals
-	 */
-	public char[] getProposalTriggerCharacters()
-	{
-		return _proposalTriggerChars;
-	}
-
-	/**
-	 * Retrieves a content assist preference and converts it into a char array
-	 * 
-	 * @param preferenceKey
-	 * @return
-	 */
-	private char[] retrieveCAPreference(String preferenceKey)
-	{
-		String qualifier = getPreferenceNodeQualifier();
-		if (qualifier == null)
-		{
-			return null;
-		}
-
-		String chars = Platform.getPreferencesService().getString(getPreferenceNodeQualifier(), preferenceKey,
-				StringUtil.EMPTY, null);
-
-		return (chars != null) ? chars.toCharArray() : null;
-	}
-
-	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
 	 */
 	public IContextInformationValidator getContextInformationValidator()
 	{
 		return null;
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
 	/*
@@ -610,21 +632,50 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 
 	/**
-	 * getProjectURI
+	 * Grab the natures associated with this processor's project
+	 * 
+	 * @return Returns an array of all nature ids
+	 */
+	protected String[] getNatureIds()
+	{
+		String[] natureIDs = NO_STRINGS;
+
+		try
+		{
+			IProject project = getProject();
+
+			if (project != null)
+			{
+				natureIDs = project.getDescription().getNatureIds();
+			}
+		}
+		catch (CoreException e)
+		{
+			// log?
+		}
+
+		return natureIDs;
+	}
+
+	/**
+	 * getParseState
 	 * 
 	 * @return
 	 */
-	protected URI getProjectURI()
+	protected IParseState getParseState()
 	{
-		URI result = null;
+		return editor.getFileService().getParseState();
+	}
 
-		IProject project = getProject();
-		if (project != null)
-		{
-			result = project.getLocationURI();
-		}
-
-		return result;
+	/**
+	 * Returns the qualifier for the preference service. Gnerally the plugin ID as that's where the relevant preferences
+	 * are stored.
+	 * 
+	 * @return
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return null;
 	}
 
 	protected IProject getProject()
@@ -647,6 +698,32 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 
 	/**
+	 * getProjectURI
+	 * 
+	 * @return
+	 */
+	protected URI getProjectURI()
+	{
+		URI result = null;
+
+		IProject project = getProject();
+		if (project != null)
+		{
+			result = project.getLocationURI();
+		}
+
+		return result;
+	}
+
+	/*
+	 * return the characters to insert proposals
+	 */
+	public char[] getProposalTriggerCharacters()
+	{
+		return _proposalTriggerChars;
+	}
+
+	/**
 	 * getURI
 	 * 
 	 * @return
@@ -666,27 +743,145 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	}
 
 	/**
-	 * getParseState
+	 * isActiveByUserAgent
 	 * 
+	 * @param userAgents
 	 * @return
 	 */
-	protected IParseState getParseState()
+	public boolean isActiveByUserAgent(String[] userAgents)
 	{
-		return editor.getFileService().getParseState();
+		boolean result = false;
+
+		if (userAgents == null || userAgents.length == 0)
+		{
+			// NOTE: libraries oftentimes do not tag their types and members with user agent info, so we intentionally
+			// do not filter items that have no user agent info
+			result = true;
+		}
+		else
+		{
+			switch (_filterType)
+			{
+				case NO_FILTER:
+					// no filtering, so all proposals are OK
+					result = true;
+					break;
+
+				case ONE_OR_MORE:
+				{
+					// if any of the active user agents are in the specified list, then allow this proposal
+					String[] userAgentIds = UserAgentManager.getInstance().getActiveUserAgentIDs(getNatureIds());
+					Set<String> activeNameSet = new HashSet<String>(Arrays.asList(userAgentIds));
+
+					for (String id : userAgents)
+					{
+						if (activeNameSet.contains(id))
+						{
+							result = true;
+							break;
+						}
+					}
+
+					break;
+				}
+
+				case ALL:
+				{
+					// if all of the active user agents are in the specified list, then allow this proposal
+					Set<String> nameSet = new HashSet<String>(Arrays.asList(userAgents));
+					String[] activeUserAgentIds = UserAgentManager.getInstance().getActiveUserAgentIDs(getNatureIds());
+
+					result = nameSet.containsAll(Arrays.asList(activeUserAgentIds));
+
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return false;
 	}
 
 	/**
-	 * getAllUserAgentIcons
+	 * Respond to preference change events
+	 */
+	public void preferenceChange(PreferenceChangeEvent event)
+	{
+		String key = event.getKey();
+
+		if (IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS.equals(key))
+		{
+			_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
+		}
+		else if (IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS.equals(key))
+		{
+			_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
+		}
+		else if (IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS.equals(key))
+		{
+			_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
+		}
+	}
+
+	/**
+	 * Retrieves a content assist preference and converts it into a char array
 	 * 
+	 * @param preferenceKey
 	 * @return
 	 */
-	protected Image[] getAllUserAgentIcons()
+	private char[] retrieveCAPreference(String preferenceKey)
 	{
-		UserAgentManager manager = UserAgentManager.getInstance();
-		String[] userAgents = manager.getActiveUserAgentIDs();
-		Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+		String chars = retrievePreference(preferenceKey);
 
-		return userAgentIcons;
+		return (chars != null) ? chars.toCharArray() : null;
+	}
+
+	/**
+	 * Retrieves a preference value as a string
+	 * 
+	 * @param preferenceKey
+	 * @return
+	 */
+	private String retrievePreference(String preferenceKey)
+	{
+		String qualifier = getPreferenceNodeQualifier();
+		if (qualifier == null)
+		{
+			return null;
+		}
+
+		return Platform.getPreferencesService().getString(getPreferenceNodeQualifier(), preferenceKey,
+				StringUtil.EMPTY, null);
 	}
 
 	/**
@@ -724,73 +919,15 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int,
-	 * org.eclipse.jface.text.IDocument, int)
-	 */
-	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.contentassist.ICommonContentAssistProcessor#isValidIdentifier(char, int)
-	 */
-	public boolean isValidIdentifier(char c, int keyCode)
-	{
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.contentassist.ICommonContentAssistProcessor#isValidActivationCharacter(char, int)
-	 */
-	public boolean isValidActivationCharacter(char c, int keyCode)
-	{
-		return false;
-	}
-
 	/**
-	 * Returns the qualifier for the preference service. Gnerally the plugin ID as that's where the relevant preferences
-	 * are stored.
+	 * Sorts the completion proposals (by default, by display string)
 	 * 
-	 * @return
+	 * @param proposals
 	 */
-	protected String getPreferenceNodeQualifier()
+	protected void sortProposals(ICompletionProposal[] proposals)
 	{
-		return null;
-	}
-
-	/**
-	 * Respond to preference change events
-	 */
-	public void preferenceChange(PreferenceChangeEvent event)
-	{
-		if (IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS.equals(event.getKey()))
-		{
-			_completionProposalChars = retrieveCAPreference(IPreferenceConstants.COMPLETION_PROPOSAL_ACTIVATION_CHARACTERS);
-		}
-		else if (IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS.equals(event.getKey()))
-		{
-			_contextInformationChars = retrieveCAPreference(IPreferenceConstants.CONTEXT_INFORMATION_ACTIVATION_CHARACTERS);
-		}
-		else if (IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS.equals(event.getKey()))
-		{
-			_proposalTriggerChars = retrieveCAPreference(IPreferenceConstants.PROPOSAL_TRIGGER_CHARACTERS);
-		}
-
-	}
-
-	/**
-	 * dispose
-	 */
-	public void dispose()
-	{
-		if (getPreferenceNodeQualifier() != null)
-		{
-			EclipseUtil.instanceScope().getNode(getPreferenceNodeQualifier()).removePreferenceChangeListener(this);
-		}
+		// Sort by relevance first, descending, and then alphabetically, ascending
+		Arrays.sort(proposals, CompletionProposalComparator.decending(CompletionProposalComparator.getComparator(
+				CompletionProposalComparator.RelevanceSort, CompletionProposalComparator.NameSort)));
 	}
 }
