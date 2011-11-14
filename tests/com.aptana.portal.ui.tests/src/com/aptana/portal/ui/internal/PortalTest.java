@@ -16,6 +16,9 @@ import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.theme.IThemeManager;
 import com.aptana.usage.PingStartup;
+import com.aptana.usage.internal.AnalyticsInfo;
+import com.aptana.usage.internal.AnalyticsInfoManager;
+import com.aptana.usage.internal.DefaultAnalyticsInfo;
 
 /**
  */
@@ -221,8 +224,10 @@ public class PortalTest extends TestCase
 	public void testGetVersion() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
-		String result = fixture.getVersion();
-		assertEquals(EclipseUtil.getPluginVersion(PortalUIPlugin.getDefault()), result);
+		String result = fixture.getStudioVersion();
+		AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+		String pluginID = (info != null) ? info.getVersionPluginId() : new DefaultAnalyticsInfo().getVersionPluginId();
+		assertEquals(EclipseUtil.getPluginVersion(pluginID), result);
 	}
 
 	/**
