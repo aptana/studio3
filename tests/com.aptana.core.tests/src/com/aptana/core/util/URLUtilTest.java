@@ -180,10 +180,12 @@ public class URLUtilTest extends TestCase
 
 		// test null case
 		url = new URL("http://www.aptana.com");
-		assertEquals("Parameter list incorrectly joined", url, URLUtil.appendParameters(url, (Map) null));
+		assertEquals("Parameter list incorrectly joined", url,
+				URLUtil.appendParameters(url, (Map<String, String>) null));
 
 		assertEquals("Parameter list incorrectly joined", null, URLUtil.appendParameters(null, params));
 
-		assertEquals("Parameter list incorrectly joined", null, URLUtil.appendParameters(null, (Map) null));
+		assertEquals("Parameter list incorrectly joined", null,
+				URLUtil.appendParameters(null, (Map<String, String>) null));
 	}
 }
