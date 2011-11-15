@@ -50,6 +50,9 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.PingStartup;
+import com.aptana.usage.internal.AnalyticsInfo;
+import com.aptana.usage.internal.AnalyticsInfoManager;
+import com.aptana.usage.internal.DefaultAnalyticsInfo;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
@@ -73,9 +76,15 @@ public class Portal
 	protected static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
 	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	protected static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
-
-	private static Portal instance;
 	private AbstractPortalBrowserEditor portalBrowser;
+	private static Portal instance;
+	private static final String STUDIO_VERSION;
+	static
+	{
+		AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
+		String pluginID = (info != null) ? info.getVersionPluginId() : new DefaultAnalyticsInfo().getVersionPluginId();
+		STUDIO_VERSION = EclipseUtil.getPluginVersion(pluginID);
+	}
 
 	// Private constructor
 	private Portal()
@@ -122,7 +131,7 @@ public class Portal
 	 */
 	public void openPortal(URL url, final String browserEditorId)
 	{
-		openPortal(url, browserEditorId, true);
+		openPortal(url, browserEditorId, true, null);
 	}
 
 	/**
@@ -137,8 +146,11 @@ public class Portal
 	 *            point.
 	 * @param bringToTop
 	 *            Indicate whether the opened portal should be brought to the top when opened.
+	 * @param additionalParameters
+	 *            An optional map that may hold additional GET parameters that will be appended to the opened URL.
 	 */
-	public void openPortal(URL url, final String browserEditorId, final boolean bringToTop)
+	public void openPortal(URL url, final String browserEditorId, final boolean bringToTop,
+			Map<String, String> additionalParameters)
 	{
 		try
 		{
@@ -154,7 +166,12 @@ public class Portal
 					url = URLUtil.appendParameters(localURL, new String[] { "url", url.toString() }); //$NON-NLS-1$
 				}
 			}
-			url = URLUtil.appendParameters(url, getURLParametersForProject(PortalUIPlugin.getActiveProject()), false);
+			Map<String, String> parameters = getURLParametersForProject(PortalUIPlugin.getActiveProject());
+			if (additionalParameters != null)
+			{
+				parameters.putAll(additionalParameters);
+			}
+			url = URLUtil.appendParameters(url, parameters, false);
 		}
 		catch (IOException e)
 		{
@@ -313,7 +330,7 @@ public class Portal
 	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
 	{
 		final Map<String, String> builder = new HashMap<String, String>();
-		builder.put("v", getVersion());
+		builder.put("v", getStudioVersion());
 
 		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
 		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
@@ -370,13 +387,11 @@ public class Portal
 	}
 
 	/**
-	 * Returns the portal plugin version
-	 * 
-	 * @return
+	 * Returns the Studio version
 	 */
-	protected String getVersion()
+	public String getStudioVersion()
 	{
-		return EclipseUtil.getPluginVersion(PortalUIPlugin.getDefault());
+		return STUDIO_VERSION;
 	}
 
 	/**

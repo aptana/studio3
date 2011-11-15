@@ -172,6 +172,7 @@ public class StepIndicatorComposite extends Composite
 		{
 			this.selection = selection;
 			stepComposite.setBackground(this.selection ? selectedColor : normalColor);
+			stepLabel.setBackground(this.selection ? selectedColor : normalColor);
 			stepLabel.setForeground(this.selection ? selectedTextColor : null);
 			stepLabel.setFont(this.selection ? selectedTextFont : null);
 			stepDecorator.redraw();

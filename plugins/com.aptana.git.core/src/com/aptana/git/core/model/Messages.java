@@ -17,6 +17,7 @@ public class Messages extends NLS // NO_UCD
 
 	public static String GitIndex_BinaryDiff_Message; // NO_UCD
 	public static String GitRepositoryManager_UnableToFindGitExecutableError; // NO_UCD
+	public static String GitExecutable_UnableToLaunchCloneError;
 
 	static
 	{

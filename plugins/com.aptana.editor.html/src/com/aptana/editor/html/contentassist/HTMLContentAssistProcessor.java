@@ -297,8 +297,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				offset = this._replaceRange.getStartingOffset();
 				replaceLength = this._replaceRange.getLength();
 			}
-			List<String> userAgents = element.getUserAgentNames();
-			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+			List<String> userAgentList = element.getUserAgentNames();
+			String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
+			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgents);
 
 			if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 			{
@@ -374,9 +375,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				String name = value.getName();
 				Image icon = ATTRIBUTE_ICON;
 				String description = value.getDescription();
-				Image[] userAgentIcons = this.getAllUserAgentIcons();
 
-				this.addProposal(proposals, name, icon, description, userAgentIcons, offset);
+				this.addProposal(proposals, name, icon, description, getActiveUserAgentIds(), offset);
 			}
 		}
 		return proposals;
@@ -469,12 +469,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			UserAgentManager manager = UserAgentManager.getInstance();
 			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
-			Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
-						offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgents, entry.getValue(), offset);
 			}
 		}
 		return proposals;
@@ -933,11 +931,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		List<EntityElement> entities = this._queryHelper.getEntities();
 		if (entities != null)
 		{
-			Image[] userAgentIcons = this.getAllUserAgentIcons();
+			String[] userAgentIds = getActiveUserAgentIds();
 
 			for (EntityElement entity : entities)
 			{
-				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
+				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIds,
 						offset);
 			}
 		}
@@ -955,7 +953,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		this._replaceRange = null;
 		// Replace all the way until we hit the end of the doctype tag!
 		Lexeme<HTMLTokenType> ptr = _currentLexeme;
-		Image[] userAgentIcons = this.getAllUserAgentIcons();
+		String[] userAgentIds = getActiveUserAgentIds();
 
 		if (ptr != null && ptr.getType() == HTMLTokenType.META && ptr.contains(offset))
 		{
@@ -978,7 +976,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			String src = entry.getValue();
 			String name = entry.getKey();
 			CommonCompletionProposal proposal = createProposal(name, src, ELEMENT_ICON,
-					MessageFormat.format("&lt;!DOCTYPE {0}&gt;", src), userAgentIcons, //$NON-NLS-1$
+					MessageFormat.format("&lt;!DOCTYPE {0}&gt;", src), userAgentIds, //$NON-NLS-1$
 					IHTMLIndexConstants.CORE, offset, src.length());
 			if (src.equalsIgnoreCase("HTML")) // Make HTML 5 the default //$NON-NLS-1$
 			{
@@ -1000,14 +998,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (ids != null)
 		{
-			UserAgentManager manager = UserAgentManager.getInstance();
-			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
-			Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+			String[] userAgents = getActiveUserAgentIds();
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgentIcons, entry.getValue(),
-						offset);
+				this.addProposal(proposals, entry.getKey(), ATTRIBUTE_ICON, null, userAgents, entry.getValue(), offset);
 			}
 		}
 		return proposals;
@@ -1111,8 +1106,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private CommonCompletionProposal createCloseTagProposal(ElementElement element,
 			ILexemeProvider<HTMLTokenType> lexemeProvider, int offset, int relevance)
 	{
-		List<String> userAgents = element.getUserAgentNames();
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+		List<String> userAgentList = element.getUserAgentNames();
+		String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
+		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgents);
 		String replaceString = "/" + element.getName(); //$NON-NLS-1$
 		Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme(); // Open of tag
 		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name
@@ -1194,9 +1190,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 */
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
-			Image[] userAgents, int offset)
+			String[] userAgentIds, int offset)
 	{
-		this.addProposal(proposals, name, image, description, userAgents, IHTMLIndexConstants.CORE, offset);
+		this.addProposal(proposals, name, image, description, userAgentIds, IHTMLIndexConstants.CORE, offset);
 	}
 
 	/**
@@ -1209,21 +1205,49 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 */
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description,
-			Image[] userAgents, String fileLocation, int offset)
+			String[] userAgentIds, String fileLocation, int offset)
 	{
-		CommonCompletionProposal proposal = createProposal(name, image, description, userAgents, fileLocation, offset);
-		// add it to the list
-		proposals.add(proposal);
+		if (isActiveByUserAgent(userAgentIds))
+		{
+			CommonCompletionProposal proposal = createProposal(name, image, description, userAgentIds, fileLocation,
+					offset);
+			// add it to the list
+			proposals.add(proposal);
+		}
 	}
 
-	private CommonCompletionProposal createProposal(String name, Image image, String description, Image[] userAgents,
-			String fileLocation, int offset)
+	/**
+	 * createProposal
+	 * 
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 * @return
+	 */
+	private CommonCompletionProposal createProposal(String name, Image image, String description,
+			String[] userAgentIds, String fileLocation, int offset)
 	{
-		return createProposal(name, name, image, description, userAgents, fileLocation, offset, name.length());
+		return createProposal(name, name, image, description, userAgentIds, fileLocation, offset, name.length());
 	}
 
+	/**
+	 * createProposal
+	 * 
+	 * @param displayName
+	 * @param name
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 * @param length
+	 * @return
+	 */
 	protected CommonCompletionProposal createProposal(String displayName, String name, Image image, String description,
-			Image[] userAgents, String fileLocation, int offset, int length)
+			String[] userAgentIds, String fileLocation, int offset, int length)
 	{
 		IContextInformation contextInfo = null;
 
@@ -1235,6 +1259,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			offset = this._replaceRange.getStartingOffset();
 			replaceLength = this._replaceRange.getLength();
 		}
+
+		Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgentIds);
 
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,

@@ -9,6 +9,7 @@ package com.aptana.portal.ui.internal.startpage;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -46,13 +47,27 @@ public class StartPageUtil
 
 	/**
 	 * Show the Start-Page.
+	 * 
+	 * @param bringToTop
 	 */
 	public static void showStartPage(boolean bringToTop)
+	{
+		showStartPage(bringToTop, null);
+	}
+
+	/**
+	 * Show the Start-Page.
+	 * 
+	 * @param bringToTop
+	 * @param additionalParameters
+	 *            - Additional GET parameters that will be added to the URL (may be <code>null</code>)
+	 */
+	public static void showStartPage(boolean bringToTop, Map<String, String> additionalParameters)
 	{
 		try
 		{
 			Portal.getInstance().openPortal(new URL(getStartPageURL()), StartPageBrowserEditor.WEB_BROWSER_EDITOR_ID,
-					bringToTop);
+					bringToTop, additionalParameters);
 			// Update the preference key with the current studio's version
 			String currentVersion = getCurrentVersion();
 			if (currentVersion != null)

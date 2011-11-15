@@ -205,9 +205,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 	/** Do we insert the selected proposal on tab? * */
 	private boolean _insertOnTab;
 
-	/** The number of user agents shown */
-	private int fUserAgents = 0;
-
 	/**
 	 * The most recently selected proposal.
 	 * 
@@ -463,23 +460,13 @@ public class CompletionProposalPopup implements IContentAssistListener
 		});
 
 		// Custom code for our impl!
-		// TODO: grab value from preferences
 		final IPreferenceStore store = UIEplPlugin.getDefault().getPreferenceStore();
 		_insertOnTab = true; // store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
-		String agents = store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
-		if (agents != null && !agents.equals("")) //$NON-NLS-1$
-		{
-			fUserAgents = agents.split(",").length; //$NON-NLS-1$
-		}
-		else
-		{
-			fUserAgents = 0;
-		}
 		// Here we add custom columns
 		new TableColumn(fProposalTable, SWT.LEFT);
 
-		for (int i = 0; i < fUserAgents; i++)
+		for (int i = 0; i < fContentAssistant.getUserAgentColumnCount(); i++)
 		{
 			TableColumn tc = new TableColumn(fProposalTable, SWT.LEFT);
 			tc.setWidth(20);
@@ -723,6 +710,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				ICommonCompletionProposal proposal = (ICommonCompletionProposal) current;
 				String location = proposal.getFileLocation();
 				Image[] images = proposal.getUserAgentImages();
+				int userAgentCount = fContentAssistant.getUserAgentColumnCount();
 
 				if (images != null)
 				{
@@ -734,19 +722,19 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 				else
 				{
-					for (int j = 0; j < fUserAgents; j++)
+					for (int j = 0; j < userAgentCount; j++)
 					{
 						item.setImage(j + 1, null);
 					}
 				}
 
-				if (fUserAgents > 0)
+				if (userAgentCount > 0)
 				{
-					item.setText(fUserAgents + 1, " " + location); //$NON-NLS-1$
+					item.setText(userAgentCount + 1, " " + location); //$NON-NLS-1$
 				}
 				else
 				{
-					item.setText(fUserAgents + 1, location);
+					item.setText(userAgentCount + 1, location);
 				}
 			}
 		}

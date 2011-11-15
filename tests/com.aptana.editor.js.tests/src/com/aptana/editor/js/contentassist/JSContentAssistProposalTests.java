@@ -33,95 +33,107 @@ import com.aptana.scripting.model.SnippetElement;
  */
 public class JSContentAssistProposalTests extends JSEditorBasedTests
 {
-	/**
-	 * testStringCharCodeAt
-	 */
-	public void testStringCharCodeAt()
+	protected void assertAutoActivation(String sourceWithCursors, boolean expectedResult)
 	{
-		this.checkProposals("contentAssist/string-charCodeAt.js", "charCodeAt");
+		IFileStore fileStore = createFileStore("proposal_tests", "js", sourceWithCursors);
+
+		setupTestContext(fileStore);
+		assertEquals(expectedResult, processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
 	}
 
-	/**
-	 * testStringF
-	 * 
-	 * @throws IOException
-	 */
-	public void testStringFPrefix() throws IOException
+	protected void assertContainsFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
-
-		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
-		bundleElement.setDisplayName("Editor Unit Tests");
-
-		File f = File.createTempFile("snippet", "rb");
-		SnippetElement se = createSnippet(f.getAbsolutePath(), "FunctionTemplate", "fun", "source.js");
-		bundleElement.addChild(se);
-		BundleManager.getInstance().addBundle(bundleElement);
-
-		try
+		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
+		for (PropertyElement element : projectGlobals)
 		{
-			// note template is before true proposal, as we are ordering by trigger prefix
-			this.checkProposals("contentAssist/f-prefix.js", true, true, "FunctionTemplate", "false", "finally",
-					"focus", "for", "forward", "frames", "function", "Function");
-		}
-		finally
-		{
-			BundleManager.getInstance().unloadScript(f);
+			if (!(element instanceof FunctionElement))
+			{
+				continue;
+			}
+			if (uniqueFunctionNames.contains(element.getName()))
+			{
+				uniqueFunctionNames.remove(element.getName());
+			}
 		}
 
+		if (!uniqueFunctionNames.isEmpty())
+		{
+			// build a list of names
+			List<String> names = new ArrayList<String>();
+			for (PropertyElement element : projectGlobals)
+			{
+				if (!(element instanceof FunctionElement))
+				{
+					continue;
+				}
+				names.add(element.getName());
+			}
+			fail(MessageFormat.format(
+					"Functions do not contain an entry for expected name(s): {0}.\nFunction list: {1}",
+					uniqueFunctionNames, names));
+		}
 	}
 
-	/**
-	 * testStringFunction
-	 */
-	public void testStringFunction()
+	protected void assertDoesntContainFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
 	{
-		this.checkProposals("contentAssist/function.js", true, true, "function", "Function");
+		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
+		Set<String> matches = new HashSet<String>(uniqueFunctionNames.size());
+		for (PropertyElement element : projectGlobals)
+		{
+			if (!(element instanceof FunctionElement))
+			{
+				continue;
+			}
+			if (uniqueFunctionNames.contains(element.getName()))
+			{
+				matches.add(element.getName());
+			}
+		}
+
+		if (!matches.isEmpty())
+		{
+			fail(MessageFormat.format("Functions contain an entry for disallowed name(s): {0}", matches));
+		}
 	}
 
-	/**
-	 * testStringFunction
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
 	 */
-	public void testStringFunctionCaseOrder()
+	@Override
+	protected IFileStoreIndexingParticipant createIndexer()
 	{
-		// Commented out for the moment until we resolve an issue with indexing
-		// this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob",
-		// "for",
-		// "forward");
+		return new JSFileIndexingParticipant();
 	}
 
-	/**
-	 * testStringFunction
-	 * 
-	 * @throws IOException
-	 */
-	public void testStringThis() throws IOException
+	public void testAutoAactivationCommaWithSpace()
 	{
-		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
-		bundleFile.deleteOnExit();
-
-		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
-		bundleElement.setDisplayName("Editor Unit Tests");
-
-		File f = File.createTempFile("snippet", "rb");
-		SnippetElement se = createSnippet(f.getAbsolutePath(), "$(this)", "this", "source.js");
-		bundleElement.addChild(se);
-		BundleManager.getInstance().addBundle(bundleElement);
-
-		this.checkProposals("contentAssist/this.js", true, true, "$(this)", "this", "throw");
-
-		BundleManager.getInstance().unloadScript(f);
-
+		assertAutoActivation("a(abc, \t\r\n|", true);
 	}
 
-	/**
-	 * testStringD
-	 */
-	public void testStringDPrefix()
+	public void testAutoActivationComma()
 	{
-		this.checkProposals("contentAssist/d-prefix.js", true, true, "default", "defaultStatus", "delete", "do",
-				"document", "Date");
+		assertAutoActivation("a(abc,|", true);
+	}
+
+	public void testAutoActivationIdentifier()
+	{
+		assertAutoActivation("a|(abc,", false);
+	}
+
+	public void testAutoActivationIdentifierWithSpace()
+	{
+		assertAutoActivation("a \t\r\n|(abc,", false);
+	}
+
+	public void testAutoActivationLeftParen()
+	{
+		assertAutoActivation("a(|abc,", true);
+	}
+
+	public void testAutoActivationLeftParenWithSpace()
+	{
+		assertAutoActivation("a( \t\r\n|abc,", true);
 	}
 
 	/**
@@ -214,122 +226,94 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		// @formatter:on
 	}
 
-	protected void assertContainsFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
-	{
-		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
-		for (PropertyElement element : projectGlobals)
-		{
-			if (!(element instanceof FunctionElement))
-			{
-				continue;
-			}
-			if (uniqueFunctionNames.contains(element.getName()))
-			{
-				uniqueFunctionNames.remove(element.getName());
-			}
-		}
-
-		if (!uniqueFunctionNames.isEmpty())
-		{
-			// build a list of names
-			List<String> names = new ArrayList<String>();
-			for (PropertyElement element : projectGlobals)
-			{
-				if (!(element instanceof FunctionElement))
-				{
-					continue;
-				}
-				names.add(element.getName());
-			}
-			fail(MessageFormat.format(
-					"Functions do not contain an entry for expected name(s): {0}.\nFunction list: {1}",
-					uniqueFunctionNames, names));
-		}
-	}
-
-	protected void assertDoesntContainFunctions(Collection<PropertyElement> projectGlobals, String... functionNames)
-	{
-		Set<String> uniqueFunctionNames = new HashSet<String>(Arrays.asList(functionNames));
-		Set<String> matches = new HashSet<String>(uniqueFunctionNames.size());
-		for (PropertyElement element : projectGlobals)
-		{
-			if (!(element instanceof FunctionElement))
-			{
-				continue;
-			}
-			if (uniqueFunctionNames.contains(element.getName()))
-			{
-				matches.add(element.getName());
-			}
-		}
-
-		if (!matches.isEmpty())
-		{
-			fail(MessageFormat.format("Functions contain an entry for disallowed name(s): {0}", matches));
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.EditorBasedTests#createIndexer()
+	/**
+	 * testStringCharCodeAt
 	 */
-	@Override
-	protected IFileStoreIndexingParticipant createIndexer()
+	public void testStringCharCodeAt()
 	{
-		return new JSFileIndexingParticipant();
+		this.checkProposals("contentAssist/string-charCodeAt.js", "charCodeAt");
 	}
 
-	public void testAutoActivationIdentifier()
+	/**
+	 * testStringD
+	 */
+	public void testStringDPrefix()
 	{
-		String source = "a|(abc,";
-		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
-
-		setupTestContext(fileStore);
-		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+		this.checkProposals("contentAssist/d-prefix.js", true, true, "default", "defaultStatus", "delete", "do",
+				"document", "Date");
 	}
 
-	public void testAutoActivationLeftParen()
+	/**
+	 * testStringF
+	 * 
+	 * @throws IOException
+	 */
+	public void testStringFPrefix() throws IOException
 	{
-		String source = "a(|abc,";
-		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
+		bundleFile.deleteOnExit();
 
-		setupTestContext(fileStore);
-		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
+		bundleElement.setDisplayName("Editor Unit Tests");
+
+		File f = File.createTempFile("snippet", "rb");
+		SnippetElement se = createSnippet(f.getAbsolutePath(), "FunctionTemplate", "fun", "source.js");
+		bundleElement.addChild(se);
+		BundleManager.getInstance().addBundle(bundleElement);
+
+		try
+		{
+			// note template is before true proposal, as we are ordering by trigger prefix
+			this.checkProposals("contentAssist/f-prefix.js", true, true, "FunctionTemplate", "false", "finally",
+					"focus", "for", "forward", "frames", "function", "Function");
+		}
+		finally
+		{
+			BundleManager.getInstance().unloadScript(f);
+		}
+
 	}
 
-	public void testAutoActivationComma()
+	/**
+	 * testStringFunction
+	 */
+	public void testStringFunction()
 	{
-		String source = "a(abc,|";
-		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
-
-		setupTestContext(fileStore);
-		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+		this.checkProposals("contentAssist/function.js", true, true, "function", "Function");
 	}
 
-	public void testAutoActivationIdentifierWithSpace()
+	/**
+	 * testStringFunction
+	 */
+	public void testStringFunctionCaseOrder()
 	{
-		String source = "a \t\r\n|(abc,";
-		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
-
-		setupTestContext(fileStore);
-		assertFalse(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+		// Commented out for the moment until we resolve an issue with indexing
+		// this.checkProposals("contentAssist/function-case-order.js", true, true, "focus", "foo", "fooa", "foob",
+		// "for",
+		// "forward");
 	}
 
-	public void testAutoActivationLeftParenWithSpace()
+	/**
+	 * testStringFunction
+	 * 
+	 * @throws IOException
+	 */
+	public void testStringThis() throws IOException
 	{
-		String source = "a( \t\r\n|abc,";
-		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+		File bundleFile = File.createTempFile("editor_unit_tests", "rb");
+		bundleFile.deleteOnExit();
 
-		setupTestContext(fileStore);
-		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
-	}
+		BundleElement bundleElement = new BundleElement(bundleFile.getAbsolutePath());
+		bundleElement.setDisplayName("Editor Unit Tests");
 
-	public void testAutoAactivationCommaWithSpace()
-	{
-		String source = "a(abc, \t\r\n|";
-		IFileStore fileStore = createFileStore("proposal_tests", "js", source);
+		File f = File.createTempFile("snippet", "rb");
+		SnippetElement se = createSnippet(f.getAbsolutePath(), "$(this)", "this", "source.js");
+		bundleElement.addChild(se);
+		BundleManager.getInstance().addBundle(bundleElement);
 
-		setupTestContext(fileStore);
-		assertTrue(processor.isValidAutoActivationLocation(' ', ' ', document, cursorOffsets.get(0)));
+		this.checkProposals("contentAssist/this.js", true, true, "$(this)", "this", "throw");
+
+		BundleManager.getInstance().unloadScript(f);
+
 	}
 }

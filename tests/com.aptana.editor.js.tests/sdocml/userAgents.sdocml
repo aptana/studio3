@@ -1,0 +1,55 @@
+<javascript>
+	<class type="NoUserAgents"/>
+	<class type="OneUserAgent">
+		<browsers>
+			<browser platform="IE" />
+		</browsers>
+	</class>
+	<class type="OneUserAgentOutlier">
+		<browsers>
+			<browser platform="Netscape" />
+		</browsers>
+	</class>
+	<class type="TwoUserAgents">
+		<browsers>
+			<browser platform="IE" />
+			<browser platform="Safari" />
+		</browsers>
+	</class>
+	<class type="TwoUserAgentsOutlier">
+		<browsers>
+			<browser platform="IE" />
+			<browser platform="Netscape" />
+		</browsers>
+	</class>
+	<class type="ThreeUserAgents">
+		<browsers>
+			<browser platform="IE" />
+			<browser platform="Safari" />
+			<browser platform="Mozilla" />
+		</browsers>
+	</class>
+	<class type="ThreeUserAgentsOutlier">
+		<browsers>
+			<browser platform="IE" />
+			<browser platform="Netscape" />
+			<browser platform="Mozilla" />
+		</browsers>
+	</class>
+	<class type="FourUserAgents">
+		<browsers>
+			<browser platform="IE" />
+			<browser platform="Safari" />
+			<browser platform="Firefox" />
+			<browser platform="Opera" />
+		</browsers>
+	</class>
+	<class type="FourUserAgentsOutlier">
+		<browsers>
+			<browser platform="IE" />
+			<browser platform="Safari" />
+			<browser platform="Netscape" />
+			<browser platform="Opera" />
+		</browsers>
+	</class>
+</javascript>

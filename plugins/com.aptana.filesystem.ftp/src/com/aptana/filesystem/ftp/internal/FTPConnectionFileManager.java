@@ -95,7 +95,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	private Boolean listASupported = null;
 	private int utimeFormat = -1;
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
-	private long serverTimeZoneShift = Integer.MIN_VALUE;
+	private long serverToLocalTimeZoneShift = Integer.MIN_VALUE;
 	protected boolean hasServerInfo;
 	protected PrintWriter messageLogWriter;
 
@@ -331,15 +331,15 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 
 		if (context != null && context.getBoolean(ConnectionContext.DETECT_TIMEZONE)) {
-			serverTimeZoneShift = Integer.MIN_VALUE;
+			serverToLocalTimeZoneShift = Integer.MIN_VALUE;
 		} else if (timezone != null) {
 			TimeZone tz = TimeZone.getTimeZone(timezone);
 			if (tz != null) {
 				long time = new Date().getTime();
-				serverTimeZoneShift = TimeZone.getDefault().getOffset(time) - tz.getOffset(time);
+				serverToLocalTimeZoneShift = TimeZone.getDefault().getOffset(time) - tz.getOffset(time);
 			}
 		}
-		if (serverTimeZoneShift == Integer.MIN_VALUE) {
+		if (serverToLocalTimeZoneShift == Integer.MIN_VALUE) {
 			Policy.checkCanceled(monitor);
 			try {
 				changeCurrentDir(Path.ROOT);
@@ -386,34 +386,35 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					}
 				}
 				if (file != null) {
-					Date lastModifiedServerInLocalTZ = file.lastModified();
+					Date serverTimeInLocalTZ = file.lastModified();
 					if (serverSupportsFeature("MDTM")) { //$NON-NLS-1$
-						Date lastModifiedLocalTZ = ftpClient.modtime(file.getName());
-						if (lastModifiedLocalTZ != null) {
+						Date gmtTimeInLocalTZ = ftpClient.modtime(file.getName());
+						if (gmtTimeInLocalTZ != null) {
 							// align to minutes
-							serverTimeZoneShift = (lastModifiedLocalTZ.getTime() - lastModifiedLocalTZ.getTime() % 60000) - (lastModifiedServerInLocalTZ.getTime() - lastModifiedServerInLocalTZ.getTime() % 60000);
+							long serverToGmtShift = (gmtTimeInLocalTZ.getTime() - gmtTimeInLocalTZ.getTime() % 60000) - (serverTimeInLocalTZ.getTime() - serverTimeInLocalTZ.getTime() % 60000);
 							Calendar calendar = (Calendar) Calendar.getInstance().clone();
 							calendar.setTime(new Date());
-							serverTimeZoneShift += calendar.get(Calendar.DST_OFFSET);
+							serverToLocalTimeZoneShift = serverToGmtShift - calendar.get(Calendar.ZONE_OFFSET) - calendar.get(Calendar.DST_OFFSET);
 						}
 					}
-					if (serverTimeZoneShift == Integer.MIN_VALUE) {
-						serverTimeZoneShift = (lastModifiedLocal.getTime() - lastModifiedLocal.getTime() % 60000) - (lastModifiedServerInLocalTZ.getTime() - lastModifiedServerInLocalTZ.getTime() % 60000);
+					if (serverToLocalTimeZoneShift == Integer.MIN_VALUE && lastModifiedLocal != null) {
+						long serverToLocalShift = (lastModifiedLocal.getTime() - lastModifiedLocal.getTime() % 60000) - (serverTimeInLocalTZ.getTime() - serverTimeInLocalTZ.getTime() % 60000);
 						// align to 1/4 hour
-						long rem = serverTimeZoneShift % 900000;
+						long rem = serverToLocalShift % 900000;
 						if (rem < 450000) {
-							serverTimeZoneShift -= rem;
+							serverToLocalShift -= rem;
 						} else {
-							serverTimeZoneShift += (900000-rem);
+							serverToLocalShift += (900000-rem);
 						}
+						serverToLocalTimeZoneShift = serverToLocalShift;
 					}
 					if (TMP_TIMEZONE_CHECK.equals(file.getName())) {
 						ftpClient.delete(file.getName());
 					}
-					if (context != null) {
+					if (context != null && serverToLocalTimeZoneShift != Integer.MIN_VALUE) {
 						Calendar cal = (Calendar) Calendar.getInstance().clone();
 						cal.setTime(new Date());
-						int rawOffset = (int) (cal.get(Calendar.ZONE_OFFSET) - serverTimeZoneShift);
+						int rawOffset = (int) (cal.get(Calendar.ZONE_OFFSET) - serverToLocalTimeZoneShift);
 						context.put(ConnectionContext.SERVER_TIMEZONE, TimeZone.getAvailableIDs(rawOffset));
 					}
 				}
@@ -422,9 +423,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			} catch (Exception e) {
 				FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_server_tz_check, e));
 			}
-			if (serverTimeZoneShift == Integer.MIN_VALUE) {
-				Calendar cal = Calendar.getInstance();
-				serverTimeZoneShift = cal.get(Calendar.ZONE_OFFSET)+cal.get(Calendar.DST_OFFSET);					
+			if (serverToLocalTimeZoneShift == Integer.MIN_VALUE) {
+				serverToLocalTimeZoneShift = 0;
 			}
 		}
 
@@ -637,8 +637,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				FTPFile[] ftpFiles = listFiles(dirPath, monitor);
 				for (FTPFile ftpFile : ftpFiles) {
 					Date lastModifiedServerInLocalTZ = ftpFile.lastModified();
-					if (serverTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
-						ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverTimeZoneShift));
+					if (serverToLocalTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
+						ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverToLocalTimeZoneShift));
 					}
 					String fileName = ftpFile.getName();
 					if (fileName == null || ".".equals(fileName) || "..".equals(fileName)) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -706,8 +706,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					continue;
 				}
 				Date lastModifiedServerInLocalTZ = ftpFile.lastModified();
-				if (serverTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
-					ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverTimeZoneShift));
+				if (serverToLocalTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
+					ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverToLocalTimeZoneShift));
 				}
 				if ((options & IExtendedFileStore.DETAILED) != 0) {
 					if (!ftpFile.isDir() && ftpFile.lastModified().getSeconds() == 0) {
