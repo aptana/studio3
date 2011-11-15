@@ -58,6 +58,7 @@ public abstract class AbstractDebugHost {
 	protected static final String RESULT = "result"; //$NON-NLS-1$
 	protected static final String THIS = "this"; //$NON-NLS-1$
 	protected static final String THIS_DOT = THIS + "."; //$NON-NLS-1$
+	protected static final String __PROTO__ = "__proto__"; //$NON-NLS-1$
 	protected static final String VARIABLES = "variables"; //$NON-NLS-1$
 	protected static final String OPTION = "option"; //$NON-NLS-1$
 	protected static final String ENABLE = "enable"; //$NON-NLS-1$
@@ -138,6 +139,7 @@ public abstract class AbstractDebugHost {
 
 	protected String suspendReason;
 	protected String resumeReason;
+	protected int targetFrameCount;
 
 	protected String reqid;
 	protected Map<String, Object> options = new HashMap<String, Object>();
@@ -256,7 +258,7 @@ public abstract class AbstractDebugHost {
 			} else if (VARIABLES.equals(command)) {
 				sendResponse(listVariables(Util.decodeData(args[2])));
 			} else if (DETAILS.equals(command)) {
-				//sendResponse(doGetDetails(Util.decodeData(args[2])));
+				sendResponse(doGetDetails(Util.decodeData(args[2])));
 			} else if (EVAL.equals(command)) {
 				sendResponse(doEval(Util.decodeData(args[2]), Util.decodeData(args[3])));
 			} else if (STEP_INTO.equals(command)
@@ -272,12 +274,12 @@ public abstract class AbstractDebugHost {
 						} catch (NumberFormatException ignore) {
 							throw new IllegalArgumentException(ARG_FRAME_ID);
 						}
-						//if (frameId == 0 || frameId >= session.getFrames().length) {
-						//	stopDebugging(STEP_OVER);
-						//} else {
-						//	targetFrameCount = frameId;
-						//	stopDebugging(STEP_RETURN);
-						//}
+						if (frameId == 0 || frameId >= frameCount()) {
+							stopDebugging(STEP_OVER);
+						} else {
+							targetFrameCount = frameId;
+							stopDebugging(STEP_RETURN);
+						}
 					} else {
 						stopDebugging(command);
 					}
@@ -312,32 +314,22 @@ public abstract class AbstractDebugHost {
 				} catch (NumberFormatException ignore) {
 					throw new IllegalArgumentException("lineNo"); //$NON-NLS-1$
 				}
-//				BreakpointProperties props = null;
-//				if (CREATE.equals(action) || CHANGE.equals(action)) {
-//					int hitCount;
-//					try {
-//						hitCount = Integer.parseInt(args[6]);
-//					} catch (NumberFormatException ignore) {
-//						throw new IllegalArgumentException("hitCount"); //$NON-NLS-1$
-//					}
-//					props = new BreakpointProperties(_0.equals(args[5]), hitCount,
-//							Util.decodeData(args[7]), _1.equals(args[8]));
-//					if (props.condition.length() > 0) {
-//						try {
-//							props.expression = astBuilder.parse(new StringReader(props.condition), false);
-//						} catch (Exception e) {
-//							logError(e);
-//						}
-//						if (props.expression == null || props.expression.hasSideEffectsOtherThanGetters()) {
-//							throw new IllegalArgumentException("condition"); //$NON-NLS-1$
-//						}
-//					}
-//				}
-//				sendResponse(processBreakpoint(
-//						action,
-//						Util.decodeData(args[3]),
-//						lineNo,
-//						props));
+				BreakpointProperties props = null;
+				if (CREATE.equals(action) || CHANGE.equals(action)) {
+					int hitCount;
+					try {
+						hitCount = Integer.parseInt(args[6]);
+					} catch (NumberFormatException ignore) {
+						throw new IllegalArgumentException("hitCount"); //$NON-NLS-1$
+					}
+					props = new BreakpointProperties(_0.equals(args[5]), hitCount,
+							Util.decodeData(args[7]), _1.equals(args[8]));
+				}
+				sendResponse(processBreakpoint(
+						action,
+						Util.decodeData(args[3]),
+						lineNo,
+						props));
 			} else if (EXCEPTION.equals(command)) {
 				//sendResponse(processException(args[2], Util.decodeData(args[3])));
 			} else if (STEP_FILTERS.equals(command)) {
@@ -400,6 +392,23 @@ public abstract class AbstractDebugHost {
 		logger.log(false, message);
 	}
 
+	private String processBreakpoint(String action, String uri, int lineNo, BreakpointProperties props) {
+		if (CREATE.equals(action)) {
+			if (setBreakpoint(uri, lineNo, props)) {
+				return CREATED;
+			}
+		} else if (CHANGE.equals(action) && removeBreakpoint(uri, lineNo)) {
+			if (setBreakpoint(uri, lineNo, props)) {
+				return CHANGED;
+			}
+		} else if (REMOVE.equals(action)) {
+			if (removeBreakpoint(uri, lineNo)) {
+				return REMOVED;
+			}
+		}
+		return null;
+	}
+
 	protected final void terminate() {
 		terminateSession();
 		if (socket != null) {
@@ -415,12 +424,16 @@ public abstract class AbstractDebugHost {
 	protected abstract void startDebugging() throws IOException;
 	protected abstract void stopDebugging(String reason) throws IOException;
 	protected abstract String listFrames();
+	protected abstract int frameCount();
 	protected abstract String listVariables(String variableName);
+	protected abstract String doGetDetails(String variableName);
 	protected abstract String doEval(String variableName, String expression);
 	protected abstract String doSetValue(String variableName, String valueRef);
 	protected abstract void suspend(String reason);
 	protected abstract String processDetailFormatters(String[] list);
 	protected abstract String getSource(String uri);
+	protected abstract boolean setBreakpoint(String uri, int lineNo, BreakpointProperties props);
+	protected abstract boolean removeBreakpoint(String uri, int lineNo);
 
 	protected void enable() throws IOException {
 		enabled = true;
@@ -448,6 +461,22 @@ public abstract class AbstractDebugHost {
 		}
 		if (uri == null || uri.getScheme() == null) {
 			return "app:///"+string;
+		}
+		return string;
+	}
+
+	protected String makeDebuggerURI(String string) {
+		URI uri = null;
+		try {
+			uri = new URI(string);
+			if ("app".equals(uri.getScheme())) {
+				String path = uri.getPath();
+				if (path.startsWith("/")) {
+					path = path.substring(1);
+				}
+				return path;
+			}
+		} catch (URISyntaxException e) {
 		}
 		return string;
 	}
@@ -517,6 +546,20 @@ public abstract class AbstractDebugHost {
 
 	private String getVersion() {
 		return (String) plugin.getBundle().getHeaders().get(Constants.BUNDLE_VERSION);
+	}
+
+	protected class BreakpointProperties {
+		public boolean disabled;
+		public int hitCount;
+		public String condition;
+		public boolean conditionOnTrue;
+				
+		BreakpointProperties(boolean disabled, int hitCount, String condition, boolean conditionOnTrue) {
+			this.disabled = disabled;
+			this.hitCount = hitCount;
+			this.condition = condition;
+			this.conditionOnTrue = conditionOnTrue;
+		}
 	}
 
 }
