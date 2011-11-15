@@ -9,8 +9,9 @@
 package com.aptana.js.debug.core.v8;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.ConnectException;
 import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +66,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		SUSPENDED, TERMINATE
 	}
 
+	private static final int V8_CONNECT_TIMEOUT = 60000;
 	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final Pattern DETAIL_EXPRESSION_PATTERN = Pattern.compile("\\bthis\\b"); //$NON-NLS-1$
 	private static final String THIS_SUBSTITUTE = "__this__"; //$NON-NLS-1$
@@ -89,8 +91,8 @@ public class V8DebugHost extends AbstractDebugHost {
 	private Map<String, Map<Integer, Breakpoint>> breakpoints = new HashMap<String, Map<Integer,Breakpoint>>();
 	private Map<Breakpoint, BreakpointProperties> breakpointProps = new HashMap<Breakpoint, AbstractDebugHost.BreakpointProperties>();
 
-	public static V8DebugHost createDebugHost(int port) throws CoreException {
-		V8DebugHost debugHost = new V8DebugHost(new InetSocketAddress("127.0.0.1", port)); //$NON-NLS-1$
+	public static V8DebugHost createDebugHost(SocketAddress sockAddress) throws CoreException {
+		V8DebugHost debugHost = new V8DebugHost(sockAddress);
 		return debugHost;
 	}
 
@@ -1086,8 +1088,23 @@ public class V8DebugHost extends AbstractDebugHost {
 	protected void initSession() throws CoreException {
 		initLogger(V8DebugPlugin.getDefault(), "v8hostdebugger"); //$NON-NLS-1$
 		try {
-			vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
-			vm.attach(debugEventListener);
+			long endTime = System.currentTimeMillis() + V8_CONNECT_TIMEOUT;
+			boolean attached = false;
+			while (System.currentTimeMillis() <= endTime) {
+				try {
+					vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
+					vm.attach(debugEventListener);
+					attached = true;
+					break;
+				} catch (ConnectException e) {
+				} catch (SocketTimeoutException e) {
+				}
+				Thread.sleep(500);
+			}
+			if (!attached) {
+				vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
+				vm.attach(debugEventListener); // last try, throws exception
+			}
 			if (vm.isAttached()) {
 				new Thread("Aptana: V8 Debug Host") { //$NON-NLS-1$
 					public void run() {
