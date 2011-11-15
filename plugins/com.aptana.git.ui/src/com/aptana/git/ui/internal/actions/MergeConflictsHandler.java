@@ -98,7 +98,7 @@ public class MergeConflictsHandler extends AbstractGitHandler
 			return false;
 		}
 		IResource blah = resources.iterator().next();
-		if (blah.getType() != IResource.FILE)
+		if (blah == null || blah.getType() != IResource.FILE)
 		{
 			return false;
 		}
