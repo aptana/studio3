@@ -237,6 +237,12 @@
             id="com.aptana.git.ui.command.rebase_branch"
             name="%RebaseBranchAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CreateTagHandler"
+            id="com.aptana.git.ui.command.create_tag"
+            name="%CreateTagAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -401,6 +407,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G I">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.create_tag"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G Z">
       </key>
       <key
             commandId="com.aptana.git.ui.command.commit.dialog"
@@ -697,6 +709,18 @@
                </reference>
             </visibleWhen>
          </menu>
+         <command
+               commandId="com.aptana.git.ui.command.create_tag"
+               id="com.aptana.git.ui.actions.CreateTagAction"
+               label="%CreateTagAction_label"
+               tooltip="%CreateTagAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="com.aptana.git.ui.hasGitRepository">
+               </reference>
+            </visibleWhen>
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="true"
@@ -913,6 +937,11 @@
       <image
             commandId="com.aptana.git.ui.command.unstash"
             icon="icons/elcl16/arrow_right.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.create_tag"
+            disabledIcon="icons/dlcl16/tag_blue_add.png"
+            icon="icons/elcl16/tag_blue_add.png">
       </image>
    </extension>
    <extension

@@ -134,7 +134,10 @@ public class GitRepository
 	 * A file created when we hit merge conflicts that need to be manually resolved.
 	 */
 	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
-	static final String HEAD = "HEAD"; //$NON-NLS-1$
+	/**
+	 * The name of HEAD
+	 */
+	public static final String HEAD = "HEAD"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
@@ -1298,9 +1301,26 @@ public class GitRepository
 		return Status.OK_STATUS;
 	}
 
+	/**
+	 * @deprecated Use {@link #validRefName(String)}
+	 * @param branchName
+	 * @return
+	 */
 	public boolean validBranchName(String branchName)
 	{
-		IStatus result = execute(GitRepository.ReadWrite.READ, "check-ref-format", GitRef.REFS_HEADS + branchName); //$NON-NLS-1$
+		return validRefName(GitRef.REFS_HEADS + branchName);
+	}
+
+	/**
+	 * Checks if a given name passes the check-ref-format. Should be used to check potential tag names, branch names.
+	 * passed in name should include GitRef.REFS_HEADS, GitRef.REFS_TAGS, or GitRef.REFS_REMOTES prefix.
+	 * 
+	 * @param refName
+	 * @return
+	 */
+	public boolean validRefName(String refName)
+	{
+		IStatus result = execute(GitRepository.ReadWrite.READ, "check-ref-format", refName); //$NON-NLS-1$
 		return result != null && result.isOK();
 	}
 
@@ -1960,5 +1980,66 @@ public class GitRepository
 	{
 		IStatus status = execute(ReadWrite.READ, "config", "branch.autosetupmerge"); //$NON-NLS-1$ //$NON-NLS-2$
 		return status != null && status.isOK() && Boolean.valueOf(status.getMessage().trim());
+	}
+
+	/**
+	 * Generate a tag for this repo.
+	 * 
+	 * @param tagName
+	 * @param message
+	 * @param startPoint
+	 * @return
+	 */
+	public IStatus createTag(String tagName, String message, String startPoint)
+	{
+		List<String> args = new ArrayList<String>();
+		args.add("tag"); //$NON-NLS-1$
+		args.add("-a"); //$NON-NLS-1$
+		args.add(tagName);
+		args.add("-m"); //$NON-NLS-1$
+		args.add(message);
+		// Default is HEAD
+		if (!StringUtil.isEmpty(startPoint))
+		{
+			args.add(startPoint);
+		}
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, args.toArray(new String[args.size()]));
+		if (result != null && result.isOK())
+		{
+			// Add tag to list in model!
+			addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_TAGS + tagName)));
+		}
+		return result;
+	}
+
+	/**
+	 * Returns the set of tags.
+	 * 
+	 * @return
+	 */
+	public Set<String> tags()
+	{
+		// Sort tags.
+		SortedSet<String> tags = new TreeSet<String>();
+		synchronized (branches)
+		{
+			for (GitRevSpecifier revSpec : branches)
+			{
+				if (!revSpec.isSimpleRef())
+				{
+					continue;
+				}
+				GitRef ref = revSpec.simpleRef();
+				if (ref == null || ref.type() == null)
+				{
+					continue;
+				}
+				if (ref.type().equals(TYPE.TAG))
+				{
+					tags.add(ref.shortName());
+				}
+			}
+		}
+		return tags;
 	}
 }
