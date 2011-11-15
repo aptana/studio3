@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -332,6 +333,8 @@ public class Portal
 		final Map<String, String> builder = new HashMap<String, String>();
 		builder.put("v", getStudioVersion());
 
+		builder.put("nl", getCurrentLocale());
+
 		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
 		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
 
@@ -392,6 +395,14 @@ public class Portal
 	public String getStudioVersion()
 	{
 		return STUDIO_VERSION;
+	}
+
+	/**
+	 * Returns the current Java locale
+	 */
+	public String getCurrentLocale()
+	{
+		return System.getProperty("osgi.nl", Locale.getDefault().toString()); //$NON-NLS-1$
 	}
 
 	/**
