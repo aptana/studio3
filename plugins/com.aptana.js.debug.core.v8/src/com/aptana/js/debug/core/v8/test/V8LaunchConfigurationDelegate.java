@@ -9,6 +9,7 @@ package com.aptana.js.debug.core.v8.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,7 +41,7 @@ public class V8LaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		int port = SocketUtil.findFreePort(null);
-		V8DebugHost debugHost = V8DebugHost.createDebugHost(port);
+		V8DebugHost debugHost = V8DebugHost.createDebugHost(new InetSocketAddress("127.0.0.1", port));
 		ProcessBuilder pb = new ProcessBuilder("./lineprocessor", "capitalizer.js", "-p", Integer.toString(port), "--wait-for-connection", "--main-cycle-in-cpp");
 		pb.directory(new File("/Users/max/dev/public/v8"));
 		try {
