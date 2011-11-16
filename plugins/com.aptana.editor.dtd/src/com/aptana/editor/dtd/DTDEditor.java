@@ -8,9 +8,13 @@
 package com.aptana.editor.dtd;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 
+@SuppressWarnings("restriction")
 public class DTDEditor extends AbstractThemeableEditor
 {
 
@@ -19,10 +23,17 @@ public class DTDEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		setPreferenceStore(getChainedPreferenceStore());
+
 		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(DTDPlugin.getDefault().getDTDDocumentProvider());
 	}
 
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { DTDPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
+	}
 	@Override
 	protected IPreferenceStore getPluginPreferenceStore()
 	{

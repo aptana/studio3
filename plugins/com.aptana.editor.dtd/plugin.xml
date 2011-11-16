@@ -5,7 +5,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.dtd.DTDEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
             extensions="dtd"
             id="com.aptana.editor.dtd"
