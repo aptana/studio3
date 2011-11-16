@@ -102,7 +102,7 @@ public class CollectionsUtil
 	{
 		if (items != null)
 		{
-			return (List<T>) new ArrayList<T>(Arrays.asList(items));
+			return new ArrayList<T>(Arrays.asList(items));
 		}
 
 		return Collections.emptyList();
@@ -121,7 +121,7 @@ public class CollectionsUtil
 	{
 		if (items != null)
 		{
-			return (Set<T>) new HashSet<T>(Arrays.asList(items));
+			return new HashSet<T>(Arrays.asList(items));
 		}
 
 		return Collections.emptySet();
