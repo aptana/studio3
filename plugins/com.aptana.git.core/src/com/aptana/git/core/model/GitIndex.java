@@ -64,7 +64,7 @@ public class GitIndex
 	 * The list of changed files that is a copy of the above list. Only copied at the very end of the refresh, so it
 	 * always contains the full listing from last finished refresh call.
 	 */
-	private List<ChangedFile> changedFiles;
+	List<ChangedFile> changedFiles;
 	private Object changedFilesLock = new Object();
 
 	private boolean notify;
@@ -315,8 +315,22 @@ public class GitIndex
 		{
 			preFiles.add(new ChangedFile(file));
 		}
+
+		// Update the staged/unstaged flags in the passed in copy of changed files, and our internal list of changed
+		// files.
 		for (ChangedFile file : stageFiles)
 		{
+			int index = Collections.binarySearch(this.changedFiles, file);
+			if (index >= 0)
+			{
+				synchronized (this.changedFilesLock)
+				{
+					ChangedFile orig = this.changedFiles.get(index);
+					orig.hasUnstagedChanges = false;
+					orig.hasStagedChanges = true;
+				}
+			}
+
 			file.hasUnstagedChanges = false;
 			file.hasStagedChanges = true;
 		}
@@ -354,8 +368,22 @@ public class GitIndex
 		{
 			preFiles.add(new ChangedFile(file));
 		}
+
+		// Update the staged/unstaged flags in the passed in copy of changed files, and our internal list of changed
+		// files.
 		for (ChangedFile file : unstageFiles)
 		{
+			int index = Collections.binarySearch(this.changedFiles, file);
+			if (index >= 0)
+			{
+				synchronized (this.changedFilesLock)
+				{
+					ChangedFile orig = this.changedFiles.get(index);
+					orig.hasUnstagedChanges = true;
+					orig.hasStagedChanges = false;
+				}
+			}
+
 			file.hasUnstagedChanges = true;
 			file.hasStagedChanges = false;
 		}
