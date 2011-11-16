@@ -9,9 +9,11 @@ package com.aptana.editor.js.inferencing;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -114,8 +116,12 @@ public class JSTypeMapper
 						addTypeMapping(srcType, dstType);
 					}
 				}
-			},
-			TAG_TYPE_MAP
+
+				public Set<String> getSupportElementNames()
+				{
+					return CollectionsUtil.newSet(TAG_TYPE_MAP);
+				}
+			}
 		);
 		// @formatter:on
 	}

@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -68,55 +70,56 @@ public class DiagnosticManager
 
 					public void processElement(IConfigurationElement element)
 					{
-						String name = element.getName();
-						if (ELEMENT_LOG.equals(name))
+						String classStr = element.getAttribute(ATTR_CLASS);
+						if (StringUtil.isEmpty(classStr))
 						{
-							String classStr = element.getAttribute(ATTR_CLASS);
-							if (StringUtil.isEmpty(classStr))
+							return;
+						}
+						IDiagnosticLog logClass = null;
+						try
+						{
+							Object clazz = element.createExecutableExtension(ATTR_CLASS);
+							if (clazz instanceof IDiagnosticLog)
 							{
-								return;
+								logClass = (IDiagnosticLog) clazz;
 							}
-							IDiagnosticLog logClass = null;
+							else
+							{
+								IdeLog.logError(UIPlugin.getDefault(), MessageFormat.format(
+										"The class {0} does not implement IDiagnosticLog.", classStr)); //$NON-NLS-1$
+							}
+						}
+						catch (CoreException e)
+						{
+							IdeLog.logError(UIPlugin.getDefault(), e);
+						}
+						if (logClass == null)
+						{
+							return;
+						}
+
+						int priority = DEFAULT_PRIORITY;
+						String priorityStr = element.getAttribute(ATTR_PRIORITY);
+						if (!StringUtil.isEmpty(priorityStr))
+						{
 							try
 							{
-								Object clazz = element.createExecutableExtension(ATTR_CLASS);
-								if (clazz instanceof IDiagnosticLog)
-								{
-									logClass = (IDiagnosticLog) clazz;
-								}
-								else
-								{
-									IdeLog.logError(UIPlugin.getDefault(), MessageFormat.format(
-											"The class {0} does not implement IDiagnosticLog.", classStr)); //$NON-NLS-1$
-								}
+								priority = Integer.parseInt(priorityStr);
 							}
-							catch (CoreException e)
+							catch (NumberFormatException e)
 							{
-								IdeLog.logError(UIPlugin.getDefault(), e);
+								IdeLog.logWarning(UIPlugin.getDefault(),
+										"The priority for diagnosticLog needs to be an integer.", e); //$NON-NLS-1$
 							}
-							if (logClass == null)
-							{
-								return;
-							}
-
-							int priority = DEFAULT_PRIORITY;
-							String priorityStr = element.getAttribute(ATTR_PRIORITY);
-							if (!StringUtil.isEmpty(priorityStr))
-							{
-								try
-								{
-									priority = Integer.parseInt(priorityStr);
-								}
-								catch (NumberFormatException e)
-								{
-									IdeLog.logWarning(UIPlugin.getDefault(),
-											"The priority for diagnosticLog needs to be an integer.", e); //$NON-NLS-1$
-								}
-							}
-							result.add(new DiagnosticLog(logClass, priority));
 						}
+						result.add(new DiagnosticLog(logClass, priority));
 					}
-				}, ELEMENT_LOG);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_LOG);
+					}
+				});
 
 		Collections.sort(result, new Comparator<DiagnosticLog>()
 		{

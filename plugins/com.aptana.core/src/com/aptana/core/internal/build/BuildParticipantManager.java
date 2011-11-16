@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -19,6 +20,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 
@@ -63,48 +65,50 @@ public class BuildParticipantManager
 
 					public void processElement(IConfigurationElement element)
 					{
-						if (ELEMENT_PARTICIPANT.equals(element.getName()))
+						try
 						{
-							try
+							Object participantClass = element.createExecutableExtension(ATTR_CLASS);
+							if (participantClass instanceof IBuildParticipant)
 							{
-								Object participantClass = element.createExecutableExtension(ATTR_CLASS);
-								if (participantClass instanceof IBuildParticipant)
-								{
-									IBuildParticipant participant = (IBuildParticipant) participantClass;
-									buildParticipants.add(participant);
+								IBuildParticipant participant = (IBuildParticipant) participantClass;
+								buildParticipants.add(participant);
 
-									String priorityStr = element.getAttribute(ATTR_PRIORITY);
-									int priority = DEFAULT_PRIORITY;
-									if (priorityStr != null)
-									{
-										try
-										{
-											priority = Integer.parseInt(priorityStr);
-										}
-										catch (NumberFormatException e)
-										{
-											IdeLog.logError(CorePlugin.getDefault(), e);
-										}
-									}
-									participant.setPriority(priority);
-								}
-								else
+								String priorityStr = element.getAttribute(ATTR_PRIORITY);
+								int priority = DEFAULT_PRIORITY;
+								if (priorityStr != null)
 								{
-									String pluginId = element.getDeclaringExtension().getNamespaceIdentifier();
-									String message = MessageFormat
-											.format("Build participant type ''{0}'' is not an instance of IBuildParticipant. This error occurred when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''", //$NON-NLS-1$
-											participantClass.getClass().getName(), ELEMENT_PARTICIPANT, EXTENSION_ID,
-													pluginId);
-									IdeLog.logError(CorePlugin.getDefault(), message);
+									try
+									{
+										priority = Integer.parseInt(priorityStr);
+									}
+									catch (NumberFormatException e)
+									{
+										IdeLog.logError(CorePlugin.getDefault(), e);
+									}
 								}
+								participant.setPriority(priority);
 							}
-							catch (CoreException e)
+							else
 							{
-								IdeLog.logError(CorePlugin.getDefault(), "Error loading build participant", e); //$NON-NLS-1$
+								String pluginId = element.getDeclaringExtension().getNamespaceIdentifier();
+								String message = MessageFormat
+										.format("Build participant type ''{0}'' is not an instance of IBuildParticipant. This error occurred when processing the ''{1}'' element in the ''{2}'' extension in plugin ''{3}''", //$NON-NLS-1$
+												participantClass.getClass().getName(), ELEMENT_PARTICIPANT,
+												EXTENSION_ID, pluginId);
+								IdeLog.logError(CorePlugin.getDefault(), message);
 							}
 						}
+						catch (CoreException e)
+						{
+							IdeLog.logError(CorePlugin.getDefault(), "Error loading build participant", e); //$NON-NLS-1$
+						}
 					}
-				}, ELEMENT_PARTICIPANT);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_PARTICIPANT);
+					}
+				});
 		Collections.sort(buildParticipants, new Comparator<IBuildParticipant>()
 		{
 
