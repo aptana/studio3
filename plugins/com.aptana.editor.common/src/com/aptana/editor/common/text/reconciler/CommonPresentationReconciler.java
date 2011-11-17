@@ -31,6 +31,7 @@ import org.eclipse.swt.custom.StyledText;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ICommonEditorSystemProperties;
 import com.aptana.editor.common.IDebugScopes;
 import com.aptana.editor.common.Regions;
 import com.aptana.ui.util.UIUtils;
@@ -40,10 +41,10 @@ import com.aptana.ui.util.UIUtils;
  */
 public class CommonPresentationReconciler extends PresentationReconciler {
 
-	private static final int ITERATION_PARTITION_LIMIT = 4000;
-	private static final int BACKGROUND_RECONCILE_DELAY = 2000;
-	private static final int ITERATION_DELAY = 500;
-	private static final int MINIMAL_VISIBLE_LENGTH = 20000;
+	private int iterationPartitionLimit = 4000;
+	private int backgroundReconcileDelay = 2000;
+	private int iterationDelay = 500;
+	private int minimalVisibleLength = 20000;
 
 	private ITextViewer textViewer;
 	private Regions delayedRegions = new Regions();
@@ -59,6 +60,21 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		super.install(viewer);
 		delayedRegions.clear();
 		textViewer = viewer;
+		iterationPartitionLimit = Integer.getInteger(
+				ICommonEditorSystemProperties.RECONCILER_ITERATION_PARTITION_LIMIT, iterationPartitionLimit);
+		backgroundReconcileDelay = Integer.getInteger(ICommonEditorSystemProperties.RECONCILER_BACKGROUND_DELAY,
+				backgroundReconcileDelay);
+		iterationDelay = Integer.getInteger(ICommonEditorSystemProperties.RECONCILER_ITERATION_DELAY, iterationDelay);
+		minimalVisibleLength = Integer.getInteger(ICommonEditorSystemProperties.RECONCILER_MINIMAL_VISIBLE_LENGTH,
+				minimalVisibleLength);
+		if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PRESENTATION)) {
+			IdeLog.logInfo(
+					CommonEditorPlugin.getDefault(),
+					MessageFormat
+							.format("Reconciling process set for partition limit of {0} partitions, background delay of {1}ms, iteration delay of {2}ms, and minimal visible length of {3} lines", //$NON-NLS-1$
+							iterationPartitionLimit, backgroundReconcileDelay, iterationDelay, minimalVisibleLength),
+					IDebugScopes.PRESENTATION);
+		}
 	}
 
 	/*
@@ -111,14 +127,15 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				}
 				damageLength = adjustedLength;
 			}
-			TextPresentation presentation = new TextPresentation(damage, ITERATION_PARTITION_LIMIT * 5);
+			TextPresentation presentation = new TextPresentation(damage, iterationPartitionLimit * 5);
 			ITypedRegion[] partitioning = TextUtilities.computePartitioning(document, getDocumentPartitioning(),
 					damageOffset, damageLength, false);
 			if (partitioning.length == 0) {
 				return presentation;
 			}
-			int limit = Math.min(ITERATION_PARTITION_LIMIT, partitioning.length);
-			int processingLength = partitioning[limit - 1].getOffset() + partitioning[limit - 1].getLength() - damageOffset;
+			int limit = Math.min(iterationPartitionLimit, partitioning.length);
+			int processingLength = partitioning[limit - 1].getOffset() + partitioning[limit - 1].getLength()
+					- damageOffset;
 			if (EclipseUtil.showSystemJobs()) {
 				monitor.subTask(MessageFormat.format(
 						"processing region at offset {0}, length {1} in document of length {2}", damageOffset, //$NON-NLS-1$
@@ -167,7 +184,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 							// save visible region here since UI thread access required
 							int topOffset = textViewer.getTopIndexStartOffset();
 							int length = textViewer.getBottomIndexEndOffset() - topOffset;
-							viewerVisibleRegion = new Region(topOffset, Math.max(length, MINIMAL_VISIBLE_LENGTH));
+							viewerVisibleRegion = new Region(topOffset, Math.max(length, minimalVisibleLength));
 						}
 					}
 				});
@@ -184,16 +201,20 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 				protected IStatus run(IProgressMonitor monitor) {
 					int priority = Thread.currentThread().getPriority();
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-					monitor.beginTask("Reconciling document", textViewer.getDocument().getLength()); //$NON-NLS-1$
-					while (!monitor.isCanceled()) {
+					IDocument document = textViewer != null ? textViewer.getDocument() : null;
+					if (document == null) {
+						return Status.CANCEL_STATUS;
+					}
+					monitor.beginTask("Reconciling document", document.getLength()); //$NON-NLS-1$
+					while (textViewer != null && !monitor.isCanceled()) {
 						IRegion damage = nextDamagedRegion();
-						if (damage == null || monitor.isCanceled()) {
+						if (damage == null || monitor.isCanceled() || textViewer == null) {
 							break;
 						}
 						processDamage(damage, textViewer.getDocument(), monitor);
 						System.gc();
 						try {
-							Thread.sleep(ITERATION_DELAY);
+							Thread.sleep(iterationDelay);
 						} catch (InterruptedException e) {
 							break;
 						}
@@ -207,7 +228,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			job.setSystem(!EclipseUtil.showSystemJobs());
 		}
 		if (!delayedRegions.isEmpty()) {
-			job.schedule(BACKGROUND_RECONCILE_DELAY);
+			job.schedule(backgroundReconcileDelay);
 		}
 	}
 
@@ -220,7 +241,7 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 					}
 					int topOffset = textViewer.getTopIndexStartOffset();
 					int length = textViewer.getBottomIndexEndOffset() - topOffset;
-					viewerVisibleRegion = new Region(topOffset, Math.max(length, MINIMAL_VISIBLE_LENGTH));
+					viewerVisibleRegion = new Region(topOffset, Math.max(length, minimalVisibleLength));
 				}
 			});
 		}
