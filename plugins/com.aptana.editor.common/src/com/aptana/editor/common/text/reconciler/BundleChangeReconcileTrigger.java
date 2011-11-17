@@ -22,15 +22,19 @@ import com.aptana.scripting.model.LoadCycleListener;
 /**
  * @author Chris Williams
  * @author Max Stepanov
- *
  */
-public class BundleChangeReconcileTrigger implements LoadCycleListener {
+public class BundleChangeReconcileTrigger implements LoadCycleListener
+{
+
+	private static final String BUNDLE_RB = "bundle.rb"; //$NON-NLS-1$
 
 	private final CommonReconciler reconciler;
 
-	private final Job job = new Job("Force reconcile on bundle change") { //$NON-NLS-1$
+	private final Job job = new Job("Force reconcile on bundle change") //$NON-NLS-1$
+	{
 		@Override
-		protected IStatus run(IProgressMonitor monitor) {
+		protected IStatus run(IProgressMonitor monitor)
+		{
 			reconciler.forceReconciling();
 			return Status.OK_STATUS;
 		}
@@ -39,45 +43,62 @@ public class BundleChangeReconcileTrigger implements LoadCycleListener {
 	/**
 	 *
 	 */
-	public BundleChangeReconcileTrigger(CommonReconciler reconciler) {
+	public BundleChangeReconcileTrigger(CommonReconciler reconciler)
+	{
 		this.reconciler = reconciler;
 		BundleManager.getInstance().addLoadCycleListener(this);
 	}
 
-	public void dispose() {
+	public void dispose()
+	{
 		BundleManager.getInstance().removeLoadCycleListener(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptLoaded(java.io.File)
 	 */
-	public void scriptLoaded(File script) {
+	public void scriptLoaded(File script)
+	{
 		bundleFileChanged(script);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptReloaded(java.io.File)
 	 */
-	public void scriptReloaded(File script) {
+	public void scriptReloaded(File script)
+	{
 		bundleFileChanged(script);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.LoadCycleListener#scriptUnloaded(java.io.File)
 	 */
-	public void scriptUnloaded(File script) {
+	public void scriptUnloaded(File script)
+	{
 		bundleFileChanged(script);
 	}
 
-	private void bundleFileChanged(File script) {
-		if (script == null || !script.getName().equals("bundle.rb")) { //$NON-NLS-1$
+	private void bundleFileChanged(File script)
+	{
+		if (script == null || !script.getName().equals(BUNDLE_RB))
+		{
 			return;
 		}
 		// Run in a job on a delay and cancel/reschedule if it already exists and is scheduled... This should
 		// basically only make us run once if we get hit multiple times in a row. We'll still probably run a few
 		// times, but this should cut it down a lot.
 		job.cancel();
-		job.setSystem(!EclipseUtil.showSystemJobs());
+		try
+		{
+			job.setSystem(!EclipseUtil.showSystemJobs());
+		}
+		catch (IllegalStateException ise)
+		{
+			// ignore
+		}
 		job.schedule(750);
 	}
 
