@@ -5,8 +5,12 @@
          point="com.aptana.deploy.deployWizards">
       <wizard
             class="com.aptana.deploy.capistrano.ui.wizard.CapistranoDeployWizard"
+            icon="icons/newproj.png"
             id="com.aptana.deploy.capistrano.wizard"
             name="Capistrano">
+         <description>
+            Capistrano makes web deployment easy. Typically found in the Rails community, it can be used on a variety of projects and facilitates deploying your code from a source control system (such as Git) to one or many machines simultaneously.
+         </description>
       </wizard>
    </extension>
    <extension

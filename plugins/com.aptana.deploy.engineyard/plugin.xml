@@ -8,6 +8,9 @@
             icon="icons/icon-engineyard.png"
             id="com.aptana.deploy.engineyard.wizard"
             name="Engine Yard">
+         <description>
+            Engine Yard is the largest cloud platform for Ruby on Rails deployments, with automation, service and expertise for building, deploying and running your applications.
+         </description>
       </wizard>
    </extension>
    <extension

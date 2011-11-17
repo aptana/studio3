@@ -8,6 +8,9 @@
             icon="icons/icon-heroku.png"
             id="com.aptana.deploy.heroku.wizard"
             name="Heroku">
+         <description>
+            Heroku offers agile deployment for Ruby, Node.js, Clojure, Java, Python, and Scala, with easy connections to Git deployment.
+         </description>
       </wizard>
    </extension>
    <extension
