@@ -131,6 +131,11 @@
             id="portal.recentFiles"
             name="Recent Files Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.TemplateActionController"
+            id="portal.project.templates"
+            name="Project Template Actions">
+      </actionController>
       <browserNotification
             class="com.aptana.portal.ui.dispatch.browserNotifications.RecentFilesBrowserNotification"
             id="com.aptana.portal.ui.recentFilesNotification"

@@ -19,6 +19,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	private TemplateType fType = TemplateType.UNDEFINED;
 	private String fLocation;
 	private String fDescription;
+	private String fId;
 
 	/**
 	 * ProjectTemplate
@@ -125,7 +126,23 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
 		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(this.isReplacingParameters())); //$NON-NLS-1$
 
-		if (this.getDescription() != null)
+	/**
+	 * Prints the interior body of the template element
+	 * 
+	 * @param printer
+	 * @param includeBlocks
+	 * @param template
+	 */
+	public static void printBody(SourcePrinter printer, boolean includeBlocks, IProjectTemplate template)
+	{
+		printer.printWithIndent("path: ").println(template.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(template.getDisplayName()); //$NON-NLS-1$
+		printer.printWithIndent("location: ").println(template.getLocation()); //$NON-NLS-1$
+		printer.printWithIndent("id: ").println(template.getId()); //$NON-NLS-1$
+		printer.printWithIndent("type: ").println(template.getType().name()); //$NON-NLS-1$
+		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(template.isReplacingParameters())); //$NON-NLS-1$
+
+		if (template.getDescription() != null)
 		{
 			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
 		}
@@ -199,5 +216,24 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 			return false;
 		}
 		return Boolean.parseBoolean(replace.toString());
+	}
+
+	/**
+	 * setId
+	 * 
+	 * @param id
+	 */
+	public void setId(String id)
+	{
+		this.fId = id;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getId()
+	 */
+	public String getId()
+	{
+		return fId;
 	}
 }

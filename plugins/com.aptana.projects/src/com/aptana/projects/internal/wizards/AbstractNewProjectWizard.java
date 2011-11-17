@@ -107,12 +107,12 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	protected ProjectTemplateSelectionPage templatesPage;
 	protected WizardNewProjectReferencePage referencePage;
 
-	protected IConfigurationElement configElement;
-
-	// Values we grab from the UI before launching our project creation.
-	protected IProject newProject;
-	protected String projectTemplateName;
+	protected String projectTemplateId;
 	protected IProjectTemplate selectedTemplate;
+
+	protected IConfigurationElement configElement;
+	protected IProject newProject;
+
 	private URI location; // null if defaults are used (under workspace)
 	private IPath destPath; // absolute path to project we're creating.
 	private IProject[] refProjects;
@@ -344,7 +344,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		{
 			if (data instanceof String)
 			{
-				projectTemplateName = (String) data;
+				projectTemplateId = (String) data;
 			}
 		}
 	}
@@ -353,13 +353,13 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		selectedTemplate = null;
 
-		if (projectTemplateName != null)
+		if (projectTemplateId != null)
 		{
 			List<IProjectTemplate> templates = getProjectTemplates(templateType);
 
 			for (IProjectTemplate template : templates)
 			{
-				if (template.getDisplayName().equals(projectTemplateName))
+				if (template.getId().equals(projectTemplateId))
 				{
 					selectedTemplate = template;
 					return;

@@ -96,6 +96,13 @@ This name will be displayed as the option to select in the project wizard.
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A string that uniquely identifies the template
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="description" type="string">
             <annotation>
                <documentation>
