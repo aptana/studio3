@@ -32,16 +32,10 @@ public class TemplateActionController extends AbstractActionController
 	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String TEMPLATE_TYPE = "type"; //$NON-NLS-1$
 
-	private static final String[] ALL_TYPES = new String[] { 
-		TemplateType.PHP.name(),
-		TemplateType.PYTHON.name(),
-		TemplateType.RAILS.name(),
-		TemplateType.RUBY.name(),
-		TemplateType.TITANIUM_DESKTOP.name(),
-		TemplateType.TITANIUM_MOBILE.name(),
-		TemplateType.WEB.name()
-	};
-	
+	private static final String[] ALL_TYPES = new String[] { TemplateType.PHP.name(), TemplateType.PYTHON.name(),
+			TemplateType.RAILS.name(), TemplateType.RUBY.name(), TemplateType.TITANIUM_DESKTOP.name(),
+			TemplateType.TITANIUM_MOBILE.name(), TemplateType.WEB.name() };
+
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
 	}
