@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -141,7 +142,12 @@ public class AnalyticsInfoManager
 							analyticsMap.put(id, new Analytics(info, overridesId));
 						}
 					}
-				}, ELEMENT_INFO, ELEMENT_ANALYTICS);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_INFO, ELEMENT_ANALYTICS);
+					}
+				});
 
 		Set<String> keys = analyticsMap.keySet();
 		Analytics analytics;

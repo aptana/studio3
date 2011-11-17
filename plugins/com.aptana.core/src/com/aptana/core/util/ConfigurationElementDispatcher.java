@@ -7,8 +7,10 @@
  */
 package com.aptana.core.util;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 
@@ -20,21 +22,46 @@ public class ConfigurationElementDispatcher implements IConfigurationElementProc
 	private Map<String, IConfigurationElementProcessor> dispatchTable;
 
 	/**
+	 * ConfigurationElementDispatcher
+	 */
+	public ConfigurationElementDispatcher()
+	{
+	}
+
+	/**
+	 * ConfigurationElementDispatcher
+	 * 
+	 * @param processors
+	 */
+	public ConfigurationElementDispatcher(IConfigurationElementProcessor... processors)
+	{
+		if (processors != null)
+		{
+			for (IConfigurationElementProcessor processor : processors)
+			{
+				addElementProcessor(processor);
+			}
+		}
+	}
+
+	/**
 	 * addElementProcessor
 	 * 
-	 * @param elementName
 	 * @param processor
 	 */
-	public void addElementProcessor(String elementName, IConfigurationElementProcessor processor)
+	public void addElementProcessor(IConfigurationElementProcessor processor)
 	{
-		if (!StringUtil.isEmpty(elementName) && processor != null)
+		if (processor != null)
 		{
 			if (dispatchTable == null)
 			{
 				dispatchTable = new HashMap<String, IConfigurationElementProcessor>();
 			}
 
-			dispatchTable.put(elementName, processor);
+			for (String elementName : processor.getSupportElementNames())
+			{
+				dispatchTable.put(elementName, processor);
+			}
 		}
 	}
 
@@ -65,5 +92,19 @@ public class ConfigurationElementDispatcher implements IConfigurationElementProc
 		{
 			dispatchTable.remove(elementName);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
+	 */
+	public Set<String> getSupportElementNames()
+	{
+		if (dispatchTable != null)
+		{
+			return dispatchTable.keySet();
+		}
+
+		return Collections.emptySet();
 	}
 }

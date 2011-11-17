@@ -10,6 +10,7 @@ package com.aptana.ui;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -17,6 +18,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.core.Identifiable;
 import com.aptana.core.util.ClassUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 
@@ -67,7 +69,12 @@ public final class ImageAssociations
 					{
 						readElement(element);
 					}
-				}, TAG_IMAGE, TAG_OBJECT_IMAGE);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_IMAGE, TAG_OBJECT_IMAGE);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

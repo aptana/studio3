@@ -10,11 +10,13 @@ package com.aptana.index.core.ui.views;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.index.core.ui.IndexUiActivator;
@@ -130,8 +132,12 @@ public abstract class AbstractProvider<T>
 						IdeLog.logError(IndexUiActivator.getDefault(), message, e);
 					}
 				}
-			},
-			getElementName()
+
+				public Set<String> getSupportElementNames()
+				{
+					return CollectionsUtil.newSet(getElementName());
+				}
+			}
 		);
 		// @formatter:on
 	}

@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -477,9 +478,10 @@ public class EclipseUtil
 	 * @param elementNames
 	 */
 	public static void processConfigurationElements(String pluginId, String extensionPointId,
-			IConfigurationElementProcessor processor, String... elementNames)
+			IConfigurationElementProcessor processor)
 	{
-		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null)
+		if (!StringUtil.isEmpty(pluginId) && !StringUtil.isEmpty(extensionPointId) && processor != null
+				&& !processor.getSupportElementNames().isEmpty())
 		{
 			IExtensionRegistry registry = Platform.getExtensionRegistry();
 
@@ -489,17 +491,17 @@ public class EclipseUtil
 
 				if (extensionPoint != null)
 				{
+					Set<String> elementNames = processor.getSupportElementNames();
+
 					for (IExtension extension : extensionPoint.getExtensions())
 					{
 						IConfigurationElement[] elements = extension.getConfigurationElements();
-						for (String elementName : elementNames)
+
+						for (IConfigurationElement element : elements)
 						{
-							for (IConfigurationElement element : elements)
+							if (elementNames.contains(element.getName()))
 							{
-								if (element.getName().equals(elementName))
-								{
-									processor.processElement(element);
-								}
+								processor.processElement(element);
 							}
 						}
 					}

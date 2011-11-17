@@ -10,6 +10,7 @@ package com.aptana.parsing;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,6 +19,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.internal.parsing.ParserPool;
@@ -25,9 +27,12 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class ParserPoolFactory
 {
+	// extension point constants
+	private static final String PARSER_ID = "parser"; //$NON-NLS-1$
+	private static final String ELEMENT_PARSER = "parser"; //$NON-NLS-1$
+	private static final String ATTR_CONTENT_TYPE = "content-type"; //$NON-NLS-1$
 
 	private static ParserPoolFactory INSTANCE;
-
 	private Map<String, IConfigurationElement> parsers;
 	private Map<String, IParserPool> pools;
 
@@ -59,17 +64,21 @@ public class ParserPoolFactory
 		// @formatter:off
 		EclipseUtil.processConfigurationElements(
 			ParsingPlugin.PLUGIN_ID,
-			"parser", //$NON-NLS-1$
+			PARSER_ID,
 			new IConfigurationElementProcessor()
 			{
 				public void processElement(IConfigurationElement element)
 				{
-					String contentType = element.getAttribute("content-type"); //$NON-NLS-1$
+					String contentType = element.getAttribute(ATTR_CONTENT_TYPE);
 
 					parsers.put(contentType, element);
 				}
-			},
-			"parser" //$NON-NLS-1$
+
+				public Set<String> getSupportElementNames()
+				{
+					return CollectionsUtil.newSet(ELEMENT_PARSER);
+				}
+			}
 		);
 		// @formatter:on
 

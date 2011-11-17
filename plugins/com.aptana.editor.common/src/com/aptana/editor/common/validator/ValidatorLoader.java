@@ -12,9 +12,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -81,7 +83,12 @@ public class ValidatorLoader
 					{
 						readElement(element);
 					}
-				}, ELEMENT_CONTENT_TYPE, ELEMENT_VALIDATOR);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_CONTENT_TYPE, ELEMENT_VALIDATOR);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

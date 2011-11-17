@@ -64,4 +64,13 @@ public class MatchAnyScopeSelector implements IScopeSelector
 	{
 		return Collections.emptyList();
 	}
+	
+	public int compareTo(IScopeSelector o)
+	{
+		if (o instanceof MatchAnyScopeSelector)
+		{
+			return 0;
+		}
+		return -1;
+	}
 }

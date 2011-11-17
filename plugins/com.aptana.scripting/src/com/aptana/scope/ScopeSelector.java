@@ -10,11 +10,13 @@ package com.aptana.scope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.scripting.model.AbstractBundleElement;
 
 public class ScopeSelector implements IScopeSelector
 {
@@ -60,7 +62,7 @@ public class ScopeSelector implements IScopeSelector
 					continue;
 				}
 
-				if (betterMatch(selector.matchResults(), bestMatch.matchResults()))
+				if (selector.compareTo(bestMatch) > 0)
 				{
 					bestMatch = selector;
 				}
@@ -69,46 +71,27 @@ public class ScopeSelector implements IScopeSelector
 		return bestMatch;
 	}
 
-	// FIXME Make like compareTo and return -1, 0, 1?
-	private static boolean betterMatch(List<Integer> results, List<Integer> matchResults)
+	/**
+	 * Sorts the matching bundle elements from "worst" match to "best" match.
+	 * 
+	 * @param bundleElements
+	 */
+	public static void sort(List<? extends AbstractBundleElement> bundleElements)
 	{
-		// offset in list is offset of space-delimited part
-		// number at that offset is length of the match at that part
-		// winner is the one with longest deepest match
-		// so first look for highest offset with a non-zero value
-
-		// if lists are not of same length, expand smaller one to match by filling with zeros
-		while (results.size() > matchResults.size())
+		if (bundleElements == null || bundleElements.isEmpty())
 		{
-			if (matchResults.isEmpty())
-			{
-				matchResults = new ArrayList<Integer>();
-			}
-			matchResults.add(0);
-		}
-		while (matchResults.size() > results.size())
-		{
-			if (results.isEmpty())
-			{
-				results = new ArrayList<Integer>();
-			}
-
-			results.add(0);
+			return;
 		}
 
-		// So starting at the end of the lists, look for the highest match length, ties go back an offset to be broken
-		for (int i = results.size() - 1; i >= 0; i--)
+		Collections.sort(bundleElements, new Comparator<AbstractBundleElement>()
 		{
-			int firstVal = results.get(i);
-			int secondVal = matchResults.get(i);
-			// If one of the two has a longer match at the offset, it wins
-			if (firstVal != secondVal)
-			{
-				return firstVal > secondVal;
-			}
-		}
 
-		return false;
+			public int compare(AbstractBundleElement o1, AbstractBundleElement o2)
+			{
+				return o1.getScopeSelector().compareTo(o2.getScopeSelector());
+			}
+
+		});
 	}
 
 	private ISelectorNode _root;
@@ -382,5 +365,51 @@ public class ScopeSelector implements IScopeSelector
 			return Collections.emptyList();
 		}
 		return matchResults;
+	}
+
+	public int compareTo(IScopeSelector o)
+	{
+		return compare(matchResults, o.matchResults());
+	}
+
+	private static int compare(List<Integer> results, List<Integer> matchResults)
+	{
+		// offset in list is offset of space-delimited part
+		// number at that offset is length of the match at that part
+		// winner is the one with longest deepest match
+		// so first look for highest offset with a non-zero value
+
+		// if lists are not of same length, expand smaller one to match by filling with zeros
+		while (results.size() > matchResults.size())
+		{
+			if (matchResults.isEmpty())
+			{
+				matchResults = new ArrayList<Integer>();
+			}
+			matchResults.add(0);
+		}
+		while (matchResults.size() > results.size())
+		{
+			if (results.isEmpty())
+			{
+				results = new ArrayList<Integer>();
+			}
+
+			results.add(0);
+		}
+
+		// So starting at the end of the lists, look for the highest match length, ties go back an offset to be broken
+		for (int i = results.size() - 1; i >= 0; i--)
+		{
+			int firstVal = results.get(i);
+			int secondVal = matchResults.get(i);
+			// If one of the two has a longer match at the offset, it wins
+			if (firstVal != secondVal)
+			{
+				return firstVal - secondVal;
+			}
+		}
+
+		return 0;
 	}
 }

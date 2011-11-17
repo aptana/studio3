@@ -8,6 +8,7 @@
 package com.aptana.core.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,22 +22,21 @@ import java.util.Set;
 public class CollectionsUtil
 {
 
-	private CollectionsUtil()
-	{
-	}
-
 	/**
-	 * Given a list of elements of type <T>, remove the duplicates from the list in place
+	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
+	 * case. If the list is non-null, then this is an identity function.
 	 * 
 	 * @param <T>
 	 * @param list
+	 * @return
 	 */
-	public static <T> void removeDuplicates(List<T> list)
+	public static <T> List<T> getListValue(List<T> list)
 	{
-		// uses LinkedHashSet to keep the order
-		Set<T> set = new LinkedHashSet<T>(list);
-		list.clear();
-		list.addAll(set);
+		if (list == null)
+		{
+			return Collections.emptyList();
+		}
+		return list;
 	}
 
 	/**
@@ -77,6 +77,71 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * This is a convenience method that returns true if the specified collection is null or empty
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param collection
+	 * @return
+	 */
+	public static <T> boolean isEmpty(Collection<T> collection)
+	{
+		return collection == null || collection.isEmpty();
+	}
+
+	/**
+	 * Convert a list of items into a List. An empty list is returned if items is null
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new ArrayList<T> or an empty list
+	 */
+	public static final <T> List<T> newList(T... items)
+	{
+		if (items != null)
+		{
+			return new ArrayList<T>(Arrays.asList(items));
+		}
+
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Convert a list of items into a Set. An empty set is returned if items is null
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new HashSet<T> or an empty set
+	 */
+	public static final <T> Set<T> newSet(T... items)
+	{
+		if (items != null)
+		{
+			return new HashSet<T>(Arrays.asList(items));
+		}
+
+		return Collections.emptySet();
+	}
+
+	/**
+	 * Given a list of elements of type <T>, remove the duplicates from the list in place
+	 * 
+	 * @param <T>
+	 * @param list
+	 */
+	public static <T> void removeDuplicates(List<T> list)
+	{
+		// uses LinkedHashSet to keep the order
+		Set<T> set = new LinkedHashSet<T>(list);
+		list.clear();
+		list.addAll(set);
+	}
+
+	/**
 	 * Given two collections of elements of type <T>, return a collection containing the items from both lists
 	 * 
 	 * @param <T>
@@ -94,32 +159,7 @@ public class CollectionsUtil
 		return new ArrayList<T>(union);
 	}
 
-	/**
-	 * This is a convenience method that returns true if the specified collection is null or empty
-	 * 
-	 * @param <T>
-	 * @param collection
-	 * @return
-	 */
-	public static <T> boolean isEmpty(Collection<T> collection)
+	private CollectionsUtil()
 	{
-		return collection == null || collection.isEmpty();
-	}
-
-	/**
-	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
-	 * case. If the list is non-null, then this is an identity function.
-	 * 
-	 * @param <T>
-	 * @param list
-	 * @return
-	 */
-	public static <T> List<T> getListValue(List<T> list)
-	{
-		if (list == null)
-		{
-			return Collections.emptyList();
-		}
-		return list;
 	}
 }
