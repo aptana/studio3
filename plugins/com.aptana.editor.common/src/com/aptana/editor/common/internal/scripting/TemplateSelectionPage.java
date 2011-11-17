@@ -9,6 +9,8 @@ package com.aptana.editor.common.internal.scripting;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -70,10 +72,8 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	public void createControl(Composite parent)
 	{
 		Composite container = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.verticalSpacing = 10;
-		container.setLayout(layout);
-		container.setLayoutData(new GridData(GridData.FILL_BOTH));
+		container.setLayout(GridLayoutFactory.swtDefaults().spacing(10, 10).create());
+		container.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		createAbove(container, 1);
 		Label label = new Label(container, SWT.NONE);

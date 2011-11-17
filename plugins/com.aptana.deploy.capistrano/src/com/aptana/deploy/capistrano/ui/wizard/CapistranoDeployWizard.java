@@ -14,7 +14,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -28,6 +30,14 @@ import com.aptana.deploy.wizard.AbstractDeployWizard;
 
 public class CapistranoDeployWizard extends AbstractDeployWizard
 {
+
+	private static final String IMG_PATH = "icons/newproj_wiz.png"; //$NON-NLS-1$
+
+	public void init(IWorkbench workbench, IStructuredSelection selection)
+	{
+		super.init(workbench, selection);
+		setDefaultPageImageDescriptor(CapistranoPlugin.getImageDescriptor(IMG_PATH));
+	}
 
 	@Override
 	public void addPages()
