@@ -30,7 +30,8 @@ public class NewWebProjectWizard extends AbstractNewProjectWizard
 
 	protected IWizardProjectCreationPage createMainPage()
 	{
-		CommonWizardNewProjectCreationPage mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		CommonWizardNewProjectCreationPage mainPage = new CommonWizardNewProjectCreationPage(
+				"basicNewProjectPage", selectedTemplate); //$NON-NLS-1$
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		return mainPage;

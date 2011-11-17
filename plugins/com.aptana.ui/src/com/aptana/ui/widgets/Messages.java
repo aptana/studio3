@@ -18,6 +18,10 @@ public class Messages extends NLS
 	public static String SingleProjectView_RegularExpression;
 	public static String SingleProjectView_Wildcard;
 
+	public static String SelectedTemplateGroup_Label;
+	public static String SelectedTemplateName_Label;
+	public static String SelectedTemplateDesc_Label;
+
 	static
 	{
 		// initialize resource bundle

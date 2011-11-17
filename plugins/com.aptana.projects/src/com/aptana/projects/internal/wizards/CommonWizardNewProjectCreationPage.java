@@ -18,9 +18,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
+import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.ui.widgets.SelectedTemplateComposite;
 
 /**
  * @author Shalom Gibly <sgibly@appcelerator.com>
@@ -31,14 +33,18 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 
 	private Label warningLabel;
 
+	// Initial Project template
+	private IProjectTemplate projectTemplate = null;
+
 	/**
 	 * Constructs a new common new project creation page.
 	 * 
 	 * @param pageName
 	 */
-	public CommonWizardNewProjectCreationPage(String pageName)
+	public CommonWizardNewProjectCreationPage(String pageName, IProjectTemplate projectTemplate)
 	{
 		super(pageName);
+		this.projectTemplate = projectTemplate;
 	}
 
 	/*
@@ -67,6 +73,8 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	public void createControl(Composite parent)
 	{
 		super.createControl(parent);
+
+		createProjectTemplateSection((Composite) getControl());
 		createWarningArea();
 	}
 
@@ -91,6 +99,16 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 				}
 			}
 		});
+	}
+
+	protected void createProjectTemplateSection(Composite parent)
+	{
+		if (projectTemplate != null)
+		{
+			new SelectedTemplateComposite(parent, projectTemplate);
+		}
+
+		return;
 	}
 
 	/*
