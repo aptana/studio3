@@ -14,7 +14,7 @@ import com.aptana.core.util.ArrayUtil;
 
 	private static final char CR = '\n';
 	
-	private final IProcessOutputFilter processOutputFilter;
+	private IProcessOutputFilter processOutputFilter;
 	private ByteArrayInputStream lineBuffer;
 	private final BufferedReader reader;
 	private Charset charset;
@@ -29,6 +29,10 @@ import com.aptana.core.util.ArrayUtil;
 		catch (IllegalCharsetNameException e) {
 		}
 		this.reader = new BufferedReader(new InputStreamReader(in, charset));
+	}
+
+	public void setProcessOutputFilter(IProcessOutputFilter processOutputFilter) {
+		this.processOutputFilter = processOutputFilter;
 	}
 
 	/*

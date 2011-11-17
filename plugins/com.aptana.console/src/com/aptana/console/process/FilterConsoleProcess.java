@@ -21,8 +21,8 @@ import org.eclipse.debug.core.model.RuntimeProcess;
  */
 public class FilterConsoleProcess extends RuntimeProcess {
 
-	private Process proxyProcess = null;
 	private IProcessOutputFilter processOutputFilter;
+	private ProxyProcess proxyProcess;
 
 	/**
 	 * @param launch
@@ -41,6 +41,10 @@ public class FilterConsoleProcess extends RuntimeProcess {
 	 */
 	public void setProcessOutputFilter(IProcessOutputFilter processOutputFilter) {
 		this.processOutputFilter = processOutputFilter;
+		if (proxyProcess != null) {
+			((FilterProxyInputStream)proxyProcess.getInputStream()).setProcessOutputFilter(processOutputFilter);
+			((FilterProxyInputStream)proxyProcess.getErrorStream()).setProcessOutputFilter(processOutputFilter);
+		}
 	}
 
 	/*
