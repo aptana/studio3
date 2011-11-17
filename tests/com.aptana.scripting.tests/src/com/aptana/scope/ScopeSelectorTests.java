@@ -9,6 +9,7 @@ package com.aptana.scope;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -389,5 +390,44 @@ public class ScopeSelectorTests extends TestCase
 
 		assertEquals(textMinusMetaSourceSelector, ScopeSelector.bestMatch(Arrays.asList(textSourceSelector,
 				metaSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope2));
+	}
+
+	public void testSortAfterMatching()
+	{
+		String scope = "text.haml meta.line.ruby.haml source.ruby.embedded.haml";
+
+		IScopeSelector textSourceSelector = new ScopeSelector("text source");
+		IScopeSelector metaSourceSelector = new ScopeSelector("meta source");
+		IScopeSelector sourceSelector = new ScopeSelector("source");
+		IScopeSelector sourceRubySelector = new ScopeSelector("source.ruby");
+
+		assertTrue("Selector should match, but doesn't", textSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(4, 0, 6), textSourceSelector.matchResults());
+
+		assertTrue("Selector should match, but doesn't", metaSourceSelector.matches(scope));
+		assertEquals(Arrays.asList(0, 4, 6), metaSourceSelector.matchResults());
+
+		assertTrue("Selector should match, but doesn't", sourceSelector.matches(scope));
+		assertEquals(Arrays.asList(0, 0, 6), sourceSelector.matchResults());
+
+		assertTrue("Selector should match, but doesn't", sourceRubySelector.matches(scope));
+		assertEquals(Arrays.asList(0, 0, 11), sourceRubySelector.matchResults());
+
+		// Generate a list of matches
+		List<IScopeSelector> matches = Arrays.asList(metaSourceSelector, textSourceSelector, sourceRubySelector,
+				sourceSelector);
+		assertEquals(metaSourceSelector, matches.get(0));
+		assertEquals(textSourceSelector, matches.get(1));
+		assertEquals(sourceRubySelector, matches.get(2));
+		assertEquals(sourceSelector, matches.get(3));
+
+		// Now sort them...
+		Collections.sort(matches);
+
+		// Make sure they get sorted into "worst to best" match order.
+		assertEquals(sourceSelector, matches.get(0));
+		assertEquals(textSourceSelector, matches.get(1));
+		assertEquals(metaSourceSelector, matches.get(2));
+		assertEquals(sourceRubySelector, matches.get(3));
 	}
 }

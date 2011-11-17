@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * IScopeSelector
  */
-public interface IScopeSelector
+public interface IScopeSelector extends Comparable<IScopeSelector>
 {
 
 	/**
