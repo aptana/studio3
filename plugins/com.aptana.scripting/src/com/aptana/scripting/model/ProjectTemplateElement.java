@@ -127,6 +127,12 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
 		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(this.isReplacingParameters())); //$NON-NLS-1$
 
+		if (this.getDescription() != null)
+		{
+			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
+		}
+	}
+
 	/**
 	 * Prints the interior body of the template element
 	 * 
@@ -142,11 +148,6 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		printer.printWithIndent("id: ").println(template.getId()); //$NON-NLS-1$
 		printer.printWithIndent("type: ").println(template.getType().name()); //$NON-NLS-1$
 		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(template.isReplacingParameters())); //$NON-NLS-1$
-
-		if (template.getDescription() != null)
-		{
-			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
-		}
 	}
 
 	/**
@@ -243,7 +244,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	{
 		super.setDisplayName(displayName);
 
-		if (StringUtil.EMPTY.equals(getId()))
+		if (StringUtil.EMPTY.equals(getId()) || getId() == null)
 		{
 			setId(displayName);
 		}

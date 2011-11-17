@@ -359,7 +359,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 			for (IProjectTemplate template : templates)
 			{
-				if (template.getId().equals(projectTemplateId))
+				if (template.getId() != null && template.getId().equals(projectTemplateId))
 				{
 					selectedTemplate = template;
 					return;
