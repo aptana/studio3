@@ -26,10 +26,10 @@ import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.configurations.processor.IConfigurationProcessorDelegate;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.portal.ui.PortalUIPlugin;
-import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 import com.aptana.portal.ui.dispatch.processorDelegates.CachedVersionProcessorDelegate;
 
 /**
@@ -102,7 +102,7 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 					getActiveWorkingDir());
 			if (commandResult != null)
 			{
-				Version version = BaseVersionProcessor.parseVersion(commandResult.toString());
+				Version version = VersionUtil.parseVersion(commandResult.toString());
 				if (version != null)
 				{
 					Version minVersion = Version.parseVersion(attrItems.get(app));

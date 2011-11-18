@@ -32,10 +32,10 @@ import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
-import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 
 /**
  * Basic, abstract implementation, of a processor that deals with installing software.
@@ -143,7 +143,7 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 			versionsMap = (Map<String, Map<String, String>>) JSON.parse(versions);
 		}
 		Map<String, String> appVersionMap = new HashMap<String, String>();
-		Version version = BaseVersionProcessor.parseVersion(versionedFileLocation);
+		Version version = VersionUtil.parseVersion(versionedFileLocation);
 		if (version != null)
 		{
 			appVersionMap.put(IPortalPreferences.CACHED_VERSION_PROPERTY, version.toString());

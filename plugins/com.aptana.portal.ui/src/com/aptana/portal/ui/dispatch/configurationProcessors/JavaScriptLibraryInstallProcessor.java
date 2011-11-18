@@ -34,9 +34,9 @@ import org.osgi.framework.Version;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.JavaScriptImporterOptionsDialog;
-import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 
 /**
  * An installer (import) processor for JavaScript libraries, such as jQuery and Prototype.<br>
@@ -70,14 +70,14 @@ public class JavaScriptLibraryInstallProcessor extends InstallerConfigurationPro
 	 */
 	protected Version getLibraryVersion()
 	{
-		Version version = BaseVersionProcessor.parseVersion(getApplicationName());
+		Version version = VersionUtil.parseVersion(getApplicationName());
 		if (version == null)
 		{
 			for (String url : this.urls)
 			{
 				if (version == null)
 				{
-					version = BaseVersionProcessor.parseVersion(url);
+					version = VersionUtil.parseVersion(url);
 				}
 				else
 				{
