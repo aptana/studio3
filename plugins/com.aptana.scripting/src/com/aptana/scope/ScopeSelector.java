@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.model.AbstractBundleElement;
 
@@ -40,7 +41,7 @@ public class ScopeSelector implements IScopeSelector
 	 */
 	public static IScopeSelector bestMatch(Collection<IScopeSelector> selectors, String scope)
 	{
-		if (selectors == null || selectors.isEmpty())
+		if (CollectionsUtil.isEmpty(selectors))
 		{
 			return null;
 		}
@@ -78,7 +79,7 @@ public class ScopeSelector implements IScopeSelector
 	 */
 	public static void sort(List<? extends AbstractBundleElement> bundleElements)
 	{
-		if (bundleElements == null || bundleElements.isEmpty())
+		if (CollectionsUtil.isEmpty(bundleElements))
 		{
 			return;
 		}
