@@ -110,6 +110,9 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 	 */
 	@Override
 	protected IHyperlink findHyperlink(Point cellCoords) {
+		if (fLinks == null || cellCoords == null) {
+			return null;
+		}
 		IHyperlink[] links = fLinks.get(cellCoords.y);
 		if (links == null) {
 			return null;
