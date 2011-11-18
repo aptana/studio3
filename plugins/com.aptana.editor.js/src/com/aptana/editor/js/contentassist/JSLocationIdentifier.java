@@ -571,7 +571,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 	{
 		if (node.contains(this._offset))
 		{
-			this.setType(LocationType.UNKNOWN);
+			this.setType(LocationType.NONE);
 		}
 	}
 
