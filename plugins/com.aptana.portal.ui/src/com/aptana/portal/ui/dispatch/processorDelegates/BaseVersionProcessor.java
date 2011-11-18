@@ -7,14 +7,7 @@
  */
 package com.aptana.portal.ui.dispatch.processorDelegates;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.osgi.framework.Version;
-
 import com.aptana.configurations.processor.AbstractProcessorDelegate;
-import com.aptana.core.logging.IdeLog;
-import com.aptana.portal.ui.PortalUIPlugin;
 
 /**
  * A base application version retrieval delegate for applications that use '--version' in order to get their version.
@@ -23,8 +16,6 @@ import com.aptana.portal.ui.PortalUIPlugin;
  */
 public abstract class BaseVersionProcessor extends AbstractProcessorDelegate
 {
-	// Match x.y and x.y.z
-	private static final String VERSION_PATTERN = "(\\d+)\\.(\\d+)(\\.(\\d+))?"; //$NON-NLS-1$
 	private static final String VERSION_COMMAND_SYNTAX = "--version"; //$NON-NLS-1$
 
 	/**
@@ -34,31 +25,5 @@ public abstract class BaseVersionProcessor extends AbstractProcessorDelegate
 	{
 		// Make sure we add the supported commands
 		supportedCommands.put(VERSION_COMMAND, VERSION_COMMAND_SYNTAX);
-	}
-
-	/**
-	 * Parse the raw output and return a {@link Version} instance out of it.
-	 * 
-	 * @param rawOutput
-	 * @return A {@link Version} instance. Null if the output did not contain a parsable version number.
-	 */
-	public static Version parseVersion(String rawOutput)
-	{
-		Pattern pattern = Pattern.compile(VERSION_PATTERN);
-		Matcher matcher = pattern.matcher(rawOutput);
-		if (matcher.find())
-		{
-			String version = matcher.group();
-			try
-			{
-				return Version.parseVersion(version);
-			}
-			catch (IllegalArgumentException iae)
-			{
-				// Should never happen, since the matcher found it. But just in case.
-				IdeLog.logError(PortalUIPlugin.getDefault(), "Error parsing the version string - " + version, iae); //$NON-NLS-1$
-			}
-		}
-		return null;
 	}
 }
