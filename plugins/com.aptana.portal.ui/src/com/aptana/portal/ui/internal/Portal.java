@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -41,7 +40,6 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
@@ -51,9 +49,6 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.PingStartup;
-import com.aptana.usage.internal.AnalyticsInfo;
-import com.aptana.usage.internal.AnalyticsInfoManager;
-import com.aptana.usage.internal.DefaultAnalyticsInfo;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
@@ -79,13 +74,6 @@ public class Portal
 	protected static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
 	private AbstractPortalBrowserEditor portalBrowser;
 	private static Portal instance;
-	private static final String STUDIO_VERSION;
-	static
-	{
-		AnalyticsInfo info = AnalyticsInfoManager.getInstance().getInfo("com.aptana.usage.analytics"); //$NON-NLS-1$
-		String pluginID = (info != null) ? info.getVersionPluginId() : new DefaultAnalyticsInfo().getVersionPluginId();
-		STUDIO_VERSION = EclipseUtil.getPluginVersion(pluginID);
-	}
 
 	// Private constructor
 	private Portal()
@@ -331,9 +319,7 @@ public class Portal
 	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
 	{
 		final Map<String, String> builder = new HashMap<String, String>();
-		builder.put("v", getStudioVersion());
-
-		builder.put("nl", getCurrentLocale());
+		builder.putAll(URLUtil.getDefaultParameters());
 
 		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
 		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
@@ -387,22 +373,6 @@ public class Portal
 				builder.put("dep", "cap");
 		}
 		return builder;
-	}
-
-	/**
-	 * Returns the Studio version
-	 */
-	public String getStudioVersion()
-	{
-		return STUDIO_VERSION;
-	}
-
-	/**
-	 * Returns the current Java locale
-	 */
-	public String getCurrentLocale()
-	{
-		return System.getProperty("osgi.nl", Locale.getDefault().toString()); //$NON-NLS-1$
 	}
 
 	/**
