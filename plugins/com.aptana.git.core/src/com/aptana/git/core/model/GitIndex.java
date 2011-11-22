@@ -270,7 +270,13 @@ public class GitIndex
 		{
 			if (this.changedFiles == null)
 			{
-				refresh(false, new NullProgressMonitor()); // Don't want to call back to fireIndexChangeEvent yet!
+				// Don't want to call back to fireIndexChangeEvent yet!
+				IStatus status = refresh(false, new NullProgressMonitor());
+				if (!status.isOK())
+				{
+					IdeLog.logError(GitPlugin.getDefault(), status.getMessage());
+					return Collections.emptyList();
+				}
 			}
 
 			List<ChangedFile> copy = new ArrayList<ChangedFile>(this.changedFiles.size());

@@ -29,6 +29,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.Messages;
@@ -44,13 +45,24 @@ public class DiffHandler extends AbstractGitHandler
 
 	private List<ChangedFile> getSelectedChangedFiles()
 	{
-		GitRepository repo = null;
 		List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
+		IGitRepositoryManager manager = getGitRepositoryManager();
+		if (manager == null)
+		{
+			return changedFiles;
+		}
+
+		GitRepository repo = null;
 		for (IResource resource : getSelectedResources())
 		{
+			if (resource == null)
+			{
+				continue;
+			}
+
 			if (repo == null)
 			{
-				repo = getGitRepositoryManager().getAttached(resource.getProject());
+				repo = manager.getAttached(resource.getProject());
 			}
 			changedFiles.addAll(getChangedFilesForResource(repo, resource));
 		}
