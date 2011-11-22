@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -45,6 +46,7 @@ public class AnalyticsEvent
 			APP_INFO = info;
 		}
 	}
+	private static String sessionId;
 
 	private String dateTime;
 	private String eventType;
@@ -138,7 +140,11 @@ public class AnalyticsEvent
 
 		addPostEntry(event, "event", eventName); //$NON-NLS-1$
 		addPostEntry(event, "type", eventType); //$NON-NLS-1$
-		addPostEntry(event, "sid", (user == null) ? StringUtil.EMPTY : user.getSessionID()); //$NON-NLS-1$
+		if (user == null && sessionId == null)
+		{
+			sessionId = MessageFormat.format("{0}:{1}", APP_INFO.getAppGuid(), System.currentTimeMillis()); //$NON-NLS-1$
+		}
+		addPostEntry(event, "sid", (user == null) ? sessionId : user.getSessionID()); //$NON-NLS-1$
 		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
 		addPostEntry(event, "mid", CorePlugin.getMID()); //$NON-NLS-1$
 		addPostEntry(event, "app_id", APP_INFO.getAppId()); //$NON-NLS-1$
