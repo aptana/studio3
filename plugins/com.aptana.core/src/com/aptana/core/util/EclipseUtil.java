@@ -493,11 +493,12 @@ public class EclipseUtil
 
 				if (extensionPoint != null)
 				{
-					for (IExtension extension : extensionPoint.getExtensions())
+					IExtension[] extensions = extensionPoint.getExtensions();
+					for (String elementName : elementNames)
 					{
-						IConfigurationElement[] elements = extension.getConfigurationElements();
-						for (String elementName : elementNames)
+						for (IExtension extension : extensions)
 						{
+							IConfigurationElement[] elements = extension.getConfigurationElements();
 							for (IConfigurationElement element : elements)
 							{
 								if (element.getName().equals(elementName))
