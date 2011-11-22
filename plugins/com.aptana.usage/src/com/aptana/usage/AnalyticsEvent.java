@@ -11,9 +11,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.text.MessageFormat;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.eclipse.core.runtime.Platform;
 import org.mortbay.util.ajax.JSON;
@@ -142,7 +142,7 @@ public class AnalyticsEvent
 		addPostEntry(event, "type", eventType); //$NON-NLS-1$
 		if (user == null && sessionId == null)
 		{
-			sessionId = MessageFormat.format("{0}:{1}", APP_INFO.getAppGuid(), System.currentTimeMillis()); //$NON-NLS-1$
+			sessionId = UUID.randomUUID().toString();
 		}
 		addPostEntry(event, "sid", (user == null) ? sessionId : user.getSessionID()); //$NON-NLS-1$
 		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
