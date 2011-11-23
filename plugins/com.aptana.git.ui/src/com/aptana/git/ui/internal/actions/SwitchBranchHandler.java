@@ -53,7 +53,7 @@ public class SwitchBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(UIUtils.getActiveShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
 			dialog.setInput(listOfMaps);
 			if (dialog.open() != -1)
 			{

@@ -243,6 +243,12 @@
             id="com.aptana.git.ui.command.create_tag"
             name="%CreateTagAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.PushTagsHandler"
+            id="com.aptana.git.ui.command.push_tags"
+            name="%PushTagsAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -412,7 +418,13 @@
             commandId="com.aptana.git.ui.command.create_tag"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M2+M3+G Z">
+            sequence="M2+M3+G NUMPAD_9">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.push_tags"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G NUMPAD_6">
       </key>
       <key
             commandId="com.aptana.git.ui.command.commit.dialog"
@@ -639,7 +651,8 @@
             <menu
                   commandId="com.aptana.git.ui.command.delete_branch"
                   id="com.aptana.git.ui.actions.DeleteBranchAction"
-                  label="%delete.branch.menu.label">
+                  label="%delete.branch.menu.label"
+                  mnemonic="D">
                <dynamic
                      class="com.aptana.git.ui.actions.DeleteBranchItem"
                      id="com.aptana.git.ui.command.delete_branch.items">
@@ -654,7 +667,8 @@
             <menu
                   commandId="com.aptana.git.ui.command.switch_branch"
                   id="com.aptana.git.ui.actions.SwitchBranchAction"
-                  label="%switch.branch.menu.label">
+                  label="%switch.branch.menu.label"
+                  mnemonic="S">
                <dynamic
                      class="com.aptana.git.ui.actions.SwitchBranchItem"
                      id="com.aptana.git.ui.command.switch_branch.items">
@@ -669,7 +683,8 @@
             <menu
                   commandId="com.aptana.git.ui.command.merge_branch"
                   id="com.aptana.git.ui.actions.MergeBranchAction"
-                  label="%merge.menu.label">
+                  label="%merge.menu.label"
+                  mnemonic="M">
                <dynamic
                      class="com.aptana.git.ui.actions.MergeBranchItem"
                      id="com.aptana.git.ui.command.merge_branch.items">
@@ -684,7 +699,8 @@
             <menu
                   commandId="com.aptana.git.ui.command.squash_merge_branch"
                   id="com.aptana.git.ui.actions.SquashMergeBranchAction"
-                  label="%squash.merge.menu.label">
+                  label="%squash.merge.menu.label"
+                  mnemonic="q">
                <dynamic
                      class="com.aptana.git.ui.actions.SquashMergeBranchItem"
                      id="com.aptana.git.ui.command.squash_merge_branch.items">
@@ -700,6 +716,7 @@
                   commandId="com.aptana.git.ui.command.rebase_branch"
                   id="com.aptana.git.ui.actions.RebaseBranchAction"
                   label="%RebaseBranchAction_label"
+                  mnemonic="R"
                   tooltip="%RebaseBranchAction_tooltip">
                <dynamic
                      class="com.aptana.git.ui.actions.RebaseBranchItem"
@@ -727,6 +744,21 @@
                   </reference>
                </visibleWhen>
             </command>
+            <menu
+                  commandId="com.aptana.git.ui.command.push_tags"
+                  id="com.aptana.git.ui.actions.PushTagsAction"
+                  label="%push.tags.menu.label">
+               <dynamic
+                     class="com.aptana.git.ui.actions.PushTagsItem"
+                     id="com.aptana.git.ui.command.push_tags.items">
+               </dynamic>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="com.aptana.git.ui.hasGitRepository">
+                  </reference>
+               </visibleWhen>
+            </menu>
          </menu>
          <menu
                icon="icons/elcl16/server.png"
