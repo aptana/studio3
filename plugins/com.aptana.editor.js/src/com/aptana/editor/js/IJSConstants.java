@@ -8,10 +8,17 @@
 
 package com.aptana.editor.js;
 
+import org.eclipse.core.resources.IMarker;
+
 /**
  * IJSConstants
  */
 public interface IJSConstants
 {
 	public String CONTENT_TYPE_JS = "com.aptana.contenttype.js"; //$NON-NLS-1$
+
+	/**
+	 * Marker type id used for JS problems. Extends {@link IMarker#PROBLEM}
+	 */
+	public String JS_PROBLEM_MARKER_TYPE = "com.aptana.editor.js.problem"; //$NON-NLS-1$
 }

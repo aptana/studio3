@@ -12,28 +12,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Parser;
 
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.common.validator.ValidationManager;
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
+import com.aptana.editor.js.JSPlugin;
+import com.aptana.index.core.build.BuildContext;
 
-public class MozillaJsValidator implements IValidator
+public class MozillaJsValidator extends AbstractBuildParticipant
 {
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	// FIXME Create sub-markers of Problem marker just for Mozilla JS!
+
+	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
+		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
+	}
+
+	public void buildFile(BuildContext context, IProgressMonitor monitor)
+	{
+		List<IProblem> problems = new ArrayList<IProblem>();
 		Context cx = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
+		URI path = context.getURI();
+		String sourcePath = path.toString();
 		try
 		{
+			String source = context.getContents();
+
 			cx.setErrorReporter(reporter);
 
 			CompilerEnvirons compilerEnv = new CompilerEnvirons();
@@ -42,12 +58,16 @@ public class MozillaJsValidator implements IValidator
 			Parser p = new Parser(compilerEnv, reporter);
 			try
 			{
-				p.parse(source, path.toString(), 1);
+				p.parse(source, sourcePath, 1);
 			}
 			catch (EvaluatorException e)
 			{
 				// ignores the exception here
 			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for Mozilla JS Validation", e); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -61,10 +81,10 @@ public class MozillaJsValidator implements IValidator
 		for (ErrorItem error : errors)
 		{
 			message = error.getMessage();
-			if (!manager.isIgnored(message, IJSConstants.CONTENT_TYPE_JS))
+			if (!isIgnored(message, IJSConstants.CONTENT_TYPE_JS))
 			{
 				// Don't attempt to add errors or warnings if there are already errors on this line
-				if (ValidationManager.hasErrorOrWarningOnLine(items, error.getLine()))
+				if (hasErrorOrWarningOnLine(problems, error.getLine()))
 				{
 					continue;
 				}
@@ -72,14 +92,38 @@ public class MozillaJsValidator implements IValidator
 				severity = error.getSeverity();
 				if (severity == IMarker.SEVERITY_ERROR)
 				{
-					items.add(manager.createError(message, error.getLine(), error.getLineOffset(), 0, path));
+					problems.add(createError(message, error.getLine(), error.getLineOffset(), 0, sourcePath));
 				}
 				else if (severity == IMarker.SEVERITY_WARNING)
 				{
-					items.add(manager.createWarning(message, error.getLine(), error.getLineOffset(), 0, path));
+					problems.add(createWarning(message, error.getLine(), error.getLineOffset(), 0, sourcePath));
 				}
 			}
 		}
-		return items;
+
+		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems);
+	}
+
+	private String getFilterExpressionsPrefKey(String language)
+	{
+		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
+	}
+
+	private boolean isIgnored(String message, String language)
+	{
+		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
+				.getString(getFilterExpressionsPrefKey(language));
+		if (!StringUtil.isEmpty(list))
+		{
+			String[] expressions = list.split("####"); //$NON-NLS-1$
+			for (String expression : expressions)
+			{
+				if (message.matches(expression))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

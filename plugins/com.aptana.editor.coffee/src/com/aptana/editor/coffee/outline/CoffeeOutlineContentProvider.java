@@ -35,7 +35,7 @@ public class CoffeeOutlineContentProvider extends CommonOutlineContentProvider
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
-			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
+			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getAST();
 			return getChildren(rootNode);
 		}
 		if (parentElement instanceof IParseRootNode)

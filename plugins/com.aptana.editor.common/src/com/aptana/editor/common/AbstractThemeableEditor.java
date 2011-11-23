@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -81,7 +80,6 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
@@ -94,13 +92,14 @@ import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.properties.CommonEditorPropertySheetPage;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
 import com.aptana.editor.common.viewer.CommonProjectionViewer;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -174,7 +173,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private ICommandElementsProvider fCommandElementsProvider;
 
 	private CommonOutlinePage fOutlinePage;
-	private FileService fFileService;
 
 	private boolean fCursorChangeListened;
 	private SelectionChangedListener fSelectionChangedListener;
@@ -479,34 +477,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 
 			fCommandElementsProvider = null;
-			if (fFileService != null)
-			{
-				fFileService.dispose();
-				fFileService = null;
-			}
 			fPeerCharacterCloser = null;
 		}
 		finally
 		{
 			super.dispose();
 		}
-	}
-
-	@Override
-	protected void doSetInput(final IEditorInput input) throws CoreException
-	{
-		super.doSetInput(input);
-
-		Object resource;
-		if (input instanceof IFileEditorInput)
-		{
-			resource = ((IFileEditorInput) input).getFile();
-		}
-		else
-		{
-			resource = input.getAdapter(IUniformResource.class);
-		}
-		getFileService().setResource(resource);
 	}
 
 	/*
@@ -693,12 +669,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return null;
 	}
 
-	protected FileService createFileService()
-	{
-		return new FileService(getFileServiceContentTypeId());
-	}
-
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		try
 		{
@@ -711,6 +682,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		catch (Exception e)
 		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -768,15 +740,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 			return;
 		}
-	}
-
-	public synchronized FileService getFileService()
-	{
-		if (fFileService == null)
-		{
-			fFileService = createFileService();
-		}
-		return fFileService;
 	}
 
 	public Object computeHighlightedOutlineNode(int caretOffset)
@@ -994,11 +957,35 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return CommonEditorPlugin.getDefault().getPreferenceStore();
 	}
 
+	protected IDocument getDocument()
+	{
+		return getDocumentProvider().getDocument(getEditorInput());
+	}
+
+	/**
+	 * FIXME Should we hang this here?
+	 * 
+	 * @return
+	 */
+	public IParseRootNode getAST()
+	{
+		try
+		{
+			IDocument document = getDocument();
+			return ParserPoolFactory.parse(getContentType(), document.get());
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+		}
+		return null;
+	}
+
 	protected IParseNode getASTNodeAt(int offset)
 	{
 		try
 		{
-			IParseNode root = getFileService().getParseResult();
+			IParseNode root = getAST();
 			if (root == null)
 			{
 				return null;

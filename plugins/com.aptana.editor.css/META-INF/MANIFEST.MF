@@ -15,20 +15,22 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.index.core,
  beaver,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.scripting,
  com.aptana.parsing,
  com.aptana.ui,
  com.aptana.theme,
  com.aptana.editor.common,
  org.mortbay.jetty.util,
- org.w3c.css
+ org.w3c.css,
+ com.aptana.buildpath.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.css,
  com.aptana.editor.css.contentassist;x-friends:="com.aptana.editor.html,com.aptana.editor.erb,com.aptana.editor.svg",
  com.aptana.editor.css.contentassist.index,
+ com.aptana.editor.css.internal.build;x-friends:="com.aptana.editor.html",
  com.aptana.editor.css.internal.text;x-friends:="com.aptana.editor.html",
  com.aptana.editor.css.outline,
  com.aptana.editor.css.parsing,

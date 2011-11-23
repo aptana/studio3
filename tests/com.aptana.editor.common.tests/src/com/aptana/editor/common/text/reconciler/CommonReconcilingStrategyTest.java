@@ -48,8 +48,8 @@ public class CommonReconcilingStrategyTest extends TestCase
 		{
 			{
 				oneOf(editor).addPropertyListener(with(any(IPropertyListener.class)));
-				// Make sure we never even try to get file service to parse
-				never(editor).getFileService();
+				// Make sure we never even try to get file service to parse/check folding/etc
+				never(editor).isFoldingEnabled();
 			}
 		});
 

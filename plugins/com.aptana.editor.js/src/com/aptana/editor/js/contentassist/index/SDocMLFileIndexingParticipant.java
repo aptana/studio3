@@ -11,8 +11,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -26,35 +25,26 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.build.BuildContext;
 
 public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
-	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
-		if (file == null)
-		{
-			return;
-		}
 		try
 		{
-			sub.subTask(getIndexingMessage(index, file));
+			sub.subTask(getIndexingMessage(index, context.getURI()));
 
 			try
 			{
 				JSMetadataReader reader = new JSMetadataReader();
 
-				InputStream stream = file.openInputStream(EFS.NONE, sub.newChild(20));
+				InputStream stream = context.openInputStream(sub.newChild(5));
 
 				// parse
 				reader.loadXML(stream);
-				sub.worked(50);
+				sub.worked(45);
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
@@ -70,7 +60,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 				JSIndexWriter indexer = new JSIndexWriter();
 				TypeElement[] types = reader.getTypes();
 				AliasElement[] aliases = reader.getAliases();
-				URI location = file.toURI();
+				URI location = context.getURI();
 
 				// write types and add properties to Window
 				for (TypeElement type : types)

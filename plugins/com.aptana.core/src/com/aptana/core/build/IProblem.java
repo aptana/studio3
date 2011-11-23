@@ -5,14 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.validator;
+package com.aptana.core.build;
 
 import java.util.Map;
 
 /**
  * @author Ingo Muschenetz
  */
-public interface IValidationItem
+public interface IProblem
 {
 
 	/**
@@ -49,6 +49,13 @@ public interface IValidationItem
 	 * @return the severity
 	 */
 	int getSeverity();
+	
+	/**
+	 * Gets the priority of the task (typically unused for errors/warnings).
+	 * 
+	 * @return the priority
+	 */
+	int getPriority();
 
 	/**
 	 * Gets the path of the source.
@@ -63,4 +70,10 @@ public interface IValidationItem
 	 * @return the attributes in a map
 	 */
 	Map<String, Object> createMarkerAttributes();
+
+	boolean isWarning();
+
+	boolean isError();
+
+	boolean isTask();
 }

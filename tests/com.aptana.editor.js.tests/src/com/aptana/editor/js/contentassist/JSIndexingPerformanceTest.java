@@ -14,6 +14,7 @@ import java.net.URL;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -26,11 +27,13 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class JSIndexingPerformanceTest extends PerformanceTestCase
 {
@@ -238,8 +241,16 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 		{
 			fParser.parse(parseState);
 
-			IParseNode root = parseState.getParseResult();
+			final IParseRootNode root = (IParseRootNode) parseState.getParseResult();
 
+			FileStoreBuildContext context = new FileStoreBuildContext(store)
+			{
+				@Override
+				public synchronized IParseRootNode getAST() throws CoreException
+				{
+					return root;
+				}
+			};
 			if (root instanceof JSParseRootNode)
 			{
 				IProgressMonitor monitor = new NullProgressMonitor();
@@ -254,7 +265,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 					Index index = this.getIndex();
 
 					startMeasuring();
-					jsIndexer.processParseResults(store, src, index, root, monitor);
+					jsIndexer.index(context, index, monitor);
 					stopMeasuring();
 				}
 			}

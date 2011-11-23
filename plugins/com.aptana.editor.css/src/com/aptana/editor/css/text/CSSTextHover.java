@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
@@ -26,19 +25,16 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.css.CSSColors;
-import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSFunctionNode;
 import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.css.parsing.ast.CSSSimpleSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSTermListNode;
-import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.editor.css.parsing.ast.ICSSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
@@ -70,7 +66,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	protected IParseNode getAST(ITextViewer textViewer, int offset)
 	{
 		IParseNode ast = null;
-		boolean forceParse = true;
 
 		if (textViewer instanceof IAdaptable)
 		{
@@ -80,33 +75,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 			if (editor != null)
 			{
-				FileService fs = editor.getFileService();
-
-				if (fs != null)
-				{
-					fs.parse(null);
-
-					// TODO: check for failed parse status and abort?
-					ast = fs.getParseResult();
-
-					// we use this flag to prevent re-parsing of the document if the ast turns out to be null. No sense
-					// in parsing twice to get nothing
-					forceParse = false;
-				}
-			}
-		}
-
-		// if we couldn't get the AST via an editor's file service then parse content directly
-		if (forceParse)
-		{
-			try
-			{
-				IDocument document = textViewer.getDocument();
-
-				ast = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, document.get());
-			}
-			catch (Exception e)
-			{
+				ast = editor.getAST();
 			}
 		}
 

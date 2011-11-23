@@ -11,34 +11,60 @@ import beaver.Symbol;
 
 /**
  * @author ayeung
- *
  */
 public class ParseError implements IParseError // $codepro.audit.disable consistentSuffixUsage
 {
 	private Symbol fSymbol;
 	private String fMessage;
 	private final Severity fSeverity;
-	private int fOffset;
+	private int fOffset = 0;
+	private int fLength = 0;
 
 	public ParseError(Symbol symbol, Severity severity)
 	{
+		this(symbol, null, severity);
+	}
+
+	public ParseError(Symbol symbol, String message, Severity severity)
+	{
 		fSymbol = symbol;
-		fMessage = buildErrorMessage(symbol);
+		if (message == null)
+		{
+			fMessage = buildErrorMessage(symbol);
+		}
+		else
+		{
+			fMessage = message;
+		}
 		fSeverity = severity;
 		if (fSymbol != null)
 		{
 			fOffset = fSymbol.getStart();
+			fLength = fSymbol.getEnd() - fOffset;
 		}
 	}
 
+	/**
+	 * @deprecated
+	 * @param offset
+	 * @param message
+	 * @param severity
+	 */
 	public ParseError(int offset, String message, Severity severity)
+	{
+		this(offset, 0, message, severity);
+	}
+
+	public ParseError(int offset, int length, String message, Severity severity)
 	{
 		fSeverity = severity;
 		fMessage = message;
 		fOffset = offset;
+		fLength = length;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseError#getOffset()
 	 */
 	public int getOffset()
@@ -46,7 +72,17 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 		return fOffset;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.IParseError#getLength()
+	 */
+	public int getLength()
+	{
+		return fLength;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseError#getMessage()
 	 */
 	public String getMessage()

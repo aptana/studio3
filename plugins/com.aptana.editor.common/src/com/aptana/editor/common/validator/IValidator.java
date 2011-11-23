@@ -10,6 +10,8 @@ package com.aptana.editor.common.validator;
 import java.net.URI;
 import java.util.List;
 
+import com.aptana.core.build.IProblem;
+
 public interface IValidator
 {
 
@@ -25,5 +27,5 @@ public interface IValidator
 	 * @param items
 	 *            the list of validations
 	 */
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager);
+	public List<IProblem> validate(String source, URI path, IValidationManager manager);
 }

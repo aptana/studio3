@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.usage,
  com.aptana.git.core,
  org.eclipse.team.core,
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ com.aptana.buildpath.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.projects,

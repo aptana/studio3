@@ -10,12 +10,17 @@ package com.aptana.buildpath.core;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.build.IBuildParticipantManager;
+import com.aptana.core.internal.build.BuildParticipantManager;
+
 public class BuildPathCorePlugin extends Plugin
 {
 	private static BuildPathCorePlugin plugin;
 	private static BundleContext context;
 
 	public static final String PLUGIN_ID = "com.aptana.buildpath.core"; //$NON-NLS-1$
+
+	private IBuildParticipantManager fBuildParticipantManager;
 
 	/**
 	 * Returns the bundle context
@@ -54,8 +59,18 @@ public class BuildPathCorePlugin extends Plugin
 	 */
 	public void stop(BundleContext bundleContext) throws Exception
 	{
+		fBuildParticipantManager = null;
 		plugin = null;
 		super.stop(context);
 		BuildPathCorePlugin.context = null;
+	}
+
+	public synchronized IBuildParticipantManager getBuildParticipantManager()
+	{
+		if (fBuildParticipantManager == null)
+		{
+			fBuildParticipantManager = new BuildParticipantManager();
+		}
+		return fBuildParticipantManager;
 	}
 }

@@ -8,6 +8,8 @@
 
 package com.aptana.editor.html;
 
+import org.eclipse.core.resources.IMarker;
+
 /**
  * @author Max Stepanov
  */
@@ -20,4 +22,9 @@ public interface IHTMLConstants
 	 * The annotation type/id used to mark tag pair occurrences.
 	 */
 	public String TAG_PAIR_OCCURRENCE_ID = "com.aptana.html.tagPair.occurrences"; //$NON-NLS-1$
+
+	/**
+	 * The marker type id for HTML problems. Extends {@link IMarker#PROBLEM}
+	 */
+	public String HTML_PROBLEM = "com.aptana.editor.html.problem"; //$NON-NLS-1$
 }

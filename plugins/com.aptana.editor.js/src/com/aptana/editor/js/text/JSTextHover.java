@@ -24,11 +24,10 @@ import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.LocationType;
+import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
@@ -51,31 +50,24 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 		if (this.isHoverEnabled())
 		{
-			FileService fs = this.getFileService(textViewer);
+			AbstractThemeableEditor editor = this.getEditor(textViewer);
+			IParseNode ast = editor.getAST();
 
-			if (fs != null)
+			if (ast != null)
 			{
-				// force a parse
-				fs.parse();
+				result = ast.getNodeAtOffset(offset);
 
-				IParseNode ast = fs.getParseResult();
-
-				if (ast != null)
+				// We won't get a current node if the cursor is outside of the positions
+				// recorded by the AST
+				if (result == null)
 				{
-					result = ast.getNodeAtOffset(offset);
-
-					// We won't get a current node if the cursor is outside of the positions
-					// recorded by the AST
-					if (result == null)
+					if (offset < ast.getStartingOffset())
 					{
-						if (offset < ast.getStartingOffset())
-						{
-							result = ast.getNodeAtOffset(ast.getStartingOffset());
-						}
-						else if (ast.getEndingOffset() < offset)
-						{
-							result = ast.getNodeAtOffset(ast.getEndingOffset());
-						}
+						result = ast.getNodeAtOffset(ast.getStartingOffset());
+					}
+					else if (ast.getEndingOffset() < offset)
+					{
+						result = ast.getNodeAtOffset(ast.getEndingOffset());
 					}
 				}
 			}
@@ -97,25 +89,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		if (textViewer instanceof IAdaptable)
 		{
 			result = (AbstractThemeableEditor) ((IAdaptable) textViewer).getAdapter(AbstractThemeableEditor.class);
-		}
-
-		return result;
-	}
-
-	/**
-	 * getFileService
-	 * 
-	 * @param textViewer
-	 * @return
-	 */
-	protected FileService getFileService(ITextViewer textViewer)
-	{
-		AbstractThemeableEditor editor = this.getEditor(textViewer);
-		FileService result = null;
-
-		if (editor != null)
-		{
-			result = editor.getFileService();
 		}
 
 		return result;

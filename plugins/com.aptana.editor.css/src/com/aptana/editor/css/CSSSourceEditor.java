@@ -56,7 +56,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected Object getOutlineElementAt(int caret)
 	{
-		return CSSOutlineContentProvider.getElementAt(getFileService().getParseResult(), caret);
+		return CSSOutlineContentProvider.getElementAt(getAST(), caret);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return ICSSConstants.CONTENT_TYPE_CSS;
 	}

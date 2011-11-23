@@ -232,12 +232,12 @@ public class HTMLParserTest extends TestCase
 
 		IParseError divError = errors.get(0);
 		assertEquals(Severity.WARNING, divError.getSeverity());
-		assertEquals(17, divError.getOffset());
+		assertEquals(13, divError.getOffset());
 		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "div"), divError.getMessage());
 
 		IParseError titleError = errors.get(1);
 		assertEquals(Severity.WARNING, titleError.getSeverity());
-		assertEquals(6, titleError.getOffset());
+		assertEquals(0, titleError.getOffset());
 		assertEquals(MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, "title"), titleError.getMessage());
 	}
 

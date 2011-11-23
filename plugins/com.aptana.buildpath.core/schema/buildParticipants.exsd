@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="com.aptana.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="com.aptana.buildpath.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.core" id="buildParticipants" name="Build Participants"/>
+         <meta.schema plugin="com.aptana.buildpath.core" id="buildParticipants" name="Build Participants"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -49,6 +49,9 @@
 
    <element name="participant">
       <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="contentTypeBinding"/>
+         </sequence>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
@@ -64,6 +67,31 @@
                <documentation>
                   This defines at what priority this build participant should be used when a mix of build participants are going to be used at the same time. A higher value indicates a higher priority, meaning that this build participant will run before other participants at a lower priority. The order in which build participants run is undefined when their priority levels match.
                </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="contentTypeBinding">
+      <complexType>
+         <attribute name="contentTypeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>

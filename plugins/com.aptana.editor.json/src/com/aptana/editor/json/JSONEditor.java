@@ -69,7 +69,7 @@ public class JSONEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IJSONConstants.CONTENT_TYPE_JSON;
 	}

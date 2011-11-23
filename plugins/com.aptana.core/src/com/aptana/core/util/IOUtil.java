@@ -32,6 +32,7 @@ import com.ibm.icu.text.CharsetMatch;
 public abstract class IOUtil
 {
 
+	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 	private static final int BUFFER_SIZE = 4096;
 
 	/**
@@ -76,7 +77,7 @@ public abstract class IOUtil
 				else
 				{
 					// Now what? Assume UTF-8?
-					charset = "UTF-8"; //$NON-NLS-1$
+					charset = UTF_8;
 					reader = new BufferedReader(new InputStreamReader(stream, charset));
 				}
 			}
@@ -91,7 +92,7 @@ public abstract class IOUtil
 			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4508058. Below, we try to read the first character for
 			// utf-8 encodings only. If it matches \uFEFF, then we skip that character; otherwise, we emit it into our
 			// output buffer
-			if (charset.toLowerCase().equals("utf-8")) //$NON-NLS-1$
+			if (charset.toUpperCase().equals(UTF_8))
 			{
 				char[] bomBuffer = new char[1];
 
@@ -322,6 +323,11 @@ public abstract class IOUtil
 
 	public static void write(OutputStream stream, String rawSource)
 	{
+		write(stream, rawSource, null);
+	}
+
+	public static void write(OutputStream stream, String rawSource, String charset)
+	{
 		if (stream == null)
 		{
 			return;
@@ -331,11 +337,15 @@ public abstract class IOUtil
 		{
 			rawSource = StringUtil.EMPTY;
 		}
+		if (charset == null)
+		{
+			charset = UTF_8;
+		}
 
 		Writer writer = null;
 		try
 		{
-			writer = new OutputStreamWriter(stream);
+			writer = new OutputStreamWriter(stream, charset);
 			writer.write(rawSource);
 		}
 		catch (IOException e)

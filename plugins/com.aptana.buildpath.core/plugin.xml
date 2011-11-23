@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-	<extension-point id="buildPaths" name="%buildPaths.extensionPoint.name" schema="schema/buildPaths.exsd"/>
-	<extension
+  <extension-point id="buildPaths" name="%buildPaths.extensionPoint.name" schema="schema/buildPaths.exsd"/>
+  <extension-point id="buildParticipants" name="%extension-point.buildparticipants.name" schema="schema/buildParticipants.exsd"/>
+  <extension
+         point="com.aptana.buildpath.core.buildParticipants">
+      <participant
+            class="com.aptana.core.internal.build.IndexBuildParticipant"
+            priority="95">
+      </participant>
+  </extension>
+  <extension
          point="com.aptana.index.core.fileContributors">
       <contributor
             class="com.aptana.buildpath.core.BuildPathIndexContributor"
             id="com.aptana.buildpath.core.buildPathIndexContributor"
             name="Build Path Index Contributor">
       </contributor>
-   </extension>
+  </extension>
+  <extension
+       id="com.aptana.ide.core.unifiedBuilder"
+       name="%builder.name"
+       point="org.eclipse.core.resources.builders">
+    <builder
+          callOnEmptyDelta="true"
+          hasNature="false"
+          isConfigurable="false">
+       <run
+             class="com.aptana.core.build.UnifiedBuilder">
+       </run>
+    	</builder>
+  </extension>
 </plugin>

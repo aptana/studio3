@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
+import com.aptana.core.epl.util.LRUCache;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
@@ -33,6 +34,11 @@ public class ParserPoolFactory
 	private static final String ATTR_CONTENT_TYPE = "content-type"; //$NON-NLS-1$
 
 	private static ParserPoolFactory INSTANCE;
+	/**
+	 * A parse cache. Keyed by combo of content type and source hash, holds IParseRootNode result. Retains most recently
+	 * used ASTs.
+	 */
+	private LRUCache<String, IParseRootNode> fParseCache;
 	private Map<String, IConfigurationElement> parsers;
 	private Map<String, IParserPool> pools;
 
@@ -90,6 +96,7 @@ public class ParserPoolFactory
 	 */
 	private ParserPoolFactory()
 	{
+		fParseCache = new LRUCache<String, IParseRootNode>(3);
 	}
 
 	/**
@@ -97,6 +104,12 @@ public class ParserPoolFactory
 	 */
 	synchronized void dispose()
 	{
+		if (fParseCache != null)
+		{
+			fParseCache.flush();
+			fParseCache = null;
+		}
+
 		if (pools != null)
 		{
 			// Clean all the parsers up!
@@ -212,14 +225,33 @@ public class ParserPoolFactory
 	public static IParseRootNode parse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
 																										// declaredExceptions
 	{
+		return getInstance().doParse(contentTypeId, parseState);
+	}
+
+	/**
+	 * parse
+	 * 
+	 * @param contentTypeId
+	 * @param source
+	 * @return
+	 */
+	private IParseRootNode doParse(String contentTypeId, IParseState parseState) throws Exception // $codepro.audit.disable
+																									// declaredExceptions
+	{
 		if (contentTypeId == null)
 		{
 			return null;
 		}
+		// Must grab hash on the string, because char[] hash gives different results each time for same underlying data
+		int sourceHash = new String(parseState.getSource()).hashCode();
+		String key = MessageFormat.format("{0}:{1}", contentTypeId, sourceHash); //$NON-NLS-1$
+		IParseRootNode result = fParseCache.get(key);
+		if (result != null)
+		{
+			return result;
+		}
 
-		IParserPool pool = getInstance().getParserPool(contentTypeId);
-		IParseRootNode result = null;
-
+		IParserPool pool = getParserPool(contentTypeId);
 		if (pool != null)
 		{
 			IParser parser = pool.checkOut();
@@ -229,6 +261,7 @@ public class ParserPoolFactory
 				try
 				{
 					result = parser.parse(parseState);
+					fParseCache.put(key, result);
 				}
 				finally
 				{

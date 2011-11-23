@@ -48,6 +48,9 @@ public interface ICorePreferenceConstants
 	 * The list of components to debug
 	 */
 	String PREF_DEBUG_COMPONENT_LIST = "pref_debug_component_list"; //$NON-NLS-1$
+	public static final boolean DEFAULT_AUTO_REFRESH_PROJECTS = true;
+	public static final boolean DEFAULT_AUTO_MIGRATE_OLD_PROJECTS = true;
+	public static final boolean DEFAULT_DEBUG_MODE = false;
 
 	/**
 	 * The preference key for the comma-separated list of task tag names.

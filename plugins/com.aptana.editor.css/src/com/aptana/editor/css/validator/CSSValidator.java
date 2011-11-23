@@ -25,6 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.w3c.css.css.StyleReport;
 import org.w3c.css.css.StyleReportFactory;
 import org.w3c.css.css.StyleSheet;
@@ -33,16 +36,24 @@ import org.w3c.css.properties.PropertiesLoader;
 import org.w3c.css.util.ApplContext;
 import org.w3c.css.util.Utf8Properties;
 
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
+import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.common.validator.ValidationManager;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.index.core.build.BuildContext;
+import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseError.Severity;
 
-public class CSSValidator implements IValidator
+/**
+ * @author cwilliams
+ */
+public class CSSValidator extends AbstractBuildParticipant
 {
 
 	private static final String APTANA_PROFILE = "AptanaProfile"; //$NON-NLS-1$
@@ -81,29 +92,17 @@ public class CSSValidator implements IValidator
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED_MESSAGES = { "unrecognized media only" };
 
-	public CSSValidator()
+	static
 	{
 		loadAptanaCSSProfile();
 	}
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
-	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		String report = getReport(source, path);
-		manager.addParseErrors(items, ICSSConstants.CONTENT_TYPE_CSS);
-		processErrorsInReport(report, path, manager, items);
-		processWarningsInReport(report, path, manager, items);
-		return items;
-	}
-
-	private void processErrorsInReport(String report, URI sourceUri, IValidationManager manager,
-			List<IValidationItem> items)
+	private void processErrorsInReport(String report, String sourcePath, List<IProblem> items)
 	{
 		int offset = 0;
 		String elementName = "errorlist"; //$NON-NLS-1$
 		String startTag = MessageFormat.format("<{0}>", elementName); //$NON-NLS-1$
 		String endTag = MessageFormat.format("</{0}>", elementName); //$NON-NLS-1$
-		String sourcePath = sourceUri.toString();
 
 		while (offset < report.length())
 		{
@@ -132,7 +131,7 @@ public class CSSValidator implements IValidator
 				// finds the errors
 				String[] errors = getContent(ERROR_PATTERN, listString);
 				// add errors
-				addErrors(errors, sourceUri, manager, items);
+				addErrors(errors, sourcePath, items);
 			}
 
 			// advances past the current error list
@@ -140,14 +139,12 @@ public class CSSValidator implements IValidator
 		}
 	}
 
-	private void processWarningsInReport(String report, URI sourceUri, IValidationManager manager,
-			List<IValidationItem> items)
+	private void processWarningsInReport(String report, String sourcePath, List<IProblem> items)
 	{
 		int offset = 0;
 		String elementName = "warninglist"; //$NON-NLS-1$
 		String startTag = MessageFormat.format("<{0}>", elementName); //$NON-NLS-1$
 		String endTag = MessageFormat.format("</{0}>", elementName); //$NON-NLS-1$
-		String sourcePath = sourceUri.toString();
 
 		while (offset < report.length())
 		{
@@ -175,7 +172,7 @@ public class CSSValidator implements IValidator
 				// finds the warnings
 				String[] warnings = getContent(WARNING_PATTERN, listString);
 				// adds errors
-				addWarnings(warnings, sourceUri, manager, items);
+				addWarnings(warnings, sourcePath, items);
 			}
 
 			// advance past the current warning list
@@ -189,10 +186,10 @@ public class CSSValidator implements IValidator
 	 * @throws IOException
 	 *             if profile loading fails
 	 */
-	private void loadAptanaCSSProfile()
+	private static void loadAptanaCSSProfile()
 	{
-		InputStream configStream = getClass().getResourceAsStream(CONFIG_FILE);
-		InputStream profilesStream = getClass().getResourceAsStream(PROFILES_CONFIG_FILE);
+		InputStream configStream = CSSValidator.class.getResourceAsStream(CONFIG_FILE);
+		InputStream profilesStream = CSSValidator.class.getResourceAsStream(PROFILES_CONFIG_FILE);
 
 		try
 		{
@@ -242,8 +239,7 @@ public class CSSValidator implements IValidator
 	 * @param items
 	 *            the list that stores the added validation items
 	 */
-	private static void addErrors(String[] errors, URI sourcePath, IValidationManager manager,
-			List<IValidationItem> items)
+	private void addErrors(String[] errors, String sourcePath, List<IProblem> items)
 	{
 		Map<String, String> map;
 		for (String error : errors)
@@ -258,7 +254,7 @@ public class CSSValidator implements IValidator
 			String errorsubtype = map.get("errorsubtype"); //$NON-NLS-1$
 
 			// Don't attempt to add errors if there are already errors on this line
-			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber))
+			if (hasErrorOrWarningOnLine(items, lineNumber))
 			{
 				continue;
 			}
@@ -279,13 +275,36 @@ public class CSSValidator implements IValidator
 			message = StringEscapeUtils.unescapeHtml(message);
 			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (!manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message)
+			if (!isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message)
 					&& !containsCSS3AtRule(message) && !isFiltered(message))
 			{
 				// there is no info on the line offset or the length of the errored text
-				items.add(manager.createError(message, lineNumber, 0, 0, sourcePath));
+				items.add(createError(message, lineNumber, 0, 0, sourcePath));
 			}
 		}
+	}
+
+	private static boolean isIgnored(String message, String language)
+	{
+		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
+				.getString(getFilterExpressionsPrefKey(language));
+		if (!StringUtil.isEmpty(list))
+		{
+			String[] expressions = list.split("####"); //$NON-NLS-1$
+			for (String expression : expressions)
+			{
+				if (message.matches(expression))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static String getFilterExpressionsPrefKey(String language)
+	{
+		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
 	}
 
 	/**
@@ -295,13 +314,10 @@ public class CSSValidator implements IValidator
 	 *            the array of warnings
 	 * @param sourcePath
 	 *            the source path
-	 * @param manager
-	 *            the validation manager
 	 * @param items
 	 *            the list that stores the added validation items
 	 */
-	private static void addWarnings(String[] warnings, URI sourcePath, IValidationManager manager,
-			List<IValidationItem> items)
+	private void addWarnings(String[] warnings, String sourcePath, List<IProblem> items)
 	{
 		Map<String, String> map;
 		String last = ""; //$NON-NLS-1$
@@ -315,16 +331,16 @@ public class CSSValidator implements IValidator
 			String context = map.get("context"); //$NON-NLS-1$
 
 			// Don't attempt to add warnings if there are already errors on this line
-			if (ValidationManager.hasErrorOrWarningOnLine(items, lineNumber))
+			if (hasErrorOrWarningOnLine(items, lineNumber))
 			{
 				continue;
 			}
 
 			String hash = MessageFormat.format("{0}:{1}:{2}:{3}", lineNumber, level, message, context); //$NON-NLS-1$
 			// guards against duplicate warnings
-			if (!last.equals(hash) && !manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS))
+			if (!last.equals(hash) && !isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS))
 			{
-				items.add(manager.createWarning(message, lineNumber, 0, 0, sourcePath));
+				items.add(createWarning(message, lineNumber, 0, 0, sourcePath));
 			}
 
 			last = hash;
@@ -447,5 +463,46 @@ public class CSSValidator implements IValidator
 			}
 		}
 		return false;
+	}
+
+	public void buildFile(BuildContext context, IProgressMonitor monitor)
+	{
+		try
+		{
+			String source = context.getContents();
+			URI uri = context.getURI();
+			String path = uri.toString();
+			
+			context.getAST(); // make sure a parse has happened...
+
+			List<IProblem> problems = new ArrayList<IProblem>();
+			// Add parse errors...
+			for (IParseError parseError : context.getParseErrors())
+			{
+				int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
+						: IMarker.SEVERITY_WARNING;
+				int line = -1;
+				if (source != null)
+				{
+					line = getLineNumber(parseError.getOffset(), source);
+				}
+				problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
+						.getLength(), line, path));
+			}
+
+			String report = getReport(source, uri);
+			processErrorsInReport(report, path, problems);
+			processWarningsInReport(report, path, problems);
+			context.putProblems(IMarker.PROBLEM, problems);
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(CSSPlugin.getDefault(), e);
+		}
+	}
+
+	public void deleteFile(BuildContext context, IProgressMonitor monitor)
+	{
+		context.removeProblems(IMarker.PROBLEM);
 	}
 }

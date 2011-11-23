@@ -8,12 +8,11 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -25,6 +24,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.json.SchemaContext;
 
 /**
@@ -32,39 +32,27 @@ import com.aptana.json.SchemaContext;
  */
 public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
-	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
-		if (file == null)
-		{
-			return;
-		}
-
 		try
 		{
-			InputStreamReader isr = null;
+			Reader isr = null;
 
-			sub.subTask(getIndexingMessage(index, file));
+			sub.subTask(getIndexingMessage(index, context.getURI()));
 
 			try
 			{
 				JSCAReader reader = new JSCAReader();
-				SchemaContext context = new SchemaContext();
+				SchemaContext schemaContext = new SchemaContext();
 				JSCAHandler handler = new JSCAHandler();
 
-				context.setHandler(handler);
+				schemaContext.setHandler(handler);
 
-				InputStream stream = file.openInputStream(EFS.NONE, sub.newChild(20));
-				isr = new InputStreamReader(stream);
+				isr = new StringReader(context.getContents());
 
 				// parse
-				reader.read(isr, context);
+				reader.read(isr, schemaContext);
 				sub.worked(50);
 
 				// create new Window type for this file
@@ -81,7 +69,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				JSIndexWriter indexer = new JSIndexWriter();
 				TypeElement[] types = handler.getTypes();
 				AliasElement[] aliases = handler.getAliases();
-				URI location = file.toURI();
+				URI location = context.getURI();
 
 				for (TypeElement type : types)
 				{

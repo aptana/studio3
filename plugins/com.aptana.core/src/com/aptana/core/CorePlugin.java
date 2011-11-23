@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
 import com.aptana.core.util.EclipseUtil;
@@ -275,7 +274,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	{
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
-				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
+				ICorePreferenceConstants.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
 	}
 
 	private void addProjectListeners()

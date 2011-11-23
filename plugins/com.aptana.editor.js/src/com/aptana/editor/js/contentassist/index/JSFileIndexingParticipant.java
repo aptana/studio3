@@ -12,20 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
-import beaver.Parser;
-
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.resources.TaskTag;
-import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -34,14 +27,12 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
 
 public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
@@ -88,44 +79,17 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.AbstractFileIndexingParticipant#indexFileStore(com.aptana.index.core.Index,
-	 * org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	protected void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
+	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
 		try
 		{
-			if (file != null)
-			{
-				sub.subTask(getIndexingMessage(index, file));
-
-				removeTasks(file, sub.newChild(10));
-
-				// grab the source of the file we're going to parse
-				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)), getCharset(file));
-
-				// minor optimization when creating a new empty file
-				if (source != null && source.trim().length() > 0)
-				{
-					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source, sub.newChild(50));
-					if (ast != null)
-					{
-						this.processParseResults(file, source, index, ast, sub.newChild(20));
-					}
-				}
-			}
+			sub.subTask(getIndexingMessage(index, context.getURI()));
+			processParseResults(context, index, context.getAST(), sub.newChild(20));
 		}
-		catch (Parser.Exception e) // $codepro.audit.disable emptyCatchClause
+		catch (CoreException ce)
 		{
-			// ignore parse errors
-		}
-		catch (Throwable e)
-		{
-			IdeLog.logError(JSPlugin.getDefault(), e);
+			IdeLog.logError(JSPlugin.getDefault(), ce);
 		}
 		finally
 		{
@@ -183,25 +147,18 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	/**
 	 * processParseResults
 	 * 
-	 * @param index
-	 * @param file
+	 * @param context
 	 * @param monitor
 	 * @param parseState
 	 */
-	public void processParseResults(IFileStore file, String source, Index index, IParseNode ast,
-			IProgressMonitor monitor)
+	public void processParseResults(BuildContext context, Index index, IParseNode ast, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		if (ast instanceof IParseRootNode)
-		{
-			processComments(file, source, ((IParseRootNode) ast).getCommentNodes(), sub.newChild(20));
-		}
-		sub.setWorkRemaining(80);
+		SubMonitor sub = SubMonitor.convert(monitor, 80);
 
 		JSScope globals = this.getGlobals(ast);
 		if (globals != null)
 		{
-			URI location = file.toURI();
+			URI location = context.getURI();
 
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
@@ -239,75 +196,6 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 
 		sub.done();
-	}
-
-	private void processComments(IFileStore file, String source, IParseNode[] commentNodes, IProgressMonitor monitor)
-	{
-		if (commentNodes == null || commentNodes.length == 0)
-		{
-			return;
-		}
-		SubMonitor sub = SubMonitor.convert(monitor, commentNodes.length);
-		for (IParseNode commentNode : commentNodes)
-		{
-			if (commentNode instanceof JSCommentNode)
-			{
-				processCommentNode(file, source, (JSCommentNode) commentNode);
-			}
-			sub.worked(1);
-		}
-		sub.done();
-	}
-
-	private void processCommentNode(IFileStore store, String source, JSCommentNode commentNode)
-	{
-		String text = getText(source, commentNode);
-		if (!TaskTag.isCaseSensitive())
-		{
-			text = text.toLowerCase();
-		}
-		int lastOffset = 0;
-		String[] lines = StringUtil.LINE_SPLITTER.split(text);
-		for (String line : lines)
-		{
-			int offset = text.indexOf(line, lastOffset);
-
-			for (TaskTag entry : TaskTag.getTaskTags())
-			{
-				String tag = entry.getName();
-				if (!TaskTag.isCaseSensitive())
-				{
-					tag = tag.toLowerCase();
-				}
-				int index = line.indexOf(tag);
-				if (index == -1)
-				{
-					continue;
-				}
-
-				String message = line.substring(index).trim();
-				// Remove "**/" from the end of the line!
-				if (message.endsWith("**/")) //$NON-NLS-1$
-				{
-					message = message.substring(0, message.length() - 3).trim();
-				}
-				// Remove "*/" from the end of the line!
-				if (message.endsWith("*/")) //$NON-NLS-1$
-				{
-					message = message.substring(0, message.length() - 2).trim();
-				}
-				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getPriority(), getLineNumber(start, source), start,
-						start + message.length());
-			}
-
-			lastOffset = offset;
-		}
-	}
-
-	private String getText(String source, JSCommentNode commentNode)
-	{
-		return new String(source.substring(commentNode.getStartingOffset(), commentNode.getEndingOffset() + 1));
 	}
 
 	/**

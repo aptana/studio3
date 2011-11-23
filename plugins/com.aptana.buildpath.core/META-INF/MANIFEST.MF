@@ -9,7 +9,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
  com.aptana.core,
- com.aptana.index.core
+ com.aptana.index.core,
+ com.aptana.parsing
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.buildpath.core
+Export-Package: com.aptana.buildpath.core,
+ com.aptana.core.build

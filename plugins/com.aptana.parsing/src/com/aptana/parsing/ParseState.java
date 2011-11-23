@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 
 public class ParseState implements IParseState
@@ -35,7 +35,7 @@ public class ParseState implements IParseState
 	private Map<String, Object> fProperties;
 
 	// represents the root node of the parsing result
-	private IParseNode fParseResult;
+	private IParseRootNode fParseResult;
 	private IProgressMonitor fProgressMonitor;
 
 	public ParseState()
@@ -54,7 +54,7 @@ public class ParseState implements IParseState
 		fSkippedRanges = null;
 	}
 
-	public IParseNode getParseResult()
+	public IParseRootNode getParseResult()
 	{
 		return fParseResult;
 	}
@@ -98,7 +98,7 @@ public class ParseState implements IParseState
 		fSkippedRanges = null;
 	}
 
-	public void setParseResult(IParseNode result)
+	public void setParseResult(IParseRootNode result)
 	{
 		fParseResult = result;
 	}

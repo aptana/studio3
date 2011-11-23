@@ -13,7 +13,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 
 public interface IParseState
@@ -35,7 +35,7 @@ public interface IParseState
 	 * 
 	 * @return
 	 */
-	public IParseNode getParseResult();
+	public IParseRootNode getParseResult();
 
 	/**
 	 * getRemovedLength
@@ -87,7 +87,7 @@ public interface IParseState
 	 * 
 	 * @param result
 	 */
-	public void setParseResult(IParseNode result);
+	public void setParseResult(IParseRootNode result);
 
 	/**
 	 * Returns a list of the errors found in the document.

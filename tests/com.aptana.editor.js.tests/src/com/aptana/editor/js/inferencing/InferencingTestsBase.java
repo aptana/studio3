@@ -37,8 +37,10 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -48,12 +50,13 @@ public abstract class InferencingTestsBase extends TestCase
 	{
 		public void indexTree(IFileStore file, String source, Index index, JSParseRootNode root)
 		{
-			this.processParseResults(file, source, index, root, new NullProgressMonitor());
+			BuildContext context = new FileStoreBuildContext(file);
+			processParseResults(context, index, root, new NullProgressMonitor());
 		}
 	}
 
 	private JSIndexReader _reader;
-	
+
 	/**
 	 * getContent
 	 * 
@@ -129,13 +132,13 @@ public abstract class InferencingTestsBase extends TestCase
 	{
 		return URI.create("inference.testing");
 	}
-	
+
 	/**
 	 * getLastStatementTypes
 	 * 
 	 * @param path
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	protected List<String> getLastStatementTypes(String rawSource)
 	{
@@ -154,30 +157,30 @@ public abstract class InferencingTestsBase extends TestCase
 		}
 		return Collections.emptyList();
 	}
-	
+
 	/**
 	 * getLastStatementTypes
 	 * 
 	 * @param path
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	protected List<String> getLastStatementTypes(IPath path)
 	{
 		return getLastStatementTypes(getFileStore(path));
 	}
-	
+
 	/**
 	 * getLastStatementTypes
 	 * 
 	 * @param store
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	protected List<String> getLastStatementTypes(IFileStore store)
 	{
 		String source = getContent(store);
-		
+
 		IParseNode root = this.getParseRootNode(source);
 		assertNotNull(root);
 		assertTrue(root instanceof JSParseRootNode);
@@ -189,8 +192,8 @@ public abstract class InferencingTestsBase extends TestCase
 		JSScope globals = this.getGlobals((JSParseRootNode) root);
 		assertNotNull(globals);
 
-		Indexer indexer = new Indexer();		
-		
+		Indexer indexer = new Indexer();
+
 		indexer.indexTree(store, source, this.getIndex(), (JSParseRootNode) root);
 
 		return this.getTypes(globals, (JSNode) statement);
@@ -212,8 +215,8 @@ public abstract class InferencingTestsBase extends TestCase
 		}
 
 		assertNotNull(store);
-//		assertTrue(store.exists());
-		
+		// assertTrue(store.exists());
+
 		return store;
 	}
 
@@ -313,13 +316,13 @@ public abstract class InferencingTestsBase extends TestCase
 		List<String> statementTypes = this.getLastStatementTypes(rawSource);
 		assertStatementTypes(statementTypes, types);
 	}
-	
+
 	public void lastStatementTypeTests(IPath path, String... types)
 	{
 		List<String> statementTypes = this.getLastStatementTypes(path);
 		assertStatementTypes(statementTypes, types);
 	}
-	
+
 	protected void assertStatementTypes(List<String> statementTypes, String... types)
 	{
 		assertNotNull(statementTypes);

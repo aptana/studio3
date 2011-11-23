@@ -36,7 +36,7 @@ public class MarkdownEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IMarkdownConstants.CONTENT_TYPE_MARKDOWN;
 	}

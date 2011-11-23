@@ -10,10 +10,17 @@ package com.aptana.editor.js.validator;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -25,45 +32,114 @@ import org.mozilla.javascript.ScriptOrFnNode;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.optimizer.Codegen;
 
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
+import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StreamUtil;
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.common.validator.ValidationManager;
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.index.core.build.BuildContext;
+import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseError.Severity;
 
-public class JSLintValidator implements IValidator
+public class JSLintValidator extends AbstractBuildParticipant
 {
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
 
-	public JSLintValidator()
+	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		boolean enableParseErrors = enableJSParseErrors();
+		boolean enableJSLint = enableJSLint();
+
+		List<IProblem> problems = new ArrayList<IProblem>();
+		if (enableParseErrors || enableJSLint)
+		{
+			try
+			{
+
+				String source = context.getContents();
+				URI uri = context.getURI();
+				String sourcePath = uri.toString();
+
+				if (enableParseErrors)
+				{
+					context.getAST(); // Ensure a parse happened
+
+					// Add parse errors... FIXME Move this out of here!
+					for (IParseError parseError : context.getParseErrors())
+					{
+						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
+								: IMarker.SEVERITY_WARNING;
+						int line = -1;
+						if (source != null)
+						{
+							line = getLineNumber(parseError.getOffset(), source);
+						}
+						problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
+								.getLength(), line, sourcePath));
+					}
+				}
+				if (enableJSLint)
+				{
+					// FIXME Create sub-marker type of JS Problem marker just for JSLint!
+					Context cContext = Context.enter();
+					try
+					{
+
+						DefaultErrorReporter reporter = new DefaultErrorReporter();
+						cContext.setErrorReporter(reporter);
+						parseWithLint(cContext, source, sourcePath, problems);
+					}
+					finally
+					{
+						Context.exit();
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JSLint", e); //$NON-NLS-1$
+			}
+		}
+		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems);
 	}
 
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	private boolean enableJSLint()
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		Context context = Context.enter();
-		DefaultErrorReporter reporter = new DefaultErrorReporter();
-		try
-		{
-			context.setErrorReporter(reporter);
-			manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
-			parseWithLint(context, source, path, manager, items);
-		}
-		finally
-		{
-			Context.exit();
-		}
-		return items;
+		// FIXME We shouldn't be storing translatable names in prefs like this. Use ids, store under sub-nodes per
+		// langauge or something?
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		String result = prefs
+				.get(MessageFormat.format(
+						"{0}:{1}", IJSConstants.CONTENT_TYPE_JS, IPreferenceConstants.SELECTED_VALIDATORS), //$NON-NLS-1$
+						"JSLint JavaScript Validator"); //$NON-NLS-1$
+		return result.indexOf("JSLint JavaScript Validator") != -1; //$NON-NLS-1$
 	}
 
-	private void parseWithLint(Context context, String source, URI path, IValidationManager manager,
-			List<IValidationItem> items)
+	private boolean enableJSParseErrors()
+	{
+		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		return store.getBoolean(getEnableParseErrorPrefKey(IJSConstants.CONTENT_TYPE_JS), true);
+	}
+
+	private String getEnableParseErrorPrefKey(String language)
+	{
+		return MessageFormat.format("{0}:{1}", language, IPreferenceConstants.PARSE_ERROR_ENABLED); //$NON-NLS-1$
+	}
+
+	public void deleteFile(BuildContext context, IProgressMonitor monitor)
+	{
+		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
+	}
+
+	private void parseWithLint(Context context, String source, String path, List<IProblem> items)
 	{
 		Scriptable scope = context.initStandardObjects();
 		Script script = getJSLintScript();
@@ -72,6 +148,8 @@ public class JSLintValidator implements IValidator
 			return;
 		}
 		script.exec(context, scope);
+
+		IDocument doc = null;
 
 		Object functionObj = scope.get("JSLINT", scope); //$NON-NLS-1$
 		if (functionObj instanceof Function)
@@ -116,26 +194,62 @@ public class JSLintValidator implements IValidator
 						character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
 
 						// Don't attempt to add errors or warnings if there are already errors on this line
-						if (ValidationManager.hasErrorOrWarningOnLine(items, line))
+						if (hasErrorOrWarningOnLine(items, line))
 						{
 							continue;
 						}
 
-						if (!manager.isIgnored(reason, IJSConstants.CONTENT_TYPE_JS))
+						if (!isIgnored(reason, IJSConstants.CONTENT_TYPE_JS))
 						{
+							if (doc == null)
+							{
+								doc = new Document(source);
+							}
+							try
+							{
+								character += doc.getLineOffset(line - 1);
+							}
+							catch (BadLocationException e)
+							{
+								// ignore
+							}
+
 							if (i == ids.length - 2 && lastIsError)
 							{
-								items.add(manager.createError(reason, line, character, 0, path));
+								items.add(createError(reason, line, character, 0, path));
 							}
 							else
 							{
-								items.add(manager.createWarning(reason, line, character, 0, path));
+								items.add(createWarning(reason, line, character, 0, path));
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	private String getFilterExpressionsPrefKey(String language)
+	{
+		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
+	}
+
+	private boolean isIgnored(String message, String language)
+	{
+		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
+				.getString(getFilterExpressionsPrefKey(language));
+		if (!StringUtil.isEmpty(list))
+		{
+			String[] expressions = list.split("####"); //$NON-NLS-1$
+			for (String expression : expressions)
+			{
+				if (message.matches(expression))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private static synchronized Script getJSLintScript()

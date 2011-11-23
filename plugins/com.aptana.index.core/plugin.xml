@@ -3,11 +3,5 @@
 <plugin>
    <extension-point id="com.aptana.index.core.fileIndexingParticipants" name="%extension-point.name" schema="schema/fileIndexingParticipants.exsd"/>
    <extension-point id="com.aptana.index.core.indexFilterParticipants" name="%extension-point.indexfilter.name" schema="schema/indexFilterParticipants.exsd"/>
-   <extension-point id="com.aptana.index.core.fileContributors" name="fileContributors" schema="schema/fileContributors.exsd"/>
-   <extension
-         point="com.aptana.core.buildParticipants">
-      <participant
-            class="com.aptana.index.core.build.IndexBuildParticipant">
-      </participant>
-   </extension>  
+   <extension-point id="com.aptana.index.core.fileContributors" name="fileContributors" schema="schema/fileContributors.exsd"/> 
 </plugin>

@@ -638,8 +638,27 @@
             targetId="com.aptana.editor.ui.hyperlinkTarget">
       </hyperlinkDetector>
    </extension>
-   <extension
+   
+    <extension
          point="org.eclipse.ui.editors.annotationTypes">
+      <type
+         name="com.aptana.editor.common.error"
+         super="org.eclipse.ui.workbench.texteditor.error"
+         markerType="com.aptana.core.problem"
+         markerSeverity="2">
+      </type>
+      <type
+         name="com.aptana.editor.common.warning"
+         super="org.eclipse.ui.workbench.texteditor.warning"
+         markerType="com.aptana.core.problem"
+         markerSeverity="1">
+      </type>
+      <type
+         name="com.aptana.editor.common.info"
+         super="org.eclipse.ui.workbench.texteditor.info"
+         markerType="com.aptana.core.problem"
+         markerSeverity="0">
+      </type>
       <type
             markerSeverity="0"
             name="com.aptana.editor.common.occurrence">
@@ -725,5 +744,18 @@
                id="com.aptana.editor.common.presentation">
          </actionSet>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="com.aptana.buildpath.core.buildParticipants">
+      <participant
+            class="com.aptana.editor.common.validator.LegacyValidationBuildParticipant"
+            priority="60">
+      </participant>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.annotationModelCreation">
+      <factory
+            contentTypeId="org.eclipse.core.runtime.text"
+            class="com.aptana.editor.common.CommonAnnotationModelFactory"/>
    </extension>
 </plugin>

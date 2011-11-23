@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
@@ -22,15 +23,8 @@ import com.aptana.index.core.IndexManager;
  */
 public class SDocMLIndexingTests extends JSEditorBasedTests
 {
-	class Indexer extends SDocMLFileIndexingParticipant
-	{
-		public void index(Index index, IFileStore file)
-		{
-			indexFileStore(index, file, new NullProgressMonitor());
-		}
-	}
-
 	protected void indexAndCheckProposals(String indexResource, String fileResource, String... proposals)
+			throws Exception
 	{
 		URI uri = null;
 
@@ -45,17 +39,13 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 
 			// create index for file
 			Index index = IndexManager.getInstance().getIndex(uri);
-			Indexer indexer = new Indexer();
+			SDocMLFileIndexingParticipant indexer = new SDocMLFileIndexingParticipant();
 
 			// index file
-			indexer.index(index, indexFile);
+			indexer.index(new FileStoreBuildContext(indexFile), index, new NullProgressMonitor());
 
 			// check proposals
 			checkProposals(fileResource, proposals);
-		}
-		catch (Throwable t)
-		{
-			fail(t.getMessage());
 		}
 		finally
 		{
@@ -66,7 +56,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		}
 	}
 
-	public void assertStaticProperties_1_6_2(String fileResource)
+	public void assertStaticProperties_1_6_2(String fileResource) throws Exception
 	{
 		// @formatter:off
 		indexAndCheckProposals(
@@ -121,7 +111,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		// @formatter:on
 	}
 
-	public void assertInstanceProperties_1_6_2(String fileResource)
+	protected void assertInstanceProperties_1_6_2(String fileResource) throws Exception
 	{
 		// @formatter:off
 		indexAndCheckProposals(
@@ -269,22 +259,22 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		// @formatter:on
 	}
 
-	public void testJQuerySymbolStatics_1_6_2()
+	public void testJQuerySymbolStatics_1_6_2() throws Exception
 	{
 		assertStaticProperties_1_6_2("sdocml/jQuery-statics.js");
 	}
 
-	public void testDollarSymbolStatics_1_6_2()
+	public void testDollarSymbolStatics_1_6_2() throws Exception
 	{
 		assertStaticProperties_1_6_2("sdocml/$-statics.js");
 	}
 
-	public void testJQueryAddReturnValueProperties()
+	public void testJQueryAddReturnValueProperties() throws Exception
 	{
 		assertInstanceProperties_1_6_2("sdocml/jQuery-add-properties.js");
 	}
 
-	public void testDollarAddReturnValueProperties()
+	public void testDollarAddReturnValueProperties() throws Exception
 	{
 		assertInstanceProperties_1_6_2("sdocml/$-add-properties.js");
 	}
@@ -292,7 +282,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 	// @formatter:off
 	// Commented out ATM, as the following test fail. Attached to ticket APSTUD-3389
 	/*
-	public void testDollarJQXHR()
+	public void testDollarJQXHR() throws Exception
 	{
 		indexAndCheckProposals(
 			"sdocml/jquery.1.6.2.sdocml",
@@ -318,7 +308,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		);
 	}
 
-	public void testDollarDeferred()
+	public void testDollarDeferred() throws Exception
 	{
 		indexAndCheckProposals(
 			"sdocml/jquery.1.6.2.sdocml",
@@ -338,7 +328,7 @@ public class SDocMLIndexingTests extends JSEditorBasedTests
 		);
 	}
 
-	public void testPromise()
+	public void testPromise() throws Exception
 	{
 		// @formatter:off
 		indexAndCheckProposals(

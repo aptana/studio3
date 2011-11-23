@@ -7,23 +7,23 @@
  */
 package com.aptana.index.core;
 
-import java.util.Set;
-
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import com.aptana.index.core.build.BuildContext;
+
 public interface IFileStoreIndexingParticipant
 {
+
 	/**
-	 * Index all file stores into the specified index
+	 * Indexes a single file wrapped up by a context object.
 	 * 
-	 * @param resources
+	 * @param context
 	 * @param index
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	void index(Set<IFileStore> resources, Index index, IProgressMonitor monitor) throws CoreException;
+	void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * The priority is used to determine the order in which multiple indexing participants should run when more than one

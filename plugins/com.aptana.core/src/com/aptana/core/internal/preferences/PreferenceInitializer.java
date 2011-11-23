@@ -21,10 +21,6 @@ import com.aptana.core.util.EclipseUtil;
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
-	public static final boolean DEFAULT_DEBUG_MODE = false;
-	public static final boolean DEFAULT_AUTO_MIGRATE_OLD_PROJECTS = true;
-	public static final boolean DEFAULT_AUTO_REFRESH_PROJECTS = true;
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
@@ -33,9 +29,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CorePlugin.PLUGIN_ID);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, DEFAULT_DEBUG_MODE);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, DEFAULT_AUTO_MIGRATE_OLD_PROJECTS);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, DEFAULT_AUTO_REFRESH_PROJECTS);
+		prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, ICorePreferenceConstants.DEFAULT_DEBUG_MODE);
+		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, ICorePreferenceConstants.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS);
+		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS);
 		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, IdeLog.StatusLevel.ERROR.toString());
 		prefs.put(
 				ICorePreferenceConstants.PREF_WEB_FILES,

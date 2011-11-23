@@ -42,7 +42,7 @@ public class IDLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IIDLConstants.CONTENT_TYPE_IDL;
 	}

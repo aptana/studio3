@@ -10,7 +10,6 @@ package com.aptana.index.core;
 import java.io.File;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Set;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.filesystem.EFS;
@@ -22,8 +21,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
@@ -42,10 +39,16 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	 * @param file
 	 * @param category
 	 * @param word
+	 * @deprecated
 	 */
 	protected void addIndex(Index index, IFileStore file, String category, String word)
 	{
-		index.addEntry(category, word, file.toURI());
+		addIndex(index, file.toURI(), category, word);
+	}
+
+	protected void addIndex(Index index, URI uri, String category, String word)
+	{
+		index.addEntry(category, word, uri);
 	}
 
 	/**
@@ -117,17 +120,23 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	 * @param index
 	 * @param file
 	 * @return
+	 * @deprecated
 	 */
 	protected String getIndexingMessage(Index index, IFileStore file)
+	{
+		return getIndexingMessage(index, file.toURI());
+	}
+
+	protected String getIndexingMessage(Index index, URI uri)
 	{
 		String relativePath = null;
 		if (index != null)
 		{
-			relativePath = index.getRelativeDocumentPath(file.toURI()).toString();
+			relativePath = index.getRelativeDocumentPath(uri).toString();
 		}
 		else
 		{
-			relativePath = file.toURI().toString();
+			relativePath = uri.toString();
 		}
 
 		return MessageFormat.format("Indexing {0}", relativePath); //$NON-NLS-1$
@@ -163,50 +172,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, files.size() * 100);
-
-		for (IFileStore file : files)
-		{
-			if (sub.isCanceled())
-			{
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-
-			Thread.yield(); // be nice to other threads, let them get in before each file...
-
-			// @formatter:off
-			String message = MessageFormat.format(
-				"Add file ''{0}'' to index ''{1}''", //$NON-NLS-1$
-				file,
-				index
-			);
-			// @formatter:on
-
-			IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.INDEXER);
-
-			indexFileStore(index, file, sub.newChild(100));
-		}
-
-		sub.done();
-	}
-
-	/**
-	 * indexFileStore
-	 * 
-	 * @param index
-	 * @param store
-	 * @param monitor
-	 */
-	protected abstract void indexFileStore(final Index index, IFileStore store, IProgressMonitor monitor);
-
+	
 	/**
 	 * removeTasks
 	 * 

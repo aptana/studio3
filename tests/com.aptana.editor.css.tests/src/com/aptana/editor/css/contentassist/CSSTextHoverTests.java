@@ -7,17 +7,24 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import java.io.File;
+import java.io.FileWriter;
+
 import junit.framework.TestCase;
 
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.ide.IDE;
 
-import com.aptana.editor.common.tests.TextViewer;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.text.CSSTextHover;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * CSSTextHoverTests
@@ -25,6 +32,8 @@ import com.aptana.editor.css.text.CSSTextHover;
 public class CSSTextHoverTests extends TestCase
 {
 	private CSSTextHover fHover;
+	private AbstractThemeableEditor editor;
+	private File file;
 
 	/*
 	 * (non-Javadoc)
@@ -74,9 +83,39 @@ public class CSSTextHoverTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		super.tearDown();
-
-		fHover = null;
+		try
+		{
+			if (editor != null)
+			{
+				if (editor != null)
+				{
+					if (Display.getCurrent() != null)
+					{
+						editor.getSite().getPage().closeEditor(editor, false);
+					}
+					else
+					{
+						editor.close(false);
+					}
+				}
+				editor = null;
+			}
+			if (file != null)
+			{
+				if (!file.delete())
+				{
+					file.deleteOnExit();
+				}
+				file = null;
+			}
+		}
+		finally
+		{
+			file = null;
+			editor = null;
+			fHover = null;
+			super.tearDown();
+		}
 	}
 
 	/**
@@ -85,15 +124,22 @@ public class CSSTextHoverTests extends TestCase
 	 * @param source
 	 * @return
 	 */
-	protected ITextViewer getTextViewer(String source)
+	protected ITextViewer getTextViewer(String source) throws Exception
 	{
-		IDocument document = new Document(source);
+		file = File.createTempFile("test_css_hover", ".css");
+		FileWriter writer = new FileWriter(file);
+		writer.write(source);
+		writer.close();
+		IFileStore fileStore = EFS.getStore(file.toURI());
 
-		return new TextViewer(document);
+		FileStoreEditorInput input = new FileStoreEditorInput(fileStore);
+		editor = (AbstractThemeableEditor) IDE.openEditor(UIUtils.getActivePage(), input, "com.aptana.editor.css");
+
+		return editor.getISourceViewer();
 	}
 
 	protected void assertRegionAndInfoType(String source, int hoverOffset, int regionOffset, int regionLength,
-			Class<?> infoType)
+			Class<?> infoType) throws Exception
 	{
 		ITextViewer textViewer = getTextViewer(source);
 
@@ -110,7 +156,7 @@ public class CSSTextHoverTests extends TestCase
 	/**
 	 * testElement
 	 */
-	public void testElement()
+	public void testElement() throws Exception
 	{
 		assertRegionAndInfoType("div { background: green; }", 1, 0, 3, String.class);
 	}
@@ -118,7 +164,7 @@ public class CSSTextHoverTests extends TestCase
 	/**
 	 * testProperty
 	 */
-	public void testProperty()
+	public void testProperty() throws Exception
 	{
 		assertRegionAndInfoType("div { background: green; }", 7, 6, 10, String.class);
 	}
@@ -126,7 +172,7 @@ public class CSSTextHoverTests extends TestCase
 	/**
 	 * testNamedColor
 	 */
-	public void testNamedColor()
+	public void testNamedColor() throws Exception
 	{
 		assertRegionAndInfoType("div { background: green; }", 19, 18, 5, RGB.class);
 	}
@@ -134,7 +180,7 @@ public class CSSTextHoverTests extends TestCase
 	/**
 	 * testRGBFunction
 	 */
-	public void testRGBFunction()
+	public void testRGBFunction() throws Exception
 	{
 		assertRegionAndInfoType("div { background: rgb(128,128,128); }", 19, 18, 16, RGB.class);
 	}
@@ -142,7 +188,7 @@ public class CSSTextHoverTests extends TestCase
 	/**
 	 * testHexColor
 	 */
-	public void testHexColor()
+	public void testHexColor() throws Exception
 	{
 		assertRegionAndInfoType("div { background: #888; }", 19, 18, 4, RGB.class);
 	}
@@ -150,7 +196,7 @@ public class CSSTextHoverTests extends TestCase
 	/**
 	 * testHexColor2
 	 */
-	public void testHexColor2()
+	public void testHexColor2() throws Exception
 	{
 		assertRegionAndInfoType("div { background: #818283; }", 19, 18, 7, RGB.class);
 	}

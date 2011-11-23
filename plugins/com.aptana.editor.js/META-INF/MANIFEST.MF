@@ -22,13 +22,15 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.theme,
  org.mortbay.jetty.util,
  org.mozilla.rhino,
- json.simple;bundle-version="1.0.0"
+ json.simple;bundle-version="1.0.0",
+ com.aptana.buildpath.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,
  com.aptana.editor.js.contentassist,
  com.aptana.editor.js.contentassist.index,
+ com.aptana.editor.js.internal.build;x-friends:="com.aptana.editor.html",
  com.aptana.editor.js.internal.text;x-friends:="com.aptana.editor.html",
  com.aptana.editor.js.outline,
  com.aptana.editor.js.parsing,

@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.views,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.index.core,
  com.aptana.ui,
  com.aptana.editor.common,
@@ -27,7 +27,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.theme,
  com.aptana.preview;visibility:=reexport,
  org.mortbay.jetty.util,
- org.w3c.tidy
+ org.w3c.tidy,
+ com.aptana.buildpath.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

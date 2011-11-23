@@ -9,7 +9,6 @@ CVS/
 *.user
 *.sass-cache
 .pmd
-build/
 *.pbxuser
 *.perspective
 *.perspectivev3

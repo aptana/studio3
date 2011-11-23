@@ -25,8 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.core.build.UnifiedBuilder;
-
 public class ResourceUtilTest extends TestCase
 {
 
@@ -37,6 +35,7 @@ public class ResourceUtilTest extends TestCase
 	private static final String TITANIUM_MOBILE_NATURE_ID = "com.appcelerator.titanium.mobile.nature";
 	private static final String TITANIUM_DESKTOP_NATURE_ID = "com.appcelerator.titanium.desktop.nature";
 	private static final String JAVANATUREID = "org.eclipse.jdt.core.javanature";
+	private static final String UnifiedBuilder_ID = "com.aptana.ide.core.unifiedBuilder";
 
 	private IProject testProject;
 
@@ -130,7 +129,7 @@ public class ResourceUtilTest extends TestCase
 		IProjectDescription desc = testProject.getDescription();
 		int numCommands = desc.getBuildSpec().length;
 
-		ResourceUtil.addBuilder(testProject, UnifiedBuilder.ID);
+		ResourceUtil.addBuilder(testProject, UnifiedBuilder_ID);
 
 		// get new value
 		desc = testProject.getDescription();
@@ -139,7 +138,7 @@ public class ResourceUtilTest extends TestCase
 		ICommand[] commands = desc.getBuildSpec();
 		for (ICommand command : commands)
 		{
-			if (UnifiedBuilder.ID.equals(command.getBuilderName()))
+			if (UnifiedBuilder_ID.equals(command.getBuilderName()))
 			{
 				foundBuilder = true;
 				break;
@@ -149,7 +148,7 @@ public class ResourceUtilTest extends TestCase
 		// That there is the builder in question;
 		assertTrue(foundBuilder);
 
-		ResourceUtil.removeBuilder(testProject, UnifiedBuilder.ID);
+		ResourceUtil.removeBuilder(testProject, UnifiedBuilder_ID);
 
 		// get new value
 		desc = testProject.getDescription();
@@ -161,7 +160,7 @@ public class ResourceUtilTest extends TestCase
 		commands = desc.getBuildSpec();
 		for (ICommand command : commands)
 		{
-			if (UnifiedBuilder.ID.equals(command.getBuilderName()))
+			if (UnifiedBuilder_ID.equals(command.getBuilderName()))
 			{
 				foundBuilder = true;
 				break;
@@ -172,7 +171,7 @@ public class ResourceUtilTest extends TestCase
 		assertFalse(foundBuilder);
 
 		// re-add builder
-		ResourceUtil.addBuilder(testProject, UnifiedBuilder.ID);
+		ResourceUtil.addBuilder(testProject, UnifiedBuilder_ID);
 
 		desc = testProject.getDescription();
 
@@ -180,7 +179,7 @@ public class ResourceUtilTest extends TestCase
 		ResourceUtil.addNature(testProject, WEBNATUREID);
 
 		// try to remove the builder. It should not
-		assertFalse(ResourceUtil.removeBuilderIfOrphaned(testProject, UnifiedBuilder.ID));
+		assertFalse(ResourceUtil.removeBuilderIfOrphaned(testProject, UnifiedBuilder_ID));
 
 		// remove a nature. Internally will remove builder if orphaned
 		ResourceUtil.removeNature(testProject, WEBNATUREID);

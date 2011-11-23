@@ -13,6 +13,7 @@ import junit.framework.TestSuite;
 import com.aptana.editor.css.CSSCodeScannerTest;
 import com.aptana.editor.css.CSSEditorTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
+import com.aptana.editor.css.internal.build.CSSTaskDetectorTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
 import com.aptana.editor.css.validator.CSSValidatorTests;
 
@@ -32,6 +33,7 @@ public class AllTests
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.contentassist.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.contentassist.index.IndexTests.suite());
+		suite.addTestSuite(CSSTaskDetectorTest.class);
 		// $JUnit-END$
 		return suite;
 	}

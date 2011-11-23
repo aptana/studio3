@@ -16,12 +16,10 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
-import com.aptana.editor.js.parsing.JSParseState;
 
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
@@ -79,18 +77,8 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IJSConstants.CONTENT_TYPE_JS;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(getFileServiceContentTypeId(), new JSParseState());
 	}
 }

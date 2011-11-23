@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aptana.editor.common.validator.IValidationItem;
+import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.js.IJSConstants;
@@ -25,7 +25,7 @@ public class SDocMLValidator implements IValidator
 	{
 		private URI path;
 		private IValidationManager manager;
-		private List<IValidationItem> items = new ArrayList<IValidationItem>();
+		private List<IProblem> items = new ArrayList<IProblem>();
 
 		/**
 		 * Collector
@@ -33,7 +33,7 @@ public class SDocMLValidator implements IValidator
 		 * @param manager
 		 * @param path
 		 */
-		private LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
+		private LogCollector(IValidationManager manager, URI path, List<IProblem> items)
 		{
 			this.path = path;
 			this.manager = manager;
@@ -45,7 +45,7 @@ public class SDocMLValidator implements IValidator
 		 * 
 		 * @param item
 		 */
-		public void addItem(IValidationItem item)
+		public void addItem(IProblem item)
 		{
 			items.add(item);
 		}
@@ -83,9 +83,9 @@ public class SDocMLValidator implements IValidator
 	 * @see com.aptana.editor.common.validator.IValidator#validate(java.lang.String, java.net.URI,
 	 * com.aptana.editor.common.validator.IValidationManager)
 	 */
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public List<IProblem> validate(String source, URI path, IValidationManager manager)
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
+		List<IProblem> items = new ArrayList<IProblem>();
 		JSMetadataReader reader = new JSMetadataReader();
 		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes()); // $codepro.audit.disable closeWhereCreated
 		LogCollector collector = new LogCollector(manager, path, items);
