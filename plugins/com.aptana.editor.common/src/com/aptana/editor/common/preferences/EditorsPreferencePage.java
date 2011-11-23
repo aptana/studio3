@@ -8,6 +8,7 @@
 package com.aptana.editor.common.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -18,7 +19,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
@@ -89,9 +92,6 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 						{ CoreStrings.ON, Boolean.toString(true) }, { CoreStrings.OFF, Boolean.toString(false) } },
 				caGroup));
 
-		createUserAgentCategoryArea(caGroup);
-		createUserAgentButtons(caGroup);
-
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
 		createTextEditorLink(appearanceComposite);
@@ -120,4 +120,4 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	public void init(IWorkbench workbench)
 	{
 	}
-	}
+}
