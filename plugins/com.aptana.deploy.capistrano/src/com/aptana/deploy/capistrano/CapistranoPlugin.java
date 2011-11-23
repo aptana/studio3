@@ -7,6 +7,7 @@
  */
 package com.aptana.deploy.capistrano;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -58,4 +59,17 @@ public class CapistranoPlugin extends AbstractUIPlugin
 	{
 		return plugin;
 	}
+
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		ImageDescriptor desc = getDefault().getImageRegistry().getDescriptor(path);
+		if (desc != null)
+		{
+			return desc;
+		}
+		desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
+		getDefault().getImageRegistry().put(path, desc);
+		return desc;
+	}
+
 }

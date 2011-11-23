@@ -40,7 +40,6 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
@@ -73,9 +72,8 @@ public class Portal
 	protected static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
 	protected static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	protected static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
-
-	private static Portal instance;
 	private AbstractPortalBrowserEditor portalBrowser;
+	private static Portal instance;
 
 	// Private constructor
 	private Portal()
@@ -321,7 +319,7 @@ public class Portal
 	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
 	{
 		final Map<String, String> builder = new HashMap<String, String>();
-		builder.put("v", getVersion());
+		builder.putAll(URLUtil.getDefaultParameters());
 
 		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
 		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
@@ -375,16 +373,6 @@ public class Portal
 				builder.put("dep", "cap");
 		}
 		return builder;
-	}
-
-	/**
-	 * Returns the portal plugin version
-	 * 
-	 * @return
-	 */
-	protected String getVersion()
-	{
-		return EclipseUtil.getPluginVersion(PortalUIPlugin.getDefault());
 	}
 
 	/**

@@ -59,6 +59,9 @@ public class ProtocolLogger {
 	public void log(boolean recv, String message) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
+		if (message.length() > 1024) {
+			message = message.substring(0, 1024)+"..."+Integer.toString(message.length()-1024); //$NON-NLS-1$
+		}
 		writer.println(MessageFormat
 				.format("[{0,number,##}:{1,number,##}.{2,number,###}] {3}: >{4}<", cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND), cal.get(Calendar.MILLISECOND), recv ? "Recv" : "Sent", message)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

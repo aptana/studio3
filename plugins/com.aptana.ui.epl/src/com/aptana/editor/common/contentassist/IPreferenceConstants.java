@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.contentassist;
 
+
 public interface IPreferenceConstants
 {
 
@@ -14,6 +15,14 @@ public interface IPreferenceConstants
 	 * The types of user agents to display in code assist
 	 */
 	String USER_AGENT_PREFERENCE = "selectUserAgents"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to determine if filtering should occur based on user agent type. There are three values:
+	 * none, some, all. "none" indicates that no filtering should occur. "some" indicates that at least one user agent
+	 * must be associated with the proposal for it to be included in the proposal list. "all" indicates that all user
+	 * agents associated with the proposal must exist for it to be added to the proposal list
+	 */
+	public static final String CONTENT_ASSIST_USER_AGENT_FILTER_TYPE = "CONTENT_ASSIST_USER_AGENT_FILTER_TYPE"; //$NON-NLS-1$
 
 	/**
 	 * The characters we use to pop up content assist

@@ -7,7 +7,6 @@
  */
 package com.aptana.deploy.heroku.internal.ui;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -61,9 +60,12 @@ public class HerokuContributionItem extends DeployContributionItem
 			public void widgetSelected(SelectionEvent e)
 			{
 				// run heroku info
-				Map<String, String> env = new HashMap<String, String>();
-				env.putAll(ShellExecutable.getEnvironment());
 				IPath workingDir = selectedProject.getLocation();
+				Map<String, String> env = null;
+				if (!Platform.OS_WIN32.equals(Platform.getOS()))
+				{
+					env = ShellExecutable.getEnvironment(workingDir);
+				}
 				IPath herokuPath = ExecutableUtil.find("heroku", true, null); //$NON-NLS-1$
 				String output = ProcessUtil.outputForCommand(herokuPath.toOSString(), workingDir, env, "info"); //$NON-NLS-1$
 

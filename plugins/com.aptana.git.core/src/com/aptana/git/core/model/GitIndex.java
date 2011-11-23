@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -64,7 +65,7 @@ public class GitIndex
 	 * The list of changed files that is a copy of the above list. Only copied at the very end of the refresh, so it
 	 * always contains the full listing from last finished refresh call.
 	 */
-	private List<ChangedFile> changedFiles;
+	List<ChangedFile> changedFiles;
 	private Object changedFilesLock = new Object();
 
 	private boolean notify;
@@ -270,7 +271,13 @@ public class GitIndex
 		{
 			if (this.changedFiles == null)
 			{
-				refresh(false, new NullProgressMonitor()); // Don't want to call back to fireIndexChangeEvent yet!
+				// Don't want to call back to fireIndexChangeEvent yet!
+				IStatus status = refresh(false, new NullProgressMonitor());
+				if (!status.isOK())
+				{
+					IdeLog.logError(GitPlugin.getDefault(), status.getMessage());
+					return Collections.emptyList();
+				}
 			}
 
 			List<ChangedFile> copy = new ArrayList<ChangedFile>(this.changedFiles.size());
@@ -315,8 +322,22 @@ public class GitIndex
 		{
 			preFiles.add(new ChangedFile(file));
 		}
+
+		// Update the staged/unstaged flags in the passed in copy of changed files, and our internal list of changed
+		// files.
 		for (ChangedFile file : stageFiles)
 		{
+			int index = Collections.binarySearch(this.changedFiles, file);
+			if (index >= 0)
+			{
+				synchronized (this.changedFilesLock)
+				{
+					ChangedFile orig = this.changedFiles.get(index);
+					orig.hasUnstagedChanges = false;
+					orig.hasStagedChanges = true;
+				}
+			}
+
 			file.hasUnstagedChanges = false;
 			file.hasStagedChanges = true;
 		}
@@ -354,8 +375,22 @@ public class GitIndex
 		{
 			preFiles.add(new ChangedFile(file));
 		}
+
+		// Update the staged/unstaged flags in the passed in copy of changed files, and our internal list of changed
+		// files.
 		for (ChangedFile file : unstageFiles)
 		{
+			int index = Collections.binarySearch(this.changedFiles, file);
+			if (index >= 0)
+			{
+				synchronized (this.changedFilesLock)
+				{
+					ChangedFile orig = this.changedFiles.get(index);
+					orig.hasUnstagedChanges = true;
+					orig.hasStagedChanges = false;
+				}
+			}
+
 			file.hasUnstagedChanges = true;
 			file.hasStagedChanges = false;
 		}
@@ -415,6 +450,10 @@ public class GitIndex
 
 	private boolean doCommit(String commitMessage)
 	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
 		return result != null && result.isOK();
 	}

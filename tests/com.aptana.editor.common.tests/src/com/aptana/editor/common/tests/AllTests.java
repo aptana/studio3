@@ -11,6 +11,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.common.EditorCommonTests;
+import com.aptana.editor.common.contentassist.ContentAssistTests;
 import com.aptana.editor.common.internal.peer.PeerTests;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManagerTest;
 import com.aptana.editor.common.scripting.ScriptingInputOutputTest;
@@ -42,6 +43,7 @@ public class AllTests
 		suite.addTest(ViewerTests.suite());
 		suite.addTestSuite(ScriptingInputOutputTest.class);
 		suite.addTestSuite(DocumentScopeManagerTest.class);
+		suite.addTest(ContentAssistTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

@@ -216,16 +216,6 @@ public class PortalTest extends TestCase
 	}
 
 	/**
-	 * testGetVersion
-	 */
-	public void testGetVersion() throws Exception
-	{
-		Portal fixture = Portal.getInstance();
-		String result = fixture.getVersion();
-		assertEquals(EclipseUtil.getPluginVersion(PortalUIPlugin.getDefault()), result);
-	}
-
-	/**
 	 * testOpenPortal
 	 */
 	public void testOpenPortal() throws Exception

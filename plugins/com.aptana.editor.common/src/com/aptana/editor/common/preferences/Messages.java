@@ -37,6 +37,22 @@ public class Messages extends NLS
 
 	public static String CommonEditorPreferencePage_OnTypingCharacters;
 
+	public static String ContentAssistPreferencePage_AllFilterLabel;
+
+	public static String ContentAssistPreferencePage_ContentAssistPreferencePageDescription;
+
+	public static String ContentAssistPreferencePage_NatureComboLabel;
+
+	public static String ContentAssistPreferencePage_NoFilterLabel;
+
+	public static String ContentAssistPreferencePage_OneOrMoreFilterLabel;
+
+	public static String ContentAssistPreferencePage_ProposalFilterTypeLabel;
+
+	public static String ContentAssistPreferencePage_ProposalsGroupLabel;
+
+	public static String ContentAssistPreferencePage_UserAgentGroupLabel;
+
 	public static String TasksPreferencePage_CaseSensitiveLabel;
 	public static String TasksPreferencePage_Description;
 	public static String TasksPreferencePage_EditTagTitle;

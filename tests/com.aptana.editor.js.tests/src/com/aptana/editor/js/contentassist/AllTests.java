@@ -12,7 +12,6 @@ import junit.framework.TestSuite;
 
 public class AllTests
 {
-
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.contentassist");
@@ -20,8 +19,8 @@ public class AllTests
 		suite.addTestSuite(LocationTests.class);
 		suite.addTestSuite(JSContentAssistProposalTests.class);
 		suite.addTestSuite(RangeTests.class);
+		suite.addTestSuite(JSUserAgentFilteringTests.class);
 		//$JUnit-END$
 		return suite;
 	}
-
 }

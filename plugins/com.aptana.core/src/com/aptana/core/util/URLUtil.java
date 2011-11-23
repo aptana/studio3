@@ -14,6 +14,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -60,7 +61,8 @@ public class URLUtil
 		{
 			if (encode)
 			{
-				builder.add(URLEncoder.encode(entry.getKey(), UTF8) + "=" + URLEncoder.encode(entry.getValue(), UTF8)); //$NON-NLS-1$
+				String value = (entry.getValue() != null) ? entry.getValue() : StringUtil.EMPTY;
+				builder.add(URLEncoder.encode(entry.getKey(), UTF8) + "=" + URLEncoder.encode(value, UTF8)); //$NON-NLS-1$
 			}
 			else
 			{
@@ -113,6 +115,33 @@ public class URLUtil
 			UnsupportedEncodingException
 	{
 		return appendParameters(url, parameters, true);
+	}
+
+	/**
+	 * Appends a default suite of parameters to Studio URLs, including version and user's language
+	 * 
+	 * @param url
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException
+	 */
+	public static URL appendDefaultParameters(URL url) throws MalformedURLException, UnsupportedEncodingException
+	{
+		Map<String, String> parameters = getDefaultParameters();
+		return appendParameters(url, parameters, true);
+	}
+
+	/**
+	 * Gets a default set of parameters to append to common Studio URLs
+	 * 
+	 * @return
+	 */
+	public static Map<String, String> getDefaultParameters()
+	{
+		Map<String, String> parameters = new HashMap<String, String>();
+		parameters.put("nl", System.getProperty("osgi.nl", Locale.getDefault().toString())); //$NON-NLS-1$ //$NON-NLS-2$
+		parameters.put("v", EclipseUtil.getProductVersion()); //$NON-NLS-1$
+		return parameters;
 	}
 
 	/**

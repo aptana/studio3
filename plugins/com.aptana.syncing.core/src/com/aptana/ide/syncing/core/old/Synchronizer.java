@@ -156,14 +156,21 @@ public class Synchronizer implements ILoggable
 		try
 		{
 			basePath = EFSUtils.getAbsolutePath(root);
+			if (basePath == null)
+			{
+				return null;
+			}
 
-			result = EFSUtils.getAbsolutePath(file).substring(basePath.length());
-
+			String filePath = EFSUtils.getAbsolutePath(file);
+			if (filePath == null)
+			{
+				return null;
+			}
+			result = filePath.substring(basePath.length());
 			if (result.indexOf('\\') != -1)
 			{
 				result = result.replace('\\', '/');
 			}
-
 			if (result.startsWith("/")) //$NON-NLS-1$
 			{
 				result = result.substring(1);

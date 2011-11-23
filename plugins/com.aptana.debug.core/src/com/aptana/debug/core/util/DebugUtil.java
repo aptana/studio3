@@ -113,6 +113,7 @@ public final class DebugUtil {
 
 	public static ServerSocket allocateServerSocket(int port) throws IOException {
 		ServerSocket socket = new ServerSocket(port);
+		socket.setReuseAddress(true);
 		if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			socket.setSoTimeout(SOCKET_TIMEOUT);
 		}

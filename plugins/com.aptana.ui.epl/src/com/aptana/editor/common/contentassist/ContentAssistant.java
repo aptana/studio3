@@ -1132,6 +1132,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	private CompletionProposalPopup fProposalPopup;
 	private ContextInformationPopup fContextInfoPopup;
 
+	private int fUserAgentColumnCount;
+
 	// private IUnifiedEditor editor;
 
 	/**
@@ -2141,18 +2143,38 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			int offset, char activationChar)
 	{
 		fLastErrorMessage = null;
+		fUserAgentColumnCount = 0;
 
 		ICompletionProposal[] result = null;
+		IContentAssistProcessor processor = getProcessor(contentAssistSubjectControl, offset);
 
-		IContentAssistProcessor p = getProcessor(contentAssistSubjectControl, offset);
-		if (p instanceof ISubjectControlContentAssistProcessor)
+		if (processor != null)
 		{
-			result = ((ISubjectControlContentAssistProcessor) p).computeCompletionProposals(
-					contentAssistSubjectControl, offset);
-			fLastErrorMessage = p.getErrorMessage();
+			if (processor instanceof ISubjectControlContentAssistProcessor)
+			{
+				result = ((ISubjectControlContentAssistProcessor) processor).computeCompletionProposals(
+						contentAssistSubjectControl, offset);
+				fLastErrorMessage = processor.getErrorMessage();
+			}
+			if (processor instanceof ICommonContentAssistProcessor)
+			{
+				String[] ids = ((ICommonContentAssistProcessor) processor).getActiveUserAgentIds();
+
+				fUserAgentColumnCount = (ids != null) ? ids.length : 0;
+			}
 		}
 
 		return result;
+	}
+
+	/**
+	 * Return the number of columns needed to display all user agents
+	 * 
+	 * @return Returns the column count
+	 */
+	public int getUserAgentColumnCount()
+	{
+		return fUserAgentColumnCount;
 	}
 
 	/**
@@ -2172,6 +2194,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			boolean autoActivated)
 	{
 		fLastErrorMessage = null;
+		fUserAgentColumnCount = 0;
 
 		ICompletionProposal[] result = null;
 		IContentAssistProcessor processor = this.getProcessor(viewer, offset);
@@ -2183,6 +2206,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 				ICommonContentAssistProcessor commonProcessor = (ICommonContentAssistProcessor) processor;
 
 				result = commonProcessor.computeCompletionProposals(viewer, offset, activationChar, autoActivated);
+
+				String[] ids = ((ICommonContentAssistProcessor) processor).getActiveUserAgentIds();
+
+				fUserAgentColumnCount = (ids != null) ? ids.length : 0;
 			}
 			else
 			{

@@ -51,7 +51,8 @@ class HTMLTagProposal extends CommonCompletionProposal
 				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
 		setFileLocation(IHTMLIndexConstants.CORE);
 
-		List<String> userAgents = element.getUserAgentNames();
+		List<String> userAgentList = element.getUserAgentNames();
+		String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 		setUserAgentImages(userAgentIcons);
 

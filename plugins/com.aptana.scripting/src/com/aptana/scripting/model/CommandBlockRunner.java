@@ -31,6 +31,7 @@ import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -111,6 +112,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			// Grab all the matching env objects contributed via bundles that have scope matching!
 			IModelFilter filter = new ScopeFilter((String) hash.get("TM_CURRENT_SCOPE")); //$NON-NLS-1$
 			List<EnvironmentElement> envs = BundleManager.getInstance().getEnvs(filter);
+			ScopeSelector.sort(envs);
 			for (EnvironmentElement e : envs)
 			{
 				RubyProc invoke = e.getInvokeBlock();

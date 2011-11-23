@@ -8,6 +8,9 @@
             icon="icons/ftp16.png"
             id="com.aptana.deploy.ftp.wizard"
             name="%wizard.ftp.name">
+         <description>
+            FTP, SFTP and FTPS are widespread standards for easily uploading your application to a variety of web hosts. Choose SFTP or FTPS if you are concerned about security, as they offer an encrypted format.
+         </description>
       </wizard>
    </extension>
       <extension
