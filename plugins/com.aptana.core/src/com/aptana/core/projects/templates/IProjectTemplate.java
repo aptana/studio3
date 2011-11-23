@@ -18,6 +18,20 @@ import java.net.URL;
 public interface IProjectTemplate
 {
 	/**
+	 * getPath
+	 * 
+	 * @return
+	 */
+	public String getPath();
+
+	/**
+	 * Get the id associated with the template
+	 * 
+	 * @return
+	 */
+	public String getId();
+
+	/**
 	 * getDisplayName
 	 * 
 	 * @return

@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.Assert;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -557,7 +559,12 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 					{
 						readElement(element);
 					}
-				}, TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

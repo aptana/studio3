@@ -13,11 +13,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -92,7 +94,12 @@ public class SamplesManager implements ISamplesManager
 					{
 						readElement(element);
 					}
-				}, ELEMENT_CATEGORY, ELEMENT_SAMPLESINFO);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_CATEGORY, ELEMENT_SAMPLESINFO);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

@@ -13,12 +13,14 @@ import java.net.URL;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 
 public class ProjectTemplateElement extends AbstractBundleElement implements IProjectTemplate
 {
 	private TemplateType fType = TemplateType.UNDEFINED;
 	private String fLocation;
 	private String fDescription;
+	private String fId;
 
 	/**
 	 * ProjectTemplate
@@ -132,6 +134,23 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	}
 
 	/**
+	 * Prints the interior body of the template element
+	 * 
+	 * @param printer
+	 * @param includeBlocks
+	 * @param template
+	 */
+	public static void printBody(SourcePrinter printer, boolean includeBlocks, IProjectTemplate template)
+	{
+		printer.printWithIndent("path: ").println(template.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(template.getDisplayName()); //$NON-NLS-1$
+		printer.printWithIndent("location: ").println(template.getLocation()); //$NON-NLS-1$
+		printer.printWithIndent("id: ").println(template.getId()); //$NON-NLS-1$
+		printer.printWithIndent("type: ").println(template.getType().name()); //$NON-NLS-1$
+		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(template.isReplacingParameters())); //$NON-NLS-1$
+	}
+
+	/**
 	 * setDescription
 	 * 
 	 * @param description
@@ -199,5 +218,35 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 			return false;
 		}
 		return Boolean.parseBoolean(replace.toString());
+	}
+
+	/**
+	 * setId
+	 * 
+	 * @param id
+	 */
+	public void setId(String id)
+	{
+		this.fId = id;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getId()
+	 */
+	public String getId()
+	{
+		return fId;
+	}
+
+	@Override
+	public void setDisplayName(String displayName)
+	{
+		super.setDisplayName(displayName);
+
+		if (StringUtil.EMPTY.equals(getId()) || getId() == null)
+		{
+			setId(displayName);
+		}
 	}
 }

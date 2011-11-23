@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -25,6 +26,7 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -148,8 +150,12 @@ public class ScriptingEngine
 							ScriptingActivator.logError(message, null);
 						}
 					}
-				},
-				TAG_LOADPATH
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_LOADPATH);
+					}
+				}
 			);
 			// @formatter:on
 
@@ -181,8 +187,12 @@ public class ScriptingEngine
 					{
 						names.add(element.getAttribute(ATTR_NAME));
 					}
-				}, 
-				TAG_FILE
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_FILE);
+					}
+				}
 			);
 			// @formatter:on
 

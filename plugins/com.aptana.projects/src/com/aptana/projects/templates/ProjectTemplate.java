@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
+import com.aptana.core.util.SourcePrinter;
+import com.aptana.scripting.model.ProjectTemplateElement;
 
 /**
  * Project template that is loaded from the <code>"projectTemplates"</code> extension point.
@@ -27,6 +29,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private String path;
 	private String description;
 	private String name;
+	private String id;
 	private URL iconPath;
 	private boolean isReplacingParameters;
 
@@ -39,9 +42,10 @@ public class ProjectTemplate implements IProjectTemplate
 	 * @param isReplacingParameters
 	 * @param description
 	 * @param iconPath
+	 * @param id
 	 */
-	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters, String description,
-			URL iconPath)
+	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
+			String description, URL iconPath, String id)
 	{
 		this.type = type;
 		this.path = path;
@@ -49,6 +53,7 @@ public class ProjectTemplate implements IProjectTemplate
 		this.isReplacingParameters = isReplacingParameters;
 		this.description = description;
 		this.iconPath = iconPath;
+		this.id = id;
 	}
 
 	/*
@@ -114,4 +119,37 @@ public class ProjectTemplate implements IProjectTemplate
 		return isReplacingParameters;
 	}
 
+	protected void toSource(SourcePrinter printer)
+	{
+	}
+
+	@Override
+	public String toString()
+	{
+		SourcePrinter printer = new SourcePrinter();
+
+		// open element
+		printer.printWithIndent("project_template"); //$NON-NLS-1$
+		printer.print(" \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+
+		ProjectTemplateElement.printBody(printer, false, this);
+
+		// close element
+		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
+		return printer.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getId()
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	public String getPath()
+	{
+		return path;
+	}
 }

@@ -21,9 +21,9 @@ public class GitRef
 	 * Ref dirs
 	 */
 	static final String REFS = "refs/"; //$NON-NLS-1$
-	static final String REFS_REMOTES = REFS + "remotes/"; //$NON-NLS-1$
-	static final String REFS_TAGS = REFS + "tags/"; //$NON-NLS-1$
-	static final String REFS_HEADS = REFS + "heads/"; //$NON-NLS-1$
+	public static final String REFS_REMOTES = REFS + "remotes/"; //$NON-NLS-1$
+	public static final String REFS_TAGS = REFS + "tags/"; //$NON-NLS-1$
+	public static final String REFS_HEADS = REFS + "heads/"; //$NON-NLS-1$
 
 	/**
 	 * Ref Types

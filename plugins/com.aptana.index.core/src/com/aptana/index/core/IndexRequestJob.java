@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 
@@ -217,7 +218,12 @@ abstract class IndexRequestJob extends Job
 								IdeLog.logError(IndexPlugin.getDefault(), e);
 							}
 						}
-					}, ELEMENT_CONTRIBUTOR);
+
+						public Set<String> getSupportElementNames()
+						{
+							return CollectionsUtil.newSet(ELEMENT_CONTRIBUTOR);
+						}
+					});
 		}
 
 		return fileContributors;
@@ -250,7 +256,12 @@ abstract class IndexRequestJob extends Job
 						}
 						map.put(element, types);
 					}
-				}, TAG_FILE_INDEXING_PARTICIPANT);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_FILE_INDEXING_PARTICIPANT);
+					}
+				});
 
 		return map;
 	}
@@ -282,7 +293,12 @@ abstract class IndexRequestJob extends Job
 								IdeLog.logError(IndexPlugin.getDefault(), e);
 							}
 						}
-					}, ELEMENT_FILTER);
+
+						public Set<String> getSupportElementNames()
+						{
+							return CollectionsUtil.newSet(ELEMENT_FILTER);
+						}
+					});
 		}
 
 		return filterParticipants;

@@ -49,6 +49,8 @@ import com.aptana.ui.widgets.StepIndicatorComposite;
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener,
 		IStepIndicatorWizardPage
 {
+	public static final String COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME = "projectTemplateId";
+	public static final String COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID = "newWizardId";
 
 	private Button fUseTemplateButton;
 	private TableViewer fTemplateSelectionViewer;

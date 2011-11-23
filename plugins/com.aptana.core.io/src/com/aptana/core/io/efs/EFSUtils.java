@@ -9,6 +9,7 @@
 package com.aptana.core.io.efs;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,10 +62,12 @@ public final class EFSUtils
 		}
 		return EFS.getLocalFileSystem().fromLocalFile(file);
 	}
-	
-	public static IFileStore fromLocalFile(File file) {
+
+	public static IFileStore fromLocalFile(File file)
+	{
 		IFileStore fileStore = WorkspaceFileSystem.getInstance().fromLocalFile(file);
-		if (fileStore == null) {
+		if (fileStore == null)
+		{
 			fileStore = EFS.getLocalFileSystem().fromLocalFile(file);
 		}
 		return fileStore;
@@ -109,14 +112,23 @@ public final class EFSUtils
 	 */
 	public static String getAbsolutePath(IFileStore file)
 	{
-		return file.toURI().getPath();
+		if (file != null)
+		{
+			URI uri = file.toURI();
+			if (uri != null)
+			{
+				return uri.getPath();
+			}
+		}
+		return null;
 	}
 
 	/**
 	 * Returns the path of this file relative to the parent
-	 * @param file
-	 * @param obsoleted TODO
 	 * 
+	 * @param file
+	 * @param obsoleted
+	 *            TODO
 	 * @return
 	 * @throws CoreException
 	 * @deprecated
@@ -127,7 +139,10 @@ public final class EFSUtils
 		{
 			String rootFile = getAbsolutePath(parent);
 			String childFile = getAbsolutePath(file);
-			return childFile.substring(rootFile.length());
+			if (rootFile != null && childFile != null)
+			{
+				return childFile.substring(rootFile.length());
+			}
 		}
 		return null;
 	}
@@ -152,9 +167,10 @@ public final class EFSUtils
 
 	/**
 	 * Returns the parent file of this file
-	 * @param file
-	 * @param obsoleted TODO
 	 * 
+	 * @param file
+	 * @param obsoleted
+	 *            TODO
 	 * @return
 	 * @throws CoreException
 	 * @deprecated
@@ -302,31 +318,35 @@ public final class EFSUtils
 		}
 		return false;
 	}
-	
+
 	/*
 	 * TODO: cleanup everything above
 	 */
 
-	
 	/**
 	 * getRelativePath
+	 * 
 	 * @param connectionPoint
 	 * @param fileStore
 	 * @return
 	 * @throws CoreException
 	 */
-	public static IPath getRelativePath(IConnectionPoint connectionPoint, IFileStore fileStore) throws CoreException {
+	public static IPath getRelativePath(IConnectionPoint connectionPoint, IFileStore fileStore) throws CoreException
+	{
 		return getRelativePath(connectionPoint.getRoot(), fileStore);
 	}
-	
+
 	/**
 	 * getRelativePath
+	 * 
 	 * @param parentFileStore
 	 * @param childFileStore
 	 * @return
 	 */
-	public static IPath getRelativePath(IFileStore parentFileStore, IFileStore childFileStore) {
-		if (parentFileStore.isParentOf(childFileStore)) {
+	public static IPath getRelativePath(IFileStore parentFileStore, IFileStore childFileStore)
+	{
+		if (parentFileStore.isParentOf(childFileStore))
+		{
 			IPath parentPath = Path.fromPortableString(parentFileStore.toURI().getPath());
 			IPath childPath = Path.fromPortableString(childFileStore.toURI().getPath());
 			return childPath.makeRelativeTo(parentPath);

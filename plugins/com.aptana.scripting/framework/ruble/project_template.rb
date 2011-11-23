@@ -15,6 +15,14 @@ module Ruble
       @jobj.type.to_s
     end
     
+    def id=(id)
+      @jobj.id = id
+    end    
+    
+    def id
+      @jobj.id
+    end
+    
     def location=(location)
       @jobj.location = location
     end    
@@ -30,7 +38,7 @@ module Ruble
     def description
       @jobj.description
     end
-
+    
     class << self
       def define_template(name, &block)
         log_info("loading project template #{name}")

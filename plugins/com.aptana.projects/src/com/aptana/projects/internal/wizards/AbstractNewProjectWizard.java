@@ -107,11 +107,12 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	protected ProjectTemplateSelectionPage templatesPage;
 	protected WizardNewProjectReferencePage referencePage;
 
-	protected IConfigurationElement configElement;
+	protected String projectTemplateId;
+	protected IProjectTemplate selectedTemplate;
 
-	// Values we grab from the UI before launching our project creation.
+	protected IConfigurationElement configElement;
 	protected IProject newProject;
-	private IProjectTemplate selectedTemplate;
+
 	private URI location; // null if defaults are used (under workspace)
 	private IPath destPath; // absolute path to project we're creating.
 	private IProject[] refProjects;
@@ -181,6 +182,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		super.addPages();
 
+		validateProjectTemplate(getProjectTemplateTypes());
+
 		addPage(mainPage = createMainPage());
 
 		List<String> steps = new ArrayList<String>();
@@ -193,7 +196,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		}
 
 		List<IProjectTemplate> templates = getProjectTemplates(getProjectTemplateTypes());
-		if (templates.size() > 0)
+		if (templates.size() > 0 && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
 			if (templatesPage instanceof IStepIndicatorWizardPage)
@@ -212,7 +215,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 	protected IWizardProjectCreationPage createMainPage()
 	{
-		CommonWizardNewProjectCreationPage mainPage = new CommonWizardNewProjectCreationPage("basicNewProjectPage"); //$NON-NLS-1$
+		CommonWizardNewProjectCreationPage mainPage = new CommonWizardNewProjectCreationPage(
+				"basicNewProjectPage", selectedTemplate); //$NON-NLS-1$
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		return mainPage;
@@ -335,6 +339,33 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			throws CoreException
 	{
 		configElement = config;
+
+		if (ProjectTemplateSelectionPage.COMMAND_PROJECT_FROM_TEMPLATE_PROJECT_TEMPLATE_NAME.equals(propertyName))
+		{
+			if (data instanceof String)
+			{
+				projectTemplateId = (String) data;
+			}
+		}
+	}
+
+	protected void validateProjectTemplate(TemplateType[] templateType)
+	{
+		selectedTemplate = null;
+
+		if (projectTemplateId != null)
+		{
+			List<IProjectTemplate> templates = getProjectTemplates(templateType);
+
+			for (IProjectTemplate template : templates)
+			{
+				if (template.getId() != null && template.getId().equals(projectTemplateId))
+				{
+					selectedTemplate = template;
+					return;
+				}
+			}
+		}
 	}
 
 	/*

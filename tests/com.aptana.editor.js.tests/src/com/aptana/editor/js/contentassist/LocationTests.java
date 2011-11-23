@@ -558,4 +558,15 @@ public class LocationTests extends JSEditorBasedTests
 			new LocationTypeRange(LocationType.IN_GLOBAL, 12, 14)
 		);
 	}
+
+	/**
+	 * testErrorInObjectLiteral
+	 */
+	public void testErrorInObjectLiteral()
+	{
+		this.testLocations(
+			"locations/errorInObjectLiteral.js",
+			new LocationTypeRange(LocationType.NONE, 6)
+		);
+	}
 }

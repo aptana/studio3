@@ -7,6 +7,8 @@
  */
 package com.aptana.core.util;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 
 /**
@@ -21,4 +23,11 @@ public interface IConfigurationElementProcessor
 	 * @param element
 	 */
 	void processElement(IConfigurationElement element);
+
+	/**
+	 * Return a collection of element names that this processor processes.
+	 * 
+	 * @return A collection of strings
+	 */
+	Set<String> getSupportElementNames();
 }

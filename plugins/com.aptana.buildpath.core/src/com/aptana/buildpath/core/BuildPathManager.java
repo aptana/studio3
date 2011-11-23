@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.ConfigurationElementDispatcher;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -314,96 +316,142 @@ public class BuildPathManager
 		return result;
 	}
 
+	private class BuildPathProcessor implements IConfigurationElementProcessor
+	{
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.aptana.core.util.IConfigurationElementProcessor#processElement(org.eclipse.core.runtime.IConfigurationElement
+		 * )
+		 */
+		public void processElement(IConfigurationElement element)
+		{
+			// get extension pt's bundle
+			IExtension extension = element.getDeclaringExtension();
+			String pluginId = extension.getNamespaceIdentifier();
+			Bundle bundle = Platform.getBundle(pluginId);
+
+			// grab the item's display name
+			String name = element.getAttribute(ATTR_NAME);
+
+			// get the item's URI, resolved to a local file
+			String resource = element.getAttribute(ATTR_PATH);
+			URL url = FileLocator.find(bundle, new Path(resource), null);
+
+			// add item to master list
+			URI localFileURI = ResourceUtil.resourcePathToURI(url);
+
+			if (localFileURI != null)
+			{
+				addBuildPath(name, localFileURI);
+			}
+			else
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					Messages.BuildPathManager_UnableToConvertURLToURI,
+					url.toString(),
+					ELEMENT_BUILD_PATH,
+					BUILD_PATHS_ID,
+					pluginId
+				);
+				// @formatter:on
+
+				IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
+		 */
+		public Set<String> getSupportElementNames()
+		{
+			return CollectionsUtil.newSet(ELEMENT_BUILD_PATH);
+		}
+	}
+
+	private class ContributorProcessor implements IConfigurationElementProcessor
+	{
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.aptana.core.util.IConfigurationElementProcessor#processElement(org.eclipse.core.runtime.IConfigurationElement
+		 * )
+		 */
+		public void processElement(IConfigurationElement element)
+		{
+			try
+			{
+				Object contributor = element.createExecutableExtension(ATTR_CLASS);
+
+				if (contributor instanceof IBuildPathContributor)
+				{
+					addContributor((IBuildPathContributor) contributor);
+				}
+				else
+				{
+					IExtension extension = element.getDeclaringExtension();
+					String pluginId = extension.getNamespaceIdentifier();
+
+					// @formatter:off
+					String message = MessageFormat.format(
+						Messages.BuildPathManager_PathContributorIsWrongType,
+						contributor.getClass().getName(),
+						ELEMENT_CONTRIBUTOR,
+						BUILD_PATHS_ID,
+						pluginId
+					);
+					// @formatter:on
+
+					IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
+				}
+			}
+			catch (CoreException e)
+			{
+				IExtension extension = element.getDeclaringExtension();
+				String pluginId = extension.getNamespaceIdentifier();
+				// @formatter:off
+				String message = MessageFormat.format(
+					Messages.BuildPathManager_UnableToCreatePathContributor,
+					ELEMENT_CONTRIBUTOR,
+					BUILD_PATHS_ID,
+					pluginId
+				);
+				// @formatter:on
+
+				IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.core.util.IConfigurationElementProcessor#getSupportElementNames()
+		 */
+		public Set<String> getSupportElementNames()
+		{
+			return CollectionsUtil.newSet(ELEMENT_CONTRIBUTOR);
+		}
+	}
+
 	/**
 	 * Process all load path extensions
 	 */
 	private void loadExtension()
 	{
 		// @formatter:off
+		// configure dispatcher for each element type we process
+		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(
+			new BuildPathProcessor(),
+			new ContributorProcessor()
+		);
+
 		EclipseUtil.processConfigurationElements(
 			BuildPathCorePlugin.PLUGIN_ID,
 			BUILD_PATHS_ID,
-			new IConfigurationElementProcessor()
-			{
-				public void processElement(IConfigurationElement element)
-				{
-					if (ELEMENT_BUILD_PATH.equals(element.getName()))
-					{
-						// get extension pt's bundle
-						IExtension extension = element.getDeclaringExtension();
-						String pluginId = extension.getNamespaceIdentifier();
-						Bundle bundle = Platform.getBundle(pluginId);
-
-						// grab the item's display name
-						String name = element.getAttribute(ATTR_NAME);
-
-						// get the item's URI, resolved to a local file
-						String resource = element.getAttribute(ATTR_PATH);
-						URL url = FileLocator.find(bundle, new Path(resource), null);
-
-						// add item to master list
-						URI localFileURI = ResourceUtil.resourcePathToURI(url);
-
-						if (localFileURI != null)
-						{
-							addBuildPath(name, localFileURI);
-						}
-						else
-						{
-							String message = MessageFormat.format(
-								Messages.BuildPathManager_UnableToConvertURLToURI,
-								url.toString(),
-								ELEMENT_BUILD_PATH,
-								BUILD_PATHS_ID,
-								pluginId
-							);
-
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
-						}
-					}
-					else if (ELEMENT_CONTRIBUTOR.equals(element.getName()))
-					{
-						try
-						{
-							Object contributor = element.createExecutableExtension(ATTR_CLASS);
-
-							if (contributor instanceof IBuildPathContributor)
-							{
-								addContributor((IBuildPathContributor) contributor);
-							}
-							else
-							{
-								IExtension extension = element.getDeclaringExtension();
-								String pluginId = extension.getNamespaceIdentifier();
-								String message = MessageFormat.format(
-									Messages.BuildPathManager_PathContributorIsWrongType,
-									contributor.getClass().getName(),
-									ELEMENT_CONTRIBUTOR,
-									BUILD_PATHS_ID,
-									pluginId
-								);
-
-								IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
-							}
-						}
-						catch (CoreException e)
-						{
-							IExtension extension = element.getDeclaringExtension();
-							String pluginId = extension.getNamespaceIdentifier();
-							String message = MessageFormat.format(
-								Messages.BuildPathManager_UnableToCreatePathContributor,
-								ELEMENT_CONTRIBUTOR,
-								BUILD_PATHS_ID,
-								pluginId
-							);
-
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
-						}
-					}
-				}
-			},
-			ELEMENT_BUILD_PATH,
-			ELEMENT_CONTRIBUTOR
+			dispatcher
 		);
 		// @formatter:on
 	}

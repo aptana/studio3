@@ -79,7 +79,9 @@ public abstract class FlexLexemeProvider<T extends ITypePredicate> extends Abstr
 			while (token.getId() != 0)
 			{
 				T type = getTypeFromId(token.getId());
-				Lexeme<T> lexeme = new Lexeme<T>(type, token.getStart(), token.getEnd(), token.value.toString());
+				int start = token.getStart() + offset;
+				int end = token.getEnd() + offset;
+				Lexeme<T> lexeme = new Lexeme<T>(type, start, end, token.value.toString());
 
 				addLexeme(lexeme);
 

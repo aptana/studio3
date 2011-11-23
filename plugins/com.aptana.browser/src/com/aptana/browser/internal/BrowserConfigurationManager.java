@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -19,6 +20,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.browser.BrowserPlugin;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
@@ -77,7 +79,12 @@ public class BrowserConfigurationManager
 					{
 						readElement(element);
 					}
-				}, ELEMENT_SIZE_CATEGORY, ELEMENT_BACKGROUND_IMAGE, ELEMENT_SIZE);
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(ELEMENT_SIZE_CATEGORY, ELEMENT_BACKGROUND_IMAGE, ELEMENT_SIZE);
+					}
+				});
 	}
 
 	private void readElement(IConfigurationElement element)

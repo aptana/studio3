@@ -40,6 +40,7 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -339,8 +340,12 @@ public class BundleManager
 							IdeLog.logError(ScriptingActivator.getDefault(), message);
 						}
 					}
-				},
-				TAG_BUNDLE_PATH
+
+					public Set<String> getSupportElementNames()
+					{
+						return CollectionsUtil.newSet(TAG_BUNDLE_PATH);
+					}
+				}
 			);
 			// @formatter:on
 
