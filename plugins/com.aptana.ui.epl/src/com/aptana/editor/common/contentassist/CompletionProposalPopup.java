@@ -755,6 +755,13 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalTable.setRedraw(false);
 			int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
+
+			if (fProposalTable.getHorizontalBar() != null)
+			{
+				height += fProposalTable.getHorizontalBar().getSize().y;
+			}
+
+			System.out.println(fProposalTable.getHorizontalBar());
 			fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(true, true)
 					.create());
 			for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
