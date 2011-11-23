@@ -82,6 +82,8 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
+import com.aptana.git.ui.internal.actions.DisconnectHandler;
+import com.aptana.projects.IDebugScopes;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.scripting.model.AbstractElement;
@@ -568,6 +570,13 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		for (TemplateType t : templateTypes)
 		{
 			templates.addAll(manager.getTemplatesForType(t));
+		}
+
+		if (IdeLog.isInfoEnabled(ProjectsPlugin.getDefault(), IDebugScopes.TEMPLATES))
+		{
+			IdeLog.logInfo(ProjectsPlugin.getDefault(),
+					MessageFormat.format("\nFound project templates:\n{0}", templates), //$NON-NLS-1$
+					IDebugScopes.TEMPLATES);
 		}
 		return templates;
 	}

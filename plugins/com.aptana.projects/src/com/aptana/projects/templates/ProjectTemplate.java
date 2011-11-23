@@ -58,6 +58,15 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getPath()
+	 */
+	public String getPath()
+	{
+		return path;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.projects.templates.IProjectTemplate#getDisplayName()
 	 */
 	public String getDisplayName()
