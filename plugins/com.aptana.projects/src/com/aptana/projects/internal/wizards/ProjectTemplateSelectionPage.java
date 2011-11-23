@@ -8,6 +8,7 @@
 package com.aptana.projects.internal.wizards;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -294,7 +295,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public void initStepIndicator(String[] stepNames)
 	{
-		this.stepNames = stepNames;
+		this.stepNames = Arrays.copyOf(stepNames, stepNames.length);
 	}
 
 	public String getStepName()
