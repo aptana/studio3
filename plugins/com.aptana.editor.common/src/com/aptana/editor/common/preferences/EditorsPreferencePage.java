@@ -65,6 +65,33 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		//								{ Messages.EditorsPreferencePage_JumpsStartEnd, "false" } }, //$NON-NLS-1$
 		// appearanceComposite, true));
 
+		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.EditorsPreferencePage_Content_Assist);
+
+		addField(new BooleanFieldEditor(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Insert, caGroup));
+
+		addField(new ComboFieldEditor(
+				IPreferenceConstants.CONTENT_ASSIST_DELAY,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Display,
+				new String[][] {
+						{ Messages.EditorsPreferencePage_Instant,
+								Integer.toString(CommonSourceViewerConfiguration.NO_CONTENT_ASSIST_DELAY) },
+						{ Messages.EditorsPreferencePage_DefaultDelay,
+								Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) },
+						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
+								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },
+						{ CoreStrings.OFF, String.valueOf(CommonSourceViewerConfiguration.CONTENT_ASSIST_OFF_DELAY) } },
+				caGroup));
+
+		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_HOVER,
+				Messages.EditorsPreferencePage_Content_Assist_Hover, new String[][] {
+						{ CoreStrings.ON, Boolean.toString(true) }, { CoreStrings.OFF, Boolean.toString(false) } },
+				caGroup));
+
+		createUserAgentCategoryArea(caGroup);
+		createUserAgentButtons(caGroup);
+
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
 		createTextEditorLink(appearanceComposite);
@@ -93,4 +120,4 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	public void init(IWorkbench workbench)
 	{
 	}
-}
+	}
