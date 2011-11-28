@@ -40,13 +40,13 @@ import com.aptana.samples.ui.SamplesUIPlugin;
  */
 public class SamplesActionController extends AbstractActionController
 {
-	private static final String CATEGORY = "category"; //$NON-NLS-1$
-	private static final String ID = "id"; //$NON-NLS-1$
-	private static final String NAME = "name"; //$NON-NLS-1$
-	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
-	private static final String IMAGE = "image"; //$NON-NLS-1$
-	private static final String IMPORT_SAMPLE_COMMAND = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
-	private static final String IMPORT_SAMPLE_COMMAND_ID = "id"; //$NON-NLS-1$
+	protected static final String CATEGORY = "category"; //$NON-NLS-1$
+	protected static final String ID = "id"; //$NON-NLS-1$
+	protected static final String NAME = "name"; //$NON-NLS-1$
+	protected static final String DESCRIPTION = "description"; //$NON-NLS-1$
+	protected static final String IMAGE = "image"; //$NON-NLS-1$
+	protected static final String IMPORT_SAMPLE_COMMAND = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
+	protected static final String IMPORT_SAMPLE_COMMAND_ID = "id"; //$NON-NLS-1$
 
 	// ############## Actions ###############
 

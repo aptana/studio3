@@ -147,4 +147,8 @@ public interface IBrowserNotificationConstants
 	 */
 	public static final String EVENT_ID_VERSIONS_LIST = "app-versions"; //$NON-NLS-1$
 
+	/**
+	 * An event id for notifying a 'Samples' change.
+	 */
+	public static final String EVENT_ID_SAMPLES = "samples"; //$NON-NLS-1$
 }
