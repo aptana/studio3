@@ -1774,7 +1774,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 
 		IdeLog.logInfo(UIEplPlugin.getDefault(),
-				MessageFormat.format("Filtered list to {0} proposals", filtered.size()), IUiEplScopes.CONTENT_ASSIST);
+				MessageFormat.format("Filtered list to {0} proposals", filtered.size()), IUiEplScopes.CONTENT_ASSIST); //$NON-NLS-1$
 
 		return filtered.toArray(new ICompletionProposal[filtered.size()]);
 	}
