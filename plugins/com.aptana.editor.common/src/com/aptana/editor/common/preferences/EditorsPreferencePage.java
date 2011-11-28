@@ -8,6 +8,7 @@
 package com.aptana.editor.common.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -18,7 +19,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
@@ -64,6 +67,30 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		//								{ Messages.EditorsPreferencePage_ToggleBetween, "true" }, //$NON-NLS-1$
 		//								{ Messages.EditorsPreferencePage_JumpsStartEnd, "false" } }, //$NON-NLS-1$
 		// appearanceComposite, true));
+
+		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.EditorsPreferencePage_Content_Assist);
+
+		addField(new BooleanFieldEditor(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Insert, caGroup));
+
+		addField(new ComboFieldEditor(
+				IPreferenceConstants.CONTENT_ASSIST_DELAY,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Display,
+				new String[][] {
+						{ Messages.EditorsPreferencePage_Instant,
+								Integer.toString(CommonSourceViewerConfiguration.NO_CONTENT_ASSIST_DELAY) },
+						{ Messages.EditorsPreferencePage_DefaultDelay,
+								Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) },
+						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
+								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },
+						{ CoreStrings.OFF, String.valueOf(CommonSourceViewerConfiguration.CONTENT_ASSIST_OFF_DELAY) } },
+				caGroup));
+
+		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_HOVER,
+				Messages.EditorsPreferencePage_Content_Assist_Hover, new String[][] {
+						{ CoreStrings.ON, Boolean.toString(true) }, { CoreStrings.OFF, Boolean.toString(false) } },
+				caGroup));
 
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
