@@ -573,6 +573,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						if (lastSlash != -1 && lastSlash < valuePrefix.length() - 1)
 						{
 							parsed = URI.create(valuePrefix.substring(0, lastSlash));
+							offset += lastSlash + 1;
+							valuePrefix = valuePrefix.substring(lastSlash + 1);
 						}
 						else
 						{
@@ -621,6 +623,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (possibleChild.fetchInfo().exists())
 				{
 					baseStore = possibleChild;
+				}
+				else
+				{
+					// Child is invalid/non-existant, we should just punt. http://jira.appcelerator.org/browse/APSTUD-3862
+					return Collections.emptyList();
 				}
 				offset += lastSlash + 1;
 				valuePrefix = valuePrefix.substring(lastSlash + 1);
@@ -677,7 +684,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			if (info.isDirectory())
 			{
 				isDir = true;
-				name = name + '/'; // $codepro.audit.disable stringConcatenationInLoop
 			}
 
 			// build proposal

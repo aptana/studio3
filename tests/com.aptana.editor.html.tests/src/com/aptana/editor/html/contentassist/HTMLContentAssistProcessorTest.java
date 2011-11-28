@@ -26,11 +26,14 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.text.link.LinkedModeModel;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.part.FileEditorInput;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.tests.util.AssertUtil;
 import com.aptana.editor.common.tests.util.TestProject;
@@ -362,8 +365,8 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testLinkHREFFolderProposal() throws Exception
 	{
-		assertHREFProposal("<link rel=\"stylesheet\" href=\"|\" />", "<link rel=\"stylesheet\" href=\"folder/\" />",
-				"folder/");
+		assertHREFProposal("<link rel=\"stylesheet\" href=\"|\" />", "<link rel=\"stylesheet\" href=\"folder\" />",
+				"folder");
 	}
 
 	public void testLinkHREFFileProposal() throws Exception
@@ -389,8 +392,8 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testLinkHREFFolderProposalWithPrefix() throws Exception
 	{
-		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder/' />",
-				"folder/");
+		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder' />",
+				"folder");
 
 	}
 
@@ -500,8 +503,8 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 		AssertUtil.assertProposalFound("file.html", proposals);
 		AssertUtil.assertProposalFound("root.css", proposals);
-		AssertUtil.assertProposalFound("folder/", proposals);
-		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder/' />", document, "folder/", proposals,
+		AssertUtil.assertProposalFound("folder", proposals);
+		AssertUtil.assertProposalApplies("<link rel='stylesheet' href='/folder' />", document, "folder", proposals,
 				offset, new Point(0, 0));
 
 		WebServerCorePlugin.getDefault().getServerManager().remove(server);
@@ -905,6 +908,23 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		assertFalse(fProcessor.isValidIdentifier('_', '_'));
 		assertFalse(fProcessor.isValidIdentifier('$', '$'));
 		assertFalse(fProcessor.isValidIdentifier(' ', ' '));
+	}
+
+	public void testAPSTUD3862() throws Exception
+	{
+		TestProject project = createWebProject("3862_");
+		project.createFolder("public");
+		project.createFolder("public/css");
+		project.createFolder("application");
+		IFile file = project.createFile("index.html", "<img src=\"/img/\" />\n");
+
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) createEditor(new FileEditorInput(file));
+		fProcessor = new HTMLContentAssistProcessor(editor);
+		ISourceViewer viewer = editor.getISourceViewer();
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, 15, '\t', false);
+
+		assertEquals("src value prefix reefers to non-existant subfolder, but we incorrectly suggested children anyways", 0,
+				proposals.length);
 	}
 
 	protected ITextViewer createTextViewer(IDocument fDocument)
