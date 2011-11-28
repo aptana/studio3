@@ -54,6 +54,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 	{
 		isListening = false;
 		SamplesPlugin.getDefault().getSamplesManager().removeSampleListener(getListener());
+		listener = null;
 		IdeLog.logInfo(SamplesUIPlugin.getDefault(), "Samples Portal notifier stopped", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}
 
@@ -93,11 +94,12 @@ public class SamplesNotification extends AbstractBrowserNotification
 	{
 		Map<String, String> sampleInfo = new HashMap<String, String>();
 		SampleCategory category = sample.getCategory();
-		sampleInfo.put(SamplesActionController.CATEGORY, (category != null) ? category.getName() : StringUtil.EMPTY);
-		sampleInfo.put(SamplesActionController.NAME, sample.getName());
-		sampleInfo.put(SamplesActionController.ID, sample.getId());
-		sampleInfo.put(SamplesActionController.DESCRIPTION, sample.getDescription());
-		sampleInfo.put(SamplesActionController.IMAGE, StringUtil.EMPTY); // always empty for now
+		sampleInfo.put(SamplesActionController.SAMPLE_INFO.CATEGORY.toString(), (category != null) ? category.getName()
+				: StringUtil.EMPTY);
+		sampleInfo.put(SamplesActionController.SAMPLE_INFO.NAME.toString(), sample.getName());
+		sampleInfo.put(SamplesActionController.SAMPLE_INFO.ID.toString(), sample.getId());
+		sampleInfo.put(SamplesActionController.SAMPLE_INFO.DESCRIPTION.toString(), sample.getDescription());
+		sampleInfo.put(SamplesActionController.SAMPLE_INFO.IMAGE.toString(), StringUtil.EMPTY); // always empty for now
 		return JSON.toString(sampleInfo);
 	}
 
