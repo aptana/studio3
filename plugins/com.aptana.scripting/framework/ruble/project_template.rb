@@ -15,6 +15,14 @@ module Ruble
       @jobj.type.to_s
     end
     
+    def icon=(icon)
+      @jobj.icon = icon.to_s
+    end
+    
+    def icon
+      @jobj.icon.to_s
+    end
+    
     def id=(id)
       @jobj.id = id
     end    

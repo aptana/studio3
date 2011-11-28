@@ -62,6 +62,13 @@ class ProjectTemplateNode extends BaseNode<ProjectTemplateNode.Property>
 			{
 				return node.projectTemplate.getDescription();
 			}
+		},
+		ICON(Messages.ProjectTemplateNode_Project_Template_Icon_Path)
+		{
+			public Object getPropertyValue(ProjectTemplateNode node)
+			{
+				return node.projectTemplate.getIcon();
+			}
 		};
 
 		private String header;

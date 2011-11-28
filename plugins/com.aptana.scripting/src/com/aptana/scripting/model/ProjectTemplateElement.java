@@ -8,12 +8,19 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scripting.ScriptingActivator;
 
 public class ProjectTemplateElement extends AbstractBundleElement implements IProjectTemplate
 {
@@ -21,6 +28,8 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	private String fLocation;
 	private String fDescription;
 	private String fId;
+	private String fIconPath;
+	private URL fIconURL;
 
 	/**
 	 * ProjectTemplate
@@ -122,15 +131,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	 */
 	protected void printBody(SourcePrinter printer, boolean includeBlocks)
 	{
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
-		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
-		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(this.isReplacingParameters())); //$NON-NLS-1$
-
-		if (this.getDescription() != null)
-		{
-			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
-		}
+		printBody(printer, includeBlocks, this);
 	}
 
 	/**
@@ -148,6 +149,17 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 		printer.printWithIndent("id: ").println(template.getId()); //$NON-NLS-1$
 		printer.printWithIndent("type: ").println(template.getType().name()); //$NON-NLS-1$
 		printer.printWithIndent("replaceParameters: ").println(Boolean.toString(template.isReplacingParameters())); //$NON-NLS-1$
+
+		if (template.getDescription() != null)
+		{
+			printer.printWithIndent("description: ").println(template.getDescription()); //$NON-NLS-1$
+		}
+
+		if (template.getIconURL() != null)
+		{
+			printer.printWithIndent("iconURL: ").println(template.getIconURL().toString()); //$NON-NLS-1$
+		}
+
 	}
 
 	/**
@@ -201,9 +213,57 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	 * (non-Javadoc)
 	 * @see com.aptana.core.projects.templates.IProjectTemplate#getIconPath()
 	 */
-	public URL getIconPath()
+	public URL getIconURL()
 	{
-		return null;
+		if (fIconPath == null)
+		{
+			return null;
+		}
+
+		if (fIconURL != null)
+		{
+			return fIconURL;
+		}
+
+		try
+		{
+			// First try to convert path into a URL
+			fIconURL = new URL(fIconPath);
+		}
+		catch (MalformedURLException e1)
+		{
+			// If it fails, assume it's a project-relative local path
+			IPath path = new Path(getDirectory().getAbsolutePath()).append(fIconPath);
+			try
+			{
+				fIconURL = path.toFile().toURI().toURL();
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(ScriptingActivator.getDefault(), MessageFormat.format(
+						"Unable to convert {0} into an icon URL for template {1}", fIconPath, getDisplayName())); //$NON-NLS-1$
+			}
+		}
+
+		return fIconURL;
+
+	}
+
+	/*
+	 * setIconPath
+	 */
+	public void setIcon(String iconPath)
+	{
+		fIconPath = iconPath;
+		fIconURL = null;
+	}
+
+	/*
+	 * getIconPath
+	 */
+	public String getIcon()
+	{
+		return fIconPath;
 	}
 
 	/*

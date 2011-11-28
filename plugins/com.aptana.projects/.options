@@ -1,0 +1,3 @@
+# This file is here so we can turn on tracing for the plugin to have debug logs
+com.aptana.projects/debug=true
+com.aptana.projects/debug/templates=true
