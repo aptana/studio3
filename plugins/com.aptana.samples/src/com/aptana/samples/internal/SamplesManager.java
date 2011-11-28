@@ -33,18 +33,16 @@ public class SamplesManager implements ISamplesManager
 {
 
 	private static final String EXTENSION_POINT = "samplespath"; //$NON-NLS-1$
-	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
 	private static final String ELEMENT_CATEGORY = "category"; //$NON-NLS-1$
 	private static final String ELEMENT_SAMPLESINFO = "samplesinfo"; //$NON-NLS-1$
 	private static final String ELEMENT_LOCAL = "local"; //$NON-NLS-1$
 	private static final String ELEMENT_REMOTE = "remote"; //$NON-NLS-1$
 	private static final String ELEMENT_NATURE = "nature"; //$NON-NLS-1$
 	private static final String ELEMENT_INCLUDE = "include"; //$NON-NLS-1$
-	private static final String ELEMENT_LOCAL_DESCRIPTION = "localDescription"; //$NON-NLS-1$
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
-	private static final String ATTR_DIRECTORY = "directory"; //$NON-NLS-1$
-	private static final String ATTR_URL = "url"; //$NON-NLS-1$
+	private static final String ATTR_DESCRIPTION = "description"; //$NON-NLS-1$
+	private static final String ATTR_LOCATION = "location"; //$NON-NLS-1$
 	private static final String ATTR_INFOFILE = "infoFile"; //$NON-NLS-1$
 	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
@@ -132,42 +130,38 @@ public class SamplesManager implements ISamplesManager
 		else if (ELEMENT_SAMPLESINFO.equals(elementName))
 		{
 			// either a local path or remote git url needs to be defined
-			boolean isRemote = false;
 			String path = null;
-			Map<String, String> descriptions = new HashMap<String, String>();
+			boolean isRemote = false;
 
 			Bundle bundle = Platform.getBundle(element.getNamespaceIdentifier());
 			IConfigurationElement[] localPaths = element.getChildren(ELEMENT_LOCAL);
 			if (localPaths.length > 0)
 			{
-				IConfigurationElement localPath = localPaths[0];
-				String directory = localPath.getAttribute(ATTR_DIRECTORY);
-				IConfigurationElement[] toolTipElement = localPath.getChildren(ELEMENT_LOCAL_DESCRIPTION);
-				URL url = bundle.getEntry(directory);
+				String location = localPaths[0].getAttribute(ATTR_LOCATION);
+				URL url = bundle.getEntry(location);
 				path = ResourceUtil.resourcePathToString(url);
-				for (IConfigurationElement toolTip : toolTipElement)
-				{
-					descriptions.put(toolTip.getAttribute(ATTR_NAME), toolTip.getAttribute(DESCRIPTION));
-				}
 			}
 			else
 			{
 				IConfigurationElement[] remotePaths = element.getChildren(ELEMENT_REMOTE);
 				if (remotePaths.length > 0)
 				{
-					IConfigurationElement remotePath = remotePaths[0];
+					path = remotePaths[0].getAttribute(ATTR_LOCATION);
 					isRemote = true;
-					path = remotePath.getAttribute(ATTR_URL);
-					descriptions.put(SamplesReference.REMOTE_DESCRIPTION_KEY, remotePath.getAttribute(DESCRIPTION));
 				}
 			}
-			if (StringUtil.isEmpty(path))
+			if (path == null)
 			{
 				return;
 			}
 
 			String id = element.getAttribute(ATTR_ID);
 			if (StringUtil.isEmpty(id))
+			{
+				return;
+			}
+			String name = element.getAttribute(ATTR_NAME);
+			if (StringUtil.isEmpty(name))
 			{
 				return;
 			}
@@ -190,16 +184,11 @@ public class SamplesManager implements ISamplesManager
 				samples = new ArrayList<SamplesReference>();
 				sampleRefsByCategory.put(categoryId, samples);
 			}
+			String description = element.getAttribute(ATTR_DESCRIPTION);
 
-			SamplesReference samplesRef = new SamplesReference(category, id, path, isRemote, element, descriptions);
+			SamplesReference samplesRef = new SamplesReference(category, id, name, path, isRemote, description, element);
 			samples.add(samplesRef);
 			samplesById.put(id, samplesRef);
-
-			String name = element.getAttribute(ATTR_NAME);
-			if (!StringUtil.isEmpty(name))
-			{
-				samplesRef.setName(name);
-			}
 
 			String infoFile = element.getAttribute(ATTR_INFOFILE);
 			if (!StringUtil.isEmpty(infoFile))

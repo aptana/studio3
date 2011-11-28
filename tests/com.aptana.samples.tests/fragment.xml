@@ -10,11 +10,11 @@
       </category>
       <samplesinfo
             category="com.aptana.samples.tests.category"
+            description="Testing remote sample"
             id="com.aptana.samples.tests.remote"
             name="Remote">
          <remote
-               description="Testing remote sample"
-               url="git://github.com/aptana/remote_sample.git">
+               location="git://github.com/aptana/remote_sample.git">
          </remote>
          <nature
                id="com.aptana.projects.webnature">
@@ -24,7 +24,7 @@
             id="com.aptana.samples.tests.nocategory"
             name="Sample without a category">
          <remote
-               url="sample_with_no_category">
+               location="sample_with_no_category">
          </remote>
       </samplesinfo>
    </extension>

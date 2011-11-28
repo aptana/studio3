@@ -16,10 +16,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.samples.SamplesPlugin;
-import com.aptana.samples.model.LocalSample;
-import com.aptana.samples.model.RemoteSample;
-import com.aptana.samples.model.SampleEntry;
-import com.aptana.samples.model.SampleEntryUtil;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.project.SampleProjectCreator;
 
@@ -40,24 +36,7 @@ public class ImportSampleHandler extends AbstractHandler
 
 				if (firstElement instanceof SamplesReference)
 				{
-					SamplesReference samplesRef = (SamplesReference) firstElement;
-					if (samplesRef.isRemote())
-					{
-						// imports from git
-						SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
-					}
-				}
-				else
-				{
-					SampleEntry sampleEntry = null;
-					if (firstElement instanceof SampleEntry)
-					{
-						sampleEntry = SampleEntryUtil.getRootSample((SampleEntry) firstElement);
-					}
-					if (sampleEntry != null)
-					{
-						SampleProjectCreator.createSampleProject(new LocalSample(sampleEntry));
-					}
+					SampleProjectCreator.createSampleProject((SamplesReference) firstElement);
 				}
 			}
 		}
@@ -66,7 +45,7 @@ public class ImportSampleHandler extends AbstractHandler
 			SamplesReference samplesRef = SamplesPlugin.getDefault().getSamplesManager().getSample(id);
 			if (samplesRef != null)
 			{
-				SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
+				SampleProjectCreator.createSampleProject(samplesRef);
 			}
 		}
 		return null;
