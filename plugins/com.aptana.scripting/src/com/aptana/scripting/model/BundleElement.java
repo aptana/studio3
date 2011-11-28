@@ -686,6 +686,14 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * @return the list of project samples contributed
+	 */
+	public List<ProjectSampleElement> getProjectSamples()
+	{
+		return this.getChildrenByType(ProjectSampleElement.class);
+	}
+
+	/**
 	 * getFileTemplates
 	 * 
 	 * @return
@@ -826,6 +834,11 @@ public class BundleElement extends AbstractElement
 		for (ProjectTemplateElement projTemplates : this.getProjectTemplates())
 		{
 			projTemplates.toSource(printer, includeBlocks);
+		}
+
+		for (ProjectSampleElement projSample : this.getProjectSamples())
+		{
+			projSample.toSource(printer, includeBlocks);
 		}
 	}
 

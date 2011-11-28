@@ -7,7 +7,9 @@
  */
 package com.aptana.samples.model;
 
-public interface ISample
+import com.aptana.samples.handlers.ISampleProjectHandler;
+
+public interface IProjectSample
 {
 
 	/**
@@ -21,17 +23,17 @@ public interface ISample
 	public String getName();
 
 	/**
-	 * @return the remote git path, or null if the sample is local
+	 * @return the remote git url or the local zip path
 	 */
-	public String getPath();
+	public String getLocation();
 
 	/**
-	 * @return this sample's reference that contains additional information
+	 * @return the array of nature ids that should apply to the project
 	 */
-	public SamplesReference getReference();
+	public String[] getNatures();
 
 	/**
-	 * @return the root entry for the local sample, or null if the sample is remote
+	 * @return a class that does any necessary post-processing after the project is created; could be null
 	 */
-	public SampleEntry getRootEntry();
+	public ISampleProjectHandler getProjectHandler();
 }

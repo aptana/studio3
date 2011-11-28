@@ -219,6 +219,7 @@ public class BundleManager
 	private static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	private static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
+	private static final String SAMPLES_DIRECTORY_NAME = "samples"; //$NON-NLS-1$
 
 	// constant to indicated we have no file instances
 	private static final File[] NO_FILES = new File[0];
@@ -430,7 +431,7 @@ public class BundleManager
 
 	/**
 	 * Determine if the specified path is one of the special directories in a bundle: commands, snippets, templates,
-	 * etc.
+	 * samples, etc.
 	 * 
 	 * @param path
 	 *            The path to test. This may be null, in which case this predicate will return false
@@ -444,9 +445,12 @@ public class BundleManager
 		{
 			String pathString = path.getName();
 
-			result = COMMANDS_DIRECTORY_NAME.equals(pathString) //
-					|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
-					|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
+			// @formatter:off
+			result = COMMANDS_DIRECTORY_NAME.equals(pathString)
+					|| SNIPPETS_DIRECTORY_NAME.equals(pathString)
+					|| TEMPLATES_DIRECTORY_NAME.equals(pathString)
+					|| SAMPLES_DIRECTORY_NAME.equals(pathString);
+			// @formatter:on
 		}
 
 		return result;
@@ -1205,7 +1209,7 @@ public class BundleManager
 
 	/**
 	 * Return a list of all scripts that need to be processed in a specified bundle directory. Note that the items are
-	 * returned in the following order: bundle.rb, commands, snippets, and then project templates.
+	 * returned in the following order: bundle.rb, commands, snippets, project templates, and then samples.
 	 * 
 	 * @param bundleDirectory
 	 *            The bundle directory used to search for scripts
@@ -1239,6 +1243,10 @@ public class BundleManager
 			File templatesDirectory = new File(bundleDirectory, TEMPLATES_DIRECTORY_NAME);
 
 			result.addAll(this.getScriptsFromDirectory(templatesDirectory));
+
+			// look for samples inside "samples" directory
+			File samplesDirectory = new File(bundleDirectory, SAMPLES_DIRECTORY_NAME);
+			result.addAll(getScriptsFromDirectory(samplesDirectory));
 		}
 
 		return result;
@@ -1582,6 +1590,35 @@ public class BundleManager
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
 			for (ProjectTemplateElement template : bundleEntry.getProjectTemplates())
+			{
+				if (filter == null || filter.include(template))
+				{
+					result.add(template);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of all active project sample elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<ProjectSampleElement> getProjectSamples(IModelFilter filter)
+	{
+		List<ProjectSampleElement> result = new ArrayList<ProjectSampleElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(name);
+
+			for (ProjectSampleElement template : bundleEntry.getProjectSamples())
 			{
 				if (filter == null || filter.include(template))
 				{

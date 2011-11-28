@@ -83,7 +83,7 @@ public class SamplesActionController extends AbstractActionController
 				sampleInfo.put(CATEGORY, category.getName());
 				sampleInfo.put(NAME, sample.getName());
 				sampleInfo.put(ID, sample.getId());
-				sampleInfo.put(DESCRIPTION, sample.getDescriptionText());
+				sampleInfo.put(DESCRIPTION, sample.getDescription());
 				sampleInfo.put(IMAGE, StringUtil.EMPTY); // always empty for now
 				samples.add(sampleInfo);
 			}

@@ -18,8 +18,8 @@
       </annotation>
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="samplesinfo"/>
             <element ref="category"/>
+            <element ref="samplesinfo"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -48,6 +48,48 @@
       </complexType>
    </element>
 
+   <element name="category">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  An optional icon to use for the category.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="projectHandler" type="string">
+            <annotation>
+               <documentation>
+                  A handler for adding custom steps as the sample project is getting created.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISampleProjectHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <element name="samplesinfo">
       <complexType>
          <sequence>
@@ -65,6 +107,16 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
          <attribute name="category" type="string">
             <annotation>
                <documentation>
@@ -75,7 +127,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="name" type="string">
+         <attribute name="description" type="string">
             <annotation>
                <documentation>
                   
@@ -147,10 +199,7 @@
 
    <element name="local">
       <complexType>
-         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="localDescription"/>
-         </sequence>
-         <attribute name="directory" type="string" use="required">
+         <attribute name="location" type="string" use="required">
             <annotation>
                <documentation>
                   
@@ -165,70 +214,7 @@
 
    <element name="remote">
       <complexType>
-         <attribute name="url" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="description" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="category">
-      <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute translatable="true"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="icon" type="string">
-            <annotation>
-               <documentation>
-                  An optional icon to use for the category.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="resource"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="localDescription">
-      <annotation>
-         <documentation>
-            Provides the description for the given sample name
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The name of the sample that needs to have a special tooltip applied to it. (Normally the directory name)
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="description" type="string">
+         <attribute name="location" type="string" use="required">
             <annotation>
                <documentation>
                   

@@ -5,18 +5,26 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.samples.handlers;
+package com.aptana.samples;
 
 import com.aptana.samples.model.SamplesReference;
 
-public interface ISamplePreviewHandler
+public interface ISampleListener
 {
 
 	/**
-	 * Handles the preview request on a sample.
+	 * Fired when a sample is added.
 	 * 
 	 * @param sample
-	 *            the sample entry
+	 *            the added sample
 	 */
-	public void previewRequested(SamplesReference sample);
+	public void sampleAdded(SamplesReference sample);
+
+	/**
+	 * Fired when a sample is removed.
+	 * 
+	 * @param sample
+	 *            the removed sample
+	 */
+	public void sampleRemoved(SamplesReference sample);
 }

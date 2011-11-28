@@ -118,6 +118,7 @@ class BundleEntryNode extends BaseNode<BundleEntryNode.Property>
 		addNode(result, new BuildPathsNode(entry.getBuildPaths()));
 		addNode(result, new EnvsNode(entry.getEnvs()));
 		addNode(result, new ProjectTemplatesNode(entry.getProjectTemplates()));
+		addNode(result, new ProjectSamplesNode(entry.getProjectSamples()));
 
 		return result.toArray();
 	}

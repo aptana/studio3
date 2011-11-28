@@ -10,7 +10,7 @@ package com.aptana.samples.ui.project;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.samples.model.ISample;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -25,7 +25,7 @@ public class SampleProjectCreator
 	 * @param sample
 	 *            the sample
 	 */
-	public static void createSampleProject(ISample sample)
+	public static void createSampleProject(IProjectSample sample)
 	{
 		openWizard(new NewSampleProjectWizard(sample));
 	}
