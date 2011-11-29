@@ -18,7 +18,7 @@ import org.mortbay.util.ajax.JSON;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
-import com.aptana.projects.internal.wizards.NewProjectWizard;
+import com.aptana.projects.ProjectsPlugin;
 
 /**
  * Action controller for Template operations
@@ -77,8 +77,8 @@ public class TemplateActionController extends AbstractActionController
 			}
 		}
 
-		List<IProjectTemplate> templates = NewProjectWizard.getProjectTemplates(types.toArray(new TemplateType[types
-				.size()]));
+		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
+				.getTemplates(types.toArray(new TemplateType[types.size()]));
 		List<Map<String, String>> templateObjects = new ArrayList<Map<String, String>>();
 
 		for (IProjectTemplate template : templates)
