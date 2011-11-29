@@ -142,6 +142,12 @@
             name="Recent Files Notifier"
             notificationTarget="*">
       </browserNotification>
+      <browserNotification
+            class="com.aptana.portal.ui.dispatch.browserNotifications.TemplatesNotification"
+            id="com.aptana.portal.ui.templatesNotification"
+            name="Templates Notifier"
+            notificationTarget="*">
+      </browserNotification>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
