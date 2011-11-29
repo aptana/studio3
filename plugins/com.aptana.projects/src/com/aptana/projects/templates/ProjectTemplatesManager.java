@@ -27,6 +27,11 @@ import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;
+import com.aptana.scripting.model.AbstractElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.ElementVisibilityListener;
+import com.aptana.scripting.model.ProjectTemplateElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 /**
  * Project templates manager for templates contributions through the <code>"projectTemplates"</code> extension point.
@@ -49,20 +54,92 @@ public class ProjectTemplatesManager
 
 	private Map<TemplateType, List<IProjectTemplate>> projectTemplates;
 
+	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	{
+
+		public void elementBecameHidden(AbstractElement element)
+		{
+			if (element instanceof ProjectTemplateElement)
+			{
+				ProjectTemplateElement template = (ProjectTemplateElement) element;
+				removeTemplate(template);
+				fireTemplateRemoved(template);
+			}
+		}
+
+		public void elementBecameVisible(AbstractElement element)
+		{
+			if (element instanceof ProjectTemplateElement)
+			{
+				ProjectTemplateElement template = (ProjectTemplateElement) element;
+				addTemplate(template);
+				fireTemplateAdded(template);
+			}
+		}
+	};
+
+	private List<IProjectTemplateListener> templateListeners;
+
 	public ProjectTemplatesManager()
 	{
 		projectTemplates = new HashMap<TemplateType, List<IProjectTemplate>>();
+		templateListeners = new ArrayList<IProjectTemplateListener>();
 		readExtensionRegistry();
+		loadTemplatesFromBundles();
+
+		BundleManager.getInstance().addElementVisibilityListener(elementListener);
 	}
 
+	public void dispose()
+	{
+		BundleManager.getInstance().removeElementVisibilityListener(elementListener);
+	}
+
+	public void addListener(IProjectTemplateListener listener)
+	{
+		if (!templateListeners.contains(listener))
+		{
+			templateListeners.add(listener);
+		}
+	}
+
+	public void removeListener(IProjectTemplateListener listener)
+	{
+		templateListeners.remove(listener);
+	}
+
+	/**
+	 * Returns a list of {@link IProjectTemplate} for the given type.<br>
+	 * 
+	 * @param projectType
+	 *            The specific project type
+	 * @return a list of project templates matching the type
+	 */
 	public List<IProjectTemplate> getTemplatesForType(TemplateType projectType)
 	{
-		List<IProjectTemplate> samples = projectTemplates.get(projectType);
-		if (samples == null)
+		List<IProjectTemplate> templates = projectTemplates.get(projectType);
+		if (templates == null)
 		{
 			return Collections.emptyList();
 		}
-		return Collections.unmodifiableList(samples);
+		return Collections.unmodifiableList(templates);
+	}
+
+	/**
+	 * Returns a list of {@link IProjectTemplate} that match any of the given types.<br>
+	 * 
+	 * @param projectTypes
+	 *            an array of project types
+	 * @return a list of project templates matching the types
+	 */
+	public List<IProjectTemplate> getTemplates(TemplateType[] projectTypes)
+	{
+		List<IProjectTemplate> templates = new ArrayList<IProjectTemplate>();
+		for (TemplateType type : projectTypes)
+		{
+			templates.addAll(getTemplatesForType(type));
+		}
+		return templates;
 	}
 
 	private void readExtensionRegistry()
@@ -110,12 +187,7 @@ public class ProjectTemplatesManager
 				return;
 			}
 			TemplateType type = TemplateType.valueOf(element.getAttribute(ATTR_TYPE).toUpperCase());
-			List<IProjectTemplate> templates = projectTemplates.get(type);
-			if (templates == null)
-			{
-				templates = new ArrayList<IProjectTemplate>();
-				projectTemplates.put(type, templates);
-			}
+
 			String name = element.getAttribute(ATTR_NAME);
 			if (name == null)
 			{
@@ -142,9 +214,62 @@ public class ProjectTemplatesManager
 			}
 
 			boolean replacingParameters = Boolean.parseBoolean(element.getAttribute(ATTR_REPLACE_PARAMETERS));
-			IProjectTemplate projectTemplate = new ProjectTemplate(path, type, name, replacingParameters, description,
-					iconURL, id);
-			templates.add(projectTemplate);
+
+			addTemplate(new ProjectTemplate(path, type, name, replacingParameters, description, iconURL, id));
+		}
+	}
+
+	private void loadTemplatesFromBundles()
+	{
+		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		{
+
+			public boolean include(AbstractElement element)
+			{
+				return (element instanceof ProjectTemplateElement);
+			}
+		});
+		for (IProjectTemplate template : templates)
+		{
+			addTemplate(template);
+		}
+	}
+
+	private void addTemplate(IProjectTemplate template)
+	{
+		TemplateType type = template.getType();
+		List<IProjectTemplate> templates = projectTemplates.get(type);
+		if (templates == null)
+		{
+			templates = new ArrayList<IProjectTemplate>();
+			projectTemplates.put(type, templates);
+		}
+		templates.add(template);
+	}
+
+	private void removeTemplate(IProjectTemplate template)
+	{
+		TemplateType type = template.getType();
+		List<IProjectTemplate> templates = projectTemplates.get(type);
+		if (templates != null)
+		{
+			templates.remove(template);
+		}
+	}
+
+	private void fireTemplateAdded(IProjectTemplate template)
+	{
+		for (IProjectTemplateListener listener : templateListeners)
+		{
+			listener.templateAdded(template);
+		}
+	}
+
+	private void fireTemplateRemoved(IProjectTemplate template)
+	{
+		for (IProjectTemplateListener listener : templateListeners)
+		{
+			listener.templateRemoved(template);
 		}
 	}
 }

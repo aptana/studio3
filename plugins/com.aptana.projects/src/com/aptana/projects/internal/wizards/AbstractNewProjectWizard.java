@@ -82,14 +82,7 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
-import com.aptana.git.ui.internal.actions.DisconnectHandler;
-import com.aptana.projects.IDebugScopes;
 import com.aptana.projects.ProjectsPlugin;
-import com.aptana.projects.templates.ProjectTemplatesManager;
-import com.aptana.scripting.model.AbstractElement;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.ProjectTemplateElement;
-import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
@@ -197,7 +190,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
 		}
 
-		List<IProjectTemplate> templates = getProjectTemplates(getProjectTemplateTypes());
+		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
+				.getTemplates(getProjectTemplateTypes());
 		if (templates.size() > 0 && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage(TEMPLATE_SELECTION_PAGE_NAME, templates));
@@ -357,7 +351,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 		if (projectTemplateId != null)
 		{
-			List<IProjectTemplate> templates = getProjectTemplates(templateType);
+			List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
+					.getTemplates(templateType);
 
 			for (IProjectTemplate template : templates)
 			{
@@ -527,58 +522,6 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		{
 			throw new InvocationTargetException(e);
 		}
-	}
-
-	/**
-	 * Returns a list of {@link IProjectTemplate} that match the any of the given types.<br>
-	 * Templates are loaded from the Rubles and from the "projectTemplates" extension point.
-	 * 
-	 * @param templateTypes
-	 *            The Types to match to.
-	 * @return A list of ProjectTemplateElement
-	 */
-	public static List<IProjectTemplate> getProjectTemplates(final TemplateType[] templateTypes)
-	{
-		if (templateTypes == null || templateTypes.length == 0)
-		{
-			return Collections.emptyList();
-		}
-
-		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
-		{
-			public boolean include(AbstractElement element)
-			{
-				boolean result = false;
-
-				if (element instanceof ProjectTemplateElement)
-				{
-					ProjectTemplateElement template = (ProjectTemplateElement) element;
-					TemplateType type = template.getType();
-					for (TemplateType t : templateTypes)
-					{
-						if (type == t)
-						{
-							result = true;
-							break;
-						}
-					}
-				}
-				return result;
-			}
-		});
-		ProjectTemplatesManager manager = new ProjectTemplatesManager();
-		for (TemplateType t : templateTypes)
-		{
-			templates.addAll(manager.getTemplatesForType(t));
-		}
-
-		if (IdeLog.isInfoEnabled(ProjectsPlugin.getDefault(), IDebugScopes.TEMPLATES))
-		{
-			IdeLog.logInfo(ProjectsPlugin.getDefault(),
-					MessageFormat.format("\nFound project templates:\n{0}", templates), //$NON-NLS-1$
-					IDebugScopes.TEMPLATES);
-		}
-		return templates;
 	}
 
 	/**
