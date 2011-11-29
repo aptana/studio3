@@ -40,4 +40,9 @@ public interface IDebugScopes
 	 */
 	String EXTENSION_POINTS = CorePlugin.PLUGIN_ID + "/debug/extension_points"; //$NON-NLS-1$
 
+	/**
+	 * Items related to zip utils
+	 */
+	String ZIPUTIL = CorePlugin.PLUGIN_ID + "/debug/ziputil"; //$NON-NLS-1$
+
 }
