@@ -52,7 +52,7 @@ public class CoffeeFoldingComputerTest extends TestCase
 				protected IParseNode getAST()
 				{
 					IParseState parseState = new ParseState();
-					parseState.setEditState(getDocument().get(), null, 0, 0);
+					parseState.setEditState(getDocument().get(), 0);
 					try
 					{
 						return new CoffeeParser().parse(parseState);

@@ -88,9 +88,9 @@ public class HTMLParseState extends ParseState
 	}
 
 	@Override
-	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
+	public void setEditState(String source, int startingOffset)
 	{
-		super.setEditState(source, insertedText, startingOffset, removedLength);
+		super.setEditState(source, startingOffset);
 		fDocumentType = HTMLDocumentTypes.getType(source);
 	}
 

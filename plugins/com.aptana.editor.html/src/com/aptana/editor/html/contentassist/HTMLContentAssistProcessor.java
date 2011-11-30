@@ -836,7 +836,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (state == null)
 					{
 						state = new HTMLParseState();
-						state.setEditState(documentText, null, 0, 0);
+						state.setEditState(documentText, 0);
 					}
 
 					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
@@ -1089,7 +1089,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (state == null)
 				{
 					state = new HTMLParseState();
-					state.setEditState(_document.get(), null, 0, 0);
+					state.setEditState(_document.get(), 0);
 				}
 				if (state.isEmptyTagType(element.getName()))
 				{

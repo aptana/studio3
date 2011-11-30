@@ -24,25 +24,11 @@ public interface IParseState
 	public void clearEditState();
 
 	/**
-	 * getInsertedText
-	 * 
-	 * @return
-	 */
-	public char[] getInsertedText();
-
-	/**
 	 * getParseResult
 	 * 
 	 * @return
 	 */
 	public IParseRootNode getParseResult();
-
-	/**
-	 * getRemovedLength
-	 * 
-	 * @return
-	 */
-	public int getRemovedLength();
 
 	/**
 	 * getSource
@@ -76,11 +62,9 @@ public interface IParseState
 	 * setEditState
 	 * 
 	 * @param source
-	 * @param insertedText
 	 * @param startingOffset
-	 * @param removedLength
 	 */
-	public void setEditState(String source, String insertedText, int startingOffset, int removedLength);
+	public void setEditState(String source, int startingOffset);
 
 	/**
 	 * setParseResult

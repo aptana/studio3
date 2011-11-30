@@ -57,7 +57,7 @@ public class HTMLTagUtil
 	public static List<String> getUnclosedTagNames(IDocument document, int offset)
 	{
 		HTMLParseState state = new HTMLParseState();
-		state.setEditState(document.get(), null, 0, 0);
+		state.setEditState(document.get(), 0);
 
 		List<String> unclosedElements = new ArrayList<String>();
 		try

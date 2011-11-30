@@ -1546,7 +1546,7 @@ public class CoffeeParserTest extends TestCase
 	{
 		CoffeeParser parser = new CoffeeParser();
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source, null, 0, 0);
+		parseState.setEditState(source, 0);
 		return parser.parse(parseState);
 	}
 

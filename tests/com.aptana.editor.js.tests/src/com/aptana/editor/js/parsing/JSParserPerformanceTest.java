@@ -159,7 +159,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	{
 		// apply to parse state
 		JSParseState parseState = new JSParseState();
-		parseState.setEditState(src, src, 0, 0);
+		parseState.setEditState(src, 0);
 		parseState.setAttachComments(false);
 		parseState.setCollectComments(false);
 

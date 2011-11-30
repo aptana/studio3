@@ -288,7 +288,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			IParseState parseState)
 	{
 		IParser parser = checkoutParser();
-		parseState.setEditState(output, null, 0, 0);
+		parseState.setEditState(output, 0);
 		List<IRegion> onOffRegions = null;
 		try
 		{

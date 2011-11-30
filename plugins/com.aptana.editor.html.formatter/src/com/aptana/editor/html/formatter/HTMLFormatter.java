@@ -78,7 +78,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	{
 		IParseState parseState = new HTMLParseState();
 		String source = document.get();
-		parseState.setEditState(source, null, 0, 0);
+		parseState.setEditState(source, 0);
 		int indent = 0;
 		try
 		{
@@ -136,7 +136,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		try
 		{
 			IParseState parseState = new HTMLParseState();
-			parseState.setEditState(input, null, 0, 0);
+			parseState.setEditState(input, 0);
 			IParseNode parseResult = null;
 			try
 			{

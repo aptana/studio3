@@ -87,7 +87,7 @@ public class BuildContext
 			// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
 			try
 			{
-				fParseState.setEditState(getContents(), null, 0, 0);
+				fParseState.setEditState(getContents(), 0);
 				// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
 				// between those and IO errors!
 				IParseRootNode ast = ParserPoolFactory.parse(getContentType(), parseState);

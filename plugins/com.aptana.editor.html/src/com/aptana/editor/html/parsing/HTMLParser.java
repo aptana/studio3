@@ -99,7 +99,7 @@ public class HTMLParser implements IParser
 		else
 		{
 			fParseState = new HTMLParseState();
-			fParseState.setEditState(source, null, parseState.getStartingOffset(), parseState.getRemovedLength());
+			fParseState.setEditState(source, parseState.getStartingOffset());
 			fParseState.setSkippedRanges(parseState.getSkippedRanges());
 			fParseState.setProgressMonitor(parseState.getProgressMonitor());
 		}
@@ -293,7 +293,7 @@ public class HTMLParser implements IParser
 			{
 				String text = fScanner.getSource().get(start, end - start + 1);
 				ParseState subParseState = new ParseState();
-				subParseState.setEditState(text, null, 0, 0);
+				subParseState.setEditState(text, 0);
 				// FIXME We need to propagate options down to sub-languages, i.e. JS's attach/collect comments
 				IParseNode node = ParserPoolFactory.parse(language, subParseState);
 				List<IParseError> subErrors = subParseState.getErrors();

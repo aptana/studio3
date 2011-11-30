@@ -44,7 +44,7 @@ public abstract class BaseOutlineItemTest extends TestCase
 
 	protected IParseNode getParseResults(String source)
 	{
-		fParseState.setEditState(source, source, 0, 0);
+		fParseState.setEditState(source, 0);
 		try
 		{
 			fParser.parse(fParseState);

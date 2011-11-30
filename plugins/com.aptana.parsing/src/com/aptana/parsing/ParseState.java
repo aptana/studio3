@@ -23,12 +23,8 @@ import com.aptana.parsing.lexer.IRange;
 public class ParseState implements IParseState
 {
 
-	private static final char[] NO_CHARS = new char[0];
-
 	private String fSource;
-	private char[] fInsertedText;
 	private int fStartingOffset;
-	private int fRemovedLength;
 	private List<IParseError> fErrors;
 
 	private IRange[] fSkippedRanges;
@@ -41,7 +37,6 @@ public class ParseState implements IParseState
 	public ParseState()
 	{
 		fSource = StringUtil.EMPTY;
-		fInsertedText = NO_CHARS;
 		fProperties = new HashMap<String, Object>();
 		fErrors = new ArrayList<IParseError>();
 
@@ -49,24 +44,12 @@ public class ParseState implements IParseState
 
 	public void clearEditState()
 	{
-		fInsertedText = NO_CHARS;
-		fRemovedLength = 0;
 		fSkippedRanges = null;
 	}
 
 	public IParseRootNode getParseResult()
 	{
 		return fParseResult;
-	}
-
-	public char[] getInsertedText()
-	{
-		return fInsertedText;
-	}
-
-	public int getRemovedLength()
-	{
-		return fRemovedLength;
 	}
 
 	public String getSource()
@@ -89,12 +72,10 @@ public class ParseState implements IParseState
 		return fProperties;
 	}
 
-	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
+	public void setEditState(String source, int startingOffset)
 	{
 		fSource = (source != null) ? source : StringUtil.EMPTY;
-		fInsertedText = (insertedText != null) ? insertedText.toCharArray() : NO_CHARS;
 		fStartingOffset = startingOffset;
-		fRemovedLength = removedLength;
 		fSkippedRanges = null;
 	}
 
@@ -130,23 +111,7 @@ public class ParseState implements IParseState
 	{
 		StringBuilder text = new StringBuilder();
 		text.append('@').append(fStartingOffset);
-
-		if (fRemovedLength > 0)
-		{
-			text.append(":r").append(fRemovedLength); //$NON-NLS-1$
-		}
-
-		int insertedLength = fInsertedText.length;
-		if (insertedLength > 0)
-		{
-			text.append(":i").append(insertedLength).append(':').append(fInsertedText); //$NON-NLS-1$
-		}
-		else
-		{
-			// outputs closing delimiter for proper parsing of the offset
-			text.append(':');
-		}
-
+		text.append(':');
 		return text.toString();
 	}
 

@@ -932,7 +932,7 @@ public class JSParserTest extends TestCase
 		ParseState parseState = new ParseState();
 		String source = "// this is a single-line comment";
 
-		parseState.setEditState(source, null, 0, 0);
+		parseState.setEditState(source, 0);
 		fParser.parse(parseState);
 
 		IParseNode parseNode = parseState.getParseResult();

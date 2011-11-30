@@ -209,7 +209,7 @@ public class ParserPoolFactory
 																														// declaredExceptions
 	{
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source, null, 0, 0);
+		parseState.setEditState(source, 0);
 		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);

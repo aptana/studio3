@@ -40,7 +40,7 @@ public class ScopeTests extends FileContentBasedTests
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState();
 
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source, 0);
 		parser.parse(parseState);
 
 		return parseState.getParseResult();
@@ -76,7 +76,7 @@ public class ScopeTests extends FileContentBasedTests
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState();
 
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source, 0);
 		parser.parse(parseState);
 		
 		IParseNode root = parseState.getParseResult();
