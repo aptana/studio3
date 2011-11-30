@@ -8,6 +8,7 @@
 package com.aptana.editor.css.contentassist.index;
 
 import java.net.URI;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,6 +29,10 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
+	/**
+	 * Pattern used to verify hex color values.
+	 */
+	private static final Pattern fgHexColorPattern = Pattern.compile("^#[a-fA-F0-9]{3}([a-fA-F0-9]{3})?$"); //$NON-NLS-1$
 
 	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
@@ -106,10 +111,9 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				walkNode(index, uri, child);
 			}
 		}
-
 	}
 
-	private static boolean isColor(String value)
+	static boolean isColor(String value)
 	{
 		if (StringUtil.isEmpty(value))
 		{
@@ -121,7 +125,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		if (value.charAt(0) == '#' && (value.length() == 4 || value.length() == 7))
 		{
-			return true; // FIXME Check to make sure it's hex values!
+			return fgHexColorPattern.matcher(value).matches();
 		}
 		return false;
 	}

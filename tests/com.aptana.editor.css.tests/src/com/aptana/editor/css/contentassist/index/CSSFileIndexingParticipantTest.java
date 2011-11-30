@@ -33,6 +33,28 @@ public class CSSFileIndexingParticipantTest extends TestCase
 		super.tearDown();
 	}
 
+	public void testIsColor() throws Exception
+	{
+		assertTrue(CSSFileIndexingParticipant.isColor("#c9c9c9"));
+		assertTrue(CSSFileIndexingParticipant.isColor("#ccc"));
+		assertTrue(CSSFileIndexingParticipant.isColor("#000"));
+		assertTrue(CSSFileIndexingParticipant.isColor("#000000"));
+
+		assertFalse(CSSFileIndexingParticipant.isColor("#g00000"));
+
+		assertFalse(CSSFileIndexingParticipant.isColor("#0"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#00"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#0000"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#00000"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#0000000"));
+
+		assertFalse(CSSFileIndexingParticipant.isColor("#a"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aa"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aaaa"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aaaaa"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aaaaaaa"));
+	}
+
 	public void testDetectTaskTagWithUnicodeCharacters() throws Exception
 	{
 		File tmpDir = null;
