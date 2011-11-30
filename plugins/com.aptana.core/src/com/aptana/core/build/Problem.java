@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 
+import com.aptana.core.util.StringUtil;
+
 public class Problem implements IProblem
 {
 
@@ -28,8 +30,7 @@ public class Problem implements IProblem
 		this(severity, message, offset, length, lineNumber, sourcePath, IMarker.PRIORITY_NORMAL);
 	}
 
-	public Problem(int severity, String message, int offset, int length, int lineNumber, String sourcePath,
-			int priority)
+	public Problem(int severity, String message, int offset, int length, int lineNumber, String sourcePath, int priority)
 	{
 		this.severity = severity;
 		this.message = message;
@@ -109,14 +110,16 @@ public class Problem implements IProblem
 			return false;
 		}
 		Problem other = (Problem) obj;
-		return severity == other.severity && offset == other.offset && length == other.length
-				&& message.equals(other.message) && sourcePath.equals(other.sourcePath);
+		return severity == other.severity && priority == other.priority && offset == other.offset
+				&& length == other.length && StringUtil.areEqual(message, other.message)
+				&& StringUtil.areEqual(sourcePath, other.sourcePath);
 	}
 
 	@Override
 	public int hashCode()
 	{
 		int hash = severity;
+		hash = hash * 31 + priority;
 		hash = hash * 31 + offset;
 		hash = hash * 31 + length;
 		hash = hash * 31 + message.hashCode();
@@ -133,7 +136,7 @@ public class Problem implements IProblem
 	{
 		return severity == IMarker.SEVERITY_WARNING;
 	}
-	
+
 	public boolean isTask()
 	{
 		// FIXME This is wrong! We can have "problems" that are info, and tasks are separate!
