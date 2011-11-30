@@ -37,6 +37,7 @@ import com.aptana.core.build.IBuildParticipantManager;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.ReconcileContext;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonAnnotationModel;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -193,34 +194,15 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile, boolean force)
 	{
-		// Refresh the outline...
-		// TODO Does this need to be run in asyncExec here?
-		Display.getDefault().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				if (fEditor.hasOutlinePageCreated())
-				{
-					IParseNode node = fEditor.getAST();
+		SubMonitor monitor = SubMonitor.convert(fMonitor, 100);
 
-					if (node != null)
-					{
-						CommonOutlinePage page = fEditor.getOutlinePage();
-						page.refresh();
-						if (!autoExpanded)
-						{
-							page.expandToLevel(2);
-							autoExpanded = true;
-						}
-					}
-				}
-			}
-		});
+		refreshOutline();
+		monitor.worked(5);
 
 		// FIXME only do folding and validation when the source was changed
 		if (fEditor.isFoldingEnabled())
 		{
-			calculatePositions(initialReconcile, fMonitor);
+			calculatePositions(initialReconcile, monitor.newChild(20));
 		}
 		else
 		{
@@ -230,17 +212,53 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			}
 			updatePositions();
 		}
-		if (fMonitor != null && fMonitor.isCanceled())
+		monitor.setWorkRemaining(75);
+
+		if (monitor.isCanceled())
 		{
 			return;
 		}
-		runParticipants();
 
+		runParticipants(monitor.newChild(75));
 	}
 
-	private void runParticipants()
+	private void refreshOutline()
 	{
-		// FIXME Fold the validation into build participants...
+		// TODO Does this need to be run in asyncExec here?
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				if (!fEditor.hasOutlinePageCreated())
+				{
+					return;
+				}
+
+				IParseNode node = fEditor.getAST();
+				if (node == null)
+				{
+					return;
+				}
+
+				CommonOutlinePage page = fEditor.getOutlinePage();
+				page.refresh();
+
+				if (!autoExpanded)
+				{
+					page.expandToLevel(2);
+					autoExpanded = true;
+				}
+			}
+		});
+	}
+
+	/**
+	 * Runs through the {@link IBuildParticipant}s that apply to this editor's underlying file.
+	 * 
+	 * @param monitor
+	 */
+	private void runParticipants(IProgressMonitor monitor)
+	{
 		final IFile file = getFile();
 		if (file == null)
 		{
@@ -248,20 +266,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 
 		String contentTypeId = fEditor.getContentType();
-		ReconcileContext context = new ReconcileContext(contentTypeId, file, fDocument.get());
 		IBuildParticipantManager manager = BuildPathCorePlugin.getDefault().getBuildParticipantManager();
 		List<IBuildParticipant> participants = manager.getBuildParticipants(contentTypeId);
-		if (participants != null && !participants.isEmpty())
+		if (CollectionsUtil.isEmpty(participants))
 		{
-			SubMonitor sub = SubMonitor.convert(fMonitor, participants.size());
-			for (IBuildParticipant participant : participants)
-			{
-				participant.buildFile(context, sub.newChild(1));
-			}
-			sub.done();
+			return;
 		}
 
-		reportProblems(context);
+		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 1);
+		ReconcileContext context = new ReconcileContext(contentTypeId, file, fDocument.get());
+		for (IBuildParticipant participant : participants)
+		{
+			participant.buildFile(context, sub.newChild(1));
+		}
+		reportProblems(context, sub.newChild(1));
+		sub.done();
 	}
 
 	/**
@@ -269,27 +288,30 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 * markers on the underlying resource.
 	 * 
 	 * @param context
+	 * @param monitor
 	 */
-	private void reportProblems(ReconcileContext context)
+	private void reportProblems(ReconcileContext context, IProgressMonitor monitor)
 	{
 		IAnnotationModel model = fEditor.getDocumentProvider().getAnnotationModel(fEditor.getEditorInput());
-		if (model instanceof CommonAnnotationModel)
+		if (!(model instanceof CommonAnnotationModel))
 		{
-			CommonAnnotationModel caModel = (CommonAnnotationModel) model;
-			caModel.setProgressMonitor(fMonitor);
-
-			// Collect all the problems into a single collection...
-			Map<String, Collection<IProblem>> mapProblems = context.getProblems();
-			Collection<IProblem> problems = new ArrayList<IProblem>();
-			for (Collection<IProblem> blah : mapProblems.values())
-			{
-				problems.addAll(blah);
-			}
-			// Now report them all to the annotation model!
-			caModel.reportProblems(problems);
-
-			caModel.setProgressMonitor(null);
+			return;
 		}
+
+		CommonAnnotationModel caModel = (CommonAnnotationModel) model;
+		caModel.setProgressMonitor(monitor);
+
+		// Collect all the problems into a single collection...
+		Map<String, Collection<IProblem>> mapProblems = context.getProblems();
+		Collection<IProblem> allProblems = new ArrayList<IProblem>();
+		for (Collection<IProblem> problemsForMarkerType : mapProblems.values())
+		{
+			allProblems.addAll(problemsForMarkerType);
+		}
+		// Now report them all to the annotation model!
+		caModel.reportProblems(allProblems);
+
+		caModel.setProgressMonitor(null);
 	}
 
 	private IFile getFile()
