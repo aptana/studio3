@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.coffee.CoffeeScriptEditorPlugin;
 import com.aptana.editor.coffee.parsing.ast.CoffeeCommentNode;
 import com.aptana.index.core.build.BuildContext;
@@ -50,8 +51,13 @@ public class CoffeeTaskDetector extends AbstractBuildParticipant
 		try
 		{
 			IParseRootNode rootNode = context.getAST();
+			if (rootNode == null)
+			{
+				return Collections.emptyList();
+			}
+
 			IParseNode[] comments = rootNode.getCommentNodes();
-			if (comments == null || comments.length == 0)
+			if (ArrayUtil.isEmpty(comments))
 			{
 				return Collections.emptyList();
 			}
