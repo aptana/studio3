@@ -51,7 +51,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		try
 		{
-			if (resource != null && resource.exists())
+			if (resource != null && resource.isAccessible())
 			{
 				resource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
 				resource.deleteMarkers(IMarkerConstants.TASK_MARKER, true, IResource.DEPTH_INFINITE);

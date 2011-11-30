@@ -22,8 +22,8 @@ import com.aptana.parsing.ast.IParseNode;
 
 /**
  * It is recommended for instances of IBuildParticipant to subclass this class. This takes care of the getter/setter for
- * priority, as well as provides some helper methods for detecting tasks, generating task IValidationItems and
- * determining the line number of an offset in the document.
+ * priority, as well as provides some helper methods for detecting tasks, generating {@link IProblem}s and determining
+ * the line number of an offset in the document.
  * 
  * @author cwilliams
  */
@@ -90,7 +90,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 	{
 		Collection<IProblem> tasks = new ArrayList<IProblem>();
 		String text = commentNode.getText();
-		if (text == null || text.length() == 0)
+		if (StringUtil.isEmpty(text))
 		{
 			text = getText(source, commentNode);
 		}
@@ -133,7 +133,13 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 
 	private String getText(String source, IParseNode commentNode)
 	{
-		return new String(source.substring(commentNode.getStartingOffset(), commentNode.getEndingOffset() + 1));
+		if (commentNode == null || source == null)
+		{
+			return StringUtil.EMPTY;
+		}
+		int start = Math.max(0, commentNode.getStartingOffset());
+		int end = Math.min(commentNode.getEndingOffset() + 1, source.length());
+		return new String(source.substring(start, end));
 	}
 
 	protected IProblem createTask(String sourcePath, String message, Integer priority, int lineNumber, int offset,
@@ -142,15 +148,14 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 		return new Problem(IMarker.SEVERITY_INFO, message, offset, endOffset - offset, lineNumber, sourcePath);
 	}
 
-	// Stuff from Validation...
-	protected IProblem createWarning(String message, int lineNumber, int i, int j, String sourcePath)
+	protected IProblem createWarning(String message, int lineNumber, int offset, int length, String sourcePath)
 	{
-		return new Problem(IMarker.SEVERITY_WARNING, message, i, j, lineNumber, sourcePath);
+		return new Problem(IMarker.SEVERITY_WARNING, message, offset, length, lineNumber, sourcePath);
 	}
 
-	protected IProblem createError(String message, int lineNumber, int i, int j, String sourcePath)
+	protected IProblem createError(String message, int lineNumber, int offset, int length, String sourcePath)
 	{
-		return new Problem(IMarker.SEVERITY_ERROR, message, i, j, lineNumber, sourcePath);
+		return new Problem(IMarker.SEVERITY_ERROR, message, offset, length, lineNumber, sourcePath);
 	}
 
 	protected boolean hasErrorOrWarningOnLine(List<IProblem> items, int line)
@@ -160,6 +165,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 			return false;
 		}
 
+		// FIXME We may want to sort the items by line number and then do a binary search!
 		for (IProblem item : items)
 		{
 			if (item.getLineNumber() == line)

@@ -20,8 +20,8 @@ public interface IBuildParticipant
 
 	/**
 	 * Clean is called on a whole project. This method is called on every build participant regardless of the content
-	 * type bindings. Implementations are expected to introspect n the {@link IProject} to determine if they need to
-	 * operate.
+	 * type bindings. As a result, implementations are expected to introspect on the {@link IProject} to determine if
+	 * any operations need to be performed. (i.e. traverse the folders and find any files they need to operate on)
 	 * 
 	 * @param project
 	 * @param monitor
