@@ -965,6 +965,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	/**
 	 * FIXME Should we hang this here?
 	 * 
+	 * @deprecated Callers should call to {@link ParserPoolFactory} themselves
 	 * @return
 	 */
 	public IParseRootNode getAST()
@@ -981,6 +982,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return null;
 	}
 
+	/**
+	 * @deprecated This doesn't belong on the editor, this should be in some ASTUtil method or something...
+	 * @param offset
+	 * @return
+	 */
 	protected IParseNode getASTNodeAt(int offset)
 	{
 		try
