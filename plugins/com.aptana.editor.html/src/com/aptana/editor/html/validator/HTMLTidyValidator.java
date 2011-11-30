@@ -45,6 +45,7 @@ import com.aptana.parsing.ast.IParseError.Severity;
 
 public class HTMLTidyValidator extends AbstractBuildParticipant
 {
+	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final Pattern PATTERN = Pattern
 			.compile("\\s*line\\s+(\\d+)\\s*column\\s+(\\d+)\\s*-\\s*(Warning|Error):\\s*(.+)$"); //$NON-NLS-1$
@@ -251,17 +252,20 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	{
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
 				.getString(getFilterExpressionsPrefKey(language));
-		if (!StringUtil.isEmpty(list))
+		if (StringUtil.isEmpty(list))
 		{
-			String[] expressions = list.split("####"); //$NON-NLS-1$
-			for (String expression : expressions)
+			return false;
+		}
+
+		String[] expressions = fgFilterExpressionDelimiter.split(list);
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
 			{
-				if (message.matches(expression))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
+
 		return false;
 	}
 

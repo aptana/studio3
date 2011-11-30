@@ -55,6 +55,7 @@ import com.aptana.parsing.ast.IParseError.Severity;
  */
 public class CSSValidator extends AbstractBuildParticipant
 {
+	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final String APTANA_PROFILE = "AptanaProfile"; //$NON-NLS-1$
 	private static final String CONFIG_FILE = "AptanaCSSConfig.properties"; //$NON-NLS-1$
@@ -288,17 +289,20 @@ public class CSSValidator extends AbstractBuildParticipant
 	{
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
 				.getString(getFilterExpressionsPrefKey(language));
-		if (!StringUtil.isEmpty(list))
+		if (StringUtil.isEmpty(list))
 		{
-			String[] expressions = list.split("####"); //$NON-NLS-1$
-			for (String expression : expressions)
+			return false;
+		}
+
+		String[] expressions = fgFilterExpressionDelimiter.split(list);
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
 			{
-				if (message.matches(expression))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -467,12 +471,17 @@ public class CSSValidator extends AbstractBuildParticipant
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		try
 		{
 			String source = context.getContents();
 			URI uri = context.getURI();
 			String path = uri.toString();
-			
+
 			context.getAST(); // make sure a parse has happened...
 
 			List<IProblem> problems = new ArrayList<IProblem>();
@@ -503,6 +512,11 @@ public class CSSValidator extends AbstractBuildParticipant
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		context.removeProblems(IMarker.PROBLEM);
 	}
 }

@@ -10,6 +10,7 @@ package com.aptana.editor.js.validator;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -31,6 +32,8 @@ import com.aptana.index.core.build.BuildContext;
 
 public class MozillaJsValidator extends AbstractBuildParticipant
 {
+
+	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	// FIXME Create sub-markers of Problem marker just for Mozilla JS!
 
@@ -113,17 +116,20 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 	{
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
 				.getString(getFilterExpressionsPrefKey(language));
-		if (!StringUtil.isEmpty(list))
+		if (StringUtil.isEmpty(list))
 		{
-			String[] expressions = list.split("####"); //$NON-NLS-1$
-			for (String expression : expressions)
+			return false;
+		}
+		
+		String[] expressions = fgFilterExpressionDelimiter.split(list);
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
 			{
-				if (message.matches(expression))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
+
 		return false;
 	}
 }

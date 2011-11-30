@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,6 +50,7 @@ import com.aptana.parsing.ast.IParseError.Severity;
 
 public class JSLintValidator extends AbstractBuildParticipant
 {
+	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
@@ -238,17 +240,20 @@ public class JSLintValidator extends AbstractBuildParticipant
 	{
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
 				.getString(getFilterExpressionsPrefKey(language));
-		if (!StringUtil.isEmpty(list))
+		if (StringUtil.isEmpty(list))
 		{
-			String[] expressions = list.split("####"); //$NON-NLS-1$
-			for (String expression : expressions)
+			return false;
+		}
+
+		String[] expressions = fgFilterExpressionDelimiter.split(list);
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
 			{
-				if (message.matches(expression))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
+
 		return false;
 	}
 
