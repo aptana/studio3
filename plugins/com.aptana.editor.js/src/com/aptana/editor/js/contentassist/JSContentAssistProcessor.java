@@ -32,6 +32,7 @@ import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSSourceConfiguration;
@@ -44,6 +45,7 @@ import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.parsing.JSFlexLexemeProvider;
 import com.aptana.editor.js.parsing.JSFlexScanner;
+import com.aptana.editor.js.parsing.JSParseState;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -52,6 +54,7 @@ import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.index.core.Index;
+import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -530,7 +533,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		IParseNode result = null;
 		try
 		{
-			IParseNode ast = editor.getAST();
+			IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			JSParseState parseState = new JSParseState();
+			parseState.setEditState(doc.get(), null, 0, 0);
+			parseState.setAttachComments(false);
+			parseState.setCollectComments(false);
+			IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, parseState);
+
 			if (ast != null)
 			{
 				result = ast.getNodeAtOffset(offset);
