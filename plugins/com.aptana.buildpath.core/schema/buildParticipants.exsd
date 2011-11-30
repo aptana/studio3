@@ -6,7 +6,7 @@
          <meta.schema plugin="com.aptana.buildpath.core" id="buildParticipants" name="Build Participants"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows clients to participate in the build process by receiving notifications during build and reconcile, via an com.aptana.core.build.IBuildParticipant.
       </documentation>
    </annotation>
 
@@ -55,7 +55,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the class that implements this build participant. This class must implement a public implementation of com.aptana.core.build.IBuildParticipant with a public 0-argument constructor.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.core.build.IBuildParticipant"/>
@@ -83,11 +83,16 @@
    </element>
 
    <element name="contentTypeBinding">
+      <annotation>
+         <documentation>
+            Advertises that the containing build participant understands the given content type and is suitable for participating in the build/reconcile process for files of that type.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="contentTypeId" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The content type identifier. This is an ID defined by the &apos;org.eclipse.core.contenttype.contentTypes&apos; extension point.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
@@ -102,7 +107,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         3.1.0
       </documentation>
    </annotation>
 
@@ -111,27 +116,34 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+         Example of a declaration of a &lt;code&gt;buildParticipant&lt;/code&gt;:  &lt;pre&gt;                                                                       
+&lt;extension
+      id=&quot;example&quot;
+      name=&quot;%exampleParticipantName&quot;
+      point=&quot;com.aptana.buildpath.core.buildParticipants&quot;&gt;
+   &lt;buildParticipant
+         class=&quot;com.aptana.core.internal.ExampleBuildParticipant&quot;
+         id=&quot;ExampleID&quot;
+         priority&quot;65&quot;&gt;
+      &lt;contentTypeBinding contentTypeId=&quot;org.eclipse.jdt.apt.core.compile.problem&quot;/&gt;
+   &lt;/buildParticipant&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
       </documentation>
    </annotation>
+
+
 
    <annotation>
       <appinfo>
-         <meta.section type="apiinfo"/>
+         <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         [Enter API information here.]
+         Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+Licensed under the terms of the Eclipse Public License (EPL).
+Please see the license-epl.html included with this distribution for details.
+Any modifications to this file must keep this entire copyright intact.
       </documentation>
    </annotation>
-
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
-
 
 </schema>
