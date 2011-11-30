@@ -91,7 +91,7 @@ public class HTMLParser implements IParser
 		fTagScanner = new HTMLTagScanner();
 		fElementStack = new Stack<IParseNode>();
 
-		String source = new String(parseState.getSource());
+		String source = parseState.getSource();
 		if (parseState instanceof HTMLParseState)
 		{
 			fParseState = (HTMLParseState) parseState;
@@ -294,6 +294,7 @@ public class HTMLParser implements IParser
 				String text = fScanner.getSource().get(start, end - start + 1);
 				ParseState subParseState = new ParseState();
 				subParseState.setEditState(text, null, 0, 0);
+				// FIXME We need to propagate options down to sub-languages, i.e. JS's attach/collect comments
 				IParseNode node = ParserPoolFactory.parse(language, subParseState);
 				List<IParseError> subErrors = subParseState.getErrors();
 				if (subErrors != null)

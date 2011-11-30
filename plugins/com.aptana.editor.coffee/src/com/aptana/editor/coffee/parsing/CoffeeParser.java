@@ -161,11 +161,8 @@ public class CoffeeParser extends Parser implements IParser {
 
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
-		// grab source
-		char[] characters = parseState.getSource();
-
 		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		String source = parseState.getSource();
 
 		// create scanner and send source to it
 		CoffeeScanner scanner = new CoffeeScanner();
@@ -174,7 +171,7 @@ public class CoffeeParser extends Parser implements IParser {
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 		int start = parseState.getStartingOffset();
-		int end = start + parseState.getSource().length - 1;
+		int end = start + parseState.getSource().length() - 1;
 		result.setLocation(start, end);
 
 		// store results in the parse state

@@ -15,6 +15,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
@@ -24,12 +25,11 @@ public class ParseState implements IParseState
 
 	private static final char[] NO_CHARS = new char[0];
 
-	private char[] fSource;
+	private String fSource;
 	private char[] fInsertedText;
 	private int fStartingOffset;
 	private int fRemovedLength;
 	private List<IParseError> fErrors;
-
 
 	private IRange[] fSkippedRanges;
 	private Map<String, Object> fProperties;
@@ -40,7 +40,7 @@ public class ParseState implements IParseState
 
 	public ParseState()
 	{
-		fSource = NO_CHARS;
+		fSource = StringUtil.EMPTY;
 		fInsertedText = NO_CHARS;
 		fProperties = new HashMap<String, Object>();
 		fErrors = new ArrayList<IParseError>();
@@ -69,7 +69,7 @@ public class ParseState implements IParseState
 		return fRemovedLength;
 	}
 
-	public char[] getSource()
+	public String getSource()
 	{
 		return fSource;
 	}
@@ -91,7 +91,7 @@ public class ParseState implements IParseState
 
 	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
 	{
-		fSource = (source != null) ? source.toCharArray() : NO_CHARS;
+		fSource = (source != null) ? source : StringUtil.EMPTY;
 		fInsertedText = (insertedText != null) ? insertedText.toCharArray() : NO_CHARS;
 		fStartingOffset = startingOffset;
 		fRemovedLength = removedLength;
@@ -108,7 +108,8 @@ public class ParseState implements IParseState
 		fSkippedRanges = ranges;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParseState#getProgressMonitor()
 	 */
 	public IProgressMonitor getProgressMonitor()

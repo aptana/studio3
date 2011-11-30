@@ -18,24 +18,26 @@
 	 */
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
-		DTDScanner scanner = new DTDScanner();
-
-		// grab source
-		char[] characters = parseState.getSource();
-
-		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		this._scanner = new DTDScanner();
 
 		// send source to the scanner
-		scanner.setSource(source);
+		this._scanner.setSource(parseState.getSource());
 
-		// parse
-		IParseRootNode result = (IParseRootNode) parse(scanner);
-
-		// save reference to result
-		parseState.setParseResult(result);
-
-		return result;
+		try
+		{
+			// parse
+			IParseRootNode result = (IParseRootNode) parse(this._scanner);
+			
+			// save reference to result
+			parseState.setParseResult(result);
+			
+			return result;
+		}
+		finally
+		{
+			// loose reference for GC
+			this._scanner = null;
+		}
 	}
 
 	protected void addChildren(IParseNode node, ArrayList children)

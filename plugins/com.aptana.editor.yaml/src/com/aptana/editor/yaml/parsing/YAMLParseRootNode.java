@@ -22,7 +22,7 @@ public class YAMLParseRootNode extends ParseRootNode
 	public YAMLParseRootNode(Node yamlRoot, IParseState parseState)
 	{
 		super(IYAMLConstants.CONTENT_TYPE_YAML, new Symbol[0], parseState.getStartingOffset(), parseState
-				.getStartingOffset() + parseState.getSource().length);
+				.getStartingOffset() + parseState.getSource().length());
 		traverse(yamlRoot, parseState);
 	}
 
@@ -62,12 +62,12 @@ public class YAMLParseRootNode extends ParseRootNode
 		return lineOffset + startMark.getColumn();
 	}
 
-	private static int offsetOfLine(int line, char[] source)
+	private static int offsetOfLine(int line, String source)
 	{
 
 		try
 		{
-			return new Document(new String(source)).getLineOffset(line);
+			return new Document(source).getLineOffset(line);
 		}
 		catch (BadLocationException e)
 		{
@@ -79,17 +79,17 @@ public class YAMLParseRootNode extends ParseRootNode
 			return 0;
 		}
 		int curLine = 0;
-		for (int i = 0; i < source.length; i++)
+		for (int i = 0; i < source.length(); i++)
 		{
 			if (curLine == line)
 			{
 				return i;
 			}
-			char c = source[i];
+			char c = source.charAt(i);
 			if (c == '\r')
 			{
 				// peek to see if next is '\n'
-				if (((i + 1) < source.length) && source[i + 1] == '\n')
+				if (((i + 1) < source.length()) && source.charAt(i + 1) == '\n')
 				{
 					i += 1;
 				}
@@ -110,7 +110,7 @@ public class YAMLParseRootNode extends ParseRootNode
 		if (parseState != null)
 		{
 			lineOffset = offsetOfLine(endMark.getLine(), parseState.getSource());
-			return Math.min(lineOffset + endMark.getColumn() - 1, parseState.getSource().length);
+			return Math.min(lineOffset + endMark.getColumn() - 1, parseState.getSource().length());
 		}
 		return lineOffset + endMark.getColumn() - 1;
 	}

@@ -1,6 +1,7 @@
 package com.aptana.editor.yaml.parsing;
 
-import java.io.CharArrayReader;
+import java.io.Reader;
+import java.io.StringReader;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.Node;
@@ -21,12 +22,12 @@ public class YAMLParser implements IParser
 
 	public IParseRootNode parse(IParseState parseState) throws Exception
 	{
-		CharArrayReader reader = new CharArrayReader(parseState.getSource());
+		Reader reader = new StringReader(parseState.getSource());
 		Node root = getSourceParser().compose(reader);
-		
+
 		// Convert YAML nodes to our own!
 		YAMLParseRootNode yamlRoot = new YAMLParseRootNode(root, parseState);
-		
+
 		parseState.setParseResult(yamlRoot);
 
 		return yamlRoot;

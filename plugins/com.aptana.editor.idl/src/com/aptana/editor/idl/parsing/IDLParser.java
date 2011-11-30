@@ -86,14 +86,8 @@ public class IDLParser extends Parser implements IParser {
 	{
 		IDLScanner scanner = new IDLScanner();
 
-		// grab source
-		char[] characters = parseState.getSource();
-
-		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
-
 		// send source to the scanner
-		scanner.setSource(source);
+		scanner.setSource(parseState.getSource());
 
 		// parse
 		IParseRootNode result = (IParseRootNode) parse(scanner);

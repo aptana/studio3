@@ -242,8 +242,7 @@ public class ParserPoolFactory
 		{
 			return null;
 		}
-		// Must grab hash on the string, because char[] hash gives different results each time for same underlying data
-		int sourceHash = new String(parseState.getSource()).hashCode();
+		int sourceHash = parseState.getSource().hashCode();
 		String key = MessageFormat.format("{0}:{1}", contentTypeId, sourceHash); //$NON-NLS-1$
 		IParseRootNode result = fParseCache.get(key);
 		if (result != null)

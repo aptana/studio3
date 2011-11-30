@@ -76,10 +76,7 @@
 	{
 		fParseState = parseState;
 		// grab source
-		char[] characters = fParseState.getSource();
-
-		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : ""; //$NON-NLS-1$
+		String source = fParseState.getSource();
 
 		fParseState.clearErrors();
 
@@ -90,7 +87,7 @@
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 		int start = fParseState.getStartingOffset();
-		int end = start + fParseState.getSource().length - 1;
+		int end = start + source.length() - 1;
 		result.setLocation(start, end);
 
 		// store results in the parse state
@@ -117,13 +114,10 @@
 
 	private String getSource(IParseState parseState, IRange comment)
 	{
-		char[] src = parseState.getSource();
-		int length = comment.getLength();
-		char[] dest = new char[length];
-
-		System.arraycopy(src, comment.getStartingOffset(), dest, 0, length);
-
-		return new String(dest);
+		String src = parseState.getSource();
+		int start = comment.getStartingOffset();
+		int endIndex = start + comment.getLength();
+		return new String(src.substring(start, endIndex));
 	}
 :};
 

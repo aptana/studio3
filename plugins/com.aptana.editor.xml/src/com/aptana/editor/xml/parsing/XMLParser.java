@@ -115,7 +115,7 @@ public class XMLParser implements IParser
 		fElementStack = new Stack<IParseNode>();
 
 		// create scanner and apply source
-		String source = new String(parseState.getSource());
+		String source = parseState.getSource();
 		fScanner.setSource(source);
 
 		int startingOffset = parseState.getStartingOffset();

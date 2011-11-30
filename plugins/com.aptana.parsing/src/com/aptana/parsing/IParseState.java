@@ -49,7 +49,7 @@ public interface IParseState
 	 * 
 	 * @return
 	 */
-	public char[] getSource();
+	public String getSource();
 
 	/**
 	 * getStartingOffset

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -107,7 +106,7 @@ public class BuildContext
 			finally
 			{
 				// Wipe the source out of the parse state to clean up RAM?
-				fParseState.setEditState(null, null, 0, 0);
+				fParseState.clearEditState();
 			}
 		}
 		if (fParseState == null)
