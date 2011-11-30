@@ -33,21 +33,52 @@ public class CSSFileIndexingParticipantTest extends TestCase
 		super.tearDown();
 	}
 
-	public void testIsColor() throws Exception
+	public void testIsColorWithNames() throws Exception
 	{
+		assertTrue(CSSFileIndexingParticipant.isColor("aqua"));
+		assertTrue(CSSFileIndexingParticipant.isColor("black"));
+		assertTrue(CSSFileIndexingParticipant.isColor("blue"));
+		assertTrue(CSSFileIndexingParticipant.isColor("fuchsia"));
+		assertTrue(CSSFileIndexingParticipant.isColor("gray"));
+		assertTrue(CSSFileIndexingParticipant.isColor("green"));
+		assertTrue(CSSFileIndexingParticipant.isColor("lime"));
+		assertTrue(CSSFileIndexingParticipant.isColor("maroon"));
+		assertTrue(CSSFileIndexingParticipant.isColor("navy"));
+		assertTrue(CSSFileIndexingParticipant.isColor("olive"));
+		assertTrue(CSSFileIndexingParticipant.isColor("purple"));
+		assertTrue(CSSFileIndexingParticipant.isColor("red"));
+		assertTrue(CSSFileIndexingParticipant.isColor("silver"));
+		assertTrue(CSSFileIndexingParticipant.isColor("teal"));
+		assertTrue(CSSFileIndexingParticipant.isColor("white"));
+		assertTrue(CSSFileIndexingParticipant.isColor("yellow"));
+		
+		// Non-standard names don't work
+		assertFalse(CSSFileIndexingParticipant.isColor("grey"));
+	}
+
+	public void testIsColorWithHexValues() throws Exception
+	{
+		// various correct hex values
 		assertTrue(CSSFileIndexingParticipant.isColor("#c9c9c9"));
 		assertTrue(CSSFileIndexingParticipant.isColor("#ccc"));
 		assertTrue(CSSFileIndexingParticipant.isColor("#000"));
 		assertTrue(CSSFileIndexingParticipant.isColor("#000000"));
 
+		// empty and just hash
+		assertFalse(CSSFileIndexingParticipant.isColor(""));
+		assertFalse(CSSFileIndexingParticipant.isColor("#"));
+
+		// letter outside hex
 		assertFalse(CSSFileIndexingParticipant.isColor("#g00000"));
 
+		// Wrong lengths with digits
 		assertFalse(CSSFileIndexingParticipant.isColor("#0"));
 		assertFalse(CSSFileIndexingParticipant.isColor("#00"));
 		assertFalse(CSSFileIndexingParticipant.isColor("#0000"));
 		assertFalse(CSSFileIndexingParticipant.isColor("#00000"));
 		assertFalse(CSSFileIndexingParticipant.isColor("#0000000"));
 
+		// wrong lengths with letters
 		assertFalse(CSSFileIndexingParticipant.isColor("#a"));
 		assertFalse(CSSFileIndexingParticipant.isColor("#aa"));
 		assertFalse(CSSFileIndexingParticipant.isColor("#aaaa"));
