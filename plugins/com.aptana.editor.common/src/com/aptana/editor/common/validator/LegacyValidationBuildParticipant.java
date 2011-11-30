@@ -10,10 +10,14 @@ package com.aptana.editor.common.validator;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -28,6 +32,7 @@ import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -42,6 +47,8 @@ import com.aptana.parsing.ast.IParseError;
  */
 public class LegacyValidationBuildParticipant extends AbstractBuildParticipant implements IValidationManager
 {
+	
+	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private Document fDocument;
 	private BuildContext fContext;
@@ -63,17 +70,16 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 		else
 		{
 			String[] selectedValidators = list.split(","); //$NON-NLS-1$
-			for (String name : selectedValidators)
+			Set<String> selectedValidatorNames = new HashSet<String>(Arrays.asList(selectedValidators));
+			for (ValidatorReference validator : validatorRefs)
 			{
-				for (ValidatorReference validator : validatorRefs)
+				if (selectedValidatorNames.contains(validator.getName()))
 				{
-					if (validator.getName().equals(name))
-					{
-						result.add(validator);
-						break;
-					}
+					result.add(validator);
+					break;
 				}
 			}
+
 		}
 		return result;
 	}
@@ -95,40 +101,49 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		try
 		{
 			fContext = context;
-			Map<String, List<IProblem>> allItems = new HashMap<String, List<IProblem>>();
-			List<ValidatorReference> validatorRefs = getValidatorRefs(context.getContentType());
-			if (!validatorRefs.isEmpty())
+
+			List<ValidatorReference> validatorRefs = getValidatorRefs(fContext.getContentType());
+			if (CollectionsUtil.isEmpty(validatorRefs))
 			{
-				fDocument = new Document(context.getContents());
+				return;
+			}
 
-				for (ValidatorReference validatorRef : validatorRefs)
+			String contents = fContext.getContents();
+			URI uri = fContext.getURI();
+			fDocument = new Document(contents);
+
+			Map<String, List<IProblem>> allItems = new HashMap<String, List<IProblem>>();
+			for (ValidatorReference validatorRef : validatorRefs)
+			{
+				List<IProblem> newItems = validatorRef.getValidator().validate(contents, uri, this);
+				String type = validatorRef.getMarkerType();
+				List<IProblem> items = allItems.get(type);
+				if (items == null)
 				{
-					List<IProblem> newItems = validatorRef.getValidator().validate(context.getContents(),
-							context.getURI(), this);
-					String type = validatorRef.getMarkerType();
-					List<IProblem> items = allItems.get(type);
-					if (items == null)
-					{
-						items = Collections.synchronizedList(new ArrayList<IProblem>());
-						allItems.put(type, items);
-					}
-					items.addAll(newItems);
-
-					// FIXME We need to handle nested languages here....
-					// for (String nestedLanguage : fNestedLanguages)
-					// {
-					// processNestedLanguage(nestedLanguage, allItems);
-					// }
+					items = Collections.synchronizedList(new ArrayList<IProblem>());
+					allItems.put(type, items);
 				}
+				items.addAll(newItems);
 
-				// Now stick the generated problems into the context
-				for (Map.Entry<String, List<IProblem>> entry : allItems.entrySet())
-				{
-					context.putProblems(entry.getKey(), entry.getValue());
-				}
+				// FIXME We need to handle nested languages here....
+				// for (String nestedLanguage : fNestedLanguages)
+				// {
+				// processNestedLanguage(nestedLanguage, allItems);
+				// }
+			}
+
+			// Now stick the generated problems into the context
+			for (Map.Entry<String, List<IProblem>> entry : allItems.entrySet())
+			{
+				fContext.putProblems(entry.getKey(), entry.getValue());
 			}
 		}
 		catch (CoreException e)
@@ -144,10 +159,15 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		try
 		{
 			List<ValidatorReference> validatorRefs = getValidatorRefs(context.getContentType());
-			if (!validatorRefs.isEmpty())
+			if (!CollectionsUtil.isEmpty(validatorRefs))
 			{
 				for (ValidatorReference validatorRef : validatorRefs)
 				{
@@ -193,22 +213,24 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 
 	public void addNestedLanguage(String language)
 	{
-		// TODO Auto-generated method stub
-
+		// no-op, we don't handle nested languages properly.
 	}
 
 	public boolean isIgnored(String message, String language)
 	{
 		String list = getPreferenceStore().getString(getFilterExpressionsPrefKey(language));
-		if (!StringUtil.isEmpty(list))
+		if (StringUtil.isEmpty(list))
 		{
-			String[] expressions = list.split("####"); //$NON-NLS-1$
-			for (String expression : expressions)
+			return false;
+		}
+		
+		
+		String[] expressions = fgFilterExpressionDelimiter.split(list);
+		for (String expression : expressions)
+		{
+			if (message.matches(expression))
 			{
-				if (message.matches(expression))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 		return false;
@@ -216,7 +238,7 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 
 	public void addParseErrors(List<IProblem> items, String language)
 	{
-		if (fDocument == null || !getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(language)))
+		if (fContext == null || fDocument == null || !getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(language)))
 		{
 			return;
 		}
