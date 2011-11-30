@@ -7,6 +7,9 @@
  */
 package com.aptana.ui.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -20,7 +23,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -257,5 +262,44 @@ public class SWTUtils
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Evaluates each of the controls and determines the largest width. Then sets each control with the largest width.
+	 * Each control must have a GridData as its layout data
+	 * 
+	 * @param controls
+	 */
+	public static void resizeControlWidthInGrid(List<Control> controls)
+	{
+		int largestWidth = SWT.DEFAULT;
+		List<GridData> gridDatas = new ArrayList<GridData>();
+		for (Control control : controls)
+		{
+			Object layoutData = control.getLayoutData();
+			if (layoutData instanceof GridData)
+			{
+				GridData gridData = (GridData) layoutData;
+				gridDatas.add(gridData);
+
+				if (gridData.widthHint > largestWidth)
+				{
+					largestWidth = gridData.widthHint;
+				}
+				else
+				{
+					int preferredX = control.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+					if (preferredX > largestWidth)
+					{
+						largestWidth = preferredX;
+					}
+				}
+			}
+		}
+
+		for (GridData gridData : gridDatas)
+		{
+			gridData.widthHint = largestWidth;
+		}
 	}
 }
