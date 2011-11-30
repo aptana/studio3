@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -37,11 +38,15 @@ public class BuildContext
 
 	private String fContents;
 
+	protected BuildContext()
+	{
+		this.problems = new HashMap<String, Collection<IProblem>>();
+	}
+
 	public BuildContext(IFile file)
 	{
+		this();
 		this.file = file;
-		this.problems = new HashMap<String, Collection<IProblem>>();
-		this.fParseState = null;
 	}
 
 	public IProject getProject()
@@ -59,7 +64,7 @@ public class BuildContext
 		return getFile().getLocationURI();
 	}
 
-	public synchronized IParseRootNode getAST() throws CoreException
+	public IParseRootNode getAST() throws CoreException
 	{
 		return getAST(new ParseState());
 	}
@@ -74,7 +79,7 @@ public class BuildContext
 		}
 		else
 		{
-			// TODO Check equality of the parse states to see if anything has changed (and therefore we need to
+			// TODO Check the parse states to see if anything has changed (and therefore we need to
 			// re-parse)?
 		}
 
@@ -128,7 +133,7 @@ public class BuildContext
 
 	protected String getCharset() throws CoreException
 	{
-		return file.getCharset(true);
+		return getFile().getCharset(true);
 	}
 
 	public String getContentType() throws CoreException
@@ -150,7 +155,7 @@ public class BuildContext
 
 	public String getName()
 	{
-		return file.getName();
+		return getFile().getName();
 	}
 
 	public void removeProblems(String markerType)
@@ -166,18 +171,24 @@ public class BuildContext
 
 	public Map<String, Collection<IProblem>> getProblems()
 	{
+		// TODO Handle possible concurrent modification exceptions
 		return Collections.unmodifiableMap(problems);
 	}
 
 	public Collection<IParseError> getParseErrors()
 	{
-		// FIXME Maybe we should force getAST() if fParseState == null?
-		
+		if (fParseState == null)
+		{
+			// FIXME Maybe we should force getAST() if fParseState == null?
+			return Collections.emptyList();
+		}
+
+		// TODO Handle possible concurrent modification exceptions
 		return Collections.unmodifiableCollection(fParseState.getErrors());
 	}
 
 	public InputStream openInputStream(IProgressMonitor monitor) throws CoreException
 	{
-		return file.getContents();
+		return getFile().getContents();
 	}
 }

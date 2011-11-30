@@ -62,7 +62,10 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	// FIXME Add a special sub-type of HTML Problem markers just for Tidy!
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
-		boolean enableParseErrors = enableHTMLParseErrors();
+		if (context == null)
+		{
+			return;
+		}
 
 		List<IProblem> problems = new ArrayList<IProblem>();
 		try
@@ -76,8 +79,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				String sourcePath = path.toString();
 
 				// TODO Break out parse error stuff from Tidy!
-
-				if (enableParseErrors)
+				if (enableHTMLParseErrors())
 				{
 					context.getAST(); // Ensure a parse has happened
 

@@ -16,6 +16,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -41,7 +42,8 @@ public class FileStoreBuildContext extends BuildContext
 
 	public FileStoreBuildContext(IFileStore fileStore)
 	{
-		super(null);
+		super();
+		Assert.isNotNull(fileStore, "fileStore cannot be null"); //$NON-NLS-1$
 		this.fileStore = fileStore;
 	}
 

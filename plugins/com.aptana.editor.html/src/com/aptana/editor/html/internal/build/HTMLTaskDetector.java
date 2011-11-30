@@ -46,12 +46,22 @@ public class HTMLTaskDetector extends AbstractBuildParticipant
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		Collection<IProblem> tasks = detectTasks(context, monitor);
 		context.putProblems(IMarker.TASK, tasks);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		context.removeProblems(IMarker.TASK);
 	}
 
@@ -63,6 +73,11 @@ public class HTMLTaskDetector extends AbstractBuildParticipant
 		try
 		{
 			IParseRootNode rootNode = context.getAST();
+			if (rootNode == null)
+			{
+				return tasks;
+			}
+
 			tasks.addAll(walkAST(context, rootNode, sub.newChild(1)));
 			tasks.addAll(processComments(rootNode, context, sub.newChild(1)));
 			sub.done();

@@ -39,11 +39,21 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
 	}
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		List<IProblem> problems = new ArrayList<IProblem>();
 		Context cx = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
@@ -120,7 +130,7 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 		{
 			return false;
 		}
-		
+
 		String[] expressions = fgFilterExpressionDelimiter.split(list);
 		for (String expression : expressions)
 		{

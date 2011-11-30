@@ -87,17 +87,15 @@ public class CSSTextHoverTests extends TestCase
 		{
 			if (editor != null)
 			{
-				if (editor != null)
+				if (Display.getCurrent() != null)
 				{
-					if (Display.getCurrent() != null)
-					{
-						editor.getSite().getPage().closeEditor(editor, false);
-					}
-					else
-					{
-						editor.close(false);
-					}
+					editor.getSite().getPage().closeEditor(editor, false);
 				}
+				else
+				{
+					editor.close(false);
+				}
+
 				editor = null;
 			}
 			if (file != null)

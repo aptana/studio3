@@ -57,6 +57,11 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		boolean enableParseErrors = enableJSParseErrors();
 		boolean enableJSLint = enableJSLint();
 
@@ -65,7 +70,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 		{
 			try
 			{
-
 				String source = context.getContents();
 				URI uri = context.getURI();
 				String sourcePath = uri.toString();
@@ -138,6 +142,11 @@ public class JSLintValidator extends AbstractBuildParticipant
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
 	}
 

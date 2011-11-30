@@ -40,6 +40,11 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
+		if (context == null || index == null)
+		{
+			return;
+		}
+
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		sub.subTask(getIndexingMessage(index, context.getURI()));
 		walkAST(context, index, context.getAST(), monitor);
@@ -176,23 +181,25 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 */
 	public void walkAST(BuildContext context, Index index, IParseNode parent, IProgressMonitor monitor)
 	{
-		if (parent != null)
+		if (context == null || index == null || parent == null)
 		{
-			Queue<IParseNode> queue = new LinkedList<IParseNode>();
+			return;
+		}
 
-			// prime queue
-			queue.offer(parent);
+		Queue<IParseNode> queue = new LinkedList<IParseNode>();
 
-			while (!queue.isEmpty())
+		// prime queue
+		queue.offer(parent);
+
+		while (!queue.isEmpty())
+		{
+			IParseNode current = queue.poll();
+
+			processNode(index, context, current);
+
+			for (IParseNode child : current)
 			{
-				IParseNode current = queue.poll();
-
-				processNode(index, context, current);
-
-				for (IParseNode child : current)
-				{
-					queue.offer(child);
-				}
+				queue.offer(child);
 			}
 		}
 	}

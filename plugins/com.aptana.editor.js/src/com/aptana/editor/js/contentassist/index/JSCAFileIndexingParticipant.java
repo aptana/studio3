@@ -34,6 +34,11 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	public void index(BuildContext context, Index index, IProgressMonitor monitor) throws CoreException
 	{
+		if (context == null || index == null)
+		{
+			return;
+		}
+
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		try
 		{
