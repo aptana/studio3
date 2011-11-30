@@ -16,6 +16,8 @@ import org.eclipse.jface.text.source.AnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModel;
 
 /**
+ * Attaches the {@link CommonAnnotationModel} to the editor for IFiles.
+ * 
  * @author cwilliams
  */
 public class CommonAnnotationModelFactory implements IAnnotationModelFactory

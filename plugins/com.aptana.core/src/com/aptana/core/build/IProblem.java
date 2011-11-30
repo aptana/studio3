@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * @author Ingo Muschenetz
+ * @author Chris Williams
  */
 public interface IProblem
 {
@@ -49,7 +50,7 @@ public interface IProblem
 	 * @return the severity
 	 */
 	int getSeverity();
-	
+
 	/**
 	 * Gets the priority of the task (typically unused for errors/warnings).
 	 * 
@@ -71,9 +72,24 @@ public interface IProblem
 	 */
 	Map<String, Object> createMarkerAttributes();
 
+	/**
+	 * Does this problem represent a warning?
+	 * 
+	 * @return
+	 */
 	boolean isWarning();
 
+	/**
+	 * Does this problem represent an error?
+	 * 
+	 * @return
+	 */
 	boolean isError();
 
+	/**
+	 * Does this problem represent a task?
+	 * 
+	 * @return
+	 */
 	boolean isTask();
 }

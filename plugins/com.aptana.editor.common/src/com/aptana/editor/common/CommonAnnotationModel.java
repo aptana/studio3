@@ -22,7 +22,8 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 import com.aptana.core.build.IProblem;
 
 /**
- * Annotation Model for {@link IProblem}s.
+ * Annotation Model for {@link IProblem}s. This model is used to draw annotations on the editor for
+ * problems/tasks/warnings foudn during reconcile.
  * 
  * @author cwilliams
  */
