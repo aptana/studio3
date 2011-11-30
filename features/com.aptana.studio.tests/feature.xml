@@ -69,6 +69,7 @@
       <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.index.core"/>
       <import plugin="com.aptana.portal.ui"/>
+      <import plugin="com.aptana.buildpath.core"/>
    </requires>
 
    <plugin
@@ -395,6 +396,14 @@
 
    <plugin
          id="com.aptana.portal.ui.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.buildpath.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
