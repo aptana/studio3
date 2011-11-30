@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.ast.CSSCommentNode;
 import com.aptana.index.core.build.BuildContext;
@@ -32,19 +33,36 @@ import com.aptana.parsing.ast.IParseRootNode;
  */
 public class CSSTaskDetector extends AbstractBuildParticipant
 {
+	private static final String COMMENT_ENDING = "*/"; //$NON-NLS-1$
+
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		Collection<IProblem> tasks = detectTasks(context, monitor);
 		context.putProblems(IMarker.TASK, tasks);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
+
 		context.removeProblems(IMarker.TASK);
 	}
 
 	private Collection<IProblem> detectTasks(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return Collections.emptyList();
+		}
+
 		try
 		{
 			return detectTasks(context.getAST(), context, monitor);
@@ -62,23 +80,29 @@ public class CSSTaskDetector extends AbstractBuildParticipant
 	 */
 	public Collection<IProblem> detectTasks(IParseRootNode rootNode, BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null || rootNode == null)
+		{
+			return Collections.emptyList();
+		}
+
+		IParseNode[] comments = rootNode.getCommentNodes();
+		if (ArrayUtil.isEmpty(comments))
+		{
+			return Collections.emptyList();
+		}
+
 		Collection<IProblem> tasks = new ArrayList<IProblem>();
 		try
 		{
-			IParseNode[] comments = rootNode.getCommentNodes();
-			if (comments == null || comments.length == 0)
-			{
-				return Collections.emptyList();
-			}
-
 			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
 			String source = context.getContents();
 			String filePath = context.getURI().toString();
+
 			for (IParseNode commentNode : comments)
 			{
 				if (commentNode instanceof CSSCommentNode)
 				{
-					tasks.addAll(processCommentNode(filePath, source, 0, commentNode, "*/")); //$NON-NLS-1$
+					tasks.addAll(processCommentNode(filePath, source, 0, commentNode, COMMENT_ENDING));
 				}
 				sub.worked(1);
 			}
