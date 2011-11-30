@@ -66,6 +66,8 @@
          point="com.aptana.buildpath.core.buildParticipants">
       <participant
             class="com.aptana.editor.coffee.internal.build.CoffeeTaskDetector"
+            id="com.aptana.editor.coffee.CoffeeTaskDetector"
+            name="%coffeescript.task.participant.name"
             priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.coffeescript">

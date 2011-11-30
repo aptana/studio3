@@ -215,7 +215,8 @@
          point="com.aptana.buildpath.core.buildParticipants">
       <participant
             class="com.aptana.editor.js.internal.build.JSTaskDetector"
-            name="JS Task Detector"
+            id="com.aptana.editor.js.build.JSTaskDetector"
+            name="%js.task.detector.name"
             priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.js">
@@ -223,6 +224,7 @@
       </participant>
       <participant
             class="com.aptana.editor.js.validator.JSLintValidator"
+            id="com.aptana.editor.js.validator.JSLintValidator"
             name="%validator.jslint.name"
             priority="50">
          <contentTypeBinding
@@ -231,6 +233,7 @@
       </participant>
       <participant
             class="com.aptana.editor.js.validator.MozillaJsValidator"
+            id="com.aptana.editor.js.validator.MozillaValidator"
             name="%validator.mozilla.name"
             priority="50">
          <contentTypeBinding

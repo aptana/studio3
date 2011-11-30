@@ -52,6 +52,13 @@
          <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="contentTypeBinding"/>
          </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Unique identifier of this participant. Must be globally unique.
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>

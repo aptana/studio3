@@ -194,7 +194,8 @@
          point="com.aptana.buildpath.core.buildParticipants">
       <participant
             class="com.aptana.editor.html.internal.build.HTMLTaskDetector"
-            name="HTML Task Detector"
+            id="com.aptana.editor.html.HTMLTaskDetector"
+            name="%html.task.detector.name"
             priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.html">
@@ -202,6 +203,7 @@
       </participant>
       <participant
             class="com.aptana.editor.html.validator.HTMLTidyValidator"
+            id="com.aptana.editor.html.validator.TidyValidator"
             name="%validator.tidy.name"
             priority="50">
          <contentTypeBinding

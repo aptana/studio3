@@ -113,6 +113,8 @@
          point="com.aptana.buildpath.core.buildParticipants">
       <participant
             class="com.aptana.editor.css.internal.build.CSSTaskDetector"
+            id="com.aptana.editor.css.CSSTaskDetector"
+            name="%css.task.detector.name"
             priority="50">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.css">
@@ -120,6 +122,7 @@
       </participant>
       <participant
             class="com.aptana.editor.css.validator.CSSValidator"
+            id="com.aptana.editor.css.validator.W3CValidator"
             name="%validator.css.name"
             priority="49">
          <contentTypeBinding
