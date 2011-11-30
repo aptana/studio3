@@ -16,12 +16,17 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 
+/**
+ * @deprecated Please use {@link IBuildParticipant}s
+ * @author cwilliams
+ */
 public class ValidatorLoader
 {
 

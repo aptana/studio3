@@ -10,8 +10,13 @@ package com.aptana.editor.common.validator;
 import java.net.URI;
 import java.util.List;
 
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 
+/**
+ * @deprecated Please use {@link IBuildParticipant}s
+ * @author cwilliams
+ */
 public interface IValidationManager
 {
 

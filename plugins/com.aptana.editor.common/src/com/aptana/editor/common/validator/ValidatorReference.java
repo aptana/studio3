@@ -12,9 +12,14 @@ import java.text.MessageFormat;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
+import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.CommonEditorPlugin;
 
+/**
+ * @deprecated Please use {@link IBuildParticipant}s
+ * @author cwilliams
+ */
 public class ValidatorReference
 {
 
