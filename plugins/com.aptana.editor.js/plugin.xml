@@ -240,6 +240,31 @@
                contentTypeId="com.aptana.contenttype.js">
          </contentTypeBinding>
       </participant>
+      <participant
+            class="com.aptana.editor.js.validator.JSParserValidator"
+            id="com.aptana.editor.js.validator.JSParserValidator"
+            name="%validator.parser.name"
+            priority="60">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
+   </extension>
+   <extension
+         id="jslint_problem"
+         name="%marker.jslint.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.js.problem">
+      </super>
+   </extension>
+   <extension
+         id="mozilla_problem"
+         name="%marker.mozilla.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.js.problem">
+      </super>
    </extension>
 
 </plugin>

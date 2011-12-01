@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -35,7 +34,6 @@ import org.mozilla.javascript.optimizer.Codegen;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StreamUtil;
@@ -45,8 +43,6 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 
 public class JSLintValidator extends AbstractBuildParticipant
 {
@@ -62,11 +58,8 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		boolean enableParseErrors = enableJSParseErrors();
-		boolean enableJSLint = enableJSLint();
-
 		List<IProblem> problems = new ArrayList<IProblem>();
-		if (enableParseErrors || enableJSLint)
+		if (jsLintEnabled())
 		{
 			try
 			{
@@ -74,39 +67,16 @@ public class JSLintValidator extends AbstractBuildParticipant
 				URI uri = context.getURI();
 				String sourcePath = uri.toString();
 
-				if (enableParseErrors)
+				Context cContext = Context.enter();
+				try
 				{
-					context.getAST(); // Ensure a parse happened
-
-					// Add parse errors... FIXME Move this out of here!
-					for (IParseError parseError : context.getParseErrors())
-					{
-						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-								: IMarker.SEVERITY_WARNING;
-						int line = -1;
-						if (source != null)
-						{
-							line = getLineNumber(parseError.getOffset(), source);
-						}
-						problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-								.getLength(), line, sourcePath));
-					}
+					DefaultErrorReporter reporter = new DefaultErrorReporter();
+					cContext.setErrorReporter(reporter);
+					parseWithLint(cContext, source, sourcePath, problems);
 				}
-				if (enableJSLint)
+				finally
 				{
-					// FIXME Create sub-marker type of JS Problem marker just for JSLint!
-					Context cContext = Context.enter();
-					try
-					{
-
-						DefaultErrorReporter reporter = new DefaultErrorReporter();
-						cContext.setErrorReporter(reporter);
-						parseWithLint(cContext, source, sourcePath, problems);
-					}
-					finally
-					{
-						Context.exit();
-					}
+					Context.exit();
 				}
 			}
 			catch (Exception e)
@@ -114,10 +84,10 @@ public class JSLintValidator extends AbstractBuildParticipant
 				IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JSLint", e); //$NON-NLS-1$
 			}
 		}
-		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems);
+		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
-	private boolean enableJSLint()
+	private boolean jsLintEnabled()
 	{
 		// FIXME We shouldn't be storing translatable names in prefs like this. Use ids, store under sub-nodes per
 		// langauge or something?
@@ -129,17 +99,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 		return result.indexOf("JSLint JavaScript Validator") != -1; //$NON-NLS-1$
 	}
 
-	private boolean enableJSParseErrors()
-	{
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		return store.getBoolean(getEnableParseErrorPrefKey(IJSConstants.CONTENT_TYPE_JS), true);
-	}
-
-	private String getEnableParseErrorPrefKey(String language)
-	{
-		return MessageFormat.format("{0}:{1}", language, IPreferenceConstants.PARSE_ERROR_ENABLED); //$NON-NLS-1$
-	}
-
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -147,7 +106,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
+		context.removeProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
 	}
 
 	private void parseWithLint(Context context, String source, String path, List<IProblem> items)

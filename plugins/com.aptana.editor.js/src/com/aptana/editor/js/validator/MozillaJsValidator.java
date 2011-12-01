@@ -35,8 +35,6 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 
 	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
-	// FIXME Create sub-markers of Problem marker just for Mozilla JS!
-
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
 		if (context == null)
@@ -44,7 +42,7 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
+		context.removeProblems(IJSConstants.MOZILLA_PROBLEM_MARKER_TYPE);
 	}
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
@@ -114,7 +112,7 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 			}
 		}
 
-		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems);
+		context.putProblems(IJSConstants.MOZILLA_PROBLEM_MARKER_TYPE, problems);
 	}
 
 	private String getFilterExpressionsPrefKey(String language)
