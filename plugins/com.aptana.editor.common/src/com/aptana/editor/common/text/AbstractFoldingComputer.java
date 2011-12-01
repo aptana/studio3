@@ -1,5 +1,6 @@
 package com.aptana.editor.common.text;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,7 +13,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.common.text.reconciler.Messages;
 import com.aptana.parsing.ast.IParseNode;
@@ -170,8 +173,16 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 				if (add)
 				{
 					end = Math.min(getDocument().getLength(), end);
-					newPositions.put(initialReconcile ? new ProjectionAnnotation(isCollapsed(child))
-							: new ProjectionAnnotation(), new Position(start, end - start));
+					if (start <= end)
+					{
+						newPositions.put(initialReconcile ? new ProjectionAnnotation(isCollapsed(child))
+								: new ProjectionAnnotation(), new Position(start, end - start));
+					}
+					else
+					{
+						IdeLog.logWarning(CommonEditorPlugin.getDefault(), MessageFormat.format(
+								"Was unable to add folding position. Start: {0}, end: {1}", start, end)); //$NON-NLS-1$
+					}
 				}
 			}
 			if (traverseInto(child))
