@@ -16,32 +16,25 @@ import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.text.Document;
 import org.w3c.tidy.Tidy;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 
 public class HTMLTidyValidator extends AbstractBuildParticipant
 {
@@ -77,30 +70,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			{
 				URI path = context.getURI();
 				String sourcePath = path.toString();
-
-				// TODO Break out parse error stuff from Tidy!
-				if (enableHTMLParseErrors())
-				{
-					context.getAST(); // Ensure a parse has happened
-
-					// Add parse errors...
-					for (IParseError parseError : context.getParseErrors())
-					{
-						int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-								: IMarker.SEVERITY_WARNING;
-						int line = -1;
-						if (source != null)
-						{
-							line = getLineNumber(parseError.getOffset(), source);
-						}
-						problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-								.getLength(), line, sourcePath));
-					}
-				}
-
 				runTidy(sourcePath, source, problems);
-
-				// TODO Run the JSLint/MozillaJS/CSS Validators on those nodes?
 			}
 		}
 		catch (CoreException e)
@@ -108,23 +78,16 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			IdeLog.logError(HTMLPlugin.getDefault(), "Failed to parse for HTML Tidy Validation", e); //$NON-NLS-1$
 		}
 
-		context.putProblems(IHTMLConstants.HTML_PROBLEM, problems);
-	}
-
-	private boolean enableHTMLParseErrors()
-	{
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		return store.getBoolean(getEnableParseErrorPrefKey(IHTMLConstants.CONTENT_TYPE_HTML), true);
-	}
-
-	private String getEnableParseErrorPrefKey(String language)
-	{
-		return MessageFormat.format("{0}:{1}", language, IPreferenceConstants.PARSE_ERROR_ENABLED); //$NON-NLS-1$
+		context.putProblems(IHTMLConstants.TIDY_PROBLEM, problems);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
-		context.removeProblems(IHTMLConstants.HTML_PROBLEM);
+		if (context == null)
+		{
+			return;
+		}
+		context.removeProblems(IHTMLConstants.TIDY_PROBLEM);
 	}
 
 	private List<IProblem> runTidy(String sourcePath, final String source, List<IProblem> items)

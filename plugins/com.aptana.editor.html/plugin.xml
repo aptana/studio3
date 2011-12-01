@@ -210,5 +210,22 @@
                contentTypeId="com.aptana.contenttype.html">
          </contentTypeBinding>
       </participant>
+      <participant
+            class="com.aptana.editor.html.validator.HTMLParseErrorValidator"
+            id="com.aptana.editor.html.validator.HTMLParseErrorValidator"
+            name="%validator.parser.name"
+            priority="60">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
+      </participant>
+   </extension>
+   <extension
+         id="tidy_problem"
+         name="%marker.tidy.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.html.problem">
+      </super>
    </extension>
 </plugin>
