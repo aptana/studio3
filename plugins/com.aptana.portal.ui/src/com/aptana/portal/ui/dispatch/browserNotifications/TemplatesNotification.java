@@ -63,7 +63,7 @@ public class TemplatesNotification extends AbstractBrowserNotification
 	protected void notifyAdd(IProjectTemplate template)
 	{
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_TEMPLATES, IBrowserNotificationConstants.EVENT_TYPE_ADDED,
-				createTemplateInfo(template));
+				createTemplateInfo(template), true);
 		IdeLog.logInfo(ProjectsPlugin.getDefault(),
 				"Template added. Fired Template notification.", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}
@@ -76,7 +76,7 @@ public class TemplatesNotification extends AbstractBrowserNotification
 	protected void notifyRemoved(IProjectTemplate template)
 	{
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_TEMPLATES,
-				IBrowserNotificationConstants.EVENT_TYPE_DELETED, createTemplateInfo(template));
+				IBrowserNotificationConstants.EVENT_TYPE_DELETED, createTemplateInfo(template), true);
 		IdeLog.logInfo(ProjectsPlugin.getDefault(),
 				"Template removed. Fired Template notification.", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}

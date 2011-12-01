@@ -66,7 +66,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 	protected void notifyAdd(SamplesReference sample)
 	{
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_SAMPLES, IBrowserNotificationConstants.EVENT_TYPE_ADDED,
-				createSampleInfo(sample));
+				createSampleInfo(sample), true);
 		IdeLog.logInfo(SamplesUIPlugin.getDefault(),
 				"Sample added. Fired Samples notification.", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}
@@ -79,7 +79,7 @@ public class SamplesNotification extends AbstractBrowserNotification
 	protected void notifyRemoved(SamplesReference sample)
 	{
 		notifyTargets(IBrowserNotificationConstants.EVENT_ID_SAMPLES, IBrowserNotificationConstants.EVENT_TYPE_DELETED,
-				createSampleInfo(sample));
+				createSampleInfo(sample), true);
 		IdeLog.logInfo(SamplesUIPlugin.getDefault(),
 				"Sample removed. Fired Samples notification.", IDebugScopes.START_PAGE); //$NON-NLS-1$
 	}
