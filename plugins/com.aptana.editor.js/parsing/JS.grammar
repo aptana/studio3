@@ -8,6 +8,7 @@
 %import "java.util.ArrayList";
 %import "java.util.List";
 
+%import "com.aptana.editor.js.IJSConstants";
 %import "com.aptana.editor.js.parsing.ast.*";
 %import "com.aptana.editor.js.parsing.lexer.JSTokenType";
 %import "com.aptana.editor.js.sdoc.model.DocumentationBlock";
@@ -40,7 +41,7 @@
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
+			fParseState.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)

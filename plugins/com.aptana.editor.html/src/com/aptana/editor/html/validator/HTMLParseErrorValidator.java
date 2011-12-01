@@ -10,7 +10,9 @@ package com.aptana.editor.html.validator;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -25,8 +27,10 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseError.Severity;
@@ -46,10 +50,13 @@ public class HTMLParseErrorValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		List<IProblem> problems = new ArrayList<IProblem>();
+		Map<String, List<IProblem>> problems = new HashMap<String, List<IProblem>>();
+		context.putProblems(IHTMLConstants.HTML_PROBLEM, new ArrayList<IProblem>());
+		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, new ArrayList<IProblem>());
+		context.putProblems(ICSSConstants.CSS_PROBLEM, new ArrayList<IProblem>());
+
 		try
 		{
-
 			String source = context.getContents();
 			if (!StringUtil.isEmpty(source))
 			{
@@ -68,8 +75,11 @@ public class HTMLParseErrorValidator extends AbstractBuildParticipant
 					{
 						line = getLineNumber(parseError.getOffset(), source);
 					}
-					problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
+					String language = parseError.getLangauge();
+					List<IProblem> langProblems = problems.get(language);
+					langProblems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
 							.getLength(), line, sourcePath));
+					problems.put(language, langProblems);
 				}
 			}
 		}
@@ -78,7 +88,9 @@ public class HTMLParseErrorValidator extends AbstractBuildParticipant
 			IdeLog.logError(HTMLPlugin.getDefault(), "Failed to parse for HTML Parse Error Validation", e); //$NON-NLS-1$
 		}
 
-		context.putProblems(IHTMLConstants.HTML_PROBLEM, problems);
+		context.putProblems(IHTMLConstants.HTML_PROBLEM, problems.get(IHTMLConstants.CONTENT_TYPE_HTML));
+		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems.get(IJSConstants.CONTENT_TYPE_JS));
+		context.putProblems(ICSSConstants.CSS_PROBLEM, problems.get(ICSSConstants.CONTENT_TYPE_CSS));
 	}
 
 	private boolean enableHTMLParseErrors()
@@ -99,5 +111,7 @@ public class HTMLParseErrorValidator extends AbstractBuildParticipant
 			return;
 		}
 		context.removeProblems(IHTMLConstants.HTML_PROBLEM);
+		context.removeProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE);
+		context.removeProblems(ICSSConstants.CSS_PROBLEM);
 	}
 }

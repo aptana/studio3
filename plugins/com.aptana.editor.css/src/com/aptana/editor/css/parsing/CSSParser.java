@@ -9,6 +9,7 @@ import beaver.ParsingTables;
 import beaver.Scanner;
 import beaver.Symbol;
 
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.parsing.ast.CSSAtRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSCharSetNode;
@@ -93,7 +94,7 @@ public class CSSParser extends Parser implements IParser
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
+			fParseState.addError(new ParseError(ICSSConstants.CONTENT_TYPE_CSS, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)

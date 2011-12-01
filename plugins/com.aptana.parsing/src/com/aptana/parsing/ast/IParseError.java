@@ -56,4 +56,11 @@ public interface IParseError // $codepro.audit.disable consistentSuffixUsage
 	 * @return the severity of the error
 	 */
 	public Severity getSeverity();
+
+	/**
+	 * The language/content type where this error originated.
+	 * 
+	 * @return
+	 */
+	public String getLangauge();
 }

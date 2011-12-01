@@ -10,6 +10,7 @@ package com.aptana.parsing.ast;
 import beaver.Symbol;
 
 /**
+ * @author cwilliams
  * @author ayeung
  */
 public class ParseError implements IParseError // $codepro.audit.disable consistentSuffixUsage
@@ -19,14 +20,16 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 	private final Severity fSeverity;
 	private int fOffset = 0;
 	private int fLength = 0;
+	private String fLanguage;
 
-	public ParseError(Symbol symbol, Severity severity)
+	public ParseError(String language, Symbol symbol, Severity severity)
 	{
-		this(symbol, null, severity);
+		this(language, symbol, null, severity);
 	}
 
-	public ParseError(Symbol symbol, String message, Severity severity)
+	public ParseError(String language, Symbol symbol, String message, Severity severity)
 	{
+		fLanguage = language;
 		fSymbol = symbol;
 		if (message == null)
 		{
@@ -44,8 +47,9 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 		}
 	}
 
-	public ParseError(int offset, int length, String message, Severity severity)
+	public ParseError(String language, int offset, int length, String message, Severity severity)
 	{
+		fLanguage = language;
 		fSeverity = severity;
 		fMessage = message;
 		fOffset = offset;
@@ -92,6 +96,11 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 		builder.append(token.value);
 		builder.append('"');
 		return builder.toString();
+	}
+
+	public String getLangauge()
+	{
+		return fLanguage;
 	}
 
 }

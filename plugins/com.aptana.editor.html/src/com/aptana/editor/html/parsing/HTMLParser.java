@@ -216,8 +216,9 @@ public class HTMLParser implements IParser
 		parseAttribute(element, fCurrentSymbol);
 		if (element.isSelfClosing() && !HTMLParseState.isEndForbiddenOrEmptyTag(element.getName()))
 		{
-			fParseState.addError(new ParseError(element.getStartingOffset(), element.getLength(),
-					Messages.HTMLParser_self_closing_syntax_on_non_void_element_error, IParseError.Severity.ERROR));
+			fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, element.getStartingOffset(), element
+					.getLength(), Messages.HTMLParser_self_closing_syntax_on_non_void_element_error,
+					IParseError.Severity.ERROR));
 		}
 		return element;
 	}
@@ -302,8 +303,8 @@ public class HTMLParser implements IParser
 					for (IParseError subError : subErrors)
 					{
 						// Shift the line/offsets based on the starting offset/line of the sub-language!
-						fParseState.addError(new ParseError(start + subError.getOffset(), subError.getLength(),
-								subError.getMessage(), subError.getSeverity()));
+						fParseState.addError(new ParseError(language, start + subError.getOffset(), subError
+								.getLength(), subError.getMessage(), subError.getSeverity()));
 					}
 				}
 				if (node == null)
@@ -392,8 +393,8 @@ public class HTMLParser implements IParser
 			}
 			else
 			{
-				fParseState.addError(new ParseError(fCurrentSymbol, Messages.HTMLParser_unexpected_error
-						+ fCurrentSymbol.value, IParseError.Severity.WARNING));
+				fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, fCurrentSymbol,
+						Messages.HTMLParser_unexpected_error + fCurrentSymbol.value, IParseError.Severity.WARNING));
 			}
 		}
 
@@ -423,8 +424,9 @@ public class HTMLParser implements IParser
 	{
 		if (fParseState.getCloseTagType(node.getName()) != IHTMLTagInfo.END_OPTIONAL)
 		{
-			fParseState.addError(new ParseError(node.getStartingOffset(), node.getLength(), MessageFormat.format(
-					Messages.HTMLParser_missing_end_tag_error, node.getName()), IParseError.Severity.WARNING));
+			fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, node.getStartingOffset(), node
+					.getLength(), MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, node.getName()),
+					IParseError.Severity.WARNING));
 		}
 	}
 
