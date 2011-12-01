@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.w3c.css.css.StyleReport;
@@ -38,7 +37,6 @@ import org.w3c.css.util.Utf8Properties;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
@@ -47,8 +45,6 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseError.Severity;
 
 /**
  * @author cwilliams
@@ -476,38 +472,23 @@ public class CSSValidator extends AbstractBuildParticipant
 			return;
 		}
 
+		List<IProblem> problems = new ArrayList<IProblem>();
 		try
 		{
 			String source = context.getContents();
 			URI uri = context.getURI();
 			String path = uri.toString();
 
-			context.getAST(); // make sure a parse has happened...
-
-			List<IProblem> problems = new ArrayList<IProblem>();
-			// Add parse errors...
-			for (IParseError parseError : context.getParseErrors())
-			{
-				int severity = (parseError.getSeverity() == Severity.ERROR) ? IMarker.SEVERITY_ERROR
-						: IMarker.SEVERITY_WARNING;
-				int line = -1;
-				if (source != null)
-				{
-					line = getLineNumber(parseError.getOffset(), source);
-				}
-				problems.add(new Problem(severity, parseError.getMessage(), parseError.getOffset(), parseError
-						.getLength(), line, path));
-			}
-
 			String report = getReport(source, uri);
 			processErrorsInReport(report, path, problems);
 			processWarningsInReport(report, path, problems);
-			context.putProblems(IMarker.PROBLEM, problems);
+
 		}
 		catch (CoreException e)
 		{
 			IdeLog.logError(CSSPlugin.getDefault(), e);
 		}
+		context.putProblems(ICSSConstants.W3C_PROBLEM, problems);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
@@ -517,6 +498,6 @@ public class CSSValidator extends AbstractBuildParticipant
 			return;
 		}
 
-		context.removeProblems(IMarker.PROBLEM);
+		context.removeProblems(ICSSConstants.W3C_PROBLEM);
 	}
 }

@@ -129,6 +129,23 @@
                contentTypeId="com.aptana.contenttype.css">
          </contentTypeBinding>
       </participant>
+      <participant
+            class="com.aptana.editor.css.validator.CSSParserValidator"
+            id="com.aptana.editor.css.validator.CSSParserValidator"
+            name="%validator.parser.name"
+            priority="60">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.css">
+         </contentTypeBinding>
+      </participant>
+   </extension>
+   <extension
+         id="w3c_problem"
+         name="%marker.w3c.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.css.problem">
+      </super>
    </extension>
 
 </plugin>
