@@ -14,12 +14,16 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
+import com.aptana.editor.js.parsing.JSParseState;
+import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseRootNode;
 
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
@@ -80,5 +84,25 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	public String getContentType()
 	{
 		return IJSConstants.CONTENT_TYPE_JS;
+	}
+
+	@Override
+	public IParseRootNode getAST()
+	{
+		try
+		{
+			// Don't attach or collect comments for hovers/outline
+			IDocument document = getDocument();
+			JSParseState parseState = new JSParseState();
+			parseState.setAttachComments(false);
+			parseState.setCollectComments(false);
+			parseState.setEditState(document.get(), 0);
+			return ParserPoolFactory.parse(getContentType(), parseState);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+		}
+		return null;
 	}
 }
