@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
+import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
  * A base class for all browser notification classed. The BrowserNotification register itself as a listener to some
@@ -97,6 +98,31 @@ public abstract class AbstractBrowserNotification
 	 */
 	protected void notifyTargets(String eventId, String eventType, String data)
 	{
-		BrowserNotifier.getInstance().notifyBrowser(getNotificationTargets(), eventId, eventType, data);
+		notifyTargets(eventId, eventType, data, false);
+	}
+
+	/**
+	 * Fire a notification for the registered notification targets with the eventId, type and data.
+	 * 
+	 * @param eventId
+	 *            See {@link IBrowserNotificationConstants}
+	 * @param eventType
+	 *            See {@link IBrowserNotificationConstants}
+	 * @param data
+	 *            A JSON data (can be null)
+	 * @param notifyInUIThread
+	 *            Indicate that the notification should be wrapped in a UI thread.
+	 * @see IBrowserNotificationConstants
+	 */
+	protected void notifyTargets(String eventId, String eventType, String data, boolean notifyInUIThread)
+	{
+		if (notifyInUIThread)
+		{
+			BrowserNotifier.getInstance().notifyBrowserInUIThread(getNotificationTargets(), eventId, eventType, data);
+		}
+		else
+		{
+			BrowserNotifier.getInstance().notifyBrowser(getNotificationTargets(), eventId, eventType, data);
+		}
 	}
 }
