@@ -44,17 +44,6 @@ public class ParseError implements IParseError // $codepro.audit.disable consist
 		}
 	}
 
-	/**
-	 * @deprecated
-	 * @param offset
-	 * @param message
-	 * @param severity
-	 */
-	public ParseError(int offset, String message, Severity severity)
-	{
-		this(offset, 0, message, severity);
-	}
-
 	public ParseError(int offset, int length, String message, Severity severity)
 	{
 		fSeverity = severity;
