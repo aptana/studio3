@@ -19,7 +19,9 @@ import com.aptana.parsing.lexer.IRange;
 public interface IParseState
 {
 	/**
-	 * clearEditState
+	 * This will clean up the source passed in via {@link #setEditState(String, int)} for RAM/GC purposes. The
+	 * implementation should retain a hashcode of the source or any other artifacts to be able to compare later via
+	 * {@link #requiresReparse(IParseState)}
 	 */
 	public void clearEditState();
 
@@ -91,7 +93,7 @@ public interface IParseState
 	 * Clears the list of errors
 	 */
 	public void clearErrors();
-	
+
 	/**
 	 * Returns parsing progress monitor primarily for cancellation checks.
 	 * 
@@ -101,7 +103,18 @@ public interface IParseState
 
 	/**
 	 * Set parsing progress monitor
+	 * 
 	 * @param monitor
 	 */
 	public void setProgressMonitor(IProgressMonitor monitor);
+
+	/**
+	 * Given the new parse state, does this old one encompass the requirements? (i.e. can we just re-use the parse
+	 * result from this parse state instead of doing a re-parse?)
+	 * 
+	 * @param newState
+	 * @return
+	 */
+	public boolean requiresReparse(IParseState newState);
+
 }

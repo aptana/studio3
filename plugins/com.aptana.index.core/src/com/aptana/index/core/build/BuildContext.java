@@ -70,50 +70,61 @@ public class BuildContext
 
 	public synchronized IParseRootNode getAST(IParseState parseState) throws CoreException
 	{
-		boolean reparse = false;
-		if (fParseState == null)
+		parseState.setEditState(getContents(), 0);
+		try
 		{
-			reparse = true;
-			fParseState = parseState;
-		}
-		else
-		{
-			// TODO Check the parse states to see if anything has changed (and therefore we need to
-			// re-parse)?
-		}
+			boolean reparse = false;
+			if (fParseState == null)
+			{
+				reparse = true;
+			}
+			else
+			{
+				reparse = fParseState.requiresReparse(parseState);
+				if (!reparse)
+				{
+					// copy over errors from old parse state to new one since we're not re-parsing
+					for (IParseError error : fParseState.getErrors())
+					{
+						parseState.addError(error);
+					}
+				}
+			}
 
-		if (reparse)
+			if (reparse)
+			{
+				fParseState = parseState;
+				// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
+				try
+				{
+					// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
+					// between those and IO errors!
+					IParseRootNode ast = ParserPoolFactory.parse(getContentType(), fParseState);
+					fParseState.setParseResult(ast);
+				}
+				catch (CoreException e)
+				{
+					throw e;
+				}
+				catch (Exception e)
+				{
+					throw new CoreException(new Status(IStatus.ERROR, IndexPlugin.PLUGIN_ID, e.getMessage(), e));
+				}
+			}
+			if (fParseState == null)
+			{
+				return null;
+			}
+			return fParseState.getParseResult();
+		}
+		finally
 		{
-			// FIXME What if we fail to parse? Should we catch and log that exception here and return null?
-			try
-			{
-				fParseState.setEditState(getContents(), 0);
-				// FIXME The parsers need to throw a specific SyntaxException or something for us to differentiate
-				// between those and IO errors!
-				IParseRootNode ast = ParserPoolFactory.parse(getContentType(), parseState);
-				fParseState.setParseResult(ast);
-
-				// TODO Turn fParseState.getErrors() into IProblems on this context?
-			}
-			catch (CoreException e)
-			{
-				throw e;
-			}
-			catch (Exception e)
-			{
-				throw new CoreException(new Status(IStatus.ERROR, IndexPlugin.PLUGIN_ID, e.getMessage(), e));
-			}
-			finally
+			if (fParseState != null)
 			{
 				// Wipe the source out of the parse state to clean up RAM?
 				fParseState.clearEditState();
 			}
 		}
-		if (fParseState == null)
-		{
-			return null;
-		}
-		return fParseState.getParseResult();
 	}
 
 	public synchronized void resetAST()
