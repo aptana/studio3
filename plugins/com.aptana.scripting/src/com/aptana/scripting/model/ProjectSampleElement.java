@@ -8,17 +8,32 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.scripting.ScriptingActivator;
 
 public class ProjectSampleElement extends AbstractBundleElement
 {
+
+	private static final String DEFAULT_ICON_KEY = "default"; //$NON-NLS-1$
 
 	private String fSampleId;
 	private String fCategoryId;
 	private String fLocation;
 	private String fDescription;
 	private String[] fProjectNatures;
+	private Map<String, String> fIconPaths;
+	private Map<String, URL> fIconUrls;
 
 	/**
 	 * @param path
@@ -26,6 +41,8 @@ public class ProjectSampleElement extends AbstractBundleElement
 	public ProjectSampleElement(String path)
 	{
 		super(path);
+		fIconPaths = new HashMap<String, String>();
+		fIconUrls = new HashMap<String, URL>();
 	}
 
 	/**
@@ -63,6 +80,55 @@ public class ProjectSampleElement extends AbstractBundleElement
 	public String[] getNatures()
 	{
 		return fProjectNatures;
+	}
+
+	public String getIcon()
+	{
+		return getIcon(DEFAULT_ICON_KEY);
+	}
+
+	public String getIcon(String iconSize)
+	{
+		return fIconPaths.get(iconSize);
+	}
+
+	public Map<String, URL> getIconUrls()
+	{
+		Collection<String> iconSizes = fIconPaths.keySet();
+		for (String size : iconSizes)
+		{
+			String iconPath = fIconPaths.get(size);
+			if (iconPath == null)
+			{
+				continue;
+			}
+
+			URL iconUrl = fIconUrls.get(size);
+			if (iconUrl == null)
+			{
+				try
+				{
+					// First try to convert path into a URL
+					iconUrl = new URL(iconPath);
+				}
+				catch (MalformedURLException e1)
+				{
+					// If it fails, assume it's a project-relative local path
+					IPath path = new Path(getDirectory().getAbsolutePath()).append(iconPath);
+					try
+					{
+						iconUrl = path.toFile().toURI().toURL();
+					}
+					catch (Exception e)
+					{
+						IdeLog.logError(ScriptingActivator.getDefault(), MessageFormat.format(
+								"Unable to convert {0} into an icon URL for sample {1}", iconPath, getDisplayName())); //$NON-NLS-1$
+					}
+				}
+				fIconUrls.put(size, iconUrl);
+			}
+		}
+		return fIconUrls;
 	}
 
 	/**
@@ -120,6 +186,17 @@ public class ProjectSampleElement extends AbstractBundleElement
 		fProjectNatures = natures;
 	}
 
+	public void setIcon(String iconPath)
+	{
+		setIcon(DEFAULT_ICON_KEY, iconPath);
+	}
+
+	public void setIcon(String iconSize, String iconPath)
+	{
+		fIconPaths.put(iconSize, iconPath);
+		fIconUrls.remove(iconSize);
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -173,6 +250,19 @@ public class ProjectSampleElement extends AbstractBundleElement
 				natureStr.append(']');
 				printer.printWithIndent("natures: ").println(natureStr.toString()); //$NON-NLS-1$
 			}
+		}
+		Map<String, URL> iconUrls = getIconUrls();
+		if (iconUrls.size() > 0)
+		{
+			printer.printWithIndent("iconURL: "); //$NON-NLS-1$
+			StringBuilder text = new StringBuilder();
+			Collection<String> iconSizes = iconUrls.keySet();
+			for (String size : iconSizes)
+			{
+				text.append(size).append('=').append(iconUrls.get(size)).append(',');
+			}
+			text.deleteCharAt(text.length() - 1);
+			printer.println(text.toString());
 		}
 	}
 }
