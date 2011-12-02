@@ -191,7 +191,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
-		int searchStartPosition = isForward ? charOffset + 1 : caretOffset - 2;
+		int searchStartPosition = isForward ? charOffset + 1 : charOffset - 1;
 		char endChar = fPairs.getMatching(prevChar);
 
 		int endOffset = -1;
