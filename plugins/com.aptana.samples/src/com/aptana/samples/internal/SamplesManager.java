@@ -8,18 +8,22 @@
 package com.aptana.samples.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
 import com.aptana.core.util.ResourceUtil;
@@ -155,7 +159,9 @@ public class SamplesManager implements ISamplesManager
 				location = (new File(sampleElement.getDirectory(), location)).getAbsolutePath();
 			}
 			String description = sampleElement.getDescription();
-			SamplesReference sample = new SamplesReference(category, id, name, location, isRemote, description, null);
+			Map<String, URL> iconUrls = sampleElement.getIconUrls();
+			SamplesReference sample = new SamplesReference(category, id, name, location, isRemote, description,
+					iconUrls, null);
 			sample.setNatures(sampleElement.getNatures());
 
 			List<SamplesReference> samples = bundleSamplesByCategory.get(categoryId);
@@ -290,9 +296,30 @@ public class SamplesManager implements ISamplesManager
 				samples = new ArrayList<SamplesReference>();
 				sampleRefsByCategory.put(categoryId, samples);
 			}
+
 			String description = element.getAttribute(ATTR_DESCRIPTION);
 
-			SamplesReference samplesRef = new SamplesReference(category, id, name, path, isRemote, description, element);
+			URL iconUrl = null;
+			String iconPath = element.getAttribute(ATTR_ICON);
+			if (!StringUtil.isEmpty(iconPath))
+			{
+				URL url = bundle.getEntry(iconPath);
+				try
+				{
+					iconUrl = FileLocator.toFileURL(url);
+				}
+				catch (IOException e)
+				{
+					IdeLog.logError(SamplesPlugin.getDefault(),
+							MessageFormat.format("Unable to retrieve the icon at {0} for sample {1}", iconPath, name), //$NON-NLS-1$
+							e);
+				}
+			}
+			Map<String, URL> iconUrls = new HashMap<String, URL>();
+			iconUrls.put(SamplesReference.DEFAULT_ICON_KEY, iconUrl);
+
+			SamplesReference samplesRef = new SamplesReference(category, id, name, path, isRemote, description,
+					iconUrls, element);
 			samples.add(samplesRef);
 			samplesById.put(id, samplesRef);
 

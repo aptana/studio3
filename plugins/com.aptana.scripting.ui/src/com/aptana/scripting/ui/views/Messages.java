@@ -80,6 +80,8 @@ public class Messages extends NLS
 	public static String ProjectSampleNode_All_SCOPES;
 	public static String ProjectSampleNode_Project_Sample_Category;
 	public static String ProjectSampleNode_Project_Sample_Description;
+
+	public static String ProjectSampleNode_Project_Sample_Icon_Path;
 	public static String ProjectSampleNode_Project_Sample_Location;
 	public static String ProjectSampleNode_Project_Sample_Name;
 	public static String ProjectSampleNode_Project_Sample_Path;
