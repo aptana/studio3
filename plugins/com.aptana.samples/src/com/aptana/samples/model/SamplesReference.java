@@ -7,12 +7,6 @@
  */
 package com.aptana.samples.model;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
@@ -20,20 +14,19 @@ import com.aptana.core.util.ArrayUtil;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 
-public class SamplesReference
+public class SamplesReference implements IProjectSample
 {
 
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 	private static final String ATTR_PREVIEW_HANDLER = "previewHandler"; //$NON-NLS-1$
-	public static final String REMOTE_DESCRIPTION_KEY = "remoteDescription"; //$NON-NLS-1$
 
 	private final SampleCategory category;
-	private final String path;
+	private final String location;
 	private final IConfigurationElement configElement;
 
 	private final String id;
-	private String name;
-	private Map<String, String> descriptions;
+	private final String name;
+	private String description;
 	private boolean isRemote;
 	private String infoFile;
 	private ISampleProjectHandler projectHandler;
@@ -41,35 +34,23 @@ public class SamplesReference
 	private String[] natures;
 	private String[] includePaths;
 
-	private List<SampleEntry> samples;
-
-	public SamplesReference(SampleCategory category, String id, String path, boolean isRemote,
-			IConfigurationElement element, Map<String, String> toolTipText)
+	public SamplesReference(SampleCategory category, String id, String name, String location, boolean isRemote,
+			String description, IConfigurationElement element)
 	{
 		this.category = category;
 		this.id = id;
-		this.path = path;
+		this.name = name;
+		this.location = location;
 		this.isRemote = isRemote;
-		this.descriptions = toolTipText;
+		this.description = description;
 		configElement = element;
 		natures = ArrayUtil.NO_STRINGS;
 		includePaths = ArrayUtil.NO_STRINGS;
-		samples = new ArrayList<SampleEntry>();
-
-		if (!isRemote)
-		{
-			loadSamples();
-		}
 	}
 
-	public String getDescriptionText()
+	public String getDescription()
 	{
-		if (isRemote)
-		{
-			return descriptions.get(REMOTE_DESCRIPTION_KEY);
-		}
-
-		return null;
+		return description;
 	}
 
 	public SampleCategory getCategory()
@@ -87,9 +68,9 @@ public class SamplesReference
 		return name;
 	}
 
-	public String getPath()
+	public String getLocation()
 	{
-		return path;
+		return location;
 	}
 
 	public String getInfoFile()
@@ -99,7 +80,7 @@ public class SamplesReference
 
 	public ISampleProjectHandler getProjectHandler()
 	{
-		if (projectHandler == null)
+		if (projectHandler == null && configElement != null)
 		{
 			try
 			{
@@ -110,12 +91,12 @@ public class SamplesReference
 				// ignores the exception since it's optional
 			}
 		}
-		return projectHandler;
+		return (projectHandler == null) ? category.getProjectHandler() : projectHandler;
 	}
 
 	public ISamplePreviewHandler getPreviewHandler()
 	{
-		if (previewHandler == null)
+		if (previewHandler == null && configElement != null)
 		{
 			try
 			{
@@ -139,19 +120,9 @@ public class SamplesReference
 		return includePaths;
 	}
 
-	public List<SampleEntry> getSamples()
-	{
-		return Collections.unmodifiableList(samples);
-	}
-
 	public boolean isRemote()
 	{
 		return isRemote;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
 	}
 
 	public void setInfoFile(String infoFile)
@@ -167,35 +138,5 @@ public class SamplesReference
 	public void setIncludePaths(String[] paths)
 	{
 		includePaths = paths;
-	}
-
-	private void loadSamples()
-	{
-		samples.clear();
-
-		File samplesDirectory = new File(path);
-		File[] sampleFiles = samplesDirectory.listFiles();
-		if (sampleFiles == null)
-		{
-			samples.add(new SampleEntry(samplesDirectory, this, true));
-		}
-		else
-		{
-			for (File file : sampleFiles)
-			{
-				if (file.isDirectory())
-				{
-					String directoryName = file.getName();
-					if (descriptions.containsKey(directoryName))
-					{
-						samples.add(new SampleEntry(file, this, true, descriptions.get(directoryName)));
-					}
-					else
-					{
-						samples.add(new SampleEntry(file, this, true));
-					}
-				}
-			}
-		}
 	}
 }

@@ -18,7 +18,7 @@ import org.mortbay.util.ajax.JSON;
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
-import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
+import com.aptana.projects.ProjectsPlugin;
 
 /**
  * Action controller for Template operations
@@ -27,10 +27,28 @@ import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
  */
 public class TemplateActionController extends AbstractActionController
 {
-	private static final String ID = "id"; //$NON-NLS-1$
-	private static final String NAME = "name"; //$NON-NLS-1$
-	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
-	private static final String TEMPLATE_TYPE = "type"; //$NON-NLS-1$
+	/**
+	 * Template-Info enum.
+	 */
+	public static enum TEMPLATE_INFO
+	{
+		ID("id"), //$NON-NLS-1$
+		NAME("name"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		TEMPLATE_TYPE("type"); //$NON-NLS-1$
+
+		private String key;
+
+		private TEMPLATE_INFO(String key)
+		{
+			this.key = key;
+		}
+
+		public String toString()
+		{
+			return key;
+		}
+	};
 
 	private static final String[] ALL_TYPES = new String[] { TemplateType.PHP.name(), TemplateType.PYTHON.name(),
 			TemplateType.RAILS.name(), TemplateType.RUBY.name(), TemplateType.TITANIUM_DESKTOP.name(),
@@ -76,10 +94,9 @@ public class TemplateActionController extends AbstractActionController
 				}
 			}
 		}
-		
-		List<IProjectTemplate> templates = AbstractNewProjectWizard.getProjectTemplates(types
-				.toArray(new TemplateType[types
-				.size()]));
+
+		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
+				.getTemplates(types.toArray(new TemplateType[types.size()]));
 		List<Map<String, String>> templateObjects = new ArrayList<Map<String, String>>();
 
 		for (IProjectTemplate template : templates)
@@ -90,10 +107,10 @@ public class TemplateActionController extends AbstractActionController
 			}
 
 			Map<String, String> properties = new HashMap<String, String>();
-			properties.put(ID, template.getId());
-			properties.put(NAME, template.getDisplayName());
-			properties.put(DESCRIPTION, template.getDescription());
-			properties.put(TEMPLATE_TYPE, template.getType().name());
+			properties.put(TEMPLATE_INFO.ID.toString(), template.getId());
+			properties.put(TEMPLATE_INFO.NAME.toString(), template.getDisplayName());
+			properties.put(TEMPLATE_INFO.DESCRIPTION.toString(), template.getDescription());
+			properties.put(TEMPLATE_INFO.TEMPLATE_TYPE.toString(), template.getType().name());
 			templateObjects.add(properties);
 		}
 

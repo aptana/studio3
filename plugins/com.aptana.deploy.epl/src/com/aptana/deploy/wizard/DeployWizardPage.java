@@ -16,6 +16,8 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -38,7 +40,6 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.activities.ITriggerPoint;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.DialogUtil;
 import org.eclipse.ui.internal.dialogs.WizardActivityFilter;
@@ -51,6 +52,8 @@ import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
+
+import com.aptana.core.util.StringUtil;
 
 @SuppressWarnings("restriction")
 public class DeployWizardPage extends WorkbenchWizardSelectionPage
@@ -67,6 +70,8 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 
 	// tree viewer of wizard selections
 	private TreeViewer treeViewer;
+
+	private Label descriptionLabel;
 
 	/*
 	 * Class to create a control that shows a categorized tree of wizard types.
@@ -118,6 +123,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 			messageLabel.setFont(font);
 
 			createFilteredTree(outerContainer);
+
 			layoutTopControl(viewer.getControl());
 
 			return outerContainer;
@@ -195,13 +201,13 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 			int availableRows = DialogUtil.availableRows(control.getParent());
 
 			// Only give a height hint if the dialog is going to be too small
-			if (availableRows > 50)
+			if (availableRows > 40)
 			{
 				data.heightHint = SIZING_LISTS_HEIGHT;
 			}
 			else
 			{
-				data.heightHint = availableRows * 3;
+				data.heightHint = availableRows * 2;
 			}
 
 			control.setLayoutData(data);
@@ -219,7 +225,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 	protected DeployWizardPage(IWorkbench aWorkbench, IStructuredSelection currentSelection)
 	{
 		super("deployWizardPage", aWorkbench, currentSelection, null, null); //$NON-NLS-1$
-		setTitle(WorkbenchMessages.Select);
+		setTitle(WorkbenchMessages.DeployWizardPage_DeploymentOption);
 	}
 
 	/*
@@ -232,13 +238,21 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 
 		// create composite for page.
 		Composite outerContainer = new Composite(parent, SWT.NONE);
-		outerContainer.setLayout(new GridLayout());
-		outerContainer.setLayoutData(new GridData(GridData.FILL_BOTH));
+		outerContainer.setLayout(GridLayoutFactory.swtDefaults().spacing(0, 10).create());
+		outerContainer.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 		outerContainer.setFont(font);
 
 		Composite comp = createTreeViewer(outerContainer);
-
 		Dialog.applyDialogFont(comp);
+
+		descriptionLabel = new Label(comp, SWT.WRAP);
+		if (descriptionLabel != null)
+		{
+			descriptionLabel.setText(StringUtil.EMPTY);
+			descriptionLabel.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 50)
+					.create());
+			descriptionLabel.setFont(font);
+		}
 
 		restoreWidgetValues();
 
@@ -253,7 +267,8 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 	protected Composite createTreeViewer(Composite parent)
 	{
 		IWizardCategory root = DeployWizardRegistry.getInstance().getRootCategory();
-		wizardTree = new CategorizedWizardSelectionTree(root, "Select a Deployment Provider: ");
+		wizardTree = new CategorizedWizardSelectionTree(root,
+				com.aptana.deploy.wizard.WorkbenchMessages.DeployWizardPage_SelectDeploymentProvider);
 		Composite exportComp = wizardTree.createControl(parent);
 		wizardTree.getViewer().addSelectionChangedListener(new ISelectionChangedListener()
 		{
@@ -316,7 +331,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 		}
 
 		setSelectedNode(createWizardNode(wizardElement));
-		setMessage(wizardElement.getDescription());
+		descriptionLabel.setText(wizardElement.getDescription());
 	}
 
 	/*
@@ -324,7 +339,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 	 */
 	protected void updateMessage()
 	{
-		setMessage("Select your desired deployment option.");
+		setMessage(com.aptana.deploy.wizard.WorkbenchMessages.DeployWizardPage_SelectYourDesiredDeploymentOption);
 		TreeViewer viewer = getTreeViewer();
 		if (viewer != null)
 		{
@@ -342,13 +357,13 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 		}
 		else
 		{
-			setMessage(null);
+			descriptionLabel.setText(null);
 		}
 	}
 
 	/*
-	 * Method to call whenever the selection in one of the lists has changed. Updates the wizard's message to relect the
-	 * description of the currently selected wizard.
+	 * Method to call whenever the selection in one of the lists has changed. Updates the wizard's message to reflect
+	 * the description of the currently selected wizard.
 	 */
 	protected void listSelectionChanged(ISelection selection)
 	{

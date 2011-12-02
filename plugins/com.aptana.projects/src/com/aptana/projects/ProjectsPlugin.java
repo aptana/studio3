@@ -11,6 +11,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.projects.templates.ProjectTemplatesManager;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -22,6 +24,8 @@ public class ProjectsPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static ProjectsPlugin plugin;
+
+	private ProjectTemplatesManager templatesManager;
 
 	/**
 	 * The constructor
@@ -47,6 +51,11 @@ public class ProjectsPlugin extends AbstractUIPlugin
 	public void stop(BundleContext context) throws Exception
 	{
 		plugin = null;
+		if (templatesManager != null)
+		{
+			templatesManager.dispose();
+			templatesManager = null;
+		}
 		super.stop(context);
 	}
 
@@ -71,5 +80,14 @@ public class ProjectsPlugin extends AbstractUIPlugin
 			}
 		}
 		return getDefault().getImageRegistry().getDescriptor(string);
+	}
+
+	public synchronized ProjectTemplatesManager getTemplatesManager()
+	{
+		if (templatesManager == null)
+		{
+			templatesManager = new ProjectTemplatesManager();
+		}
+		return templatesManager;
 	}
 }

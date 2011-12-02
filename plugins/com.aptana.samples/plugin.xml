@@ -11,12 +11,5 @@
             properties="canPreview, hasHelp"
             type="com.aptana.samples.model.SamplesReference">
       </propertyTester>
-      <propertyTester
-            class="com.aptana.samples.internal.SampleEntryPropertyTester"
-            id="com.aptana.samples.sampleEntryPropertyTester"
-            namespace="com.aptana.samples.entry"
-            properties="canPreview, hasHelp"
-            type="com.aptana.samples.model.SampleEntry">
-      </propertyTester>
    </extension>
 </plugin>

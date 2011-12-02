@@ -17,7 +17,6 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.samples.ui.views.messages"; //$NON-NLS-1$
 
-	public static String SamplesView_ERR_UnableToOpenFile;
 	public static String SamplesView_ERR_UnableToOpenHelp;
 
 	static

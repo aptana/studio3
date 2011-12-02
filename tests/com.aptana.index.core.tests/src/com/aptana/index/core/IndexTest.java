@@ -9,6 +9,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("nls")
 public class IndexTest extends TestCase
 {
 

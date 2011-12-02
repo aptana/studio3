@@ -21,8 +21,6 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.samples.model.SampleEntry;
-import com.aptana.samples.model.SampleEntryUtil;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
 import com.aptana.samples.ui.views.Messages;
@@ -39,21 +37,12 @@ public class ViewHelpHandler extends AbstractHandler
 		{
 			Object firstElement = ((IStructuredSelection) selection).getFirstElement();
 
-			SamplesReference samplesRef = null;
 			if (firstElement instanceof SamplesReference)
 			{
-				samplesRef = (SamplesReference) firstElement;
-			}
-			else if (firstElement instanceof SampleEntry)
-			{
-				samplesRef = SampleEntryUtil.getParentSamplesRef((SampleEntry) firstElement);
-			}
-			if (samplesRef != null)
-			{
-				try
+				String infoFile = ((SamplesReference) firstElement).getInfoFile();
+				if (infoFile != null)
 				{
-					String infoFile = samplesRef.getInfoFile();
-					if (infoFile != null)
+					try
 					{
 						URL url = (new File(infoFile)).toURI().toURL();
 						WebBrowserEditorInput input = new WebBrowserEditorInput(url);
@@ -63,11 +52,10 @@ public class ViewHelpHandler extends AbstractHandler
 							page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
 						}
 					}
-
-				}
-				catch (Exception e)
-				{
-					IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.SamplesView_ERR_UnableToOpenHelp, e);
+					catch (Exception e)
+					{
+						IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.SamplesView_ERR_UnableToOpenHelp, e);
+					}
 				}
 			}
 		}

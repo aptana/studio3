@@ -13,13 +13,10 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 
 import com.aptana.samples.model.SampleCategory;
-import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
 
@@ -27,13 +24,11 @@ import com.aptana.samples.ui.SamplesUIPlugin;
  * @author Kevin Lindsey
  * @author Michael Xia
  */
-@SuppressWarnings("restriction")
 public class SamplesViewLabelProvider extends ColumnLabelProvider
 {
+
 	private static final Image IMAGE_FOLDER = PlatformUI.getWorkbench().getSharedImages()
 			.getImage(ISharedImages.IMG_OBJ_FOLDER);
-	private static final Image IMAGE_FILE = PlatformUI.getWorkbench().getSharedImages()
-			.getImage(ISharedImages.IMG_OBJ_FILE);
 	private static final String ICON_REMOTE = "icons/samples_remote.gif"; //$NON-NLS-1$
 
 	private ImageRegistry imageRegistry;
@@ -74,32 +69,6 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 			// uses folder as the default image
 			return IMAGE_FOLDER;
 		}
-		if (element instanceof SampleEntry)
-		{
-			File file = ((SampleEntry) element).getFile();
-			if (file != null)
-			{
-				if (file.isDirectory())
-				{
-					return IMAGE_FOLDER;
-				}
-
-				IEditorDescriptor editorDescriptor = WorkbenchPlugin.getDefault().getEditorRegistry()
-						.getDefaultEditor(file.getName());
-				if (editorDescriptor == null || editorDescriptor.getImageDescriptor() == null)
-				{
-					return IMAGE_FILE;
-				}
-				String key = editorDescriptor.getId();
-				Image image = imageRegistry.get(key);
-				if (image == null)
-				{
-					image = editorDescriptor.getImageDescriptor().createImage();
-					imageRegistry.put(key, image);
-				}
-				return image;
-			}
-		}
 		if (element instanceof SamplesReference)
 		{
 			return SamplesUIPlugin.getImage(ICON_REMOTE);
@@ -118,15 +87,7 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 		{
 			SamplesReference samplesRef = (SamplesReference) element;
 			String name = samplesRef.getName();
-			return (name == null) ? samplesRef.getPath() : name;
-		}
-		if (element instanceof SampleEntry)
-		{
-			File file = ((SampleEntry) element).getFile();
-			if (file != null)
-			{
-				return file.getName();
-			}
+			return (name == null) ? samplesRef.getLocation() : name;
 		}
 		return super.getText(element);
 	}
@@ -143,31 +104,17 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 		if (element instanceof SamplesReference)
 		{
 			SamplesReference samplesRef = (SamplesReference) element;
-			toolTipText = samplesRef.getDescriptionText();
+			toolTipText = samplesRef.getDescription();
 			if (toolTipText == null)
 			{
 				toolTipText = samplesRef.getName();
 			}
 			if (toolTipText == null)
 			{
-				toolTipText = samplesRef.getPath();
+				toolTipText = samplesRef.getLocation();
 			}
 			return toolTipText;
 		}
-		if (element instanceof SampleEntry)
-		{
-			toolTipText = ((SampleEntry) element).getDescription();
-			if (toolTipText != null)
-			{
-				return toolTipText;
-			}
-			File file = ((SampleEntry) element).getFile();
-			if (file != null)
-			{
-				return file.getName();
-			}
-		}
 		return super.getText(element);
 	}
-
 }

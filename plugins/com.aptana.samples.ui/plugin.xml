@@ -99,26 +99,15 @@
                      variable="selection">
                   <iterate
                         ifEmpty="false">
-                     <or>
-                        <and>
-                           <instanceof
-                                 value="com.aptana.samples.model.SamplesReference">
-                           </instanceof>
-                           <test
-                                 property="com.aptana.samples.reference.canPreview"
-                                 value="true">
-                           </test>
-                        </and>
-                        <and>
-                           <instanceof
-                                 value="com.aptana.samples.model.SampleEntry">
-                           </instanceof>
-                           <test
-                                 property="com.aptana.samples.entry.canPreview"
-                                 value="true">
-                           </test>
-                        </and>
-                     </or>
+                     <and>
+                        <instanceof
+                              value="com.aptana.samples.model.SamplesReference">
+                        </instanceof>
+                        <test
+                              property="com.aptana.samples.reference.canPreview"
+                              value="true">
+                        </test>
+                     </and>
                   </iterate>
                </with>
             </visibleWhen>
@@ -135,26 +124,15 @@
                      variable="selection">
                   <iterate
                         ifEmpty="false">
-                     <or>
-                        <and>
-                           <instanceof
-                                 value="com.aptana.samples.model.SamplesReference">
-                           </instanceof>
-                           <test
-                                 property="com.aptana.samples.reference.hasHelp"
-                                 value="true">
-                           </test>
-                        </and>
-                        <and>
-                           <instanceof
-                                 value="com.aptana.samples.model.SampleEntry">
-                           </instanceof>
-                           <test
-                                 property="com.aptana.samples.entry.hasHelp"
-                                 value="true">
-                           </test>
-                        </and>
-                     </or>
+                     <and>
+                        <instanceof
+                              value="com.aptana.samples.model.SamplesReference">
+                        </instanceof>
+                        <test
+                              property="com.aptana.samples.reference.hasHelp"
+                              value="true">
+                        </test>
+                     </and>
                   </iterate>
                </with>
             </visibleWhen>
@@ -175,5 +153,11 @@
             id="portal.samples"
             name="Samples Actions">
       </actionController>
+      <browserNotification
+            class="com.aptana.samples.ui.portal.actionController.SamplesNotification"
+            id="com.aptana.samples.ui.samplesNotification"
+            name="Samples Notifier"
+            notificationTarget="*">
+      </browserNotification>
    </extension>
 </plugin>

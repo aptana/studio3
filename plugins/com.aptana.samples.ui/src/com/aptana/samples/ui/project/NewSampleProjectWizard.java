@@ -8,8 +8,6 @@
 package com.aptana.samples.ui.project;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -20,7 +18,6 @@ import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -36,7 +33,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -62,9 +58,7 @@ import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
 import com.aptana.samples.handlers.ISampleProjectHandler;
-import com.aptana.samples.model.ISample;
-import com.aptana.samples.model.SampleEntry;
-import com.aptana.samples.model.SamplesReference;
+import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.ui.SamplesUIPlugin;
 import com.aptana.ui.util.UIUtils;
 
@@ -80,7 +74,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 	private static final String NEWPROJECT_WIZARD = "BasicNewProjectResourceWizard"; //$NON-NLS-1$
 
-	private ISample sample;
+	private IProjectSample sample;
 	private WizardNewProjectCreationPage mainPage;
 	private IProject newProject;
 	private IConfigurationElement configElement;
@@ -91,7 +85,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	 * @param localSample
 	 *            the root sample entry
 	 */
-	public NewSampleProjectWizard(ISample sample)
+	public NewSampleProjectWizard(IProjectSample sample)
 	{
 		this.sample = sample;
 		initDialogSettings();
@@ -179,31 +173,21 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
 		description.setLocationURI(location);
-		SamplesReference samplesRef = sample.getReference();
-		if (samplesRef != null)
-		{
-			description.setNatureIds(samplesRef.getNatures());
-		}
+		description.setNatureIds(sample.getNatures());
 
 		try
 		{
 			if (sample.isRemote())
 			{
-				cloneFromGit(sample.getPath(), newProjectHandle, description);
+				cloneFromGit(sample.getLocation(), newProjectHandle, description);
 			}
 			else
 			{
 				doBasicCreateProject(newProjectHandle, description);
-				SampleEntry rootEntry = sample.getRootEntry();
-				if (rootEntry.getFile().getName().endsWith(".zip")) //$NON-NLS-1$
-				{
-					Set<IPath> emptySet = Collections.emptySet();
-					AbstractNewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true, emptySet, false);
-				}
-				else
-				{
-					copySampleSource(rootEntry, newProjectHandle);
-				}
+
+				Set<IPath> emptySet = Collections.emptySet();
+				AbstractNewProjectWizard.extractZip(new File(sample.getLocation()), newProjectHandle, true, emptySet, false);
+
 				doPostProjectCreation(newProjectHandle);
 			}
 		}
@@ -282,40 +266,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 	}
 
-	private void copySampleSource(SampleEntry rootEntry, IProject project)
-	{
-		SampleEntry[] entries = rootEntry.getSubEntries();
-		IProgressMonitor monitor = new NullProgressMonitor();
-		IResource createdFile;
-		if (entries != null)
-		{
-			for (SampleEntry entry : entries)
-			{
-				createdFile = createFile(project, entry.getFile(), monitor);
-				if (createdFile instanceof IFolder)
-				{
-					createNestedEntries((IFolder) createdFile, entry, monitor);
-				}
-			}
-		}
-
-		SamplesReference samplesRef = sample.getReference();
-		if (samplesRef != null)
-		{
-			String[] includes = samplesRef.getIncludePaths();
-			File file;
-			for (String include : includes)
-			{
-				file = new File(include);
-				createdFile = createFile(project, file, monitor);
-				if (createdFile instanceof IFolder)
-				{
-					createNestedFiles((IFolder) createdFile, file, monitor);
-				}
-			}
-		}
-	}
-
 	private void cloneFromGit(String gitURL, final IProject projectHandle, final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
@@ -381,14 +331,10 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 	private void doPostProjectCreation(IProject newProject)
 	{
-		SamplesReference samplesRef = sample.getReference();
-		if (samplesRef != null)
+		ISampleProjectHandler projectHandler = sample.getProjectHandler();
+		if (projectHandler != null)
 		{
-			ISampleProjectHandler projectHandler = samplesRef.getProjectHandler();
-			if (projectHandler != null)
-			{
-				projectHandler.projectCreated(newProject);
-			}
+			projectHandler.projectCreated(newProject);
 		}
 	}
 
@@ -408,79 +354,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				{
 					IdeLog.logError(SamplesUIPlugin.getDefault(), Messages.NewSampleProjectWizard_ERR_OpenIndexFile, e);
 				}
-			}
-		}
-	}
-
-	/**
-	 * Creates the workspace resource under the specific container (could be project or folder).
-	 * 
-	 * @param container
-	 *            the parent directory in where the file is to be created
-	 * @param file
-	 *            the file
-	 * @param monitor
-	 *            the progress monitor
-	 * @return the created resource
-	 */
-	private static IResource createFile(IContainer container, File file, IProgressMonitor monitor)
-	{
-		if (file.isDirectory())
-		{
-			IFolder folder = container.getFolder(new Path(file.getName()));
-			if (!folder.exists())
-			{
-				try
-				{
-					folder.create(true, true, monitor);
-				}
-				catch (CoreException e)
-				{
-					return null;
-				}
-			}
-			return folder;
-		}
-
-		IFile iFile = container.getFile(new Path(file.getName()));
-		try
-		{
-			iFile.create(new FileInputStream(file), true, monitor);
-			return iFile;
-		}
-		catch (FileNotFoundException e)
-		{
-		}
-		catch (CoreException e)
-		{
-		}
-		return null;
-	}
-
-	private static void createNestedEntries(IFolder folder, SampleEntry entry, IProgressMonitor monitor)
-	{
-		SampleEntry[] subentries = entry.getSubEntries();
-		IResource createdFile;
-		for (SampleEntry subentry : subentries)
-		{
-			createdFile = createFile(folder, subentry.getFile(), monitor);
-			if (createdFile instanceof IFolder)
-			{
-				createNestedEntries((IFolder) createdFile, subentry, monitor);
-			}
-		}
-	}
-
-	private static void createNestedFiles(IFolder folder, File file, IProgressMonitor monitor)
-	{
-		File[] children = file.listFiles();
-		IResource createdFile;
-		for (File nestedFile : children)
-		{
-			createdFile = createFile(folder, nestedFile, monitor);
-			if (createdFile instanceof IFolder)
-			{
-				createNestedFiles((IFolder) createdFile, nestedFile, monitor);
 			}
 		}
 	}

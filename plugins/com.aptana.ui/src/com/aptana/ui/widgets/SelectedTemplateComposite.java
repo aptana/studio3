@@ -56,10 +56,10 @@ public class SelectedTemplateComposite extends Composite
 		group.setLayoutData(gd_group);
 		group.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
 
-		if (projectTemplate.getIconPath() != null)
+		if (projectTemplate.getIconURL() != null)
 		{
 			Label templateLabel = new Label(group, SWT.NONE);
-			templateIcon = ImageDescriptor.createFromURL(projectTemplate.getIconPath()).createImage();
+			templateIcon = ImageDescriptor.createFromURL(projectTemplate.getIconURL()).createImage();
 			templateLabel.setImage(templateIcon);
 			templateLabel.setLayoutData(GridDataFactory.swtDefaults().align(SWT.LEFT, SWT.BEGINNING).create());
 		}
@@ -133,7 +133,7 @@ public class SelectedTemplateComposite extends Composite
 		descriptionValue.setLayoutData(layoutData);
 
 	}
-	
+
 	public void dispose()
 	{
 		if (templateIcon != null)

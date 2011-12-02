@@ -473,20 +473,20 @@ public class TypeElement extends BaseElement
 			printer.print(" : ").print(StringUtil.join(", ", this.getParentTypes())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		printer.println().print('{').increaseIndent().println(); //$NON-NLS-1$
+		printer.println().print('{').increaseIndent().println();
 
 		for (PropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
-			printer.println(';'); //$NON-NLS-1$
+			printer.println(';');
 		}
 
 		for (EventElement event : this.getEvents())
 		{
 			event.toSource(printer);
-			printer.println(';'); //$NON-NLS-1$
+			printer.println(';');
 		}
 
-		printer.decreaseIndent().println('}'); //$NON-NLS-1$
+		printer.decreaseIndent().println('}');
 	}
 }

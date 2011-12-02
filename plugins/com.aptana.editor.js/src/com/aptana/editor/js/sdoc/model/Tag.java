@@ -92,7 +92,7 @@ public class Tag extends Symbol
 
 		if (this._text != null && !StringUtil.isEmpty(this._text))
 		{
-			writer.print(' ').print(this._text); //$NON-NLS-1$
+			writer.print(' ').print(this._text);
 		}
 	}
 }

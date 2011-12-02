@@ -40,13 +40,32 @@ import com.aptana.samples.ui.SamplesUIPlugin;
  */
 public class SamplesActionController extends AbstractActionController
 {
-	private static final String CATEGORY = "category"; //$NON-NLS-1$
-	private static final String ID = "id"; //$NON-NLS-1$
-	private static final String NAME = "name"; //$NON-NLS-1$
-	private static final String DESCRIPTION = "description"; //$NON-NLS-1$
-	private static final String IMAGE = "image"; //$NON-NLS-1$
-	private static final String IMPORT_SAMPLE_COMMAND = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
-	private static final String IMPORT_SAMPLE_COMMAND_ID = "id"; //$NON-NLS-1$
+	/**
+	 * Sample-Info enum
+	 */
+	protected static enum SAMPLE_INFO
+	{
+		CATEGORY("category"), //$NON-NLS-1$
+		ID("id"), //$NON-NLS-1$
+		NAME("name"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		IMAGE("image"); //$NON-NLS-1$
+
+		private String name;
+
+		SAMPLE_INFO(String name)
+		{
+			this.name = name;
+		};
+
+		public String toString()
+		{
+			return name;
+		}
+	}
+
+	protected static final String IMPORT_SAMPLE_COMMAND = "com.aptana.samples.ui.commands.import"; //$NON-NLS-1$
+	protected static final String IMPORT_SAMPLE_COMMAND_ID = "id"; //$NON-NLS-1$
 
 	// ############## Actions ###############
 
@@ -80,11 +99,11 @@ public class SamplesActionController extends AbstractActionController
 			for (SamplesReference sample : samplesManager.getSamplesForCategory(category.getId()))
 			{
 				Map<String, String> sampleInfo = new HashMap<String, String>();
-				sampleInfo.put(CATEGORY, category.getName());
-				sampleInfo.put(NAME, sample.getName());
-				sampleInfo.put(ID, sample.getId());
-				sampleInfo.put(DESCRIPTION, sample.getDescriptionText());
-				sampleInfo.put(IMAGE, StringUtil.EMPTY); // always empty for now
+				sampleInfo.put(SAMPLE_INFO.CATEGORY.toString(), category.getName());
+				sampleInfo.put(SAMPLE_INFO.NAME.toString(), sample.getName());
+				sampleInfo.put(SAMPLE_INFO.ID.toString(), sample.getId());
+				sampleInfo.put(SAMPLE_INFO.DESCRIPTION.toString(), sample.getDescription());
+				sampleInfo.put(SAMPLE_INFO.IMAGE.toString(), StringUtil.EMPTY); // always empty for now
 				samples.add(sampleInfo);
 			}
 		}

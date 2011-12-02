@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -180,10 +181,29 @@ public class URLUtilTest extends TestCase
 
 		// test null case
 		url = new URL("http://www.aptana.com");
-		assertEquals("Parameter list incorrectly joined", url, URLUtil.appendParameters(url, (Map) null));
+		assertEquals("Parameter list incorrectly joined", url,
+				URLUtil.appendParameters(url, (Map<String, String>) null));
 
 		assertEquals("Parameter list incorrectly joined", null, URLUtil.appendParameters(null, params));
 
-		assertEquals("Parameter list incorrectly joined", null, URLUtil.appendParameters(null, (Map) null));
+		assertEquals("Parameter list incorrectly joined", null,
+				URLUtil.appendParameters(null, (Map<String, String>) null));
+	}
+
+	public void testAppendDefaultParameters() throws MalformedURLException, UnsupportedEncodingException
+	{
+		// not encoding
+		// url, no params
+		URL url = new URL("http://www.aptana.com");
+		URL newUrl = URLUtil.appendDefaultParameters(url);
+		assertEquals(URLUtil.joinParameters(URLUtil.getDefaultParameters()), newUrl.getQuery());
+	}
+
+	public void testGetDefaultParameters()
+	{
+		Map<String, String> parameters = URLUtil.getDefaultParameters();
+		assertEquals(EclipseUtil.getProductVersion(), parameters.get("v"));
+		assertEquals(Locale.getDefault().toString(), parameters.get("nl"));
+		assertEquals(2, parameters.size());
 	}
 }
