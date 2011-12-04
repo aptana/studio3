@@ -27,7 +27,12 @@ import com.aptana.core.util.EclipseUtil;
 public class StudioAnalytics
 {
 
-	private static final String ANALYTICS_URL = "https://api.appcelerator.net/p/v1/app-track"; //$NON-NLS-1$
+	private static final String ANALYTICS_URL;
+	static
+	{
+		String url = EclipseUtil.getSystemProperty(IUsageSystemProperties.ANALYTICS_URL);
+		ANALYTICS_URL = (url == null) ? "https://api.appcelerator.net/p/v1/app-track" : url; //$NON-NLS-1$
+	}
 	private static final int TIMEOUT = 5 * 1000; // 5 seconds
 
 	private static StudioAnalytics instance;

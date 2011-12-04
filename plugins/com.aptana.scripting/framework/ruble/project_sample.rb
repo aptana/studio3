@@ -47,6 +47,14 @@ module Ruble
       @jobj.natures
     end
 
+    def icon=(icon)
+      @jobj.icon = icon.to_s
+    end
+
+    def icon
+      @jobj.icon.to_s
+    end
+
     class << self
       def define_sample(name, &block)
         log_info("loading project sample #{name}")
