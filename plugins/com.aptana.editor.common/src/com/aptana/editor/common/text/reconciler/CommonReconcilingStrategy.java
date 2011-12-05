@@ -30,6 +30,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.build.IBuildParticipant;
@@ -292,7 +293,24 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	private void reportProblems(ReconcileContext context, IProgressMonitor monitor)
 	{
-		IAnnotationModel model = fEditor.getDocumentProvider().getAnnotationModel(fEditor.getEditorInput());
+		if (fEditor == null)
+		{
+			return;
+		}
+
+		IDocumentProvider docProvider = fEditor.getDocumentProvider();
+		if (docProvider == null)
+		{
+			return;
+		}
+
+		IEditorInput editorInput = fEditor.getEditorInput();
+		if (editorInput == null)
+		{
+			return;
+		}
+
+		IAnnotationModel model = docProvider.getAnnotationModel(editorInput);
 		if (!(model instanceof CommonAnnotationModel))
 		{
 			return;
