@@ -63,6 +63,13 @@ class ProjectSampleNode extends BaseNode<ProjectSampleNode.Property>
 			{
 				return node.projectSample.getDescription();
 			}
+		},
+		ICON(Messages.ProjectSampleNode_Project_Sample_Icon_Path)
+		{
+			public Object getPropertyValue(ProjectSampleNode node)
+			{
+				return node.projectSample.getIcon();
+			}
 		};
 
 		private String header;

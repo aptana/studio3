@@ -7,6 +7,10 @@
  */
 package com.aptana.samples.model;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
@@ -16,6 +20,8 @@ import com.aptana.samples.handlers.ISampleProjectHandler;
 
 public class SamplesReference implements IProjectSample
 {
+
+	public static final String DEFAULT_ICON_KEY = "default"; //$NON-NLS-1$
 
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 	private static final String ATTR_PREVIEW_HANDLER = "previewHandler"; //$NON-NLS-1$
@@ -33,9 +39,10 @@ public class SamplesReference implements IProjectSample
 	private ISamplePreviewHandler previewHandler;
 	private String[] natures;
 	private String[] includePaths;
+	private final Map<String, URL> iconUrls;
 
 	public SamplesReference(SampleCategory category, String id, String name, String location, boolean isRemote,
-			String description, IConfigurationElement element)
+			String description, Map<String, URL> iconUrls, IConfigurationElement element)
 	{
 		this.category = category;
 		this.id = id;
@@ -43,6 +50,7 @@ public class SamplesReference implements IProjectSample
 		this.location = location;
 		this.isRemote = isRemote;
 		this.description = description;
+		this.iconUrls = new HashMap<String, URL>(iconUrls);
 		configElement = element;
 		natures = ArrayUtil.NO_STRINGS;
 		includePaths = ArrayUtil.NO_STRINGS;
@@ -118,6 +126,16 @@ public class SamplesReference implements IProjectSample
 	public String[] getIncludePaths()
 	{
 		return includePaths;
+	}
+
+	public URL getIconUrl()
+	{
+		return getIconUrl(DEFAULT_ICON_KEY);
+	}
+
+	public URL getIconUrl(String iconSize)
+	{
+		return iconUrls.get(iconSize);
 	}
 
 	public boolean isRemote()

@@ -19,7 +19,8 @@ import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 public class CharacterPairMatcherTest extends TestCase
 {
-	private static final char[] pairs = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"' };
+	private static final char[] pairs = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"', '<',
+			'>' };
 	private ICharacterPairMatcher matcher;
 
 	@Override
@@ -39,6 +40,13 @@ public class CharacterPairMatcherTest extends TestCase
 					}
 				}
 				return null;
+			}
+
+			@Override
+			protected ITypedRegion[] computePartitioning(IDocument doc, int offset, int length)
+					throws BadLocationException
+			{
+				return new ITypedRegion[] { new TypedRegion(0, doc.getLength(), IDocument.DEFAULT_CONTENT_TYPE) };
 			}
 		};
 		super.setUp();
@@ -71,6 +79,7 @@ public class CharacterPairMatcherTest extends TestCase
 	{
 		String source = "<?xml version=\"1.0\"\n encoding=\"ISO-8859-1\"?>";
 		IDocument document = new Document(source);
+		assertMatch(document, source, 0);
 		assertMatch(document, source, 14, 18);
 		assertMatch(document, source, 30, 41);
 	}
@@ -132,6 +141,21 @@ public class CharacterPairMatcherTest extends TestCase
 		assertNull(matcher.match(document, 8));
 		assertNull(matcher.match(document, 24));
 		assertNull(matcher.match(document, 48));
+	}
+
+	public void testAPSTUD3926()
+	{
+		// --------------------01234567890123456789012345678
+		// --------------------__________1_________2
+		final String source = "faux_function(str_pos(next));";
+		IDocument document = new Document(source);
+
+		// check after last )
+		assertRawMatch(document, 13, 28, 13, 15);
+		// check middle () pair
+		assertMatch(document, source, 21, 26);
+		// check between )), it matches the inside pair
+		assertRawMatch(document, 21, 27, 21, 6);
 	}
 
 	public void testSkipsPairsInComments()
@@ -210,8 +234,8 @@ public class CharacterPairMatcherTest extends TestCase
 		// right
 		region = matcher.match(document, rightOffsetToMatch);
 		assertNotNull("Failed to match backwards from right side of pair", region);
-		assertEquals("offset", offset, region.getOffset());
-		assertEquals("length", length, region.getLength());
+		assertEquals("offset of left side of pair (from right) doesn't match", offset, region.getOffset());
+		assertEquals("length matching backwards doesn't match", length, region.getLength());
 		assertEquals(ICharacterPairMatcher.RIGHT, matcher.getAnchor());
 	}
 }

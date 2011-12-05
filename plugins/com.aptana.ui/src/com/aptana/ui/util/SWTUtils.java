@@ -27,6 +27,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -301,5 +302,29 @@ public class SWTUtils
 		{
 			gridData.widthHint = largestWidth;
 		}
+	}
+
+	/**
+	 * Update the width of the label to take into account the error font. Only works for labels in a grid layout
+	 * 
+	 * @param label
+	 * @param errorFont
+	 */
+	public static void updateErrorLabelWidth(Label label, Font errorFont)
+	{
+		Object layoutData = label.getLayoutData();
+		if (layoutData instanceof GridData)
+		{
+			Font currentFont = label.getFont();
+			label.setFont(errorFont);
+			((GridData) layoutData).widthHint = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+			label.setFont(currentFont);
+		}
+	}
+
+	public static void updateLabelStatus(Label label, Font errorFont, Color errorColor, boolean isValid)
+	{
+		label.setForeground(isValid ? null : errorColor);
+		label.setFont(isValid ? null : errorFont);
 	}
 }

@@ -8,7 +8,9 @@
 package com.aptana.samples.ui.views;
 
 import java.io.File;
+import java.net.URL;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -30,6 +32,7 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 	private static final Image IMAGE_FOLDER = PlatformUI.getWorkbench().getSharedImages()
 			.getImage(ISharedImages.IMG_OBJ_FOLDER);
 	private static final String ICON_REMOTE = "icons/samples_remote.gif"; //$NON-NLS-1$
+	private static final String ICON_SIZE = "16"; //$NON-NLS-1$
 
 	private ImageRegistry imageRegistry;
 
@@ -71,6 +74,24 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 		}
 		if (element instanceof SamplesReference)
 		{
+			SamplesReference sample = (SamplesReference) element;
+			URL url = sample.getIconUrl(ICON_SIZE);
+			if (url == null)
+			{
+				// falls back to the default icon
+				url = sample.getIconUrl();
+			}
+			if (url != null)
+			{
+				String key = url.toString();
+				Image image = imageRegistry.get(key);
+				if (image == null)
+				{
+					imageRegistry.put(key, ImageDescriptor.createFromURL(url));
+					image = imageRegistry.get(key);
+				}
+				return image;
+			}
 			return SamplesUIPlugin.getImage(ICON_REMOTE);
 		}
 		return super.getImage(element);
