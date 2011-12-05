@@ -77,7 +77,7 @@ public class ParseState implements IParseState
 	{
 		return fProperties;
 	}
-	
+
 	public void setEditState(String source)
 	{
 		setEditState(source, 0);
@@ -162,12 +162,7 @@ public class ParseState implements IParseState
 			return true;
 		}
 
-		if (fStartingOffset != newParseState.fStartingOffset)
-		{
-			// starting offsets don't match, requires re-parse
-			return true;
-		}
-
-		return false;
+		// if starting offsets don't match, requires re-parse
+		return fStartingOffset != newParseState.fStartingOffset;
 	}
 }
