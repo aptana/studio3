@@ -83,6 +83,7 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
+import com.aptana.projects.IDebugScopes;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
 import com.aptana.usage.FeatureEvent;
@@ -156,6 +157,12 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		if (templates.size() > 0 && selectedTemplate == null)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
+			if (IdeLog.isInfoEnabled(ProjectsPlugin.getDefault(), IDebugScopes.TEMPLATES))
+			{
+				IdeLog.logInfo(ProjectsPlugin.getDefault(),
+						MessageFormat.format("\nFound project templates:\n{0}", templates), //$NON-NLS-1$
+						IDebugScopes.TEMPLATES);
+			}
 		}
 	}
 
