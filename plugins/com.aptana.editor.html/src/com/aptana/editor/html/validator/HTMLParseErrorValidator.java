@@ -51,9 +51,9 @@ public class HTMLParseErrorValidator extends AbstractBuildParticipant
 		}
 
 		Map<String, List<IProblem>> problems = new HashMap<String, List<IProblem>>();
-		context.putProblems(IHTMLConstants.HTML_PROBLEM, new ArrayList<IProblem>());
-		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, new ArrayList<IProblem>());
-		context.putProblems(ICSSConstants.CSS_PROBLEM, new ArrayList<IProblem>());
+		problems.put(IHTMLConstants.CONTENT_TYPE_HTML, new ArrayList<IProblem>());
+		problems.put(IJSConstants.CONTENT_TYPE_JS, new ArrayList<IProblem>());
+		problems.put(ICSSConstants.CONTENT_TYPE_CSS, new ArrayList<IProblem>());
 
 		try
 		{
