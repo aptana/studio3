@@ -15,7 +15,8 @@ import com.aptana.editor.css.CSSEditorTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
 import com.aptana.editor.css.internal.build.CSSTaskDetectorTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
-import com.aptana.editor.css.validator.CSSValidatorTests;
+import com.aptana.editor.css.validator.CSSValidatorTest;
+import com.aptana.editor.css.validator.ValidatorTests;
 
 public class AllTests
 {
@@ -28,7 +29,7 @@ public class AllTests
 		suite.addTestSuite(CSSEditorTest.class);
 		suite.addTestSuite(CSSFoldingComputerTest.class);
 		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
-		suite.addTestSuite(CSSValidatorTests.class);
+		suite.addTest(ValidatorTests.suite());
 		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.contentassist.AllTests.suite());

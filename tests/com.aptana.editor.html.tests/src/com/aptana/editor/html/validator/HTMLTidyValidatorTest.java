@@ -14,12 +14,10 @@ import org.eclipse.core.runtime.CoreException;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
-import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.js.IJSConstants;
 
-public class HTMLValidatorTests extends AbstractValidatorTestCase
+public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 {
 	@Override
 	protected AbstractBuildParticipant createValidator()
@@ -37,7 +35,6 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n<video />\n</body>\n</html>\n";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
 		IProblem item = items.get(0);
@@ -51,10 +48,8 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<title>test\n<body>\n</body>\n</html>";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(2, items.size());
-		assertContains(items, "Missing end tag </title>");
+		assertEquals(1, items.size());
 		assertContains(items, "missing </title> before <body>");
 	}
 
@@ -74,66 +69,8 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n</body>\n</html>";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
-	}
-
-	public void testHTMLEmbeddedCSSParseError() throws CoreException
-	{
-		String text = "<html>\n<style>\ndiv#paginator {\nfloat: left\nwidth: 65px\n}\n</style>\n<title>test</title>\n<body></body>\n</html>";
-
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
-
-		List<IProblem> items = getParseErrors(text);
-
-		assertEquals(1, items.size());
-		IProblem item = items.get(0);
-
-		assertEquals("Error was not found on expected line", 5, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \":\"",
-				item.getMessage());
-	}
-
-	public void testNoHTMLEmbeddedCSSParseError() throws CoreException
-	{
-		String text = "<html>\n<style>\ndiv#paginator {\nfloat: left;\nwidth: 65px\n}\n</style>\n<title>test</title>\n<body></body>\n</html>";
-
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
-
-		List<IProblem> items = getParseErrors(text);
-
-		assertEquals("A validation error was found in valid html with embedded css", 0, items.size());
-	}
-
-	public void testNoHTMLEmbeddedJSParseError() throws CoreException
-	{
-		String text = "<html>\n<script>\nvar foo = function() {\nhello();\n};\n</script>\n<title>test</title>\n<body></body>\n</html>";
-
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
-
-		List<IProblem> items = getParseErrors(text);
-
-		assertEquals("A validation error was found in valid html with embedded js", 0, items.size());
-	}
-
-	public void testHTMLEmbeddedJSParseError() throws CoreException
-	{
-		String text = "<html>\n<script>\nvar foo = function() {\nhello()\n};\n</script>\n<title>test</title>\n<body></body>\n</html>";
-
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
-
-		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
-		IProblem item = items.get(0);
-
-		assertEquals("Error was not found on expected line", 5, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \"}\"",
-				item.getMessage());
 	}
 
 	public void testNoTypeAttributeRequired() throws CoreException
@@ -160,9 +97,8 @@ public class HTMLValidatorTests extends AbstractValidatorTestCase
 		assertEquals(1, items.size());
 	}
 
-	@Override
 	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		return super.getParseErrors(source, new HTMLParseState(), IHTMLConstants.HTML_PROBLEM);
+		return getParseErrors(source, new HTMLParseState(), IHTMLConstants.TIDY_PROBLEM);
 	}
 }

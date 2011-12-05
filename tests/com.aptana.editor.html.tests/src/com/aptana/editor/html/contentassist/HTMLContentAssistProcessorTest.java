@@ -392,8 +392,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testLinkHREFFolderProposalWithPrefix() throws Exception
 	{
-		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder' />",
-				"folder");
+		assertHREFProposal("<link rel='stylesheet' href='fo|' />", "<link rel='stylesheet' href='folder' />", "folder");
 
 	}
 
@@ -912,19 +911,27 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testAPSTUD3862() throws Exception
 	{
-		TestProject project = createWebProject("3862_");
-		project.createFolder("public");
-		project.createFolder("public/css");
-		project.createFolder("application");
-		IFile file = project.createFile("index.html", "<img src=\"/img/\" />\n");
+		TestProject project = createWebProject("3862");
+		try
+		{
+			project.createFolder("public");
+			project.createFolder("public/css");
+			project.createFolder("application");
+			IFile file = project.createFile("index.html", "<img src=\"/img/\" />\n");
 
-		AbstractThemeableEditor editor = (AbstractThemeableEditor) createEditor(new FileEditorInput(file));
-		fProcessor = new HTMLContentAssistProcessor(editor);
-		ISourceViewer viewer = editor.getISourceViewer();
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, 15, '\t', false);
+			AbstractThemeableEditor editor = (AbstractThemeableEditor) createEditor(new FileEditorInput(file));
+			fProcessor = new HTMLContentAssistProcessor(editor);
+			ISourceViewer viewer = editor.getISourceViewer();
+			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, 15, '\t', false);
 
-		assertEquals("src value prefix reefers to non-existant subfolder, but we incorrectly suggested children anyways", 0,
-				proposals.length);
+			assertEquals(
+					"src value prefix reefers to non-existant subfolder, but we incorrectly suggested children anyways",
+					0, proposals.length);
+		}
+		finally
+		{
+			project.delete();
+		}
 	}
 
 	protected ITextViewer createTextViewer(IDocument fDocument)

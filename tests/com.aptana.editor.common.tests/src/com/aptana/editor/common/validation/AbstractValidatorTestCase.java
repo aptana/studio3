@@ -43,16 +43,6 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		store.putBoolean(getEnableParseErrorPrefKey(language), enabled);
 	}
 
-	protected List<IProblem> getParseErrors(String source) throws CoreException
-	{
-		return getParseErrors(source, new ParseState());
-	}
-
-	protected List<IProblem> getParseErrors(String source, IParseState ps) throws CoreException
-	{
-		return getParseErrors(source, ps, IMarker.PROBLEM);
-	}
-
 	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{
 		TestProject project = new TestProject("Test", new String[] { "com.aptana.projects.webnature" });

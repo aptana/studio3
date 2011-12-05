@@ -16,8 +16,9 @@ import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.parsing.ParseState;
 
-public class CSSValidatorTests extends AbstractValidatorTestCase
+public class CSSValidatorTest extends AbstractValidatorTestCase
 {
 
 	@Override
@@ -32,28 +33,9 @@ public class CSSValidatorTests extends AbstractValidatorTestCase
 		return "css";
 	}
 
-	public void testCSSParseErrors() throws CoreException
+	protected List<IProblem> getParseErrors(String source) throws CoreException
 	{
-		String text = "div#paginator {\nfloat: left\nwidth: 65px\n}";
-
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
-		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
-
-		IProblem item = items.get(0);
-
-		assertEquals("Error was not found on expected line", 3, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \":\"",
-				item.getMessage());
-	}
-
-	public void testNoCSSParseErrors() throws CoreException
-	{
-		String text = "div#paginator {\nfloat: left;\nwidth: 65px\n}";
-
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
-		List<IProblem> items = getParseErrors(text);
-		assertEquals(0, items.size());
+		return getParseErrors(source, new ParseState(), ICSSConstants.W3C_PROBLEM);
 	}
 
 	public void testCSS3TransitionProperty() throws CoreException

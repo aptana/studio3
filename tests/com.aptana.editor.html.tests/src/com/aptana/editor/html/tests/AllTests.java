@@ -12,6 +12,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipantTest;
 import com.aptana.editor.html.internal.build.HTMLTaskDetectorTest;
+import com.aptana.editor.html.validator.ValidatorTests;
 
 public class AllTests
 {
@@ -24,6 +25,7 @@ public class AllTests
 		suite.addTest(com.aptana.editor.html.parsing.HTMLParsingTests.suite());
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
+		suite.addTest(ValidatorTests.suite());
 		suite.addTestSuite(HTMLFileIndexingParticipantTest.class);
 		suite.addTestSuite(HTMLTaskDetectorTest.class);
 		// $JUnit-END$
