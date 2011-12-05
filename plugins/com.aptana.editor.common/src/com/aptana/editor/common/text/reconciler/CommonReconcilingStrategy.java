@@ -306,7 +306,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		Collection<IProblem> allProblems = new ArrayList<IProblem>();
 		for (Collection<IProblem> problemsForMarkerType : mapProblems.values())
 		{
-			allProblems.addAll(problemsForMarkerType);
+			if (!CollectionsUtil.isEmpty(problemsForMarkerType))
+			{
+				allProblems.addAll(problemsForMarkerType);
+			}
 		}
 		// Now report them all to the annotation model!
 		caModel.reportProblems(allProblems);
