@@ -10,7 +10,7 @@ package com.aptana.editor.js;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.editor.js.validator.JSValidatorTests;
+import com.aptana.editor.js.validator.JSLintValidatorTest;
 
 public class AllTests
 {
@@ -26,7 +26,6 @@ public class AllTests
 		suite.addTestSuite(JSRegexScannerTest.class);
 		suite.addTestSuite(JSSingleQuotedStringScannerTest.class);
 		suite.addTestSuite(JSSourcePartitionScannerTest.class);
-		suite.addTestSuite(JSValidatorTests.class);
 		// $JUnit-END$
 		return suite;
 	}

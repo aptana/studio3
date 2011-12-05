@@ -31,6 +31,7 @@ public class AllTests
 		suite.addTest(com.aptana.editor.js.sdoc.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.vsdoc.parsing.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.text.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.validator.ValidatorTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

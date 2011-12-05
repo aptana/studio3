@@ -9,26 +9,21 @@ package com.aptana.editor.js.validator;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.validation.AbstractValidatorTestCase;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.parsing.JSParseState;
 
-public class JSValidatorTests extends AbstractValidatorTestCase
+public class JSParserValidatorTest extends AbstractValidatorTestCase
 {
 
 	@Override
 	protected AbstractBuildParticipant createValidator()
 	{
-		return new JSLintValidator();
+		return new JSParserValidator();
 	}
 
 	@Override
@@ -42,9 +37,6 @@ public class JSValidatorTests extends AbstractValidatorTestCase
 		String text = "var foo = function() {\nhello()\n};";
 
 		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
-		// Turn off JSLint
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IJSConstants.CONTENT_TYPE_JS + ":" + IPreferenceConstants.SELECTED_VALIDATORS, "");
 
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
@@ -67,24 +59,5 @@ public class JSValidatorTests extends AbstractValidatorTestCase
 		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
-	}
-
-	public void testJSLintValidator() throws CoreException
-	{
-		String text = "var foo = function() {\nhello();\n};";
-
-		// Turn on JSLint
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IJSConstants.CONTENT_TYPE_JS + ":" + IPreferenceConstants.SELECTED_VALIDATORS,
-				"JSLint JavaScript Validator");
-
-		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
-
-		IProblem item = items.get(0);
-		assertEquals(2, item.getLineNumber());
-		assertEquals("'hello' is not defined.", item.getMessage());
-		assertEquals(IMarker.SEVERITY_WARNING, item.getSeverity());
-		assertEquals(24, item.getOffset());
 	}
 }
