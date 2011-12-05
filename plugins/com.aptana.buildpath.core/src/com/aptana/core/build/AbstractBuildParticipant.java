@@ -165,7 +165,6 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 			return false;
 		}
 
-		// FIXME We may want to sort the items by line number and then do a binary search!
 		for (IProblem item : items)
 		{
 			if (item.getLineNumber() == line)

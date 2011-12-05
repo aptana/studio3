@@ -276,7 +276,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		output = output.trim();
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
-		parseState.setEditState(output, 0);
+		parseState.setEditState(output);
 		IParseRootNode outputParseResult = null;
 		try
 		{

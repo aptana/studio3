@@ -77,6 +77,11 @@ public class ParseState implements IParseState
 	{
 		return fProperties;
 	}
+	
+	public void setEditState(String source)
+	{
+		setEditState(source, 0);
+	}
 
 	public void setEditState(String source, int startingOffset)
 	{

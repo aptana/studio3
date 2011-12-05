@@ -70,7 +70,7 @@ public class BuildContext
 
 	public synchronized IParseRootNode getAST(IParseState parseState) throws CoreException
 	{
-		parseState.setEditState(getContents(), 0);
+		parseState.setEditState(getContents());
 		try
 		{
 			boolean reparse = false;

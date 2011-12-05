@@ -64,7 +64,7 @@ public class ArrayUtil
 		Collections.reverse(list);
 		return (T[]) list.toArray();
 	}
-	
+
 	public static <T> boolean isEmpty(T[] array)
 	{
 		return array == null || array.length == 0;

@@ -294,7 +294,7 @@ public class HTMLParser implements IParser
 			{
 				String text = fScanner.getSource().get(start, end - start + 1);
 				ParseState subParseState = new ParseState();
-				subParseState.setEditState(text, 0);
+				subParseState.setEditState(text, start);
 				// FIXME We need to propagate options down to sub-languages, i.e. JS's attach/collect comments
 				IParseNode node = ParserPoolFactory.parse(language, subParseState);
 				List<IParseError> subErrors = subParseState.getErrors();
@@ -313,6 +313,7 @@ public class HTMLParser implements IParser
 				}
 				else
 				{
+					// FIXME Do we need to shift this here, if we passed in offset in setEditState?
 					addOffset(node, start);
 				}
 				return new IParseNode[] { node };

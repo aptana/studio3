@@ -47,7 +47,7 @@ import com.aptana.parsing.ast.IParseError;
  */
 public class LegacyValidationBuildParticipant extends AbstractBuildParticipant implements IValidationManager
 {
-	
+
 	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private Document fDocument;
@@ -223,8 +223,7 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 		{
 			return false;
 		}
-		
-		
+
 		String[] expressions = fgFilterExpressionDelimiter.split(list);
 		for (String expression : expressions)
 		{
@@ -238,7 +237,8 @@ public class LegacyValidationBuildParticipant extends AbstractBuildParticipant i
 
 	public void addParseErrors(List<IProblem> items, String language)
 	{
-		if (fContext == null || fDocument == null || !getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(language)))
+		if (fContext == null || fDocument == null
+				|| !getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(language)))
 		{
 			return;
 		}

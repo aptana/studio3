@@ -241,7 +241,7 @@ public abstract class InferencingTestsBase extends TestCase
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState();
 
-		parseState.setEditState(source, 0);
+		parseState.setEditState(source);
 
 		try
 		{

@@ -210,7 +210,7 @@ public class ParserPoolFactory
 																														// declaredExceptions
 	{
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source, 0);
+		parseState.setEditState(source);
 		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);
@@ -249,17 +249,14 @@ public class ParserPoolFactory
 			int sourceHash = parseState.getSource().hashCode();
 			String key = MessageFormat.format("{0}:{1}", contentTypeId, sourceHash); //$NON-NLS-1$
 			IParseState cached = fParseCache.get(key);
-			if (cached != null)
+			if (cached != null && !cached.requiresReparse(parseState))
 			{
-				if (!cached.requiresReparse(parseState))
+				// copy over errors from old parse state to new one since we're not re-parsing
+				for (IParseError error : cached.getErrors())
 				{
-					// copy over errors from old parse state to new one since we're not re-parsing
-					for (IParseError error : cached.getErrors())
-					{
-						parseState.addError(error);
-					}
-					return cached.getParseResult();
+					parseState.addError(error);
 				}
+				return cached.getParseResult();
 			}
 
 			IParserPool pool = getParserPool(contentTypeId);

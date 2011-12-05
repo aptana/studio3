@@ -96,7 +96,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 			JSParseState parseState = new JSParseState();
 			parseState.setAttachComments(false);
 			parseState.setCollectComments(false);
-			parseState.setEditState(document.get(), 0);
+			parseState.setEditState(document.get());
 			return ParserPoolFactory.parse(getContentType(), parseState);
 		}
 		catch (Exception e)

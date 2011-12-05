@@ -54,7 +54,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -82,7 +82,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -108,7 +108,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -139,7 +139,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -170,7 +170,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -197,7 +197,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);
@@ -223,7 +223,7 @@ public class CSSFoldingComputerTest extends TestCase
 			protected IParseNode getAST()
 			{
 				IParseState parseState = new ParseState();
-				parseState.setEditState(getDocument().get(), 0);
+				parseState.setEditState(getDocument().get());
 				try
 				{
 					return new CSSParser().parse(parseState);

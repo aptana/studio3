@@ -27,7 +27,7 @@ public interface IHTMLConstants
 	 * The marker type id for HTML problems. Extends {@link IMarker#PROBLEM}
 	 */
 	public String HTML_PROBLEM = "com.aptana.editor.html.problem"; //$NON-NLS-1$
-	
+
 	/**
 	 * The marker type id for HTML Tidy problems. Extends {@link #HTML_PROBLEM}
 	 */

@@ -229,7 +229,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	{
 		// apply to parse state
 		IParseState parseState = new ParseState();
-		parseState.setEditState(src, 0);
+		parseState.setEditState(src);
 		
 		URL url = FileLocator.find(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path(resourceName),
 				null);

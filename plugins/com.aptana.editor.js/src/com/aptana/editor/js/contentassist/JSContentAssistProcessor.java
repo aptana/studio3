@@ -535,7 +535,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 			JSParseState parseState = new JSParseState();
-			parseState.setEditState(doc.get(), 0);
+			parseState.setEditState(doc.get());
 			parseState.setAttachComments(false);
 			parseState.setCollectComments(false);
 			IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, parseState);
