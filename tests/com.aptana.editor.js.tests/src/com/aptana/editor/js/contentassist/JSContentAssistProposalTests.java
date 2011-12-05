@@ -27,6 +27,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.tests.util.TestProject;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -286,15 +287,8 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			// TODO Verify "eight" is in CA inside foo?
 
 			// Close the editor without saving, make sure we end up indexing underlying content again!
-			UIUtils.getDisplay().syncExec(new Runnable()
-			{
-
-				public void run()
-				{
-					editor.getSite().getPage().closeEditor(editor, false);
-					editor.dispose();
-				}
-			});
+			EditorTestHelper.closeEditor(editor);
+			
 			Thread.sleep(1000); // FIXME Is there anyway to tell when indexing happens and is finished?
 
 			// Now verify that our index reflects the file's contents and not the unsaved contents of the editor.

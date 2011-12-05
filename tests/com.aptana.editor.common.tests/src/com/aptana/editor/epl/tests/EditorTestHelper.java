@@ -89,11 +89,22 @@ public class EditorTestHelper {
 			runEventQueue(editor);
 	}
 
-	public static void closeEditor(IEditorPart editor) {
-		IWorkbenchPartSite site;
-		IWorkbenchPage page;
-		if (editor != null && (site= editor.getSite()) != null && (page= site.getPage()) != null)
-			page.closeEditor(editor, false);
+	public static void closeEditor(IEditorPart editor) 
+	{	
+		if (Display.getCurrent() != null)
+		{
+			IWorkbenchPartSite site;
+			IWorkbenchPage page;
+			if (editor != null && (site= editor.getSite()) != null && (page= site.getPage()) != null)
+			{
+				page.closeEditor(editor, false);
+				runEventQueue();
+			}
+		}
+		else
+		{
+			((AbstractTextEditor) editor).close(false);
+		}		
 	}
 
 	public static void closeAllEditors() {

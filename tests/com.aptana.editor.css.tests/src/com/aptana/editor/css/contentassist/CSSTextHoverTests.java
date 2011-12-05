@@ -17,13 +17,13 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.text.CSSTextHover;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -87,15 +87,7 @@ public class CSSTextHoverTests extends TestCase
 		{
 			if (editor != null)
 			{
-				if (Display.getCurrent() != null)
-				{
-					editor.getSite().getPage().closeEditor(editor, false);
-				}
-				else
-				{
-					editor.close(false);
-				}
-
+				EditorTestHelper.closeEditor(editor);
 				editor = null;
 			}
 			if (file != null)

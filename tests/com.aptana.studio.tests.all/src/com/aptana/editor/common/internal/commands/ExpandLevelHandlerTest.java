@@ -28,6 +28,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -42,6 +43,7 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 
 public class ExpandLevelHandlerTest extends TestCase
 {
@@ -83,7 +85,7 @@ public class ExpandLevelHandlerTest extends TestCase
 			getActivePage().hideView(outline);
 			outline.dispose();
 			// Need to force the editor shut!
-			editor.close(false);
+			EditorTestHelper.closeEditor(editor);
 			// Delete the generated file
 			file.delete(true, new NullProgressMonitor());
 			// Delete the generated project
