@@ -1,6 +1,10 @@
 package com.aptana.editor.html.formatter.tests;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+
 import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
+import com.aptana.editor.html.HTMLPlugin;
 
 public class FormattingTests extends AbstractFormatterTestCase
 {
@@ -17,6 +21,14 @@ public class FormattingTests extends AbstractFormatterTestCase
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.html.formatterFactory"; //$NON-NLS-1$
 	private static String TEST_BUNDLE_ID = "com.aptana.editor.html.formatter.tests"; //$NON-NLS-1$
 	private static String FILE_TYPE = "html"; //$NON-NLS-1$
+
+	@Override
+	protected void setUpSuite() throws Exception
+	{
+		IPreferenceStore prefs = HTMLPlugin.getDefault().getPreferenceStore();
+		prefs.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+		super.setUpSuite();
+	}
 
 	/*
 	 * (non-Javadoc)
