@@ -11,17 +11,18 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @author klindsey
- *
  */
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.buildpath.core.messages"; //$NON-NLS-1$
+
 	public static String BuildPathManager_PathContributorIsWrongType;
 	public static String BuildPathManager_UnableToConvertURI;
 	public static String BuildPathManager_UnableToConvertURLToURI;
 	public static String BuildPathManager_UnableToCreatePathContributor;
 	public static String BuildPathManager_UnableToRetrievePersistenceProperty;
 	public static String BuildPathManager_UnableToSetPersistenceProperty;
+
 	static
 	{
 		// initialize resource bundle
