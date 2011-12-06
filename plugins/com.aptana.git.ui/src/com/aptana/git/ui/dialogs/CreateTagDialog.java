@@ -11,14 +11,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.fieldassist.ComboContentAdapter;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
@@ -34,7 +30,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -44,13 +39,12 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRef;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.GitRevList;
-import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.ui.GitUIPlugin;
 
 /**
  * @author cwilliams
  */
-public class CreateTagDialog extends InputDialog
+public class CreateTagDialog extends StatusDialog
 {
 
 	private GitRepository repo;
@@ -58,46 +52,39 @@ public class CreateTagDialog extends InputDialog
 	private Text messageText;
 	private String startPoint;
 	private String message;
+	private Text tagNameText;
+	private String tagName;
+	private List<GitCommit> commits;
 
-	public CreateTagDialog(final Shell parentShell, final GitRepository repo)
+	public CreateTagDialog(final Shell parentShell, final GitRepository repo, final List<GitCommit> commits)
 	{
-		super(parentShell, Messages.CreateTagDialog_Title, Messages.CreateTagDialog_Message, StringUtil.EMPTY,
-				new IInputValidator()
-				{
-
-					public String isValid(String newText)
-					{
-						if (StringUtil.isEmpty(newText))
-						{
-							return Messages.CreateTagDialog_NonEmptyBranchNameMessage;
-						}
-						String trimmed = newText.trim();
-						if (trimmed.contains(" ") || trimmed.contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
-						{
-							return Messages.CreateTagDialog_NoWhitespaceBranchNameMessage;
-						}
-						if (repo.tags().contains(trimmed))
-						{
-							return Messages.CreateTagDialog_BranchAlreadyExistsMessage;
-						}
-						if (!repo.validRefName(GitRef.REFS_TAGS + trimmed))
-						{
-							return Messages.CreateTagDialog_InvalidBranchNameMessage;
-						}
-						return null;
-					}
-				});
+		super(parentShell);
+		setTitle(Messages.CreateTagDialog_Title);
 		this.repo = repo;
+		this.commits = commits;
 	}
 
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
-		// Add an advanced section so users can specify a non-HEAD SHA/ref tag point
 		Composite composite = (Composite) super.createDialogArea(parent);
 
-		Label label = new Label(composite, SWT.NONE);
-		label.setText(Messages.CreateTagDialog_Message_label);
+		Label tagNameLabel = new Label(composite, SWT.NONE);
+		tagNameLabel.setText(Messages.CreateTagDialog_Message);
+
+		tagNameText = new Text(composite, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		tagNameText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(300, 100).create());
+		tagNameText.addModifyListener(new ModifyListener()
+		{
+			public void modifyText(ModifyEvent e)
+			{
+				tagName = tagNameText.getText();
+				validate();
+			}
+		});
+
+		Label tagMessageLabel = new Label(composite, SWT.NONE);
+		tagMessageLabel.setText(Messages.CreateTagDialog_Message_label);
 
 		messageText = new Text(composite, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		messageText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(300, 100).create());
@@ -106,6 +93,7 @@ public class CreateTagDialog extends InputDialog
 			public void modifyText(ModifyEvent e)
 			{
 				message = messageText.getText();
+				validate();
 			}
 		});
 
@@ -115,11 +103,11 @@ public class CreateTagDialog extends InputDialog
 		group.setLayout(new GridLayout(1, false));
 		group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 
-		label = new Label(group, SWT.NONE);
-		label.setText(Messages.CreateTagDialog_StartPoint_label);
+		Label tagRevLabel = new Label(group, SWT.NONE);
+		tagRevLabel.setText(Messages.CreateTagDialog_StartPoint_label);
 
-		startPointText = new Combo(group, getInputTextStyle() | SWT.DROP_DOWN);
-		startPointText.setText(GitRepository.HEAD);
+		startPointText = new Combo(group, SWT.SINGLE | SWT.BORDER | SWT.DROP_DOWN);
+		startPointText.setText(startPoint = GitRepository.HEAD);
 		startPointText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 		startPointText.addModifyListener(new ModifyListener()
 		{
@@ -130,55 +118,68 @@ public class CreateTagDialog extends InputDialog
 				int index = startPoint.indexOf(' ');
 				if (index != -1)
 				{
-					startPoint.substring(0, index);
+					startPoint = startPoint.substring(0, index);
 				}
-				// TODO Validate the start point. Must be branch name, commit id or tag ref. repo.validateRefName?
+				validate();
 			}
 		});
 
-		Job job = new Job("Populating commit SHAs") //$NON-NLS-1$
+		for (GitCommit commit : commits)
 		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-				GitRevList revList = new GitRevList(repo);
-				revList.walkRevisionListWithSpecifier(new GitRevSpecifier("."), subMonitor.newChild(95)); //$NON-NLS-1$
-				final List<GitCommit> commits = revList.getCommits();
-				Display.getDefault().asyncExec(new Runnable()
-				{
+			startPointText.add(commitMessage(commit));
+		}
 
-					public void run()
-					{
-						// FIXME This is probably pretty nasty memory wise. Can we look up commits based on typing,
-						// rather than pre-calculate?
-						for (GitCommit commit : commits)
-						{
-							startPointText.add(commitMessage(commit));
-						}
+		SearchingContentProposalProvider proposalProvider = new SearchingContentProposalProvider(commits);
+		ContentProposalAdapter adapter = new ContentProposalAdapter(startPointText, new ComboContentAdapter(),
+				proposalProvider, KeyStroke.getInstance(SWT.CONTROL, ' '), null);
+		adapter.setPropagateKeys(true);
+		adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
 
-						SearchingContentProposalProvider proposalProvider = new SearchingContentProposalProvider(
-								commits);
-						ContentProposalAdapter adapter = new ContentProposalAdapter(startPointText,
-								new ComboContentAdapter(), proposalProvider, KeyStroke.getInstance(SWT.CONTROL, ' '),
-								null);
-						adapter.setPropagateKeys(true);
-						adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-
-						ControlDecoration decoration = new ControlDecoration(startPointText, SWT.LEFT);
-						decoration.setImage(FieldDecorationRegistry.getDefault()
-								.getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
-					}
-				});
-				subMonitor.done();
-				return Status.OK_STATUS;
-			}
-		};
-		job.setUser(false);
-		job.setPriority(Job.SHORT);
-		job.schedule();
+		ControlDecoration decoration = new ControlDecoration(startPointText, SWT.LEFT);
+		decoration.setImage(FieldDecorationRegistry.getDefault()
+				.getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
 
 		return composite;
+	}
+
+	protected void validate()
+	{
+		if (StringUtil.isEmpty(tagName))
+		{
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+					Messages.CreateTagDialog_NonEmptyTagNameMessage));
+			return;
+		}
+
+		String trimmed = tagName.trim();
+		if (trimmed.contains(" ") || trimmed.contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+					Messages.CreateTagDialog_NoWhitespaceTagNameMessage));
+			return;
+		}
+		if (repo.tags().contains(trimmed))
+		{
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+					Messages.CreateTagDialog_TagAlreadyExistsMessage));
+			return;
+		}
+		if (!repo.validRefName(GitRef.REFS_TAGS + trimmed))
+		{
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+					Messages.CreateTagDialog_InvalidTagNameMessage));
+			return;
+		}
+
+		// Validate the rev object for startPoint
+		IStatus status = repo.revParse(startPoint);
+		if (!status.isOK())
+		{
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+					Messages.CompareWithDialog_InvalidRefError));
+			return;
+		}
+		updateStatus(Status.OK_STATUS);
 	}
 
 	public String getStartPoint()
@@ -189,6 +190,11 @@ public class CreateTagDialog extends InputDialog
 	public String getMessage()
 	{
 		return message;
+	}
+
+	public String getTagName()
+	{
+		return tagName;
 	}
 
 	protected static String commitMessage(GitCommit commit)
@@ -204,6 +210,8 @@ public class CreateTagDialog extends InputDialog
 	 */
 	private static class SearchingContentProposalProvider implements IContentProposalProvider
 	{
+
+		// TODO Combine with provider from CompareWithDialog...
 		private List<GitCommit> commits;
 
 		private SearchingContentProposalProvider(List<GitCommit> commits)
