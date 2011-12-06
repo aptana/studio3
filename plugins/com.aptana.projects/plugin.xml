@@ -204,6 +204,7 @@
    <extension
          point="com.aptana.samples.samplespath">
       <category
+            icon="icons/new_web_project.png"
             id="com.aptana.projects.samples.web.category"
             name="%category.sample.web.name">
       </category>
