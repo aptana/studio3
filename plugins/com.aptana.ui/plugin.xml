@@ -223,6 +223,10 @@
             </command>
             -->
          </menu>
+         <separator
+               name="helpStudio"
+               visible="true">
+         </separator>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
