@@ -25,8 +25,6 @@ import com.aptana.scripting.ScriptingActivator;
 public class ProjectSampleElement extends AbstractBundleElement
 {
 
-	private static final String DEFAULT_ICON_KEY = "default"; //$NON-NLS-1$
-
 	private String fSampleId;
 	private String fCategoryId;
 	private String fLocation;
@@ -82,22 +80,18 @@ public class ProjectSampleElement extends AbstractBundleElement
 		return fProjectNatures;
 	}
 
-	public String getIcon()
+	public Map<String, String> getIcon()
 	{
-		return getIcon(DEFAULT_ICON_KEY);
-	}
-
-	public String getIcon(String iconSize)
-	{
-		return fIconPaths.get(iconSize);
+		return fIconPaths;
 	}
 
 	public Map<String, URL> getIconUrls()
 	{
-		Collection<String> iconSizes = fIconPaths.keySet();
+		Map<String, String> iconPaths = getIcon();
+		Collection<String> iconSizes = iconPaths.keySet();
 		for (String size : iconSizes)
 		{
-			String iconPath = fIconPaths.get(size);
+			String iconPath = iconPaths.get(size);
 			if (iconPath == null)
 			{
 				continue;
@@ -186,9 +180,13 @@ public class ProjectSampleElement extends AbstractBundleElement
 		fProjectNatures = natures;
 	}
 
-	public void setIcon(String iconPath)
+	public void setIcon(Map<String, String> iconMap)
 	{
-		setIcon(DEFAULT_ICON_KEY, iconPath);
+		Collection<String> iconSizes = iconMap.keySet();
+		for (String size : iconSizes)
+		{
+			setIcon(size, iconMap.get(size));
+		}
 	}
 
 	public void setIcon(String iconSize, String iconPath)
