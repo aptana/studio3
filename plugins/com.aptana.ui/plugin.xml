@@ -123,6 +123,9 @@
          <showInPart
                id="org.eclipse.ui.navigator.ProjectExplorer">
          </showInPart>
+         <viewShortcut
+               id="com.aptana.webserver.ui.view">
+         </viewShortcut>
       </perspectiveExtension>
    </extension>
    <extension
