@@ -66,7 +66,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		SUSPENDED, TERMINATE
 	}
 
-	private static final int V8_CONNECT_TIMEOUT = 60000;
+	private static final int V8_CONNECT_TIMEOUT = 300000;
 	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final Pattern DETAIL_EXPRESSION_PATTERN = Pattern.compile("\\bthis\\b"); //$NON-NLS-1$
 	private static final String THIS_SUBSTITUTE = "__this__"; //$NON-NLS-1$
@@ -1098,6 +1098,7 @@ public class V8DebugHost extends AbstractDebugHost {
 					break;
 				} catch (ConnectException e) {
 				} catch (SocketTimeoutException e) {
+				} catch (IOException e) {
 				}
 				Thread.sleep(500);
 			}
