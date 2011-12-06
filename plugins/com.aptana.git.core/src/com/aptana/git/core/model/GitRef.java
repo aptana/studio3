@@ -30,7 +30,7 @@ public class GitRef
 	 */
 	public enum TYPE
 	{
-		TAG, HEAD, REMOTE
+		HEAD, REMOTE, TAG
 	}
 
 	private String ref;

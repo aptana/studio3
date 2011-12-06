@@ -90,6 +90,25 @@ public class GitRepository
 	}
 
 	/**
+	 * Order git refs alphabetically (within each type), with local branches first, then remote branches, then tags,
+	 * then untyped refs.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class GitRefComparator implements Comparator<GitRef>
+	{
+		public int compare(GitRef o1, GitRef o2)
+		{
+			int diff = o1.type().ordinal() - o2.type().ordinal();
+			if (diff != 0)
+			{
+				return diff;
+			}
+			return o1.toString().compareTo(o2.toString());
+		}
+	}
+
+	/**
 	 * Extension of temporary git lock files.
 	 */
 	private static final String DOT_LOCK = ".lock"; //$NON-NLS-1$
@@ -563,7 +582,7 @@ public class GitRepository
 	 */
 	public Set<String> localBranches()
 	{
-		return branches(GitRef.TYPE.HEAD);
+		return simpleRefsOfType(GitRef.TYPE.HEAD);
 	}
 
 	/**
@@ -573,7 +592,7 @@ public class GitRepository
 	 */
 	public Set<String> remoteBranches()
 	{
-		return branches(GitRef.TYPE.REMOTE);
+		return simpleRefsOfType(GitRef.TYPE.REMOTE);
 	}
 
 	/**
@@ -616,20 +635,18 @@ public class GitRepository
 	 */
 	public Set<String> allBranches()
 	{
-		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
+		return simpleRefsOfType(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
 	}
 
-	private Set<String> branches(GitRef.TYPE... types)
+	/**
+	 * Returns the set of all simple refs. These are the refs for local branches (heads), remote branches (remotes) and
+	 * tags.
+	 * 
+	 * @return
+	 */
+	public SortedSet<GitRef> simpleRefs()
 	{
-		if (types == null || types.length == 0)
-		{
-			return Collections.emptySet();
-		}
-		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
-
-		// Sort branches. Make sure local ones always come before remote
-		SortedSet<String> allBranches = new TreeSet<String>(new BranchNameComparator());
-
+		SortedSet<GitRef> refs = new TreeSet<GitRef>(new GitRefComparator());
 		synchronized (branches)
 		{
 			for (GitRevSpecifier revSpec : branches)
@@ -643,25 +660,45 @@ public class GitRepository
 				{
 					continue;
 				}
-				for (GitRef.TYPE string : types)
-				{
-					if (ref.type().equals(string))
-					{
-						break;
-					}
-				}
-				if (!validTypes.contains(ref.type()))
-				{
-					continue;
-				}
 				// Skip these magical "*.lock" files
 				if (ref.type() == TYPE.HEAD && ref.shortName().endsWith(DOT_LOCK))
 				{
 					continue;
 				}
-				allBranches.add(ref.shortName());
+				refs.add(ref);
 			}
 		}
+		return refs;
+	}
+
+	/**
+	 * Returns the Set of ref short names that have on of the passed in types. The results are sorted alphabetically,
+	 * with local branches always listed before remote branches.
+	 * 
+	 * @param types
+	 * @return
+	 */
+	private Set<String> simpleRefsOfType(GitRef.TYPE... types)
+	{
+		if (types == null || types.length == 0)
+		{
+			return Collections.emptySet();
+		}
+		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
+
+		// Sort branches. Make sure local ones always come before remote
+		SortedSet<String> allBranches = new TreeSet<String>(new BranchNameComparator());
+
+		Collection<GitRef> simpleRefs = simpleRefs();
+		for (GitRef ref : simpleRefs)
+		{
+			if (!validTypes.contains(ref.type()))
+			{
+				continue;
+			}
+			allBranches.add(ref.shortName());
+		}
+
 		return allBranches;
 	}
 
@@ -1299,16 +1336,6 @@ public class GitRepository
 		}
 		fireBranchRemovedEvent(branchName);
 		return Status.OK_STATUS;
-	}
-
-	/**
-	 * @deprecated Use {@link #validRefName(String)}
-	 * @param branchName
-	 * @return
-	 */
-	public boolean validBranchName(String branchName)
-	{
-		return validRefName(GitRef.REFS_HEADS + branchName);
 	}
 
 	/**
@@ -2041,5 +2068,16 @@ public class GitRepository
 			}
 		}
 		return tags;
+	}
+
+	/**
+	 * Executes "git rev-parse --verify <ref>"
+	 * 
+	 * @param ref
+	 * @return
+	 */
+	public IStatus revParse(String ref)
+	{
+		return execute(GitRepository.ReadWrite.READ, "rev-parse", "--verify", ref); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
