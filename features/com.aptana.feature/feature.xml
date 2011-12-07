@@ -52,6 +52,7 @@
       <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jsch.core"/>
       <import plugin="com.aptana.ide.libraries.subscription"/>
+      <import plugin="com.aptana.swt.webkitbrowser" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

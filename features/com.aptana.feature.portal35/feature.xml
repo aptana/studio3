@@ -32,7 +32,7 @@
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.console"/>
       <import plugin="org.eclipse.core.filesystem"/>
-      <import plugin="com.aptana.swt.webkitbrowser"/>
+      <import plugin="com.aptana.swt.webkitbrowser" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.security"/>
       <import plugin="org.eclipse.ecf"/>
       <import plugin="org.eclipse.ecf.filetransfer"/>
