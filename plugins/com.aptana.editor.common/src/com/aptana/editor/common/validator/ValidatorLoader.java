@@ -86,7 +86,7 @@ public class ValidatorLoader
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(ELEMENT_CONTENT_TYPE, ELEMENT_VALIDATOR);
+						return CollectionsUtil.newInOrderSet(ELEMENT_CONTENT_TYPE, ELEMENT_VALIDATOR);
 					}
 				});
 	}

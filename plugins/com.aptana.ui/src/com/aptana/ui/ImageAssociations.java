@@ -72,7 +72,7 @@ public final class ImageAssociations
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(TAG_IMAGE, TAG_OBJECT_IMAGE);
+						return CollectionsUtil.newInOrderSet(TAG_IMAGE, TAG_OBJECT_IMAGE);
 					}
 				});
 	}

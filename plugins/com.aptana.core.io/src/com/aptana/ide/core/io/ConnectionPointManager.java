@@ -562,7 +562,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
+						return CollectionsUtil.newInOrderSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
 					}
 				});
 	}

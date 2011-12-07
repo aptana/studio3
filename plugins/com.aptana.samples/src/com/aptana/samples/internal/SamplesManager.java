@@ -207,7 +207,7 @@ public class SamplesManager implements ISamplesManager
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(ELEMENT_CATEGORY, ELEMENT_SAMPLESINFO);
+						return CollectionsUtil.newInOrderSet(ELEMENT_CATEGORY, ELEMENT_SAMPLESINFO);
 					}
 				});
 	}

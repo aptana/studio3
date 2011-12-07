@@ -82,7 +82,8 @@ public class BrowserConfigurationManager
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(ELEMENT_SIZE_CATEGORY, ELEMENT_BACKGROUND_IMAGE, ELEMENT_SIZE);
+						return CollectionsUtil.newInOrderSet(ELEMENT_SIZE_CATEGORY, ELEMENT_BACKGROUND_IMAGE,
+								ELEMENT_SIZE);
 					}
 				});
 	}

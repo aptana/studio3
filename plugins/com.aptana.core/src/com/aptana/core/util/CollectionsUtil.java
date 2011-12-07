@@ -128,6 +128,24 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * Convert a list of items into a Set while preserving the order. An empty set is returned if items is null.
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new LinkedHashSet<T> or an empty set
+	 */
+	public static final <T> Set<T> newInOrderSet(T... items)
+	{
+		if (items != null)
+		{
+			return new LinkedHashSet<T>(Arrays.asList(items));
+		}
+		return Collections.emptySet();
+	}
+
+	/**
 	 * Given a list of elements of type <T>, remove the duplicates from the list in place
 	 * 
 	 * @param <T>
