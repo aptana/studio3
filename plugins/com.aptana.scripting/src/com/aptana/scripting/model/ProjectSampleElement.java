@@ -25,6 +25,8 @@ import com.aptana.scripting.ScriptingActivator;
 public class ProjectSampleElement extends AbstractBundleElement
 {
 
+	private static final String DEFAULT_ICON = "default"; //$NON-NLS-1$
+
 	private String fSampleId;
 	private String fCategoryId;
 	private String fLocation;
@@ -178,6 +180,11 @@ public class ProjectSampleElement extends AbstractBundleElement
 	public void setNatures(String[] natures)
 	{
 		fProjectNatures = natures;
+	}
+
+	public void setIcon(String defaultIcon)
+	{
+		setIcon(DEFAULT_ICON, defaultIcon);
 	}
 
 	public void setIcon(Map<String, String> iconMap)
