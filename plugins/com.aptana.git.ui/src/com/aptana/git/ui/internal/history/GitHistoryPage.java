@@ -28,6 +28,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -74,12 +75,15 @@ public class GitHistoryPage extends HistoryPage
 	private CommitGraphTable graph;
 	private Browser commentViewer;
 	private CommitFileDiffViewer fileViewer;
+	private String currentRef;
 
 	@Override
 	public boolean inputSet()
 	{
 		if (graph == null)
+		{
 			return false;
+		}
 
 		Object input = super.getInput();
 
@@ -88,7 +92,9 @@ public class GitHistoryPage extends HistoryPage
 		{
 			IResource[] resources = (IResource[]) input;
 			if (resources.length == 0)
+			{
 				return false;
+			}
 			resource = resources[0];
 		}
 		else if (input instanceof IResource)
@@ -96,9 +102,18 @@ public class GitHistoryPage extends HistoryPage
 			resource = (IResource) input;
 		}
 		if (resource == null)
+		{
 			return false;
+		}
 
-		final IResource theResource = resource;
+		GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
+		loadHistory(resource, currentRef = repo.currentBranch());
+		return true;
+	}
+
+	private void loadHistory(final IResource resource, final String ref)
+	{
+		currentRef = ref;
 		Job job = new Job(Messages.GitHistoryPage_GeneratingHistoryJob_title)
 		{
 			@Override
@@ -106,17 +121,21 @@ public class GitHistoryPage extends HistoryPage
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 				// Generate the commit list and set the components up with it!
-				GitRepository repo = getGitRepositoryManager().getAttached(theResource.getProject());
+				GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 				if (repo == null)
+				{
 					return Status.OK_STATUS;
+				}
 				GitRevList revList = new GitRevList(repo);
 				// Need the repo relative path
-				IPath resourcePath = repo.relativePath(theResource);
+				IPath resourcePath = repo.relativePath(resource);
 				if (subMonitor.isCanceled())
+				{
 					return Status.CANCEL_STATUS;
+				}
 				repo.lazyReload();
 				subMonitor.worked(5);
-				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath.toOSString()),
+				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(ref, "--", resourcePath.toOSString()), //$NON-NLS-1$
 						subMonitor.newChild(95));
 				final List<GitCommit> commits = revList.getCommits();
 				Display.getDefault().asyncExec(new Runnable()
@@ -134,7 +153,6 @@ public class GitHistoryPage extends HistoryPage
 		job.setUser(true);
 		job.setPriority(Job.SHORT);
 		schedule(job);
-		return true;
 	}
 
 	private IGitRepositoryManager getGitRepositoryManager()
@@ -170,18 +188,10 @@ public class GitHistoryPage extends HistoryPage
 	public void createControl(Composite parent)
 	{
 		ourControl = createMainPanel(parent);
-		GridData gd = new GridData();
-		gd.verticalAlignment = SWT.FILL;
-		gd.horizontalAlignment = SWT.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		gd.grabExcessVerticalSpace = true;
+
+		GridData gd = GridDataFactory.fillDefaults().grab(true, true).create();
 		ourControl.setLayoutData(gd);
 
-		gd = new GridData();
-		gd.verticalAlignment = SWT.FILL;
-		gd.horizontalAlignment = SWT.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		gd.grabExcessVerticalSpace = true;
 		graphDetailSplit = new SashForm(ourControl, SWT.VERTICAL);
 		graphDetailSplit.setLayoutData(gd);
 
@@ -198,8 +208,8 @@ public class GitHistoryPage extends HistoryPage
 		layout();
 
 		setTheme(false);
-		commentViewer.setText("<html><head></head><body style=\"background-color: " //$NON-NLS-1$
-				+ toHex(getBackground()) + ";\"></body></html>"); //$NON-NLS-1$
+		commentViewer.setText(MessageFormat.format(
+				"<html><head></head><body style=\"background-color: {0};\"></body></html>", toHex(getBackground()))); //$NON-NLS-1$
 	}
 
 	protected RGB getBackground()
@@ -309,7 +319,9 @@ public class GitHistoryPage extends HistoryPage
 		{
 			IResource[] resources = (IResource[]) input;
 			if (resources.length == 0)
-				return ""; //$NON-NLS-1$
+			{
+				return StringUtil.EMPTY;
+			}
 			resource = resources[0];
 		}
 		else if (input instanceof IResource)
@@ -317,7 +329,9 @@ public class GitHistoryPage extends HistoryPage
 			resource = (IResource) input;
 		}
 		if (resource == null)
-			return ""; //$NON-NLS-1$
+		{
+			return StringUtil.EMPTY;
+		}
 
 		return resource.getProject().getName();
 	}
@@ -352,7 +366,7 @@ public class GitHistoryPage extends HistoryPage
 		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads //$NON-NLS-1$ //$NON-NLS-2$
 		variables.put("\\{comment\\}", comment); //$NON-NLS-1$
 
-		String avatar = ""; //$NON-NLS-1$
+		String avatar = StringUtil.EMPTY;
 		if (commit.getAuthorEmail() != null)
 		{
 			avatar = StringUtil.md5(commit.getAuthorEmail().toLowerCase());
@@ -400,11 +414,15 @@ public class GitHistoryPage extends HistoryPage
 		{
 			final IResource[] array = (IResource[]) object;
 			if (array.length == 0)
+			{
 				return false;
+			}
 			for (final IResource r : array)
 			{
 				if (!typeOk(r))
+				{
 					return false;
+				}
 			}
 			return true;
 
@@ -474,5 +492,31 @@ public class GitHistoryPage extends HistoryPage
 	{
 		setTheme(false);
 		super.dispose();
+	}
+
+	public void setRef(String branchName)
+	{
+		Object input = super.getInput();
+
+		IResource resource = null;
+		if (input instanceof IResource[])
+		{
+			IResource[] resources = (IResource[]) input;
+			if (resources.length > 0)
+			{
+				resource = resources[0];
+			}
+		}
+		else if (input instanceof IResource)
+		{
+			resource = (IResource) input;
+		}
+
+		loadHistory(resource, branchName);
+	}
+
+	public String getCurrentRef()
+	{
+		return currentRef;
 	}
 }
