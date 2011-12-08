@@ -359,14 +359,11 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			final IRegion lineRegion = document.getLineInformation(line);
 
 			// Handle fully opaque line highlight here. A modified approach from CursorLinePainter.
-			if (isOpaque())
+			if (fEnabled && isOpaque() && isCurrentLine(line))
 			{
-				if (isCurrentLine(line))
-				{
-					// draw current line
-					drawCurrentLine(event, lineRegion);
-					return;
-				}
+				// draw current line
+				drawCurrentLine(event, lineRegion);
+				return;
 			}
 
 			// Not drawing an opaque line highlight, so we need to do our normal line coloring here.
