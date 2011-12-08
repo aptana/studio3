@@ -21,7 +21,7 @@ public class ArrayUtilTest extends TestCase
 
 		try
 		{
-			ArrayUtil.flatten((Object[]) null);
+			ArrayUtil.flatten(null);
 			fail();
 		}
 		catch (IllegalArgumentException e)
