@@ -194,7 +194,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			return;
 		}
 		sendData(new String[] { SUSPENDED, suspendReason, Util.encodeData(fileName),
-				Integer.toString(position.getLine()) });
+				Integer.toString(position.getLine()+1) }); // Line numbers are 0-based in V8, 1-based in Aptana Debugger Protocol/Eclipse.
 		suspendReason = null;
 	}
 
@@ -319,7 +319,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 			framesData[i] = StringUtil.join(SUBARGS_DELIMITER, new String[] {
 					Integer.toString(i), Util.encodeData(functionName), Util.encodeData(listArguments(frame)),
-					Util.encodeData(fileName), Integer.toString(position.getLine()),
+					Util.encodeData(fileName), Integer.toString(position.getLine()+1), // Line numbers are 0-based in V8, 1-based in Aptana Debugger Protocol/Eclipse.
 					Boolean.toString(script.getType() == Script.Type.NATIVE), Long.toString(position.getOffset()), Integer.toString(getScriptFunctionId(script, functionName))
 			});
 		}
@@ -1032,6 +1032,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	 */
 	@Override
 	protected boolean setBreakpoint(String uri, int lineNo, BreakpointProperties props) {
+		lineNo -= 1; // Line numbers are 0-based in V8, 1-based in Aptana Debugger Protocol/Eclipse.
 		final Breakpoint[] result = new Breakpoint[1];
 		CallbackSemaphore semaphore = new CallbackSemaphore();
 		Target target = new Breakpoint.Target.ScriptName(makeDebuggerURI(uri));
@@ -1064,6 +1065,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	 */
 	@Override
 	protected boolean removeBreakpoint(String uri, int lineNo) {
+		lineNo -= 1; // Line numbers are 0-based in V8, 1-based in Aptana Debugger Protocol/Eclipse.
 		Map<Integer, Breakpoint> scriptBreakpoints = breakpoints.get(uri);
 		if (scriptBreakpoints != null) {
 			Breakpoint bp = scriptBreakpoints.remove(Integer.valueOf(lineNo));
