@@ -1087,7 +1087,6 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="com.aptana.theme.internal.OpenThemePreferencesHandler"
             id="com.aptana.git.ui.history.switch_branch"
             name="%switch.history.branch.name">
       </command>
