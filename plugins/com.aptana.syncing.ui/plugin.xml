@@ -88,6 +88,15 @@
          </enablement>
       </actionProvider>
       <actionProvider
+            class="com.aptana.ide.ui.io.navigator.actions.FileSystemNewFromTemplateActionProvider"
+            id="com.aptana.ide.syncing.ui.navigator.actions.FileSystemNewFromTemplateActions">
+         <enablement>
+            <instanceof
+                  value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
+            </instanceof>
+         </enablement>
+      </actionProvider>
+      <actionProvider
             class="com.aptana.ide.ui.io.navigator.actions.FileSystemMgmtActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.FileSystemMgmtActions">
          <enablement>
