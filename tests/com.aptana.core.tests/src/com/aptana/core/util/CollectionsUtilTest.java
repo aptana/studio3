@@ -9,7 +9,10 @@ package com.aptana.core.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -90,5 +93,35 @@ public class CollectionsUtilTest extends TestCase
 		list.add("abc");
 
 		assertFalse(CollectionsUtil.isEmpty(list));
+	}
+
+	public void testNewList()
+	{
+		List<String> list = new ArrayList<String>();
+		assertEquals(list, CollectionsUtil.newList((String[]) null));
+
+		list.add("item1");
+		list.add("item2");
+		assertEquals(list, CollectionsUtil.newList("item1", "item2"));
+	}
+
+	public void testNewSet()
+	{
+		Set<String> list = new HashSet<String>();
+		assertEquals(list, CollectionsUtil.newSet((String[]) null));
+
+		list.add("item1");
+		list.add("item2");
+		assertEquals(list, CollectionsUtil.newSet("item1", "item2"));
+	}
+
+	public void testNewInOrderSet()
+	{
+		Set<String> list = new LinkedHashSet<String>();
+		assertEquals(list, CollectionsUtil.newInOrderSet((String[]) null));
+
+		list.add("item1");
+		list.add("item2");
+		assertEquals(list, CollectionsUtil.newInOrderSet("item1", "item2"));
 	}
 }

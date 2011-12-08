@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 
 public class ArrayUtilTest extends TestCase
 {
+
 	public void testFlatten() throws Exception
 	{
 		Integer[] array1 = { 0, 1, 2 };
@@ -20,7 +21,7 @@ public class ArrayUtilTest extends TestCase
 
 		try
 		{
-			ArrayUtil.flatten(null);
+			ArrayUtil.flatten((Object[]) null);
 			fail();
 		}
 		catch (IllegalArgumentException e)
@@ -38,6 +39,5 @@ public class ArrayUtilTest extends TestCase
 		{
 			assertEquals("Value in combined array not as expected", i, (int) combined[i]);
 		}
-
 	}
 }
