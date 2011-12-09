@@ -224,7 +224,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		JSGetPropertyNode node = ParseUtil.getGetPropertyNode(_targetNode, _statementNode);
+		JSGetPropertyNode node = ASTUtil.getGetPropertyNode(_targetNode, _statementNode);
 		List<String> types = getParentObjectTypes(node, offset);
 
 		// add all properties of each type to our proposal list
@@ -317,7 +317,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (_targetNode != null)
 		{
-			JSScope globalScope = ParseUtil.getGlobalScope(_targetNode);
+			JSScope globalScope = ASTUtil.getGlobalScope(_targetNode);
 
 			if (globalScope != null)
 			{
@@ -667,7 +667,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				case IN_PROPERTY_NAME:
 				{
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(node,
+					JSGetPropertyNode propertyNode = ASTUtil.getGetPropertyNode(node,
 							((JSNode) node).getContainingStatementNode());
 					List<String> types = getParentObjectTypes(propertyNode, offset);
 
@@ -853,7 +853,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		return ParseUtil.getParentObjectTypes(getIndex(), getURI(), _targetNode, node, offset);
+		return ASTUtil.getParentObjectTypes(getIndex(), getURI(), _targetNode, node, offset);
 	}
 
 	/**

@@ -40,7 +40,6 @@ import com.aptana.ui.util.UIUtils;
  * @author Max Stepanov
  */
 public class CommonPresentationReconciler extends PresentationReconciler {
-
 	private int iterationPartitionLimit = 4000;
 	private int backgroundReconcileDelay = 2000;
 	private int iterationDelay = 500;
@@ -176,14 +175,15 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 			if (presentation[0] != null) {
 				UIUtils.getDisplay().syncExec(new Runnable() {
 					public void run() {
-						if (textViewer != null) {
-							StyledText widget = textViewer.getTextWidget();
+						ITextViewer viewer = textViewer;
+						if (viewer != null) {
+							StyledText widget = viewer.getTextWidget();
 							if (widget != null && !widget.isDisposed()) {
-								textViewer.changeTextPresentation(presentation[0], false);
+								viewer.changeTextPresentation(presentation[0], false);
 							}
 							// save visible region here since UI thread access required
-							int topOffset = textViewer.getTopIndexStartOffset();
-							int length = textViewer.getBottomIndexEndOffset() - topOffset;
+							int topOffset = viewer.getTopIndexStartOffset();
+							int length = viewer.getBottomIndexEndOffset() - topOffset;
 							viewerVisibleRegion = new Region(topOffset, Math.max(length, minimalVisibleLength));
 						}
 					}
@@ -233,14 +233,15 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 	}
 
 	private IRegion nextDamagedRegion() {
-		if (viewerVisibleRegion == null) {
+		if (viewerVisibleRegion == null && textViewer != null) {
 			UIUtils.getDisplay().syncExec(new Runnable() {
 				public void run() {
-					if (textViewer == null) {
+					ITextViewer viewer = textViewer;
+					if (viewer == null) {
 						return;
 					}
-					int topOffset = textViewer.getTopIndexStartOffset();
-					int length = textViewer.getBottomIndexEndOffset() - topOffset;
+					int topOffset = viewer.getTopIndexStartOffset();
+					int length = viewer.getBottomIndexEndOffset() - topOffset;
 					viewerVisibleRegion = new Region(topOffset, Math.max(length, minimalVisibleLength));
 				}
 			});

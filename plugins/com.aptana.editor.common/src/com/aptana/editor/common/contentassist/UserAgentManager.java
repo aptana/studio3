@@ -466,13 +466,12 @@ public class UserAgentManager
 	 */
 	private void loadExtension()
 	{
+		// configure dispatcher for each element type we process
+		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(new UserAgentProcessor(),
+				new DefaultUserAgentsProcessor());
+
 		// @formatter:off
 		// configure dispatcher for each element type we process
-		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(
-			new UserAgentProcessor(),
-			new DefaultUserAgentsProcessor()
-		);
-
 		EclipseUtil.processConfigurationElements(
 			CommonEditorPlugin.PLUGIN_ID,
 			USERAGENT_ID,

@@ -7,12 +7,21 @@
  */
 package com.aptana.editor.js.parsing;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Queue;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
@@ -22,6 +31,97 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 {
 
 	private JSParser fParser;
+
+	/**
+	 * assertLocalFiles
+	 * 
+	 * @param root
+	 * @throws Exception
+	 */
+	public void assertLocalFiles(File root) throws Exception
+	{
+		List<File> files = collectFiles(root);
+
+		for (File file : files)
+		{
+			if (fPerformanceMeter != null)
+			{
+				fPerformanceMeter.dispose();
+			}
+
+			Performance performance = Performance.getDefault();
+			fPerformanceMeter = performance.createPerformanceMeter(file.getAbsolutePath());
+
+			FileInputStream fis = new FileInputStream(file);
+			String source = getSource(fis);
+			fis.close();
+			timeParse(file.getName(), source, 10);
+
+			commitMeasurements();
+			assertPerformance();
+		}
+	}
+
+	/**
+	 * assertParse
+	 * 
+	 * @param resourceName
+	 * @throws Exception
+	 */
+	private void assertParse(int numRuns, String... resources) throws Exception
+	{
+		for (String resourceName : resources)
+		{
+			if (fPerformanceMeter != null)
+			{
+				fPerformanceMeter.dispose();
+			}
+
+			Performance performance = Performance.getDefault();
+			fPerformanceMeter = performance.createPerformanceMeter(resourceName);
+
+			timeParse(resourceName, numRuns);
+
+			commitMeasurements();
+			assertPerformance();
+		}
+	}
+
+	/**
+	 * collectFiles
+	 * 
+	 * @param root
+	 * @return
+	 */
+	private List<File> collectFiles(File root)
+	{
+		List<File> result = new ArrayList<File>();
+		final Queue<File> directories = new ArrayDeque<File>();
+
+		directories.offer(root);
+
+		while (!directories.isEmpty())
+		{
+			File directory = directories.poll();
+			File[] files = directory.listFiles(new FileFilter()
+			{
+				public boolean accept(File pathname)
+				{
+					if (pathname.isDirectory())
+					{
+						directories.add(pathname);
+						return false;
+					}
+
+					return pathname.getName().toLowerCase().endsWith(".js");
+				}
+			});
+
+			result.addAll(Arrays.asList(files));
+		}
+
+		return result;
+	}
 
 	/**
 	 * getSource
@@ -92,6 +192,16 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	}
 
 	/**
+	 * testJaxerFiles
+	 * 
+	 * @throws Exception
+	 */
+	public void testJaxerFiles() throws Exception
+	{
+		assertParse(5, ITestFiles.JAXER_FILES);
+	}
+
+	/**
 	 * testTiMobile
 	 * 
 	 * @throws Exception
@@ -109,32 +219,6 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	public void testTinyMce() throws Exception
 	{
 		assertParse(10, ITestFiles.TINY_MCE_FILES);
-	}
-
-	/**
-	 * testJaxerFiles
-	 * 
-	 * @throws Exception
-	 */
-	public void testJaxerFiles() throws Exception
-	{
-		assertParse(5, ITestFiles.JAXER_FILES);
-	}
-
-	/**
-	 * assertParse
-	 * 
-	 * @param resourceName
-	 * @throws Exception
-	 */
-	private void assertParse(int numRuns, String... resources) throws Exception
-	{
-		for (String resourceName : resources)
-		{
-			timeParse(resourceName, numRuns);
-		}
-		commitMeasurements();
-		assertPerformance();
 	}
 
 	/**

@@ -30,6 +30,7 @@ import com.aptana.ui.util.UIUtils;
  */
 public class NewProjectFromTemplateCommandHandler extends AbstractHandler
 {
+	@SuppressWarnings("unchecked")
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		String wizardId = event.getParameter(ProjectTemplateSelectionPage.COMMAND_PROJECT_FROM_TEMPLATE_NEW_WIZARD_ID);

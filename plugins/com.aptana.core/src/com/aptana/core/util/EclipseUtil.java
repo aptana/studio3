@@ -12,10 +12,12 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +43,8 @@ import org.osgi.framework.ServiceReference;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.IDebugScopes;
+import com.aptana.core.logging.IdeLog;
 
 @SuppressWarnings("restriction")
 public class EclipseUtil
@@ -504,6 +508,15 @@ public class EclipseUtil
 								if (element.getName().equals(elementName))
 								{
 									processor.processElement(element);
+									if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
+									{
+										IdeLog.logInfo(
+												CorePlugin.getDefault(),
+												MessageFormat
+														.format("Processing extension element {0} with attributes {1}", element.getName(), //$NON-NLS-1$
+																collectElementAttributes(element)),
+												IDebugScopes.EXTENSION_POINTS);
+									}
 								}
 							}
 						}
@@ -511,6 +524,23 @@ public class EclipseUtil
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns a map of all the configuration element attributes
+	 * 
+	 * @param element
+	 * @return
+	 */
+	public static Map<String, String> collectElementAttributes(IConfigurationElement element)
+	{
+		Map<String, String> map = new TreeMap<String, String>();
+		String[] attributes = element.getAttributeNames();
+		for (String string : attributes)
+		{
+			map.put(string, element.getAttribute(string));
+		}
+		return map;
 	}
 
 	/**
