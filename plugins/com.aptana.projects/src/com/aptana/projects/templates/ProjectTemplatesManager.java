@@ -156,7 +156,7 @@ public class ProjectTemplatesManager
 					public Set<String> getSupportElementNames()
 					{
 						return CollectionsUtil.newSet(ELEMENT_TEMPLATEINFO);
-					}
+	}
 				});
 	}
 

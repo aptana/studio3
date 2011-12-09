@@ -145,7 +145,7 @@ public class AnalyticsInfoManager
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(ELEMENT_INFO, ELEMENT_ANALYTICS);
+						return CollectionsUtil.newInOrderSet(ELEMENT_INFO, ELEMENT_ANALYTICS);
 					}
 				});
 

@@ -755,6 +755,12 @@ public class CompletionProposalPopup implements IContentAssistListener
 		{
 			fProposalTable.setRedraw(false);
 			int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
+
+			if (fProposalTable.getHorizontalBar() != null)
+			{
+				height += fProposalTable.getHorizontalBar().getSize().y;
+			}
+
 			fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(true, true)
 					.create());
 			for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
@@ -1768,7 +1774,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 
 		IdeLog.logInfo(UIEplPlugin.getDefault(),
-				MessageFormat.format("Filtered list to {0} proposals", filtered.size()), IUiEplScopes.CONTENT_ASSIST);
+				MessageFormat.format("Filtered list to {0} proposals", filtered.size()), IUiEplScopes.CONTENT_ASSIST); //$NON-NLS-1$
 
 		return filtered.toArray(new ICompletionProposal[filtered.size()]);
 	}

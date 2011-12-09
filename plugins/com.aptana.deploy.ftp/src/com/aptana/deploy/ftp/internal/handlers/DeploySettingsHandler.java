@@ -10,6 +10,7 @@ package com.aptana.deploy.ftp.internal.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 
@@ -27,7 +28,7 @@ public class DeploySettingsHandler extends AbstractHandler
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		IResource selectedResource = UIUtils.getSelectedResource();
+		IResource selectedResource = UIUtils.getSelectedResource((IEvaluationContext) event.getApplicationContext());
 		if (selectedResource == null)
 		{
 			return null;

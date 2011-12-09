@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.model.GitRef;
 import com.aptana.git.core.model.GitRepository;
 
 public class CreateBranchDialog extends InputDialog
@@ -72,7 +73,7 @@ public class CreateBranchDialog extends InputDialog
 						{
 							return Messages.CreateBranchDialog_BranchAlreadyExistsMessage;
 						}
-						if (!repo.validBranchName(newText.trim()))
+						if (!repo.validRefName(GitRef.REFS_HEADS + newText.trim()))
 						{
 							return Messages.CreateBranchDialog_InvalidBranchNameMessage;
 						}

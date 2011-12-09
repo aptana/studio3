@@ -444,10 +444,10 @@ public class BuildPathManager
 		// @formatter:off
 		// configure dispatcher for each element type we process
 		ConfigurationElementDispatcher dispatcher = new ConfigurationElementDispatcher(
-			new BuildPathProcessor(),
-			new ContributorProcessor()
-		);
-
+				new BuildPathProcessor(),
+				new ContributorProcessor()
+			);
+		
 		EclipseUtil.processConfigurationElements(
 			BuildPathCorePlugin.PLUGIN_ID,
 			BUILD_PATHS_ID,

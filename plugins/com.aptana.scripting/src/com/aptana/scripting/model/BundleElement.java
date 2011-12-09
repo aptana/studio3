@@ -106,12 +106,12 @@ public class BundleElement extends AbstractElement
 				}
 			}
 
+			element.setOwningBundle(this);
+
 			if (context != null)
 			{
 				context.fireElementVisibilityEvents();
 			}
-
-			element.setOwningBundle(this);
 		}
 	}
 

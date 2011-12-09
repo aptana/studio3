@@ -24,10 +24,10 @@ import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
+import com.aptana.editor.js.contentassist.ASTUtil;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.LocationType;
-import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
@@ -143,12 +143,12 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 					Index index = this.getIndex(textViewer);
 					// @formatter:off
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(
+					JSGetPropertyNode propertyNode = ASTUtil.getGetPropertyNode(
 						identifier.getTargetNode(),
 						identifier.getStatementNode()
 					);
 					// @formatter:on
-					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(textViewer),
+					List<String> types = ASTUtil.getParentObjectTypes(index, this.getEditorURI(textViewer),
 							identifier.getTargetNode(), propertyNode, offset);
 					String typeName = null;
 					String methodName = null;

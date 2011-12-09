@@ -47,7 +47,7 @@ public class SamplesManagerTest extends TestCase
 		SampleCategory category = categories.get(0);
 		assertEquals("com.aptana.projects.samples.web.category", category.getId());
 		assertEquals("Web", category.getName());
-		assertNull(category.getIconFile());
+		assertNotNull(category.getIconFile());
 
 		category = categories.get(1);
 		assertEquals("com.aptana.samples.tests.category", category.getId());

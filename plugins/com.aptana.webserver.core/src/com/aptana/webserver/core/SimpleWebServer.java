@@ -10,6 +10,8 @@ package com.aptana.webserver.core;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -177,5 +179,10 @@ public class SimpleWebServer extends AbstractWebServer
 	public void setDocumentRoot(URI uri)
 	{
 		this.documentRoot = uri;
+	}
+
+	public Set<String> getAvailableModes()
+	{
+		return Collections.emptySet();
 	}
 }

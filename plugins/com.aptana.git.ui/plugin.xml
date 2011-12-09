@@ -1084,4 +1084,33 @@
          </or>
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="com.aptana.git.ui.history.switch_branch"
+            name="%switch.history.branch.name">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:com.aptana.git.ui.history.switch_branch.command.pulldown">
+         <dynamic
+               class="com.aptana.git.ui.internal.actions.SwitchHistoryBranchPulldownContributionItem"
+               id="com.aptana.git.ui.history.branches_dynamic">
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.team.ui.GenericHistoryView">
+         <command
+               commandId="com.aptana.git.ui.history.switch_branch"
+               icon="icons/elcl16/arrow_branch.png"
+               id="com.aptana.git.ui.history.switch_branch.command.pulldown"
+               label="%switch.history.branch.label"
+               style="pulldown">
+         </command>
+      </menuContribution>
+   </extension>
 </plugin>

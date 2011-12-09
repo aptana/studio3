@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	private static final String EXTENSION_POINT_ID = "connectionPoint"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_POINT_TYPE = "connectionPointType"; //$NON-NLS-1$
 	private static final String TAG_CONNECTION_POINT_CATEGORY = "connectionPointCategory"; //$NON-NLS-1$
+	private static final String DEFAULT_CATEGORY_ID = "unknown"; //$NON-NLS-1$
+
 	/* package */static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_NAME = "name"; //$NON-NLS-1$
 	private static final String ATT_ORDER = "order"; //$NON-NLS-1$
@@ -562,8 +565,8 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 
 					public Set<String> getSupportElementNames()
 					{
-						return CollectionsUtil.newSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
-					}
+						return CollectionsUtil.newInOrderSet(TAG_CONNECTION_POINT_CATEGORY, TAG_CONNECTION_POINT_TYPE);
+	}
 				});
 	}
 
@@ -593,6 +596,10 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 			}
 			boolean remote = Boolean.parseBoolean(element.getAttribute(ATT_REMOTE));
 			categories.put(id, new ConnectionPointCategory(id, name, order, remote));
+			IdeLog.logInfo(
+					CoreIOPlugin.getDefault(),
+					MessageFormat
+							.format("Loaded connection point category {0}. id: {1}, order: {2}, remote: {3}", name, id, order, remote), IDebugScopes.CONNECTIONS); //$NON-NLS-1$
 		}
 		else if (TAG_CONNECTION_POINT_TYPE.equals(element.getName()))
 		{
@@ -624,17 +631,20 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 			ConnectionPointCategory category = categories.get(categoryId);
 			if (category == null)
 			{
-				String defaultCategoryId = "unknown"; //$NON-NLS-1$
-				category = categories.get(defaultCategoryId);
+				category = categories.get(DEFAULT_CATEGORY_ID);
 				if (category == null)
 				{
-					categories.put(defaultCategoryId, category = new ConnectionPointCategory(defaultCategoryId,
-							Messages.ConnectionPointManager_CategoryUnknown, Integer.MAX_VALUE));
+					categories.put(DEFAULT_CATEGORY_ID, category = new ConnectionPointCategory(DEFAULT_CATEGORY_ID,
+							Messages.ConnectionPointManager_CategoryUnknown, Integer.MAX_VALUE, true));
 				}
 			}
 			ConnectionPointType type = new ConnectionPointType(typeId, name, category);
 			types.add(type);
 			category.addType(type);
+			IdeLog.logInfo(
+					CoreIOPlugin.getDefault(),
+					MessageFormat.format(
+							"Loaded connection point type {0}. id: {1}, category: {2}", name, typeId, category), IDebugScopes.CONNECTIONS); //$NON-NLS-1$
 		}
 	}
 }

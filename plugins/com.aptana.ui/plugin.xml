@@ -123,6 +123,9 @@
          <showInPart
                id="org.eclipse.ui.navigator.ProjectExplorer">
          </showInPart>
+         <viewShortcut
+               id="com.aptana.webserver.ui.view">
+         </viewShortcut>
       </perspectiveExtension>
    </extension>
    <extension
@@ -223,6 +226,10 @@
             </command>
             -->
          </menu>
+         <separator
+               name="helpStudio"
+               visible="true">
+         </separator>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">

@@ -47,12 +47,12 @@ module Ruble
       @jobj.natures
     end
 
-    def icon=(icon)
-      @jobj.icon = icon.to_s
+    def icon=(icon_map)
+      @jobj.icon = icon_map
     end
 
     def icon
-      @jobj.icon.to_s
+      @jobj.icon
     end
 
     class << self

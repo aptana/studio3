@@ -163,27 +163,37 @@ public final class UIUtils
 				IEvaluationService.class);
 		if (evaluationService != null)
 		{
-			IEvaluationContext currentState = evaluationService.getCurrentState();
-			Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-			if (variable instanceof IStructuredSelection)
+			return getSelectedResource(evaluationService.getCurrentState());
+		}
+		return null;
+	}
+
+	public static IResource getSelectedResource(IEvaluationContext evaluationContext)
+	{
+		if (evaluationContext == null)
+		{
+			return null;
+		}
+
+		Object variable = evaluationContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+		if (variable instanceof IStructuredSelection)
+		{
+			Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
+			if (selectedObject instanceof IResource)
 			{
-				Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
-				if (selectedObject instanceof IResource)
-				{
-					return (IResource) selectedObject;
-				}
+				return (IResource) selectedObject;
 			}
-			else
+		}
+		else
+		{
+			// checks the active editor
+			variable = evaluationContext.getVariable(ISources.ACTIVE_EDITOR_NAME);
+			if (variable instanceof IEditorPart)
 			{
-				// checks the active editor
-				variable = currentState.getVariable(ISources.ACTIVE_EDITOR_NAME);
-				if (variable instanceof IEditorPart)
+				IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
+				if (editorInput instanceof IFileEditorInput)
 				{
-					IEditorInput editorInput = ((IEditorPart) variable).getEditorInput();
-					if (editorInput instanceof IFileEditorInput)
-					{
-						return ((IFileEditorInput) editorInput).getFile().getProject();
-					}
+					return ((IFileEditorInput) editorInput).getFile();
 				}
 			}
 		}

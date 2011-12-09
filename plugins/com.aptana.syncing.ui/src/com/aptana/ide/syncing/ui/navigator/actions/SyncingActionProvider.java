@@ -7,7 +7,13 @@
  */
 package com.aptana.ide.syncing.ui.navigator.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IActionBars;
@@ -18,6 +24,7 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
+import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 
 public class SyncingActionProvider extends CommonActionProvider
@@ -27,11 +34,26 @@ public class SyncingActionProvider extends CommonActionProvider
 	private static final String UPLOAD_IMAGE = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
 	private static final String DOWNLOAD_IMAGE = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
 
+	private static final String GROUP_SYNCING = "syncing"; //$NON-NLS-1$
+
 	private NavigatorSynchronizeAction fSynchronizeAction;
 	private NavigatorUploadAction fUploadAction;
 	private NavigatorDownloadAction fDownloadAction;
 
 	private boolean isToolbarFilled;
+	private List<IContributionItem> hiddenItems;
+
+	public SyncingActionProvider()
+	{
+		hiddenItems = new ArrayList<IContributionItem>();
+	}
+
+	@Override
+	public void dispose()
+	{
+		hiddenItems.clear();
+		super.dispose();
+	}
 
 	@Override
 	public void init(ICommonActionExtensionSite aSite)
@@ -59,20 +81,38 @@ public class SyncingActionProvider extends CommonActionProvider
 	@Override
 	public void fillActionBars(IActionBars actionBars)
 	{
+		boolean hasSyncConnection = false;
+		IStructuredSelection selection = getSelection();
+		if (!selection.isEmpty())
+		{
+			Object element = selection.getFirstElement();
+			if (element instanceof IAdaptable)
+			{
+				hasSyncConnection = (SiteConnectionUtils.findSitesForSource((IAdaptable) element).length > 0);
+			}
+		}
 		// fillActionBars() is called each time the selection changes, so adds a check to only add the toolbar items
 		// once
+		IToolBarManager toolbar = actionBars.getToolBarManager();
 		if (!isToolbarFilled)
 		{
-			fillToolBar(actionBars.getToolBarManager());
+			if (hasSyncConnection)
+			{
+				fillToolBar(toolbar);
+				actionBars.updateActionBars();
+				isToolbarFilled = true;
+			}
+		}
+		else if (updateToolbar(toolbar, hasSyncConnection))
+		{
 			actionBars.updateActionBars();
-			isToolbarFilled = true;
 		}
 		updateSelection();
 	}
 
 	protected void fillToolBar(IToolBarManager toolBar)
 	{
-		toolBar.add(new GroupMarker("syncing")); //$NON-NLS-1$
+		toolBar.add(new GroupMarker(GROUP_SYNCING));
 		toolBar.add(fSynchronizeAction);
 		toolBar.add(fUploadAction);
 		toolBar.add(fDownloadAction);
@@ -90,5 +130,39 @@ public class SyncingActionProvider extends CommonActionProvider
 		fSynchronizeAction.selectionChanged(selection);
 		fUploadAction.selectionChanged(selection);
 		fDownloadAction.selectionChanged(selection);
+	}
+
+	private boolean updateToolbar(IToolBarManager toolbar, boolean hasSyncConnection)
+	{
+		boolean updated = false;
+		IContributionItem[] items = toolbar.getItems();
+		if (hasSyncConnection)
+		{
+			// adds the syncing items back, but only needs to do it once until after the next time hasSyncConnection is
+			// false
+			for (IContributionItem hiddenItem : hiddenItems)
+			{
+				toolbar.appendToGroup(GROUP_SYNCING, hiddenItem);
+			}
+			updated = hiddenItems.size() > 0;
+			hiddenItems.clear();
+		}
+		else
+		{
+			// removes the syncing items
+			for (IContributionItem item : items)
+			{
+				if (item instanceof ActionContributionItem)
+				{
+					if (((ActionContributionItem) item).getAction() instanceof NavigatorBaseSyncAction)
+					{
+						toolbar.remove(item);
+						hiddenItems.add(item);
+						updated = true;
+					}
+				}
+			}
+		}
+		return updated;
 	}
 }
