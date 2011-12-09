@@ -22,6 +22,9 @@ public class Messages extends NLS
 	public static String SimpleWebServerPropertyDialog_ShellTitle;
 	public static String SimpleWebServerPropertyDialog_Title;
 
+	public static String ExternalWebServerPropertyDialog_StartCommandLabel;
+	public static String ExternalWebServerPropertyDialog_StopCommandLabel;
+
 	static
 	{
 		// initialize resource bundle

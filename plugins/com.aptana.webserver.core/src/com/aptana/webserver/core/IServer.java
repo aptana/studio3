@@ -9,6 +9,7 @@ package com.aptana.webserver.core;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -157,4 +158,11 @@ public interface IServer extends IURIMapper, Identifiable
 	 * @return
 	 */
 	public URL getBaseURL();
+
+	/**
+	 * Returns the Set of launch modes supported by this server.
+	 * 
+	 * @return
+	 */
+	public Set<String> getAvailableModes();
 }

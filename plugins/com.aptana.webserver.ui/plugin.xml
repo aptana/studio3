@@ -23,6 +23,11 @@
             id="com.aptana.webserver.dialogs.simpleServer"
             objectClass="com.aptana.webserver.core.SimpleWebServer">
       </dialog>
+      <dialog
+            class="com.aptana.webserver.ui.internal.ExternalWebServerPropertyDialog$Provider"
+            id="com.aptana.webserver.dialogs.externalServer"
+            objectClass="com.aptana.webserver.core.ExternalWebServer">
+      </dialog>
    </extension>
    <extension
          point="com.aptana.ui.imageAssociations">
@@ -111,6 +116,50 @@
                   name="mode"
                   value="debug">
             </parameter>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="com.aptana.webserver.core.IServer">
+                        <test
+                              property="com.aptana.webserver.canDebug"
+                              value="true">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.webserver.command.start_server"
+               icon="platform:/plugin/org.eclipse.debug.ui/icons/full/etool16/profile_exc.gif"
+               label="%profile_server.command.name"
+               style="push">
+            <parameter
+                  name="mode"
+                  value="profile">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="com.aptana.webserver.core.IServer">
+                        <test
+                              property="com.aptana.webserver.canProfile"
+                              value="true">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
          <command
                commandId="com.aptana.webserver.command.restart_server"
