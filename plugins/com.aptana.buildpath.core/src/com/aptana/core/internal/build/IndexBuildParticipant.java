@@ -65,6 +65,8 @@ public class IndexBuildParticipant extends AbstractBuildParticipant
 		{
 			fIndex = getIndex(context.getProject());
 		}
+		// Remove existing index entries for this file...
+		fIndex.remove(context.getURI());
 
 		List<IFileStoreIndexingParticipant> indexers = IndexManager.getInstance().getIndexParticipants(
 				context.getName());
