@@ -8,12 +8,26 @@
 package com.aptana.webserver.ui.internal.actions;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.debug.core.ILaunchManager;
 
 import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.IServer.State;
 
+/**
+ * @author cwilliams
+ */
 public class ServerTester extends PropertyTester
 {
+	/**
+	 * Properties we can test.
+	 */
+	private static final String CAN_PROFILE = "canProfile"; //$NON-NLS-1$
+	private static final String CAN_DEBUG = "canDebug"; //$NON-NLS-1$
+	private static final String CAN_RUN = "canRun"; //$NON-NLS-1$
+	private static final String CAN_EDIT = "canEdit"; //$NON-NLS-1$
+	private static final String CAN_DELETE = "canDelete"; //$NON-NLS-1$
+	private static final String CAN_RESTART = "canRestart"; //$NON-NLS-1$
+	private static final String CAN_STOP = "canStop"; //$NON-NLS-1$
 
 	public ServerTester()
 	{
@@ -25,21 +39,41 @@ public class ServerTester extends PropertyTester
 		{
 			return false;
 		}
+
 		IServer server = (IServer) receiver;
-		if ("canRun".equals(property) || "canDebug".equals(property) || "canProfile".equals(property)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (CAN_RUN.equals(property))
 		{
-			// FIXME Can we somehow get the args to know if we mean to run, profile or debug?
-			return server.getState() == State.STOPPED;
+			if (server.getState() != State.STOPPED)
+			{
+				return false;
+			}
+			return server.getAvailableModes().contains(ILaunchManager.RUN_MODE);
 		}
-		else if ("canStop".equals(property)) //$NON-NLS-1$
+		if (CAN_DEBUG.equals(property))
+		{
+			if (server.getState() != State.STOPPED)
+			{
+				return false;
+			}
+			return server.getAvailableModes().contains(ILaunchManager.DEBUG_MODE);
+		}
+		if (CAN_PROFILE.equals(property))
+		{
+			if (server.getState() != State.STOPPED)
+			{
+				return false;
+			}
+			return server.getAvailableModes().contains(ILaunchManager.PROFILE_MODE);
+		}
+		else if (CAN_STOP.equals(property))
 		{
 			return server.getState() == State.STARTED;
 		}
-		else if ("canRestart".equals(property)) //$NON-NLS-1$
+		else if (CAN_RESTART.equals(property))
 		{
 			return server.getState() == State.STARTED;
 		}
-		else if ("canDelete".equals(property) || "canEdit".equals(property)) //$NON-NLS-1$ //$NON-NLS-2$
+		else if (CAN_DELETE.equals(property) || CAN_EDIT.equals(property))
 		{
 			// TODO Maybe we want to enforce a server is stopped before we can edit or delete?
 			return true;

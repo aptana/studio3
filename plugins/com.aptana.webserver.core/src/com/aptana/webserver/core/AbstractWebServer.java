@@ -8,14 +8,18 @@
 // $codepro.audit.disable unnecessaryExceptions
 package com.aptana.webserver.core;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.debug.core.ILaunchManager;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.webserver.internal.core.ServerManager;
 import com.aptana.webserver.internal.core.ServerType;
 
@@ -31,12 +35,11 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 
 	private IServerType type;
 	private String name;
+	protected State fState;
 
-	/**
-	 * 
-	 */
 	protected AbstractWebServer()
 	{
+		this.fState = State.STOPPED;
 	}
 
 	public void loadState(IMemento memento)
@@ -97,6 +100,17 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 		this.name = name;
 	}
 
+	public State getState()
+	{
+		return this.fState;
+	}
+
+	protected void updateState(State state)
+	{
+		this.fState = state;
+		fireServerChangedEvent();
+	}
+
 	protected void fireServerChangedEvent()
 	{
 		ServerManager manager = (ServerManager) WebServerCorePlugin.getDefault().getServerManager();
@@ -116,5 +130,10 @@ public abstract class AbstractWebServer implements IExecutableExtension, IServer
 			return status;
 		}
 		return start(mode, sub.newChild(70));
+	}
+
+	public Set<String> getAvailableModes()
+	{
+		return CollectionsUtil.newSet(ILaunchManager.RUN_MODE);
 	}
 }

@@ -10,6 +10,11 @@
             id="com.aptana.webserver.simple"
             name="%type.webserver.name">
       </type>
+      <type
+            class="com.aptana.webserver.core.ExternalWebServer"
+            id="com.aptana.webserver.external"
+            name="%external_server.name">
+      </type>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
