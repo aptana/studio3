@@ -18,8 +18,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +53,7 @@ import org.chromium.sdk.Script;
 import org.chromium.sdk.StandaloneVm;
 import org.chromium.sdk.TextStreamPosition;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.StringUtil;
@@ -66,11 +69,20 @@ public class V8DebugHost extends AbstractDebugHost {
 		SUSPENDED, TERMINATE
 	}
 
+	private static final JsScope.Type[] SCOPE_ORDER = new JsScope.Type[] {
+		JsScope.Type.CATCH,
+		JsScope.Type.CLOSURE,
+		JsScope.Type.WITH,
+		JsScope.Type.LOCAL,
+		JsScope.Type.GLOBAL
+	};
+
 	private static final int V8_CONNECT_TIMEOUT = 300000;
 	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final Pattern DETAIL_EXPRESSION_PATTERN = Pattern.compile("\\bthis\\b"); //$NON-NLS-1$
 	private static final String THIS_SUBSTITUTE = "__this__"; //$NON-NLS-1$
 
+	private boolean flatScopesMode = true;
 	private final SocketAddress v8SocketAddress;
 
 	private StandaloneVm vm;
@@ -81,6 +93,8 @@ public class V8DebugHost extends AbstractDebugHost {
 	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
 	private final Callback callback = new Callback();
 	
+	private List<Pattern> scriptFilters = new ArrayList<Pattern>();
+	private List<Pattern> variableFilters = new ArrayList<Pattern>();
 	private Map<String, String> detailFormatters = new HashMap<String, String>();
 	private Map<String, Script> loadedScripts = new HashMap<String, Script>();
 	private Map<String, Integer> scriptFunctionIds = new HashMap<String, Integer>();
@@ -146,6 +160,14 @@ public class V8DebugHost extends AbstractDebugHost {
 		};
 	}
 
+	public void setScriptFilters(Collection<Pattern> filters) {
+		scriptFilters.addAll(filters);
+	}
+
+	public void setVariableFilters(Collection<Pattern> filters) {
+		variableFilters.addAll(filters);
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#getSyncObject()
 	 */
@@ -181,17 +203,30 @@ public class V8DebugHost extends AbstractDebugHost {
 			continueVm(StepAction.CONTINUE, 0);
 			return;
 		}
-		if (suspendReason == null) {
-			suspendReason = UNDEFINED;
-		}
 		CallFrame frame = currentFrames.get(0);
 		Script script = frame.getScript();
+		// Filter internal API frames
+		if (currentContext.getState() == State.NORMAL && isScriptFiltered(script)) {
+			continueVm(StepAction.OUT, 1);
+			return;
+		}
+		List<CallFrame> filteredFrames = new ArrayList<CallFrame>();
+		for (CallFrame f : currentFrames) {
+			if (!isScriptFiltered(f.getScript())) {
+				filteredFrames.add(f);
+			}
+		}
+		currentFrames = filteredFrames;
+
 		String fileName = makeAbsoluteURI(script.getName());
 		TextStreamPosition position = frame.getStatementStartPosition();
 		if (position == null) {
 			logError("startDebugging(position=null)"); //$NON-NLS-1$
 			continueVm(StepAction.CONTINUE, 0);
 			return;
+		}
+		if (suspendReason == null) {
+			suspendReason = UNDEFINED;
 		}
 		sendData(new String[] { SUSPENDED, suspendReason, Util.encodeData(fileName),
 				Integer.toString(position.getLine()+1) }); // Line numbers are 0-based in V8, 1-based in Aptana Debugger Protocol/Eclipse.
@@ -373,15 +408,19 @@ public class V8DebugHost extends AbstractDebugHost {
 		if (variableName.length() == 0) {
 			if (frame != null) {
 				generateVariablesData(data, Arrays.asList(frame.getReceiverVariable()));
-				for (JsScope scope : frame.getVariableScopes()) {
-					if (scope.getType() == Type.LOCAL) {
-						continue;
+				if (flatScopesMode) {
+					flattenScopes(data, frame);
+				} else {
+					for (JsScope scope : frame.getVariableScopes()) {
+						if (scope.getType() == Type.LOCAL) {
+							continue;
+						}
+						data.add(generateVariableData(
+								new VariableProperties(MessageFormat.format("<{0}>", scope.getType().name()), String.valueOf('o'), JsValue.Type.TYPE_OBJECT, StringUtil.EMPTY, StringUtil.EMPTY, null), //$NON-NLS-1$
+								StringUtil.EMPTY));
 					}
-					data.add(generateVariableData(
-							new VariableProperties(MessageFormat.format("<{0}>", scope.getType().name()), String.valueOf('o'), JsValue.Type.TYPE_OBJECT, StringUtil.EMPTY, StringUtil.EMPTY, null), //$NON-NLS-1$
-							StringUtil.EMPTY));
+					generateVariablesData(data, getScopeVariables(frame, JsScope.Type.LOCAL), String.valueOf('l'), null);
 				}
-				generateVariablesData(data, getScopeVariables(frame, JsScope.Type.LOCAL), String.valueOf('l'));
 			} else if (evalResult != null) {
 				generateValueData(data, evalResult);
 			}
@@ -393,6 +432,24 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 		}
 		return StringUtil.join(ARGS_DELIMITER, data.toArray(new String[data.size()]));
+	}
+
+	private void flattenScopes(List<String> data, CallFrame frame) {
+		Set<String> visitedNames = new HashSet<String>();
+		for (JsScope.Type type : SCOPE_ORDER) {
+			generateVariablesData(data, getScopeVariables(frame, type), type == Type.LOCAL ? String.valueOf('l') : null, visitedNames);
+		}
+	}
+
+	private JsVariable findVariableInFlattenScope(CallFrame frame, String name) {
+		for (JsScope.Type type : SCOPE_ORDER) {
+			for (JsVariable v : getScopeVariables(frame, type)) {
+				if (name.equals(v.getName())) {
+					return v;
+				}
+			}
+		}
+		return null;
 	}
 
 	private static JsScope getScope(CallFrame frame, JsScope.Type type) {
@@ -412,11 +469,37 @@ public class V8DebugHost extends AbstractDebugHost {
 		return Collections.emptyList();
 	}
 
+	private boolean isScriptFiltered(Script script) {
+		String fileName = script.getName();
+		for (Pattern pattern : scriptFilters) {
+			if (pattern.matcher(fileName).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isVariableFiltered(JsVariable variable) {
+		String name = variable.getFullyQualifiedName();
+		for (Pattern pattern : variableFilters) {
+			if (pattern.matcher(name).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private Object findVariable(CallFrame frame, String variableName) {
 		if (THIS.equals(variableName)) {
 			return frame.getReceiverVariable();
 		} else if (variableName.startsWith(THIS_DOT)) {
 			return findVariable(frame.getReceiverVariable(), variableName.substring(THIS_DOT.length()));
+		} else if (flatScopesMode) {
+			String name = variableName.split(VARIABLE_PARTS_SPLIT)[0];
+			JsVariable v = findVariableInFlattenScope(frame, name);
+			if (v != null) {
+				return findVariable(v, variableName.length() == name.length() ? StringUtil.EMPTY : variableName.substring(name.length()+1));
+			}
 		} else if (variableName.startsWith("<")) { //$NON-NLS-1$
 			int index = variableName.indexOf('>');
 			if (index > 0) {
@@ -483,14 +566,20 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 
 	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables) {
-		generateVariablesData(data, variables, StringUtil.EMPTY);
+		generateVariablesData(data, variables, StringUtil.EMPTY, null);
 	}
 
-	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables, String extraFlags) {
+	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables, String extraFlags, Set<String> ignoreSet) {
 		for (JsVariable variable : variables) {
+			if (isVariableFiltered(variable) || (ignoreSet != null && ignoreSet.contains(variable.getName()))) {
+				continue;
+			}
 			VariableProperties props = getVariableProperties(variable, false);
 			if (props != null) {
 				data.add(generateVariableData(props, extraFlags));
+				if (ignoreSet != null) {
+					ignoreSet.add(props.name);
+				}
 			}
 		}		
 	}
@@ -505,7 +594,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 		} else if (object instanceof JsScope) {
 			JsScope scope = (JsScope) object;
-			generateVariablesData(data, scope.getVariables(), ""); //$NON-NLS-1$
+			generateVariablesData(data, scope.getVariables(), "", null); //$NON-NLS-1$
 		}
 	}
 
@@ -1105,7 +1194,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				Thread.sleep(500);
 			}
 			if (!attached) {
-				vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
+				vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, Platform.inDevelopmentMode() ? new ConnectionLoggerImpl(System.out) : null);
 				vm.attach(debugEventListener); // last try, throws exception
 			}
 			if (vm.isAttached()) {
