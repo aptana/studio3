@@ -103,31 +103,11 @@
 			</fileset>
 		</copy>
 		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
-			<param name="p2.repo" value="${libraries-com.p2.repo}" />
-		</antcall>
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.webkitbrowser.feature.group" />
-			<param name="p2.repo" value="${webkit.p2.repo}" />
-		</antcall>
-		<!-- Install Studio Core feature -->
-		<antcall target="install.studio.core" />
-		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.windowtester.runtime.feature.group" />
-			<param name="p2.repo" value="${windowtester.p2.repo}" />
+			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group,com.aptana.webkitbrowser.feature.group,com.windowtester.runtime.feature.group,com.aptana.feature.feature.group" />
+			<param name="p2.repo" value="${libraries-com.p2.repo},${webkit.p2.repo},${windowtester.p2.repo},file:${studio3.p2.repo}" />
 		</antcall>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: install.studio.core                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="install.studio.core" unless="dont.install.studio.core">
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.feature.feature.group" />
-			<param name="p2.repo" value="file:${studio3.p2.repo}" />
-		</antcall>
-	</target>
 	<!-- - - - - - - - - - - - - - - - - - 
           target: wipe.plugins                      
          - - - - - - - - - - - - - - - - - -->
