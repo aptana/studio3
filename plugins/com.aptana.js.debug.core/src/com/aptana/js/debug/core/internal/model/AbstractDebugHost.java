@@ -26,7 +26,9 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -142,6 +144,7 @@ public abstract class AbstractDebugHost {
 
 	protected String reqid;
 	protected Map<String, Object> options = new HashMap<String, Object>();
+	protected Set<String> exceptions = new HashSet<String>();
 
 	/**
 	 * 
@@ -297,6 +300,7 @@ public abstract class AbstractDebugHost {
 					} else {
 						options.put(option, args[3]);
 					}
+					processOptionChange(option);
 					sendResponse(null);
 				} else {
 					sendResponse("!unknown option <"+option+">"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -330,7 +334,7 @@ public abstract class AbstractDebugHost {
 						lineNo,
 						props));
 			} else if (EXCEPTION.equals(command)) {
-				//sendResponse(processException(args[2], Util.decodeData(args[3])));
+				sendResponse(processExceptionBreakpoint(args[2], Util.decodeData(args[3])));
 			} else if (STEP_FILTERS.equals(command)) {
 				sendResponse(null/* TODO */);
 			} else if (DETAIL_FORMATTERS.equals(command)) {
@@ -407,6 +411,26 @@ public abstract class AbstractDebugHost {
 		}
 		return null;
 	}
+	
+	private String processExceptionBreakpoint(String action, String exceptionType) {
+		if (CREATE.equals(action)) {
+			if (!exceptions.contains(exceptionType)) {
+				exceptions.add(exceptionType);
+				setExceptionBreakpoint(exceptionType);
+				return CREATED;
+			}
+		} else if (CHANGE.equals(action)) {
+			exceptions.add(exceptionType);
+			setExceptionBreakpoint(exceptionType);
+			return CHANGED;
+		} else if (REMOVE.equals(action)) {
+			if (exceptions.remove(exceptionType)) {
+				removeExceptionBreakpoint(exceptionType);
+				return REMOVED;
+			}
+		}
+		return null;
+	}
 
 	protected final void terminate() {
 		terminateSession();
@@ -433,6 +457,9 @@ public abstract class AbstractDebugHost {
 	protected abstract String getSource(String uri);
 	protected abstract boolean setBreakpoint(String uri, int lineNo, BreakpointProperties props);
 	protected abstract boolean removeBreakpoint(String uri, int lineNo);
+	protected abstract void setExceptionBreakpoint(String exceptionType);
+	protected abstract void removeExceptionBreakpoint(String exceptionType);
+	protected abstract void processOptionChange(String option);
 
 	protected void enable() throws IOException {
 		enabled = true;
