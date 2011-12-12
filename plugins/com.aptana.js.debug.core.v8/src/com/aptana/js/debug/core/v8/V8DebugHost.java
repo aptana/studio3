@@ -92,8 +92,6 @@ public class V8DebugHost extends AbstractDebugHost {
 	private DebugEventListener debugEventListener;
 	private DebugContext currentContext;
 	private List<? extends CallFrame> currentFrames;
-	private ExceptionData currentException;
-
 	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
 	private final Callback callback = new Callback();
 	
@@ -153,7 +151,6 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 
 			public void resumed() {
-				currentException = null;
 				currentFrames = null;
 				currentContext = null;
 			}
@@ -263,7 +260,6 @@ public class V8DebugHost extends AbstractDebugHost {
 				continueVm(StepAction.CONTINUE, 0);
 			}
 		}
-		currentException = null;
 		currentFrames = null;
 		currentContext = null;
 		if (resumeReason == null) {
@@ -304,7 +300,6 @@ public class V8DebugHost extends AbstractDebugHost {
 				break;
 			case EXCEPTION:
 				suspendReason = EXCEPTION;
-				currentException = currentContext.getExceptionData();
 				break;
 		}
 		startDebugging();
