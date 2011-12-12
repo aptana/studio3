@@ -41,6 +41,7 @@ import org.chromium.sdk.DebugEventListener;
 import org.chromium.sdk.ExceptionData;
 import org.chromium.sdk.IgnoreCountBreakpointExtension;
 import org.chromium.sdk.JavascriptVm.BreakpointCallback;
+import org.chromium.sdk.JavascriptVm.ExceptionCatchMode;
 import org.chromium.sdk.JavascriptVm.ScriptsCallback;
 import org.chromium.sdk.JsEvaluateContext.EvaluateCallback;
 import org.chromium.sdk.JsObject;
@@ -52,6 +53,7 @@ import org.chromium.sdk.JsVariable.SetValueCallback;
 import org.chromium.sdk.Script;
 import org.chromium.sdk.StandaloneVm;
 import org.chromium.sdk.TextStreamPosition;
+import org.chromium.sdk.util.GenericCallback;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -90,6 +92,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	private DebugEventListener debugEventListener;
 	private DebugContext currentContext;
 	private List<? extends CallFrame> currentFrames;
+	private ExceptionData currentException;
 
 	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
 	private final Callback callback = new Callback();
@@ -105,6 +108,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	private int evalResultsLastId = 0;
 	private Map<String, Map<Integer, Breakpoint>> breakpoints = new HashMap<String, Map<Integer,Breakpoint>>();
 	private Map<Breakpoint, BreakpointProperties> breakpointProps = new HashMap<Breakpoint, AbstractDebugHost.BreakpointProperties>();
+	private Map<String, Boolean> exceptions = new HashMap<String, Boolean>();
 
 	public static V8DebugHost createDebugHost(SocketAddress sockAddress) throws CoreException {
 		V8DebugHost debugHost = new V8DebugHost(sockAddress);
@@ -149,6 +153,8 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 
 			public void resumed() {
+				currentException = null;
+				currentFrames = null;
 				currentContext = null;
 			}
 
@@ -257,6 +263,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				continueVm(StepAction.CONTINUE, 0);
 			}
 		}
+		currentException = null;
 		currentFrames = null;
 		currentContext = null;
 		if (resumeReason == null) {
@@ -297,6 +304,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				break;
 			case EXCEPTION:
 				suspendReason = EXCEPTION;
+				currentException = currentContext.getExceptionData();
 				break;
 		}
 		startDebugging();
@@ -316,8 +324,26 @@ public class V8DebugHost extends AbstractDebugHost {
 		closeLogger();
 	}
 
-	private boolean suspendOnException(ExceptionData exception) {
-		return true;
+	private boolean suspendOnException(ExceptionData exceptionData) {
+		JsValue exception = exceptionData.getExceptionValue();
+		if (exception == null || !JsValue.Type.isObjectType(exception.getType())) {
+			return false;
+		}
+		String exceptionClass = exception.asObject().getClassName();
+		if (getBooleanOption(SUSPEND_ON_ERRORS) && exceptionClass.endsWith("Error")) { //$NON-NLS-1$
+			return true;
+		} else if (getBooleanOption(SUSPEND_ON_EXCEPTIONS) && exceptionClass.endsWith("Exception")) { //$NON-NLS-1$
+			return true;
+		} else if (exceptions.containsKey(exceptionClass)) {
+			return true;
+		} else {
+			for (String t : getClassHierarchy(exception.asObject())) {
+				if (exceptions.containsKey(t)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -772,7 +798,45 @@ public class V8DebugHost extends AbstractDebugHost {
 		}
 		return null;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#setExceptionBreakpoint(java.lang.String)
+	 */
+	@Override
+	protected void setExceptionBreakpoint(String exceptionType) {
+		if (exceptions.size() == 1) {
+			setCatchExceptions();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#removeExceptionBreakpoint(java.lang.String)
+	 */
+	@Override
+	protected void removeExceptionBreakpoint(String exceptionType) {
+		if (exceptions.isEmpty()) {
+			setCatchExceptions();
+		}
+	}
 	
+	private void setCatchExceptions() {
+		CallbackSemaphore semaphore = new CallbackSemaphore();
+		ExceptionCatchMode mode = getBooleanOption(SUSPEND_ON_ERRORS) || getBooleanOption(SUSPEND_ON_EXCEPTIONS) || !exceptions.isEmpty() ? ExceptionCatchMode.ALL : ExceptionCatchMode.NONE;
+		semaphore.acquireDefault(vm.setBreakOnException(mode, callback, semaphore));
+
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#processOptionChange(java.lang.String)
+	 */
+	@Override
+	protected void processOptionChange(String option) {
+		if (SUSPEND_ON_ERRORS.equals(option) || SUSPEND_ON_EXCEPTIONS.equals(option)) {
+			setCatchExceptions();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#doEval(java.lang.String, java.lang.String)
 	 */
@@ -1038,6 +1102,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		}
 		initialized = true;
 		processLoadedScripts();
+		setCatchExceptions();
 	}
 		
 	private void processLoadedScripts() {
@@ -1241,7 +1306,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		eventQueue.offer(EventType.TERMINATE);
 	}
 
-	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback, BreakpointCallback {
+	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback, BreakpointCallback, GenericCallback<ExceptionCatchMode> {
 
 		/*
 		 * (non-Javadoc)
@@ -1266,6 +1331,19 @@ public class V8DebugHost extends AbstractDebugHost {
 		 * @see org.chromium.sdk.JavascriptVm.BreakpointCallback#success(org.chromium.sdk.Breakpoint)
 		 */
 		public void success(Breakpoint breakpoint) {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.chromium.sdk.util.GenericCallback#success(java.lang.Object)
+		 */
+		public void success(ExceptionCatchMode value) {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.chromium.sdk.util.GenericCallback#failure(java.lang.Exception)
+		 */
+		public void failure(Exception exception) {
+			logError(exception.getMessage());
 		}
 
 		/*
