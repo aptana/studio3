@@ -18,6 +18,8 @@ public class Messages extends NLS
 
 	public static String ProjectConnectionDisconnectAction_Disconnecting;
 
+	public static String RemoteConnectionManagerAction_LBL_ConnectionManager;
+
 	static
 	{
 		// initialize resource bundle

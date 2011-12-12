@@ -144,6 +144,11 @@
             </or>
          </enablement>
       </actionProvider>
+      <actionProvider
+            class="com.aptana.ide.syncing.ui.navigator.actions.RemoteConnectionActionProvider"
+            id="com.aptana.ui.remote.actions.ConnectionActionsActions">
+         <enablement></enablement>
+      </actionProvider>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">

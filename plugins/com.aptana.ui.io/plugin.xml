@@ -598,6 +598,9 @@
                   pattern="com.aptana.ide.ui.io.navigator.actions.*">
             </actionExtension>
             <actionExtension
+                  pattern="com.aptana.ui.remote.actions.*">
+            </actionExtension>
+            <actionExtension
                   pattern="org.eclipse.ui.navigator.resources.PropertiesActionProvider">
             </actionExtension>
             <actionExtension
