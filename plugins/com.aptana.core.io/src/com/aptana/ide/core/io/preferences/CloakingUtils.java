@@ -76,10 +76,10 @@ public class CloakingUtils {
      * @return true if the file should be cloaked, false otherwise
      */
     public static boolean isFileCloaked(IFileStore fileStore) {
-        String filename = fileStore.getName();
+        String filepath = fileStore.toString();
         String[] expressions = getCloakedExpressions();
         for (String expression : expressions) {
-            if (filename.matches(expression)) {
+            if (filepath.matches(expression)) {
                 return true;
             }
         }
