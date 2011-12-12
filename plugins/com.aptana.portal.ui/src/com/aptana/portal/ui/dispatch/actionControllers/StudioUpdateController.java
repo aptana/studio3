@@ -120,8 +120,8 @@ public class StudioUpdateController extends AbstractActionController
 		else
 		{
 			IdeLog.logError(PortalUIPlugin.getDefault(), "Missing processor for the StudioUpdateController"); //$NON-NLS-1$
+			return IBrowserNotificationConstants.JSON_ERROR;
 		}
-		return IBrowserNotificationConstants.JSON_OK;
 	}
 
 	/*
