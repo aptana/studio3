@@ -81,6 +81,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final Pattern DETAIL_EXPRESSION_PATTERN = Pattern.compile("\\bthis\\b"); //$NON-NLS-1$
 	private static final String THIS_SUBSTITUTE = "__this__"; //$NON-NLS-1$
+	private static final String ANONYMOUS = "(anonymous function)"; //$NON-NLS-1$
 
 	private boolean flatScopesMode = true;
 	private final SocketAddress v8SocketAddress;
@@ -349,7 +350,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				continue;
 			}
 			String functionName = frame.getFunctionName();
-			if (ANONYMOUS.equals(functionName)) {
+			if (ANONYMOUS.equals(functionName) && i == currentFrames.size() - 1) {
 				functionName = StringUtil.EMPTY;
 			}
 			framesData[i] = StringUtil.join(SUBARGS_DELIMITER, new String[] {
