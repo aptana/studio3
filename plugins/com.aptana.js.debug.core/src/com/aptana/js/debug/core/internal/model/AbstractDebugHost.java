@@ -110,7 +110,6 @@ public abstract class AbstractDebugHost {
 	protected static final String STEP_RETURN = "stepReturn"; //$NON-NLS-1$
 	protected static final String STEP_TO_FRAME = "stepToFrame"; //$NON-NLS-1$
 	protected static final String FRAMES = "frames"; //$NON-NLS-1$
-	protected static final String ANONYMOUS = "<anonymous>"; //$NON-NLS-1$
 	protected static final String DBGSOURCE_SCHEME = "dbgsource://"; //$NON-NLS-1$
 	protected static final String _0 = "0"; //$NON-NLS-1$
 	protected static final String _1 = "1"; //$NON-NLS-1$
