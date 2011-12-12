@@ -657,6 +657,13 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 			break;
 		case TYPE_ARRAY:
+			flags = addFlag(flags, 'o');
+			displayValue = StringUtil.format(OBJECT_0, value.asObject().getClassName());
+			displayType = value.asObject().getClassName();
+			if (computeDetails) {
+				detailValue = getObjectDetail(value.asObject());
+			}
+			break;
 		default:
 			displayType = value.asObject().getClassName();
 			displayType = StringUtil.format("Unknown <{0}>", displayType); //$NON-NLS-1$
