@@ -32,8 +32,6 @@
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
-		<antcall target="deploy" />
-		<antcall target="clean.after" />
 	</target>
 
 	<!-- ================================= 
@@ -69,29 +67,6 @@
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
-		      target: deploy                      
-		     - - - - - - - - - - - - - - - - - -->
-	<target name="deploy">
-		<!-- wipe deploy directory -->
-		<delete dir="${deploy.dir}" failonerror="false" />
-		<mkdir dir="${deploy.dir}" />
-		<!-- grab final version -->
-		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
-		<propertycopy name="finalVersion" from="${topLevelElementId}" />
-		<!-- copy over result zipfile -->
-		<move file="${buildDirectory}/${buildType}.${build.revision}/${topLevelElementId}-${build.revision}-group.group.group.zip" tofile="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" />
-		<!-- Extract zipped p2 repo too -->
-		<unzip src="${deploy.dir}/${topLevelElementId}-${finalVersion}.zip" dest="${deploy.dir}" />
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-	      target: clean.after                      
-	     - - - - - - - - - - - - - - - - - -->
-	<target name="clean.after" if="cleanAfter">
-		<antcall target="clean" />
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
@@ -116,7 +91,6 @@
 			<fileset dir="${vanilla.eclipse}" includes="**/*" defaultexcludes="false" />
 		</copy>
 	</target>
-
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: get.revision                      
