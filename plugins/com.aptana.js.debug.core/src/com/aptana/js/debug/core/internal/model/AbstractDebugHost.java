@@ -433,6 +433,7 @@ public abstract class AbstractDebugHost {
 	}
 
 	protected final void terminate() {
+		checkCloseStreams();
 		terminateSession();
 		if (socket != null) {
 			try {
@@ -440,8 +441,30 @@ public abstract class AbstractDebugHost {
 			} catch (IOException ignore) {
 			}
 			socket = null;
+			checkCloseStreams();
 		}
 		logger.close();
+	}
+	
+	private void checkCloseStreams() {
+		if (socket == null || socket.isClosed()) {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException ignore) {
+				} finally {
+					reader = null;
+				}
+			}
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException ignore) {
+				} finally {
+					writer = null;
+				}
+			}
+		}		
 	}
 
 	protected abstract void startDebugging() throws IOException;
