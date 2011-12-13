@@ -1,5 +1,10 @@
 <project name="customnTargets overrides" default="noDefault">
 	<import file="${eclipse.pdebuild.templates}/headless-build/customTargets.xml"/>
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${builder}/ant-contrib/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
 
 	<!-- ===================================================================== -->
 	<!-- Steps to do before generating the build scripts. -->
