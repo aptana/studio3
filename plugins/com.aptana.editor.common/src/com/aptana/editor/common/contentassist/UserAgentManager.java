@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -410,7 +411,15 @@ public class UserAgentManager
 	public Image[] getUserAgentImages(String[] natureIDs, String... userAgents)
 	{
 		UserAgent[] activeUserAgents = getActiveUserAgents(natureIDs);
-		Set<String> enabledAgents = new HashSet<String>(Arrays.asList(userAgents));
+		Set<String> enabledAgents;
+		if (userAgents == null)
+		{
+			enabledAgents = Collections.emptySet();
+		}
+		else
+		{
+			enabledAgents = new HashSet<String>(Arrays.asList(userAgents));
+		}
 		Image[] result = new Image[activeUserAgents.length];
 
 		Arrays.sort(activeUserAgents);
