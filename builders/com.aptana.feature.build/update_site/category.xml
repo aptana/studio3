@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.aptana.feature_3.1.0.1323738665-BJ7G8EBTE4J7jW5SP1DC34EVnIM5.jar" id="com.aptana.feature" version="3.1.0.1323738665-BJ7G8EBTE4J7jW5SP1DC34EVnIM5">
+      <category name="com.aptana.feature.category"/>
+   </feature>
+   <category-def name="com.aptana.feature.category" label="Aptana Studio 3 Core"/>
+</site>

@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -109,6 +110,10 @@ class CommitGraphTable extends TableViewer
 		this.commits = commits;
 		decorations = new GitGrapher().decorateCommits(commits);
 		setInput(commits);
+		if (!commits.isEmpty())
+		{
+			setSelection(new StructuredSelection(commits.get(0)));
+		}
 	}
 
 	/**

@@ -1011,6 +1011,10 @@
             commandId="com.aptana.git.ui.command.revert"
             icon="icons/elcl16/arrow_undo.png">
       </image>
+      <image
+            commandId="com.aptana.git.ui.command.cherry-pick"
+            icon="icons/elcl16/cherry.gif">
+      </image>
    </extension>
    <extension
          point="org.eclipse.debug.ui.consoleLineTrackers">
@@ -1087,8 +1091,13 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
+            categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.history.switch_branch"
             name="%switch.history.branch.name">
+      </command>
+      <command
+            id="com.aptana.git.ui.command.cherry-pick"
+            name="cherry-pick">
       </command>
    </extension>
    <extension
@@ -1111,6 +1120,44 @@
                label="%switch.history.branch.label"
                style="pulldown">
          </command>
+         <command
+               commandId="com.aptana.git.ui.command.cherry-pick"
+               style="push">
+         </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:com.aptana.git.ui.git_history">
+         <command
+               commandId="com.aptana.git.ui.command.cherry-pick"
+               style="push">
+         </command>
+         <menu
+               commandId="com.aptana.git.ui.history.switch_branch"
+               icon="icons/elcl16/arrow_branch.png"
+               id="com.aptana.git.ui.actions.SwitchHistoryBranchAction"
+               label="%switch.history.branch.label">
+            <dynamic
+                  class="com.aptana.git.ui.internal.actions.SwitchHistoryBranchPulldownContributionItem"
+                  id="com.aptana.git.ui.history.branches_dynamic">
+            </dynamic>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.git.ui.internal.actions.CherryPickHandler"
+            commandId="com.aptana.git.ui.command.cherry-pick">
+         <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="com.aptana.git.core.model.GitCommit">
+                  </instanceof>
+               </iterate>
+        </enabledWhen>
+      </handler>
    </extension>
 </plugin>
