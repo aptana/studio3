@@ -43,6 +43,7 @@ import org.chromium.sdk.IgnoreCountBreakpointExtension;
 import org.chromium.sdk.JavascriptVm.BreakpointCallback;
 import org.chromium.sdk.JavascriptVm.ExceptionCatchMode;
 import org.chromium.sdk.JavascriptVm.ScriptsCallback;
+import org.chromium.sdk.JavascriptVm.SuspendCallback;
 import org.chromium.sdk.JsEvaluateContext.EvaluateCallback;
 import org.chromium.sdk.JsObject;
 import org.chromium.sdk.JsScope;
@@ -92,6 +93,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	private DebugEventListener debugEventListener;
 	private DebugContext currentContext;
 	private List<? extends CallFrame> currentFrames;
+	private StepAction lastStopAction;
 	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
 	private final Callback callback = new Callback();
 	
@@ -102,6 +104,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	private Map<String, Integer> scriptFunctionIds = new HashMap<String, Integer>();
 	private int nextScriptFunctionId = 1;
 	private boolean initialized = false;
+	private boolean terminating = false;
 	private Map<Integer, JsVariable> evalResults = new HashMap<Integer,JsVariable>();
 	private int evalResultsLastId = 0;
 	private Map<String, Map<Integer, Breakpoint>> breakpoints = new HashMap<String, Map<Integer,Breakpoint>>();
@@ -123,7 +126,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			public void suspended(DebugContext context) {
 				if (context.getState() == State.EXCEPTION) {
 					if (!suspendOnException(context.getExceptionData())) {
-						context.continueVm(StepAction.CONTINUE, 0, null);
+						continueVm(lastStopAction, 1);
 						return;
 					}
 				}
@@ -204,7 +207,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		currentFrames = currentContext.getCallFrames();
 		if (currentFrames == null || currentFrames.isEmpty()) {
 			logError("startDebugging(frames is empty)"); //$NON-NLS-1$
-			continueVm(StepAction.CONTINUE, 0);
+			continueVm(StepAction.IN, 1);
 			return;
 		}
 		CallFrame frame = currentFrames.get(0);
@@ -284,6 +287,9 @@ public class V8DebugHost extends AbstractDebugHost {
 					break;
 				case TERMINATE:
 					handleTerminate();
+					if (vm == null || !vm.isAttached()) {
+						return;
+					}
 				default:
 					break;
 			}
@@ -292,6 +298,10 @@ public class V8DebugHost extends AbstractDebugHost {
 
 	private void handleSuspended() throws IOException {
 		checkInitialized();
+		if (terminating) {
+			handleTerminate();
+			return;
+		}
 		switch (currentContext.getState()) {
 			case NORMAL:
 				if (!currentContext.getBreakpointsHit().isEmpty()) {
@@ -305,18 +315,15 @@ public class V8DebugHost extends AbstractDebugHost {
 		startDebugging();
 	}
 	
-	private void handleTerminate() {
-		if (currentContext != null) {
-			try {
-				stopDebugging(ABORT);
-			} catch (IOException e) {
-				logError(e);
-			}
-		}
+	protected void handleTerminate() {
 		if (vm != null) {
 			vm.detach();
 		}
 		closeLogger();
+	}
+	
+	protected void evaluateInGlobalContext(String expression) {
+		currentContext.getGlobalEvaluateContext().evaluateSync(expression, null, new Callback());
 	}
 
 	private boolean suspendOnException(ExceptionData exceptionData) {
@@ -345,11 +352,13 @@ public class V8DebugHost extends AbstractDebugHost {
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#suspend(java.lang.String)
 	 */
 	@Override
-	protected void suspend(String reason) {
-		if (currentContext == null) {
+	protected boolean suspend(String reason) {
+		if (currentContext == null && vm != null) {
 			suspendReason = reason;
 			vm.suspend(null);
-		}			
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -1237,7 +1246,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 
 	private void continueVm(StepAction stepAction, int stepCount) {
-		currentContext.continueVm(stepAction, stepCount, callback);
+		currentContext.continueVm(lastStopAction = stepAction, stepCount, callback);
 	}
 
 	/* (non-Javadoc)
@@ -1251,7 +1260,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			boolean attached = false;
 			while (System.currentTimeMillis() <= endTime) {
 				try {
-					vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
+					vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, Platform.inDevelopmentMode() ? new ConnectionLoggerImpl(System.out) : null);
 					vm.attach(debugEventListener);
 					attached = true;
 					break;
@@ -1298,10 +1307,14 @@ public class V8DebugHost extends AbstractDebugHost {
 	 */
 	@Override
 	protected void terminateSession() {
+		if (terminating) {
+			return;
+		}
+		terminating = true;
 		eventQueue.offer(EventType.TERMINATE);
 	}
 
-	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback, BreakpointCallback, GenericCallback<ExceptionCatchMode> {
+	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback, BreakpointCallback, SuspendCallback, GenericCallback<ExceptionCatchMode> {
 
 		/*
 		 * (non-Javadoc)
