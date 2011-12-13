@@ -16,13 +16,15 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.team.ui.TeamUI;
-import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchPage;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
+import com.aptana.git.ui.internal.history.GitHistoryPageSource;
+import com.aptana.ui.util.UIUtils;
 
 public class ShowInHistoryHandler extends AbstractHandler
 {
@@ -71,11 +73,8 @@ public class ShowInHistoryHandler extends AbstractHandler
 			IResource resource = getResource((EvaluationContext) context);
 			if (resource != null)
 			{
-				IHistoryView view = TeamUI.getHistoryView();
-				if (view != null)
-				{
-					view.showHistoryFor(resource);
-				}
+				IWorkbenchPage page = UIUtils.getActivePage();
+				TeamUI.showHistoryFor(page, resource, GitHistoryPageSource.getInstance());
 			}
 		}
 		return null;
