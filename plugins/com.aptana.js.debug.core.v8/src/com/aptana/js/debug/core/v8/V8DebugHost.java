@@ -91,7 +91,7 @@ public class V8DebugHost extends AbstractDebugHost {
 
 	private StandaloneVm vm;
 	private DebugEventListener debugEventListener;
-	protected DebugContext currentContext;
+	private DebugContext currentContext;
 	private List<? extends CallFrame> currentFrames;
 	private StepAction lastStopAction;
 	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
@@ -352,11 +352,13 @@ public class V8DebugHost extends AbstractDebugHost {
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#suspend(java.lang.String)
 	 */
 	@Override
-	protected void suspend(String reason) {
+	protected boolean suspend(String reason) {
 		if (currentContext == null && vm != null) {
 			suspendReason = reason;
 			vm.suspend(null);
-		}			
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)

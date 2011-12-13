@@ -475,7 +475,7 @@ public abstract class AbstractDebugHost {
 	protected abstract String doGetDetails(String variableName);
 	protected abstract String doEval(String variableName, String expression);
 	protected abstract String doSetValue(String variableName, String valueRef);
-	protected abstract void suspend(String reason);
+	protected abstract boolean suspend(String reason);
 	protected abstract String processDetailFormatters(String[] list);
 	protected abstract String getSource(String uri);
 	protected abstract boolean setBreakpoint(String uri, int lineNo, BreakpointProperties props);
