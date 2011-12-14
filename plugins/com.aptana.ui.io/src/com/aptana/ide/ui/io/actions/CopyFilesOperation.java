@@ -316,17 +316,16 @@ public class CopyFilesOperation
 		}
 		try
 		{
+			IFileStore[] childStores = Utils.isDirectory(sourceStore) ? sourceStore.childStores(EFS.NONE, monitor)
+					: new IFileStore[0];
 			SyncUtils.copy(sourceStore, null, destinationStore, EFS.NONE, monitor);
-			if (Utils.isDirectory(sourceStore))
+
+			// copy the children recursively
+			IFileStore destChildStore;
+			for (IFileStore childStore : childStores)
 			{
-				// copy the children recursively
-				IFileStore[] childStores = sourceStore.childStores(EFS.NONE, monitor);
-				IFileStore destChildStore;
-				for (IFileStore childStore : childStores)
-				{
-					destChildStore = destinationStore.getChild(childStore.getName());
-					copyFile(childStore, destChildStore, monitor);
-				}
+				destChildStore = destinationStore.getChild(childStore.getName());
+				copyFile(childStore, destChildStore, monitor);
 			}
 		}
 		catch (CoreException e)

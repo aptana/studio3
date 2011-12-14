@@ -11,6 +11,7 @@ package com.aptana.git.ui.internal.history;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.team.ui.history.HistoryPageSource;
+import org.eclipse.team.ui.history.IHistoryPageSource;
 import org.eclipse.ui.part.Page;
 
 /**
@@ -19,6 +20,7 @@ import org.eclipse.ui.part.Page;
 public class GitHistoryPageSource extends HistoryPageSource
 {
 	private static final IResource[] NO_RESOURCES = new IResource[0];
+	private static GitHistoryPageSource instance;
 
 	public boolean canShowHistoryFor(final Object object)
 	{
@@ -45,5 +47,14 @@ public class GitHistoryPageSource extends HistoryPageSource
 		final GitHistoryPage pg = new GitHistoryPage();
 		pg.setInput(input);
 		return pg;
+	}
+
+	public synchronized static IHistoryPageSource getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new GitHistoryPageSource();
+		}
+		return instance;
 	}
 }

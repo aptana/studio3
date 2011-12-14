@@ -6,7 +6,6 @@
      Builds the Studio core features
                    
      cwilliams
-     schitale                                                               
      ====================================================================== -->
 <project name="studio3" default="build">
 	<description>
@@ -33,8 +32,6 @@
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
-		<antcall target="categorize" />
-		<antcall target="clean.after" />
 	</target>
 
 	<!-- ================================= 
@@ -53,15 +50,6 @@
 	</target>
 
 	<!-- ================================= 
-         target: categorize              
-        ================================= -->
-	<target name="categorize" description="categorize the update site">
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
-			<arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator -nosplash -consolelog -updateSite ${deploy.dir} -site file:${deploy.dir}/site.xml -metadataRepository file:${deploy.dir} -metadataRepositoryName &quot;Aptana Studio 3 Core Update Site&quot; -artifactRepository file:${deploy.dir} -artifactRepositoryName &quot;Aptana Studio 3 Core Artifacts&quot; -publishArtifacts -publishArtifactRepository -compress -reusePack200Files -noDefaultIUs -vmargs -Xmx256m" />
-		</java>
-	</target>
-
-	<!-- ================================= 
 	      target: clean              
 	     ================================= -->
 	<target name="clean" depends="generate.build.properties" description="Clean up temp and build files">
@@ -76,91 +64,17 @@
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
-		<delete dir="${p2.repo.dir}" failonerror="false" />
-		<!-- Do a git clean of the build directory -->
-		<exec executable="/bin/bash" dir="${buildDirectory}">
-			<arg value="-c" />
-			<arg value="${git.executable} clean -f -d -x" />
-		</exec>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-	      target: clean.after                      
-	     - - - - - - - - - - - - - - - - - -->
-	<target name="clean.after" if="cleanAfter">
-		<antcall target="clean" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
-			<param name="p2.repo" value="${libraries-com.p2.repo}" />
-		</antcall>
-		<!-- Copy the features and plugins over into a dropins folder. Installing makes it so that non-linux plugins/features won't be there! -->
-		<mkdir dir="${baseLocation}/dropins/eclipse" />
-		<copy todir="${baseLocation}/dropins/eclipse">
-			<fileset dir="${webkit.p2.repo}" defaultexcludes="true">
-				<include name="features/*" />
-				<include name="plugins/*" />
-			</fileset>
-		</copy>
 		<copy todir="${baseLocation}/dropins">
 			<fileset dir="${portal35.dir}">
 				<include name="plugins/com.aptana.portal.ui.*.jar" />
 			</fileset>
 		</copy>
-
-		<!-- Unjar the features -->
-		<for param="file">
-			<path>
-				<fileset dir="${baseLocation}/dropins/eclipse/features" defaultexcludes="true">
-					<include name="*.jar" />
-				</fileset>
-			</path>
-			<sequential>
-				<echo message="Unzipping JAR @{file}" />
-				<basename file="@{file}" property="@{file}.name" suffix="jar" />
-				<mkdir dir="${baseLocation}/dropins/eclipse/features/${@{file}.name}" />
-				<unjar dest="${baseLocation}/dropins/eclipse/features/${@{file}.name}" src="@{file}" />
-				<delete file="@{file}" />
-			</sequential>
-		</for>
-		<!-- UnJAR the handful of plugins that we need to... -->
-		<for param="file">
-			<path>
-				<fileset dir="${baseLocation}/dropins/eclipse/plugins" defaultexcludes="true">
-					<include name="com.aptana.swt.webkitbrowser.macosx.x86_*.jar" />
-					<include name="com.aptana.swt.webkitbrowser.win32.x86_*.jar" />
-					<include name="com.aptana.swt.webkitbrowser.linux.x86_*.jar" />
-					<include name="com.aptana.swt.webkitbrowser.macosx.carbon_*.jar" />
-					<include name="com.aptana.swt.webkitbrowser.macosx.cocoa.ppc_*.jar" />
-				</fileset>
-			</path>
-			<sequential>
-				<echo message="Unzipping JAR @{file}" />
-				<basename file="@{file}" property="@{file}.name" suffix="jar" />
-				<mkdir dir="${baseLocation}/dropins/eclipse/plugins/${@{file}.name}" />
-				<unjar dest="${baseLocation}/dropins/eclipse/plugins/${@{file}.name}" src="@{file}" />
-				<delete file="@{file}" />
-			</sequential>
-		</for>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-			  target: run.director                      
-			 - - - - - - - - - - - - - - - - - -->
-	<target name="run.director" description="Runs the p2 director installs">
-		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000">
-			<arg line="-application org.eclipse.equinox.p2.director" />
-			<arg line="-nosplash" />
-			<arg line="-consoleLog" />
-			<arg line="-metadataRepository ${p2.repo}" />
-			<arg line="-artifactRepository ${p2.repo}" />
-			<arg line="-installIU ${p2.installIU}" />
-		</java>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -203,7 +117,6 @@
 	<target name="replace.versions" description="Replaces all the qualifiers for plugins/features with the last changed rev for that plugin/feature.">
 		<!-- Iterate through every plugin and feature directory and replace qualifier in
 		        build.properties with qualifier for just that plugin/feature! -->
-		<!-- TODO Handle if build.properties has no qualifier entry! -->
 		<for param="file">
 			<path>
 				<dirset dir="${buildDirectory}" defaultexcludes="true">
@@ -220,18 +133,18 @@
 					<arg value="${git.executable} log --max-count=1 --pretty=format:'%ct' ." />
 				</exec>
 				<echo message="Replacing qualifier for @{file} with ${@{file}.committed.max}" />
-				<exec executable="grep" dir="@{file}" outputproperty="@{file}.hasQualifierLine" logerror="false" failifexecutionfails="false" failonerror="false">
+				<exec executable="grep" dir="@{file}" resultproperty="@{file}.hasQualifierLine" logerror="false" failifexecutionfails="false" failonerror="false">
 					<arg line="qualifier ./build.properties" />
 				</exec>
 				<if>
-					<equals arg1="${@{file}.hasQualifierLine}" arg2="" />
+					<equals arg1="${@{file}.hasQualifierLine}" arg2="0" />
 					<then>
-						<echo message="no qualifier property, adding one" />
-						<concat append="true" destfile="@{file}/build.properties">qualifier = ${@{file}.committed.max}</concat>
+						<!-- <echo message="replacing qualifier value" /> -->
+						<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
 					</then>
 					<else>
-						<echo message="replacing qualifier value" />
-						<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
+						<!-- <echo message="no qualifier property, adding one" /> -->
+						<concat append="true" destfile="@{file}/build.properties">qualifier = ${@{file}.committed.max}</concat>
 					</else>
 				</if>
 			</sequential>
@@ -247,6 +160,6 @@
 		</exec>
 	</target>
 	<target name="link.check">
-		<available file="${env.WORKSPACE}/build-artifacts"  property="link.exists"/>
+		<available file="${env.WORKSPACE}/build-artifacts" property="link.exists" />
 	</target>
 </project>
