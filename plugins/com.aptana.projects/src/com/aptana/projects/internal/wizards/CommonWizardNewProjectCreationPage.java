@@ -10,10 +10,12 @@ package com.aptana.projects.internal.wizards;
 import java.io.File;
 
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
@@ -23,18 +25,23 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SelectedTemplateComposite;
+import com.aptana.ui.widgets.StepIndicatorComposite;
 
 /**
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
 public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreationPage implements
-		IWizardProjectCreationPage
+		IWizardProjectCreationPage, IStepIndicatorWizardPage
 {
 
 	private Label warningLabel;
 
 	// Initial Project template
 	private IProjectTemplate projectTemplate = null;
+
+	// Used for step indicator composite
+	protected StepIndicatorComposite stepIndicatorComposite;
+	protected String[] stepNames;
 
 	/**
 	 * Constructs a new common new project creation page.
@@ -72,9 +79,21 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	@Override
 	public void createControl(Composite parent)
 	{
-		super.createControl(parent);
+		Composite pageComposite = new Composite(parent, SWT.NONE);
+		GridLayout pageLayout = GridLayoutFactory.fillDefaults().spacing(0, 0).create();
+		pageComposite.setLayout(pageLayout);
+		pageComposite.setLayoutData(GridDataFactory.fillDefaults().create());
 
-		createProjectTemplateSection((Composite) getControl());
+		stepIndicatorComposite = new StepIndicatorComposite(pageComposite, stepNames);
+		stepIndicatorComposite.setSelection(getStepName());
+
+		super.createControl(pageComposite);
+
+		((Composite) getControl()).setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
+		((Composite) getControl()).setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).create());
+		setControl(pageComposite);
+
+		createProjectTemplateSection(pageComposite);
 		createWarningArea();
 	}
 
@@ -143,6 +162,16 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 		}
 
 		return isValid;
+	}
+
+	public String getStepName()
+	{
+		return getTitle();
+	}
+
+	public void initStepIndicator(String[] stepNames)
+	{
+		this.stepNames = stepNames;
 	}
 
 }
