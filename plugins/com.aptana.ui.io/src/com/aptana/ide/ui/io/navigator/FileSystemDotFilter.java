@@ -9,6 +9,7 @@ package com.aptana.ide.ui.io.navigator;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
@@ -17,19 +18,27 @@ import com.aptana.ide.ui.io.FileSystemUtils;
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class FileSystemDotFilter extends ViewerFilter {
+public class FileSystemDotFilter extends ViewerFilter
+{
 
-    private static final String EXPRESSION = "."; //$NON-NLS-1$
+	private static final String EXPRESSION = "."; //$NON-NLS-1$
 
-    public FileSystemDotFilter() {
-    }
+	public FileSystemDotFilter()
+	{
+	}
 
-    @Override
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
-        if (element instanceof IResource) {
-            return !((IResource) element).getName().startsWith(EXPRESSION);
-        }
-        IFileStore fileStore = FileSystemUtils.getFileStore(element);
-        return fileStore == null || !fileStore.getName().startsWith(EXPRESSION);
-    }
+	@Override
+	public boolean select(Viewer viewer, Object parentElement, Object element)
+	{
+		if (element instanceof IAdaptable)
+		{
+			IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+			if (resource != null)
+			{
+				return !resource.getName().startsWith(EXPRESSION);
+			}
+		}
+		IFileStore fileStore = FileSystemUtils.getFileStore(element);
+		return fileStore == null || !fileStore.getName().startsWith(EXPRESSION);
+	}
 }

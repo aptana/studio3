@@ -19,32 +19,45 @@ import com.aptana.core.io.vfs.IExtendedFileStore;
  * @author Michael Xia (mxia@aptana.com)
  * @author Max Stepanov
  */
-public class Utils {
+public class Utils
+{
 
-	public static IFileStore getFileStore(Object adaptable) {
-		if (adaptable instanceof IResource) {
-			return EFSUtils.getFileStore((IResource) adaptable);
+	public static IFileStore getFileStore(Object adaptable)
+	{
+		if (adaptable instanceof IAdaptable)
+		{
+			IResource resource = (IResource) ((IAdaptable) adaptable).getAdapter(IResource.class);
+			if (resource != null)
+			{
+				return EFSUtils.getFileStore(resource);
+			}
 		}
 		return FileSystemUtils.getFileStore(adaptable);
 	}
 
-	public static IFileInfo getDetailedFileInfo(IAdaptable adaptable) {
+	public static IFileInfo getDetailedFileInfo(IAdaptable adaptable)
+	{
 		return getFileInfo(adaptable, IExtendedFileStore.DETAILED);
 	}
 
-	public static boolean exists(IAdaptable adaptable) {
+	public static boolean exists(IAdaptable adaptable)
+	{
 		return getFileInfo(adaptable, IExtendedFileStore.EXISTENCE).exists();
 	}
 
-	public static boolean isDirectory(IAdaptable adaptable) {
+	public static boolean isDirectory(IAdaptable adaptable)
+	{
 		return getFileInfo(adaptable, IExtendedFileStore.EXISTENCE).isDirectory();
 	}
 
-	public static IFileInfo getFileInfo(IAdaptable adaptable, int options) {
+	public static IFileInfo getFileInfo(IAdaptable adaptable, int options)
+	{
 		IFileInfo fileInfo = (IFileInfo) adaptable.getAdapter(IFileInfo.class);
-		if (fileInfo == null) {
+		if (fileInfo == null)
+		{
 			IFileStore fileStore = getFileStore(adaptable);
-			if (fileStore != null) {
+			if (fileStore != null)
+			{
 				fileInfo = FileSystemUtils.fetchFileInfo(fileStore, options);
 			}
 		}

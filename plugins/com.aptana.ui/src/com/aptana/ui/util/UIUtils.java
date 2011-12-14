@@ -13,6 +13,7 @@ import java.net.URI;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -179,9 +180,13 @@ public final class UIUtils
 		if (variable instanceof IStructuredSelection)
 		{
 			Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
-			if (selectedObject instanceof IResource)
+			if (selectedObject instanceof IAdaptable)
 			{
-				return (IResource) selectedObject;
+				IResource resource = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
+				if (resource != null)
+				{
+					return resource;
+				}
 			}
 		}
 		else

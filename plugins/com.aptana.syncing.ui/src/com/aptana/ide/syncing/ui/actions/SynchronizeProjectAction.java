@@ -46,14 +46,15 @@ public class SynchronizeProjectAction extends BaseSyncAction
 					dialog.open();
 					dialog.setHandler(new SyncEventHandlerAdapter()
 					{
+
 						public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 						{
-							Object file = source.getAdapter(IResource.class);
-							if (file != null && file instanceof IResource)
+							IResource resource = (IResource) source.getAdapter(IResource.class);
+							if (resource != null)
 							{
 								try
 								{
-									((IResource) file).refreshLocal(IResource.DEPTH_INFINITE, null);
+									resource.refreshLocal(IResource.DEPTH_INFINITE, null);
 								}
 								catch (CoreException e)
 								{

@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -49,13 +50,13 @@ public class FTPDeployWizard extends AbstractDeployWizard
 	{
 		super.init(workbench, selection);
 		Object element = selection.getFirstElement();
-		if (element instanceof IContainer)
+		if (element instanceof IAdaptable)
 		{
-			selectedContainer = (IContainer) element;
-		}
-		else if (element instanceof IResource)
-		{
-			selectedContainer = ((IResource) element).getParent();
+			IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+			if (resource != null)
+			{
+				selectedContainer = (resource instanceof IContainer) ? (IContainer) resource : resource.getParent();
+			}
 		}
 	}
 
