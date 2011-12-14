@@ -199,13 +199,17 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			{
 				stepPages.add((IStepIndicatorWizardPage) templatesPage);
 				steps.add(((IStepIndicatorWizardPage) templatesPage).getStepName());
-		}
+			}
 		}
 
 		stepNames = steps.toArray(new String[steps.size()]);
-		for (IStepIndicatorWizardPage page : stepPages)
+
+		if (stepNames.length > 1)
 		{
-			page.initStepIndicator(stepNames);
+			for (IStepIndicatorWizardPage page : stepPages)
+			{
+				page.initStepIndicator(stepNames);
+			}
 		}
 	}
 

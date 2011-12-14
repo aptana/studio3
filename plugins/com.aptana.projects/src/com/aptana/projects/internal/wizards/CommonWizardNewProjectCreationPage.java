@@ -80,7 +80,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	public void createControl(Composite parent)
 	{
 		Composite pageComposite = new Composite(parent, SWT.NONE);
-		GridLayout pageLayout = GridLayoutFactory.fillDefaults().spacing(0, 0).create();
+		GridLayout pageLayout = GridLayoutFactory.fillDefaults().spacing(0, 5).create();
 		pageComposite.setLayout(pageLayout);
 		pageComposite.setLayoutData(GridDataFactory.fillDefaults().create());
 
@@ -166,7 +166,7 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 
 	public String getStepName()
 	{
-		return getTitle();
+		return Messages.NewProjectWizard_Step_Lbl;
 	}
 
 	public void initStepIndicator(String[] stepNames)
