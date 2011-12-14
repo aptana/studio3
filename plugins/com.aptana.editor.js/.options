@@ -1,2 +1,3 @@
 com.aptana.editor.js/debug/show_content_assist_types = true
-
+com.aptana.editor.js/debug/show_index_writes = true
+com.aptana.editor.js/debug/show_indexing_steps = true
