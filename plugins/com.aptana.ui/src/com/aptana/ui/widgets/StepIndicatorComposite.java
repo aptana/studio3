@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -100,6 +101,7 @@ public class StepIndicatorComposite extends Composite
 			if ((gridData.heightHint % 2) == 0)
 			{
 				gridData.heightHint++;
+				((GridData) stepLabel.getLayoutData()).heightHint = gridData.heightHint - 10;
 			}
 
 			gridData.widthHint = ((gridData.heightHint - 1) / 2) + 1;
@@ -107,12 +109,7 @@ public class StepIndicatorComposite extends Composite
 			if (selectedTextFont == null)
 			{
 				Font font2 = stepLabel.getFont();
-				FontData[] fontData = font2.getFontData();
-				for (FontData data : fontData)
-				{
-					data.setStyle(data.getStyle() | SWT.BOLD);
-				}
-
+				FontData[] fontData = SWTUtils.boldFont(font2);
 				selectedTextFont = new Font(getDisplay(), fontData);
 			}
 
@@ -130,8 +127,8 @@ public class StepIndicatorComposite extends Composite
 					if (selection)
 					{
 						Path path = new Path(gc.getDevice());
-						path.moveTo(bounds.x, bounds.y + 1);
-						path.lineTo(bounds.x + bounds.width, bounds.y + ((bounds.height - 1) / 2) + 1);
+						path.moveTo(bounds.x, bounds.y);
+						path.lineTo(bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2));
 						path.lineTo(bounds.x, bounds.y + bounds.height - 1);
 						gc.setForeground(selectedColor);
 						gc.setBackground(selectedColor);
@@ -158,10 +155,9 @@ public class StepIndicatorComposite extends Composite
 					}
 
 					gc.setForeground(borderColor);
-					gc.drawLine(bounds.x, bounds.y, bounds.x + bounds.width - 1, bounds.y
-							+ ((bounds.height - 1) / 2));
-					gc.drawLine(bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2), bounds.x,
-							bounds.y + bounds.height - 1);
+					gc.drawLine(bounds.x, bounds.y, bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2));
+					gc.drawLine(bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2), bounds.x, bounds.y
+							+ bounds.height - 1);
 					gc.drawLine(bounds.x - 1, bounds.y, bounds.x + bounds.width + 1, bounds.y);
 					gc.drawLine(bounds.x - 1, bounds.y + bounds.height - 1, bounds.x + bounds.width + 1, bounds.y
 							+ bounds.height - 1);
