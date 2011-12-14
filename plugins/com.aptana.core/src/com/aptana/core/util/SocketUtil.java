@@ -88,7 +88,11 @@ public final class SocketUtil {
 					InetAddress inetAddr = e2.nextElement();
 					if (inetAddr instanceof Inet4Address) {
 						if (!addrs.contains(inetAddr)) {
-							addrs.add(inetAddr);
+							if (!inetAddr.isLoopbackAddress()) {
+								addrs.add(0, inetAddr);
+							} else {
+								addrs.add(inetAddr);
+							}
 						}
 					}
 				}
