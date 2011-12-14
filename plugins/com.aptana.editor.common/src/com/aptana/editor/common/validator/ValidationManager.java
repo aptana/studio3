@@ -341,6 +341,55 @@ public class ValidationManager implements IValidationManager
 			return;
 		}
 
+		if (fExistingItemsByType.isEmpty())
+		{
+			// the first run, so removes all markers and adds the new ones
+			Set<String> markerTypes = itemsByType.keySet();
+			List<IValidationItem> items;
+			for (String markerType : markerTypes)
+			{
+				try
+				{
+					// deletes the old markers
+					if (isExternal)
+					{
+						MarkerUtils.deleteMarkers(externalResource, markerType, true);
+					}
+					else
+					{
+						workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+					}
+
+					// adds the new ones
+					items = itemsByType.get(markerType);
+					IMarker marker;
+					synchronized (items)
+					{
+						for (IValidationItem item : items)
+						{
+							if (isExternal)
+							{
+								marker = MarkerUtils.createMarker(externalResource, null, markerType);
+								// don't persist on external file
+								marker.setAttribute(IMarker.TRANSIENT, true);
+							}
+							else
+							{
+								marker = workspaceResource.createMarker(markerType);
+							}
+							marker.setAttributes(item.createMarkerAttributes());
+						}
+					}
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(CommonEditorPlugin.getDefault(), e.getMessage(), e);
+				}
+			}
+			fExistingItemsByType = itemsByType;
+			return;
+		}
+
 		// checks each marker type that we had items for to see if we need to completely delete the markers of this type
 		// and re-add or if we need only to add the new items that didn't exist before
 		Set<String> markerTypes = fExistingItemsByType.keySet();
