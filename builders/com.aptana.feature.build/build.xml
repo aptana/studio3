@@ -70,11 +70,6 @@
           target: generate.base                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
-		<copy todir="${baseLocation}/dropins">
-			<fileset dir="${portal35.dir}">
-				<include name="plugins/com.aptana.portal.ui.*.jar" />
-			</fileset>
-		</copy>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
