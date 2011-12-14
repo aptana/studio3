@@ -206,15 +206,14 @@ public class V8DebugHost extends AbstractDebugHost {
 	protected void startDebugging() throws IOException {
 		currentFrames = currentContext.getCallFrames();
 		if (currentFrames == null || currentFrames.isEmpty()) {
-			logError("startDebugging(frames is empty)"); //$NON-NLS-1$
-			continueVm(StepAction.IN, 1);
+			handleSuspend();
 			return;
 		}
 		CallFrame frame = currentFrames.get(0);
 		Script script = frame.getScript();
 		// Filter internal API frames
 		if (currentContext.getState() == State.NORMAL && isScriptFiltered(script)) {
-			continueVm(StepAction.OUT, 1);
+			continueVm(SUSPEND.equals(suspendReason) ? StepAction.IN : StepAction.OUT, 1);
 			return;
 		}
 		List<CallFrame> filteredFrames = new ArrayList<CallFrame>();
@@ -323,7 +322,9 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 	
 	protected void evaluateInGlobalContext(String expression) {
-		currentContext.getGlobalEvaluateContext().evaluateSync(expression, null, new Callback());
+		if (currentContext != null) {
+			currentContext.getGlobalEvaluateContext().evaluateSync(expression, null, new Callback());
+		}
 	}
 
 	private boolean suspendOnException(ExceptionData exceptionData) {
@@ -359,6 +360,10 @@ public class V8DebugHost extends AbstractDebugHost {
 			return true;
 		}
 		return false;
+	}
+	
+	protected void handleSuspend() {
+		continueVm(StepAction.CONTINUE, 0);
 	}
 
 	/* (non-Javadoc)
