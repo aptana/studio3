@@ -8,6 +8,7 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.IDebugScopes;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -198,43 +200,124 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		sub.setWorkRemaining(80);
 
+		// build symbol tables
+		URI location = file.toURI();
+
+		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+		{
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Building symbol tables for file ''{0}'' for index ''{1}''",
+				location.toString(),
+				index.toString()
+			);
+			// @formatter:on
+
+			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+		}
+
 		JSScope globals = this.getGlobals(ast);
+
+		// process globals
 		if (globals != null)
 		{
-			URI location = file.toURI();
-
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
 			type.setName(JSTypeConstants.WINDOW_TYPE);
 			type.addParentType(JSTypeConstants.GLOBAL_TYPE);
 
+			// add declared variables and functions from the global scope
+			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''",
+					location.toString(),
+					index.toString()
+				);
+				// @formatter:on
+
+				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			}
+
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
 
-			// add declared variables and functions from the global scope
 			for (PropertyElement property : symbolInferrer.getScopeProperties())
 			{
 				type.addProperty(property);
 			}
 
 			// include any assignments to Window
+			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''",
+					location.toString(),
+					index.toString()
+				);
+				// @formatter:on
+
+				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			}
+
 			for (PropertyElement property : this.processWindowAssignments(index, globals, location))
 			{
 				type.addProperty(property);
 			}
 
 			// process window assignments in lambdas (self-invoking functions)
+			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''",
+					location.toString(),
+					index.toString()
+				);
+				// @formatter:on
+
+				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			}
+
 			for (PropertyElement property : this.processLambdas(index, globals, ast, location))
 			{
 				type.addProperty(property);
 			}
 
 			// associate all user agents with these properties
+			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Assigning user agents to properties in file ''{0}'' for index ''{1}''",
+					location.toString(),
+					index.toString()
+				);
+				// @formatter:on
+
+				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			}
+
 			for (PropertyElement property : type.getProperties())
 			{
 				JSTypeUtil.addAllUserAgents(property);
 			}
 
 			// write new Window type to index
+			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Writing indexing results to index ''{0}'' for file ''{1}''",
+					index.toString(),
+					location.toString()
+				);
+				// @formatter:on
+
+				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			}
+
 			this._indexWriter.writeType(index, type, location);
 		}
 

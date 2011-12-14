@@ -8,9 +8,13 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.IDebugScopes;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -48,6 +52,21 @@ public class JSIndexWriter extends IndexWriter
 		);
 		// @formatter:on
 
+		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+		{
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Writing function ''{0}.{1}'' from location ''{2}'' to index ''{3}''", //$NON-NLS-1$
+				function.getOwningType(),
+				function.getName(),
+				location.toString(),
+				index.toString()
+			);
+			// @formatter:on
+
+			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+		}
+
 		index.addEntry(IJSIndexConstants.FUNCTION, value, location);
 	}
 
@@ -68,6 +87,21 @@ public class JSIndexWriter extends IndexWriter
 			this.serialize(property)
 		);
 		// @formatter:on
+
+		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+		{
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Writing property ''{0}.{1}'' from location ''{2}'' to index ''{3}''", //$NON-NLS-1$
+				property.getOwningType(),
+				property.getName(),
+				location.toString(),
+				index.toString()
+			);
+			// @formatter:on
+
+			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+		}
 
 		index.addEntry(IJSIndexConstants.PROPERTY, value, location);
 	}
@@ -121,6 +155,20 @@ public class JSIndexWriter extends IndexWriter
 				type.getDescription()
 			);
 			// @formatter:on
+
+			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+			{
+				// @formatter:off
+				String message = MessageFormat.format(
+					"Writing type ''{0}'' from location ''{1}'' to index ''{2}''", //$NON-NLS-1$
+					type.getName(),
+					location.toString(),
+					index.toString()
+				);
+				// @formatter:on
+
+				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+			}
 
 			index.addEntry(IJSIndexConstants.TYPE, value, location);
 
