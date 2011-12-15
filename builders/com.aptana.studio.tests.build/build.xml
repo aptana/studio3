@@ -74,12 +74,6 @@
 		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
-		<delete dir="${p2.repo.dir}" failonerror="false" />
-		<!-- Do a git clean of the build directory -->
-		<exec executable="/bin/bash" dir="${buildDirectory}">
-			<arg value="-c" />
-			<arg value="${git.executable} clean -f -d -x" />
-		</exec>
 		<delete file="build.properties" failonerror="false" />
 	</target>
 
@@ -102,10 +96,6 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group,com.aptana.webkitbrowser.feature.group,com.windowtester.runtime.feature.group,com.aptana.feature.feature.group" />
-			<param name="p2.repo" value="${libraries-com.p2.repo},${webkit.p2.repo},${windowtester.p2.repo},file:${studio3.p2.repo}" />
-		</antcall>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -154,11 +144,11 @@
 
 	<target name="-pre-test" description="Install test features and do pre-test setup.">
 		<!-- Unzip Eclipse Testing Framework and... -->
-		<unzip src="eclipse-test-framework-3.6.zip" dest="${baseLocation}/test-framework" />
+		<unzip src="eclipse-test-framework-3.6.zip" dest="${baseLocation}/dropins" />
 		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
-			<param name="p2.installIU" value="${topLevelElementId}.feature.group,org.eclipse.test.feature.group" />
-			<param name="p2.repo" value="file:${p2.repo.dir},file:${baseLocation}/test-framework/eclipse" />
+			<param name="p2.installIU" value="com.aptana.feature.feature.group,com.windowtester.runtime.feature.group,${topLevelElementId}.feature.group" />
+			<param name="p2.repo" value="${studio3.p2.repo},${windowtester.p2.repo},file:${deploy.dir}" />
 		</antcall>
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.6.0.v201006080911/plugin_customization.ini">
