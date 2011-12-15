@@ -178,6 +178,16 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	}
 
 	/**
+	 * getContextInformation
+	 * 
+	 * @return
+	 */
+	protected IContextInformation getContextInformation()
+	{
+		return _contextInformation;
+	}
+
+	/**
 	 * getCurrentTheme
 	 * 
 	 * @return
