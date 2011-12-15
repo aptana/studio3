@@ -54,6 +54,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -612,7 +613,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getContentType(textViewer.getDocument(), offset);
 			EvaluationContext context = new EvaluationContext(null, textViewer);
-			context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
+			IWorkbenchPartSite site = fTextEditor.getSite();
+			if (site != null)
+			{
+				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, site.getId());
+			}
 			for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers())
 			{
 				if (descriptor.isEnabledFor(contentType, context))
