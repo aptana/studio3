@@ -10,6 +10,7 @@ package com.aptana.theme.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -206,10 +207,11 @@ class TreeThemer extends ControlThemer
 	private void addCustomTreeControlDrawing()
 	{
 		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
-		if (isMacOSX)
+		if (isMacOSX || isUbuntu)
 		{
 			return;
 		}
+		
 		// FIXME The native control/arrow still shows through on OpenSuSE 11.4
 		final Tree tree = getTree();
 		customDrawingListener = new Listener()
