@@ -11,11 +11,11 @@ import java.util.Map;
 
 /**
  * @author Max Stepanov
- *
  */
 @SuppressWarnings("nls")
-public class MimeTypesRegistry {
-	
+public class MimeTypesRegistry
+{
+
 	private final static String TEXT_HTML = "text/html"; //$NON-NLS-1$
 
 	public static final MimeTypesRegistry INSTANCE = new MimeTypesRegistry();
@@ -25,53 +25,9 @@ public class MimeTypesRegistry {
 	/**
 	 * 
 	 */
-	private MimeTypesRegistry() {
+	private MimeTypesRegistry()
+	{
 		map(TEXT_HTML, "html", "htm", "xhtml", "stm");
-		map("image/bmp", "bmp");
-		map("image/cis-cod", "cod");
-		map("image/gif", "gif");
-		map("image/ief", "ief");
-		map("image/jpeg", "jpg", "jpeg", "jpe");
-		map("image/pipeg", "jfif");
-		map("image/png", "png");
-		map("image/svg+xml", "svg");
-		map("image/tiff", "tiff", "tif");
-		map("image/x-cmu-raster", "ras");
-		map("image/x-cmx", "cmx");
-		map("image/x-icon", "ico");
-		map("image/x-portable-anymap", "pnm");
-		map("image/x-portable-bitmap", "pbm");
-		map("image/x-portable-graymap", "pgm");
-		map("image/x-portable-pixmap", "ppm");
-		map("image/x-rgb", "rgb");
-		map("image/x-xbitmap", "xbm");
-		map("image/x-xpixmap", "xpm");
-		map("image/x-xwindowdump", "xwd");
-		map("text/css", "css");
-		map("text/h323", "323");
-		map("text/iuls", "uls");
-		map("text/plain", "bas", "c", "h", "txt");
-		map("text/richtext", "rtx");
-		map("text/scriptlet", "sct");
-		map("text/tab-separated-values", "tsv");
-		map("text/webviewhtml", "htt");
-		map("text/x-component", "htc");
-		map("text/x-setext", "etx");
-		map("text/x-vcard", "vcf");
-		map("video/mpeg", "mp2", "mpa", "mpe", "mpeg", "mpg", "mpv2");
-		map("video/quicktime", "mov", "qt");
-		map("video/x-la-asf", "lsf", "lsx");
-		map("video/x-ms-asf", "asf", "asr", "asx");
-		map("video/x-msvideo", "avi");
-		map("video/ogg", "ogg");
-		map("video/x-sgi-movie", "movie");
-		map("audio/basic", "au", "snd");
-		map("audio/mid", "mid", "rmi");
-		map("audio/mpeg", "mp3");
-		map("audio/x-aiff", "aif", "aifc", "aiff");
-		map("audio/x-mpegurl", "m3u");
-		map("audio/x-pn-realaudio", "ra", "ram");
-		map("audio/x-wav", "wav");
 		map("application/envoy", "evy");
 		map("application/fractals", "fif");
 		map("application/futuresplash", "spl");
@@ -152,22 +108,72 @@ public class MimeTypesRegistry {
 		map("application/x-x509-ca-cert", "cer", "crt", "der");
 		map("application/ynd.ms-pkipko", "pko");
 		map("application/zip", "zip");
+		map("audio/basic", "au", "snd");
+		map("audio/mid", "mid", "rmi");
+		map("audio/mpeg", "mp3");
+		map("audio/x-aiff", "aif", "aifc", "aiff");
+		map("audio/x-mpegurl", "m3u");
+		map("audio/x-pn-realaudio", "ra", "ram");
+		map("audio/x-wav", "wav");
+		map("image/bmp", "bmp");
+		map("image/cis-cod", "cod");
+		map("image/gif", "gif");
+		map("image/ief", "ief");
+		map("image/jpeg", "jpg", "jpeg", "jpe");
+		map("image/pipeg", "jfif");
+		map("image/png", "png");
+		map("image/svg+xml", "svg");
+		map("image/tiff", "tiff", "tif");
+		map("image/x-cmu-raster", "ras");
+		map("image/x-cmx", "cmx");
+		map("image/x-icon", "ico");
+		map("image/x-portable-anymap", "pnm");
+		map("image/x-portable-bitmap", "pbm");
+		map("image/x-portable-graymap", "pgm");
+		map("image/x-portable-pixmap", "ppm");
+		map("image/x-rgb", "rgb");
+		map("image/x-xbitmap", "xbm");
+		map("image/x-xpixmap", "xpm");
+		map("image/x-xwindowdump", "xwd");
+		map("text/css", "css");
+		map("text/h323", "323");
+		map("text/iuls", "uls");
+		map("text/plain", "bas", "c", "h", "txt");
+		map("text/richtext", "rtx");
+		map("text/scriptlet", "sct");
+		map("text/tab-separated-values", "tsv");
+		map("text/webviewhtml", "htt");
+		map("text/x-component", "htc");
+		map("text/x-setext", "etx");
+		map("text/x-vcard", "vcf");
+		map("video/mpeg", "mp2", "mpa", "mpe", "mpeg", "mpg", "mpv2");
+		map("video/ogg", "ogg");
+		map("video/quicktime", "mov", "qt");
+		map("video/x-la-asf", "lsf", "lsx");
+		map("video/x-ms-asf", "asf", "asr", "asx");
+		map("video/x-msvideo", "avi");
+		map("video/x-sgi-movie", "movie");
 	}
-	
-	private void map(String mimeType, String...extensions) {
-		for (String extension : extensions) {
+
+	private void map(String mimeType, String... extensions)
+	{
+		for (String extension : extensions)
+		{
 			map.put(extension, mimeType);
 		}
 	}
 
 	/**
 	 * Returns mime type for the given extension
+	 * 
 	 * @param extension
 	 * @return
 	 */
-	public String getMimeType(String extension) {
+	public String getMimeType(String extension)
+	{
 		String mimeType = map.get(extension);
-		if (mimeType != null) {
+		if (mimeType != null)
+		{
 			return mimeType;
 		}
 		return TEXT_HTML;
