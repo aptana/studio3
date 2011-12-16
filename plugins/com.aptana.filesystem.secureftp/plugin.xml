@@ -28,5 +28,14 @@
          </run>
       </filesystem>
    </extension>
+   <extension
+         point="org.eclipse.core.filesystem.filesystems">
+      <filesystem
+            scheme="ftps">
+         <run
+               class="com.aptana.filesystem.secureftp.FTPSFileSystem">
+         </run>
+      </filesystem>
+   </extension>
 
 </plugin>
