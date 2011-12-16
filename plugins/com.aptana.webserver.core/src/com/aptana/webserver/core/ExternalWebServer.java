@@ -162,6 +162,7 @@ public class ExternalWebServer extends SimpleWebServer
 				// ignore
 			}
 			fLaunch = new Launch(null, ILaunchManager.RUN_MODE, null);
+			fLaunch.setAttribute(DebugPlugin.ATTR_LAUNCH_TIMESTAMP, Long.toString(System.currentTimeMillis()));
 			getLaunchManager().addLaunch(fLaunch);
 			process = DebugPlugin.newProcess(fLaunch, p,
 					MessageFormat.format("{0} - {1}", getType().getName(), getName())); //$NON-NLS-1$

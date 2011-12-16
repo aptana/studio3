@@ -177,7 +177,8 @@ class S3FileStore extends FileStore
 		{
 			info.setExists(true);
 			info.setDirectory(true);
-			info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+			info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+			info.setAttribute(EFS.ATTRIBUTE_GROUP_EXECUTE, true);
 		}
 		else if (isBucket())
 		{
@@ -187,7 +188,7 @@ class S3FileStore extends FileStore
 				boolean exists = getAWSConnection().checkBucketExists(getBucket());
 				info.setExists(exists);
 				info.setDirectory(true);
-				info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+				info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 			}
 			catch (IOException e)
 			{
@@ -232,7 +233,7 @@ class S3FileStore extends FileStore
 						info.setExists(true);
 						info.setLastModified(System.currentTimeMillis());
 						info.setLength(EFS.NONE);
-						info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+						info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 					}
 				}
 			}

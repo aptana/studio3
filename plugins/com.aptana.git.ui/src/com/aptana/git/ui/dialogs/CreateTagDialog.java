@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.fieldassist.ComboContentAdapter;
+import org.eclipse.jface.fieldassist.ContentProposal;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -227,45 +228,10 @@ public class CreateTagDialog extends StatusDialog
 				String msg = commitMessage(commit);
 				if (msg.indexOf(contents) != -1)
 				{
-					list.add(new SimpleContentProposal(msg));
+					list.add(new ContentProposal(msg));
 				}
 			}
-			return (IContentProposal[]) list.toArray(new IContentProposal[list.size()]);
-		}
-	}
-
-	/**
-	 * Simplest implementation of {@link IContentProposal}
-	 * 
-	 * @author cwilliams
-	 */
-	private static class SimpleContentProposal implements IContentProposal
-	{
-		private String msg;
-
-		private SimpleContentProposal(String msg)
-		{
-			this.msg = msg;
-		}
-
-		public String getContent()
-		{
-			return msg;
-		}
-
-		public int getCursorPosition()
-		{
-			return msg.length();
-		}
-
-		public String getDescription()
-		{
-			return null;
-		}
-
-		public String getLabel()
-		{
-			return msg;
+			return list.toArray(new IContentProposal[list.size()]);
 		}
 	}
 }
