@@ -1090,8 +1090,8 @@ public class FilteringProjectView extends GitProjectView
 			{
 				// Paint the down arrow
 				GC gc = event.gc;
-				final int width = 5;
-				int x = 16;
+				final int width = 7;
+				int x = 15;
 				int y = 10;
 				if (Platform.getOS().equals(Platform.OS_WIN32)) // On windows, we need to draw on right side
 				{
@@ -1107,7 +1107,7 @@ public class FilteringProjectView extends GitProjectView
 
 				Color bg = gc.getBackground();
 				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				gc.fillPolygon(new int[] { x, y, x + width, y, x + (width / 2), y + width - 1 });
+				gc.fillPolygon(new int[] { x, y, x + width - 1, y, x + ((width - 1) / 2), y + ((width - 1) / 2) });
 				gc.setBackground(bg);
 			}
 		});
