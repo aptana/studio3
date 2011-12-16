@@ -213,7 +213,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		Script script = frame.getScript();
 		// Filter internal API frames
 		if (currentContext.getState() == State.NORMAL && isScriptFiltered(script)) {
-			continueVm(SUSPEND.equals(suspendReason) ? StepAction.IN : StepAction.OUT, 1);
+			continueVm(SUSPEND.equals(suspendReason) ? StepAction.IN : (currentFrames.size() > 1 ? StepAction.OUT : StepAction.CONTINUE), 1);
 			return;
 		}
 		List<CallFrame> filteredFrames = new ArrayList<CallFrame>();
@@ -257,7 +257,9 @@ public class V8DebugHost extends AbstractDebugHost {
 			} else if (STEP_OVER.equals(resumeReason)) {
 				continueVm(StepAction.OVER, 1);
 			} else if (STEP_RETURN.equals(resumeReason)) {
-				continueVm(StepAction.OUT, 1);
+				int count = targetFrameCount;
+				targetFrameCount = 1;
+				continueVm(StepAction.OUT, count);
 			} else if (!ABORT.equals(reason)) {
 				continueVm(StepAction.CONTINUE, 0);
 			}
