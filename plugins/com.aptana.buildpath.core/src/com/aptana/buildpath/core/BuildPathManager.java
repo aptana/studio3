@@ -310,7 +310,9 @@ public class BuildPathManager
 
 		if (project != null && entry != null)
 		{
-			getBuildPaths(project).contains(entry);
+			Set<BuildPathEntry> buildPathSet = getBuildPaths(project);
+
+			result = buildPathSet.contains(entry);
 		}
 
 		return result;
