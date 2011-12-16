@@ -528,4 +528,14 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	{
 		return true;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return getDisplayString();
+	}
 }
