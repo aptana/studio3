@@ -74,6 +74,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
 import com.aptana.explorer.ui.filter.PathFilter;
@@ -1101,8 +1102,17 @@ public class FilteringProjectView extends GitProjectView
 				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still
 																		// doesn't overlap magnifying glass)
 				{
-					x = 0;
-					y = 15;
+					//For Ubuntu, draw the down arrow below the text. That is better than right in the middle of the text
+					if (PlatformUtil.isOSName("Ubuntu")) //$NON-NLS-1$
+					{
+						x = 0;
+						y = 17;
+					}
+					else
+					{
+						x = 0;
+						y = 15;
+					}
 				}
 
 				Color bg = gc.getBackground();
