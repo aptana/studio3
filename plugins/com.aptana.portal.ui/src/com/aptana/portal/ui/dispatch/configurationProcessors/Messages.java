@@ -11,10 +11,13 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
+
 	private static final String BUNDLE_NAME = "com.aptana.portal.ui.dispatch.configurationProcessors.messages"; //$NON-NLS-1$
+
 	public static String GemsConfigurationProcessor_errorInvokingGemList;
 	public static String GemsConfigurationProcessor_missingShellError;
 	public static String GemsConfigurationProcessor_wrongGemsRequest;
+
 	public static String ImportJavaScriptLibraryDialog_emptyPathError;
 	public static String ImportJavaScriptLibraryDialog_folderSelectionDialogMessage;
 	public static String ImportJavaScriptLibraryDialog_folderSelectionDialogTitle;
@@ -24,13 +27,14 @@ public class Messages extends NLS
 	public static String ImportJavaScriptLibraryDialog_projectLable;
 	public static String ImportJavaScriptLibraryDialog_useDefaultLocation;
 	public static String ImportJavaScriptLibraryDialog_wrongProjectRootError;
+
 	public static String InstallerConfigurationProcessor_emptyURLsArrayError;
 	public static String InstallerConfigurationProcessor_expectedArrayError;
 	public static String InstallerConfigurationProcessor_expectedMapError;
 	public static String InstallerConfigurationProcessor_expectedURLsArrayError;
 	public static String InstallerConfigurationProcessor_unableToExtractZip;
+
 	public static String InstallProcessor_couldNotLocateInstaller;
-	public static String InstallProcessor_browse;
 	public static String InstallProcessor_corruptedZip;
 	public static String InstallProcessor_couldNotLocatePackage;
 	public static String InstallProcessor_errorWhileInstalling;
@@ -56,6 +60,7 @@ public class Messages extends NLS
 	public static String InstallProcessor_updatingTaskName;
 	public static String InstallProcessor_InstallForAllUsers;
 	public static String InstallProcessor_wrongNumberOfInstallLinks;
+
 	public static String InstallerConfigurationProcessor_missingAttributeMap;
 	public static String InstallerConfigurationProcessor_missingDownloadTargets;
 	public static String InstallerOptionsDialog_creatingDirectoriesErrorMessage;
@@ -63,6 +68,7 @@ public class Messages extends NLS
 	public static String InstallerOptionsDialog_emptyPathError;
 	public static String InstallerOptionsDialog_inputDirectoryWillBeCreated;
 	public static String InstallerOptionsDialog_nonExistingPathError;
+
 	public static String JSLibraryInstallProcessor_directoriesCreationFailed;
 	public static String JSLibraryInstallProcessor_directorySelection;
 	public static String JSLibraryInstallProcessor_fileConflictMessage;
@@ -70,12 +76,14 @@ public class Messages extends NLS
 	public static String JSLibraryInstallProcessor_multipleErrorsWhileImportingJS;
 	public static String JSLibraryInstallProcessor_overwriteQuestion;
 	public static String JSLibraryInstallProcessor_unexpectedNull;
+
 	public static String InstallProcessor_aptanaInstallationComment;
 	public static String SystemConfigurationProcessor_missingConfigurationItems;
 	public static String SystemConfigurationProcessor_noShellCommandPath;
 	public static String SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
 	public static String XAMPPInstallProcessor_executeXAMPPAutoSetup;
 	public static String XAMPPInstallProcessor_openXAMPPConsoleJobName;
+
 	static
 	{
 		// initialize resource bundle

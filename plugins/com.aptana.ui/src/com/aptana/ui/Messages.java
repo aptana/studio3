@@ -17,9 +17,7 @@ public class Messages extends NLS
 	public static String DialogUtils_HideMessage;
 
 	public static String IDialogConstants_LBL_Apply;
-	public static String IDialogConstants_LBL_Browse;
 	public static String IDialogConstants_LBL_Overwrite;
-	public static String IDialogConstants_LBL_Rename;
 
 	public static String QuickMenuDialog_NoMatchesFound;
 

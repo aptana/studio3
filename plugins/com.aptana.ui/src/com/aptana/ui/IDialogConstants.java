@@ -5,20 +5,22 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.ui;
+
+import com.aptana.core.CoreStrings;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IDialogConstants extends org.eclipse.jface.dialogs.IDialogConstants {
+public interface IDialogConstants extends org.eclipse.jface.dialogs.IDialogConstants
+{
 
-    public static final int APPLY_ID = 31;
-    public static final int BROWSE_ID = 32;
-    
-    public static final String APPLY_LABEL = Messages.IDialogConstants_LBL_Apply;
-    public static final String BROWSE_LABEL = Messages.IDialogConstants_LBL_Browse;
-    public static final String OVERWRITE_LABEL = Messages.IDialogConstants_LBL_Overwrite;
-    public static final String RENAME_LABEL = Messages.IDialogConstants_LBL_Rename;
+	public static final int APPLY_ID = 31;
+	public static final int BROWSE_ID = 32;
+
+	public static final String APPLY_LABEL = Messages.IDialogConstants_LBL_Apply;
+	public static final String BROWSE_LABEL = StringUtil.ellipsify(CoreStrings.BROWSE);
+	public static final String OVERWRITE_LABEL = Messages.IDialogConstants_LBL_Overwrite;
+	public static final String RENAME_LABEL = CoreStrings.RENAME;
 }

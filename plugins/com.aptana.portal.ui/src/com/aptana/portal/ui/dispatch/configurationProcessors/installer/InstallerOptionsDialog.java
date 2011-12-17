@@ -33,6 +33,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.CoreStrings;
+import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.dispatch.configurationProcessors.Messages;
 
 /**
@@ -177,7 +179,7 @@ public abstract class InstallerOptionsDialog extends TitleAreaDialog
 			}
 		});
 		Button browse = new Button(installLocation, SWT.PUSH);
-		browse.setText(Messages.InstallProcessor_browse);
+		browse.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
 		browse.addSelectionListener(new SelectionAdapter()
 		{
 			@Override

@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import com.aptana.browser.internal.BrowserBackgroundImage;
 import com.aptana.browser.internal.BrowserSize;
 import com.aptana.browser.internal.BrowserSizeCategory;
+import com.aptana.core.CoreStrings;
 import com.aptana.swt.webkitbrowser.OpenWindowEvent;
 import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
@@ -399,7 +400,7 @@ public class WebBrowserViewer extends Composite {
 				browser.stop();
 			}
 		};
-		refreshAction = new Action(Messages.WebBrowserViewer_LBL_Refresh) {
+		refreshAction = new Action(CoreStrings.REFRESH) {
 			{
 				setToolTipText(Messages.WebBrowserViewer_TTP_Refresh);
 				setImageDescriptor(ImageResource
