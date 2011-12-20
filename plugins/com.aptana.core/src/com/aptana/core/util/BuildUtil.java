@@ -10,6 +10,7 @@ package com.aptana.core.util;
 import java.util.Map;
 
 import org.eclipse.core.internal.events.BuildManager;
+import org.eclipse.core.internal.resources.BuildConfiguration;
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -48,7 +49,7 @@ public class BuildUtil
 		{
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			BuildManager buildManager = ((Workspace) workspace).getBuildManager();
-			return buildManager.build(project, kind, builderName, args, monitor);
+			return buildManager.build(new BuildConfiguration(project), kind, builderName, args, monitor);
 		}
 		catch (IllegalStateException e)
 		{
