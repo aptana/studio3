@@ -7,10 +7,10 @@
  */
 package com.aptana.core.util;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.eclipse.core.internal.events.BuildManager;
-import org.eclipse.core.internal.resources.BuildConfiguration;
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -32,6 +32,9 @@ import com.aptana.core.CorePlugin;
 @SuppressWarnings({ "rawtypes", "restriction" })
 public class BuildUtil
 {
+	private static final String BUILD_METHOD_NAME = "build"; //$NON-NLS-1$
+	private static final String BUILD_CONFIGURATION_37_CLASS_NAME = "org.eclipse.core.internal.resources.BuildConfiguration"; //$NON-NLS-1$
+
 	/**
 	 * Synchronous run of a builder with the given name on the given project.
 	 * 
@@ -47,14 +50,70 @@ public class BuildUtil
 	{
 		try
 		{
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			BuildManager buildManager = ((Workspace) workspace).getBuildManager();
-			return buildManager.build(new BuildConfiguration(project), kind, builderName, args, monitor);
+			Class buildConfigurationClass = null;
+			try
+			{
+				buildConfigurationClass = Class.forName(BUILD_CONFIGURATION_37_CLASS_NAME);
+			}
+			catch (Throwable t)
+			{
+				// ignore
+			}
+			if (buildConfigurationClass == null)
+			{
+				return syncBuild36(project, kind, builderName, args, monitor);
+			}
+			else
+			{
+				return syncBuild37(project, kind, builderName, args, monitor);
+			}
 		}
-		catch (IllegalStateException e)
+		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error while getting the Workspace", e); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error while invoking a synchronous builder", e); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Sync build on an Eclipse 3.6
+	 * 
+	 * @param project
+	 * @param kind
+	 * @param builderName
+	 * @param args
+	 * @param monitor
+	 * @throws Exception
+	 */
+	private static IStatus syncBuild36(IProject project, int kind, String builderName, Map args,
+			IProgressMonitor monitor) throws Exception
+	{
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		BuildManager buildManager = ((Workspace) workspace).getBuildManager();
+		Method buildMethod = buildManager.getClass().getMethod(BUILD_METHOD_NAME, IProject.class, Integer.TYPE,
+				String.class, Map.class, IProgressMonitor.class);
+		return (IStatus) buildMethod.invoke(buildManager, project, kind, builderName, args, monitor);
+	}
+
+	/**
+	 * Sync build on an Eclipse 3.7
+	 * 
+	 * @param project
+	 * @param kind
+	 * @param builderName
+	 * @param args
+	 * @param monitor
+	 * @throws Exception
+	 */
+	private static IStatus syncBuild37(IProject project, int kind, String builderName, Map args,
+			IProgressMonitor monitor) throws Exception
+	{
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		BuildManager buildManager = ((Workspace) workspace).getBuildManager();
+		Class buildConfigurationClass = Class.forName(BUILD_CONFIGURATION_37_CLASS_NAME);
+		Method buildMethod = buildManager.getClass().getMethod(BUILD_METHOD_NAME, buildConfigurationClass, Integer.TYPE,
+				String.class, Map.class, IProgressMonitor.class);
+		Object buildConfigurationInstance = buildConfigurationClass.getConstructor(IProject.class).newInstance(project);
+		return (IStatus) buildMethod.invoke(buildManager, buildConfigurationInstance, kind, builderName, args, monitor);
 	}
 
 	/**
