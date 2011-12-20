@@ -34,6 +34,18 @@ public class BuildUtil
 {
 	private static final String BUILD_METHOD_NAME = "build"; //$NON-NLS-1$
 	private static final String BUILD_CONFIGURATION_37_CLASS_NAME = "org.eclipse.core.internal.resources.BuildConfiguration"; //$NON-NLS-1$
+	private static Class buildConfigurationClass;
+	static
+	{
+		try
+		{
+			buildConfigurationClass = Class.forName(BUILD_CONFIGURATION_37_CLASS_NAME);
+		}
+		catch (Throwable t)
+		{
+			// ignore
+		}
+	}
 
 	/**
 	 * Synchronous run of a builder with the given name on the given project.
@@ -50,15 +62,6 @@ public class BuildUtil
 	{
 		try
 		{
-			Class buildConfigurationClass = null;
-			try
-			{
-				buildConfigurationClass = Class.forName(BUILD_CONFIGURATION_37_CLASS_NAME);
-			}
-			catch (Throwable t)
-			{
-				// ignore
-			}
 			if (buildConfigurationClass == null)
 			{
 				return syncBuild36(project, kind, builderName, args, monitor);
@@ -109,9 +112,8 @@ public class BuildUtil
 	{
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		BuildManager buildManager = ((Workspace) workspace).getBuildManager();
-		Class buildConfigurationClass = Class.forName(BUILD_CONFIGURATION_37_CLASS_NAME);
-		Method buildMethod = buildManager.getClass().getMethod(BUILD_METHOD_NAME, buildConfigurationClass, Integer.TYPE,
-				String.class, Map.class, IProgressMonitor.class);
+		Method buildMethod = buildManager.getClass().getMethod(BUILD_METHOD_NAME, buildConfigurationClass,
+				Integer.TYPE, String.class, Map.class, IProgressMonitor.class);
 		Object buildConfigurationInstance = buildConfigurationClass.getConstructor(IProject.class).newInstance(project);
 		return (IStatus) buildMethod.invoke(buildManager, buildConfigurationInstance, kind, builderName, args, monitor);
 	}
