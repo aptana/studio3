@@ -12,11 +12,15 @@ import java.util.Map;
 import org.eclipse.core.internal.events.BuildManager;
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
+import com.aptana.core.CorePlugin;
 
 /**
  * Build utilities class. <br>
@@ -40,8 +44,16 @@ public class BuildUtil
 	 */
 	public static IStatus syncBuild(IProject project, int kind, String builderName, Map args, IProgressMonitor monitor)
 	{
-		BuildManager buildManager = ((Workspace) ResourcesPlugin.getWorkspace()).getBuildManager();
-		return buildManager.build(project, kind, builderName, args, monitor);
+		try
+		{
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			BuildManager buildManager = ((Workspace) workspace).getBuildManager();
+			return buildManager.build(project, kind, builderName, args, monitor);
+		}
+		catch (IllegalStateException e)
+		{
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error while getting the Workspace", e); //$NON-NLS-1$
+		}
 	}
 
 	/**
