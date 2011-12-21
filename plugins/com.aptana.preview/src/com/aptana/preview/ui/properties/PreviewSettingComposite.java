@@ -78,7 +78,7 @@ public class PreviewSettingComposite extends Composite implements SelectionListe
 	public PreviewSettingComposite(Composite parent)
 	{
 		super(parent, SWT.NONE);
-		setLayout(GridLayoutFactory.fillDefaults().create());
+		setLayout(GridLayoutFactory.fillDefaults().spacing(5, 0).create());
 		fListeners = new ArrayList<Listener>();
 
 		fNoSettingRadio = new Button(this, SWT.RADIO);
