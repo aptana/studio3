@@ -47,7 +47,8 @@ import com.aptana.ui.util.UIUtils;
 @SuppressWarnings("restriction")
 public class EditorUtil
 {
-	public static final int DEFAULT_SPACE_INDENT_SIZE = 2;
+
+	protected static final int DEFAULT_SPACE_INDENT_SIZE = 2;
 
 	/**
 	 * Retrieves the indentation settings for the current editor, or falls back on default settings if the current
@@ -135,15 +136,17 @@ public class EditorUtil
 	public static IEditorDescriptor getEditorDescriptor(URI uri)
 	{
 		// NOTE: Moved from PHP's EditorUtils
-		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
-		if (uri.getPath() == null || uri.getPath().equals("/") || uri.getPath().trim().equals("")) //$NON-NLS-1$ //$NON-NLS-2$
+		String uriPath = uri.getPath();
+		if (StringUtil.isEmpty(uriPath) || uriPath.equals("/")) //$NON-NLS-1$
+		{
 			return null;
-		IPath path = new Path(uri.getPath());
-		return editorReg.getDefaultEditor(path.lastSegment());
+		}
+		IPath path = new Path(uriPath);
+		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(path.lastSegment());
 	}
 
 	/**
-	 * Get the indexing associated with the editor.
+	 * Gets the indexing associated with the editor.
 	 * 
 	 * @param editor
 	 * @return
@@ -182,7 +185,7 @@ public class EditorUtil
 	}
 
 	/**
-	 * Get the URI associated with the editor.
+	 * Gets the URI associated with the editor.
 	 * 
 	 * @param editor
 	 * @return
@@ -235,16 +238,10 @@ public class EditorUtil
 		{
 			URI uri = file.toURI();
 			IEditorDescriptor desc = getEditorDescriptor(uri);
+			String editorId = (desc == null) ? IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID : desc.getId();
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-			if (desc == null)
-			{
-				return IDE.openEditor(page, uri, IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID, true);
-			}
-			else
-			{
-				return IDE.openEditor(page, uri, desc.getId(), true);
-			}
+			return IDE.openEditor(page, uri, editorId, true);
 		}
 		catch (Exception e)
 		{
@@ -254,15 +251,14 @@ public class EditorUtil
 	}
 
 	/**
-	 * getProject
+	 * Returns the project that the file for the editor belongs.
 	 * 
 	 * @param editor
-	 * @return
+	 *            a file editor
+	 * @return the project the editor belongs
 	 */
 	public static IProject getProject(AbstractThemeableEditor editor)
 	{
-		IProject result = null;
-
 		if (editor != null)
 		{
 			IEditorInput editorInput = editor.getEditorInput();
@@ -270,29 +266,21 @@ public class EditorUtil
 			if (editorInput instanceof IFileEditorInput)
 			{
 				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-				IFile file = fileEditorInput.getFile();
-				result = file.getProject();
+				return fileEditorInput.getFile().getProject();
 			}
 		}
 
-		return result;
+		return null;
 	}
 
 	/**
-	 * getProjectURI
+	 * Gets the project URI associated with the editor.
 	 * 
-	 * @return
+	 * @return the project URI
 	 */
 	public static URI getProjectURI(AbstractThemeableEditor editor)
 	{
 		IProject project = getProject(editor);
-		URI result = null;
-
-		if (project != null)
-		{
-			result = project.getLocationURI();
-		}
-
-		return result;
+		return (project == null) ? null : project.getLocationURI();
 	}
 }
