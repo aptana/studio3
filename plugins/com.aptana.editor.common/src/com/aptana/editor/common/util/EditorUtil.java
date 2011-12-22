@@ -7,14 +7,34 @@
  */
 package com.aptana.editor.common.util;
 
+import java.io.File;
+import java.net.URI;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -102,4 +122,165 @@ public class EditorUtil
 		return indent;
 	}
 
+	/**
+	 * Returns the editor descriptor for the given URI. The editor descriptor is computed by the last segment of the URI
+	 * (the file name).
+	 * 
+	 * @param uri
+	 *            A file URI
+	 * @return the descriptor of the default editor, or null if not found
+	 */
+	public static IEditorDescriptor getEditorDescriptor(URI uri)
+	{
+		// NOTE: Moved from PHP's EditorUtils
+		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
+		if (uri.getPath() == null || uri.getPath().equals("/") || uri.getPath().trim().equals("")) //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		IPath path = new Path(uri.getPath());
+		return editorReg.getDefaultEditor(path.lastSegment());
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @param editor
+	 * @return
+	 */
+	public static Index getIndex(AbstractThemeableEditor editor)
+	{
+		// NOTE: Moved from CommonContentAssistProcessor
+		Index result = null;
+
+		if (editor != null)
+		{
+			IEditorInput editorInput = editor.getEditorInput();
+
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				IFile file = fileEditorInput.getFile();
+				IProject project = file.getProject();
+
+				result = IndexManager.getInstance().getIndex(project.getLocationURI());
+			}
+			else if (editorInput instanceof IURIEditorInput)
+			{
+				IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
+				URI uri = uriEditorInput.getURI();
+
+				// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
+				result = IndexManager.getInstance().getIndex(uri);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getURI
+	 * 
+	 * @param editor
+	 * @return
+	 */
+	public static URI getURI(AbstractThemeableEditor editor)
+	{
+		// NOTE: Moved from CommonContentAssistProcessor
+		URI result = null;
+
+		if (editor != null)
+		{
+			IEditorInput editorInput = editor.getEditorInput();
+
+			if (editorInput instanceof IURIEditorInput)
+			{
+				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+
+				result = fileEditorInput.getURI();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Open a file in an editor and return the opened editor part.<br>
+	 * This method will try to open the file in an internal editor, unless there is no editor descriptor assigned to
+	 * that file type.
+	 * 
+	 * @param file
+	 * @return The {@link IEditorPart} that was created when the file was opened; Return null in case of an error
+	 */
+	public static IEditorPart openInEditor(File file)
+	{
+		// NOTE: Moved from PHP's EditorUtils
+		if (file == null)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(),
+					"Error open a file in the editor", new IllegalArgumentException("file is null")); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		try
+		{
+			URI uri = file.toURI();
+			IEditorDescriptor desc = getEditorDescriptor(uri);
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+			if (desc == null)
+			{
+				return IDE.openEditor(page, uri, IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID, true);
+			}
+			else
+			{
+				return IDE.openEditor(page, uri, desc.getId(), true);
+			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CommonEditorPlugin.getDefault(), "Error open a file in the editor", e); //$NON-NLS-1$
+		}
+		return null;
+	}
+
+	/**
+	 * getProject
+	 * 
+	 * @param editor
+	 * @return
+	 */
+	public static IProject getProject(AbstractThemeableEditor editor)
+	{
+		IProject result = null;
+
+		if (editor != null)
+		{
+			IEditorInput editorInput = editor.getEditorInput();
+
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				IFile file = fileEditorInput.getFile();
+				result = file.getProject();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getProjectURI
+	 * 
+	 * @return
+	 */
+	public static URI getProjectURI(AbstractThemeableEditor editor)
+	{
+		IProject project = getProject(editor);
+		URI result = null;
+
+		if (project != null)
+		{
+			result = project.getLocationURI();
+		}
+
+		return result;
+	}
 }

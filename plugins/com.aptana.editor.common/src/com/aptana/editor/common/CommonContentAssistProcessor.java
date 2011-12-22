@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PerformanceStats;
@@ -43,9 +42,6 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
 import org.jruby.Ruby;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
@@ -64,8 +60,8 @@ import com.aptana.editor.common.contentassist.UserAgentFilterType;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 import com.aptana.parsing.IParseState;
@@ -229,7 +225,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			Image image = CommonEditorPlugin.getImage(DEFAULT_IMAGE);
 			if (element instanceof RubyHash)
 			{
-				Map hash = (RubyHash) element;
+				Map<?, ?> hash = (RubyHash) element;
 				if (!hash.containsKey(insertSymbol))
 				{
 					continue;
@@ -607,28 +603,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected Index getIndex()
 	{
-		if (editor == null)
-		{
-			return null;
-		}
-		IEditorInput editorInput = editor.getEditorInput();
-		Index result = null;
-		if (editorInput instanceof IFileEditorInput)
-		{
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile file = fileEditorInput.getFile();
-			IProject project = file.getProject();
-			result = IndexManager.getInstance().getIndex(project.getLocationURI());
-		}
-		else if (editorInput instanceof IURIEditorInput)
-		{
-			IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
-			URI uri = uriEditorInput.getURI();
-			// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
-			result = IndexManager.getInstance().getIndex(uri);
-		}
-
-		return result;
+		return EditorUtil.getIndex(editor);
 	}
 
 	/**
@@ -678,23 +653,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		return null;
 	}
 
+	/**
+	 * getProject
+	 * 
+	 * @return
+	 */
 	protected IProject getProject()
 	{
-		IProject result = null;
-
-		if (editor != null)
-		{
-			IEditorInput editorInput = editor.getEditorInput();
-
-			if (editorInput instanceof IFileEditorInput)
-			{
-				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-				IFile file = fileEditorInput.getFile();
-				result = file.getProject();
-			}
-		}
-
-		return result;
+		return EditorUtil.getProject(editor);
 	}
 
 	/**
@@ -704,15 +670,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected URI getProjectURI()
 	{
-		URI result = null;
-
-		IProject project = getProject();
-		if (project != null)
-		{
-			result = project.getLocationURI();
-		}
-
-		return result;
+		return EditorUtil.getProjectURI(editor);
 	}
 
 	/*
@@ -730,16 +688,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected URI getURI()
 	{
-		if (editor != null)
-		{
-			IEditorInput editorInput = editor.getEditorInput();
-			if (editorInput instanceof IURIEditorInput)
-			{
-				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-				return fileEditorInput.getURI();
-			}
-		}
-		return null;
+		return EditorUtil.getURI(editor);
 	}
 
 	/**
