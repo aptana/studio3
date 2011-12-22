@@ -5,7 +5,6 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.editor.common.preferences;
 
 import java.util.ArrayList;
@@ -96,8 +95,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		fCaseSensitiveButton = new Button(composite, SWT.CHECK);
 		fCaseSensitiveButton.setFont(parent.getFont());
 		fCaseSensitiveButton.setText(Messages.TasksPreferencePage_CaseSensitiveLabel);
-		fCaseSensitiveButton.setSelection(getPreferenceStore()
-.getBoolean(
+		fCaseSensitiveButton.setSelection(getPreferenceStore().getBoolean(
 				ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
 		setButtonLayoutData(fCaseSensitiveButton);
 	}

@@ -51,6 +51,7 @@ import com.aptana.ui.preferences.AptanaPreferencePage;
  */
 public class ContentAssistPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
+
 	private class CategoryLabelProvider extends LabelProvider implements ITableLabelProvider
 	{
 		/**
@@ -102,11 +103,13 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 		Composite parent = getFieldEditorParent();
 
 		// create user agent group
-		Composite uaGroup = AptanaPreferencePage.createGroup(parent, Messages.ContentAssistPreferencePage_UserAgentGroupLabel);
+		Composite uaGroup = AptanaPreferencePage.createGroup(parent,
+				Messages.ContentAssistPreferencePage_UserAgentGroupLabel);
 		createUserAgentGroupContent(uaGroup);
 
 		// create proposal group
-		Composite pGroup = AptanaPreferencePage.createGroup(parent, Messages.ContentAssistPreferencePage_ProposalsGroupLabel);
+		Composite pGroup = AptanaPreferencePage.createGroup(parent,
+				Messages.ContentAssistPreferencePage_ProposalsGroupLabel);
 		createProposalGroupContent(pGroup);
 	}
 

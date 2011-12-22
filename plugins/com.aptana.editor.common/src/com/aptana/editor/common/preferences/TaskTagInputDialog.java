@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.preferences;
 
 import java.util.List;
@@ -20,6 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.resources.TaskTag;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 class TaskTagInputDialog extends StatusDialog
@@ -91,7 +99,7 @@ class TaskTagInputDialog extends StatusDialog
 	{
 		super.create();
 		// Don't enable OK until the user has entered something
-		updateButtonsEnableState(new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, "")); //$NON-NLS-1$
+		updateButtonsEnableState(new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, StringUtil.EMPTY));
 	}
 
 	public TaskTag getTaskTag()
@@ -120,5 +128,4 @@ class TaskTagInputDialog extends StatusDialog
 		// Remove error message
 		updateStatus(Status.OK_STATUS);
 	}
-
 }
