@@ -87,5 +87,21 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.xml.contentMergeViewer"
+            contentTypeId="org.eclipse.core.runtime.xml">
+      </contentTypeBinding>
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.xml.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.xsl">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.xml.internal.XMLMergeViewerCreator"
+            extensions="xml,xsl"
+            id="com.aptana.editor.xml.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

@@ -15,14 +15,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.index.core,
  beaver,
-  com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="3.0.4",
  com.aptana.scripting,
  com.aptana.parsing,
  com.aptana.ui,
  com.aptana.theme,
  com.aptana.editor.common,
  org.mortbay.jetty.util,
- org.w3c.css
+ org.w3c.css,
+ org.eclipse.compare
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

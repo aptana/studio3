@@ -27,5 +27,17 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.markdown.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.markdown">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.markdown.internal.MarkdownMergeViewerCreator"
+            extensions="md, mdown, markdown, markdn"
+            id="com.aptana.editor.markdown.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

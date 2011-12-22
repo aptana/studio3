@@ -33,5 +33,17 @@
             content-type="com.aptana.contenttype.dtd">
       </parser>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.dtd.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.dtd">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.dtd.internal.DTDMergeViewerCreator"
+            extensions="dtd"
+            id="com.aptana.editor.dtd.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

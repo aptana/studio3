@@ -61,5 +61,17 @@
             name="JSON">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.json.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.json">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.json.internal.JSONMergeViewerCreator"
+            extensions="json,jsca"
+            id="com.aptana.editor.json.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.editors,
  com.aptana.editor.common,
- com.aptana.editor.html
+ com.aptana.editor.html,
+ org.eclipse.compare
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

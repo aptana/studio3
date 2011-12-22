@@ -608,6 +608,10 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private List<TextHoverDescriptor> getEnabledTextHoverDescriptors(ITextViewer textViewer, int offset)
 	{
 		List<TextHoverDescriptor> result = new ArrayList<TextHoverDescriptor>();
+		if (fTextEditor == null)
+		{
+			return result;
+		}
 		try
 		{
 			QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()

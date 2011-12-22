@@ -61,5 +61,17 @@
             name="%editor.prefpage.name">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.coffee.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.coffeescript">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.coffee.internal.CoffeeMergeViewerCreator"
+            extensions="coffee"
+            id="com.aptana.editor.coffee.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

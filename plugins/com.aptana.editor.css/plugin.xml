@@ -121,5 +121,17 @@
          </contentType>
       </hover>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.css.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.css">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.css.internal.CSSMergeViewerCreator"
+            extensions="css"
+            id="com.aptana.editor.css.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

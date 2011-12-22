@@ -36,5 +36,17 @@
             class="com.aptana.editor.svg.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.svg.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.svg">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.svg.internal.SVGMergeViewerCreator"
+            extensions="svg"
+            id="com.aptana.editor.svg.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

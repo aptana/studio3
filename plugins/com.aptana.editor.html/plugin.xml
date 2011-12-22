@@ -202,4 +202,16 @@
          </with>
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.html.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.html">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.html.internal.HTMLMergeViewerCreator"
+            extensions="html,htm,xhtml,shtml"
+            id="com.aptana.editor.html.contentMergeViewer">
+      </viewer>
+   </extension>
 </plugin>

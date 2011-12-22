@@ -48,5 +48,17 @@
             class="com.aptana.editor.yaml.preferences.YAMLPreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.yaml.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.yml">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.xml.internal.YMLMergeViewerCreator"
+            extensions="yml,yaml"
+            id="com.aptana.editor.yaml.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>
