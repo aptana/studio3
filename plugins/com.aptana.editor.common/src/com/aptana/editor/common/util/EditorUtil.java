@@ -10,6 +10,7 @@ package com.aptana.editor.common.util;
 import java.io.File;
 import java.net.URI;
 
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -21,6 +22,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -141,7 +143,7 @@ public class EditorUtil
 	}
 
 	/**
-	 * getIndex
+	 * Get the indexing associated with the editor.
 	 * 
 	 * @param editor
 	 * @return
@@ -149,8 +151,6 @@ public class EditorUtil
 	public static Index getIndex(AbstractThemeableEditor editor)
 	{
 		// NOTE: Moved from CommonContentAssistProcessor
-		Index result = null;
-
 		if (editor != null)
 		{
 			IEditorInput editorInput = editor.getEditorInput();
@@ -159,25 +159,30 @@ public class EditorUtil
 			{
 				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 				IFile file = fileEditorInput.getFile();
-				IProject project = file.getProject();
 
-				result = IndexManager.getInstance().getIndex(project.getLocationURI());
+				return IndexManager.getInstance().getIndex(file.getProject().getLocationURI());
 			}
-			else if (editorInput instanceof IURIEditorInput)
+			if (editorInput instanceof IURIEditorInput)
 			{
 				IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
-				URI uri = uriEditorInput.getURI();
 
 				// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
-				result = IndexManager.getInstance().getIndex(uri);
+				return IndexManager.getInstance().getIndex(uriEditorInput.getURI());
+			}
+			if (editorInput instanceof IPathEditorInput)
+			{
+				IPathEditorInput pathEditorInput = (IPathEditorInput) editorInput;
+
+				// FIXME This file may be a child, we need to check to see if there's an index with a parent URI.
+				return IndexManager.getInstance().getIndex(URIUtil.toURI(pathEditorInput.getPath()));
 			}
 		}
 
-		return result;
+		return null;
 	}
 
 	/**
-	 * getURI
+	 * Get the URI associated with the editor.
 	 * 
 	 * @param editor
 	 * @return
@@ -185,21 +190,28 @@ public class EditorUtil
 	public static URI getURI(AbstractThemeableEditor editor)
 	{
 		// NOTE: Moved from CommonContentAssistProcessor
-		URI result = null;
-
 		if (editor != null)
 		{
 			IEditorInput editorInput = editor.getEditorInput();
 
 			if (editorInput instanceof IURIEditorInput)
 			{
-				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-
-				result = fileEditorInput.getURI();
+				IURIEditorInput uriEditorInput = (IURIEditorInput) editorInput;
+				return uriEditorInput.getURI();
+			}
+			if (editorInput instanceof IPathEditorInput)
+			{
+				IPathEditorInput pathEditorInput = (IPathEditorInput) editorInput;
+				return URIUtil.toURI(pathEditorInput.getPath());
+			}
+			if (editorInput instanceof IFileEditorInput)
+			{
+				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+				return fileEditorInput.getFile().getLocationURI();
 			}
 		}
 
-		return result;
+		return null;
 	}
 
 	/**
