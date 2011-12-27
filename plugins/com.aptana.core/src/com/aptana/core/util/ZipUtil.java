@@ -178,9 +178,18 @@ public final class ZipUtil {
 				IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
 				subMonitor.worked(1);
-				if (!entry.isDirectory() && (overwrite || !file.exists())) {
+				if (!entry.isDirectory()) {
+					if (file.exists()) {
+						if (overwrite) {
+							IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Deleting a file/directory before overwrite {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
+							FileUtil.deleteRecursively(file);
+						} else {
+							continue;
+						}
+					}
 					file.getParentFile().mkdirs();
-					if (!file.createNewFile() && !overwrite) {
+					if (!file.createNewFile()) {
+						IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format("Cannot create the file {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 						continue;
 					}
 					boolean symlink = isSymlink(entry);
