@@ -12,9 +12,10 @@
  *******************************************************************************/
 package org.eclipse.jface.text.source;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -49,6 +50,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TypedListener;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.epl.EditorEplPlugin;
+
 
 /**
  * A vertical ruler column displaying line numbers.
@@ -57,6 +61,29 @@ import org.eclipse.swt.widgets.TypedListener;
  * @since 2.0
  */
 public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
+
+	/**
+	 * Used to map document lines to widget lines and visual lines for word wrap and line numbers.
+	 */
+	class LineMap
+	{
+		int documentLine;
+		int widgetLine;
+		int visualLine;
+
+		LineMap(int docLine, int widgetLine, int visualLine)
+		{
+			this.documentLine = docLine;
+			this.widgetLine = widgetLine;
+			this.visualLine = visualLine;
+		}
+
+		@Override
+		public String toString()
+		{
+			return MessageFormat.format("LineMap <Document: {0}, widget: {1}, visual: {2}>", documentLine, widgetLine, visualLine); //$NON-NLS-1$
+		}
+	}
 
 	/**
 	 * Internal listener class.
@@ -733,52 +760,76 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 
 	void doPaint(GC gc, ILineRange visibleLines)
 	{
+
 		Display display = fCachedTextWidget.getDisplay();
 
 		// draw diff info
 		int y = -JFaceTextUtil.getHiddenTopLinePixels(fCachedTextWidget);
-		int lastLine = end(visibleLines);
-
-		Map<Integer, Integer> lineMap = getLineMap(fCachedTextWidget, visibleLines);
-		for (int line = visibleLines.getStartLine(); line < lastLine; line++)
+		List<LineMap> lineMap = getLineMap(fCachedTextWidget, visibleLines);
+		for (int i = 0; i < lineMap.size(); i++)
 		{
-			int widgetLine = JFaceTextUtil.modelLineToWidgetLine(fCachedTextViewer, line);
-			if (widgetLine == -1)
+			LineMap map = lineMap.get(i);
+			int line = map.documentLine;
+			int widgetLine = map.widgetLine;
+			try
 			{
-				continue;
+				int lineHeight = fCachedTextWidget.getLineHeight(fCachedTextWidget.getOffsetAtLine(widgetLine));
+				paintLine(line, y, lineHeight, gc, display);
+
+				int distanceFromPrevious = 1;
+				if (line < fCachedTextWidget.getLineCount() - 1 && i + 1 < lineMap.size())
+				{
+					distanceFromPrevious = lineMap.get(i + 1).visualLine - map.visualLine;
+				}
+
+				y += (lineHeight * distanceFromPrevious);
 			}
-
-			int lineHeight = fCachedTextWidget.getLineHeight(fCachedTextWidget.getOffsetAtLine(widgetLine));
-			paintLine(line, y, lineHeight, gc, display);
-
-			int distanceFromPrevious = 1;
-			if (line < fCachedTextWidget.getLineCount() - 1)
+			catch (Exception e)
 			{
-				distanceFromPrevious = lineMap.get(line + 1) - lineMap.get(line);
+				IdeLog.logError(EditorEplPlugin.getDefault(), MessageFormat.format("Error painting line number: {0}", map), e); //$NON-NLS-1$
 			}
-
-			y += (lineHeight * distanceFromPrevious);
 		}
+
 	}
 
-	Map<Integer, Integer> getLineMap(StyledText text, ILineRange visibleLines)
+	List<LineMap> getLineMap(StyledText text, ILineRange visibleLines)
 	{
-		TreeMap<Integer, Integer> lineMap = new TreeMap<Integer, Integer>();
-
-		int endLine = Math.min(visibleLines.getStartLine() + visibleLines.getNumberOfLines(), text.getLineCount() - 1);
-		int firstVisibleLineY = text.getLocationAtOffset(text.getOffsetAtLine(visibleLines.getStartLine())).y;
-		int lineHeight = text.getLineHeight();
-
+		List<LineMap> lineMap = new ArrayList<LineMap>();
+		int endLine = end(visibleLines);
+		int firstVisibleLineY = 0;
+		int lineHeight = 1;
+		try
+		{
+			lineHeight = text.getLineHeight();
+			int widgetLine = JFaceTextUtil.modelLineToWidgetLine(fCachedTextViewer, visibleLines.getStartLine());
+			firstVisibleLineY = text.getLocationAtOffset(text.getOffsetAtLine(widgetLine)).y;
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(EditorEplPlugin.getDefault(), "Error translating starting line number to y offset in text widget", e); //$NON-NLS-1$
+		}
 		for (int i = visibleLines.getStartLine(); i <= endLine; i++)
 		{
 			if (i == 0)
 			{
-				lineMap.put(0, 0);
+				lineMap.add(new LineMap(0, 0, 0));
 			}
 			else
 			{
-				int lineY = text.getLocationAtOffset(text.getOffsetAtLine(i)).y;
-				lineMap.put(i, visibleLines.getStartLine() + ((lineY - firstVisibleLineY) / lineHeight));
+				int widgetI = JFaceTextUtil.modelLineToWidgetLine(fCachedTextViewer, i);
+				if (widgetI == -1)
+				{
+					continue;
+				}
+				try
+				{
+					int lineY = text.getLocationAtOffset(text.getOffsetAtLine(widgetI)).y;
+					lineMap.add(new LineMap(i, widgetI, visibleLines.getStartLine() + ((lineY - firstVisibleLineY) / lineHeight)));
+				}
+				catch (Exception e)
+				{
+					IdeLog.logError(EditorEplPlugin.getDefault(), "Error translating line number to y offset in text widget", e); //$NON-NLS-1$
+				}
 			}
 		}
 
