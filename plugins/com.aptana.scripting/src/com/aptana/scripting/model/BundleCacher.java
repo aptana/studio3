@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -41,6 +42,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptLogger;
@@ -54,6 +56,8 @@ import com.aptana.scripting.ScriptingEngine;
  */
 public class BundleCacher
 {
+
+	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 
 	/**
 	 * The file where we store our serialized model.
@@ -96,7 +100,7 @@ public class BundleCacher
 		private void updateCacheIfNecessary(File script)
 		{
 			File bundleDir = getBundleDir(script);
-			File cacheFile = new File(bundleDir, CACHE_FILE);
+			File cacheFile = getCacheFile(bundleDir);
 
 			List<File> bundleFiles = new ArrayList<File>();
 			bundleFiles.add(script);
@@ -151,16 +155,19 @@ public class BundleCacher
 		{
 			if (be.getBundleDirectory().canWrite())
 			{
-				cacheFile = new File(be.getBundleDirectory(), CACHE_FILE);
-				writer = new OutputStreamWriter(new FileOutputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
-
 				yaml = createYAML(be.getBundleDirectory());
+
+				Locale locale = Locale.getDefault();
+				cacheFile = new File(be.getBundleDirectory(), MessageFormat.format(
+						"cache.{0}_{1}.yml", locale.getLanguage(), locale.getCountry())); //$NON-NLS-1$
+				writer = new OutputStreamWriter(new FileOutputStream(cacheFile), UTF_8);
+
 				yaml.dump(be, writer);
 			}
 		}
 		catch (IOException e)
 		{
-			ScriptingActivator.logError(e.getMessage(), e);
+			IdeLog.logError(ScriptingActivator.getDefault(), e);
 		}
 		finally
 		{
@@ -184,7 +191,7 @@ public class BundleCacher
 			if (be.getBundleDirectory().canRead())
 			{
 				Assert.isNotNull(cacheFile);
-				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
+				reader = new InputStreamReader(new FileInputStream(cacheFile), UTF_8);
 				BundleElement be2 = (BundleElement) yaml.load(reader);
 
 				// invoke blocks don't serialize correctly, so the comparison gets screwy.
@@ -200,7 +207,7 @@ public class BundleCacher
 		}
 		catch (IOException e)
 		{
-			ScriptingActivator.logError(e.getMessage(), e);
+			IdeLog.logError(ScriptingActivator.getDefault(), e);
 		}
 		finally
 		{
@@ -225,6 +232,33 @@ public class BundleCacher
 		}
 
 		return false;
+	}
+
+	/**
+	 * Tries to return the cache file that matches the current locale.
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	private File getCacheFile(File bundleDirectory)
+	{
+		File file = null;
+		Locale current = Locale.getDefault();
+		// Try "cache.lang_country.yml", like "cache.en_US.yml"
+		file = new File(bundleDirectory, MessageFormat.format("cache.{0}_{1}.yml", current.getLanguage(), //$NON-NLS-1$
+				current.getCountry()));
+		if (file.isFile())
+		{
+			return file;
+		}
+		// Then try just language: cache.en.yml
+		file = new File(bundleDirectory, MessageFormat.format("cache.{0}.yml", current.getLanguage())); //$NON-NLS-1$
+		if (file.isFile())
+		{
+			return file;
+		}
+		// Fall back to cache.yml
+		return new File(bundleDirectory, CACHE_FILE);
 	}
 
 	/**
@@ -256,7 +290,7 @@ public class BundleCacher
 		BundleElement be = null;
 		try
 		{
-			File cacheFile = new File(bundleDirectory, CACHE_FILE);
+			File cacheFile = getCacheFile(bundleDirectory);
 			if (!cacheFile.exists())
 			{
 				return null;
@@ -273,7 +307,7 @@ public class BundleCacher
 			try
 			{
 				Yaml yaml = createYAML(bundleDirectory);
-				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
+				reader = new InputStreamReader(new FileInputStream(cacheFile), UTF_8);
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
 
@@ -293,9 +327,10 @@ public class BundleCacher
 			}
 			catch (Exception e)
 			{
-				ScriptingActivator.logError(e.getMessage(), e);
-				ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_LoadingYAMLError,
-						bundleDirectory.getAbsolutePath()));
+				IdeLog.logError(ScriptingActivator.getDefault(),
+						MessageFormat.format("Failed to load bundle {0}", bundleDirectory.getAbsolutePath()), e); //$NON-NLS-1$
+				IdeLog.logInfo(ScriptingActivator.getDefault(),
+						MessageFormat.format(Messages.BundleCacher_LoadingYAMLError, bundleDirectory.getAbsolutePath()));
 			}
 			finally
 			{
@@ -402,8 +437,8 @@ public class BundleCacher
 				{
 					// One of the files is newer, don't load cache! This will reload everything from disk and rewrite
 					// the cache
-					ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_OutOfDateCacheMsg,
-							file.getPath()));
+					IdeLog.logInfo(ScriptingActivator.getDefault(),
+							MessageFormat.format(Messages.BundleCacher_OutOfDateCacheMsg, file.getPath()));
 					return true;
 				}
 			}
@@ -436,8 +471,10 @@ public class BundleCacher
 				String path = abe.getPath();
 				if (!new File(path).exists())
 				{
-					ScriptingActivator.logInfo(MessageFormat.format(
-							Messages.BundleCacher_FileReferencedInCacheMissingMsg, path, abe.toString()));
+					IdeLog.logInfo(
+							ScriptingActivator.getDefault(),
+							MessageFormat.format(Messages.BundleCacher_FileReferencedInCacheMissingMsg, path,
+									abe.toString()));
 					return true;
 				}
 				if (abe instanceof MenuElement)
@@ -466,8 +503,10 @@ public class BundleCacher
 			String path = child.getPath();
 			if (!new File(path).exists())
 			{
-				ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_FileReferencedInCacheMissingMsg,
-						path, child.toString()));
+				IdeLog.logInfo(
+						ScriptingActivator.getDefault(),
+						MessageFormat.format(Messages.BundleCacher_FileReferencedInCacheMissingMsg, path,
+								child.toString()));
 				return true;
 			}
 			return anyFileDeleted(child);
@@ -709,8 +748,16 @@ public class BundleCacher
 									List<String> values = new ArrayList<String>();
 									for (Node prefixValue : prefixValuesNode.getValue())
 									{
-										ScalarNode blah = (ScalarNode) prefixValue;
-										values.add(blah.getValue());
+										if (prefixValue instanceof ScalarNode)
+										{
+											ScalarNode blah = (ScalarNode) prefixValue;
+											values.add(blah.getValue());
+										}
+										else
+										{
+											IdeLog.logError(ScriptingActivator.getDefault(),
+													"Expected a flattened array for trigger, but got nested arrays."); //$NON-NLS-1$
+										}
 									}
 									be.setTrigger(TriggerType.PREFIX.getName(),
 											values.toArray(new String[values.size()]));

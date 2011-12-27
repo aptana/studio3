@@ -58,6 +58,9 @@
       <file
             name="ruble/project_sample.rb">
       </file>
+      <file
+            name="ruble/i18n.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
