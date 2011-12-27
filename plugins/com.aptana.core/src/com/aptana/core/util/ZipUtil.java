@@ -222,6 +222,7 @@ public final class ZipUtil {
 			return Status.OK_STATUS;
 		} finally {
 			subMonitor.done();
+			ZipFile.closeQuietly(zip);
 		}
 	}
 
