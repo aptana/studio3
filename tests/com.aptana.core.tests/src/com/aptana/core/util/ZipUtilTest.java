@@ -32,6 +32,7 @@ public class ZipUtilTest extends TestCase
 
 	private static final String TEST_ZIP = "resources/test.zip";
 	private static final String TEST_OVERWRITE_ZIP = "resources/test_overwrite.zip";
+	private static final String TEST_OVERWRITE_DIR_ZIP = "resources/test_overwrite_dir.zip";
 	private static final String TEST_ZIP_SYMLINKS = "resources/test_symlinks.zip";
 	private static final HashSet<String> TOP_ENTRIES = new HashSet<String>(Arrays.asList("folder", "file.txt"));
 	private static final HashSet<String> TOP_OVERWRITE_ENTRIES = new HashSet<String>(Arrays.asList("folder",
@@ -92,8 +93,7 @@ public class ZipUtilTest extends TestCase
 		try
 		{
 			// Extract once.
-			assertEquals(Status.OK_STATUS,
-					ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
 			// Extract again, with an overwrite mode.
 			assertEquals(Status.OK_STATUS,
 					ZipUtil.extract(resourceFile, destinationDir, true, new NullProgressMonitor()));
@@ -128,10 +128,10 @@ public class ZipUtilTest extends TestCase
 		URL overwriteResourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_OVERWRITE_ZIP);
 		assertNotNull(resourceURL);
 		assertNotNull(overwriteResourceURL);
-		
+
 		File resourceFile = ResourceUtil.resourcePathToFile(resourceURL);
 		File overwriteResourceFile = ResourceUtil.resourcePathToFile(overwriteResourceURL);
-		
+
 		assertNotNull(resourceFile);
 		assertNotNull(overwriteResourceFile);
 
@@ -142,14 +142,14 @@ public class ZipUtilTest extends TestCase
 		try
 		{
 			// Extract once.
-			assertEquals(Status.OK_STATUS,
-					ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
 			// Extract again, with an overwrite mode.
 			assertEquals(Status.OK_STATUS,
 					ZipUtil.extract(overwriteResourceFile, destinationDir, true, new NullProgressMonitor()));
 
 			File[] files = destinationDir.listFiles();
-			assertEquals("Unzipped contents to not match expected number of files", TOP_OVERWRITE_ENTRIES.size(), files.length);
+			assertEquals("Unzipped contents to not match expected number of files", TOP_OVERWRITE_ENTRIES.size(),
+					files.length);
 
 			for (File file : files)
 			{
@@ -166,6 +166,48 @@ public class ZipUtilTest extends TestCase
 			// The file.txt should now contain the string "new content"
 			assertEquals("Expected 'new content' as the overitten content of 'file.txt'", "new content",
 					IOUtil.read(new FileInputStream(new File(destinationDir, "folder/file.txt"))));
+		}
+		finally
+		{
+			// remove the contents after we are done with the test
+			FileUtil.deleteRecursively(destinationDir);
+		}
+	}
+
+	/*
+	 * Test a case where the overriding Zip has a file that overwrite a folder on the target directory.
+	 */
+	public void testOverwriteDirWithFile() throws Exception
+	{
+		URL resourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_ZIP);
+		URL overwriteResourceURL = Platform.getBundle(BUNDLE_ID).getEntry(TEST_OVERWRITE_DIR_ZIP);
+		assertNotNull(resourceURL);
+		assertNotNull(overwriteResourceURL);
+
+		File resourceFile = ResourceUtil.resourcePathToFile(resourceURL);
+		File overwriteResourceFile = ResourceUtil.resourcePathToFile(overwriteResourceURL);
+
+		assertNotNull(resourceFile);
+		assertNotNull(overwriteResourceFile);
+
+		File destinationDir = File.createTempFile(getClass().getSimpleName(), null);
+		assertTrue(destinationDir.delete());
+		assertTrue(destinationDir.mkdirs());
+
+		try
+		{
+			// Extract once.
+			assertEquals(Status.OK_STATUS, ZipUtil.extract(resourceFile, destinationDir, new NullProgressMonitor()));
+			// Extract again, with an overwrite mode.
+			assertEquals(Status.OK_STATUS,
+					ZipUtil.extract(overwriteResourceFile, destinationDir, true, new NullProgressMonitor()));
+
+			File[] files = destinationDir.listFiles();
+			assertEquals("Unzipped contents to not match expected number of files", 2, files.length);
+
+			// The previous 'folder' directory should now be a file.
+			assertTrue("Expected entry is not a file", new File(destinationDir, "folder").isFile());
+			assertTrue("Expected entry is not a file", new File(destinationDir, "file.txt").isFile());
 		}
 		finally
 		{
