@@ -509,7 +509,7 @@ public abstract class AbstractDebugHost {
 		} catch (URISyntaxException e) {
 		}
 		if (uri == null || uri.getScheme() == null) {
-			return "app:///"+string;
+			return "app:///"+string; //$NON-NLS-1$
 		}
 		return string;
 	}
@@ -518,9 +518,9 @@ public abstract class AbstractDebugHost {
 		URI uri = null;
 		try {
 			uri = new URI(string);
-			if ("app".equals(uri.getScheme())) {
+			if ("app".equals(uri.getScheme())) { //$NON-NLS-1$
 				String path = uri.getPath();
-				if (path.startsWith("/")) {
+				if (path.startsWith("/")) { //$NON-NLS-1$
 					path = path.substring(1);
 				}
 				return path;
@@ -565,7 +565,7 @@ public abstract class AbstractDebugHost {
 
 	protected final void initLogger(Plugin plugin, String basename) throws DebugException {
 		this.plugin = plugin;
-		IPath base = plugin.getStateLocation().append("logs");
+		IPath base = plugin.getStateLocation().append("logs"); //$NON-NLS-1$
 		base.toFile().mkdirs();
 		errorLogFile = base.append(basename+".err").toFile(); //$NON-NLS-1$
 		logger = new ProtocolLogger(basename, plugin.getBundle().getSymbolicName());

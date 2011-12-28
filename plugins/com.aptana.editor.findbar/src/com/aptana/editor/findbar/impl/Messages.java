@@ -9,8 +9,11 @@ package com.aptana.editor.findbar.impl;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS {
+public class Messages extends NLS
+{
+
 	private static final String BUNDLE_NAME = "com.aptana.editor.findbar.impl.messages"; //$NON-NLS-1$
+
 	public static String FindBarDecorator_LABEL_ShowOptions;
 	public static String FindBarDecorator_LABEL_ReplaceAll;
 	public static String FindBarDecorator_LABEL_SearchBackward;
@@ -26,22 +29,27 @@ public class Messages extends NLS {
 	public static String FindBarDecorator_TOOLTIP_HideFindBar;
 	public static String FindBarDecorator_TOOLTIP_ShowMatchCount;
 	public static String FindBarDecorator_TOOLTIP_MatchCount;
+	public static String FindBarDecorator_TOOLTIP_SearchInOpenFiles;
 	public static String FindBarDecorator_TOOLTIP_ShowFindReplaceDialog;
 	public static String FindBarDecorator_MSG_ReadOnly;
 	public static String FindBarDecorator_MSG_Replaced;
 	public static String FindBarDecorator_MSG_ReplaceNeedsFind;
 	public static String FindBarDecorator_MSG_ReplaceNeedsToMatchSelectedText;
+	public static String FindBarDecorator_ReplaceError;
+
 	public static String FindBarActions_TOOLTIP_FocusReplaceCombo;
 	public static String FindBarActions_TOOLTIP_FocusFindCombo;
+
 	public static String FindInOpenDocuments_NoFileFound;
 	public static String FindInOpenDocuments_FileNotInWorkspace;
-	public static String FindBarDecorator_TOOLTIP_SearchInOpenFiles;
-	
-	static {
+
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
+	private Messages()
+	{
 	}
 }

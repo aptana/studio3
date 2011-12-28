@@ -207,7 +207,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
-				"Building symbol tables for file ''{0}'' for index ''{1}''",
+				"Building symbol tables for file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 				location.toString(),
 				index.toString()
 			);
@@ -231,7 +231,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''",
+					"Processing globally declared variables and functions in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
@@ -252,7 +252,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''",
+					"Processing assignments to ''window'' in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
@@ -271,7 +271,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''",
+					"Processing assignments to ''window'' within self-invoking function literals in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
@@ -290,7 +290,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Assigning user agents to properties in file ''{0}'' for index ''{1}''",
+					"Assigning user agents to properties in file ''{0}'' for index ''{1}''", //$NON-NLS-1$
 					location.toString(),
 					index.toString()
 				);
@@ -309,7 +309,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Writing indexing results to index ''{0}'' for file ''{1}''",
+					"Writing indexing results to index ''{0}'' for file ''{1}''", //$NON-NLS-1$
 					index.toString(),
 					location.toString()
 				);

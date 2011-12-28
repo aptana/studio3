@@ -85,7 +85,7 @@ public class Parameter extends Symbol
 				break;
 
 			case OPTIONAL:
-				writer.print('[').print(this._name).print(']'); //$NON-NLS-1$ //$NON-NLS-2$
+				writer.print('[').print(this._name).print(']');
 				break;
 
 			case ONE_OR_MORE:

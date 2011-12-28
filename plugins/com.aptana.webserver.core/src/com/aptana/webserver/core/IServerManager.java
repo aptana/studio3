@@ -75,5 +75,4 @@ public interface IServerManager
 	 * @throws CoreException
 	 */
 	public IServer createServer(String typeId) throws CoreException;
-
 }

@@ -349,7 +349,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		else
 		{
 			IdeLog.logInfo(HTMLPlugin.getDefault(),
-					MessageFormat.format("Current element: {0}, Current lexeme: {1}", elementName, _currentLexeme),
+					MessageFormat.format("Current element: {0}, Current lexeme: {1}", elementName, _currentLexeme), //$NON-NLS-1$
 					IDebugScopes.CONTENT_ASSIST);
 		}
 
@@ -521,8 +521,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					IServer serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 					if (serverConfiguration == null)
 					{
-						for (IServer server : WebServerCorePlugin.getDefault().getServerManager()
-								.getServers())
+						for (IServer server : WebServerCorePlugin.getDefault().getServerManager().getServers())
 						{
 							if (server.resolve(editorStore) != null)
 							{
@@ -626,7 +625,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				else
 				{
-					// Child is invalid/non-existant, we should just punt. http://jira.appcelerator.org/browse/APSTUD-3862
+					// Child is invalid/non-existant, we should just punt.
+					// http://jira.appcelerator.org/browse/APSTUD-3862
 					return Collections.emptyList();
 				}
 				offset += lastSlash + 1;

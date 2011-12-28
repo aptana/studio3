@@ -138,12 +138,12 @@ public class SimpleWebServer extends AbstractWebServer
 
 	public IStatus stop(boolean force, IProgressMonitor monitor)
 	{
-		return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Generic server doesn't support stop.");
+		return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, Messages.SimpleWebServer_ERR_StopNotSupported);
 	}
 
 	public IStatus start(String mode, IProgressMonitor monitor)
 	{
-		return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Generic server doesn't support start.");
+		return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, Messages.SimpleWebServer_ERR_StartNotSupported);
 	}
 
 	public String getMode()

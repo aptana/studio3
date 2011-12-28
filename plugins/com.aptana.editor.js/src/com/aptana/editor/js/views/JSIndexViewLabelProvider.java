@@ -27,12 +27,13 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
  */
 public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 {
+
 	private static final Image CLASS_ICON = JSPlugin.getImage("icons/class.png"); //$NON-NLS-1$
 	private static final Image CONSTRUCTOR_ICON = JSPlugin.getImage("icons/constructor.png"); //$NON-NLS-1$
 	private static final Image FUNCTION_ICON = JSPlugin.getImage("icons/js_function.png"); //$NON-NLS-1$
 	private static final Image PROPERTY_ICON = JSPlugin.getImage("icons/js_property.png"); //$NON-NLS-1$
 
-	private static final ImageDescriptor STATIC_OVERLAY = JSPlugin.getImageDescriptor("icons/overlays/static.png");
+	private static final ImageDescriptor STATIC_OVERLAY = JSPlugin.getImageDescriptor("icons/overlays/static.png"); //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)

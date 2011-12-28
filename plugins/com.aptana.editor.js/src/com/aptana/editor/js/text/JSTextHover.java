@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
@@ -56,7 +57,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 			if (fs != null)
 			{
 				// force a parse
-				fs.parse();
+				fs.parse(new NullProgressMonitor());
 
 				IParseNode ast = fs.getParseResult();
 

@@ -29,7 +29,7 @@ import com.aptana.core.CorePlugin;
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-@SuppressWarnings({ "rawtypes", "restriction" })
+@SuppressWarnings({ "rawtypes", "restriction", "unchecked" })
 public class BuildUtil
 {
 	private static final String BUILD_METHOD_NAME = "build"; //$NON-NLS-1$

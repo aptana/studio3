@@ -299,7 +299,7 @@ public class ASTUtil
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
-					"Parser error: Expected {0} but encountered {1}",
+					"Parser error: Expected {0} but encountered {1}", //$NON-NLS-1$
 					type,
 					(currentLexeme != null) ? currentLexeme.getType() : JSTokenType.EOF
 				);
