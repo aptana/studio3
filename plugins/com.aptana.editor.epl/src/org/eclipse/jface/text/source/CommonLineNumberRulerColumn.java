@@ -795,7 +795,7 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 	List<LineMap> getLineMap(StyledText text, ILineRange visibleLines)
 	{
 		List<LineMap> lineMap = new ArrayList<LineMap>();
-		int endLine = end(visibleLines);
+		int endLine = Math.min(end(visibleLines), text.getLineCount() - 1);
 		int firstVisibleLineY = 0;
 		int lineHeight = 1;
 		try
@@ -828,7 +828,7 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(EditorEplPlugin.getDefault(), "Error translating line number to y offset in text widget", e); //$NON-NLS-1$
+					IdeLog.logError(EditorEplPlugin.getDefault(), MessageFormat.format("Error translating line number {0} to y offset in text widget", i), e); //$NON-NLS-1$
 				}
 			}
 		}
