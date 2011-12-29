@@ -13,6 +13,9 @@
 package com.aptana.ide.ui.io;
 
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -21,7 +24,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -85,6 +90,8 @@ public class IOUIPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static IOUIPlugin plugin;
+
+	private Map<IEditorInput, Job> saveRemoteJobs;
 
 	private IConnectionPointListener connectionListener = new IConnectionPointListener()
 	{
@@ -217,6 +224,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+		saveRemoteJobs = new HashMap<IEditorInput, Job>();
 		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 		addPartListener();
@@ -230,6 +238,16 @@ public class IOUIPlugin extends AbstractUIPlugin
 		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
 		removePartListener();
+		if (saveRemoteJobs != null)
+		{
+			Collection<Job> jobs = saveRemoteJobs.values();
+			for (Job job : jobs)
+			{
+				job.cancel();
+			}
+			saveRemoteJobs.clear();
+			saveRemoteJobs = null;
+		}
 		plugin = null;
 		super.stop(context);
 	}
@@ -434,7 +452,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 	 * @param editorPart
 	 *            the editor part the file is opened on
 	 */
-	private static void attachSaveListener(final IEditorPart editorPart)
+	private void attachSaveListener(final IEditorPart editorPart)
 	{
 		final IEditorInput editorInput = editorPart.getEditorInput();
 		if (!(editorInput instanceof UniformFileStoreEditorInput)
@@ -457,7 +475,13 @@ public class IOUIPlugin extends AbstractUIPlugin
 						return;
 					}
 
-					Job job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName())
+					Job job = saveRemoteJobs.get(editorInput);
+					if (job != null)
+					{
+						// a job saving the remote file is already running
+						return;
+					}
+					job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName())
 					{
 
 						protected IStatus run(IProgressMonitor monitor)
@@ -503,6 +527,15 @@ public class IOUIPlugin extends AbstractUIPlugin
 							return Status.OK_STATUS;
 						}
 					};
+					saveRemoteJobs.put(editorInput, job);
+					job.addJobChangeListener(new JobChangeAdapter()
+					{
+
+						public void done(IJobChangeEvent event)
+						{
+							saveRemoteJobs.remove(editorInput);
+						};
+					});
 					job.schedule();
 				}
 			}
