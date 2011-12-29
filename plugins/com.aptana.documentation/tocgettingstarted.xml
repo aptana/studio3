@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Web Help" link_to="toc.xml#gettingstarted"> 
-	<topic label="Index"  href="html/gettingstarted/index.html" /> 
+<toc label="Getting Started" link_to="toc.xml#getting_started">
+   <topic href="https://wiki.appcelerator.org/display/tis/Home" label="Studio Guides">
+      <topic href="https://wiki.appcelerator.org/display/tis/Basic+Concepts" label="Basic Concepts">
+      </topic>
+      <topic href="https://wiki.appcelerator.org/display/tis/Titanium+Development" label="Titanium Development">
+      </topic>
+      <topic href="https://wiki.appcelerator.org/display/tis/Web+Development" label="Web Development">
+      </topic>
+      <topic href="https://wiki.appcelerator.org/display/tis/Customizing+Studio" label="Customizing Studio">
+      </topic>
+      <topic href="https://wiki.appcelerator.org/display/tis/Troubleshooting" label="Troubleshooting">
+      </topic>
+   </topic> 
 </toc>
