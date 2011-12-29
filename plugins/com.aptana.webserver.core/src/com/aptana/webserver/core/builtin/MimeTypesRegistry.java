@@ -219,7 +219,7 @@ public class MimeTypesRegistry
 		map("text/x-component", "htc");
 		map("text/x-setext", "etx");
 		map("text/x-vcard", "vcf");
-		map("text/xml", "xml");
+		map("application/xml", "xml");
 		map("video/3gpp", "3gpp", "3gp");
 		map("video/dl", "dl");
 		map("video/gl", "gl");
