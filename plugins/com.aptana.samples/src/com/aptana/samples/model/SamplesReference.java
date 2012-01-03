@@ -157,4 +157,24 @@ public class SamplesReference implements IProjectSample
 	{
 		includePaths = paths;
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof SamplesReference))
+		{
+			return false;
+		}
+		SamplesReference otherSample = (SamplesReference) obj;
+		return id.equals(otherSample.id) && name.equals(otherSample.name) && location.equals(otherSample.location);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = id.hashCode();
+		hash = hash * 31 + name.hashCode();
+		hash = hash * 31 + location.hashCode();
+		return hash;
+	}
 }

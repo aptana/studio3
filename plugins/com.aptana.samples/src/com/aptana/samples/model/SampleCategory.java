@@ -71,4 +71,21 @@ public class SampleCategory
 	{
 		return getName();
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof SampleCategory))
+		{
+			return false;
+		}
+		SampleCategory category = (SampleCategory) obj;
+		return id.equals(category.id) && name.equals(category.name);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return id.hashCode() * 31 + name.hashCode();
+	}
 }
