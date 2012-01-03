@@ -8,138 +8,23 @@
 package com.aptana.core.resources;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.contentobjects.jnotify.JNotifyAdapter;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.core.CorePlugin;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.filewatcher.FileWatcher;
 
 public class FileDeltaRefreshAdapter extends JNotifyAdapter
 {
-	private WorkspaceJob job;
-	private Map<IResource, Integer> toRefresh = new HashMap<IResource, Integer>();
 
-	private synchronized void refresh()
+	private RefreshThread fThread;
+
+	public FileDeltaRefreshAdapter(RefreshThread thread)
 	{
-		// return quickly if there's no work
-		if (toRefresh.isEmpty())
-		{
-			return;
-		}
-
-		// lazily init the job
-		if (job == null)
-		{
-			job = createRefreshJob();
-		}
-		// cancel if it's already running
-		job.cancel();
-		job.schedule(200); // give a little delay so we can have a chance to cancel and batch together refreshes!
-	}
-
-	protected WorkspaceJob createRefreshJob()
-	{
-		return new WorkspaceJob("Refresh...") //$NON-NLS-1$
-		{
-
-			@Override
-			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
-			{
-				if (notificationsFrozen())
-				{
-					schedule(1000);
-					return Status.OK_STATUS;
-				}
-				Map<IResource, Integer> copy;
-				synchronized (toRefresh)
-				{
-					copy = new HashMap<IResource, Integer>(toRefresh);
-				}
-				SubMonitor sub = SubMonitor.convert(monitor, copy.size());
-				for (Map.Entry<IResource, Integer> entry : copy.entrySet())
-				{
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-					IResource resource = entry.getKey();
-					try
-					{
-						if (resource.getType() == IResource.PROJECT)
-						{
-							// Check to see if this project exists in the new branch! If not, auto-close the
-							// project, or
-							// just not refresh it?
-							IPath path = resource.getLocation();
-							if (path == null || !path.toFile().exists())
-							{
-								// Close the project, this actually causes the .project file to get generated,
-								// though!
-								try
-								{
-									if (resource.getProject().exists())
-									{
-										resource.getProject().close(sub.newChild(100));
-									}
-								}
-								catch (CoreException e)
-								{
-									if (e.getStatus().getSeverity() > IStatus.WARNING)
-									{
-										throw e;
-									}
-								}
-								if (path != null)
-								{
-									File projectFile = path.toFile();
-									if (projectFile != null)
-									{
-										File dotProject = new File(projectFile,
-												IProjectDescription.DESCRIPTION_FILE_NAME);
-										if (dotProject.delete())
-										{
-											projectFile.delete();
-										}
-									}
-								}
-								continue;
-							}
-						}
-						resource.refreshLocal(entry.getValue(), sub.newChild(1));
-					}
-					finally
-					{
-						synchronized (toRefresh)
-						{
-							toRefresh.remove(resource);
-						}
-					}
-				}
-				return Status.OK_STATUS;
-			}
-		};
-	}
-
-	protected boolean notificationsFrozen()
-	{
-		return !FileWatcher.shouldNotify();
+		this.fThread = thread;
 	}
 
 	@Override
@@ -172,49 +57,7 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 		{
 			return;
 		}
-		try
-		{
-			synchronized (toRefresh)
-			{
-				if (toRefresh.containsKey(resource))
-				{
-					Integer oldDepth = toRefresh.get(resource);
-					if (oldDepth < depth)
-					{
-						toRefresh.put(resource, depth);
-					}
-				}
-				else
-				{
-					for (IResource refreshing : toRefresh.keySet())
-					{
-						if (refreshing instanceof IContainer)
-						{
-							IContainer container = (IContainer) refreshing;
-							if (resource.getLocation() != null && container.getLocation() != null
-									&& container.getLocation().isPrefixOf(resource.getLocation()))
-							{
-								// We already have an ancestor in the map. If it's refreshing infinitely don't add this
-								// resource
-								if (toRefresh.get(container) == IResource.DEPTH_INFINITE)
-								{
-									return;
-								}
-							}
-						}
-					}
-					toRefresh.put(resource, depth);
-				}
-			}
-		}
-		catch (Throwable e)
-		{
-			IdeLog.logError(CorePlugin.getDefault(), e);
-		}
-		finally
-		{
-			refresh();
-		}
+		fThread.refresh(resource, depth);
 	}
 
 	@Override
