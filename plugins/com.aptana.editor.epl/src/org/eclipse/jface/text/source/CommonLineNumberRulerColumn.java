@@ -824,8 +824,12 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 				}
 				try
 				{
-					int lineY = text.getLocationAtOffset(text.getOffsetAtLine(widgetI)).y;
-					lineMap.add(new LineMap(i, widgetI, visibleLines.getStartLine() + ((lineY - firstVisibleLineY) / lineHeight)));
+					if (widgetI >= 0 && widgetI < text.getLineCount())
+					{
+						int lineY = text.getLocationAtOffset(text.getOffsetAtLine(widgetI)).y;
+						lineMap.add(new LineMap(i, widgetI, visibleLines.getStartLine()
+								+ ((lineY - firstVisibleLineY) / lineHeight)));
+					}
 				}
 				catch (Exception e)
 				{
