@@ -204,10 +204,19 @@ public final class ZipUtil {
 					}
 					in.close();
 					out.close();
-					if (!Platform.OS_WIN32.equals(Platform.getOS())) {
-						try {
-							Runtime.getRuntime().exec(new String[] { "chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
-						} catch (Exception ignore) {
+					if (!Platform.OS_WIN32.equals(Platform.getOS()))
+					{
+						if (entry.getPlatform() == ZipEntry.PLATFORM_UNIX)
+						{
+							try
+							{
+								Runtime.getRuntime()
+										.exec(new String[] {
+												"chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
+							}
+							catch (Exception ignore)
+							{
+							}
 						}
 						if (symlink) {
 							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8"); //$NON-NLS-1$
