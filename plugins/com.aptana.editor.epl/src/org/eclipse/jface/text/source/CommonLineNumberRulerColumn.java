@@ -795,7 +795,7 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 	List<LineMap> getLineMap(StyledText text, ILineRange visibleLines)
 	{
 		List<LineMap> lineMap = new ArrayList<LineMap>();
-		int endLine = Math.min(end(visibleLines), text.getLineCount() - 1);
+		int endLine = end(visibleLines);
 		int firstVisibleLineY = 0;
 		int lineHeight = 1;
 		try
@@ -819,6 +819,7 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 				int widgetI = JFaceTextUtil.modelLineToWidgetLine(fCachedTextViewer, i);
 				if (widgetI == -1)
 				{
+					// Line is hidden/folded
 					continue;
 				}
 				try
