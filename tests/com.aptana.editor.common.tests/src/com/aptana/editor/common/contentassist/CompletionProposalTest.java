@@ -38,7 +38,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 
-		assertTrue(proposal1.equals(proposal2));
+		assertEquals("Proposals should be equal", proposal1, proposal2);
 	}
 
 	public void testProposalsReplacementStringsDiffer()
@@ -46,7 +46,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("b", 0, 1, 2, image, "abc", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Replacement strings should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsReplacementOffsetsDiffer()
@@ -54,7 +54,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 1, 1, 2, image, "abc", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Replacement offsets should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsReplacementLengthsDiffer()
@@ -62,7 +62,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 2, 2, image, "abc", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Replacement lengths should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsCursorPositionsDiffer()
@@ -70,7 +70,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 3, image, "abc", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Cursor positions should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsImagesDiffer()
@@ -78,7 +78,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 2, null, "abc", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Images should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsDisplayStringsDiffer()
@@ -86,7 +86,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 2, image, "def", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Display strings should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsContextInfosDiffer()
@@ -96,7 +96,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc",
 				new ContextInformation("abc", "def"), "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Context infos should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsAdditionalInfosDiffer()
@@ -104,7 +104,7 @@ public class CompletionProposalTest extends TestCase
 		CommonCompletionProposal proposal1 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "some");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Additional infos should not match", proposal1.equals(proposal2));
 	}
 
 	public void testProposalsLocationsDiffer()
@@ -113,6 +113,6 @@ public class CompletionProposalTest extends TestCase
 		proposal1.setFileLocation("somewhere");
 		CommonCompletionProposal proposal2 = new CommonCompletionProposal("a", 0, 1, 2, image, "abc", null, "none");
 
-		assertFalse(proposal1.equals(proposal2));
+		assertFalse("Locations should not match", proposal1.equals(proposal2));
 	}
 }

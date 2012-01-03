@@ -21,6 +21,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
@@ -103,15 +104,15 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 
 			// @formatter:off
 			result =
-					StringUtil.areEqual(_replacementString, that._replacementString)
+					ObjectUtil.areEqual(_replacementString, that._replacementString)
 				&&	_replacementOffset == that._replacementOffset
 				&&	_replacementLength == that._replacementLength
 				&&	_cursorPosition == that._cursorPosition
-				&&	_image == that._image
-				&&	StringUtil.areEqual(_displayString, that._displayString)
-				&&	_contextInformation == that._contextInformation
-				&&	StringUtil.areEqual(_additionalProposalInformation, that._additionalProposalInformation)
-				&&	StringUtil.areEqual(_fileLocation, that._fileLocation);
+				&&	ObjectUtil.areEqual(_image, that._image)
+				&&	ObjectUtil.areEqual(_displayString, that._displayString)
+				&&	ObjectUtil.areEqual(_contextInformation, that._contextInformation)
+				&&	ObjectUtil.areEqual(_additionalProposalInformation, that._additionalProposalInformation)
+				&&	ObjectUtil.areEqual(_fileLocation, that._fileLocation);
 			// @formatter:on
 		}
 

@@ -303,10 +303,11 @@ public class StringUtil
 	 * @param s1
 	 * @param s2
 	 * @return
+	 * @deprecated Use the more generic {@link ObjectUtil#areNotEqual(Object, Object)} in place of this method
 	 */
 	public static boolean areNotEqual(String s1, String s2)
 	{
-		return (s1 == null) ? (s2 != null) : (s2 == null) ? true : !s1.equals(s2);
+		return ObjectUtil.areNotEqual(s1, s2);
 	}
 
 	/**
@@ -315,10 +316,11 @@ public class StringUtil
 	 * @param s1
 	 * @param s2
 	 * @return
+	 * @deprecated Use the more generic {@link ObjectUtil#areEqual(Object, Object)} in place of this method
 	 */
 	public static boolean areEqual(String s1, String s2)
 	{
-		return (s1 == null) ? (s2 == null) : (s2 != null) ? s1.equals(s2) : false;
+		return ObjectUtil.areEqual(s1, s2);
 	}
 
 	/**

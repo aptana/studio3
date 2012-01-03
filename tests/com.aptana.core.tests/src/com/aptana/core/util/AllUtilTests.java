@@ -27,6 +27,7 @@ public class AllUtilTests
 		suite.addTestSuite(FirefoxUtilTest.class);
 		suite.addTestSuite(InputStreamGobblerTest.class);
 		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(ObjectUtilTest.class);
 		suite.addTestSuite(OutputStreamThreadTest.class);
 		suite.addTestSuite(PlatformUtilTest.class);
 		suite.addTestSuite(ProcessStatusTest.class);
