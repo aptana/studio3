@@ -249,14 +249,17 @@ public final class ZipUtil
 					out.close();
 					if (!Platform.OS_WIN32.equals(Platform.getOS()))
 					{
-						try
+						if (entry.getPlatform() == ZipEntry.PLATFORM_UNIX)
 						{
-							Runtime.getRuntime()
-									.exec(new String[] {
-											"chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
-						}
-						catch (Exception ignore)
-						{
+							try
+							{
+								Runtime.getRuntime()
+										.exec(new String[] {
+												"chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
+							}
+							catch (Exception ignore)
+							{
+							}
 						}
 						if (symlink)
 						{
