@@ -168,6 +168,11 @@ public class SamplesManager implements ISamplesManager
 				samples = new ArrayList<SamplesReference>();
 				bundleSamplesByCategory.put(categoryId, samples);
 			}
+			SamplesReference existingSample = bundleSamplesById.get(id);
+			if (existingSample != null)
+			{
+				samples.remove(existingSample);
+			}
 			samples.add(sample);
 			bundleSamplesById.put(id, sample);
 
