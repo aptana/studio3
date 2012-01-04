@@ -163,9 +163,10 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 	{
 		IEclipsePreferences prefs = getEclipsePreferences();
 		int editorTabSize = getEditorTabSize();
-		boolean isEditorTabPolicy = CodeFormatterConstants.EDITOR.equals(getFormatterTabPolicy(preferences));
-		if (isEditorTabPolicy)
+		if (CodeFormatterConstants.EDITOR.equals(getFormatterTabPolicy(preferences)))
 		{
+			// In case the formatter defines to follow the Editor's Tab-Policy, just update the preferences Map with the
+			// editor-tab-size.
 			preferences.put(getFormatterTabSizeKey(), String.valueOf(editorTabSize));
 		}
 		else
@@ -193,7 +194,6 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 			}
 			try
 			{
-				// EclipseUtil.instanceScope().getNode(PHPEplPlugin.getDefault().getBundle().getSymbolicName()).flush();
 				prefs.flush();
 			}
 			catch (Exception e)

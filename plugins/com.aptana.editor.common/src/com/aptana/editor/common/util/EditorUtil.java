@@ -9,6 +9,7 @@ package com.aptana.editor.common.util;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
@@ -33,9 +34,10 @@ public class EditorUtil
 	 */
 	public static int getSpaceIndentSize()
 	{
-		if (UIUtils.getActiveEditor() != null)
+		IEditorPart activeEditor = UIUtils.getActiveEditor();
+		if (activeEditor != null)
 		{
-			return getSpaceIndentSize(UIUtils.getActiveEditor().getSite().getId());
+			return getSpaceIndentSize(activeEditor.getSite().getId());
 		}
 		return getSpaceIndentSize(null);
 	}
@@ -52,12 +54,8 @@ public class EditorUtil
 			spaceIndentSize = Platform.getPreferencesService().getInt(preferencesQualifier,
 					AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 0, null);
 		}
-		if (spaceIndentSize > 0)
-		{
-			return spaceIndentSize;
-		}
 		// Fall back on CommonEditorPlugin or EditorsPlugin values if none are set for current editor
-		return getDefaultSpaceIndentSize(preferencesQualifier);
+		return (spaceIndentSize > 0) ? spaceIndentSize : getDefaultSpaceIndentSize(preferencesQualifier);
 	}
 
 	public static int getDefaultSpaceIndentSize(String preferencesQualifier)
@@ -70,7 +68,7 @@ public class EditorUtil
 					EditorsPlugin.getDefault().getPreferenceStore() })
 					.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 		}
-		return (spaceIndentSize != 0) ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
+		return (spaceIndentSize > 0) ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
 	}
 
 	/**

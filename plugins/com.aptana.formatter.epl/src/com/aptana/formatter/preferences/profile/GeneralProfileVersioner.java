@@ -52,7 +52,6 @@ public class GeneralProfileVersioner implements IProfileVersioner
 			CustomProfile customProfile = (CustomProfile) profile;
 			if (customProfile.getVersion() != CURRENT_VERSION)
 			{
-				customProfile.setVersion(CURRENT_VERSION);
 				// Migrate any tab-spacing setting to the default one.
 				IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions(true);
 				for (IContributedExtension extension : extensions)
@@ -64,6 +63,8 @@ public class GeneralProfileVersioner implements IProfileVersioner
 						((IScriptFormatterFactory) extension).updateProfile(profile);
 					}
 				}
+				// Update the current profile with the new version.
+				customProfile.setVersion(CURRENT_VERSION);
 			}
 
 		}
