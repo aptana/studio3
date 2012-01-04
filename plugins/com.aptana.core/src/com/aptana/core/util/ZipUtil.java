@@ -206,7 +206,7 @@ public final class ZipUtil {
 					out.close();
 					if (!Platform.OS_WIN32.equals(Platform.getOS()))
 					{
-						if (entry.getPlatform() == ZipEntry.PLATFORM_UNIX)
+						if (entry.getUnixMode() != 0)
 						{
 							try
 							{
