@@ -12,6 +12,7 @@
 
 package com.aptana.ide.ui.io;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -38,6 +40,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
@@ -484,10 +487,10 @@ public class IOUIPlugin extends AbstractUIPlugin
 					job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName())
 					{
 
-						protected IStatus run(IProgressMonitor monitor)
+						protected IStatus run(final IProgressMonitor monitor)
 						{
 							UniformFileStoreEditorInput input = (UniformFileStoreEditorInput) editorInput;
-							IFileStore localCacheFile = input.getLocalFileStore();
+							final IFileStore localCacheFile = input.getLocalFileStore();
 							IFileStore originalFile = input.getFileStore();
 							IFileInfo originalFileInfo = input.getFileInfo();
 							try
@@ -506,11 +509,42 @@ public class IOUIPlugin extends AbstractUIPlugin
 								}
 								SyncUtils.copy(localCacheFile, null, originalFile, EFS.NONE, monitor);
 							}
-							catch (CoreException e)
+							catch (final CoreException e)
 							{
-								UIUtils.showErrorMessage(
-										MessageFormat.format(Messages.EditorUtils_ERR_SavingRemoteFile,
-												originalFile.getName()), e);
+								// save failed; offers user to save the file locally instead
+								final String filename = originalFile.getName();
+								UIUtils.getDisplay().asyncExec(new Runnable()
+								{
+
+									public void run()
+									{
+										if (MessageDialog.openConfirm(UIUtils.getActiveShell(), MessageFormat.format(
+												Messages.IOUIPlugin_ErrorSavingRemoteFile_Title, filename),
+												MessageFormat.format(Messages.IOUIPlugin_ErrorSavingRemoteFile_Message,
+														e.getLocalizedMessage())))
+										{
+											FileDialog dialog = new FileDialog(UIUtils.getActiveShell(), SWT.SAVE);
+											dialog.setFileName(filename);
+											String filepath = dialog.open();
+											if (filepath != null)
+											{
+												IFileStore localFileStore = EFS.getLocalFileSystem().fromLocalFile(
+														new File(filepath));
+												try
+												{
+													SyncUtils.copy(localCacheFile, null, localFileStore, EFS.NONE,
+															monitor);
+												}
+												catch (CoreException e1)
+												{
+													UIUtils.showErrorMessage(MessageFormat.format(
+															Messages.IOUIPlugin_ErrorSavingRemoteFile_Title, filename),
+															e);
+												}
+											}
+										}
+									}
+								});
 							}
 							finally
 							{
@@ -521,7 +555,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 								}
 								catch (CoreException e)
 								{
-									IdeLog.logError(IOUIPlugin.getDefault(), e);
+									IdeLog.logWarning(IOUIPlugin.getDefault(), e);
 								}
 							}
 							return Status.OK_STATUS;
