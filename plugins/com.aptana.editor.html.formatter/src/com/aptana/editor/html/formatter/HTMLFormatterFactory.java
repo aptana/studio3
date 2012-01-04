@@ -10,12 +10,16 @@ package com.aptana.editor.html.formatter;
 import java.net.URL;
 import java.util.Map;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.HTMLSourceViewerConfiguration;
 import com.aptana.editor.html.formatter.preferences.HTMLFormatterModifyDialog;
@@ -110,5 +114,54 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 	public boolean canConsumePreviousIndent()
 	{
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getEclipsePreferences()
+	 */
+	@Override
+	protected IEclipsePreferences getEclipsePreferences()
+	{
+		return EclipseUtil.instanceScope().getNode(HTMLPlugin.PLUGIN_ID);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getFormatterTabPolicy()
+	 */
+	@Override
+	protected String getFormatterTabPolicy(Map<String, String> preferences)
+	{
+		return preferences.get(HTMLFormatterConstants.FORMATTER_TAB_CHAR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getFormatterTabSizeKey()
+	 */
+	@Override
+	protected String getFormatterTabSizeKey()
+	{
+		return HTMLFormatterConstants.FORMATTER_TAB_SIZE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getEditorTabSize()
+	 */
+	@Override
+	protected int getEditorTabSize()
+	{
+		return EditorUtil.getSpaceIndentSize(HTMLPlugin.getDefault().getBundle().getSymbolicName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getDefaultEditorTabSize()
+	 */
+	protected int getDefaultEditorTabSize()
+	{
+		return EditorUtil.getDefaultSpaceIndentSize(HTMLPlugin.getDefault().getBundle().getSymbolicName());
 	}
 }

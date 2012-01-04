@@ -14,6 +14,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.formatter.XMLFormatterConstants;
 import com.aptana.editor.xml.formatter.XMLFormatterPlugin;
 import com.aptana.formatter.IDebugScopes;
@@ -31,7 +33,8 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	{
 		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(XMLFormatterPlugin.PLUGIN_ID);
 		store.put(XMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
-		store.put(XMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		store.put(XMLFormatterConstants.FORMATTER_TAB_SIZE,
+				Integer.toString(EditorUtil.getSpaceIndentSize(XMLPlugin.getDefault().getBundle().getSymbolicName())));
 		store.put(XMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(XMLFormatterConstants.WRAP_COMMENTS, false);
 		store.putInt(XMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);

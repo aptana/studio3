@@ -227,6 +227,18 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected void applyPreferences()
 	{
+		applyPreferences(false);
+	}
+
+	/**
+	 * Apply the preferences on all the registered formatter factories.
+	 * 
+	 * @param isInitializing
+	 *            Indicate that the apply is called during an initialization of a user class (for example - the
+	 *            AbstractFormatterSelectionBlock).
+	 */
+	protected void applyPreferences(boolean isInitializing)
+	{
 		IProfileManager manager = getProfileManager();
 		IProfile profile = manager.getSelected(fProject);
 		Map<String, String> settings = new HashMap<String, String>();
@@ -249,7 +261,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		IPreferencesSaveDelegate delegate = new SaveDelegate();
 		for (IScriptFormatterFactory factory : factories)
 		{
-			factory.savePreferences(settings, delegate);
+			factory.savePreferences(settings, delegate, isInitializing);
+			// Re-set the formatter preferences into the profile. There is a chance that they were modified in the
+			// savePreferences call.
+			if (profile != null)
+			{
+				profile.setSettings(settings);
+			}
 		}
 		if (selectedFormatter < 0)
 		{
@@ -445,7 +463,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 		configurePreview(fComposite, numColumns);
 		updateButtons();
-		applyPreferences();
+		applyPreferences(true);
 
 		return fComposite;
 	}

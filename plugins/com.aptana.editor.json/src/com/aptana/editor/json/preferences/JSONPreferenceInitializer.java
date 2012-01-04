@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
@@ -29,7 +30,8 @@ public class JSONPreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences pref = EclipseUtil.defaultScope().getNode(JSONPlugin.PLUGIN_ID);
 
 		pref.put(IPreferenceConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
-		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE,
+				Integer.toString(EditorUtil.getSpaceIndentSize(JSONPlugin.getDefault().getBundle().getSymbolicName())));
 		pref.put(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		pref.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		pref.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_ENABLE_FOLDING, true);

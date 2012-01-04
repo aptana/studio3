@@ -15,6 +15,8 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -47,6 +49,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	private IntegerFieldEditor tabSize;
 	protected BooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
+	private IPropertyChangeListener tabSizeListener;
 
 	/**
 	 * EditorsPreferencePage
@@ -192,6 +195,37 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		addField(tabSize);
 
 		createAutoIndentOptions(group);
+
+		tabSizeListener = new IPropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.equals(event.getProperty()))
+				{
+					// Update the tab-size control
+					setTabSpaceCombo();
+					tabSize.load();
+				}
+			}
+		};
+		// Listen to any external changes to the tab-size. The code-formatter preference page may change this value, so
+		// we need to track it here, as long as this page is not disposed.
+		getPreferenceStore().addPropertyChangeListener(tabSizeListener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (tabSizeListener != null)
+		{
+			getPreferenceStore().removePropertyChangeListener(tabSizeListener);
+			tabSizeListener = null;
+		}
+		super.dispose();
 	}
 
 	private void setTabSpaceCombo()
