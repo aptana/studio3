@@ -56,12 +56,13 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 	public static final String HEREGEX = PREFIX + "heregex"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLELINE_COMMENT, MULTILINE_COMMENT,
-			STRING_DOUBLE, STRING_SINGLE, REGEXP, HEREDOC, DOUBLE_HEREDOC, COMMAND,
-			HEREGEX };
+			STRING_DOUBLE, STRING_SINGLE, REGEXP, HEREDOC, DOUBLE_HEREDOC, COMMAND, HEREGEX };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICoffeeConstants.CONTENT_TYPE_COFFEE } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			// Special rule to avoid matching multiline comments for more than 3 #
+			new EndOfLineRule("####", getToken(SINGLELINE_COMMENT)), //$NON-NLS-1$
 			new MultiLineRule("###", "###", getToken(MULTILINE_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
 			new EndOfLineRule("#", getToken(SINGLELINE_COMMENT)), //$NON-NLS-1$			
 			new MultiLineRule("`", "`", getToken(COMMAND), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
@@ -87,16 +88,13 @@ public class CoffeeSourceConfiguration implements IPartitioningConfiguration, IS
 				ICoffeeScopeConstants.STRING_SINGLE));
 		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(
 				ICoffeeScopeConstants.STRING_DOUBLE));
-		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(
-				ICoffeeScopeConstants.COMMAND));
+		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(ICoffeeScopeConstants.COMMAND));
 		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
 				ICoffeeScopeConstants.COMMENT_BLOCK));
 		c.addTranslation(new QualifiedContentType(SINGLELINE_COMMENT), new QualifiedContentType(
 				ICoffeeScopeConstants.COMMENT_LINE));
-		c.addTranslation(new QualifiedContentType(HEREGEX), new QualifiedContentType(
-				ICoffeeScopeConstants.REGEXP));
-		c.addTranslation(new QualifiedContentType(REGEXP),
-				new QualifiedContentType(ICoffeeScopeConstants.REGEXP));
+		c.addTranslation(new QualifiedContentType(HEREGEX), new QualifiedContentType(ICoffeeScopeConstants.REGEXP));
+		c.addTranslation(new QualifiedContentType(REGEXP), new QualifiedContentType(ICoffeeScopeConstants.REGEXP));
 	}
 
 	private CoffeeSourceConfiguration()
