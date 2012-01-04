@@ -766,7 +766,9 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 		// draw diff info
 		int y = -JFaceTextUtil.getHiddenTopLinePixels(fCachedTextWidget);
 		List<LineMap> lineMap = getLineMap(fCachedTextWidget, visibleLines);
-		for (int i = 0; i < lineMap.size(); i++)
+		int lineCount = fCachedTextWidget.getLineCount();
+		int lineMapSize = lineMap.size();
+		for (int i = 0; i < lineMapSize; i++)
 		{
 			LineMap map = lineMap.get(i);
 			int line = map.documentLine;
@@ -777,7 +779,7 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 				paintLine(line, y, lineHeight, gc, display);
 
 				int distanceFromPrevious = 1;
-				if (line < fCachedTextWidget.getLineCount() - 1 && i + 1 < lineMap.size())
+				if (line < lineCount - 1 && i + 1 < lineMapSize)
 				{
 					distanceFromPrevious = lineMap.get(i + 1).visualLine - map.visualLine;
 				}
