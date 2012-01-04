@@ -69,9 +69,9 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 				FormatterMessages.IndentationTabPage_general_group_option_tab_policy, TAB_OPTION_ITEMS,
 				TAB_OPTION_NAMES);
 		final Text indentationSize = manager.createNumber(group, JSFormatterConstants.FORMATTER_INDENTATION_SIZE,
-				FormatterMessages.IndentationTabPage_general_group_option_indent_size);
+				FormatterMessages.IndentationTabPage_general_group_option_indent_size, 1);
 		final Text tabSize = manager.createNumber(group, JSFormatterConstants.FORMATTER_TAB_SIZE,
-				FormatterMessages.IndentationTabPage_general_group_option_tab_size);
+				FormatterMessages.IndentationTabPage_general_group_option_tab_size, 1);
 		tabSize.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(ModifyEvent e)
