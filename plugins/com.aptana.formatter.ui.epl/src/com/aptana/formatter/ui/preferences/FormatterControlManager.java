@@ -113,6 +113,20 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createNumber(org.eclipse.swt.widgets.Composite,
+	 * java.lang.String, java.lang.String, int)
+	 */
+	public Text createNumber(Composite parent, String key, String label, int minValue)
+	{
+		final Label labelControl = SWTFactory.createLabel(parent, label);
+		Text text = SWTFactory.createText(parent, SWT.BORDER, 1, Util.EMPTY_STRING);
+		bindingManager.bindControl(text, key, new FieldValidators.MinimumNumberValidator(minValue));
+		registerAssociatedLabel(text, labelControl);
+		return text;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IFormatterControlManager#createSpinner(org.eclipse.swt.widgets.Composite,
 	 * java.lang.Object, int, int, int)
 	 */
