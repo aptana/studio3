@@ -10,12 +10,15 @@ package com.aptana.editor.json.formatter;
 import java.net.URL;
 import java.util.Map;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.editor.json.JSONSourceConfiguration;
 import com.aptana.editor.json.JSONSourceViewerConfiguration;
@@ -113,5 +116,54 @@ public class JSONFormatterFactory extends AbstractScriptFormatterFactory
 	public Object getPartitioningConfiguration()
 	{
 		return JSONSourceConfiguration.getDefault();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getEclipsePreferences()
+	 */
+	@Override
+	protected IEclipsePreferences getEclipsePreferences()
+	{
+		return EclipseUtil.instanceScope().getNode(JSONPlugin.PLUGIN_ID);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getFormatterTabPolicy()
+	 */
+	@Override
+	protected String getFormatterTabPolicy(Map<String, String> preferences)
+	{
+		return preferences.get(IPreferenceConstants.FORMATTER_TAB_CHAR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getEditorTabSize()
+	 */
+	@Override
+	protected int getEditorTabSize()
+	{
+		return EditorUtil.getSpaceIndentSize(JSONPlugin.getDefault().getBundle().getSymbolicName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getDefaultEditorTabSize()
+	 */
+	protected int getDefaultEditorTabSize()
+	{
+		return EditorUtil.getDefaultSpaceIndentSize(JSONPlugin.getDefault().getBundle().getSymbolicName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getFormatterTabSizeKey()
+	 */
+	@Override
+	protected String getFormatterTabSizeKey()
+	{
+		return IPreferenceConstants.FORMATTER_TAB_SIZE;
 	}
 }

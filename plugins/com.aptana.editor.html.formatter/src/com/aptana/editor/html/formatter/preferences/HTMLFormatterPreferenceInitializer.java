@@ -13,6 +13,8 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.editor.html.formatter.HTMLFormatterPlugin;
 import com.aptana.formatter.IDebugScopes;
@@ -36,7 +38,8 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	{
 		IEclipsePreferences store = EclipseUtil.defaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
-		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE,
+				Integer.toString(EditorUtil.getSpaceIndentSize(HTMLPlugin.getDefault().getBundle().getSymbolicName())));
 		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(HTMLFormatterConstants.WRAP_COMMENTS, false);
 		store.putBoolean(HTMLFormatterConstants.PLACE_COMMENTS_IN_SEPARATE_LINES, false);
