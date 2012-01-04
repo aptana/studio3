@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -25,6 +26,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -117,6 +119,22 @@ public class XMLEditor extends AbstractThemeableEditor
 	@Override
 	protected String getFileServiceContentTypeId()
 	{
+		try
+		{
+			IContentType contentType = ((TextFileDocumentProvider) getDocumentProvider())
+					.getContentType(getEditorInput());
+			if (contentType != null)
+			{
+				IContentType baseType = contentType.getBaseType();
+				if (baseType != null && IXMLConstants.CONTENT_TYPE_XML.equals(baseType.getId()))
+				{
+					return contentType.getId();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
 		return IXMLConstants.CONTENT_TYPE_XML;
 	}
 
