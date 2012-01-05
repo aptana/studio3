@@ -48,6 +48,9 @@ public class Messages extends NLS
 	public static String FileSystemRenameAction_InputTitle;
 	public static String FileSystemRenameAction_ToolTip;
 
+	public static String IOUIPlugin_ErrorSavingRemoteFile_Message;
+	public static String IOUIPlugin_ErrorSavingRemoteFile_Title;
+
 	public static String NewFileAction_Confirm_Message;
 	public static String NewFileAction_Confirm_Title;
 	public static String NewExternalFileWizard_Description;
