@@ -113,7 +113,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		});
 
 		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(GridLayoutFactory.swtDefaults().spacing(0, 10).margins(10, 0).create());
+		main.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 10).create());
 		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		stepIndicatorComposite = new StepIndicatorComposite(main, stepNames);

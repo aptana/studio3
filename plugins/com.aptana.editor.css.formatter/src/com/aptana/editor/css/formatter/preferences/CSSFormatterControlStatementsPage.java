@@ -51,9 +51,9 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 				Messages.CSSFormatterControlStatementsPage_tab_policy_group_option, TAB_OPTION_ITEMS, TAB_OPTION_NAMES);
 		final Text indentationSize = manager.createNumber(generalGroup,
 				CSSFormatterConstants.FORMATTER_INDENTATION_SIZE,
-				Messages.CSSFormatterControlStatementsPage_indentation_size_group_option);
+				Messages.CSSFormatterControlStatementsPage_indentation_size_group_option, 1);
 		final Text tabSize = manager.createNumber(generalGroup, CSSFormatterConstants.FORMATTER_TAB_SIZE,
-				Messages.CSSFormatterControlStatementsPage_tab_size_group_option);
+				Messages.CSSFormatterControlStatementsPage_tab_size_group_option, 1);
 
 		tabSize.addModifyListener(new ModifyListener()
 		{

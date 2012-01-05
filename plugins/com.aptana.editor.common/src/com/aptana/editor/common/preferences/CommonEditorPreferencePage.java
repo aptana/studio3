@@ -9,16 +9,17 @@ package com.aptana.editor.common.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -48,6 +49,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	private IntegerFieldEditor tabSize;
 	protected BooleanFieldEditor enableFolding;
 	private Combo tabSpaceCombo;
+	private IPropertyChangeListener tabSizeListener;
 
 	/**
 	 * EditorsPreferencePage
@@ -69,14 +71,14 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
 		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.CommonEditorPreferencePage_Folding);
-		group.setLayout(new GridLayout(1, false));
+		group.setLayout(GridLayoutFactory.swtDefaults().create());
 		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		createFoldingOptions(group);
 
 		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.CommonEditorPreferencePage_ContentAssist);
-		caGroup.setLayout(new GridLayout(1, false));
+		caGroup.setLayout(GridLayoutFactory.swtDefaults().create());
 		caGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		Composite caOptions = createContentAssistOptions(caGroup);
@@ -89,7 +91,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void createTextEditingOptions(Composite parent, String groupName)
 	{
 		Composite group = AptanaPreferencePage.createGroup(parent, groupName);
-		group.setLayout(new GridLayout(3, false));
+		group.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
 		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		Label label = new Label(group, SWT.NONE);
@@ -193,6 +195,37 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		addField(tabSize);
 
 		createAutoIndentOptions(group);
+
+		tabSizeListener = new IPropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.equals(event.getProperty()))
+				{
+					// Update the tab-size control
+					setTabSpaceCombo();
+					tabSize.load();
+				}
+			}
+		};
+		// Listen to any external changes to the tab-size. The code-formatter preference page may change this value, so
+		// we need to track it here, as long as this page is not disposed.
+		getPreferenceStore().addPropertyChangeListener(tabSizeListener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (tabSizeListener != null)
+		{
+			getPreferenceStore().removePropertyChangeListener(tabSizeListener);
+			tabSizeListener = null;
+		}
+		super.dispose();
 	}
 
 	private void setTabSpaceCombo()
@@ -271,9 +304,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		Composite autoIndentGroup = new Composite(parent, SWT.NONE);
 		autoIndentGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
 
-		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
-				Messages.CommonEditorPreferencePage_auto_indent_label, autoIndentGroup);
-		addField(autoIndentTag);
+		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
+				Messages.CommonEditorPreferencePage_auto_indent_label, autoIndentGroup));
 	}
 
 	protected Composite createFoldingOptions(Composite parent)
@@ -281,9 +313,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		Composite foldingGroup = new Composite(parent, SWT.NONE);
 		foldingGroup.setLayoutData(GridDataFactory.fillDefaults().span(1, 1).create());
 
-		enableFolding = new BooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
-				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup);
-		addField(enableFolding);
+		addField(enableFolding = new BooleanFieldEditor(IPreferenceConstants.EDITOR_ENABLE_FOLDING,
+				Messages.CommonEditorPreferencePage_enable_folding_label, foldingGroup));
 
 		return foldingGroup;
 	}
@@ -412,6 +443,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 	}
 
+	/**
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	public void init(IWorkbench workbench)
 	{
 	}

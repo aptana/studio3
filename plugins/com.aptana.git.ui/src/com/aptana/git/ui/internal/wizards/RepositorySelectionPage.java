@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.CoreStrings;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitRepository;
 
 class RepositorySelectionPage extends WizardPage
@@ -104,7 +106,7 @@ class RepositorySelectionPage extends WizardPage
 		});
 
 		final Button b = new Button(composite, SWT.PUSH);
-		b.setText(Messages.RepositorySelectionPage_Browse_Label);
+		b.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
 		b.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(final SelectionEvent e)

@@ -18,8 +18,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +41,9 @@ import org.chromium.sdk.DebugEventListener;
 import org.chromium.sdk.ExceptionData;
 import org.chromium.sdk.IgnoreCountBreakpointExtension;
 import org.chromium.sdk.JavascriptVm.BreakpointCallback;
+import org.chromium.sdk.JavascriptVm.ExceptionCatchMode;
 import org.chromium.sdk.JavascriptVm.ScriptsCallback;
+import org.chromium.sdk.JavascriptVm.SuspendCallback;
 import org.chromium.sdk.JsEvaluateContext.EvaluateCallback;
 import org.chromium.sdk.JsObject;
 import org.chromium.sdk.JsScope;
@@ -50,7 +54,9 @@ import org.chromium.sdk.JsVariable.SetValueCallback;
 import org.chromium.sdk.Script;
 import org.chromium.sdk.StandaloneVm;
 import org.chromium.sdk.TextStreamPosition;
+import org.chromium.sdk.util.GenericCallback;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.StringUtil;
@@ -66,30 +72,44 @@ public class V8DebugHost extends AbstractDebugHost {
 		SUSPENDED, TERMINATE
 	}
 
+	private static final JsScope.Type[] SCOPE_ORDER = new JsScope.Type[] {
+		JsScope.Type.CATCH,
+		JsScope.Type.CLOSURE,
+		JsScope.Type.WITH,
+		JsScope.Type.LOCAL,
+		JsScope.Type.GLOBAL
+	};
+
 	private static final int V8_CONNECT_TIMEOUT = 300000;
-	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final Pattern SCOPE_CHAIN_PATTERN = Pattern.compile("^<[A-Z]+>\\.(.*)$"); //$NON-NLS-1$
 	private static final Pattern DETAIL_EXPRESSION_PATTERN = Pattern.compile("\\bthis\\b"); //$NON-NLS-1$
 	private static final String THIS_SUBSTITUTE = "__this__"; //$NON-NLS-1$
+	private static final String ANONYMOUS = "(anonymous function)"; //$NON-NLS-1$
 
+	private boolean flatScopesMode = true;
 	private final SocketAddress v8SocketAddress;
 
 	private StandaloneVm vm;
 	private DebugEventListener debugEventListener;
 	private DebugContext currentContext;
 	private List<? extends CallFrame> currentFrames;
-
+	private StepAction lastStopAction;
 	private BlockingQueue<EventType> eventQueue = new LinkedBlockingQueue<EventType>();
 	private final Callback callback = new Callback();
 	
+	private List<Pattern> scriptFilters = new ArrayList<Pattern>();
+	private List<Pattern> variableFilters = new ArrayList<Pattern>();
 	private Map<String, String> detailFormatters = new HashMap<String, String>();
 	private Map<String, Script> loadedScripts = new HashMap<String, Script>();
 	private Map<String, Integer> scriptFunctionIds = new HashMap<String, Integer>();
 	private int nextScriptFunctionId = 1;
 	private boolean initialized = false;
+	private boolean terminating = false;
 	private Map<Integer, JsVariable> evalResults = new HashMap<Integer,JsVariable>();
 	private int evalResultsLastId = 0;
 	private Map<String, Map<Integer, Breakpoint>> breakpoints = new HashMap<String, Map<Integer,Breakpoint>>();
 	private Map<Breakpoint, BreakpointProperties> breakpointProps = new HashMap<Breakpoint, AbstractDebugHost.BreakpointProperties>();
+	private Map<String, Boolean> exceptions = new HashMap<String, Boolean>();
 
 	public static V8DebugHost createDebugHost(SocketAddress sockAddress) throws CoreException {
 		V8DebugHost debugHost = new V8DebugHost(sockAddress);
@@ -106,7 +126,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			public void suspended(DebugContext context) {
 				if (context.getState() == State.EXCEPTION) {
 					if (!suspendOnException(context.getExceptionData())) {
-						context.continueVm(StepAction.CONTINUE, 0, null);
+						continueVm(lastStopAction, 1);
 						return;
 					}
 				}
@@ -134,6 +154,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 
 			public void resumed() {
+				currentFrames = null;
 				currentContext = null;
 			}
 
@@ -144,6 +165,14 @@ public class V8DebugHost extends AbstractDebugHost {
 			public void disconnected() {
 			}
 		};
+	}
+
+	public void setScriptFilters(Collection<Pattern> filters) {
+		scriptFilters.addAll(filters);
+	}
+
+	public void setVariableFilters(Collection<Pattern> filters) {
+		variableFilters.addAll(filters);
 	}
 
 	/* (non-Javadoc)
@@ -177,21 +206,33 @@ public class V8DebugHost extends AbstractDebugHost {
 	protected void startDebugging() throws IOException {
 		currentFrames = currentContext.getCallFrames();
 		if (currentFrames == null || currentFrames.isEmpty()) {
-			logError("startDebugging(frames is empty)"); //$NON-NLS-1$
-			continueVm(StepAction.CONTINUE, 0);
+			handleSuspend();
 			return;
-		}
-		if (suspendReason == null) {
-			suspendReason = UNDEFINED;
 		}
 		CallFrame frame = currentFrames.get(0);
 		Script script = frame.getScript();
+		// Filter internal API frames
+		if (currentContext.getState() == State.NORMAL && isScriptFiltered(script)) {
+			continueVm(SUSPEND.equals(suspendReason) ? StepAction.IN : (currentFrames.size() > 1 ? StepAction.OUT : StepAction.CONTINUE), 1);
+			return;
+		}
+		List<CallFrame> filteredFrames = new ArrayList<CallFrame>();
+		for (CallFrame f : currentFrames) {
+			if (!isScriptFiltered(f.getScript())) {
+				filteredFrames.add(f);
+			}
+		}
+		currentFrames = filteredFrames;
+
 		String fileName = makeAbsoluteURI(script.getName());
 		TextStreamPosition position = frame.getStatementStartPosition();
 		if (position == null) {
 			logError("startDebugging(position=null)"); //$NON-NLS-1$
 			continueVm(StepAction.CONTINUE, 0);
 			return;
+		}
+		if (suspendReason == null) {
+			suspendReason = UNDEFINED;
 		}
 		sendData(new String[] { SUSPENDED, suspendReason, Util.encodeData(fileName),
 				Integer.toString(position.getLine()+1) }); // Line numbers are 0-based in V8, 1-based in Aptana Debugger Protocol/Eclipse.
@@ -216,7 +257,9 @@ public class V8DebugHost extends AbstractDebugHost {
 			} else if (STEP_OVER.equals(resumeReason)) {
 				continueVm(StepAction.OVER, 1);
 			} else if (STEP_RETURN.equals(resumeReason)) {
-				continueVm(StepAction.OUT, 1);
+				int count = targetFrameCount;
+				targetFrameCount = 1;
+				continueVm(StepAction.OUT, count);
 			} else if (!ABORT.equals(reason)) {
 				continueVm(StepAction.CONTINUE, 0);
 			}
@@ -245,6 +288,9 @@ public class V8DebugHost extends AbstractDebugHost {
 					break;
 				case TERMINATE:
 					handleTerminate();
+					if (vm == null || !vm.isAttached()) {
+						return;
+					}
 				default:
 					break;
 			}
@@ -253,6 +299,10 @@ public class V8DebugHost extends AbstractDebugHost {
 
 	private void handleSuspended() throws IOException {
 		checkInitialized();
+		if (terminating) {
+			handleTerminate();
+			return;
+		}
 		switch (currentContext.getState()) {
 			case NORMAL:
 				if (!currentContext.getBreakpointsHit().isEmpty()) {
@@ -266,33 +316,56 @@ public class V8DebugHost extends AbstractDebugHost {
 		startDebugging();
 	}
 	
-	private void handleTerminate() {
-		if (currentContext != null) {
-			try {
-				stopDebugging(ABORT);
-			} catch (IOException e) {
-				logError(e);
-			}
-		}
+	protected void handleTerminate() {
 		if (vm != null) {
 			vm.detach();
 		}
 		closeLogger();
 	}
+	
+	protected void evaluateInGlobalContext(String expression) {
+		if (currentContext != null) {
+			currentContext.getGlobalEvaluateContext().evaluateSync(expression, null, new Callback());
+		}
+	}
 
-	private boolean suspendOnException(ExceptionData exception) {
-		return true;
+	private boolean suspendOnException(ExceptionData exceptionData) {
+		JsValue exception = exceptionData.getExceptionValue();
+		if (exception == null || !JsValue.Type.isObjectType(exception.getType())) {
+			return false;
+		}
+		String exceptionClass = exception.asObject().getClassName();
+		if (getBooleanOption(SUSPEND_ON_ERRORS) && exceptionClass.endsWith("Error")) { //$NON-NLS-1$
+			return true;
+		} else if (getBooleanOption(SUSPEND_ON_EXCEPTIONS) && exceptionClass.endsWith("Exception")) { //$NON-NLS-1$
+			return true;
+		} else if (exceptions.containsKey(exceptionClass)) {
+			return true;
+		} else {
+			for (String t : getClassHierarchy(exception.asObject())) {
+				if (exceptions.containsKey(t)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#suspend(java.lang.String)
 	 */
 	@Override
-	protected void suspend(String reason) {
-		if (currentContext == null) {
+	protected boolean suspend(String reason) {
+		if (currentContext == null && vm != null) {
 			suspendReason = reason;
 			vm.suspend(null);
-		}			
+			return true;
+		}
+		return false;
+	}
+	
+	protected void handleSuspend() {
+		continueVm(StepAction.CONTINUE, 0);
 	}
 
 	/* (non-Javadoc)
@@ -314,7 +387,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				continue;
 			}
 			String functionName = frame.getFunctionName();
-			if (ANONYMOUS.equals(functionName)) {
+			if (ANONYMOUS.equals(functionName) && i == currentFrames.size() - 1) {
 				functionName = StringUtil.EMPTY;
 			}
 			framesData[i] = StringUtil.join(SUBARGS_DELIMITER, new String[] {
@@ -373,15 +446,19 @@ public class V8DebugHost extends AbstractDebugHost {
 		if (variableName.length() == 0) {
 			if (frame != null) {
 				generateVariablesData(data, Arrays.asList(frame.getReceiverVariable()));
-				for (JsScope scope : frame.getVariableScopes()) {
-					if (scope.getType() == Type.LOCAL) {
-						continue;
+				if (flatScopesMode) {
+					flattenScopes(data, frame);
+				} else {
+					for (JsScope scope : frame.getVariableScopes()) {
+						if (scope.getType() == Type.LOCAL) {
+							continue;
+						}
+						data.add(generateVariableData(
+								new VariableProperties(MessageFormat.format("<{0}>", scope.getType().name()), String.valueOf('o'), JsValue.Type.TYPE_OBJECT, StringUtil.EMPTY, StringUtil.EMPTY, null), //$NON-NLS-1$
+								StringUtil.EMPTY));
 					}
-					data.add(generateVariableData(
-							new VariableProperties(MessageFormat.format("<{0}>", scope.getType().name()), String.valueOf('o'), JsValue.Type.TYPE_OBJECT, StringUtil.EMPTY, StringUtil.EMPTY, null), //$NON-NLS-1$
-							StringUtil.EMPTY));
+					generateVariablesData(data, getScopeVariables(frame, JsScope.Type.LOCAL), String.valueOf('l'), null);
 				}
-				generateVariablesData(data, getScopeVariables(frame, JsScope.Type.LOCAL), String.valueOf('l'));
 			} else if (evalResult != null) {
 				generateValueData(data, evalResult);
 			}
@@ -393,6 +470,24 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 		}
 		return StringUtil.join(ARGS_DELIMITER, data.toArray(new String[data.size()]));
+	}
+
+	private void flattenScopes(List<String> data, CallFrame frame) {
+		Set<String> visitedNames = new HashSet<String>();
+		for (JsScope.Type type : SCOPE_ORDER) {
+			generateVariablesData(data, getScopeVariables(frame, type), type == Type.LOCAL ? String.valueOf('l') : null, visitedNames);
+		}
+	}
+
+	private JsVariable findVariableInFlattenScope(CallFrame frame, String name) {
+		for (JsScope.Type type : SCOPE_ORDER) {
+			for (JsVariable v : getScopeVariables(frame, type)) {
+				if (name.equals(v.getName())) {
+					return v;
+				}
+			}
+		}
+		return null;
 	}
 
 	private static JsScope getScope(CallFrame frame, JsScope.Type type) {
@@ -412,11 +507,37 @@ public class V8DebugHost extends AbstractDebugHost {
 		return Collections.emptyList();
 	}
 
+	private boolean isScriptFiltered(Script script) {
+		String fileName = script.getName();
+		for (Pattern pattern : scriptFilters) {
+			if (pattern.matcher(fileName).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isVariableFiltered(JsVariable variable) {
+		String name = variable.getFullyQualifiedName();
+		for (Pattern pattern : variableFilters) {
+			if (pattern.matcher(name).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private Object findVariable(CallFrame frame, String variableName) {
 		if (THIS.equals(variableName)) {
 			return frame.getReceiverVariable();
 		} else if (variableName.startsWith(THIS_DOT)) {
 			return findVariable(frame.getReceiverVariable(), variableName.substring(THIS_DOT.length()));
+		} else if (flatScopesMode) {
+			String name = variableName.split(VARIABLE_PARTS_SPLIT)[0];
+			JsVariable v = findVariableInFlattenScope(frame, name);
+			if (v != null) {
+				return findVariable(v, variableName.length() == name.length() ? StringUtil.EMPTY : variableName.substring(name.length()+1));
+			}
 		} else if (variableName.startsWith("<")) { //$NON-NLS-1$
 			int index = variableName.indexOf('>');
 			if (index > 0) {
@@ -483,14 +604,20 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 
 	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables) {
-		generateVariablesData(data, variables, StringUtil.EMPTY);
+		generateVariablesData(data, variables, StringUtil.EMPTY, null);
 	}
 
-	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables, String extraFlags) {
+	private void generateVariablesData(List<String> data, Collection<? extends JsVariable> variables, String extraFlags, Set<String> ignoreSet) {
 		for (JsVariable variable : variables) {
+			if (isVariableFiltered(variable) || (ignoreSet != null && ignoreSet.contains(variable.getName()))) {
+				continue;
+			}
 			VariableProperties props = getVariableProperties(variable, false);
 			if (props != null) {
 				data.add(generateVariableData(props, extraFlags));
+				if (ignoreSet != null) {
+					ignoreSet.add(props.name);
+				}
 			}
 		}		
 	}
@@ -505,7 +632,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 		} else if (object instanceof JsScope) {
 			JsScope scope = (JsScope) object;
-			generateVariablesData(data, scope.getVariables(), ""); //$NON-NLS-1$
+			generateVariablesData(data, scope.getVariables(), "", null); //$NON-NLS-1$
 		}
 	}
 
@@ -567,6 +694,13 @@ public class V8DebugHost extends AbstractDebugHost {
 			}
 			break;
 		case TYPE_ARRAY:
+			flags = addFlag(flags, 'o');
+			displayValue = StringUtil.format(OBJECT_0, value.asObject().getClassName());
+			displayType = value.asObject().getClassName();
+			if (computeDetails) {
+				detailValue = getObjectDetail(value.asObject());
+			}
+			break;
 		default:
 			displayType = value.asObject().getClassName();
 			displayType = StringUtil.format("Unknown <{0}>", displayType); //$NON-NLS-1$
@@ -675,7 +809,45 @@ public class V8DebugHost extends AbstractDebugHost {
 		}
 		return null;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#setExceptionBreakpoint(java.lang.String)
+	 */
+	@Override
+	protected void setExceptionBreakpoint(String exceptionType) {
+		if (exceptions.size() == 1) {
+			setCatchExceptions();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#removeExceptionBreakpoint(java.lang.String)
+	 */
+	@Override
+	protected void removeExceptionBreakpoint(String exceptionType) {
+		if (exceptions.isEmpty()) {
+			setCatchExceptions();
+		}
+	}
 	
+	private void setCatchExceptions() {
+		CallbackSemaphore semaphore = new CallbackSemaphore();
+		ExceptionCatchMode mode = getBooleanOption(SUSPEND_ON_ERRORS) || getBooleanOption(SUSPEND_ON_EXCEPTIONS) || !exceptions.isEmpty() ? ExceptionCatchMode.ALL : ExceptionCatchMode.NONE;
+		semaphore.acquireDefault(vm.setBreakOnException(mode, callback, semaphore));
+
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#processOptionChange(java.lang.String)
+	 */
+	@Override
+	protected void processOptionChange(String option) {
+		if (SUSPEND_ON_ERRORS.equals(option) || SUSPEND_ON_EXCEPTIONS.equals(option)) {
+			setCatchExceptions();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.js.debug.core.internal.model.AbstractDebugHost#doEval(java.lang.String, java.lang.String)
 	 */
@@ -941,6 +1113,7 @@ public class V8DebugHost extends AbstractDebugHost {
 		}
 		initialized = true;
 		processLoadedScripts();
+		setCatchExceptions();
 	}
 		
 	private void processLoadedScripts() {
@@ -1080,7 +1253,7 @@ public class V8DebugHost extends AbstractDebugHost {
 	}
 
 	private void continueVm(StepAction stepAction, int stepCount) {
-		currentContext.continueVm(stepAction, stepCount, callback);
+		currentContext.continueVm(lastStopAction = stepAction, stepCount, callback);
 	}
 
 	/* (non-Javadoc)
@@ -1094,7 +1267,7 @@ public class V8DebugHost extends AbstractDebugHost {
 			boolean attached = false;
 			while (System.currentTimeMillis() <= endTime) {
 				try {
-					vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
+					vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, Platform.inDevelopmentMode() ? new ConnectionLoggerImpl(System.out) : null);
 					vm.attach(debugEventListener);
 					attached = true;
 					break;
@@ -1105,7 +1278,7 @@ public class V8DebugHost extends AbstractDebugHost {
 				Thread.sleep(500);
 			}
 			if (!attached) {
-				vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, new ConnectionLoggerImpl(System.out));
+				vm = BrowserFactory.getInstance().createStandalone(v8SocketAddress, Platform.inDevelopmentMode() ? new ConnectionLoggerImpl(System.out) : null);
 				vm.attach(debugEventListener); // last try, throws exception
 			}
 			if (vm.isAttached()) {
@@ -1141,10 +1314,14 @@ public class V8DebugHost extends AbstractDebugHost {
 	 */
 	@Override
 	protected void terminateSession() {
+		if (terminating) {
+			return;
+		}
+		terminating = true;
 		eventQueue.offer(EventType.TERMINATE);
 	}
 
-	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback, BreakpointCallback {
+	private class Callback implements ContinueCallback, ScriptsCallback, EvaluateCallback, SetValueCallback, BreakpointCallback, SuspendCallback, GenericCallback<ExceptionCatchMode> {
 
 		/*
 		 * (non-Javadoc)
@@ -1169,6 +1346,19 @@ public class V8DebugHost extends AbstractDebugHost {
 		 * @see org.chromium.sdk.JavascriptVm.BreakpointCallback#success(org.chromium.sdk.Breakpoint)
 		 */
 		public void success(Breakpoint breakpoint) {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.chromium.sdk.util.GenericCallback#success(java.lang.Object)
+		 */
+		public void success(ExceptionCatchMode value) {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.chromium.sdk.util.GenericCallback#failure(java.lang.Exception)
+		 */
+		public void failure(Exception exception) {
+			logError(exception.getMessage());
 		}
 
 		/*

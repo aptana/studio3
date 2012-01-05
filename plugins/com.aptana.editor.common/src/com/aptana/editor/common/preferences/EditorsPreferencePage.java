@@ -18,17 +18,15 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
-import com.aptana.core.CoreStrings;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
- * The form for configuring the general top-level preferences for this plugin
+ * The form for configuring the general top-level preferences for this plugin.
  */
-
 public class EditorsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
+
 	private String GENERAL_TEXT_EDITOR_PREF_ID = "org.eclipse.ui.preferencePages.GeneralTextEditor"; //$NON-NLS-1$
 
 	/**
@@ -69,24 +67,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
 				Messages.EditorsPreferencePage_Enable_WordWrap, appearanceComposite));
+
 		createTextEditorLink(appearanceComposite);
-	}
-
-	private void createTextEditorLink(Composite appearanceComposite)
-	{
-
-		// Link to general text editor prefs from Eclipse - they can set tabs/spaces/whitespace drawing, etc
-		Link link = new Link(appearanceComposite, SWT.NONE);
-		link.setText(Messages.EditorsPreferencePage_GeneralTextEditorPrefLink);
-		link.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent e)
-			{
-				((IWorkbenchPreferenceContainer) getContainer()).openPage(GENERAL_TEXT_EDITOR_PREF_ID, null);
-			}
-
-		});
 	}
 
 	/**
@@ -94,5 +76,21 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	 */
 	public void init(IWorkbench workbench)
 	{
+	}
+
+	private void createTextEditorLink(Composite appearanceComposite)
+	{
+		// Link to general text editor prefs from Eclipse - they can set tabs/spaces/whitespace drawing, etc
+		Link link = new Link(appearanceComposite, SWT.NONE);
+		link.setText(Messages.EditorsPreferencePage_GeneralTextEditorPrefLink);
+		link.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				((IWorkbenchPreferenceContainer) getContainer()).openPage(GENERAL_TEXT_EDITOR_PREF_ID, null);
+			}
+		});
 	}
 }

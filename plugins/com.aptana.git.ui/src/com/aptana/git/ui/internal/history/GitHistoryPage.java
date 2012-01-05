@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
@@ -45,6 +46,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.team.ui.history.HistoryPage;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -66,6 +68,8 @@ import com.aptana.ui.util.UIUtils;
 
 public class GitHistoryPage extends HistoryPage
 {
+
+	private static final String POPUP_MENU_ID = "com.aptana.git.ui.git_history"; //$NON-NLS-1$
 
 	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
 
@@ -144,6 +148,11 @@ public class GitHistoryPage extends HistoryPage
 					public void run()
 					{
 						graph.setCommits(commits);
+						if (getControl() != null && !getControl().isDisposed())
+						{
+							getSite().getPage().activate((IWorkbenchPart) getHistoryView());
+							((IViewPart) getHistoryView()).getViewSite().getActionBars().updateActionBars();
+						}
 					}
 				});
 				subMonitor.done();
@@ -210,6 +219,25 @@ public class GitHistoryPage extends HistoryPage
 		setTheme(false);
 		commentViewer.setText(MessageFormat.format(
 				"<html><head></head><body style=\"background-color: {0};\"></body></html>", toHex(getBackground()))); //$NON-NLS-1$
+
+		getHistoryPageSite().setSelectionProvider(getSelectionProvider());
+		getHistoryPageSite().getPart().getSite().setSelectionProvider(getSelectionProvider());
+
+		hookContextMenu(graph);
+	}
+
+	/**
+	 * hookContextMenu
+	 */
+	private void hookContextMenu(TableViewer treeViewer)
+	{
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+
+		// Create menu.
+		Menu menu = menuMgr.createContextMenu(treeViewer.getControl());
+		treeViewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(POPUP_MENU_ID, menuMgr, treeViewer);
 	}
 
 	protected RGB getBackground()

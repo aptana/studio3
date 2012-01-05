@@ -13,17 +13,16 @@ public interface IServerType extends Identifiable
 {
 
 	/**
-	 * Unique identifier from the extension.
+	 * Returns an unique identifier from the extension.
 	 * 
-	 * @return
+	 * @return the id
 	 */
-	public abstract String getId();
+	public String getId();
 
 	/**
-	 * A human-readbale name for this type of server.
+	 * Returns a human-readable name for this type of server.
 	 * 
-	 * @return
+	 * @return the name
 	 */
-	public abstract String getName();
-
+	public String getName();
 }

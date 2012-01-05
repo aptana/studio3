@@ -122,11 +122,12 @@ public class DownloadAction extends BaseSyncAction
 								{
 									for (IAdaptable file : files)
 									{
-										if (file instanceof IResource)
+										IResource resource = (IResource) file.getAdapter(IResource.class);
+										if (resource != null)
 										{
 											try
 											{
-												((IResource) file).refreshLocal(IResource.DEPTH_INFINITE, monitor);
+												resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 											}
 											catch (CoreException e)
 											{

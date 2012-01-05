@@ -22,6 +22,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
 import com.aptana.formatter.preferences.PreferenceKey;
 import com.aptana.formatter.preferences.PreferencesLookupDelegate;
+import com.aptana.formatter.preferences.profile.IProfile;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 
@@ -42,6 +43,8 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	PreferenceKey[] getPreferenceKeys();
 
 	void savePreferences(Map<String, String> preferences, IPreferencesSaveDelegate delegate);
+
+	void savePreferences(Map<String, String> preferences, IPreferencesSaveDelegate delegate, boolean isInitializing);
 
 	/**
 	 * Creates the {@link IScriptFormatter} with the specified preferences.
@@ -131,4 +134,14 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 * @return True, if this formatter may consume indentation; False, otherwise.
 	 */
 	boolean canConsumePreviousIndent();
+
+	/**
+	 * Update the formatted profile. <br>
+	 * This method is called when the existing profile version has an older version than the latest available, and it
+	 * needs an update, or migration.
+	 * 
+	 * @param profile
+	 *            An {@link IProfile}
+	 */
+	void updateProfile(IProfile profile);
 }

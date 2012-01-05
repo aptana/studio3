@@ -16,7 +16,7 @@ public class NavigatorUploadAction extends NavigatorBaseSyncAction
 
 	public NavigatorUploadAction(IWorkbenchPart activePart)
 	{
-		super("Upload", activePart); //$NON-NLS-1$
+		super(Messages.NavigatorUploadAction_LBL_Upload, activePart);
 	}
 
 	@Override

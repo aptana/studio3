@@ -7,8 +7,9 @@
  */
 package com.aptana.core.util;
 
-
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.eclipse.core.runtime.Platform;
 
@@ -33,31 +35,36 @@ import com.aptana.core.logging.IdeLog;
  */
 public final class PlatformUtil
 {
-	
+
 	private static final ProcessItem[] NO_PROCESS_ITEMS = new ProcessItem[0];
 
-	public static class ProcessItem {
+	public static class ProcessItem
+	{
 		private String executableName;
 		private int pid;
 		private int parentId;
-		
-		private ProcessItem(String executableName, int pid, int parentId) {
+
+		private ProcessItem(String executableName, int pid, int parentId)
+		{
 			this.executableName = executableName;
 			this.pid = pid;
 			this.parentId = parentId;
 		}
 
-		public String getExecutableName() {
+		public String getExecutableName()
+		{
 			return executableName;
 		}
 
-		public int getPid() {
+		public int getPid()
+		{
 			return pid;
 		}
 
 		@Override
-		public String toString() {
-			return "["+pid+"] "+executableName; //$NON-NLS-1$ //$NON-NLS-2$
+		public String toString()
+		{
+			return "[" + pid + "] " + executableName; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}
@@ -77,7 +84,6 @@ public final class PlatformUtil
 	 */
 	public static final String COMMON_APPDATA = "%COMMON_APPDATA%"; //$NON-NLS-1$
 
-
 	/**
 	 * DOCUMENTS_DIRECTORY
 	 */
@@ -87,7 +93,7 @@ public final class PlatformUtil
 	 * HOME_DIRECTORY
 	 */
 	public static final String HOME_DIRECTORY = Platform.OS_WIN32.equals(Platform.getOS()) ? "%USERPROFILE%" : "~"; //$NON-NLS-1$ //$NON-NLS-2$	
-	
+
 	private PlatformUtil()
 	{
 	}
@@ -97,42 +103,56 @@ public final class PlatformUtil
 	 * 
 	 * @return processes list as ProcessItem[]
 	 */
-	public static ProcessItem[] getRunningProcesses() {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
-			try {
+	public static ProcessItem[] getRunningProcesses()
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			try
+			{
 				Object[] namesWithIDs = CoreNatives.GetProcessList();
-				if (namesWithIDs != null) {
+				if (namesWithIDs != null)
+				{
 					List<ProcessItem> list = new ArrayList<ProcessItem>();
-					for (int i = 0; i < namesWithIDs.length - 2; i += 3) {
+					for (int i = 0; i < namesWithIDs.length - 2; i += 3)
+					{
 						list.add(new ProcessItem((String) namesWithIDs[i], /* executable */
 						((Integer) namesWithIDs[i + 1]).intValue(), /* pid */
 						((Integer) namesWithIDs[i + 2]).intValue())); /* ppid */
 					}
 					return list.toArray(new ProcessItem[list.size()]);
 				}
-			} catch (UnsatisfiedLinkError e) {
+			}
+			catch (UnsatisfiedLinkError e)
+			{
 				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
-		} else if (Platform.OS_LINUX.equals(Platform.getOS())) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()))
+		{
 			Process process = null;
 			LineNumberReader reader = null;
-			try {
+			try
+			{
 				process = Runtime.getRuntime().exec("/bin/ps --no-headers xo pid:1,ppid:1,args"); //$NON-NLS-1$
 				InputStream in = process.getInputStream();
 				reader = new LineNumberReader(new InputStreamReader(in, "ISO-8859-1")); //$NON-NLS-1$
 				String line;
 				List<ProcessItem> list = new ArrayList<ProcessItem>();
-				while ((line = reader.readLine()) != null) {
+				while ((line = reader.readLine()) != null)
+				{
 					int index = line.indexOf(' ');
-					if (index > 0) {
+					if (index > 0)
+					{
 						int pid = Integer.parseInt(line.substring(0, index));
 						line = line.substring(index + 1).trim();
 						index = line.indexOf(' ');
-						if (index > 0) {
+						if (index > 0)
+						{
 							int ppid = Integer.parseInt(line.substring(0, index));
 							line = line.substring(index + 1).trim();
 							index = line.indexOf(' ');
-							if (index > 0) {
+							if (index > 0)
+							{
 								line = line.substring(0, index);
 							}
 							list.add(new ProcessItem(line.trim(), pid, ppid));
@@ -140,24 +160,36 @@ public final class PlatformUtil
 					}
 				}
 				return list.toArray(new ProcessItem[list.size()]);
-			} catch (IOException e) {
-			} finally {
-				if (reader != null) {
-					try {
+			}
+			catch (IOException e)
+			{
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try
+					{
 						reader.close();
-					} catch (IOException ignore) {
+					}
+					catch (IOException ignore)
+					{
 					}
 				}
-				if (process != null) {
+				if (process != null)
+				{
 					process.destroy();
 				}
 			}
-		} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+		}
+		else if (Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
 			Process process = null;
 			Process process2 = null;
 			LineNumberReader reader = null;
 			LineNumberReader reader2 = null;
-			try {
+			try
+			{
 				process = Runtime.getRuntime().exec(
 						"/usr/bin/perl", new String[] { "VERSIONER_PERL_PREFER_32_BIT=yes" }); //$NON-NLS-1$ //$NON-NLS-2$
 				InputStream in = process.getInputStream();
@@ -168,15 +200,16 @@ public final class PlatformUtil
 				reader = new LineNumberReader(new InputStreamReader(in, "ISO-8859-1")); //$NON-NLS-1$
 
 				process2 = Runtime.getRuntime().exec("/bin/ps xo pid=,ppid=,command="); //$NON-NLS-1$
-				reader2 = new LineNumberReader(new InputStreamReader(process2.getInputStream(),
-						"ISO-8859-1")); //$NON-NLS-1$
+				reader2 = new LineNumberReader(new InputStreamReader(process2.getInputStream(), "ISO-8859-1")); //$NON-NLS-1$
 				Map<Integer, Integer> pid2ppid = new HashMap<Integer, Integer>();
 				Map<Integer, String> pid2command = new HashMap<Integer, String>();
 				String line;
-				while ((line = reader2.readLine()) != null) {
+				while ((line = reader2.readLine()) != null)
+				{
 					line = line.trim();
 					int index = line.indexOf(' ');
-					if (index > 0) {
+					if (index > 0)
+					{
 						int pid = Integer.parseInt(line.substring(0, index));
 						line = line.substring(index + 1).trim();
 						index = line.indexOf(' ');
@@ -188,36 +221,53 @@ public final class PlatformUtil
 				}
 
 				List<ProcessItem> list = new ArrayList<ProcessItem>();
-				while ((line = reader.readLine()) != null) {
+				while ((line = reader.readLine()) != null)
+				{
 					int index = line.indexOf(' ');
-					if (index > 0) {
+					if (index > 0)
+					{
 						int pid = Integer.parseInt(line.substring(0, index));
 						pid2command.put(pid, line.substring(index + 1).trim());
 					}
 				}
-				for (int pid : pid2command.keySet()) {
+				for (int pid : pid2command.keySet())
+				{
 					Integer ppid = pid2ppid.get(pid);
 					list.add(new ProcessItem(pid2command.get(pid), pid, ppid != null ? ppid.intValue() : 0));
 				}
 				return list.toArray(new ProcessItem[list.size()]);
-			} catch (IOException e) {
-			} finally {
-				if (reader != null) {
-					try {
+			}
+			catch (IOException e)
+			{
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try
+					{
 						reader.close();
-					} catch (IOException ignore) {
+					}
+					catch (IOException ignore)
+					{
 					}
 				}
-				if (reader2 != null) {
-					try {
+				if (reader2 != null)
+				{
+					try
+					{
 						reader2.close();
-					} catch (IOException ignore) {
+					}
+					catch (IOException ignore)
+					{
 					}
 				}
-				if (process != null) {
+				if (process != null)
+				{
 					process.destroy();
 				}
-				if (process2 != null) {
+				if (process2 != null)
+				{
 					process2.destroy();
 				}
 			}
@@ -230,57 +280,82 @@ public final class PlatformUtil
 	 * 
 	 * @return child processes list as ProcessItem[]
 	 */
-	public static ProcessItem[] getRunningChildProcesses() {
+	public static ProcessItem[] getRunningChildProcesses()
+	{
 		int currentPid = 0;
 		ProcessItem[] allProcesses = getRunningProcesses();
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
-			try {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			try
+			{
 				currentPid = CoreNatives.GetCurrentProcessId();
-			} catch (UnsatisfiedLinkError e) {
+			}
+			catch (UnsatisfiedLinkError e)
+			{
 				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
-		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
 			Process process = null;
 			LineNumberReader reader = null;
-			try {
+			try
+			{
 				process = Runtime.getRuntime().exec("/bin/ps xo ppid=,command="); //$NON-NLS-1$
 				InputStream in = process.getInputStream();
 				reader = new LineNumberReader(new InputStreamReader(in, "ISO-8859-1")); //$NON-NLS-1$
 				String line;
-				while ((line = reader.readLine()) != null) {
+				while ((line = reader.readLine()) != null)
+				{
 					line = line.trim();
 					int index = line.indexOf(' ');
-					if (index > 0) {
-						try {
+					if (index > 0)
+					{
+						try
+						{
 							int pid = Integer.parseInt(line.substring(0, index));
 							line = line.substring(index + 1).trim();
 							if (line.startsWith("/bin/ps xo ppid")) { //$NON-NLS-1$
 								currentPid = pid;
 								break;
 							}
-						} catch (NumberFormatException e) {
+						}
+						catch (NumberFormatException e)
+						{
 						}
 					}
 				}
-			} catch (IOException e) {
-			} finally {
-				if (reader != null) {
-					try {
+			}
+			catch (IOException e)
+			{
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try
+					{
 						reader.close();
-					} catch (IOException e) {
+					}
+					catch (IOException e)
+					{
 					}
 				}
-				if (process != null) {
+				if (process != null)
+				{
 					process.destroy();
 				}
 			}
 
 		}
 
-		if (currentPid != 0) {
+		if (currentPid != 0)
+		{
 			List<ProcessItem> list = new ArrayList<ProcessItem>();
-			for (int i = 0; i < allProcesses.length; ++i) {
-				if (allProcesses[i].parentId == currentPid && allProcesses[i].pid != currentPid) {
+			for (int i = 0; i < allProcesses.length; ++i)
+			{
+				if (allProcesses[i].parentId == currentPid && allProcesses[i].pid != currentPid)
+				{
 					list.add(allProcesses[i]);
 				}
 			}
@@ -290,24 +365,38 @@ public final class PlatformUtil
 		return NO_PROCESS_ITEMS;
 	}
 
-	public static void killProcess(int pid) {
+	public static void killProcess(int pid)
+	{
 		killProcess(pid, 9);
 	}
 
-	public static void killProcess(int pid, int signal) {
-		if (pid == 0) {
+	public static void killProcess(int pid, int signal)
+	{
+		if (pid == 0)
+		{
 			return;
 		}
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
-			try {
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			try
+			{
 				CoreNatives.KillProcess(pid);
-			} catch (UnsatisfiedLinkError e) {
+			}
+			catch (UnsatisfiedLinkError e)
+			{
 				IdeLog.logError(CorePlugin.getDefault(), Messages.PlatformUtils_CoreLibraryNotFound, e);
 			}
-		} else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
-			try {
-				Runtime.getRuntime().exec(MessageFormat.format("/bin/kill -{0} {1}", Integer.toString(signal & 0x0F), Long.toString((((long) pid) & 0xFFFFFFFF)))); //$NON-NLS-1$
-			} catch (IOException e) {
+		}
+		else if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			try
+			{
+				Runtime.getRuntime()
+						.exec(MessageFormat
+								.format("/bin/kill -{0} {1}", Integer.toString(signal & 0x0F), Long.toString((((long) pid) & 0xFFFFFFFF)))); //$NON-NLS-1$
+			}
+			catch (IOException e)
+			{
 			}
 		}
 	}
@@ -318,37 +407,55 @@ public final class PlatformUtil
 	 * @param path
 	 * @return expanded environment variable
 	 */
-	public static synchronized String expandEnvironmentStrings(String path) {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+	public static synchronized String expandEnvironmentStrings(String path)
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			String expanded = CoreNatives.ExpandEnvironmentStrings(path);
-			if (expanded != null) {
+			if (expanded != null)
+			{
 				path = expanded;
 			}
-			if (path.startsWith(DESKTOP_DIRECTORY)) {
+			if (path.startsWith(DESKTOP_DIRECTORY))
+			{
 				String desktopDirectory = CoreNatives.GetSpecialFolderPath(CoreNatives.CSIDL_DESKTOPDIRECTORY);
-				if (desktopDirectory != null) {
+				if (desktopDirectory != null)
+				{
 					path = desktopDirectory + path.substring(DESKTOP_DIRECTORY.length());
 				}
-			} else if (path.startsWith(LOCAL_APPDATA)) {
+			}
+			else if (path.startsWith(LOCAL_APPDATA))
+			{
 				String localAppData = CoreNatives.GetSpecialFolderPath(CoreNatives.CSIDL_LOCAL_APPDATA);
-				if (localAppData != null) {
+				if (localAppData != null)
+				{
 					path = localAppData + path.substring(LOCAL_APPDATA.length());
 				}
-			} else if (path.startsWith(COMMON_APPDATA)) {
+			}
+			else if (path.startsWith(COMMON_APPDATA))
+			{
 				String commonAppData = CoreNatives.GetSpecialFolderPath(CoreNatives.CSIDL_COMMON_APPDATA);
-				if (commonAppData != null) {
+				if (commonAppData != null)
+				{
 					path = commonAppData + path.substring(COMMON_APPDATA.length());
 				}
 			}
-		} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			if (path.startsWith(DESKTOP_DIRECTORY)) {
+		}
+		else if (Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			if (path.startsWith(DESKTOP_DIRECTORY))
+			{
 				String desktopDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kDesktopFolderType);
-				if (desktopDirectory != null) {
+				if (desktopDirectory != null)
+				{
 					path = desktopDirectory + path.substring(DESKTOP_DIRECTORY.length());
 				}
-			} else if (path.startsWith(DOCUMENTS_DIRECTORY)) {
+			}
+			else if (path.startsWith(DOCUMENTS_DIRECTORY))
+			{
 				String docsDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kDocumentsFolderType);
-				if (docsDirectory != null) {
+				if (docsDirectory != null)
+				{
 					path = docsDirectory + path.substring(DOCUMENTS_DIRECTORY.length());
 				}
 			}
@@ -356,7 +463,8 @@ public final class PlatformUtil
 		if (path.length() > 0 && path.charAt(0) == '~')
 		{
 			String home = System.getProperty("user.home"); //$NON-NLS-1$
-			if (home != null) {
+			if (home != null)
+			{
 				return home + path.substring(1);
 			}
 		}
@@ -370,21 +478,28 @@ public final class PlatformUtil
 	 * @param valueName
 	 * @return value of regestry key
 	 */
-	public static String queryRegestryStringValue(String keyName, String valueName) {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+	public static String queryRegestryStringValue(String keyName, String valueName)
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			long hRootKey;
 			if (keyName.startsWith("HKCR\\") || keyName.startsWith("HKEY_CLASSES_ROOT\\")) { //$NON-NLS-1$ //$NON-NLS-2$
 				hRootKey = CoreNatives.HKEY_CLASSES_ROOT;
-			} else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
 				hRootKey = CoreNatives.HKEY_LOCAL_MACHINE;
-			} else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
 				hRootKey = CoreNatives.HKEY_CURRENT_USER;
-			} else {
+			}
+			else
+			{
 				throw new IllegalArgumentException("Invalid regestry key name"); //$NON-NLS-1$
 			}
 			keyName = keyName.substring(keyName.indexOf('\\') + 1);
 			long[] hKey = new long[1];
-			if (CoreNatives.RegOpenKey(hRootKey, keyName, CoreNatives.KEY_READ, hKey)) {
+			if (CoreNatives.RegOpenKey(hRootKey, keyName, CoreNatives.KEY_READ, hKey))
+			{
 				String[] result = new String[1];
 				CoreNatives.RegQueryValue(hKey[0], valueName, result);
 				CoreNatives.RegCloseKey(hKey[0]);
@@ -402,21 +517,28 @@ public final class PlatformUtil
 	 * @param value
 	 * @return result of operation
 	 */
-	public static boolean setRegestryStringValue(String keyName, String valueName, String value) {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+	public static boolean setRegestryStringValue(String keyName, String valueName, String value)
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			long hRootKey;
 			if (keyName.startsWith("HKCR\\") || keyName.startsWith("HKEY_CLASSES_ROOT\\")) { //$NON-NLS-1$ //$NON-NLS-2$
 				hRootKey = CoreNatives.HKEY_CLASSES_ROOT;
-			} else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (keyName.startsWith("HKLM\\") || keyName.startsWith("HKEY_LOCAL_MACHINE\\")) { //$NON-NLS-1$ //$NON-NLS-2$
 				hRootKey = CoreNatives.HKEY_LOCAL_MACHINE;
-			} else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (keyName.startsWith("HKCU\\") || keyName.startsWith("HKEY_CURRENT_USER\\")) { //$NON-NLS-1$ //$NON-NLS-2$
 				hRootKey = CoreNatives.HKEY_CURRENT_USER;
-			} else {
+			}
+			else
+			{
 				throw new IllegalArgumentException("Invalid regestry key name"); //$NON-NLS-1$
 			}
 			keyName = keyName.substring(keyName.indexOf('\\') + 1);
 			long[] hKey = new long[1];
-			if (CoreNatives.RegCreateKey(hRootKey, keyName, CoreNatives.KEY_WRITE, hKey)) {
+			if (CoreNatives.RegCreateKey(hRootKey, keyName, CoreNatives.KEY_WRITE, hKey))
+			{
 				boolean result = CoreNatives.RegSetValue(hKey[0], valueName, value);
 				CoreNatives.RegCloseKey(hKey[0]);
 				return result;
@@ -424,28 +546,36 @@ public final class PlatformUtil
 		}
 		return false;
 	}
-	
+
 	/**
-	 * 
 	 * @return
 	 */
-	public static boolean isUserAdmin() {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+	public static boolean isUserAdmin()
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			return CoreNatives.IsUserAnAdmin();
 		}
 		return false;
 	}
-	
-	public static boolean runAsAdmin(String program, String[] arguments) {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+
+	public static boolean runAsAdmin(String program, String[] arguments)
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			StringBuffer sb = null;
-			if (arguments != null && arguments.length > 0) {
+			if (arguments != null && arguments.length > 0)
+			{
 				sb = new StringBuffer();
-				for (int i = 0; i < arguments.length; ++i) {
+				for (int i = 0; i < arguments.length; ++i)
+				{
 					String arg = arguments[i];
-					if (arg.indexOf(' ') != -1) {
+					if (arg.indexOf(' ') != -1)
+					{
 						sb.append('"').append(arg).append('"');
-					} else {
+					}
+					else
+					{
 						sb.append(arg);
 					}
 					sb.append(' ');
@@ -456,47 +586,65 @@ public final class PlatformUtil
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns application info by name
+	 * 
 	 * @param applicationPath
 	 * @param name
 	 * @return
 	 */
-	public static String getApplicationInfo(String applicationPath, String name) {
-		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+	public static String getApplicationInfo(String applicationPath, String name)
+	{
+		if (Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
 			File dir = new File(applicationPath);
-			if (dir.isDirectory()) {
+			if (dir.isDirectory())
+			{
 				File plist = new File(dir, "Contents/Info.plist"); //$NON-NLS-1$
-				if (plist.exists()) {
+				if (plist.exists())
+				{
 					LineNumberReader r = null;
 					String keyString = "<key>" + name + "</key>"; //$NON-NLS-1$ //$NON-NLS-2$
-					try {
+					try
+					{
 						r = new LineNumberReader(new FileReader(plist));
 						String line;
-						while ((line = r.readLine()) != null) {
-							if (line.indexOf(keyString) != -1) {
+						while ((line = r.readLine()) != null)
+						{
+							if (line.indexOf(keyString) != -1)
+							{
 								line = r.readLine();
 								String stag = "<string>"; //$NON-NLS-1$
 								String etag = "</string>"; //$NON-NLS-1$
 								int start = line.indexOf(stag);
-								if (start != -1) {
+								if (start != -1)
+								{
 									start += stag.length();
 									int end = line.indexOf(etag, start);
-									if (end != -1) {
+									if (end != -1)
+									{
 										return line.substring(start, end);
 									}
 								}
 							}
 						}
-					} catch (IOException e) {
+					}
+					catch (IOException e)
+					{
 						IdeLog.logError(CorePlugin.getDefault(),
 								MessageFormat.format("Reading {0} fails", plist.getAbsolutePath()), e); //$NON-NLS-1$
-					} finally {
-						if (r != null) {
-							try {
+					}
+					finally
+					{
+						if (r != null)
+						{
+							try
+							{
 								r.close();
-							} catch (IOException ignore) {
+							}
+							catch (IOException ignore)
+							{
 							}
 						}
 					}
@@ -509,23 +657,30 @@ public final class PlatformUtil
 
 	/**
 	 * Returns full path to platform-specific application executable
+	 * 
 	 * @param applicationPath
 	 * @return
 	 */
-	public static File getApplicationExecutable(String applicationPath) {
+	public static File getApplicationExecutable(String applicationPath)
+	{
 		File file = new File(applicationPath);
-		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			if (!file.isDirectory()) {
+		if (Platform.OS_MACOSX.equals(Platform.getOS()))
+		{
+			if (!file.isDirectory())
+			{
 				return file;
 			}
 			String executable = getApplicationInfo(applicationPath, "CFBundleExecutable"); //$NON-NLS-1$
-			if (executable != null) {
+			if (executable != null)
+			{
 				File file2 = new File(file, "Contents/MacOSX/" + executable); //$NON-NLS-1$
-				if (file2.exists()) {
+				if (file2.exists())
+				{
 					return file2;
 				}
 				file2 = new File(file, "Contents/MacOS/" + executable); //$NON-NLS-1$
-				if (file2.exists()) {
+				if (file2.exists())
+				{
 					return file2;
 				}
 			}
@@ -533,4 +688,99 @@ public final class PlatformUtil
 		return file;
 	}
 
+	/**
+	 * Expands functionality to handle different linux distributions
+	 * 
+	 * @param targetOsName
+	 * @return
+	 */
+	public static boolean isOSName(String targetOsName)
+	{
+		String osName = Platform.getOS();
+
+		if (osName.equals(Platform.OS_LINUX))
+		{
+			// tries to get more precise information for Linux OSes
+			try
+			{
+				File f;
+				if ((f = new File("/etc/lsb-release")).canRead()) //$NON-NLS-1$
+				{
+					// Debian-based distribution; the file has same syntax as Java properties
+					Properties props = new Properties();
+					props.load(new FileInputStream(f));
+					osName = props.getProperty("DISTRIB_ID"); //$NON-NLS-1$
+				}
+				else if ((f = new File("/etc/redhat-release")).canRead()) //$NON-NLS-1$
+				{
+					// RedHat-based distribution
+					BufferedReader in = null;
+					try
+					{
+						in = new BufferedReader(new FileReader(f));
+						String line = in.readLine();
+						int index = line.indexOf(" release"); //$NON-NLS-1$
+						if (index >= 0)
+						{
+							osName = line.substring(0, index);
+						}
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						if (in != null)
+						{
+							try
+							{
+								in.close();
+							}
+							catch (IOException e)
+							{
+								// ignores
+							}
+						}
+					}
+				}
+				else if ((f = new File("/etc/SuSE-release")).canRead()) //$NON-NLS-1$
+				{
+					// SuSE-based distribution
+					BufferedReader in = null;
+					try
+					{
+						in = new BufferedReader(new FileReader(f));
+						osName = in.readLine();
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						if (in != null)
+						{
+							try
+							{
+								in.close();
+							}
+							catch (IOException e)
+							{
+								// ignores
+							}
+						}
+					}
+				}
+			}
+			catch (IOException e)
+			{
+			}
+		}
+
+		if (osName != null)
+		{
+			return osName.equals(targetOsName);
+		}
+
+		return false;
+	}
 }

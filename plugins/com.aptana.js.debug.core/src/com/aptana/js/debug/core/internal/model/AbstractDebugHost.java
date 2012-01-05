@@ -26,7 +26,9 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -110,7 +112,6 @@ public abstract class AbstractDebugHost {
 	protected static final String STEP_RETURN = "stepReturn"; //$NON-NLS-1$
 	protected static final String STEP_TO_FRAME = "stepToFrame"; //$NON-NLS-1$
 	protected static final String FRAMES = "frames"; //$NON-NLS-1$
-	protected static final String ANONYMOUS = "<anonymous>"; //$NON-NLS-1$
 	protected static final String DBGSOURCE_SCHEME = "dbgsource://"; //$NON-NLS-1$
 	protected static final String _0 = "0"; //$NON-NLS-1$
 	protected static final String _1 = "1"; //$NON-NLS-1$
@@ -143,6 +144,7 @@ public abstract class AbstractDebugHost {
 
 	protected String reqid;
 	protected Map<String, Object> options = new HashMap<String, Object>();
+	protected Set<String> exceptions = new HashSet<String>();
 
 	/**
 	 * 
@@ -298,6 +300,7 @@ public abstract class AbstractDebugHost {
 					} else {
 						options.put(option, args[3]);
 					}
+					processOptionChange(option);
 					sendResponse(null);
 				} else {
 					sendResponse("!unknown option <"+option+">"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -331,7 +334,7 @@ public abstract class AbstractDebugHost {
 						lineNo,
 						props));
 			} else if (EXCEPTION.equals(command)) {
-				//sendResponse(processException(args[2], Util.decodeData(args[3])));
+				sendResponse(processExceptionBreakpoint(args[2], Util.decodeData(args[3])));
 			} else if (STEP_FILTERS.equals(command)) {
 				sendResponse(null/* TODO */);
 			} else if (DETAIL_FORMATTERS.equals(command)) {
@@ -408,8 +411,29 @@ public abstract class AbstractDebugHost {
 		}
 		return null;
 	}
+	
+	private String processExceptionBreakpoint(String action, String exceptionType) {
+		if (CREATE.equals(action)) {
+			if (!exceptions.contains(exceptionType)) {
+				exceptions.add(exceptionType);
+				setExceptionBreakpoint(exceptionType);
+				return CREATED;
+			}
+		} else if (CHANGE.equals(action)) {
+			exceptions.add(exceptionType);
+			setExceptionBreakpoint(exceptionType);
+			return CHANGED;
+		} else if (REMOVE.equals(action)) {
+			if (exceptions.remove(exceptionType)) {
+				removeExceptionBreakpoint(exceptionType);
+				return REMOVED;
+			}
+		}
+		return null;
+	}
 
 	protected final void terminate() {
+		checkCloseStreams();
 		terminateSession();
 		if (socket != null) {
 			try {
@@ -417,8 +441,30 @@ public abstract class AbstractDebugHost {
 			} catch (IOException ignore) {
 			}
 			socket = null;
+			checkCloseStreams();
 		}
 		logger.close();
+	}
+	
+	private void checkCloseStreams() {
+		if (socket == null || socket.isClosed()) {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException ignore) {
+				} finally {
+					reader = null;
+				}
+			}
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException ignore) {
+				} finally {
+					writer = null;
+				}
+			}
+		}		
 	}
 
 	protected abstract void startDebugging() throws IOException;
@@ -429,11 +475,14 @@ public abstract class AbstractDebugHost {
 	protected abstract String doGetDetails(String variableName);
 	protected abstract String doEval(String variableName, String expression);
 	protected abstract String doSetValue(String variableName, String valueRef);
-	protected abstract void suspend(String reason);
+	protected abstract boolean suspend(String reason);
 	protected abstract String processDetailFormatters(String[] list);
 	protected abstract String getSource(String uri);
 	protected abstract boolean setBreakpoint(String uri, int lineNo, BreakpointProperties props);
 	protected abstract boolean removeBreakpoint(String uri, int lineNo);
+	protected abstract void setExceptionBreakpoint(String exceptionType);
+	protected abstract void removeExceptionBreakpoint(String exceptionType);
+	protected abstract void processOptionChange(String option);
 
 	protected void enable() throws IOException {
 		enabled = true;
@@ -460,7 +509,7 @@ public abstract class AbstractDebugHost {
 		} catch (URISyntaxException e) {
 		}
 		if (uri == null || uri.getScheme() == null) {
-			return "app:///"+string;
+			return "app:///"+string; //$NON-NLS-1$
 		}
 		return string;
 	}
@@ -469,9 +518,9 @@ public abstract class AbstractDebugHost {
 		URI uri = null;
 		try {
 			uri = new URI(string);
-			if ("app".equals(uri.getScheme())) {
+			if ("app".equals(uri.getScheme())) { //$NON-NLS-1$
 				String path = uri.getPath();
-				if (path.startsWith("/")) {
+				if (path.startsWith("/")) { //$NON-NLS-1$
 					path = path.substring(1);
 				}
 				return path;
@@ -516,7 +565,7 @@ public abstract class AbstractDebugHost {
 
 	protected final void initLogger(Plugin plugin, String basename) throws DebugException {
 		this.plugin = plugin;
-		IPath base = plugin.getStateLocation().append("logs");
+		IPath base = plugin.getStateLocation().append("logs"); //$NON-NLS-1$
 		base.toFile().mkdirs();
 		errorLogFile = base.append(basename+".err").toFile(); //$NON-NLS-1$
 		logger = new ProtocolLogger(basename, plugin.getBundle().getSymbolicName());

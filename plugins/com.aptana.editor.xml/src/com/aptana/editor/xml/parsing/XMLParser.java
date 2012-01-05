@@ -26,6 +26,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.Lexeme;
 
@@ -248,7 +249,7 @@ public class XMLParser implements IParser
 	protected void processEndTag()
 	{
 		// adjusts the ending offset of current element to include the entire block
-		((XMLElementNode) fCurrentElement).setLocation( //
+		((ParseNode) fCurrentElement).setLocation( //
 				fCurrentElement.getStartingOffset(), //
 				fCurrentLexeme.getEndingOffset() //
 				);

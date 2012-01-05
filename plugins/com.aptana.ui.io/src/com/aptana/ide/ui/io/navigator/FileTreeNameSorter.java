@@ -9,10 +9,9 @@
 package com.aptana.ide.ui.io.navigator;
 
 import org.eclipse.core.filesystem.IFileInfo;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
@@ -22,49 +21,61 @@ import com.aptana.ide.ui.io.FileSystemUtils;
 
 /**
  * @author Max Stepanov
- *
  */
-public class FileTreeNameSorter extends ViewerSorter {
+public class FileTreeNameSorter extends ViewerSorter
+{
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ViewerComparator#category(java.lang.Object)
 	 */
 	@Override
-	public int category(Object element) {
-	    if (element instanceof WorkspaceProjects) {
-	        return 0;
-	    } else if (element instanceof LocalFileSystems) {
-	        return 1;
-	    } else if (element instanceof IConnectionPointCategory) {
+	public int category(Object element)
+	{
+		if (element instanceof WorkspaceProjects)
+		{
+			return 0;
+		}
+		if (element instanceof LocalFileSystems)
+		{
+			return 1;
+		}
+		if (element instanceof IConnectionPointCategory)
+		{
 			return 2;
-	    } else if (element instanceof IProject) {
-	    	return 3;
-		} else if (element instanceof IResource) {
-			IPath path = ((IResource) element).getLocation();
-			if (path != null) {
-				return path.toFile().isDirectory() ? 3 : 4;
+		}
+		if (element instanceof IAdaptable)
+		{
+			IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+			if (resource != null)
+			{
+				return (resource instanceof IContainer) ? 3 : 4;
 			}
-		} else if (element instanceof IAdaptable) {
-		    IFileInfo fileInfo = FileSystemUtils.getFileInfo(element);
-            if (fileInfo != null) {
-                return fileInfo.isDirectory() ? 3 : 4;
-            }
+			IFileInfo fileInfo = FileSystemUtils.getFileInfo(element);
+			if (fileInfo != null)
+			{
+				return fileInfo.isDirectory() ? 3 : 4;
+			}
 		}
 		return super.category(element);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object,
+	 * java.lang.Object)
 	 */
 	@Override
-	public int compare(Viewer viewer, Object e1, Object e2) {
-		if (e1 instanceof LocalRoot && e2 instanceof LocalRoot) {
+	public int compare(Viewer viewer, Object e1, Object e2)
+	{
+		if (e1 instanceof LocalRoot && e2 instanceof LocalRoot)
+		{
 			return 0;
 		}
-		if (e1 instanceof IConnectionPointCategory && e2 instanceof IConnectionPointCategory) {
+		if (e1 instanceof IConnectionPointCategory && e2 instanceof IConnectionPointCategory)
+		{
 			return ((IConnectionPointCategory) e1).compareTo(e2);
 		}
 		return super.compare(viewer, e1, e2);
 	}
-
 }

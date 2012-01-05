@@ -20,6 +20,7 @@ public class AllTests
 		suite.addTestSuite(JSContentAssistProposalTests.class);
 		suite.addTestSuite(RangeTests.class);
 		suite.addTestSuite(JSUserAgentFilteringTests.class);
+		suite.addTestSuite(JSContextInfoTests.class);
 		//$JUnit-END$
 		return suite;
 	}

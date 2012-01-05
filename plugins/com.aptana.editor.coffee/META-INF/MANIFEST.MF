@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.common,
  com.aptana.editor.js,
  com.aptana.index.core;bundle-version="3.0.0",
- com.aptana.buildpath.core
+ com.aptana.buildpath.core,
+ org.eclipse.compare
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true

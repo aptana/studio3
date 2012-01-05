@@ -40,15 +40,16 @@ public class Messages extends NLS
 	public static String FileSystemPasteAction_TTP;
 	public static String FileSystemPasteAction_TXT;
 
-	public static String FileSystemRefreshAction_Text;
 	public static String FileSystemRefreshAction_ToolTip;
 
 	public static String FileSystemRenameAction_ERR_Message;
 	public static String FileSystemRenameAction_ERR_Title;
 	public static String FileSystemRenameAction_InputMessage;
 	public static String FileSystemRenameAction_InputTitle;
-	public static String FileSystemRenameAction_Text;
 	public static String FileSystemRenameAction_ToolTip;
+
+	public static String IOUIPlugin_ErrorSavingRemoteFile_Message;
+	public static String IOUIPlugin_ErrorSavingRemoteFile_Title;
 
 	public static String NewFileAction_Confirm_Message;
 	public static String NewFileAction_Confirm_Title;
@@ -75,7 +76,6 @@ public class Messages extends NLS
 	public static String OpenActionProvider_LBL_OpenWith;
 
 	public static String OpenFileAction_ERR_FailedOpenFile;
-	public static String OpenFileAction_Text;
 
 	public static String WizardNewExternalFilePage_LBL_Filename;
 

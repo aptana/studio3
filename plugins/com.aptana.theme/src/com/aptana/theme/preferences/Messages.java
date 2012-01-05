@@ -11,6 +11,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
+
 	private static final String BUNDLE_NAME = "com.aptana.theme.preferences.messages"; //$NON-NLS-1$
 
 	public static String ThemePreferencePage_AddTokenLabel;
@@ -39,7 +40,6 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_NewThemeMsg;
 	public static String ThemePreferencePage_NewThemeTitle;
 	public static String ThemePreferencePage_RemoveTokenLabel;
-	public static String ThemePreferencePage_RenameButtonLabel;
 	public static String ThemePreferencePage_RenameThemeMsg;
 	public static String ThemePreferencePage_RenameThemeTitle;
 	public static String ThemePreferencePage_ScopeSelectoreLabel;

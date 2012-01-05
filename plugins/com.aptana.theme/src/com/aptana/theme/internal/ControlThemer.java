@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scrollable;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.IControlThemer;
 import com.aptana.theme.IThemeManager;
@@ -40,6 +41,7 @@ class ControlThemer implements IControlThemer
 	protected static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
 	protected static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+	protected static final boolean isUbuntu = PlatformUtil.isOSName("Ubuntu"); //$NON-NLS-1$
 
 	private Control control;
 

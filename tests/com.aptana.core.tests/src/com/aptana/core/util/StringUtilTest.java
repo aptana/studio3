@@ -105,57 +105,6 @@ public class StringUtilTest extends TestCase
 		assertEquals(0, StringUtil.tokenize(null, "\0").size());
 	}
 
-	public void testAreNotEqual1()
-	{
-		assertFalse(StringUtil.areNotEqual(null, null));
-	}
-
-	public void testAreNotEqual2()
-	{
-		assertTrue(StringUtil.areNotEqual(null, "test"));
-	}
-
-	public void testAreNotEqual3()
-	{
-		assertTrue(StringUtil.areNotEqual("test", null));
-	}
-
-	public void testAreNotEqual4()
-	{
-		assertTrue(StringUtil.areNotEqual("test", "tes"));
-	}
-
-	public void testAreNotEqual5()
-	{
-		assertFalse(StringUtil.areNotEqual("test", "test"));
-
-	}
-
-	public void testAreEqual1()
-	{
-		assertTrue(StringUtil.areEqual(null, null));
-	}
-
-	public void testAreEqual2()
-	{
-		assertFalse(StringUtil.areEqual(null, "test"));
-	}
-
-	public void testAreEqual3()
-	{
-		assertFalse(StringUtil.areEqual("test", null));
-	}
-
-	public void testAreEqual4()
-	{
-		assertTrue(StringUtil.areEqual("test", "test"));
-	}
-
-	public void testAreEqual5()
-	{
-		assertFalse(StringUtil.areEqual("test", "tes"));
-	}
-
 	public void testCompare1()
 	{
 		assertTrue(StringUtil.compare(null, null) == 0);

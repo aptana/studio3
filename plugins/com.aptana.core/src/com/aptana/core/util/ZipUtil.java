@@ -35,137 +35,257 @@ import com.aptana.core.logging.IdeLog;
 /**
  * @author Max Stepanov
  */
-public final class ZipUtil {
+public final class ZipUtil
+{
 
 	private static final int ATTR_SYMLINK = 0xA000;
 
 	/**
 	 * 
 	 */
-	private ZipUtil() {
+	private ZipUtil()
+	{
 	}
 
 	/**
-	 * Extract zip file into specified local path
+	 * Extract zip file into specified local path. By default, file that exist in the destination path will not be
+	 * overwritten.
 	 * 
 	 * @param zipFile
 	 * @param destinationPath
+	 * @param monitor
 	 * @throws IOException
 	 */
-	public static IStatus extract(File zipFile, File destinationPath, IProgressMonitor monitor) throws IOException {
+	public static IStatus extract(File zipFile, File destinationPath, IProgressMonitor monitor) throws IOException
+	{
 		return extract(new ZipFile(zipFile), destinationPath, monitor);
 	}
 
 	/**
-	 * Extract zip file into specified local path
+	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
+	 * <code>overwrite</code> flag is <code>true</code>.
+	 * 
+	 * @param zipFile
+	 * @param destinationPath
+	 * @param overwrite
+	 * @param monitor
+	 * @throws IOException
+	 */
+	public static IStatus extract(File zipFile, File destinationPath, boolean overwrite, IProgressMonitor monitor)
+			throws IOException
+	{
+		return extract(new ZipFile(zipFile), destinationPath, overwrite, monitor);
+	}
+
+	/**
+	 * Extract zip file into specified local path. By default, file that exist in the destination path will not be
+	 * overwritten.
 	 * 
 	 * @param zip
 	 * @param destinationPath
+	 * @param monitor
 	 * @throws IOException
 	 */
-	public static IStatus extract(ZipFile zip, File destinationPath, IProgressMonitor monitor) throws IOException {
+	public static IStatus extract(ZipFile zip, File destinationPath, IProgressMonitor monitor) throws IOException
+	{
 		return extract(zip, zip.getEntries(), destinationPath, monitor);
 	}
 
 	/**
-	 * Open iput stream for specified zip entry
+	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
+	 * <code>overwrite</code> flag is <code>true</code>.
+	 * 
+	 * @param zip
+	 * @param destinationPath
+	 * @param overwrite
+	 * @param monitor
+	 * @throws IOException
+	 */
+	public static IStatus extract(ZipFile zip, File destinationPath, boolean overwrite, IProgressMonitor monitor)
+			throws IOException
+	{
+		return extract(zip, zip.getEntries(), destinationPath, overwrite, monitor);
+	}
+
+	/**
+	 * Open iput stream for specified zip entry.
 	 * 
 	 * @param zipFile
 	 * @param path
 	 * @return
 	 * @throws IOException
 	 */
-	public static InputStream openEntry(File zipFile, IPath path) throws IOException {
+	public static InputStream openEntry(File zipFile, IPath path) throws IOException
+	{
 		ZipFile zip = new ZipFile(zipFile);
 		ZipEntry entry = zip.getEntry(path.makeRelative().toPortableString());
-		if (entry != null) {
+		if (entry != null)
+		{
 			return zip.getInputStream(entry);
 		}
 		return null;
 	}
 
 	/**
-	 * Extract specified list of entries from zip file to local path
+	 * Extract specified list of entries from zip file to local path. By default, file that exist in the destination
+	 * path will not be overwritten.
 	 * 
 	 * @param zip
 	 * @param entries
 	 * @param destinationPath
+	 * @param monitor
+	 * @throws IOException
+	 */
+	@SuppressWarnings("rawtypes")
+	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, IProgressMonitor monitor)
+			throws IOException
+	{
+		return extract(zip, entries, destinationPath, false, monitor);
+	}
+
+	/**
+	 * Extract specified list of entries from zip file to local path. File that exist in the destination path will be
+	 * overwritten if the <code>overwrite</code> flag is <code>true</code>.
+	 * 
+	 * @param zip
+	 * @param entries
+	 * @param destinationPath
+	 * @param overwrite
+	 *            - Indicate if existing folders and files should be overwritten during the extraction.
+	 * @param monitor
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, IProgressMonitor monitor) throws IOException {
+	public static IStatus extract(ZipFile zip, Enumeration entries, File destinationPath, boolean overwrite,
+			IProgressMonitor monitor) throws IOException
+	{
 		Collection collection = Collections.list(entries);
 
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ZipUtil_default_extract_label, collection.size());
-		try {
+		try
+		{
 			/* Create directories first */
-			for (Object i : collection) {
+			for (Object i : collection)
+			{
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
-				if (entry.isDirectory() && !file.exists()) {
-					IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL);
+				if (entry.isDirectory() && !file.exists())
+				{
+					IdeLog.logInfo(
+							CorePlugin.getDefault(),
+							MessageFormat.format("Creating directory {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 					file.mkdirs();
-				} else if (name.indexOf('/') != -1) {
+				}
+				else if (name.indexOf('/') != -1)
+				{
 					File parent = file.getParentFile();
-					if (!parent.exists()) {
-						IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Creating directory {0}", parent.getAbsolutePath()), IDebugScopes.ZIPUTIL);
+					if (!parent.exists())
+					{
+						IdeLog.logInfo(
+								CorePlugin.getDefault(),
+								MessageFormat.format("Creating directory {0}", parent.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 						parent.mkdirs();
 					}
 				}
-				if (subMonitor.isCanceled()) {
+				if (subMonitor.isCanceled())
+				{
 					return Status.CANCEL_STATUS;
 				}
 			}
 			byte[] buffer = new byte[0x1000];
 			int n;
 			/* Extract files */
-			for (Object i : collection) {
+			for (Object i : collection)
+			{
 				ZipEntry entry = (ZipEntry) i;
 				String name = entry.getName();
 				File file = new File(destinationPath, name);
-				IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL);
+				IdeLog.logInfo(
+						CorePlugin.getDefault(),
+						MessageFormat.format("Extracting {0} as {1}", name, file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 				subMonitor.setTaskName(Messages.ZipUtil_extract_prefix_label + name);
 				subMonitor.worked(1);
-				if (!entry.isDirectory() && !file.exists()) {
+				if (!entry.isDirectory())
+				{
+					if (file.exists())
+					{
+						if (overwrite)
+						{
+							IdeLog.logInfo(
+									CorePlugin.getDefault(),
+									MessageFormat.format(
+											"Deleting a file/directory before overwrite {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
+							FileUtil.deleteRecursively(file);
+						}
+						else
+						{
+							continue;
+						}
+					}
 					file.getParentFile().mkdirs();
-					if (!file.createNewFile()) {
+					if (!file.createNewFile())
+					{
+						IdeLog.logWarning(
+								CorePlugin.getDefault(),
+								MessageFormat.format("Cannot create the file {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 						continue;
 					}
 					boolean symlink = isSymlink(entry);
-					if (symlink) {
-						IdeLog.logInfo(CorePlugin.getDefault(), MessageFormat.format("Deleting symlink {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL);
+					if (symlink)
+					{
+						IdeLog.logInfo(
+								CorePlugin.getDefault(),
+								MessageFormat.format("Deleting symlink {0}", file.getAbsolutePath()), IDebugScopes.ZIPUTIL); //$NON-NLS-1$
 						file.delete();
 					}
 					OutputStream out = symlink ? new ByteArrayOutputStream() : new FileOutputStream(file);
 					InputStream in = zip.getInputStream(entry);
-					while ((n = in.read(buffer)) > 0) {
+					while ((n = in.read(buffer)) > 0)
+					{
 						out.write(buffer, 0, n);
 					}
 					in.close();
 					out.close();
-					if (!Platform.OS_WIN32.equals(Platform.getOS())) {
-						try {
-							Runtime.getRuntime().exec(new String[] { "chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
-						} catch (Exception ignore) {
+					if (!Platform.OS_WIN32.equals(Platform.getOS()))
+					{
+						if (entry.getUnixMode() != 0)
+						{
+							try
+							{
+								Runtime.getRuntime()
+										.exec(new String[] {
+												"chmod", Integer.toOctalString(entry.getUnixMode() & 0x0FFF), file.getAbsolutePath() }); //$NON-NLS-1$
+							}
+							catch (Exception ignore)
+							{
+							}
 						}
-						if (symlink) {
-							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8");
-							Runtime.getRuntime().exec(new String[] { "ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
+						if (symlink)
+						{
+							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8"); //$NON-NLS-1$
+							Runtime.getRuntime()
+									.exec(new String[] {
+											"ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					}
 				}
-				if (subMonitor.isCanceled()) {
+				if (subMonitor.isCanceled())
+				{
 					return Status.CANCEL_STATUS;
 				}
 			}
 			return Status.OK_STATUS;
-		} finally {
+		}
+		finally
+		{
 			subMonitor.done();
+			ZipFile.closeQuietly(zip);
 		}
 	}
 
-	private static boolean isSymlink(ZipEntry entry) {
+	private static boolean isSymlink(ZipEntry entry)
+	{
 		return (entry.getUnixMode() & ATTR_SYMLINK) == ATTR_SYMLINK;
 	}
 }

@@ -24,6 +24,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
 public class CoreEPLPlugin extends Plugin
 {
 
@@ -101,10 +102,15 @@ public class CoreEPLPlugin extends Plugin
 	public static Object getService(BundleContext context, String name)
 	{
 		if (context == null)
+		{
 			return null;
+		}
+		// don't add <?> as it's for Eclipse 3.7's getServiceReference() only
 		ServiceReference reference = context.getServiceReference(name);
 		if (reference == null)
+		{
 			return null;
+		}
 		Object result = context.getService(reference);
 		context.ungetService(reference);
 		return result;

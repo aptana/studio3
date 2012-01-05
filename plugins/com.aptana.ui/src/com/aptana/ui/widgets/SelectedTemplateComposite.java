@@ -94,7 +94,7 @@ public class SelectedTemplateComposite extends Composite
 				{
 					Rectangle bounds = descriptionValue.getBounds();
 					int width = bounds.width;
-					if (!displayingMore) //$NON-NLS-1$
+					if (!displayingMore)
 					{
 						descriptionValue.setText(MessageFormat.format(Messages.SelectedTemplateDesc_More_Label,
 								projectTemplate.getDescription().substring(0, cutoff)));

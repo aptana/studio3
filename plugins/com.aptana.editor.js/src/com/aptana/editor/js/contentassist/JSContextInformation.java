@@ -22,7 +22,7 @@ import com.aptana.core.util.StringUtil;
 public class JSContextInformation implements IContextInformation, IContextInformationExtension
 {
 	public static final String DESCRIPTION_DELIMITER = "\ufeff"; //$NON-NLS-1$
-	private static final String LINE_DELIMITER = FileUtil.NEW_LINE + DESCRIPTION_DELIMITER; //$NON-NLS-1$
+	private static final String LINE_DELIMITER = FileUtil.NEW_LINE + DESCRIPTION_DELIMITER;
 
 	private String _contextString;
 	private String _infoString;

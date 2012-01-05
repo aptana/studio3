@@ -88,22 +88,22 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
 			else
 			{
 				// multiple connections on the selected source
-				Object firstElement = fSelectedElements.get(0);
-				if (firstElement instanceof IResource)
+				IResource resource = (IResource) fSelectedElements.get(0).getAdapter(IResource.class);
+				if (resource != null)
 				{
 					IContainer container = null;
 					boolean remember = false;
-					if (firstElement instanceof IContainer)
+					if (resource instanceof IContainer)
 					{
-						remember = ResourceSynchronizationUtils.isRememberDecision((IContainer) firstElement);
+						remember = ResourceSynchronizationUtils.isRememberDecision((IContainer) resource);
 						if (remember)
 						{
-							container = (IContainer) firstElement;
+							container = (IContainer) resource;
 						}
 					}
 					if (!remember)
 					{
-						IProject project = ((IResource) firstElement).getProject();
+						IProject project = resource.getProject();
 						remember = ResourceSynchronizationUtils.isRememberDecision(project);
 						if (remember)
 						{

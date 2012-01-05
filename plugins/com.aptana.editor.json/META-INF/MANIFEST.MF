@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.ui.epl,
  com.aptana.editor.common,
  com.aptana.formatter.epl,
- com.aptana.formatter.ui.epl
+ com.aptana.formatter.ui.epl,
+ org.eclipse.compare
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true

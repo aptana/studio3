@@ -5,7 +5,6 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-
 package com.aptana.webserver.internal.core.builtin;
 
 import org.eclipse.osgi.util.NLS;
@@ -13,6 +12,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.webserver.internal.core.builtin.messages"; //$NON-NLS-1$
+
+	public static String LocalWebServer_ServerModeError;
 
 	public static String LocalWebServerHttpRequestHandler_FILE_NOT_FOUND;
 	public static String LocalWebServerHttpRequestHandler_FORBIDDEN;

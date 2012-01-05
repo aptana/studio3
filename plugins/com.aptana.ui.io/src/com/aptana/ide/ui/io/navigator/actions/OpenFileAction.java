@@ -15,42 +15,52 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
  */
-public class OpenFileAction extends BaseSelectionListenerAction {
+public class OpenFileAction extends BaseSelectionListenerAction
+{
 
-    private List<IFileStore> fFileStores;
+	private List<IFileStore> fFileStores;
 
-    public OpenFileAction() {
-        super(Messages.OpenFileAction_Text);
-        fFileStores = new ArrayList<IFileStore>();
-    }
+	public OpenFileAction()
+	{
+		super(CoreStrings.OPEN);
+		fFileStores = new ArrayList<IFileStore>();
+	}
 
-    public void run() {
-        for (IFileStore fileStore : fFileStores) {
-            EditorUtils.openFileInEditor(fileStore, null);
-        }
-    }
+	public void run()
+	{
+		for (IFileStore fileStore : fFileStores)
+		{
+			EditorUtils.openFileInEditor(fileStore, null);
+		}
+	}
 
-    public boolean updateSelection(IStructuredSelection selection) {
-        fFileStores.clear();
+	public boolean updateSelection(IStructuredSelection selection)
+	{
+		fFileStores.clear();
 
-        if (selection != null && !selection.isEmpty()) {
-            Object[] elements = selection.toArray();
-            IFileStore fileStore;
-            for (Object element : elements) {
-                if (element instanceof IAdaptable) {
-                    fileStore = Utils.getFileStore((IAdaptable) element);
-                    if (fileStore != null) {
-                        fFileStores.add(fileStore);
-                    }
-                }
-            }
-        }
+		if (selection != null && !selection.isEmpty())
+		{
+			Object[] elements = selection.toArray();
+			IFileStore fileStore;
+			for (Object element : elements)
+			{
+				if (element instanceof IAdaptable)
+				{
+					fileStore = Utils.getFileStore((IAdaptable) element);
+					if (fileStore != null)
+					{
+						fFileStores.add(fileStore);
+					}
+				}
+			}
+		}
 
-        return super.updateSelection(selection) && fFileStores.size() > 0;
-    }
+		return super.updateSelection(selection) && fFileStores.size() > 0;
+	}
 }

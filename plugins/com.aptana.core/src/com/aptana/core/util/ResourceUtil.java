@@ -223,6 +223,7 @@ public class ResourceUtil
 	 * @param builderId
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public static boolean addBuilder(IProjectDescription description, String builderId)
 	{
 		ICommand[] commands = description.getBuildSpec();

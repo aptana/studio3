@@ -136,6 +136,9 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 	private IExecutionListener fExecutionListener = new IExecutionListener()
 	{
 
+		private static final String COMMAND_SAVE = "org.eclipse.ui.file.save"; //$NON-NLS-1$
+		private static final String COMMAND_SAVE_ALL = "org.eclipse.ui.file.saveAll"; //$NON-NLS-1$
+
 		public void notHandled(String commandId, NotHandledException exception)
 		{
 		}
@@ -147,7 +150,7 @@ public class SyncingUIPlugin extends AbstractUIPlugin
 		public void postExecuteSuccess(String commandId, Object returnValue)
 		{
 			// if we see a save command
-			if ("org.eclipse.ui.file.save".equals(commandId)) //$NON-NLS-1$
+			if (COMMAND_SAVE.equals(commandId) || COMMAND_SAVE_ALL.equals(commandId))
 			{
 				IEditorPart editorPart = UIUtils.getActiveEditor();
 				if (editorPart != null)

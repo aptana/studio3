@@ -13,6 +13,8 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.editor.css.formatter.CSSFormatterPlugin;
 import com.aptana.formatter.IDebugScopes;
@@ -31,7 +33,8 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		IEclipsePreferences pref = EclipseUtil.defaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
 
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
-		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE,
+				Integer.toString(EditorUtil.getSpaceIndentSize(CSSPlugin.getDefault().getBundle().getSymbolicName())));
 		pref.put(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		pref.putBoolean(CSSFormatterConstants.WRAP_COMMENTS, false);
 		pref.putInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH, 80);

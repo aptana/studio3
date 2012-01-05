@@ -100,70 +100,75 @@ public final class SiteConnectionUtils
 	{
 		List<ISiteConnection> list = new ArrayList<ISiteConnection>();
 		ISiteConnection[] allsites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-		if (object instanceof IConnectionPoint)
+
+		IConnectionPoint connectionPoint = (IConnectionPoint) object.getAdapter(IConnectionPoint.class);
+		if (connectionPoint != null)
 		{
 			for (ISiteConnection i : allsites)
 			{
-				if (object.equals(i.getSource()))
+				if (connectionPoint.equals(i.getSource()))
 				{
 					list.add(i);
 				}
 			}
 		}
-		else if (object instanceof IResource)
-		{
-			IResource resource = (IResource) object;
-			for (ISiteConnection i : allsites)
-			{
-				IConnectionPoint sourceConnectionPoint = i.getSource();
-				if (sourceConnectionPoint != null)
-				{
-					IContainer connectionRoot = (IContainer) sourceConnectionPoint.getAdapter(IResource.class);
-					if (connectionRoot != null)
-					{
-						if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource))
-								|| (includeChildren && contains(resource, connectionRoot)))
-						{
-							IConnectionPoint destination = i.getDestination();
-							if (destination != null
-									&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null)
-							{
-								list.add(i);
-							}
-						}
-					}
-				}
-			}
-		}
 		else
 		{
-			IFileStore fileStore = (IFileStore) object.getAdapter(IFileStore.class);
-			if (fileStore != null)
+			IResource resource = (IResource) object.getAdapter(IResource.class);
+			if (resource != null)
 			{
 				for (ISiteConnection i : allsites)
 				{
 					IConnectionPoint sourceConnectionPoint = i.getSource();
 					if (sourceConnectionPoint != null)
 					{
-						try
+						IContainer connectionRoot = (IContainer) sourceConnectionPoint.getAdapter(IResource.class);
+						if (connectionRoot != null)
 						{
-							IFileStore root = sourceConnectionPoint.getRoot();
-							if (root != null)
+							if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource))
+									|| (includeChildren && contains(resource, connectionRoot)))
 							{
-								if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore))
-										|| (includeChildren && fileStore.isParentOf(root)))
+								IConnectionPoint destination = i.getDestination();
+								if (destination != null
+										&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null)
 								{
-									IConnectionPoint destination = i.getDestination();
-									if (destination != null
-											&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null)
-									{
-										list.add(i);
-									}
+									list.add(i);
 								}
 							}
 						}
-						catch (CoreException ignore)
+					}
+				}
+			}
+			else
+			{
+				IFileStore fileStore = (IFileStore) object.getAdapter(IFileStore.class);
+				if (fileStore != null)
+				{
+					for (ISiteConnection i : allsites)
+					{
+						IConnectionPoint sourceConnectionPoint = i.getSource();
+						if (sourceConnectionPoint != null)
 						{
+							try
+							{
+								IFileStore root = sourceConnectionPoint.getRoot();
+								if (root != null)
+								{
+									if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore))
+											|| (includeChildren && fileStore.isParentOf(root)))
+									{
+										IConnectionPoint destination = i.getDestination();
+										if (destination != null
+												&& ConnectionPointUtils.findConnectionPoint(destination.getRootURI()) != null)
+										{
+											list.add(i);
+										}
+									}
+								}
+							}
+							catch (CoreException ignore)
+							{
+							}
 						}
 					}
 				}
@@ -197,58 +202,63 @@ public final class SiteConnectionUtils
 	{
 		List<ISiteConnection> list = new ArrayList<ISiteConnection>();
 		ISiteConnection[] allsites = SyncingPlugin.getSiteConnectionManager().getSiteConnections();
-		if (object instanceof IConnectionPoint)
+
+		IConnectionPoint connectionPoint = (IConnectionPoint) object.getAdapter(IConnectionPoint.class);
+		if (connectionPoint != null)
 		{
 			for (ISiteConnection i : allsites)
 			{
-				if (object.equals(i.getDestination()))
+				if (connectionPoint.equals(i.getDestination()))
 				{
 					list.add(i);
 				}
 			}
 		}
-		else if (object instanceof IResource)
-		{
-			IResource resource = (IResource) object;
-			for (ISiteConnection i : allsites)
-			{
-				IConnectionPoint destinationConnectionPoint = i.getDestination();
-				if (destinationConnectionPoint != null)
-				{
-					IContainer connectionRoot = (IContainer) destinationConnectionPoint.getAdapter(IResource.class);
-					if (connectionRoot != null)
-					{
-						if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource)))
-						{
-							list.add(i);
-						}
-					}
-				}
-			}
-		}
 		else
 		{
-			IFileStore fileStore = (IFileStore) object.getAdapter(IFileStore.class);
-			if (fileStore != null)
+			IResource resource = (IResource) object.getAdapter(IResource.class);
+			if (resource != null)
 			{
 				for (ISiteConnection i : allsites)
 				{
 					IConnectionPoint destinationConnectionPoint = i.getDestination();
 					if (destinationConnectionPoint != null)
 					{
-						try
+						IContainer connectionRoot = (IContainer) destinationConnectionPoint.getAdapter(IResource.class);
+						if (connectionRoot != null)
 						{
-							IFileStore root = destinationConnectionPoint.getRoot();
-							if (root != null)
+							if (connectionRoot.equals(resource) || (!strict && contains(connectionRoot, resource)))
 							{
-								if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore)))
-								{
-									list.add(i);
-								}
+								list.add(i);
 							}
 						}
-						catch (CoreException ignore)
+					}
+				}
+			}
+			else
+			{
+				IFileStore fileStore = (IFileStore) object.getAdapter(IFileStore.class);
+				if (fileStore != null)
+				{
+					for (ISiteConnection i : allsites)
+					{
+						IConnectionPoint destinationConnectionPoint = i.getDestination();
+						if (destinationConnectionPoint != null)
 						{
+							try
+							{
+								IFileStore root = destinationConnectionPoint.getRoot();
+								if (root != null)
+								{
+									if (root.equals(fileStore) || (!strict && root.isParentOf(fileStore)))
+									{
+										list.add(i);
+									}
+								}
+							}
+							catch (CoreException ignore)
+							{
+							}
 						}
 					}
 				}

@@ -152,10 +152,10 @@ public class EventElement extends BaseElement
 		for (EventPropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
-			printer.println(';'); //$NON-NLS-1$
+			printer.println(';');
 		}
 
 		printer.decreaseIndent();
-		printer.printWithIndent('}'); //$NON-NLS-1$
+		printer.printWithIndent('}');
 	}
 }

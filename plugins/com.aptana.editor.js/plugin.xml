@@ -266,5 +266,17 @@
             type="com.aptana.editor.js.problem">
       </super>
    </extension>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <contentTypeBinding
+            contentMergeViewerId="com.aptana.editor.js.contentMergeViewer"
+            contentTypeId="com.aptana.contenttype.js">
+      </contentTypeBinding>
+      <viewer
+            class="com.aptana.editor.js.internal.JSMergeViewerCreator"
+            extensions="js,jsx,htc"
+            id="com.aptana.editor.js.contentMergeViewer">
+      </viewer>
+   </extension>
 
 </plugin>

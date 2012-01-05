@@ -713,7 +713,7 @@ public class GitRepository
 	{
 		if (branchName == null)
 		{
-			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "Branch to switch to must be provided.");
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, Messages.GitRepository_ERR_BranchNotProvided);
 		}
 		SubMonitor sub = SubMonitor.convert(monitor, 4);
 		try

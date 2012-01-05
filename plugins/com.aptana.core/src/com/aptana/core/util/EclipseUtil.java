@@ -426,6 +426,7 @@ public class EclipseUtil
 	 * @param currentOptions
 	 * @param debugEnabled
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void setBundleDebugOptions(String[] currentOptions, boolean debugEnabled)
 	{
 		Map<String, BundleContext> bundles = getCurrentBundleContexts();

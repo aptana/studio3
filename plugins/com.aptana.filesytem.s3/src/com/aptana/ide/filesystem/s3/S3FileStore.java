@@ -177,7 +177,8 @@ class S3FileStore extends FileStore
 		{
 			info.setExists(true);
 			info.setDirectory(true);
-			info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+			info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+			info.setAttribute(EFS.ATTRIBUTE_GROUP_EXECUTE, true);
 		}
 		else if (isBucket())
 		{
@@ -187,7 +188,7 @@ class S3FileStore extends FileStore
 				boolean exists = getAWSConnection().checkBucketExists(getBucket());
 				info.setExists(exists);
 				info.setDirectory(true);
-				info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+				info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 			}
 			catch (IOException e)
 			{
@@ -232,7 +233,7 @@ class S3FileStore extends FileStore
 						info.setExists(true);
 						info.setLastModified(System.currentTimeMillis());
 						info.setLength(EFS.NONE);
-						info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+						info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 					}
 				}
 			}
@@ -377,8 +378,8 @@ class S3FileStore extends FileStore
 		{
 			return userInfo.split(":")[1]; //$NON-NLS-1$
 		}
-		return new String(getOrPromptPassword(MessageFormat.format("S3 Authentication for {0}", getAccessKey()),
-				"Please enter your secret access key."));
+		return new String(getOrPromptPassword(MessageFormat.format(Messages.S3FileStore_Authentication, getAccessKey()),
+				Messages.S3FileStore_EnterAccessKey));
 	}
 
 	private synchronized String getAccessKey()
@@ -522,12 +523,12 @@ class S3FileStore extends FileStore
 					// directory!
 					if (!info.exists())
 					{
-						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent doesn't exist",
+						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, Messages.S3FileStore_ParentNotExist,
 								new FileNotFoundException(path.toPortableString()));
 					}
 					if (!info.isDirectory())
 					{
-						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent isn't a directory",
+						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, Messages.S3FileStore_ParentNotADirectory,
 								new FileNotFoundException(path.toPortableString()));
 					}
 				}
@@ -655,7 +656,7 @@ class S3FileStore extends FileStore
 				if (destInfo.exists())
 				{
 					throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
-							"Destination exists and OVERWRITE flag was not specified", new FileNotFoundException(
+							Messages.S3FileStore_DestinationExists, new FileNotFoundException(
 									s3Dest.path.toPortableString()));
 				}
 			}
@@ -667,12 +668,12 @@ class S3FileStore extends FileStore
 			// directory!
 			if (!info.exists())
 			{
-				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent doesn't exist",
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, Messages.S3FileStore_ParentNotExist,
 						new FileNotFoundException(s3Dest.path.toPortableString()));
 			}
 			if (!info.isDirectory())
 			{
-				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent isn't a directory",
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, Messages.S3FileStore_ParentNotADirectory,
 						new FileNotFoundException(s3Dest.path.toPortableString()));
 			}
 

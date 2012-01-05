@@ -21,6 +21,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
@@ -28,21 +29,26 @@ import com.aptana.parsing.lexer.Range;
 public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension,
 		ICompletionProposalExtension2, ICompletionProposalExtension3, Comparable<ICompletionProposal>
 {
-	private String _additionalProposalInformation;
-	private IContextInformation _contextInformation;
-	private String _displayString;
-	protected Image _image;
-	protected int _cursorPosition;
+	protected String _replacementString;
 	protected int _replacementOffset;
 	protected int _replacementLength;
-	protected String _replacementString;
+	protected int _cursorPosition;
+	protected Image _image;
+	private String _displayString;
+	private IContextInformation _contextInformation;
+	private String _additionalProposalInformation;
 	private String _fileLocation;
-	protected boolean _isDefaultSelection;
-	private boolean _isSuggestedSelection;
-	private int _relevance;
-	private Image[] _userAgentImages;
 	private int _hash;
+
+	private Image[] _userAgentImages;
 	private char[] _triggerChars;
+
+	/** @deprecated Use _relevance instead */
+	protected boolean _isDefaultSelection;
+	/** @deprecated Use _relevance instead */
+	private boolean _isSuggestedSelection;
+
+	private int _relevance;
 
 	/**
 	 * CommonCompletionProposal
@@ -96,10 +102,18 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		{
 			CommonCompletionProposal that = (CommonCompletionProposal) obj;
 
-			result = this._replacementString.equals(that._replacementString)
-					&& this._replacementOffset == that._replacementOffset
-					&& this._replacementLength == that._replacementLength
-					&& this._cursorPosition == that._cursorPosition && this._displayString.equals(that._displayString);
+			// @formatter:off
+			result =
+					ObjectUtil.areEqual(_replacementString, that._replacementString)
+				&&	_replacementOffset == that._replacementOffset
+				&&	_replacementLength == that._replacementLength
+				&&	_cursorPosition == that._cursorPosition
+				&&	ObjectUtil.areEqual(_image, that._image)
+				&&	ObjectUtil.areEqual(_displayString, that._displayString)
+				&&	ObjectUtil.areEqual(_contextInformation, that._contextInformation)
+				&&	ObjectUtil.areEqual(_additionalProposalInformation, that._additionalProposalInformation)
+				&&	ObjectUtil.areEqual(_fileLocation, that._fileLocation);
+			// @formatter:on
 		}
 
 		return result;
@@ -112,16 +126,22 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	@Override
 	public int hashCode()
 	{
-		if (this._hash == 0)
+		if (_hash == 0)
 		{
-			this._hash = this._hash * 31 + this._replacementString.hashCode();
-			this._hash = this._hash * 31 + this._replacementOffset;
-			this._hash = this._hash * 31 + this._replacementLength;
-			this._hash = this._hash * 31 + this._cursorPosition;
-			this._hash = this._hash * 31 + this._displayString.hashCode();
+			// @formatter:off
+			_hash = _hash * 31 + ((_replacementString != null) ? _replacementString.hashCode() : 0);
+			_hash = _hash * 31 + _replacementOffset;
+			_hash = _hash * 31 + _replacementLength;
+			_hash = _hash * 31 + _cursorPosition;
+			_hash = _hash * 31 + ((_image != null) ? _image.hashCode() : 0);
+			_hash = _hash * 31 + ((_displayString != null) ?_displayString.hashCode() : 0);
+			_hash = _hash * 31 + ((_contextInformation != null) ? _contextInformation.hashCode() : 0);
+			_hash = _hash * 31 + ((_additionalProposalInformation != null) ? _additionalProposalInformation.hashCode() : 0);
+			_hash = _hash * 31 + ((_fileLocation != null) ? _fileLocation.hashCode() : 0);
+			// @formatter:on
 		}
 
-		return this._hash;
+		return _hash;
 	}
 
 	/*
@@ -527,5 +547,15 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	public boolean validateTrigger(IDocument document, int offset, KeyEvent keyEvent)
 	{
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return getDisplayString();
 	}
 }

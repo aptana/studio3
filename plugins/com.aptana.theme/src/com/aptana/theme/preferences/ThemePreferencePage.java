@@ -102,6 +102,7 @@ import org.eclipse.ui.internal.themes.ThemeElementHelper;
 import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scope.ScopeSelector;
@@ -327,7 +328,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fAddThemeButton.addSelectionListener(this);
 
 		renameThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
-		renameThemeButton.setText(Messages.ThemePreferencePage_RenameButtonLabel);
+		renameThemeButton.setText(CoreStrings.RENAME);
 		renameThemeButton.addSelectionListener(this);
 
 		deleteThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);

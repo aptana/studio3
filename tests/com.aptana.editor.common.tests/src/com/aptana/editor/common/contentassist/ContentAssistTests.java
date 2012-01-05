@@ -19,6 +19,7 @@ public class ContentAssistTests
 	{
 		TestSuite suite = new TestSuite(ContentAssistTests.class.getName());
 		// $JUnit-BEGIN$
+		suite.addTestSuite(CompletionProposalTest.class);
 		suite.addTestSuite(UserAgentManagerTests.class);
 		// $JUnit-END$
 		return suite;

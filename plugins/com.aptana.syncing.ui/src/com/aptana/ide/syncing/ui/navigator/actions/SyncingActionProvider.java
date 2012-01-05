@@ -88,7 +88,7 @@ public class SyncingActionProvider extends CommonActionProvider
 			Object element = selection.getFirstElement();
 			if (element instanceof IAdaptable)
 			{
-				hasSyncConnection = (SiteConnectionUtils.findSitesForSource((IAdaptable) element).length > 0);
+				hasSyncConnection = hasSyncConnection((IAdaptable) element);
 			}
 		}
 		// fillActionBars() is called each time the selection changes, so adds a check to only add the toolbar items
@@ -164,5 +164,11 @@ public class SyncingActionProvider extends CommonActionProvider
 			}
 		}
 		return updated;
+	}
+
+	private static boolean hasSyncConnection(IAdaptable element)
+	{
+		return (SiteConnectionUtils.findSitesForSource(element).length > 0)
+				|| (SiteConnectionUtils.findSitesWithDestination(element).length > 0);
 	}
 }

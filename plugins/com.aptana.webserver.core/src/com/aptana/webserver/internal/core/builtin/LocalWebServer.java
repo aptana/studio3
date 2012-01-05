@@ -251,7 +251,7 @@ public class LocalWebServer extends SimpleWebServer
 	{
 		if (!ILaunchManager.RUN_MODE.equals(mode))
 		{
-			return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, "Cannot start server in any mode but 'run'");
+			return new Status(IStatus.ERROR, WebServerCorePlugin.PLUGIN_ID, Messages.LocalWebServer_ServerModeError);
 		}
 		try
 		{

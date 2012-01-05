@@ -12,40 +12,22 @@ import org.eclipse.osgi.util.NLS;
 /**
  * @author Ingo Muschenetz
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
+
 	private static final String BUNDLE_NAME = "com.aptana.js.debug.ui.internal.launchConfigurations.messages"; //$NON-NLS-1$
 
-	private Messages() {
+	private Messages()
+	{
 	}
 
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	public static String HttpServerSettingsTab_Add;
-
-	public static String HttpServerSettingsTab_AddNewPath;
-
-	public static String HttpServerSettingsTab_AddServerPath;
-
-	public static String HttpServerSettingsTab_Edit;
-
-	public static String HttpServerSettingsTab_EditPath;
-
-	public static String HttpServerSettingsTab_EditSelectedPath;
-
-	public static String HttpServerSettingsTab_Remove;
-
-	public static String HttpServerSettingsTab_RemoveSelectedPath;
-
-	public static String HttpServerSettingsTab_ServerPath;
-
 	public static String HttpServerSettingsTab_Title;
-
-	public static String HttpServerSettingsTab_WebServerPathConfiguration;
-
-	public static String HttpServerSettingsTab_WorkspacePath;
 
 	public static String LaunchBrowserSettingsTab_AppendProjectName;
 

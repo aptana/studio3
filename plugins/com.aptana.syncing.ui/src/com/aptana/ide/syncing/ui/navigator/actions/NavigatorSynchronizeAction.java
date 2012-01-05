@@ -16,7 +16,7 @@ public class NavigatorSynchronizeAction extends NavigatorBaseSyncAction
 
 	public NavigatorSynchronizeAction(IWorkbenchPart activePart)
 	{
-		super("Synchronize", activePart); //$NON-NLS-1$
+		super(Messages.NavigatorSynchronizeAction_LBL_Synchronize, activePart);
 	}
 
 	@Override

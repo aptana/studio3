@@ -66,11 +66,11 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 			{
 				if (node instanceof FunctionElement)
 				{
-					return StringUtil.join(", ", node.getTypeNames());
+					return StringUtil.join(", ", node.getTypeNames()); //$NON-NLS-1$
 				}
 				else
 				{
-					return StringUtil.join(", ", ((FunctionElement) node).getReturnTypeNames());
+					return StringUtil.join(", ", ((FunctionElement) node).getReturnTypeNames()); //$NON-NLS-1$
 				}
 			}
 		},
@@ -78,7 +78,7 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		{
 			public Object getPropertyValue(PropertyElement node)
 			{
-				return StringUtil.join(", ", node.getDocuments());
+				return StringUtil.join(", ", node.getDocuments()); //$NON-NLS-1$
 			}
 		};
 
