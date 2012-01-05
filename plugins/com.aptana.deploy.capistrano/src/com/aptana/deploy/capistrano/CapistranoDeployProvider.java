@@ -35,4 +35,8 @@ public class CapistranoDeployProvider implements IDeployProvider
 		return selectedContainer.getProject().getFile("Capfile").exists(); //$NON-NLS-1$
 	}
 
+	public String getDeployMenuName()
+	{
+		return null;
+	}
 }

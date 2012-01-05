@@ -5,17 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.ui;
+package com.aptana.deploy.ftp;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.deploy.internal.ui.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.deploy.ftp.messages"; //$NON-NLS-1$
 
-	public static String DeployAppContributionItem_Text;
-
-	public static String DeployPopupContributionItem_Text;
+	public static String FTPDeployProvider_DeployMenuName;
 
 	static
 	{
