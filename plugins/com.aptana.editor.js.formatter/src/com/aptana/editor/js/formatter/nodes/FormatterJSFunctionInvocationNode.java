@@ -96,16 +96,10 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 			case IJSNodeTypes.ARGUMENTS:
 			case IJSNodeTypes.SUBTRACT:
 				return true;
-		}
-		switch (parentType)
-		{
 			case IJSNodeTypes.ASSIGN:
 			case IJSNodeTypes.COMMA:
 			case IJSNodeTypes.CONDITIONAL:
-				if (parent.getChildIndex(invocationNode) != 0)
-				{
-					return true;
-				}
+				return parent.getChildIndex(invocationNode) != 0;
 		}
 		return false;
 	}
