@@ -22,7 +22,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
 	public static final boolean DEFAULT_DEBUG_MODE = false;
-	public static final boolean DEFAULT_AUTO_MIGRATE_OLD_PROJECTS = true;
 	public static final boolean DEFAULT_AUTO_REFRESH_PROJECTS = true;
 
 	/*
@@ -34,7 +33,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	{
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CorePlugin.PLUGIN_ID);
 		prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, DEFAULT_DEBUG_MODE);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, DEFAULT_AUTO_MIGRATE_OLD_PROJECTS);
 		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, DEFAULT_AUTO_REFRESH_PROJECTS);
 		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, IdeLog.StatusLevel.ERROR.toString());
 		prefs.put(
