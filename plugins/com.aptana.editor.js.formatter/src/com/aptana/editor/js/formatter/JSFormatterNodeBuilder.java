@@ -26,6 +26,7 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDefaultLineNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSElseIfNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSElseNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSExpressionWrapperNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionInvocationNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSGetElementNode;
@@ -368,6 +369,13 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSConditionalNode node)
 		{
+			// We need to wrap this conditional node with a wrapper that will handle new-lines before the nore.
+			int nodeStart = node.getStartingOffset();
+			FormatterJSExpressionWrapperNode conditionalWrapperNode = new FormatterJSExpressionWrapperNode(document,
+					node, hasSingleCommentBefore(nodeStart));
+			conditionalWrapperNode.setBegin(createTextNode(document, nodeStart, nodeStart));
+			push(conditionalWrapperNode);
+
 			JSNode condition = (JSNode) node.getTestExpression();
 			condition.accept(this);
 
@@ -386,6 +394,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
+
+			checkedPop(conditionalWrapperNode, -1);
+			IFormatterContainerNode topNode = peek();
+			int endingOffset = topNode.getEndOffset();
+			conditionalWrapperNode.setEnd(createTextNode(document, endingOffset, endingOffset));
 		}
 
 		/*
@@ -981,12 +994,22 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSBinaryBooleanOperatorNode node)
 		{
+			// Wrap the node with a generic expression node to handle new-lines.
+			FormatterJSExpressionWrapperNode wrapperNode = new FormatterJSExpressionWrapperNode(document, node,
+					hasSingleCommentBefore(node.getStartingOffset()));
+			int startingOffset = node.getStartingOffset();
+			wrapperNode.setBegin(createTextNode(document, startingOffset, node.getStartingOffset()));
+			push(wrapperNode);
 			visitLeftRightExpression(node, (JSNode) node.getLeftHandSide(), (JSNode) node.getRightHandSide(),
 					node.getOperator().value.toString());
 			if (node.getSemicolonIncluded())
 			{
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 			}
+			checkedPop(wrapperNode, -1);
+			IFormatterContainerNode topNode = peek();
+			int endingOffset = topNode.getEndOffset();
+			wrapperNode.setEnd(createTextNode(document, endingOffset, endingOffset));
 		}
 
 		/*
@@ -1018,7 +1041,17 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSCommaNode node)
 		{
 			// a = s, d, f;
+			// Wrap this node with a generic expression node to manage any new-lines before the comma.
+			FormatterJSExpressionWrapperNode wrapperNode = new FormatterJSExpressionWrapperNode(document, node,
+					hasSingleCommentBefore(node.getStartingOffset()));
+			int startingOffset = node.getStartingOffset();
+			wrapperNode.setBegin(createTextNode(document, startingOffset, node.getStartingOffset()));
+			push(wrapperNode);
 			visitNodeLists(asJSNodesList(node.getChildren()), null, null, TypePunctuation.COMMA);
+			checkedPop(wrapperNode, -1);
+			IFormatterContainerNode topNode = peek();
+			int endingOffset = topNode.getEndOffset();
+			wrapperNode.setEnd(createTextNode(document, endingOffset, endingOffset));
 		}
 
 		/*
@@ -1034,7 +1067,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (nodeType == IJSNodeTypes.GROUP || nodeType == IJSNodeTypes.FUNCTION
 					|| nodeType == IJSNodeTypes.GET_PROPERTY)
 			{
-				// inline invocation
+				// inline invocation.
+				// We force an invocation node before visiting the function name. This should handle any new lines that
+				// need to be before the invocation code.
+				FormatterJSFunctionInvocationNode fin = new FormatterJSFunctionInvocationNode(document, node,
+						hasAnyCommentBefore(node.getStartingOffset()));
+				fin.setBegin(createTextNode(document, functionName.getStart(), functionName.getStart()));
+				push(fin);
+				checkedPop(fin, -1);
 				functionName.accept(this);
 			}
 			else
