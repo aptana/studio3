@@ -10,31 +10,32 @@ package com.aptana.editor.js.formatter.nodes;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
- * A function invocation formatter node.
+ * An expression wrapper node for the JS formatter.<br>
+ * This node can be used to wrap complex expressions and handle the new-lines settings that appears, or should appear,
+ * before that expression.
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNode
+public class FormatterJSExpressionWrapperNode extends FormatterBlockWithBeginEndNode
 {
 
-	private JSNode invocationNode;
-	private boolean hasCommentBefore;
+	protected boolean forceNewLine;
+	protected JSNode node;
 
 	/**
 	 * @param document
-	 * @param invocationNode
-	 * @param hasSemicolon
+	 * @param node
+	 * @param forceNewLine
 	 */
-	public FormatterJSFunctionInvocationNode(IFormatterDocument document, JSNode invocationNode,
-			boolean hasCommentBefore)
+	public FormatterJSExpressionWrapperNode(IFormatterDocument document, JSNode node, boolean forceNewLine)
 	{
 		super(document);
-		this.invocationNode = invocationNode;
-		this.hasCommentBefore = hasCommentBefore;
+		this.node = node;
+		this.forceNewLine = forceNewLine;
 	}
 
 	/*
@@ -44,7 +45,11 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 	@Override
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		IParseNode parent = invocationNode.getParent();
+		if (forceNewLine)
+		{
+			return false;
+		}
+		IParseNode parent = node.getParent();
 		short parentType = parent.getNodeType();
 		switch (parentType)
 		{
@@ -95,11 +100,12 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 			case IJSNodeTypes.THROW:
 			case IJSNodeTypes.ARGUMENTS:
 			case IJSNodeTypes.SUBTRACT:
-				return true;
+			case IJSNodeTypes.GROUP:
+			case IJSNodeTypes.GET_ELEMENT:
 			case IJSNodeTypes.ASSIGN:
 			case IJSNodeTypes.COMMA:
 			case IJSNodeTypes.CONDITIONAL:
-				return parent.getChildIndex(invocationNode) != 0;
+				return true;
 		}
 		return false;
 	}
@@ -111,17 +117,17 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		if (hasCommentBefore)
+		if (forceNewLine)
 		{
 			return true;
 		}
-		switch (invocationNode.getParent().getNodeType())
+		IParseNode parent = node.getParent();
+		boolean isFirstInLine = parent.getStartingOffset() == node.getStartingOffset();
+		if (parent instanceof JSNode && ((JSNode) parent).getSemicolonIncluded())
 		{
-			// APSTUD-3313
-			case IJSNodeTypes.STATEMENTS:
-				return true;
+			return isFirstInLine;
 		}
-		return false;
+		return !shouldConsumePreviousWhiteSpaces();
 	}
 
 }

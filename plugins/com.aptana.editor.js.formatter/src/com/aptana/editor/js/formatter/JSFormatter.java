@@ -284,6 +284,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (Exception e)
 		{
+			IdeLog.logError(JSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			return false;
 		}
 		checkinParser(parser);
