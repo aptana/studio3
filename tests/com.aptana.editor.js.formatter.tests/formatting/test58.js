@@ -2849,8 +2849,8 @@ if( typeof window.jQuery == "undefined") {
                 fn.apply(obj[i], args || [i, obj[i]]);
             else
                 for(var i = 0, ol = obj.length; i < ol; i++)
-                if(fn.apply(obj[i], args || [i, obj[i]]) === false)
-                    break;
+                    if(fn.apply(obj[i], args || [i, obj[i]]) === false)
+                        break;
             return obj;
         },
         prop : function(elem, value, type, index, prop) {
@@ -3012,8 +3012,8 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                             tb = div.childNodes;
 
                         for(var n = tb.length - 1; n >= 0; --n)
-                        if(jQuery.nodeName(tb[n], "tbody") && !tb[n].childNodes.length)
-                            tb[n].parentNode.removeChild(tb[n]);
+                            if(jQuery.nodeName(tb[n], "tbody") && !tb[n].childNodes.length)
+                                tb[n].parentNode.removeChild(tb[n]);
 
                     }
                     arg = jQuery.makeArray(div.childNodes);
@@ -3084,7 +3084,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             // Need to use typeof to fight Safari childNodes crashes
             if( typeof a != "array")
                 for(var i = 0, al = a.length; i < al; i++)
-                r.push(a[i]);
+                    r.push(a[i]);
             else
                 r = a.slice(0);
 
@@ -3092,8 +3092,8 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
         },
         inArray : function(b, a) {
             for(var i = 0, al = a.length; i < al; i++)
-            if(a[i] == b)
-                return i;
+                if(a[i] == b)
+                    return i;
             return -1;
         },
         /** @id jQuery.$.merge */
@@ -3101,17 +3101,17 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             // We have to loop this way because IE & Opera overwrite the length
             // expando of getElementsByTagName
             for(var i = 0; second[i]; i++)
-            first.push(second[i]);
+                first.push(second[i]);
             return first;
         },
         unique : function(first) {
             var r = [], num = jQuery.mergeNum++;
 
             for(var i = 0, fl = first.length; i < fl; i++)
-            if(num != first[i].mergeNum) {
-                first[i].mergeNum = num;
-                r.push(first[i]);
-            }
+                if(num != first[i].mergeNum) {
+                    first[i].mergeNum = num;
+                    r.push(first[i]);
+                }
 
             return r;
         },
@@ -3129,8 +3129,8 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             // Go through the array, only saving the items
             // that pass the validator function
             for(var i = 0, el = elems.length; i < el; i++)
-            if(!inv && fn(elems[i], i) || inv && !fn(elems[i], i))
-                result.push(elems[i]);
+                if(!inv && fn(elems[i], i) || inv && !fn(elems[i], i))
+                    result.push(elems[i]);
 
             return result;
         },
@@ -3228,7 +3228,8 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
         jQuery.fn[i] = function() {
             var a = arguments;
             return this.each(function() {
-                for(var j = 0, al = a.length; j < al; j++)jQuery(a[j])[n](this);
+                for(var j = 0, al = a.length; j < al; j++)
+                    jQuery(a[j])[n](this);
             });
         };
     });
@@ -3398,9 +3399,9 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
                     // Perform our own iteration and filter
                     for(var i = 0; ret[i]; i++)
-                    for(var c = ret[i].firstChild; c; c = c.nextSibling)
-                    if(c.nodeType == 1 && (nodeName == "*" || c.nodeName.toUpperCase() == nodeName.toUpperCase()))
-                        r.push(c);
+                        for(var c = ret[i].firstChild; c; c = c.nextSibling)
+                            if(c.nodeType == 1 && (nodeName == "*" || c.nodeName.toUpperCase() == nodeName.toUpperCase()))
+                                r.push(c);
                     ret = r;
                     t = t.replace(re, "");
                     if(t.indexOf(" ") == 0)
@@ -3416,24 +3417,24 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                         m = m[1];
 
                         for(var j = 0, rl = ret.length; j < rl; j++)
-                        if(m.indexOf("..") < 0) {
-                            var n = m == "~" || m == "+" ? ret[j].nextSibling : ret[j].firstChild;
-                            for(; n; n = n.nextSibling)
-                            if(n.nodeType == 1) {
-                                if(m == "~" && n.mergeNum == mergeNum)
-                                    break;
+                            if(m.indexOf("..") < 0) {
+                                var n = m == "~" || m == "+" ? ret[j].nextSibling : ret[j].firstChild;
+                                for(; n; n = n.nextSibling)
+                                    if(n.nodeType == 1) {
+                                        if(m == "~" && n.mergeNum == mergeNum)
+                                            break;
 
-                                if(!nodeName || n.nodeName.toUpperCase() == nodeName.toUpperCase()) {
-                                    if(m == "~")
-                                        n.mergeNum = mergeNum;
-                                    r.push(n);
-                                }
+                                        if(!nodeName || n.nodeName.toUpperCase() == nodeName.toUpperCase()) {
+                                            if(m == "~")
+                                                n.mergeNum = mergeNum;
+                                            r.push(n);
+                                        }
 
-                                if(m == "+")
-                                    break;
-                            }
-                        } else
-                            r.push(ret[j].parentNode);
+                                        if(m == "+")
+                                            break;
+                                    }
+                            } else
+                                r.push(ret[j].parentNode);
                         ret = r;
 
                         // And remove the token
@@ -3516,10 +3517,10 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
                                 // Try to find the element with the ID
                                 for(var i = 0; r[i]; i++)
-                                if(r[i].getAttribute("id") == m[2]) {
-                                    tmp = [r[i]];
-                                    break;
-                                }
+                                    if(r[i].getAttribute("id") == m[2]) {
+                                        tmp = [r[i]];
+                                        break;
+                                    }
                                 r = tmp;
                             }
                             ret = r;
@@ -3620,8 +3621,8 @@ else if(m[1] == "@") {
                             var c = 1;
 
                             for(var n = parentNode.firstChild; n; n = n.nextSibling)
-                            if(n.nodeType == 1)
-                                n.nodeIndex = c++;
+                                if(n.nodeType == 1)
+                                    n.nodeIndex = c++;
 
                             parentNode.mergeNum = num;
                         }
@@ -3676,8 +3677,8 @@ else if(m[1] == "@") {
             var num = 0;
 
             for(; cur; cur = cur[dir])
-            if(cur.nodeType == 1 && ++num == result)
-                break;
+                if(cur.nodeType == 1 && ++num == result)
+                    break;
 
             return cur;
         },
@@ -4739,8 +4740,8 @@ else if(m[1] == "@") {
                         var timers = jQuery.timers;
 
                         for(var i = 0; i < timers.length; i++)
-                        if(!timers[i]())
-                            timers.splice(i--, 1);
+                            if(!timers[i]())
+                                timers.splice(i--, 1);
 
                         if(!timers.length)
                             clearInterval(timer);
