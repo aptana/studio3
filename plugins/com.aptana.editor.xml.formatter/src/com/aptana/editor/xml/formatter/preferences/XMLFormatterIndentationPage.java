@@ -135,7 +135,7 @@ public class XMLFormatterIndentationPage extends FormatterModifyTabPage
 				manager.enableControl(tabSize, !editorSettingsMode);
 				if (editorSettingsMode)
 				{
-					setEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+					setEditorTabWidth(XMLPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 				}
 			}
 		}
@@ -150,7 +150,7 @@ public class XMLFormatterIndentationPage extends FormatterModifyTabPage
 			manager.enableControl(tabSize, !editorSettingsMode);
 			if (editorSettingsMode)
 			{
-				setEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				setEditorTabWidth(XMLPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 			}
 		}
 	}

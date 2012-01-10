@@ -16,7 +16,6 @@ import java.net.URL;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -36,7 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.formatter.FormatterUtils;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
@@ -344,14 +343,14 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 	 * Update the tab-width value to match the editor's setting.<br>
 	 * In case no specific editor's setting are found, the default workspace setting will be used.
 	 * 
-	 * @param preferenceStore
-	 *            The editor's plugin preference store to look for the width setting.
+	 * @param qualifier
+	 *            A qualifier string for the editor's preferences.
 	 * @param textWidgets
 	 *            The {@link Text}s to update with the read settings.
 	 */
-	protected void setEditorTabWidth(IPreferenceStore preferenceStore, Text... textWidgets)
+	protected void setEditorTabWidth(String qualifier, Text... textWidgets)
 	{
-		int tabWidth = FormatterUtils.getEditorTabWidth(preferenceStore);
+		int tabWidth = EditorUtil.getSpaceIndentSize(qualifier);
 		String tabValue = String.valueOf(tabWidth);
 		for (Text t : textWidgets)
 		{
