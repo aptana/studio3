@@ -45,7 +45,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 	 * @param positions
 	 */
 	HTMLTagProposal(String replacementString, int replacementOffset, int replacementLength, ElementElement element,
-			Integer... positions)
+			String[] natureIds, Integer... positions)
 	{
 		super(replacementString, replacementOffset, replacementLength, positions[0],
 				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
@@ -53,7 +53,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 
 		List<String> userAgentList = element.getUserAgentNames();
 		String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(natureIds, userAgents);
 		setUserAgentImages(userAgentIcons);
 
 		this._positions = positions;
