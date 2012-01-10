@@ -22,6 +22,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -202,7 +203,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int getEditorSpecificTabWidth()
 	{
-		return FormatterUtils.getEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore());
+		return EditorUtil.getSpaceIndentSize(CSSPlugin.getDefault().getBundle().getSymbolicName());
 	}
 
 	/*
