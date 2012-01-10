@@ -22,7 +22,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -134,10 +134,9 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		categoryViewer = new CheckboxTableViewer(table);
 		categoryViewer.getControl().setFont(group.getFont());
 		categoryViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
-		categoryViewer.setContentProvider(new ArrayContentProvider());
-		ColumnLabelProvider categoryLabelProvider = new ColumnLabelProvider();
-		categoryViewer.setLabelProvider(categoryLabelProvider);
-		categoryViewer.setSorter(new ViewerSorter());
+		categoryViewer.setContentProvider(ArrayContentProvider.getInstance());
+		categoryViewer.setLabelProvider(new ColumnLabelProvider());
+		categoryViewer.setComparator(new ViewerComparator());
 
 		Map<String, String> tItems = EclipseUtil.getTraceableItems();
 		Set<String> keys = tItems.keySet();

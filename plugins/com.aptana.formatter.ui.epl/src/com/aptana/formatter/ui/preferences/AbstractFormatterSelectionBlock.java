@@ -611,7 +611,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		previewPane.setLayout(previewStackLayout);
 
 		// Set the data into the list
-		listViewer.setContentProvider(new ArrayContentProvider());
+		listViewer.setContentProvider(ArrayContentProvider.getInstance());
 		listViewer.setLabelProvider(new LabelProvider()
 		{
 			@Override

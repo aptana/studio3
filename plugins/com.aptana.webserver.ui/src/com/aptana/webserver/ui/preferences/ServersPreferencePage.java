@@ -130,7 +130,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 			public void widgetSelected(SelectionEvent event)
 			{
 				ListDialog dlg = new ListDialog(getShell());
-				dlg.setContentProvider(new ArrayContentProvider());
+				dlg.setContentProvider(ArrayContentProvider.getInstance());
 				dlg.setLabelProvider(new LabelProvider()
 				{
 					@Override

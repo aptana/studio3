@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -112,7 +112,7 @@ public class AddRemoveList implements Listener
 		});
 		contentProvider = new ListContentProvider();
 		listViewer.setContentProvider(contentProvider);
-		listViewer.setSorter(new ViewerSorter());
+		listViewer.setComparator(new ViewerComparator());
 
 		data = new GridData(GridData.FILL_BOTH);
 		data.heightHint = 300;
