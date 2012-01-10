@@ -464,8 +464,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 		}
 
-		// Feature: the visibility should be done for all the find bars, not only for the current one.
 		findBarVisibilityControl.setVisible(visible, this, selectedFindText);
+		if (visible)
+		{
+			findBar.setFocus();
+		}
 	}
 
 	/*
@@ -755,7 +758,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		catch (Exception e1)
 		{
-			statusLineManager.setMessage(true, MessageFormat.format(Messages.FindBarDecorator_ReplaceError, e1.getMessage()), null);
+			statusLineManager.setMessage(true,
+					MessageFormat.format(Messages.FindBarDecorator_ReplaceError, e1.getMessage()), null);
 			FindBarPlugin.log(e1);
 			return;
 		}
