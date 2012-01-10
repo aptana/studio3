@@ -7936,6 +7936,7 @@ if( typeof dojo == "undefined") {
                         }
                     }
                 }
+
                 uri = "";
                 if(relobj.scheme) {
                     uri += relobj.scheme + ":";
@@ -12316,6 +12317,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                     if(condition.charAt(0) == "@") {
                         condition = condition.slice(1);
                     }
+
                     matcher = null;
                     // http://www.w3.org/TR/css3-selectors/#attribute-selectors
                     for(var x = 0; x < attrList.length; x++) {
@@ -12338,6 +12340,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                         handleMatch(matcher);
                         // ff = agree(ff, matcher);
                     }
+
                     condition = null;
                     var nbktIdx = query.indexOf("[", lBktIdx);
                     if(0 <= nbktIdx) {
@@ -12368,6 +12371,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
 
                 // get the tag name (if any)
                 var tagName = getTagName(tqp);
+
                 xpath += prefix + tagName;
 
                 // check to see if it's got an id. Needs to come first in xpath.

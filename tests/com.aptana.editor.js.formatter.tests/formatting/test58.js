@@ -2915,6 +2915,7 @@ if( typeof window.jQuery == "undefined") {
                         var parPos = jQuery.css(e.parentNode, "position") || "static";
                         if(parPos == "static")
                             e.parentNode.style.position = "relative";
+
                         oHeight = e.clientHeight;
                         oWidth = e.clientWidth;
 
@@ -2947,6 +2948,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
                 if(prop.match(/float/i))
                     prop = "float";
+
                 prop = prop.replace(/([A-Z])/g, "-$1").toLowerCase();
                 var cur = document.defaultView.getComputedStyle(elem, null);
 
@@ -3016,6 +3018,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                                 tb[n].parentNode.removeChild(tb[n]);
 
                     }
+
                     arg = jQuery.makeArray(div.childNodes);
                 }
 
@@ -3385,6 +3388,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             while(t && last != t) {
                 var r = [];
                 last = t;
+
                 t = jQuery.trim(t).replace(/^\/\//, "");
 
                 var foundToken = false;
@@ -3402,6 +3406,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                         for(var c = ret[i].firstChild; c; c = c.nextSibling)
                             if(c.nodeType == 1 && (nodeName == "*" || c.nodeName.toUpperCase() == nodeName.toUpperCase()))
                                 r.push(c);
+
                     ret = r;
                     t = t.replace(re, "");
                     if(t.indexOf(" ") == 0)
@@ -3435,6 +3440,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                                     }
                             } else
                                 r.push(ret[j].parentNode);
+
                         ret = r;
 
                         // And remove the token
@@ -3504,6 +3510,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                                 // Handle IE7 being really dumb about <object>s
                                 if(tag == "*" && ret[i].nodeName.toLowerCase() == "object")
                                     tag = "param";
+
                                 r = jQuery.merge(r, ret[i].getElementsByTagName(tag));
                             }
 
@@ -3521,10 +3528,13 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                                         tmp = [r[i]];
                                         break;
                                     }
+
                                 r = tmp;
                             }
+
                             ret = r;
                         }
+
                         t = t.replace(re2, "");
                     }
 
@@ -3608,6 +3618,7 @@ else if(m[1] == "@") {
                         if((type == "" && !!z || type == "=" && z == m[5] || type == "!=" && z != m[5] || type == "^=" && z && !z.indexOf(m[5]) || type == "$=" && z.substr(z.length - m[5].length) == m[5] || (type == "*=" || type == "~=") && z.indexOf(m[5]) >= 0) ^ not)
                             tmp.push(a);
                     }
+
                     r = tmp;
 
                     // We can get a speed boost by handling nth-child here
@@ -3638,6 +3649,7 @@ else if(m[1] == "@") {
                         if(add ^ not)
                             tmp.push(node);
                     }
+
                     r = tmp;
 
                     // Otherwise, find the expression to execute
@@ -3743,6 +3755,7 @@ else if(m[1] == "@") {
                     // an event is called after a page has unloaded
                     if( typeof jQuery == "undefined" || jQuery.event.triggered)
                         return val;
+
                     val = jQuery.event.handle.apply(element, arguments);
 
                     return val;
@@ -4147,6 +4160,7 @@ else if(m[1] == "@") {
         load : function(url, params, callback, ifModified) {
             if(jQuery.isFunction(url))
                 return this.bind("load", url);
+
             callback = callback ||
             function() {
             };
