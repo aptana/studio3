@@ -463,8 +463,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 		}
 
-		// Feature: the visibility should be done for all the find bars, not only for the current one.
 		findBarVisibilityControl.setVisible(visible, this, selectedFindText);
+		if (visible)
+		{
+			findBar.setFocus();
+		}
 	}
 
 	/*
