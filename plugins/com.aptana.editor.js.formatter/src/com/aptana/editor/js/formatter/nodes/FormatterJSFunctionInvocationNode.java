@@ -95,6 +95,8 @@ public class FormatterJSFunctionInvocationNode extends FormatterBlockWithBeginNo
 			case IJSNodeTypes.THROW:
 			case IJSNodeTypes.ARGUMENTS:
 			case IJSNodeTypes.SUBTRACT:
+			case IJSNodeTypes.TYPEOF:
+			case IJSNodeTypes.DELETE:
 				return true;
 			case IJSNodeTypes.ASSIGN:
 			case IJSNodeTypes.COMMA:
