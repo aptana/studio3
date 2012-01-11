@@ -17,6 +17,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.editor.json.preferences.IPreferenceConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
@@ -245,7 +246,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int getEditorSpecificTabWidth()
 	{
-		return FormatterUtils.getEditorTabWidth(JSONPlugin.getDefault().getPreferenceStore());
+		return EditorUtil.getSpaceIndentSize(JSONPlugin.getDefault().getBundle().getSymbolicName());
 	}
 
 	/*
