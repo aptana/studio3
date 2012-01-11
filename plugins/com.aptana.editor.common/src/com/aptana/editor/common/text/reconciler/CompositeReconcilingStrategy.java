@@ -19,7 +19,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
  * passed on to the contained strategies.
  */
 public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
-		IBatchReconcilingStrategy
+		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
 {
 
 	/** The list of internal reconciling strategies. */
@@ -31,6 +31,17 @@ public class CompositeReconcilingStrategy implements IReconcilingStrategy, IReco
 	public CompositeReconcilingStrategy(IReconcilingStrategy... strategies)
 	{
 		fStrategies = (strategies != null) ? strategies : new IReconcilingStrategy[0];
+	}
+
+	public void dispose()
+	{
+		for (IReconcilingStrategy strategy : fStrategies)
+		{
+			if (strategy instanceof IDisposableReconcilingStrategy)
+			{
+				((IDisposableReconcilingStrategy) strategy).dispose();
+			}
+		}
 	}
 
 	/*
