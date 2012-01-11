@@ -25,10 +25,11 @@ import org.eclipse.ui.IPropertyListener;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.outline.IParseListener;
+import com.aptana.parsing.IParseState;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
-		IBatchReconcilingStrategy
+		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
 {
 
 	private AbstractThemeableEditor fEditor;
@@ -43,20 +44,76 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private IFoldingComputer folder;
 
+	private IPropertyListener propertyListener = new IPropertyListener()
+	{
+
+		public void propertyChanged(Object source, int propId)
+		{
+			if (propId == IEditorPart.PROP_INPUT)
+			{
+				reconcile(false, true);
+			}
+		}
+	};
+
+	private boolean isInitialReconcile;
+	private IParseListener parseListener = new IParseListener()
+	{
+
+		public void afterParse(IParseState parseState)
+		{
+			if (fEditor == null)
+			{
+				return;
+			}
+			// only do folding and validation when parsing happened
+			try
+			{
+				if (fEditor.isFoldingEnabled())
+				{
+					calculatePositions(isInitialReconcile, fMonitor);
+				}
+				else
+				{
+					synchronized (fPositions)
+					{
+						fPositions.clear();
+					}
+					updatePositions();
+				}
+				fEditor.getFileService().validate();
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			}
+		}
+
+		public void beforeParse(IParseState parseState)
+		{
+		}
+
+		public void parseCompletedSuccessfully()
+		{
+		}
+	};
+
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
-		fEditor.addPropertyListener(new IPropertyListener()
-		{
-
-			public void propertyChanged(Object source, int propId)
-			{
-				if (propId == IEditorPart.PROP_INPUT)
-				{
-					reconcile(false, true);
+		fEditor.addPropertyListener(propertyListener);
+		fEditor.getFileService().addListener(parseListener);
 	}
-			}
-		});
+
+	public void dispose()
+	{
+		if (fEditor != null)
+		{
+			fEditor.getFileService().removeListener(parseListener);
+			fEditor.removePropertyListener(propertyListener);
+			fEditor = null;
+		}
+		fPositions.clear();
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -172,29 +229,9 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void reconcile(boolean initialReconcile, boolean force)
 	{
-		FileService fileService = fEditor.getFileService();
+		isInitialReconcile = initialReconcile;
 		// doing a full parse at the moment
-		if (force || fileService.parse(fMonitor))
-		{
-			// only do folding and validation when the source was changed
-			if (fEditor.isFoldingEnabled())
-			{
-				calculatePositions(initialReconcile, fMonitor);
-			}
-			else
-			{
-				synchronized (fPositions)
-				{
-					fPositions.clear();
-				}
-				updatePositions();
-			}
-			if (fMonitor != null && fMonitor.isCanceled())
-			{
-				return;
-			}
-			fEditor.getFileService().validate();
-		}
+		fEditor.getFileService().parse(force, fMonitor);
 	}
 
 	public void fullReconcile()

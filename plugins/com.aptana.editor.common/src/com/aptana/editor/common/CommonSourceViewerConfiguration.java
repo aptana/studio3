@@ -123,7 +123,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	{
 		fTextEditor = null;
 		fDoubleClickStrategy = null;
-		fReconciler = null;
+		if (fReconciler != null)
+		{
+			fReconciler.dispose();
+			fReconciler = null;
+		}
 		if (fAutoActivationListener != null)
 		{
 			EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
