@@ -135,7 +135,15 @@ public class CreateProfileDialog extends StatusDialog
 		gd.horizontalSpan = numColumns;
 
 		fProfileCombo.setItems(fSortedNames);
-		fProfileCombo.setText(fProfileManager.getSelected(fProject).getName());
+		String selectedProfile = fProfileManager.getSelected(fProject).getName();
+		if (fProfileCombo.indexOf(selectedProfile) > -1)
+		{
+			fProfileCombo.setText(selectedProfile);
+		}
+		else
+		{
+			fProfileCombo.select(0);
+		}
 		updateStatus(fEmpty);
 
 		applyDialogFont(composite);
