@@ -75,6 +75,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -337,7 +338,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	public int getEditorSpecificTabWidth()
 	{
-		return FormatterUtils.getEditorTabWidth(JSPlugin.getDefault().getPreferenceStore());
+		return EditorUtil.getSpaceIndentSize(JSPlugin.getDefault().getBundle().getSymbolicName());
 	}
 
 	/*

@@ -131,6 +131,7 @@ public class FormatterUtils
 	 * @param preferenceStore
 	 *            The editor's preferences store; Null, in case a workspace setting is needed.
 	 * @return The editor's tab-width
+	 * @deprecated Use EditorUtil.getSpaceIndentSize(preferencesQualifier)
 	 */
 	public static int getEditorTabWidth(IPreferenceStore preferenceStore)
 	{

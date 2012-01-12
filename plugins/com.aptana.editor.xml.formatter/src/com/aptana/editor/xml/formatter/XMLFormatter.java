@@ -20,6 +20,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -197,7 +198,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int getEditorSpecificTabWidth()
 	{
-		return FormatterUtils.getEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore());
+		return EditorUtil.getSpaceIndentSize(XMLPlugin.getDefault().getBundle().getSymbolicName());
 	}
 
 	/*
