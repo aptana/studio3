@@ -144,6 +144,10 @@
 			<param name="bundle.dir.name" value="coffeescript.ruble" />
 			<param name="bundle.branch" value="${scs.branch.name}" />
 		</antcall>
+		
+		<!-- Delete the pre-generation of cache scripts repo clone -->
+		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
+		
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
 		<script language="javascript">
 			<![CDATA[
@@ -204,7 +208,7 @@
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
 		
 		<!-- Now pre-generate the cache files! -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" failonerror="true">
+		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true">
 			<arg value="-c" />
 			<arg value="ruby -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
 		</exec>
