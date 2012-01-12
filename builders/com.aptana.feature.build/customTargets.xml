@@ -24,6 +24,7 @@
 		<echo append="true" file="${bundle.timestamps.file}" message="," />
 
 		<!-- Pull down the cache pre-generation scripts -->
+		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
 		<echo message="git clone git://github.com/aptana/studio3-sdk.git" />
 		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
 			<arg value="-c" />
