@@ -208,7 +208,7 @@
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
 		
 		<!-- Now pre-generate the cache files! -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true">
+		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator" failonerror="true">
 			<arg value="-c" />
 			<arg value="ruby -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
 		</exec>
