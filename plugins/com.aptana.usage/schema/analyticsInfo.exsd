@@ -6,7 +6,7 @@
          <meta.schema plugin="com.aptana.usage" id="analyticsInfo" name="Analytics Information"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point defines the app information for the product&apos;s analytics.
       </documentation>
    </annotation>
 
@@ -24,21 +24,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  a fully qualified identifier of the target extension point
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+                  an optional identifier of the extension instance
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+                  an optional name of the extension instance
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -53,42 +53,42 @@
          <attribute name="appId" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the id of the app
                </documentation>
             </annotation>
          </attribute>
          <attribute name="appName" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the name of the app
                </documentation>
             </annotation>
          </attribute>
          <attribute name="appGuid" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the guid of the app
                </documentation>
             </annotation>
          </attribute>
          <attribute name="versionPluginId" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the id of the plugin to use for getting the product version
                </documentation>
             </annotation>
          </attribute>
          <attribute name="userAgent" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the user agent
                </documentation>
             </annotation>
          </attribute>
          <attribute name="userManager" type="string">
             <annotation>
                <documentation>
-                  
+                  an optional class that could define a analytic user
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.usage.IAnalyticsUserManager"/>
@@ -103,14 +103,14 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  an identifier for the product&apos;s analytics
                </documentation>
             </annotation>
          </attribute>
          <attribute name="info" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the app id for the analytics
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="com.aptana.usage.analyticsInfo/info/@appId"/>
@@ -120,7 +120,7 @@
          <attribute name="overrides" type="string">
             <annotation>
                <documentation>
-                  
+                  Could optionally override another contributor of analytics extension point.
                </documentation>
             </annotation>
          </attribute>
@@ -132,36 +132,12 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         This extension point was introduced in Studio 3.0.
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="examples"/>
-      </appinfo>
-      <documentation>
-         [Enter extension point usage example here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="apiinfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>
