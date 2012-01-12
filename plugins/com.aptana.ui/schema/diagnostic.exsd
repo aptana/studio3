@@ -6,7 +6,7 @@
          <meta.schema plugin="com.aptana.ui" id="diagnostic" name="diagnostic"/>
       </appinfo>
       <documentation>
-         Diagnostic extenstion point.  Diagnostic logs from each plugin should be registered to be included in the &quot;Run Diagnostic Tests...&quot; command.
+         This extenstion point allows contribution to the output shown from running the &quot;Run Diagnostic Tests...&quot; command.
       </documentation>
    </annotation>
 
@@ -23,14 +23,14 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  a fully qualified identifier of the target extension point
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  
+                  an optional identifier of the extension instance
                </documentation>
             </annotation>
          </attribute>
@@ -74,7 +74,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         This extension point was introduced in Studio 3.0.
       </documentation>
    </annotation>
 
@@ -83,7 +83,18 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;p&gt;
+&lt;pre&gt;
+&lt;extension
+  point=&quot;com.my.xyz.diagnostic&quot;&gt;
+  &lt;diagnosticLog
+    class=&quot;com.my.xyz.MyDiagnosticLog&quot;
+    priority=&quot;50&quot;&gt;
+  &lt;/diagnosticLog&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
       </documentation>
    </annotation>
 
@@ -92,18 +103,10 @@
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         [Enter API information here.]
+         The priority is used to sort the order which each contributed log is shown; a lower number means higher priority.
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>
