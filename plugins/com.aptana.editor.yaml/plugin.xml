@@ -39,7 +39,7 @@
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.yaml.preferences.YAMLPreferencePage"
             id="com.aptana.editor.yaml.preferences.YamlPreferencePage"
-            name="YAML">
+            name="%preferencePage.yaml.name">
       </page>
    </extension>
    <extension
