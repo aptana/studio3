@@ -22,6 +22,16 @@
 			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
 		</exec>
 		<echo append="true" file="${bundle.timestamps.file}" message="," />
+
+		<!-- Pull down the cache pre-generation scripts -->
+		<echo message="git clone git://github.com/aptana/studio3-sdk.git" />
+		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
+			<arg value="-c" />
+			<arg value="git clone git://github.com/aptana/studio3-sdk.git" />
+		</exec>
+		<property name="cache.generator.script" location="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator/main.rb"/>
+		<!-- TODO Checkout the correct branch of the generator scripts... -->
+
 		<!-- Grab the pre-defined set of bundles -->
 		<antcall target="clone-bundle">
 			<param name="bundle.name" value="text.ruble" />
@@ -170,8 +180,7 @@
 
 	<target name="clone-bundle">
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" failonerror="true" />
-		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}">
-		</echo>
+		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
 		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
 			<arg value="-c" />
 			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
@@ -192,6 +201,12 @@
 		<echo append="true" file="${bundle.timestamps.file}" message="," />
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
+		
+		<!-- Now pre-generate the cache files! -->
+		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" failonerror="true">
+			<arg value="-c" />
+			<arg value="ruby -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
+		</exec>
 	</target>
 	
 	<!-- ===================================================================== -->
