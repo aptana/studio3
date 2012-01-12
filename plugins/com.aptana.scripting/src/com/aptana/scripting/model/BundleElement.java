@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
@@ -779,7 +780,7 @@ public class BundleElement extends AbstractElement
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
 
-		return !StringUtil.isEmpty(displayName) && StringUtil.areNotEqual(displayName, this.getDefaultName());
+		return !StringUtil.isEmpty(displayName) && ObjectUtil.areNotEqual(displayName, this.getDefaultName());
 	}
 
 	/**

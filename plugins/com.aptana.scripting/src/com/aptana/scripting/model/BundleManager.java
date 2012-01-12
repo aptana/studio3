@@ -39,7 +39,6 @@ import org.jruby.RubyRegexp;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
@@ -1295,13 +1294,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (CommandElement command : this.getBundleCommands(name))
-			{
-				if (filter == null || filter.include(command))
-				{
-					result.add(command);
-				}
-			}
+			CollectionsUtil.filter(getBundleCommands(name), result, filter);
 		}
 
 		return result;
@@ -1322,13 +1315,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (ContentAssistElement assist : this.getBundleContentAssists(name))
-			{
-				if (filter == null || filter.include(assist))
-				{
-					result.add(assist);
-				}
-			}
+			CollectionsUtil.filter(getBundleContentAssists(name), result, filter);
 		}
 
 		return result;
@@ -1392,13 +1379,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (EnvironmentElement command : this.getBundleEnvs(name))
-			{
-				if (filter == null || filter.include(command))
-				{
-					result.add(command);
-				}
-			}
+			CollectionsUtil.filter(getBundleEnvs(name), result, filter);
 		}
 
 		return result;
@@ -1533,13 +1514,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (MenuElement menu : this.getBundleMenus(name))
-			{
-				if (filter == null || filter.include(menu))
-				{
-					result.add(menu);
-				}
-			}
+			CollectionsUtil.filter(getBundleMenus(name), result, filter);
 		}
 
 		return result;
@@ -1560,13 +1535,7 @@ public class BundleManager
 
 		for (String name : this.getBundleNames())
 		{
-			for (SmartTypingPairsElement command : this.getBundlePairs(name))
-			{
-				if (filter == null || filter.include(command))
-				{
-					result.add(command);
-				}
-			}
+			CollectionsUtil.filter(getBundlePairs(name), result, filter);
 		}
 
 		return result;
@@ -1581,21 +1550,15 @@ public class BundleManager
 	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
 	 * @return A list of elements that are visible and that pass the specified filter
 	 */
-	public List<IProjectTemplate> getProjectTemplates(IModelFilter filter)
+	public List<ProjectTemplateElement> getProjectTemplates(IModelFilter filter)
 	{
-		List<IProjectTemplate> result = new ArrayList<IProjectTemplate>();
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
 		for (String name : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
-			for (ProjectTemplateElement template : bundleEntry.getProjectTemplates())
-			{
-				if (filter == null || filter.include(template))
-				{
-					result.add(template);
-				}
-			}
+			CollectionsUtil.filter(bundleEntry.getProjectTemplates(), result, filter);
 		}
 
 		return result;
@@ -1618,13 +1581,7 @@ public class BundleManager
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
-			for (ProjectSampleElement template : bundleEntry.getProjectSamples())
-			{
-				if (filter == null || filter.include(template))
-				{
-					result.add(template);
-				}
-			}
+			CollectionsUtil.filter(bundleEntry.getProjectSamples(), result, filter);
 		}
 
 		return result;
