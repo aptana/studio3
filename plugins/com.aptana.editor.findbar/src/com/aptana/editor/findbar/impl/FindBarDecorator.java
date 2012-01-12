@@ -466,7 +466,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		findBarVisibilityControl.setVisible(visible, this, selectedFindText);
 		if (visible)
 		{
-			findBar.setFocus();
+			combo.setFocus();
 		}
 	}
 
