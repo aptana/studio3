@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist.index;
 
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
@@ -73,7 +74,7 @@ public class JSCAHandler implements IContextHandler
 		USAGE("usage"); //$NON-NLS-1$
 
 		private static Map<String, PropertyName> NAME_MAP;
-		private String _name;
+		private String name;
 
 		static
 		{
@@ -99,12 +100,12 @@ public class JSCAHandler implements IContextHandler
 
 		private PropertyName(String name)
 		{
-			this._name = name;
+			this.name = name;
 		}
 
 		public String getName()
 		{
-			return this._name;
+			return name;
 		}
 	}
 
@@ -128,7 +129,7 @@ public class JSCAHandler implements IContextHandler
 		BOOLEAN("Boolean"); //$NON-NLS-1$
 
 		private static Map<String, TypeName> NAME_MAP;
-		private String _name;
+		private String name;
 
 		static
 		{
@@ -154,12 +155,12 @@ public class JSCAHandler implements IContextHandler
 
 		private TypeName(String name)
 		{
-			this._name = name;
+			this.name = name;
 		}
 
 		public String getName()
 		{
-			return this._name;
+			return name;
 		}
 	}
 
@@ -172,23 +173,23 @@ public class JSCAHandler implements IContextHandler
 	private static final Pattern TYPE_PATTERN = Pattern
 			.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:\\.[$_a-zA-Z][$_a-zA-Z0-9]*)*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 
-	private Map<String, TypeElement> _typesByName;
-	private List<AliasElement> _aliases;
+	private Map<String, TypeElement> typesByName;
+	private List<AliasElement> aliases;
 
-	private AliasElement _currentAlias;
-	private TypeElement _currentType;
-	private UserAgentElement _currentUserAgent;
-	private SinceElement _currentSince;
-	private PropertyElement _currentProperty;
-	private FunctionElement _currentFunction;
-	private EventElement _currentEvent;
-	private EventPropertyElement _currentEventProperty;
-	private ReturnTypeElement _currentReturnType;
-	private String _currentExample;
-	private ParameterElement _currentParameter;
-	private ExceptionElement _currentException;
-	private String _currentString;
-	private Boolean _currentBoolean;
+	private AliasElement currentAlias;
+	private TypeElement currentType;
+	private UserAgentElement currentUserAgent;
+	private SinceElement currentSince;
+	private PropertyElement currentProperty;
+	private FunctionElement currentFunction;
+	private EventElement currentEvent;
+	private EventPropertyElement currentEventProperty;
+	private ReturnTypeElement currentReturnType;
+	private String currentExample;
+	private ParameterElement currentParameter;
+	private ExceptionElement currentException;
+	private String currentString;
+	private Boolean currentBoolean;
 
 	static
 	{
@@ -212,8 +213,8 @@ public class JSCAHandler implements IContextHandler
 	 */
 	public JSCAHandler()
 	{
-		this._typesByName = new HashMap<String, TypeElement>();
-		this._aliases = new ArrayList<AliasElement>();
+		typesByName = new HashMap<String, TypeElement>();
+		aliases = new ArrayList<AliasElement>();
 	}
 
 	/*
@@ -227,134 +228,198 @@ public class JSCAHandler implements IContextHandler
 		switch (type)
 		{
 			case ALIAS:
-				this._aliases.add(this._currentAlias);
-				this._currentAlias = null;
+				aliases.add(currentAlias);
+				currentAlias = null;
 				break;
 
 			case TYPE:
+				// grab namespace
+				String typeName = currentType.getName();
+
+				// hide property
+				setIsInternal(typeName, currentType.isInternal());
+
+				// potentially hide all segments up to this one
+				hideNamespace(getNamespace(typeName));
+
 				// NOTE: Setting name on type already puts it into the typesByName hash, so we don't have
-				// to do anything here
-				this._currentType = null;
+				// to do anything else here
+				currentType = null;
 				break;
 
 			case USER_AGENT:
-				if (this._currentProperty != null)
+				if (currentProperty != null)
 				{
-					this._currentProperty.addUserAgent(this._currentUserAgent);
+					currentProperty.addUserAgent(currentUserAgent);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.addUserAgent(this._currentUserAgent);
+					currentFunction.addUserAgent(currentUserAgent);
 				}
-				else if (this._currentType != null)
+				else if (currentType != null)
 				{
-					this._currentType.addUserAgent(this._currentUserAgent);
+					currentType.addUserAgent(currentUserAgent);
 				}
-				this._currentUserAgent = null;
+				currentUserAgent = null;
 				break;
 
 			case SINCE:
-				if (this._currentProperty != null)
+				if (currentProperty != null)
 				{
-					this._currentProperty.addSince(this._currentSince);
+					currentProperty.addSince(currentSince);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.addSince(this._currentSince);
+					currentFunction.addSince(currentSince);
 				}
-				else if (this._currentType != null)
+				else if (currentType != null)
 				{
-					this._currentType.addSince(this._currentSince);
+					currentType.addSince(currentSince);
 				}
-				this._currentSince = null;
+				currentSince = null;
 				break;
 
 			case PROPERTY:
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.addProperty(this._currentProperty);
+					currentType.addProperty(currentProperty);
 				}
-				this._currentProperty = null;
+				currentProperty = null;
 				break;
 
 			case FUNCTION:
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.addProperty(this._currentFunction);
+					currentType.addProperty(currentFunction);
 				}
-				this._currentFunction = null;
+				currentFunction = null;
 				break;
 
 			case EVENT:
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.addEvent(this._currentEvent);
+					currentType.addEvent(currentEvent);
 				}
-				this._currentEvent = null;
+				currentEvent = null;
 				break;
 
 			case STRING:
-				if (this._currentFunction != null)
+				if (currentFunction != null)
 				{
-					this._currentFunction.addReference(this._currentString);
+					currentFunction.addReference(currentString);
 				}
-				else if (this._currentType != null)
+				else if (currentType != null)
 				{
-					this._currentType.addRemark(this._currentString);
+					currentType.addRemark(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case EVENT_PROPERTY:
-				if (this._currentEvent != null)
+				if (currentEvent != null)
 				{
-					this._currentEvent.addProperty(this._currentEventProperty);
+					currentEvent.addProperty(currentEventProperty);
 				}
-				this._currentEventProperty = null;
+				currentEventProperty = null;
 				break;
 
 			case EXAMPLE:
-				if (this._currentProperty != null)
+				if (currentProperty != null)
 				{
-					this._currentProperty.addExample(this._currentExample);
+					currentProperty.addExample(currentExample);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.addExample(this._currentExample);
+					currentFunction.addExample(currentExample);
 				}
-				else if (this._currentType != null)
+				else if (currentType != null)
 				{
-					this._currentType.addExample(this._currentExample);
+					currentType.addExample(currentExample);
 				}
-				this._currentExample = null;
+				currentExample = null;
 				break;
 
 			case PARAMETER:
-				if (this._currentFunction != null)
+				if (currentFunction != null)
 				{
-					this._currentFunction.addParameter(this._currentParameter);
+					currentFunction.addParameter(currentParameter);
 				}
-				this._currentParameter = null;
+				currentParameter = null;
 				break;
 
 			case EXCEPTION:
-				if (this._currentFunction != null)
+				if (currentFunction != null)
 				{
-					this._currentFunction.addException(this._currentException);
+					currentFunction.addException(currentException);
 				}
-				this._currentException = null;
+				currentException = null;
 				break;
 
 			case RETURN_TYPE:
-				if (this._currentFunction != null)
+				if (currentFunction != null)
 				{
-					this._currentFunction.addReturnType(this._currentReturnType);
+					currentFunction.addReturnType(currentReturnType);
 				}
-				this._currentReturnType = null;
+				currentReturnType = null;
 				break;
 
 			default:
 				// TODO: warn
+		}
+	}
+
+	protected void createType()
+	{
+		// NOTE: It is assumed that the "name" property is always the first property on a type. This allows us to do the
+		// following.
+
+		if (typesByName.containsKey(currentString))
+		{
+			// Use existing type if we've already created one for the current name
+			currentType = typesByName.get(currentString);
+		}
+		else
+		{
+			// Otherwise, use the current empty type, set its name, and store it in the type map
+			currentType.setName(currentString);
+			typesByName.put(currentString, currentType);
+		}
+
+		String[] parts = DOT_PATTERN.split(currentString);
+
+		if (parts.length > 1)
+		{
+			String accumulatedName = parts[0];
+			TypeElement type = getType(accumulatedName);
+
+			for (int i = 1; i < parts.length; i++)
+			{
+				// grab name part
+				String pName = parts[i];
+
+				// update accumulated type name
+				accumulatedName += "." + pName; //$NON-NLS-1$ // $codepro.audit.disable stringConcatenationInLoop
+
+				// try to grab the property off of the current type
+				PropertyElement property = type.getProperty(pName);
+
+				// create property, if we didn't have one
+				if (property == null)
+				{
+					property = new PropertyElement();
+
+					property.setName(pName);
+					property.setIsClassProperty(true);
+					property.addType(accumulatedName);
+
+					type.addProperty(property);
+				}
+
+				// make sure to save last visited type
+				typesByName.put(type.getName(), type);
+
+				type = getType(accumulatedName);
+			}
 		}
 	}
 
@@ -369,39 +434,39 @@ public class JSCAHandler implements IContextHandler
 		switch (t)
 		{
 			case ALIAS:
-				this._currentAlias = new AliasElement();
+				currentAlias = new AliasElement();
 				break;
 
 			case TYPE:
-				this._currentType = new TypeElement();
+				currentType = new TypeElement();
 				break;
 
 			case USER_AGENT:
-				this._currentUserAgent = new UserAgentElement();
+				currentUserAgent = new UserAgentElement();
 				break;
 
 			case SINCE:
-				this._currentSince = new SinceElement();
+				currentSince = new SinceElement();
 				break;
 
 			case PROPERTY:
-				this._currentProperty = new PropertyElement();
+				currentProperty = new PropertyElement();
 				break;
 
 			case FUNCTION:
-				this._currentFunction = new FunctionElement();
+				currentFunction = new FunctionElement();
 				break;
 
 			case EVENT:
-				this._currentEvent = new EventElement();
+				currentEvent = new EventElement();
 				break;
 
 			case EVENT_PROPERTY:
-				this._currentEventProperty = new EventPropertyElement();
+				currentEventProperty = new EventPropertyElement();
 				break;
 
 			case RETURN_TYPE:
-				this._currentReturnType = new ReturnTypeElement();
+				currentReturnType = new ReturnTypeElement();
 				break;
 
 			case EXAMPLE:
@@ -409,19 +474,19 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			case PARAMETER:
-				this._currentParameter = new ParameterElement();
+				currentParameter = new ParameterElement();
 				break;
 
 			case EXCEPTION:
-				this._currentException = new ExceptionElement();
+				currentException = new ExceptionElement();
 				break;
 
 			case STRING:
-				this._currentString = (String) value;
+				currentString = (String) value;
 				break;
 
 			case BOOLEAN:
-				this._currentBoolean = (Boolean) value;
+				currentBoolean = (Boolean) value;
 				break;
 
 			default:
@@ -436,7 +501,7 @@ public class JSCAHandler implements IContextHandler
 	 */
 	public AliasElement[] getAliases()
 	{
-		return this._aliases.toArray(new AliasElement[this._aliases.size()]);
+		return aliases.toArray(new AliasElement[aliases.size()]);
 	}
 
 	/**
@@ -460,7 +525,7 @@ public class JSCAHandler implements IContextHandler
 					// map types
 					if (TYPE_MAP.containsKey(type))
 					{
-						result.add(TYPE_MAP.get(this._currentString));
+						result.add(TYPE_MAP.get(currentString));
 					}
 					else
 					{
@@ -481,6 +546,19 @@ public class JSCAHandler implements IContextHandler
 	}
 
 	/**
+	 * getNamespace
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	private String getNamespace(String typeName)
+	{
+		int index = typeName.lastIndexOf('.');
+
+		return (index != -1) ? typeName.substring(0, index) : StringUtil.EMPTY;
+	}
+
+	/**
 	 * getType
 	 * 
 	 * @param typeName
@@ -488,7 +566,7 @@ public class JSCAHandler implements IContextHandler
 	 */
 	private TypeElement getType(String typeName)
 	{
-		TypeElement result = this._typesByName.get(typeName);
+		TypeElement result = typesByName.get(typeName);
 
 		if (result == null)
 		{
@@ -509,9 +587,84 @@ public class JSCAHandler implements IContextHandler
 	 */
 	public TypeElement[] getTypes()
 	{
-		Collection<TypeElement> types = this._typesByName.values();
+		Collection<TypeElement> types = typesByName.values();
 
 		return types.toArray(new TypeElement[types.size()]);
+	}
+
+	/**
+	 * Possibly hide/show the specified namespace by visiting its properties. If all properties are internal, then the
+	 * namespace will become internal. Note that this method both hides and shows namespaces and all parent namespaces
+	 * are visited as well
+	 * 
+	 * @param namespace
+	 *            The namespace to process
+	 */
+	protected void hideNamespace(String namespace)
+	{
+		while (!StringUtil.isEmpty(namespace))
+		{
+			TypeElement type = typesByName.get(namespace);
+
+			if (type != null)
+			{
+				boolean isInternal = true;
+
+				for (PropertyElement property : type.getProperties())
+				{
+					if (!property.isInternal())
+					{
+						isInternal = false;
+						break;
+					}
+				}
+
+				setIsInternal(namespace, isInternal);
+			}
+			// TODO: warn about missing type?
+
+			// move back one more segment
+			namespace = getNamespace(namespace);
+		}
+	}
+
+	/**
+	 * Set the isInternal flag for the specified type. If the type name includes a namespace, then property for that
+	 * type on the namespace will have its flag set. Otherwise, the type itself will have its flag set
+	 * 
+	 * @param typeName
+	 *            The name of the type to process
+	 * @param isInternal
+	 *            The value to use when setting the type's isInternal flag
+	 */
+	protected void setIsInternal(String typeName, boolean isInternal)
+	{
+		String namespace = getNamespace(typeName);
+
+		if (!StringUtil.isEmpty(namespace))
+		{
+			TypeElement namespaceType = typesByName.get(namespace);
+
+			if (namespaceType != null)
+			{
+				String name = typeName.substring(namespace.length() + 1);
+
+				// get property for type name
+				PropertyElement property = namespaceType.getProperty(name);
+
+				if (property != null)
+				{
+					// tag property as internal
+					property.setIsInternal(isInternal);
+				}
+			}
+		}
+		else
+		{
+			TypeElement type = typesByName.get(typeName);
+
+			type.setIsInternal(isInternal);
+		}
 	}
 
 	/**
@@ -603,295 +756,299 @@ public class JSCAHandler implements IContextHandler
 		{
 			case VERSION:
 				// NOTE: Ignoring JSMetadata properties
-				if (this._currentUserAgent != null)
+				if (currentUserAgent != null)
 				{
-					this._currentUserAgent.setVersion(this._currentString);
+					currentUserAgent.setVersion(currentString);
 				}
-				else if (this._currentSince != null)
+				else if (currentSince != null)
 				{
-					this._currentSince.setVersion(this._currentString);
+					currentSince.setVersion(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case NAME:
-				if (this._currentSince != null)
+				if (currentSince != null)
 				{
-					this._currentSince.setName(this._currentString);
+					currentSince.setName(currentString);
 				}
-				else if (this._currentExample != null)
+				else if (currentExample != null)
 				{ // $codepro.audit.disable emptyIfStatement
 					// TODO: add ExampleElement to support for name+code
 				}
-				else if (this._currentEventProperty != null)
+				else if (currentEventProperty != null)
 				{
-					if (isValidIdentifier(this._currentString))
+					if (isValidIdentifier(currentString))
 					{
-						this._currentEventProperty.setName(this._currentString);
+						currentEventProperty.setName(currentString);
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Event_Property_Name + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Event_Property_Name + currentString);
 					}
 				}
-				else if (this._currentEvent != null)
+				else if (currentEvent != null)
 				{
-					if (isValidEventIdentifier(this._currentString))
+					if (isValidEventIdentifier(currentString))
 					{
-						this._currentEvent.setName(this._currentString);
+						currentEvent.setName(currentString);
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Event_Name + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Event_Name + currentString);
 					}
 				}
-				else if (this._currentProperty != null)
+				else if (currentProperty != null)
 				{
-					if (isValidIdentifier(this._currentString))
+					if (isValidIdentifier(currentString))
 					{
-						this._currentProperty.setName(this._currentString);
+						currentProperty.setName(currentString);
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Property_Name + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Property_Name + currentString);
 					}
 				}
-				else if (this._currentParameter != null)
+				else if (currentParameter != null)
 				{
-					if (isValidIdentifier(this._currentString))
+					if (isValidIdentifier(currentString))
 					{
-						this._currentParameter.setName(this._currentString);
+						currentParameter.setName(currentString);
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Parameter_Name + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Parameter_Name + currentString);
 					}
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					if (isValidIdentifier(this._currentString))
+					if (isValidIdentifier(currentString))
 					{
-						this._currentFunction.setName(this._currentString);
+						currentFunction.setName(currentString);
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Function_Name + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Function_Name + currentString);
 					}
 				}
-				else if (this._currentAlias != null)
+				else if (currentAlias != null)
 				{
-					if (isValidIdentifier(this._currentString))
+					if (isValidIdentifier(currentString))
 					{
-						this._currentAlias.setName(this._currentString);
+						currentAlias.setName(currentString);
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Alias + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Alias + currentString);
 					}
 				}
-				else if (this._currentType != null)
+				else if (currentType != null)
 				{
-					if (isValidTypeIdentifier(this._currentString))
+					if (isValidTypeIdentifier(currentString))
 					{
-						this.createType();
+						createType();
 					}
 					else
 					{
-						this.log(Messages.JSCAHandler_Invalid_Type_Name + this._currentString);
+						log(Messages.JSCAHandler_Invalid_Type_Name + currentString);
 					}
 				}
 				else
 				{
-					this.log(Messages.JSCAHandler_Unable_To_Set_Name_Property);
+					log(Messages.JSCAHandler_Unable_To_Set_Name_Property);
 				}
 
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case DESCRIPTION:
-				if (this._currentUserAgent != null)
+				if (currentUserAgent != null)
 				{
-					this._currentUserAgent.setDescription(this._currentString);
+					currentUserAgent.setDescription(currentString);
 				}
-				else if (this._currentException != null)
+				else if (currentException != null)
 				{
-					this._currentException.setDescription(this._currentString);
+					currentException.setDescription(currentString);
 				}
-				else if (this._currentEventProperty != null)
+				else if (currentEventProperty != null)
 				{
-					this._currentEventProperty.setDescription(this._currentString);
+					currentEventProperty.setDescription(currentString);
 				}
-				else if (this._currentEvent != null)
+				else if (currentEvent != null)
 				{
-					this._currentEvent.setDescription(this._currentString);
+					currentEvent.setDescription(currentString);
 				}
-				else if (this._currentProperty != null)
+				else if (currentProperty != null)
 				{
-					this._currentProperty.setDescription(this._currentString);
+					currentProperty.setDescription(currentString);
 				}
-				else if (this._currentParameter != null)
+				else if (currentParameter != null)
 				{
-					this._currentParameter.setDescription(this._currentString);
+					currentParameter.setDescription(currentString);
 				}
-				else if (this._currentReturnType != null)
+				else if (currentReturnType != null)
 				{
-					this._currentReturnType.setDescription(this._currentString);
+					currentReturnType.setDescription(currentString);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.setDescription(this._currentString);
+					currentFunction.setDescription(currentString);
 				}
-				else if (this._currentAlias != null)
+				else if (currentAlias != null)
 				{
-					this._currentAlias.setDescription(this._currentString);
+					currentAlias.setDescription(currentString);
 				}
-				else if (this._currentType != null)
+				else if (currentType != null)
 				{
-					this._currentType.setDescription(this._currentString);
+					currentType.setDescription(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case TYPE:
-				List<String> types = this.getMappedTypes(this._currentString);
+				List<String> types = getMappedTypes(currentString);
 
 				for (String type : types)
 				{
-					if (this._currentException != null)
+					if (currentException != null)
 					{
 						// last wins
-						this._currentException.setType(type);
+						currentException.setType(type);
 					}
-					if (this._currentReturnType != null)
+					if (currentReturnType != null)
 					{
 						// last wins
-						this._currentReturnType.setType(type);
+						currentReturnType.setType(type);
 					}
-					else if (this._currentEventProperty != null)
+					else if (currentEventProperty != null)
 					{
 						// last wins, but may want to support multiple types here
-						this._currentEventProperty.setType(type);
+						currentEventProperty.setType(type);
 					}
-					else if (this._currentParameter != null)
+					else if (currentParameter != null)
 					{
-						this._currentParameter.addType(type);
+						currentParameter.addType(type);
 					}
-					else if (this._currentProperty != null)
+					else if (currentProperty != null)
 					{
-						this._currentProperty.addType(type);
+						currentProperty.addType(type);
 					}
-					else if (this._currentAlias != null)
+					else if (currentAlias != null)
 					{
 						// last wins
-						this._currentAlias.setType(type);
+						currentAlias.setType(type);
 					}
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case DEPRECATED:
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.setIsDeprecated(this._currentBoolean);
+					currentType.setIsDeprecated(currentBoolean);
 				}
-				this._currentBoolean = null;
+				currentBoolean = null;
 				break;
 
 			case INHERITS:
-				if (this._currentType != null)
+				if (currentType != null)
 				{
-					this._currentType.addParentType(this._currentString);
+					currentType.addParentType(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case PLATFORM:
-				if (this._currentUserAgent != null)
+				if (currentUserAgent != null)
 				{
-					this._currentUserAgent.setPlatform(this._currentString);
+					currentUserAgent.setPlatform(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case OS:
-				if (this._currentUserAgent != null)
+				if (currentUserAgent != null)
 				{
-					this._currentUserAgent.setOS(this._currentString);
+					currentUserAgent.setOS(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case OS_VERSION:
-				if (this._currentUserAgent != null)
+				if (currentUserAgent != null)
 				{
-					this._currentUserAgent.setOSVersion(this._currentString);
+					currentUserAgent.setOSVersion(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case IS_INSTANCE_PROPERTY:
-				if (this._currentProperty != null)
+				if (currentProperty != null)
 				{
-					this._currentProperty.setIsInstanceProperty(this._currentBoolean);
+					currentProperty.setIsInstanceProperty(currentBoolean);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.setIsInstanceProperty(this._currentBoolean);
+					currentFunction.setIsInstanceProperty(currentBoolean);
 				}
-				this._currentBoolean = null;
+				currentBoolean = null;
 				break;
 
 			case IS_CLASS_PROPERTY:
-				if (this._currentProperty != null)
+				if (currentProperty != null)
 				{
-					this._currentProperty.setIsClassProperty(this._currentBoolean);
+					currentProperty.setIsClassProperty(currentBoolean);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.setIsClassProperty(this._currentBoolean);
+					currentFunction.setIsClassProperty(currentBoolean);
 				}
-				this._currentBoolean = null;
+				currentBoolean = null;
 				break;
 
 			case IS_INTERNAL:
-				if (this._currentProperty != null)
+				if (currentProperty != null)
 				{
-					this._currentProperty.setIsInternal(this._currentBoolean);
+					currentProperty.setIsInternal(currentBoolean);
 				}
-				else if (this._currentFunction != null)
+				else if (currentFunction != null)
 				{
-					this._currentFunction.setIsInternal(this._currentBoolean);
+					currentFunction.setIsInternal(currentBoolean);
 				}
-				this._currentBoolean = null;
+				else if (currentType != null)
+				{
+					currentType.setIsInternal(currentBoolean);
+				}
+				currentBoolean = null;
 				break;
 
 			case IS_CONSTRUCTOR:
-				if (this._currentFunction != null)
+				if (currentFunction != null)
 				{
-					this._currentFunction.setIsConstructor(this._currentBoolean);
+					currentFunction.setIsConstructor(currentBoolean);
 				}
-				this._currentBoolean = null;
+				currentBoolean = null;
 				break;
 
 			case IS_METHOD:
-				if (this._currentFunction != null)
+				if (currentFunction != null)
 				{
-					this._currentFunction.setIsMethod(this._currentBoolean);
+					currentFunction.setIsMethod(currentBoolean);
 				}
-				this._currentBoolean = null;
+				currentBoolean = null;
 				break;
 
 			case CODE:
-				this._currentExample = this._currentString;
-				this._currentString = null;
+				currentExample = currentString;
+				currentString = null;
 				break;
 
 			case USAGE:
-				if (this._currentParameter != null)
+				if (currentParameter != null)
 				{
-					this._currentParameter.setUsage(this._currentString);
+					currentParameter.setUsage(currentString);
 				}
-				this._currentString = null;
+				currentString = null;
 				break;
 
 			case ALIASES:
@@ -911,63 +1068,8 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				this.log(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
+				log(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
 				break;
-		}
-	}
-
-	protected void createType()
-	{
-		// NOTE: It is assumed that the "name" property is always the first property on a type. This allows us to do the
-		// following.
-
-		if (this._typesByName.containsKey(this._currentString))
-		{
-			// Use existing type if we've already created one for the current name
-			this._currentType = this._typesByName.get(this._currentString);
-		}
-		else
-		{
-			// Otherwise, use the current empty type, set it's name, and store it in the type map
-			this._currentType.setName(this._currentString);
-			this._typesByName.put(this._currentString, this._currentType);
-		}
-
-		String[] parts = DOT_PATTERN.split(this._currentString);
-
-		if (parts.length > 1)
-		{
-			String accumulatedName = parts[0];
-			TypeElement type = this.getType(accumulatedName);
-
-			for (int i = 1; i < parts.length; i++)
-			{
-				// grab name part
-				String pName = parts[i];
-
-				// update accumulated type name
-				accumulatedName += "." + pName; //$NON-NLS-1$ // $codepro.audit.disable stringConcatenationInLoop
-
-				// try to grab the property off of the current type
-				PropertyElement property = type.getProperty(pName);
-
-				// create property, if we didn't have one
-				if (property == null)
-				{
-					property = new PropertyElement();
-
-					property.setName(pName);
-					property.setIsClassProperty(true);
-					property.addType(accumulatedName);
-
-					type.addProperty(property);
-				}
-
-				// make sure to save last type we visited
-				this._typesByName.put(type.getName(), type);
-
-				type = this.getType(accumulatedName);
-			}
 		}
 	}
 }
