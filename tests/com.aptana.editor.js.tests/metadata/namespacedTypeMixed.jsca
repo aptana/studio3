@@ -1,0 +1,11 @@
+{
+	"types": [
+		{
+			"name": "com.aptana.SimpleType",
+			"isInternal": true
+		},
+		{
+			"name": "com.aptana.SimpleType2"
+		}
+	]
+}
