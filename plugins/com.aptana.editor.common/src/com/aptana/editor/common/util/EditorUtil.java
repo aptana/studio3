@@ -154,7 +154,7 @@ public class EditorUtil
 		if (StringUtil.isEmpty(uriPath) || uriPath.equals("/")) //$NON-NLS-1$
 		{
 			return null;
-		}
+}
 		IPath path = new Path(uriPath);
 		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(path.lastSegment());
 	}
