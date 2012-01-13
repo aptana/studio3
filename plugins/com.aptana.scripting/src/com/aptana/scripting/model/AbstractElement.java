@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.SourcePrinter;
-import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.IDebugScopes;
 import com.aptana.scripting.ScriptingActivator;
 
@@ -362,7 +362,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	public void setPath(String path)
 	{
-		if (StringUtil.areNotEqual(this._path, path))
+		if (ObjectUtil.areNotEqual(this._path, path))
 		{
 			unregisterElement(this);
 

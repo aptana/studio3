@@ -16,6 +16,8 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import com.aptana.core.IFilter;
+
 public class CollectionsUtilTest extends TestCase
 {
 
@@ -123,5 +125,154 @@ public class CollectionsUtilTest extends TestCase
 		list.add("item1");
 		list.add("item2");
 		assertEquals(list, CollectionsUtil.newInOrderSet("item1", "item2"));
+	}
+
+	public void testCollectionFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> filteredList = CollectionsUtil.filter(list, selectWithA);
+
+		assertNotNull(filteredList);
+		assertEquals("List should contain 3 items", 3, filteredList.size());
+		assertTrue("List should contain 'a'", filteredList.contains("a"));
+		assertTrue("List should contain 'ab'", filteredList.contains("ab"));
+		assertTrue("List should contain 'ba'", filteredList.contains("ba"));
+	}
+
+	public void testCollectionFilterNullCollection()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> filteredList = CollectionsUtil.filter(null, selectWithA);
+
+		assertNotNull(filteredList);
+		assertEquals("List should contain 0 items", 0, filteredList.size());
+	}
+
+	public void testCollectionFilterNullFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		List<String> filteredList = CollectionsUtil.filter(list, null);
+
+		assertNotNull(filteredList);
+		assertEquals("List should contain 6 items", 6, filteredList.size());
+	}
+
+	public void testCollectionFilterInPlace()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+
+		CollectionsUtil.filterInPlace(list, selectWithA);
+
+		assertEquals("List should contain 3 items", 3, list.size());
+		assertTrue("List should contain 'a'", list.contains("a"));
+		assertTrue("List should contain 'ab'", list.contains("ab"));
+		assertTrue("List should contain 'ba'", list.contains("ba"));
+	}
+
+	public void testCollectionFilterInPlaceNullCollection()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+
+		try
+		{
+			CollectionsUtil.filterInPlace(null, selectWithA);
+		}
+		catch (Throwable t)
+		{
+			fail("CollectionsUtil.filterInPlace should not throw an exception with a null collection");
+		}
+	}
+
+	public void testCollectionFilterInPlaceNullFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		CollectionsUtil.filterInPlace(list, null);
+
+		assertEquals("List should contain 6 items", 6, list.size());
+	}
+
+	public void testCollectionFilterWithDestinationCollection()
+	{
+		List<String> list1 = CollectionsUtil.newList("a", "b", "c");
+		List<String> list2 = CollectionsUtil.newList("ab", "ba", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> accumulator = new ArrayList<String>();
+
+		CollectionsUtil.filter(list1, accumulator, selectWithA);
+		CollectionsUtil.filter(list2, accumulator, selectWithA);
+
+		assertNotNull(accumulator);
+		assertEquals("List should contain 3 items", 3, accumulator.size());
+		assertTrue("List should contain 'a'", accumulator.contains("a"));
+		assertTrue("List should contain 'ab'", accumulator.contains("ab"));
+		assertTrue("List should contain 'ba'", accumulator.contains("ba"));
+	}
+
+	public void testCollectionFilterWithDestinationCollectionNullSource()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> accumulator = new ArrayList<String>();
+
+		try
+		{
+			CollectionsUtil.filter(null, accumulator, selectWithA);
+		}
+		catch (Throwable t)
+		{
+			fail("CollectionsUtil.filter should not throw an exception with a null destination collection");
+		}
+
+		assertEquals("List should contain 0 items", 0, accumulator.size());
+	}
+
+	public void testCollectionFilterWithDestinationCollectionNullFilter()
+	{
+		List<String> list1 = CollectionsUtil.newList("a", "b", "c");
+		List<String> list2 = CollectionsUtil.newList("ab", "ba", "bc", "cb");
+		List<String> accumulator = new ArrayList<String>();
+
+		CollectionsUtil.filter(list1, accumulator, null);
+		CollectionsUtil.filter(list2, accumulator, null);
+
+		assertNotNull(accumulator);
+		assertEquals("List should contain 7 items", 7, accumulator.size());
 	}
 }

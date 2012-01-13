@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="processConfigurations" name="Process Configurations" schema="schema/processConfigurations.exsd"/>
-   <extension-point id="terminalHyperlinkDetectors" name="Terminal Hyperlink Detectors" schema="schema/terminalHyperlinkDetectors.exsd"/>
+   <extension-point id="processConfigurations" name="%extension-point.process.config.name" schema="schema/processConfigurations.exsd"/>
+   <extension-point id="terminalHyperlinkDetectors" name="%extension-point.hyperlink.name" schema="schema/terminalHyperlinkDetectors.exsd"/>
 
    <extension
          point="org.eclipse.ui.views">
@@ -106,7 +106,7 @@
             class="com.aptana.terminal.connector.LocalTerminalConnector"
             hidden="false"
             id="com.aptana.terminal.connector.local"
-            name="Local Connection">
+            name="%connector.local.name">
       </connector>
    </extension>
    <extension
@@ -114,19 +114,19 @@
       <configuration
             class="com.aptana.terminal.internal.configurations.NixBashConfiguration"
             id="com.aptana.terminal.configurations.macosx"
-            name="MacOSX Bash"
+            name="%configuration.bash.mac.name"
             platform="macosx">
       </configuration>
       <configuration
             class="com.aptana.terminal.internal.configurations.NixBashConfiguration"
             id="com.aptana.terminal.configurations.linux"
-            name="Linux Bash"
+            name="%configuration.bash.linux.name"
             platform="linux">
       </configuration>
       <configuration
             class="com.aptana.terminal.internal.configurations.WindowsMingwConfiguration"
             id="com.aptana.terminal.configurations.win32"
-            name="Windows MINGW"
+            name="%configuration.bash.win.name"
             platform="win32">
       </configuration>
    </extension>

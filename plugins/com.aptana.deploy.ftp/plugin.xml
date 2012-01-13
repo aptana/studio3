@@ -9,7 +9,7 @@
             id="com.aptana.deploy.ftp.wizard"
             name="%wizard.ftp.name">
          <description>
-            FTP, SFTP and FTPS are widespread standards for easily uploading your application to a variety of web hosts. Choose SFTP or FTPS if you are concerned about security, as they offer an encrypted format.
+            %wizard.deploy.ftp.description
          </description>
       </wizard>
    </extension>
@@ -18,7 +18,7 @@
       <command
             defaultHandler="com.aptana.deploy.ftp.internal.handlers.DeploySettingsHandler"
             id="com.aptana.deploy.commands.ftp.settings"
-            name="Deployment Settings...">
+            name="%command.ftp.deploy.settings.name">
       </command>
    </extension>
       <extension

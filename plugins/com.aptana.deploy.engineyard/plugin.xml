@@ -7,9 +7,9 @@
             class="com.aptana.deploy.engineyard.ui.wizard.EngineYardDeployWizard"
             icon="icons/icon-engineyard.png"
             id="com.aptana.deploy.engineyard.wizard"
-            name="Engine Yard">
+            name="%wizard.engineyard.name">
          <description>
-            Engine Yard is the largest cloud platform for Ruby on Rails deployments, with automation, service and expertise for building, deploying and running your applications.
+            %wizard.engineyard.description
          </description>
       </wizard>
    </extension>
