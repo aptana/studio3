@@ -5,18 +5,18 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.model.filters;
+package com.aptana.core;
 
-import com.aptana.core.IFilter;
-import com.aptana.scripting.model.AbstractElement;
-
-public interface IModelFilter extends IFilter<AbstractElement>
+/**
+ * IFilter
+ */
+public interface IFilter<T>
 {
 	/**
 	 * include
 	 * 
-	 * @param element
+	 * @param item
 	 * @return
 	 */
-	boolean include(AbstractElement element);
+	boolean include(T item);
 }
