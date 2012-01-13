@@ -107,4 +107,9 @@ public class FormatterJSPunctuationNode extends FormatterJSTextNode
 	{
 		return (forceLineTermination || super.isAddingEndNewLine());
 	}
+
+	protected void setForceLineTermination(boolean force)
+	{
+		forceLineTermination = force;
+	}
 }

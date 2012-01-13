@@ -59,4 +59,4 @@ if(a > b) {
     alert("hello");
 }
 delete a;
-delete b[6];
+delete b[6]; 

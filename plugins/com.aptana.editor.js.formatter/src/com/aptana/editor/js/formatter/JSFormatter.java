@@ -208,7 +208,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		String originalText = source.substring(offset, offset + length);
-		String input = originalText.trim();
+		String input = leftTrim(originalText, 0);
+		if (indentationLevel > 0 && FormatterWriter.endsWithNewLine(input, lineSeparator))
+		{
+			String substring = input.substring(0, input.length() - lineSeparator.length());
+			if (!FormatterWriter.endsWithNewLine(substring, lineSeparator))
+			{
+				input = substring;
+			}
+		}
 		int inputOffset = offset + countLeftWhitespaceChars(originalText);
 		IParseRootNode parseResult = null;
 		try
