@@ -26,6 +26,7 @@ public class TypeElement extends BaseElement
 	private static final String EXAMPLES_PROPERTY = "examples"; //$NON-NLS-1$
 	private static final String REMARKS_PROPERTY = "remarks"; //$NON-NLS-1$
 	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
+	private static final String IS_INTERNAL_PROPERTY = "internal"; //$NON-NLS-1$
 
 	private List<String> _parentTypes;
 	private List<PropertyElement> _properties;
@@ -34,6 +35,7 @@ public class TypeElement extends BaseElement
 	private List<String> _remarks;
 	private boolean _deprecated;
 	private boolean _serializeProperties;
+	private boolean _isInternal;
 
 	/**
 	 * TypeElement
@@ -212,6 +214,7 @@ public class TypeElement extends BaseElement
 		}
 
 		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY)); // $codepro.audit.disable useEquals
+		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY)); // $codepro.audit.disable useEquals
 	}
 
 	/**
@@ -366,6 +369,16 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
+	 * isInternal
+	 * 
+	 * @return
+	 */
+	public boolean isInternal()
+	{
+		return _isInternal;
+	}
+
+	/**
 	 * isDeprecated
 	 * 
 	 * @return
@@ -400,6 +413,16 @@ public class TypeElement extends BaseElement
 	public void setIsDeprecated(boolean value)
 	{
 		this._deprecated = value;
+	}
+
+	/**
+	 * setIsInternal
+	 * 
+	 * @param isInternal
+	 */
+	public void setIsInternal(boolean isInternal)
+	{
+		this._isInternal = isInternal;
 	}
 
 	/**
@@ -442,6 +465,7 @@ public class TypeElement extends BaseElement
 			out.add(EXAMPLES_PROPERTY, this.getExamples());
 			out.add(REMARKS_PROPERTY, this.getRemarks());
 			out.add(DEPRECATED_PROPERTY, this.isDeprecated());
+			out.add(IS_INTERNAL_PROPERTY, this.isInternal());
 		}
 	}
 

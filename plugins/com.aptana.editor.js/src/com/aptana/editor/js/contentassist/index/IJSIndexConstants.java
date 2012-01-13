@@ -27,7 +27,8 @@ public interface IJSIndexConstants
 	// 0.24 - Fix String.fromCharCode
 	// 0.25 - Fix document.body type
 	// 0.26 - Fix parsing of arrays in this format: IDENT LPAREN RPAREN
-	public static final double INDEX_VERSION = 0.26;
+	// 0.27 - Add isInternal property to type elements
+	public static final double INDEX_VERSION = 0.27;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
