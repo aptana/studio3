@@ -171,7 +171,8 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			}
 			catch (BadLocationException e)
 			{
-				WorkbenchPlugin.log(e);
+				IdeLog.logError(WorkbenchPlugin.getDefault(), e);
+				;
 			}
 
 			// First pull all possible menus from the current caret position's
@@ -451,5 +452,4 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			return new Class[] { IEditorActionBarContributor.class };
 		}
 	}
-
 }
