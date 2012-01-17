@@ -5,6 +5,7 @@ aptanaOptions.undef = true;
 aptanaOptions.browser = true;
 aptanaOptions.jscript = true;
 aptanaOptions.debug = true;
+aptanaOptions.maxerr = 1000;
 aptanaOptions.predef = ["Ti","Titanium","alert","require","exports","native","implements"];
 
 // jslint.js

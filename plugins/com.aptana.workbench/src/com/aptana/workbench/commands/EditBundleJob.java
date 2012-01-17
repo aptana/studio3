@@ -27,6 +27,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
@@ -59,7 +60,9 @@ class EditBundleJob extends Job
 	{
 		// Bundle is a project one, so it already exists as a project in the user's workspace. Nothing to do.
 		if (bundle.getBundlePrecedence() == BundlePrecedence.PROJECT)
+		{
 			return Status.OK_STATUS;
+		}
 		try
 		{
 			SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
@@ -78,12 +81,12 @@ class EditBundleJob extends Job
 		}
 		catch (CoreException e)
 		{
-			WorkbenchPlugin.log(e);
+			IdeLog.logError(WorkbenchPlugin.getDefault(), e);
 			return e.getStatus();
 		}
 		catch (Exception e)
 		{
-			WorkbenchPlugin.log(e);
+			IdeLog.logError(WorkbenchPlugin.getDefault(), e);
 			return new Status(IStatus.ERROR, WorkbenchPlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		return Status.OK_STATUS;
@@ -103,8 +106,8 @@ class EditBundleJob extends Job
 		IPath destRuble = destinationDir.append(bundle.getBundleDirectory().getName());
 		if (destRuble.toFile().isDirectory())
 		{
-			WorkbenchPlugin
-					.log("Trying to grab bundle, destination directory already exists: " + destRuble.toOSString()); //$NON-NLS-1$
+			IdeLog.logInfo(WorkbenchPlugin.getDefault(),
+					"Trying to grab bundle, destination directory already exists: " + destRuble.toOSString()); //$NON-NLS-1$
 			return destRuble; // Already exists, just return it.
 		}
 
@@ -130,10 +133,13 @@ class EditBundleJob extends Job
 	{
 		IPath userBundlesDir = Path.fromOSString(BundleManager.getInstance().getUserBundlesPath());
 		if (userBundlesDir.toFile().isDirectory())
+		{
 			return userBundlesDir;
+		}
 		if (userBundlesDir.toFile().mkdirs())
+		{
 			return userBundlesDir;
-
+		}
 		throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
 				Messages.EditBundleJob_CantCreateUserBundlesDir_Error));
 	}
@@ -335,5 +341,4 @@ class EditBundleJob extends Job
 	{
 		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-
 }

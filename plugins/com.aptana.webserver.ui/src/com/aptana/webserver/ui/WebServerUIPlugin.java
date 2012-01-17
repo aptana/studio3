@@ -16,8 +16,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.core.logging.IdeLog;
-
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -70,34 +68,6 @@ public class WebServerUIPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	/**
-	 * @deprecated
-	 * @param e
-	 */
-	public static void log(Throwable e)
-	{
-		IdeLog.logError(getDefault(), e);
-	}
-
-	/**
-	 * @deprecated
-	 * @param msg
-	 */
-	public static void log(String msg)
-	{
-		IdeLog.logInfo(getDefault(), msg);
-	}
-
-	/**
-	 * @deprecated
-	 * @param msg
-	 * @param e
-	 */
-	public static void log(String msg, Throwable e)
-	{
-		IdeLog.logInfo(getDefault(), msg, e, null);
-	}
-
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg)
 	{
@@ -114,5 +84,4 @@ public class WebServerUIPlugin extends AbstractUIPlugin
 		}
 		return desc.createImage();
 	}
-
 }

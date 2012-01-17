@@ -30,8 +30,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	{
 		IEclipsePreferences prefs = EclipseUtil.defaultScope().getNode(CorePlugin.PLUGIN_ID);
 		prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, ICorePreferenceConstants.DEFAULT_DEBUG_MODE);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, ICorePreferenceConstants.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS);
+		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
+				ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS);
 		prefs.put(ICorePreferenceConstants.PREF_DEBUG_LEVEL, IdeLog.StatusLevel.ERROR.toString());
 		prefs.put(
 				ICorePreferenceConstants.PREF_WEB_FILES,

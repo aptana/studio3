@@ -269,9 +269,6 @@
             id="com.aptana.ui.AptanaPreferencePage"
             name="%page.name">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.ui.preferences.TroubleshootingPreferencePage"

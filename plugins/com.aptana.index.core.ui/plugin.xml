@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="com.aptana.index.core.ui.indexViewContributors" name="indexViewContributors" schema="schema/indexViewContributors.exsd"/>
+   <extension-point id="com.aptana.index.core.ui.indexViewContributors" name="%extension-point.index-contributors.name" schema="schema/indexViewContributors.exsd"/>
    <extension
          point="org.eclipse.equinox.preferences.preferences">
       <initializer
@@ -153,7 +153,7 @@
             class="com.aptana.index.core.ui.views.IndexView"
             icon="icons/index-view.png"
             id="com.aptana.index.core.ui.view"
-            name="Index View"
+            name="%view.index.name"
             restorable="true">
       </view>
    </extension>

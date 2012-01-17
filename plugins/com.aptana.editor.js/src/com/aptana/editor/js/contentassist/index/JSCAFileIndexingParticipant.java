@@ -82,7 +82,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 					String typeName = type.getName();
 
-					if (!typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN)) //$NON-NLS-1$
+					if (isGlobalProperty(type))
 					{
 						PropertyElement property = window.getProperty(typeName);
 
@@ -109,7 +109,10 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				}
 
 				// write global type info
-				indexer.writeType(index, window, location);
+				if (window.hasProperties())
+				{
+					indexer.writeType(index, window, location);
+				}
 			}
 			catch (Throwable e)
 			{
@@ -133,5 +136,28 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.done();
 		}
+	}
+
+	/**
+	 * Determine if the specified type should generate a global property
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected boolean isGlobalProperty(TypeElement type)
+	{
+		boolean result = false;
+
+		if (type != null)
+		{
+			if (!type.isInternal())
+			{
+				String typeName = type.getName();
+
+				result = !typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN); //$NON-NLS-1$
+			}
+		}
+
+		return result;
 	}
 }

@@ -136,12 +136,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (PropertyElement property : globals)
 			{
-				String name = property.getName();
-				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = JSModelFormatter.getImage(property);
-				String[] userAgents = property.getUserAgentNames().toArray(new String[0]);
+				if (!property.isInternal())
+				{
+					String name = property.getName();
+					String description = JSModelFormatter.getDescription(property, projectURI);
+					Image image = JSModelFormatter.getImage(property);
+					String[] userAgents = property.getUserAgentNames().toArray(new String[0]);
 
-				addProposal(proposals, name, image, description, userAgents, location, offset);
+					addProposal(proposals, name, image, description, userAgents, location, offset);
+				}
 			}
 		}
 	}
@@ -171,14 +174,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 					for (PropertyElement property : properties)
 					{
-						String name = property.getName();
-						String description = JSModelFormatter.getDescription(property, getProjectURI());
-						Image image = JSModelFormatter.getImage(property);
-						List<String> userAgentNameList = property.getUserAgentNames();
-						String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
-						String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
+						if (!property.isInternal())
+						{
+							String name = property.getName();
+							String description = JSModelFormatter.getDescription(property, getProjectURI());
+							Image image = JSModelFormatter.getImage(property);
+							List<String> userAgentNameList = property.getUserAgentNames();
+							String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
+							String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
 
-						addProposal(proposals, name, image, description, userAgentNames, owningType, offset);
+							addProposal(proposals, name, image, description, userAgentNames, owningType, offset);
+						}
 					}
 				}
 			}
@@ -202,14 +208,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (PropertyElement property : projectGlobals)
 			{
-				String name = property.getName();
-				String description = JSModelFormatter.getDescription(property, projectURI);
-				Image image = JSModelFormatter.getImage(property);
-				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
-						.getDocumentDisplayName(documents.get(0)) : null;
+				if (!property.isInternal())
+				{
+					String name = property.getName();
+					String description = JSModelFormatter.getDescription(property, projectURI);
+					Image image = JSModelFormatter.getImage(property);
+					List<String> documents = property.getDocuments();
+					String location = (documents != null && documents.size() > 0) ? JSModelFormatter
+							.getDocumentDisplayName(documents.get(0)) : null;
 
-				addProposal(proposals, name, image, description, userAgentNames, location, offset);
+					addProposal(proposals, name, image, description, userAgentNames, location, offset);
+				}
 			}
 		}
 	}
@@ -378,14 +387,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		for (PropertyElement property : properties)
 		{
-			String name = property.getName();
-			String description = JSModelFormatter.getDescription(property, getProjectURI());
-			Image image = JSModelFormatter.getImage(property);
-			List<String> userAgentNameList = property.getUserAgentNames();
-			String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
-			String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
+			if (!property.isInternal())
+			{
+				String name = property.getName();
+				String description = JSModelFormatter.getDescription(property, getProjectURI());
+				Image image = JSModelFormatter.getImage(property);
+				List<String> userAgentNameList = property.getUserAgentNames();
+				String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
+				String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
 
-			addProposal(proposals, name, image, description, userAgentNames, owningType, offset);
+				addProposal(proposals, name, image, description, userAgentNames, owningType, offset);
+			}
 		}
 	}
 

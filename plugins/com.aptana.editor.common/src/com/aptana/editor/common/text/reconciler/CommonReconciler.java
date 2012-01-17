@@ -26,7 +26,7 @@ import org.eclipse.jface.text.reconciler.Reconciler;
 public class CommonReconciler extends Reconciler
 {
 
-	private final IReconcilingStrategy defaultStrategy;
+	private IReconcilingStrategy defaultStrategy;
 	private final Set<IReconcilingStrategy> reconcilingStrategies = new HashSet<IReconcilingStrategy>();
 	private BundleChangeReconcileTrigger bundleChangeReconcileTrigger;
 
@@ -44,6 +44,15 @@ public class CommonReconciler extends Reconciler
 		super();
 		this.defaultStrategy = defaultStrategy;
 		setReconcilingStrategy(defaultStrategy, String.valueOf(System.currentTimeMillis()));
+	}
+
+	public void dispose()
+	{
+		if (defaultStrategy instanceof IDisposableReconcilingStrategy)
+		{
+			((IDisposableReconcilingStrategy) defaultStrategy).dispose();
+		}
+		defaultStrategy = null;
 	}
 
 	/*

@@ -140,7 +140,7 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 				manager.enableControl(tabSize, !editorSettingsMode);
 				if (editorSettingsMode)
 				{
-					setEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+					setEditorTabWidth(HTMLPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 				}
 			}
 		}
@@ -155,7 +155,7 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 			manager.enableControl(tabSize, !editorSettingsMode);
 			if (editorSettingsMode)
 			{
-				setEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				setEditorTabWidth(HTMLPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 			}
 		}
 	}

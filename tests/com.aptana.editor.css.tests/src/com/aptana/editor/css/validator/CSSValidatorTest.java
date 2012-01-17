@@ -137,4 +137,12 @@ public class CSSValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
 	}
+
+	public void testCSS3UserSelectProperty() throws CoreException
+	{
+		String text = "div {\nuser-select: none;\n}";
+
+		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		assertEquals(0, items.size());
+	}
 }

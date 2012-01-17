@@ -57,7 +57,6 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 
 		tabSize.addModifyListener(new ModifyListener()
 		{
-
 			public void modifyText(ModifyEvent e)
 			{
 				int index = tabOptions.getSelectionIndex();
@@ -119,7 +118,7 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 				manager.enableControl(tabSize, !editorSettingsMode);
 				if (editorSettingsMode)
 				{
-					setEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+					setEditorTabWidth(CSSPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 				}
 			}
 		}
@@ -134,7 +133,7 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 			manager.enableControl(tabSize, !editorSettingsMode);
 			if (editorSettingsMode)
 			{
-				setEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				setEditorTabWidth(CSSPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 			}
 		}
 	}

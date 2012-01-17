@@ -626,6 +626,27 @@
             class="com.aptana.editor.common.preferences.TasksPreferencePage"
             id="com.aptana.editor.common.preferences.TasksPreferencePage"
             name="%page.tasks.name">
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.ValidationPreferencePage"
+            id="com.aptana.editor.common.ValidationPreferencePage"
+            name="%page.validation.name">
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.spelling.SpellingPreferencePage"
+            id="com.aptana.editor.common.spelling"
+            name="%page.spelling.name">
+         <keywordReference
+               id="org.eclipse.ui.editors.spelling">
+         </keywordReference>
+      </page>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
+            id="com.aptana.editor.common.contentassist"
+            name="%content.assist.pref.page.title">
       </page>            
    </extension>
    <extension
@@ -691,30 +712,6 @@
             verticalRulerPreferenceKey="OccurrenceIndicationInVerticalRuler"
             verticalRulerPreferenceValue="false">
       </specification>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.ValidationPreferencePage"
-            id="com.aptana.editor.common.ValidationPreferencePage"
-            name="%page.validation.name">
-      </page>
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.spelling.SpellingPreferencePage"
-            id="com.aptana.editor.common.spelling"
-            name="%page.spelling.name">
-         <keywordReference
-               id="org.eclipse.ui.editors.spelling">
-         </keywordReference>
-      </page>
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.ContentAssistPreferencePage"
-            id="com.aptana.editor.common.contentassist"
-            name="%content.assist.pref.page.title">
-      </page>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">

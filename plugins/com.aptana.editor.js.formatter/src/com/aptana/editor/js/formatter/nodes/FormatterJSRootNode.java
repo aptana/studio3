@@ -7,8 +7,13 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import java.util.List;
+
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.IFormatterNode;
 
 /**
  * A JavaScript formatter root node.<br>
@@ -26,5 +31,25 @@ public class FormatterJSRootNode extends FormatterBlockNode
 	public FormatterJSRootNode(IFormatterDocument document)
 	{
 		super(document);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptNodes(java.util.List,
+	 * com.aptana.formatter.IFormatterContext, com.aptana.formatter.IFormatterWriter)
+	 */
+	@Override
+	protected void acceptNodes(List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
+			throws Exception
+	{
+		if (!nodes.isEmpty())
+		{
+			IFormatterNode lastNode = nodes.get(nodes.size() - 1);
+			if (lastNode instanceof FormatterJSPunctuationNode)
+			{
+				((FormatterJSPunctuationNode) lastNode).setForceLineTermination(false);
+			}
+		}
+		super.acceptNodes(nodes, context, visitor);
 	}
 }

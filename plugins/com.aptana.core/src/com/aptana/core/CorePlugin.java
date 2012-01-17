@@ -10,18 +10,15 @@ package com.aptana.core;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -31,11 +28,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -65,9 +60,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	private static CorePlugin plugin;
 
 	private ResourceListener fProjectsListener;
-	private IResourceChangeListener fProjectCreationListener;
 
-	private Job addBuilderJob;
 	private Job addFilewatcherJob;
 
 	private BundleContext context;
@@ -107,20 +100,6 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		addFilewatcherJob.setSystem(!EclipseUtil.showSystemJobs());
 		addFilewatcherJob.setPriority(Job.LONG);
 		addFilewatcherJob.schedule(250);
-
-		if (inMigrationMode())
-		{
-			addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
-			{
-				protected IStatus run(IProgressMonitor monitor)
-				{
-					return updateProjectNatures(ResourcesPlugin.getWorkspace().getRoot().getProjects(), monitor);
-				}
-			};
-			addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
-			addBuilderJob.setPriority(Job.LONG);
-			addBuilderJob.schedule(250);
-		}
 
 		IdeLog.flushCache();
 	}
@@ -170,11 +149,6 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 				addFilewatcherJob.cancel();
 				addFilewatcherJob = null;
 			}
-			if (addBuilderJob != null)
-			{
-				addBuilderJob.cancel();
-				addBuilderJob = null;
-			}
 			removeProjectListeners();
 		}
 		finally
@@ -194,64 +168,6 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		return plugin;
 	}
 
-	private IStatus updateProjectNatures(IProject[] projects, IProgressMonitor monitor)
-	{
-		MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
-		Map<String, String> oldToNewNatures = new HashMap<String, String>();
-		oldToNewNatures.put("com.aptana.ide.project.nature.web", "com.aptana.projects.webnature"); //$NON-NLS-1$ //$NON-NLS-2$
-		// oldToNewNatures.put("com.aptana.ide.project.remote.nature",
-		// "com.aptana.ruby.core.rubynature"); // There is no remote nature now
-		oldToNewNatures.put("com.aptana.ide.editor.php.phpnature", "com.aptana.editor.php.phpNature"); //$NON-NLS-1$ //$NON-NLS-2$
-		// oldToNewNatures.put("org.radrails.rails.core.railsnature",
-		// "org.radrails.rails.core.railsnature"); // Same id
-		oldToNewNatures.put("org.rubypeople.rdt.core.rubynature", "com.aptana.ruby.core.rubynature"); //$NON-NLS-1$ //$NON-NLS-2$
-		SubMonitor sub = SubMonitor.convert(monitor, 10 * projects.length);
-		for (IProject p : projects)
-		{
-			if (sub.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
-
-			try
-			{
-				if (!p.isAccessible())
-				{
-					continue;
-				}
-				sub.subTask(p.getName());
-
-				// Look for Studio 1.x and 2.x project natures, attach our new natures where needed
-				IProjectDescription desc = p.getDescription();
-				boolean modified = false;
-				List<String> newNatures = new ArrayList<String>();
-				for (String nature : desc.getNatureIds())
-				{
-					String newNature = oldToNewNatures.get(nature);
-					if (newNature != null)
-					{
-						modified = true;
-						newNatures.add(newNature);
-					}
-					newNatures.add(nature);
-				}
-				if (modified)
-				{
-					desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
-					p.setDescription(desc, sub.newChild(5));
-					status.add(Status.OK_STATUS);
-				}
-				sub.worked(5);
-			}
-			catch (CoreException e)
-			{
-				status.add(e.getStatus());
-			}
-		}
-		sub.done();
-		return status;
-	}
-
 	private void removeProjectListeners()
 	{
 		if (fProjectsListener != null)
@@ -259,90 +175,12 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 			fProjectsListener.dispose();
 			fProjectsListener = null;
 		}
-
-		if (fProjectCreationListener != null)
-		{
-			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectCreationListener);
-		}
-	}
-
-	/**
-	 * Are we migrating projects from Studio 2.x to 3?
-	 * 
-	 * @return
-	 */
-	private boolean inMigrationMode()
-	{
-		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
-				ICorePreferenceConstants.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
 	}
 
 	private void addProjectListeners()
 	{
 		fProjectsListener = new ResourceListener();
 		fProjectsListener.start();
-
-		if (inMigrationMode())
-		{
-			fProjectCreationListener = new IResourceChangeListener()
-			{
-				public void resourceChanged(IResourceChangeEvent event)
-				{
-					IResourceDelta delta = event.getDelta();
-					if (delta == null)
-					{
-						return;
-					}
-					try
-					{
-						delta.accept(new IResourceDeltaVisitor()
-						{
-							public boolean visit(IResourceDelta delta) throws CoreException
-							{
-								final IResource resource = delta.getResource();
-								if (resource.getType() == IResource.ROOT)
-								{
-									return true;
-								}
-								if (resource.getType() == IResource.PROJECT)
-								{
-									// a project was added or opened
-									if (delta.getKind() == IResourceDelta.ADDED
-											|| (delta.getKind() == IResourceDelta.CHANGED
-													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-													.isAccessible()))
-									{
-										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
-										{
-											protected IStatus run(IProgressMonitor monitor)
-											{
-												return updateProjectNatures(new IProject[] { resource.getProject() },
-														monitor);
-											}
-										};
-										addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
-										addBuilderJob.setPriority(Job.LONG);
-										addBuilderJob.schedule();
-									}
-
-								}
-								return false;
-							}
-						});
-					}
-					catch (CoreException e)
-					{
-						IStatus status = new Status(e.getStatus().getSeverity(), CorePlugin.PLUGIN_ID,
-								e.getLocalizedMessage(), e);
-						IdeLog.log(CorePlugin.getDefault(), status);
-					}
-				}
-			};
-
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectCreationListener,
-					IResourceChangeEvent.POST_CHANGE);
-		}
 	}
 
 	public static String getAptanaStudioVersion()

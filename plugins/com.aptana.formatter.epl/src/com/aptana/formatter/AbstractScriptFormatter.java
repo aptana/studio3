@@ -674,18 +674,24 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 
 	/**
 	 * Process an output string to determine if it needs wrapping new-line chars, indent-suffix addition, or just
-	 * trimming.
+	 * trimming and adding a suffix when needed.
 	 * 
 	 * @param output
 	 * @param lineSeparator
+	 * @param suffix
+	 *            A suffix to be added to the output. Note that only the 'indentSufix' will be used when
+	 *            'postfixWithNewLine' is set to <code>true</code>.
 	 * @param indentSufix
+	 *            A suffix to be added to the output as an <b>indentation</b> addition when a 'postfixWithNewLine' is
+	 *            set to <code>true</code>.
 	 * @param prefixWithNewLine
 	 *            Prefix the output with a line terminator
 	 * @param postfixWithNewLine
-	 *            Terminate the output with a line terminator and append the 'indentSuffix' to it.
+	 *            Terminate the output with a line terminator and append the 'suffix' to it.
 	 * @return A processed output string.
+	 * @see #processNestedOutput(String, String, String, boolean, boolean)
 	 */
-	protected String processNestedOutput(String output, String lineSeparator, String indentSufix,
+	protected String processNestedOutput(String output, String lineSeparator, String suffix, String indentSufix,
 			boolean prefixWithNewLine, boolean postfixWithNewLine)
 	{
 		// In case the output contains multiple lines, make sure it starts and ends with a new-line char
@@ -702,13 +708,40 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 				// Add the indentSufix that we may have.
 				wrappedOutput.append(indentSufix);
 			}
+			else
+			{
+				wrappedOutput.append(suffix);
+			}
 			output = wrappedOutput.toString();
 		}
 		else
 		{
 			// Trim the output. Disregard any indentSufix that we have.
-			output = output.trim();
+			output = output.trim() + suffix;
 		}
 		return output;
+	}
+
+	/**
+	 * Process an output string to determine if it needs wrapping new-line chars, indent-suffix addition, or just
+	 * trimming.
+	 * 
+	 * @param output
+	 * @param lineSeparator
+	 * @param indentSufix
+	 *            A suffix to be added to the output as an <b>indentation</b> addition when a 'postfixWithNewLine' is
+	 *            set to <code>true</code>.
+	 * @param prefixWithNewLine
+	 *            Prefix the output with a line terminator
+	 * @param postfixWithNewLine
+	 *            Terminate the output with a line terminator and append the 'suffix' to it.
+	 * @return A processed output string.
+	 * @see #processNestedOutput(String, String, String, String, boolean, boolean)
+	 */
+	protected String processNestedOutput(String output, String lineSeparator, String indentSufix,
+			boolean prefixWithNewLine, boolean postfixWithNewLine)
+	{
+		return processNestedOutput(output, lineSeparator, StringUtil.EMPTY, indentSufix, prefixWithNewLine,
+				postfixWithNewLine);
 	}
 }

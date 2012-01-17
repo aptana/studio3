@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -78,7 +78,7 @@ public class BundleView extends ViewPart
 		treeViewer.setContentProvider(contentProvider);
 		treeViewer.setLabelProvider(labelProvider);
 		treeViewer.setInput(BundleManager.getInstance());
-		treeViewer.setSorter(new ViewerSorter()
+		treeViewer.setComparator(new ViewerComparator()
 		{
 			/*
 			 * (non-Javadoc)

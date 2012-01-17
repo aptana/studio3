@@ -20,6 +20,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.parsing.CompositeParser;
+import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
@@ -230,7 +231,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int getEditorSpecificTabWidth()
 	{
-		return FormatterUtils.getEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore());
+		return EditorUtil.getSpaceIndentSize(HTMLPlugin.getDefault().getBundle().getSymbolicName());
 	}
 
 	/*

@@ -59,7 +59,7 @@
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.json.preferences.JSONPreferencePage"
             id="com.aptana.editor.json.preferences.JSONPreferencePage"
-            name="JSON">
+            name="%preferencePage.json.name">
       </page>
    </extension>
    <extension

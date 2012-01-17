@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -121,7 +121,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 		fTasksTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		fTasksTableViewer.setLabelProvider(new TaskLabelProvider());
-		fTasksTableViewer.setSorter(new ViewerSorter());
+		fTasksTableViewer.setComparator(new ViewerComparator());
 		fTasksTableViewer.setInput(getTaskTags());
 
 		fTasksTableViewer.addSelectionChangedListener(new ISelectionChangedListener()

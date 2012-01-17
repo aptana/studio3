@@ -18,10 +18,10 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 public class FormatterJSTextNode extends FormatterBlockWithBeginNode
 {
 
-	private boolean shouldConsumePreviousSpaces;
+	protected boolean shouldConsumePreviousSpaces;
+	protected boolean isAddingBeginLine;
 	private int spacesCountBefore;
 	private int spacesCountAfter;
-	private boolean isAddingBeginLine;
 
 	/**
 	 * @param document

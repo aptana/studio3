@@ -46,7 +46,7 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.parsing.ast.IParseNode;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension,
-		IBatchReconcilingStrategy
+		IBatchReconcilingStrategy, IDisposableReconcilingStrategy
 {
 
 	/**
@@ -76,20 +76,32 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	 */
 	private boolean autoExpanded;
 
+	private IPropertyListener propertyListener = new IPropertyListener()
+	{
+
+		public void propertyChanged(Object source, int propId)
+		{
+			if (propId == IEditorPart.PROP_INPUT)
+			{
+				reconcile(false, true);
+			}
+		}
+	};
+
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
-		fEditor.addPropertyListener(new IPropertyListener()
-		{
+		fEditor.addPropertyListener(propertyListener);
+	}
 
-			public void propertyChanged(Object source, int propId)
-			{
-				if (propId == IEditorPart.PROP_INPUT)
-				{
-					reconcile(false, true);
-				}
-			}
-		});
+	public void dispose()
+	{
+		if (fEditor != null)
+		{
+			fEditor.removePropertyListener(propertyListener);
+			fEditor = null;
+		}
+		fPositions.clear();
 	}
 
 	protected AbstractThemeableEditor getEditor()

@@ -51,9 +51,9 @@
       </menuContribution>         
          <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
-         <command
-               commandId="com.aptana.deploy.commands.deployApp"
-               style="push">
+         <dynamic
+               class="com.aptana.deploy.internal.ui.DeployAppContributionItem"
+               id="com.aptana.deploy.deployAppMenu">
             <visibleWhen
                   checkEnabled="false">
                <or>
@@ -90,7 +90,7 @@
                   </and>
                </or>
             </visibleWhen>
-         </command>
+         </dynamic>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?before=group.edit">

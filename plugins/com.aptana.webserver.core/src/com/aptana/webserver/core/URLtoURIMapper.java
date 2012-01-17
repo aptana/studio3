@@ -5,6 +5,13 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.webserver.core;
 
 import java.net.URI;
@@ -20,6 +27,7 @@ import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A URIMapper for mapping an external base server URL to a document root (typically local).
@@ -55,13 +63,13 @@ public class URLtoURIMapper implements IURIMapper
 				}
 				catch (URISyntaxException e)
 				{
-					WebServerCorePlugin.log(e);
+					IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 				}
 			}
 		}
 		catch (CoreException e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 		}
 		return null;
 	}
@@ -78,7 +86,7 @@ public class URLtoURIMapper implements IURIMapper
 		}
 		catch (URISyntaxException e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			return null;
 		}
 	}
@@ -101,7 +109,7 @@ public class URLtoURIMapper implements IURIMapper
 		}
 		catch (CoreException e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			return null;
 		}
 	}
@@ -110,5 +118,4 @@ public class URLtoURIMapper implements IURIMapper
 	{
 		return baseURL != null && documentRoot != null;
 	}
-
 }

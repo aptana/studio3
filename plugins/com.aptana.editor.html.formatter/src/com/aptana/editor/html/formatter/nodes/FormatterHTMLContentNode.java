@@ -8,6 +8,8 @@
 package com.aptana.editor.html.formatter.nodes;
 
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
@@ -31,6 +33,7 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class FormatterHTMLContentNode extends FormatterTextNode
 {
+	private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r\n|\r|\n"); //$NON-NLS-1$
 	private String parentTagName;
 	private String previousSiblingTagName;
 	private IParseNode parentElement;
@@ -85,18 +88,27 @@ public class FormatterHTMLContentNode extends FormatterTextNode
 		{
 			if (!tagsWithoutNewLine.contains(parentTagName))
 			{
-				if (contentTrimmedLength == 0 && emptyTagsInSameLine && !isSpaceSensitive
-						&& !tagsWithoutNewLine.contains(previousSiblingTagName) && parentElement.getChildCount() <= 1)
+				if (preserveNewLines(content))
 				{
-					// this will trim any new-lines previously entered by the wrapping tag
-					visitor.appendToPreviousLine(context, StringUtil.EMPTY);
-					content = content.trim();
-					lookForNewline = false;
+					super.accept(context, visitor);
+					return;
 				}
 				else
 				{
-					insertNewLine = previousSiblingTagName == null
-							|| !tagsWithoutNewLine.contains(previousSiblingTagName);
+					if (contentTrimmedLength == 0 && emptyTagsInSameLine && !isSpaceSensitive
+							&& !tagsWithoutNewLine.contains(previousSiblingTagName)
+							&& parentElement.getChildCount() <= 1)
+					{
+						// this will trim any new-lines previously entered by the wrapping tag
+						visitor.appendToPreviousLine(context, StringUtil.EMPTY);
+						content = content.trim();
+						lookForNewline = false;
+					}
+					else
+					{
+						insertNewLine = previousSiblingTagName == null
+								|| !tagsWithoutNewLine.contains(previousSiblingTagName);
+					}
 				}
 			}
 			else
@@ -164,6 +176,30 @@ public class FormatterHTMLContentNode extends FormatterTextNode
 		{
 			writeSpaces(visitor, context, getSpacesCountAfter());
 		}
+	}
+
+	/**
+	 * @param content
+	 * @return
+	 */
+	private boolean preserveNewLines(String content)
+	{
+		Matcher matcher = NEW_LINE_PATTERN.matcher(content);
+		int count = 0;
+		while (matcher.find())
+		{
+			count++;
+		}
+		if (count == 1 && getDocument().getBoolean(HTMLFormatterConstants.NEW_LINES_EXCLUSION_IN_EMPTY_TAGS))
+		{
+			return false;
+		}
+		if (count > 1 && getDocument().getInt(HTMLFormatterConstants.PRESERVED_LINES) > 0)
+		{
+			// preserve new lines
+			return true;
+		}
+		return false;
 	}
 
 	/*

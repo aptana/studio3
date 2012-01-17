@@ -7512,7 +7512,8 @@ if( typeof dojo == "undefined") {
 
     dojo.unloaded = function() {
         var mll = this._unloaders;
-        while(mll.length) {(mll.pop())();
+        while(mll.length) {
+            (mll.pop())();
         }
     }
 
@@ -7863,7 +7864,8 @@ if( typeof dojo == "undefined") {
 
         dojo.require("dojo.i18n");
         dojo.i18n._requireLocalization.apply(dojo.hostenv, arguments);
-    }; (function() {
+    };
+    (function() {
 
         var ore = new RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?$");
         var ire = new RegExp("^((([^:]+:)?([^@]+))@)?([^:]*)(:([0-9]+))?$");
@@ -7934,6 +7936,7 @@ if( typeof dojo == "undefined") {
                         }
                     }
                 }
+
                 uri = "";
                 if(relobj.scheme) {
                     uri += relobj.scheme + ":";
@@ -9193,7 +9196,8 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         // Note that args is an array, which is more efficient vs variable length
         // argument list.  Ideally, var args would be implemented via Array
         // throughout the APIs.
-        var f = dojo._topics[topic]; (f) && (f.apply(this, args || []));
+        var f = dojo._topics[topic];
+        (f) && (f.apply(this, args || []));
     }
 
     dojo.connectPublisher = function(/*String*/topic,
@@ -9757,7 +9761,9 @@ if(!dojo._hasResource["dojo._base.json"]) {//_hasResource checks added by build.
 if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build. Do not use _hasResource directly in your code.
     dojo._hasResource["dojo._base.array"] = true;
 
-    dojo.provide("dojo._base.array"); (function() {
+    dojo.provide("dojo._base.array");
+
+    (function() {
         var _getParts = function(arr, obj, cb) {
             return [(dojo.isString(arr) ? arr.split("") : arr), (obj || dojo.global),
             // FIXME: cache the anonymous functions we create here?
@@ -10721,7 +10727,9 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 // DomNode
             }
         }
-    }(function() {
+    }
+
+    (function() {
         /*
          dojo.createElement = function(obj, parent, position){
          // TODO: need to finish this!
@@ -11207,7 +11215,8 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 // We don't want to compute the parent's style, so instead we examine node's
                 // computed left/top which is more stable.
                 var sl = parseFloat(s.left), st = parseFloat(s.top);
-                if(!isNaN(sl) && !isNaN(st)) { l = sl, t = st;
+                if(!isNaN(sl) && !isNaN(st)) {
+                    l = sl, t = st;
                 } else {
                     // If child's computed left/top are not parseable as a number (e.g. "auto"), we
                     // have no choice but to examine the parent's computed style.
@@ -11215,7 +11224,8 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                     if(p && p.style) {
                         var pcs = gcs(p);
                         if(pcs.overflow != "visible") {
-                            var be = dojo._getBorderExtents(p, pcs); l += be.l, t += be.t;
+                            var be = dojo._getBorderExtents(p, pcs);
+                            l += be.l, t += be.t;
                         }
                     }
                 }
@@ -11223,7 +11233,8 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
                 // On Opera, offsetLeft includes the parent's border
                 var p = node.parentNode;
                 if(p) {
-                    var be = dojo._getBorderExtents(p); l -= be.l, t -= be.t;
+                    var be = dojo._getBorderExtents(p);
+                    l -= be.l, t -= be.t;
                 }
             }
             return {
@@ -11243,8 +11254,10 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             // clientWidth/Height are important since the automatically account for scrollbars
             // fallback to offsetWidth/Height for special cases (see #3378)
             var s = computedStyle || gcs(node), pe = dojo._getPadExtents(node, s), be = dojo._getBorderExtents(node, s), w = node.clientWidth, h;
-            if(!w) { w = node.offsetWidth, h = node.offsetHeight;
-            } else { h = node.clientHeight, be.w = be.h = 0;
+            if(!w) {
+                w = node.offsetWidth, h = node.offsetHeight;
+            } else {
+                h = node.clientHeight, be.w = be.h = 0;
             }
             // On Opera, offsetLeft includes the parent's border
             if(dojo.isOpera) {
@@ -12153,7 +12166,8 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
      5.) matched nodes are pruned to ensure they are unique
      */
 
-    ;(function() {
+    ;
+    (function() {
         // define everything in a closure for compressability reasons. "d" is an
         // alias to "dojo" since it's so frequently used. This seems a
         // transformation that the build system could perform on a per-file basis.
@@ -12303,6 +12317,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                     if(condition.charAt(0) == "@") {
                         condition = condition.slice(1);
                     }
+
                     matcher = null;
                     // http://www.w3.org/TR/css3-selectors/#attribute-selectors
                     for(var x = 0; x < attrList.length; x++) {
@@ -12325,6 +12340,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                         handleMatch(matcher);
                         // ff = agree(ff, matcher);
                     }
+
                     condition = null;
                     var nbktIdx = query.indexOf("[", lBktIdx);
                     if(0 <= nbktIdx) {
@@ -12355,6 +12371,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
 
                 // get the tag name (if any)
                 var tagName = getTagName(tqp);
+
                 xpath += prefix + tagName;
 
                 // check to see if it's got an id. Needs to come first in xpath.
@@ -13463,7 +13480,9 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
                 return xhr.responseXML;
             }
         }
-    }; (function() {
+    };
+
+    (function() {
 
         dojo._ioSetArgs = function(/*Object*/args,
         /*Function*/canceller,
@@ -14114,7 +14133,9 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return this;
             // dojo._Animation
         }
-    }); (function() {
+    });
+
+    (function() {
         var _makeFadeable = function(node) {
             if(dojo.isIE) {
                 // only set the zoom if the "tickle" value would be the same as the

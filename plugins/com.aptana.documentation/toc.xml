@@ -2,10 +2,9 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Studio User Guide" topic="html/toc.html">
-   <topic label="Getting Started">
-      <anchor id="getting_started"/>
-   </topic>
-   <topic label="Reference">
+   <anchor id="getting_started"/>
+   <anchor id="studio_additions"/>
+   <topic label="Web Reference">
       <anchor id="reference"/>
    </topic>
 </toc>

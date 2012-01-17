@@ -416,11 +416,13 @@ public class ProfileManager implements IProfileManager
 			// oldProfile.setManager(null);
 
 			if (index >= fProfilesByName.size())
+			{
 				index--;
+			}
 			IProject[] projects = fSelected.keySet().toArray(new IProject[fSelected.size()]);
 			for (IProject key : projects)
 			{
-				if (key != null && profile.equals(fSelected.get(key)))
+				if (profile.equals(fSelected.get(key)))
 				{
 					fSelected.remove(key);
 					break;

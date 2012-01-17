@@ -103,7 +103,7 @@ public class LocalWebServer extends SimpleWebServer
 		}
 		catch (MalformedURLException e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 		}
 	}
 
@@ -210,11 +210,11 @@ public class LocalWebServer extends SimpleWebServer
 		}
 		catch (IOReactorException e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 		}
 		catch (IOException e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 		}
 	}
 

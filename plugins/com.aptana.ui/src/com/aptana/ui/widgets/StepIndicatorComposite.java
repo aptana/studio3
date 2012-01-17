@@ -17,7 +17,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -126,32 +125,36 @@ public class StepIndicatorComposite extends Composite
 
 					if (selection)
 					{
-						Path path = new Path(gc.getDevice());
-						path.moveTo(bounds.x, bounds.y);
-						path.lineTo(bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2));
-						path.lineTo(bounds.x, bounds.y + bounds.height - 1);
 						gc.setForeground(selectedColor);
 						gc.setBackground(selectedColor);
-						path.lineTo(bounds.x, bounds.y + 1);
-						gc.fillPath(path);
-						path.dispose();
+						
+						int[] polygonPath = new int[] {
+								bounds.x, bounds.y,
+								bounds.x + bounds.width - 1, bounds.y + ((bounds.height - 1) / 2),
+								bounds.x, bounds.y + bounds.height - 1
+						};
+						
+						gc.fillPolygon(polygonPath);
 					}
 					else if (siblingSelected)
 					{
-						Path path = new Path(gc.getDevice());
-						path = new Path(gc.getDevice());
-						path.moveTo(bounds.x + 1, bounds.y + 1);
-						path.lineTo(bounds.x + bounds.width, bounds.y + ((bounds.height - 1) / 2) + 1);
-						path.lineTo(bounds.x + 1, bounds.y + bounds.height - 1);
-						path.lineTo(bounds.x + bounds.width, bounds.y + bounds.height - 1);
-
 						gc.setForeground(selectedColor);
 						gc.setBackground(selectedColor);
-
-						path.lineTo(bounds.x + bounds.width, bounds.y + 1);
-						path.lineTo(bounds.x + 1, bounds.y + 1);
-						gc.fillPath(path);
-						path.dispose();
+						
+						int[] polygonPath = new int[] { 
+								bounds.x + 1, bounds.y + 1, 
+								bounds.x + bounds.width, bounds.y + ((bounds.height - 1) / 2) + 1,
+								bounds.x + bounds.width, bounds.y + 1};
+						
+						gc.fillPolygon(polygonPath);
+						
+						polygonPath = new int[] {
+								bounds.x + 1, bounds.y + bounds.height - 1,
+								bounds.x + bounds.width, bounds.y + ((bounds.height - 1) / 2) + 1,
+								bounds.x + bounds.width, bounds.y + bounds.height - 1
+						};
+						
+						gc.fillPolygon(polygonPath);
 					}
 
 					gc.setForeground(borderColor);

@@ -12,15 +12,102 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.aptana.core.IFilter;
 
 /**
  * Utility functions for set-like operations on collections
  */
 public class CollectionsUtil
 {
+	/**
+	 * Filter a source collection into a destination collection using a filter predicate. If the source or destination
+	 * are null, then this is a no-op. If the filter is null, then all source items are added to the destination
+	 * collection. Note that the destination collection has no requirements other than it must be a collection of
+	 * matching type as the source. This allows the destination to be used, for example, as an accumulator. Note that
+	 * this method is not thread safe, so users of this method will need to maintain type safety against the collections
+	 * 
+	 * @param source
+	 *            A collection to filter
+	 * @param destination
+	 *            A collection to which unfiltered items in source are added
+	 * @param filter
+	 *            A filter that determines which items to add to the destination collection
+	 */
+	public static <T> void filter(Collection<T> source, Collection<T> destination, IFilter<? super T> filter)
+	{
+		if (source != null && destination != null)
+		{
+			if (filter != null)
+			{
+				for (T item : source)
+				{
+					if (filter.include(item))
+					{
+						destination.add(item);
+					}
+				}
+			}
+			else
+			{
+				destination.addAll(source);
+			}
+		}
+	}
+
+	/**
+	 * Generate a new list containing items from the specified collection that the filter determines should be included.
+	 * If the specified filter is null, then all items are added to the result list. If the specified collection is null
+	 * then an empty list is returned. Note that this method is not thread safe, so users of this method will need to
+	 * maintain type safety against the collection
+	 * 
+	 * @param collection
+	 *            A collection to filter
+	 * @param filter
+	 *            A filter that determines which items to keep in the collection
+	 * @return Returns a List<T> containing all non-filtered items from the collection
+	 */
+	public static <T> List<T> filter(Collection<T> collection, IFilter<T> filter)
+	{
+		ArrayList<T> result = new ArrayList<T>();
+
+		filter(collection, result, filter);
+
+		return result;
+	}
+
+	/**
+	 * Filter a collection in place using a filter predicate. If the source or the filter are null, then this is a
+	 * no-op. collection. Note that this method is not thread safe, so users of this method will need to maintain type
+	 * safety against the collection. Also, not all collections support {@link Iterator#remove()} so it is possible that
+	 * a UnsupportedOperationException can be thrown depending on the type of the collection
+	 * 
+	 * @param collection
+	 *            A collection to filter
+	 * @param filter
+	 *            A filter that determines which items to keep in the source collection
+	 */
+	public static <T> void filterInPlace(Collection<T> collection, IFilter<? super T> filter)
+	{
+		if (collection != null && filter != null)
+		{
+			Iterator<T> iterator = collection.iterator();
+
+			while (iterator.hasNext())
+			{
+				T item = iterator.next();
+
+				if (!filter.include(item))
+				{
+					iterator.remove();
+				}
+			}
+		}
+	}
 
 	/**
 	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
@@ -90,6 +177,24 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * Convert a list of items into a Set while preserving the order. An empty set is returned if items is null.
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new LinkedHashSet<T> or an empty set
+	 */
+	public static final <T> Set<T> newInOrderSet(T... items)
+	{
+		if (items != null)
+		{
+			return new LinkedHashSet<T>(Arrays.asList(items));
+		}
+		return Collections.emptySet();
+	}
+
+	/**
 	 * Convert a list of items into a List. An empty list is returned if items is null
 	 * 
 	 * @param <T>
@@ -124,24 +229,6 @@ public class CollectionsUtil
 			return new HashSet<T>(Arrays.asList(items));
 		}
 
-		return Collections.emptySet();
-	}
-
-	/**
-	 * Convert a list of items into a Set while preserving the order. An empty set is returned if items is null.
-	 * 
-	 * @param <T>
-	 *            Any type of object
-	 * @param items
-	 *            A variable length list of items of type T
-	 * @return Returns a new LinkedHashSet<T> or an empty set
-	 */
-	public static final <T> Set<T> newInOrderSet(T... items)
-	{
-		if (items != null)
-		{
-			return new LinkedHashSet<T>(Arrays.asList(items));
-		}
 		return Collections.emptySet();
 	}
 

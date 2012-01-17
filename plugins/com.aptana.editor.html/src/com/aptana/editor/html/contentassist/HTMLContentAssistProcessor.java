@@ -893,7 +893,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 				positions.add(0, cursorPosition);
 				HTMLTagProposal proposal = new HTMLTagProposal(replacement.toString(), replaceOffset, replaceLength,
-						element, positions.toArray(new Integer[positions.size()]));
+						element, getNatureIds(), positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
 		}

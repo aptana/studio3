@@ -276,18 +276,19 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant
 
 	private void refresh(Object element)
 	{
+		IResource resource = null;
 		if (element instanceof IAdaptable)
 		{
-			IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
-			if (resource != null)
+			resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+		}
+		if (resource != null)
+		{
+			try
 			{
-				try
-				{
-					resource.refreshLocal(IResource.DEPTH_INFINITE, null);
-				}
-				catch (CoreException e)
-				{
-				}
+				resource.refreshLocal(IResource.DEPTH_INFINITE, null);
+			}
+			catch (CoreException e)
+			{
 			}
 		}
 		else
