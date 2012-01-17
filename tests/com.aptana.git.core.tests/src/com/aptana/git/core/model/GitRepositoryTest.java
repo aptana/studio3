@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -547,6 +548,44 @@ public class GitRepositoryTest extends TestCase
 		repo.firePushEvent();
 		assertEquals(1, pushEvents.size());
 		assertSame(repo, pushEvents.get(0).getRepository());
+	}
+
+	public void testDontBlockToAcquireLocks() throws Exception
+	{
+		// Force a write operation on repo, then while it is running, ask for a read operation
+		// make sure we never deadlock, but fail gracefully if we can't acquire the lock!
+		final GitRepository repo = createRepo();
+		final Random r = new Random();
+		repo.enterWriteProcess();
+		final boolean[] finished = new boolean[1];
+		Thread t2 = new Thread(new Runnable()
+		{
+
+			public void run()
+			{
+				for (int i = 0; i < 100; i++)
+				{
+					boolean acquired = repo.enterRead();
+					try
+					{
+						Thread.sleep(r.nextInt(10));
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					if (acquired)
+					{
+						repo.exitRead();
+					}
+				}
+				finished[0] = true;
+			}
+		});
+		t2.start();
+		t2.join(1500);
+		repo.exitWriteProcess();
+		assertTrue("Failed to finish read lock acquiring thread, may be blocked", finished[0]);
 	}
 
 	protected IPath repoToGenerate()

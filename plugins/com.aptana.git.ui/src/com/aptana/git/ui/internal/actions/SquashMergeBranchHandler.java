@@ -72,7 +72,6 @@ public class SquashMergeBranchHandler extends AbstractGitHandler
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 
-				repo.enterWriteProcess();
 				try
 				{
 					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "merge", //$NON-NLS-1$
@@ -91,10 +90,6 @@ public class SquashMergeBranchHandler extends AbstractGitHandler
 				{
 					IdeLog.logError(GitUIPlugin.getDefault(), e);
 					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
-				}
-				finally
-				{
-					repo.exitWriteProcess();
 				}
 				repo.index().refresh(subMonitor.newChild(25));
 				return Status.OK_STATUS;

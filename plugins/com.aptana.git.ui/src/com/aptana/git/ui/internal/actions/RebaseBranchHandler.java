@@ -79,7 +79,6 @@ public class RebaseBranchHandler extends AbstractGitHandler
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 
-				repo.enterWriteProcess();
 				try
 				{
 					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "rebase", //$NON-NLS-1$
@@ -98,10 +97,6 @@ public class RebaseBranchHandler extends AbstractGitHandler
 				{
 					IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
-				}
-				finally
-				{
-					repo.exitWriteProcess();
 				}
 				repo.index().refresh(subMonitor.newChild(25));
 				return Status.OK_STATUS;
