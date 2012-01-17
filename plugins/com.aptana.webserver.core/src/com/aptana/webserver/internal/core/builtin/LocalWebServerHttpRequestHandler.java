@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.IURIMapper;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -142,7 +143,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 		}
 		catch (Exception e)
 		{
-			WebServerCorePlugin.log(e);
+			IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 			response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_INTERNAL_SERVER_ERROR));
 		}

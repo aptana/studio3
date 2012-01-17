@@ -358,10 +358,9 @@ public final class ServerManager implements IServerManager
 
 				public void handleException(Throwable exception)
 				{
-					WebServerCorePlugin.log(exception);
+					IdeLog.logError(WebServerCorePlugin.getDefault(), exception);
 				}
 			});
 		}
 	}
-
 }

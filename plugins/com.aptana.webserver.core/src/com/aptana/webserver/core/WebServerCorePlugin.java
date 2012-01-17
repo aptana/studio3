@@ -19,11 +19,9 @@ import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.io.efs.EFSUtils;
@@ -50,12 +48,12 @@ public class WebServerCorePlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext )
 	 */
-	@SuppressWarnings("deprecation")
 	public void start(BundleContext context) throws Exception
 	{
 		super.start(context);
 		plugin = this;
-		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, new WorkspaceSaveParticipant());
+		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(PLUGIN_ID,
+				new WorkspaceSaveParticipant());
 		if (lastState != null)
 		{
 			IPath location = lastState.lookup(new Path(ServerManager.STATE_FILENAME));
@@ -70,10 +68,9 @@ public class WebServerCorePlugin extends Plugin
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext )
 	 */
-	@SuppressWarnings("deprecation")
 	public void stop(BundleContext context) throws Exception
 	{
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
+		ResourcesPlugin.getWorkspace().removeSaveParticipant(PLUGIN_ID);
 		plugin = null;
 		serverManager = null;
 		if (defaultWebServer != null)
@@ -91,26 +88,6 @@ public class WebServerCorePlugin extends Plugin
 	public static WebServerCorePlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void log(Throwable e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
-	}
-
-	public static void log(String msg)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
-	}
-
-	public static void log(String msg, Throwable e)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
-	}
-
-	public static void log(IStatus status)
-	{
-		getDefault().getLog().log(status);
 	}
 
 	/**
@@ -145,7 +122,6 @@ public class WebServerCorePlugin extends Plugin
 	{
 		if (defaultWebServer == null)
 		{
-
 			defaultWebServer = new LocalWebServer(EFSUtils.getFileStore(ResourcesPlugin.getWorkspace().getRoot())
 					.toURI());
 		}
@@ -197,5 +173,4 @@ public class WebServerCorePlugin extends Plugin
 			context.needSaveNumber();
 		}
 	}
-
 }

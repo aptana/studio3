@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * @author Max Stepanov
@@ -53,7 +54,7 @@ public class WorkspaceResolvingURIMapper implements IURIMapper
 			}
 			catch (CoreException e)
 			{
-				WebServerCorePlugin.log(e);
+				IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			}
 		}
 		return uri;
@@ -66,7 +67,8 @@ public class WorkspaceResolvingURIMapper implements IURIMapper
 	public IFileStore resolve(URI uri)
 	{
 		IFileStore fileStore = baseMapper.resolve(uri);
-		if (fileStore != null && fileStore.getFileSystem() == EFS.getLocalFileSystem()) // $codepro.audit.disable useEquals
+		if (fileStore != null && fileStore.getFileSystem() == EFS.getLocalFileSystem()) // $codepro.audit.disable
+																						// useEquals
 		{
 			try
 			{
@@ -74,10 +76,9 @@ public class WorkspaceResolvingURIMapper implements IURIMapper
 			}
 			catch (CoreException e)
 			{
-				WebServerCorePlugin.log(e);
+				IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			}
 		}
 		return fileStore;
 	}
-
 }
