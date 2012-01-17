@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
 
 /**
  * Utility functions for set-like operations on collections
@@ -25,11 +26,54 @@ import com.aptana.core.IFilter;
 public class CollectionsUtil
 {
 	/**
+	 * Add a varargs list of items to the specified list. If the list or items array are null, then no action is
+	 * performed. Note that the destination list has no requirements other than it must be a List of the source item's
+	 * type. This allows the destination to be used, for example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * list.
+	 * 
+	 * @param list
+	 *            A list to which items will be added
+	 * @param items
+	 *            A list of items to add
+	 */
+	public static final <T, U extends T> void addToList(List<T> list, U... items)
+	{
+		if (list != null && items != null)
+		{
+			list.addAll(Arrays.asList(items));
+		}
+	}
+
+	/**
+	 * Add a varargs list of items into a set. If the set or items are null then no action is performed. Note that the
+	 * destination set has no requirements other than it must be a Set of the source item's type. This allows the
+	 * destination to be used, for example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the set.
+	 * 
+	 * @param set
+	 *            A set to which items will be added
+	 * @param items
+	 *            A list of items to add
+	 */
+	public static final <T, U extends T> void addToSet(Set<T> set, U... items)
+	{
+		if (set != null && items != null)
+		{
+			set.addAll(Arrays.asList(items));
+		}
+	}
+
+	/**
 	 * Filter a source collection into a destination collection using a filter predicate. If the source or destination
 	 * are null, then this is a no-op. If the filter is null, then all source items are added to the destination
 	 * collection. Note that the destination collection has no requirements other than it must be a collection of
-	 * matching type as the source. This allows the destination to be used, for example, as an accumulator. Note that
-	 * this method is not thread safe, so users of this method will need to maintain type safety against the collections
+	 * matching type as the source. This allows the destination to be used, for example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * collections.
 	 * 
 	 * @param source
 	 *            A collection to filter
@@ -62,8 +106,10 @@ public class CollectionsUtil
 	/**
 	 * Generate a new list containing items from the specified collection that the filter determines should be included.
 	 * If the specified filter is null, then all items are added to the result list. If the specified collection is null
-	 * then an empty list is returned. Note that this method is not thread safe, so users of this method will need to
-	 * maintain type safety against the collection
+	 * then an empty list is returned.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * collection
 	 * 
 	 * @param collection
 	 *            A collection to filter
@@ -82,9 +128,13 @@ public class CollectionsUtil
 
 	/**
 	 * Filter a collection in place using a filter predicate. If the source or the filter are null, then this is a
-	 * no-op. collection. Note that this method is not thread safe, so users of this method will need to maintain type
-	 * safety against the collection. Also, not all collections support {@link Iterator#remove()} so it is possible that
-	 * a UnsupportedOperationException can be thrown depending on the type of the collection
+	 * no-op. collection.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * list.<br>
+	 * <br>
+	 * Note that not all collections support {@link Iterator#remove()} so it is possible that a
+	 * {@link UnsupportedOperationException} can be thrown depending on the collection type
 	 * 
 	 * @param collection
 	 *            A collection to filter
@@ -123,6 +173,7 @@ public class CollectionsUtil
 		{
 			return Collections.emptyList();
 		}
+
 		return list;
 	}
 
@@ -141,7 +192,9 @@ public class CollectionsUtil
 	public static <T> Collection<T> getNonOverlapping(Collection<T> collection1, Collection<T> collection2)
 	{
 		Collection<T> result = union(collection1, collection2);
+
 		result.removeAll(intersect(collection1, collection2));
+
 		return result;
 	}
 
@@ -159,7 +212,9 @@ public class CollectionsUtil
 	public static <T> Collection<T> intersect(Collection<T> collection1, Collection<T> collection2)
 	{
 		Set<T> intersection = new HashSet<T>(collection1);
+
 		intersection.retainAll(new HashSet<T>(collection2));
+
 		return intersection;
 	}
 
@@ -177,7 +232,56 @@ public class CollectionsUtil
 	}
 
 	/**
-	 * Convert a list of items into a Set while preserving the order. An empty set is returned if items is null.
+	 * Transform the items of a collection to a new type and add to a specified collection. If source, destination, or
+	 * mapper are null then no action is performed. Note that the destination collection has no requirements other than
+	 * it must be a collection of map's destination type. This allows the destination to be used, for example, as an
+	 * accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * collections.
+	 * 
+	 * @param source
+	 *            The collection containing items to be transformed
+	 * @param destination
+	 *            A collection to which transformed items will be added
+	 * @param mapper
+	 *            The map that transforms items from their source type to their destination type
+	 */
+	public static <T, U> void map(Collection<T> source, Collection<U> destination, IMap<? super T, U> mapper)
+	{
+		if (source != null && destination != null && mapper != null)
+		{
+			for (T item : source)
+			{
+				destination.add(mapper.map(item));
+			}
+		}
+	}
+
+	/**
+	 * Transform the items of a collection to a new type and add to a new list. If collection or mapper are null then no
+	 * action is performed<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the
+	 * collection.
+	 * 
+	 * @param collection
+	 *            The collection containing items to be transformed
+	 * @param mapper
+	 *            The map that transforms items from their source type to their destination type
+	 * @return
+	 */
+	public static <T, U> List<U> map(Collection<T> collection, IMap<? super T, U> mapper)
+	{
+		List<U> result = new ArrayList<U>();
+
+		map(collection, result, mapper);
+
+		return result;
+	}
+
+	/**
+	 * Convert a varargs list of items into a Set while preserving order. An empty set is returned if items is null.
 	 * 
 	 * @param <T>
 	 *            Any type of object
@@ -187,15 +291,15 @@ public class CollectionsUtil
 	 */
 	public static final <T> Set<T> newInOrderSet(T... items)
 	{
-		if (items != null)
-		{
-			return new LinkedHashSet<T>(Arrays.asList(items));
-		}
-		return Collections.emptySet();
+		Set<T> result = new LinkedHashSet<T>();
+
+		addToSet(result, items);
+
+		return result;
 	}
 
 	/**
-	 * Convert a list of items into a List. An empty list is returned if items is null
+	 * Convert a vararg list of items into a List. An empty list is returned if items is null
 	 * 
 	 * @param <T>
 	 *            Any type of object
@@ -205,12 +309,19 @@ public class CollectionsUtil
 	 */
 	public static final <T> List<T> newList(T... items)
 	{
+		List<T> result;
+
 		if (items != null)
 		{
-			return new ArrayList<T>(Arrays.asList(items));
+			result = new ArrayList<T>();
+			addToList(result, items);
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
-		return Collections.emptyList();
+		return result;
 	}
 
 	/**
@@ -224,12 +335,19 @@ public class CollectionsUtil
 	 */
 	public static final <T> Set<T> newSet(T... items)
 	{
+		Set<T> result;
+
 		if (items != null)
 		{
-			return new HashSet<T>(Arrays.asList(items));
+			result = new HashSet<T>();
+			addToSet(result, items);
+		}
+		else
+		{
+			result = Collections.emptySet();
 		}
 
-		return Collections.emptySet();
+		return result;
 	}
 
 	/**
@@ -242,6 +360,7 @@ public class CollectionsUtil
 	{
 		// uses LinkedHashSet to keep the order
 		Set<T> set = new LinkedHashSet<T>(list);
+
 		list.clear();
 		list.addAll(set);
 	}
@@ -260,7 +379,9 @@ public class CollectionsUtil
 	public static <T> Collection<T> union(Collection<T> collection1, Collection<T> collection2)
 	{
 		Set<T> union = new HashSet<T>(collection1);
+
 		union.addAll(new HashSet<T>(collection2));
+
 		return new ArrayList<T>(union);
 	}
 

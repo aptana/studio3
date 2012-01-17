@@ -8,17 +8,16 @@
 package com.aptana.core;
 
 /**
- * IFilter
+ * IMap
  */
-public interface IFilter<T>
+public interface IMap<T, U>
 {
 	/**
-	 * Determine if the specified item should be filtered or not. A true value indicates that the item is not being
-	 * filtered.
+	 * Transform item of type T to a new item of type U
 	 * 
 	 * @param item
-	 *            The item to possibly filter
-	 * @return Returns a boolean
+	 *            The item to transform
+	 * @return Returns a transformed item of type U
 	 */
-	boolean include(T item);
+	U map(T item);
 }

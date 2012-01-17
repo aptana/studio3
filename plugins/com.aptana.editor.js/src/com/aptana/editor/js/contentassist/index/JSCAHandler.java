@@ -364,7 +364,8 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				// TODO: warn
+				IdeLog.logError(JSPlugin.getDefault(),
+						"Unrecognized element type name in JSCAHandler#addElement: " + elementTypeName); //$NON-NLS-1
 		}
 	}
 
@@ -490,7 +491,7 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				// TODO: warn
+				IdeLog.logError(JSPlugin.getDefault(), "Unrecognized type name in JSCAHandler#createType: " + typeName); //$NON-NLS-1
 		}
 	}
 
@@ -621,7 +622,11 @@ public class JSCAHandler implements IContextHandler
 
 				setIsInternal(namespace, isInternal);
 			}
-			// TODO: warn about missing type?
+			else
+			{
+				IdeLog.logError(JSPlugin.getDefault(),
+						"Unrecognized namespace in JSCAHandler#hideNamespace: " + namespace); //$NON-NLS-1
+			}
 
 			// move back one more segment
 			namespace = getNamespace(namespace);
