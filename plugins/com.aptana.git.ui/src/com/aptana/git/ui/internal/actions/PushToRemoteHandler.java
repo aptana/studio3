@@ -79,7 +79,6 @@ public class PushToRemoteHandler extends AbstractGitHandler
 					return Status.CANCEL_STATUS;
 				}
 
-				repo.enterWriteProcess();
 				try
 				{
 					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "push", //$NON-NLS-1$
@@ -103,10 +102,6 @@ public class PushToRemoteHandler extends AbstractGitHandler
 				{
 					IdeLog.logError(GitUIPlugin.getDefault(), e, IDebugScopes.DEBUG);
 					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
-				}
-				finally
-				{
-					repo.exitWriteProcess();
 				}
 				repo.index().refresh(subMonitor.newChild(25));
 				return Status.OK_STATUS;

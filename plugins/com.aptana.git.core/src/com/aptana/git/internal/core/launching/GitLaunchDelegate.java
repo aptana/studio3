@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchListener;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
@@ -55,15 +57,55 @@ public class GitLaunchDelegate extends LaunchConfigurationDelegate
 		// ENV
 		String[] env = getEnvironment(configuration);
 
-		// Now actually launch the process!
-		Process process = DebugPlugin.exec(commandList.toArray(new String[commandList.size()]),
-				(workingDir == null) ? null : workingDir.toFile(), env);
-		// FIXME Build a label from args?
-		String label = commandList.get(0);
-		// Set process type to "git" so our linetracker hyperlink stuff works
-		Map<String, String> map = new HashMap<String, String>();
-		map.put(IProcess.ATTR_PROCESS_TYPE, IGitLaunchConfigurationConstants.PROCESS_TYPE);
-		DebugPlugin.newProcess(launch, process, label, map);
+		// Enter write lock on repo
+		final GitRepository repo = getRepositoryManager().getUnattachedExisting(workingDir.toFile().toURI());
+		if (!repo.enterWriteProcess())
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+					Messages.GitLaunchDelegate_FailedToAcquireWriteLock));
+		}
+
+		try
+		{
+			// Now actually launch the process!
+			Process process = DebugPlugin.exec(commandList.toArray(new String[commandList.size()]),
+					(workingDir == null) ? null : workingDir.toFile(), env);
+			// FIXME Build a label from args?
+			String label = commandList.get(0);
+			// Set process type to "git" so our linetracker hyperlink stuff works
+			Map<String, String> map = new HashMap<String, String>();
+			map.put(IProcess.ATTR_PROCESS_TYPE, IGitLaunchConfigurationConstants.PROCESS_TYPE);
+			DebugPlugin.newProcess(launch, process, label, map);
+
+			// We need to listen to see when the process/launch terminates and when it does, exit write lock on the
+			// repo.
+			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+			final ILaunch origLaunch = launch;
+			manager.addLaunchListener(new ILaunchListener()
+			{
+
+				public void launchRemoved(ILaunch launch)
+				{
+					if (launch.equals(origLaunch))
+					{
+						repo.exitWriteProcess();
+					}
+				}
+
+				public void launchChanged(ILaunch launch)
+				{
+				}
+
+				public void launchAdded(ILaunch launch)
+				{
+				}
+			});
+		}
+		catch (Throwable t)
+		{
+			// if something gets messed up, exit the write lock...
+			repo.exitWriteProcess();
+		}
 	}
 
 	private Collection<? extends String> arguments(ILaunchConfiguration configuration) throws CoreException

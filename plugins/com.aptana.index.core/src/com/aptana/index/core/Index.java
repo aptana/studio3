@@ -17,19 +17,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.CRC32;
 
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.core.epl.IReadWriteMonitor;
-import com.aptana.core.epl.ReadWriteMonitor;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.internal.index.core.DiskIndex;
 import com.aptana.internal.index.core.MemoryIndex;
 
-public class Index implements IReadWriteMonitor
+public class Index
 {
 	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
 			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
@@ -293,7 +293,7 @@ public class Index implements IReadWriteMonitor
 
 	private MemoryIndex memoryIndex;
 	private DiskIndex diskIndex;
-	private IReadWriteMonitor monitor;
+	private ReadWriteLock monitor;
 	private URI containerURI;
 
 	/**
@@ -308,7 +308,7 @@ public class Index implements IReadWriteMonitor
 		this.containerURI = containerURI;
 
 		this.memoryIndex = new MemoryIndex();
-		this.monitor = new ReadWriteMonitor();
+		this.monitor = new ReentrantReadWriteLock();
 
 		// Convert to a filename we can use for the actual index on disk
 		IPath diskIndexPath = computeIndexLocation(containerURI);
@@ -363,79 +363,71 @@ public class Index implements IReadWriteMonitor
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IReadWriteMonitor#enterRead()
+	/**
+	 * Blocks to acquire the read lock.
 	 */
-	public void enterRead()
+	private void enterRead()
 	{
 		if (this.monitor != null)
 		{
-			this.monitor.enterRead();
+			this.monitor.readLock().lock();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IReadWriteMonitor#enterWrite()
+	/**
+	 * Blocks to acquire the write lock
 	 */
-	public void enterWrite()
+	private void enterWrite()
 	{
 		if (this.monitor != null)
 		{
-			this.monitor.enterWrite();
+			this.monitor.writeLock().lock();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IReadWriteMonitor#exitRead()
-	 */
-	public void exitRead()
+	private void exitRead()
 	{
 		if (this.monitor != null)
 		{
-			this.monitor.exitRead();
+			this.monitor.readLock().unlock();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IReadWriteMonitor#exitReadEnterWrite()
+	/**
+	 * This method does not guarantee that it will acquire the write lock. A boolean is returned indicating success.
+	 * 
+	 * @return
 	 */
-	public boolean exitReadEnterWrite()
+	private boolean exitReadEnterWrite()
 	{
 		boolean result = false;
 
 		if (this.monitor != null)
 		{
-			result = this.monitor.exitReadEnterWrite();
+			monitor.readLock().unlock();
+			result = monitor.writeLock().tryLock();
 		}
 
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IReadWriteMonitor#exitWrite()
-	 */
-	public void exitWrite()
+	private void exitWrite()
 	{
 		if (this.monitor != null)
 		{
-			this.monitor.exitWrite();
+			this.monitor.writeLock().unlock();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.index.core.IReadWriteMonitor#exitWriteEnterRead()
+	/**
+	 * This operation is _not_ atomic. This method will block until the read lock is acquired.
 	 */
-	public void exitWriteEnterRead()
+	private void exitWriteEnterRead()
 	{
 		if (this.monitor != null)
 		{
-			this.monitor.exitWriteEnterRead();
+			exitWrite();
+			enterRead();
 		}
 	}
 

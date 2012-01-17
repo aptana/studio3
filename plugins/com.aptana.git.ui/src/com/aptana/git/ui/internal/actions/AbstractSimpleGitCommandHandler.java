@@ -75,7 +75,6 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 						return Status.CANCEL_STATUS;
 					}
 
-					currentRepo.enterWriteProcess();
 					try
 					{
 						ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);
@@ -114,10 +113,6 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 					catch (Throwable e)
 					{
 						return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
-					}
-					finally
-					{
-						currentRepo.exitWriteProcess();
 					}
 					sub.setWorkRemaining(1000);
 					postLaunch(currentRepo);

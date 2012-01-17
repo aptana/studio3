@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +56,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.epl.ReadWriteMonitor;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
@@ -174,7 +175,7 @@ public class GitRepository
 	/**
 	 * Monitor to allow simultaneous read processes, but only one "write" process which alters the repo/index.
 	 */
-	private ReadWriteMonitor monitor = new ReadWriteMonitor();
+	private ReadWriteLock monitor = new ReentrantReadWriteLock();
 
 	private Set<GitRevSpecifier> branches;
 	Map<String, List<GitRef>> refs;
@@ -605,24 +606,36 @@ public class GitRepository
 	public Set<String> remotes()
 	{
 		Set<String> set = new HashSet<String>();
-		monitor.enterRead();
-		try
+		if (enterRead())
 		{
-			File configFile = gitFile(CONFIG_FILENAME);
-			String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
-			Matcher m = fgRemoteNamePattern.matcher(contents);
-			while (m.find())
+			try
 			{
-				set.add(m.group(1));
+				File configFile = gitFile(CONFIG_FILENAME);
+				String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable
+																				// closeWhereCreated
+				Matcher m = fgRemoteNamePattern.matcher(contents);
+				while (m.find())
+				{
+					set.add(m.group(1));
+				}
+			}
+			catch (FileNotFoundException e)
+			{
+				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			}
+			finally
+			{
+				exitRead();
 			}
 		}
-		catch (FileNotFoundException e)
+		else
 		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-		}
-		finally
-		{
-			monitor.exitRead();
+			// We can't access the repo due to write lock. Fall back to generating list of remotes from remote branches.
+			Set<String> remoteBranches = remoteBranches();
+			for (String branch : remoteBranches)
+			{
+				set.add(GitRef.refFromString(branch).getRemoteName());
+			}
 		}
 		return set;
 	}
@@ -822,10 +835,16 @@ public class GitRepository
 					.append(relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString())
 					.append('\n');
 		}
-		this.monitor.enterRead();
+
+		if (!enterRead())
+		{
+			IdeLog.logError(GitPlugin.getDefault(), Messages.GitRepository_FailedAcquireReadLock);
+			return Collections.emptySet();
+		}
+
 		IStatus result = GitExecutable.instance().runInBackground(input.toString(), workingDir,
 				"cat-file", "--batch-check"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.monitor.exitRead();
+		exitRead();
 		if (result.isOK())
 		{
 			String output = result.getMessage();
@@ -1246,24 +1265,28 @@ public class GitRepository
 	public Set<String> remoteURLs()
 	{
 		Set<String> remoteURLs = new HashSet<String>();
-		monitor.enterRead();
-		try
+		if (enterRead())
 		{
-			File configFile = gitFile(CONFIG_FILENAME);
-			String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
-			Matcher m = fgRemoteURLPattern.matcher(contents);
-			while (m.find())
+			try
 			{
-				remoteURLs.add(m.group(3));
+				// TODO Cache the listing and update when the config file changes?
+				File configFile = gitFile(CONFIG_FILENAME);
+				String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable
+																				// closeWhereCreated
+				Matcher m = fgRemoteURLPattern.matcher(contents);
+				while (m.find())
+				{
+					remoteURLs.add(m.group(3));
+				}
 			}
-		}
-		catch (FileNotFoundException e)
-		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-		}
-		finally
-		{
-			monitor.exitRead();
+			catch (FileNotFoundException e)
+			{
+				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			}
+			finally
+			{
+				exitRead();
+			}
 		}
 		return remoteURLs;
 	}
@@ -1406,36 +1429,50 @@ public class GitRepository
 
 	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
 	{
+		boolean acquired = false;
 		switch (readOrWrite)
 		{
 			case READ:
-				monitor.enterRead();
+				acquired = enterRead();
 				break;
 
 			case WRITE:
-				monitor.enterWrite();
+				acquired = enterWriteProcess();
 				break;
 		}
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), env, args);
-		switch (readOrWrite)
+		if (!acquired)
 		{
-			case READ:
-				monitor.exitRead();
-				break;
-
-			case WRITE:
-				monitor.exitWrite();
-				break;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), Messages.GitRepository_FailedAcquireLock);
 		}
-		return result;
+
+		try
+		{
+			return GitExecutable.instance().runInBackground(workingDirectory(), env, args);
+		}
+		finally
+		{
+			switch (readOrWrite)
+			{
+				case READ:
+					exitRead();
+					break;
+
+				case WRITE:
+					exitWriteProcess();
+					break;
+			}
+		}
 	}
 
 	IStatus executeWithInput(String input, String... args)
 	{
 		// All of these processes appear to be write, so just hard-code that
-		monitor.enterWrite();
+		if (!enterWriteProcess())
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), Messages.GitRepository_FailedAcquireWriteLock);
+		}
 		IStatus result = GitExecutable.instance().runInBackground(input, workingDirectory(), args);
-		monitor.exitWrite();
+		exitWriteProcess();
 		return result;
 	}
 
@@ -1919,23 +1956,30 @@ public class GitRepository
 	 */
 	public void exitWriteProcess()
 	{
-		monitor.exitWrite();
+		try
+		{
+			monitor.writeLock().unlock();
+		}
+		catch (Throwable t)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), t);
+		}
 	}
 
 	/**
 	 * Not to be used by callers! This is for entering write lock when we run git commands like push/pull in console!
 	 */
-	public void enterWriteProcess()
+	public boolean enterWriteProcess()
 	{
-		monitor.enterWrite();
+		return monitor.writeLock().tryLock();
 	}
 
 	/**
 	 * Not to be used by callers! This is for entering read lock when we run git commands outside this class!
 	 */
-	void enterRead()
+	boolean enterRead()
 	{
-		monitor.enterRead();
+		return monitor.readLock().tryLock();
 	}
 
 	/**
@@ -1943,7 +1987,14 @@ public class GitRepository
 	 */
 	void exitRead()
 	{
-		monitor.exitRead();
+		try
+		{
+			monitor.readLock().unlock();
+		}
+		catch (Throwable t)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), t);
+		}
 	}
 
 	public Set<String> getGithubURLs()
