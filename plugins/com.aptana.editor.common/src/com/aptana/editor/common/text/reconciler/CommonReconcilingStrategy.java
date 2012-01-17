@@ -242,7 +242,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		{
 			public void run()
 			{
-				if (!fEditor.hasOutlinePageCreated())
+				if (fEditor == null || !fEditor.hasOutlinePageCreated())
 				{
 					return;
 				}

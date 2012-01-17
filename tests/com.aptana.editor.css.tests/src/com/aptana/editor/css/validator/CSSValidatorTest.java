@@ -142,7 +142,7 @@ public class CSSValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "div {\nuser-select: none;\n}";
 
-		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
 	}
 }
