@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Platform;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.EventPropertyElement;
@@ -491,7 +492,10 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				IdeLog.logError(JSPlugin.getDefault(), "Unrecognized type name in JSCAHandler#createType: " + typeName); //$NON-NLS-1
+				if (typeName != null && !typeName.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
+				{
+					IdeLog.logError(JSPlugin.getDefault(), "Unrecognized type name in JSCAHandler#createType: " + typeName); //$NON-NLS-1
+				}
 		}
 	}
 
