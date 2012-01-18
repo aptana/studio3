@@ -545,7 +545,7 @@ public class GitRepository
 		{
 			return gitDirPath().removeLastSegments(1);
 		}
-		IStatus result = execute(ReadWrite.READ, "rev-parse", "--is-inside-work-tree"); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = execute(ReadWrite.READ, gitDirPath(), "rev-parse", "--is-inside-work-tree"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.isOK() && result.getMessage().trim().equals("true")) //$NON-NLS-1$
 		{
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
@@ -1363,6 +1363,11 @@ public class GitRepository
 	 */
 	public IStatus execute(ReadWrite readOrWrite, String... args)
 	{
+		return execute(readOrWrite, workingDirectory(), args);
+	}
+
+	private IStatus execute(ReadWrite readOrWrite, IPath workingDir, String... args)
+	{
 		return execute(readOrWrite, null, args);
 	}
 
@@ -1377,10 +1382,10 @@ public class GitRepository
 	 */
 	IStatus executeWithPromptHandling(ReadWrite readOrWrite, String... args)
 	{
-		return execute(readOrWrite, GitExecutable.getEnvironment(), args);
+		return execute(readOrWrite, workingDirectory(), GitExecutable.getEnvironment(), args);
 	}
 
-	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
+	private IStatus execute(ReadWrite readOrWrite, IPath workingDir, Map<String, String> env, String... args)
 	{
 		boolean acquired = false;
 		switch (readOrWrite)
@@ -1400,7 +1405,7 @@ public class GitRepository
 
 		try
 		{
-			return GitExecutable.instance().runInBackground(workingDirectory(), env, args);
+			return GitExecutable.instance().runInBackground(workingDir, env, args);
 		}
 		finally
 		{
