@@ -1368,7 +1368,7 @@ public class GitRepository
 
 	private IStatus execute(ReadWrite readOrWrite, IPath workingDir, String... args)
 	{
-		return execute(readOrWrite, null, args);
+		return execute(readOrWrite, workingDir, null, args);
 	}
 
 	/**
