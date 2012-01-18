@@ -634,7 +634,7 @@ public class GitRepository
 			Set<String> remoteBranches = remoteBranches();
 			for (String branch : remoteBranches)
 			{
-				set.add(GitRef.refFromString(branch).getRemoteName());
+				set.add(GitRef.refFromString(GitRef.REFS_REMOTES + branch).getRemoteName());
 			}
 		}
 		return set;
