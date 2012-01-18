@@ -612,7 +612,7 @@ public class GitRepository
 			Set<String> remoteBranches = remoteBranches();
 			for (String branch : remoteBranches)
 			{
-				set.add(GitRef.refFromString(branch).getRemoteName());
+				set.add(GitRef.refFromString(GitRef.REFS_REMOTES + branch).getRemoteName());
 			}
 		}
 		return set;
@@ -652,13 +652,6 @@ public class GitRepository
 				if (ref == null || ref.type() == null)
 				{
 					continue;
-				}
-				for (GitRef.TYPE string : types)
-				{
-					if (ref.type().equals(string))
-					{
-						break;
-					}
 				}
 				if (!validTypes.contains(ref.type()))
 				{
