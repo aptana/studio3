@@ -53,7 +53,12 @@ public class FormatterCSSSelectorNode extends FormatterBlockWithBeginNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
-		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+		int lineAfter = getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+		if (lineAfter == 0)
+		{
+			return -1;
+		}
+		return lineAfter;
 	}
 
 	/*
