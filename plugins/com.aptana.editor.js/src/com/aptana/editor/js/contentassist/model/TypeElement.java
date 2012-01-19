@@ -18,8 +18,73 @@ import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
-public class TypeElement extends BaseElement
+public class TypeElement extends BaseElement<TypeElement.Property>
 {
+	enum Property implements IPropertyInformation<TypeElement>
+	{
+		NAME(Messages.TypeElement_Name)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return node.getName();
+			}
+		},
+		PARENT_TYPES(Messages.TypeElement_ParentTypes)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return StringUtil.join(",", node.getParentTypes()); //$NON-NLS-1$
+			}
+		},
+		DESCRIPTION(Messages.TypeElement_Description)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return node.getDescription();
+			}
+		},
+		DOCUMENTS(Messages.TypeElement_Documents)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return StringUtil.join(", ", node.getDocuments()); //$NON-NLS-1$
+			}
+		},
+		EVENT_COUNT(Messages.TypeElement_EventCount)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return node.getEvents().size();
+			}
+		},
+		PROPERTY_COUNT(Messages.TypeElement_PropertyCount)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return node.getProperties().size();
+			}
+		},
+		DEPRECATED(Messages.TypeElement_Deprecated)
+		{
+			public Object getPropertyValue(TypeElement node)
+			{
+				return node.isDeprecated();
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String FUNCTIONS_PROPERTY = "functions"; //$NON-NLS-1$
 	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
 	private static final String EVENTS_PROPERTY = "events"; //$NON-NLS-1$
@@ -117,18 +182,7 @@ public class TypeElement extends BaseElement
 				this._properties = new ArrayList<PropertyElement>();
 			}
 
-			int index = this.getPropertyIndex(property.getName());
-
-			if (index >= 0)
-			{
-				// replace existing property with the same name
-				this._properties.set(index, property);
-			}
-			else
-			{
-				// add to the end of our list
-				this._properties.add(property);
-			}
+			this._properties.add(property);
 
 			property.setOwningType(this.getName());
 		}
@@ -160,6 +214,8 @@ public class TypeElement extends BaseElement
 	public void fromJSON(Map object)
 	{
 		super.fromJSON(object);
+
+		// NOTE: parent types are added to this type element when reading types from the JS index
 
 		if (object.containsKey(PROPERTIES_PROPERTY))
 		{
@@ -459,6 +515,7 @@ public class TypeElement extends BaseElement
 
 			properties.removeAll(functions);
 
+			// NOTE: parent types are written to the index by JSIndexWriter, so we don't need to serialize that value
 			out.add(PROPERTIES_PROPERTY, properties);
 			out.add(FUNCTIONS_PROPERTY, functions);
 			out.add(EVENTS_PROPERTY, this.getEvents());
@@ -467,20 +524,6 @@ public class TypeElement extends BaseElement
 			out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 			out.add(IS_INTERNAL_PROPERTY, this.isInternal());
 		}
-	}
-
-	/**
-	 * toSource
-	 * 
-	 * @return
-	 */
-	public String toSource()
-	{
-		SourcePrinter printer = new SourcePrinter();
-
-		this.toSource(printer);
-
-		return printer.toString();
 	}
 
 	/**

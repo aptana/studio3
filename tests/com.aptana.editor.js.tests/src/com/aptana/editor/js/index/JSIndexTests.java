@@ -52,7 +52,7 @@ public class JSIndexTests extends TestCase
 	 * @param typeName
 	 * @return
 	 */
-	private TypeElement getType(String typeName)
+	private List<TypeElement> getType(String typeName)
 	{
 		JSIndexReader reader = new JSIndexReader();
 
@@ -82,7 +82,8 @@ public class JSIndexTests extends TestCase
 		type.setName(typeName);
 		this.writeType(type);
 
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -109,7 +110,8 @@ public class JSIndexTests extends TestCase
 		this.writeType(type);
 
 		// then retrieve it
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -149,7 +151,8 @@ public class JSIndexTests extends TestCase
 		this.writeType(type);
 
 		// then retrieve it
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());

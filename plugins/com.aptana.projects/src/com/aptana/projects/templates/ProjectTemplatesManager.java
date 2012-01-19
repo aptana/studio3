@@ -223,7 +223,6 @@ public class ProjectTemplatesManager
 	{
 		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
-
 			public boolean include(AbstractElement element)
 			{
 				return (element instanceof ProjectTemplateElement);

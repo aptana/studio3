@@ -14,13 +14,20 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.util.SourcePrinter;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.parsing.ast.JSNode;
 
+/**
+ * This class represents a single JS property, used during inferencing. Each
+ */
 public class JSPropertyCollection
 {
-	private List<JSNode> _values;
-	private List<String> _types;
-	private Map<String, JSPropertyCollection> _properties;
+	private List<JSNode> values;
+	private List<String> types;
+	private Map<String, JSPropertyCollection> properties;
+
+	private String name;
+	private JSPropertyCollection parentProperty;
 
 	/**
 	 * addType
@@ -34,16 +41,16 @@ public class JSPropertyCollection
 		// allow empty types to generate a new array, but we don't add them to
 		// it. This indicates that this object's types have been inferred. See
 		// JSObject#hasTypes for more info
-		if (this._types == null)
+		if (types == null)
 		{
-			this._types = new ArrayList<String>();
+			types = new ArrayList<String>();
 		}
 
 		// NOTE: The number of types in the list will be small, so the contains
 		// test should not have any performance issues.
-		if (type != null && type.length() > 0 && !this._types.contains(type))
+		if (type != null && type.length() > 0 && !types.contains(type))
 		{
-			this._types.add(type);
+			types.add(type);
 		}
 	}
 
@@ -56,12 +63,12 @@ public class JSPropertyCollection
 	{
 		if (value != null)
 		{
-			if (this._values == null)
+			if (values == null)
 			{
-				this._values = new ArrayList<JSNode>();
+				values = new ArrayList<JSNode>();
 			}
 
-			this._values.add(value);
+			values.add(value);
 		}
 	}
 
@@ -70,7 +77,57 @@ public class JSPropertyCollection
 	 */
 	public void clearTypes()
 	{
-		this._types = null;
+		types = null;
+	}
+
+	/**
+	 * getQualifiedName
+	 * 
+	 * @return
+	 */
+	public String getQualifiedName()
+	{
+		List<String> parts = new ArrayList<String>();
+		JSPropertyCollection current = this;
+
+		while (current != null)
+		{
+			String name = current.getName();
+
+			if (StringUtil.isEmpty(name))
+			{
+				break;
+			}
+			else
+			{
+				parts.add(name);
+				current = current.getParentProperty();
+			}
+		}
+
+		Collections.reverse(parts);
+
+		return StringUtil.join(".", parts); //$NON-NLS-1$
+	}
+
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * getParentProperty
+	 * 
+	 * @return
+	 */
+	public JSPropertyCollection getParentProperty()
+	{
+		return parentProperty;
 	}
 
 	/**
@@ -83,29 +140,29 @@ public class JSPropertyCollection
 	{
 		JSPropertyCollection result = null;
 
-		if (this._properties != null)
+		if (properties != null)
 		{
-			result = this._properties.get(name);
+			result = properties.get(name);
 		}
 
 		return result;
 	}
 
 	/**
-	 * getPropertyNames
+	 * Return a list of property names defined within this collection.
 	 * 
-	 * @return
+	 * @return Returns a list of strings. This value is always defined
 	 */
 	public List<String> getPropertyNames()
 	{
 		List<String> result;
 
-		if (this._properties != null)
+		if (properties != null)
 		{
 			// NOTE: We're using a LinkedHashMap to preserve the order items are
 			// added to the hash. We return a list to imply the order of those
 			// items...as opposed the set returned by keySet
-			result = new ArrayList<String>(this._properties.keySet());
+			result = new ArrayList<String>(properties.keySet());
 		}
 		else
 		{
@@ -122,7 +179,7 @@ public class JSPropertyCollection
 	 */
 	public List<String> getTypes()
 	{
-		List<String> result = this._types;
+		List<String> result = types;
 
 		if (result == null)
 		{
@@ -139,7 +196,7 @@ public class JSPropertyCollection
 	 */
 	public List<JSNode> getValues()
 	{
-		List<JSNode> result = this._values;
+		List<JSNode> result = values;
 
 		if (result == null)
 		{
@@ -158,9 +215,9 @@ public class JSPropertyCollection
 	{
 		boolean result = false;
 
-		if (this._properties != null)
+		if (properties != null)
 		{
-			result = !this._properties.isEmpty();
+			result = !properties.isEmpty();
 		}
 
 		return result;
@@ -176,9 +233,9 @@ public class JSPropertyCollection
 	{
 		boolean result = false;
 
-		if (this._properties != null)
+		if (properties != null)
 		{
-			result = this._properties.containsKey(name);
+			result = properties.containsKey(name);
 		}
 
 		return result;
@@ -195,7 +252,7 @@ public class JSPropertyCollection
 		// importantly to prevent infinite recursion with some constructs. A
 		// non-null types array is all we need to consider that this object has
 		// cached types so we don't the length in this predicate
-		return this._types != null;
+		return types != null;
 	}
 
 	/**
@@ -208,14 +265,17 @@ public class JSPropertyCollection
 	{
 		if (name != null && name.length() > 0 && property != null)
 		{
-			if (this._properties == null)
+			if (properties == null)
 			{
 				// Using a linked hash map to preserve order in which
 				// properties were added
-				this._properties = new LinkedHashMap<String, JSPropertyCollection>();
+				properties = new LinkedHashMap<String, JSPropertyCollection>();
 			}
 
-			this._properties.put(name, property);
+			properties.put(name, property);
+
+			property.name = name;
+			property.parentProperty = this;
 		}
 	}
 
@@ -240,18 +300,18 @@ public class JSPropertyCollection
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
-		if (this._properties != null)
+		if (properties != null)
 		{
-			for (Map.Entry<String, JSPropertyCollection> entry : this._properties.entrySet())
+			for (Map.Entry<String, JSPropertyCollection> entry : properties.entrySet())
 			{
 				String name = entry.getKey();
 				JSPropertyCollection object = entry.getValue();
 
 				printer.printIndent().print(name);
 
-				if (object._values != null)
+				if (object.values != null)
 				{
-					printer.print(object._values);
+					printer.print(object.values);
 				}
 				else
 				{

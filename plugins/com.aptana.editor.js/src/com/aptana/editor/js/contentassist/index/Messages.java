@@ -26,15 +26,6 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	public static String JSCAHandler_Invalid_Alias;
-	public static String JSCAHandler_Invalid_Event_Name;
-	public static String JSCAHandler_Invalid_Event_Property_Name;
-	public static String JSCAHandler_Invalid_Function_Name;
-	public static String JSCAHandler_Invalid_Parameter_Name;
-	public static String JSCAHandler_Invalid_Property_Name;
-	public static String JSCAHandler_Invalid_Type_Name;
-	public static String JSCAHandler_Unable_To_Set_Name_Property;
-	public static String JSCAHandler_Unrecognized_Property_Name;
 	public static String JSMetadataReader_Invalid_Base_Type;
 	public static String JSMetadataReader_Invalid_Exception_Name;
 	public static String JSMetadataReader_Invalid_Parameter_Type;

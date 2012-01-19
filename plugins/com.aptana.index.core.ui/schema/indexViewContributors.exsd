@@ -91,6 +91,16 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="action-provider" type="string">
+            <annotation>
+               <documentation>
+                  An action provider class that implements IActionProvider
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.index.core.ui.views.IActionProvider"/>
+               </appinfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
