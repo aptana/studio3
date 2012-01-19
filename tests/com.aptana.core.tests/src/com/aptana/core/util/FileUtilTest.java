@@ -13,6 +13,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+
 public class FileUtilTest extends TestCase
 {
 
@@ -176,6 +179,94 @@ public class FileUtilTest extends TestCase
 		catch (IOException e)
 		{
 			fail("Unable to test parsing of file name from command line");
+		}
+	}
+
+	public void testCountFilesWithNullArg()
+	{
+		assertEquals(0, FileUtil.countFiles(null));
+	}
+
+	public void testCountFilesWithSingleFile() throws Exception
+	{
+		File file = File.createTempFile("delete_me", null);
+		file.deleteOnExit();
+		assertEquals(1, FileUtil.countFiles(file));
+	}
+
+	public void testCountFilesWithDirectory() throws Exception
+	{
+		File dir = new File(System.getProperty("java.io.tmpdir"), "count_dir_" + System.currentTimeMillis());
+		try
+		{
+			dir.mkdirs();
+			int fileCount = 10;
+			for (int i = 0; i < fileCount; i++)
+			{
+				new File(dir, Integer.toString(i)).createNewFile();
+			}
+			assertEquals(fileCount, FileUtil.countFiles(dir));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dir);
+		}
+	}
+
+	public void testCountFilesWithMultipleDirectories() throws Exception
+	{
+		File dir = new File(System.getProperty("java.io.tmpdir"), "count_dir_" + System.currentTimeMillis());
+		try
+		{
+			dir.mkdirs();
+			int dirCount = 5;
+			int fileCount = 10;
+			for (int j = 0; j < dirCount; j++)
+			{
+				File subDir = new File(dir, "dir_" + Integer.toString(j));
+				subDir.mkdirs();
+				for (int i = 0; i < fileCount; i++)
+				{
+					new File(subDir, Integer.toString(i)).createNewFile();
+				}
+			}
+
+			assertEquals(dirCount * fileCount, FileUtil.countFiles(dir));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dir);
+		}
+	}
+
+	// TODO Add test for countFiles with symlink loop?
+
+	public void testCountFilesWithMultipleDirectoriesAndSymlinkLoop() throws Exception
+	{
+		File dir = new File(System.getProperty("java.io.tmpdir"), "count_dir_" + System.currentTimeMillis());
+		try
+		{
+			dir.mkdirs();
+			int dirCount = 5;
+			int fileCount = 10;
+			for (int j = 0; j < dirCount; j++)
+			{
+				File subDir = new File(dir, "dir_" + Integer.toString(j));
+				subDir.mkdirs();
+				for (int i = 0; i < fileCount; i++)
+				{
+					new File(subDir, Integer.toString(i)).createNewFile();
+				}
+
+				IStatus status = ProcessUtil.runInBackground("ln", Path.fromOSString(subDir.getAbsolutePath()), "-s",
+						dir.getAbsolutePath(), "symlink");
+				assertTrue(status.isOK());
+			}
+			assertEquals(dirCount * (fileCount + 1), FileUtil.countFiles(dir));
+		}
+		finally
+		{
+			FileUtil.deleteRecursively(dir);
 		}
 	}
 }
