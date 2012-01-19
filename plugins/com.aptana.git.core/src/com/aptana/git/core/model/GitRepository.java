@@ -1422,9 +1422,14 @@ public class GitRepository
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), Messages.GitRepository_FailedAcquireWriteLock);
 		}
-		IStatus result = GitExecutable.instance().runInBackground(input, workingDirectory(), args);
-		exitWriteProcess();
-		return result;
+		try
+		{
+			return GitExecutable.instance().runInBackground(input, workingDirectory(), args);
+		}
+		finally
+		{
+			exitWriteProcess();
+		}
 	}
 
 	public IStatus deleteFolder(IPath folderPath)
