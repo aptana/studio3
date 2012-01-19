@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
@@ -24,37 +22,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.model.ChangedFile.Status;
 
 @SuppressWarnings("nls")
-public class GitRepositoryTest extends TestCase
+public class GitRepositoryTest extends GitTestCase
 {
-
-	private GitRepository fRepo;
-	private IPath fPath;
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		try
-		{
-			File generatedRepo = fRepo.workingDirectory().toFile();
-			if (generatedRepo.exists())
-			{
-				delete(generatedRepo);
-			}
-			fRepo = null;
-			fPath = null;
-		}
-		finally
-		{
-			super.tearDown();
-		}
-	}
 
 	public void testCreate() throws Throwable
 	{
@@ -67,12 +40,7 @@ public class GitRepositoryTest extends TestCase
 		assertNotNull(repo);
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
-
-	public void testAddFileStageUnstageAndCommit() throws Throwable
+	public void testAddFileStageUnstageAndCommit() throws Exception
 	{
 		GitRepository repo = createRepo();
 		GitIndex index = repo.index();
@@ -164,13 +132,13 @@ public class GitRepositoryTest extends TestCase
 		// make sure it's there first
 		assertTrue("File we want to delete through git repo doesn't exist", addedFile.exists());
 		// delete it
-		IStatus status = fRepo.deleteFile(addedFile.getName());
+		IStatus status = getRepo().deleteFile(addedFile.getName());
 		assertTrue("Deleting file in git repo returned an error status", status.isOK());
 		// make sure its deleted from filesystem
 		assertFalse("Deleted file through git, file still exists", addedFile.exists());
 
 		// Check the changed files and make sure it shows up as changed: DELETED, unstaged
-		GitIndex index = fRepo.index();
+		GitIndex index = getRepo().index();
 		index.refresh(new NullProgressMonitor());
 
 		// Now there should be a single file that's been changed!
@@ -198,7 +166,7 @@ public class GitRepositoryTest extends TestCase
 	{
 		testAddFileStageUnstageAndCommit();
 
-		GitIndex index = fRepo.index();
+		GitIndex index = getRepo().index();
 
 		// Actually add a file to the location
 		FileWriter writer = new FileWriter(fileToAdd(), true);
@@ -276,19 +244,10 @@ public class GitRepositoryTest extends TestCase
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "master", "my_new_branch");
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "my_new_branch", "master");
 
-		fRepo.removeListener(listener);
+		getRepo().removeListener(listener);
 		// Do some things that should send events and make sure we don't get any more.
 		assertSwitchBranch("my_new_branch");
 		assertEquals(size, eventsReceived.size());
-	}
-
-	protected GitRepository getRepo()
-	{
-		if (fRepo == null)
-		{
-			createRepo();
-		}
-		return fRepo;
 	}
 
 	protected void assertBranchChangedEvent(List<RepositoryEvent> events, String oldName, String newName)
@@ -316,15 +275,15 @@ public class GitRepositoryTest extends TestCase
 		testAddFileStageUnstageAndCommit();
 
 		// Make sure we just have master branch
-		Set<String> branches = fRepo.allBranches();
+		Set<String> branches = getRepo().allBranches();
 		assertEquals("Should only have one branch: " + branches.toString(), 1, branches.size());
 		assertTrue(branches.contains("master"));
 
 		// Create a new branch off master
-		assertTrue(fRepo.createBranch("my_new_branch", false, "master"));
+		assertTrue(getRepo().createBranch("my_new_branch", false, "master"));
 
 		// make sure the branch is listed in model
-		branches = fRepo.allBranches();
+		branches = getRepo().allBranches();
 		assertEquals("Should have one new branch: " + branches.toString(), 2, branches.size());
 		assertTrue(branches.contains("master"));
 		assertTrue(branches.contains("my_new_branch"));
@@ -337,10 +296,10 @@ public class GitRepositoryTest extends TestCase
 		testAddBranch();
 
 		// Delete the new branch
-		assertTrue(fRepo.deleteBranch("my_new_branch").isOK());
+		assertTrue(getRepo().deleteBranch("my_new_branch").isOK());
 
 		// make sure the branch is no longer listed in model
-		Set<String> branches = fRepo.allBranches();
+		Set<String> branches = getRepo().allBranches();
 		assertEquals(1, branches.size());
 		assertTrue(branches.contains("master"));
 		assertFalse(branches.contains("my_new_branch"));
@@ -362,20 +321,20 @@ public class GitRepositoryTest extends TestCase
 		assertCurrentBranch("master");
 		assertSwitchBranch("my_new_branch");
 
-		GitIndex index = fRepo.index();
+		GitIndex index = getRepo().index();
 		assertTrue("Expected changed file listing to be empty", index.changedFiles().isEmpty());
 
 		// Create a new project on this branch!
 		String projectName = "project_on_branch" + System.currentTimeMillis();
 
-		File projectDir = fRepo.workingDirectory().append(projectName).toFile();
+		File projectDir = getRepo().workingDirectory().append(projectName).toFile();
 		projectDir.mkdirs();
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProject project = workspace.getRoot().getProject(projectName);
 
 		IProjectDescription description = workspace.newProjectDescription(projectName);
-		description.setLocation(fRepo.workingDirectory().append(projectName));
+		description.setLocation(getRepo().workingDirectory().append(projectName));
 		project.create(description, new NullProgressMonitor());
 
 		// Commit the project on this branch!
@@ -413,11 +372,11 @@ public class GitRepositoryTest extends TestCase
 		assertSwitchBranch("my_new_branch");
 
 		// Now we need to make changes, commit and then switch back to master
-		GitIndex index = fRepo.index();
+		GitIndex index = getRepo().index();
 
 		// TODO Refactor out common code with testAddFileStageUnstageCommit
 		// Actually add a file to the location
-		String txtFile = fRepo.workingDirectory() + File.separator + "file_on_branch.txt";
+		String txtFile = getRepo().workingDirectory() + File.separator + "file_on_branch.txt";
 		FileWriter writer = new FileWriter(txtFile);
 		writer.write("Hello Branched World!");
 		writer.close();
@@ -442,7 +401,7 @@ public class GitRepositoryTest extends TestCase
 		// Now switch to master
 		assertSwitchBranch("master");
 
-		IStatus status = fRepo.deleteBranch("my_new_branch");
+		IStatus status = getRepo().deleteBranch("my_new_branch");
 		assertFalse("Deleting an umerged branch didn't return an error status (as it should)", status.isOK());
 		assertEquals(1, status.getCode());
 		// Can't rely on the unmerged failure message from git to remain the same across versions.
@@ -454,7 +413,7 @@ public class GitRepositoryTest extends TestCase
 	public void testRemoteURLs() throws Exception
 	{
 		GitRepository repo = createRepo();
-		File configFile = repoToGenerate().append(".git").append("config").toFile();
+		File configFile = repoToGenerate().append(GitRepository.GIT_DIR).append(GitRepository.CONFIG_FILENAME).toFile();
 		// Test that our regexp can handle when fetch is first or url is first as child of remote section in config
 		// file.
 		FileWriter writer = new FileWriter(configFile, true);
@@ -466,7 +425,73 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(urls.contains("git@github.com:aptana/bob.git"));
 	}
 
-	public void testFirePullEvent()
+	public void testMatchingRemoteBranchWithTrackedBranch() throws Exception
+	{
+		// Must be at least one file for us to be able to get branches and add them properly!
+		testAddFileStageUnstageAndCommit();
+		GitRepository repo = getRepo();
+
+		assertCurrentBranch("master");
+		assertNull("Expected to get no matching remote branch for 'master', but did",
+				repo.matchingRemoteBranch("master"));
+
+		// @formatter:off
+		String configContents =
+				"[remote \"origin\"]\n" +
+				"\tfetch = +refs/heads/*:refs/remotes/origin/*\n" +
+				"\turl = git@github.com:aptana/origin.git\n" +
+				"[remote \"upstream\"]\n" +
+				"\turl = git@github.com:aptana/upstream.git\n" +
+				"\tfetch = +refs/heads/*:refs/remotes/upstream/*\n" +
+				"[branch \"master\"]\n" +
+		        "\tremote = origin\n" +
+		        "\tmerge = refs/heads/master\n" +
+		        "\trebase = true\n";
+        // @formatter:on
+
+		// Set up remotes
+		File configFile = repo.workingDirectory().append(GitRepository.GIT_DIR).append(GitRepository.CONFIG_FILENAME)
+				.toFile();
+		FileWriter writer = new FileWriter(configFile, true);
+		writer.append(configContents);
+		writer.close();
+
+		assertEquals("Expected to get matching remote branch for 'master'",
+				GitRef.refFromString(GitRef.REFS_REMOTES + "origin/master"), repo.matchingRemoteBranch("master"));
+	}
+
+	public void testMatchingRemoteBranchWithImplicitlyTrackedBranch() throws Exception
+	{
+		// Must be at least one file for us to be able to get branches and add them properly!
+		testAddFileStageUnstageAndCommit();
+		GitRepository repo = getRepo();
+
+		assertCurrentBranch("master");
+		assertNull("Expected to get no matching remote branch for 'master', but did",
+				repo.matchingRemoteBranch("master"));
+
+		// Grab HEAD SHA
+		File masterSHA = repo.workingDirectory().append(GitRepository.GIT_DIR).append("refs").append("heads")
+				.append("master").toFile();
+		String sha = IOUtil.read(new FileInputStream(masterSHA));
+
+		// Write that SHA to the remotes/origin/master ref
+		File ref = repo.workingDirectory().append(GitRepository.GIT_DIR).append("refs").append("remotes")
+				.append("origin").append("master").toFile();
+		ref.getParentFile().mkdirs();
+		FileWriter writer = new FileWriter(ref, true);
+		writer.append(sha);
+		writer.close();
+		// Force reload of refs
+		repo.hasChanged();
+		repo.lazyReload();
+
+		// Now make sure we try implicit tracking
+		assertEquals("Expected to get matching remote branch for 'master'",
+				GitRef.refFromString(GitRef.REFS_REMOTES + "origin/master"), repo.matchingRemoteBranch("master"));
+	}
+
+	public void testFirePullEvent() throws Exception
 	{
 		GitRepository repo = createRepo();
 		final List<PullEvent> pullEvents = new ArrayList<PullEvent>();
@@ -484,7 +509,7 @@ public class GitRepositoryTest extends TestCase
 		assertSame(repo, pullEvents.get(0).getRepository());
 	}
 
-	public void testFirePushEvent()
+	public void testFirePushEvent() throws Exception
 	{
 		GitRepository repo = createRepo();
 		final List<PushEvent> pushEvents = new ArrayList<PushEvent>();
@@ -552,167 +577,8 @@ public class GitRepositoryTest extends TestCase
 		}
 	}
 
-	protected IPath repoToGenerate()
+	protected String fileToAdd() throws Exception
 	{
-		if (fPath == null)
-		{
-			String tmpDirString = System.getProperty("java.io.tmpdir");
-			fPath = new Path(tmpDirString).append("git_repo" + System.currentTimeMillis());
-			// fPath = GitPlugin.getDefault().getStateLocation().append("git_repo" + System.currentTimeMillis());
-		}
-		return fPath;
+		return getRepo().workingDirectory() + File.separator + "file.txt";
 	}
-
-	protected String fileToAdd()
-	{
-		return fRepo.workingDirectory() + File.separator + "file.txt";
-	}
-
-	protected GitRepository createRepo()
-	{
-		return createRepo(repoToGenerate());
-	}
-
-	/**
-	 * Create a git repo and make sure it actually generate a model object and not null
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected GitRepository createRepo(IPath path)
-	{
-		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
-		getGitRepositoryManager().create(path);
-		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
-		assertNotNull(repo);
-		fRepo = repo;
-		// Remove the auto-generated .gitignore file!
-		fRepo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
-		return repo;
-	}
-
-	// Git specific assertions
-	protected void assertCurrentBranch(String branchName)
-	{
-		assertEquals("Current branch is incorrect", branchName, fRepo.currentBranch());
-	}
-
-	protected void assertCommit(GitIndex index, String commitMessage)
-	{
-		assertTrue("Failed to commit", index.commit(commitMessage));
-		assertTrue("After a commit, the repository changed file listing should be empty but is not", index
-				.changedFiles().isEmpty());
-	}
-
-	protected void assertUnstageFiles(GitIndex index, List<ChangedFile> changed)
-	{
-		assertTrue("Failed to unstage changes", index.unstageFiles(changed));
-	}
-
-	protected void assertStageFiles(GitIndex index, List<ChangedFile> changed)
-	{
-		assertTrue("Failed to stage changes", index.stageFiles(changed));
-	}
-
-	protected void assertModifiedUnstagedFile(ChangedFile changed)
-	{
-		assertUnstaged(changed);
-		assertStatus(Status.MODIFIED, changed);
-	}
-
-	protected void assertModifiedStagedFile(ChangedFile changed)
-	{
-		assertStaged(changed);
-		assertStatus(Status.MODIFIED, changed);
-	}
-
-	protected void assertDeletedUnstagedFile(ChangedFile changedFile)
-	{
-		assertUnstaged(changedFile);
-		assertStatus(Status.DELETED, changedFile);
-	}
-
-	protected void assertDeletedStagedFile(ChangedFile changedFile)
-	{
-		assertStaged(changedFile);
-		assertStatus(Status.DELETED, changedFile);
-	}
-
-	protected void assertNewStagedFile(ChangedFile changed)
-	{
-		assertStaged(changed);
-		assertStatus(Status.NEW, changed);
-	}
-
-	protected void assertNewUnstagedFile(ChangedFile changed)
-	{
-		assertUnstaged(changed);
-		assertStatus(Status.NEW, changed);
-	}
-
-	protected void assertStatus(Status status, ChangedFile file)
-	{
-		assertEquals("Changed file in git repo has unexpected status", status, file.getStatus());
-	}
-
-	/**
-	 * Assert a changed file has staged changes and no unstaged changes.
-	 * 
-	 * @param file
-	 */
-	protected void assertStaged(ChangedFile file)
-	{
-		assertTrue("Changed file in git repo doesn't have expected staged changes", file.hasStagedChanges());
-		assertFalse("Changed file in git repo has unexpected unstaged changes", file.hasUnstagedChanges());
-	}
-
-	/**
-	 * Assert a changed file has unstaged changes and no staged changes.
-	 * 
-	 * @param file
-	 */
-	protected void assertUnstaged(ChangedFile file)
-	{
-		assertFalse("Changed file in git repo has unexpected staged changes", file.hasStagedChanges());
-		assertTrue("Changed file in git repo doesn't have expected unstaged changes", file.hasUnstagedChanges());
-	}
-
-	/**
-	 * Switch branch and make sure that it performed properly and update current branch in model.
-	 * 
-	 * @param branchName
-	 */
-	protected void assertSwitchBranch(String branchName)
-	{
-		IStatus status = fRepo.switchBranch(branchName, new NullProgressMonitor());
-		assertTrue("switchBranch returned an unexpected error status", status.isOK());
-		assertCurrentBranch(branchName);
-	}
-
-	/**
-	 * Recursively delete a directory tree.
-	 * 
-	 * @param generatedRepo
-	 */
-	private void delete(File generatedRepo)
-	{
-		if (generatedRepo == null)
-		{
-			return;
-		}
-		File[] children = generatedRepo.listFiles();
-		if (children != null)
-		{
-			for (File child : children)
-			{
-				delete(child);
-			}
-		}
-
-		if (!generatedRepo.delete())
-		{
-			generatedRepo.deleteOnExit();
-		}
-	}
-
 }

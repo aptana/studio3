@@ -23,6 +23,8 @@ public class Messages extends NLS // NO_UCD
 	public static String GitRepository_FailedAcquireReadLock;
 	public static String GitRepository_FailedAcquireWriteLock;
 
+	public static String GitRepository_FailedReadLockForConfig;
+
 	public static String GitRepositoryManager_UnableToFindGitExecutableError; // NO_UCD
 
 	static

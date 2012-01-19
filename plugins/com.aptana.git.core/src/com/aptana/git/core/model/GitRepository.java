@@ -66,9 +66,11 @@ import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitRef.TYPE;
 
+/**
+ * @author cwilliams
+ */
 public class GitRepository
 {
-
 	/**
 	 * Order branches alphabetically, with local branches all appearing before remote ones.
 	 * 
@@ -78,11 +80,11 @@ public class GitRepository
 	{
 		public int compare(String o1, String o2)
 		{
-			if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			if (o1.contains(BRANCH_DELIMITER) && !o2.contains(BRANCH_DELIMITER))
 			{
 				return 1;
 			}
-			if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			if (o2.contains(BRANCH_DELIMITER) && !o1.contains(BRANCH_DELIMITER))
 			{
 				return -1;
 			}
@@ -110,6 +112,11 @@ public class GitRepository
 	}
 
 	/**
+	 * Delimiter used to separate remote name and remote brnahc name.
+	 */
+	private static final String BRANCH_DELIMITER = "/"; //$NON-NLS-1$
+
+	/**
 	 * Extension of temporary git lock files.
 	 */
 	private static final String DOT_LOCK = ".lock"; //$NON-NLS-1$
@@ -117,7 +124,7 @@ public class GitRepository
 	/**
 	 * Filename of git config.
 	 */
-	private static final String CONFIG_FILENAME = "config"; //$NON-NLS-1$
+	static final String CONFIG_FILENAME = "config"; //$NON-NLS-1$
 
 	private static final String GITHUB_COM = "github.com"; //$NON-NLS-1$
 
@@ -125,39 +132,52 @@ public class GitRepository
 	 * Filename to store ignores of files.
 	 */
 	public static final String GITIGNORE = ".gitignore"; //$NON-NLS-1$
+
 	/**
 	 * File used to associate SHAs and refs when git pack-refs has been used.
 	 */
 	private static final String PACKED_REFS = "packed-refs"; //$NON-NLS-1$
+
 	/**
 	 * The file used to write the commit message.
 	 */
 	static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
+
 	/**
 	 * File holding the concatenated commit messages from merge --squash
 	 */
 	private static final String SQUASH_MSG = "SQUASH_MSG"; //$NON-NLS-1$
+
 	/**
-	 * File holding the pre-pulated commit messages from merge (w/conflicts)
+	 * File holding the pre-populated commit messages from merge (w/conflicts)
 	 */
 	private static final String MERGE_MSG = "MERGE_MSG"; //$NON-NLS-1$
+
 	/**
 	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
 	 * repo has changed.
 	 */
 	private static final String INDEX = "index"; //$NON-NLS-1$
+
 	/**
 	 * File created prior to merges (which happen as part of pull, which is just fetch + merge).
 	 */
 	private static final String ORIG_HEAD = "ORIG_HEAD"; //$NON-NLS-1$
+
 	/**
 	 * A file created when we hit merge conflicts that need to be manually resolved.
 	 */
 	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+
 	/**
 	 * The name of HEAD
 	 */
 	public static final String HEAD = "HEAD"; //$NON-NLS-1$
+
+	/**
+	 * The default 'remote' name for git.
+	 */
+	private static final String ORIGIN = "origin"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
@@ -598,7 +618,7 @@ public class GitRepository
 
 	/**
 	 * Returns the set of remotes attached to this repository. Equivalent of 'git remote'. For performance reasons, we
-	 * parse the list of remotes from .git/config file rather than run 'git remote' process.§We can't just look at
+	 * parse the list of remotes from .git/config file rather than run 'git remote' process. We can't just look at
 	 * .git/remotes, because entries only appear there after a push has been performed.
 	 * 
 	 * @return
@@ -606,26 +626,13 @@ public class GitRepository
 	public Set<String> remotes()
 	{
 		Set<String> set = new HashSet<String>();
-		if (enterRead())
+		String contents = configContents();
+		if (!StringUtil.isEmpty(contents))
 		{
-			try
+			Matcher m = fgRemoteNamePattern.matcher(contents);
+			while (m.find())
 			{
-				File configFile = gitFile(CONFIG_FILENAME);
-				String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable
-																				// closeWhereCreated
-				Matcher m = fgRemoteNamePattern.matcher(contents);
-				while (m.find())
-				{
-					set.add(m.group(1));
-				}
-			}
-			catch (FileNotFoundException e)
-			{
-				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-			}
-			finally
-			{
-				exitRead();
+				set.add(m.group(1));
 			}
 		}
 		else
@@ -1154,14 +1161,14 @@ public class GitRepository
 	 * @param localBranchName
 	 * @return
 	 */
-	private GitRef matchingRemoteBranch(String localBranchName)
+	public GitRef matchingRemoteBranch(String localBranchName)
 	{
 		GitRef remote = remoteTrackingBranch(localBranchName);
 		if (remote != null)
 		{
 			return remote;
 		}
-		String remoteMatchingName = "origin/" + localBranchName; //$NON-NLS-1$
+		String remoteMatchingName = MessageFormat.format("{0}{1}{2}", ORIGIN, BRANCH_DELIMITER, localBranchName); //$NON-NLS-1$
 		// If tracking is not set up, git still checks "origin" remote for matching name
 		if (remoteBranches().contains(remoteMatchingName))
 		{
@@ -1205,16 +1212,11 @@ public class GitRepository
 	private GitRef remoteTrackingBranch(String branchName)
 	{
 		// Given a local branch name (/refs/head/*), we need to track back to the remote + branch.
-		// TODO Store the config contents and only read it again when last mod changes?
-		File configFile = gitFile(CONFIG_FILENAME);
-		String contents = ""; //$NON-NLS-1$
-		try
+		String contents = configContents();
+		if (StringUtil.isEmpty(contents))
 		{
-			contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable closeWhereCreated
-		}
-		catch (FileNotFoundException e)
-		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			// Failed to acquire read lock for config file.
+			return null;
 		}
 
 		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName); //$NON-NLS-1$
@@ -1234,8 +1236,8 @@ public class GitRepository
 		}
 		String branchDetails = contents.substring(precedingBracket, trailingBracket);
 		String remoteBranchName = null;
-		String remoteName = "origin"; //$NON-NLS-1$
-		String[] lines = branchDetails.split("\\r?\\n|\\r"); //$NON-NLS-1$
+		String remoteName = ORIGIN;
+		String[] lines = StringUtil.LINE_SPLITTER.split(branchDetails);
 		for (String line : lines)
 		{
 			line = line.trim();
@@ -1252,7 +1254,38 @@ public class GitRepository
 		{
 			return null;
 		}
-		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteName + "/" + remoteBranchName); //$NON-NLS-1$
+		return GitRef.refFromString(MessageFormat.format(
+				"{0}{1}{2}{3}", GitRef.REFS_REMOTES, remoteName, BRANCH_DELIMITER, remoteBranchName)); //$NON-NLS-1$
+	}
+
+	/**
+	 * Reads the raw contents of the .git/config file. If we can't get the "read" lock, we return null.
+	 * 
+	 * @return
+	 */
+	private String configContents()
+	{
+		// TODO Store the config contents and only read it again when last mod changes?
+		if (!enterRead())
+		{
+			IdeLog.logError(GitPlugin.getDefault(), Messages.GitRepository_FailedReadLockForConfig, IDebugScopes.DEBUG);
+			return null;
+		}
+
+		try
+		{
+			return IOUtil.read(new FileInputStream(gitFile(CONFIG_FILENAME))); // $codepro.audit.disable
+																				// closeWhereCreated
+		}
+		catch (FileNotFoundException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+		}
+		finally
+		{
+			exitRead();
+		}
+		return null;
 	}
 
 	/**
@@ -1265,29 +1298,16 @@ public class GitRepository
 	public Set<String> remoteURLs()
 	{
 		Set<String> remoteURLs = new HashSet<String>();
-		if (enterRead())
+		String contents = configContents();
+		if (contents != null)
 		{
-			try
+			Matcher m = fgRemoteURLPattern.matcher(contents);
+			while (m.find())
 			{
-				// TODO Cache the listing and update when the config file changes?
-				File configFile = gitFile(CONFIG_FILENAME);
-				String contents = IOUtil.read(new FileInputStream(configFile)); // $codepro.audit.disable
-																				// closeWhereCreated
-				Matcher m = fgRemoteURLPattern.matcher(contents);
-				while (m.find())
-				{
-					remoteURLs.add(m.group(3));
-				}
-			}
-			catch (FileNotFoundException e)
-			{
-				IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
-			}
-			finally
-			{
-				exitRead();
+				remoteURLs.add(m.group(3));
 			}
 		}
+		// TODO If we can't acquire the config read lock, can we fall back to something else?
 		return remoteURLs;
 	}
 
@@ -1969,6 +1989,10 @@ public class GitRepository
 		try
 		{
 			monitor.writeLock().unlock();
+		}
+		catch (IllegalMonitorStateException e)
+		{
+			IdeLog.logError(GitPlugin.getDefault(), "Wrong thread is trying to unlock write lock.", e); //$NON-NLS-1$
 		}
 		catch (Throwable t)
 		{
