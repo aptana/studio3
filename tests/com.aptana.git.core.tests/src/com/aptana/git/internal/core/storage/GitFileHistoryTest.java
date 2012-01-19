@@ -76,11 +76,11 @@ public class GitFileHistoryTest extends TestCase
 				if (tries <= 0)
 					break;
 			}
-			assertNotNull(toStage);
-			assertTrue(toStage.size() > 0);
-			assertTrue(index.stageFiles(toStage));
+			assertNotNull("Expected a non-null list of changes to stage", toStage);
+			assertTrue("Expected at least one change to stage, but there are none", toStage.size() > 0);
+			assertTrue("Failed to stage changes", index.stageFiles(toStage));
 			index.refresh(new NullProgressMonitor());
-			assertTrue(index.commit(contents));
+			assertTrue("Failed to commit staged changes", index.commit(contents));
 		}
 
 		// Normal test

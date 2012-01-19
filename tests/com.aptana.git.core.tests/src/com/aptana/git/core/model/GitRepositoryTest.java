@@ -56,36 +56,15 @@ public class GitRepositoryTest extends TestCase
 		}
 	}
 
-	/**
-	 * Recursively delete a directory tree.
-	 * 
-	 * @param generatedRepo
-	 */
-	private void delete(File generatedRepo)
-	{
-		if (generatedRepo == null)
-			return;
-		File[] children = generatedRepo.listFiles();
-		if (children != null)
-		{
-			for (File child : children)
-			{
-				delete(child);
-			}
-		}
-
-		if (!generatedRepo.delete())
-			generatedRepo.deleteOnExit();
-	}
-
 	public void testCreate() throws Throwable
 	{
 		IPath path = repoToGenerate();
 		// Doesn't yet exist
 		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
-		assertNull(repo);
+		assertNull("Got a GitRepository instance, even though it doesn't exist yet!", repo);
 		// Create it now and assert that it was created
-		createRepo(path);
+		repo = createRepo(path);
+		assertNotNull(repo);
 	}
 
 	protected IGitRepositoryManager getGitRepositoryManager()
@@ -108,34 +87,26 @@ public class GitRepositoryTest extends TestCase
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
-		assertFalse(changed.isEmpty());
-		assertEquals(1, changed.size());
+		assertEquals("Repository changed file listing should contain one entry for the new file, but does not", 1,
+				changed.size());
 
 		// Make sure it's shown as having unstaged changes only and is NEW
-		assertUnstaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		assertNewUnstagedFile(changed.get(0));
 
 		// Stage the new file
-		assertFalse(changed.isEmpty());
-		assertTrue(index.stageFiles(changed));
-		assertStaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		assertStageFiles(index, changed);
+		assertNewStagedFile(changed.get(0));
 
 		// Unstage the file
-		assertFalse(changed.isEmpty());
-		assertTrue(index.unstageFiles(changed));
-		assertUnstaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		assertUnstageFiles(index, changed);
+		assertNewUnstagedFile(changed.get(0));
 
-		// stage again so we can commit...
-		assertFalse(changed.isEmpty());
-		assertTrue(index.stageFiles(changed));
-		assertStaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		// Stage
+		assertStageFiles(index, changed);
+		assertNewStagedFile(changed.get(0));
 
-		index.commit("Initial commit");
-		// No more changed files now...
-		assertTrue(index.changedFiles().isEmpty());
+		// Commit
+		assertCommit(index, "Initial commit");
 	}
 
 	public void testCommitMessageWithDoubleQuotes() throws Throwable
@@ -153,23 +124,19 @@ public class GitRepositoryTest extends TestCase
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
-		assertFalse(changed.isEmpty());
-		assertEquals(1, changed.size());
+		assertEquals("Repository changed file listing should contain one entry for the new file, but does not", 1,
+				changed.size());
 
 		// Make sure it's shown as having unstaged changes only and is NEW
-		assertUnstaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		assertNewUnstagedFile(changed.get(0));
 
-		// Stage the new file
-		assertFalse(changed.isEmpty());
-		assertTrue(index.stageFiles(changed));
-		assertStaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		// stage
+		assertStageFiles(index, changed);
+		assertNewStagedFile(changed.get(0));
 
+		// commit
 		final String commitMessage = "Initial commit with \"double quotes\" inside the message!";
-		index.commit(commitMessage);
-		// No more changed files now...
-		assertTrue(index.changedFiles().isEmpty());
+		assertCommit(index, commitMessage);
 
 		// now grab the resulting log to see if the message escaped the quotes too many times!
 		File file = repo.gitFile(GitRepository.COMMIT_EDITMSG);
@@ -195,12 +162,12 @@ public class GitRepositoryTest extends TestCase
 		// Now delete the file we committed!
 		File addedFile = new File(fileToAdd());
 		// make sure it's there first
-		assertTrue(addedFile.exists());
+		assertTrue("File we want to delete through git repo doesn't exist", addedFile.exists());
 		// delete it
 		IStatus status = fRepo.deleteFile(addedFile.getName());
-		assertTrue(status.isOK());
+		assertTrue("Deleting file in git repo returned an error status", status.isOK());
 		// make sure its deleted from filesystem
-		assertFalse(addedFile.exists());
+		assertFalse("Deleted file through git, file still exists", addedFile.exists());
 
 		// Check the changed files and make sure it shows up as changed: DELETED, unstaged
 		GitIndex index = fRepo.index();
@@ -208,26 +175,22 @@ public class GitRepositoryTest extends TestCase
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changedFiles = index.changedFiles();
-		assertFalse(changedFiles.isEmpty());
-		assertEquals(1, changedFiles.size());
+		assertEquals("Repository changed file listing should contain one entry for the deleted file, but does not", 1,
+				changedFiles.size());
 
 		// Make sure it's shown as having staged changes only and is DELETED
-		assertStaged(changedFiles.get(0));
-		assertStatus(Status.DELETED, changedFiles.get(0));
+		assertDeletedStagedFile(changedFiles.get(0));
 
-		// Unstage the file
-		assertTrue(index.unstageFiles(changedFiles));
-		assertUnstaged(changedFiles.get(0));
-		assertStatus(Status.DELETED, changedFiles.get(0));
+		// unstage
+		assertUnstageFiles(index, changedFiles);
+		assertDeletedUnstagedFile(changedFiles.get(0));
 
-		// stage again so we can commit...
-		assertTrue(index.stageFiles(changedFiles));
-		assertStaged(changedFiles.get(0));
-		assertStatus(Status.DELETED, changedFiles.get(0));
+		// stage
+		assertStageFiles(index, changedFiles);
+		assertDeletedStagedFile(changedFiles.get(0));
 
-		index.commit("Delete files");
-		// No more changed files now...
-		assertTrue(index.changedFiles().isEmpty());
+		// commit
+		assertCommit(index, "Delete files");
 	}
 
 	// Test modifying file that isn't new (already checked in)
@@ -246,31 +209,26 @@ public class GitRepositoryTest extends TestCase
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
-		assertFalse(changed.isEmpty());
-		assertEquals(1, changed.size());
+		assertEquals("Repository changed file listing should contain one entry for a new file, but does not", 1,
+				changed.size());
 
 		// Make sure it's shown as having unstaged changes only and is MODIFIED
-		assertUnstaged(changed.get(0));
-		assertStatus(Status.MODIFIED, changed.get(0));
+		assertModifiedUnstagedFile(changed.get(0));
 
-		// Stage the new file
-		assertTrue(index.stageFiles(changed));
-		assertStaged(changed.get(0));
-		assertStatus(Status.MODIFIED, changed.get(0));
+		// stage
+		assertStageFiles(index, changed);
+		assertModifiedStagedFile(changed.get(0));
 
-		// Unstage the file
-		assertTrue(index.unstageFiles(changed));
-		assertUnstaged(changed.get(0));
-		assertStatus(Status.MODIFIED, changed.get(0));
+		// unstage
+		assertUnstageFiles(index, changed);
+		assertModifiedUnstagedFile(changed.get(0));
 
-		// stage again so we can commit...
-		assertTrue(index.stageFiles(changed));
-		assertStaged(changed.get(0));
-		assertStatus(Status.MODIFIED, changed.get(0));
+		// stage
+		assertStageFiles(index, changed);
+		assertModifiedStagedFile(changed.get(0));
 
-		index.commit("Add second line");
-		// No more changed files now...
-		assertTrue(index.changedFiles().isEmpty());
+		// commit
+		assertCommit(index, "Add second line");
 	}
 
 	public void testAddRemoveListeners() throws Throwable
@@ -314,7 +272,7 @@ public class GitRepositoryTest extends TestCase
 		testSwitchBranch();
 
 		int size = eventsReceived.size();
-		assertTrue(size > 0);
+		assertTrue("Expected git repo events, but got none", size > 0);
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "master", "my_new_branch");
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "my_new_branch", "master");
 
@@ -327,7 +285,9 @@ public class GitRepositoryTest extends TestCase
 	protected GitRepository getRepo()
 	{
 		if (fRepo == null)
+		{
 			createRepo();
+		}
 		return fRepo;
 	}
 
@@ -390,7 +350,7 @@ public class GitRepositoryTest extends TestCase
 	{
 		testAddBranch();
 
-		assertEquals("master", fRepo.currentBranch());
+		assertCurrentBranch("master");
 		assertSwitchBranch("my_new_branch");
 		assertSwitchBranch("master");
 	}
@@ -399,11 +359,11 @@ public class GitRepositoryTest extends TestCase
 	{
 		testAddBranch();
 
-		assertEquals("master", fRepo.currentBranch());
+		assertCurrentBranch("master");
 		assertSwitchBranch("my_new_branch");
 
 		GitIndex index = fRepo.index();
-		assertTrue(index.changedFiles().isEmpty());
+		assertTrue("Expected changed file listing to be empty", index.changedFiles().isEmpty());
 
 		// Create a new project on this branch!
 		String projectName = "project_on_branch" + System.currentTimeMillis();
@@ -423,22 +383,17 @@ public class GitRepositoryTest extends TestCase
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
-		assertFalse(changed.isEmpty());
-		assertEquals(1, changed.size());
+		assertEquals("repository changed file listing should contain one entry for new .project file, but does not", 1,
+				changed.size());
 
 		// Make sure it's shown as having unstaged changes only and is NEW
-		assertUnstaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		assertNewUnstagedFile(changed.get(0));
 
 		// Stage the new file
-		assertFalse(changed.isEmpty());
-		assertTrue(index.stageFiles(changed));
-		assertStaged(changed.get(0));
-		assertStatus(Status.NEW, changed.get(0));
+		assertStageFiles(index, changed);
+		assertNewStagedFile(changed.get(0));
 
-		index.commit("Initial commit");
-		// No more changed files now...
-		assertTrue(index.changedFiles().isEmpty());
+		assertCommit(index, "Initial commit");
 
 		assertSwitchBranch("master");
 
@@ -471,27 +426,24 @@ public class GitRepositoryTest extends TestCase
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changedFiles = index.changedFiles();
-		assertFalse(changedFiles.isEmpty());
-		assertEquals(1, changedFiles.size());
+		assertEquals(
+				"repository changed file listing should contain one entry for a new file_on_branch.txt file, but does not",
+				1, changedFiles.size());
 
 		// Make sure it's shown as having unstaged changes only and is NEW
-		assertUnstaged(changedFiles.get(0));
-		assertStatus(Status.NEW, changedFiles.get(0));
+		assertNewUnstagedFile(changedFiles.get(0));
 
 		// Stage the new file
-		assertTrue(index.stageFiles(changedFiles));
-		assertStaged(changedFiles.get(0));
-		assertStatus(Status.NEW, changedFiles.get(0));
+		assertStageFiles(index, changedFiles);
+		assertNewStagedFile(changedFiles.get(0));
 
-		index.commit("Initial commit");
-		// No more changed files now...
-		assertTrue(index.changedFiles().isEmpty());
+		assertCommit(index, "Initial commit");
 
 		// Now switch to master
 		assertSwitchBranch("master");
 
 		IStatus status = fRepo.deleteBranch("my_new_branch");
-		assertFalse(status.isOK());
+		assertFalse("Deleting an umerged branch didn't return an error status (as it should)", status.isOK());
 		assertEquals(1, status.getCode());
 		// Can't rely on the unmerged failure message from git to remain the same across versions.
 		// assertEquals(
@@ -557,35 +509,47 @@ public class GitRepositoryTest extends TestCase
 		final GitRepository repo = createRepo();
 		final Random r = new Random();
 		repo.enterWriteProcess();
-		final boolean[] finished = new boolean[1];
-		Thread t2 = new Thread(new Runnable()
+		try
 		{
-
-			public void run()
+			final boolean[] finished = new boolean[1];
+			Thread t2 = new Thread(new Runnable()
 			{
-				for (int i = 0; i < 100; i++)
+
+				public void run()
 				{
-					boolean acquired = repo.enterRead();
-					try
+					for (int i = 0; i < 100; i++)
 					{
-						Thread.sleep(r.nextInt(10));
+						boolean acquired = repo.enterRead();
+						try
+						{
+							Thread.sleep(r.nextInt(10));
+						}
+						catch (InterruptedException e)
+						{
+							e.printStackTrace();
+							return;
+						}
+						finally
+						{
+							if (acquired)
+							{
+								repo.exitRead();
+							}
+						}
 					}
-					catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-					if (acquired)
-					{
-						repo.exitRead();
-					}
+					finished[0] = true;
 				}
-				finished[0] = true;
-			}
-		});
-		t2.start();
-		t2.join(1500);
-		repo.exitWriteProcess();
-		assertTrue("Failed to finish read lock acquiring thread, may be blocked", finished[0]);
+			});
+			t2.start();
+			t2.join(1500);
+			t2.interrupt();
+
+			assertTrue("Failed to finish read lock acquiring thread, may be blocked", finished[0]);
+		}
+		finally
+		{
+			repo.exitWriteProcess();
+		}
 	}
 
 	protected IPath repoToGenerate()
@@ -627,9 +591,68 @@ public class GitRepositoryTest extends TestCase
 		return repo;
 	}
 
-	private void assertStatus(Status status, ChangedFile file)
+	// Git specific assertions
+	protected void assertCurrentBranch(String branchName)
 	{
-		assertEquals(status, file.getStatus());
+		assertEquals("Current branch is incorrect", branchName, fRepo.currentBranch());
+	}
+
+	protected void assertCommit(GitIndex index, String commitMessage)
+	{
+		assertTrue("Failed to commit", index.commit(commitMessage));
+		assertTrue("After a commit, the repository changed file listing should be empty but is not", index
+				.changedFiles().isEmpty());
+	}
+
+	protected void assertUnstageFiles(GitIndex index, List<ChangedFile> changed)
+	{
+		assertTrue("Failed to unstage changes", index.unstageFiles(changed));
+	}
+
+	protected void assertStageFiles(GitIndex index, List<ChangedFile> changed)
+	{
+		assertTrue("Failed to stage changes", index.stageFiles(changed));
+	}
+
+	protected void assertModifiedUnstagedFile(ChangedFile changed)
+	{
+		assertUnstaged(changed);
+		assertStatus(Status.MODIFIED, changed);
+	}
+
+	protected void assertModifiedStagedFile(ChangedFile changed)
+	{
+		assertStaged(changed);
+		assertStatus(Status.MODIFIED, changed);
+	}
+
+	protected void assertDeletedUnstagedFile(ChangedFile changedFile)
+	{
+		assertUnstaged(changedFile);
+		assertStatus(Status.DELETED, changedFile);
+	}
+
+	protected void assertDeletedStagedFile(ChangedFile changedFile)
+	{
+		assertStaged(changedFile);
+		assertStatus(Status.DELETED, changedFile);
+	}
+
+	protected void assertNewStagedFile(ChangedFile changed)
+	{
+		assertStaged(changed);
+		assertStatus(Status.NEW, changed);
+	}
+
+	protected void assertNewUnstagedFile(ChangedFile changed)
+	{
+		assertUnstaged(changed);
+		assertStatus(Status.NEW, changed);
+	}
+
+	protected void assertStatus(Status status, ChangedFile file)
+	{
+		assertEquals("Changed file in git repo has unexpected status", status, file.getStatus());
 	}
 
 	/**
@@ -639,8 +662,8 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected void assertStaged(ChangedFile file)
 	{
-		assertTrue(file.hasStagedChanges());
-		assertFalse(file.hasUnstagedChanges());
+		assertTrue("Changed file in git repo doesn't have expected staged changes", file.hasStagedChanges());
+		assertFalse("Changed file in git repo has unexpected unstaged changes", file.hasUnstagedChanges());
 	}
 
 	/**
@@ -650,8 +673,8 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected void assertUnstaged(ChangedFile file)
 	{
-		assertFalse(file.hasStagedChanges());
-		assertTrue(file.hasUnstagedChanges());
+		assertFalse("Changed file in git repo has unexpected staged changes", file.hasStagedChanges());
+		assertTrue("Changed file in git repo doesn't have expected unstaged changes", file.hasUnstagedChanges());
 	}
 
 	/**
@@ -662,7 +685,34 @@ public class GitRepositoryTest extends TestCase
 	protected void assertSwitchBranch(String branchName)
 	{
 		IStatus status = fRepo.switchBranch(branchName, new NullProgressMonitor());
-		assertTrue(status.isOK());
-		assertEquals(branchName, fRepo.currentBranch());
+		assertTrue("switchBranch returned an unexpected error status", status.isOK());
+		assertCurrentBranch(branchName);
 	}
+
+	/**
+	 * Recursively delete a directory tree.
+	 * 
+	 * @param generatedRepo
+	 */
+	private void delete(File generatedRepo)
+	{
+		if (generatedRepo == null)
+		{
+			return;
+		}
+		File[] children = generatedRepo.listFiles();
+		if (children != null)
+		{
+			for (File child : children)
+			{
+				delete(child);
+			}
+		}
+
+		if (!generatedRepo.delete())
+		{
+			generatedRepo.deleteOnExit();
+		}
+	}
+
 }
