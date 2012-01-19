@@ -51,6 +51,15 @@ import com.aptana.parsing.lexer.IRange;
 public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 
+	/**
+	 * The length of @media rule.
+	 */
+	private static final int MEDIA_AT_RULE_LENGTH = 6;
+	/**
+	 * The length of @page rule.
+	 */
+	private static final int PAGE_AT_RULE_LENGTH = 5;
+
 	private FormatterDocument document;
 
 	@SuppressWarnings("nls")
@@ -194,8 +203,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		// Push an At-Node to control the lines separators.
 		FormatterCSSAtRuleNode atNode = new FormatterCSSAtRuleNode(document);
 		int mediaNodeStart = mediaNode.getStartingOffset();
-		int atMediaLength = 6;
-		atNode.setBegin(createTextNode(document, mediaNodeStart, mediaNodeStart + atMediaLength));
+		atNode.setBegin(createTextNode(document, mediaNodeStart, mediaNodeStart + MEDIA_AT_RULE_LENGTH));
 		push(atNode);
 		checkedPop(atNode, -1);
 
@@ -349,8 +357,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		FormatterCSSAtRuleNode atNode = new FormatterCSSAtRuleNode(document);
 		// +5 for @page length
 		int pageNodeStart = pageNode.getStartingOffset();
-		int atPageLength = 5;
-		atNode.setBegin(createTextNode(document, pageNodeStart, pageNodeStart + atPageLength));
+		atNode.setBegin(createTextNode(document, pageNodeStart, pageNodeStart + PAGE_AT_RULE_LENGTH));
 		push(atNode);
 		checkedPop(atNode, -1);
 
@@ -365,7 +372,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true, false);
 			formatterSelectorNode.setBegin(createTextNode(document,
 					getBeginWithoutWhiteSpaces(pageNodeStart, document),
-					getEndWithoutWhiteSpaces(pageNodeStart + atPageLength, document) + 1));
+					getEndWithoutWhiteSpaces(pageNodeStart + PAGE_AT_RULE_LENGTH, document) + 1));
 			push(formatterSelectorNode);
 			checkedPop(formatterSelectorNode, -1);
 
