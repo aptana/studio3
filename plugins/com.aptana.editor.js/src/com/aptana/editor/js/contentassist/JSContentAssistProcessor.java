@@ -121,12 +121,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		AUTO_ACTIVATION_PARTITION_TYPES.add(IDocument.DEFAULT_CONTENT_TYPE);
 	}
 
-	private JSIndexQueryHelper _indexHelper;
-	private IParseNode _targetNode;
-	private IParseNode _statementNode;
-	private IRange _replaceRange;
-	private IParseListener _parseListener;
-	private IRange _activeRange;
+	private JSIndexQueryHelper indexHelper;
+	private IParseNode targetNode;
+	private IParseNode statementNode;
+	private IRange replaceRange;
+	private IParseListener parseListener;
+	private IRange activeRange;
 
 	/**
 	 * JSIndexContentAssistProcessor
@@ -137,7 +137,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		super(editor);
 
-		_indexHelper = new JSIndexQueryHelper();
+		indexHelper = new JSIndexQueryHelper();
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		this(editor);
 
-		_activeRange = activeRange;
+		this.activeRange = activeRange;
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = _indexHelper.getCoreGlobals();
+		List<PropertyElement> globals = indexHelper.getCoreGlobals();
 
 		if (globals != null)
 		{
@@ -215,7 +215,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				for (String type : param.getTypes())
 				{
-					List<PropertyElement> properties = _indexHelper.getTypeProperties(getIndex(), type);
+					List<PropertyElement> properties = indexHelper.getTypeProperties(getIndex(), type);
 
 					for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 					{
@@ -241,7 +241,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> projectGlobals = _indexHelper.getProjectGlobals(getIndex());
+		List<PropertyElement> projectGlobals = indexHelper.getProjectGlobals(getIndex());
 
 		if (projectGlobals != null && !projectGlobals.isEmpty())
 		{
@@ -270,7 +270,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		JSGetPropertyNode node = ParseUtil.getGetPropertyNode(_targetNode, _statementNode);
+		JSGetPropertyNode node = ParseUtil.getGetPropertyNode(targetNode, statementNode);
 		List<String> types = getParentObjectTypes(node, offset);
 
 		// add all properties of each type to our proposal list
@@ -319,10 +319,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			// calculate what text will be replaced
 			int replaceLength = 0;
 
-			if (_replaceRange != null)
+			if (replaceRange != null)
 			{
-				offset = _replaceRange.getStartingOffset(); // $codepro.audit.disable questionableAssignment
-				replaceLength = _replaceRange.getLength();
+				offset = replaceRange.getStartingOffset(); // $codepro.audit.disable questionableAssignment
+				replaceLength = replaceRange.getLength();
 			}
 
 			// build proposal
@@ -347,9 +347,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addSymbolsInScope(Set<ICompletionProposal> proposals, int offset)
 	{
-		if (_targetNode != null)
+		if (targetNode != null)
 		{
-			JSScope globalScope = ParseUtil.getGlobalScope(_targetNode);
+			JSScope globalScope = ParseUtil.getGlobalScope(targetNode);
 
 			if (globalScope != null)
 			{
@@ -404,13 +404,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		Index index = getIndex();
 
 		// grab all ancestors of the specified type
-		List<String> allTypes = _indexHelper.getTypeAncestorNames(index, typeName);
+		List<String> allTypes = indexHelper.getTypeAncestorNames(index, typeName);
 
 		// include the type in the list as well
 		allTypes.add(0, typeName);
 
 		// add properties and methods
-		List<PropertyElement> properties = _indexHelper.getTypeMembers(index, allTypes);
+		List<PropertyElement> properties = indexHelper.getTypeMembers(index, allTypes);
 
 		for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 		{
@@ -484,13 +484,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ILexemeProvider<JSTokenType> result;
 
 		// NOTE: use active range temporarily until we get proper partitions for JS inside of HTML
-		if (_activeRange != null)
+		if (activeRange != null)
 		{
-			result = new JSFlexLexemeProvider(document, _activeRange, scanner);
+			result = new JSFlexLexemeProvider(document, activeRange, scanner);
 		}
-		else if (_statementNode != null)
+		else if (statementNode != null)
 		{
-			result = new JSFlexLexemeProvider(document, _statementNode, scanner);
+			result = new JSFlexLexemeProvider(document, statementNode, scanner);
 		}
 		else
 		{
@@ -550,11 +550,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				.size()]);
 
 		// select the current proposal based on the prefix
-		if (_replaceRange != null)
+		if (replaceRange != null)
 		{
 			try
 			{
-				String prefix = document.get(_replaceRange.getStartingOffset(), _replaceRange.getLength());
+				String prefix = document.get(replaceRange.getStartingOffset(), replaceRange.getLength());
 
 				setSelectedProposal(prefix, resultList);
 			}
@@ -686,14 +686,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (node != null)
 		{
 			// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
-			IRange range = _replaceRange;
+			IRange range = replaceRange;
 
 			// grab the content assist location type for the symbol before the arguments list
 			int functionOffset = node.getStartingOffset();
 			LocationType location = getLocation(viewer.getDocument(), functionOffset);
 
 			// restore replace range
-			_replaceRange = range;
+			replaceRange = range;
 
 			// init type and method names
 			String typeName = null;
@@ -728,8 +728,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (typeName != null && methodName != null)
 			{
-				List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName,
-						methodName);
+				List<PropertyElement> properties = indexHelper.getTypeMembers(getIndex(), typeName, methodName);
 
 				if (properties != null)
 				{
@@ -761,9 +760,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		JSLocationIdentifier identifier = new JSLocationIdentifier(offset, getActiveASTNode(offset - 1));
 		LocationType result = identifier.getType();
 
-		_targetNode = identifier.getTargetNode();
-		_statementNode = identifier.getStatementNode();
-		_replaceRange = identifier.getReplaceRange();
+		targetNode = identifier.getTargetNode();
+		statementNode = identifier.getStatementNode();
+		replaceRange = identifier.getReplaceRange();
 
 		// if we couldn't determine the location type with the AST, then
 		// fallback to using lexemes
@@ -952,7 +951,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		return ParseUtil.getParentObjectTypes(getIndex(), getURI(), _targetNode, node, offset);
+		return ParseUtil.getParentObjectTypes(getIndex(), getURI(), targetNode, node, offset);
 	}
 
 	/**
@@ -962,9 +961,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected IParseListener getParseListener()
 	{
-		if (_parseListener == null)
+		if (parseListener == null)
 		{
-			_parseListener = new IParseListener()
+			parseListener = new IParseListener()
 			{
 				public void afterParse(IParseState parseState)
 				{
@@ -1000,7 +999,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			};
 		}
 
-		return _parseListener;
+		return parseListener;
 	}
 
 	/*
@@ -1019,7 +1018,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	IRange getReplaceRange()
 	{
-		return _replaceRange;
+		return replaceRange;
 	}
 
 	/*
@@ -1096,6 +1095,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public void setActiveRange(IRange activeRange)
 	{
-		_activeRange = activeRange;
+		this.activeRange = activeRange;
 	}
 }
