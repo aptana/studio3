@@ -1,16 +1,44 @@
 package com.aptana.git.core.model;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
-public class GitIndexTest extends GitTestCase
+public class GitIndexTest extends TestCase
 {
+
+	private GitRepository fRepo;
+	private IPath fPath;
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		try
+		{
+			File generatedRepo = fRepo.workingDirectory().toFile();
+			if (generatedRepo.exists())
+			{
+				delete(generatedRepo);
+			}
+			fRepo = null;
+			fPath = null;
+		}
+		finally
+		{
+			super.tearDown();
+		}
+	}
 
 	public void testStageFilesUpdatesStagedFlagsOnAffectedFiles() throws Exception
 	{
@@ -122,9 +150,73 @@ public class GitIndexTest extends GitTestCase
 				fileToStage.hasUnstagedChanges());
 	}
 
+	protected GitRepository createRepo()
+	{
+		return createRepo(repoToGenerate());
+	}
+
+	/**
+	 * Create a git repo and make sure it actually generate a model object and not null
+	 * 
+	 * @param path
+	 * @return
+	 */
+	protected GitRepository createRepo(IPath path)
+	{
+		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
+		getGitRepositoryManager().create(path);
+		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
+		assertNotNull(repo);
+		fRepo = repo;
+		// Remove the auto-generated .gitignore file!
+		fRepo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
+		return repo;
+	}
+
+	protected IPath repoToGenerate()
+	{
+		if (fPath == null)
+		{
+			String tmpDirString = System.getProperty("java.io.tmpdir");
+			fPath = new Path(tmpDirString).append("git_repo" + System.currentTimeMillis());
+		}
+		return fPath;
+	}
+
+	/**
+	 * Recursively delete a directory tree.
+	 * 
+	 * @param generatedRepo
+	 */
+	private void delete(File generatedRepo)
+	{
+		if (generatedRepo == null)
+		{
+			return;
+		}
+		File[] children = generatedRepo.listFiles();
+		if (children != null)
+		{
+			for (File child : children)
+			{
+				delete(child);
+			}
+		}
+
+		if (!generatedRepo.delete())
+		{
+			generatedRepo.deleteOnExit();
+		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
 	public void testDeadlock() throws Exception
 	{
-		final GitRepository repo = getRepo();
+		final GitRepository repo = createRepo();
 		final GitIndex index = repo.index();
 		final Object notifier = new Object();
 		final boolean[] finished = new boolean[2];
