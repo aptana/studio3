@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
+import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.Index;
 
@@ -42,6 +43,13 @@ public class JSElement extends BaseElement<JSElement.Property>
 			{
 				// TODO: don't emit children that have zero classes?
 				return 2;
+			}
+		},
+		VERSION(Messages.JSElement_Version)
+		{
+			public Object getPropertyValue(JSElement node)
+			{
+				return IJSIndexConstants.INDEX_VERSION;
 			}
 		};
 

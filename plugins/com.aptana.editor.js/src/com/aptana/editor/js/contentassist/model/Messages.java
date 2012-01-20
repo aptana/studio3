@@ -26,6 +26,7 @@ public class Messages extends NLS
 	public static String JSElement_IndexFile;
 	public static String JSElement_Name;
 	public static String JSElement_NodeLabel;
+	public static String JSElement_Version;
 	public static String PropertyElement_Description;
 	public static String PropertyElement_Documents;
 	public static String PropertyElement_InstanceProperty;
