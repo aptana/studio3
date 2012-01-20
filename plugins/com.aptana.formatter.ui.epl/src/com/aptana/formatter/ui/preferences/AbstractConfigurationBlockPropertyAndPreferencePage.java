@@ -102,7 +102,7 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	public final void setElement(IAdaptable element)
 	{
 		super.setElement(element);
-		// no description for property page
+		// no description for property page.
 		setDescription(null);
 	}
 

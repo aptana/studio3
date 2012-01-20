@@ -37,9 +37,9 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.Lexeme;
 
 /**
- * ASTUtil
+ * ParseUtil
  */
-public class ASTUtil
+public class ParseUtil
 {
 	private static class FunctionParameterParser
 	{
@@ -57,7 +57,7 @@ public class ASTUtil
 		}
 
 		/**
-		 * Advance to the next token in the token stream. The currentLexeme is updated approporiately. If we advance
+		 * Advance to the next token in the token stream. The currentLexeme is updated appropriately. If we advance
 		 * beyond the end of the stream, currentLexeme will be null indicating an EOF condition
 		 */
 		private void advance()
@@ -430,7 +430,7 @@ public class ASTUtil
 
 		if (getPropertyNode != null)
 		{
-			JSScope localScope = ASTUtil.getScopeAtOffset(targetNode, offset);
+			JSScope localScope = ParseUtil.getScopeAtOffset(targetNode, offset);
 
 			if (localScope != null)
 			{
@@ -495,7 +495,7 @@ public class ASTUtil
 		JSScope result = null;
 
 		// grab global scope
-		JSScope global = ASTUtil.getGlobalScope(node);
+		JSScope global = ParseUtil.getGlobalScope(node);
 
 		if (global != null)
 		{
@@ -510,7 +510,7 @@ public class ASTUtil
 	/**
 	 * Prevent instantiation of this class
 	 */
-	private ASTUtil()
+	private ParseUtil()
 	{
 	}
 }

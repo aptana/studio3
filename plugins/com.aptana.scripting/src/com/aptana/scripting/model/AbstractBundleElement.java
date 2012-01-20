@@ -7,7 +7,7 @@
  */
 package com.aptana.scripting.model;
 
-import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.MatchAnyScopeSelector;
 import com.aptana.scope.ScopeSelector;
@@ -135,7 +135,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 			scope = null;
 		}
 
-		if (StringUtil.areNotEqual(this._scope, scope))
+		if (ObjectUtil.areNotEqual(this._scope, scope))
 		{
 			this._scope = scope;
 			this._scopeSelector = null;

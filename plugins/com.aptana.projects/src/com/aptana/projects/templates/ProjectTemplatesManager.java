@@ -221,9 +221,8 @@ public class ProjectTemplatesManager
 
 	private void loadTemplatesFromBundles()
 	{
-		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
-
 			public boolean include(AbstractElement element)
 			{
 				return (element instanceof ProjectTemplateElement);

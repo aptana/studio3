@@ -428,7 +428,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			remotesViewer.getControl().setLayoutData(
 					GridDataFactory.swtDefaults().exclude(!showRemote).align(SWT.FILL, SWT.CENTER).span(2, 1)
 							.grab(true, false).create());
-			remotesViewer.setContentProvider(new ArrayContentProvider());
+			remotesViewer.setContentProvider(ArrayContentProvider.getInstance());
 			remotesViewer.addSelectionChangedListener(this);
 			updateRemotesViewer();
 
@@ -448,7 +448,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 			projectViewer = new ComboViewer(mainComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 			projectViewer.getControl().setLayoutData(
 					GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(3, 1).grab(true, false).create());
-			projectViewer.setContentProvider(new ArrayContentProvider());
+			projectViewer.setContentProvider(ArrayContentProvider.getInstance());
 			if (projects.length == 0)
 			{
 				projectViewer.setLabelProvider(new LabelProvider());

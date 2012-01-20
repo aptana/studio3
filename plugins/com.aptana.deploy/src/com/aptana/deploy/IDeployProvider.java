@@ -31,4 +31,12 @@ public interface IDeployProvider
 	 * @return
 	 */
 	public boolean handles(IContainer selectedContainer);
+
+	/**
+	 * Returns the text of the menu item for deploying. If null is returned, the name associated with the deploy command
+	 * will be used.
+	 * 
+	 * @return the text of the menu item, or null if the default name for the deploy command should be used
+	 */
+	public String getDeployMenuName();
 }

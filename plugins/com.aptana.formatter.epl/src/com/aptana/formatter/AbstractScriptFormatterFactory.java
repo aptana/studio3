@@ -171,7 +171,8 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		}
 		else
 		{
-			int selectedTabValue = Integer.parseInt(preferences.get(getFormatterTabSizeKey()));
+			String prefTabSize = preferences.get(getFormatterTabSizeKey());
+			int selectedTabValue = (prefTabSize != null) ? Integer.parseInt(prefTabSize) : 0;
 			if (selectedTabValue == editorTabSize)
 			{
 				if (selectedTabValue == getDefaultEditorTabSize())

@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRef;
 
@@ -63,7 +64,7 @@ class CommitGraphTable extends TableViewer
 
 		final TableColumn graph = new TableColumn(table, SWT.NONE);
 		graph.setResizable(true);
-		graph.setText(""); //$NON-NLS-1$
+		graph.setText(StringUtil.EMPTY);
 		graph.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(20, true));
 
@@ -79,7 +80,7 @@ class CommitGraphTable extends TableViewer
 		date.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(5, true));
 
-		setContentProvider(new ArrayContentProvider());
+		setContentProvider(ArrayContentProvider.getInstance());
 		setLabelProvider(new CommitLabelProvider());
 
 		createPaintListener(table);
@@ -172,7 +173,9 @@ class CommitGraphTable extends TableViewer
 		{
 			GitCommit commit = (GitCommit) element;
 			if (commit == null)
-				return ""; //$NON-NLS-1$
+			{
+				return StringUtil.EMPTY;
+			}
 			switch (columnIndex)
 			{
 				case 0:
@@ -182,7 +185,7 @@ class CommitGraphTable extends TableViewer
 				case 2:
 					return fmt.format(commit.date());
 				default:
-					return ""; //$NON-NLS-1$
+					return StringUtil.EMPTY;
 			}
 		}
 
@@ -400,7 +403,5 @@ class CommitGraphTable extends TableViewer
 			g.setBackground(cellBG);
 			g.drawString(msg, cellX + x, cellY + texty, true);
 		}
-
 	}
-
 }

@@ -9,15 +9,24 @@ package com.aptana.core.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
+
 public class CollectionsUtilTest extends TestCase
 {
+	private IMap<Object, String> toStringMap = new IMap<Object, String>()
+	{
+		public String map(Object item)
+		{
+			return (item != null) ? item.toString() : StringUtil.EMPTY;
+		}
+	};
 
 	public void testRemoveDuplicates() throws Exception
 	{
@@ -97,22 +106,148 @@ public class CollectionsUtilTest extends TestCase
 
 	public void testNewList()
 	{
-		List<String> list = new ArrayList<String>();
-		assertEquals(list, CollectionsUtil.newList((String[]) null));
+		List<String> list = CollectionsUtil.newList("item1", "item2");
 
-		list.add("item1");
-		list.add("item2");
-		assertEquals(list, CollectionsUtil.newList("item1", "item2"));
+		assertNotNull(list);
+		assertEquals("The list should have only two items", 2, list.size());
+		assertEquals("'item1' should be at index 0", 0, list.indexOf("item1"));
+		assertEquals("'item2' should be at index 1", 1, list.indexOf("item2"));
+	}
+
+	public void testNewListNullItems()
+	{
+		String[] items = null;
+		List<String> list = CollectionsUtil.newList(items);
+
+		assertNotNull(list);
+		assertTrue("List should be empty", list.isEmpty());
+	}
+
+	public void testAddToListSubclass()
+	{
+		Number doubleOne = 1.0;
+		Number intOne = 1;
+		Float floatOne = 1.0f;
+
+		// generate initial set
+		List<Number> list = CollectionsUtil.newList(doubleOne, intOne);
+
+		// add sub-type of Number
+		CollectionsUtil.addToList(list, floatOne);
+
+		assertEquals("The list should have only three items", 3, list.size());
+		assertEquals("Double 1.0 should be at index 0", 0, list.indexOf(doubleOne));
+		assertEquals("Integer 1 should be at index 1", 1, list.indexOf(intOne));
+		assertEquals("Float 1.0f should be at index 2", 2, list.indexOf(floatOne));
+	}
+
+	public void testAddToList()
+	{
+		List<String> list = CollectionsUtil.newList("a", "b");
+		assertNotNull(list);
+
+		CollectionsUtil.addToList(list, "c");
+		assertEquals("The list should have only three items", 3, list.size());
+		assertEquals("'a' should be at index 0", 0, list.indexOf("a"));
+		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
+		assertEquals("'c' should be at index 2", 2, list.indexOf("c"));
+	}
+
+	public void testAddToListNullItems()
+	{
+		List<String> list = CollectionsUtil.newList("a", "b");
+		assertNotNull(list);
+
+		String[] items = null;
+		CollectionsUtil.addToList(list, items);
+		assertEquals("The list should have only three items", 2, list.size());
+		assertEquals("'a' should be at index 0", 0, list.indexOf("a"));
+		assertEquals("'b' should be at index 1", 1, list.indexOf("b"));
+	}
+
+	public void testAddToListNullList()
+	{
+		try
+		{
+			CollectionsUtil.addToList(null, "a", "b", "c");
+		}
+		catch (Throwable t)
+		{
+			fail(t.getMessage());
+		}
 	}
 
 	public void testNewSet()
 	{
-		Set<String> list = new HashSet<String>();
-		assertEquals(list, CollectionsUtil.newSet((String[]) null));
+		Set<String> set = CollectionsUtil.newSet("item1", "item2");
 
-		list.add("item1");
-		list.add("item2");
-		assertEquals(list, CollectionsUtil.newSet("item1", "item2"));
+		assertNotNull(set);
+		assertEquals("The set should have only two items", 2, set.size());
+		assertTrue("'item1' should exist in the set", set.contains("item1"));
+		assertTrue("'item2' should exist in the set", set.contains("item2"));
+	}
+
+	public void testNewSetNullItems()
+	{
+		String[] items = null;
+		Set<String> set = CollectionsUtil.newSet(items);
+
+		assertNotNull(set);
+		assertTrue("Set should be empty", set.isEmpty());
+	}
+
+	public void testAddToSetSubclass()
+	{
+		Number doubleOne = 1.0;
+		Number intOne = 1;
+		Float floatOne = 1.0f;
+
+		// generate initial set
+		Set<Number> set = CollectionsUtil.newSet(doubleOne, intOne);
+
+		// add sub-type of Number
+		CollectionsUtil.addToSet(set, floatOne);
+
+		assertEquals("The set should have only three items", 3, set.size());
+		assertTrue("Set should contain double 1.0", set.contains(doubleOne));
+		assertTrue("Set should contain integer 1", set.contains(intOne));
+		assertTrue("Set should contain float 1.0f", set.contains(floatOne));
+	}
+
+	public void testAddToSet()
+	{
+		Set<String> set = CollectionsUtil.newSet("a", "b");
+		assertNotNull(set);
+
+		CollectionsUtil.addToSet(set, "c");
+		assertEquals("The set should have only three items", 3, set.size());
+		assertTrue("'a' should exist in the set", set.contains("a"));
+		assertTrue("'b' should exist in the set", set.contains("b"));
+		assertTrue("'c' should exist in the set", set.contains("c"));
+	}
+
+	public void testAddToSetNullItems()
+	{
+		Set<String> set = CollectionsUtil.newSet("a", "b");
+		assertNotNull(set);
+
+		String[] items = null;
+		CollectionsUtil.addToSet(set, items);
+		assertEquals("The set should have only two items", 2, set.size());
+		assertTrue("'a' should exist in the set", set.contains("a"));
+		assertTrue("'b' should exist in the set", set.contains("b"));
+	}
+
+	public void testAddToSetNullSet()
+	{
+		try
+		{
+			CollectionsUtil.addToSet(null, "a", "b", "c");
+		}
+		catch (Throwable t)
+		{
+			fail(t.getMessage());
+		}
 	}
 
 	public void testNewInOrderSet()
@@ -123,5 +258,220 @@ public class CollectionsUtilTest extends TestCase
 		list.add("item1");
 		list.add("item2");
 		assertEquals(list, CollectionsUtil.newInOrderSet("item1", "item2"));
+	}
+
+	public void testCollectionFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> filteredList = CollectionsUtil.filter(list, selectWithA);
+
+		assertNotNull(filteredList);
+		assertEquals("List should contain 3 items", 3, filteredList.size());
+		assertTrue("List should contain 'a'", filteredList.contains("a"));
+		assertTrue("List should contain 'ab'", filteredList.contains("ab"));
+		assertTrue("List should contain 'ba'", filteredList.contains("ba"));
+	}
+
+	public void testCollectionFilterNullCollection()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> filteredList = CollectionsUtil.filter(null, selectWithA);
+
+		assertNotNull(filteredList);
+		assertEquals("List should contain 0 items", 0, filteredList.size());
+	}
+
+	public void testCollectionFilterNullFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		List<String> filteredList = CollectionsUtil.filter(list, null);
+
+		assertNotNull(filteredList);
+		assertEquals("List should contain 6 items", 6, filteredList.size());
+	}
+
+	public void testCollectionFilterInPlace()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+
+		CollectionsUtil.filterInPlace(list, selectWithA);
+
+		assertEquals("List should contain 3 items", 3, list.size());
+		assertTrue("List should contain 'a'", list.contains("a"));
+		assertTrue("List should contain 'ab'", list.contains("ab"));
+		assertTrue("List should contain 'ba'", list.contains("ba"));
+	}
+
+	public void testCollectionFilterInPlaceNullCollection()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+
+		try
+		{
+			CollectionsUtil.filterInPlace(null, selectWithA);
+		}
+		catch (Throwable t)
+		{
+			fail("CollectionsUtil.filterInPlace should not throw an exception with a null collection");
+		}
+	}
+
+	public void testCollectionFilterInPlaceNullFilter()
+	{
+		List<String> list = CollectionsUtil.newList("a", "ab", "ba", "b", "bc", "cb");
+		CollectionsUtil.filterInPlace(list, null);
+
+		assertEquals("List should contain 6 items", 6, list.size());
+	}
+
+	public void testCollectionFilterWithDestinationCollection()
+	{
+		List<String> list1 = CollectionsUtil.newList("a", "b", "c");
+		List<String> list2 = CollectionsUtil.newList("ab", "ba", "bc", "cb");
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> accumulator = new ArrayList<String>();
+
+		CollectionsUtil.filter(list1, accumulator, selectWithA);
+		CollectionsUtil.filter(list2, accumulator, selectWithA);
+
+		assertNotNull(accumulator);
+		assertEquals("List should contain 3 items", 3, accumulator.size());
+		assertTrue("List should contain 'a'", accumulator.contains("a"));
+		assertTrue("List should contain 'ab'", accumulator.contains("ab"));
+		assertTrue("List should contain 'ba'", accumulator.contains("ba"));
+	}
+
+	public void testCollectionFilterWithDestinationCollectionNullSource()
+	{
+		IFilter<String> selectWithA = new IFilter<String>()
+		{
+			public boolean include(String item)
+			{
+				return (item != null && item.contains("a"));
+			}
+		};
+		List<String> accumulator = new ArrayList<String>();
+
+		try
+		{
+			CollectionsUtil.filter(null, accumulator, selectWithA);
+		}
+		catch (Throwable t)
+		{
+			fail("CollectionsUtil.filter should not throw an exception with a null destination collection");
+		}
+
+		assertEquals("List should contain 0 items", 0, accumulator.size());
+	}
+
+	public void testCollectionFilterWithDestinationCollectionNullFilter()
+	{
+		List<String> list1 = CollectionsUtil.newList("a", "b", "c");
+		List<String> list2 = CollectionsUtil.newList("ab", "ba", "bc", "cb");
+		List<String> accumulator = new ArrayList<String>();
+
+		CollectionsUtil.filter(list1, accumulator, null);
+		CollectionsUtil.filter(list2, accumulator, null);
+
+		assertNotNull(accumulator);
+		assertEquals("List should contain 7 items", 7, accumulator.size());
+	}
+
+	public void testMapObjectToString()
+	{
+		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
+		assertNotNull(numbers);
+		assertEquals(3, numbers.size());
+
+		List<String> strings = CollectionsUtil.map(numbers, toStringMap);
+		assertNotNull(strings);
+		assertEquals(numbers.size(), strings.size());
+		assertEquals("'1' should be at index 0", 0, strings.indexOf("1"));
+		assertEquals("'2' should be at index 0", 1, strings.indexOf("2"));
+		assertEquals("'3' should be at index 0", 2, strings.indexOf("3"));
+	}
+
+	public void testMapNullCollection()
+	{
+		Collection<Object> items = null;
+		List<String> strings = CollectionsUtil.map(items, toStringMap);
+
+		assertNotNull(strings);
+		assertTrue(strings.isEmpty());
+	}
+
+	public void testMapNullMapper()
+	{
+		List<Integer> numbers = CollectionsUtil.newList(1, 2, 3);
+		List<String> strings = CollectionsUtil.map(numbers, null);
+
+		assertNotNull(strings);
+		assertTrue(strings.isEmpty());
+	}
+
+	public void testMapNullSource()
+	{
+		Collection<Object> source = null;
+		List<String> destination = new ArrayList<String>();
+
+		CollectionsUtil.map(source, destination, toStringMap);
+
+		assertTrue(destination.isEmpty());
+	}
+
+	public void testMapNullDestination()
+	{
+		List<Integer> source = CollectionsUtil.newList(1, 2, 3);
+		List<String> destination = null;
+
+		try
+		{
+			CollectionsUtil.map(source, destination, toStringMap);
+		}
+		catch (Throwable t)
+		{
+			fail(t.getMessage());
+		}
+	}
+
+	public void testMapNullMapper2()
+	{
+		List<Integer> source = CollectionsUtil.newList(1, 2, 3);
+		List<String> destination = new ArrayList<String>();
+
+		CollectionsUtil.map(source, destination, null);
+		assertTrue(destination.isEmpty());
 	}
 }

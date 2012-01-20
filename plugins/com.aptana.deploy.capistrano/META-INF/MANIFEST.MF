@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Capistrano Deployment
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.deploy.capistrano;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.deploy.capistrano.CapistranoPlugin
-Bundle-Vendor: Appcelerator, Inc.
+Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.ui,

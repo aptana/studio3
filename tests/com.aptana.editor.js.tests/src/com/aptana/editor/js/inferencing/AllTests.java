@@ -18,6 +18,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(ConstructorInferencingTests.class);
 		suite.addTestSuite(DocumentationTests.class);
+		suite.addTestSuite(DynamicTypeInferencingTests.class);
 		suite.addTestSuite(FunctionInferencingTests.class);
 		suite.addTestSuite(InferencingBugs.class);
 		suite.addTestSuite(ObjectInferencingTests.class);

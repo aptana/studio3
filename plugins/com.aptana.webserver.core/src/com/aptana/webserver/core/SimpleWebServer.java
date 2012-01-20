@@ -24,6 +24,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A simple web server configuration. This simply assumes a server mapping to a local document root. Users cannot start,
@@ -74,7 +75,7 @@ public class SimpleWebServer extends AbstractWebServer
 			}
 			catch (MalformedURLException e)
 			{
-				WebServerCorePlugin.log(e);
+				IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 			}
 		}
 		child = memento.getChild(ELEMENT_DOCUMENT_ROOT);
@@ -89,7 +90,7 @@ public class SimpleWebServer extends AbstractWebServer
 				}
 				catch (IllegalArgumentException e)
 				{
-					WebServerCorePlugin.log(e);
+					IdeLog.logError(WebServerCorePlugin.getDefault(), e);
 				}
 			}
 		}

@@ -61,7 +61,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 * @param typeName
 	 * @return
 	 */
-	private TypeElement getType(String typeName)
+	private List<TypeElement> getType(String typeName)
 	{
 		JSIndexReader reader = new JSIndexReader();
 
@@ -127,7 +127,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeOnly.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -145,7 +146,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithMethod.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -176,7 +178,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithProperty.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());
@@ -202,7 +205,8 @@ public class JSMetadataIndexWriterTests extends TestCase
 
 		// transfer XML to index and grab our class of interest
 		this.writeMetadataResource("/metadata/typeWithDescription.xml");
-		TypeElement retrievedType = this.getType(typeName);
+		List<TypeElement> retrievedTypes = this.getType(typeName);
+		TypeElement retrievedType = retrievedTypes.get(0);
 
 		assertNotNull(retrievedType);
 		assertEquals(typeName, retrievedType.getName());

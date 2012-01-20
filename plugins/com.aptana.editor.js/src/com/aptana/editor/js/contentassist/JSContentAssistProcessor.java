@@ -9,7 +9,11 @@ package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +29,9 @@ import org.eclipse.swt.graphics.Image;
 
 import beaver.Scanner;
 
+import com.aptana.core.IFilter;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
@@ -62,15 +68,53 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
+	/**
+	 * This class is used via {@link CollectionsUtil#filter(Collection, IFilter)} to remove duplicate proposals based on
+	 * display names. Duplicate proposals are merged into a single entry
+	 */
+	public class ProposalMerger implements IFilter<ICompletionProposal>
+	{
+		private ICompletionProposal lastProposal = null;
+
+		public boolean include(ICompletionProposal item)
+		{
+			boolean result;
+
+			if (lastProposal == null || !lastProposal.getDisplayString().equals(item.getDisplayString()))
+			{
+				result = true;
+				lastProposal = item;
+			}
+			else
+			{
+				result = false;
+				// TODO: merge proposal with last proposal
+			}
+
+			return result;
+		}
+	}
+
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final Image JS_KEYWORD = JSPlugin.getImage("/icons/keyword.png"); //$NON-NLS-1$
+	private static final IFilter<PropertyElement> isVisibleFilter = new IFilter<PropertyElement>()
+	{
+		public boolean include(PropertyElement item)
+		{
+			return !item.isInternal();
+		}
+	};
 
-	private static String[] KEYWORDS = ArrayUtil.flatten(JSLanguageConstants.KEYWORD_OPERATORS,
-			JSLanguageConstants.GRAMMAR_KEYWORDS, JSLanguageConstants.KEYWORD_CONTROL);
+	// @formatter:off
+	private static String[] KEYWORDS = ArrayUtil.flatten(
+		JSLanguageConstants.KEYWORD_OPERATORS,
+		JSLanguageConstants.GRAMMAR_KEYWORDS,
+		JSLanguageConstants.KEYWORD_CONTROL
+	);
+	// @formatter:on
 
 	private static Set<String> AUTO_ACTIVATION_PARTITION_TYPES;
-
 	{
 		AUTO_ACTIVATION_PARTITION_TYPES = new HashSet<String>();
 		AUTO_ACTIVATION_PARTITION_TYPES.add(JSSourceConfiguration.DEFAULT);
@@ -82,22 +126,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private IParseNode _statementNode;
 	private IRange _replaceRange;
 	private IParseListener _parseListener;
-
-	// NOTE: temp (I hope) until we get proper partitions for JS inside of HTML
 	private IRange _activeRange;
-
-	/**
-	 * JSContentAssistProcessor
-	 * 
-	 * @param editor
-	 * @param activeRange
-	 */
-	public JSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
-	{
-		this(editor);
-
-		_activeRange = activeRange;
-	}
 
 	/**
 	 * JSIndexContentAssistProcessor
@@ -112,12 +141,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * The currently active range
+	 * JSContentAssistProcessor
 	 * 
+	 * @param editor
 	 * @param activeRange
 	 */
-	public void setActiveRange(IRange activeRange)
+	public JSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
 	{
+		this(editor);
+
 		_activeRange = activeRange;
 	}
 
@@ -136,7 +168,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			URI projectURI = getProjectURI();
 			String location = IJSIndexConstants.CORE;
 
-			for (PropertyElement property : globals)
+			for (PropertyElement property : CollectionsUtil.filter(globals, isVisibleFilter))
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
@@ -145,6 +177,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
+		}
+	}
+
+	/**
+	 * @param prefix
+	 * @param completionProposals
+	 */
+	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
+	{
+		for (String name : KEYWORDS)
+		{
+			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
+			addProposal(proposals, name, JS_KEYWORD, description, getActiveUserAgentIds(),
+					Messages.JSContentAssistProcessor_KeywordLocation, offset);
 		}
 	}
 
@@ -171,7 +217,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					List<PropertyElement> properties = _indexHelper.getTypeProperties(getIndex(), type);
 
-					for (PropertyElement property : properties)
+					for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 					{
 						String name = property.getName();
 						String description = JSModelFormatter.getDescription(property, getProjectURI());
@@ -202,7 +248,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			String[] userAgentNames = getActiveUserAgentIds();
 			URI projectURI = getProjectURI();
 
-			for (PropertyElement property : projectGlobals)
+			for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
 			{
 				String name = property.getName();
 				String description = JSModelFormatter.getDescription(property, projectURI);
@@ -224,27 +270,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		JSGetPropertyNode node = ASTUtil.getGetPropertyNode(_targetNode, _statementNode);
+		JSGetPropertyNode node = ParseUtil.getGetPropertyNode(_targetNode, _statementNode);
 		List<String> types = getParentObjectTypes(node, offset);
 
 		// add all properties of each type to our proposal list
 		for (String type : types)
 		{
 			addTypeProperties(proposals, type, offset);
-		}
-	}
-
-	/**
-	 * @param prefix
-	 * @param completionProposals
-	 */
-	private void addKeywords(Set<ICompletionProposal> proposals, int offset)
-	{
-		for (String name : KEYWORDS)
-		{
-			String description = StringUtil.format(Messages.JSContentAssistProcessor_KeywordDescription, name);
-			addProposal(proposals, name, JS_KEYWORD, description, getActiveUserAgentIds(),
-					Messages.JSContentAssistProcessor_KeywordLocation, offset);
 		}
 	}
 
@@ -317,22 +349,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		if (_targetNode != null)
 		{
-			JSScope globalScope = ASTUtil.getGlobalScope(_targetNode);
+			JSScope globalScope = ParseUtil.getGlobalScope(_targetNode);
 
 			if (globalScope != null)
 			{
 				JSScope localScope = globalScope.getScopeAtOffset(offset);
+				String fileLocation = getFilename();
+				String[] userAgentNames = getActiveUserAgentIds();
 
-				if (localScope != null)
+				while (localScope != null && localScope != globalScope)
 				{
-					String fileLocation = getFilename();
-					String[] userAgentNames = getActiveUserAgentIds();
-					List<String> symbols = localScope.getSymbolNames();
+					List<String> symbols = localScope.getLocalSymbolNames();
 
 					for (String symbol : symbols)
 					{
 						boolean isFunction = false;
-						JSPropertyCollection object = localScope.getSymbol(symbol);
+						JSPropertyCollection object = localScope.getLocalSymbol(symbol);
 						List<JSNode> nodes = object.getValues();
 
 						if (nodes != null)
@@ -353,6 +385,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 						addProposal(proposals, name, image, description, userAgentNames, fileLocation, offset);
 					}
+
+					localScope = localScope.getParentScope();
 				}
 			}
 		}
@@ -378,7 +412,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		List<PropertyElement> properties = _indexHelper.getTypeMembers(index, allTypes);
 
-		for (PropertyElement property : properties)
+		for (PropertyElement property : CollectionsUtil.filter(properties, isVisibleFilter))
 		{
 			String name = property.getName();
 			String description = JSModelFormatter.getDescription(property, getProjectURI());
@@ -476,12 +510,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
 			boolean autoActivated)
 	{
-		IDocument document = viewer.getDocument();
-		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
+		// NOTE: Using a linked hash set to preserve add-order. We need this in case we end up filtering proposals. This
+		// will give precedence to the first of a collection of proposals with like names
+		Set<ICompletionProposal> result = new LinkedHashSet<ICompletionProposal>();
 
-		// first step is to determine where we are
+		// grab document
+		IDocument document = viewer.getDocument();
+
+		// determine the content assist location type
 		LocationType location = getLocation(document, offset);
 
+		// process the resulting location
 		switch (location)
 		{
 			case IN_PROPERTY_NAME:
@@ -494,7 +533,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				addKeywords(result, offset);
 				addCoreGlobals(result, offset);
 				addProjectGlobals(result, offset);
-				addSymbolsInScope(result, offset);
+				// addSymbolsInScope(result, offset);
 				break;
 
 			case IN_OBJECT_LITERAL_PROPERTY:
@@ -505,14 +544,18 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 		}
 
-		ICompletionProposal[] resultList = result.toArray(new ICompletionProposal[result.size()]);
+		// merge and remove duplicates from the proposal list
+		List<ICompletionProposal> filteredProposalList = getMergedProposals(new ArrayList<ICompletionProposal>(result));
+		ICompletionProposal[] resultList = filteredProposalList.toArray(new ICompletionProposal[filteredProposalList
+				.size()]);
 
-		// select the current proposal based on the range
+		// select the current proposal based on the prefix
 		if (_replaceRange != null)
 		{
 			try
 			{
 				String prefix = document.get(_replaceRange.getStartingOffset(), _replaceRange.getLength());
+
 				setSelectedProposal(prefix, resultList);
 			}
 			catch (BadLocationException e) // $codepro.audit.disable emptyCatchClause
@@ -667,7 +710,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				case IN_PROPERTY_NAME:
 				{
-					JSGetPropertyNode propertyNode = ASTUtil.getGetPropertyNode(node,
+					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(node,
 							((JSNode) node).getContainingStatementNode());
 					List<String> types = getParentObjectTypes(propertyNode, offset);
 
@@ -685,11 +728,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (typeName != null && methodName != null)
 			{
-				PropertyElement property = _indexHelper.getTypeMember(getIndex(), typeName, methodName);
+				List<PropertyElement> properties = this._indexHelper.getTypeMembers(this.getIndex(), typeName,
+						methodName);
 
-				if (property instanceof FunctionElement)
+				if (properties != null)
 				{
-					result = (FunctionElement) property;
+					// TODO: Should we do anything special if there is more than one function?
+					for (PropertyElement property : properties)
+					{
+						if (property instanceof FunctionElement)
+						{
+							result = (FunctionElement) property;
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -845,6 +897,53 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * @param result
+	 * @return
+	 */
+	protected List<ICompletionProposal> getMergedProposals(List<ICompletionProposal> proposals)
+	{
+		// order proposals by display name
+		Collections.sort(proposals, new Comparator<ICompletionProposal>()
+		{
+			public int compare(ICompletionProposal o1, ICompletionProposal o2)
+			{
+				int result = getImageIndex(o1) - getImageIndex(o2);
+
+				if (result == 0)
+				{
+					result = o1.getDisplayString().compareTo(o2.getDisplayString());
+				}
+
+				return result;
+			}
+
+			protected int getImageIndex(ICompletionProposal proposal)
+			{
+				Image image = proposal.getImage();
+				int result = 0;
+
+				if (image == JS_KEYWORD)
+				{
+					result = 1;
+				}
+				else if (image == JS_PROPERTY)
+				{
+					result = 2;
+				}
+				else if (image == JS_PROPERTY)
+				{
+					result = 3;
+				}
+
+				return result;
+			}
+		});
+
+		// remove duplicates, merging duplicates into a single proposal
+		return CollectionsUtil.filter(proposals, new ProposalMerger());
+	}
+
+	/**
 	 * getParentObjectTypes
 	 * 
 	 * @param node
@@ -853,7 +952,64 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
 	{
-		return ASTUtil.getParentObjectTypes(getIndex(), getURI(), _targetNode, node, offset);
+		return ParseUtil.getParentObjectTypes(getIndex(), getURI(), _targetNode, node, offset);
+	}
+
+	/**
+	 * getParseListener
+	 * 
+	 * @return
+	 */
+	protected IParseListener getParseListener()
+	{
+		if (_parseListener == null)
+		{
+			_parseListener = new IParseListener()
+			{
+				public void afterParse(IParseState parseState)
+				{
+					if (parseState instanceof JSParseState)
+					{
+						JSParseState jsParseState = (JSParseState) parseState;
+
+						jsParseState.popCommentContext();
+					}
+				}
+
+				public void beforeParse(IParseState parseState)
+				{
+					// NOTE: We turn off all comment processing if we have a JSParseState associated with this file's
+					// FileService.
+					// If a previous parse included comment processing, that's fine as well
+					if (parseState instanceof JSParseState)
+					{
+						JSParseState jsParseState = (JSParseState) parseState;
+
+						// save old settings
+						jsParseState.pushCommentContext();
+
+						// turn off all comment processing
+						jsParseState.setAttachComments(false);
+						jsParseState.setCollectComments(false);
+					}
+				}
+
+				public void parseCompletedSuccessfully()
+				{
+				}
+			};
+		}
+
+		return _parseListener;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
+	 */
+	protected String getPreferenceNodeQualifier()
+	{
+		return JSPlugin.PLUGIN_ID;
 	}
 
 	/**
@@ -864,6 +1020,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	IRange getReplaceRange()
 	{
 		return _replaceRange;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
+	{
+		return Character.isWhitespace(c);
 	}
 
 	/*
@@ -924,69 +1089,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		return Character.isJavaIdentifierStart(c) || Character.isJavaIdentifierPart(c) || c == '$';
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
-	 */
-	public boolean isValidActivationCharacter(char c, int keyCode)
-	{
-		return Character.isWhitespace(c);
-	}
-
 	/**
-	 * getParseListener
+	 * The currently active range
 	 * 
-	 * @return
+	 * @param activeRange
 	 */
-	protected IParseListener getParseListener()
+	public void setActiveRange(IRange activeRange)
 	{
-		if (_parseListener == null)
-		{
-			_parseListener = new IParseListener()
-			{
-				public void beforeParse(IParseState parseState)
-				{
-					// NOTE: We turn off all comment processing if we have a JSParseState associated with this file's
-					// FileService.
-					// If a previous parse included comment processing, that's fine as well
-					if (parseState instanceof JSParseState)
-					{
-						JSParseState jsParseState = (JSParseState) parseState;
-
-						// save old settings
-						jsParseState.pushCommentContext();
-
-						// turn off all comment processing
-						jsParseState.setAttachComments(false);
-						jsParseState.setCollectComments(false);
-					}
-				}
-
-				public void parseCompletedSuccessfully()
-				{
-				}
-
-				public void afterParse(IParseState parseState)
-				{
-					if (parseState instanceof JSParseState)
-					{
-						JSParseState jsParseState = (JSParseState) parseState;
-
-						jsParseState.popCommentContext();
-					}
-				}
-			};
-		}
-
-		return _parseListener;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getPreferenceNodeQualifier()
-	 */
-	protected String getPreferenceNodeQualifier()
-	{
-		return JSPlugin.PLUGIN_ID;
+		_activeRange = activeRange;
 	}
 }

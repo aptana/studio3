@@ -60,7 +60,7 @@ public final class ZipUtil
 	{
 		return extract(new ZipFile(zipFile), destinationPath, monitor);
 	}
-
+	
 	/**
 	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
 	 * <code>overwrite</code> flag is <code>true</code>.
@@ -90,7 +90,7 @@ public final class ZipUtil
 	{
 		return extract(zip, zip.getEntries(), destinationPath, monitor);
 	}
-
+	
 	/**
 	 * Extract zip file into specified local path. File that exist in the destination path will be overwritten if the
 	 * <code>overwrite</code> flag is <code>true</code>.
@@ -259,15 +259,15 @@ public final class ZipUtil
 							}
 							catch (Exception ignore)
 							{
-							}
 						}
+					}
 						if (symlink)
 						{
 							String target = new String(((ByteArrayOutputStream) out).toByteArray(), "UTF-8"); //$NON-NLS-1$
 							Runtime.getRuntime()
 									.exec(new String[] {
 											"ln", "-s", new File(destinationPath, target).getAbsolutePath(), file.getAbsolutePath() }); //$NON-NLS-1$ //$NON-NLS-2$
-						}
+				}
 					}
 				}
 				if (subMonitor.isCanceled())

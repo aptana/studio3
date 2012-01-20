@@ -37,7 +37,6 @@ public class MimeTypesRegistry
 		map("application/dxf", "dxf");
 		map("application/envoy", "evy");
 		map("application/fractals", "fif");
-		map("application/futuresplash", "spl");
 		map("application/hta", "hta");
 		map("application/i-deas", "unv");
 		map("application/internet-property-stream", "acx");
@@ -46,8 +45,8 @@ public class MimeTypesRegistry
 		map("application/mac-binhex40", "hqx");
 		map("application/mac-compactpro", "cpt");
 		map("application/msword", "doc", "dot");
-		map("application/octet-stream", "bin", "class", "dms", "exe", "lha", "lzh", "deb", "dmg", "eot", "iso", "img",
-				"lzh", "msi", "msp", "msm");
+		map("application/octet-stream", "bin", "class", "dms", "exe", "lha", "lzh", "dmg", "eot", "iso", "img", "msi",
+				"msp", "msm");
 		map("application/oda", "oda");
 		map("application/ogg", "ogm");
 		map("application/olescript", "axs");
@@ -74,7 +73,6 @@ public class MimeTypesRegistry
 		map("application/vnd.ms-outlook", "msg");
 		map("application/vnd.ms-pkicertstore", "sst");
 		map("application/vnd.ms-pkiseccat", "cat");
-		map("application/vnd.ms-pkistl", "stl");
 		map("application/vnd.ms-powerpoint", "pot", "pps", "ppt", "ppz");
 		map("application/vnd.ms-project", "mpp");
 		map("application/vnd.ms-works", "wcm", "wdb", "wks", "wps");
@@ -90,7 +88,6 @@ public class MimeTypesRegistry
 		map("application/x-chess-pgn", "pgn");
 		map("application/x-cocoa", "cco");
 		map("application/x-compress", "z");
-		map("application/x-compressed", "tgz");
 		map("application/x-cpio", "cpio");
 		map("application/x-csh", "csh");
 		map("application/x-debian-package", "deb");
@@ -126,7 +123,7 @@ public class MimeTypesRegistry
 		map("application/x-msschedule", "scd");
 		map("application/x-msterminal", "trm");
 		map("application/x-mswrite", "wri");
-		map("application/x-netcdf", "cdf", "nc");
+		map("application/x-netcdf", "nc");
 		map("application/x-perfmon", "pma", "pmc", "pml", "pmr", "pmw");
 		map("application/x-perl", "pl", "pm");
 		map("application/x-pilot", "prc", "pdb");
@@ -149,7 +146,6 @@ public class MimeTypesRegistry
 		map("application/x-tcl", "tcl", "tk");
 		map("application/x-tex", "tex");
 		map("application/x-texinfo", "texi", "texinfo");
-		map("application/x-texinfo", "texinfo");
 		map("application/x-troff", "roff", "t", "tr");
 		map("application/x-troff-man", "man");
 		map("application/x-troff-me", "me");
@@ -161,22 +157,17 @@ public class MimeTypesRegistry
 		map("application/ynd.ms-pkipko", "pko");
 		map("application/zip", "zip");
 		map("audio/basic", "au", "snd");
-		map("audio/mid", "mid", "rmi");
+		map("audio/mid", "rmi");
 		map("audio/midi", "mid", "midi", "kar");
 		map("audio/mpeg", "mp3", "mpga");
 		map("audio/TSP-audio", "tsi");
-		map("audio/ulaw", "au");
 		map("audio/x-aiff", "aif", "aifc", "aiff");
 		map("audio/x-mpegurl", "m3u");
 		map("audio/x-ms-wax", "wax");
 		map("audio/x-ms-wma", "wma");
 		map("audio/x-pn-realaudio", "ra", "ram", "rm");
-		map("audio/x-pn-realaudio-plugin", "rpm");
-		map("audio/x-realaudio", "ra");
 		map("audio/x-wav", "wav");
 		map("chemical/x-pdb", "xyz");
-		map("image/bmp", "bmp");
-		map("image/cis-cod", "cod");
 		map("image/gif", "gif");
 		map("image/ief", "ief");
 		map("image/jpeg", "jpg", "jpeg", "jpe");
@@ -205,11 +196,9 @@ public class MimeTypesRegistry
 		map("text/css", "less");
 		map("text/h323", "323");
 		map("text/iuls", "uls");
-		map("text/javascript", "js");
 		map("text/mathml", "mml");
 		map("text/plain", "bas", "c", "h", "txt", "m");
 		map("text/richtext", "rtx");
-		map("text/rtf", "rtf");
 		map("text/scriptlet", "sct");
 		map("text/sgml", "sgml");
 		map("text/tab-separated-values", "tsv");
@@ -219,7 +208,7 @@ public class MimeTypesRegistry
 		map("text/x-component", "htc");
 		map("text/x-setext", "etx");
 		map("text/x-vcard", "vcf");
-		map("text/xml", "xml");
+		map("application/xml", "xml");
 		map("video/3gpp", "3gpp", "3gp");
 		map("video/dl", "dl");
 		map("video/gl", "gl");
@@ -233,7 +222,7 @@ public class MimeTypesRegistry
 		map("video/x-flv", "flv");
 		map("video/x-la-asf", "lsf", "lsx");
 		map("video/x-mng", "mng");
-		map("video/x-ms-asf", "asf", "asr", "asx");
+		map("video/x-ms-asf", "asf", "asr");
 		map("video/x-ms-asx", "asx");
 		map("video/x-ms-wmx", "wmx");
 		map("video/x-ms-wvx", "wvx");

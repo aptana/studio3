@@ -70,7 +70,7 @@ public class JSONFormatWhitespacePage extends FormatterModifyTabPage
 			manager.enableControl(tabSize, !editorSettingsMode);
 			if (editorSettingsMode)
 			{
-				setEditorTabWidth(JSONPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				setEditorTabWidth(JSONPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 			}
 		}
 
@@ -86,7 +86,7 @@ public class JSONFormatWhitespacePage extends FormatterModifyTabPage
 				manager.enableControl(tabSize, !editorSettingsMode);
 				if (editorSettingsMode)
 				{
-					setEditorTabWidth(JSONPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+					setEditorTabWidth(JSONPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 				}
 			}
 		}

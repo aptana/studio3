@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
 import com.aptana.scripting.listeners.ExecutionListenerRegistrant;
@@ -65,42 +66,35 @@ public class ScriptingActivator extends Plugin
 	/**
 	 * logError
 	 * 
+	 * @deprecated Use {@link IdeLog#logError(Plugin, String, Throwable)}
 	 * @param msg
 	 * @param e
 	 */
 	public static void logError(String msg, Throwable e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+		IdeLog.logError(getDefault(), msg, e);
 	}
 
 	/**
 	 * logInfo
 	 * 
+	 * @deprecated Use {@link IdeLog#logInfo(Plugin, String)}
 	 * @param string
 	 */
 	public static void logInfo(String string)
 	{
-		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		IdeLog.logInfo(getDefault(), string);
 	}
 
 	/**
 	 * logWarning
 	 * 
+	 * @deprecated Use {@link IdeLog#logWarning(Plugin, String)}
 	 * @param msg
 	 */
 	public static void logWarning(String msg)
 	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
-	}
-
-	/**
-	 * trace
-	 * 
-	 * @param string
-	 */
-	public static void trace(String string)
-	{
-		// getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
+		IdeLog.logWarning(getDefault(), msg);
 	}
 
 	private FileTypeAssociationListener fileTypeListener;

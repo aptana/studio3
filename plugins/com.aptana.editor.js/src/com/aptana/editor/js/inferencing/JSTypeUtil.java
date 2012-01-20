@@ -74,7 +74,7 @@ public class JSTypeUtil
 	 * 
 	 * @param element
 	 */
-	public static void addAllUserAgents(BaseElement element)
+	public static void addAllUserAgents(BaseElement<?> element)
 	{
 		if (element != null)
 		{

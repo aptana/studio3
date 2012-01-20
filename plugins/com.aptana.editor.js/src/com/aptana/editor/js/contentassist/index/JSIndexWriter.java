@@ -16,6 +16,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.IDebugScopes;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -32,6 +33,42 @@ public class JSIndexWriter extends IndexWriter
 	protected URI getDocumentPath()
 	{
 		return URI.create(IJSIndexConstants.METADATA_FILE_LOCATION);
+	}
+
+	/**
+	 * writeEvent
+	 * 
+	 * @param index
+	 * @param event
+	 * @param location
+	 */
+	protected void writeEvent(Index index, EventElement event, URI location)
+	{
+		// @formatter:off
+		String value = StringUtil.join(
+			IJSIndexConstants.DELIMITER,
+			event.getOwningType(),
+			event.getName(),
+			this.serialize(event)
+		);
+		// @formatter:on
+
+		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+		{
+			// @formatter:off
+			String message = MessageFormat.format(
+				"Writing event ''{0}.{1}'' from location ''{2}'' to index ''{3}''", //$NON-NLS-1$
+				event.getOwningType(),
+				event.getName(),
+				location.toString(),
+				index.toString()
+			);
+			// @formatter:on
+
+			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+		}
+
+		index.addEntry(IJSIndexConstants.EVENT, value, location);
 	}
 
 	/**
@@ -141,10 +178,9 @@ public class JSIndexWriter extends IndexWriter
 			}
 			else
 			{
+				//
 				parentType = StringUtil.EMPTY;
 			}
-			// SinceElement[] sinceList = type.getSinceList();
-			// UserAgentElement[] userAgents = type.getUserAgents();
 
 			// calculate key value and add to index
 			// @formatter:off
@@ -183,6 +219,12 @@ public class JSIndexWriter extends IndexWriter
 				{
 					this.writeProperty(index, property, location);
 				}
+			}
+
+			// write events
+			for (EventElement event : type.getEvents())
+			{
+				this.writeEvent(index, event, location);
 			}
 		}
 	}

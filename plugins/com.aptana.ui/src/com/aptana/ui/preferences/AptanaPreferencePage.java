@@ -30,7 +30,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 
 	protected static String PAGE_ID = "com.aptana.ui.AptanaPreferencePage"; //$NON-NLS-1$
 
-	private Button migrateButton;
 	private Button autoRefreshButton;
 
 	@Override
@@ -66,22 +65,11 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	{
 		Composite comp = (Composite) super.createContents(parent);
 
-		migrateButton = new Button(comp, SWT.CHECK);
-		migrateButton.setText(Messages.AptanaPreferencePage_Auto_Migrate_Projects);
-		migrateButton.setSelection(autoMigration());
-
 		autoRefreshButton = new Button(comp, SWT.CHECK);
 		autoRefreshButton.setText(Messages.AptanaPreferencePage_Auto_Refresh_Projects);
 		autoRefreshButton.setSelection(autoRefresh());
 
 		return comp;
-	}
-
-	private static boolean autoMigration()
-	{
-		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
-				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null);
 	}
 
 	private static boolean autoRefresh()
@@ -95,7 +83,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	public boolean performOk()
 	{
 		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
 		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
 		try
 		{
@@ -112,9 +99,6 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	@Override
 	protected void performDefaults()
 	{
-		migrateButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS,
-				PreferenceInitializer.DEFAULT_AUTO_MIGRATE_OLD_PROJECTS, null));
 		autoRefreshButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
 				PreferenceInitializer.DEFAULT_AUTO_REFRESH_PROJECTS, null));

@@ -347,7 +347,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 				{
 					profileManager.deleteProfile(selected);
 					updateComboFromProfiles();
-					applyPreferences();
+					updateSelection();
 				}
 			}
 		});
@@ -611,7 +611,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		previewPane.setLayout(previewStackLayout);
 
 		// Set the data into the list
-		listViewer.setContentProvider(new ArrayContentProvider());
+		listViewer.setContentProvider(ArrayContentProvider.getInstance());
 		listViewer.setLabelProvider(new LabelProvider()
 		{
 			@Override
@@ -771,7 +771,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				fProfileCombo.add(profile.getName());
 				if (profile.equals(selected))
+				{
 					selection = index;
+				}
 				index++;
 			}
 			fProfileCombo.select(selection);
@@ -784,7 +786,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		if (fDeleteButton != null && !fDeleteButton.isDisposed())
 		{
 			IProfile selected = getProfileManager().getSelected(fProject);
-			fDeleteButton.setEnabled(!selected.isBuiltInProfile());
+			fDeleteButton.setEnabled(selected != null && !selected.isBuiltInProfile());
 		}
 	}
 

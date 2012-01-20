@@ -64,7 +64,8 @@ import com.aptana.webserver.ui.IWebServerUIConstants;
 /**
  * Launch settings tab
  */
-public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
+public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
+{
 
 	private Listener dirtyListener;
 	private Image image;
@@ -88,15 +89,18 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	public void createControl(Composite parent) {
+	public void createControl(Composite parent)
+	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		setControl(composite);
 
 		composite.setLayout(GridLayoutFactory.swtDefaults().create());
 		composite.setFont(parent.getFont());
 
-		dirtyListener = new Listener() {
-			public void handleEvent(Event event) {
+		dirtyListener = new Listener()
+		{
+			public void handleEvent(Event event)
+			{
 				updateEnablement();
 				setDirty(true);
 				updateLaunchConfigurationDialog();
@@ -111,7 +115,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		hookListeners(true);
 	}
 
-	private void createBrowserSection(Composite parent) {
+	private void createBrowserSection(Composite parent)
+	{
 		Group group = new Group(parent, SWT.FLAT | SWT.SHADOW_IN);
 		group.setText(Messages.LaunchBrowserSettingsTab_WebBrowser);
 		group.setFont(parent.getFont());
@@ -139,27 +144,32 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		fCommandArgsText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.create());
 
-		bBrowserExeBrowse.addSelectionListener(new SelectionAdapter() {
+		bBrowserExeBrowse.addSelectionListener(new SelectionAdapter()
+		{
 			/**
 			 * Prompts the user to choose a location from the filesystem and sets the location as the full path of the
 			 * selected file.
 			 */
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 				fileDialog.setFileName(fBrowserExeText.getText());
-				if (Platform.OS_WIN32.equals(Platform.getOS())) {
+				if (Platform.OS_WIN32.equals(Platform.getOS()))
+				{
 					fileDialog.setFilterExtensions(new String[] { "*.exe" }); //$NON-NLS-1$
 					fileDialog.setFilterNames(new String[] { Messages.LaunchBrowserSettingsTab_ExecutableFiles });
 				}
 				String text = fileDialog.open();
-				if (text != null) {
+				if (text != null)
+				{
 					fBrowserExeText.setText(text);
 				}
 			}
 		});
 	}
 
-	private void createStartActionSection(Composite parent) {
+	private void createStartActionSection(Composite parent)
+	{
 		Group group = new Group(parent, SWT.FLAT | SWT.SHADOW_IN);
 		group.setText(Messages.LaunchBrowserSettingsTab_StartAction);
 		group.setFont(parent.getFont());
@@ -195,17 +205,21 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		fStartUrlText.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).span(2, 1)
 				.grab(true, false).create());
 
-		bSpecificPageBrowse.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+		bSpecificPageBrowse.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
 				IResource resource = chooseWorkspaceLocation();
-				if (resource != null) {
+				if (resource != null)
+				{
 					fSpecificPageText.setText(resource.getFullPath().toPortableString());
 				}
 			}
 		});
 	}
 
-	private void createServerSection(Composite parent) {
+	private void createServerSection(Composite parent)
+	{
 		Group group = new Group(parent, SWT.FLAT);
 		group.setText(Messages.LaunchBrowserSettingsTab_Server);
 		group.setFont(parent.getFont());
@@ -224,33 +238,36 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		managedServersView = new ComboViewer(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		managedServersView.getControl().setLayoutData(
 				GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).create());
-		managedServersView.setContentProvider(new ArrayContentProvider());
-		managedServersView.setLabelProvider(new LabelProvider() {
+		managedServersView.setContentProvider(ArrayContentProvider.getInstance());
+		managedServersView.setLabelProvider(new LabelProvider()
+		{
 			@Override
-			public String getText(Object element) {
-				if (element instanceof IServer) {
+			public String getText(Object element)
+			{
+				if (element instanceof IServer)
+				{
 					return ((IServer) element).getName();
 				}
 				return super.getText(element);
 			}
 		});
-		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerManager()
-				.getServers());
+		managedServersView.setInput(WebServerCorePlugin.getDefault().getServerManager().getServers());
 
 		Link configureLink = new Link(group, SWT.NONE);
 		configureLink.setText(MessageFormat.format("<a>{0}</a>", Messages.LaunchBrowserSettingsTab_Configure_Label)); //$NON-NLS-1$
 		configureLink.setLayoutData(GridDataFactory.swtDefaults().create());
-		configureLink.addSelectionListener(new SelectionAdapter() {
+		configureLink.addSelectionListener(new SelectionAdapter()
+		{
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				PreferenceDialog dlg = PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(),
 						IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID,
 						new String[] { IWebServerUIConstants.WEBSERVERS_PREFERENCE_PAGE_ID }, null,
 						PreferencesUtil.OPTION_FILTER_LOCKED);
 				dlg.open();
 				ISelection selection = managedServersView.getSelection();
-				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerManager()
-						.getServers());
+				managedServersView.setInput(WebServerCorePlugin.getDefault().getServerManager().getServers());
 				managedServersView.setSelection(selection);
 			}
 		});
@@ -267,8 +284,10 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		fAddProjectName.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).span(3, 1).create());
 	}
 
-	private void hookListeners(boolean hook) {
-		if (hook) {
+	private void hookListeners(boolean hook)
+	{
+		if (hook)
+		{
 			fBrowserExeText.addListener(SWT.Modify, dirtyListener);
 			fCommandArgsText.addListener(SWT.Modify, dirtyListener);
 
@@ -284,7 +303,9 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			rbManagedServer.addListener(SWT.Selection, dirtyListener);
 			managedServersView.getControl().addListener(SWT.Selection, dirtyListener);
 			fAddProjectName.addListener(SWT.Selection, dirtyListener);
-		} else {
+		}
+		else
+		{
 			fBrowserExeText.removeListener(SWT.Modify, dirtyListener);
 			fCommandArgsText.removeListener(SWT.Modify, dirtyListener);
 
@@ -303,7 +324,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 	}
 
-	private void updateEnablement() {
+	private void updateEnablement()
+	{
 		fSpecificPageText.setEnabled(rbSpecificPage.getSelection());
 		bSpecificPageBrowse.setEnabled(rbSpecificPage.getSelection());
 		boolean startUrlEnabled = rbStartUrl.getSelection();
@@ -321,13 +343,15 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 				&& (rbCurrentPage.getSelection() || rbSpecificPage.getSelection()));
 	}
 
-	private IResource chooseWorkspaceLocation() {
+	private IResource chooseWorkspaceLocation()
+	{
 		ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), new WorkbenchLabelProvider(),
 				new WorkbenchContentProvider());
 		dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
 		dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
 		dialog.setMessage(Messages.LaunchBrowserSettingsTab_ChooseFile);
-		if (dialog.open() == Window.OK) {
+		if (dialog.open() == Window.OK)
+		{
 			return (IResource) dialog.getFirstResult();
 		}
 
@@ -337,16 +361,19 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration)
+	{
 		JSLaunchConfigurationHelper.setBrowserDefaults(configuration, null);
 	}
 
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public void initializeFrom(ILaunchConfiguration configuration) {
+	public void initializeFrom(ILaunchConfiguration configuration)
+	{
 		hookListeners(false);
-		try {
+		try
+		{
 			fBrowserExeText.setText(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, StringUtil.EMPTY));
 			fCommandArgsText.setText(configuration.getAttribute(
@@ -378,12 +405,17 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 					.findServerByName(
 							configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
 									StringUtil.EMPTY));
-			if (server != null) {
+			if (server != null)
+			{
 				managedServersView.setSelection(new StructuredSelection(server));
 			}
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			IdeLog.logError(JSDebugUIPlugin.getDefault(), "Reading launch configuration fails", e); //$NON-NLS-1$
-		} finally {
+		}
+		finally
+		{
 			hookListeners(true);
 			updateEnablement();
 		}
@@ -392,7 +424,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+	public void performApply(ILaunchConfigurationWorkingCopy configuration)
+	{
 		String value;
 		value = fBrowserExeText.getText();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, value);
@@ -401,11 +434,16 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, value);
 
 		int startActionType = 0;
-		if (rbCurrentPage.getSelection()) {
+		if (rbCurrentPage.getSelection())
+		{
 			startActionType = ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE;
-		} else if (rbSpecificPage.getSelection()) {
+		}
+		else if (rbSpecificPage.getSelection())
+		{
 			startActionType = ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE;
-		} else if (rbStartUrl.getSelection()) {
+		}
+		else if (rbStartUrl.getSelection())
+		{
 			startActionType = ILaunchConfigurationConstants.START_ACTION_START_URL;
 		}
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE, startActionType);
@@ -416,11 +454,16 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_URL, value);
 
 		int serverType = 0;
-		if (rbInternalServer.getSelection()) {
+		if (rbInternalServer.getSelection())
+		{
 			serverType = ILaunchConfigurationConstants.SERVER_INTERNAL;
-		} else if (rbCustomServer.getSelection()) {
+		}
+		else if (rbCustomServer.getSelection())
+		{
 			serverType = ILaunchConfigurationConstants.SERVER_EXTERNAL;
-		} else if (rbManagedServer.getSelection()) {
+		}
+		else if (rbManagedServer.getSelection())
+		{
 			serverType = ILaunchConfigurationConstants.SERVER_MANAGED;
 		}
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_TYPE, serverType);
@@ -428,8 +471,8 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 		value = fbaseUrlText.getText();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, value);
 
-		IServer serverSelection = (IServer) ((IStructuredSelection) managedServersView
-				.getSelection()).getFirstElement();
+		IServer serverSelection = (IServer) ((IStructuredSelection) managedServersView.getSelection())
+				.getFirstElement();
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME,
 				(serverSelection != null) ? serverSelection.getName() : null);
 
@@ -440,52 +483,69 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
-	public boolean isValid(ILaunchConfiguration launchConfig) {
+	public boolean isValid(ILaunchConfiguration launchConfig)
+	{
 		setErrorMessage(null);
 		setMessage(null);
 
 		String value = fBrowserExeText.getText();
-		if (!new File(value).exists()) {
+		if (!new File(value).exists())
+		{
 			setErrorMessage(Messages.LaunchBrowserSettingsTab_BrowserExecutableShouldBeSpecified);
 			return false;
 		}
-		if (rbSpecificPage.getSelection()) {
+		if (rbSpecificPage.getSelection())
+		{
 			value = fSpecificPageText.getText();
-			if (value.length() == 0 || ResourcesPlugin.getWorkspace().getRoot().findMember(value) == null) {
+			if (value.length() == 0 || ResourcesPlugin.getWorkspace().getRoot().findMember(value) == null)
+			{
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_StartPageShouldBeSpecified);
 				return false;
 			}
-		} else if (rbStartUrl.getSelection()) {
+		}
+		else if (rbStartUrl.getSelection())
+		{
 			value = fStartUrlText.getText();
-			try {
+			try
+			{
 				new URL(value);
-			} catch (MalformedURLException e) {
+			}
+			catch (MalformedURLException e)
+			{
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_ValidStartPageURLShouldBeSpecified);
 				return false;
 			}
 		}
 
-		if (rbCustomServer.getSelection()) {
+		if (rbCustomServer.getSelection())
+		{
 			value = fbaseUrlText.getText();
-			try {
+			try
+			{
 				new URL(value);
-			} catch (MalformedURLException e) {
+			}
+			catch (MalformedURLException e)
+			{
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_ValidBaseURLShouldBeSpecified);
 				return false;
 			}
 		}
-		if (rbCurrentPage.getSelection()) {
+		if (rbCurrentPage.getSelection())
+		{
 			Object activeResource = new ActiveResourcePathGetterAdapter().getActiveResourcePath();
-			if (activeResource == null) {
+			if (activeResource == null)
+			{
 				setMessage(Messages.LaunchBrowserSettingsTab_NoFilesOpenedInEditor);
 				return false;
 			}
 		}
 
-		if (rbManagedServer.getSelection()) {
-			IServer serverSelection = (IServer) ((IStructuredSelection) managedServersView
-					.getSelection()).getFirstElement();
-			if (serverSelection == null) {
+		if (rbManagedServer.getSelection())
+		{
+			IServer serverSelection = (IServer) ((IStructuredSelection) managedServersView.getSelection())
+					.getFirstElement();
+			if (serverSelection == null)
+			{
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_ServerNotSelected);
 				return false;
 			}
@@ -497,15 +557,18 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return Messages.LaunchBrowserSettingsTab_Main;
 	}
 
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getImage()
 	 */
-	public Image getImage() {
-		if (image == null) {
+	public Image getImage()
+	{
+		if (image == null)
+		{
 			image = JSDebugUIPlugin.getImageDescriptor("icons/full/obj16/launch-main.gif").createImage(); //$NON-NLS-1$
 		}
 		return image;
@@ -514,8 +577,10 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#dispose()
 	 */
-	public void dispose() {
-		if (image != null) {
+	public void dispose()
+	{
+		if (image != null)
+		{
 			image.dispose();
 		}
 		super.dispose();

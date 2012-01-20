@@ -23,7 +23,7 @@ public class ObjectInferencingTests extends InferencingTestsBase
 	{
 		String source = "var x = {}; x;";
 
-		this.lastStatementTypeTests(source, "Object");
+		lastStatementTypeTests(source, "Object");
 	}
 
 	/**
@@ -32,12 +32,12 @@ public class ObjectInferencingTests extends InferencingTestsBase
 	public void testObjectWithAddedProperties()
 	{
 		String source = "var x = {}; x.a = true; x;";
-		List<String> types = this.getLastStatementTypes(source);
+		List<String> types = getLastStatementTypes(source);
 
 		assertEquals(1, types.size());
 		String typeName = types.get(0);
 
-		this.structureTests(typeName, "a");
+		structureTests(typeName, "a");
 	}
 
 	/**
@@ -46,12 +46,12 @@ public class ObjectInferencingTests extends InferencingTestsBase
 	public void testObjectWithProperties()
 	{
 		String source = "var x = { a: true }; x;";
-		List<String> types = this.getLastStatementTypes(source);
+		List<String> types = getLastStatementTypes(source);
 
 		assertEquals(1, types.size());
 		String typeName = types.get(0);
 
-		this.structureTests(typeName, "a");
+		structureTests(typeName, "a");
 	}
 
 	/**
@@ -60,12 +60,12 @@ public class ObjectInferencingTests extends InferencingTestsBase
 	public void testObjectWithPropertiesAndAddedProperties()
 	{
 		String source = "var x = { a: true }; x.b = true; x;";
-		List<String> types = this.getLastStatementTypes(source);
+		List<String> types = getLastStatementTypes(source);
 
 		assertEquals(1, types.size());
 		String typeName = types.get(0);
 
-		this.structureTests(typeName, "a", "b");
+		structureTests(typeName, "a", "b");
 	}
 
 	/**
@@ -73,24 +73,24 @@ public class ObjectInferencingTests extends InferencingTestsBase
 	 */
 	public void testNestedObjects()
 	{
-		List<String> types = this.getLastStatementTypes(Path.fromPortableString("inferencing/nested-objects.js"));
+		List<String> types = getLastStatementTypes(Path.fromPortableString("inferencing/nested-objects.js"));
 
 		assertEquals(1, types.size());
 		String typeName = types.get(0);
 
-		TypeElement type = this.getType(typeName);
-		assertNotNull(type);
-		this.structureTests(type, "a");
+		List<TypeElement> typeElements = getType(typeName);
+		assertNotNull(typeElements);
+		structureTests(typeElements, "a");
 
-		PropertyElement property = type.getProperty("b");
+		PropertyElement property = typeElements.get(0).getProperty("b");
 		assertNotNull(property);
 		List<String> propertyTypeNames = property.getTypeNames();
 		assertEquals(1, propertyTypeNames.size());
 
 		String propertyTypeName = propertyTypeNames.get(0);
-		TypeElement propertyType = this.getType(propertyTypeName);
-		assertNotNull(propertyType);
+		List<TypeElement> propertyTypes = getType(propertyTypeName);
+		assertNotNull(propertyTypes);
 
-		this.structureTests(propertyType, "c");
+		structureTests(propertyTypes, "c");
 	}
 }

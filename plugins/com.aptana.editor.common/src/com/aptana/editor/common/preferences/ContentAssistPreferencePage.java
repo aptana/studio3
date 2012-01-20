@@ -308,7 +308,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 		categoryViewer = new CheckboxTableViewer(table);
 		categoryViewer.getControl().setFont(parent.getFont());
 		categoryViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
-		categoryViewer.setContentProvider(new ArrayContentProvider());
+		categoryViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		CategoryLabelProvider categoryLabelProvider = new CategoryLabelProvider(true);
 		categoryViewer.setLabelProvider(categoryLabelProvider);

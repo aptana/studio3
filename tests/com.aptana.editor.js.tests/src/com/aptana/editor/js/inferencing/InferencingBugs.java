@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import java.util.List;
+
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
@@ -22,7 +24,7 @@ public class InferencingBugs extends InferencingTestsBase
 		JSIndexWriter writer = new JSIndexWriter();
 		JSIndexReader reader = new JSIndexReader();
 		TypeElement type = new TypeElement();
-		TypeElement type2;
+		List<TypeElement> type2;
 
 		type.setName(JSTypeConstants.OBJECT_TYPE);
 		writer.writeType(this.getIndex(), type);

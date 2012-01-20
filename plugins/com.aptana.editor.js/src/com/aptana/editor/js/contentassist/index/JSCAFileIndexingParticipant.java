@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -18,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
@@ -69,9 +71,14 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
-				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+				List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+				TypeElement window;
 
-				if (window == null)
+				if (!CollectionsUtil.isEmpty(windows))
+				{
+					window = windows.get(windows.size() - 1);
+				}
+				else
 				{
 					window = new TypeElement();
 					window.setName(JSTypeConstants.WINDOW_TYPE);
@@ -89,7 +96,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 					String typeName = type.getName();
 
-					if (!typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN)) //$NON-NLS-1$
+					if (isGlobalProperty(type))
 					{
 						PropertyElement property = window.getProperty(typeName);
 
@@ -116,7 +123,10 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				}
 
 				// write global type info
-				indexer.writeType(index, window, location);
+				if (window.hasProperties())
+				{
+					indexer.writeType(index, window, location);
+				}
 			}
 			catch (Throwable e)
 			{
@@ -140,5 +150,28 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.done();
 		}
+	}
+
+	/**
+	 * Determine if the specified type should generate a global property
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected boolean isGlobalProperty(TypeElement type)
+	{
+		boolean result = false;
+
+		if (type != null)
+		{
+			if (!type.isInternal())
+			{
+				String typeName = type.getName();
+
+				result = !typeName.contains(".") && !typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN); //$NON-NLS-1$
+			}
+		}
+
+		return result;
 	}
 }
