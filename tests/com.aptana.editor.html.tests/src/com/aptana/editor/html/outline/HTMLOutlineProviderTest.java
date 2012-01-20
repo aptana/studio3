@@ -159,4 +159,23 @@ public class HTMLOutlineProviderTest extends TestCase
 		assertEquals(11, cssNode.getStartingOffset());
 		assertEquals(21, cssNode.getEndingOffset());
 	}
+
+	public void testAPSTUD4178() throws Exception
+	{
+		String source = "<script>\n(function() {\nvar foo = function() {};\nfoo.bar = function() {};\n})();\n</script>";
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode astRoot = fParser.parse(fParseState);
+
+		Object[] outlineResult = fContentProvider.getElements(astRoot);
+		assertEquals(1, outlineResult.length);
+		assertEquals(astRoot.getChild(0), ((CommonOutlineItem) outlineResult[0]).getReferenceNode());
+
+		Object[] childFoo = fContentProvider.getElements(outlineResult[0]);
+		assertEquals(1, childFoo.length);
+		assertEquals("foo()", fLabelProvider.getText(childFoo[0]));
+
+		Object[] grandchildBar = fContentProvider.getElements(childFoo[0]);
+		assertEquals(1, grandchildBar.length);
+		assertEquals("bar()", fLabelProvider.getText(grandchildBar[0]));
+	}
 }
