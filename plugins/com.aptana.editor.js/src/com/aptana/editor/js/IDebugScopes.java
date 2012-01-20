@@ -20,4 +20,13 @@ public interface IDebugScopes
 	 */
 	String CONTENT_ASSIST_TYPES = JSPlugin.PLUGIN_ID + "/debug/show_content_assist_types"; //$NON-NLS-1$
 
+	/**
+	 * A debug scope used to display info on writes to JS indexes
+	 */
+	String INDEX_WRITES = JSPlugin.PLUGIN_ID + "/debug/show_index_writes"; //$NON-NLS-1$
+
+	/**
+	 * A debug scope used to display the stages of JS indexing
+	 */
+	String INDEXING_STEPS = JSPlugin.PLUGIN_ID + "/debug/show_indexing_steps"; //$NON-NLS-1$
 }

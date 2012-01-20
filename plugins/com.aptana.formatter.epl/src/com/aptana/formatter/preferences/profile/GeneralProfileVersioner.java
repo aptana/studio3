@@ -11,6 +11,10 @@
  *******************************************************************************/
 package com.aptana.formatter.preferences.profile;
 
+import com.aptana.formatter.IContributedExtension;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ScriptFormatterManager;
+
 /**
  * Default implementation of the <code>IProfileVersioner</code>
  */
@@ -18,7 +22,7 @@ public class GeneralProfileVersioner implements IProfileVersioner
 {
 
 	private static final int FIRST_VERSION = 1;
-	private static final int CURRENT_VERSION = 2;
+	private static final int CURRENT_VERSION = 3;
 	private String formatter;
 
 	public GeneralProfileVersioner(String formatter)
@@ -44,6 +48,25 @@ public class GeneralProfileVersioner implements IProfileVersioner
 	public void update(IProfile profile)
 	{
 		if (profile instanceof CustomProfile)
-			((CustomProfile) profile).setVersion(CURRENT_VERSION);
+		{
+			CustomProfile customProfile = (CustomProfile) profile;
+			if (customProfile.getVersion() != CURRENT_VERSION)
+			{
+				// Migrate any tab-spacing setting to the default one.
+				IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions(true);
+				for (IContributedExtension extension : extensions)
+				{
+					if (extension instanceof IScriptFormatterFactory)
+					{
+						// Each factory is aware of the internals that needs to be updated, so
+						// we let the factory do the update.
+						((IScriptFormatterFactory) extension).updateProfile(profile);
+					}
+				}
+				// Update the current profile with the new version
+				customProfile.setVersion(CURRENT_VERSION);
+			}
+
+		}
 	}
 }

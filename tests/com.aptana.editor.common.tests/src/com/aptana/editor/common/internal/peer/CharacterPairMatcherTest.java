@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -158,6 +161,57 @@ public class CharacterPairMatcherTest extends TestCase
 		assertRawMatch(document, 21, 27, 21, 6);
 	}
 
+	public void testAPSTUD3926_2()
+	{
+		// --------------------0123456789012345678901 2345
+		// --------------------__________1_________2______
+		final String source = "print(String(\"message\"));";
+		IDocument document = new Document(source);
+		matcher = new CharacterPairMatcher(pairs)
+		{
+
+			private ITypedRegion[] partitions = new TypedRegion[] {
+					new TypedRegion(0, 13, IDocument.DEFAULT_CONTENT_TYPE),
+					new TypedRegion(13, 9, "__js_string_double"),
+					new TypedRegion(22, 3, IDocument.DEFAULT_CONTENT_TYPE) };
+
+			@Override
+			protected ITypedRegion getPartition(IDocument doc, int charOffset) throws BadLocationException
+			{
+				for (ITypedRegion region : partitions)
+				{
+					if (charOffset >= region.getOffset() && charOffset < (region.getOffset() + region.getLength()))
+					{
+						return region;
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected ITypedRegion[] computePartitioning(IDocument doc, int offset, int length)
+					throws BadLocationException
+			{
+				List<ITypedRegion> matching = new ArrayList<ITypedRegion>();
+				for (ITypedRegion region : partitions)
+				{
+					if (region.getOffset() >= (offset + length))
+					{
+						continue;
+					}
+					if (region.getOffset() >= offset)
+					{
+						matching.add(region);
+					}
+				}
+				return matching.toArray(new ITypedRegion[matching.size()]);
+			}
+		};
+
+		// check after last )
+		assertMatchFromRight(document, 24, 5, 19);
+	}
+
 	public void testSkipsPairsInComments()
 	{
 		String source = "(\n# )\n)";
@@ -225,14 +279,22 @@ public class CharacterPairMatcherTest extends TestCase
 	private void assertRawMatch(IDocument document, int leftOffsetToMatch, int rightOffsetToMatch, int offset,
 			int length)
 	{
-		// left
+		assertMatchFromLeft(document, leftOffsetToMatch, offset, length);
+		assertMatchFromRight(document, rightOffsetToMatch, offset, length);
+	}
+
+	protected void assertMatchFromLeft(IDocument document, int leftOffsetToMatch, int offset, int length)
+	{
 		IRegion region = matcher.match(document, leftOffsetToMatch);
 		assertNotNull("Failed to match forwards from left side of pair", region);
 		assertEquals("offset", offset, region.getOffset());
 		assertEquals("length", length, region.getLength());
 		assertEquals(ICharacterPairMatcher.LEFT, matcher.getAnchor());
-		// right
-		region = matcher.match(document, rightOffsetToMatch);
+	}
+
+	protected void assertMatchFromRight(IDocument document, int rightOffsetToMatch, int offset, int length)
+	{
+		IRegion region = matcher.match(document, rightOffsetToMatch);
 		assertNotNull("Failed to match backwards from right side of pair", region);
 		assertEquals("offset of left side of pair (from right) doesn't match", offset, region.getOffset());
 		assertEquals("length matching backwards doesn't match", length, region.getLength());

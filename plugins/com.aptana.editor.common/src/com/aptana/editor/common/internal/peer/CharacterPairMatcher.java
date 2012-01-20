@@ -226,7 +226,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			String partitionType) throws BadLocationException
 	{
 		int stack = 0;
-		ITypedRegion[] partitions = computePartitioning(doc, 0, searchStartPosition);
+		ITypedRegion[] partitions = computePartitioning(doc, 0, searchStartPosition + 1);
 		// reverse the partitions
 		partitions = ArrayUtil.reverse(partitions);
 		for (ITypedRegion p : partitions)

@@ -374,4 +374,28 @@ public abstract class IOUtil
 			output.write(buffer, 0, bytes);
 		}
 	}
+
+	/**
+	 * Returns true if there are write permissions on the given directory.
+	 * 
+	 * @param dir
+	 * @return <code>true</code> if we can write to the directory; <code>false</code> otherwise.
+	 */
+	public static boolean isWritableDirectory(File dir)
+	{
+		if (dir.isDirectory() && dir.exists())
+		{
+			try
+			{
+				File tempFile = File.createTempFile(String.valueOf(System.currentTimeMillis()), ".tmp", dir); //$NON-NLS-1$
+				boolean canWrite = tempFile != null && tempFile.exists();
+				tempFile.delete();
+				return canWrite;
+			}
+			catch (IOException e)
+			{
+			}
+		}
+		return false;
+	}
 }

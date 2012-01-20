@@ -110,8 +110,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"quotes", "resize", "richness", "right", "size", "speak-header", "speak-numeral", "speak-punctuation",
 			"speech-rate", "speak", "src", "stress", "table-layout", "text-align", "text-decoration", "text-indent",
 			"text-overflow", "text-shadow", "text-transform", "top", "transform", "transition", "unicode-bidi",
-			"vertical-align", "visibility", "voice-family", "volume", "weight", "white-space", "widows", "width",
-			"word-break", "word-spacing", "word-wrap", "z-index", "zoom" };
+			"user-select", "vertical-align", "visibility", "voice-family", "volume", "weight", "white-space", "widows",
+			"width", "word-break", "word-spacing", "word-wrap", "z-index", "zoom" };
 
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
 			"baseline", "below", "bidi-override", "blink", "block", "bold", "bolder", "border-box", "both", "bottom",

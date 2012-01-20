@@ -169,6 +169,11 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	@Override
 	public boolean performFinish()
 	{
+		if (templatesPage != null && selectedTemplate == null)
+		{
+			selectedTemplate = templatesPage.getSelectedTemplate();
+		}
+
 		createNewProject();
 		if (newProject == null)
 		{
@@ -315,13 +320,9 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			try
 			{
 				doBasicCreateProject(newProjectHandle, description);
-				if (templatesPage != null)
+				if (selectedTemplate != null)
 				{
-					IProjectTemplate template = templatesPage.getSelectedTemplate();
-					if (template != null)
-					{
-						extractZip(template, newProjectHandle, true);
-					}
+					extractZip(selectedTemplate, newProjectHandle, true);
 				}
 			}
 			catch (CoreException e)
@@ -357,8 +358,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 */
 	protected void cloneFromGit(IProject newProjectHandle, IProjectDescription description)
 	{
-		IProjectTemplate template = templatesPage.getSelectedTemplate();
-		doCloneFromGit(template.getLocation(), newProjectHandle, description);
+		if (selectedTemplate != null)
+		{
+			doCloneFromGit(selectedTemplate.getLocation(), newProjectHandle, description);
+		}
 	}
 
 	/**

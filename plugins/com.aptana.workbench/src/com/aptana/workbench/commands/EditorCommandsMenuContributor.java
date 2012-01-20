@@ -347,10 +347,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 									InvocationType.MENU, textEditor);
 							if (commandResult == null)
 							{
+								BundleElement bundle = command.getOwningBundle();
+								String bundleName = (bundle == null) ? "Unknown bundle" : bundle.getDisplayName(); //$NON-NLS-1$
 								IdeLog.logError(WorkbenchPlugin.getDefault(), StringUtil.format(
 										Messages.EditorCommandsMenuContributor_ErrorExecutingCommandNullResult,
-										new String[] { command.getDisplayName(),
-												command.getOwningBundle().getDisplayName() }));
+										new String[] { command.getDisplayName(), bundleName }));
 							}
 							else
 							{

@@ -7,8 +7,10 @@
  */
 package com.aptana.core.resources;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -18,7 +20,9 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 
 public class TaskTag
@@ -39,7 +43,7 @@ public class TaskTag
 	private static boolean fgCaseSensitive;
 	private static IEclipsePreferences.IPreferenceChangeListener fgPrefListener;
 
-	private static List<TaskTag> fgTaskTags;
+	private static volatile List<TaskTag> fgTaskTags;
 
 	private int fPriority;
 	private String fName;
@@ -107,41 +111,72 @@ public class TaskTag
 		{
 			final IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(),
 					EclipseUtil.defaultScope() };
-			fgPrefListener = new IEclipsePreferences.IPreferenceChangeListener()
+			try
 			{
-
-				public void preferenceChange(PreferenceChangeEvent event)
+				fgPrefListener = new IEclipsePreferences.IPreferenceChangeListener()
 				{
-					if (ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE.equals(event.getKey()))
+
+					public void preferenceChange(PreferenceChangeEvent event)
 					{
-						fgCaseSensitive = Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
-								ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+						if (ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE.equals(event.getKey()))
+						{
+							fgCaseSensitive = Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
+									ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+						}
+						else if (ICorePreferenceConstants.TASK_TAG_PRIORITIES.equals(event.getKey())
+								|| ICorePreferenceConstants.TASK_TAG_NAMES.equals(event.getKey()))
+						{
+							fgTaskTags = getCurrentTaskTags();
+						}
 					}
-					else if (ICorePreferenceConstants.TASK_TAG_PRIORITIES.equals(event.getKey())
-							|| ICorePreferenceConstants.TASK_TAG_NAMES.equals(event.getKey()))
-					{
-						String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
-								ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
-						String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
-								ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
-						fgTaskTags = createTaskTags(rawTagNames, rawTagPriorities);
-					}
-				}
-			};
-			EclipseUtil.instanceScope().getNode(PREF_PLUGIN_ID).addPreferenceChangeListener(fgPrefListener);
+				};
+				EclipseUtil.instanceScope().getNode(PREF_PLUGIN_ID).addPreferenceChangeListener(fgPrefListener);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(CorePlugin.getDefault(), "Failed to attach preference listener for task tag prefs", e); //$NON-NLS-1$
+				fgPrefListener = null;
+			}
 			fgCaseSensitive = Platform.getPreferencesService().getBoolean(PREF_PLUGIN_ID,
 					ICorePreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true, contexts);
+		}
+		if (fgTaskTags == null)
+		{
+			fgTaskTags = getCurrentTaskTags();
+		}
+	}
+
+	/**
+	 * Looks up the task tag strings an priorities from preferences.
+	 * 
+	 * @return
+	 */
+	protected static List<TaskTag> getCurrentTaskTags()
+	{
+		try
+		{
+			final IScopeContext[] contexts = new IScopeContext[] { EclipseUtil.instanceScope(),
+					EclipseUtil.defaultScope() };
 			String rawTagNames = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
 					ICorePreferenceConstants.TASK_TAG_NAMES, null, contexts);
 			String rawTagPriorities = Platform.getPreferencesService().getString(PREF_PLUGIN_ID,
 					ICorePreferenceConstants.TASK_TAG_PRIORITIES, null, contexts);
-			fgTaskTags = createTaskTags(rawTagNames, rawTagPriorities);
+			return createTaskTags(rawTagNames, rawTagPriorities);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), "Failed to lookup task tag strings and priorities", e); //$NON-NLS-1$
+			return Collections.emptyList();
 		}
 	}
 
 	public static Collection<TaskTag> getTaskTags()
 	{
 		initializeValues();
+		if (fgTaskTags == null)
+		{
+			return Collections.emptyList();
+		}
 		return fgTaskTags;
 	}
 
@@ -150,10 +185,22 @@ public class TaskTag
 		List<TaskTag> tags = new ArrayList<TaskTag>();
 		String[] tagNames = fgCommaSplitter.split(rawTagNames);
 		String[] tagPriorities = fgCommaSplitter.split(rawTagPriorities);
-		// TODO make sure arrays are same size!
+		if (tagNames.length != tagPriorities.length)
+		{
+			IdeLog.logWarning(
+					CorePlugin.getDefault(),
+					MessageFormat
+							.format("Tag name and priority lists weren't the same length. Names: {0}; Priorities: {1}", rawTagNames, rawTagPriorities)); //$NON-NLS-1$
+		}
 		for (int i = 0; i < tagNames.length; i++)
 		{
-			tags.add(new TaskTag(tagNames[i], tagPriorities[i]));
+			// If array sizes don't match, assume "normal" priority.
+			String priority = NORMAL;
+			if (i < tagPriorities.length)
+			{
+				priority = tagPriorities[i];
+			}
+			tags.add(new TaskTag(tagNames[i], priority));
 		}
 		return tags;
 	}

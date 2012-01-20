@@ -23,6 +23,7 @@ import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -75,7 +76,11 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 						return Status.CANCEL_STATUS;
 					}
 
-					currentRepo.enterWriteProcess();
+					if (!currentRepo.enterWriteProcess())
+					{
+						return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+								Messages.GitLaunchDelegate_FailedToAcquireWriteLock);
+					}
 					try
 					{
 						ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);

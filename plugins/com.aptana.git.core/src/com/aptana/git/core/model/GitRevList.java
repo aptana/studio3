@@ -99,10 +99,19 @@ public class GitRevList
 		{
 			return Status.CANCEL_STATUS;
 		}
+
+		if (!repository.enterRead())
+		{
+			// Bail early and report a failure to acquire the lock on the repo
+			return new Status(
+					IStatus.ERROR,
+					GitPlugin.getPluginId(),
+					"Failed to acquire read lock on the git repository. A long-running operation that writes to the repo is running (i.e. pull). Please ensure that has finished before trying again.");
+		}
+
 		try
 		{
 			// FIXME Move this into GitRepository, so we can set up lock/monitor on it!
-			repository.enterRead();
 			Process p = GitExecutable.instance().run(directory, arguments.toArray(new String[arguments.size()]));
 			InputStream stream = p.getInputStream();
 

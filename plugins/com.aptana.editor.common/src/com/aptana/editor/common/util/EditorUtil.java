@@ -9,6 +9,7 @@ package com.aptana.editor.common.util;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
@@ -30,30 +31,44 @@ public class EditorUtil
 	/**
 	 * Retrieves the indentation settings for the current editor, or falls back on default settings if the current
 	 * editor is not available.
-	 * 
-	 * @return
 	 */
 	public static int getSpaceIndentSize()
 	{
-		int spaceIndentSize = 0;
-
-		// Check the preferences of the active editor
-		if (UIUtils.getActiveEditor() != null)
+		IEditorPart activeEditor = UIUtils.getActiveEditor();
+		if (activeEditor != null)
 		{
-			spaceIndentSize = Platform.getPreferencesService().getInt(UIUtils.getActiveEditor().getSite().getId(),
+			return getSpaceIndentSize(activeEditor.getSite().getId());
+		}
+		return getSpaceIndentSize(null);
+	}
+
+	/**
+	 * Retrieves the indentation settings from the given preferences qualifier, or falls back on default settings if the
+	 * given qualifier is null, or the value of the indent-size is smaller than 1.
+	 */
+	public static int getSpaceIndentSize(String preferencesQualifier)
+	{
+		int spaceIndentSize = 0;
+		if (preferencesQualifier != null)
+		{
+			spaceIndentSize = Platform.getPreferencesService().getInt(preferencesQualifier,
 					AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 0, null);
 		}
-
 		// Fall back on CommonEditorPlugin or EditorsPlugin values if none are set for current editor
-		if (spaceIndentSize == 0 && CommonEditorPlugin.getDefault() != null && EditorsPlugin.getDefault() != null)
+		return (spaceIndentSize > 0) ? spaceIndentSize : getDefaultSpaceIndentSize(preferencesQualifier);
+	}
+
+	public static int getDefaultSpaceIndentSize(String preferencesQualifier)
+	{
+		int spaceIndentSize = 0;
+		if (CommonEditorPlugin.getDefault() != null && EditorsPlugin.getDefault() != null)
 		{
 			spaceIndentSize = new ChainedPreferenceStore(new IPreferenceStore[] {
 					CommonEditorPlugin.getDefault().getPreferenceStore(),
 					EditorsPlugin.getDefault().getPreferenceStore() })
 					.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 		}
-
-		return (spaceIndentSize != 0) ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
+		return (spaceIndentSize > 0) ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
 	}
 
 	/**

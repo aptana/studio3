@@ -267,17 +267,28 @@ public class GitIndex
 	 */
 	public List<ChangedFile> changedFiles()
 	{
+		boolean isNull = false;
+		synchronized (this.changedFilesLock)
+		{
+			isNull = (this.changedFiles == null);
+		}
+
+		if (isNull)
+		{
+			// Don't want to call back to fireIndexChangeEvent yet!
+			IStatus status = refresh(false, new NullProgressMonitor());
+			if (!status.isOK())
+			{
+				IdeLog.logError(GitPlugin.getDefault(), status.getMessage());
+				return Collections.emptyList();
+			}
+		}
+
 		synchronized (this.changedFilesLock)
 		{
 			if (this.changedFiles == null)
 			{
-				// Don't want to call back to fireIndexChangeEvent yet!
-				IStatus status = refresh(false, new NullProgressMonitor());
-				if (!status.isOK())
-				{
-					IdeLog.logError(GitPlugin.getDefault(), status.getMessage());
-					return Collections.emptyList();
-				}
+				return Collections.emptyList();
 			}
 
 			List<ChangedFile> copy = new ArrayList<ChangedFile>(this.changedFiles.size());
@@ -327,14 +338,18 @@ public class GitIndex
 		// files.
 		for (ChangedFile file : stageFiles)
 		{
-			int index = Collections.binarySearch(this.changedFiles, file);
-			if (index >= 0)
+			synchronized (changedFilesLock)
 			{
-				synchronized (this.changedFilesLock)
+				if (this.changedFiles != null)
 				{
-					ChangedFile orig = this.changedFiles.get(index);
-					orig.hasUnstagedChanges = false;
-					orig.hasStagedChanges = true;
+					int index = Collections.binarySearch(this.changedFiles, file);
+					if (index >= 0)
+					{
+
+						ChangedFile orig = this.changedFiles.get(index);
+						orig.hasUnstagedChanges = false;
+						orig.hasStagedChanges = true;
+					}
 				}
 			}
 
@@ -380,14 +395,18 @@ public class GitIndex
 		// files.
 		for (ChangedFile file : unstageFiles)
 		{
-			int index = Collections.binarySearch(this.changedFiles, file);
-			if (index >= 0)
+			synchronized (this.changedFilesLock)
 			{
-				synchronized (this.changedFilesLock)
+				if (this.changedFiles != null)
 				{
-					ChangedFile orig = this.changedFiles.get(index);
-					orig.hasUnstagedChanges = true;
-					orig.hasStagedChanges = false;
+					int index = Collections.binarySearch(this.changedFiles, file);
+					if (index >= 0)
+					{
+
+						ChangedFile orig = this.changedFiles.get(index);
+						orig.hasUnstagedChanges = true;
+						orig.hasStagedChanges = false;
+					}
 				}
 			}
 

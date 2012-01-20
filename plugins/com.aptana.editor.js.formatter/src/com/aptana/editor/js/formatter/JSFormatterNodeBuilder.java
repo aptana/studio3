@@ -1000,7 +1000,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				IFormatterContainerNode lineNode = pushLineNode(node);
 				int startingOffset = node.getStartingOffset();
-				visitTextNode(startingOffset, startingOffset + 7, true, 0, 0, false);
+				visitTextNode(startingOffset, startingOffset + 8, true, 0, 0, false);
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());
 			}
@@ -1070,7 +1070,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 				else
 				{
-					visitTextNode(startingOffset, startingOffset + 5, true, 0, 0, false);
+					visitTextNode(startingOffset, startingOffset + 6, true, 0, 0, false);
 				}
 				findAndPushPunctuationNode(TypePunctuation.SEMICOLON, node.getEndingOffset(), false, true);
 				checkedPop(lineNode, lineNode.getEndOffset());

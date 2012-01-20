@@ -70,7 +70,7 @@ public class JSONFormatWhitespacePage extends FormatterModifyTabPage
 			manager.enableControl(tabSize, !editorSettingsMode);
 			if (editorSettingsMode)
 			{
-				setEditorTabWidth(JSONPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				setEditorTabWidth(JSONPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 			}
 		}
 
@@ -86,7 +86,7 @@ public class JSONFormatWhitespacePage extends FormatterModifyTabPage
 				manager.enableControl(tabSize, !editorSettingsMode);
 				if (editorSettingsMode)
 				{
-					setEditorTabWidth(JSONPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+					setEditorTabWidth(JSONPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 				}
 			}
 		}
@@ -125,9 +125,9 @@ public class JSONFormatWhitespacePage extends FormatterModifyTabPage
 						TAB_OPTION_NAMES);
 		final Text indentationSize = manager.createNumber(generalGroup,
 				IPreferenceConstants.FORMATTER_INDENTATION_SIZE,
-				Messages.JSONFormatterControlStatementsPage_indentation_size_group_option);
+				Messages.JSONFormatterControlStatementsPage_indentation_size_group_option, 1);
 		final Text tabSize = manager.createNumber(generalGroup, IPreferenceConstants.FORMATTER_TAB_SIZE,
-				Messages.JSONFormatterControlStatementsPage_tab_size_group_option);
+				Messages.JSONFormatterControlStatementsPage_tab_size_group_option, 1);
 
 		tabSize.addModifyListener(new ModifyListener()
 		{

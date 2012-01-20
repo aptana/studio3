@@ -286,9 +286,11 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				try
 				{
 					projectHandle.setDescription(projectDescription, null);
+					projectHandle.refreshLocal(IResource.DEPTH_INFINITE, null);
 				}
 				catch (CoreException e)
 				{
+					IdeLog.logError(SamplesUIPlugin.getDefault(), e);
 				}
 
 				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
@@ -306,6 +308,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 							}
 							catch (CoreException e)
 							{
+								IdeLog.logError(SamplesUIPlugin.getDefault(), e);
 							}
 						}
 					}

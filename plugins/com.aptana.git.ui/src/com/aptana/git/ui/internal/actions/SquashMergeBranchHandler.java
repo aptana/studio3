@@ -22,6 +22,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -72,7 +73,11 @@ public class SquashMergeBranchHandler extends AbstractGitHandler
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 
-				repo.enterWriteProcess();
+				if (!repo.enterWriteProcess())
+				{
+					return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+							Messages.GitLaunchDelegate_FailedToAcquireWriteLock);
+				}
 				try
 				{
 					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "merge", //$NON-NLS-1$

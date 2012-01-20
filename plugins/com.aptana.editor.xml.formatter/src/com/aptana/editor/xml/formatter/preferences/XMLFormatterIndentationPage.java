@@ -65,9 +65,9 @@ public class XMLFormatterIndentationPage extends FormatterModifyTabPage
 		final Combo tabOptions = manager.createCombo(group, XMLFormatterConstants.FORMATTER_TAB_CHAR,
 				FormatterMessages.IndentationTabPage_general_group_option_tab_policy, tabOptionItems, tabOptionNames);
 		final Text indentationSize = manager.createNumber(group, XMLFormatterConstants.FORMATTER_INDENTATION_SIZE,
-				FormatterMessages.IndentationTabPage_general_group_option_indent_size);
+				FormatterMessages.IndentationTabPage_general_group_option_indent_size, 1);
 		final Text tabSize = manager.createNumber(group, XMLFormatterConstants.FORMATTER_TAB_SIZE,
-				FormatterMessages.IndentationTabPage_general_group_option_tab_size);
+				FormatterMessages.IndentationTabPage_general_group_option_tab_size, 1);
 		tabSize.addModifyListener(new ModifyListener()
 		{
 			public void modifyText(ModifyEvent e)
@@ -135,7 +135,7 @@ public class XMLFormatterIndentationPage extends FormatterModifyTabPage
 				manager.enableControl(tabSize, !editorSettingsMode);
 				if (editorSettingsMode)
 				{
-					setEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+					setEditorTabWidth(XMLPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 				}
 			}
 		}
@@ -150,7 +150,7 @@ public class XMLFormatterIndentationPage extends FormatterModifyTabPage
 			manager.enableControl(tabSize, !editorSettingsMode);
 			if (editorSettingsMode)
 			{
-				setEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				setEditorTabWidth(XMLPlugin.getDefault().getBundle().getSymbolicName(), tabSize, indentationSize);
 			}
 		}
 	}

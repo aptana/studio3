@@ -44,6 +44,7 @@ import org.osgi.framework.BundleContext;
 import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
+import com.aptana.core.resources.RefreshThread;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.eaio.uuid.MACAddress;
@@ -369,17 +370,20 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 	{
 
 		private Map<IProject, Integer> fWatchers;
+		private RefreshThread fRefreshThread;
 		private FileDeltaRefreshAdapter fAdapter;
 		private boolean hooked;
 
 		ResourceListener()
 		{
-			fAdapter = new FileDeltaRefreshAdapter();
+			fRefreshThread = new RefreshThread();
+			fAdapter = new FileDeltaRefreshAdapter(fRefreshThread);
 			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
 		public void start()
 		{
+			fRefreshThread.start();
 			if (autoHookFileWatcher())
 			{
 				hookAll();
@@ -417,6 +421,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 		public synchronized void dispose()
 		{
+			fRefreshThread.terminate();
 			// Don't listen to auto-refresh pref changes anymore
 			EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 			// Now remove all the existing file watchers
@@ -503,7 +508,7 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 
 					public boolean visit(IResourceDelta delta) throws CoreException
 					{
-						IResource resource = delta.getResource();
+						final IResource resource = delta.getResource();
 						if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER)
 						{
 							return false;
@@ -519,7 +524,17 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
 							{
-								hookFilewatcher(resource.getProject());
+								Job job = new Job("Hooking file watcher to new project...") //$NON-NLS-1$
+								{
+									protected IStatus run(IProgressMonitor monitor)
+									{
+										hookFilewatcher(resource.getProject());
+										fRefreshThread.refresh(resource.getProject(), IResource.DEPTH_INFINITE);
+										return Status.OK_STATUS;
+									};
+								};
+								job.setSystem(EclipseUtil.showSystemJobs());
+								job.schedule(1000);
 							}
 						}
 						return false;

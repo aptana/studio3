@@ -48,6 +48,7 @@ public class Messages extends NLS
 	public static String DeleteBranchAction_BranchDeletionFailed_Title;
 	public static String DeleteBranchHandler_JobName;
 	public static String GithubNetworkHandler_ViewName;
+	public static String GitLaunchDelegate_FailedToAcquireWriteLock;
 
 	static
 	{

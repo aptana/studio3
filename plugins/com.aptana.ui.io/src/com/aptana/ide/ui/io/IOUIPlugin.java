@@ -12,7 +12,11 @@
 
 package com.aptana.ide.ui.io;
 
+import java.io.File;
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -21,9 +25,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -33,6 +40,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
@@ -85,6 +93,8 @@ public class IOUIPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static IOUIPlugin plugin;
+
+	private Map<IEditorInput, Job> saveRemoteJobs;
 
 	private IConnectionPointListener connectionListener = new IConnectionPointListener()
 	{
@@ -217,6 +227,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+		saveRemoteJobs = new HashMap<IEditorInput, Job>();
 		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 		addPartListener();
@@ -230,6 +241,16 @@ public class IOUIPlugin extends AbstractUIPlugin
 		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
 		removePartListener();
+		if (saveRemoteJobs != null)
+		{
+			Collection<Job> jobs = saveRemoteJobs.values();
+			for (Job job : jobs)
+			{
+				job.cancel();
+			}
+			saveRemoteJobs.clear();
+			saveRemoteJobs = null;
+		}
 		plugin = null;
 		super.stop(context);
 	}
@@ -434,7 +455,7 @@ public class IOUIPlugin extends AbstractUIPlugin
 	 * @param editorPart
 	 *            the editor part the file is opened on
 	 */
-	private static void attachSaveListener(final IEditorPart editorPart)
+	private void attachSaveListener(final IEditorPart editorPart)
 	{
 		final IEditorInput editorInput = editorPart.getEditorInput();
 		if (!(editorInput instanceof UniformFileStoreEditorInput)
@@ -457,13 +478,19 @@ public class IOUIPlugin extends AbstractUIPlugin
 						return;
 					}
 
-					Job job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName())
+					Job job = saveRemoteJobs.get(editorInput);
+					if (job != null)
+					{
+						// a job saving the remote file is already running
+						return;
+					}
+					job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName())
 					{
 
-						protected IStatus run(IProgressMonitor monitor)
+						protected IStatus run(final IProgressMonitor monitor)
 						{
 							UniformFileStoreEditorInput input = (UniformFileStoreEditorInput) editorInput;
-							IFileStore localCacheFile = input.getLocalFileStore();
+							final IFileStore localCacheFile = input.getLocalFileStore();
 							IFileStore originalFile = input.getFileStore();
 							IFileInfo originalFileInfo = input.getFileInfo();
 							try
@@ -482,11 +509,42 @@ public class IOUIPlugin extends AbstractUIPlugin
 								}
 								SyncUtils.copy(localCacheFile, null, originalFile, EFS.NONE, monitor);
 							}
-							catch (CoreException e)
+							catch (final CoreException e)
 							{
-								UIUtils.showErrorMessage(
-										MessageFormat.format(Messages.EditorUtils_ERR_SavingRemoteFile,
-												originalFile.getName()), e);
+								// save failed; offers user to save the file locally instead
+								final String filename = originalFile.getName();
+								UIUtils.getDisplay().asyncExec(new Runnable()
+								{
+
+									public void run()
+									{
+										if (MessageDialog.openConfirm(UIUtils.getActiveShell(), MessageFormat.format(
+												Messages.IOUIPlugin_ErrorSavingRemoteFile_Title, filename),
+												MessageFormat.format(Messages.IOUIPlugin_ErrorSavingRemoteFile_Message,
+														e.getLocalizedMessage())))
+										{
+											FileDialog dialog = new FileDialog(UIUtils.getActiveShell(), SWT.SAVE);
+											dialog.setFileName(filename);
+											String filepath = dialog.open();
+											if (filepath != null)
+											{
+												IFileStore localFileStore = EFS.getLocalFileSystem().fromLocalFile(
+														new File(filepath));
+												try
+												{
+													SyncUtils.copy(localCacheFile, null, localFileStore, EFS.NONE,
+															monitor);
+												}
+												catch (CoreException e1)
+												{
+													UIUtils.showErrorMessage(MessageFormat.format(
+															Messages.IOUIPlugin_ErrorSavingRemoteFile_Title, filename),
+															e);
+												}
+											}
+										}
+									}
+								});
 							}
 							finally
 							{
@@ -497,12 +555,21 @@ public class IOUIPlugin extends AbstractUIPlugin
 								}
 								catch (CoreException e)
 								{
-									IdeLog.logError(IOUIPlugin.getDefault(), e);
+									IdeLog.logWarning(IOUIPlugin.getDefault(), e);
 								}
 							}
 							return Status.OK_STATUS;
 						}
 					};
+					saveRemoteJobs.put(editorInput, job);
+					job.addJobChangeListener(new JobChangeAdapter()
+					{
+
+						public void done(IJobChangeEvent event)
+						{
+							saveRemoteJobs.remove(editorInput);
+						};
+					});
 					job.schedule();
 				}
 			}

@@ -61,6 +61,17 @@ public interface IFormatterControlManager extends IPreferenceDelegate
 	Text createNumber(Composite parent, Object key, String label);
 
 	/**
+	 * Create a {@link Text} that holds a number, and has a minimum value validation.
+	 * 
+	 * @param parent
+	 * @param key
+	 * @param label
+	 * @param minValue
+	 * @return
+	 */
+	Text createNumber(Composite parent, String key, String label, int minValue);
+
+	/**
 	 * Creates a {@link Spinner} with a min and max values.
 	 * 
 	 * @param parent

@@ -12,9 +12,11 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.internal.core.launching.messages"; //$NON-NLS-1$
+
 	public static String GitLaunchDelegate_GitExecutableDoesntExist;
 	public static String GitLaunchDelegate_InvalidWorkingDir;
 	public static String GitLaunchDelegate_NoGitExecutableSpecified;
+	
 	static
 	{
 		// initialize resource bundle

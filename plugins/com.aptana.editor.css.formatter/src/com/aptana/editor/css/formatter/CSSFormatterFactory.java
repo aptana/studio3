@@ -10,12 +10,16 @@ package com.aptana.editor.css.formatter;
 import java.net.URL;
 import java.util.Map;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.util.EditorUtil;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.CSSSourceViewerConfiguration;
 import com.aptana.editor.css.formatter.preferences.CSSFormatterModifyDialog;
@@ -98,4 +102,52 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 		return CSSSourceConfiguration.getDefault();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getEclipsePreferences()
+	 */
+	@Override
+	protected IEclipsePreferences getEclipsePreferences()
+	{
+		return EclipseUtil.instanceScope().getNode(CSSPlugin.PLUGIN_ID);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getFormatterTabPolicy()
+	 */
+	@Override
+	protected String getFormatterTabPolicy(Map<String, String> preferences)
+	{
+		return preferences.get(CSSFormatterConstants.FORMATTER_TAB_CHAR);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getEditorTabSize()
+	 */
+	@Override
+	protected int getEditorTabSize()
+	{
+		return EditorUtil.getSpaceIndentSize(CSSPlugin.getDefault().getBundle().getSymbolicName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getDefaultEditorTabSize()
+	 */
+	protected int getDefaultEditorTabSize()
+	{
+		return EditorUtil.getDefaultSpaceIndentSize(CSSPlugin.getDefault().getBundle().getSymbolicName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#getFormatterTabSizeKey()
+	 */
+	@Override
+	protected String getFormatterTabSizeKey()
+	{
+		return CSSFormatterConstants.FORMATTER_TAB_SIZE;
+	}
 }

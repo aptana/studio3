@@ -77,6 +77,18 @@ public class CoffeeSourcePartitionScannerTest extends TestCase
 		assertPartition(source, CoffeeSourceConfiguration.DEFAULT, 67, 1);
 	}
 
+	// http://jira.appcelerator.org/browse/APSTUD-4054
+	public void testMultilineCommentNotDetectedIfFourOrMoreHashes() throws Exception
+	{
+		String source = "#### This is a single line comment\n" + //
+				"number = 42\n" + //
+				"#### This is another single line comment\n";
+
+		assertPartition(source, CoffeeSourceConfiguration.SINGLELINE_COMMENT, 0, 35);
+		assertPartition(source, CoffeeSourceConfiguration.DEFAULT, 35, 12);
+		assertPartition(source, CoffeeSourceConfiguration.SINGLELINE_COMMENT, 47, 41);
+	}
+
 	public void testExtendedRegex() throws Exception
 	{
 		String source = "OPERATOR = /// ^ (\n" + //
