@@ -1,42 +1,16 @@
 package com.aptana.git.core.model;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
-public class GitIndexTest extends TestCase
+public class GitIndexTest extends GitTestCase
 {
-
-	private GitRepository fRepo;
-	private IPath fPath;
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		try
-		{
-			File generatedRepo = fRepo.workingDirectory().toFile();
-			if (generatedRepo.exists())
-			{
-				delete(generatedRepo);
-			}
-			fRepo = null;
-			fPath = null;
-		}
-		finally
-		{
-			super.tearDown();
-		}
-	}
 
 	public void testStageFilesUpdatesStagedFlagsOnAffectedFiles() throws Exception
 	{
@@ -103,7 +77,7 @@ public class GitIndexTest extends TestCase
 		// Commit the new file
 		index.stageFiles(index.changedFiles());
 		index.commit("initial commit");
-		
+
 		// Now edit the file...
 		writer = new FileWriter(repo.workingDirectory().append(fileName).toOSString(), true);
 		writer.write(" It's me again!");
@@ -111,7 +85,7 @@ public class GitIndexTest extends TestCase
 		// stage it
 		index.refresh(null);
 		index.stageFiles(index.changedFiles());
-		
+
 		// Now fake the new status as being unmerged
 		List<ChangedFile> blah = index.changedFiles();
 		blah.iterator().next().status = Status.UNMERGED;
@@ -148,68 +122,58 @@ public class GitIndexTest extends TestCase
 				fileToStage.hasUnstagedChanges());
 	}
 
-	protected GitRepository createRepo()
+	public void testDeadlock() throws Exception
 	{
-		return createRepo(repoToGenerate());
-	}
-
-	/**
-	 * Create a git repo and make sure it actually generate a model object and not null
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected GitRepository createRepo(IPath path)
-	{
-		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
-		getGitRepositoryManager().create(path);
-		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
-		assertNotNull(repo);
-		fRepo = repo;
-		// Remove the auto-generated .gitignore file!
-		fRepo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
-		return repo;
-	}
-
-	protected IPath repoToGenerate()
-	{
-		if (fPath == null)
+		final GitRepository repo = getRepo();
+		final GitIndex index = repo.index();
+		final Object notifier = new Object();
+		final boolean[] finished = new boolean[2];
+		Thread t = new Thread(new Runnable()
 		{
-			String tmpDirString = System.getProperty("java.io.tmpdir");
-			fPath = new Path(tmpDirString).append("git_repo" + System.currentTimeMillis());
-		}
-		return fPath;
-	}
-
-	/**
-	 * Recursively delete a directory tree.
-	 * 
-	 * @param generatedRepo
-	 */
-	private void delete(File generatedRepo)
-	{
-		if (generatedRepo == null)
-		{
-			return;
-		}
-		File[] children = generatedRepo.listFiles();
-		if (children != null)
-		{
-			for (File child : children)
+			public void run()
 			{
-				delete(child);
+				IProgressMonitor monitor = new NullProgressMonitor();
+				synchronized (notifier)
+				{
+					notifier.notify();
+				}
+				index.refresh(true, monitor);
+				finished[0] = true;
 			}
-		}
-
-		if (!generatedRepo.delete())
+		});
+		Thread t2 = new Thread(new Runnable()
 		{
-			generatedRepo.deleteOnExit();
-		}
-	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
+			public void run()
+			{
+				try
+				{
+					synchronized (notifier)
+					{
+						notifier.wait();
+					}
+					Thread.sleep(5);
+					List<ChangedFile> changedFiles = index.changedFiles();
+					assertNotNull(changedFiles);
+					finished[1] = true;
+				}
+				catch (InterruptedException e)
+				{
+					fail("Failed!");
+				}
+			}
+		});
 
+		t2.start();
+		t.start();
+		// Now give them some time to finish, up to 5 seconds each thread.
+		t.join(5000);
+		t2.join(5000);
+		// if they haven't finished, forcibly interrupt them
+		t.interrupt();
+		t2.interrupt();
+		// Now check to see if the calls ever finished normally, or the interrupt killed them
+		assertTrue("Call to refresh() never finished normally", finished[0]);
+		assertTrue("Call to changedFiles() never finished normally", finished[1]);
+	}
 }
