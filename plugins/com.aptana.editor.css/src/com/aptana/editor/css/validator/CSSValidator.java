@@ -79,7 +79,7 @@ public class CSSValidator implements IValidator
 
 	// other messages that should be filtered automatically
 	@SuppressWarnings("nls")
-	private static final String[] FILTERED_MESSAGES = { "unrecognized media only" };
+	private static final String[] FILTERED_MESSAGES = { "unrecognized media only", "linear-gradient" };
 
 	public CSSValidator()
 	{
