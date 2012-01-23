@@ -380,6 +380,17 @@ public class LocationTests extends JSEditorBasedTests
 			new LocationTypeRange(LocationType.IN_GLOBAL, 20, 23)
 		);
 	}
+
+	/**
+	 * testIfAtEOF
+	 */
+	public void testIfAtEOF()
+	{
+		this.testLocations(
+			"locations/if-eof.js",
+			new LocationTypeRange(LocationType.IN_PROPERTY_NAME, 21)
+		);
+	}
 	
 	/**
 	 * testLabelledFor

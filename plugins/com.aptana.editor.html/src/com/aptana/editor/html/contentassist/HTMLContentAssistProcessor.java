@@ -1475,14 +1475,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	ILexemeProvider<HTMLTokenType> createLexemeProvider(IDocument document, int offset)
+	HTMLLexemeProvider createLexemeProvider(IDocument document, int offset)
 	{
 		int documentLength = document.getLength();
 
 		// account for last position returning an empty IDocument default partition
 		int lexemeProviderOffset = (offset >= documentLength) ? documentLength - 1 : offset;
 
-		return new HTMLLexemeProvider(document, lexemeProviderOffset, new HTMLTagScanner());
+		return new HTMLLexemeProvider(document, lexemeProviderOffset, new HTMLTagScanner(false));
 	}
 
 	/**
@@ -1578,57 +1578,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private IRange getAttributeValueRange(ILexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		int startingOffset = -1;
-		int endingOffset = -1;
-		int floorIndex = lexemeProvider.getLexemeFloorIndex(offset);
-		int ceilingIndex = lexemeProvider.getLexemeCeilingIndex(offset);
+		Lexeme<HTMLTokenType> attribute = lexemeProvider.getLexemeFromOffset(offset);
+		IRange result = Range.EMPTY;
 
-		// NOTE: technically don't need to make this check since the loop condition will catch this case, but adding
-		// this here for symmetry with next loop and to make it explicit that we are handling a case where the offset
-		// does not provide a lexeme
-		if (floorIndex != -1)
+		if (attribute != null)
 		{
-			for (int i = floorIndex; i >= 0; i--)
+			switch (attribute.getType())
 			{
-				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
-
-				// NOTE: we have to check the offset since it's possible to get the right-hand side quote here
-				if (lexeme.getStartingOffset() < offset)
-				{
-					HTMLTokenType type = lexeme.getType();
-
-					if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
-					{
-						startingOffset = lexeme.getStartingOffset() + 1;
-						break;
-					}
-				}
-			}
-		}
-
-		if (ceilingIndex != -1)
-		{
-			for (int i = ceilingIndex; i < lexemeProvider.size(); i++)
-			{
-				Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
-				HTMLTokenType type = lexeme.getType();
-
-				if (type == HTMLTokenType.DOUBLE_QUOTED_STRING || type == HTMLTokenType.SINGLE_QUOTED_STRING)
-				{
-					endingOffset = lexeme.getEndingOffset() - 1;
+				case DOUBLE_QUOTED_STRING:
+				case SINGLE_QUOTED_STRING:
+					result = new Range(attribute.getStartingOffset() + 1, attribute.getEndingOffset() - 1);
 					break;
-				}
 			}
 		}
 
-		if (startingOffset != -1 && endingOffset != -1 && startingOffset <= endingOffset)
-		{
-			return new Range(startingOffset, endingOffset);
-		}
-		else
-		{
-			return Range.EMPTY;
-		}
+		return result;
 	}
 
 	/**

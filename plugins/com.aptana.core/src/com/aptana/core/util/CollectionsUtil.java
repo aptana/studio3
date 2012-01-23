@@ -38,12 +38,14 @@ public class CollectionsUtil
 	 * @param items
 	 *            A list of items to add
 	 */
-	public static final <T, U extends T> void addToList(List<T> list, U... items)
+	public static final <T, U extends T> List<T> addToList(List<T> list, U... items)
 	{
 		if (list != null && items != null)
 		{
 			list.addAll(Arrays.asList(items));
 		}
+
+		return list;
 	}
 
 	/**
@@ -58,12 +60,14 @@ public class CollectionsUtil
 	 * @param items
 	 *            A list of items to add
 	 */
-	public static final <T, U extends T> void addToSet(Set<T> set, U... items)
+	public static final <T, U extends T> Set<T> addToSet(Set<T> set, U... items)
 	{
 		if (set != null && items != null)
 		{
 			set.addAll(Arrays.asList(items));
 		}
+
+		return set;
 	}
 
 	/**

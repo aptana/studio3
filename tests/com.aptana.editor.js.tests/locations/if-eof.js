@@ -1,0 +1,1 @@
+if (true) document.ge
