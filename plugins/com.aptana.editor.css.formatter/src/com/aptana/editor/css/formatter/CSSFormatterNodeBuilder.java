@@ -537,11 +537,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		int expressionEndOffset = expressionNode.getEndingOffset();
 		int semicolonLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, ';', false);
 		int commaLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, ',', false);
+		int forwardSlashLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '/', false);
 		int LFLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '\n', false);
 		int CRLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '\r', false);
 
 		boolean endsWithSemicolon = false;
 		boolean endsWithComma = false;
+		boolean endsWithSlash = false;
 		boolean isLastNodeInDeclaration = false;
 
 		if (document.charAt(semicolonLocation) == ';')
@@ -553,6 +555,11 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			endsWithComma = true;
 		}
+		
+		if (document.charAt(forwardSlashLocation) == '/')
+		{
+			endsWithSlash = true;
+		}
 
 		if ((document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r') && isLastDeclaration)
 		{
@@ -560,7 +567,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		FormatterBlockWithBeginNode formatterDeclarationValueNode = new FormatterCSSDeclarationValueNode(document,
-				isLastNodeInDeclaration, endsWithComma || endsWithSemicolon);
+				isLastNodeInDeclaration, endsWithComma || endsWithSemicolon || endsWithSlash);
 
 		formatterDeclarationValueNode.setBegin(createTextNode(document, expressionNode.getStartingOffset(),
 				expressionNode.getEndingOffset() + 1));
@@ -571,7 +578,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			findAndPushPunctuationNode(TypePunctuation.COMMA, commaLocation, false);
 		}
-
 	}
 
 	private void pushTermListNode(CSSTermListNode termListNode, boolean isLastDeclaration)
