@@ -33,6 +33,7 @@ public class JSModelFormatter
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
 	private static final char BULLET = '\u2022';
+	private static final String PROTOTYPE_PROPERTY = "." + JSTypeConstants.PROTOTYPE_PROPERTY; //$NON-NLS-1$
 
 	/**
 	 * static initializer
@@ -431,6 +432,10 @@ public class JSModelFormatter
 					&& type.endsWith(JSTypeConstants.GENERIC_CLOSE))
 			{
 				result = type.substring(JSTypeConstants.GENERIC_FUNCTION_OPEN.length(), type.length() - 1);
+			}
+			else if (type.endsWith(PROTOTYPE_PROPERTY))
+			{
+				result = type.substring(0, type.length() - PROTOTYPE_PROPERTY.length());
 			}
 			else
 			{
