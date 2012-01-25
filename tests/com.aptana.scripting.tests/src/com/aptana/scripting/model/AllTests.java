@@ -27,6 +27,7 @@ public class AllTests
 		suite.addTestSuite(FilterTests.class);
 		suite.addTestSuite(KeyBindingTests.class);
 		suite.addTestSuite(PlatformSpecificCommandTests.class);
+		suite.addTestSuite(SnippetCategoryTests.class);
 		suite.addTestSuite(WithDefaultsTests.class);
 
 		// TODO: uncomment once timing issues are resolved. We're still getting

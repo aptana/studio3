@@ -1,15 +1,15 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.scripting.ui.views;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,19 +17,23 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.SnippetCategoryElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class SnippetsNode extends BaseNode<SnippetsNode.Property>
+/**
+ * A node in the Bundles view that contains the defined SnippetCategoryNodes
+ * 
+ * @author nle
+ */
+public class SnippetCategoriesNode extends BaseNode<SnippetCategoriesNode.Property>
 {
-	enum Property implements IPropertyInformation<SnippetsNode>
+	enum Property implements IPropertyInformation<SnippetCategoriesNode>
 	{
 		COUNT(Messages.SnippetsNode_Snippets_Count)
 		{
-			public Object getPropertyValue(SnippetsNode node)
+			public Object getPropertyValue(SnippetCategoriesNode node)
 			{
-				return node.snippets.length;
+				return node.snippetCategories.length;
 			}
 		};
 
@@ -46,17 +50,17 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 		}
 	}
 
-	private static final Image SNIPPETS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	private SnippetNode[] snippets;
+	private static final Image SNIPPET_CATEGORIES_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	private SnippetCategoryNode[] snippetCategories;
 
 	/**
 	 * CommandsNode
 	 * 
 	 * @param bundle
 	 */
-	SnippetsNode(BundleElement bundle)
+	SnippetCategoriesNode(BundleElement bundle)
 	{
-		this(bundle.getCommands());
+		this(bundle.getSnippetCategories());
 	}
 
 	/**
@@ -64,24 +68,24 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 	 * 
 	 * @param elements
 	 */
-	SnippetsNode(List<CommandElement> elements)
+	SnippetCategoriesNode(List<SnippetCategoryElement> elements)
 	{
-		List<SnippetNode> items = new LinkedList<SnippetNode>();
+		List<SnippetCategoryNode> items = new ArrayList<SnippetCategoryNode>();
 
 		if (elements != null)
 		{
 			Collections.sort(elements);
 
-			for (CommandElement command : elements)
+			for (SnippetCategoryElement element : elements)
 			{
-				if (command instanceof SnippetElement)
+				if (element instanceof SnippetCategoryElement)
 				{
-					items.add(new SnippetNode((SnippetElement) command));
+					items.add(new SnippetCategoryNode((SnippetCategoryElement) element));
 				}
 			}
 		}
 
-		snippets = items.toArray(new SnippetNode[items.size()]);
+		snippetCategories = items.toArray(new SnippetCategoryNode[items.size()]);
 	}
 
 	/*
@@ -90,7 +94,7 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 	 */
 	public Object[] getChildren()
 	{
-		return snippets;
+		return snippetCategories;
 	}
 
 	/*
@@ -99,7 +103,7 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 	 */
 	public Image getImage()
 	{
-		return SNIPPETS_ICON;
+		return SNIPPET_CATEGORIES_ICON;
 	}
 
 	/*
@@ -118,7 +122,7 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 	 */
 	public String getLabel()
 	{
-		return Messages.SnippetsNode_Snippets_Node;
+		return Messages.SnippetCategoriesNode_SnippetCategories_Node;
 	}
 
 	/**
@@ -128,6 +132,6 @@ class SnippetsNode extends BaseNode<SnippetsNode.Property>
 	 */
 	public boolean hasChildren()
 	{
-		return !ArrayUtil.isEmpty(snippets);
+		return !ArrayUtil.isEmpty(snippetCategories);
 	}
 }

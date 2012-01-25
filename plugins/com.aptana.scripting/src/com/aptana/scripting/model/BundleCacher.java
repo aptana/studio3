@@ -625,6 +625,7 @@ public class BundleCacher
 			this.yamlConstructors.put(new Tag(BundleElement.class), new ConstructBundleElement());
 			this.yamlConstructors.put(new Tag(MenuElement.class), new ConstructMenuElement());
 			this.yamlConstructors.put(new Tag(SnippetElement.class), new ConstructSnippetElement());
+			this.yamlConstructors.put(new Tag(SnippetCategoryElement.class), new ConstructSnippetCategoryElement());
 			this.yamlConstructors.put(new Tag(ContentAssistElement.class), new ConstructContentAssistElement());
 			this.yamlConstructors.put(new Tag(CommandElement.class), new ConstructCommandElement());
 			this.yamlConstructors.put(new Tag(TemplateElement.class), new ConstructTemplateElement());
@@ -827,6 +828,20 @@ public class BundleCacher
 				be.setPath(path);
 				setPrefixTriggers(node, be);
 				return be;
+			}
+		}
+
+		private class ConstructSnippetCategoryElement extends AbstractBundleElementConstruct
+		{
+			public Object construct(Node node)
+			{
+				node.setType(SnippetCategoryElement.class);
+				String path = getPath(node);
+				SnippetCategoryElement sce = new SnippetCategoryElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, sce);
+				sce.setPath(path);
+				return sce;
 			}
 		}
 

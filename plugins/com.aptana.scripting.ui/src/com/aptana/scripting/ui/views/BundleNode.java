@@ -151,6 +151,7 @@ class BundleNode extends BaseNode<BundleNode.Property>
 		// create and add children
 		addNode(items, new CommandsNode(bundle));
 		addNode(items, new SnippetsNode(bundle));
+		addNode(items, new SnippetCategoriesNode(bundle));
 		addNode(items, new FileTemplatesNode(bundle));
 		addNode(items, new MenusNode(bundle));
 		addNode(items, new BuildPathsNode(bundle));

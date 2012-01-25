@@ -8,19 +8,12 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.MessageFormat;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.scripting.ScriptingActivator;
 
 public class ProjectTemplateElement extends AbstractBundleElement implements IProjectTemplate
 {
@@ -215,36 +208,12 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 	 */
 	public URL getIconURL()
 	{
-		if (fIconPath == null)
-		{
-			return null;
-		}
-
 		if (fIconURL != null)
 		{
 			return fIconURL;
 		}
 
-		try
-		{
-			// First try to convert path into a URL
-			fIconURL = new URL(fIconPath);
-		}
-		catch (MalformedURLException e1)
-		{
-			// If it fails, assume it's a project-relative local path
-			IPath path = new Path(getDirectory().getAbsolutePath()).append(fIconPath);
-			try
-			{
-				fIconURL = path.toFile().toURI().toURL();
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(ScriptingActivator.getDefault(), MessageFormat.format(
-						"Unable to convert {0} into an icon URL for template {1}", fIconPath, getDisplayName())); //$NON-NLS-1$
-			}
-		}
-
+		fIconURL = getURLFromPath(fIconPath);
 		return fIconURL;
 
 	}

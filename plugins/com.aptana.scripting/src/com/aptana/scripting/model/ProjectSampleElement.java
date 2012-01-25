@@ -8,19 +8,12 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
-import com.aptana.scripting.ScriptingActivator;
 
 public class ProjectSampleElement extends AbstractBundleElement
 {
@@ -102,25 +95,7 @@ public class ProjectSampleElement extends AbstractBundleElement
 			URL iconUrl = fIconUrls.get(size);
 			if (iconUrl == null)
 			{
-				try
-				{
-					// First try to convert path into a URL
-					iconUrl = new URL(iconPath);
-				}
-				catch (MalformedURLException e1)
-				{
-					// If it fails, assume it's a project-relative local path
-					IPath path = new Path(getDirectory().getAbsolutePath()).append(iconPath);
-					try
-					{
-						iconUrl = path.toFile().toURI().toURL();
-					}
-					catch (Exception e)
-					{
-						IdeLog.logError(ScriptingActivator.getDefault(), MessageFormat.format(
-								"Unable to convert {0} into an icon URL for sample {1}", iconPath, getDisplayName())); //$NON-NLS-1$
-					}
-				}
+				iconUrl = getURLFromPath(iconPath);
 				fIconUrls.put(size, iconUrl);
 			}
 		}

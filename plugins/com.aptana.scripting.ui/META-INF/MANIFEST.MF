@@ -13,8 +13,17 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.theme,
  org.eclipse.jface.text,
  com.aptana.ui;bundle-version="3.0.0",
- com.aptana.core
+ com.aptana.core,
+ com.aptana.formatter.epl;bundle-version="3.0.0",
+ org.eclipse.ui.editors,
+ com.aptana.formatter.ui.epl;bundle-version="3.0.0",
+ com.aptana.editor.common,
+ org.eclipse.core.resources,
+ com.aptana.editor.text,
+ org.eclipse.search,
+ org.eclipse.ui.ide
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.scripting.ui
+Export-Package: com.aptana.scripting.ui,
+ com.aptana.snippets.ui.views
 Eclipse-ExtensibleAPI: true

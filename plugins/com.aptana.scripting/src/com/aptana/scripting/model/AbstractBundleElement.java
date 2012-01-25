@@ -7,10 +7,20 @@
  */
 package com.aptana.scripting.model;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.MessageFormat;
+
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.MatchAnyScopeSelector;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.ScriptingActivator;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
@@ -140,5 +150,47 @@ public abstract class AbstractBundleElement extends AbstractElement
 			this._scope = scope;
 			this._scopeSelector = null;
 		}
+	}
+
+	protected URL getURLFromPath(String path)
+	{
+		if (path == null)
+		{
+			return null;
+		}
+
+		URL iconURL = null;
+
+		try
+		{
+			// First try to convert path into a URL
+			iconURL = new URL(path);
+		}
+		catch (MalformedURLException e1)
+		{
+			// If it fails, assume it's a project-relative local path
+			IPath iconPath = new Path(getDirectory().getAbsolutePath()).append(path);
+			try
+			{
+				iconURL = iconPath.toFile().toURI().toURL();
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(ScriptingActivator.getDefault(), MessageFormat.format(
+						"Unable to convert {0} into an URL for bundle element {1}", path, getDisplayName())); //$NON-NLS-1$
+			}
+		}
+
+		return iconURL;
+	}
+
+	/**
+	 * getDirectory
+	 * 
+	 * @return
+	 */
+	private File getDirectory()
+	{
+		return getOwningBundle().getBundleDirectory();
 	}
 }

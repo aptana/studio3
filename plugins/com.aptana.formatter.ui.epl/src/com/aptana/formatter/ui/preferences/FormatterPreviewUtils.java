@@ -45,9 +45,9 @@ public class FormatterPreviewUtils
 	public static void updatePreview(ISourceViewer viewer, URL previewContent, String[] substitutions,
 			IScriptFormatterFactory factory, Map<String, String> preferences)
 	{
+		String content = null;
 		if (previewContent != null)
 		{
-			String content;
 			try
 			{
 				final String c = new String(Util.getInputStreamAsCharArray(previewContent.openConnection()
@@ -64,6 +64,17 @@ public class FormatterPreviewUtils
 				disablePreview(viewer);
 				return;
 			}
+		}
+
+		updatePreview(viewer, content, substitutions, factory, preferences);
+	}
+
+	public static void updatePreview(ISourceViewer viewer, String previewContent, String[] substitutions,
+			IScriptFormatterFactory factory, Map<String, String> preferences)
+	{
+		if (previewContent != null)
+		{
+			String content = substitute(previewContent, substitutions);
 			IScriptFormatter formatter = factory.createFormatter(LINE_SEPARATOR, preferences);
 			int tabSize = formatter.getTabSize();
 			String indentType = formatter.getIndentType();

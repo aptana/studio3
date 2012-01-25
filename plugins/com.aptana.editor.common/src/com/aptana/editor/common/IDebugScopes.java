@@ -31,4 +31,9 @@ public interface IDebugScopes
 	 */
 	String CONTENT_ASSIST = CommonEditorPlugin.PLUGIN_ID + "/debug/content_assist"; //$NON-NLS-1$
 
+	/**
+	 * Items related to drag/drop
+	 */
+	String DRAG_DROP = CommonEditorPlugin.PLUGIN_ID + "/debug/drag_drop"; //$NON-NLS-1$
+
 }

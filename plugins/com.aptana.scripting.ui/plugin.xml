@@ -79,5 +79,12 @@
             name="%view.name"
             restorable="true">
       </view>
+      <view
+            category="com.aptana"
+            class="com.aptana.snippets.ui.views.SnippetsView"
+            icon="icons/snippet.png"
+            id="com.aptana.snippets.ui.views.SnippetsView"
+            name="%snippets.view.name">
+      </view>
    </extension>
 </plugin>
