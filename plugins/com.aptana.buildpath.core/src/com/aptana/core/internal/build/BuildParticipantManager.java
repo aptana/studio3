@@ -43,7 +43,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 	private static final String ELEMENT_PARTICIPANT = "participant"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
-	private static final int DEFAULT_PRIORITY = 50;
+	public static final int DEFAULT_PRIORITY = 50;
 
 	private Map<IConfigurationElement, Set<IContentType>> buildParticipants;
 
@@ -207,7 +207,10 @@ public class BuildParticipantManager implements IBuildParticipantManager
 							{
 								String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
 								IContentType type = manager.getContentType(contentTypeId);
-								types.add(type);
+								if (type != null)
+								{
+									types.add(type);
+								}
 							}
 							map.put(element, types);
 						}

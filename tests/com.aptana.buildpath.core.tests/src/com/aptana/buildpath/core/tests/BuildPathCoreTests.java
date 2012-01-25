@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.aptana.core.build.AbstractBuildParticipantTest;
+import com.aptana.core.build.BuildParticipantManagerTest;
 
 public class BuildPathCoreTests extends TestCase
 {
@@ -14,6 +15,7 @@ public class BuildPathCoreTests extends TestCase
 		TestSuite suite = new TestSuite(BuildPathCoreTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(AbstractBuildParticipantTest.class);
+		suite.addTestSuite(BuildParticipantManagerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="com.aptana.buildpath.core.buildParticipants">
+      <participant
+            class="com.aptana.core.build.BuildParticipantManagerTest$TestBuildParticipant"
+            id="com.aptana.buildpath.core.tests.participant1"
+            priority="99">
+         <contentTypeBinding
+               contentTypeId="com.aptana.buildpath.core.fake_content_type1">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.core.build.BuildParticipantManagerTest$NoPrioritySpecifiedBuildParticipant"
+            id="com.aptana.buildpath.core.tests.participant2">
+            <contentTypeBinding
+               contentTypeId="com.aptana.buildpath.core.fake_content_type2">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.core.build.BuildParticipantManagerTest$TestBuildParticipant"
+            id="com.aptana.buildpath.core.tests.participant3"
+            priority="10">
+      </participant>
+      <participant
+            class="com.aptana.core.build.BuildParticipantManagerTest$TestBuildParticipant"
+            id="com.aptana.buildpath.core.tests.participant4"
+            priority="75">
+            <contentTypeBinding
+               contentTypeId="com.aptana.buildpath.core.fake_content_type1">
+         </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.buildpath.core.fake_content_type3">
+         </contentTypeBinding>
+      </participant>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            id="com.aptana.buildpath.core.fake_content_type1"
+            name="Fake Content Type 1"
+            priority="normal">
+      </content-type>
+      <content-type
+      		base-type="org.eclipse.core.runtime.text"
+            id="com.aptana.buildpath.core.fake_content_type2"
+            name="Fake Content Type 2"
+            priority="normal">
+      </content-type>
+      <content-type
+      		base-type="org.eclipse.core.runtime.text"
+            id="com.aptana.buildpath.core.fake_content_type3"
+            name="Fake Content Type 3"
+            priority="normal">
+      </content-type>
+      <content-type
+     		base-type="org.eclipse.core.runtime.text"
+            id="com.aptana.buildpath.core.fake_content_type4"
+            name="Fake Content Type 4"
+            priority="normal">
+      </content-type>
+   </extension>
+</fragment>
