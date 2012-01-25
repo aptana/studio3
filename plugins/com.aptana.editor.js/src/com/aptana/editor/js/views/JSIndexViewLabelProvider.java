@@ -19,7 +19,10 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSModelFormatter;
 import com.aptana.editor.js.contentassist.model.BaseElement;
 import com.aptana.editor.js.contentassist.model.ClassElement;
+import com.aptana.editor.js.contentassist.model.ClassGroupElement;
+import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.JSElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 
 /**
@@ -32,6 +35,9 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 	private static final Image CONSTRUCTOR_ICON = JSPlugin.getImage("icons/constructor.png"); //$NON-NLS-1$
 	private static final Image FUNCTION_ICON = JSPlugin.getImage("icons/js_function.png"); //$NON-NLS-1$
 	private static final Image PROPERTY_ICON = JSPlugin.getImage("icons/js_property.png"); //$NON-NLS-1$
+	private static final Image FOLDER_ICON = JSPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	private static final Image SCRIPT_ICON = JSPlugin.getImage("icons/js.png"); //$NON-NLS-1$
+	private static final Image EVENT_ICON = JSPlugin.getImage("icons/event.gif"); //$NON-NLS-1$
 
 	private static final ImageDescriptor STATIC_OVERLAY = JSPlugin.getImageDescriptor("icons/overlays/static.png"); //$NON-NLS-1$
 
@@ -92,7 +98,15 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 	{
 		Image result = null;
 
-		if (element instanceof ClassElement)
+		if (element instanceof JSElement)
+		{
+			result = SCRIPT_ICON;
+		}
+		else if (element instanceof ClassGroupElement)
+		{
+			result = FOLDER_ICON;
+		}
+		else if (element instanceof ClassElement)
 		{
 			result = CLASS_ICON;
 		}
@@ -112,8 +126,12 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 		}
 		else if (element instanceof PropertyElement)
 		{
-			// Use same logic we use in CA to determine icon type
+			// Use same logic we use in CA to determine icon type. This gives us individual icons by property type
 			result = JSModelFormatter.getImage((PropertyElement) element);
+		}
+		else if (element instanceof EventElement)
+		{
+			result = EVENT_ICON;
 		}
 		else
 		{

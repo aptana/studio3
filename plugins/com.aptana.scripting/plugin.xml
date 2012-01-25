@@ -35,6 +35,9 @@
             name="ruble/snippet.rb">
       </file>
       <file
+            name="ruble/snippet_category.rb">
+      </file>
+      <file
             name="ruble/context.rb">
       </file>
       <file

@@ -183,10 +183,21 @@ public class SWTUtils
 	 */
 	public static FontData[] boldFont(Font font)
 	{
+		return styleFont(font, SWT.BOLD);
+	}
+
+	/**
+	 * Styles a font.
+	 * 
+	 * @param font
+	 * @return styled font data
+	 */
+	public static FontData[] styleFont(Font font, int fontStyle)
+	{
 		FontData[] datas = font.getFontData();
 		for (FontData data : datas)
 		{
-			data.setStyle(data.getStyle() | SWT.BOLD);
+			data.setStyle(data.getStyle() | fontStyle);
 		}
 		return datas;
 	}
@@ -199,12 +210,7 @@ public class SWTUtils
 	 */
 	public static FontData[] italicizedFont(Font font)
 	{
-		FontData[] datas = font.getFontData();
-		for (FontData data : datas)
-		{
-			data.setStyle(data.getStyle() | SWT.ITALIC);
-		}
-		return datas;
+		return styleFont(font, SWT.ITALIC);
 	}
 
 	/**

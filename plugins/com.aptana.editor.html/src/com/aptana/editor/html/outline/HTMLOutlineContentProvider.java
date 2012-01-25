@@ -38,6 +38,7 @@ import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.preferences.HTMLPreferenceUtil;
@@ -95,10 +96,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
-		if (parentElement instanceof CommonOutlineItem)
+		if (parentElement instanceof HTMLOutlineItem)
 		{
 			// delegates to the parse node it references to
-			return getChildren(((CommonOutlineItem) parentElement).getReferenceNode());
+			return getChildren(((HTMLOutlineItem) parentElement).getReferenceNode());
 		}
 		// Handle expansion of link tags pointing to stylesheets
 		if (parentElement instanceof HTMLElementNode)
@@ -202,10 +203,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	@Override
 	public boolean hasChildren(Object element)
 	{
-		if (element instanceof CommonOutlineItem)
+		if (element instanceof HTMLOutlineItem)
 		{
 			// delegates to the parse node it references to
-			return hasChildren(((CommonOutlineItem) element).getReferenceNode());
+			return hasChildren(((HTMLOutlineItem) element).getReferenceNode());
 		}
 
 		// Handle expansion of link tags pointing to stylesheets
@@ -402,5 +403,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		this.treeViewer = (TreeViewer) viewer;
 		super.inputChanged(viewer, oldInput, newInput);
+	}
+
+	@Override
+	public CommonOutlineItem getOutlineItem(IParseNode node)
+	{
+		if (node instanceof HTMLNode)
+		{
+			return new HTMLOutlineItem(node.getNameNode().getNameRange(), node);
+		}
+		return super.getOutlineItem(node);
 	}
 }

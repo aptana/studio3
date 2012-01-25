@@ -206,6 +206,7 @@
    <extension
          point="com.aptana.index.core.ui.indexViewContributors">
       <contributor
+            action-provider="com.aptana.editor.js.views.JSIndexViewActionProvider"
             content-provider="com.aptana.editor.js.views.JSIndexViewContentProvider"
             label-provider="com.aptana.editor.js.views.JSIndexViewLabelProvider"
             name="%js.index.view.contributors">

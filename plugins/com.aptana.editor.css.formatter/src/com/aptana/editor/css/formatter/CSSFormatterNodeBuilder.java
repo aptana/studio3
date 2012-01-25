@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+import com.aptana.editor.css.formatter.nodes.FormatterCSSAtRuleNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationPropertyNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationValueNode;
@@ -49,6 +50,15 @@ import com.aptana.parsing.lexer.IRange;
  */
 public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
+
+	/**
+	 * The length of @media rule.
+	 */
+	private static final int MEDIA_AT_RULE_LENGTH = 6;
+	/**
+	 * The length of @page rule.
+	 */
+	private static final int PAGE_AT_RULE_LENGTH = 5;
 
 	private FormatterDocument document;
 
@@ -119,6 +129,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				pushFormatterMediaNode((CSSMediaNode) cssNode);
 				break;
 			case ICSSNodeTypes.AT_RULE:
+			case ICSSNodeTypes.CHAR_SET:
+			case ICSSNodeTypes.NAMESPACE:
 			case ICSSNodeTypes.IMPORT:
 				// Custom at-rule and import nodes currently fall under the same formatting case. This may need to
 				// change once the parser returns the url part as a textnode
@@ -160,6 +172,11 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			}
 			selectEndingOffset--;
 		}
+		// Push an At-Node to control the lines separators.
+		FormatterCSSAtRuleNode atNode = new FormatterCSSAtRuleNode(document);
+		atNode.setBegin(createTextNode(document, atRuleNode.getStartingOffset(), selectorStartingOffset));
+		push(atNode);
+		checkedPop(atNode, -1);
 
 		// We use a selector node for now, we may want to create a new formatter node type for rule id
 		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false, false);
@@ -182,6 +199,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void pushFormatterMediaNode(CSSMediaNode mediaNode)
 	{
+
+		// Push an At-Node to control the lines separators.
+		FormatterCSSAtRuleNode atNode = new FormatterCSSAtRuleNode(document);
+		int mediaNodeStart = mediaNode.getStartingOffset();
+		atNode.setBegin(createTextNode(document, mediaNodeStart, mediaNodeStart + MEDIA_AT_RULE_LENGTH));
+		push(atNode);
+		checkedPop(atNode, -1);
 
 		CSSTextNode[] medias = mediaNode.getMedias();
 
@@ -291,12 +315,12 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		int blockStartOffset = getBlockStartOffset(faceFontNode.getStartingOffset() + 9, document);
 
 		// create a FormatterCSSSelectorNode for @font-face
-		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true, false);
-		formatterSelectorNode.setBegin(createTextNode(document,
+		FormatterCSSAtRuleNode atFontFaceNode = new FormatterCSSAtRuleNode(document);
+		atFontFaceNode.setBegin(createTextNode(document,
 				getBeginWithoutWhiteSpaces(faceFontNode.getStartingOffset(), document),
 				getEndWithoutWhiteSpaces(faceFontNode.getStartingOffset() + 9, document) + 1));
-		push(formatterSelectorNode);
-		checkedPop(formatterSelectorNode, -1);
+		push(atFontFaceNode);
+		checkedPop(atFontFaceNode, -1);
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
@@ -329,10 +353,17 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void pushFormatterPageNode(CSSPageNode pageNode)
 	{
+		// Push an At-Node to control the lines separators.
+		FormatterCSSAtRuleNode atNode = new FormatterCSSAtRuleNode(document);
+		// +5 for @page length
+		int pageNodeStart = pageNode.getStartingOffset();
+		atNode.setBegin(createTextNode(document, pageNodeStart, pageNodeStart + PAGE_AT_RULE_LENGTH));
+		push(atNode);
+		checkedPop(atNode, -1);
 
 		CSSPageSelectorNode selector = pageNode.getSelector();
 		CSSDeclarationNode[] declarations = pageNode.getDeclarations();
-		int blockStartOffset = getBlockStartOffset(pageNode.getStartingOffset() + 1, document);
+		int blockStartOffset = getBlockStartOffset(pageNodeStart + 1, document);
 
 		if (selector != null)
 		{
@@ -340,8 +371,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true, false);
 			formatterSelectorNode.setBegin(createTextNode(document,
-					getBeginWithoutWhiteSpaces(pageNode.getStartingOffset(), document),
-					getEndWithoutWhiteSpaces(pageNode.getStartingOffset() + 5, document) + 1));
+					getBeginWithoutWhiteSpaces(pageNodeStart, document),
+					getEndWithoutWhiteSpaces(pageNodeStart + PAGE_AT_RULE_LENGTH, document) + 1));
 			push(formatterSelectorNode);
 			checkedPop(formatterSelectorNode, -1);
 
@@ -506,11 +537,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		int expressionEndOffset = expressionNode.getEndingOffset();
 		int semicolonLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, ';', false);
 		int commaLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, ',', false);
+		int forwardSlashLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '/', false);
 		int LFLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '\n', false);
 		int CRLocation = locateCharacterSkippingWhitespaces(document, expressionEndOffset + 1, '\r', false);
 
 		boolean endsWithSemicolon = false;
 		boolean endsWithComma = false;
+		boolean endsWithSlash = false;
 		boolean isLastNodeInDeclaration = false;
 
 		if (document.charAt(semicolonLocation) == ';')
@@ -522,6 +555,11 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			endsWithComma = true;
 		}
+		
+		if (document.charAt(forwardSlashLocation) == '/')
+		{
+			endsWithSlash = true;
+		}
 
 		if ((document.charAt(LFLocation) == '\n' || document.charAt(CRLocation) == '\r') && isLastDeclaration)
 		{
@@ -529,7 +567,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		FormatterBlockWithBeginNode formatterDeclarationValueNode = new FormatterCSSDeclarationValueNode(document,
-				isLastNodeInDeclaration, endsWithComma || endsWithSemicolon);
+				isLastNodeInDeclaration, endsWithComma || endsWithSemicolon || endsWithSlash);
 
 		formatterDeclarationValueNode.setBegin(createTextNode(document, expressionNode.getStartingOffset(),
 				expressionNode.getEndingOffset() + 1));
@@ -540,7 +578,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			findAndPushPunctuationNode(TypePunctuation.COMMA, commaLocation, false);
 		}
-
 	}
 
 	private void pushTermListNode(CSSTermListNode termListNode, boolean isLastDeclaration)

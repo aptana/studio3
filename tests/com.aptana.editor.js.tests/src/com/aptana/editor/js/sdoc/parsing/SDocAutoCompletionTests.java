@@ -9,7 +9,7 @@ package com.aptana.editor.js.sdoc.parsing;
 
 import java.util.List;
 
-import com.aptana.editor.js.contentassist.ASTUtil;
+import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
 
 /**
@@ -23,7 +23,7 @@ public class SDocAutoCompletionTests extends JSEditorBasedTests
 
 		if (cursorOffsets.size() > 0)
 		{
-			List<String> extractedParameters = ASTUtil.getFunctionParameters(document, cursorOffsets.get(0));
+			List<String> extractedParameters = ParseUtil.getFunctionParameters(document, cursorOffsets.get(0));
 
 			assertEquals("Wrong number of parameters", parameters.length, extractedParameters.size());
 

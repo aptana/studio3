@@ -64,13 +64,23 @@ class ControlThemer implements IControlThemer
 		if (invasiveThemesEnabled() && getControl() != null && !getControl().isDisposed())
 		{
 			getControl().setRedraw(false);
-			getControl().setBackground(getBackground());
-			getControl().setForeground(getForeground());
-			if (useEditorFont())
-			{
-				getControl().setFont(getFont());
-			}
+			applyControlColors();
+			applyControlFont();
 			getControl().setRedraw(true);
+		}
+	}
+
+	protected void applyControlColors()
+	{
+		getControl().setBackground(getBackground());
+		getControl().setForeground(getForeground());
+	}
+
+	protected void applyControlFont()
+	{
+		if (useEditorFont())
+		{
+			getControl().setFont(getFont());
 		}
 	}
 
@@ -96,14 +106,27 @@ class ControlThemer implements IControlThemer
 		if (control != null && !control.isDisposed())
 		{
 			control.setRedraw(false);
-
-			control.setBackground(null);
-			control.setForeground(null);
-			if (useEditorFont())
-			{
-				control.setFont(null);
-			}
+			unapplyControlColors();
+			unapplyControlFont();
 			control.setRedraw(true);
+		}
+	}
+
+	protected void unapplyControlColors()
+	{
+		control.setBackground(null);
+		control.setForeground(null);
+	}
+
+	protected void unapplyControlFont()
+	{
+		if (useEditorFont())
+		{
+			control.setFont(getFont());
+		}
+		else
+		{
+			control.setFont(null);
 		}
 	}
 
@@ -236,11 +259,11 @@ class ControlThemer implements IControlThemer
 					// Handle the invasive font setting change
 					if (Boolean.parseBoolean((String) event.getNewValue()))
 					{
-						getControl().setFont(getFont());
+						applyControlFont();
 					}
 					else
 					{
-						getControl().setFont(null);
+						unapplyControlFont();
 					}
 				}
 				else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))

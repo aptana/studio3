@@ -42,9 +42,11 @@ import com.aptana.editor.html.HTMLMetadataLoader;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
+import com.aptana.editor.html.parsing.lexer.HTMLLexemeProvider;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
 import com.aptana.editor.html.tests.HTMLEditorBasedTests;
+import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.projects.WebProjectNature;
 import com.aptana.webserver.core.SimpleWebServer;
 import com.aptana.webserver.core.WebServerCorePlugin;
@@ -911,7 +913,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 
 	public void testAPSTUD3862() throws Exception
 	{
-		TestProject project = createWebProject("3862");
+		TestProject project = createWebProject("3862_");
 		try
 		{
 			project.createFolder("public");
@@ -925,7 +927,7 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 			ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, 15, '\t', false);
 
 			assertEquals(
-					"src value prefix reefers to non-existant subfolder, but we incorrectly suggested children anyways",
+					"src value prefix refers to non-existant subfolder, but we incorrectly suggested children anyways",
 					0, proposals.length);
 		}
 		finally
@@ -967,6 +969,70 @@ public class HTMLContentAssistProcessorTest extends HTMLEditorBasedTests
 		{
 			AssertUtil.assertProposalFound(proposalToChoose, proposals);
 			AssertUtil.assertProposalApplies(postCompletion, document, proposalToChoose, proposals, offset, point);
+		}
+	}
+
+	public void testDoubleQuotedEventAttributeValueType()
+	{
+		setupTestContext("contentAssist/js-event-attribute-double-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.DOUBLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(17, lexeme.getStartingOffset());
+			assertEquals(63, lexeme.getEndingOffset());
+		}
+	}
+
+	public void testSingleQuotedEventAttributeValueType()
+	{
+		setupTestContext("contentAssist/js-event-attribute-single-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.SINGLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(17, lexeme.getStartingOffset());
+			assertEquals(63, lexeme.getEndingOffset());
+		}
+	}
+
+	public void testDoubleQuotedStyleAttributeValueType()
+	{
+		setupTestContext("contentAssist/css-style-attribute-double-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.DOUBLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(12, lexeme.getStartingOffset());
+			assertEquals(29, lexeme.getEndingOffset());
+		}
+	}
+
+	public void testSingleQuotedStyleAttributeValueType()
+	{
+		setupTestContext("contentAssist/css-style-attribute-single-quoted.html");
+
+		for (int offset : cursorOffsets)
+		{
+			HTMLLexemeProvider lexemeProvider = processor.createLexemeProvider(document, offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
+
+			assertNotNull(lexeme);
+			assertEquals(HTMLTokenType.SINGLE_QUOTED_STRING, lexeme.getType());
+			assertEquals(12, lexeme.getStartingOffset());
+			assertEquals(29, lexeme.getEndingOffset());
 		}
 	}
 }

@@ -9,6 +9,7 @@ package com.aptana.editor.js.index;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -42,9 +43,10 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		for (String propertyName : propertyNames)
 		{
-			PropertyElement property = queryHelper.getTypeMember(index, typeName, propertyName);
+			List<PropertyElement> property = queryHelper.getTypeMembers(index, typeName, propertyName);
 
 			assertNotNull(typeName + "." + propertyName + " does not exist", property);
+			assertFalse(typeName + "." + propertyName + " does not exist", property.isEmpty());
 		}
 	}
 
@@ -52,9 +54,10 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 	{
 		for (String typeName : typeNames)
 		{
-			TypeElement type = queryHelper.getType(index, typeName, false);
+			List<TypeElement> type = queryHelper.getTypes(index, typeName, false);
 
 			assertNotNull(type);
+			assertFalse(type.isEmpty());
 		}
 	}
 
@@ -109,8 +112,9 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		PropertyElement global = queryHelper.getGlobal(index, "SimpleType");
+		List<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
 		assertNotNull(global);
+		assertFalse(global.isEmpty());
 	}
 
 	public void testSimpleInternalType() throws Exception
@@ -121,8 +125,9 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "SimpleType");
 
 		// check for global
-		PropertyElement global = queryHelper.getGlobal(index, "SimpleType");
-		assertNull(global);
+		List<PropertyElement> global = queryHelper.getGlobals(index, "SimpleType");
+		assertNotNull(global);
+		assertTrue(global.isEmpty());
 	}
 
 	public void testNamespacedType() throws Exception
@@ -146,8 +151,9 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTypes(index, "com", "com.aptana", "com.aptana.SimpleType");
 
 		// check for global
-		PropertyElement global = queryHelper.getGlobal(index, "com");
-		assertNull(global);
+		List<PropertyElement> global = queryHelper.getGlobals(index, "com");
+		assertNotNull(global);
+		assertTrue(global.isEmpty());
 	}
 
 	public void testNamespacedTypeMixed() throws Exception

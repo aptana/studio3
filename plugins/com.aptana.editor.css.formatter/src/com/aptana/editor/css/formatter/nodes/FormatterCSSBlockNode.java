@@ -74,11 +74,20 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
+		int lineAfter;
 		if (isDeclaration)
 		{
-			return getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION);
+			lineAfter = getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION);
 		}
-		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+		else
+		{
+			lineAfter = getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+		}
+		if (lineAfter == 0)
+		{
+			return -1;
+		}
+		return lineAfter;
 	}
 
 	/*

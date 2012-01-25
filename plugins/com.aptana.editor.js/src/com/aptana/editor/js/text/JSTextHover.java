@@ -8,6 +8,7 @@
 package com.aptana.editor.js.text;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -22,12 +23,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.js.contentassist.ASTUtil;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.LocationType;
+import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
@@ -130,11 +132,18 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 				{
 					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 					Index index = this.getIndex(textViewer);
-					PropertyElement property = queryHelper.getGlobal(index, activeNode.getText());
+					List<PropertyElement> properties = queryHelper.getGlobals(index, activeNode.getText());
 
-					if (property != null)
+					if (properties != null)
 					{
-						result = property.getDescription();
+						List<String> descriptions = new ArrayList<String>();
+
+						for (PropertyElement property : properties)
+						{
+							descriptions.add(property.getDescription());
+						}
+
+						result = StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
 					}
 					break;
 				}
@@ -143,12 +152,12 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 					Index index = this.getIndex(textViewer);
 					// @formatter:off
-					JSGetPropertyNode propertyNode = ASTUtil.getGetPropertyNode(
+					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(
 						identifier.getTargetNode(),
 						identifier.getStatementNode()
 					);
 					// @formatter:on
-					List<String> types = ASTUtil.getParentObjectTypes(index, this.getEditorURI(textViewer),
+					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(textViewer),
 							identifier.getTargetNode(), propertyNode, offset);
 					String typeName = null;
 					String methodName = null;
@@ -161,11 +170,21 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 					if (typeName != null && methodName != null)
 					{
-						PropertyElement property = queryHelper.getTypeMember(index, typeName, methodName);
+						List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
 
-						if (property instanceof FunctionElement)
+						if (properties != null)
 						{
-							result = ((FunctionElement) property).getDescription();
+							List<String> descriptions = new ArrayList<String>();
+
+							for (PropertyElement property : properties)
+							{
+								if (property instanceof FunctionElement)
+								{
+									descriptions.add(((FunctionElement) property).getDescription());
+								}
+							}
+
+							result = StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
 						}
 					}
 					break;

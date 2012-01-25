@@ -215,7 +215,7 @@ public class BundleManager
 	private static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
 
 	// special sub-directories within a bundle directory
-	private static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	public static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	private static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
 	private static final String SAMPLES_DIRECTORY_NAME = "samples"; //$NON-NLS-1$
@@ -227,7 +227,7 @@ public class BundleManager
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 
 	// special file name used to define a bundle
-	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
+	public static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 
@@ -1093,6 +1093,56 @@ public class BundleManager
 	}
 
 	/**
+	 * Return a list of snippet category elements in the specified bundle name. Note that bundle precedence is taken
+	 * into account, so only visible elements are returned in this list
+	 * 
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<SnippetCategoryElement> getBundleSnippetCategories(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<SnippetCategoryElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getSnippetCategories();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of snippet elements in the specified bundle name. Note that bundle precedence is taken into
+	 * account, so only visible elements are returned in this list
+	 * 
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<SnippetElement> getBundleSnippets(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<SnippetElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getSnippets();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
 	 * Return a list of menu elements in the specified bundle name. Note that bundle precedence is taken into account,
 	 * so only visible elements are returned in this list
 	 * 
@@ -1582,6 +1632,48 @@ public class BundleManager
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
 			CollectionsUtil.filter(bundleEntry.getProjectSamples(), result, filter);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of all active snippets. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<SnippetElement> getSnippets(IModelFilter filter)
+	{
+		List<SnippetElement> result = new ArrayList<SnippetElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			CollectionsUtil.filter(getBundleSnippets(name), result, filter);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of all active snippet categories. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<SnippetCategoryElement> getSnippetCategories(IModelFilter filter)
+	{
+		List<SnippetCategoryElement> result = new ArrayList<SnippetCategoryElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			CollectionsUtil.filter(getBundleSnippetCategories(name), result, filter);
 		}
 
 		return result;

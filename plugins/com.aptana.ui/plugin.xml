@@ -61,6 +61,16 @@
                id="com.aptana.samples.ui.SamplesView">
          </viewShortcut>
          <view
+               id="com.aptana.snippets.ui.views.SnippetsView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.views.ContentOutline"
+               visible="true">
+         </view>
+         <viewShortcut
+               id="com.aptana.snippets.ui.views.SnippetsView">
+         </viewShortcut>
+         <view
                id="com.aptana.terminal.views.terminal"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"

@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -43,6 +44,7 @@ public class IndexView extends ViewPart
 	private TreeViewer treeViewer;
 	private ITreeContentProvider contentProvider;
 	private ILabelProvider labelProvider;
+	private IActionProvider actionProvider;
 
 	/**
 	 * addListeners
@@ -86,6 +88,7 @@ public class IndexView extends ViewPart
 		treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		contentProvider = new IndexViewContentProvider();
 		labelProvider = new IndexViewLabelProvider();
+		actionProvider = new IndexViewActionProvider();
 
 		// set content and label providers
 		treeViewer.setContentProvider(contentProvider);
@@ -154,9 +157,27 @@ public class IndexView extends ViewPart
 
 			if (item != null)
 			{
-				// TODO: build list of actions and add them to the manager
+				IAction[] actions = actionProvider.getActions(this, item);
+
+				if (actions != null)
+				{
+					for (IAction action : actions)
+					{
+						manager.add(action);
+					}
+				}
 			}
 		}
+	}
+
+	/**
+	 * getTreeViewer
+	 * 
+	 * @return
+	 */
+	public TreeViewer getTreeViewer()
+	{
+		return treeViewer;
 	}
 
 	/**
@@ -213,7 +234,14 @@ public class IndexView extends ViewPart
 				{
 					IProject project = ((IResource) item).getProject();
 
-					treeViewer.setInput(project);
+					if (project.isOpen())
+					{
+						treeViewer.setInput(project);
+					}
+					else
+					{
+						treeViewer.setInput(null);
+					}
 
 					break;
 				}

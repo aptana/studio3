@@ -22,7 +22,9 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -46,90 +48,96 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 		}
 
 		final String[] command = getCommand();
-		if (command == null || command.length == 0)
+		if (ArrayUtil.isEmpty(command))
 		{
 			return null;
-		}
-		StringBuilder baseJobName = new StringBuilder("git"); //$NON-NLS-1$
-		for (String string : command)
-		{
-			baseJobName.append(' ').append(string);
 		}
 
 		// Run one job per repo
 		for (final GitRepository currentRepo : repos)
 		{
-			StringBuilder jobName = new StringBuilder(baseJobName.toString());
-			if (repos.size() > 1)
-			{
-				jobName.append(" (").append(currentRepo.workingDirectory()).append(')'); //$NON-NLS-1$
-			}
-			Job job = new Job(jobName.toString())
-			{
-				@Override
-				protected IStatus run(IProgressMonitor monitor)
-				{
-					SubMonitor sub = SubMonitor.convert(monitor, 10000);
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-
-					currentRepo.enterWriteProcess();
-					try
-					{
-						ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);
-
-						if (launch.getProcesses() == null || launch.getProcesses().length < 1)
-						{
-							// If something went wrong and there's no process (like unsaved files and user cancelled
-							// dialog)
-							return Status.OK_STATUS;
-						}
-
-						IProcess process = launch.getProcesses()[0];
-						while (!launch.isTerminated())
-						{
-							Thread.yield();
-							if (sub.isCanceled())
-							{
-								launch.terminate();
-								return Status.CANCEL_STATUS;
-							}
-							sub.worked(1);
-						}
-
-						int exitValue = process.getExitValue();
-						if (exitValue != 0)
-						{
-							String msg = MessageFormat
-									.format("command returned non-zero exit value. wd: {0}, command: {1}", currentRepo.workingDirectory(), StringUtil.join(" ", command)); //$NON-NLS-1$ //$NON-NLS-2$
-							IdeLog.logWarning(GitUIPlugin.getDefault(), msg);
-						}
-					}
-					catch (CoreException e)
-					{
-						return e.getStatus();
-					}
-					catch (Throwable e)
-					{
-						return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
-					}
-					finally
-					{
-						currentRepo.exitWriteProcess();
-					}
-					sub.setWorkRemaining(1000);
-					postLaunch(currentRepo);
-					sub.done();
-
-					return Status.OK_STATUS;
-				}
-			};
-			job.setPriority(Job.LONG);
-			job.schedule();
+			runCommandAsJob(command, currentRepo);
 		}
 		return null;
+	}
+
+	protected void runCommandAsJob(final String[] command, final GitRepository currentRepo)
+	{
+		StringBuilder jobName = new StringBuilder("git"); //$NON-NLS-1$
+		for (String string : command)
+		{
+			jobName.append(' ').append(string);
+		}
+		jobName.append(" (").append(currentRepo.workingDirectory()).append(')'); //$NON-NLS-1$
+
+		Job job = new Job(jobName.toString())
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				SubMonitor sub = SubMonitor.convert(monitor, 10000);
+				if (sub.isCanceled())
+				{
+					return Status.CANCEL_STATUS;
+				}
+
+				if (!currentRepo.enterWriteProcess())
+				{
+					return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+							Messages.GitLaunchDelegate_FailedToAcquireWriteLock);
+				}
+				try
+				{
+					ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);
+
+					if (launch.getProcesses() == null || launch.getProcesses().length < 1)
+					{
+						// If something went wrong and there's no process (like unsaved files and user cancelled
+						// dialog)
+						return Status.OK_STATUS;
+					}
+
+					IProcess process = launch.getProcesses()[0];
+					while (!launch.isTerminated())
+					{
+						Thread.yield();
+						if (sub.isCanceled())
+						{
+							launch.terminate();
+							return Status.CANCEL_STATUS;
+						}
+						sub.worked(1);
+					}
+
+					int exitValue = process.getExitValue();
+					if (exitValue != 0)
+					{
+						String msg = MessageFormat
+								.format("command returned non-zero exit value. wd: {0}, command: {1}", currentRepo.workingDirectory(), StringUtil.join(" ", command)); //$NON-NLS-1$ //$NON-NLS-2$
+						IdeLog.logWarning(GitUIPlugin.getDefault(), msg);
+					}
+				}
+				catch (CoreException e)
+				{
+					return e.getStatus();
+				}
+				catch (Throwable e)
+				{
+					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
+				}
+				finally
+				{
+					currentRepo.exitWriteProcess();
+				}
+				sub.setWorkRemaining(1000);
+				postLaunch(currentRepo);
+				sub.done();
+
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.LONG);
+		job.schedule();
 	}
 
 	protected boolean supportsMultipleRepoOperation()

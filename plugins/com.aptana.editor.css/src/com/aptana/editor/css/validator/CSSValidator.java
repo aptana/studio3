@@ -87,7 +87,7 @@ public class CSSValidator extends AbstractBuildParticipant
 
 	// other messages that should be filtered automatically
 	@SuppressWarnings("nls")
-	private static final String[] FILTERED_MESSAGES = { "unrecognized media only" };
+	private static final String[] FILTERED_MESSAGES = { "unrecognized media only", "linear-gradient" };
 
 	static
 	{

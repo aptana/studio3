@@ -830,7 +830,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected void setSelectedProposal(String prefix, ICompletionProposal[] proposals)
 	{
-		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
+		if (StringUtil.isEmpty(prefix) || proposals == null)
 		{
 			return;
 		}

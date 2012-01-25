@@ -705,6 +705,22 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * @return the list of snippets contributed
+	 */
+	public List<SnippetElement> getSnippets()
+	{
+		return this.getChildrenByType(SnippetElement.class);
+	}
+
+	/**
+	 * @return the list of snippet categories contributed
+	 */
+	public List<SnippetCategoryElement> getSnippetCategories()
+	{
+		return this.getChildrenByType(SnippetCategoryElement.class);
+	}
+
+	/**
 	 * getGitRepo
 	 * 
 	 * @return

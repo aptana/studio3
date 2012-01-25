@@ -13,10 +13,12 @@ package com.aptana.core;
 public interface IFilter<T>
 {
 	/**
-	 * include
+	 * Determine if the specified item should be filtered or not. A true value indicates that the item is not being
+	 * filtered.
 	 * 
 	 * @param item
-	 * @return
+	 *            The item to possibly filter
+	 * @return Returns a boolean
 	 */
 	boolean include(T item);
 }

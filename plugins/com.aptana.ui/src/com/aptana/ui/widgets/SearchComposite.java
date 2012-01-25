@@ -60,6 +60,11 @@ public class SearchComposite extends Composite
 
 	public SearchComposite(Composite parent, int style, Client client)
 	{
+		this(parent, style, true, client);
+	}
+
+	public SearchComposite(Composite parent, int style, boolean showSearchIcon, Client client)
+	{
 		super(parent, style);
 		this.client = client;
 
@@ -68,7 +73,13 @@ public class SearchComposite extends Composite
 		searchGridLayout.marginHeight = 0;
 		setLayout(searchGridLayout);
 
-		searchText = new Text(this, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+		int searchTextStyle = SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL;
+		if (showSearchIcon)
+		{
+			searchTextStyle |= SWT.ICON_SEARCH;
+		}
+
+		searchText = new Text(this, searchTextStyle);
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));

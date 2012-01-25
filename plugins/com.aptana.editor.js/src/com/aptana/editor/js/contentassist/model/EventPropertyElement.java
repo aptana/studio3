@@ -7,7 +7,9 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.mortbay.util.ajax.JSON.Output;
 
@@ -17,8 +19,38 @@ import com.aptana.core.util.StringUtil;
 /**
  * EventProperty
  */
-public class EventPropertyElement extends BaseElement
+public class EventPropertyElement extends BaseElement<EventPropertyElement.Property>
 {
+	enum Property implements IPropertyInformation<EventPropertyElement>
+	{
+		NAME(Messages.EventPropertyElement_Name)
+		{
+			public Object getPropertyValue(EventPropertyElement node)
+			{
+				return node.getName();
+			}
+		},
+		TYPE(Messages.EventPropertyElement_Type)
+		{
+			public Object getPropertyValue(EventPropertyElement node)
+			{
+				return node.getType();
+			}
+		};
+
+		private String header;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 
 	private String _type;
@@ -41,6 +73,16 @@ public class EventPropertyElement extends BaseElement
 		super.fromJSON(object);
 
 		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/**
@@ -70,20 +112,6 @@ public class EventPropertyElement extends BaseElement
 		super.toJSON(out);
 
 		out.add(TYPE_PROPERTY, this.getType());
-	}
-
-	/**
-	 * toSource
-	 * 
-	 * @return
-	 */
-	public String toSource()
-	{
-		SourcePrinter printer = new SourcePrinter();
-
-		this.toSource(printer);
-
-		return printer.toString();
 	}
 
 	/**

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
@@ -31,14 +32,37 @@ public class ControlThemerFactory implements IControlThemerFactory
 	 */
 	public void apply(Control control)
 	{
+		apply(control, SWT.NONE, -1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.theme.IControlThemerFactory#applyWithStyle(org.eclipse.swt.widgets.Control, int)
+	 */
+	public void applyWithFontStyle(Control control, int fontStyle)
+	{
+		apply(control, fontStyle, -1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.theme.IControlThemerFactory#applyWithAlpha(org.eclipse.swt.widgets.Control, int)
+	 */
+	public void applyWithAlpha(Control control, int alpha)
+	{
+		apply(control, SWT.NONE, alpha);
+	}
+
+	private void apply(Control control, int fontStyle, int alpha)
+	{
 		// If a themer already exists for the control, just return it
 		IControlThemer themer = themers.get(control);
 		if (themer != null)
 		{
 			return;
-		}		
-		
-		themer = createThemer(control);
+		}
+
+		themer = createThemer(control, fontStyle, alpha);
 		synchronized (themers)
 		{
 			themers.put(control, themer);
@@ -63,7 +87,7 @@ public class ControlThemerFactory implements IControlThemerFactory
 		}
 	}
 
-	private IControlThemer createThemer(Control control)
+	private IControlThemer createThemer(Control control, int fontStyle, int alpha)
 	{
 		// No themer exists, create a new one
 		if (control instanceof Tree)
@@ -74,6 +98,15 @@ public class ControlThemerFactory implements IControlThemerFactory
 		{
 			return new TableThemer((Table) control);
 		}
+		if (fontStyle != SWT.NONE)
+		{
+			return new StyledFontThemer(control, fontStyle);
+		}
+		if (alpha > -1)
+		{
+			return new AlphaBlendThemer(control, alpha);
+		}
+
 		return new ControlThemer(control);
 	}
 

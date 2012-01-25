@@ -8,7 +8,12 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
+import com.aptana.core.util.ObjectUtil;
 
 /**
  * ClassElement
@@ -56,21 +61,73 @@ public class ClassElement extends TypeElement
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.contentassist.model.TypeElement#getProperties()
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public List<PropertyElement> getProperties()
+	public boolean equals(Object obj)
 	{
-		List<PropertyElement> result = new ArrayList<PropertyElement>();
+		boolean result = false;
+
+		if (obj instanceof ClassElement)
+		{
+			ClassElement element = (ClassElement) obj;
+
+			// NOTE: This model element is only being used in the Index View which currently exists for debugging
+			// purposes only. TreeViews use "equals" to find nodes during selection, so we essentially only need to
+			// compare label names
+			result = ObjectUtil.areEqual(getName(), element.getName());
+		}
+		else
+		{
+			result = super.equals(obj);
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#getDocuments()
+	 */
+	@Override
+	public List<String> getDocuments()
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (classTypes != null)
+		{
+			for (TypeElement type : classTypes)
+			{
+				result.addAll(type.getDocuments());
+			}
+		}
+
+		if (instanceTypes != null)
+		{
+			for (TypeElement type : instanceTypes)
+			{
+				result.addAll(type.getDocuments());
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.TypeElement#getEvents()
+	 */
+	@Override
+	public List<EventElement> getEvents()
+	{
+		// Use linked hash set to preserve add order
+		Set<EventElement> result = new LinkedHashSet<EventElement>();
 
 		if (classTypes != null)
 		{
 			for (TypeElement classType : classTypes)
 			{
-				for (PropertyElement property : classType.getProperties())
-				{
-					result.add(property);
-				}
+				result.addAll(classType.getEvents());
 			}
 		}
 
@@ -78,14 +135,79 @@ public class ClassElement extends TypeElement
 		{
 			for (TypeElement instanceType : instanceTypes)
 			{
-				for (PropertyElement property : instanceType.getProperties())
-				{
-					result.add(property);
-				}
+				result.addAll(instanceType.getEvents());
 			}
 		}
 
-		return result;
+		return new ArrayList<EventElement>(result);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.TypeElement#getParentTypes()
+	 */
+	@Override
+	public List<String> getParentTypes()
+	{
+		// Use linked has set to preserve add order
+		Set<String> result = new LinkedHashSet<String>();
+
+		if (classTypes != null)
+		{
+			for (TypeElement classType : classTypes)
+			{
+				result.addAll(classType.getParentTypes());
+			}
+		}
+
+		if (instanceTypes != null)
+		{
+			for (TypeElement instanceType : instanceTypes)
+			{
+				result.addAll(instanceType.getParentTypes());
+			}
+		}
+
+		return new ArrayList<String>(result);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.TypeElement#getProperties()
+	 */
+	@Override
+	public List<PropertyElement> getProperties()
+	{
+		// NOTE: use linked hash set to both preserve order and to remove duplicates
+		Set<PropertyElement> result = new LinkedHashSet<PropertyElement>();
+
+		if (classTypes != null)
+		{
+			for (TypeElement classType : classTypes)
+			{
+				result.addAll(classType.getProperties());
+			}
+		}
+
+		if (instanceTypes != null)
+		{
+			for (TypeElement instanceType : instanceTypes)
+			{
+				result.addAll(instanceType.getProperties());
+			}
+		}
+
+		return new ArrayList<PropertyElement>(result);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#getPropertyInfoSet()
+	 */
+	@Override
+	protected Set<Property> getPropertyInfoSet()
+	{
+		return EnumSet.allOf(Property.class);
 	}
 
 	/**

@@ -22,6 +22,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IDebugScopes;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -79,7 +80,11 @@ public class PushToRemoteHandler extends AbstractGitHandler
 					return Status.CANCEL_STATUS;
 				}
 
-				repo.enterWriteProcess();
+				if (!repo.enterWriteProcess())
+				{
+					return new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+							Messages.GitLaunchDelegate_FailedToAcquireWriteLock);
+				}
 				try
 				{
 					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "push", //$NON-NLS-1$

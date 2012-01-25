@@ -11,12 +11,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
@@ -62,9 +64,14 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
-				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+				List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+				TypeElement window;
 
-				if (window == null)
+				if (!CollectionsUtil.isEmpty(windows))
+				{
+					window = windows.get(windows.size() - 1);
+				}
+				else
 				{
 					window = new TypeElement();
 					window.setName(JSTypeConstants.WINDOW_TYPE);

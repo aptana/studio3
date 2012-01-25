@@ -20,6 +20,7 @@ import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexDocument;
 import com.aptana.index.core.IndexUtil;
@@ -280,5 +281,29 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 		out.add(SINCE_PROPERTY, this.getSinceList());
 		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourcePrinter printer = new SourcePrinter();
+
+		this.toSource(printer);
+
+		return printer.toString();
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @param printer
+	 */
+	public void toSource(SourcePrinter printer)
+	{
+		// Subclasses need to override this method
 	}
 }

@@ -15,6 +15,9 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
+
 public class FileUtil
 {
 	/**
@@ -37,6 +40,7 @@ public class FileUtil
 
 	/**
 	 * Returns true if the given file is symlink
+	 * 
 	 * @param file
 	 * @return
 	 * @throws IOException
@@ -235,5 +239,45 @@ public class FileUtil
 		}
 
 		return files;
+	}
+
+	/**
+	 * Given a directory (or file), we recursively count the number of files in the directory tree. If the argument is
+	 * null, returns 0. If a file is a symlink, it is counted as 1 and is not followed. Directories are not counted, but
+	 * any files underneath them are.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static int countFiles(File file)
+	{
+		if (file == null)
+		{
+			return 0;
+		}
+
+		try
+		{
+			if (isSymlink(file))
+			{
+				return 1;
+			}
+
+			if (file.isDirectory())
+			{
+				int sum = 0;
+				File[] children = file.listFiles();
+				for (File child : children)
+				{
+					sum += countFiles(child);
+				}
+				return sum;
+			}
+		}
+		catch (IOException e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), e);
+		}
+		return 1;
 	}
 }

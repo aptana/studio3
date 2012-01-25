@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
@@ -47,26 +48,7 @@ class SnippetNode extends BaseNode<SnippetNode.Property>
 		{
 			public Object getPropertyValue(SnippetNode node)
 			{
-				String[] triggers = node.snippet.getTriggerTypeValues(TriggerType.PREFIX);
-
-				if (triggers != null)
-				{
-					StringBuilder buffer = new StringBuilder();
-
-					for (int i = 0; i < triggers.length; i++)
-					{
-						if (i > 0)
-						{
-							buffer.append(", "); //$NON-NLS-1$
-						}
-
-						buffer.append(triggers[i]);
-					}
-
-					return buffer.toString();
-				}
-
-				return null;
+				return StringUtil.join(", ", node.snippet.getTriggerTypeValues(TriggerType.PREFIX)); //$NON-NLS-1$
 			}
 		},
 		EXPANSION(Messages.SnippetNode_Snippet_Expansion)
@@ -74,6 +56,27 @@ class SnippetNode extends BaseNode<SnippetNode.Property>
 			public Object getPropertyValue(SnippetNode node)
 			{
 				return node.snippet.getDisplayName();
+			}
+		},
+		CATEGORY(Messages.SnippetNode_Category)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				return node.snippet.getCategory();
+			}
+		},
+		ICON_PATH(Messages.SnippetNode_Icon_Path)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				return node.snippet.getIconPath();
+			}
+		},
+		TAGS(Messages.SnippetNode_Tags)
+		{
+			public Object getPropertyValue(SnippetNode node)
+			{
+				return StringUtil.join(", ", node.snippet.getTags()); //$NON-NLS-1$
 			}
 		};
 

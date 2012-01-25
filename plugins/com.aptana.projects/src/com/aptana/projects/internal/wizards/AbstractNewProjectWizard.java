@@ -422,29 +422,29 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			}
 		sub.worked(10);
 
-		if (!cloneAfterProjectCreated() && isCloneFromGit())
+		if (!applySourcedProjectFilesAfterProjectCreated() && isCloneFromGit())
 		{
 			cloneFromGit(newProject, description, sub.newChild(90));
 		}
 		else
 		{
 			doBasicCreateProject(newProject, description, sub.newChild(75));
-			if (selectedTemplate != null && !isCloneFromGit())
+			if (!applySourcedProjectFilesAfterProjectCreated() && selectedTemplate != null && !isCloneFromGit())
 			{
 				extractZip(selectedTemplate, newProject, true);
-					}
-				}
+			}
+		}
 
 		return newProject;
 	}
 
 	/**
-	 * If a wizard needs to run git clone after a project has been generated (say by a script/process), this should
-	 * return true.
+	 * If a wizard needs to apply project files from an additional source (git clone or template) after a project has
+	 * been generated (say by a script/process), this should return true.
 	 * 
 	 * @return
 	 */
-	protected boolean cloneAfterProjectCreated()
+	protected boolean applySourcedProjectFilesAfterProjectCreated()
 	{
 		return false;
 	}

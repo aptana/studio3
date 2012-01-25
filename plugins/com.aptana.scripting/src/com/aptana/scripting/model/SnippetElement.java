@@ -7,10 +7,19 @@
  */
 package com.aptana.scripting.model;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SnippetElement extends CommandElement
 {
 	private String _expansion;
-	
+	private String _category;
+	private List<String> _tags = new ArrayList<String>();
+	private String _iconPath;
+	private URL _iconURL;
+	private String _description;
+
 	/**
 	 * Snippet
 	 * 
@@ -19,7 +28,7 @@ public class SnippetElement extends CommandElement
 	public SnippetElement(String path)
 	{
 		super(path);
-		
+
 		this.setInputType(InputType.NONE);
 		this.setOutputType(OutputType.INSERT_AS_SNIPPET);
 	}
@@ -51,9 +60,9 @@ public class SnippetElement extends CommandElement
 		// grab input type so we can report back which input was used
 		String inputTypeString = (String) context.get(CommandContext.INPUT_TYPE);
 		InputType inputType = InputType.get(inputTypeString);
-		
+
 		result.setInputType(inputType);
-		
+
 		return result;
 	}
 
@@ -64,7 +73,7 @@ public class SnippetElement extends CommandElement
 	{
 		return "snippet"; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * getExpansion
 	 * 
@@ -83,6 +92,97 @@ public class SnippetElement extends CommandElement
 	public void setExpansion(String expansion)
 	{
 		this._expansion = expansion;
+	}
+
+	/**
+	 * @return the category
+	 */
+	public String getCategory()
+	{
+		return _category;
+	}
+
+	/**
+	 * @param category
+	 *            the category to set
+	 */
+	public void setCategory(String category)
+	{
+		this._category = category;
+	}
+
+	/**
+	 * @return the tags
+	 */
+	public List<String> getTags()
+	{
+		return _tags;
+	}
+
+	/**
+	 * @param tags
+	 *            the tags to set
+	 */
+	public void setTags(List<String> tags)
+	{
+		this._tags.clear();
+		if (tags != null)
+		{
+			this._tags.addAll(tags);
+		}
+	}
+
+	/**
+	 * setIconPath
+	 * 
+	 * @param iconPath
+	 */
+	public void setIconPath(String iconPath)
+	{
+		_iconPath = iconPath;
+	}
+
+	/**
+	 * @return icon path
+	 */
+	public String getIconPath()
+	{
+		return _iconPath;
+	}
+
+	/**
+	 * @return the icon
+	 */
+	public URL getIconURL()
+	{
+		if (_iconURL != null)
+		{
+			return _iconURL;
+		}
+
+		_iconURL = getURLFromPath(_iconPath);
+
+		return _iconURL;
+	}
+
+	/**
+	 * getDescription
+	 * 
+	 * @return
+	 */
+	public String getDescription()
+	{
+		return _description;
+	}
+
+	/**
+	 * setDescription
+	 * 
+	 * @param description
+	 */
+	public void setDescription(String description)
+	{
+		_description = description;
 	}
 
 	/**

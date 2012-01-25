@@ -11,8 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -23,20 +21,19 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryManager;
+import com.aptana.git.core.model.GitTestCase;
 import com.aptana.testing.utils.ProjectCreator;
 
-public class GitFileHistoryTest extends TestCase
+public class GitFileHistoryTest extends GitTestCase
 {
 
 	private static final String PROJECT_NAME = "gfh_test"; //$NON-NLS-1$
 	private IProject fProject;
-	private GitRepository fRepo;
 
 	public void testGetFileRevisions() throws Exception
 	{
@@ -68,19 +65,24 @@ public class GitFileHistoryTest extends TestCase
 			int tries = 100;
 			List<ChangedFile> toStage = index.changedFiles();
 			// HACK Wait until we get a non-empty list?
-			while (toStage == null || toStage.isEmpty())
+			while (CollectionsUtil.isEmpty(toStage))
 			{
 				Thread.sleep(50);
 				toStage = index.changedFiles();
 				tries--;
 				if (tries <= 0)
+				{
 					break;
+				}
 			}
-			assertNotNull(toStage);
-			assertTrue(toStage.size() > 0);
-			assertTrue(index.stageFiles(toStage));
+			assertNotNull("Expected a non-null list of changes to stage", toStage);
+			assertTrue("Expected at least one change to stage, but there are none", toStage.size() > 0);
+
+			assertStageFiles(index, toStage);
+
 			index.refresh(new NullProgressMonitor());
-			assertTrue(index.commit(contents));
+
+			assertCommit(index, contents);
 		}
 
 		// Normal test
@@ -124,34 +126,20 @@ public class GitFileHistoryTest extends TestCase
 	}
 
 	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	@Override
 	protected void tearDown() throws Exception
 	{
 		try
 		{
 			if (fProject != null)
+			{
 				fProject.delete(true, new NullProgressMonitor());
+			}
 		}
 		finally
 		{
 			fProject = null;
-			fRepo = null;
 			super.tearDown();
 		}
-	}
-
-	protected GitRepository getRepo() throws CoreException
-	{
-		if (fRepo == null)
-		{
-			fRepo = createRepo();
-		}
-		return fRepo;
 	}
 
 	protected GitRepository createRepo() throws CoreException
@@ -160,17 +148,12 @@ public class GitFileHistoryTest extends TestCase
 		return getGitRepositoryManager().attachExisting(getProject(), new NullProgressMonitor());
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
-
 	protected IPath repoToGenerate() throws CoreException
 	{
 		return getProject().getLocation();
 	}
 
-	private IProject getProject() throws CoreException
+	private synchronized IProject getProject() throws CoreException
 	{
 		if (fProject == null)
 		{

@@ -870,6 +870,10 @@ public class JSLocationIdentifier extends JSTreeWalker
 			{
 				this.setType(trueBlock);
 			}
+			else if (trueBlock.getEndingOffset() == this._offset && falseBlock.isEmpty())
+			{
+				this.setType(trueBlock);
+			}
 			else if (this._offset < falseBlock.getStartingOffset())
 			{
 				this.setType(LocationType.NONE);
