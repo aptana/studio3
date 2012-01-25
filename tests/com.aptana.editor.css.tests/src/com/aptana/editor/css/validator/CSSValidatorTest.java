@@ -150,7 +150,7 @@ public class CSSValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "div {\nbackground-image: -ms-linear-gradient(left, #2c072c, #3d243d, #2c072c);\nbackground-image: -o-linear-gradient(left, #2c072c, #3d243d, #2c072c);\nbackground-image: linear-gradient(left, #2c072c, #3d243d, #2c072c);\n}";
 
-		List<IValidationItem> items = getParseErrors(text, ICSSConstants.CONTENT_TYPE_CSS, new ParseState());
+		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
 	}
 }

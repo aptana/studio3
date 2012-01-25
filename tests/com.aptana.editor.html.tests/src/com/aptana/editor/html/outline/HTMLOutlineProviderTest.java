@@ -166,7 +166,7 @@ public class HTMLOutlineProviderTest extends TestCase
 	public void testAPSTUD4178() throws Exception
 	{
 		String source = "<script>\n(function() {\nvar foo = function() {};\nfoo.bar = function() {};\n})();\n</script>";
-		fParseState.setEditState(source, source, 0, 0);
+		fParseState.setEditState(source, 0);
 		IParseNode astRoot = fParser.parse(fParseState);
 
 		Object[] outlineResult = fContentProvider.getElements(astRoot);
