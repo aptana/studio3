@@ -175,7 +175,6 @@ public class IndexManager
 						map.put(element, types);
 					}
 
-					@Override
 					public Set<String> getSupportElementNames()
 					{
 						return CollectionsUtil.newSet(TAG_FILE_INDEXING_PARTICIPANT);
