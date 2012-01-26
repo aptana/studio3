@@ -330,7 +330,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				doPostProjectCreation(newProject);
 			}
 		});
-		job.schedule();
+		job.schedule(500);
 	}
 
 	private void doPostProjectCreation(IProject newProject)
