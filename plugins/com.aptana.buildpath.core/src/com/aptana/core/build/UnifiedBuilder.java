@@ -36,6 +36,7 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.build.BuildContext;
 
 public class UnifiedBuilder extends IncrementalProjectBuilder
@@ -86,17 +87,21 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
 	{
+		boolean logInfoEnabled = IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
+
 		String projectName = getProject().getName();
 		long startTime = System.nanoTime();
 
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 
+		// Keep these build participant instances and use them in the build process, rather than grabbing new ones
+		// in sub-methods. We do pre- and post- setups on them, so we need to retain instances.
 		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
 		buildStarting(participants, kind, sub.newChild(10));
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
-			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
+			if (logInfoEnabled)
 			{
 				// @formatter:off
 				IdeLog.logInfo(
@@ -106,46 +111,54 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 				);
 				// @formatter:on
 			}
-			fullBuild(sub.newChild(80));
+			fullBuild(participants, sub.newChild(80));
 		}
 		else
 		{
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null)
 			{
-				// @formatter:off
-				IdeLog.logInfo(
-					CorePlugin.getDefault(),
-					MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
-					IDebugScopes.BUILDER
-				);
-				// @formatter:on
-				fullBuild(sub.newChild(80));
+				if (logInfoEnabled)
+				{
+					// @formatter:off
+					IdeLog.logInfo(
+						CorePlugin.getDefault(),
+						MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName),
+						IDebugScopes.BUILDER
+					);
+					// @formatter:on
+				}
+				fullBuild(participants, sub.newChild(80));
 			}
 			else
 			{
-				// @formatter:off
-				IdeLog.logInfo(
-					CorePlugin.getDefault(),
-					MessageFormat.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
-					IDebugScopes.BUILDER
-				);
-				// @formatter:on
-				incrementalBuild(delta, sub.newChild(80));
+				if (logInfoEnabled)
+				{
+					// @formatter:off
+					IdeLog.logInfo(
+						CorePlugin.getDefault(),
+						MessageFormat.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName),
+						IDebugScopes.BUILDER
+					);
+					// @formatter:on
+				}
+				incrementalBuild(participants, delta, sub.newChild(80));
 			}
 		}
 
 		buildEnding(participants, sub.newChild(10));
 
-		double endTime = ((double) System.nanoTime() - startTime) / 1000000;
-		// @formatter:off
-		IdeLog.logInfo(
-			CorePlugin.getDefault(),
-			MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime),
-			IDebugScopes.BUILDER
-		);
-		// @formatter:on
-
+		if (logInfoEnabled)
+		{
+			double endTime = ((double) System.nanoTime() - startTime) / 1000000;
+			// @formatter:off
+			IdeLog.logInfo(
+				CorePlugin.getDefault(),
+				MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime),
+				IDebugScopes.BUILDER
+			);
+			// @formatter:on
+		}
 		return null;
 	}
 
@@ -177,7 +190,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		sub.done();
 	}
 
-	private void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor)
+	private void incrementalBuild(List<IBuildParticipant> participants, IResourceDelta delta, IProgressMonitor monitor)
 	{
 		try
 		{
@@ -186,10 +199,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			delta.accept(collector);
 
 			// Notify of the removed files
-			removeFiles(collector.removedFiles, sub.newChild(25));
+			removeFiles(participants, collector.removedFiles, sub.newChild(25));
 
 			// Now build the new/updated files
-			buildFiles(collector.updatedFiles, sub.newChild(75));
+			buildFiles(participants, collector.updatedFiles, sub.newChild(75));
 		}
 		catch (CoreException e)
 		{
@@ -197,9 +210,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		}
 	}
 
-	private void removeFiles(Set<IFile> filesToRemoveFromIndex, IProgressMonitor monitor) throws CoreException
+	private void removeFiles(List<IBuildParticipant> participants, Set<IFile> filesToRemoveFromIndex,
+			IProgressMonitor monitor) throws CoreException
 	{
-		if (filesToRemoveFromIndex == null || filesToRemoveFromIndex.isEmpty())
+		if (CollectionsUtil.isEmpty(filesToRemoveFromIndex))
 		{
 			return;
 		}
@@ -209,17 +223,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
-			List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(
-					context.getContentType());
+			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
+					participants, context.getContentType());
 			sub.worked(5);
-			deleteFile(context, participants, sub.newChild(10));
+			deleteFile(context, filteredParticipants, sub.newChild(10));
 		}
 		sub.done();
 	}
 
 	protected void deleteFile(BuildContext context, List<IBuildParticipant> participants, IProgressMonitor monitor)
 	{
-		if (participants == null || participants.isEmpty())
+		if (CollectionsUtil.isEmpty(participants))
 		{
 			return;
 		}
@@ -243,17 +257,18 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	private void fullBuild(IProgressMonitor monitor) throws CoreException
+	private void fullBuild(List<IBuildParticipant> participants, IProgressMonitor monitor) throws CoreException
 	{
 		// TODO Do we need to basically perform a clean first?
 		CollectingResourceVisitor visitor = new CollectingResourceVisitor();
 		getProject().accept(visitor);
-		buildFiles(visitor.files, monitor);
+		buildFiles(participants, visitor.files, monitor);
 	}
 
-	protected void buildFiles(Collection<IFile> files, IProgressMonitor monitor) throws CoreException
+	protected void buildFiles(List<IBuildParticipant> participants, Collection<IFile> files, IProgressMonitor monitor)
+			throws CoreException
 	{
-		if (files == null || files.isEmpty())
+		if (CollectionsUtil.isEmpty(files))
 		{
 			return;
 		}
@@ -264,11 +279,11 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			BuildContext context = new BuildContext(file);
 			sub.worked(1);
 
-			List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(
-					context.getContentType());
+			List<IBuildParticipant> filteredParticipants = getBuildParticipantManager().filterParticipants(
+					participants, context.getContentType());
 			sub.worked(2);
 
-			buildFile(context, participants, sub.newChild(12));
+			buildFile(context, filteredParticipants, sub.newChild(12));
 		}
 		sub.done();
 	}
@@ -276,7 +291,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	protected void buildFile(BuildContext context, List<IBuildParticipant> participants, IProgressMonitor monitor)
 			throws CoreException
 	{
-		if (participants == null || participants.isEmpty())
+		if (CollectionsUtil.isEmpty(participants))
 		{
 			return;
 		}
@@ -294,7 +309,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		final IFile file = context.getFile();
 		final Map<String, Collection<IProblem>> itemsByType = context.getProblems();
-		if (itemsByType == null || itemsByType.isEmpty())
+		if (CollectionsUtil.isEmpty(itemsByType))
 		{
 			return;
 		}
@@ -302,7 +317,6 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		// bunch of resource updated events while problem markers are being added to the file.
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable()
 		{
-
 			public void run(IProgressMonitor monitor)
 			{
 				updateMarkers(file, itemsByType, monitor);
@@ -366,7 +380,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	private void addMarkers(Collection<IProblem> items, String markerType, IFile file, IProgressMonitor monitor)
 			throws CoreException
 	{
-		if (items == null)
+		if (CollectionsUtil.isEmpty(items))
 		{
 			return;
 		}
@@ -390,7 +404,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	{
 		Collection<IFile> files;
 
-		CollectingResourceVisitor()
+		private CollectingResourceVisitor()
 		{
 			files = new ArrayList<IFile>();
 		}

@@ -7,8 +7,11 @@
  */
 package com.aptana.core.build;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.content.IContentType;
 
 import com.aptana.index.core.build.BuildContext;
 
@@ -72,4 +75,8 @@ public interface IBuildParticipant
 	 * @param monitor
 	 */
 	public void deleteFile(BuildContext context, IProgressMonitor monitor);
+
+	public void setContentTypes(Set<IContentType> contentTypes);
+
+	public Set<IContentType> getContentTypes();
 }

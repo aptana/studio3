@@ -63,7 +63,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 		{
 			try
 			{
-				IBuildParticipant participant = createParticipant(entry.getKey());
+				IBuildParticipant participant = createParticipant(entry.getKey(), entry.getValue());
 				if (participant != null)
 				{
 					participants.add(participant);
@@ -104,7 +104,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 			{
 				try
 				{
-					IBuildParticipant participant = createParticipant(entry.getKey());
+					IBuildParticipant participant = createParticipant(entry.getKey(), entry.getValue());
 					if (participant != null)
 					{
 						participants.add(participant);
@@ -132,7 +132,26 @@ public class BuildParticipantManager implements IBuildParticipantManager
 		return result;
 	}
 
-	private IBuildParticipant createParticipant(IConfigurationElement ice) throws CoreException
+	/**
+	 * Given a list of already instantiated {@link IBuildParticipant}s, and a contentTypeId, we filter the list down to
+	 * the participants that apply for this content type.
+	 */
+	public List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, String contentTypeId)
+	{
+		ArrayList<IBuildParticipant> filtered = new ArrayList<IBuildParticipant>(participants.size());
+		for (IBuildParticipant participant : participants)
+		{
+			if (hasType(contentTypeId, participant.getContentTypes()))
+			{
+				filtered.add(participant);
+			}
+		}
+		filtered.trimToSize();
+		return filtered;
+	}
+
+	private IBuildParticipant createParticipant(IConfigurationElement ice, Set<IContentType> contentTypes)
+			throws CoreException
 	{
 		IBuildParticipant participant = (IBuildParticipant) ice.createExecutableExtension(ATTR_CLASS);
 		String rawPriority = ice.getAttribute(ATTR_PRIORITY);
@@ -150,6 +169,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 			}
 		}
 		participant.setPriority(priority);
+		participant.setContentTypes(contentTypes);
 		return participant;
 	}
 

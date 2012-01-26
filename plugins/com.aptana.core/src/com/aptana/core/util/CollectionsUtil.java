@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.aptana.core.IFilter;
@@ -233,6 +234,19 @@ public class CollectionsUtil
 	public static <T> boolean isEmpty(Collection<T> collection)
 	{
 		return collection == null || collection.isEmpty();
+	}
+
+	/**
+	 * This is a convenience method that returns true if the specified collection is null or empty
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param map
+	 * @return
+	 */
+	public static <T, U> boolean isEmpty(Map<T, U> map)
+	{
+		return map == null || map.isEmpty();
 	}
 
 	/**

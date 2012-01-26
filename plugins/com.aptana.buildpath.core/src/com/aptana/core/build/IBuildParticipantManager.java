@@ -29,4 +29,6 @@ public interface IBuildParticipantManager
 	 */
 	List<IBuildParticipant> getAllBuildParticipants();
 
+	List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, String contentType);
+
 }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -286,13 +287,22 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			return;
 		}
 
-		SubMonitor sub = SubMonitor.convert(monitor, participants.size() + 1);
+		SubMonitor sub = SubMonitor.convert(monitor, (participants.size() * 12) + 10);
 		ReconcileContext context = new ReconcileContext(contentTypeId, file, fDocument.get());
 		for (IBuildParticipant participant : participants)
 		{
-			participant.buildFile(context, sub.newChild(1));
+			participant.buildStarting(context.getProject(), IncrementalProjectBuilder.INCREMENTAL_BUILD,
+					sub.newChild(1));
 		}
-		reportProblems(context, sub.newChild(1));
+		for (IBuildParticipant participant : participants)
+		{
+			participant.buildFile(context, sub.newChild(10));
+		}
+		for (IBuildParticipant participant : participants)
+		{
+			participant.buildEnding(sub.newChild(1));
+		}
+		reportProblems(context, sub.newChild(10));
 		sub.done();
 	}
 

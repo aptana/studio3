@@ -7,6 +7,7 @@
  */
 package com.aptana.core.internal.build;
 
+import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.List;
@@ -56,7 +57,18 @@ public class IndexBuildParticipant extends AbstractBuildParticipant
 
 	public void buildEnding(IProgressMonitor monitor)
 	{
-		fIndex = null;
+		if (fIndex != null)
+		{
+			try
+			{
+				fIndex.save();
+			}
+			catch (IOException e)
+			{
+				IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+			}
+			fIndex = null;
+		}
 	}
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
@@ -85,6 +97,10 @@ public class IndexBuildParticipant extends AbstractBuildParticipant
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (fIndex == null)
+		{
+			fIndex = getIndex(context.getProject());
+		}
 		fIndex.remove(context.getURI());
 	}
 

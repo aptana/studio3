@@ -9,12 +9,15 @@ package com.aptana.core.build;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.content.IContentType;
 
 import com.aptana.core.resources.TaskTag;
 import com.aptana.core.util.StringUtil;
@@ -31,6 +34,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 {
 
 	private int priority;
+	private Set<IContentType> contentTypes = Collections.emptySet();
 
 	public int getPriority()
 	{
@@ -40,6 +44,16 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 	public void setPriority(int priority)
 	{
 		this.priority = priority;
+	}
+
+	public Set<IContentType> getContentTypes()
+	{
+		return contentTypes;
+	}
+
+	public void setContentTypes(Set<IContentType> types)
+	{
+		this.contentTypes = types;
 	}
 
 	public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
