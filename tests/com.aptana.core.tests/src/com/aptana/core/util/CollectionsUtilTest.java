@@ -86,7 +86,7 @@ public class CollectionsUtilTest extends TestCase
 
 	public void testIsEmptyWithNull()
 	{
-		assertTrue(CollectionsUtil.isEmpty(null));
+		assertTrue(CollectionsUtil.isEmpty((List<Object>) null));
 	}
 
 	public void testIsEmptyWithEmptyList()
