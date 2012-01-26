@@ -27,6 +27,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.TeamException;
+
+import com.aptana.core.logging.IdeLog;
+import com.aptana.git.ui.GitUIPlugin;
 
 public class DisconnectHandler extends AbstractGitHandler
 {
@@ -63,21 +67,35 @@ public class DisconnectHandler extends AbstractGitHandler
 					SubMonitor sub = SubMonitor.convert(monitor, 100);
 
 					// Set back all the team privates to false!
-					project.accept(new IResourceProxyVisitor()
+					try
 					{
-
-						public boolean visit(IResourceProxy proxy) throws CoreException
+						project.accept(new IResourceProxyVisitor()
 						{
-							if (proxy.isTeamPrivateMember())
+
+							public boolean visit(IResourceProxy proxy) throws CoreException
 							{
-								proxy.requestResource().setTeamPrivateMember(false);
+								if (proxy.isTeamPrivateMember())
+								{
+									proxy.requestResource().setTeamPrivateMember(false);
+								}
+								return true;
 							}
-							return true;
-						}
-					}, IContainer.INCLUDE_TEAM_PRIVATE_MEMBERS);
+						}, IContainer.INCLUDE_TEAM_PRIVATE_MEMBERS);
+					}
+					catch (CoreException e)
+					{
+						IdeLog.logError(GitUIPlugin.getDefault(), e);
+					}
 					sub.worked(20);
 
-					RepositoryProvider.unmap(project);
+					try
+					{
+						RepositoryProvider.unmap(project);
+					}
+					catch (TeamException e)
+					{
+						IdeLog.logError(GitUIPlugin.getDefault(), e);
+					}
 					sub.worked(10);
 
 					getGitRepositoryManager().removeRepository(project);
