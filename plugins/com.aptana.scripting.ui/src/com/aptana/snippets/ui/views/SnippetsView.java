@@ -131,8 +131,8 @@ public class SnippetsView extends ViewPart
 	private SnippetsFilter filter;
 
 	private Map<String, SnippetCategoryElement> snippetCategories = new LinkedHashMap<String, SnippetCategoryElement>();
-	private HashMap<String, List<SnippetElement>> sortedSnippets = new LinkedHashMap<String, List<SnippetElement>>();
-	private Map<SnippetElement, SnippetItem> snippetItems = new HashMap<SnippetElement, SnippetItem>();
+	private HashMap<String, List<SnippetData>> sortedSnippets = new LinkedHashMap<String, List<SnippetData>>();
+	private Map<SnippetData, SnippetItem> snippetItems = new HashMap<SnippetData, SnippetItem>();
 	private Map<String, List<ToolItem>> toolItemMap = new HashMap<String, List<ToolItem>>();
 
 	private Font defaultFont, themeFont;
@@ -295,13 +295,30 @@ public class SnippetsView extends ViewPart
 	};
 
 	/**
+	 * UI model for a snippet element. Maintains UI state for a SnippetItem
+	 * 
+	 * @author nle
+	 */
+	private class SnippetData
+	{
+		private SnippetElement snippet;
+		private boolean visuallyEnabled = true;
+		private boolean filtered = false;
+
+		SnippetData(SnippetElement snippet)
+		{
+			this.snippet = snippet;
+		}
+	}
+
+	/**
 	 * UI representation of a snippet in the Snippets view
 	 * 
 	 * @author nle
 	 */
 	private class SnippetItem extends Composite
 	{
-		private SnippetElement snippet;
+		private SnippetData snippetData;
 		private MouseListener mouseListener;
 		private Label imageLabel;
 		private Composite textComposite;
@@ -309,23 +326,25 @@ public class SnippetsView extends ViewPart
 		private CLabel descLabel;
 		private ToolBar toolbar;
 		private ToolBar tagToolBar;
-		private boolean visuallyEnabled = true;
 		private String categoryName;
 
 		// Default margin for the snippet item
 		final int SNIPPET_MARGIN = 5;
 
-		SnippetItem(Composite parent, SnippetElement snippet)
+		SnippetItem(Composite parent, SnippetData snippetData)
 		{
 			super(parent, SWT.NONE);
-			this.snippet = snippet;
-			mouseListener = new InsertSnippetListener(snippet);
-			categoryName = getSnippetCategoryName(snippet);
+			this.snippetData = snippetData;
+			mouseListener = new InsertSnippetListener(snippetData.snippet);
+			categoryName = getSnippetCategoryName(snippetData.snippet);
 
 			setLayout(GridLayoutFactory.fillDefaults()
 					.extendedMargins(SNIPPET_MARGIN, SNIPPET_MARGIN, 0, SNIPPET_MARGIN).spacing(2, 0)
 					.numColumns(3).create());
-			setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+			GridData gridData = GridDataFactory.fillDefaults().grab(true, false).create();
+			gridData.exclude = snippetData.filtered;
+			setLayoutData(gridData);
+
 			addPaintListener(new PaintListener()
 			{
 				public void paintControl(PaintEvent e)
@@ -343,9 +362,23 @@ public class SnippetsView extends ViewPart
 			addMouseListener(mouseListener);
 			addThemedControl(this, SWT.NONE, -1);
 
-			addTitleAndDescriptionForSnippet(snippet, this, mouseListener);
-			addActionToobarForSnippet(snippet, this);
-			addTagToolbarForSnippet(snippet, this);
+			addTitleAndDescriptionForSnippet(snippetData.snippet, this, mouseListener);
+			addActionToobarForSnippet(snippetData.snippet, this);
+			addTagToolbarForSnippet(snippetData.snippet, this);
+
+			applyVisualEnablement();
+		}
+
+		protected void setFiltered(boolean filtered)
+		{
+			snippetData.filtered = filtered;
+			applyFiltered();
+		}
+
+		protected void applyFiltered()
+		{
+			setVisible(!snippetData.filtered);
+			((GridData) getLayoutData()).exclude = snippetData.filtered;
 		}
 
 		/**
@@ -356,13 +389,13 @@ public class SnippetsView extends ViewPart
 		 */
 		protected void setVisualEnabled(boolean enabled)
 		{
-			visuallyEnabled = enabled;
+			snippetData.visuallyEnabled = enabled;
 			applyVisualEnablement();
 		}
 
 		protected void applyVisualEnablement()
 		{
-			if (visuallyEnabled)
+			if (snippetData.visuallyEnabled)
 			{
 				titleLabel.setForeground(themeFgColor);
 			}
@@ -373,10 +406,10 @@ public class SnippetsView extends ViewPart
 
 			if (tagToolBar != null)
 			{
-				tagToolBar.setEnabled(visuallyEnabled);
+				tagToolBar.setEnabled(snippetData.visuallyEnabled);
 			}
 
-			imageLabel.setImage(getSnippetImage(visuallyEnabled));
+			imageLabel.setImage(getSnippetImage(snippetData.visuallyEnabled));
 		}
 
 		private void addTitleAndDescriptionForSnippet(SnippetElement snippet, Composite itemComposite,
@@ -427,6 +460,7 @@ public class SnippetsView extends ViewPart
 
 			ToolItem insertItem = new ToolItem(toolbar, SWT.NONE);
 			insertItem.setImage(insertSnippetImage);
+			insertItem.setToolTipText(Messages.SnippetsView_Insert_Snippet_desc);
 			insertItem.addSelectionListener(new SelectionAdapter()
 			{
 				@Override
@@ -438,6 +472,7 @@ public class SnippetsView extends ViewPart
 
 			ToolItem infoItem = new ToolItem(toolbar, SWT.NONE);
 			infoItem.setImage(informationImage);
+			infoItem.setToolTipText(Messages.SnippetsView_Show_Information_desc);
 			infoItem.addSelectionListener(new SelectionAdapter()
 			{
 
@@ -463,7 +498,6 @@ public class SnippetsView extends ViewPart
 				public void mouseMove(MouseEvent e)
 				{
 					boolean contains = itemComposite.getClientArea().contains(e.x, e.y);
-
 					if (contains)
 					{
 						for (SnippetItem item : snippetItems.values())
@@ -519,7 +553,7 @@ public class SnippetsView extends ViewPart
 
 				public void dragSetData(DragSourceEvent event)
 				{
-					event.data = snippet;
+					event.data = snippetData.snippet;
 				}
 
 				public void dragFinished(DragSourceEvent event)
@@ -538,7 +572,7 @@ public class SnippetsView extends ViewPart
 
 		private Image getSnippetImage(boolean enabled)
 		{
-			URL iconURL = snippet.getIconURL();
+			URL iconURL = snippetData.snippet.getIconURL();
 			Image image = null;
 			if (enabled)
 			{
@@ -560,9 +594,9 @@ public class SnippetsView extends ViewPart
 	 */
 	private class FilterSnippetsJob extends Job
 	{
-		List<SnippetElement> snippets = new ArrayList<SnippetElement>();
+		List<SnippetData> snippets = new ArrayList<SnippetData>();
 
-		public FilterSnippetsJob(List<SnippetElement> newSnippets)
+		public FilterSnippetsJob(List<SnippetData> newSnippets)
 		{
 			super("Filter snippets"); //$NON-NLS-1$
 			snippets.addAll(newSnippets);
@@ -732,20 +766,25 @@ public class SnippetsView extends ViewPart
 				filter.setPattern(pattern);
 
 				List<SnippetElement> snippets = new ArrayList<SnippetElement>();
+				Map<SnippetElement, SnippetData> mapping = new HashMap<SnippetElement, SnippetsView.SnippetData>();
 
-				for (List<SnippetElement> list : sortedSnippets.values())
+				for (List<SnippetData> list : sortedSnippets.values())
 				{
-					snippets.addAll(list);
+					for (SnippetData data : list)
+					{
+						snippets.add(data.snippet);
+						mapping.put(data.snippet, data);
+					}
 				}
 
 				Object[] filtered = filter.filter(null, (Object) null,
 						snippets.toArray(new SnippetElement[snippets.size()]));
 
-				snippets.clear();
+				List<SnippetData> snippetDatas = new ArrayList<SnippetsView.SnippetData>();
 
 				for (Object object : filtered)
 				{
-					snippets.add((SnippetElement) object);
+					snippetDatas.add(mapping.get(object));
 				}
 
 				// Updates the snippets on a delay
@@ -754,7 +793,7 @@ public class SnippetsView extends ViewPart
 					filterSnippetsJob.cancel();
 				}
 
-				filterSnippetsJob = new FilterSnippetsJob(snippets);
+				filterSnippetsJob = new FilterSnippetsJob(snippetDatas);
 				filterSnippetsJob.schedule(750);
 			}
 		});
@@ -785,6 +824,7 @@ public class SnippetsView extends ViewPart
 
 			public void itemExpanded(ExpandEvent e)
 			{
+				expandDrawer((String) ((ExpandItem) e.item).getData(), false);
 				updateScrollMinSize((ExpandItem) e.item, true);
 				collapsedCategories.remove((String) e.item.getData());
 			}
@@ -872,13 +912,13 @@ public class SnippetsView extends ViewPart
 		}
 	}
 
-	protected void showSnippets(List<SnippetElement> snippets)
+	protected void showSnippets(List<SnippetData> snippets)
 	{
 		Map<String, List<SnippetElement>> localSnippets = new HashMap<String, List<SnippetElement>>();
 
-		for (SnippetElement snippet : snippets)
+		for (SnippetData snippetData : snippets)
 		{
-			String category = getSnippetCategoryName(snippet);
+			String category = getSnippetCategoryName(snippetData.snippet);
 			List<SnippetElement> snippetList = localSnippets.get(category);
 			if (snippetList == null)
 			{
@@ -886,29 +926,57 @@ public class SnippetsView extends ViewPart
 				localSnippets.put(category, snippetList);
 			}
 
-			snippetList.add(snippet);
+			snippetList.add(snippetData.snippet);
 		}
 
 		// Determine whether to show or hide the snippet
 		Map<String, List<Control>> changedSnippets = new HashMap<String, List<Control>>();
-		for (SnippetElement element : snippetItems.keySet())
+		for (String category : sortedSnippets.keySet())
 		{
-			SnippetItem item = snippetItems.get(element);
-			GridData gridData = (GridData) item.getLayoutData();
-			boolean newExclude = !snippets.contains(element);
-
-			if (newExclude != gridData.exclude)
+			List<SnippetData> datas = sortedSnippets.get(category);
+			for (SnippetData data : datas)
 			{
-				List<Control> list = changedSnippets.get(item.categoryName);
-				if (list == null)
-				{
-					list = new ArrayList<Control>();
-					changedSnippets.put(item.categoryName, list);
-				}
-				list.add(item);
-			}
+				SnippetItem item = snippetItems.get(data);
+				boolean newExclude = !snippets.contains(data);
+				boolean oldExclude = data.filtered;
+				data.filtered = newExclude;
+				boolean itemChanged = false;
 
-			gridData.exclude = newExclude;
+				if (item != null)
+				{
+					if (newExclude != oldExclude)
+					{
+						itemChanged = true;
+					}
+
+					item.setFiltered(newExclude);
+				}
+				else if (!newExclude)
+				{
+					ExpandItem expandItem = expandItems.get(category);
+					if (expandItem.getExpanded())
+					{
+						expandDrawer(category, false);
+						itemChanged = true;
+						item = snippetItems.get(data);
+						if (item != null)
+						{
+							item.setFiltered(newExclude);
+						}
+					}
+				}
+
+				if (itemChanged)
+				{
+					List<Control> list = changedSnippets.get(category);
+					if (list == null)
+					{
+						list = new ArrayList<Control>();
+						changedSnippets.put(category, list);
+					}
+					list.add(item);
+				}
+			}
 		}
 
 		// Update category text and layout if necessary
@@ -971,18 +1039,6 @@ public class SnippetsView extends ViewPart
 
 		updateCategoriesAndSnippets(expandedDrawers);
 
-		if (CollectionsUtil.isEmpty(collapsedCategories) && CollectionsUtil.isEmpty(expandedDrawers))
-		{
-			for (String category : sortedSnippets.keySet())
-			{
-				if (!CollectionsUtil.isEmpty(sortedSnippets.get(category)))
-				{
-					expandItems.get(category).setExpanded(true);
-					break;
-				}
-			}
-		}
-
 		updateScrollMinSize(null, false);
 		scrolledComposite.layout(true, true);
 
@@ -991,12 +1047,62 @@ public class SnippetsView extends ViewPart
 		EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeListener);
 	}
 
+	/**
+	 * Lazy load the create of SnippetItems when the category is expanded
+	 * 
+	 * @param category
+	 * @param shouldExpand
+	 */
+	private void expandDrawer(String category, boolean shouldExpand)
+	{
+		ExpandItem expandItem = expandItems.get(category);
+		if (expandItem != null)
+		{
+			boolean adjustHeight = false;
+			Composite composite = (Composite) expandItem.getControl();
+			List<SnippetData> elements = sortedSnippets.get(category);
+			if (!CollectionsUtil.isEmpty(elements))
+			{
+				for (SnippetData element : elements)
+				{
+					if (snippetItems.get(element) == null)
+					{
+						snippetItems.put(element, new SnippetItem(composite, element));
+						adjustHeight = true;
+					}
+				}
+			}
+
+			if (adjustHeight)
+			{
+				expandItem.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+			}
+
+			if (shouldExpand)
+			{
+				expandItem.setExpanded(true);
+			}
+		}
+	}
+	
 	private void updateSnippetEnablement(String scope)
 	{
 		currentScope = scope;
-		for (SnippetItem item : snippetItems.values())
+		for (List<SnippetData> datas : sortedSnippets.values())
 		{
-			item.setVisualEnabled(item.snippet.getScopeSelector().matches(scope));
+			for (SnippetData data : datas)
+			{
+				boolean matches = data.snippet.getScopeSelector().matches(scope);
+				SnippetItem item = snippetItems.get(data);
+				if (item != null)
+				{
+					item.setVisualEnabled(matches);
+				}
+				else
+				{
+					data.visuallyEnabled = matches;
+				}
+			}
 		}
 
 		updateSnippetDrawers();
@@ -1033,14 +1139,14 @@ public class SnippetsView extends ViewPart
 				snippetCategories.put(category, snippetCategoryElement);
 			}
 
-			List<SnippetElement> snippetList = sortedSnippets.get(category);
+			List<SnippetData> snippetList = sortedSnippets.get(category);
 			if (snippetList == null)
 			{
-				snippetList = new ArrayList<SnippetElement>();
+				snippetList = new ArrayList<SnippetData>();
 				sortedSnippets.put(category, snippetList);
 			}
 
-			snippetList.add(snippet);
+			snippetList.add(new SnippetData(snippet));
 		}
 
 		List<SnippetCategoryElement> categories = new ArrayList<SnippetCategoryElement>();
@@ -1049,11 +1155,11 @@ public class SnippetsView extends ViewPart
 
 		for (SnippetCategoryElement category : categories)
 		{
-			List<SnippetElement> snippetList = sortedSnippets.get(category.getDisplayName());
+			List<SnippetData> snippetList = sortedSnippets.get(category.getDisplayName());
 			ExpandItem expandItem = createSnippetDrawer(expandBar, category, snippetList);
 			if (expandedDrawers.contains(expandItem.getData()))
 			{
-				expandItem.setExpanded(true);
+				expandDrawer((String) expandItem.getData(), true);
 			}
 		}
 	}
@@ -1095,7 +1201,7 @@ public class SnippetsView extends ViewPart
 	}
 
 	protected ExpandItem createSnippetDrawer(ExpandBar expandBar, SnippetCategoryElement category,
-			List<SnippetElement> snippets)
+			List<SnippetData> snippets)
 	{
 		final Composite composite = new Composite(expandBar, SWT.NONE);
 		composite.setForeground(themeFgColor != null ? themeFgColor : UIUtils.getDisplay().getSystemColor(
@@ -1115,14 +1221,6 @@ public class SnippetsView extends ViewPart
 		expandItem.setImage(category != null && category.getIconURL() != null ? getImage(category.getIconURL())
 				: genericSnippetImage);
 		expandItem.setData(category != null ? category.getDisplayName() : null);
-
-		if (snippets != null)
-		{
-			for (SnippetElement snippet : snippets)
-			{
-				snippetItems.put(snippet, new SnippetItem(composite, snippet));
-			}
-		}
 
 		expandItem.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 		expandItems.put(category != null ? category.getDisplayName() : null, expandItem);
@@ -1365,7 +1463,7 @@ public class SnippetsView extends ViewPart
 				for (ExpandItem item : expandItems.values())
 				{
 					boolean expanded = item.getExpanded();
-					item.setExpanded(true);
+					expandDrawer((String) item.getData(), true);
 					if (!expanded)
 					{
 						updateScrollMinSize(item, true);
@@ -1410,9 +1508,6 @@ public class SnippetsView extends ViewPart
 	@Override
 	public void setFocus()
 	{
-		if (search != null)
-		{
-			search.setFocus();
-		}
+		expandBar.setFocus();
 	}
 }

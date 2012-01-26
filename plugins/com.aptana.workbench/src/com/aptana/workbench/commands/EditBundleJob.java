@@ -44,7 +44,7 @@ import com.aptana.workbench.WorkbenchPlugin;
  * 
  * @author cwilliams
  */
-class EditBundleJob extends Job
+public class EditBundleJob extends Job
 {
 
 	private BundleElement bundle;

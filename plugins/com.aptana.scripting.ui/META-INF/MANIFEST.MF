@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  com.aptana.editor.text,
  org.eclipse.search,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ com.aptana.workbench;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.scripting.ui,

@@ -12,8 +12,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -44,13 +49,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -69,6 +75,9 @@ import com.aptana.formatter.preferences.profile.IProfileManager;
 import com.aptana.formatter.preferences.profile.ProfileManager;
 import com.aptana.formatter.ui.preferences.FormatterPreviewUtils;
 import com.aptana.formatter.ui.preferences.ScriptSourcePreviewerUpdater;
+import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.BundlePrecedence;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
@@ -76,6 +85,7 @@ import com.aptana.theme.ColorManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.util.UIUtils;
+import com.aptana.workbench.commands.EditBundleJob;
 
 /**
  * PopupDialog that displays the contents of a snippets, formatted and colored based on the preferences
@@ -155,6 +165,7 @@ public class SnippetPopupDialog extends PopupDialog
 				.createImage();
 		toolbarImages.add(navigateImage);
 		openSnippetItem.setImage(navigateImage);
+		openSnippetItem.setToolTipText(Messages.SnippetPopupDialog_Open_Snippet_Source_desc);
 		openSnippetItem.addSelectionListener(new SelectionAdapter()
 		{
 			/*
@@ -164,7 +175,73 @@ public class SnippetPopupDialog extends PopupDialog
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				EditorUtil.openInEditor(new File(snippet.getPath()));
+				// We have to create it if it's still pre-packaged
+				final BundleElement bundle = snippet.getOwningBundle();
+				if (bundle.getBundlePrecedence() != BundlePrecedence.PROJECT
+				/** && bundle.getBundlePrecedence() != BundlePrecedence.USER **/
+				)
+				{
+					final EditBundleJob job = new EditBundleJob(bundle);
+					job.addJobChangeListener(new JobChangeAdapter()
+					{
+						public void done(IJobChangeEvent event)
+						{
+							openBundleSnippet(bundle);
+						}
+					});
+
+					job.schedule();
+				}
+				else
+				{
+					openBundleSnippet(bundle);
+				}
+
+				close();
+			}
+
+			private void openBundleSnippet(BundleElement bundle)
+			{
+				String path = snippet.getPath();
+				List<SnippetElement> bundleSnippets = BundleManager.getInstance().getBundleSnippets(
+						bundle.getDisplayName());
+				for (SnippetElement element : bundleSnippets)
+				{
+					if (element.getDisplayName().equals(snippet.getDisplayName())
+							&& element.getExpansion().equals(snippet.getExpansion()))
+					{
+						path = element.getPath();
+						break;
+					}
+				}
+
+				final File file = new File(path);
+				Display.getDefault().asyncExec(new Runnable()
+				{
+
+					public void run()
+					{
+						IFile[] foundFiles = ResourcesPlugin.getWorkspace().getRoot()
+								.findFilesForLocationURI(file.toURI());
+						if (!ArrayUtil.isEmpty(foundFiles))
+						{
+							try
+							{
+								IDE.openEditor(UIUtils.getActivePage(), foundFiles[0]);
+							}
+							catch (PartInitException e1)
+							{
+								IdeLog.logError(ScriptingUIPlugin.getDefault(), MessageFormat.format(
+										"Unable to open editor for {0}", foundFiles[0].getFullPath().toOSString())); //$NON-NLS-1$
+							}
+						}
+						else if (file.exists())
+						{
+							EditorUtil.openInEditor(file);
+						}
+					}
+				});
+
 			}
 		});
 
@@ -289,24 +366,25 @@ public class SnippetPopupDialog extends PopupDialog
 
 			IProfileManager manager = ProfileManager.getInstance();
 			IResource selectedResource = UIUtils.getSelectedResource();
+			IProject project = null;
 
 			if (selectedResource == null)
 			{
 				IEditorPart activeEditor = UIUtils.getActiveEditor();
-				if (activeEditor instanceof IEditorPart)
+				if (activeEditor instanceof AbstractThemeableEditor)
 				{
-					IEditorInput editorInput = ((IEditorPart) activeEditor).getEditorInput();
-					if (editorInput instanceof IFileEditorInput)
-					{
-						selectedResource = ((IFileEditorInput) editorInput).getFile();
-					}
+					project = EditorUtil.getProject((AbstractThemeableEditor) activeEditor);
 				}
 			}
-
-			if (selectedResource != null)
+			else
 			{
-				FormatterPreviewUtils.updatePreview(viewer, expansion, null, factory,
-						manager.getSelected(selectedResource.getProject()).getSettings());
+				project = selectedResource.getProject();
+			}
+
+			if (project != null)
+			{
+				FormatterPreviewUtils.updatePreview(viewer, expansion, null, factory, manager.getSelected(project)
+						.getSettings());
 			}
 			else
 			{
@@ -318,6 +396,13 @@ public class SnippetPopupDialog extends PopupDialog
 			document.set(expansion);
 		}
 
+		if (translatedQualifiedType != null)
+		{
+			for (String part : translatedQualifiedType.getParts())
+			{
+				viewer.removeTextHovers(part);
+			}
+		}
 		return viewer;
 	}
 
