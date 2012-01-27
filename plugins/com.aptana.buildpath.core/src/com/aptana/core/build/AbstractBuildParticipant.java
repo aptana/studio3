@@ -48,7 +48,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 
 	public Set<IContentType> getContentTypes()
 	{
-		return contentTypes;
+		return Collections.unmodifiableSet(contentTypes);
 	}
 
 	public void setContentTypes(Set<IContentType> types)
