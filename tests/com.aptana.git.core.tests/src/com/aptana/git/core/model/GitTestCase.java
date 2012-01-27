@@ -186,6 +186,18 @@ public abstract class GitTestCase extends TestCase
 		assertCurrentBranch(branchName);
 	}
 
+	protected void assertCreateBranch(String newBranch, boolean track, String startPoint) throws Exception
+	{
+		assertTrue(MessageFormat.format("Failed to create new branch {0} off of {1} (track: {3})", newBranch,
+				startPoint, track), getRepo().createBranch(newBranch, track, startPoint));
+	}
+
+	protected void assertRefresh(GitIndex index)
+	{
+		IStatus status = index.refresh(new NullProgressMonitor());
+		assertTrue(MessageFormat.format("Refreshing index returned error status: {0}", status), status.isOK());
+	}
+
 	/**
 	 * Recursively delete a directory tree.
 	 * 

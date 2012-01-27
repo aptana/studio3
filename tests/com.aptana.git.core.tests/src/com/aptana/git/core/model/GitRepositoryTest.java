@@ -10,6 +10,7 @@ package com.aptana.git.core.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -133,7 +134,8 @@ public class GitRepositoryTest extends GitTestCase
 		assertTrue("File we want to delete through git repo doesn't exist", addedFile.exists());
 		// delete it
 		IStatus status = getRepo().deleteFile(addedFile.getName());
-		assertTrue("Deleting file in git repo returned an error status", status.isOK());
+		assertTrue(MessageFormat.format("Deleting file in git repo returned an error status: {0}", status),
+				status.isOK());
 		// make sure its deleted from filesystem
 		assertFalse("Deleted file through git, file still exists", addedFile.exists());
 
@@ -280,7 +282,7 @@ public class GitRepositoryTest extends GitTestCase
 		assertTrue(branches.contains("master"));
 
 		// Create a new branch off master
-		assertTrue(getRepo().createBranch("my_new_branch", false, "master"));
+		assertCreateBranch("my_new_branch", false, "master");
 
 		// make sure the branch is listed in model
 		branches = getRepo().allBranches();
