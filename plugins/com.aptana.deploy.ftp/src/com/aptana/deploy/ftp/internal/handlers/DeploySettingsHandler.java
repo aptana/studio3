@@ -77,16 +77,21 @@ public class DeploySettingsHandler extends AbstractHandler
 			dialog.setShowRememberMyDecision(true);
 			dialog.open();
 
-			IConnectionPoint destination = dialog.getSelectedSite().getDestination();
-			if (destination != null)
+			IConnectionPoint destination = null;
+			ISiteConnection site = dialog.getSelectedSite();
+			if (site != null)
 			{
-				Boolean rememberMyDecision = dialog.isRememberMyDecision();
-				if (rememberMyDecision)
+				destination = site.getDestination();
+				if (destination != null)
 				{
-					ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
+					Boolean rememberMyDecision = dialog.isRememberMyDecision();
+					if (rememberMyDecision)
+					{
+						ResourceSynchronizationUtils.setRememberDecision(container, rememberMyDecision);
+					}
+					// remembers the last sync connection
+					ResourceSynchronizationUtils.setLastSyncConnection(container, destination.getName());
 				}
-				// remembers the last sync connection
-				ResourceSynchronizationUtils.setLastSyncConnection(container, destination.getName());
 			}
 			settingsDialog.setPropertySource(destination);
 		}

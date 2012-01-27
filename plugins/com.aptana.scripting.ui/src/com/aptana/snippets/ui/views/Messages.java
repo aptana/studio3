@@ -14,11 +14,14 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.snippets.ui.views.messages"; //$NON-NLS-1$
 	public static String SnippetPopupDialog_content_type_unknown;
 	public static String SnippetPopupDialog_Desciption;
+	public static String SnippetPopupDialog_Open_Snippet_Source_desc;
 	public static String SnippetPopupDialog_Scope_None;
 	public static String SnippetsView_Collapse_All_Action;
 	public static String SnippetsView_Expand_All_Action;
 	public static String SnippetsView_Initial_filter_text;
+	public static String SnippetsView_Insert_Snippet_desc;
 	public static String SnippetsView_partName;
+	public static String SnippetsView_Show_Information_desc;
 	public static String SnippetsView_Snippet_drawer_other;
 	public static String SnippetsView_Snippet_drawer_title;
 	static
