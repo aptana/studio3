@@ -14,101 +14,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
-import com.aptana.git.core.model.IGitRepositoryManager;
+import com.aptana.git.core.model.GitTestCase;
 
-public class CommitFileRevisionTest extends TestCase
+public class CommitFileRevisionTest extends GitTestCase
 {
-
-	private GitRepository fRepo;
-	private IPath fPath;
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		try
-		{
-			File generatedRepo = fRepo.workingDirectory().toFile();
-			if (generatedRepo.exists())
-			{
-				delete(generatedRepo);
-			}
-			fRepo = null;
-			fPath = null;
-		}
-		finally
-		{
-			super.tearDown();
-		}
-	}
-
-	/**
-	 * Recursively delete a directory tree.
-	 * 
-	 * @param generatedRepo
-	 */
-	private void delete(File generatedRepo)
-	{
-		if (generatedRepo == null)
-			return;
-		File[] children = generatedRepo.listFiles();
-		if (children != null)
-		{
-			for (File child : children)
-			{
-				delete(child);
-			}
-		}
-
-		if (!generatedRepo.delete())
-			generatedRepo.deleteOnExit();
-	}
-
-	protected GitRepository createRepo()
-	{
-		return createRepo(repoToGenerate());
-	}
-
-	/**
-	 * Create a git repo and make sure it actually generate a model object and not null
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected GitRepository createRepo(IPath path)
-	{
-		getGitRepositoryManager().create(path);
-		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
-		assertNotNull(repo);
-		fRepo = repo;
-		return repo;
-	}
-
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
-
-	protected IPath repoToGenerate()
-	{
-		if (fPath == null)
-			fPath = GitPlugin.getDefault().getStateLocation().append("git_cfr_" + System.currentTimeMillis());
-		return fPath;
-	}
 
 	public void testCommitFileRevision() throws Exception
 	{
@@ -123,13 +43,13 @@ public class CommitFileRevisionTest extends TestCase
 		writer.write(contents);
 		writer.close();
 		// refresh the index
-		index.refresh(new NullProgressMonitor());
+		assertRefresh(index);
 
 		// Stage the new file
 		List<ChangedFile> toStage = index.changedFiles();
-		index.stageFiles(toStage);
-		index.refresh(new NullProgressMonitor());
-		index.commit("Initial commit");
+		assertStageFiles(index, toStage);
+		assertRefresh(index);
+		assertCommit(index, "Initial commit");
 
 		GitCommit gitCommit = new GitCommit(repo, "HEAD");
 		CommitFileRevision revision = new CommitFileRevision(gitCommit, Path.fromPortableString(filename));
@@ -160,13 +80,13 @@ public class CommitFileRevisionTest extends TestCase
 			writer.write(entry.getValue());
 			writer.close();
 			// refresh the index
-			index.refresh(new NullProgressMonitor());
+			assertRefresh(index);
 
-			// Stage the new file
+			// Stage and then commit the new file
 			List<ChangedFile> toStage = index.changedFiles();
-			index.stageFiles(toStage);
-			index.refresh(new NullProgressMonitor());
-			index.commit(entry.getKey());
+			assertStageFiles(index, toStage);
+			assertRefresh(index);
+			assertCommit(index, entry.getKey());
 		}
 
 		GitRevList revList = new GitRevList(repo);
