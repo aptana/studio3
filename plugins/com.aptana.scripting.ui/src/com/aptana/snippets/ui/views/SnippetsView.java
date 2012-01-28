@@ -81,6 +81,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -807,7 +808,7 @@ public class SnippetsView extends ViewPart
 		scrolledComposite.setLayout(GridLayoutFactory.fillDefaults().create());
 		scrolledComposite.getVerticalBar().setIncrement(6);
 
-		expandBar = new ExpandBar(scrolledComposite, SWT.BORDER);
+		expandBar = new ExpandBar(scrolledComposite, SWT.NONE);
 		expandBar.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		scrolledComposite.setBackground(themeBgColor);
@@ -1231,13 +1232,27 @@ public class SnippetsView extends ViewPart
 	private void insertSnippet(SnippetElement snippet)
 	{
 		IEditorPart activeEditor = UIUtils.getActiveEditor();
-		if (activeEditor != null && activeEditor instanceof ITextEditor)
+		ITextEditor textEditor = null;
+		if (activeEditor instanceof MultiPageEditorPart)
 		{
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(snippet, InvocationType.MENU,
-					(ITextEditor) activeEditor);
+			Object selectedPage = ((MultiPageEditorPart) activeEditor).getSelectedPage();
+			if (selectedPage instanceof ITextEditor)
+			{
+				textEditor = (ITextEditor) selectedPage;
+			}
+		}
+		else if (activeEditor instanceof ITextEditor)
+		{
+			textEditor = (ITextEditor) activeEditor;
+		}
+
+		if (textEditor != null)
+		{
+			CommandResult commandResult = CommandExecutionUtils
+					.executeCommand(snippet, InvocationType.MENU, textEditor);
 			if (commandResult != null)
 			{
-				CommandExecutionUtils.processCommandResult(snippet, commandResult, (ITextEditor) activeEditor);
+				CommandExecutionUtils.processCommandResult(snippet, commandResult, textEditor);
 				activeEditor.setFocus();
 			}
 		}

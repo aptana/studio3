@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.scripting.model.SnippetElement;
 
 /**
@@ -93,10 +94,14 @@ public class SnippetTransfer extends ByteArrayTransfer
 
 		try
 		{
-			out.writeUTF(element.getPath());
-			out.writeUTF(element.getDisplayName());
-			out.writeUTF(element.getScope());
-			out.writeUTF(element.getExpansion());
+			String path = element.getPath();
+			out.writeUTF(path != null ? path : StringUtil.EMPTY);
+			String displayName = element.getDisplayName();
+			out.writeUTF(displayName != null ? displayName : StringUtil.EMPTY);
+			String scope = element.getScope();
+			out.writeUTF(scope != null ? scope : StringUtil.EMPTY);
+			String expansion = element.getExpansion();
+			out.writeUTF(expansion != null ? expansion : StringUtil.EMPTY);
 
 			out.close();
 			bytes = byteOut.toByteArray();
