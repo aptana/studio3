@@ -50,9 +50,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
@@ -178,8 +176,7 @@ public class SnippetPopupDialog extends PopupDialog
 				// We have to create it if it's still pre-packaged
 				final BundleElement bundle = snippet.getOwningBundle();
 				if (bundle.getBundlePrecedence() != BundlePrecedence.PROJECT
-				/** && bundle.getBundlePrecedence() != BundlePrecedence.USER **/
-				)
+						&& bundle.getBundlePrecedence() != BundlePrecedence.USER)
 				{
 					final EditBundleJob job = new EditBundleJob(bundle);
 					job.addJobChangeListener(new JobChangeAdapter()
@@ -225,15 +222,7 @@ public class SnippetPopupDialog extends PopupDialog
 								.findFilesForLocationURI(file.toURI());
 						if (!ArrayUtil.isEmpty(foundFiles))
 						{
-							try
-							{
-								IDE.openEditor(UIUtils.getActivePage(), foundFiles[0]);
-							}
-							catch (PartInitException e1)
-							{
-								IdeLog.logError(ScriptingUIPlugin.getDefault(), MessageFormat.format(
-										"Unable to open editor for {0}", foundFiles[0].getFullPath().toOSString())); //$NON-NLS-1$
-							}
+							EditorUtil.openInEditor(new File(foundFiles[0].getLocationURI()));
 						}
 						else if (file.exists())
 						{
