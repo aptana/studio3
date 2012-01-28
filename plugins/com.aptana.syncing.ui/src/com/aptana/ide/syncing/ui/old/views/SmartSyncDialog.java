@@ -445,6 +445,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			data[i].setStyle(SWT.BOLD);
 		}
 		final Font headerFont = new Font(top.getDisplay(), data);
+		descriptionLabel.setFont(headerFont);
 		descriptionLabel.addDisposeListener(new DisposeListener()
 		{
 			public void widgetDisposed(DisposeEvent e)
