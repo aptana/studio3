@@ -136,15 +136,6 @@
          <viewShortcut
                id="com.aptana.webserver.ui.view">
          </viewShortcut>
-         <view
-               id="com.aptana.snippets.ui.views.SnippetsView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ui.views.ContentOutline">
-         </view>
-         <viewShortcut
-               id="com.aptana.snippets.ui.views.SnippetsView">
-         </viewShortcut>
       </perspectiveExtension>
    </extension>
    <extension
