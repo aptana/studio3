@@ -13,7 +13,6 @@ import com.aptana.editor.xml.formatter.XMLFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
-import com.aptana.formatter.nodes.IFormatterNode;
 
 /**
  * A formatter node which represents a 'Void' element (as described at W3C).<br>
@@ -79,12 +78,7 @@ public class FormatterXMLVoidElementNode extends FormatterBlockWithBeginNode
 	@Override
 	protected int getBlankLinesBefore(IFormatterContext context)
 	{
-		IFormatterNode parent = context.getParent();
-		if (parent == null || context.getChildIndex() == 0)
-		{
-			return super.getBlankLinesBefore(context);
-		}
-		if (context.getChildIndex() > 1)
+		if (context.getParent() != null && context.getChildIndex() > 1)
 		{
 			return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
 		}
