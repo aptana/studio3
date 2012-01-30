@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.js;
 
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -47,4 +49,20 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 				.getDefault().getPreferenceStore()) };
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
+	{
+		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+
+		targets.put("com.aptana.editor.js.sourceCode", getEditor()); //$NON-NLS-1$
+
+		return targets;
+	}
 }

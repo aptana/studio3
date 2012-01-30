@@ -131,6 +131,12 @@
             id="com.aptana.editor.js.quick_outline"
             name="%command.quickoutline.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.navigate"
+            description="%openDeclaration.description"
+            id="com.aptana.editor.js.openDeclaration"
+            name="%openDeclaration.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -139,6 +145,12 @@
             contextId="com.aptana.editor.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+O">
+      </key>
+      <key
+            commandId="com.aptana.editor.js.openDeclaration"
+            contextId="com.aptana.scripting.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F3">
       </key>
    </extension>
    <extension
@@ -215,6 +227,23 @@
                type="com.aptana.contenttype.js">
          </contentType>
       </hover>
+   </extension>
+      <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.js.sourceCode"
+            name="%jshyperlink.description">
+      </target>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.js.hyperlink.JSHyperlinkDetector"
+            id="com.aptana.editor.js.hyperlinkDetector"
+            name="%hyperlinkDetector.name"
+            targetId="com.aptana.editor.js.sourceCode">
+      </hyperlinkDetector>
    </extension>
    <extension
          point="com.aptana.index.core.ui.indexViewContributors">

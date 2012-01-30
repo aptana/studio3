@@ -7377,6 +7377,7 @@ if( typeof dojo == "undefined") {
                 return Boolean(mp[module] && mp[module].value);
                 // Boolean
             },
+
             _getModulePrefix : function(/*String*/module) {
                 // summary: gets the prefix associated with module
                 var mp = this._modulePrefixes;
@@ -7387,6 +7388,7 @@ if( typeof dojo == "undefined") {
                 return module;
                 // String
             },
+
             _loadedUrls : [],
 
             //WARNING:
@@ -7865,6 +7867,7 @@ if( typeof dojo == "undefined") {
         dojo.require("dojo.i18n");
         dojo.i18n._requireLocalization.apply(dojo.hostenv, arguments);
     };
+
     (function() {
 
         var ore = new RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?$");
@@ -8298,7 +8301,6 @@ if( typeof dojo == "undefined") {
                 var oldHandler = _w[evtName] ||
                 function() {
                 };
-
                 _w[evtName] = function() {
                     fp.apply(_w, arguments);
                     oldHandler.apply(_w, arguments);
@@ -8328,6 +8330,7 @@ if( typeof dojo == "undefined") {
                         dojo.unloaded();
                     }
                 });
+
                 try {
                     document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
                     document.createStyleSheet().addRule("v\\:*", "behavior:url(#default#VML)");
@@ -8651,8 +8654,6 @@ if(!dojo._hasResource["dojo._base.lang"]) {//_hasResource checks added by build.
         // boodman/crockford delegation
         function TMP() {
         };
-
-
         TMP.prototype = obj;
         var tmp = new TMP();
         if(props) {
@@ -9223,6 +9224,7 @@ if(!dojo._hasResource["dojo._base.connect"]) {//_hasResource checks added by bui
         }
         return (event) ? dojo.connect(obj, event, pf) : dojo.connect(obj, pf);
     };
+
 }
 
 if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by build. Do not use _hasResource directly in your code.
@@ -9498,6 +9500,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
                 this.results[0].cancel();
             }
         },
+
         _resback : function(res) {
             // summary:
             //		The private primitive that means either callback or errback
@@ -9505,6 +9508,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             this.results[this.fired] = res;
             this._fire();
         },
+
         _check : function() {
             if(this.fired != -1) {
                 if(!this.silentlyCancelled) {
@@ -9514,6 +9518,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
                 return;
             }
         },
+
         callback : function(res) {
             // summary:	Begin the callback sequence with a non-error value.
 
@@ -9524,6 +9529,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             this._check();
             this._resback(res);
         },
+
         errback : function(/*Error*/res) {
             // summary:
             //		Begin the callback sequence with an error result.
@@ -9533,6 +9539,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             }
             this._resback(res);
         },
+
         addBoth : function(/*Function||Object*/cb, /*Optional, String*/cbfn) {
             // summary:
             //		Add the same function as both a callback and an errback as the
@@ -9544,6 +9551,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             }
             return this.addCallbacks(enclosed, enclosed);
         },
+
         addCallback : function(cb, cbfn) {
             // summary:
             //		Add a single callback to the end of the callback sequence.
@@ -9553,6 +9561,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             }
             return this.addCallbacks(enclosed, null);
         },
+
         addErrback : function(cb, cbfn) {
             // summary:
             //		Add a single callback to the end of the callback sequence.
@@ -9562,6 +9571,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             }
             return this.addCallbacks(null, enclosed);
         },
+
         addCallbacks : function(cb, eb) {
             // summary:
             //		Add separate callback and errback to the end of the callback
@@ -9572,6 +9582,7 @@ if(!dojo._hasResource["dojo._base.Deferred"]) {//_hasResource checks added by bu
             }
             return this;
         },
+
         _fire : function() {
             // summary:
             //		Used internally to exhaust the callback sequence when a result
@@ -9795,6 +9806,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                 return -1;
                 // number
             },
+
             lastIndexOf : function(/*Array*/array, /*Object*/value, /*Integer?*/fromIndex) {
                 // summary:
                 //		locates the last index of the provided value in the passed
@@ -9805,6 +9817,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                 return dojo.indexOf(array, value, fromIndex, true);
                 // number
             },
+
             forEach : function(/*Array*/arr, /*Function*/callback, /*Object?*/obj) {
                 // summary:
                 //		for every item in arr, call callback with that item as its
@@ -9828,6 +9841,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                     _p[2].call(_p[1], arr[i], i, arr);
                 }
             },
+
             _everyOrSome : function(/*Boolean*/every, /*Array*/arr, /*Function*/callback, /*Object?*/obj) {
                 var _p = _getParts(arr, obj, callback);
                 arr = _p[0];
@@ -9841,6 +9855,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                 return every;
                 // Boolean
             },
+
             every : function(/*Array*/arr, /*Function*/callback, /*Object?*/thisObject) {
                 // summary:
                 //		determines whether or not every item in the array satisfies the
@@ -9857,6 +9872,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                 return this._everyOrSome(true, arr, callback, thisObject);
                 // Boolean
             },
+
             some : function(/*Array*/arr, /*Function*/callback, /*Object?*/thisObject) {
                 // summary:
                 //		determines whether or not any item in the array satisfies the
@@ -9873,6 +9889,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                 return this._everyOrSome(false, arr, callback, thisObject);
                 // Boolean
             },
+
             map : function(/*Array*/arr, /*Function*/func, /*Function?*/obj) {
                 // summary:
                 //		applies a function to each element of an Array and creates
@@ -9897,6 +9914,7 @@ if(!dojo._hasResource["dojo._base.array"]) {//_hasResource checks added by build
                 return outArr;
                 // Array
             },
+
             filter : function(/*Array*/arr, /*Function*/callback, /*Object?*/obj) {
                 // summary:
                 //		returns a new Array with those items from arr that match the
@@ -9938,6 +9956,7 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
             this.setColor(color);
         }
     };
+
     // FIXME: there's got to be a more space-efficient way to encode or discover these!!  Use hex?
     dojo.Color.named = {
         black : [0, 0, 0],
@@ -10089,6 +10108,7 @@ if(!dojo._hasResource["dojo._base.Color"]) {//_hasResource checks added by build
         var a = dojo.Color.named[str];
         return a && dojo.colorFromArray(a, obj) || dojo.colorFromRgb(str, obj) || dojo.colorFromHex(str, obj);
     };
+
 }
 
 if(!dojo._hasResource["dojo._base"]) {//_hasResource checks added by build. Do not use _hasResource directly in your code.
@@ -10793,6 +10813,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
             }
             //FIXME: else?  Opera?
         };
+
         var _insertBefore = function(/*Node*/node, /*Node*/ref) {
             ref.parentNode.insertBefore(node, ref);
             return true;
@@ -11661,6 +11682,7 @@ if(!dojo._hasResource["dojo._base.html"]) {//_hasResource checks added by build.
         }
         dojo[condition ? "addClass" : "removeClass"](node, classStr);
     };
+
 }
 
 if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by build. Do not use _hasResource directly in your code.
@@ -11747,6 +11769,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 //		array is implicitly this NodeList
                 return d.indexOf(this, value, fromIndex);
             },
+
             lastIndexOf : function(/*Object*/value, /*Integer?*/fromIndex) {
                 //	summary:
                 //		see dojo.lastIndexOf(). The primary difference is that the
@@ -11755,6 +11778,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 aa.unshift(this);
                 return d.lastIndexOf.apply(d, aa);
             },
+
             every : function(/*Function*/callback, /*Object?*/thisObject) {
                 //	summary:
                 //		see dojo.every() and:
@@ -11765,6 +11789,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return d.every(this, callback, thisObject);
                 // Boolean
             },
+
             some : function(/*Function*/callback, /*Object?*/thisObject) {
                 //	summary:
                 //		see dojo.some() and:
@@ -11775,6 +11800,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return d.some(this, callback, thisObject);
                 // Boolean
             },
+
             forEach : function(callback, thisObj) {
                 //	summary:
                 //		see dojo.forEach(). The primary difference is that the acted-on
@@ -11783,6 +11809,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return this;
                 // dojo.NodeList non-standard return to allow easier chaining
             },
+
             map : function(/*Function*/func, /*Function?*/obj) {
                 //	summary:
                 //		see dojo.map(). The primary difference is that the acted-on
@@ -11792,6 +11819,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return d.map(this, func, obj, d.NodeList);
                 // dojo.NodeList
             },
+
             // custom methods
 
             coords : function() {
@@ -11801,6 +11829,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
 
                 return d.map(this, d.coords);
             },
+
             style : function(/*String*/property, /*String?*/value) {
                 //	summary:
                 //		gets or sets the value of the CSS property
@@ -11818,6 +11847,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return (arguments.length > 1) ? this : s;
                 // String||dojo.NodeList
             },
+
             styles : function(/*String*/property, /*String?*/value) {
                 //	summary:
                 //		gets or sets the CSS property for every element in the NodeList
@@ -11836,16 +11866,19 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return (arguments.length > 1) ? this : s;
                 // String||dojo.NodeList
             },
+
             addClass : function(/*String*/className) {
                 return this.forEach(function(i) {
                     dojo.addClass(i, className);
                 });
             },
+
             removeClass : function(/*String*/className) {
                 return this.forEach(function(i) {
                     dojo.removeClass(i, className);
                 });
             },
+
             // FIXME: toggleClass()? connectPublisher()? connectRunOnce()?
 
             place : function(/*String||Node*/queryOrNode, /*String*/position) {
@@ -11872,6 +11905,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return this;
                 // dojo.NodeList
             },
+
             connect : function(/*String*/methodName, /*Object||Function||String*/objOrFunc, /*String?*/funcName) {
                 //	summary:
                 //		attach event handlers to every item of the NodeList. Uses dojo.connect()
@@ -11902,6 +11936,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return this;
                 // dojo.NodeList
             },
+
             orphan : function(/*String?*/simpleFilter) {
                 //	summary:
                 //		removes elements in this list that match the simple
@@ -11918,6 +11953,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return orphans;
                 // dojo.NodeList
             },
+
             adopt : function(/*String||Array||DomNode*/queryOrListOrNode, /*String?*/position) {
                 //	summary:
                 //		places any/all elements in queryOrListOrNode at a
@@ -11940,6 +11976,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 });
                 // dojo.NodeList
             },
+
             // FIXME: do we need this?
             query : function(/*String*/queryStr) {
                 //	summary:
@@ -11961,6 +11998,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return ret;
                 // dojo.NodeList
             },
+
             filter : function(/*String*/simpleQuery) {
                 //	summary:
                 // 		"masks" the built-in javascript filter() method to support
@@ -12002,6 +12040,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 // dojo.NodeList
 
             },
+
             /*
              // FIXME: should this be "copyTo" and include parenting info?
              clone: function(){
@@ -12040,6 +12079,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return this;
                 // dojo.NodeList
             },
+
             _anim : function(method, args) {
                 var anims = [];
                 args = args || {};
@@ -12054,6 +12094,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return d.fx.combine(anims);
                 // dojo._Animation
             },
+
             fadeIn : function(args) {
                 //	summary:
                 //		fade in all elements of this NodeList. Returns an instance of dojo._Animation
@@ -12063,6 +12104,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return this._anim("fadeIn", args);
                 // dojo._Animation
             },
+
             fadeOut : function(args) {
                 //	summary:
                 //		fade out all elements of this NodeList. Returns an instance of dojo._Animation
@@ -12077,6 +12119,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) {//_hasResource checks added by bu
                 return this._anim("fadeOut", args);
                 // dojo._Animation
             },
+
             animateProperty : function(args) {
                 //	summary:
                 //		see dojo.animateProperty(). Animate all elements of this
@@ -12396,10 +12439,12 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
                 }, function(matcher) {
                     xpath += matcher;
                 });
+
                 // FIXME: need to implement pseudo-class checks!!
             };
             return xpath;
         };
+
         var _xpathFuncCache = {};
         var getXPathFunc = function(path) {
             if(_xpathFuncCache[path]) {
@@ -12433,6 +12478,7 @@ if(!dojo._hasResource["dojo._base.query"]) {//_hasResource checks added by build
             }
             return _xpathFuncCache[path] = tf;
         };
+
         /*
         d.xPathMatch = function(query){
         // XPath based DOM query system. Handles a small subset of CSS
@@ -13612,6 +13658,7 @@ if(!dojo._hasResource["dojo._base.xhr"]) {//_hasResource checks added by build. 
             d.addCallbacks(okHandler, function(error) {
                 return errHandler(error, d);
             });
+
             //Support specifying load, error and handle callback functions from the args.
             //For those callbacks, the "this" object will be the args object.
             //The callbacks will get the deferred result value as the
@@ -13957,6 +14004,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
                 this.curve = new dojo._Line(this.curve[0], this.curve[1]);
             }
         },
+
         // public properties
         curve : null,
         duration : 1000,
@@ -13994,6 +14042,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return this;
             // dojo._Animation
         },
+
         play : function(/*int?*/delay, /*boolean?*/gotoStart) {
             // summary: Start the animation.
             // delay: How many milliseconds to delay before starting.
@@ -14042,6 +14091,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return this;
             // dojo._Animation
         },
+
         pause : function() {
             // summary: Pauses a running animation.
             clearTimeout(this._timer);
@@ -14054,6 +14104,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return this;
             // dojo._Animation
         },
+
         gotoPercent : function(/*Decimal*/pct, /*boolean?*/andPlay) {
             // summary: Sets the progress of the animation.
             // pct: A percentage in decimal notation (between and including 0.0 and 1.0).
@@ -14067,6 +14118,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return this;
             // dojo._Animation
         },
+
         stop : function(/*boolean?*/gotoEnd) {
             // summary: Stops a running animation.
             // gotoEnd: If true, the animation will end.
@@ -14082,6 +14134,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return this;
             // dojo._Animation
         },
+
         status : function() {
             // summary: Returns a string token representation of the status of
             //			the animation, one of: "paused", "playing", "stopped"
@@ -14092,6 +14145,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             return "stopped";
             // String
         },
+
         _cycle : function() {
             clearTimeout(this._timer);
             if(this._active) {
@@ -14177,6 +14231,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
             dojo.connect(anim, "beforeBegin", null, function() {
                 _makeFadeable(fArgs.node);
             });
+
             return anim;
             // dojo._Animation
         }
@@ -14313,6 +14368,7 @@ if(!dojo._hasResource["dojo._base.fx"]) {//_hasResource checks added by build. D
                 }
                 // }catch(e){ console.debug(dojo.toJson(e)); }
             });
+
             return anim;
             // dojo._Animation
         }
