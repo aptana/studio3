@@ -2542,6 +2542,7 @@ if( typeof window.jQuery == "undefined") {
 
         return this.init(a, c);
     };
+
     // Map over the $ in case of overwrite
     if( typeof $ != "undefined")
         jQuery._$ = $;
@@ -2582,6 +2583,7 @@ if( typeof window.jQuery == "undefined") {
             // HANDLE: $(*)
             [a]);
         },
+
         /** @id jQuery.jquery */
         jquery : "1.1.3.1",
 
@@ -2589,6 +2591,7 @@ if( typeof window.jQuery == "undefined") {
         size : function() {
             return this.length;
         },
+
         /** @id jQuery.length */
         length : 0,
 
@@ -2602,22 +2605,26 @@ if( typeof window.jQuery == "undefined") {
             // Return just the object
             this[num];
         },
+
         /** @id jQuery.pushStack */
         pushStack : function(a) {
             var ret = jQuery(a);
             ret.prevObject = this;
             return ret;
         },
+
         /** @id jQuery.setArray */
         setArray : function(a) {
             this.length = 0;
             [].push.apply(this, a);
             return this;
         },
+
         /** @id jQuery.each */
         each : function(fn, args) {
             return jQuery.each(this, fn, args);
         },
+
         /** @id jQuery.index */
         index : function(obj) {
             var pos = -1;
@@ -2627,6 +2634,7 @@ if( typeof window.jQuery == "undefined") {
             });
             return pos;
         },
+
         /** @id jQuery.attr */
         attr : function(key, value, type) {
             var obj = key;
@@ -2647,10 +2655,12 @@ if( typeof window.jQuery == "undefined") {
                 jQuery.attr( type ? this.style : this, prop, jQuery.prop(this, obj[prop], type, index, prop));
             });
         },
+
         /** @id jQuery.css */
         css : function(key, value) {
             return this.attr(key, value, "curCSS");
         },
+
         /** @id jQuery.text */
         text : function(e) {
             if( typeof e == "string")
@@ -2665,6 +2675,7 @@ if( typeof window.jQuery == "undefined") {
             });
             return t;
         },
+
         /** @id jQuery.wrap */
         wrap : function() {
             // The elements to wrap the target around
@@ -2689,34 +2700,40 @@ if( typeof window.jQuery == "undefined") {
                 b.appendChild(this);
             });
         },
+
         /** @id jQuery.append */
         append : function() {
             return this.domManip(arguments, true, 1, function(a) {
                 this.appendChild(a);
             });
         },
+
         /** @id jQuery.prepend */
         prepend : function() {
             return this.domManip(arguments, true, -1, function(a) {
                 this.insertBefore(a, this.firstChild);
             });
         },
+
         /** @id jQuery.before */
         before : function() {
             return this.domManip(arguments, false, 1, function(a) {
                 this.parentNode.insertBefore(a, this);
             });
         },
+
         /** @id jQuery.after */
         after : function() {
             return this.domManip(arguments, false, -1, function(a) {
                 this.parentNode.insertBefore(a, this.nextSibling);
             });
         },
+
         /** @id jQuery.end */
         end : function() {
             return this.prevObject || jQuery([]);
         },
+
         /** @id jQuery.find */
         find : function(t) {
             var data = jQuery.map(this, function(a) {
@@ -2724,6 +2741,7 @@ if( typeof window.jQuery == "undefined") {
             });
             return this.pushStack(/[^+>] [^+>]/.test(t) || t.indexOf("..") > -1 ? jQuery.unique(data) : data);
         },
+
         /** @id jQuery.clone */
         clone : function(deep) {
             // Need to remove events on the element and its descendants
@@ -2738,6 +2756,7 @@ if( typeof window.jQuery == "undefined") {
             var r = this.pushStack(jQuery.map(this, function(a) {
                 return a.cloneNode(deep != undefined ? deep : true);
             }));
+
             // Add the events back to the original and its descendants
             $this.each(function() {
                 var events = this._$events;
@@ -2746,37 +2765,45 @@ if( typeof window.jQuery == "undefined") {
                 jQuery.event.add(this, type, events[type][handler], events[type][handler].data);
                 this._$events = null;
             });
+
             // Return the cloned set
             return r;
         },
+
         /** @id jQuery.filter */
         filter : function(t) {
             return this.pushStack(jQuery.isFunction(t) && jQuery.grep(this, function(el, index) {
                 return t.apply(el, [index])
             }) || jQuery.multiFilter(t, this));
         },
+
         /** @id jQuery.not */
         not : function(t) {
             return this.pushStack(t.constructor == String && jQuery.multiFilter(t, this, true) || jQuery.grep(this, function(a) {
                 return (t.constructor == Array || t.jquery ) ? jQuery.inArray(a, t) < 0 : a != t;
             }));
         },
+
         /** @id jQuery.add */
         add : function(t) {
             return this.pushStack(jQuery.merge(this.get(), t.constructor == String ? jQuery(t).get() : t.length != undefined && (!t.nodeName || t.nodeName == "FORM") ? t : [t]));
         },
+
         /** @id jQuery.is */
         is : function(expr) {
             return expr ? jQuery.multiFilter(expr, this).length > 0 : false;
         },
+
         /** @id jQuery.val */
         val : function(val) {
             return val == undefined ? (this.length ? this[0].value : null ) : this.attr("value", val);
         },
+
         /** @id jQuery.html */
         html : function(val) {
             return val == undefined ? (this.length ? this[0].innerHTML : null ) : this.empty().append(val);
         },
+
         /** @id jQuery.domManip */
         domManip : function(args, table, dir, fn) {
             var clone = this.length > 1, a;
@@ -2796,6 +2823,7 @@ if( typeof window.jQuery == "undefined") {
                 jQuery.each(a, function() {
                     fn.apply(obj, [ clone ? this.cloneNode(true) : this]);
                 });
+
             });
         }
     };
@@ -2828,15 +2856,18 @@ if( typeof window.jQuery == "undefined") {
                 $ = jQuery._$;
             return jQuery;
         },
+
         // This may seem like some crazy code, but trust me when I say that this
         // is the only cross-browser way to do this. --John
         isFunction : function(fn) {
             return !!fn && typeof fn != "string" && !fn.nodeName && fn.constructor != Array && /function/i.test(fn + "");
         },
+
         // check if an element is in a XML document
         isXMLDoc : function(elem) {
             return elem.tagName && elem.ownerDocument && !elem.ownerDocument.body;
         },
+
         nodeName : function(elem, name) {
             return elem.nodeName && elem.nodeName.toUpperCase() == name.toUpperCase();
         },
@@ -2853,6 +2884,7 @@ if( typeof window.jQuery == "undefined") {
                         break;
             return obj;
         },
+
         prop : function(elem, value, type, index, prop) {
             // Handle executable functions
             if(jQuery.isFunction(value))
@@ -2864,6 +2896,7 @@ if( typeof window.jQuery == "undefined") {
             // Handle passing in a number to a CSS property
             return value && value.constructor == Number && type == "curCSS" && !exclude.test(prop) ? value + "px" : value;
         },
+
         className : {
             // internal only, use addClass("class")
             add : function(elem, c) {
@@ -2872,12 +2905,14 @@ if( typeof window.jQuery == "undefined") {
                         elem.className += (elem.className ? " " : "" ) + cur;
                 });
             },
+
             // internal only, use removeClass("class")
             remove : function(elem, c) {
                 elem.className = c != undefined ? jQuery.grep(elem.className.split(/\s+/), function(cur) {
                     return !jQuery.className.has(c, cur);
                 }).join(" ") : "";
             },
+
             // internal only, use is(".class")
             has : function(t, c) {
                 return jQuery.inArray(c, (t.className || t).toString().split(/\s+/)) > -1;
@@ -2892,6 +2927,7 @@ if( typeof window.jQuery == "undefined") {
             for(var i in o )
             e.style[i] = e.style["old" + i];
         },
+
         css : function(e, p) {
             if(p == "height" || p == "width") {
                 var old = {}, oHeight, oWidth, d = ["Top", "Bottom", "Right", "Left"];
@@ -2925,11 +2961,13 @@ if( typeof window.jQuery == "undefined") {
                         e.parentNode.removeChild(e);
                     }
                 });
+
                 return p == "height" ? oHeight : oWidth;
             }
 
             return jQuery.curCSS(e, p);
         },
+
         curCSS : function(elem, prop, force) {
             var ret;
 
@@ -2963,6 +3001,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                         var c = document.defaultView.getComputedStyle(this, "");
                         ret = c && c.getPropertyValue(prop) || "";
                     });
+
             } else if(elem.currentStyle) {
                 var newProp = prop.replace(/\-(\w)/g, function(m, c) {
                     return c.toUpperCase();
@@ -2972,6 +3011,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             return ret;
         },
+
         clean : function(a, doc) {
             var r = [];
             doc = doc || document;
@@ -3031,8 +3071,10 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                     r = jQuery.merge(r, arg);
 
             });
+
             return r;
         },
+
         attr : function(elem, name, value) {
             var fix = jQuery.isXMLDoc(elem) ? {} : jQuery.props;
 
@@ -3077,10 +3119,12 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
                 return elem[name];
             }
         },
+
         /** @id jQuery.$.trim */
         trim : function(t) {
             return t.replace(/^\s+|\s+$/g, "");
         },
+
         makeArray : function(a) {
             var r = [];
 
@@ -3093,12 +3137,14 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             return r;
         },
+
         inArray : function(b, a) {
             for(var i = 0, al = a.length; i < al; i++)
                 if(a[i] == b)
                     return i;
             return -1;
         },
+
         /** @id jQuery.$.merge */
         merge : function(first, second) {
             // We have to loop this way because IE & Opera overwrite the length
@@ -3118,6 +3164,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             return r;
         },
+
         mergeNum : 0,
 
         /** @id jQuery.$.grep */
@@ -3137,6 +3184,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             return result;
         },
+
         /** @id jQuery.$.map */
         map : function(elems, fn) {
             // If a string is passed in for the function, make a function
@@ -3354,6 +3402,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             return cur;
         },
+
         /** @id jQuery.$.find */
         find : function(t, context) {
             // Quickly handle non-string expressions
@@ -3563,6 +3612,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
 
             return done;
         },
+
         classFilter : function(r, m, not) {
             m = " " + m + " ";
             var tmp = [];
@@ -3573,6 +3623,7 @@ else if(document.defaultView && document.defaultView.getComputedStyle) {
             }
             return tmp;
         },
+
         filter : function(t, r, not) {
             var last;
 
@@ -3673,6 +3724,7 @@ else if(m[1] == "@") {
                 t : t
             };
         },
+
         /** @id jQuery.$.parents */
         parents : function(elem) {
             var matched = [];
@@ -3683,6 +3735,7 @@ else if(m[1] == "@") {
             }
             return matched;
         },
+
         /** @id jQuery.$.nth */
         nth : function(cur, result, dir, elem) {
             result = result || 1;
@@ -3694,6 +3747,7 @@ else if(m[1] == "@") {
 
             return cur;
         },
+
         /** @id jQuery.$.sibling */
         sibling : function(n, elem) {
             var r = [];
@@ -3735,6 +3789,7 @@ else if(m[1] == "@") {
                     // Pass arguments and context to original handler
                     return fn.apply(this, arguments);
                 };
+
                 // Store data in unique handler
                 handler.data = data;
 
@@ -3760,6 +3815,7 @@ else if(m[1] == "@") {
 
                     return val;
                 };
+
             // Get the current list of functions bound to this event
             var handlers = element.$events[type];
 
@@ -3784,6 +3840,7 @@ else if(m[1] == "@") {
             if(jQuery.inArray(element, this.global[type]) == -1)
                 this.global[type].push(element);
         },
+
         guid : 1,
         global : {},
 
@@ -3837,6 +3894,7 @@ else if(m[1] == "@") {
                     element.$handle = element.$events = null;
             }
         },
+
         trigger : function(type, data, element) {
             // Clone the incoming data, if any
             data = jQuery.makeArray(data || []);
@@ -3846,6 +3904,7 @@ else if(m[1] == "@") {
                 jQuery.each(this.global[type] || [], function() {
                     jQuery.event.trigger(type, data, this);
                 });
+
             // Handle triggering a single element
             else {
                 var val, ret, fn = jQuery.isFunction(element[type] || null);
@@ -3866,6 +3925,7 @@ else if(m[1] == "@") {
                 this.triggered = false;
             }
         },
+
         handle : function(event) {
             // returned undefined or false
             var val;
@@ -3895,6 +3955,7 @@ else if(m[1] == "@") {
 
             return val;
         },
+
         fix : function(event) {
             // store a copy of the original event object
             // and clone to set read-only properties
@@ -3917,6 +3978,7 @@ else if(m[1] == "@") {
                 // otherwise set the cancelBubble property of the original event to true (IE)
                 originalEvent.cancelBubble = true;
             };
+
             // Fix target property, if necessary
             if(!event.target && event.srcElement)
                 event.target = event.srcElement;
@@ -3961,6 +4023,7 @@ else if(m[1] == "@") {
                 jQuery.event.add(this, type, fn || data, fn && data);
             });
         },
+
         /** @id jQuery.one */
         one : function(type, data, fn) {
             return this.each(function() {
@@ -3970,18 +4033,21 @@ else if(m[1] == "@") {
                 }, fn && data);
             });
         },
+
         /** @id jQuery.unbind */
         unbind : function(type, fn) {
             return this.each(function() {
                 jQuery.event.remove(this, type, fn);
             });
         },
+
         /** @id jQuery.trigger */
         trigger : function(type, data) {
             return this.each(function() {
                 jQuery.event.trigger(type, data, this);
             });
         },
+
         /** @id jQuery.toggle */
         toggle : function() {
             // Save reference to arguments for access in closure
@@ -3998,6 +4064,7 @@ else if(m[1] == "@") {
                 return a[this.lastToggle].apply(this, [e]) || false;
             });
         },
+
         /** @id jQuery.hover */
         hover : function(f, g) {
 
@@ -4025,6 +4092,7 @@ else if(m[1] == "@") {
             // Bind the function to the two event listeners
             return this.mouseover(handleHover).mouseout(handleHover);
         },
+
         /** @id jQuery.ready */
         ready : function(f) {
             // If the DOM is already ready
@@ -4038,6 +4106,7 @@ else if(m[1] == "@") {
                 jQuery.readyList.push(function() {
                     return f.apply(this, [jQuery])
                 });
+
             return this;
         }
     });
@@ -4062,6 +4131,7 @@ else if(m[1] == "@") {
                     jQuery.each(jQuery.readyList, function() {
                         this.apply(document);
                     });
+
                     // Reset the list of functions
                     jQuery.readyList = null;
                 }
@@ -4204,10 +4274,12 @@ else if(m[1] == "@") {
             });
             return this;
         },
+
         /** @id jQuery.serialize */
         serialize : function() {
             return jQuery.param(this);
         },
+
         /** @id jQuery.evalScripts */
         evalScripts : function() {
             return this.find("script").each(function() {
@@ -4246,18 +4318,22 @@ else if(m[1] == "@") {
                 ifModified : ifModified
             });
         },
+
         /** @id jQuery.$.getIfModified */
         getIfModified : function(url, data, callback, type) {
             return jQuery.get(url, data, callback, type, 1);
         },
+
         /** @id jQuery.$.getScript */
         getScript : function(url, callback) {
             return jQuery.get(url, null, callback, "script");
         },
+
         /** @id jQuery.$.getJSON */
         getJSON : function(url, data, callback) {
             return jQuery.get(url, data, callback, "json");
         },
+
         /** @id jQuery.$.post */
         post : function(url, data, callback, type) {
             if(jQuery.isFunction(data)) {
@@ -4273,14 +4349,17 @@ else if(m[1] == "@") {
                 dataType : type
             });
         },
+
         /** @id jQuery.$.ajaxTimeout */
         ajaxTimeout : function(timeout) {
             jQuery.ajaxSettings.timeout = timeout;
         },
+
         /** @id jQuery.$.ajaxSetup */
         ajaxSetup : function(settings) {
             jQuery.extend(jQuery.ajaxSettings, settings);
         },
+
         ajaxSettings : {
             global : true,
             type : "GET",
@@ -4405,6 +4484,7 @@ else if(m[1] == "@") {
                         xml = null;
                 }
             };
+
             // don't attach the handler to the request, just poll it instead
             var ival = setInterval(onreadystatechange, 13);
 
@@ -4435,6 +4515,7 @@ else if(m[1] == "@") {
             // return XMLHttpRequest to allow aborting the request etc.
             return xml;
         },
+
         handleError : function(s, xml, status, e) {
             // If a local callback was specified, fire it
             if(s.error)
@@ -4444,6 +4525,7 @@ else if(m[1] == "@") {
             if(s.global)
                 jQuery.event.trigger("ajaxError", [xml, s, e]);
         },
+
         // Counter for holding the number of active queries
         active : 0,
 
@@ -4455,6 +4537,7 @@ else if(m[1] == "@") {
             }
             return false;
         },
+
         // Determines if an XMLHttpRequest returns NotModified
         httpNotModified : function(xml, url) {
             try {
@@ -4466,6 +4549,7 @@ else if(m[1] == "@") {
             }
             return false;
         },
+
         /* Get the data out of an XMLHttpRequest.
          * Return parsed XML if content-type header is "xml" and type is "xml" or omitted,
          * otherwise return plain text.
@@ -4491,6 +4575,7 @@ else if(m[1] == "@") {
 
             return data;
         },
+
         // Serialize an array of form elements or a set of
         // key/values into a query string
         param : function(a) {
@@ -4503,6 +4588,7 @@ else if(m[1] == "@") {
                 jQuery.each(a, function() {
                     s.push(encodeURIComponent(this.name) + "=" + encodeURIComponent(this.value));
                 });
+
             // Otherwise, assume that it's an object of key/value pairs
             else
                 // Serialize the key/values
@@ -4518,6 +4604,7 @@ else if(m[1] == "@") {
             // Return the resulting serialization
             return s.join("&");
         },
+
         // evalulates a script in global context
         // not reliable for safari
         globalEval : function(data) {
@@ -4544,6 +4631,7 @@ else if(m[1] == "@") {
                     this.style.display = "block";
             }).end();
         },
+
         /** @id jQuery.hide */
         hide : function(speed, callback) {
             return speed ? this.animate({
@@ -4557,6 +4645,7 @@ else if(m[1] == "@") {
                 this.style.display = "none";
             }).end();
         },
+
         // Save the old toggle function
         _toggle : jQuery.fn.toggle,
         toggle : function(fn, fn2) {
@@ -4568,42 +4657,49 @@ else if(m[1] == "@") {
                 jQuery(this)[ jQuery(this).is(":hidden") ? "show" : "hide" ]();
             });
         },
+
         /** @id jQuery.slideDown */
         slideDown : function(speed, callback) {
             return this.animate({
                 height : "show"
             }, speed, callback);
         },
+
         /** @id jQuery.slideUp */
         slideUp : function(speed, callback) {
             return this.animate({
                 height : "hide"
             }, speed, callback);
         },
+
         /** @id jQuery.slideToggle */
         slideToggle : function(speed, callback) {
             return this.animate({
                 height : "toggle"
             }, speed, callback);
         },
+
         /** @id jQuery.fadeIn */
         fadeIn : function(speed, callback) {
             return this.animate({
                 opacity : "show"
             }, speed, callback);
         },
+
         /** @id jQuery.fadeOut */
         fadeOut : function(speed, callback) {
             return this.animate({
                 opacity : "hide"
             }, speed, callback);
         },
+
         /** @id jQuery.fadeTo */
         fadeTo : function(speed, to, callback) {
             return this.animate({
                 opacity : to
             }, speed, callback);
         },
+
         /** @id jQuery.animate */
         animate : function(prop, speed, easing, callback) {
             return this.queue(function() {
@@ -4675,8 +4771,10 @@ else if(m[1] == "@") {
                 if(jQuery.isFunction(opt.old))
                     opt.old.apply(this);
             };
+
             return opt;
         },
+
         easing : {
             linear : function(p, n, firstNum, diff) {
                 return firstNum + diff * p;
@@ -4702,6 +4800,7 @@ else if(m[1] == "@") {
                     f.apply(elem);
             }
         },
+
         timers : [],
 
         /*
@@ -4731,15 +4830,18 @@ else if(m[1] == "@") {
                     // Set display property to block for animation
                 }
             };
+
             // Figure out the maximum number to run to
             z.max = function() {
                 return parseFloat(jQuery.css(elem, prop));
             };
+
             // Get the current size
             z.cur = function() {
                 var r = parseFloat(jQuery.curCSS(elem, prop));
                 return r && r > -10000 ? r : z.max();
             };
+
             // Start an animation from one number to another
             z.custom = function(from, to) {
                 z.startTime = (new Date()).getTime();
@@ -4749,6 +4851,7 @@ else if(m[1] == "@") {
                 jQuery.timers.push(function() {
                     return z.step(from, to);
                 });
+
                 if(jQuery.timers.length == 1) {
                     var timer = setInterval(function() {
                         var timers = jQuery.timers;
@@ -4762,6 +4865,7 @@ else if(m[1] == "@") {
                     }, 13);
                 }
             };
+
             // Simple 'show' function
             z.show = function() {
                 if(!elem.orig)
@@ -4783,6 +4887,7 @@ else if(m[1] == "@") {
                 // Start by showing the element
                 jQuery(elem).show();
             };
+
             // Simple 'hide' function
             z.hide = function() {
                 if(!elem.orig)
@@ -4796,6 +4901,7 @@ else if(m[1] == "@") {
                 // Begin the animation
                 z.custom(this.cur(), 0);
             };
+
             // Each step of an animation
             z.step = function(firstNum, lastNum) {
                 var t = (new Date()).getTime();
@@ -4853,6 +4959,7 @@ else if(m[1] == "@") {
 
                 return true;
             };
+
         }
     });
 }

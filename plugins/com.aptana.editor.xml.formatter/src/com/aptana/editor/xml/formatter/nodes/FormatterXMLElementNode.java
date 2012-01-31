@@ -54,6 +54,15 @@ public class FormatterXMLElementNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
 	 */
 	protected boolean isAddingEndNewLine()
@@ -72,6 +81,29 @@ public class FormatterXMLElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
-		return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		if (context.getParent() == null)
+		{
+			return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		}
+		else
+		{
+			return super.getBlankLinesBefore(context);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesBefore(com.aptana.formatter.IFormatterContext
+	 * )
+	 */
+	@Override
+	protected int getBlankLinesBefore(IFormatterContext context)
+	{
+		if (context.getParent() != null && context.getChildIndex() > 1)
+		{
+			return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		}
+		return super.getBlankLinesBefore(context);
 	}
 }

@@ -4,6 +4,8 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -11,8 +13,6 @@ import org.eclipse.core.runtime.Path;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
-
-import junit.framework.TestCase;
 
 public abstract class GitTestCase extends TestCase
 {
@@ -188,7 +188,7 @@ public abstract class GitTestCase extends TestCase
 
 	protected void assertCreateBranch(String newBranch, boolean track, String startPoint) throws Exception
 	{
-		assertTrue(MessageFormat.format("Failed to create new branch {0} off of {1} (track: {3})", newBranch,
+		assertTrue(MessageFormat.format("Failed to create new branch {0} off of {1} (track: {2})", newBranch,
 				startPoint, track), getRepo().createBranch(newBranch, track, startPoint));
 	}
 

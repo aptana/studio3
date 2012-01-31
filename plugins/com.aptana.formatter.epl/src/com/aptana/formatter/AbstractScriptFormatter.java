@@ -704,7 +704,10 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			}
 			if (postfixWithNewLine)
 			{
-				wrappedOutput.append(lineSeparator);
+				if (!output.endsWith(lineSeparator))
+				{
+					wrappedOutput.append(lineSeparator);
+				}
 				// Add the indentSufix that we may have.
 				wrappedOutput.append(indentSufix);
 			}

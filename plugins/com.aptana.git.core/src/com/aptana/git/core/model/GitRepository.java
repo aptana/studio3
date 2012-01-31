@@ -214,6 +214,13 @@ public class GitRepository
 		this.branches = new HashSet<GitRevSpecifier>();
 		reloadRefs();
 		readCurrentBranch();
+
+		// Don't add filewatcher if we're testing...
+		if (EclipseUtil.isTesting())
+		{
+			return;
+		}
+
 		try
 		{
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
