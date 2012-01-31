@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -16,9 +16,9 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
+import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -29,7 +29,7 @@ import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseError.Severity;
 
-public class JSParserValidator extends AbstractBuildParticipant
+public class JSParserValidator extends RequiredBuildParticipant
 {
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)

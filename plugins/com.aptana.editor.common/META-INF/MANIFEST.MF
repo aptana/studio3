@@ -49,7 +49,6 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text.hyperlink,
  com.aptana.editor.common.text.reconciler,
  com.aptana.editor.common.text.rules,
- com.aptana.editor.common.util,
- com.aptana.editor.common.validator
+ com.aptana.editor.common.util
 Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .

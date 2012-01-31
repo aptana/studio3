@@ -88,19 +88,6 @@
       </parser>
    </extension>
    <extension
-         point="com.aptana.editor.common.validator">
-      <content-type
-            id="com.aptana.contenttype.sdocml"
-            name="%sdocml.content.name">
-      </content-type>
-      <validator
-            class="com.aptana.editor.js.validator.SDocMLValidator"
-            content-type="com.aptana.contenttype.sdocml"
-            marker-type="com.aptana.editor.js.sdocml_problem"
-            name="%validator.sdocml.name">
-      </validator>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
@@ -277,6 +264,14 @@
             priority="60">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.js.validator.SDocMLValidator"
+            id="com.aptana.editor.js.validator.SDocMLValidator"
+            name="%validator.sdocml.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.sdocml">
          </contentTypeBinding>
       </participant>
    </extension>

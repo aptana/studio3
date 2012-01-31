@@ -41,7 +41,7 @@ public class BuildParticipantManagerTest extends TestCase
 			if (participant instanceof NoPrioritySpecifiedBuildParticipant)
 			{
 				assertEquals("Incorrect default priority when unspecified", participant.getPriority(),
-						BuildParticipantManager.DEFAULT_PRIORITY);
+						AbstractBuildParticipant.DEFAULT_PRIORITY);
 				break;
 			}
 		}

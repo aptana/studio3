@@ -8,7 +8,13 @@
 package com.aptana.core.build;
 
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.runtime.content.IContentType;
+
+/**
+ * @author cwilliams
+ */
 public interface IBuildParticipantManager
 {
 
@@ -29,6 +35,21 @@ public interface IBuildParticipantManager
 	 */
 	List<IBuildParticipant> getAllBuildParticipants();
 
-	List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, String contentType);
+	/**
+	 * Given a list of existing participant instances, this filters them down to those that apply to the given
+	 * contentTypeId
+	 * 
+	 * @param participants
+	 * @param contentTypeId
+	 * @return
+	 */
+	List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, String contentTypeId);
+
+	/**
+	 * Returns the set of all explicitly registered content types across all registered build participants.
+	 * 
+	 * @return
+	 */
+	Set<IContentType> getContentTypes();
 
 }

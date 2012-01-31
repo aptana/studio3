@@ -32,6 +32,7 @@ import com.aptana.index.core.build.BuildContext;
 
 public class MozillaJsValidator extends AbstractBuildParticipant
 {
+	public static final String ID = "com.aptana.editor.js.validator.MozillaValidator"; //$NON-NLS-1$
 
 	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 

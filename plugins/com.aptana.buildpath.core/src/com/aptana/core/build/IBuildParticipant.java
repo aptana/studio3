@@ -7,6 +7,7 @@
  */
 package com.aptana.core.build;
 
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -20,6 +21,11 @@ import com.aptana.index.core.build.BuildContext;
  */
 public interface IBuildParticipant
 {
+
+	enum BuildType
+	{
+		BUILD, RECONCILE;
+	}
 
 	/**
 	 * Clean is called on a whole project. This method is called on every build participant regardless of the content
@@ -54,11 +60,6 @@ public interface IBuildParticipant
 	public int getPriority();
 
 	/**
-	 * @param priority
-	 */
-	public void setPriority(int priority);
-
-	/**
 	 * Called on an individual file. For incremental builds we traverse the diff and call this for every updated/added
 	 * file. For full builds we traverse the project to collect the files and call this once per file.
 	 * 
@@ -76,7 +77,58 @@ public interface IBuildParticipant
 	 */
 	public void deleteFile(BuildContext context, IProgressMonitor monitor);
 
-	public void setContentTypes(Set<IContentType> contentTypes);
-
+	/**
+	 * Returns the set of {@link IContentType}s that this participant is registered for.
+	 * 
+	 * @return
+	 */
 	public Set<IContentType> getContentTypes();
+
+	/**
+	 * Returns the display name.
+	 * 
+	 * @return
+	 */
+	public String getName();
+
+	/**
+	 * Returns the unique id string used to identify this participant. This is not unique per instance of this type.
+	 * 
+	 * @return
+	 */
+	public String getId();
+
+	/**
+	 * Is this participant enabled?
+	 * 
+	 * @return
+	 */
+	public boolean isEnabled(BuildType type);
+
+	/**
+	 * Change enablement if possible.
+	 * 
+	 * @param enabled
+	 */
+	public void setEnabled(BuildType type, boolean enabled);
+
+	/**
+	 * Tells the participant to restore it's default enablement state and possibly reset any participant specified
+	 * settings (like filters for warnings).
+	 */
+	public void restoreDefaults();
+
+	/**
+	 * Some participants are required - meaning they cannot be disabled.
+	 * 
+	 * @return
+	 */
+	public boolean isRequired();
+
+	/**
+	 * Returns the list of filters.
+	 * 
+	 * @return
+	 */
+	public List<String> getFilters();
 }

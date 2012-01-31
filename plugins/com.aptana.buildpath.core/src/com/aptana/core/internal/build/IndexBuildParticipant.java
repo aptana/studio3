@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -19,14 +19,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
-import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.build.BuildContext;
 
-public class IndexBuildParticipant extends AbstractBuildParticipant
+public class IndexBuildParticipant extends RequiredBuildParticipant
 {
 
 	private Index fIndex;

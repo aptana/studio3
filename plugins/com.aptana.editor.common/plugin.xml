@@ -743,15 +743,6 @@
       </perspectiveExtension>
    </extension>
    <extension
-         point="com.aptana.buildpath.core.buildParticipants">
-      <participant
-            class="com.aptana.editor.common.validator.LegacyValidationBuildParticipant"
-            id="com.aptana.editor.common.validator.LegacyValidationBuildParticipant"
-            name="%legacy.validation.participant.name"
-            priority="60">
-      </participant>
-   </extension>
-   <extension
          point="org.eclipse.core.filebuffers.annotationModelCreation">
       <factory
             contentTypeId="org.eclipse.core.runtime.text"

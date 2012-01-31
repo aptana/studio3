@@ -1,94 +1,87 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.common.preferences;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
+import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipantManager;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.validator.ValidatorLanguage;
-import com.aptana.editor.common.validator.ValidatorLoader;
-import com.aptana.editor.common.validator.ValidatorReference;
 import com.aptana.ui.widgets.CListTable;
 
 public class ValidationPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
-	// to distinguish between the default state and user-modified one for preference value
-	private static final String EMPTY_LIST = "empty"; //$NON-NLS-1$
-	private static final String VALIDATORS_DELIMITER = ","; //$NON-NLS-1$
-	private static final String FILTER_DELIMITER = "####"; //$NON-NLS-1$
+	// TODO Move this to a buildpath.ui plugin!
+	/**
+	 * Property names for columns.
+	 */
+	private static final String NAME = "name"; //$NON-NLS-1$
+	private static final String BUILD = "build"; //$NON-NLS-1$
+	private static final String RECONCILE = "reconcile"; //$NON-NLS-1$
 
-	private ListViewer languagesViewer;
-	private CheckboxTableViewer validatorsViewer;
+	private ListViewer contentTypesViewer;
+	private TableViewer validatorsViewer;
 	private CListTable filterViewer;
-
-	// stores the list of selected validators by language type
-	private Map<String, List<String>> selectedValidatorsMap;
-	// stores the list of filter expressions by language type
-	private Map<String, List<String>> filterExpressionsMap;
-	// stores the list of languages that have parsing errors enabled
-	private List<String> parseErrorEnabledList;
-
-	private String selectedLanguage;
-	private String enableParseError;
 
 	public ValidationPreferencePage()
 	{
-		selectedValidatorsMap = new HashMap<String, List<String>>();
-		filterExpressionsMap = new HashMap<String, List<String>>();
-		parseErrorEnabledList = new ArrayList<String>();
-		enableParseError = Messages.ValidationPreferencePage_enable_parse_errors_label;
+		super();
 	}
 
 	public void init(IWorkbench workbench)
 	{
 		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
-		loadAllSelectedValidators();
-		loadAllFilterExpressions();
-	}
-
-	@Override
-	public void dispose()
-	{
-		selectedValidatorsMap.clear();
-		filterExpressionsMap.clear();
-		parseErrorEnabledList.clear();
-		super.dispose();
 	}
 
 	@Override
@@ -98,55 +91,47 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		sash.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		// the left side
-		languagesViewer = new ListViewer(sash, SWT.BORDER | SWT.SINGLE);
-		languagesViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().create());
-		languagesViewer.setContentProvider(ArrayContentProvider.getInstance());
-		languagesViewer.setLabelProvider(new LabelProvider()
+		contentTypesViewer = new ListViewer(sash, SWT.BORDER | SWT.SINGLE);
+		contentTypesViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().create());
+		contentTypesViewer.setContentProvider(ArrayContentProvider.getInstance());
+		contentTypesViewer.setLabelProvider(new LabelProvider()
 		{
 
 			@Override
 			public String getText(Object element)
 			{
-				if (element instanceof ValidatorLanguage)
+				if (element instanceof IContentType)
 				{
-					return ((ValidatorLanguage) element).getName();
+					return ((IContentType) element).getName();
 				}
 				return super.getText(element);
 			}
 		});
-		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		Collections.sort(languages, new Comparator<ValidatorLanguage>()
+		// Filter out content types that have no optional participants
+		contentTypesViewer.addFilter(new EmptyContentTypeParticipantListFilter());
+
+		List<IContentType> contentTypes = new ArrayList<IContentType>(getContentTypes());
+		Collections.sort(contentTypes, new Comparator<IContentType>()
 		{
 
-			public int compare(ValidatorLanguage o1, ValidatorLanguage o2)
+			public int compare(IContentType o1, IContentType o2)
 			{
 				return o1.getName().compareToIgnoreCase(o2.getName());
 			}
 		});
-		languagesViewer.setInput(languages.toArray(new ValidatorLanguage[languages.size()]));
+		contentTypesViewer.setInput(contentTypes);
 
-		if (languages.size() > 0)
-		{
-			ValidatorLanguage language = languages.get(0);
-			languagesViewer.setSelection(new StructuredSelection(language));
-			selectedLanguage = language.getType();
-		}
-		languagesViewer.addSelectionChangedListener(new ISelectionChangedListener()
+		contentTypesViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
 
 			public void selectionChanged(SelectionChangedEvent event)
 			{
-				if (selectedLanguage != null)
-				{
-					// stores the selected validators and filter expressions for the previously selected language
-					storeCurrentSelectedValidators();
-					storeCurrentFilterExpressions();
-				}
-
-				selectedLanguage = getSelectedLanguageType();
 				// updates the validators and filter expressions to the newly selected language
-				updateValidators();
-				updateFilterExpressions();
+				if (validatorsViewer != null)
+				{
+					updateValidators();
+					updateFilterExpressions();
+				}
 			}
 		});
 
@@ -157,43 +142,27 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		Control validators = createValidators(rightComp);
 		validators.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
-		Control filter = createFilter(rightComp);
+		Control filter = createFiltersComposite(rightComp);
 		filter.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		sash.setWeights(new int[] { 1, 3 });
 		return sash;
 	}
 
-	@Override
-	public boolean performOk()
+	protected IBuildParticipantManager getBuildParticipantManager()
 	{
-		if (selectedLanguage != null)
-		{
-			storeCurrentSelectedValidators();
-			storeCurrentFilterExpressions();
-		}
-		// persist the selected validators and filter expressions for each language
-		saveAllSelectedValidators();
-		saveAllFilterExpressions();
-		return super.performOk();
+		return BuildPathCorePlugin.getDefault().getBuildParticipantManager();
 	}
 
 	@Override
 	protected void performDefaults()
 	{
-		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		String languageType, list;
-		for (ValidatorLanguage language : languages)
+		Collection<IBuildParticipant> participants = getAllBuildParticipants();
+		for (IBuildParticipant participant : participants)
 		{
-			languageType = language.getType();
-			list = getPreferenceStore().getDefaultString(getFilterExpressionsPrefKey(languageType));
-			if (!StringUtil.isEmpty(list))
-			{
-				List<String> expressions = new ArrayList<String>();
-				expressions.addAll(Arrays.asList(list.split(FILTER_DELIMITER)));
-				filterExpressionsMap.put(languageType, expressions);
-			}
+			participant.restoreDefaults();
 		}
+		validatorsViewer.refresh();
 		updateFilterExpressions();
 
 		super.performDefaults();
@@ -203,38 +172,82 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 	{
 		Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.ValidationPreferencePage_LBL_Validators);
-		group.setLayout(GridLayoutFactory.fillDefaults().create());
+		group.setLayout(GridLayoutFactory.fillDefaults().margins(4, 4).create());
 
-		validatorsViewer = CheckboxTableViewer.newCheckList(group, SWT.SINGLE);
-		validatorsViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		Label label = new Label(group, SWT.WRAP);
+		label.setLayoutData(GridDataFactory.fillDefaults().hint(300, 70).create());
+		label.setText(Messages.ValidationPreferencePage_EnablingValidatorWarning);
+
+		Table table = new Table(group, SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+
+		GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.grabExcessVerticalSpace = true;
+		gridData.horizontalSpan = 3;
+		table.setLayoutData(gridData);
+
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
+
+		// set up columns
+		// Name column
+		TableColumn name = new TableColumn(table, SWT.LEFT);
+		name.setWidth(250);
+		name.setText(Messages.ValidationPreferencePage_NameColumn);
+		name.setToolTipText(Messages.ValidationPreferencePage_NameColumn);
+
+		// Build column
+		TableColumn build = new TableColumn(table, SWT.CENTER);
+		build.setWidth(40);
+		build.setText(Messages.ValidationPreferencePage_BuildColumn);
+		build.setToolTipText(Messages.ValidationPreferencePage_BuildColumn);
+
+		// Reconcile column
+		TableColumn reconcile = new TableColumn(table, SWT.CENTER);
+		reconcile.setWidth(55);
+		reconcile.setText(Messages.ValidationPreferencePage_ReconcileColumn);
+		reconcile.setToolTipText(Messages.ValidationPreferencePage_ReconcileColumn);
+
+		// Now set up table viewer!
+		validatorsViewer = new TableViewer(table);
+		// validatorsViewer.setUseHashlookup(true);
+		validatorsViewer.setColumnProperties(new String[] { NAME, BUILD, RECONCILE });
+
+		// Assign the cell editors to the viewer
+		validatorsViewer.setCellEditors(new CellEditor[] { null, new CheckboxCellEditor(table),
+				new CheckboxCellEditor(table) });
+
+		// Set the cell modifier for the viewer
+		validatorsViewer.setCellModifier(new ParticipantCellModifier(validatorsViewer));
+
+		// Now set up content/label providers
 		validatorsViewer.setContentProvider(ArrayContentProvider.getInstance());
-		validatorsViewer.setLabelProvider(new LabelProvider()
+		validatorsViewer.setLabelProvider(new ParticipantLabelProvider());
+		// Hide required participants
+		validatorsViewer.addFilter(new RequiredParticipantFilter());
+		// check the selected build participant, show it's filters
+		validatorsViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
-
-			@Override
-			public String getText(Object element)
+			public void selectionChanged(SelectionChangedEvent event)
 			{
-				if (element instanceof ValidatorReference)
-				{
-					return ((ValidatorReference) element).getName();
-				}
-				return super.getText(element);
+				updateFilterExpressions();
 			}
 		});
+
+		// Now set input
 		updateValidators();
 
 		return group;
 	}
 
-	private Control createFilter(Composite parent)
+	private Control createFiltersComposite(Composite parent)
 	{
 		Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.ValidationPreferencePage_LBL_Filter);
-		group.setLayout(GridLayoutFactory.fillDefaults().create());
+		group.setLayout(GridLayoutFactory.fillDefaults().margins(4, 4).create());
 
 		filterViewer = new CListTable(group, SWT.NONE);
 		filterViewer.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-		filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_Description);
+		filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_SelectParticipant);
 		final IInputValidator inputValidator = new IInputValidator()
 		{
 
@@ -273,212 +286,228 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 				// the dialog is canceled; returns the original item
 				return item;
 			}
+
+			public void itemsChanged(List<Object> rawFilters)
+			{
+				// Save the filter expressions
+				AbstractBuildParticipant participant = (AbstractBuildParticipant) getSelectedBuildParticipant();
+				String[] filters = new String[rawFilters.size()];
+				int i = 0;
+				for (Object item : rawFilters)
+				{
+					filters[i++] = item.toString();
+				}
+				participant.setFilters(EclipseUtil.instanceScope(), filters);
+			}
 		});
-		updateFilterExpressions();
+		filterViewer.setEnabled(false);
 
 		return group;
 	}
 
-	private void loadAllSelectedValidators()
+	protected List<IBuildParticipant> getAllBuildParticipants()
 	{
-		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		for (ValidatorLanguage language : languages)
-		{
-			String languageType, list;
-			languageType = language.getType();
-			list = getPreferenceStore().getString(getSelectedValidatorsPrefKey(languageType));
-			if (!StringUtil.isEmpty(list))
-			{
-				List<String> names = new ArrayList<String>();
-				if (!EMPTY_LIST.equals(list))
-				{
-					names.addAll(Arrays.asList(list.split(VALIDATORS_DELIMITER)));
-				}
-				selectedValidatorsMap.put(languageType, names);
-			}
-			// Add parse error preference
-			if (getPreferenceStore().getBoolean(getParseErrorEnabledPrefKey(languageType)))
-			{
-				parseErrorEnabledList.add(languageType);
-			}
-		}
+		return getBuildParticipantManager().getAllBuildParticipants();
 	}
 
-	private void saveAllSelectedValidators()
+	protected Set<IContentType> getContentTypes()
 	{
-		Set<String> languages = selectedValidatorsMap.keySet();
-
-		for (String language : languages)
-		{
-			List<String> selectedValidators;
-			String value;
-			selectedValidators = selectedValidatorsMap.get(language);
-			int size = selectedValidators.size();
-			if (size == 0)
-			{
-				value = EMPTY_LIST;
-			}
-			else
-			{
-				value = StringUtil.join(VALIDATORS_DELIMITER,
-						selectedValidators.toArray(new String[selectedValidators.size()]));
-			}
-			getPreferenceStore().setValue(getSelectedValidatorsPrefKey(language), value);
-			// Save parse error preference
-			getPreferenceStore().setValue(getParseErrorEnabledPrefKey(language),
-					parseErrorEnabledList.contains(language));
-
-		}
-	}
-
-	private void loadAllFilterExpressions()
-	{
-		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
-		for (ValidatorLanguage language : languages)
-		{
-			String languageType, list;
-			languageType = language.getType();
-			list = getPreferenceStore().getString(getFilterExpressionsPrefKey(languageType));
-			if (!StringUtil.isEmpty(list))
-			{
-				List<String> expressions = new ArrayList<String>();
-				expressions.addAll(Arrays.asList(list.split(FILTER_DELIMITER)));
-				filterExpressionsMap.put(languageType, expressions);
-			}
-		}
-	}
-
-	private void saveAllFilterExpressions()
-	{
-		Set<String> languages = filterExpressionsMap.keySet();
-		for (String language : languages)
-		{
-			List<String> expressions;
-			expressions = filterExpressionsMap.get(language);
-			getPreferenceStore().setValue(getFilterExpressionsPrefKey(language),
-					StringUtil.join(FILTER_DELIMITER, expressions.toArray(new String[expressions.size()])));
-		}
-	}
-
-	private void storeCurrentSelectedValidators()
-	{
-		List<String> validatorsList = selectedValidatorsMap.get(selectedLanguage);
-		if (validatorsList == null)
-		{
-			validatorsList = new ArrayList<String>();
-			selectedValidatorsMap.put(selectedLanguage, validatorsList);
-		}
-		validatorsList.clear();
-		parseErrorEnabledList.remove(selectedLanguage);
-		Object[] selectedValidators = validatorsViewer.getCheckedElements();
-		for (Object validator : selectedValidators)
-		{
-			if (validator instanceof ValidatorReference)
-			{
-
-				validatorsList.add(((ValidatorReference) validator).getName());
-			}
-			// if it is the parse error, store it in a separate map
-			else if (validator.equals(enableParseError))
-			{
-				parseErrorEnabledList.add(selectedLanguage);
-			}
-		}
-	}
-
-	private void storeCurrentFilterExpressions()
-	{
-		List<String> filterList = filterExpressionsMap.get(selectedLanguage);
-		if (filterList == null)
-		{
-			filterList = new ArrayList<String>();
-			filterExpressionsMap.put(selectedLanguage, filterList);
-		}
-		filterList.clear();
-		List<Object> expressions = filterViewer.getItems();
-		for (Object expression : expressions)
-		{
-			filterList.add(expression.toString());
-		}
+		return getBuildParticipantManager().getContentTypes();
 	}
 
 	private void updateValidators()
 	{
-		if (selectedLanguage == null)
+		IContentType selected = getSelectedContentType();
+		if (selected == null)
 		{
-			validatorsViewer.setInput(new ValidatorReference[0]);
+			validatorsViewer.setInput(Collections.emptyList());
 		}
 		else
 		{
-			List<ValidatorReference> validators = ValidatorLoader.getInstance().getValidators(selectedLanguage);
-
-			validatorsViewer.setInput(validators.toArray(new ValidatorReference[validators.size()]));
-
-			// Add parse errors for each language
-			validatorsViewer.add(enableParseError);
-			validatorsViewer.setChecked(enableParseError, parseErrorEnabledList.contains(selectedLanguage));
-
-			// makes appropriate validators checked
-			if (selectedValidatorsMap.containsKey(selectedLanguage))
-			{
-				List<String> selectedValidators = selectedValidatorsMap.get(selectedLanguage);
-				for (ValidatorReference validator : validators)
-				{
-					validatorsViewer.setChecked(validator, selectedValidators.contains(validator.getName()));
-				}
-			}
-			else if (validators.size() > 0)
-			{
-				// default case; the first validator will be selected if one exists
-				validatorsViewer.setChecked(validators.get(0), true);
-			}
+			validatorsViewer.setInput(getBuildParticipantManager().getBuildParticipants(selected.getId()));
 		}
 	}
 
-	private void updateFilterExpressions()
+	private IBuildParticipant getSelectedBuildParticipant()
 	{
-		Object[] items;
-		if (selectedLanguage == null)
-		{
-			items = new Object[0];
-		}
-		else
-		{
-			List<String> expressions = filterExpressionsMap.get(selectedLanguage);
-			if (expressions == null)
-			{
-				items = new Object[0];
-			}
-			else
-			{
-				items = expressions.toArray(new String[expressions.size()]);
-			}
-		}
-		filterViewer.setItems(items);
-	}
-
-	private String getSelectedLanguageType()
-	{
-		IStructuredSelection selection = (IStructuredSelection) languagesViewer.getSelection();
+		IStructuredSelection selection = (IStructuredSelection) validatorsViewer.getSelection();
 		if (selection.isEmpty())
 		{
 			return null;
 		}
-		return ((ValidatorLanguage) selection.getFirstElement()).getType();
+		return (IBuildParticipant) selection.getFirstElement();
 	}
 
-	private static String getSelectedValidatorsPrefKey(String language)
+	private void updateFilterExpressions()
 	{
-		return language + ':' + IPreferenceConstants.SELECTED_VALIDATORS;
+		IBuildParticipant participant = getSelectedBuildParticipant();
+		if (participant != null)
+		{
+			filterViewer.setEnabled(true);
+			filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_Description);
+			List<String> expressions = participant.getFilters();
+			filterViewer.setItems(expressions.toArray());
+		}
+		else
+		{
+			filterViewer.setEnabled(false);
+			filterViewer.setDescription(Messages.ValidationPreferencePage_Filter_SelectParticipant);
+			filterViewer.setItems(ArrayUtil.NO_OBJECTS);
+		}
 	}
 
-	private static String getFilterExpressionsPrefKey(String language)
+	private IContentType getSelectedContentType()
 	{
-		return language + ':' + IPreferenceConstants.FILTER_EXPRESSIONS;
+		IStructuredSelection selection = (IStructuredSelection) contentTypesViewer.getSelection();
+		if (selection.isEmpty())
+		{
+			return null;
+		}
+		return (IContentType) selection.getFirstElement();
 	}
 
-	private static String getParseErrorEnabledPrefKey(String language)
+	/**
+	 * This filters the content type list to only those who have at least one non-required build participant (so we can
+	 * change it's enablement).
+	 * 
+	 * @author cwilliams
+	 */
+	private final class EmptyContentTypeParticipantListFilter extends ViewerFilter
 	{
-		return language + ':' + IPreferenceConstants.PARSE_ERROR_ENABLED;
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element)
+		{
+			if (element instanceof IContentType)
+			{
+				IContentType type = (IContentType) element;
+				List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(type.getId());
+				if (CollectionsUtil.isEmpty(participants))
+				{
+					return false;
+				}
+				for (IBuildParticipant participant : participants)
+				{
+					if (!participant.isRequired())
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Allows modifying cells of a table containing build participants.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class ParticipantCellModifier implements ICellModifier
+	{
+		private TableViewer tableViewer;
+
+		private ParticipantCellModifier(TableViewer tableViewer)
+		{
+			this.tableViewer = tableViewer;
+		}
+
+		public void modify(Object element, String property, Object value)
+		{
+			if (element instanceof TableItem)
+			{
+				element = ((TableItem) element).getData();
+			}
+			IBuildParticipant participant = (IBuildParticipant) element;
+			if (BUILD.equals(property))
+			{
+				participant.setEnabled(IBuildParticipant.BuildType.BUILD, ((Boolean) value).booleanValue());
+			}
+			else if (RECONCILE.equals(property))
+			{
+				participant.setEnabled(IBuildParticipant.BuildType.RECONCILE, ((Boolean) value).booleanValue());
+			}
+			tableViewer.refresh(participant);
+		}
+
+		public Object getValue(Object element, String property)
+		{
+			IBuildParticipant participant = (IBuildParticipant) element;
+			if (BUILD.equals(property))
+			{
+				return participant.isEnabled(IBuildParticipant.BuildType.BUILD);
+			}
+			if (RECONCILE.equals(property))
+			{
+				return participant.isEnabled(IBuildParticipant.BuildType.RECONCILE);
+			}
+			return null;
+		}
+
+		public boolean canModify(Object element, String property)
+		{
+			return BUILD.equals(property) || RECONCILE.equals(property);
+		}
+	}
+
+	/**
+	 * Provides text and images for build participants.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class ParticipantLabelProvider extends LabelProvider implements ITableLabelProvider
+	{
+		private static final String RED_X_ICON = "platform:/plugin/com.aptana.ui/icons/delete.gif"; //$NON-NLS-1$
+		private static final String CHECKMARK_ICON = "platform:/plugin/com.aptana.ui/icons/ok.png"; //$NON-NLS-1$
+
+		public String getColumnText(Object element, int columnIndex)
+		{
+			IBuildParticipant participant = (IBuildParticipant) element;
+			if (columnIndex == 0)
+			{
+				return participant.getName();
+			}
+			return null;
+		}
+
+		public Image getColumnImage(Object element, int columnIndex)
+		{
+			IBuildParticipant participant = (IBuildParticipant) element;
+			if (columnIndex == 1)
+			{
+				if (participant.isEnabled(IBuildParticipant.BuildType.BUILD))
+				{
+					return CommonEditorPlugin.getImage(CHECKMARK_ICON);
+				}
+				return CommonEditorPlugin.getImage(RED_X_ICON);
+			}
+			else if (columnIndex == 2)
+			{
+				if (participant.isEnabled(IBuildParticipant.BuildType.RECONCILE))
+				{
+					return CommonEditorPlugin.getImage(CHECKMARK_ICON);
+				}
+				return CommonEditorPlugin.getImage(RED_X_ICON);
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * Hides required participants.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class RequiredParticipantFilter extends ViewerFilter
+	{
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element)
+		{
+			if (element instanceof IBuildParticipant)
+			{
+				IBuildParticipant participant = (IBuildParticipant) element;
+				return !participant.isRequired();
+			}
+			return true;
+		}
 	}
 }

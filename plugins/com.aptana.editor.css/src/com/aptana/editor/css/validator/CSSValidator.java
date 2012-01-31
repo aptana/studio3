@@ -51,6 +51,9 @@ import com.aptana.index.core.build.BuildContext;
  */
 public class CSSValidator extends AbstractBuildParticipant
 {
+
+	public static final String ID = "com.aptana.editor.css.validator.W3CValidator"; //$NON-NLS-1$
+
 	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final String APTANA_PROFILE = "AptanaProfile"; //$NON-NLS-1$
@@ -88,6 +91,15 @@ public class CSSValidator extends AbstractBuildParticipant
 	// other messages that should be filtered automatically
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED_MESSAGES = { "unrecognized media only", "linear-gradient" };
+
+	@SuppressWarnings("nls")
+	public static final String[] DEFAULT_FILTERS = new String[] { ".*Unknown pseudo-element.*",
+			"Property\\s*[-_].*doesn't exist.*", ".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*",
+			".*accelerator.*", ".*background-position-.*", ".*filter.*", ".*ime-mode.*", ".*layout-.*",
+			".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*", ".*text-align-.*", ".*text-justify.*",
+			".*text-overflow.*", ".*text-shadow.*", ".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*",
+			".*writing-mode.*", ".*zoom.*", ".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a .* value.*",
+			".*Too many values or values are not recognized.*" };
 
 	static
 	{

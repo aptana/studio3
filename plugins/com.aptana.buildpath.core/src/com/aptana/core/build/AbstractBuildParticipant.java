@@ -1,25 +1,40 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Eclipse Public License (EPL).
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.core.build;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.TaskTag;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -30,20 +45,31 @@ import com.aptana.parsing.ast.IParseNode;
  * 
  * @author cwilliams
  */
-public abstract class AbstractBuildParticipant implements IBuildParticipant
+public abstract class AbstractBuildParticipant implements IBuildParticipant, IExecutableExtension
 {
 
-	private int priority;
+	public static final String FILTER_DELIMITER = "####"; //$NON-NLS-1$
+	private static final Pattern filterSplitter = Pattern.compile(FILTER_DELIMITER);
+
+	/**
+	 * Constants for dealing with build participants through the extension point.
+	 */
+	private static final String CONTENT_TYPE_ID = "contentTypeId"; //$NON-NLS-1$
+	private static final String CONTENT_TYPE_BINDING = "contentTypeBinding"; //$NON-NLS-1$
+	private static final String NAME = "name"; //$NON-NLS-1$
+	private static final String ID = "id"; //$NON-NLS-1$
+	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
+	public static final int DEFAULT_PRIORITY = 50;
+
+	private int fPriority = DEFAULT_PRIORITY;
 	private Set<IContentType> contentTypes = Collections.emptySet();
+	private String fId;
+	private String fName;
+	private String contributor;
 
 	public int getPriority()
 	{
-		return priority;
-	}
-
-	public void setPriority(int priority)
-	{
-		this.priority = priority;
+		return fPriority;
 	}
 
 	public Set<IContentType> getContentTypes()
@@ -51,9 +77,124 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 		return Collections.unmodifiableSet(contentTypes);
 	}
 
-	public void setContentTypes(Set<IContentType> types)
+	public String getName()
 	{
-		this.contentTypes = types;
+		return fName;
+	}
+
+	public String getId()
+	{
+		return fId;
+	}
+
+	/**
+	 * By default participants are not 'required'. We override this for many of our own builtin ones that eprform
+	 * indexing/task detection, etc.
+	 */
+	public boolean isRequired()
+	{
+		return false;
+	}
+
+	public boolean isEnabled(BuildType type)
+	{
+		if (isRequired())
+		{
+			return true;
+		}
+		return Platform.getPreferencesService().getBoolean(getPreferenceNode(), getEnablementPreferenceKey(type),
+				false, new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+	}
+
+	public void setEnabled(BuildType type, boolean enabled)
+	{
+		if (isRequired())
+		{
+			return;
+		}
+
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		prefs.putBoolean(getEnablementPreferenceKey(type), enabled);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+	}
+
+	public String getEnablementPreferenceKey(BuildType type)
+	{
+		return MessageFormat.format("{0}_{1}_enabled", getId(), type.name().toLowerCase()); //$NON-NLS-1$
+	}
+
+	public void restoreDefaults()
+	{
+		if (isRequired())
+		{
+			// no-op if required for now, since we don't do filters/etc here yet.
+			return;
+		}
+
+		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(getPreferenceNode());
+		prefs.remove(getEnablementPreferenceKey(BuildType.BUILD));
+		prefs.remove(getEnablementPreferenceKey(BuildType.RECONCILE));
+		prefs.remove(getFiltersPreferenceKey());
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+	}
+
+	public List<String> getFilters()
+	{
+		if (isRequired())
+		{
+			return Collections.emptyList();
+		}
+		String rawFilters = Platform.getPreferencesService().getString(getPreferenceNode(), getFiltersPreferenceKey(),
+				null, new IScopeContext[] { EclipseUtil.instanceScope(), EclipseUtil.defaultScope() });
+		if (StringUtil.isEmpty(rawFilters))
+		{
+			return Collections.emptyList();
+		}
+		return Arrays.asList(filterSplitter.split(rawFilters));
+	}
+
+	public void setFilters(IScopeContext context, String... filters)
+	{
+		IEclipsePreferences prefs = context.getNode(getPreferenceNode());
+		prefs.put(getFiltersPreferenceKey(), StringUtil.join(FILTER_DELIMITER, filters));
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+		}
+	}
+
+	protected String getFiltersPreferenceKey()
+	{
+		return MessageFormat.format("{0}_filters", getId()); //$NON-NLS-1$
+	}
+
+	/**
+	 * The string id of the root preference node. Typically the contributing plugin's id. this is the qualifier we use
+	 * to search for pref values for this participant.
+	 * 
+	 * @return
+	 */
+	protected String getPreferenceNode()
+	{
+		return contributor;
 	}
 
 	public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
@@ -156,10 +297,25 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 		return new String(source.substring(start, end));
 	}
 
+	/**
+	 * @deprecated
+	 * @param sourcePath
+	 * @param message
+	 * @param priority
+	 * @param lineNumber
+	 * @param offset
+	 * @param endOffset
+	 * @return
+	 */
 	protected IProblem createTask(String sourcePath, String message, Integer priority, int lineNumber, int offset,
 			int endOffset)
 	{
 		return new Problem(IMarker.SEVERITY_INFO, message, offset, endOffset - offset, lineNumber, sourcePath);
+	}
+
+	protected IProblem createInfo(String message, int lineNumber, int offset, int length, String sourcePath)
+	{
+		return new Problem(IMarker.SEVERITY_INFO, message, offset, length, lineNumber, sourcePath);
 	}
 
 	protected IProblem createWarning(String message, int lineNumber, int offset, int length, String sourcePath)
@@ -188,5 +344,40 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant
 		}
 
 		return false;
+	}
+
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException
+	{
+		String rawPriority = config.getAttribute(ATTR_PRIORITY);
+		if (!StringUtil.isEmpty(rawPriority))
+		{
+			try
+			{
+				this.fPriority = Integer.parseInt(rawPriority);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logWarning(BuildPathCorePlugin.getDefault(), MessageFormat.format(
+						"Unable to parse priority value ({0}) as an integer, defaulting to 50.", rawPriority), e); //$NON-NLS-1$
+			}
+		}
+		this.fId = config.getAttribute(ID);
+		this.fName = config.getAttribute(NAME);
+		this.contributor = config.getContributor().getName();
+
+		// Read in the content types
+		this.contentTypes = new HashSet<IContentType>();
+		IContentTypeManager manager = Platform.getContentTypeManager();
+		IConfigurationElement[] rawContentTypes = config.getChildren(CONTENT_TYPE_BINDING);
+		for (IConfigurationElement contentTypeBinding : rawContentTypes)
+		{
+			String contentTypeId = contentTypeBinding.getAttribute(CONTENT_TYPE_ID);
+			IContentType type = manager.getContentType(contentTypeId);
+			if (type != null)
+			{
+				contentTypes.add(type);
+			}
+		}
 	}
 }

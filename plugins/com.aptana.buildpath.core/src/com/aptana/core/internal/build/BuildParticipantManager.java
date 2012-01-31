@@ -30,7 +30,6 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IConfigurationElementProcessor;
-import com.aptana.core.util.StringUtil;
 
 public class BuildParticipantManager implements IBuildParticipantManager
 {
@@ -42,8 +41,6 @@ public class BuildParticipantManager implements IBuildParticipantManager
 	private static final String EXTENSION_ID = "buildParticipants"; //$NON-NLS-1$
 	private static final String ELEMENT_PARTICIPANT = "participant"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
-	public static final int DEFAULT_PRIORITY = 50;
 
 	private Map<IConfigurationElement, Set<IContentType>> buildParticipants;
 
@@ -153,24 +150,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 	private IBuildParticipant createParticipant(IConfigurationElement ice, Set<IContentType> contentTypes)
 			throws CoreException
 	{
-		IBuildParticipant participant = (IBuildParticipant) ice.createExecutableExtension(ATTR_CLASS);
-		String rawPriority = ice.getAttribute(ATTR_PRIORITY);
-		int priority = DEFAULT_PRIORITY;
-		if (!StringUtil.isEmpty(rawPriority))
-		{
-			try
-			{
-				priority = Integer.parseInt(rawPriority);
-			}
-			catch (Exception e)
-			{
-				IdeLog.logWarning(BuildPathCorePlugin.getDefault(), MessageFormat.format(
-						"Unable to parse priority value ({0}) as an integer, defaulting to 50.", rawPriority), e); //$NON-NLS-1$
-			}
-		}
-		participant.setPriority(priority);
-		participant.setContentTypes(contentTypes);
-		return participant;
+		return (IBuildParticipant) ice.createExecutableExtension(ATTR_CLASS);
 	}
 
 	/**
@@ -214,6 +194,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 			final Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
 			final IContentTypeManager manager = Platform.getContentTypeManager();
 
+			// TODO Combine the same logic/constants for dealing with children content types from AbstractBuildParticipant!
 			EclipseUtil.processConfigurationElements(BuildPathCorePlugin.PLUGIN_ID, EXTENSION_ID,
 					new IConfigurationElementProcessor()
 					{
@@ -244,5 +225,16 @@ public class BuildParticipantManager implements IBuildParticipantManager
 			buildParticipants = map;
 		}
 		return buildParticipants;
+	}
+
+	public Set<IContentType> getContentTypes()
+	{
+		Map<IConfigurationElement, Set<IContentType>> participants = getBuildParticipants();
+		Set<IContentType> contentTypes = new HashSet<IContentType>();
+		for (Set<IContentType> types : participants.values())
+		{
+			contentTypes.addAll(types);
+		}
+		return Collections.unmodifiableSet(contentTypes);
 	}
 }

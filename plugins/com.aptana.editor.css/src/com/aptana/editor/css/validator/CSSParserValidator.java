@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -15,9 +15,9 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
+import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
@@ -30,7 +30,7 @@ import com.aptana.parsing.ast.IParseError.Severity;
  * 
  * @author cwilliams
  */
-public class CSSParserValidator extends AbstractBuildParticipant
+public class CSSParserValidator extends RequiredBuildParticipant
 {
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
