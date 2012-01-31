@@ -7,12 +7,15 @@
  */
 package com.aptana.ui;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -39,12 +42,12 @@ import com.aptana.ui.util.UIUtils;
  */
 public class UIPlugin extends AbstractUIPlugin
 {
-
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static UIPlugin plugin;
+	private IPreferenceChangeListener autoBuildListener;
 
 	private final IPerspectiveListener perspectiveListener = new IPerspectiveListener()
 	{
@@ -139,6 +142,7 @@ public class UIPlugin extends AbstractUIPlugin
 		plugin = this;
 		updateInitialPerspectiveVersion();
 		addPerspectiveListener();
+		addAutoBuildListener();
 	}
 
 	/*
@@ -148,6 +152,7 @@ public class UIPlugin extends AbstractUIPlugin
 	public void stop(BundleContext context) throws Exception
 	{
 		removePerspectiveListener();
+		removeAutoBuildListener();
 		plugin = null;
 		super.stop(context);
 	}
@@ -186,6 +191,28 @@ public class UIPlugin extends AbstractUIPlugin
 			}
 		}
 		return getDefault().getImageRegistry().getDescriptor(string);
+	}
+
+	/**
+	 * Adds a listener to changes in the Project->Build Automatically changes.
+	 */
+	private void addAutoBuildListener()
+	{
+		IEclipsePreferences node = EclipseUtil.instanceScope().getNode(ResourcesPlugin.PI_RESOURCES);
+		autoBuildListener = new AutoBuildListener();
+		node.addPreferenceChangeListener(autoBuildListener);
+	}
+
+	/**
+	 * Remove the auto-build action listener.
+	 */
+	private void removeAutoBuildListener()
+	{
+		if (autoBuildListener != null)
+		{
+			IEclipsePreferences node = EclipseUtil.instanceScope().getNode(ResourcesPlugin.PI_RESOURCES);
+			node.removePreferenceChangeListener(autoBuildListener);
+		}
 	}
 
 	private void addPerspectiveListener()
@@ -249,6 +276,32 @@ public class UIPlugin extends AbstractUIPlugin
 			catch (BackingStoreException e)
 			{
 				IdeLog.logError(getDefault(), Messages.UIPlugin_ERR_FailToSetPref, e);
+			}
+		}
+	}
+
+	/**
+	 * A listener for changes in the Project->Build Automatically... action. <br>
+	 * The listener will detect when the user turn off the auto-building, and will prompt with a warning.
+	 */
+	public class AutoBuildListener implements IPreferenceChangeListener
+	{
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse
+		 * .core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+		 */
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (ResourcesPlugin.PREF_AUTO_BUILDING.equals(event.getKey()) && event.getNewValue() != null)
+			{
+				if (event.getNewValue().equals(Boolean.FALSE.toString()))
+				{
+					MessageDialog.openWarning(UIUtils.getActiveShell(), Messages.UIPlugin_automaticBuildsWarningTitle,
+							Messages.UIPlugin_automaticBuildsWarningMessage);
+				}
 			}
 		}
 	}
