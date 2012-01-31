@@ -185,7 +185,7 @@ public class ProjectSampleElement extends AbstractBundleElement
 			return false;
 		}
 		ProjectSampleElement other = (ProjectSampleElement) obj;
-		return getCategory().equals(other.getCategory()) && getDisplayName().equals(other.getDisplayName())
+		return getCategory().equals(other.getCategory()) && getId().equals(other.getId())
 				&& getLocation().equals(other.getLocation());
 	}
 
@@ -193,7 +193,7 @@ public class ProjectSampleElement extends AbstractBundleElement
 	public int hashCode()
 	{
 		int hash = getCategory().hashCode();
-		hash = 31 * hash + getDisplayName().hashCode();
+		hash = 31 * hash + getId().hashCode();
 		hash = 31 * hash + getLocation().hashCode();
 		return hash;
 	}
