@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +35,13 @@ public class StringUtil
 	 * regexp for counting lines and splitting strings by lines.
 	 */
 	public static final Pattern LINE_SPLITTER = Pattern.compile("\r?\n|\r"); //$NON-NLS-1$
+
+	/**
+	 * Map to sanitize html/xml to entities.
+	 */
+	private static final Map<String, String> SANITIZE_MAP = CollectionsUtil.newMap(
+			"&", "&amp;", "<", "&lt;", ">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+	private static final Pattern SANITIZE_PATTERN = Pattern.compile("[&<>]"); //$NON-NLS-1$
 
 	private StringUtil()
 	{
@@ -286,7 +294,7 @@ public class StringUtil
 		return null;
 	}
 
-/**
+	/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
 	 * 
 	 * @param raw
@@ -294,7 +302,14 @@ public class StringUtil
 	 */
 	public static String sanitizeHTML(String raw)
 	{
-		return raw.replaceAll("&", "&amp;").replaceAll("<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		StringBuffer sb = new StringBuffer();
+		Matcher m = SANITIZE_PATTERN.matcher(raw);
+		while (m.find())
+		{
+			m.appendReplacement(sb, SANITIZE_MAP.get(m.group()));
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 
 	/**

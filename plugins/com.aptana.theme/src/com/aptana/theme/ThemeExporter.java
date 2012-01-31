@@ -17,6 +17,7 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author cwilliams
@@ -42,7 +43,7 @@ public class ThemeExporter
 		buffer.append("<plist version=\"1.0\">\n");
 		buffer.append("<dict>\n");
 		buffer.append("  <key>name</key>\n");
-		buffer.append("  <string>").append(theme.getName()).append("</string>\n");
+		buffer.append("  <string>").append(escape(theme.getName())).append("</string>\n");
 		buffer.append("  <key>uuid</key>\n");
 		buffer.append("  <string>").append(UUID.nameUUIDFromBytes(theme.getName().getBytes())).append("</string>\n");
 		buffer.append("  <key>settings</key>\n");
@@ -71,9 +72,9 @@ public class ThemeExporter
 		{
 			buffer.append("    <dict>\n");
 			buffer.append("      <key>name</key>\n");
-			buffer.append("      <string>").append(rule.getName()).append("</string>\n");
+			buffer.append("      <string>").append(escape(rule.getName())).append("</string>\n");
 			buffer.append("      <key>scope</key>\n");
-			buffer.append("      <string>").append(rule.getScopeSelector().toString()).append("</string>\n");
+			buffer.append("      <string>").append(escape(rule.getScopeSelector().toString())).append("</string>\n");
 			buffer.append("      <key>settings</key>\n");
 			buffer.append("      <dict>\n");
 
@@ -145,6 +146,16 @@ public class ThemeExporter
 				// ignore
 			}
 		}
+	}
+
+	/**
+	 * Escapes special characters (i.e. '<' and '>' which need to be encoded for XML).
+	 * @param string
+	 * @return
+	 */
+	private String escape(String raw)
+	{
+		return StringUtil.sanitizeHTML(raw);
 	}
 
 }
