@@ -10,7 +10,6 @@ package com.aptana.editor.js.hyperlink;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
@@ -19,7 +18,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -50,22 +48,13 @@ public class JSHyperlinkDetector extends AbstractHyperlinkDetector
 
 		if (editor != null && region != null)
 		{
-			// grab file service
-			FileService fileService = editor.getFileService();
+			// grab AST
+			IParseNode ast = editor.getAST();
 
-			if (fileService != null)
+			if (ast instanceof JSParseRootNode)
 			{
-				// make sure the source has been parsed
-				fileService.parse(new NullProgressMonitor());
-
-				// grab AST
-				IParseNode ast = fileService.getParseResult();
-
-				if (ast instanceof JSParseRootNode)
-				{
-					// gather links
-					result = processAST(editor, (JSParseRootNode) ast, region.getOffset());
-				}
+				// gather links
+				result = processAST(editor, (JSParseRootNode) ast, region.getOffset());
 			}
 		}
 

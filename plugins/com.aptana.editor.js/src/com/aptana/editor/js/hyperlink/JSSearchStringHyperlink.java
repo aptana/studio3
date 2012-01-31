@@ -9,14 +9,12 @@ package com.aptana.editor.js.hyperlink;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IRegion;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -84,9 +82,7 @@ public class JSSearchStringHyperlink extends JSAbstractHyperlink
 		if (editor != null)
 		{
 			// grab AST, making sure the file has been parsed
-			FileService fileService = editor.getFileService();
-			fileService.parse(new NullProgressMonitor());
-			IParseNode ast = fileService.getParseResult();
+			IParseNode ast = editor.getAST();
 
 			// assume no target identifier
 			JSIdentifierNode targetIdentifier = null;
