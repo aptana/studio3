@@ -1,0 +1,99 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
+package com.aptana.editor.js.contentassist;
+
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.tests.util.ListCrossProduct;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
+
+/**
+ * JSUserAgentCachingTests
+ */
+public class JSUserAgentCachingTests extends TestCase
+{
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception
+	{
+		// TODO Auto-generated method stub
+		super.setUp();
+	}
+
+	protected ListCrossProduct<String> createCrossProduct(List<String>... lists)
+	{
+		ListCrossProduct<String> result = new ListCrossProduct<String>();
+
+		for (List<String> list : lists)
+		{
+			result.addList(list);
+		}
+
+		return result;
+	}
+
+	protected UserAgentElement getUserAgent(List<String> list)
+	{
+		String product = list.get(0);
+		String version = list.get(1);
+		String os = list.get(2);
+		String osVersion = list.get(3);
+		String description = list.get(4);
+
+		return UserAgentElement.createUserAgentElement(product, version, os, osVersion, description);
+	}
+
+	public void testNewUserAgent()
+	{
+		UserAgentElement.clearCache();
+		UserAgentElement uaNoncached = new UserAgentElement();
+		uaNoncached.setPlatform("IE");
+		UserAgentElement uaCached = UserAgentElement.createUserAgentElement("IE", "", "", "", "");
+
+		assertNotSame(uaNoncached, uaCached);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void testCachedUserAgent()
+	{
+		UserAgentElement.clearCache();
+		List<String> products = CollectionsUtil.newList("IE");
+		List<String> versions = CollectionsUtil.newList("", "1.0");
+		List<String> oses = CollectionsUtil.newList("", "Mac OS X");
+		List<String> osVersions = CollectionsUtil.newList("", "10.7");
+		List<String> description = CollectionsUtil.newList("", "Simple description");
+
+		ListCrossProduct<String> cp1 = createCrossProduct(products, versions, oses, osVersions, description);
+		ListCrossProduct<String> cp2 = createCrossProduct(products, versions, oses, osVersions, description);
+
+		for (List<String> list1 : cp1)
+		{
+			UserAgentElement ua1 = getUserAgent(list1);
+
+			for (List<String> list2 : cp2)
+			{
+				UserAgentElement ua2 = getUserAgent(list2);
+
+				if (list1.equals(list2))
+				{
+					assertSame(ua1, ua2);
+				}
+				else
+				{
+					assertNotSame(ua1, ua2);
+				}
+			}
+		}
+	}
+}

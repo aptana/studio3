@@ -9,6 +9,7 @@ package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 
 	private String _name;
 	private String _description;
-	private List<UserAgentElement> _userAgents;
+	private Set<UserAgentElement> _userAgents;
 	private List<SinceElement> _sinceList;
 	private List<String> _documents;
 
@@ -86,11 +87,44 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 		{
 			if (this._userAgents == null)
 			{
-				this._userAgents = new ArrayList<UserAgentElement>();
+				this._userAgents = new HashSet<UserAgentElement>();
 			}
 
 			this._userAgents.add(userAgent);
 		}
+	}
+
+	/**
+	 * createUserAgentSet
+	 * 
+	 * @param object
+	 * @return
+	 */
+	protected Set<UserAgentElement> createUserAgentSet(Object object)
+	{
+		Set<UserAgentElement> result = null;
+
+		if (object != null && object.getClass().isArray())
+		{
+			Object[] objects = (Object[]) object;
+
+			if (objects.length > 0)
+			{
+				result = new HashSet<UserAgentElement>();
+
+				for (Object value : objects)
+				{
+					if (value instanceof Map)
+					{
+						UserAgentElement userAgent = UserAgentElement.createUserAgentElement((Map<?, ?>) value);
+
+						result.add(userAgent);
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/*
@@ -104,7 +138,7 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
 		this._sinceList = IndexUtil.createList(object.get(SINCE_PROPERTY), SinceElement.class);
-		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
+		this._userAgents = createUserAgentSet(object.get(USER_AGENTS_PROPERTY));
 	}
 
 	/**
@@ -223,7 +257,7 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return CollectionsUtil.getListValue(this._userAgents);
+		return new ArrayList<UserAgentElement>(CollectionsUtil.getSetValue(this._userAgents));
 	}
 
 	/*
