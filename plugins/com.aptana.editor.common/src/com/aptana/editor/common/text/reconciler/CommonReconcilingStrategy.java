@@ -34,7 +34,9 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.IFilter;
 import com.aptana.core.build.IBuildParticipant;
+import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.build.IBuildParticipantManager;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.ReconcileContext;
@@ -286,6 +288,11 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		{
 			return;
 		}
+		participants = filterToEnabled(participants);
+		if (CollectionsUtil.isEmpty(participants))
+		{
+			return;
+		}
 
 		SubMonitor sub = SubMonitor.convert(monitor, (participants.size() * 12) + 10);
 		ReconcileContext context = new ReconcileContext(contentTypeId, file, fDocument.get());
@@ -304,6 +311,17 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 		reportProblems(context, sub.newChild(10));
 		sub.done();
+	}
+
+	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
+	{
+		return CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
+		{
+			public boolean include(IBuildParticipant item)
+			{
+				return item != null && item.isEnabled(BuildType.RECONCILE);
+			}
+		});
 	}
 
 	/**

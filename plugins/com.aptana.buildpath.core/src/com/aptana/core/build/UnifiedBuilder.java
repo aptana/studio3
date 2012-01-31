@@ -34,6 +34,8 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
+import com.aptana.core.IFilter;
+import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.CollectionsUtil;
@@ -83,6 +85,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		sub.done();
 	}
 
+	private List<IBuildParticipant> filterToEnabled(List<IBuildParticipant> participants)
+	{
+		return CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
+		{
+			public boolean include(IBuildParticipant item)
+			{
+				return item != null && item.isEnabled(BuildType.BUILD);
+			}
+		});
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
@@ -97,6 +110,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		// Keep these build participant instances and use them in the build process, rather than grabbing new ones
 		// in sub-methods. We do pre- and post- setups on them, so we need to retain instances.
 		List<IBuildParticipant> participants = getBuildParticipantManager().getAllBuildParticipants();
+		participants = filterToEnabled(participants);
 		buildStarting(participants, kind, sub.newChild(10));
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
