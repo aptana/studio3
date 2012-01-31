@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -473,5 +474,105 @@ public class CollectionsUtilTest extends TestCase
 
 		CollectionsUtil.map(source, destination, null);
 		assertTrue(destination.isEmpty());
+	}
+
+	public void testNewMap()
+	{
+		Map<String, String> map = CollectionsUtil.newMap("item1", "item2");
+
+		assertNotNull(map);
+		assertEquals("The map should have only one item", 1, map.size());
+		assertTrue("'item1' should exist in the map", map.containsKey("item1"));
+		assertTrue("'item2' should exist in the map", map.containsValue("item2"));
+		assertEquals("item2", map.get("item1"));
+	}
+
+	public void testNewMapNullItems()
+	{
+		String[] items = null;
+		Map<String, String> map = CollectionsUtil.newMap(items);
+
+		assertNotNull(map);
+		assertTrue("Map should be empty", map.isEmpty());
+	}
+
+	public void testAddToMapSubclass()
+	{
+		Number doubleOne = 1.0;
+		Number intOne = 1;
+		Float floatOne = 1.0f;
+		Float floatTwo = 2.0f;
+
+		// generate initial map
+		Map<Number, Number> map = CollectionsUtil.newMap(doubleOne, intOne);
+
+		// add sub-type of Number
+		CollectionsUtil.addToMap(map, floatOne, floatTwo);
+
+		assertEquals("The map should have only two items", 2, map.size());
+		assertTrue("Map should contain double 1.0", map.containsKey(doubleOne));
+		assertTrue("Map should contain integer 1", map.containsValue(intOne));
+		assertEquals(intOne, map.get(doubleOne));
+		assertTrue("Map should contain float 1.0f", map.containsKey(floatOne));
+		assertTrue("Map should contain float 2.0f", map.containsValue(floatTwo));
+		assertEquals(floatTwo, map.get(floatOne));
+	}
+
+	public void testAddToMap()
+	{
+		Map<String, String> map = CollectionsUtil.newMap("a", "b");
+		assertNotNull(map);
+
+		CollectionsUtil.addToMap(map, "c", "d");
+		assertEquals("The map should have only two items", 2, map.size());
+		assertTrue("'a' should exist in the map", map.containsKey("a"));
+		assertEquals("b", map.get("a"));
+		assertTrue("'b' should exist in the map", map.containsValue("b"));
+		assertTrue("'c' should exist in the map", map.containsKey("c"));
+		assertEquals("d", map.get("c"));
+		assertTrue("'d' should exist in the map", map.containsValue("d"));
+	}
+
+	public void testAddToMapNullItems()
+	{
+		Map<String, String> map = CollectionsUtil.newMap("a", "b", "c", "d");
+		assertNotNull(map);
+
+		String[] items = null;
+		CollectionsUtil.addToMap(map, items);
+		assertEquals("The map should have only two items", 2, map.size());
+		assertTrue("'a' should exist in the map", map.containsKey("a"));
+		assertEquals("b", map.get("a"));
+		assertTrue("'b' should exist in the map", map.containsValue("b"));
+		assertTrue("'c' should exist in the map", map.containsKey("c"));
+		assertEquals("d", map.get("c"));
+		assertTrue("'d' should exist in the map", map.containsValue("d"));
+	}
+
+	public void testAddToMapNullMap()
+	{
+		try
+		{
+			CollectionsUtil.addToMap(null, "a", "b", "c");
+		}
+		catch (Throwable t)
+		{
+			fail(t.getMessage());
+		}
+	}
+
+	public void testAddUnevenItemsToMap()
+	{
+		Map<String, String> map = CollectionsUtil.newMap("a", "b");
+		assertNotNull(map);
+		try
+		{
+			CollectionsUtil.addToMap(map, "c", "d", "e");
+			fail("Didn't throw IllegalArgumentException when we tried to add uneven number of elements to a map.");
+		}
+		catch (IllegalArgumentException t)
+		{
+			assertTrue(true);
+		}
 	}
 }

@@ -18,7 +18,7 @@ native/**/Debug/
 native/**/Release/
 native/**/UpgradeLog*.XML
 native/**/_UpgradeReport_Files/
-tests/com.aptana.scripting.tests/application-bundles/**/cache.yml
-tests/com.aptana.scripting.tests/user-bundles/**/cache.yml
-tests/com.aptana.scripting.tests/project-bundles/**/cache.yml
+tests/com.aptana.scripting.tests/application-bundles/**/cache*.yml
+tests/com.aptana.scripting.tests/user-bundles/**/cache*.yml
+tests/com.aptana.scripting.tests/project-bundles/**/cache*.yml
 tests/com.aptana.studio.tests.all/wintest

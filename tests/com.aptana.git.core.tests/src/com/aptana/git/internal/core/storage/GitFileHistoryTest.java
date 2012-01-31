@@ -15,14 +15,19 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
@@ -49,6 +54,8 @@ public class GitFileHistoryTest extends GitTestCase
 		IFile resource = getProject().getFile(filename);
 		for (String contents : commitsToMake)
 		{
+			// write the contents to the file.
+			// FIXME this is causing an async refresh, which will cause the stage later to fail on build machine...
 			if (!resource.exists())
 			{
 				resource.create(new ByteArrayInputStream(contents.getBytes()), true, new NullProgressMonitor());
@@ -58,8 +65,9 @@ public class GitFileHistoryTest extends GitTestCase
 				resource.setContents(new ByteArrayInputStream(contents.getBytes()), IResource.FORCE,
 						new NullProgressMonitor());
 			}
+
 			// refresh the index
-			index.refresh(new NullProgressMonitor());
+			assertRefresh(index);
 
 			// Stage the new file
 			int tries = 100;
@@ -79,9 +87,6 @@ public class GitFileHistoryTest extends GitTestCase
 			assertTrue("Expected at least one change to stage, but there are none", toStage.size() > 0);
 
 			assertStageFiles(index, toStage);
-
-			index.refresh(new NullProgressMonitor());
-
 			assertCommit(index, contents);
 		}
 
@@ -142,10 +147,22 @@ public class GitFileHistoryTest extends GitTestCase
 		}
 	}
 
-	protected GitRepository createRepo() throws CoreException
+	@Override
+	protected GitRepository createRepo(IPath path) throws CoreException
 	{
-		getGitRepositoryManager().create(getProject().getLocation());
-		return getGitRepositoryManager().attachExisting(getProject(), new NullProgressMonitor());
+		GitRepository repo = super.createRepo(path);
+		getGitRepositoryManager().createOrAttach(getProject(), new NullProgressMonitor());
+		IEclipsePreferences prefs = new ProjectScope(getProject()).getNode(GitPlugin.PLUGIN_ID);
+		prefs.putBoolean(IPreferenceConstants.REFRESH_INDEX_WHEN_RESOURCES_CHANGE, false);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			fail(e.getMessage());
+		}
+		return repo;
 	}
 
 	protected IPath repoToGenerate() throws CoreException

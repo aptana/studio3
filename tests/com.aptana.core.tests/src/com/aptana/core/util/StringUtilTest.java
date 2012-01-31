@@ -25,7 +25,6 @@ public class StringUtilTest extends TestCase
 		assertEquals("a4c4da98a897d052baf31d4e5c0cce55", StringUtil.md5("cwilliams@aptana.com"));
 
 		assertNull(StringUtil.md5(null));
-
 	}
 
 	public void testSanitizeHTML()
@@ -35,7 +34,8 @@ public class StringUtilTest extends TestCase
 
 	public void testSanitizeHTML2()
 	{
-		assertEquals("&lt;html>Heckle &amp; Jeckle&lt;/html>", StringUtil.sanitizeHTML("<html>Heckle & Jeckle</html>"));
+		assertEquals("&lt;html&gt;Heckle &amp; Jeckle&lt;/html&gt;",
+				StringUtil.sanitizeHTML("<html>Heckle & Jeckle</html>"));
 	}
 
 	public void testReplaceAll()

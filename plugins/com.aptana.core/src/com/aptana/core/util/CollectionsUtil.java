@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -366,6 +367,62 @@ public class CollectionsUtil
 		}
 
 		return result;
+	}
+
+	/**
+	 * Convert a list of items into a Set. An empty set is returned if items is null
+	 * 
+	 * @param <T>
+	 *            Any type of object
+	 * @param items
+	 *            A variable length list of items of type T
+	 * @return Returns a new HashSet<T> or an empty set
+	 */
+	public static final <T> Map<T, T> newMap(T... items)
+	{
+		Map<T, T> result;
+
+		if (items != null)
+		{
+			result = new HashMap<T, T>();
+			addToMap(result, items);
+		}
+		else
+		{
+			result = Collections.emptyMap();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Add a varargs list of items into a map. It is expected that items be in "key, value, key2, value2, etc.."
+	 * ordering. If the map or items are null then no action is performed. Note that the destination map has no
+	 * requirements other than it must be a Map of the source item's type. This allows the destination to be used, for
+	 * example, as an accumulator.<br>
+	 * <br>
+	 * Note that this method is not thread safe. Users of this method will need to maintain type safety against the map.
+	 * 
+	 * @param map
+	 *            A map to which items will be added
+	 * @param items
+	 *            A list of items to add
+	 */
+	public static final <T, U extends T> Map<T, T> addToMap(Map<T, T> map, U... items)
+	{
+		if (map != null && items != null)
+		{
+			if (items.length % 2 != 0)
+			{
+				throw new IllegalArgumentException("Length of list of items must be multiple of 2"); //$NON-NLS-1$
+			}
+			for (int i = 0; i < items.length; i += 2)
+			{
+				map.put(items[i], items[i + 1]);
+			}
+		}
+
+		return map;
 	}
 
 	/**

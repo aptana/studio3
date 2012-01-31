@@ -6,6 +6,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -71,8 +72,9 @@ public abstract class GitTestCase extends TestCase
 	 * 
 	 * @param path
 	 * @return
+	 * @throws CoreException 
 	 */
-	protected GitRepository createRepo(IPath path)
+	protected GitRepository createRepo(IPath path) throws CoreException
 	{
 		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
 		getGitRepositoryManager().create(path);
