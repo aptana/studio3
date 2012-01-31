@@ -31,4 +31,10 @@ public interface IPreferenceConstants
 	 */
 	String IGNORE_NO_GIT = "ignore_no_git"; //$NON-NLS-1$
 
+	/**
+	 * If a resource inside the workspace changes, do we force an async refresh of the git repo it's in? This may not be
+	 * necessary at all if we're already watching the git's index file via filewatcher.
+	 */
+	String REFRESH_INDEX_WHEN_RESOURCES_CHANGE = "refresh_git_index_when_resources_change"; //$NON-NLS-1$
+
 }
