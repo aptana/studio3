@@ -295,9 +295,9 @@ public class UIPlugin extends AbstractUIPlugin
 		 */
 		public void preferenceChange(PreferenceChangeEvent event)
 		{
-			if (ResourcesPlugin.PREF_AUTO_BUILDING.equals(event.getKey()) && event.getNewValue() != null)
+			if (ResourcesPlugin.PREF_AUTO_BUILDING.equals(event.getKey()))
 			{
-				if (event.getNewValue().equals(Boolean.FALSE.toString()))
+				if ((Boolean.FALSE.toString().equals(event.getNewValue())))
 				{
 					MessageDialog.openWarning(UIUtils.getActiveShell(), Messages.UIPlugin_automaticBuildsWarningTitle,
 							Messages.UIPlugin_automaticBuildsWarningMessage);
