@@ -321,7 +321,7 @@ public class JSHyperlinkCollector extends JSTreeWalker
 
 							if (name instanceof JSNode)
 							{
-								addHyperlink(node, (JSNode) name, "");
+								addHyperlink(node, (JSNode) name, StringUtil.EMPTY);
 							}
 						}
 				}

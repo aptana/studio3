@@ -85,9 +85,14 @@ public class CollectionsUtilTest extends TestCase
 		assertSame(list, result);
 	}
 
-	public void testIsEmptyWithNull()
+	public void testIsEmptyWithNullList()
 	{
-		assertTrue(CollectionsUtil.isEmpty(null));
+		assertTrue(CollectionsUtil.<List<?>> isEmpty(null));
+	}
+
+	public void testIsEmptyWithNullMap()
+	{
+		assertTrue(CollectionsUtil.<Map<?, ?>> isEmpty(null));
 	}
 
 	public void testIsEmptyWithEmptyList()
