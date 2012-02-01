@@ -80,21 +80,16 @@ module Ruble
     end
 
     def initialized?
-      bundle = Ruble::BundleManager.bundle_from_path($0)
       @initialized ||= {}
-      @initialized[bundle.path] ||= false
+      @initialized[bundle_path] ||= false
     end
 
     def init_translations
       load_translations
-      bundle = Ruble::BundleManager.bundle_from_path($0)
-      @initialized[bundle.path] = true
+      @initialized[bundle_path] = true
     end
 
     def load_translations
-      bundle = Ruble::BundleManager.bundle_from_path($0)
-      bundle_path = bundle.path
-      bundle_path = bundle_path[0..-11] if bundle_path.end_with? "bundle.rb"
       trace("Loading translations for bundle: #{bundle_path}")
       locales_dir = File.join(bundle_path, 'config', 'locales')
       Dir.chdir(locales_dir)
@@ -102,6 +97,13 @@ module Ruble
       trace("Locale files: #{filenames}")
       filenames = filenames.map {|f| File.join(locales_dir, f) }
       filenames.each { |filename| load_file(filename) }
+    end
+    
+    def bundle_path
+      bundle = Ruble::BundleManager.bundle_from_path($0)
+      path = bundle.nil? ? $0 : bundle.path # FIXME If no bundle yet, $0 may not be bundle.rb
+      path = path[0..-11] if path.end_with? "bundle.rb"
+      path
     end
 
     INTERPOLATION_PATTERN = Regexp.union(
