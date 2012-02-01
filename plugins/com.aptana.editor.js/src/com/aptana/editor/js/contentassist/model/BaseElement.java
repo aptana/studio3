@@ -25,6 +25,7 @@ import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexDocument;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
 public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? extends BaseElement<P>>> implements
 		Convertible, IndexDocument, IPropertySource
@@ -200,7 +201,15 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 
 		for (P p : getPropertyInfoSet())
 		{
-			result.add(new PropertyDescriptor(p, p.getHeader()));
+			PropertyDescriptor descriptor = new PropertyDescriptor(p, p.getHeader());
+			String category = p.getCategory();
+
+			if (!StringUtil.isEmpty(category))
+			{
+				descriptor.setCategory(category);
+			}
+
+			result.add(descriptor);
 		}
 
 		return result.toArray(new IPropertyDescriptor[result.size()]);

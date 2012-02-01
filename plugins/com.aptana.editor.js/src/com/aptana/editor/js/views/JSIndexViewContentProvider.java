@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.ClassElement;
 import com.aptana.editor.js.contentassist.model.ClassGroupElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
@@ -52,8 +53,8 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 
 			// @formatter:off
 			result = CollectionsUtil.newList(
-				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, root.getWorkspaceGlobalClasses()),
-				new ClassGroupElement(Messages.JSIndexViewContentProvider_ProjectGroupLabel, root.getProjectGlobalClasses())
+				new ClassGroupElement(Messages.JSIndexViewContentProvider_WorkspaceGroupLabel, JSIndexQueryHelper.getIndex()),
+				new ClassGroupElement(Messages.JSIndexViewContentProvider_ProjectGroupLabel, root.getIndex())
 			);
 			// @formatter:on
 		}
@@ -123,7 +124,16 @@ public class JSIndexViewContentProvider implements ITreeContentProvider
 	 */
 	public boolean hasChildren(Object element)
 	{
-		return getChildren(element).length > 0;
+		if (element instanceof ClassGroupElement)
+		{
+			ClassGroupElement classGroup = (ClassGroupElement) element;
+
+			return classGroup.hasChildren();
+		}
+		else
+		{
+			return getChildren(element).length > 0;
+		}
 	}
 
 	/*

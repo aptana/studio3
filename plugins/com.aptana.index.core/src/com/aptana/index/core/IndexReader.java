@@ -8,6 +8,8 @@
 package com.aptana.index.core;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -24,6 +26,41 @@ public abstract class IndexReader
 {
 	public static Pattern DELIMITER_PATTERN;
 	public static Pattern SUB_DELIMITER_PATTERN;
+
+	/**
+	 * getCategoryInfo
+	 * 
+	 * @param category
+	 * @return
+	 */
+	public CategoryInfo getCategoryInfo(Index index, String category)
+	{
+		List<Integer> lengths = new ArrayList<Integer>();
+
+		if (index != null)
+		{
+			// @formatter:off
+			List<QueryResult> types = index.query(
+				new String[] { category },
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH
+			);
+			// @formatter:on
+
+			if (types != null)
+			{
+				for (QueryResult query : types)
+				{
+					String word = query.getWord();
+					int length = (word != null) ? word.length() : 0;
+
+					lengths.add(length);
+				}
+			}
+		}
+
+		return new CategoryInfo(category, lengths);
+	}
 
 	/**
 	 * Get the top-level delimiter string used to separate columns in an index word
@@ -141,10 +178,12 @@ public abstract class IndexReader
 			}
 			catch (Throwable t)
 			{
-				String message = MessageFormat.format( //
+				// @formatter:off
+				String message = MessageFormat.format(
 					"An error occurred while processing the following JSON string\n{0}", // //$NON-NLS-1$
-					value //
-					);
+					value
+				);
+				// @formatter:on
 
 				IdeLog.logError(IndexPlugin.getDefault(), message, t);
 			}

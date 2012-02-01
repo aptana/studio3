@@ -214,4 +214,12 @@
             id="com.aptana.editor.html.contentMergeViewer">
       </viewer>
    </extension>
+   <extension
+         point="com.aptana.index.core.ui.indexViewContributors">
+      <contributor
+            content-provider="com.aptana.editor.html.views.HTMLIndexViewContentProvider"
+            label-provider="com.aptana.editor.html.views.HTMLIndexViewLabelProvider"
+            name="%index.view.contributor.name">
+      </contributor>
+   </extension>
 </plugin>

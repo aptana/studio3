@@ -5,63 +5,63 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist.model;
+package com.aptana.editor.css.contentassist.model;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
+import com.aptana.editor.css.contentassist.index.ICSSIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.ui.views.IPropertyInformation;
 
 /**
- * JSElement
+ * CSSElement
  */
-public class JSElement extends BaseElement<JSElement.Property>
+public class CSSElement extends BaseElement<CSSElement.Property>
 {
-	enum Property implements IPropertyInformation<JSElement>
+	enum Property implements IPropertyInformation<CSSElement>
 	{
-		NAME(Messages.JSElement_Name)
+		NAME(Messages.CSSElement_NameLabel)
 		{
-			public Object getPropertyValue(JSElement node)
+			public Object getPropertyValue(CSSElement node)
 			{
 				return node.getName();
 			}
 		},
-		INDEX(Messages.JSElement_IndexLabel)
+		INDEX(Messages.CSSElement_IndexLabel)
 		{
-			public Object getPropertyValue(JSElement node)
+			public Object getPropertyValue(CSSElement node)
 			{
 				return node.getIndex().toString();
 			}
 		},
-		INDEX_FILE(Messages.JSElement_IndexFile)
+		INDEX_FILE(Messages.CSSElement_IndexFileLabel)
 		{
-			public Object getPropertyValue(JSElement node)
+			public Object getPropertyValue(CSSElement node)
 			{
 				return node.getIndex().getIndexFile().getAbsolutePath();
 			}
 		},
-		INDEX_FILE_SIZE(Messages.JSElement_IndexFileSizeLabel)
+		INDEX_FILE_SIZE(Messages.CSSElement_IndexFileSizeLabel)
 		{
-			public Object getPropertyValue(JSElement node)
+			public Object getPropertyValue(CSSElement node)
 			{
 				return node.getIndex().getIndexFile().length();
 			}
 		},
-		CHILD_COUNT(Messages.JSElement_ChildCount)
+		CHILD_COUNT(Messages.CSSElement_ChildCountLabel)
 		{
-			public Object getPropertyValue(JSElement node)
+			public Object getPropertyValue(CSSElement node)
 			{
-				// TODO: don't emit children that have zero classes?
-				return 2;
+				// TODO: don't emit children with no content?
+				return 3;
 			}
 		},
-		VERSION(Messages.JSElement_Version)
+		VERSION(Messages.CSSElement_VersionLabel)
 		{
-			public Object getPropertyValue(JSElement node)
+			public Object getPropertyValue(CSSElement node)
 			{
-				return IJSIndexConstants.INDEX_VERSION;
+				return ICSSIndexConstants.INDEX_VERSION;
 			}
 		};
 
@@ -91,32 +91,17 @@ public class JSElement extends BaseElement<JSElement.Property>
 
 	private Index index;
 
-	/**
-	 * An element used to group JS content in an Index
-	 * 
-	 * @param index
-	 *            The index that contains JS content
-	 */
-	public JSElement(Index index)
+	public CSSElement(Index index)
 	{
 		this.index = index;
-		setName(Messages.JSElement_NodeLabel);
+		setName(Messages.CSSElement_ElementName);
 	}
 
-	/**
-	 * Returns the element associated with this element
-	 * 
-	 * @return Returns an Index
-	 */
 	public Index getIndex()
 	{
 		return index;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.contentassist.model.BaseElement#getPropertyInfoSet()
-	 */
 	@Override
 	protected Set<Property> getPropertyInfoSet()
 	{

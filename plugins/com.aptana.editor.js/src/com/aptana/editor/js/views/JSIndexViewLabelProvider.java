@@ -133,7 +133,7 @@ public class JSIndexViewLabelProvider implements ILabelProvider, ILabelDecorator
 		{
 			result = EVENT_ICON;
 		}
-		else
+		else if (element instanceof BaseElement)
 		{
 			// default to property (or return null?)
 			result = PROPERTY_ICON;
