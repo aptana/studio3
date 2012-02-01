@@ -203,7 +203,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 
 		// Reconcile column
 		TableColumn reconcile = new TableColumn(table, SWT.CENTER);
-		reconcile.setWidth(55);
+		reconcile.setWidth(75);
 		reconcile.setText(Messages.ValidationPreferencePage_ReconcileColumn);
 		reconcile.setToolTipText(Messages.ValidationPreferencePage_ReconcileColumn);
 
