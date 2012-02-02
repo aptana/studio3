@@ -65,6 +65,17 @@ public class UserAgentElement implements Convertible
 	 * Create a new instance of a UserAgentElement. This method uses cached instances when possible.
 	 * 
 	 * @param platform
+	 * @return
+	 */
+	public static UserAgentElement createUserAgentElement(String platform)
+	{
+		return createUserAgentElement(platform, StringUtil.EMPTY, StringUtil.EMPTY, StringUtil.EMPTY, StringUtil.EMPTY);
+	}
+
+	/**
+	 * Create a new instance of a UserAgentElement. This method uses cached instances when possible.
+	 * 
+	 * @param platform
 	 * @param version
 	 * @param os
 	 * @param osVersion

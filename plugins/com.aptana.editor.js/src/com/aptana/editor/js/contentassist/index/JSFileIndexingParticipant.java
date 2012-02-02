@@ -35,7 +35,6 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -301,7 +300,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 			for (PropertyElement property : type.getProperties())
 			{
-				JSTypeUtil.addAllUserAgents(property);
+				property.setHasAllUserAgents();
 			}
 
 			// write new Window type to index

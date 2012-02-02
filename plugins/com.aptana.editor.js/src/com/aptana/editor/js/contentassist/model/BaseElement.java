@@ -20,9 +20,13 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.contentassist.UserAgentManager.UserAgent;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.IndexDocument;
 import com.aptana.index.core.IndexUtil;
 import com.aptana.index.core.ui.views.IPropertyInformation;
@@ -34,6 +38,9 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	private static final String SINCE_PROPERTY = "since"; //$NON-NLS-1$
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
+
+	// A special instance used to indicate that this element should associate all user agents with it
+	private static final Set<UserAgentElement> ALL_USER_AGENTS = Collections.emptySet();
 
 	private String _name;
 	private String _description;
@@ -86,12 +93,28 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	{
 		if (userAgent != null)
 		{
-			if (this._userAgents == null)
+			if (this._userAgents == ALL_USER_AGENTS)
+			{
+				// grab the expanded set of all user agents
+				Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>(this.getUserAgents());
+
+				// if the specified user agent exists in the expanded list, then don't do anything. Otherwise, we need
+				// to generate the union of the expanded list and the specified user agent
+				if (!userAgents.contains(userAgent))
+				{
+					this._userAgents = userAgents;
+					this._userAgents.add(userAgent);
+				}
+			}
+			else if (this._userAgents == null)
 			{
 				this._userAgents = new HashSet<UserAgentElement>();
+				this._userAgents.add(userAgent);
 			}
-
-			this._userAgents.add(userAgent);
+			else
+			{
+				this._userAgents.add(userAgent);
+			}
 		}
 	}
 
@@ -137,9 +160,18 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	{
 		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
-
 		this._sinceList = IndexUtil.createList(object.get(SINCE_PROPERTY), SinceElement.class);
-		this._userAgents = createUserAgentSet(object.get(USER_AGENTS_PROPERTY));
+
+		Object userAgentsProperty = object.get(USER_AGENTS_PROPERTY);
+
+		if (userAgentsProperty == null)
+		{
+			this._userAgents = ALL_USER_AGENTS;
+		}
+		else
+		{
+			this._userAgents = createUserAgentSet(userAgentsProperty);
+		}
 	}
 
 	/**
@@ -169,16 +201,6 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	public Object getEditableValue()
 	{
 		return null;
-	}
-
-	/**
-	 * getPropertyInfoSet
-	 * 
-	 * @return Set
-	 */
-	protected Set<P> getPropertyInfoSet()
-	{
-		return Collections.emptySet();
 	}
 
 	/**
@@ -213,6 +235,16 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 		}
 
 		return result.toArray(new IPropertyDescriptor[result.size()]);
+	}
+
+	/**
+	 * getPropertyInfoSet
+	 * 
+	 * @return Set
+	 */
+	protected Set<P> getPropertyInfoSet()
+	{
+		return Collections.emptySet();
 	}
 
 	/*
@@ -266,7 +298,35 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return new ArrayList<UserAgentElement>(CollectionsUtil.getSetValue(this._userAgents));
+		Set<UserAgentElement> userAgents;
+
+		if (_userAgents == ALL_USER_AGENTS)
+		{
+			userAgents = new HashSet<UserAgentElement>();
+
+			for (UserAgent userAgent : UserAgentManager.getInstance().getAllUserAgents())
+			{
+				userAgents.add(UserAgentElement.createUserAgentElement(userAgent.ID));
+			}
+		}
+		else
+		{
+			userAgents = _userAgents;
+		}
+
+		return new ArrayList<UserAgentElement>(CollectionsUtil.getSetValue(userAgents));
+	}
+
+	/**
+	 * A predicate used to determine if this element has been tagged to use all user agents. Note that this will return
+	 * true only if setHasAllUserAgents has been called previously. If user agents have been added to this element and
+	 * they so happen to be equivalent to a set of all user agents, this method will still return false.
+	 * 
+	 * @return
+	 */
+	public boolean hasAllUserAgents()
+	{
+		return _userAgents == ALL_USER_AGENTS;
 	}
 
 	/*
@@ -297,6 +357,23 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 	}
 
 	/**
+	 * setHasAllUserAgents
+	 */
+	public void setHasAllUserAgents()
+	{
+		if (_userAgents != ALL_USER_AGENTS)
+		{
+			if (!CollectionsUtil.isEmpty(_userAgents))
+			{
+				IdeLog.logWarning(JSPlugin.getDefault(),
+						"User agents may have been deleted when setting element to use all user agents: " + toSource());
+			}
+
+			_userAgents = ALL_USER_AGENTS;
+		}
+	}
+
+	/**
 	 * setName
 	 * 
 	 * @param name
@@ -323,7 +400,16 @@ public abstract class BaseElement<P extends Enum<P> & IPropertyInformation<? ext
 		out.add(NAME_PROPERTY, this.getName());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 		out.add(SINCE_PROPERTY, this.getSinceList());
-		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
+
+		if (hasAllUserAgents())
+		{
+			// NOTE: use 'null' to indicate that all user agents should be associated with this element
+			out.add(USER_AGENTS_PROPERTY, null);
+		}
+		else
+		{
+			out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
+		}
 	}
 
 	/**
