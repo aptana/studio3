@@ -82,12 +82,12 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 				for (TypeElement type : types)
 				{
 					// apply user agents to type
-					JSTypeUtil.addAllUserAgents(type);
+					type.setHasAllUserAgents();
 
 					// apply user agents to all properties
 					for (PropertyElement property : type.getProperties())
 					{
-						JSTypeUtil.addAllUserAgents(property);
+						property.setHasAllUserAgents();
 					}
 
 					String typeName = type.getName();
@@ -126,8 +126,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 
 								property.setName(typeName);
 								property.addType(typeName);
-
-								JSTypeUtil.addAllUserAgents(property);
+								property.setHasAllUserAgents();
 
 								window.addProperty(property);
 							}
