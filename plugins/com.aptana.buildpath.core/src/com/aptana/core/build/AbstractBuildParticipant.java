@@ -88,7 +88,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	}
 
 	/**
-	 * By default participants are not 'required'. We override this for many of our own builtin ones that eprform
+	 * By default participants are not 'required'. We override this for many of our own builtin ones that perform
 	 * indexing/task detection, etc.
 	 */
 	public boolean isRequired()
@@ -169,6 +169,11 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 
 	public void setFilters(IScopeContext context, String... filters)
 	{
+		if (isRequired())
+		{
+			return; // currently required can't be edited.
+		}
+
 		IEclipsePreferences prefs = context.getNode(getPreferenceNode());
 		prefs.put(getFiltersPreferenceKey(), StringUtil.join(FILTER_DELIMITER, filters));
 		try
@@ -243,7 +248,11 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	protected Collection<IProblem> processCommentNode(String filePath, String source, int initialOffset,
 			IParseNode commentNode, String commentEnding)
 	{
-		Collection<IProblem> tasks = new ArrayList<IProblem>();
+		if (commentNode == null)
+		{
+			return Collections.emptyList();
+		}
+
 		String text = commentNode.getText();
 		if (StringUtil.isEmpty(text))
 		{
@@ -254,7 +263,9 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 		{
 			text = text.toLowerCase();
 		}
+
 		String[] lines = StringUtil.LINE_SPLITTER.split(text);
+		Collection<IProblem> tasks = new ArrayList<IProblem>();
 		for (String line : lines)
 		{
 			for (TaskTag entry : TaskTag.getTaskTags())
@@ -288,7 +299,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 
 	private String getText(String source, IParseNode commentNode)
 	{
-		if (commentNode == null || source == null)
+		if (source == null)
 		{
 			return StringUtil.EMPTY;
 		}
@@ -310,7 +321,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 	protected IProblem createTask(String sourcePath, String message, Integer priority, int lineNumber, int offset,
 			int endOffset)
 	{
-		return new Problem(IMarker.SEVERITY_INFO, message, offset, endOffset - offset, lineNumber, sourcePath);
+		return new Problem(IMarker.SEVERITY_INFO, message, offset, endOffset - offset, lineNumber, sourcePath, priority);
 	}
 
 	protected IProblem createInfo(String message, int lineNumber, int offset, int length, String sourcePath)
@@ -356,7 +367,7 @@ public abstract class AbstractBuildParticipant implements IBuildParticipant, IEx
 			{
 				this.fPriority = Integer.parseInt(rawPriority);
 			}
-			catch (Exception e)
+			catch (NumberFormatException e)
 			{
 				IdeLog.logWarning(BuildPathCorePlugin.getDefault(), MessageFormat.format(
 						"Unable to parse priority value ({0}) as an integer, defaulting to 50.", rawPriority), e); //$NON-NLS-1$

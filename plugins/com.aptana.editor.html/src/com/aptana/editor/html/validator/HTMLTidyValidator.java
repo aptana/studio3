@@ -30,8 +30,6 @@ import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.index.core.build.BuildContext;
@@ -39,12 +37,11 @@ import com.aptana.index.core.build.BuildContext;
 public class HTMLTidyValidator extends AbstractBuildParticipant
 {
 	public static final String ID = "com.aptana.editor.html.validator.TidyValidator"; //$NON-NLS-1$
-	
-	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final Pattern PATTERN = Pattern
 			.compile("\\s*line\\s+(\\d+)\\s*column\\s+(\\d+)\\s*-\\s*(Warning|Error):\\s*(.+)$"); //$NON-NLS-1$
 
+	// TODO Move these filters into default filter pref for this participant?!
 	@SuppressWarnings("nls")
 	private static final String[] HTML5_ELEMENTS = { "article>", "aside>", "audio>", "canvas>", "command>",
 			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
@@ -182,6 +179,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			return;
 		}
 
+		List<String> filters = getFilters();
 		Matcher matcher = PATTERN.matcher(report);
 		while (matcher.find())
 		{
@@ -201,7 +199,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			}
 
 			if (message != null && !containsHTML5Element(message) && !isAutoFiltered(message)
-					&& !isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML))
+					&& !isIgnored(message, filters))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
@@ -215,16 +213,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		}
 	}
 
-	private boolean isIgnored(String message, String language)
+	private boolean isIgnored(String message, List<String> expressions)
 	{
-		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-				.getString(getFilterExpressionsPrefKey(language));
-		if (StringUtil.isEmpty(list))
-		{
-			return false;
-		}
-
-		String[] expressions = fgFilterExpressionDelimiter.split(list);
 		for (String expression : expressions)
 		{
 			if (message.matches(expression))
@@ -234,11 +224,6 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 		}
 
 		return false;
-	}
-
-	private String getFilterExpressionsPrefKey(String language)
-	{
-		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
 	}
 
 	private static String patchMessage(String message)

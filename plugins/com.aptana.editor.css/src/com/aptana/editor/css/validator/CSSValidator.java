@@ -38,10 +38,7 @@ import org.w3c.css.util.Utf8Properties;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.index.core.build.BuildContext;
@@ -53,8 +50,6 @@ public class CSSValidator extends AbstractBuildParticipant
 {
 
 	public static final String ID = "com.aptana.editor.css.validator.W3CValidator"; //$NON-NLS-1$
-
-	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final String APTANA_PROFILE = "AptanaProfile"; //$NON-NLS-1$
 	private static final String CONFIG_FILE = "AptanaCSSConfig.properties"; //$NON-NLS-1$
@@ -106,7 +101,7 @@ public class CSSValidator extends AbstractBuildParticipant
 		loadAptanaCSSProfile();
 	}
 
-	private void processErrorsInReport(String report, String sourcePath, List<IProblem> items)
+	private void processErrorsInReport(String report, String sourcePath, List<IProblem> items, List<String> filters)
 	{
 		int offset = 0;
 		String elementName = "errorlist"; //$NON-NLS-1$
@@ -140,7 +135,7 @@ public class CSSValidator extends AbstractBuildParticipant
 				// finds the errors
 				String[] errors = getContent(ERROR_PATTERN, listString);
 				// add errors
-				addErrors(errors, sourcePath, items);
+				addErrors(errors, sourcePath, items, filters);
 			}
 
 			// advances past the current error list
@@ -148,7 +143,7 @@ public class CSSValidator extends AbstractBuildParticipant
 		}
 	}
 
-	private void processWarningsInReport(String report, String sourcePath, List<IProblem> items)
+	private void processWarningsInReport(String report, String sourcePath, List<IProblem> items, List<String> filters)
 	{
 		int offset = 0;
 		String elementName = "warninglist"; //$NON-NLS-1$
@@ -181,7 +176,7 @@ public class CSSValidator extends AbstractBuildParticipant
 				// finds the warnings
 				String[] warnings = getContent(WARNING_PATTERN, listString);
 				// adds errors
-				addWarnings(warnings, sourcePath, items);
+				addWarnings(warnings, sourcePath, items, filters);
 			}
 
 			// advance past the current warning list
@@ -248,7 +243,7 @@ public class CSSValidator extends AbstractBuildParticipant
 	 * @param items
 	 *            the list that stores the added validation items
 	 */
-	private void addErrors(String[] errors, String sourcePath, List<IProblem> items)
+	private void addErrors(String[] errors, String sourcePath, List<IProblem> items, List<String> filters)
 	{
 		Map<String, String> map;
 		for (String error : errors)
@@ -284,8 +279,8 @@ public class CSSValidator extends AbstractBuildParticipant
 			message = StringEscapeUtils.unescapeHtml(message);
 			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (!isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message)
-					&& !containsCSS3AtRule(message) && !isFiltered(message))
+			if (!isIgnored(message, filters) && !containsCSS3Property(message) && !containsCSS3AtRule(message)
+					&& !isFiltered(message))
 			{
 				// there is no info on the line offset or the length of the errored text
 				items.add(createError(message, lineNumber, 0, 0, sourcePath));
@@ -293,16 +288,8 @@ public class CSSValidator extends AbstractBuildParticipant
 		}
 	}
 
-	private static boolean isIgnored(String message, String language)
+	private static boolean isIgnored(String message, List<String> expressions)
 	{
-		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-				.getString(getFilterExpressionsPrefKey(language));
-		if (StringUtil.isEmpty(list))
-		{
-			return false;
-		}
-
-		String[] expressions = fgFilterExpressionDelimiter.split(list);
 		for (String expression : expressions)
 		{
 			if (message.matches(expression))
@@ -314,11 +301,6 @@ public class CSSValidator extends AbstractBuildParticipant
 		return false;
 	}
 
-	private static String getFilterExpressionsPrefKey(String language)
-	{
-		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
-	}
-
 	/**
 	 * Adds the CSS warnings.
 	 * 
@@ -328,8 +310,9 @@ public class CSSValidator extends AbstractBuildParticipant
 	 *            the source path
 	 * @param items
 	 *            the list that stores the added validation items
+	 * @param filters
 	 */
-	private void addWarnings(String[] warnings, String sourcePath, List<IProblem> items)
+	private void addWarnings(String[] warnings, String sourcePath, List<IProblem> items, List<String> filters)
 	{
 		Map<String, String> map;
 		String last = ""; //$NON-NLS-1$
@@ -350,7 +333,7 @@ public class CSSValidator extends AbstractBuildParticipant
 
 			String hash = MessageFormat.format("{0}:{1}:{2}:{3}", lineNumber, level, message, context); //$NON-NLS-1$
 			// guards against duplicate warnings
-			if (!last.equals(hash) && !isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS))
+			if (!last.equals(hash) && !isIgnored(message, filters))
 			{
 				items.add(createWarning(message, lineNumber, 0, 0, sourcePath));
 			}
@@ -492,9 +475,9 @@ public class CSSValidator extends AbstractBuildParticipant
 			String path = uri.toString();
 
 			String report = getReport(source, uri);
-			processErrorsInReport(report, path, problems);
-			processWarningsInReport(report, path, problems);
-
+			List<String> filters = getFilters();
+			processErrorsInReport(report, path, problems, filters);
+			processWarningsInReport(report, path, problems, filters);
 		}
 		catch (CoreException e)
 		{

@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.logging.IdeLog;
 
+// TODO Should we just remove this entirely? It's only used in one place!
 public class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 {
 

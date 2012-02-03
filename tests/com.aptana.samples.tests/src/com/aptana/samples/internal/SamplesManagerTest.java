@@ -42,17 +42,31 @@ public class SamplesManagerTest extends TestCase
 	{
 		List<SampleCategory> categories = samplesManager.getCategories();
 
-		assertEquals(2, categories.size());
+		assertTrue(categories.size() >= 2);
 
-		SampleCategory category = categories.get(0);
+		SampleCategory category = findCategoryById(categories, "com.aptana.projects.samples.web.category");
+		assertNotNull(category);
 		assertEquals("com.aptana.projects.samples.web.category", category.getId());
 		assertEquals("Web", category.getName());
 		assertNotNull(category.getIconFile());
 
-		category = categories.get(1);
+		category = findCategoryById(categories, "com.aptana.samples.tests.category");
+		assertNotNull(category);
 		assertEquals("com.aptana.samples.tests.category", category.getId());
 		assertEquals("Test Samples", category.getName());
 		assertEquals(getFullPath("icons/category.png"), category.getIconFile());
+	}
+
+	protected SampleCategory findCategoryById(List<SampleCategory> categories, String categoryId)
+	{
+		for (SampleCategory category : categories)
+		{
+			if (category.getId().equals(categoryId))
+			{
+				return category;
+			}
+		}
+		return null;
 	}
 
 	public void testGetSamplesForCategory()

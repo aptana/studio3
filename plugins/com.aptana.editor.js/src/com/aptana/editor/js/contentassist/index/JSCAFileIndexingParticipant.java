@@ -8,8 +8,8 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.URI;
 import java.util.List;
 
@@ -44,86 +44,20 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		try
 		{
-			Reader isr = null;
-
 			sub.subTask(getIndexingMessage(index, context.getURI()));
 
+			JSCAReader reader = new JSCAReader();
+			SchemaContext schemaContext = new SchemaContext();
+			JSCAHandler handler = new JSCAHandler();
+			schemaContext.setHandler(handler);
+
+			Reader isr = null;
 			try
 			{
-				JSCAReader reader = new JSCAReader();
-				SchemaContext schemaContext = new SchemaContext();
-				JSCAHandler handler = new JSCAHandler();
-
-				schemaContext.setHandler(handler);
-
-				isr = new StringReader(context.getContents());
-
 				// parse
+				isr = new InputStreamReader(context.openInputStream(sub.newChild(5)));
 				reader.read(isr, schemaContext);
-				sub.worked(50);
-
-				// create new Window type for this file
-				JSIndexReader jsir = new JSIndexReader();
-				List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
-				TypeElement window;
-
-				if (!CollectionsUtil.isEmpty(windows))
-				{
-					window = windows.get(windows.size() - 1);
-				}
-				else
-				{
-					window = new TypeElement();
-					window.setName(JSTypeConstants.WINDOW_TYPE);
-				}
-
-				// process results
-				JSIndexWriter indexer = new JSIndexWriter();
-				TypeElement[] types = handler.getTypes();
-				AliasElement[] aliases = handler.getAliases();
-				URI location = context.getURI();
-
-				for (TypeElement type : types)
-				{
-					indexer.writeType(index, type, location);
-
-					String typeName = type.getName();
-
-					if (isGlobalProperty(type))
-					{
-						PropertyElement property = window.getProperty(typeName);
-
-						if (property == null)
-						{
-							property = new PropertyElement();
-
-							property.setName(typeName);
-							property.addType(typeName);
-
-							window.addProperty(property);
-						}
-					}
-				}
-
-				for (AliasElement alias : aliases)
-				{
-					PropertyElement property = new PropertyElement();
-
-					property.setName(alias.getName());
-					property.addType(alias.getType());
-
-					window.addProperty(property);
-				}
-
-				// write global type info
-				if (window.hasProperties())
-				{
-					indexer.writeType(index, window, location);
-				}
-			}
-			catch (Throwable e)
-			{
-				IdeLog.logError(JSPlugin.getDefault(), e);
+				sub.worked(45);
 			}
 			finally
 			{
@@ -138,6 +72,69 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 					}
 				}
 			}
+
+			// create new Window type for this file
+			JSIndexReader jsir = new JSIndexReader();
+			List<TypeElement> windows = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+			TypeElement window;
+
+			if (!CollectionsUtil.isEmpty(windows))
+			{
+				window = windows.get(windows.size() - 1);
+			}
+			else
+			{
+				window = new TypeElement();
+				window.setName(JSTypeConstants.WINDOW_TYPE);
+			}
+
+			// process results
+			JSIndexWriter indexer = new JSIndexWriter();
+			TypeElement[] types = handler.getTypes();
+			AliasElement[] aliases = handler.getAliases();
+			URI location = context.getURI();
+
+			for (TypeElement type : types)
+			{
+				indexer.writeType(index, type, location);
+
+				String typeName = type.getName();
+
+				if (isGlobalProperty(type))
+				{
+					PropertyElement property = window.getProperty(typeName);
+
+					if (property == null)
+					{
+						property = new PropertyElement();
+
+						property.setName(typeName);
+						property.addType(typeName);
+
+						window.addProperty(property);
+					}
+				}
+			}
+
+			for (AliasElement alias : aliases)
+			{
+				PropertyElement property = new PropertyElement();
+
+				property.setName(alias.getName());
+				property.addType(alias.getType());
+
+				window.addProperty(property);
+			}
+
+			// write global type info
+			if (window.hasProperties())
+			{
+				indexer.writeType(index, window, location);
+			}
+		}
+		catch (Throwable e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
 		finally
 		{

@@ -15,6 +15,8 @@ import com.aptana.index.core.build.BuildContext;
 public interface IFileStoreIndexingParticipant
 {
 
+	public static final int DEFAULT_PRIORITY = 50;
+
 	/**
 	 * Indexes a single file wrapped up by a context object.
 	 * 
@@ -33,10 +35,4 @@ public interface IFileStoreIndexingParticipant
 	 */
 	int getPriority();
 
-	/**
-	 * Set the priority of this indexer
-	 * 
-	 * @param priority
-	 */
-	void setPriority(int priority);
 }

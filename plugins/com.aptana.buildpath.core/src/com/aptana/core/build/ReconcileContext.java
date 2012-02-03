@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.build.BuildContext;
 
@@ -51,7 +52,12 @@ public class ReconcileContext extends BuildContext
 	{
 		try
 		{
-			return new ByteArrayInputStream(getContents().getBytes(getCharset()));
+			String charset = getCharset();
+			if (charset == null)
+			{
+				charset = IOUtil.UTF_8;
+			}
+			return new ByteArrayInputStream(getContents().getBytes(charset));
 		}
 		catch (UnsupportedEncodingException e)
 		{

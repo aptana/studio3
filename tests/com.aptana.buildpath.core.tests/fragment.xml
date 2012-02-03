@@ -4,7 +4,7 @@
    <extension
          point="com.aptana.buildpath.core.buildParticipants">
       <participant
-            class="com.aptana.core.build.BuildParticipantManagerTest$TestBuildParticipant"
+            class="com.aptana.core.internal.build.BuildParticipantManagerTest$TestBuildParticipant"
             id="com.aptana.buildpath.core.tests.participant1"
             priority="99">
          <contentTypeBinding
@@ -12,19 +12,19 @@
          </contentTypeBinding>
       </participant>
       <participant
-            class="com.aptana.core.build.BuildParticipantManagerTest$NoPrioritySpecifiedBuildParticipant"
+            class="com.aptana.core.internal.build.BuildParticipantManagerTest$NoPrioritySpecifiedBuildParticipant"
             id="com.aptana.buildpath.core.tests.participant2">
             <contentTypeBinding
                contentTypeId="com.aptana.buildpath.core.fake_content_type2">
          </contentTypeBinding>
       </participant>
       <participant
-            class="com.aptana.core.build.BuildParticipantManagerTest$TestBuildParticipant"
+            class="com.aptana.core.internal.build.BuildParticipantManagerTest$TestBuildParticipant"
             id="com.aptana.buildpath.core.tests.participant3"
             priority="10">
       </participant>
       <participant
-            class="com.aptana.core.build.BuildParticipantManagerTest$TestBuildParticipant"
+            class="com.aptana.core.internal.build.BuildParticipantManagerTest$TestBuildParticipant"
             id="com.aptana.buildpath.core.tests.participant4"
             priority="75">
             <contentTypeBinding

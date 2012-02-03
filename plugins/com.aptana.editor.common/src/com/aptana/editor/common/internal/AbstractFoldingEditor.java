@@ -10,7 +10,6 @@ package com.aptana.editor.common.internal;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,7 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.IFoldingEditor;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
@@ -191,8 +191,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 							SubMonitor sub = SubMonitor.convert(monitor, 100);
 							// Wipe and re-index the file
 							IProject project = file.getProject();
-							Set<IFile> files = new HashSet<IFile>();
-							files.add(file);
+							Set<IFile> files = CollectionsUtil.newSet(file);
 							if (sub.isCanceled())
 							{
 								return Status.CANCEL_STATUS;
@@ -200,6 +199,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 							// we're already in a job, so just run these subjobs in-line rather than schedule them.
 							new RemoveIndexOfFilesOfProjectJob(project, files).run(sub.newChild(10));
 							new IndexFilesOfProjectJob(project, files).run(sub.newChild(90));
+
 							sub.done();
 							return Status.OK_STATUS;
 						}

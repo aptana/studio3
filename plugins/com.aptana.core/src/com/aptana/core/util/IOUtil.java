@@ -32,7 +32,7 @@ import com.ibm.icu.text.CharsetMatch;
 public abstract class IOUtil
 {
 
-	private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
+	public static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
 	private static final int BUFFER_SIZE = 4096;
 
 	/**

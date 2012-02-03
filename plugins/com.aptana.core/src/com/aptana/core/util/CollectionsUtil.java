@@ -125,10 +125,9 @@ public class CollectionsUtil
 	 */
 	public static <T> List<T> filter(Collection<T> collection, IFilter<T> filter)
 	{
-		ArrayList<T> result = new ArrayList<T>();
-
+		ArrayList<T> result = new ArrayList<T>(collection == null ? 0 : collection.size());
 		filter(collection, result, filter);
-
+		result.trimToSize();
 		return result;
 	}
 

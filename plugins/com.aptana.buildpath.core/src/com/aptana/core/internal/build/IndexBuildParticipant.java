@@ -15,12 +15,14 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.IDebugScopes;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -36,23 +38,17 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		URI uri = getURI(project);
 		if (uri != null)
 		{
-			if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER))
+			if (isInfoEnabled())
 			{
-				String message = MessageFormat.format("Cleaning index for project {0} ({1})", project.getName(), uri); //$NON-NLS-1$
-				IdeLog.logInfo(BuildPathCorePlugin.getDefault(), message, IDebugScopes.BUILDER);
+				logInfo(MessageFormat.format("Cleaning index for project {0} ({1})", project.getName(), uri)); //$NON-NLS-1$
 			}
-			IndexManager.getInstance().removeIndex(uri);
+			getIndexManager().removeIndex(uri);
 		}
 	}
 
 	public void buildStarting(IProject project, int kind, IProgressMonitor monitor)
 	{
 		fIndex = getIndex(project);
-	}
-
-	protected Index getIndex(IProject project)
-	{
-		return IndexManager.getInstance().getIndex(getURI(project));
 	}
 
 	public void buildEnding(IProgressMonitor monitor)
@@ -73,26 +69,26 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
-		if (fIndex == null)
-		{
-			fIndex = getIndex(context.getProject());
-		}
-		// Remove existing index entries for this file...
-		fIndex.remove(context.getURI());
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		deleteFile(context, sub.newChild(10));
 
-		List<IFileStoreIndexingParticipant> indexers = IndexManager.getInstance().getIndexParticipants(
-				context.getName());
-		for (IFileStoreIndexingParticipant indexer : indexers)
+		List<IFileStoreIndexingParticipant> indexers = getIndexParticipants(context);
+		if (!CollectionsUtil.isEmpty(indexers))
 		{
-			try
+			int unit = 90 / indexers.size();
+			for (IFileStoreIndexingParticipant indexer : indexers)
 			{
-				indexer.index(context, fIndex, monitor);
-			}
-			catch (CoreException e)
-			{
-				IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+				try
+				{
+					indexer.index(context, fIndex, sub.newChild(unit));
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+				}
 			}
 		}
+		sub.done();
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
@@ -104,7 +100,7 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		fIndex.remove(context.getURI());
 	}
 
-	private static URI getURI(IProject project)
+	protected URI getURI(IProject project)
 	{
 		URI uri = project.getLocationURI();
 		if (uri != null)
@@ -115,6 +111,31 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 				MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
 						project.getRawLocationURI(), project.getFullPath()));
 		return project.getRawLocationURI();
+	}
+
+	protected Index getIndex(IProject project)
+	{
+		return getIndexManager().getIndex(getURI(project));
+	}
+
+	protected List<IFileStoreIndexingParticipant> getIndexParticipants(BuildContext context)
+	{
+		return getIndexManager().getIndexParticipants(context.getName());
+	}
+
+	protected IndexManager getIndexManager()
+	{
+		return IndexManager.getInstance();
+	}
+
+	protected void logInfo(String message)
+	{
+		IdeLog.logInfo(BuildPathCorePlugin.getDefault(), message, IDebugScopes.BUILDER);
+	}
+
+	protected boolean isInfoEnabled()
+	{
+		return IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
 	}
 
 }

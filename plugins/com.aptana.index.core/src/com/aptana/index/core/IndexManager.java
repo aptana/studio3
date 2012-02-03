@@ -40,8 +40,6 @@ public class IndexManager
 	private static final String FILE_INDEXING_PARTICIPANTS_ID = "fileIndexingParticipants"; //$NON-NLS-1$
 	private static final String TAG_FILE_INDEXING_PARTICIPANT = "fileIndexingParticipant"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
-	private static final int DEFAULT_PRIORITY = 50;
 
 	private static IndexManager INSTANCE;
 	private Map<URI, Index> indexes;
@@ -258,24 +256,7 @@ public class IndexManager
 	{
 		try
 		{
-			String priorityString = key.getAttribute(ATTR_PRIORITY);
-			int priority = DEFAULT_PRIORITY;
-
-			try
-			{
-				priority = Integer.parseInt(priorityString);
-			}
-			catch (NumberFormatException e)
-			{
-				IdeLog.logError(IndexPlugin.getDefault(), e);
-			}
-
-			IFileStoreIndexingParticipant result = (IFileStoreIndexingParticipant) key
-					.createExecutableExtension(ATTR_CLASS);
-
-			result.setPriority(priority);
-
-			return result;
+			return (IFileStoreIndexingParticipant) key.createExecutableExtension(ATTR_CLASS);
 		}
 		catch (CoreException e)
 		{

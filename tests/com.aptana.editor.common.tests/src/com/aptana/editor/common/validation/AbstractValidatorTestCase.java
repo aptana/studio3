@@ -16,32 +16,35 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.tests.util.TestProject;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ParseState;
 
 public abstract class AbstractValidatorTestCase extends TestCase
 {
 
-	protected abstract AbstractBuildParticipant createValidator();
+	protected AbstractBuildParticipant fValidator;
 
-	protected void setEnableParseError(boolean enabled, String language)
+	@Override
+	protected void setUp() throws Exception
 	{
-		// Set enable parse errors preference
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		store.putBoolean(getEnableParseErrorPrefKey(language), enabled);
+		super.setUp();
+		fValidator = createValidator();
 	}
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		fValidator = null;
+		super.tearDown();
+	}
+
+	protected abstract AbstractBuildParticipant createValidator();
 
 	protected List<IProblem> getParseErrors(String source, IParseState ps, String markerType) throws CoreException
 	{
@@ -49,7 +52,6 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		IFile file = project.createFile("parseErrorTest." + getFileExtension(), source);
 
 		BuildContext context = new BuildContext(file);
-		AbstractBuildParticipant fValidator = createValidator();
 		fValidator.buildFile(context, new NullProgressMonitor());
 
 		project.delete();
@@ -69,9 +71,4 @@ public abstract class AbstractValidatorTestCase extends TestCase
 	 * @return
 	 */
 	protected abstract String getFileExtension();
-
-	protected String getEnableParseErrorPrefKey(String language)
-	{
-		return language + ":" + IPreferenceConstants.PARSE_ERROR_ENABLED;
-	}
 }

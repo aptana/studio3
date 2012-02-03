@@ -41,7 +41,6 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "div#paginator {\nfloat: left\nwidth: 65px\n}";
 
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
 
@@ -50,14 +49,5 @@ public class CSSParserValidatorTest extends AbstractValidatorTestCase
 		assertEquals("Error was not found on expected line", 3, item.getLineNumber());
 		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \":\"",
 				item.getMessage());
-	}
-
-	public void testNoCSSParseErrors() throws CoreException
-	{
-		String text = "div#paginator {\nfloat: left;\nwidth: 65px\n}";
-
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
-		List<IProblem> items = getParseErrors(text);
-		assertEquals(0, items.size());
 	}
 }

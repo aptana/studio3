@@ -6,18 +6,19 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.build.IProblem;
+import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
-
-import junit.framework.TestCase;
 
 public class JSTaskDetectorTest extends TestCase
 {
@@ -52,7 +53,7 @@ public class JSTaskDetectorTest extends TestCase
 			File coffeeFile = new File(tmpDir, "index_me.js");
 			IOUtil.write(new FileOutputStream(coffeeFile), src);
 			IFileStore fileStore = EFS.getStore(coffeeFile.toURI());
-			
+
 			BuildContext context = new FileStoreBuildContext(fileStore)
 			{
 				@Override
@@ -64,8 +65,8 @@ public class JSTaskDetectorTest extends TestCase
 			indexer.buildFile(context, new NullProgressMonitor());
 
 			Map<String, Collection<IProblem>> problems = context.getProblems();
-			assertTrue(problems.containsKey(IMarker.TASK));
-			Collection<IProblem> tasks = problems.get(IMarker.TASK);			
+			assertTrue(problems.containsKey(IMarkerConstants.TASK_MARKER));
+			Collection<IProblem> tasks = problems.get(IMarkerConstants.TASK_MARKER);
 			assertEquals(1, tasks.size());
 			Iterator<IProblem> iter = tasks.iterator();
 			IProblem task = iter.next();

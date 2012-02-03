@@ -16,21 +16,10 @@ import com.aptana.core.internal.build.BuildParticipantManager;
 public class BuildPathCorePlugin extends Plugin
 {
 	private static BuildPathCorePlugin plugin;
-	private static BundleContext context;
 
 	public static final String PLUGIN_ID = "com.aptana.buildpath.core"; //$NON-NLS-1$
 
 	private IBuildParticipantManager fBuildParticipantManager;
-
-	/**
-	 * Returns the bundle context
-	 * 
-	 * @return the bundle context
-	 */
-	static BundleContext getContext()
-	{
-		return context;
-	}
 
 	/**
 	 * Returns the shared instance
@@ -48,7 +37,6 @@ public class BuildPathCorePlugin extends Plugin
 	 */
 	public void start(BundleContext bundleContext) throws Exception
 	{
-		BuildPathCorePlugin.context = bundleContext;
 		super.start(bundleContext);
 		plugin = this;
 	}
@@ -61,8 +49,7 @@ public class BuildPathCorePlugin extends Plugin
 	{
 		fBuildParticipantManager = null;
 		plugin = null;
-		super.stop(context);
-		BuildPathCorePlugin.context = null;
+		super.stop(bundleContext);
 	}
 
 	public synchronized IBuildParticipantManager getBuildParticipantManager()

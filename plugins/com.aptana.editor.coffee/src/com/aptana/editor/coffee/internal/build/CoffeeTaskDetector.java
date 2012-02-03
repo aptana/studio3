@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -19,6 +18,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.coffee.CoffeeScriptEditorPlugin;
 import com.aptana.editor.coffee.parsing.ast.CoffeeCommentNode;
@@ -35,13 +35,21 @@ public class CoffeeTaskDetector extends RequiredBuildParticipant
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
+		if (context == null)
+		{
+			return;
+		}
 		Collection<IProblem> tasks = detectTasks(context, monitor);
-		context.putProblems(IMarker.TASK, tasks);
+		context.putProblems(IMarkerConstants.TASK_MARKER, tasks);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
-		context.removeProblems(IMarker.TASK);
+		if (context == null)
+		{
+			return;
+		}
+		context.removeProblems(IMarkerConstants.TASK_MARKER);
 	}
 
 	private Collection<IProblem> detectTasks(BuildContext context, IProgressMonitor monitor)

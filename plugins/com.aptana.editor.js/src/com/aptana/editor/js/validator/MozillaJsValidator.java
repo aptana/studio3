@@ -9,23 +9,20 @@ package com.aptana.editor.js.validator;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Parser;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -33,8 +30,6 @@ import com.aptana.index.core.build.BuildContext;
 public class MozillaJsValidator extends AbstractBuildParticipant
 {
 	public static final String ID = "com.aptana.editor.js.validator.MozillaValidator"; //$NON-NLS-1$
-
-	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
@@ -57,7 +52,11 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 		Context cx = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
 		URI path = context.getURI();
-		String sourcePath = path.toString();
+		String sourcePath = context.getName();
+		if (path != null)
+		{
+			sourcePath = path.toString();
+		}
 		try
 		{
 			String source = context.getContents();
@@ -86,51 +85,28 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 			Context.exit();
 		}
 
-		// converts the items from mozilla's error reporter to the ones stored in validation manager
-		List<ErrorItem> errors = reporter.getItems();
-		String message;
-		int severity;
-		for (ErrorItem error : errors)
+		// Filter the problems...
+		List<String> filters = getFilters();
+		List<IProblem> errors = reporter.getItems();
+		for (IProblem error : errors)
 		{
-			message = error.getMessage();
-			if (!isIgnored(message, IJSConstants.CONTENT_TYPE_JS))
+			String message = error.getMessage();
+			if (!isIgnored(message, filters))
 			{
 				// Don't attempt to add errors or warnings if there are already errors on this line
-				if (hasErrorOrWarningOnLine(problems, error.getLine()))
+				if (hasErrorOrWarningOnLine(problems, error.getLineNumber()))
 				{
 					continue;
 				}
-
-				severity = error.getSeverity();
-				if (severity == IMarker.SEVERITY_ERROR)
-				{
-					problems.add(createError(message, error.getLine(), error.getLineOffset(), 0, sourcePath));
-				}
-				else if (severity == IMarker.SEVERITY_WARNING)
-				{
-					problems.add(createWarning(message, error.getLine(), error.getLineOffset(), 0, sourcePath));
-				}
+				problems.add(error);
 			}
 		}
 
 		context.putProblems(IJSConstants.MOZILLA_PROBLEM_MARKER_TYPE, problems);
 	}
 
-	private String getFilterExpressionsPrefKey(String language)
+	private boolean isIgnored(String message, List<String> expressions)
 	{
-		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
-	}
-
-	private boolean isIgnored(String message, String language)
-	{
-		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-				.getString(getFilterExpressionsPrefKey(language));
-		if (StringUtil.isEmpty(list))
-		{
-			return false;
-		}
-
-		String[] expressions = fgFilterExpressionDelimiter.split(list);
 		for (String expression : expressions)
 		{
 			if (message.matches(expression))
@@ -140,5 +116,36 @@ public class MozillaJsValidator extends AbstractBuildParticipant
 		}
 
 		return false;
+	}
+
+	private class DefaultErrorReporter implements ErrorReporter
+	{
+		private List<IProblem> items = new ArrayList<IProblem>();
+
+		public DefaultErrorReporter()
+		{
+			items = new ArrayList<IProblem>();
+		}
+
+		public void error(String message, String sourceURI, int line, String lineText, int lineOffset)
+		{
+			items.add(createError(message, line, lineOffset, 0, sourceURI));
+		}
+
+		public void warning(String message, String sourceURI, int line, String lineText, int lineOffset)
+		{
+			items.add(createWarning(message, line, lineOffset, 0, sourceURI));
+		}
+
+		public EvaluatorException runtimeError(String message, String sourceURI, int line, String lineText,
+				int lineOffset)
+		{
+			return new EvaluatorException(message, sourceURI, line, lineText, lineOffset);
+		}
+
+		public List<IProblem> getItems()
+		{
+			return Collections.unmodifiableList(items);
+		}
 	}
 }

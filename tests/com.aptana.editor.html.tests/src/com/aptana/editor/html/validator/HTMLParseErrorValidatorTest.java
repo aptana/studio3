@@ -37,7 +37,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n<video />\n</body>\n</html>\n";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
 		IProblem item = items.get(0);
@@ -51,7 +50,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<title>test\n<body>\n</body>\n</html>";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
 		assertContains(items, "Missing end tag </title>");
@@ -73,7 +71,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n</body>\n</html>";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
 	}
@@ -81,9 +78,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	public void testHTMLEmbeddedCSSParseError() throws CoreException
 	{
 		String text = "<html>\n<style>\ndiv#paginator {\nfloat: left\nwidth: 65px\n}\n</style>\n<title>test</title>\n<body></body>\n</html>";
-
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
 
 		List<IProblem> htmlProblems = getParseErrors(text);
 		assertEquals(0, htmlProblems.size());
@@ -101,9 +95,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<style>\ndiv#paginator {\nfloat: left;\nwidth: 65px\n}\n</style>\n<title>test</title>\n<body></body>\n</html>";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, ICSSConstants.CONTENT_TYPE_CSS);
-
 		List<IProblem> items = getParseErrors(text);
 		assertEquals("A validation error was found in valid html with embedded css", 0, items.size());
 
@@ -115,9 +106,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "<html>\n<script>\nvar foo = function() {\nhello();\n};\n</script>\n<title>test</title>\n<body></body>\n</html>";
 
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
-
 		List<IProblem> htmlProblems = getParseErrors(text);
 		assertEquals(0, htmlProblems.size());
 
@@ -128,9 +116,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 	public void testHTMLEmbeddedJSParseError() throws CoreException
 	{
 		String text = "<html>\n<script>\nvar foo = function() {\nhello()\n};\n</script>\n<title>test</title>\n<body></body>\n</html>";
-
-		setEnableParseError(true, IHTMLConstants.CONTENT_TYPE_HTML);
-		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
 
 		List<IProblem> htmlProblems = getParseErrors(text);
 		assertEquals(0, htmlProblems.size());

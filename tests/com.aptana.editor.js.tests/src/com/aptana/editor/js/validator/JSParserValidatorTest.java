@@ -36,8 +36,6 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 	{
 		String text = "var foo = function() {\nhello()\n};";
 
-		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
-
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(1, items.size());
 		IProblem item = items.get(0);
@@ -47,17 +45,16 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 				item.getMessage());
 	}
 
-	protected List<IProblem> getParseErrors(String source) throws CoreException
-	{
-		return getParseErrors(source, new JSParseState(), IJSConstants.JS_PROBLEM_MARKER_TYPE);
-	}
-
 	public void testNoJSParseErrors() throws CoreException
 	{
 		String text = "var foo = function() {\nhello();\n};";
 
-		setEnableParseError(true, IJSConstants.CONTENT_TYPE_JS);
 		List<IProblem> items = getParseErrors(text);
 		assertEquals(0, items.size());
+	}
+
+	protected List<IProblem> getParseErrors(String source) throws CoreException
+	{
+		return getParseErrors(source, new JSParseState(), IJSConstants.JS_PROBLEM_MARKER_TYPE);
 	}
 }

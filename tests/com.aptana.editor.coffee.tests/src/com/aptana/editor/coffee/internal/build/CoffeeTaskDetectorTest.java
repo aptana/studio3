@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.build.IProblem;
+import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
@@ -60,8 +61,8 @@ public class CoffeeTaskDetectorTest extends TestCase
 			taskDetector.buildFile(context, new NullProgressMonitor());
 
 			Map<String, Collection<IProblem>> problems = context.getProblems();
-			assertTrue(problems.containsKey(IMarker.TASK));
-			Collection<IProblem> tasks = problems.get(IMarker.TASK);
+			assertTrue(problems.containsKey(IMarkerConstants.TASK_MARKER));
+			Collection<IProblem> tasks = problems.get(IMarkerConstants.TASK_MARKER);
 			assertEquals(1, tasks.size());
 			IProblem task = tasks.iterator().next();
 			assertEquals("TODO This is a task", task.getMessage());
@@ -105,10 +106,10 @@ public class CoffeeTaskDetectorTest extends TestCase
 			};
 
 			taskDetector.buildFile(context, new NullProgressMonitor());
-			
+
 			Map<String, Collection<IProblem>> problems = context.getProblems();
-			assertTrue(problems.containsKey(IMarker.TASK));
-			Collection<IProblem> tasks = problems.get(IMarker.TASK);
+			assertTrue(problems.containsKey(IMarkerConstants.TASK_MARKER));
+			Collection<IProblem> tasks = problems.get(IMarkerConstants.TASK_MARKER);
 			assertEquals(0, tasks.size());
 		}
 		finally

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -19,6 +18,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
@@ -44,7 +44,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 		}
 
 		Collection<IProblem> tasks = detectTasks(context, monitor);
-		context.putProblems(IMarker.TASK, tasks);
+		context.putProblems(IMarkerConstants.TASK_MARKER, tasks);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
@@ -54,7 +54,7 @@ public class JSTaskDetector extends RequiredBuildParticipant
 			return;
 		}
 
-		context.removeProblems(IMarker.TASK);
+		context.removeProblems(IMarkerConstants.TASK_MARKER);
 	}
 
 	private Collection<IProblem> detectTasks(BuildContext context, IProgressMonitor monitor)

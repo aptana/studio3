@@ -10,14 +10,12 @@ package com.aptana.editor.js.validator;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -35,11 +33,7 @@ import org.mozilla.javascript.optimizer.Codegen;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StreamUtil;
-import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.index.core.build.BuildContext;
@@ -47,8 +41,6 @@ import com.aptana.index.core.build.BuildContext;
 public class JSLintValidator extends AbstractBuildParticipant
 {
 	public static final String ID = "com.aptana.editor.js.validator.JSLintValidator"; //$NON-NLS-1$
-	
-	private static final Pattern fgFilterExpressionDelimiter = Pattern.compile("####"); //$NON-NLS-1$
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script JS_LINT_SCRIPT;
@@ -61,44 +53,29 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 
 		List<IProblem> problems = new ArrayList<IProblem>();
-		if (jsLintEnabled())
+
+		try
 		{
+			String source = context.getContents();
+			URI uri = context.getURI();
+			String sourcePath = uri.toString();
+
+			Context cContext = Context.enter();
 			try
 			{
-				String source = context.getContents();
-				URI uri = context.getURI();
-				String sourcePath = uri.toString();
-
-				Context cContext = Context.enter();
-				try
-				{
-					DefaultErrorReporter reporter = new DefaultErrorReporter();
-					cContext.setErrorReporter(reporter);
-					parseWithLint(cContext, source, sourcePath, problems);
-				}
-				finally
-				{
-					Context.exit();
-				}
+				parseWithLint(cContext, source, sourcePath, problems);
 			}
-			catch (Exception e)
+			finally
 			{
-				IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JSLint", e); //$NON-NLS-1$
+				Context.exit();
 			}
 		}
-		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
-	}
+		catch (Exception e)
+		{
+			IdeLog.logError(JSPlugin.getDefault(), "Failed to parse for JSLint", e); //$NON-NLS-1$
+		}
 
-	private boolean jsLintEnabled()
-	{
-		// FIXME We shouldn't be storing translatable names in prefs like this. Use ids, store under sub-nodes per
-		// langauge or something?
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		String result = prefs
-				.get(MessageFormat.format(
-						"{0}:{1}", IJSConstants.CONTENT_TYPE_JS, IPreferenceConstants.SELECTED_VALIDATORS), //$NON-NLS-1$
-						"JSLint JavaScript Validator"); //$NON-NLS-1$
-		return result.indexOf("JSLint JavaScript Validator") != -1; //$NON-NLS-1$
+		context.putProblems(IJSConstants.JSLINT_PROBLEM_MARKER_TYPE, problems);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
@@ -151,6 +128,8 @@ public class JSLintValidator extends AbstractBuildParticipant
 					lastIsError = true;
 				}
 
+				List<String> filters = getFilters();
+
 				NativeObject object;
 				int line;
 				String reason;
@@ -171,7 +150,7 @@ public class JSLintValidator extends AbstractBuildParticipant
 							continue;
 						}
 
-						if (!isIgnored(reason, IJSConstants.CONTENT_TYPE_JS))
+						if (!isIgnored(reason, filters))
 						{
 							if (doc == null)
 							{
@@ -201,21 +180,8 @@ public class JSLintValidator extends AbstractBuildParticipant
 		}
 	}
 
-	private String getFilterExpressionsPrefKey(String language)
+	private boolean isIgnored(String message, List<String> expressions)
 	{
-		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
-	}
-
-	private boolean isIgnored(String message, String language)
-	{
-		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-				.getString(getFilterExpressionsPrefKey(language));
-		if (StringUtil.isEmpty(list))
-		{
-			return false;
-		}
-
-		String[] expressions = fgFilterExpressionDelimiter.split(list);
 		for (String expression : expressions)
 		{
 			if (message.matches(expression))
@@ -277,7 +243,6 @@ public class JSLintValidator extends AbstractBuildParticipant
 		{
 			Context.exit();
 		}
-
 		return null;
 	}
 }

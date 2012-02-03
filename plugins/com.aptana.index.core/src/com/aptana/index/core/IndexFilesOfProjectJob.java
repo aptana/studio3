@@ -30,6 +30,7 @@ import com.aptana.core.logging.IdeLog;
  * 
  * @author cwilliams
  */
+// TODO Remove this entirely! It's only used in one place!
 public class IndexFilesOfProjectJob extends IndexRequestJob
 {
 
@@ -102,7 +103,9 @@ public class IndexFilesOfProjectJob extends IndexRequestJob
 			{
 				IFileStore store = EFS.getStore(file.getLocationURI());
 				if (store == null)
+				{
 					continue;
+				}
 				fileStores.add(store);
 			}
 			catch (CoreException e)

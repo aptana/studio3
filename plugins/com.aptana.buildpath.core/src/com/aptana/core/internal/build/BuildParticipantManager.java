@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
+import com.aptana.core.IFilter;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IBuildParticipantManager;
 import com.aptana.core.logging.IdeLog;
@@ -133,18 +134,15 @@ public class BuildParticipantManager implements IBuildParticipantManager
 	 * Given a list of already instantiated {@link IBuildParticipant}s, and a contentTypeId, we filter the list down to
 	 * the participants that apply for this content type.
 	 */
-	public List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, String contentTypeId)
+	public List<IBuildParticipant> filterParticipants(List<IBuildParticipant> participants, final String contentTypeId)
 	{
-		ArrayList<IBuildParticipant> filtered = new ArrayList<IBuildParticipant>(participants.size());
-		for (IBuildParticipant participant : participants)
+		return CollectionsUtil.filter(participants, new IFilter<IBuildParticipant>()
 		{
-			if (hasType(contentTypeId, participant.getContentTypes()))
+			public boolean include(IBuildParticipant item)
 			{
-				filtered.add(participant);
+				return hasType(contentTypeId, item.getContentTypes());
 			}
-		}
-		filtered.trimToSize();
-		return filtered;
+		});
 	}
 
 	private IBuildParticipant createParticipant(IConfigurationElement ice, Set<IContentType> contentTypes)
@@ -162,7 +160,7 @@ public class BuildParticipantManager implements IBuildParticipantManager
 	 */
 	private boolean hasType(String contentTypeId, Set<IContentType> types)
 	{
-		if (types == null || types.isEmpty())
+		if (CollectionsUtil.isEmpty(types))
 		{
 			// FIXME this means if no content type binding is specified then we assume the build participant is valid
 			// for all types!
@@ -194,7 +192,8 @@ public class BuildParticipantManager implements IBuildParticipantManager
 			final Map<IConfigurationElement, Set<IContentType>> map = new HashMap<IConfigurationElement, Set<IContentType>>();
 			final IContentTypeManager manager = Platform.getContentTypeManager();
 
-			// TODO Combine the same logic/constants for dealing with children content types from AbstractBuildParticipant!
+			// TODO Combine the same logic/constants for dealing with children content types from
+			// AbstractBuildParticipant!
 			EclipseUtil.processConfigurationElements(BuildPathCorePlugin.PLUGIN_ID, EXTENSION_ID,
 					new IConfigurationElementProcessor()
 					{

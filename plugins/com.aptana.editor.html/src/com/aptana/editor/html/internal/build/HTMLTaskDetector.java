@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.internal.build.CSSTaskDetector;
@@ -52,7 +53,7 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 		}
 
 		Collection<IProblem> tasks = detectTasks(context, monitor);
-		context.putProblems(IMarker.TASK, tasks);
+		context.putProblems(IMarkerConstants.TASK_MARKER, tasks);
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)
@@ -62,7 +63,7 @@ public class HTMLTaskDetector extends RequiredBuildParticipant
 			return;
 		}
 
-		context.removeProblems(IMarker.TASK);
+		context.removeProblems(IMarkerConstants.TASK_MARKER);
 	}
 
 	private Collection<IProblem> detectTasks(BuildContext context, IProgressMonitor monitor)

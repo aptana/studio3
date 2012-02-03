@@ -8,7 +8,6 @@
 package com.aptana.editor.html.validator;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,16 +16,12 @@ import java.util.Map;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.build.Problem;
 import com.aptana.core.build.RequiredBuildParticipant;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
@@ -45,7 +40,7 @@ public class HTMLParseErrorValidator extends RequiredBuildParticipant
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
-		if (context == null || !enableHTMLParseErrors())
+		if (context == null)
 		{
 			return;
 		}
@@ -91,17 +86,6 @@ public class HTMLParseErrorValidator extends RequiredBuildParticipant
 		context.putProblems(IHTMLConstants.HTML_PROBLEM, problems.get(IHTMLConstants.CONTENT_TYPE_HTML));
 		context.putProblems(IJSConstants.JS_PROBLEM_MARKER_TYPE, problems.get(IJSConstants.CONTENT_TYPE_JS));
 		context.putProblems(ICSSConstants.CSS_PROBLEM, problems.get(ICSSConstants.CONTENT_TYPE_CSS));
-	}
-
-	private boolean enableHTMLParseErrors()
-	{
-		IEclipsePreferences store = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		return store.getBoolean(getEnableParseErrorPrefKey(IHTMLConstants.CONTENT_TYPE_HTML), true);
-	}
-
-	private String getEnableParseErrorPrefKey(String language)
-	{
-		return MessageFormat.format("{0}:{1}", language, IPreferenceConstants.PARSE_ERROR_ENABLED); //$NON-NLS-1$
 	}
 
 	public void deleteFile(BuildContext context, IProgressMonitor monitor)

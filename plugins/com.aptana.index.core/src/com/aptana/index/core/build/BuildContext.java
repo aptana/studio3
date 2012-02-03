@@ -1,5 +1,6 @@
 package com.aptana.index.core.build;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
@@ -9,15 +10,19 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
 
 import com.aptana.core.build.IProblem;
+import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.parsing.IParseState;
@@ -50,7 +55,12 @@ public class BuildContext
 
 	public IProject getProject()
 	{
-		return getFile().getProject();
+		IFile file = getFile();
+		if (file == null)
+		{
+			return null;
+		}
+		return file.getProject();
 	}
 
 	public IFile getFile()
@@ -60,7 +70,12 @@ public class BuildContext
 
 	public URI getURI()
 	{
-		return getFile().getLocationURI();
+		IFile file = getFile();
+		if (file == null)
+		{
+			return null;
+		}
+		return file.getLocationURI();
 	}
 
 	public IParseRootNode getAST() throws CoreException
@@ -143,14 +158,19 @@ public class BuildContext
 
 	protected String getCharset() throws CoreException
 	{
-		return getFile().getCharset(true);
+		IFile file = getFile();
+		if (file == null)
+		{
+			return null;
+		}
+		return file.getCharset(true);
 	}
 
 	public String getContentType() throws CoreException
 	{
 		// TODO Cache this?
 		IContentType[] types = getContentTypes();
-		if (types == null || types.length == 0)
+		if (ArrayUtil.isEmpty(types))
 		{
 			return null;
 		}
@@ -159,13 +179,45 @@ public class BuildContext
 
 	protected IContentType[] getContentTypes() throws CoreException
 	{
-		IContentTypeMatcher matcher = getProject().getContentTypeMatcher();
-		return matcher.findContentTypesFor(getName());
+		IProject theProject = getProject();
+		if (theProject != null)
+		{
+			IContentTypeMatcher matcher = theProject.getContentTypeMatcher();
+			return matcher.findContentTypesFor(getName());
+		}
+
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		if (ArrayUtil.isEmpty(projects))
+		{
+			return Platform.getContentTypeManager().findContentTypesFor(getName());
+		}
+
+		for (IProject project : projects)
+		{
+			try
+			{
+				IContentType[] type = project.getContentTypeMatcher().findContentTypesFor(getName());
+				if (type != null)
+				{
+					return type;
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(IndexPlugin.getDefault(), e);
+			}
+		}
+		return NO_CONTENT_TYPES;
 	}
 
 	public String getName()
 	{
-		return getFile().getName();
+		IFile file = getFile();
+		if (file == null)
+		{
+			return null;
+		}
+		return file.getName();
 	}
 
 	public void removeProblems(String markerType)
@@ -199,6 +251,11 @@ public class BuildContext
 
 	public InputStream openInputStream(IProgressMonitor monitor) throws CoreException
 	{
-		return getFile().getContents();
+		IFile file = getFile();
+		if (file == null)
+		{
+			return new ByteArrayInputStream(new byte[0]);
+		}
+		return file.getContents();
 	}
 }

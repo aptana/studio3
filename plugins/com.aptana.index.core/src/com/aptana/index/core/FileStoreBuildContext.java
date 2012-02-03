@@ -15,16 +15,11 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.core.build.IProblem;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.index.core.build.BuildContext;
 
 /**
@@ -57,32 +52,6 @@ public class FileStoreBuildContext extends BuildContext
 	public IFile getFile()
 	{
 		return null;
-	}
-
-	protected IContentType[] getContentTypes()
-	{
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		if (projects == null || projects.length == 0)
-		{
-			IContentTypeManager manager = Platform.getContentTypeManager();
-			return manager.findContentTypesFor(getName());
-		}
-		for (IProject project : projects)
-		{
-			try
-			{
-				IContentType[] type = project.getContentTypeMatcher().findContentTypesFor(getName());
-				if (type != null)
-				{
-					return type;
-				}
-			}
-			catch (CoreException e)
-			{
-				IdeLog.logError(IndexPlugin.getDefault(), e);
-			}
-		}
-		return NO_CONTENT_TYPES;
 	}
 
 	@Override

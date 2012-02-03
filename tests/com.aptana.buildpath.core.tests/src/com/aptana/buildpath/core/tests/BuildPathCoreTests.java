@@ -4,8 +4,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.aptana.core.build.AbstractBuildParticipantTest;
-import com.aptana.core.build.BuildParticipantManagerTest;
+import com.aptana.buildpath.core.BuildPathEntryTest;
+import com.aptana.core.build.CoreBuildTests;
+import com.aptana.core.internal.build.InternalBuildTests;
 
 public class BuildPathCoreTests extends TestCase
 {
@@ -14,8 +15,9 @@ public class BuildPathCoreTests extends TestCase
 	{
 		TestSuite suite = new TestSuite(BuildPathCoreTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(AbstractBuildParticipantTest.class);
-		suite.addTestSuite(BuildParticipantManagerTest.class);
+		suite.addTest(CoreBuildTests.suite());
+		suite.addTest(InternalBuildTests.suite());
+		suite.addTestSuite(BuildPathEntryTest.class);
 		// $JUnit-END$
 		return suite;
 	}

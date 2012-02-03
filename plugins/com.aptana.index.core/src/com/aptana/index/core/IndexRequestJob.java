@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
@@ -92,9 +91,9 @@ abstract class IndexRequestJob extends Job
 	 */
 	protected Set<IFileStore> filterFileStores(Set<IFileStore> fileStores)
 	{
-		if (fileStores != null && fileStores.isEmpty() == false)
+		if (!CollectionsUtil.isEmpty(fileStores))
 		{
-			for (IIndexFilterParticipant filterParticipant : this.getFilterParticipants())
+			for (IIndexFilterParticipant filterParticipant : getFilterParticipants())
 			{
 				fileStores = filterParticipant.applyFilter(fileStores);
 			}
@@ -127,7 +126,7 @@ abstract class IndexRequestJob extends Job
 		{
 			Set<IFileStore> files = contributor.getFiles(container);
 
-			if (files != null && !files.isEmpty())
+			if (!CollectionsUtil.isEmpty(files))
 			{
 				result.addAll(files);
 			}
@@ -141,7 +140,7 @@ abstract class IndexRequestJob extends Job
 	 * 
 	 * @return
 	 */
-	private List<IIndexFileContributor> getFileContributors()
+	private synchronized List<IIndexFileContributor> getFileContributors()
 	{
 		if (fileContributors == null)
 		{
@@ -180,7 +179,7 @@ abstract class IndexRequestJob extends Job
 	 * 
 	 * @return
 	 */
-	private List<IIndexFilterParticipant> getFilterParticipants()
+	private synchronized List<IIndexFilterParticipant> getFilterParticipants()
 	{
 		if (filterParticipants == null)
 		{
@@ -220,34 +219,12 @@ abstract class IndexRequestJob extends Job
 	 */
 	protected Index getIndex()
 	{
-		return IndexManager.getInstance().getIndex(getContainerURI());
+		return getIndexManager().getIndex(getContainerURI());
 	}
 
-	/**
-	 * hasTypes
-	 * 
-	 * @param store
-	 * @param types
-	 * @return
-	 */
-	protected boolean hasType(IFileStore store, Set<IContentType> types)
+	protected IndexManager getIndexManager()
 	{
-		if (types == null || types.isEmpty())
-		{
-			return false;
-		}
-		for (IContentType type : types)
-		{
-			if (type == null)
-			{
-				continue;
-			}
-			if (type.isAssociatedWith(store.getName()))
-			{
-				return true;
-			}
-		}
-		return false;
+		return IndexManager.getInstance();
 	}
 
 	/**
@@ -262,9 +239,13 @@ abstract class IndexRequestJob extends Job
 	protected void indexFileStores(Index index, Set<IFileStore> fileStores, IProgressMonitor monitor)
 			throws CoreException
 	{
-		fileStores = this.filterFileStores(fileStores);
+		if (index == null)
+		{
+			return;
+		}
 
-		if (index == null || fileStores == null || fileStores.isEmpty())
+		fileStores = filterFileStores(fileStores);
+		if (CollectionsUtil.isEmpty(fileStores))
 		{
 			return;
 		}
@@ -285,7 +266,7 @@ abstract class IndexRequestJob extends Job
 
 				// Now run indexers on file
 				List<IFileStoreIndexingParticipant> indexers = getIndexParticipants(file);
-				if (indexers != null && !indexers.isEmpty())
+				if (!CollectionsUtil.isEmpty(indexers))
 				{
 					int work = 10 / indexers.size();
 					BuildContext context = new FileStoreBuildContext(file);
@@ -318,7 +299,7 @@ abstract class IndexRequestJob extends Job
 
 	protected List<IFileStoreIndexingParticipant> getIndexParticipants(IFileStore file)
 	{
-		return IndexManager.getInstance().getIndexParticipants(file.getName());
+		return getIndexManager().getIndexParticipants(file.getName());
 	}
 
 }

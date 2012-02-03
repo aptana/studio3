@@ -10,8 +10,6 @@ package com.aptana.index.core;
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,12 +23,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 
 public class IndexContainerJob extends IndexRequestJob
 {
-
-	private ArrayList<String> fileURIs;
 
 	protected IndexContainerJob(URI containerURI)
 	{
@@ -58,10 +58,11 @@ public class IndexContainerJob extends IndexRequestJob
 					MessageFormat.format("Index is null for container: {0}", getContainerURI())); //$NON-NLS-1$
 			return Status.CANCEL_STATUS;
 		}
+
 		try
 		{
 			// Collect the full set of files in the project...
-			Set<IFileStore> files = addFiles(EFS.getStore(getContainerURI()), sub.newChild(100));
+			Set<IFileStore> files = addFiles(getContainerFileStore(), sub.newChild(100));
 			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
@@ -73,32 +74,37 @@ public class IndexContainerJob extends IndexRequestJob
 
 			// Checks what's in the index, and if any of the files in there no longer exist, we now remove them...
 			Set<String> documents = index.queryDocumentNames(null);
-			removeDeletedFiles(index, documents, files);
-			sub.worked(100);
-
-			// Ok, we removed files, and now if there's none left in project we can just end here.
-			if (files == null || files.isEmpty())
-			{
-				return Status.OK_STATUS;
-			}
+			sub.worked(25);
 			if (sub.isCanceled())
 			{
 				return Status.CANCEL_STATUS;
+			}
+			removeDeletedFiles(index, documents, files, sub.newChild(75));
+
+			// Ok, we removed files, and now if there's none left in project we can just end here.
+			if (CollectionsUtil.isEmpty(files))
+			{
+				return Status.OK_STATUS;
 			}
 
 			// Should check timestamp of index versus timestamps of files, only index files that are out of date
 			// (for Ruby)!
 			long timestamp = 0L;
-			if (documents != null && documents.size() > 0)
+			if (!CollectionsUtil.isEmpty(documents))
 			{
 				// If there's nothing in the index, index everything; otherwise use last modified time of index to
 				// filter...
 				timestamp = index.getIndexFile().lastModified();
 			}
-			files = filterFiles(timestamp, files);
+
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			files = filterFilesByTimestamp(timestamp, files);
 			sub.worked(50);
 
-			if (files != null && !files.isEmpty())
+			if (!CollectionsUtil.isEmpty(files))
 			{
 				indexFileStores(index, files, sub.newChild(750));
 			}
@@ -126,8 +132,23 @@ public class IndexContainerJob extends IndexRequestJob
 		return Status.OK_STATUS;
 	}
 
+	protected IFileStore getContainerFileStore() throws CoreException
+	{
+		return EFS.getStore(getContainerURI());
+	}
+
+	/**
+	 * Given an {@link IFileStore}, we traverse to add all files underneath it. This method is recursive, traversing
+	 * into sub-directories. TODO Combine with logic from EFSUtils in core.io!
+	 * 
+	 * @param file
+	 * @param monitor
+	 * @return
+	 */
 	private Set<IFileStore> addFiles(IFileStore file, IProgressMonitor monitor)
 	{
+		// TODO We should likely call IFileSystem.fetchTree and use that if it doesn't return null (because that is more
+		// efficient in some schemes)!
 		SubMonitor sub = SubMonitor.convert(monitor, 10);
 		Set<IFileStore> files = new HashSet<IFileStore>();
 		try
@@ -141,13 +162,17 @@ public class IndexContainerJob extends IndexRequestJob
 			{
 				return files;
 			}
+			// We know it exists...
 			if (info.isDirectory())
 			{
 				try
 				{
+					// Now try to dive into directory and add all children recursively
 					IFileStore[] fileList = file.childStores(EFS.NONE, sub.newChild(2));
-					if (fileList == null || fileList.length == 0)
+					if (ArrayUtil.isEmpty(fileList))
+					{
 						return files;
+					}
 					for (IFileStore child : fileList)
 					{
 						files.addAll(addFiles(child, sub.newChild(7)));
@@ -160,10 +185,8 @@ public class IndexContainerJob extends IndexRequestJob
 			}
 			else
 			{
-				if (info.exists())
-				{
-					files.add(file);
-				}
+				// it's a file that exists, base case, add it.
+				files.add(file);
 			}
 		}
 		catch (CoreException e)
@@ -177,47 +200,59 @@ public class IndexContainerJob extends IndexRequestJob
 		return files;
 	}
 
-	private void removeDeletedFiles(Index index, Set<String> documents, Set<IFileStore> files)
+	// TODO Combine this with RemoveFilesOfIndexJob logic?
+	private void removeDeletedFiles(Index index, Set<String> documents, Set<IFileStore> files, IProgressMonitor monitor)
 	{
+		if (CollectionsUtil.isEmpty(documents))
+		{
+			return;
+		}
+
+		SubMonitor sub = SubMonitor.convert(monitor, files.size() + documents.size());
+
+		// Turn list of file stores into set of unique URI strings
+		List<String> fileStoreURIs = CollectionsUtil.map(files, new IMap<IFileStore, String>()
+		{
+			@Override
+			public String map(IFileStore item)
+			{
+				return item.toURI().toString();
+			}
+		});
+		Set<String> uris = new HashSet<String>(fileStoreURIs);
+		sub.worked(files.size());
+
+		// Now remove any document from index that isn't in the file listing.
 		for (String docName : documents)
 		{
-			if (!fileExists(files, docName))
+			if (!uris.contains(docName))
 			{
 				index.remove(URI.create(docName));
 			}
+			sub.worked(1);
 		}
+		sub.done();
 	}
 
-	protected Set<IFileStore> filterFiles(long indexLastModified, Set<IFileStore> files)
+	/**
+	 * Filters the set of {@link IFileStore}s to those whose lastMod is at or after the passed in mod timestamp.
+	 * 
+	 * @param indexLastModified
+	 * @param files
+	 * @return
+	 */
+	protected Set<IFileStore> filterFilesByTimestamp(final long indexLastModified, Set<IFileStore> files)
 	{
-		Set<IFileStore> filtered = new HashSet<IFileStore>();
-		for (IFileStore file : files)
+		Set<IFileStore> filtered = new HashSet<IFileStore>(files.size());
+		CollectionsUtil.filter(files, filtered, new IFilter<IFileStore>()
 		{
-			if (file.fetchInfo().getLastModified() >= indexLastModified)
+			@Override
+			public boolean include(IFileStore item)
 			{
-				filtered.add(file);
+				return item.fetchInfo().getLastModified() >= indexLastModified;
 			}
-		}
+		});
 		return filtered;
-	}
-
-	private boolean fileExists(Set<IFileStore> files, String lastString)
-	{
-		return Collections.binarySearch(getFileURIs(files), lastString) >= 0;
-	}
-
-	private List<? extends String> getFileURIs(Set<IFileStore> files)
-	{
-		if (fileURIs == null)
-		{
-			fileURIs = new ArrayList<String>();
-			for (IFileStore store : files)
-			{
-				fileURIs.add(store.toURI().toString());
-			}
-			Collections.sort(fileURIs);
-		}
-		return fileURIs;
 	}
 
 }
