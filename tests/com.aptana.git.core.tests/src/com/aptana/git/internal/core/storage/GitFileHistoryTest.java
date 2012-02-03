@@ -86,6 +86,7 @@ public class GitFileHistoryTest extends GitTestCase
 			assertNotNull("Expected a non-null list of changes to stage", toStage);
 			assertTrue("Expected at least one change to stage, but there are none", toStage.size() > 0);
 
+			// FIXME Can we wait until any async refreshes are done?
 			assertStageFiles(index, toStage);
 			assertCommit(index, contents);
 		}
