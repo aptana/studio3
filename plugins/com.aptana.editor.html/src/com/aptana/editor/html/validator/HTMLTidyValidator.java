@@ -50,7 +50,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED = { "lacks \"type\" attribute", "lacks \"summary\" attribute",
-			"replacing illegal character code" };
+			"replacing illegal character code", "video is not recognized!" };
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
