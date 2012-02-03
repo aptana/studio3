@@ -15,7 +15,9 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -81,7 +83,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		if (this._registered == false)
 		{
 			// begin monitoring resource changes
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
+					IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 
 			// Make sure the user bundles directory exists
 			String userBundlesPath = BundleManager.getInstance().getUserBundlesPath();
@@ -313,7 +316,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param delta
 	 * @return
 	 */
-	private boolean isProjectBundleFile(IResourceDelta delta)
+	private static boolean isProjectBundleFile(IResourceDelta delta)
 	{
 		String fullProjectPath = delta.getFullPath().toString();
 		boolean result = false;
@@ -338,12 +341,32 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				{
 					File script = delta.getResource().getLocation().toFile();
 
-					result = this.isScriptInExistingBundle(script);
+					result = isScriptInExistingBundle(script);
 				}
 			}
 		}
 
 		return result;
+	}
+
+	private static boolean isProjectBundleFile(IFile file)
+	{
+		String fullProjectPath = file.getFullPath().toString();
+
+		if (BUNDLE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+				|| BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+		{
+			// always return true for bundle.rb files
+			return true;
+		}
+		if (FILE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+				|| FILE_PATTERN.matcher(fullProjectPath).matches())
+		{
+			// only return true if the script is part of an existing bundle.
+			return isScriptInExistingBundle(file.getLocation().toFile());
+		}
+
+		return false;
 	}
 
 	/**
@@ -352,7 +375,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param script
 	 * @return
 	 */
-	private boolean isScriptInExistingBundle(File script)
+	private static boolean isScriptInExistingBundle(File script)
 	{
 		BundleManager manager = BundleManager.getInstance();
 		File bundleDirectory = manager.getBundleDirectory(script);
@@ -513,13 +536,62 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void resourceChanged(IResourceChangeEvent event)
 	{
-		try
+		if (event.getType() == IResourceChangeEvent.PRE_DELETE)
 		{
-			event.getDelta().accept(this);
+			handleProjectDeleteEvent((IProject) event.getResource());
 		}
-		catch (CoreException e)
+		else
 		{
-			ScriptingActivator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
+			try
+			{
+				event.getDelta().accept(this);
+			}
+			catch (CoreException e)
+			{
+				ScriptingActivator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
+			}
+		}
+	}
+
+	private void handleProjectDeleteEvent(IResource resource)
+	{
+		BundleManager manager = BundleManager.getInstance();
+		if (resource instanceof IFile)
+		{
+			IFile file = (IFile) resource;
+			if (isProjectBundleFile(file))
+			{
+				File localFile = file.getLocation().toFile();
+				BundlePrecedence scope = manager.getBundlePrecedence(localFile);
+				if (scope != BundlePrecedence.USER)
+				{
+					String fullProjectPath = file.getFullPath().toString();
+					if (BUNDLE_PATTERN_DEPRECATED.matcher(fullProjectPath).matches()
+							|| BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+					{
+						// NOTE: we have to both unload all scripts associated with this bundle
+						// and the bundle file itself.
+						manager.unloadBundle(localFile.getParentFile());
+					}
+
+					manager.unloadScript(localFile);
+				}
+			}
+		}
+		else if (resource instanceof IContainer)
+		{
+			try
+			{
+				IResource[] children = ((IContainer) resource).members();
+				for (IResource child : children)
+				{
+					handleProjectDeleteEvent(child);
+				}
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logError(ScriptingActivator.getDefault(), e);
+			}
 		}
 	}
 

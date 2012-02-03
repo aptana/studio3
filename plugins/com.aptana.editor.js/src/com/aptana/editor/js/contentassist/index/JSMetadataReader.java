@@ -103,37 +103,15 @@ public class JSMetadataReader extends MetadataReader
 	public void enterBrowser(String ns, String name, String qname, Attributes attributes)
 	{
 		// create a new item documentation object
-		UserAgentElement userAgent = new UserAgentElement();
 		Map<String, String> attrs = attributesToMap(attributes, true);
 
 		// set platform
-		userAgent.setPlatform(attrs.get("platform")); //$NON-NLS-1$
-
-		// set version
+		String platform = attrs.get("platform"); //$NON-NLS-1$
 		String version = attrs.get("version"); //$NON-NLS-1$
-
-		if (version != null)
-		{
-			userAgent.setVersion(version);
-		}
-
-		// set OS
 		String os = attrs.get("os"); //$NON-NLS-1$
-
-		if (os != null)
-		{
-			userAgent.setOS(os);
-		}
-
-		// set OS version
 		String osVersion = attrs.get("osVersion"); //$NON-NLS-1$
 
-		if (osVersion != null)
-		{
-			userAgent.setOSVersion(osVersion);
-		}
-
-		currentUserAgent = userAgent;
+		currentUserAgent = UserAgentElement.createUserAgentElement(platform, version, os, osVersion, StringUtil.EMPTY);
 	}
 
 	/**

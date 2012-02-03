@@ -8,13 +8,11 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.IJSIndexConstants;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
 /**
  * JSElement
@@ -30,11 +28,25 @@ public class JSElement extends BaseElement<JSElement.Property>
 				return node.getName();
 			}
 		},
-		INDEX(Messages.JSElement_IndexFile)
+		INDEX(Messages.JSElement_IndexLabel)
 		{
 			public Object getPropertyValue(JSElement node)
 			{
 				return node.getIndex().toString();
+			}
+		},
+		INDEX_FILE(Messages.JSElement_IndexFile)
+		{
+			public Object getPropertyValue(JSElement node)
+			{
+				return node.getIndex().getIndexFile().getAbsolutePath();
+			}
+		},
+		INDEX_FILE_SIZE(Messages.JSElement_IndexFileSizeLabel)
+		{
+			public Object getPropertyValue(JSElement node)
+			{
+				return node.getIndex().getIndexFile().length();
 			}
 		},
 		CHILD_COUNT(Messages.JSElement_ChildCount)
@@ -54,10 +66,21 @@ public class JSElement extends BaseElement<JSElement.Property>
 		};
 
 		private String header;
+		private String category;
 
 		private Property(String header) // $codepro.audit.disable unusedMethod
 		{
 			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
 		}
 
 		public String getHeader()
@@ -88,32 +111,6 @@ public class JSElement extends BaseElement<JSElement.Property>
 	public Index getIndex()
 	{
 		return index;
-	}
-
-	/**
-	 * Return a list of class elements from the workspace global area (JS metadata)
-	 * 
-	 * @return Returns a potentially empty, non-null list of ClassElements
-	 */
-	public List<ClassElement> getWorkspaceGlobalClasses()
-	{
-		JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-		List<TypeElement> types = queryHelper.getTypes();
-
-		return JSTypeUtil.typesToClasses(types);
-	}
-
-	/**
-	 * Return a list of class elements from the project area
-	 * 
-	 * @return Returns a potentially empty, non-null list of ClassElements
-	 */
-	public List<ClassElement> getProjectGlobalClasses()
-	{
-		JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-		List<TypeElement> types = queryHelper.getTypes(index);
-
-		return JSTypeUtil.typesToClasses(types);
 	}
 
 	/*

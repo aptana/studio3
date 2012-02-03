@@ -17,6 +17,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
 public class TypeElement extends BaseElement<TypeElement.Property>
 {
@@ -73,10 +74,21 @@ public class TypeElement extends BaseElement<TypeElement.Property>
 		};
 
 		private String header;
+		private String category;
 
 		private Property(String header) // $codepro.audit.disable unusedMethod
 		{
 			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
 		}
 
 		public String getHeader()

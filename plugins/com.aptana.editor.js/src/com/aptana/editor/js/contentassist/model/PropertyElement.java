@@ -21,6 +21,7 @@ import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.index.core.IndexUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
 public class PropertyElement extends BaseElement<PropertyElement.Property>
 {
@@ -91,10 +92,21 @@ public class PropertyElement extends BaseElement<PropertyElement.Property>
 		};
 
 		private String header;
+		private String category;
 
 		private Property(String header) // $codepro.audit.disable unusedMethod
 		{
 			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
 		}
 
 		public String getHeader()

@@ -183,6 +183,43 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
+	 * case. If the list is non-null, then this is an identity function.
+	 * 
+	 * @param <T>
+	 * @param <U>
+	 * @param list
+	 * @return
+	 */
+	public static <T, U> Map<T, U> getMapValue(Map<T, U> list)
+	{
+		if (list == null)
+		{
+			return Collections.emptyMap();
+		}
+
+		return list;
+	}
+
+	/**
+	 * This is a convenience method that essentially checks for a null set and returns Collections.emptySet in that
+	 * case. If the set is non-null, then this is an identity function.
+	 * 
+	 * @param <T>
+	 * @param set
+	 * @return
+	 */
+	public static <T> Set<T> getSetValue(Set<T> set)
+	{
+		if (set == null)
+		{
+			return Collections.emptySet();
+		}
+
+		return set;
+	}
+
+	/**
 	 * Given two collections of elements of type <T>, return a collection with the items which only appear in one
 	 * collection or the other
 	 * 
@@ -237,10 +274,12 @@ public class CollectionsUtil
 	}
 
 	/**
-	 * This is a convenience method that returns true if the specified collection is null or empty
+	 * This is a convenience method that returns true if the specified map is null or empty
 	 * 
 	 * @param <T>
-	 *            Any type of object
+	 *            any type of key
+	 * @param <U>
+	 *            any type of value
 	 * @param map
 	 * @return
 	 */

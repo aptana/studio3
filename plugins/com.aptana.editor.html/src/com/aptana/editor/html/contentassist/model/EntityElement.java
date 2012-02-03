@@ -12,9 +12,44 @@ import java.util.Map;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.ui.views.IPropertyInformation;
 
-public class EntityElement extends BaseElement
+public class EntityElement extends BaseElement<EntityElement.Property>
 {
+	enum Property implements IPropertyInformation<EntityElement>
+	{
+		NAME(Messages.EntityElement_NameLabel)
+		{
+			public Object getPropertyValue(EntityElement node)
+			{
+				return node.getName();
+			}
+		};
+
+		private String header;
+		private String category;
+
+		private Property(String header) // $codepro.audit.disable unusedMethod
+		{
+			this.header = header;
+		}
+
+		private Property(String header, String category)
+		{
+			this.category = category;
+		}
+
+		public String getCategory()
+		{
+			return category;
+		}
+
+		public String getHeader()
+		{
+			return header;
+		}
+	}
+
 	private static final String DECIMAL_VALUE_PROPERTY = "decimalValue"; //$NON-NLS-1$
 	private static final String HEX_VALUE_PROPERTY = "hexValue"; //$NON-NLS-1$
 

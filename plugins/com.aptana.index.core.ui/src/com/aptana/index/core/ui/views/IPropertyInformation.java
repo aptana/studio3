@@ -5,13 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist.model;
+package com.aptana.index.core.ui.views;
 
 /**
  * IPropertyInformation
  */
 public interface IPropertyInformation<N>
 {
+	String getCategory();
+
 	String getHeader();
 
 	Object getPropertyValue(N node);

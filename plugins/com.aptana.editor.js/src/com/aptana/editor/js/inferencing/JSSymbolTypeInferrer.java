@@ -572,7 +572,7 @@ public class JSSymbolTypeInferrer
 			// add user agents to all generated properties
 			for (PropertyElement property : type.getProperties())
 			{
-				JSTypeUtil.addAllUserAgents(property);
+				property.setHasAllUserAgents();
 			}
 
 			// make sure we have an index writer

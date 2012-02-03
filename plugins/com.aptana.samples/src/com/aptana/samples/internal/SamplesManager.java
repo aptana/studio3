@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +34,8 @@ import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
-import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.ElementVisibilityListener;
+import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.ProjectSampleElement;
 
 public class SamplesManager implements ISamplesManager
@@ -57,6 +57,8 @@ public class SamplesManager implements ISamplesManager
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
 	private static final String ATTR_CATEGORY = "category"; //$NON-NLS-1$
 
+	private static final String SAMPLES_SCRIPT = "project_samples.rb"; //$NON-NLS-1$
+
 	private Map<String, SampleCategory> categories;
 	private Map<String, List<SamplesReference>> sampleRefsByCategory;
 	private Map<String, SamplesReference> samplesById;
@@ -66,22 +68,30 @@ public class SamplesManager implements ISamplesManager
 
 	private List<ISampleListener> sampleListeners;
 
-	private ElementVisibilityListener elementListener = new ElementVisibilityListener()
+	private LoadCycleListener loadCycleListener = new LoadCycleListener()
 	{
 
-		public void elementBecameHidden(AbstractElement element)
+		public void scriptLoaded(File script)
 		{
-			if (element instanceof ProjectSampleElement)
+			if (script.toString().endsWith(SAMPLES_SCRIPT))
 			{
-				removeSample((ProjectSampleElement) element);
+				loadBundleSampleElements();
 			}
 		}
 
-		public void elementBecameVisible(AbstractElement element)
+		public void scriptReloaded(File script)
 		{
-			if (element instanceof ProjectSampleElement)
+			if (script.toString().endsWith(SAMPLES_SCRIPT))
 			{
-				addSample((ProjectSampleElement) element);
+				loadBundleSampleElements();
+			}
+		}
+
+		public void scriptUnloaded(File script)
+		{
+			if (script.toString().endsWith(SAMPLES_SCRIPT))
+			{
+				loadBundleSampleElements();
 			}
 		}
 	};
@@ -98,7 +108,7 @@ public class SamplesManager implements ISamplesManager
 		readExtensionRegistry();
 		loadBundleSampleElements();
 
-		BundleManager.getInstance().addElementVisibilityListener(elementListener);
+		BundleManager.getInstance().addLoadCycleListener(loadCycleListener);
 	}
 
 	public List<SampleCategory> getCategories()
@@ -179,23 +189,6 @@ public class SamplesManager implements ISamplesManager
 			bundleSamplesById.put(id, sample);
 
 			fireSampleAdded(sample);
-		}
-	}
-
-	private void removeSample(ProjectSampleElement sampleElement)
-	{
-		String categoryId = sampleElement.getCategory();
-		SampleCategory category = categories.get(categoryId);
-		if (category != null)
-		{
-			SamplesReference sample = bundleSamplesById.remove(sampleElement.getId());
-			if (sample != null)
-			{
-				List<SamplesReference> samples = bundleSamplesByCategory.get(categoryId);
-				samples.remove(sample);
-
-				fireSampleRemoved(sample);
-			}
 		}
 	}
 
@@ -371,6 +364,16 @@ public class SamplesManager implements ISamplesManager
 
 	private void loadBundleSampleElements()
 	{
+		// removes the existing samples loaded from the rubles
+		Collection<SamplesReference> samples = new ArrayList<SamplesReference>(bundleSamplesById.values());
+		bundleSamplesByCategory.clear();
+		bundleSamplesById.clear();
+		for (SamplesReference sample : samples)
+		{
+			fireSampleRemoved(sample);
+		}
+
+		// adds the current list of samples loaded from the rubles
 		List<ProjectSampleElement> elements = BundleManager.getInstance().getProjectSamples(null);
 		for (ProjectSampleElement element : elements)
 		{

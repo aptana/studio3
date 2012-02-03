@@ -15,13 +15,14 @@ public class AllTests
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.contentassist");
-		//$JUnit-BEGIN$
+		// $JUnit-BEGIN$
 		suite.addTestSuite(LocationTests.class);
 		suite.addTestSuite(JSContentAssistProposalTests.class);
 		suite.addTestSuite(RangeTests.class);
 		suite.addTestSuite(JSUserAgentFilteringTests.class);
 		suite.addTestSuite(JSContextInfoTests.class);
-		//$JUnit-END$
+		suite.addTestSuite(JSUserAgentCachingTests.class);
+		// $JUnit-END$
 		return suite;
 	}
 }

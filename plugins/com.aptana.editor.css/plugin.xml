@@ -159,5 +159,13 @@
             id="com.aptana.editor.css.contentMergeViewer">
       </viewer>
    </extension>
+   <extension
+         point="com.aptana.index.core.ui.indexViewContributors">
+      <contributor
+            content-provider="com.aptana.editor.css.views.CSSIndexViewContentProvider"
+            label-provider="com.aptana.editor.css.views.CSSIndexViewLabelProvider"
+            name="%index.view.contributor.name">
+      </contributor>
+   </extension>
 
 </plugin>

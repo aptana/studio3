@@ -577,6 +577,45 @@ public class JSIndexReader extends IndexReader
 	}
 
 	/**
+	 * getTypeNames
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public List<String> getTypeNames(Index index)
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (index != null)
+		{
+			// @formatter:off
+			List<QueryResult> types = index.query(
+				new String[] { IJSIndexConstants.TYPE },
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH
+			);
+			// @formatter:on
+
+			if (types != null)
+			{
+				for (QueryResult type : types)
+				{
+					String word = type.getWord();
+					int delimiterIndex = word.indexOf(getDelimiter());
+
+					if (delimiterIndex != -1)
+					{
+						result.add(new String(word.substring(0, delimiterIndex)));
+					}
+					// else warn?
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getTypes
 	 * 
 	 * @param index

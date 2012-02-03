@@ -31,6 +31,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -61,6 +62,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image PROPERTY_ICON = CSSPlugin.getImage("/icons/property.png"); //$NON-NLS-1$
+
+	// @formatter:off
+	private static final Set<String> COLOR_PROPERTY_NAMES = CollectionsUtil.newSet(
+		"background", //$NON-NLS-1$
+		"border-bottom", //$NON-NLS-1$
+		"border-left", //$NON-NLS-1$
+		"border-right", //$NON-NLS-1$
+		"border-top", //$NON-NLS-1$
+		"border", //$NON-NLS-1$
+		"column-rule" //$NON-NLS-1$
+	);
+	// @formatter:on
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
@@ -1375,17 +1388,17 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	@SuppressWarnings("nls")
 	private boolean supportsColorValues(PropertyElement property)
 	{
+		boolean result = false;
+
 		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for
 		// values!
-		if (property == null)
-			return false;
-		String propertyName = property.getName();
-		if (propertyName.equals("background") || propertyName.equals("border-bottom")
-				|| propertyName.equals("border-left") || propertyName.equals("border-right")
-				|| propertyName.equals("border-top") || propertyName.equals("border")
-				|| propertyName.equals("column-rule"))
-			return true;
-		return propertyName.endsWith("color");
-	}
+		if (property != null)
+		{
+			String propertyName = property.getName();
 
+			result = COLOR_PROPERTY_NAMES.contains(propertyName);
+		}
+
+		return result;
+	}
 }

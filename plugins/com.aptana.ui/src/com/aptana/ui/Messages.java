@@ -21,6 +21,9 @@ public class Messages extends NLS
 
 	public static String QuickMenuDialog_NoMatchesFound;
 
+	public static String UIPlugin_automaticBuildsWarningMessage;
+	public static String UIPlugin_automaticBuildsWarningTitle;
+
 	public static String UIPlugin_ERR_FailToSetPref;
 	public static String UIPlugin_ResetPerspective_Description;
 	public static String UIPlugin_ResetPerspective_Title;
