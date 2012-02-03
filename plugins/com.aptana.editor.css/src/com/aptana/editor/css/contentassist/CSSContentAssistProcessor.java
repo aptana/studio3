@@ -32,6 +32,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -71,7 +72,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		"border-right", //$NON-NLS-1$
 		"border-top", //$NON-NLS-1$
 		"border", //$NON-NLS-1$
-		"column-rule" //$NON-NLS-1$
+		"column-rule", //$NON-NLS-1$
+		"background-color", //$NON-NLS-1$
+		"border-color", //$NON-NLS-1$
+		"border-top-color", //$NON-NLS-1$
+		"border-right-color", //$NON-NLS-1$
+		"border-bottom-color", //$NON-NLS-1$
+		"border-left-color", //$NON-NLS-1$
+		"outline-color" //$NON-NLS-1$
 	);
 	// @formatter:on
 
@@ -414,7 +422,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// get property name
 		String propertyName = this.getPropertyName(lexemeProvider, offset);
 
-		if (propertyName != null && propertyName.length() > 0)
+		if (!StringUtil.isEmpty(propertyName))
 		{
 			this.setPropertyValueRange(lexemeProvider, offset);
 
@@ -1385,20 +1393,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param property
 	 * @return
 	 */
-	@SuppressWarnings("nls")
 	private boolean supportsColorValues(PropertyElement property)
 	{
-		boolean result = false;
-
 		// FIXME Support multiple types on properties, and use an enum of types. Then we can look for color type for
 		// values!
 		if (property != null)
 		{
 			String propertyName = property.getName();
-
-			result = COLOR_PROPERTY_NAMES.contains(propertyName);
+			return COLOR_PROPERTY_NAMES.contains(propertyName);
 		}
 
-		return result;
+		return false;
 	}
 }
