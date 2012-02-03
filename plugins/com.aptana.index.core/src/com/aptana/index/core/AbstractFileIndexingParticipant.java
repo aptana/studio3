@@ -53,7 +53,6 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		return priority;
 	}
 
-	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
 			throws CoreException
 	{

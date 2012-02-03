@@ -213,7 +213,6 @@ public class IndexContainerJob extends IndexRequestJob
 		// Turn list of file stores into set of unique URI strings
 		List<String> fileStoreURIs = CollectionsUtil.map(files, new IMap<IFileStore, String>()
 		{
-			@Override
 			public String map(IFileStore item)
 			{
 				return item.toURI().toString();
@@ -246,7 +245,6 @@ public class IndexContainerJob extends IndexRequestJob
 		Set<IFileStore> filtered = new HashSet<IFileStore>(files.size());
 		CollectionsUtil.filter(files, filtered, new IFilter<IFileStore>()
 		{
-			@Override
 			public boolean include(IFileStore item)
 			{
 				return item.fetchInfo().getLastModified() >= indexLastModified;
