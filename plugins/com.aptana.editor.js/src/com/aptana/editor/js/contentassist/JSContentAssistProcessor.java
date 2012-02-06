@@ -29,7 +29,6 @@ import org.eclipse.swt.graphics.Image;
 import beaver.Scanner;
 
 import com.aptana.core.IFilter;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
@@ -604,7 +603,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(JSPlugin.getDefault(), "Failed to parse the content", e); //$NON-NLS-1$
+			// ignore parse error exception since the user will get markers and/or entries in the Problems View
 		}
 
 		return result;
