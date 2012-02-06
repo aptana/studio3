@@ -72,7 +72,7 @@ public abstract class GitTestCase extends TestCase
 	 * 
 	 * @param path
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	protected GitRepository createRepo(IPath path) throws CoreException
 	{
@@ -105,12 +105,14 @@ public abstract class GitTestCase extends TestCase
 
 	protected void assertUnstageFiles(GitIndex index, List<ChangedFile> changed)
 	{
-		assertTrue("Failed to unstage changes", index.unstageFiles(changed));
+		IStatus status = index.unstageFiles(changed);
+		assertTrue(MessageFormat.format("Failed to unstage changes: {0}", status.getMessage()), status.isOK());
 	}
 
 	protected void assertStageFiles(GitIndex index, List<ChangedFile> changed)
 	{
-		assertTrue("Failed to stage changes", index.stageFiles(changed));
+		IStatus status = index.stageFiles(changed);
+		assertTrue(MessageFormat.format("Failed to stage changes: {0}", status.getMessage()), status.isOK());
 	}
 
 	protected void assertModifiedUnstagedFile(ChangedFile changed)
@@ -192,6 +194,11 @@ public abstract class GitTestCase extends TestCase
 	{
 		assertTrue(MessageFormat.format("Failed to create new branch {0} off of {1} (track: {2})", newBranch,
 				startPoint, track), getRepo().createBranch(newBranch, track, startPoint));
+	}
+
+	protected void assertRefresh() throws Exception
+	{
+		assertRefresh(getRepo().index());
 	}
 
 	protected void assertRefresh(GitIndex index)

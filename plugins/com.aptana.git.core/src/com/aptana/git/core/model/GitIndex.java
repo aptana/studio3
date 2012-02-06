@@ -9,6 +9,7 @@ package com.aptana.git.core.model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -300,44 +302,39 @@ public class GitIndex
 		}
 	}
 
-	public boolean stageFiles(Collection<ChangedFile> stageFiles)
+	public IStatus stageFiles(Collection<ChangedFile> stageFiles)
 	{
-		if (stageFiles == null || stageFiles.isEmpty())
+		if (CollectionsUtil.isEmpty(stageFiles))
 		{
-			return false;
+			// no-op
+			return Status.OK_STATUS;
 		}
 
-		List<String> args = new ArrayList<String>();
-		args.add("update-index"); //$NON-NLS-1$
-		args.add("--add"); //$NON-NLS-1$
-		args.add("--remove"); //$NON-NLS-1$
-		args.add("--stdin"); //$NON-NLS-1$
 		StringBuffer input = new StringBuffer(stageFiles.size() * stageFiles.iterator().next().getPath().length());
 		for (ChangedFile file : stageFiles)
 		{
 			input.append(file.getPath()).append('\n');
 		}
 
-		IStatus result = repository.executeWithInput(input.toString(), args.toArray(new String[args.size()]));
+		@SuppressWarnings("nls")
+		IStatus result = repository.executeWithInput(input.toString(), "update-index", "--add", "--remove", "--stdin");
 		if (result == null)
 		{
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "Failed to stage files. Process failed to run."); //$NON-NLS-1$;
 		}
 		if (!result.isOK())
 		{
-			IdeLog.logError(GitPlugin.getDefault(), "Failed to stage files: " + result.getMessage(), IDebugScopes.DEBUG); //$NON-NLS-1$
-			return false;
-		}
-		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(stageFiles.size());
-		for (ChangedFile file : stageFiles)
-		{
-			preFiles.add(new ChangedFile(file));
+			IdeLog.logError(GitPlugin.getDefault(),
+					MessageFormat.format("Failed to stage files: {0}", result.getMessage()), IDebugScopes.DEBUG); //$NON-NLS-1$
+			return result;
 		}
 
+		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(stageFiles.size());
 		// Update the staged/unstaged flags in the passed in copy of changed files, and our internal list of changed
 		// files.
 		for (ChangedFile file : stageFiles)
 		{
+			preFiles.add(new ChangedFile(file));
 			synchronized (changedFilesLock)
 			{
 				if (this.changedFiles != null)
@@ -356,16 +353,18 @@ public class GitIndex
 			file.hasUnstagedChanges = false;
 			file.hasStagedChanges = true;
 		}
+		preFiles.trimToSize();
 
 		postIndexChange(preFiles, stageFiles);
-		return true;
+		return result;
 	}
 
-	public boolean unstageFiles(Collection<ChangedFile> unstageFiles)
+	public IStatus unstageFiles(Collection<ChangedFile> unstageFiles)
 	{
-		if (unstageFiles == null || unstageFiles.isEmpty())
+		if (CollectionsUtil.isEmpty(unstageFiles))
 		{
-			return false;
+			// no-op, return OK
+			return Status.OK_STATUS;
 		}
 
 		StringBuilder input = new StringBuilder();
@@ -377,24 +376,22 @@ public class GitIndex
 		IStatus result = repository.executeWithInput(input.toString(), "update-index", "-z", "--index-info"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null)
 		{
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "Failed to unstage files. Process failed to run."); //$NON-NLS-1$
 		}
 		if (!result.isOK())
 		{
-			IdeLog.logError(GitPlugin.getDefault(), "Failed to stage files: " + result.getMessage(), IDebugScopes.DEBUG); //$NON-NLS-1$
-			return false;
-		}
-
-		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(unstageFiles.size());
-		for (ChangedFile file : unstageFiles)
-		{
-			preFiles.add(new ChangedFile(file));
+			IdeLog.logError(GitPlugin.getDefault(),
+					MessageFormat.format("Failed to stage files: {0}", result.getMessage()), IDebugScopes.DEBUG); //$NON-NLS-1$
+			return result;
 		}
 
 		// Update the staged/unstaged flags in the passed in copy of changed files, and our internal list of changed
 		// files.
+		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(unstageFiles.size());
 		for (ChangedFile file : unstageFiles)
 		{
+			preFiles.add(new ChangedFile(file));
+
 			synchronized (this.changedFilesLock)
 			{
 				if (this.changedFiles != null)
@@ -413,12 +410,13 @@ public class GitIndex
 			file.hasUnstagedChanges = true;
 			file.hasStagedChanges = false;
 		}
+		preFiles.trimToSize();
 
 		postIndexChange(preFiles, unstageFiles);
-		return true;
+		return result;
 	}
 
-	public void discardChangesForFiles(Collection<ChangedFile> discardFiles)
+	public IStatus discardChangesForFiles(Collection<ChangedFile> discardFiles)
 	{
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : discardFiles)
@@ -428,22 +426,27 @@ public class GitIndex
 
 		IStatus result = repository.executeWithInput(input.toString(),
 				"checkout-index", "--index", "--quiet", "--force", "-z", "--stdin"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-		if (result == null || !result.isOK())
+		if (result == null)
 		{
-			// postOperationFailed("Discarding changes failed with return value " + ret);
-			return;
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "Failed to revert files. Process failed to run."); //$NON-NLS-1$
 		}
-		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(discardFiles.size());
+		if (!result.isOK())
+		{
+			IdeLog.logError(GitPlugin.getDefault(),
+					MessageFormat.format("Failed to revert files: {0}", result.getMessage()), IDebugScopes.DEBUG); //$NON-NLS-1$
+			return result;
+		}
+
+		ArrayList<ChangedFile> preFiles = new ArrayList<ChangedFile>(discardFiles.size());
 		for (ChangedFile file : discardFiles)
 		{
 			preFiles.add(new ChangedFile(file));
-		}
-		for (ChangedFile file : discardFiles)
-		{
 			file.hasUnstagedChanges = false;
 		}
+		preFiles.trimToSize();
 
 		postIndexChange(preFiles, discardFiles);
+		return result;
 	}
 
 	public boolean commit(String commitMessage)
