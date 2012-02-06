@@ -23,12 +23,16 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.w3c.tidy.Tidy;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.IHTMLConstants;
@@ -93,6 +97,8 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	{
 		final int numberOfLines = new Document(source).getNumberOfLines();
 
+		List<String> filters = getFilters();
+
 		// Set up our pipes
 		PipedInputStream inPipe = new PipedInputStream();
 		BufferedReader reader = null;
@@ -113,7 +119,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 					ByteArrayInputStream in = null;
 					try
 					{
-						in = new ByteArrayInputStream(source.getBytes("UTF-8")); //$NON-NLS-1$
+						in = new ByteArrayInputStream(source.getBytes(IOUtil.UTF_8));
 						tidy.parse(in, null);
 					}
 					catch (UnsupportedEncodingException e)
@@ -145,7 +151,7 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 			String line = null;
 			while ((line = reader.readLine()) != null) // $codepro.audit.disable assignmentInCondition
 			{
-				parseTidyOutput(line, sourcePath, items, numberOfLines);
+				parseTidyOutput(source, line, sourcePath, items, numberOfLines, filters);
 			}
 		}
 		catch (Exception e)
@@ -172,22 +178,18 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	// FIXME This takes in a collection and adds elements to it, which is bad! But necessary for now since we skip
 	// errors based on it's contents right now...
 	// Probably should return a collection of IValidationItems and then post-filter in caller!
-	private void parseTidyOutput(String report, String sourcePath, List<IProblem> items, int numberOfLines)
+	private void parseTidyOutput(String source, String report, String sourcePath, List<IProblem> items,
+			int numberOfLines, List<String> filters)
 	{
 		if (StringUtil.isEmpty(report) || !report.startsWith("line")) //$NON-NLS-1$
 		{
 			return;
 		}
 
-		List<String> filters = getFilters();
 		Matcher matcher = PATTERN.matcher(report);
 		while (matcher.find())
 		{
 			int lineNumber = Integer.parseInt(matcher.group(1));
-			int column = Integer.parseInt(matcher.group(2));
-			String type = matcher.group(3);
-			String message = patchMessage(matcher.group(4));
-
 			// Don't attempt to add errors or warnings if there are already errors on this line
 
 			// We also squash errors on the last line, since it is normally a repeat of a parse error. For example
@@ -198,19 +200,67 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 				continue;
 			}
 
+			String message = patchMessage(matcher.group(4));
 			if (message != null && !containsHTML5Element(message) && !isAutoFiltered(message)
 					&& !isIgnored(message, filters))
 			{
+				int column = Integer.parseInt(matcher.group(2));
+				String type = matcher.group(3);
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
-					items.add(createError(message, lineNumber, column, 0, sourcePath));
+					items.add(createError(message, lineNumber, getOffset(source, lineNumber, column), 0, sourcePath));
 				}
 				else if (type.startsWith("Warning")) //$NON-NLS-1$
 				{
-					items.add(createWarning(message, lineNumber, column, 0, sourcePath));
+					items.add(createWarning(message, lineNumber, getOffset(source, lineNumber, column), 0, sourcePath));
 				}
 			}
 		}
+	}
+
+	/**
+	 * Handles converting columns we get to actual column offset, since tabs mess the number up.
+	 * 
+	 * @param source
+	 * @param lineNumber
+	 * @param column
+	 * @return
+	 */
+	private int getOffset(String source, int lineNumber, int column)
+	{
+		try
+		{
+			IDocument document = new Document(source);
+			IRegion region = document.getLineInformation(lineNumber - 1);
+			int lineOffset = region.getOffset();
+			String line = document.get(lineOffset, region.getLength());
+			column--;
+			for (int i = 0; i <= column; i++)
+			{
+				char c = line.charAt(i);
+				switch (c)
+				{
+					case '\t':
+						column -= 4;
+						break;
+
+					default:
+						column--;
+						break;
+				}
+				if (column == 0)
+				{
+					return lineOffset + i + 1;
+				}
+			}
+			return lineOffset;
+		}
+		catch (BadLocationException e)
+		{
+			IdeLog.logError(HTMLPlugin.getDefault(), e);
+			// TODO Fallback to some other way to calculate the offset!
+		}
+		return column;
 	}
 
 	private boolean isIgnored(String message, List<String> expressions)
