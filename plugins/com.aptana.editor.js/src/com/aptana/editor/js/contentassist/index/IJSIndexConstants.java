@@ -30,7 +30,8 @@ public interface IJSIndexConstants
 	// 0.27 - Add isInternal property to type elements
 	// 0.28 - Include events when reading/writing types from/to indexes. Generate "user type" names from context, if
 	// possible
-	public static final double INDEX_VERSION = 0.28;
+	// 0.29 - Update some DOM 2 content
+	public static final double INDEX_VERSION = 0.29;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;

@@ -2077,6 +2077,13 @@
                 </example>
             </property>
             
+            <property name="documentMode" type="Number" access="read-write" visibility="basic">
+            	<browsers>
+            		<browser platform="IE" version="5.0+"/>
+            	</browsers>
+            	<description></description>
+            </property>
+
             <property name="domain" type="String" access="read-write" visibility="basic">
                 <availability>
                     <specification name="HTML DOM Level 1"/>
@@ -3601,6 +3608,24 @@
                 <return-description>Returns the &lt;code&gt;Element&lt;/code&gt; object node that matches the given &lt;code&gt;ID&lt;/code&gt;.</return-description>
             </method>
             
+            <method name="getElementsByName" visibility="basic">
+            	<parameters>
+            		<parameter name="name" type="String" usage="required">
+            			<description>The name of the element you want to access/manipulate</description>
+            		</parameter>
+            	</parameters>
+        		<return-types>
+        			<return-type type="HTMLElement[]"/>
+        		</return-types>
+            	<browsers>
+                    <browser platform="IE" version="5.0+"/>
+                    <browser platform="Mozilla" version="1.0+"/>
+                    <browser platform="Netscape" version="6.0+" />
+                    <browser platform="Safari" version="1.0+"/>
+                    <browser platform="Opera" version="7.0+"/>
+                </browsers>
+            </method>
+
             <method name="getElementsByTagName" visibility="basic">
                 <parameters>
                     <parameter name="tagname" type="String" usage="one-or-more">

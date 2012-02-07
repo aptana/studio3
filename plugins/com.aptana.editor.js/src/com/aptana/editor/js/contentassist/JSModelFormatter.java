@@ -386,6 +386,10 @@ public class JSModelFormatter
 				{
 					result = TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE);
 				}
+				else if (type.endsWith(JSTypeConstants.ARRAY_LITERAL))
+				{
+					result = TYPE_IMAGE_MAP.get(JSTypeConstants.ARRAY_TYPE);
+				}
 			}
 		}
 
