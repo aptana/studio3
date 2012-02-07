@@ -11,8 +11,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.aptana.editor.html.validator.HTMLValidatorTests;
-
 public class HTMLEditorTests extends TestCase
 {
 
@@ -30,7 +28,6 @@ public class HTMLEditorTests extends TestCase
 		// suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
 		suite.addTestSuite(HTMLTagScannerTest.class);
 		suite.addTestSuite(HTMLTagUtilTest.class);
-		suite.addTestSuite(HTMLValidatorTests.class);
 		// $JUnit-END$
 		return suite;
 	}

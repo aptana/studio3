@@ -17,7 +17,6 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.core,
  com.aptana.core.build,
- com.aptana.core.internal.preferences,
  com.aptana.core.logging,
  com.aptana.core.projects.templates,
  com.aptana.core.resources,

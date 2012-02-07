@@ -7,11 +7,19 @@
  */
 package com.aptana.editor.js.preferences;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.validator.JSLintValidator;
+import com.aptana.editor.js.validator.MozillaJsValidator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -41,5 +49,51 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// mark occurrences
 		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+
+		// Set Mozilla validator to be on by default for reconcile (JSLint is off by default)
+		MozillaJsValidator validator = new MozillaJsValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+
+			@Override
+			protected String getPreferenceNode()
+			{
+				return JSPlugin.PLUGIN_ID;
+			}
+		};
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
+
+		// Migrate the old filter prefs to new validators
+		IEclipsePreferences cepPrefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		String oldKey = MessageFormat.format("{0}:{1}", IJSConstants.CONTENT_TYPE_JS, //$NON-NLS-1$
+				com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS);
+		String oldFilters = cepPrefs.get(oldKey, null);
+		if (oldFilters != null)
+		{
+			JSLintValidator jsLintValidator = new JSLintValidator()
+			{
+				@Override
+				public String getId()
+				{
+					return ID;
+				}
+
+				@Override
+				protected String getPreferenceNode()
+				{
+					return JSPlugin.PLUGIN_ID;
+				}
+			};
+
+			String[] oldFilterArray = oldFilters.split(AbstractBuildParticipant.FILTER_DELIMITER);
+			validator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
+			jsLintValidator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
+			cepPrefs.remove(oldKey);
+		}
 	}
 }

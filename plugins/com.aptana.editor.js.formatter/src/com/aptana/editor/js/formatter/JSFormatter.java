@@ -288,7 +288,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		output = output.trim();
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
-		parseState.setEditState(output, null, 0, 0);
+		parseState.setEditState(output);
 		IParseRootNode outputParseResult = null;
 		try
 		{
@@ -461,7 +461,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			IParseState parseState)
 	{
 		IParser parser = checkoutParser();
-		parseState.setEditState(output, null, 0, 0);
+		parseState.setEditState(output);
 		List<IRegion> onOffRegions = null;
 		try
 		{

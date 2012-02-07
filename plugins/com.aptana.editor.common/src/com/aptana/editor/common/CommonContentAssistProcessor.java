@@ -64,7 +64,6 @@ import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
-import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
@@ -532,7 +531,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected IParseNode getAST()
 	{
-		return editor.getFileService().getParseResult();
+		return editor.getAST();
 	}
 
 	/**
@@ -630,16 +629,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 
 		return natureIDs;
-	}
-
-	/**
-	 * getParseState
-	 * 
-	 * @return
-	 */
-	protected IParseState getParseState()
-	{
-		return editor.getFileService().getParseState();
 	}
 
 	/**

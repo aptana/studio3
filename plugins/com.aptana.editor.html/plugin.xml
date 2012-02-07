@@ -20,6 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
+            default-charset="UTF-8"
             file-extensions="html,htm,xhtml,shtml"
             id="com.aptana.contenttype.html"
             name="%content-type.html.name"
@@ -115,19 +116,6 @@
    </extension>
 
    <extension
-         point="com.aptana.editor.common.validator">
-      <content-type
-            name="%validator.language.html.name"
-            id="com.aptana.contenttype.html">
-      </content-type>
-      <validator
-            class="com.aptana.editor.html.validator.HTMLTidyValidator"
-            content-type="com.aptana.contenttype.html"
-            marker-type="com.aptana.editor.html.problem"
-            name="%validator.tidy.name">
-      </validator>
-   </extension>
-   <extension
          point="org.eclipse.core.filebuffers.annotationModelCreation">
       <factory
             class="com.aptana.editor.common.ExternalFileAnnotationModelFactory"
@@ -201,6 +189,44 @@
             </equals>
          </with>
       </definition>
+   </extension>
+   <extension
+         point="com.aptana.buildpath.core.buildParticipants">
+      <participant
+            class="com.aptana.editor.html.internal.build.HTMLTaskDetector"
+            id="com.aptana.editor.html.HTMLTaskDetector"
+            name="%html.task.detector.name"
+            priority="50">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.html.validator.HTMLTidyValidator"
+            id="com.aptana.editor.html.validator.TidyValidator"
+            name="%validator.tidy.name"
+            priority="50">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
+      </participant>
+      <participant
+            class="com.aptana.editor.html.validator.HTMLParseErrorValidator"
+            id="com.aptana.editor.html.validator.HTMLParseErrorValidator"
+            name="%validator.parser.name"
+            priority="60">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
+      </participant>
+   </extension>
+   <extension
+         id="tidy_problem"
+         name="%marker.tidy.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.editor.html.problem">
+      </super>
    </extension>
    <extension
          point="org.eclipse.compare.contentMergeViewers">

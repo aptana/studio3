@@ -988,7 +988,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public IParseRootNode parseStateTest(IParseState parseState, String source) throws Exception
 	{
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source);
 		return fParser.parse(parseState);
 	}
 

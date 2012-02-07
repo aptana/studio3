@@ -7,100 +7,72 @@
  */
 package com.aptana.editor.js.validator;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.common.validator.IValidator;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.build.IProblem;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.sax.IValidatingReaderLogger;
 
-public class SDocMLValidator implements IValidator
+public class SDocMLValidator extends AbstractBuildParticipant
 {
-	private static class LogCollector implements IValidatingReaderLogger
+
+	public void deleteFile(BuildContext context, IProgressMonitor monitor)
 	{
-		private URI path;
-		private IValidationManager manager;
-		private List<IValidationItem> items = new ArrayList<IValidationItem>();
-
-		/**
-		 * Collector
-		 * 
-		 * @param manager
-		 * @param path
-		 */
-		private LogCollector(IValidationManager manager, URI path, List<IValidationItem> items)
+		if (context == null)
 		{
-			this.path = path;
-			this.manager = manager;
-			this.items = items;
+			return;
 		}
 
-		/**
-		 * addItem
-		 * 
-		 * @param item
-		 */
-		public void addItem(IValidationItem item)
-		{
-			items.add(item);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.sax.IValidatingReaderLogger#logError(java.lang.String, int, int)
-		 */
-		public void logError(String message, int line, int column)
-		{
-			this.addItem(manager.createError(message, line, column, 0, this.path));
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.sax.IValidatingReaderLogger#logInfo(java.lang.String, int, int)
-		 */
-		public void logInfo(String message, int line, int column)
-		{
-			// not supported?
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.sax.IValidatingReaderLogger#logWarning(java.lang.String, int, int)
-		 */
-		public void logWarning(String message, int line, int column)
-		{
-			this.addItem(manager.createWarning(message, line, column, 0, this.path));
-		}
+		context.removeProblems(IJSConstants.SDOCML_PROBLEM_MARKER_TYPE);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.validator.IValidator#validate(java.lang.String, java.net.URI,
-	 * com.aptana.editor.common.validator.IValidationManager)
-	 */
-	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
+	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
-		List<IValidationItem> items = new ArrayList<IValidationItem>();
-		JSMetadataReader reader = new JSMetadataReader();
-		ByteArrayInputStream input = new ByteArrayInputStream(source.getBytes()); // $codepro.audit.disable closeWhereCreated
-		LogCollector collector = new LogCollector(manager, path, items);
+		if (context == null)
+		{
+			return;
+		}
 
-		manager.addParseErrors(items, IJSConstants.CONTENT_TYPE_JS);
+		final List<IProblem> problems = new ArrayList<IProblem>();
+		final String path = context.getURI().toString();
+		// TODO Can we re-use this reader? If so, instantiate in buildStarting()
+		JSMetadataReader reader = new JSMetadataReader();
+		IValidatingReaderLogger collector = new IValidatingReaderLogger()
+		{
+			public void logError(String message, int line, int column)
+			{
+				problems.add(createError(message, line, column, 0, path));
+			}
+
+			public void logInfo(String message, int line, int column)
+			{
+				problems.add(createInfo(message, line, column, 0, path));
+			}
+
+			public void logWarning(String message, int line, int column)
+			{
+				problems.add(createWarning(message, line, column, 0, path));
+			}
+		};
 		reader.setLogger(collector);
 
 		try
 		{
+			InputStream input = context.openInputStream(monitor); // $codepro.audit.disable closeWhereCreated
 			reader.loadXML(input);
 		}
 		catch (Exception e)
 		{
-			collector.addItem(manager.createError(e.getMessage(), 0, 0, 0, path));
+			problems.add(createError(e.getMessage(), 0, 0, 0, path.toString()));
 		}
-		return items;
+
+		context.putProblems(IJSConstants.SDOCML_PROBLEM_MARKER_TYPE, problems);
 	}
 }

@@ -684,7 +684,8 @@ class CommitDialog extends StatusDialog
 		// make a copy so we can erase from original table correctly since their flags get changed by operation
 		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
 		Collections.copy(copy, new ArrayList<ChangedFile>(files));
-		if (gitRepository.index().unstageFiles(files))
+		IStatus status = gitRepository.index().unstageFiles(files);
+		if (status.isOK())
 		{
 			getParentShell().getDisplay().asyncExec(new Runnable()
 			{
@@ -712,7 +713,8 @@ class CommitDialog extends StatusDialog
 		// make a copy so we can erase from original table correctly since their flags get changed by operation
 		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
 		Collections.copy(copy, new ArrayList<ChangedFile>(files));
-		if (gitRepository.index().stageFiles(files))
+		IStatus status = gitRepository.index().stageFiles(files);
+		if (status.isOK())
 		{
 			getParentShell().getDisplay().asyncExec(new Runnable()
 			{

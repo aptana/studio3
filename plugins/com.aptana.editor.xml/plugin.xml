@@ -81,6 +81,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.xml"
+            default-charset="UTF-8"
             file-extensions="xsl"
             id="com.aptana.contenttype.xsl"
             name="%content-type.xsl.name"

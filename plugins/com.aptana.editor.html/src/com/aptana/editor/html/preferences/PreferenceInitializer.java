@@ -10,8 +10,10 @@ package com.aptana.editor.html.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.validator.HTMLTidyValidator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -37,5 +39,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// mark occurrences
 		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+
+		// Set validator to be on by default for reconcile
+		HTMLTidyValidator validator = new HTMLTidyValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+		};
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
 	}
 }

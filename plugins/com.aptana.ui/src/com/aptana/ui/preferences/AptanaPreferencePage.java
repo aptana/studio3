@@ -20,7 +20,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
-import com.aptana.core.internal.preferences.PreferenceInitializer;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.UIPlugin;
@@ -76,7 +75,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	{
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
-				PreferenceInitializer.DEFAULT_AUTO_REFRESH_PROJECTS, null);
+				ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS, null);
 	}
 
 	@Override
@@ -101,7 +100,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	{
 		autoRefreshButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
 				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
-				PreferenceInitializer.DEFAULT_AUTO_REFRESH_PROJECTS, null));
+				ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS, null));
 
 		super.performDefaults();
 	}

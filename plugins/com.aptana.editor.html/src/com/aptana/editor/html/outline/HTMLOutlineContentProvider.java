@@ -332,7 +332,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 
 					public void run()
 					{
-						treeViewer.remove(placeholder);
+						if (treeViewer != null && treeViewer.getTree() != null && !treeViewer.getTree().isDisposed())
+						{
+							treeViewer.remove(placeholder);
+						}
 					}
 				});
 			}

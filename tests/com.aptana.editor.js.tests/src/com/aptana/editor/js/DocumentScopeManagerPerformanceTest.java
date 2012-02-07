@@ -19,6 +19,7 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
@@ -46,7 +47,8 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
 			IDocument doc = viewer.getDocument();
 			int length = doc.getLength();
-			page.closeEditor(editor, false);
+			EditorTestHelper.closeEditor(editor);
+			
 			IEditorReference[] refs = page.getEditorReferences();
 			assertEquals(0, refs.length);
 
@@ -60,7 +62,7 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 					manager.getScopeAtOffset(viewer, x);
 				}
 				stopMeasuring();
-				page.closeEditor(editor, false);
+				EditorTestHelper.closeEditor(editor);
 				refs = page.getEditorReferences();
 				assertEquals(0, refs.length);
 			}
@@ -71,7 +73,7 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 		{
 			if (editor != null)
 			{
-				editor.close(false);
+				EditorTestHelper.closeEditor(editor);
 			}
 		}
 	}

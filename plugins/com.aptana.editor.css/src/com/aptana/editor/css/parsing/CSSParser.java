@@ -9,6 +9,8 @@ import beaver.ParsingTables;
 import beaver.Scanner;
 import beaver.Symbol;
 
+import com.aptana.editor.css.ICSSConstants;
+
 import com.aptana.editor.css.parsing.ast.CSSAtRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
 import com.aptana.editor.css.parsing.ast.CSSCharSetNode;
@@ -93,7 +95,7 @@ public class CSSParser extends Parser implements IParser
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
+			fParseState.addError(new ParseError(ICSSConstants.CONTENT_TYPE_CSS, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -117,10 +119,7 @@ public class CSSParser extends Parser implements IParser
 	{
 		fParseState = parseState;
 		// grab source
-		char[] characters = fParseState.getSource();
-
-		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : ""; //$NON-NLS-1$
+		String source = fParseState.getSource();
 
 		fParseState.clearErrors();
 
@@ -131,7 +130,7 @@ public class CSSParser extends Parser implements IParser
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 		int start = fParseState.getStartingOffset();
-		int end = start + fParseState.getSource().length - 1;
+		int end = start + source.length() - 1;
 		result.setLocation(start, end);
 
 		// store results in the parse state
@@ -158,13 +157,10 @@ public class CSSParser extends Parser implements IParser
 
 	private String getSource(IParseState parseState, IRange comment)
 	{
-		char[] src = parseState.getSource();
-		int length = comment.getLength();
-		char[] dest = new char[length];
-
-		System.arraycopy(src, comment.getStartingOffset(), dest, 0, length);
-
-		return new String(dest);
+		String src = parseState.getSource();
+		int start = comment.getStartingOffset();
+		int endIndex = start + comment.getLength();
+		return new String(src.substring(start, endIndex));
 	}
 
 	public CSSParser()

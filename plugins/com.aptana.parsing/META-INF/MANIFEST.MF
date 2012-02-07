@@ -8,7 +8,8 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  beaver;visibility:=reexport,
  com.aptana.core,
- json.simple
+ json.simple,
+ com.aptana.core.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.json,

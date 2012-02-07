@@ -7,14 +7,17 @@
  */
 package com.aptana.editor.css.preferences;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.build.IBuildParticipant.BuildType;
 import com.aptana.core.util.EclipseUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.css.validator.CSSValidator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -40,18 +43,35 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// mark occurrences
 		// prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
 
-		prefs = EclipseUtil.defaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		// Set validator to be on by default for reconcile
+		CSSValidator validator = new CSSValidator()
+		{
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
 
-		String[] filtered = new String[] { ".*Unknown pseudo-element.*", "Property\\s*[-_].*doesn't exist.*",
-				".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*", ".*accelerator.*", ".*background-position-.*",
-				".*filter.*", ".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*",
-				".*scrollbar-.*", ".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
-				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
-				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a .* value.*",
-				".*Too many values or values are not recognized.*" };
+			@Override
+			protected String getPreferenceNode()
+			{
+				return CSSPlugin.PLUGIN_ID;
+			}
+		};
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.BUILD), false);
+		prefs.putBoolean(validator.getEnablementPreferenceKey(BuildType.RECONCILE), true);
+		validator.setFilters(EclipseUtil.defaultScope(), CSSValidator.DEFAULT_FILTERS);
 
-		prefs.put(ICSSConstants.CONTENT_TYPE_CSS + ":"
-				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
-				StringUtil.join("####", filtered));
+		// Migrate the old filter prefs to new
+		IEclipsePreferences cepPrefs = EclipseUtil.instanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		String oldKey = MessageFormat.format("{0}:{1}", ICSSConstants.CONTENT_TYPE_CSS,
+				com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS);
+		String oldFilters = cepPrefs.get(oldKey, null);
+		if (oldFilters != null)
+		{
+			String[] oldFilterArray = oldFilters.split(CSSValidator.FILTER_DELIMITER);
+			validator.setFilters(EclipseUtil.instanceScope(), oldFilterArray);
+			cepPrefs.remove(oldKey);
+		}
 	}
 }

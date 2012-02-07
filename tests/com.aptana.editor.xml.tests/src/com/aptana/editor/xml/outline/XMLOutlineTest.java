@@ -49,7 +49,7 @@ public class XMLOutlineTest extends TestCase
 	{
 		String source = "<test></test>";
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source);
 		fParser.parse(parseState);
 
 		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
@@ -62,7 +62,7 @@ public class XMLOutlineTest extends TestCase
 	{
 		String source = "<test x=\"100\" y=\"10\"></test>";
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source);
 		fParser.parse(parseState);
 
 		Object[] elements = fContentProvider.getElements(parseState.getParseResult());

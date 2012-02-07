@@ -36,7 +36,7 @@ public class TextEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return ITextConstants.CONTENT_TYPE;
 	}

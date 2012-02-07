@@ -40,7 +40,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.org.eclipse.tm.terminal,
  org.eclipse.test.performance,
  org.eclipse.core.tests.harness,
- com.aptana.editor.epl.tests,
  com.aptana.filesystem.s3,
  com.aptana.editor.dtd,
  com.aptana.editor.yaml,
@@ -55,7 +54,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.index.core,
  com.aptana.portal.ui,
  com.aptana.samples,
- com.aptana.console
+ com.aptana.console,
+ com.aptana.buildpath.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.studio.tests.all

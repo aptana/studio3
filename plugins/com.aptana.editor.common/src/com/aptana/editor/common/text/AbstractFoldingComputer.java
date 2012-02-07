@@ -54,7 +54,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 
 	protected IParseNode getAST()
 	{
-		return getEditor().getFileService().getParseResult();
+		return getEditor().getAST();
 	}
 
 	/*

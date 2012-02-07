@@ -2,70 +2,88 @@ package com.aptana.editor.css.contentassist.index;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.build.BuildContext;
 
 public class CSSFileIndexingParticipantTest extends TestCase
 {
 
 	private CSSFileIndexingParticipant indexer;
-	private List<Task> tasks;
-
-	private static class Task
-	{
-
-		IFileStore store;
-		String message;
-		int priority;
-		int line;
-		int start;
-		int end;
-
-		Task(IFileStore store, String message, int priority, int line, int start, int end)
-		{
-			this.store = store;
-			this.message = message;
-			this.priority = priority;
-			this.line = line;
-			this.start = start;
-			this.end = end;
-		}
-
-	}
 
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		tasks = new ArrayList<Task>();
-		indexer = new CSSFileIndexingParticipant()
-		{
-			@Override
-			protected void createTask(IFileStore store, String message, int priority, int line, int start, int end)
-			{
-				tasks.add(new Task(store, message, priority, line, start, end));
-			}
-		};
+		indexer = new CSSFileIndexingParticipant();
 	}
 
 	protected void tearDown() throws Exception
 	{
-		tasks = null;
 		indexer = null;
 		super.tearDown();
+	}
+
+	public void testIsColorWithNames() throws Exception
+	{
+		assertTrue(CSSFileIndexingParticipant.isColor("aqua"));
+		assertTrue(CSSFileIndexingParticipant.isColor("black"));
+		assertTrue(CSSFileIndexingParticipant.isColor("blue"));
+		assertTrue(CSSFileIndexingParticipant.isColor("fuchsia"));
+		assertTrue(CSSFileIndexingParticipant.isColor("gray"));
+		assertTrue(CSSFileIndexingParticipant.isColor("green"));
+		assertTrue(CSSFileIndexingParticipant.isColor("lime"));
+		assertTrue(CSSFileIndexingParticipant.isColor("maroon"));
+		assertTrue(CSSFileIndexingParticipant.isColor("navy"));
+		assertTrue(CSSFileIndexingParticipant.isColor("olive"));
+		assertTrue(CSSFileIndexingParticipant.isColor("purple"));
+		assertTrue(CSSFileIndexingParticipant.isColor("red"));
+		assertTrue(CSSFileIndexingParticipant.isColor("silver"));
+		assertTrue(CSSFileIndexingParticipant.isColor("teal"));
+		assertTrue(CSSFileIndexingParticipant.isColor("white"));
+		assertTrue(CSSFileIndexingParticipant.isColor("yellow"));
+		
+		// Non-standard names don't work
+		assertFalse(CSSFileIndexingParticipant.isColor("grey"));
+	}
+
+	public void testIsColorWithHexValues() throws Exception
+	{
+		// various correct hex values
+		assertTrue(CSSFileIndexingParticipant.isColor("#c9c9c9"));
+		assertTrue(CSSFileIndexingParticipant.isColor("#ccc"));
+		assertTrue(CSSFileIndexingParticipant.isColor("#000"));
+		assertTrue(CSSFileIndexingParticipant.isColor("#000000"));
+
+		// empty and just hash
+		assertFalse(CSSFileIndexingParticipant.isColor(""));
+		assertFalse(CSSFileIndexingParticipant.isColor("#"));
+
+		// letter outside hex
+		assertFalse(CSSFileIndexingParticipant.isColor("#g00000"));
+
+		// Wrong lengths with digits
+		assertFalse(CSSFileIndexingParticipant.isColor("#0"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#00"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#0000"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#00000"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#0000000"));
+
+		// wrong lengths with letters
+		assertFalse(CSSFileIndexingParticipant.isColor("#a"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aa"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aaaa"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aaaaa"));
+		assertFalse(CSSFileIndexingParticipant.isColor("#aaaaaaa"));
 	}
 
 	public void testDetectTaskTagWithUnicodeCharacters() throws Exception
@@ -86,24 +104,11 @@ public class CSSFileIndexingParticipantTest extends TestCase
 
 			File coffeeFile = new File(tmpDir, "index_me.css");
 			IOUtil.write(new FileOutputStream(coffeeFile), src);
-
-			Set<IFileStore> files = new HashSet<IFileStore>();
 			IFileStore fileStore = EFS.getStore(coffeeFile.toURI());
-			files.add(fileStore);
-			// Also add in a null to make sure we handle it
-			files.add(null);
+			BuildContext context = new FileStoreBuildContext(fileStore);
 
 			Index index = IndexManager.getInstance().getIndex(tmpDir.toURI());
-			indexer.index(files, index, new NullProgressMonitor());
-
-			assertEquals(1, tasks.size());
-			Task task = tasks.get(0);
-			assertEquals("TODO: Привет", task.message);
-			assertEquals(2, task.line);
-			assertEquals(11, task.start);
-			assertEquals(23, task.end);
-			assertEquals(IMarker.PRIORITY_NORMAL, task.priority);
-			assertEquals(fileStore, task.store);
+			indexer.index(context, index, new NullProgressMonitor());
 		}
 		finally
 		{

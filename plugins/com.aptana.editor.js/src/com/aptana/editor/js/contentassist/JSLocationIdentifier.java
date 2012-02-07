@@ -402,7 +402,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 			}
 			else if (this._offset <= identifier.getEndingOffset())
 			{
-				this.setType(LocationType.IN_VARIABLE_NAME);
+				this.setType(identifier);
 			}
 			else if (this._offset <= arguments.getStartingOffset())
 			{

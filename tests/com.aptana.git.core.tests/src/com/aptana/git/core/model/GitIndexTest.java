@@ -40,7 +40,7 @@ public class GitIndexTest extends GitTestCase
 		assertTrue(fileToStage.hasUnstagedChanges());
 
 		// Now stage the "fix"
-		assertTrue("Staging file failed", index.stageFiles(filesToStage));
+		assertStageFiles(index, filesToStage);
 
 		// Now that the fix is staged, there should be no "merge conflict"
 		assertFalse(index.hasUnresolvedMergeConflicts());
@@ -101,7 +101,7 @@ public class GitIndexTest extends GitTestCase
 		assertTrue(fileToStage.hasStagedChanges());
 
 		// Now unstage the "fix"
-		assertTrue("Unstaging file failed", index.unstageFiles(filesToUnstage));
+		assertUnstageFiles(index, filesToUnstage);
 
 		assertTrue(index.hasUnresolvedMergeConflicts());
 

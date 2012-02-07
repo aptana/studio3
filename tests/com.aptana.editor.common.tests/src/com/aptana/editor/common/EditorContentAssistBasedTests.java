@@ -9,6 +9,10 @@ package com.aptana.editor.common;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.text.ITextViewer;
@@ -16,10 +20,9 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 
-import com.aptana.core.util.StringUtil;
+import com.aptana.ui.util.UIUtils;
 
 public abstract class EditorContentAssistBasedTests<T extends CommonContentAssistProcessor> extends EditorBasedTests
 {
@@ -37,6 +40,61 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 	}
 
 	/**
+	 * Assertion that a list of proposals contains the set of displayNames.
+	 * 
+	 * @param proposals
+	 * @param displayNames
+	 */
+	protected void assertContains(ICompletionProposal[] proposals, String... displayNames)
+	{
+		Set<String> uniqueDisplayNames = new HashSet<String>(Arrays.asList(displayNames));
+		for (ICompletionProposal proposal : proposals)
+		{
+			if (uniqueDisplayNames.contains(proposal.getDisplayString()))
+			{
+				uniqueDisplayNames.remove(proposal.getDisplayString());
+			}
+		}
+
+		if (!uniqueDisplayNames.isEmpty())
+		{
+			// build a list of display names
+			List<String> names = new ArrayList<String>();
+			for (ICompletionProposal proposal : proposals)
+			{
+				names.add(proposal.getDisplayString());
+			}
+			fail(MessageFormat.format(
+					"Proposals do not contain an entry for expected display string(s): {0}.\nProposal list: {1}",
+					uniqueDisplayNames, names));
+		}
+	}
+
+	/**
+	 * Tests if the proposals list contains a set of proposals using specific display names.
+	 * 
+	 * @param proposals
+	 * @param displayNames
+	 */
+	protected void assertDoesntContain(ICompletionProposal[] proposals, String... displayNames)
+	{
+		Set<String> uniqueDisplayNames = new HashSet<String>(Arrays.asList(displayNames));
+		Set<String> matches = new HashSet<String>(uniqueDisplayNames.size());
+		for (ICompletionProposal proposal : proposals)
+		{
+			if (uniqueDisplayNames.contains(proposal.getDisplayString()))
+			{
+				matches.add(proposal.getDisplayString());
+			}
+		}
+
+		if (!matches.isEmpty())
+		{
+			fail(MessageFormat.format("Proposals contain an entry for disallowed display string(s): {0}", matches));
+		}
+	}
+
+	/**
 	 * checkProposals
 	 * 
 	 * @param resource
@@ -46,7 +104,7 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 	{
 		this.setupTestContext(resource);
 
-		ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
+		ITextViewer viewer = new TextViewer(UIUtils.getActiveShell(), SWT.NONE);
 		viewer.setDocument(this.document);
 
 		for (int offset : this.cursorOffsets)
@@ -63,7 +121,7 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 				if (proposal instanceof ICompletionProposalExtension2)
 				{
 					ICompletionProposalExtension2 p = (ICompletionProposalExtension2) proposal;
-					if (p.validate(document, offset, null))
+					if (p.validate(document, offset, null)) // FIXME Should we fail if any turn out to be invalid?
 					{
 						names.add(proposal.getDisplayString());
 					}
@@ -76,11 +134,8 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 
 			if (enforceOrder || enforceSize)
 			{
-				assertTrue(
-						StringUtil.format(
-								"Length of expected proposal list and actual proposal list did not match.\nExpected: <{0}> Actual: <{1}>",
-								new Object[] { StringUtil.join(", ", displayNames), StringUtil.join(", ", names) }),
-						displayNames.length == names.size());
+				assertEquals("Length of expected proposal list and actual proposal list did not match.",
+						displayNames.length, names.size());
 			}
 
 			// this only really makes sense with enforce size
@@ -95,13 +150,7 @@ public abstract class EditorContentAssistBasedTests<T extends CommonContentAssis
 			}
 			else
 			{
-				// verify each specified name is in the resulting proposal list
-				for (String displayName : displayNames)
-				{
-					assertTrue(
-							MessageFormat.format("Did not find {0} in the proposal list <{1}>", displayName,
-									StringUtil.join(", ", names)), names.contains(displayName));
-				}
+				assertContains(proposals, displayNames);
 			}
 		}
 	}

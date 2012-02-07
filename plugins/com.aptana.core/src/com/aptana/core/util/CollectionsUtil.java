@@ -125,10 +125,9 @@ public class CollectionsUtil
 	 */
 	public static <T> List<T> filter(Collection<T> collection, IFilter<T> filter)
 	{
-		ArrayList<T> result = new ArrayList<T>();
-
+		ArrayList<T> result = new ArrayList<T>(collection == null ? 0 : collection.size());
 		filter(collection, result, filter);
-
+		result.trimToSize();
 		return result;
 	}
 
@@ -279,7 +278,7 @@ public class CollectionsUtil
 	 * 
 	 * @param <T>
 	 *            any type of key
-	 * @param <T>
+	 * @param <U>
 	 *            any type of value
 	 * @param map
 	 * @return

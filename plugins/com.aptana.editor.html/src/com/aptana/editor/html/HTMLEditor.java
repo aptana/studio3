@@ -37,15 +37,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IEditorLinkedResources;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
-import com.aptana.editor.common.validator.IValidationManager;
-import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
-import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.preferences.IPreferenceConstants;
-import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.xml.TagUtil;
 
 @SuppressWarnings("restriction")
@@ -110,16 +105,6 @@ public class HTMLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected FileService createFileService()
-	{
-		FileService fileService = new FileService(getFileServiceContentTypeId(), new HTMLParseState());
-		IValidationManager validationManager = fileService.getValidationManager();
-		validationManager.addNestedLanguage(ICSSConstants.CONTENT_TYPE_CSS);
-		validationManager.addNestedLanguage(IJSConstants.CONTENT_TYPE_JS);
-		return fileService;
-	}
-
-	@Override
 	protected CommonOutlinePage createOutlinePage()
 	{
 		CommonOutlinePage outlinePage = super.createOutlinePage();
@@ -129,7 +114,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected String getFileServiceContentTypeId()
+	public String getContentType()
 	{
 		return IHTMLConstants.CONTENT_TYPE_HTML;
 	}

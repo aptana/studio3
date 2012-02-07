@@ -13,6 +13,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.ArrayUtil;
+
 public class AssertUtil
 {
 	/**
@@ -59,6 +61,7 @@ public class AssertUtil
 		if (proposal != null)
 		{
 			ICompletionProposal p = findProposal(proposal, proposals);
+			TestCase.assertNotNull(MessageFormat.format("Unable to find expected proposal {0} in proposals {1}", proposal, proposals), p);
 			ITextViewer viewer = createTextViewer(document);
 			TestCase.assertTrue("Selected proposal doesn't validate against document",
 					((ICompletionProposalExtension2) p).validate(document, offset, null));

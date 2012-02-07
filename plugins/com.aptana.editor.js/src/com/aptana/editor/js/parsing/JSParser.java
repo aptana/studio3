@@ -18,6 +18,7 @@ import beaver.ParsingTables;
 import beaver.Scanner;
 import beaver.Symbol;
 
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.parsing.ast.IJSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
@@ -219,7 +220,7 @@ public class JSParser extends Parser implements IParser
 			{
 				return;
 			}
-			fParseState.addError(new ParseError(token, IParseError.Severity.ERROR));
+			fParseState.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, token, IParseError.Severity.ERROR));
 		}
 
 		public void unexpectedTokenRemoved(Symbol token)
@@ -396,11 +397,8 @@ public class JSParser extends Parser implements IParser
 	{
 		fParseState = parseState;
 
-		// grab source
-		char[] characters = fParseState.getSource();
-
 		// make sure we have some source
-		String source = (characters != null) ? new String(characters) : "";
+		String source = fParseState.getSource();
 
 		// create scanner and send source to it
 		fScanner = new JSFlexScanner();

@@ -13,43 +13,31 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 
 public interface IParseState
 {
 	/**
-	 * clearEditState
+	 * This will clean up the source passed in via {@link #setEditState(String, int)} for RAM/GC purposes. The
+	 * implementation should retain a hashcode of the source or any other artifacts to be able to compare later via
+	 * {@link #requiresReparse(IParseState)}
 	 */
 	public void clearEditState();
-
-	/**
-	 * getInsertedText
-	 * 
-	 * @return
-	 */
-	public char[] getInsertedText();
 
 	/**
 	 * getParseResult
 	 * 
 	 * @return
 	 */
-	public IParseNode getParseResult();
-
-	/**
-	 * getRemovedLength
-	 * 
-	 * @return
-	 */
-	public int getRemovedLength();
+	public IParseRootNode getParseResult();
 
 	/**
 	 * getSource
 	 * 
 	 * @return
 	 */
-	public char[] getSource();
+	public String getSource();
 
 	/**
 	 * getStartingOffset
@@ -73,21 +61,30 @@ public interface IParseState
 	public Map<String, Object> getProperties();
 
 	/**
-	 * setEditState
+	 * Equal to calling {@link #setEditState(String, int)} with starting offset of 0.
 	 * 
 	 * @param source
-	 * @param insertedText
 	 * @param startingOffset
-	 * @param removedLength
 	 */
-	public void setEditState(String source, String insertedText, int startingOffset, int removedLength);
+	public void setEditState(String source);
+
+	/**
+	 * Sets the source to operate on along with the starting offset to use. Typically this would be 0, if that is the
+	 * case, use {@link #setEditState(String)}
+	 * 
+	 * @param source
+	 * @param startingOffset
+	 *            Typically 0, use a non-zero value for parsing embedded languages that don't start at the beginning of
+	 *            the file.
+	 */
+	public void setEditState(String source, int startingOffset);
 
 	/**
 	 * setParseResult
 	 * 
 	 * @param result
 	 */
-	public void setParseResult(IParseNode result);
+	public void setParseResult(IParseRootNode result);
 
 	/**
 	 * Returns a list of the errors found in the document.
@@ -107,7 +104,7 @@ public interface IParseState
 	 * Clears the list of errors
 	 */
 	public void clearErrors();
-	
+
 	/**
 	 * Returns parsing progress monitor primarily for cancellation checks.
 	 * 
@@ -117,7 +114,18 @@ public interface IParseState
 
 	/**
 	 * Set parsing progress monitor
+	 * 
 	 * @param monitor
 	 */
 	public void setProgressMonitor(IProgressMonitor monitor);
+
+	/**
+	 * Given the new parse state, does this old one encompass the requirements? (i.e. can we just re-use the parse
+	 * result from this parse state instead of doing a re-parse?)
+	 * 
+	 * @param newState
+	 * @return
+	 */
+	public boolean requiresReparse(IParseState newState);
+
 }

@@ -21,11 +21,12 @@ import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.epl.tests.EditorTestHelper;
 
 public abstract class SingleEditorTestCase extends TestCase
 {
@@ -49,9 +50,7 @@ public abstract class SingleEditorTestCase extends TestCase
 			// Need to force the editor shut!
 			if (editor != null)
 			{
-				// We're running under Display.synExec already. Editor.close() just schedules something async, so it never happens
-				final IWorkbenchPartSite site = editor.getSite();
-				site.getPage().closeEditor(editor, false);
+				EditorTestHelper.closeEditor(editor);
 			}
 			// Delete the generated file
 			if (file != null)

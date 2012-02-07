@@ -39,8 +39,10 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.build.BuildContext;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -50,7 +52,8 @@ public abstract class InferencingTestsBase extends TestCase
 	{
 		public void indexTree(IFileStore file, String source, Index index, JSParseRootNode root)
 		{
-			processParseResults(file, source, index, root, new NullProgressMonitor());
+			BuildContext context = new FileStoreBuildContext(file);
+			processParseResults(context, index, root, new NullProgressMonitor());
 		}
 	}
 
@@ -241,7 +244,7 @@ public abstract class InferencingTestsBase extends TestCase
 		JSParser parser = new JSParser();
 		ParseState parseState = new ParseState();
 
-		parseState.setEditState(source, source, 0, 0);
+		parseState.setEditState(source);
 
 		try
 		{

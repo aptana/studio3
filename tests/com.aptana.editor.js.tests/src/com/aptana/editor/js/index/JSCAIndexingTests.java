@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextViewer;
@@ -25,6 +26,7 @@ import com.aptana.editor.js.contentassist.index.JSCAFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
@@ -33,13 +35,6 @@ import com.aptana.index.core.IndexManager;
  */
 public class JSCAIndexingTests extends JSEditorBasedTests
 {
-	class Indexer extends JSCAFileIndexingParticipant
-	{
-		public void index(Index index, IFileStore file)
-		{
-			indexFileStore(index, file, new NullProgressMonitor());
-		}
-	}
 
 	private JSIndexQueryHelper queryHelper;
 	private URI uri;
@@ -66,14 +61,14 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		}
 	}
 
-	protected Index indexResource(String resource)
+	protected Index indexResource(String resource) throws CoreException
 	{
 		IFileStore fileToIndex = getFileStore(resource);
 		uri = fileToIndex.toURI();
 		Index index = IndexManager.getInstance().getIndex(uri);
-		Indexer indexer = new Indexer();
-
-		indexer.index(index, fileToIndex);
+		JSCAFileIndexingParticipant indexer = new JSCAFileIndexingParticipant();
+		
+		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());
 
 		return index;
 	}
@@ -109,7 +104,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		super.tearDown();
 	}
 
-	public void testSimpleType()
+	public void testSimpleType() throws Exception
 	{
 		Index index = indexResource("metadata/typeOnly.jsca");
 
@@ -122,7 +117,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertFalse(global.isEmpty());
 	}
 
-	public void testSimpleInternalType()
+	public void testSimpleInternalType() throws Exception
 	{
 		Index index = indexResource("metadata/typeInternal.jsca");
 
@@ -135,7 +130,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTrue(global.isEmpty());
 	}
 
-	public void testNamespacedType()
+	public void testNamespacedType() throws Exception
 	{
 		Index index = indexResource("metadata/namespacedType.jsca");
 
@@ -148,7 +143,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertProperties(index, "com.aptana", "SimpleType");
 	}
 
-	public void testNamespacedTypeInternal()
+	public void testNamespacedTypeInternal() throws Exception
 	{
 		Index index = indexResource("metadata/namespacedTypeInternal.jsca");
 
@@ -161,7 +156,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertTrue(global.isEmpty());
 	}
 
-	public void testNamespacedTypeMixed()
+	public void testNamespacedTypeMixed() throws Exception
 	{
 		Index index = indexResource("metadata/namespacedTypeMixed.jsca");
 
@@ -174,7 +169,7 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		assertProperties(index, "com.aptana", "SimpleType2");
 	}
 
-	public void testIsInternalProposals()
+	public void testIsInternalProposals() throws Exception
 	{
 		// grab source file URI
 		IFileStore sourceFile = getFileStore("metadata/isInternalProperty.js");
@@ -183,8 +178,8 @@ public class JSCAIndexingTests extends JSEditorBasedTests
 		// index jsca file
 		IFileStore fileToIndex = getFileStore("metadata/namespacedTypeMixed.jsca");
 		Index index = IndexManager.getInstance().getIndex(uri);
-		Indexer indexer = new Indexer();
-		indexer.index(index, fileToIndex);
+		JSCAFileIndexingParticipant indexer = new JSCAFileIndexingParticipant();
+		indexer.index(new FileStoreBuildContext(fileToIndex), index, new NullProgressMonitor());		
 
 		// setup editor and CA context
 		setupTestContext(sourceFile);

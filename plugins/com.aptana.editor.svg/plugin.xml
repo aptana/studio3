@@ -5,6 +5,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.xml"
+            default-charset="UTF-8"
             file-extensions="svg"
             id="com.aptana.contenttype.svg"
             name="%content-type.svg.name"

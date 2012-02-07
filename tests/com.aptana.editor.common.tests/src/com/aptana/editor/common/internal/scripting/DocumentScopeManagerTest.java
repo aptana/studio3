@@ -10,7 +10,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.ide.IDE;
@@ -21,6 +20,7 @@ import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
+import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.ui.util.UIUtils;
 
 public class DocumentScopeManagerTest extends TestCase
@@ -113,7 +113,7 @@ public class DocumentScopeManagerTest extends TestCase
 		{
 			if (editor != null)
 			{
-				editor.close(false);
+				EditorTestHelper.closeEditor(editor);
 			}
 			if (file != null)
 			{
@@ -124,7 +124,7 @@ public class DocumentScopeManagerTest extends TestCase
 			}
 		}
 	}
-	
+
 	public void testGetScopeAtEndOfFile() throws Exception
 	{
 		ITextEditor editor = null;
@@ -150,17 +150,7 @@ public class DocumentScopeManagerTest extends TestCase
 		{
 			if (editor != null)
 			{
-				if (editor != null)
-				{
-					if (Display.getCurrent() != null)
-					{
-						editor.getSite().getPage().closeEditor(editor, false);
-					}
-					else
-					{
-						editor.close(false);
-					}
-				}
+				EditorTestHelper.closeEditor(editor);
 			}
 			if (file != null)
 			{
@@ -181,41 +171,26 @@ public class DocumentScopeManagerTest extends TestCase
 			IWorkbenchPage page = UIUtils.getActivePage();
 			file = File.createTempFile("testing", ".html");
 			FileWriter writer = new FileWriter(file);
-			writer.write("<html>\n  <head>\n" +
-					"    <style type=\"text/css\">\n" +
-					"    h1 { color: #f00; }\n" +
-					"  </style>\n" +
-					"</head>\n" +
-					"<body>\n" +
-					"</html>");
+			writer.write("<html>\n  <head>\n" + "    <style type=\"text/css\">\n" + "    h1 { color: #f00; }\n"
+					+ "  </style>\n" + "</head>\n" + "<body>\n" + "</html>");
 			writer.close();
 
 			IEditorPart part = IDE.openEditorOnFileStore(page, EFS.getLocalFileSystem().fromLocalFile(file));
 			editor = (ITextEditor) part;
 			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
 
-			assertEquals("text.html.basic meta.tag.block.any.html string.quoted.double.html", CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(viewer, 32));
-			assertEquals("text.html.basic meta.tag.block.any.html string.quoted.double.html", CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(viewer, 41));
-			assertEquals("text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html", CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(viewer, 42));
+			assertEquals("text.html.basic meta.tag.block.any.html string.quoted.double.html", CommonEditorPlugin
+					.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, 32));
+			assertEquals("text.html.basic meta.tag.block.any.html string.quoted.double.html", CommonEditorPlugin
+					.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, 41));
+			assertEquals("text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html",
+					CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, 42));
 		}
 		finally
 		{
 			if (editor != null)
 			{
-				if (editor != null)
-				{
-					if (Display.getCurrent() != null)
-					{
-						editor.getSite().getPage().closeEditor(editor, false);
-					}
-					else
-					{
-						editor.close(false);
-					}
-				}
+				EditorTestHelper.closeEditor(editor);
 				editor = null;
 			}
 			if (file != null)
@@ -253,24 +228,14 @@ public class DocumentScopeManagerTest extends TestCase
 					CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 1));
 			assertEquals("source.js",
 					CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 7));
-			assertEquals("source.js string.quoted.double.js", CommonEditorPlugin.getDefault()
-					.getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 50));
+			assertEquals("source.js string.quoted.double.js", CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer.getDocument(), 50));
 		}
 		finally
 		{
 			if (editor != null)
 			{
-				if (editor != null)
-				{
-					if (Display.getCurrent() != null)
-					{
-						editor.getSite().getPage().closeEditor(editor, false);
-					}
-					else
-					{
-						editor.close(false);
-					}
-				}
+				EditorTestHelper.closeEditor(editor);
 				editor = null;
 			}
 			if (file != null)

@@ -15,61 +15,50 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseError;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.lexer.IRange;
 
 public class ParseState implements IParseState
 {
 
-	private static final char[] NO_CHARS = new char[0];
-
-	private char[] fSource;
-	private char[] fInsertedText;
+	private String fSource;
 	private int fStartingOffset;
-	private int fRemovedLength;
 	private List<IParseError> fErrors;
-
 
 	private IRange[] fSkippedRanges;
 	private Map<String, Object> fProperties;
 
 	// represents the root node of the parsing result
-	private IParseNode fParseResult;
+	private IParseRootNode fParseResult;
 	private IProgressMonitor fProgressMonitor;
+
+	/**
+	 * This holds onto the hashcode of the source for the parse. Used for determining if we need to re-parse or cache is
+	 * valid.
+	 */
+	private int fSourceHash;
 
 	public ParseState()
 	{
-		fSource = NO_CHARS;
-		fInsertedText = NO_CHARS;
+		fSource = StringUtil.EMPTY;
 		fProperties = new HashMap<String, Object>();
 		fErrors = new ArrayList<IParseError>();
-
 	}
 
 	public void clearEditState()
 	{
-		fInsertedText = NO_CHARS;
-		fRemovedLength = 0;
+		fSource = null;
 		fSkippedRanges = null;
 	}
 
-	public IParseNode getParseResult()
+	public IParseRootNode getParseResult()
 	{
 		return fParseResult;
 	}
 
-	public char[] getInsertedText()
-	{
-		return fInsertedText;
-	}
-
-	public int getRemovedLength()
-	{
-		return fRemovedLength;
-	}
-
-	public char[] getSource()
+	public String getSource()
 	{
 		return fSource;
 	}
@@ -89,16 +78,20 @@ public class ParseState implements IParseState
 		return fProperties;
 	}
 
-	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
+	public void setEditState(String source)
 	{
-		fSource = (source != null) ? source.toCharArray() : NO_CHARS;
-		fInsertedText = (insertedText != null) ? insertedText.toCharArray() : NO_CHARS;
+		setEditState(source, 0);
+	}
+
+	public void setEditState(String source, int startingOffset)
+	{
+		fSource = (source != null) ? source : StringUtil.EMPTY;
+		fSourceHash = fSource.hashCode(); // Store hashcode of source for use later for determining cache-busting
 		fStartingOffset = startingOffset;
-		fRemovedLength = removedLength;
 		fSkippedRanges = null;
 	}
 
-	public void setParseResult(IParseNode result)
+	public void setParseResult(IParseRootNode result)
 	{
 		fParseResult = result;
 	}
@@ -108,7 +101,8 @@ public class ParseState implements IParseState
 		fSkippedRanges = ranges;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParseState#getProgressMonitor()
 	 */
 	public IProgressMonitor getProgressMonitor()
@@ -129,23 +123,7 @@ public class ParseState implements IParseState
 	{
 		StringBuilder text = new StringBuilder();
 		text.append('@').append(fStartingOffset);
-
-		if (fRemovedLength > 0)
-		{
-			text.append(":r").append(fRemovedLength); //$NON-NLS-1$
-		}
-
-		int insertedLength = fInsertedText.length;
-		if (insertedLength > 0)
-		{
-			text.append(":i").append(insertedLength).append(':').append(fInsertedText); //$NON-NLS-1$
-		}
-		else
-		{
-			// outputs closing delimiter for proper parsing of the offset
-			text.append(':');
-		}
-
+		text.append(':');
 		return text.toString();
 	}
 
@@ -169,4 +147,22 @@ public class ParseState implements IParseState
 		fErrors.clear();
 	}
 
+	public boolean requiresReparse(IParseState newState)
+	{
+		// We can't compare, assume re-parse
+		if (!(newState instanceof ParseState))
+		{
+			return true;
+		}
+
+		ParseState newParseState = (ParseState) newState;
+		if (fSourceHash != newParseState.fSourceHash)
+		{
+			// source hashes don't match, requires re-parse
+			return true;
+		}
+
+		// if starting offsets don't match, requires re-parse
+		return fStartingOffset != newParseState.fStartingOffset;
+	}
 }

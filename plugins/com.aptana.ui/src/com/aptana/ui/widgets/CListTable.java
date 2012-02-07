@@ -46,6 +46,8 @@ public class CListTable extends Composite
 		public Object addItem();
 
 		public Object editItem(Object item);
+
+		public void itemsChanged(List<Object> rawFilters);
 	}
 
 	private Button addButton;
@@ -101,6 +103,10 @@ public class CListTable extends Composite
 				{
 					tableViewer.refresh();
 					tableViewer.setSelection(new StructuredSelection(newItem));
+					for (Listener listener : listeners)
+					{
+						listener.itemsChanged(getItems());
+					}
 				}
 			}
 		});
@@ -134,6 +140,10 @@ public class CListTable extends Composite
 					{
 						tableViewer.refresh();
 						tableViewer.setSelection(new StructuredSelection(newElement));
+						for (Listener listener : listeners)
+						{
+							listener.itemsChanged(getItems());
+						}
 					}
 				}
 			}
@@ -157,6 +167,10 @@ public class CListTable extends Composite
 				}
 				tableViewer.refresh();
 				updateStates();
+				for (Listener listener : listeners)
+				{
+					listener.itemsChanged(getItems());
+				}
 			}
 		});
 		removeButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/delete.gif")); //$NON-NLS-1$
@@ -225,5 +239,22 @@ public class CListTable extends Composite
 		boolean hasMultiSelections = selection.size() > 1;
 		editButton.setEnabled(hasSelection && !hasMultiSelections);
 		removeButton.setEnabled(hasSelection);
+		addButton.setEnabled(true);
+	}
+	
+	public void setEnabled(boolean enabled)
+	{
+		if (!enabled)
+		{
+			addButton.setEnabled(false);
+			editButton.setEnabled(false);
+			removeButton.setEnabled(false);
+		}
+		else
+		{
+			updateStates();
+		}
+		tableViewer.getTable().setEnabled(enabled);
+		super.setEnabled(enabled);
 	}
 }

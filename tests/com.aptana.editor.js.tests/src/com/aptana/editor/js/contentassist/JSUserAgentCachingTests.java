@@ -7,12 +7,15 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.tests.util.ListCrossProduct;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 
 /**
@@ -59,7 +62,7 @@ public class JSUserAgentCachingTests extends TestCase
 		UserAgentElement.clearCache();
 		UserAgentElement uaNoncached = new UserAgentElement();
 		uaNoncached.setPlatform("IE");
-		UserAgentElement uaCached = UserAgentElement.createUserAgentElement("IE", "", "", "", "");
+		UserAgentElement uaCached = UserAgentElement.createUserAgentElement("IE");
 
 		assertNotSame(uaNoncached, uaCached);
 	}
@@ -95,5 +98,63 @@ public class JSUserAgentCachingTests extends TestCase
 				}
 			}
 		}
+	}
+
+	public void testHasAllUserAgents()
+	{
+		UserAgentElement.clearCache();
+		PropertyElement property = new PropertyElement();
+		List<UserAgentElement> uaListBefore = property.getUserAgents();
+
+		assertNotNull(uaListBefore);
+		assertTrue(uaListBefore.isEmpty());
+
+		property.setHasAllUserAgents();
+		List<UserAgentElement> uaListAfter = property.getUserAgents();
+
+		assertTrue(property.hasAllUserAgents());
+		assertNotNull(uaListAfter);
+		assertFalse(uaListAfter.isEmpty());
+	}
+
+	public void testAddExistingUserAgentToAllUserAgents()
+	{
+		UserAgentElement.clearCache();
+		PropertyElement property = new PropertyElement();
+
+		property.setHasAllUserAgents();
+		property.addUserAgent(UserAgentElement.createUserAgentElement("IE"));
+
+		assertTrue(property.hasAllUserAgents());
+	}
+
+	public void testAddNewUserAgentToAllUserAgents()
+	{
+		UserAgentElement.clearCache();
+		PropertyElement property = new PropertyElement();
+
+		// set to use all ua's
+		property.setHasAllUserAgents();
+
+		// grab current list
+		Set<UserAgentElement> allUAs = new HashSet<UserAgentElement>(property.getUserAgents());
+		assertFalse(allUAs.isEmpty());
+
+		// add a user agent not in the "all ua's" list
+		property.addUserAgent(UserAgentElement.createUserAgentElement("MyCrazyBrowser"));
+
+		// grab the new list of ua's
+		Set<UserAgentElement> augmentedUAs = new HashSet<UserAgentElement>(property.getUserAgents());
+
+		// perform a diff (aug - all)
+		augmentedUAs.removeAll(allUAs);
+
+		// make sure all ua's flag is off now
+		assertFalse(property.hasAllUserAgents());
+
+		// we should have only our new custom browser
+		assertEquals(1, augmentedUAs.size());
+		UserAgentElement ua = augmentedUAs.iterator().next();
+		assertEquals("MyCrazyBrowser", ua.getPlatform());
 	}
 }

@@ -10,6 +10,7 @@ package com.aptana.editor.js.contentassist;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -19,8 +20,10 @@ import com.aptana.editor.common.contentassist.IPreferenceConstants;
 import com.aptana.editor.common.contentassist.UserAgentFilterType;
 import com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant;
 import com.aptana.editor.js.tests.JSEditorBasedTests;
+import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.build.BuildContext;
 
 /**
  * JSUserAgentFiltering
@@ -29,9 +32,10 @@ public class JSUserAgentFilteringTests extends JSEditorBasedTests
 {
 	class Indexer extends SDocMLFileIndexingParticipant
 	{
-		public void index(Index index, IFileStore file)
-		{
-			indexFileStore(index, file, new NullProgressMonitor());
+		public void index(Index index, IFileStore file) throws CoreException
+		{			
+			BuildContext context = new FileStoreBuildContext(file);
+			index(context, index, new NullProgressMonitor());
 		}
 	}
 

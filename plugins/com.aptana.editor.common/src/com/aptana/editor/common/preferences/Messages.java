@@ -74,13 +74,18 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_Instant;
 	public static String EditorsPreferencePage_Wrap_Selection;
 
-	public static String ValidationPreferencePage_enable_parse_errors_label;
+	public static String ValidationPreferencePage_EnablingValidatorWarning;
+
 	public static String ValidationPreferencePage_ERR_EmptyExpression;
 	public static String ValidationPreferencePage_Filter_Description;
+	public static String ValidationPreferencePage_Filter_SelectParticipant;
 	public static String ValidationPreferencePage_Ignore_Message;
 	public static String ValidationPreferencePage_Ignore_Title;
 	public static String ValidationPreferencePage_LBL_Filter;
 	public static String ValidationPreferencePage_LBL_Validators;
+	public static String ValidationPreferencePage_BuildColumn;
+	public static String ValidationPreferencePage_NameColumn;
+	public static String ValidationPreferencePage_ReconcileColumn;
 
 	static
 	{

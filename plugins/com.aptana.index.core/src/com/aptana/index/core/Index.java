@@ -351,16 +351,28 @@ public class Index
 	 */
 	void deleteIndexFile()
 	{
+		if (isInfoEnabled())
+		{
+			logInfo(MessageFormat.format("Deleting index ''{0}''", this)); //$NON-NLS-1$
+		}
+
 		// TODO Enter write?
-		IdeLog.logInfo(IndexPlugin.getDefault(),
-				MessageFormat.format("Deleting index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
 
 		File indexFile = this.getIndexFile();
-
 		if (indexFile != null && indexFile.exists())
 		{
 			indexFile.delete();
 		}
+	}
+
+	protected void logInfo(String msg)
+	{
+		IdeLog.logInfo(IndexPlugin.getDefault(), msg, IDebugScopes.INDEXER);
+	}
+
+	protected boolean isInfoEnabled()
+	{
+		return IdeLog.isInfoEnabled(IndexPlugin.getDefault(), IDebugScopes.INDEXER);
 	}
 
 	/**
@@ -584,8 +596,7 @@ public class Index
 		this.enterRead();
 		try
 		{
-			// TODO: Don't do any of this unless we are logging INFOs
-			if (memoryIndex.hasDocument(documentName))
+			if (isInfoEnabled() && memoryIndex.hasDocument(documentName))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -594,8 +605,7 @@ public class Index
 					this
 				);
 				// @formatter:on
-
-				IdeLog.logInfo(IndexPlugin.getDefault(), message, IDebugScopes.INDEXER);
+				logInfo(message);
 			}
 		}
 		finally
@@ -643,8 +653,10 @@ public class Index
 	 */
 	public void save() throws IOException
 	{
-		IdeLog.logInfo(IndexPlugin.getDefault(),
-				MessageFormat.format("Saving index ''{0}''", this), IDebugScopes.INDEXER); //$NON-NLS-1$
+		if (isInfoEnabled())
+		{
+			logInfo(MessageFormat.format("Saving index ''{0}''", this)); //$NON-NLS-1$
+		}
 
 		this.save(true);
 	}

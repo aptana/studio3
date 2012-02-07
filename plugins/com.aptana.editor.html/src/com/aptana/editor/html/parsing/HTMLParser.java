@@ -29,13 +29,14 @@ import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
-import com.aptana.editor.html.parsing.ast.IHTMLNodeTypes;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.ast.HTMLTextNode;
+import com.aptana.editor.html.parsing.ast.IHTMLNodeTypes;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
@@ -90,8 +91,19 @@ public class HTMLParser implements IParser
 		fTagScanner = new HTMLTagScanner();
 		fElementStack = new Stack<IParseNode>();
 
-		fParseState = (HTMLParseState) parseState;
-		String source = new String(fParseState.getSource());
+		String source = parseState.getSource();
+		if (parseState instanceof HTMLParseState)
+		{
+			fParseState = (HTMLParseState) parseState;
+		}
+		else
+		{
+			fParseState = new HTMLParseState();
+			fParseState.setEditState(source, parseState.getStartingOffset());
+			fParseState.setSkippedRanges(parseState.getSkippedRanges());
+			fParseState.setProgressMonitor(parseState.getProgressMonitor());
+		}
+
 		fScanner.setSource(source);
 
 		fParseState.clearErrors();
@@ -111,7 +123,15 @@ public class HTMLParser implements IParser
 			parseAll(source);
 			root.setCommentNodes(fCommentNodes.toArray(new IParseNode[fCommentNodes.size()]));
 
-			fParseState.setParseResult(root);
+			// If we wrapped the parse state, copy the collected errors back over to original
+			if (!(parseState instanceof HTMLParseState))
+			{
+				for (IParseError error : fParseState.getErrors())
+				{
+					parseState.addError(error);
+				}
+			}
+			parseState.setParseResult(root);
 		}
 		finally
 		{
@@ -196,8 +216,9 @@ public class HTMLParser implements IParser
 		parseAttribute(element, fCurrentSymbol);
 		if (element.isSelfClosing() && !HTMLParseState.isEndForbiddenOrEmptyTag(element.getName()))
 		{
-			fParseState.addError(new ParseError(element.getStartingOffset(),
-					Messages.HTMLParser_self_closing_syntax_on_non_void_element_error, IParseError.Severity.ERROR));
+			fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, element.getStartingOffset(), element
+					.getLength(), Messages.HTMLParser_self_closing_syntax_on_non_void_element_error,
+					IParseError.Severity.ERROR));
 		}
 		return element;
 	}
@@ -272,13 +293,27 @@ public class HTMLParser implements IParser
 			try
 			{
 				String text = fScanner.getSource().get(start, end - start + 1);
-				IParseNode node = ParserPoolFactory.parse(language, text);
+				ParseState subParseState = new ParseState();
+				subParseState.setEditState(text, start);
+				// FIXME We need to propagate options down to sub-languages, i.e. JS's attach/collect comments
+				IParseNode node = ParserPoolFactory.parse(language, subParseState);
+				List<IParseError> subErrors = subParseState.getErrors();
+				if (subErrors != null)
+				{
+					for (IParseError subError : subErrors)
+					{
+						// Shift the line/offsets based on the starting offset/line of the sub-language!
+						fParseState.addError(new ParseError(language, start + subError.getOffset(), subError
+								.getLength(), subError.getMessage(), subError.getSeverity()));
+					}
+				}
 				if (node == null)
 				{
 					node = new HTMLTextNode(text, start, end);
 				}
 				else
 				{
+					// FIXME Do we need to shift this here, if we passed in offset in setEditState?
 					addOffset(node, start);
 				}
 				return new IParseNode[] { node };
@@ -359,8 +394,8 @@ public class HTMLParser implements IParser
 			}
 			else
 			{
-				fParseState.addError(new ParseError(fCurrentSymbol.getStart(), Messages.HTMLParser_unexpected_error
-						+ fCurrentSymbol.value, IParseError.Severity.WARNING));
+				fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, fCurrentSymbol,
+						Messages.HTMLParser_unexpected_error + fCurrentSymbol.value, IParseError.Severity.WARNING));
 			}
 		}
 
@@ -390,8 +425,9 @@ public class HTMLParser implements IParser
 	{
 		if (fParseState.getCloseTagType(node.getName()) != IHTMLTagInfo.END_OPTIONAL)
 		{
-			fParseState.addError(new ParseError(node.getEndingOffset(), MessageFormat.format(
-					Messages.HTMLParser_missing_end_tag_error, node.getName()), IParseError.Severity.WARNING));
+			fParseState.addError(new ParseError(IHTMLConstants.CONTENT_TYPE_HTML, node.getStartingOffset(), node
+					.getLength(), MessageFormat.format(Messages.HTMLParser_missing_end_tag_error, node.getName()),
+					IParseError.Severity.WARNING));
 		}
 	}
 

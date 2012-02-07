@@ -8,15 +8,15 @@
 package com.aptana.theme;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.UUID;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -122,29 +122,13 @@ public class ThemeExporter
 		buffer.append("</dict>\n");
 		buffer.append("</plist>\n");
 
-		Writer writer = null;
 		try
 		{
-			writer = new FileWriter(themeFile);
-			writer.write(buffer.toString());
+			IOUtil.write(new FileOutputStream(themeFile), buffer.toString());
 		}
 		catch (IOException e)
 		{
 			IdeLog.logError(ThemePlugin.getDefault(), e);
-		}
-		finally
-		{
-			try
-			{
-				if (writer != null)
-				{
-					writer.close();
-				}
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
 		}
 	}
 

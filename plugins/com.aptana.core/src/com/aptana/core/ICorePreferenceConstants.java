@@ -8,7 +8,6 @@
 
 package com.aptana.core;
 
-
 /**
  * @author Max Stepanov
  */
@@ -22,12 +21,14 @@ public interface ICorePreferenceConstants
 	 * A boolean used to swap system jobs to user so they show in the UI for debugging CPU usage.
 	 */
 	String PREF_SHOW_SYSTEM_JOBS = "show_system_jobs"; //$NON-NLS-1$
+	public static final boolean DEFAULT_DEBUG_MODE = false;
 
 	/**
 	 * A boolean to enable/disable attaching filewatchers to automatically refresh/handle edits made to project's
 	 * contents outside the IDE.
 	 */
 	String PREF_AUTO_REFRESH_PROJECTS = "auto_refresh_projects"; //$NON-NLS-1$
+	public static final boolean DEFAULT_AUTO_REFRESH_PROJECTS = true;
 
 	/**
 	 * The current level of debugging

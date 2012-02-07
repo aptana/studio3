@@ -13,11 +13,12 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.epl.tests.EditorTestHelper;
 
 public class XMLEditorTest extends TestCase
 {
@@ -29,19 +30,10 @@ public class XMLEditorTest extends TestCase
 	{
 		if (editor != null)
 		{
-			if (editor != null)
-			{
-				if (Display.getCurrent() != null)
-				{
-					editor.getSite().getPage().closeEditor(editor, false);
-				}
-				else
-				{
-					editor.close(false);
-				}
-			}
+			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
+		super.tearDown();
 	}
 
 	public void testExecute() throws Exception

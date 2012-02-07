@@ -17,6 +17,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+/**
+ * @deprecated Combine with TestProject
+ */
 abstract public class ProjectCreator
 {
 
@@ -28,8 +31,8 @@ abstract public class ProjectCreator
 			// Create in a new directory inside the temp dir, otherwise on unit test machine we may get messed up
 			// because we're already under a git repo!
 			IProjectDescription desc = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
-			
-			File tmpDir;			
+
+			File tmpDir;
 			try
 			{
 				File tmpfile = File.createTempFile(projectName, null);

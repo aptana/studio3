@@ -20,6 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
+            default-charset="UTF-8"
             file-extensions="dtd"
             id="com.aptana.contenttype.dtd"
             name="%content-type.name"
