@@ -9,8 +9,10 @@ package com.aptana.projects.internal.wizards;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -21,6 +23,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.SWTUtils;
 import com.aptana.ui.util.UIUtils;
@@ -149,15 +152,32 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 		{
 			File locationFile = getLocationPath().toFile();
 
-			if (!useDefaults() && locationFile.exists())
+			if (useDefaults())
+			{
+				String defaultLocation = TextProcessor.process(Platform.getLocation().append(getProjectName())
+						.toOSString());
+				File dir = new File(defaultLocation);
+				if (dir.exists())
+				{
+					String[] files = dir.list();
+					if (!ArrayUtil.isEmpty(files))
+					{
+						isValid = false;
+					}
+				}
+			}
+			else if (locationFile.exists())
 			{
 				String[] files = locationFile.list();
-				if (files != null && files.length > 0)
+				if (!ArrayUtil.isEmpty(files))
 				{
-					warningLabel
-							.setText(Messages.CommonWizardNewProjectCreationPage_location_has_existing_content_warning);
-					warningLabel.getParent().layout(true);
+					isValid = false;
 				}
+			}
+			if (!isValid)
+			{
+				warningLabel.setText(Messages.CommonWizardNewProjectCreationPage_location_has_existing_content_warning);
+				warningLabel.getParent().layout(true);
 			}
 		}
 
@@ -173,5 +193,4 @@ public class CommonWizardNewProjectCreationPage extends WizardNewProjectCreation
 	{
 		this.stepNames = stepNames;
 	}
-
 }
