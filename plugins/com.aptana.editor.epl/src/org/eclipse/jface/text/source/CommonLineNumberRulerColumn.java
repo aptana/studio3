@@ -810,7 +810,7 @@ public class CommonLineNumberRulerColumn extends LineNumberRulerColumn {
 		{
 			IdeLog.logError(EditorEplPlugin.getDefault(), "Error translating starting line number to y offset in text widget", e); //$NON-NLS-1$
 		}
-		for (int i = visibleLines.getStartLine(); i <= endLine; i++)
+		for (int i = visibleLines.getStartLine(); i < endLine; i++)
 		{
 			if (i == 0)
 			{
