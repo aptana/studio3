@@ -402,4 +402,32 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	{
 		this.checkProposals("contentAssist/dotted-constructor.js", "aptana");
 	}
+
+	public void testAPSTUD3694()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/document.js",
+			"anchors",
+			"applets",
+			"body",
+			"cookie",
+			"documentMode",
+			"domain",
+			"forms",
+			"images",
+			"lastModified",
+			"links",
+			"readyState",
+			"referrer",
+			"title",
+			"URL",
+			"close",
+			"getElementsByName",
+			"open",
+			"write",
+			"writeln"
+		);
+		// @formatter:on
+	}
 }
