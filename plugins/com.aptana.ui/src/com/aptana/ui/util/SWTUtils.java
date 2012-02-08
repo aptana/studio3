@@ -37,6 +37,7 @@ public class SWTUtils
 {
 
 	private static final String SMALL_FONT = "com.aptana.ui.small_font"; //$NON-NLS-1$
+	private static Color backgroundErrorColor;
 	private static Color errorColor;
 	private static ModifyListener modifyListener;
 
@@ -51,9 +52,11 @@ public class SWTUtils
 				ColorRegistry cm = JFaceResources.getColorRegistry();
 				RGB errorRGB = new RGB(255, 255, 180);
 				cm.put("error", errorRGB); //$NON-NLS-1$
-				errorColor = cm.get("error"); //$NON-NLS-1$
+				backgroundErrorColor = cm.get("error"); //$NON-NLS-1$
 			}
 		});
+		// Set a 'Red' error color
+		errorColor = UIUtils.getDisplay().getSystemColor(SWT.COLOR_RED);
 	}
 
 	/**
@@ -214,6 +217,16 @@ public class SWTUtils
 	}
 
 	/**
+	 * Returns a standard error {@link Color}.
+	 * 
+	 * @return An error {@link Color}
+	 */
+	public static Color getErrorColor()
+	{
+		return errorColor;
+	}
+
+	/**
 	 * Tests if the Combo value is empty. If so, it adds an error color to the background of the cell.
 	 * 
 	 * @param combo
@@ -228,7 +241,7 @@ public class SWTUtils
 		String text = combo.getText();
 		if (text == null || text.length() == 0 || combo.getSelectionIndex() < selectionIndex)
 		{
-			combo.setBackground(errorColor);
+			combo.setBackground(backgroundErrorColor);
 			return false;
 		}
 		combo.setBackground(null);
@@ -246,7 +259,7 @@ public class SWTUtils
 	{
 		if (widget.getText() == null || "".equals(widget.getText())) //$NON-NLS-1$
 		{
-			widget.setBackground(errorColor);
+			widget.setBackground(backgroundErrorColor);
 			if (modifyListener == null)
 			{
 				modifyListener = new ModifyListener()
@@ -260,7 +273,7 @@ public class SWTUtils
 						}
 						else
 						{
-							t.setBackground(errorColor);
+							t.setBackground(backgroundErrorColor);
 						}
 					};
 				};
