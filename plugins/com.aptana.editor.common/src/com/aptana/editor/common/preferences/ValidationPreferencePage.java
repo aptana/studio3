@@ -324,8 +324,23 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		}
 		else
 		{
-			validatorsViewer.setInput(getBuildParticipantManager().getBuildParticipants(selected.getId()));
+			validatorsViewer.setInput(getBuildParticipants(selected.getId()));
 		}
+	}
+
+	private List<IBuildParticipant> getBuildParticipants(String contentTypeId)
+	{
+		List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(contentTypeId);
+		// removes the ones that don't have a name defined
+		List<IBuildParticipant> result = new ArrayList<IBuildParticipant>(participants);
+		for (IBuildParticipant participant : participants)
+		{
+			if (StringUtil.isEmpty(participant.getName()))
+			{
+				result.remove(participant);
+			}
+		}
+		return result;
 	}
 
 	private IBuildParticipant getSelectedBuildParticipant()
@@ -380,7 +395,7 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 			if (element instanceof IContentType)
 			{
 				IContentType type = (IContentType) element;
-				List<IBuildParticipant> participants = getBuildParticipantManager().getBuildParticipants(type.getId());
+				List<IBuildParticipant> participants = getBuildParticipants(type.getId());
 				if (CollectionsUtil.isEmpty(participants))
 				{
 					return false;
