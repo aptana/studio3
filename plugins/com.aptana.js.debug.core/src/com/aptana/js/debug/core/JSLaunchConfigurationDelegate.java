@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -61,8 +62,20 @@ import com.aptana.webserver.core.WorkspaceResolvingURIMapper;
 public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 {
 
+	public static interface Listener
+	{
+		public String checkFirefoxLocation();
+	}
+
 	protected static final IStatus launchBrowserPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 302,
 			StringUtil.EMPTY, null);
+
+	private static Listener checkFirefoxLocationListener;
+
+	public static void setCheckFirefoxLocationListener(Listener listener)
+	{
+		checkFirefoxLocationListener = listener;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -125,9 +138,29 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, (String) null);
 		if (browserExecutable == null || !new File(browserExecutable).exists())
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-					MessageFormat.format(Messages.JSLaunchConfigurationDelegate_WebBrowserDoesNotExist,
-							browserExecutable), null));
+			boolean found = false;
+			String name = configuration.getName();
+			if (!StringUtil.isEmpty(name) && name.startsWith(JSLaunchConfigurationHelper.FIREFOX) && checkFirefoxLocationListener != null)
+			{
+				browserExecutable = checkFirefoxLocationListener.checkFirefoxLocation();
+				if (StringUtil.isEmpty(browserExecutable))
+				{
+					return;
+				}
+				if ((new File(browserExecutable)).exists())
+				{
+					found = true;
+					ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
+					wc.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, browserExecutable);
+					wc.doSave();
+				}
+			}
+			if (!found)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						MessageFormat.format(Messages.JSLaunchConfigurationDelegate_WebBrowserDoesNotExist,
+								browserExecutable), null));
+			}
 		}
 
 		JSLaunchConfigurationHelper.initializeLaunchAttributes(configuration, launch);
