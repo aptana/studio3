@@ -422,7 +422,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
 		super.initializeLineNumberRulerColumn(rulerColumn);
+		if (rulerColumn instanceof CommonLineNumberChangeRulerColumn)
+		{
+			((CommonLineNumberChangeRulerColumn) rulerColumn).showLineNumbers(isLineNumberVisible());
+		}
 		this.fThemeableEditorColorsExtension.initializeLineNumberRulerColumn(rulerColumn);
+	}
+
+	private boolean isLineNumberVisible()
+	{
+		IPreferenceStore store = getPreferenceStore();
+		return (store != null) ? store
+				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER) : false;
 	}
 
 	@Override
@@ -777,7 +788,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		super.handlePreferenceStoreChanged(event);
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
-		if (property.equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
+		if (property.equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER))
+		{
+			((CommonLineNumberChangeRulerColumn) fLineNumberRulerColumn).showLineNumbers(isLineNumberVisible());
+		}
+		else if (property.equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
 		{
 			fPeerCharacterCloser.setAutoInsertEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event
 					.getNewValue())));
@@ -1184,8 +1199,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	public void setWordWrapEnabled(boolean enabled)
 	{
 		StyledText textWidget = getSourceViewer().getTextWidget();
-		textWidget.setWordWrap(enabled);
-		fLineNumberRulerColumn.redraw();
+		if (textWidget.getWordWrap() != enabled)
+		{
+			textWidget.setWordWrap(enabled);
+			fLineNumberRulerColumn.redraw();
+		}
 	}
 
 	@Override
