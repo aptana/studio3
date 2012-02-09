@@ -9,6 +9,8 @@ package com.aptana.editor.common;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.filesystem.EFS;
@@ -55,6 +57,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
@@ -86,6 +89,7 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
@@ -206,12 +210,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		public void dragOver(DropTargetEvent event)
 		{
-			event.feedback |= DND.FEEDBACK_SCROLL;
+			if (event.data instanceof SnippetElement)
+			{
+				event.feedback |= DND.FEEDBACK_SCROLL;
+			}
 		}
 
 		public void dragEnter(DropTargetEvent event)
 		{
-			event.detail = DND.DROP_COPY;
+			if (event.data instanceof SnippetElement)
+			{
+				event.detail = DND.DROP_COPY;
+			}
 		}
 	}
 
@@ -315,8 +325,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 
 		installOccurrencesUpdater();
-
-		addSnippetDragDropSupport();
 	}
 
 	protected void installOccurrencesUpdater()
@@ -326,20 +334,32 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		occurrencesUpdater.initialize(getPreferenceStore());
 	}
 
-	/*
-	 * Adds snippet drag/drop support to the ProjectionViewer
-	 */
-	private void addSnippetDragDropSupport()
+	@Override
+	protected void initializeDragAndDrop(ISourceViewer viewer)
 	{
+		super.initializeDragAndDrop(viewer);
+
+		// Adds snippet drag/drop support
 		IDragAndDropService dndService = (IDragAndDropService) getSite().getService(IDragAndDropService.class);
 		if (dndService == null)
+		{
 			return;
-
-		ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
+		}
 		StyledText st = viewer.getTextWidget();
-
-		dndService.addMergedDropTarget(st, DND.DROP_COPY, new Transfer[] { SnippetTransfer.getInstance() },
-				new SnippetDropTargetListener());
+		DropTarget dropTarget = (DropTarget) st.getData(DND.DROP_TARGET_KEY);
+		if (dropTarget != null)
+		{
+			Transfer[] transfers = dropTarget.getTransfer();
+			List<Transfer> allTransfers = new ArrayList<Transfer>(CollectionsUtil.newList(transfers));
+			allTransfers.add(SnippetTransfer.getInstance());
+			dropTarget.setTransfer(allTransfers.toArray(new Transfer[allTransfers.size()]));
+			dropTarget.addDropListener(new SnippetDropTargetListener());
+		}
+		else
+		{
+			dndService.addMergedDropTarget(st, DND.DROP_COPY, new Transfer[] { SnippetTransfer.getInstance() },
+					new SnippetDropTargetListener());
+		}
 	}
 
 	/*
