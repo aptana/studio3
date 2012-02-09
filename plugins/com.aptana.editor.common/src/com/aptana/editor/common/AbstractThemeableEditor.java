@@ -9,7 +9,6 @@ package com.aptana.editor.common;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -350,7 +349,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		if (dropTarget != null)
 		{
 			Transfer[] transfers = dropTarget.getTransfer();
-			List<Transfer> allTransfers = new ArrayList<Transfer>(CollectionsUtil.newList(transfers));
+			List<Transfer> allTransfers = CollectionsUtil.newList(transfers);
 			allTransfers.add(SnippetTransfer.getInstance());
 			dropTarget.setTransfer(allTransfers.toArray(new Transfer[allTransfers.size()]));
 			dropTarget.addDropListener(new SnippetDropTargetListener());
