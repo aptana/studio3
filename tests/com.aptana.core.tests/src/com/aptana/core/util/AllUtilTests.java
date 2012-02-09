@@ -45,7 +45,7 @@ public class AllUtilTests
 		suite.addTestSuite(VersionUtilTest.class);
 		suite.addTestSuite(WriterOutputStreamTest.class);
 		suite.addTestSuite(ZipUtilTest.class);
-		suite.addTestSuite(StatusCollectionTest.class);
+		suite.addTestSuite(StatusCollectorTest.class);
 		// $JUnit-END$
 		return suite;
 	}

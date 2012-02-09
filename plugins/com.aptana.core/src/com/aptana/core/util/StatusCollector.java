@@ -26,19 +26,19 @@ import com.aptana.core.logging.IdeLog;
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-public class StatusCollection
+public class StatusCollector
 {
 
 	private Map<Object, IStatus> statuses;
-	private Set<IStatusCollectionListener> listeners;
+	private Set<IStatusCollectorListener> listeners;
 
 	/**
-	 * Constructs a new status collection.
+	 * Constructs a new status collector.
 	 */
-	public StatusCollection()
+	public StatusCollector()
 	{
 		statuses = new HashMap<Object, IStatus>();
-		listeners = new HashSet<IStatusCollectionListener>(5);
+		listeners = new HashSet<IStatusCollectorListener>(5);
 	}
 
 	/**
@@ -127,11 +127,11 @@ public class StatusCollection
 	}
 
 	/**
-	 * Adds a {@link StatusCollection} listener.
+	 * Adds a {@link StatusCollector} listener.
 	 * 
 	 * @param listener
 	 */
-	public void addListener(IStatusCollectionListener listener)
+	public void addListener(IStatusCollectorListener listener)
 	{
 		if (listener != null)
 		{
@@ -140,11 +140,11 @@ public class StatusCollection
 	}
 
 	/**
-	 * Removes a {@link StatusCollection} listener.
+	 * Removes a {@link StatusCollector} listener.
 	 * 
 	 * @param listener
 	 */
-	public void removeListener(IStatusCollectionListener listener)
+	public void removeListener(IStatusCollectorListener listener)
 	{
 		if (listener != null)
 		{
@@ -160,8 +160,8 @@ public class StatusCollection
 	 */
 	private void notifyChange(final IStatus oldStatus, final IStatus newStatus)
 	{
-		IStatusCollectionListener[] notifyTo = listeners.toArray(new IStatusCollectionListener[listeners.size()]);
-		for (final IStatusCollectionListener listener : notifyTo)
+		IStatusCollectorListener[] notifyTo = listeners.toArray(new IStatusCollectorListener[listeners.size()]);
+		for (final IStatusCollectorListener listener : notifyTo)
 		{
 			SafeRunner.run(new ISafeRunnable()
 			{
@@ -174,7 +174,7 @@ public class StatusCollection
 				public void handleException(Throwable exception)
 				{
 					IdeLog.logError(CorePlugin.getDefault(),
-							"StatusCollection: Error while notifying a staus change event.", exception); //$NON-NLS-1$
+							"StatusCollector: Error while notifying a staus change event.", exception); //$NON-NLS-1$
 				}
 			});
 		}

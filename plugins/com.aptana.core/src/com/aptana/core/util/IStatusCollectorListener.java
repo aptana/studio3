@@ -10,12 +10,12 @@ package com.aptana.core.util;
 import org.eclipse.core.runtime.IStatus;
 
 /**
- * An {@link IStatusCollectionListener} should be registered in the {@link StatusCollection} in order to receive
+ * An {@link IStatusCollectorListener} should be registered in the {@link StatusCollector} in order to receive
  * status-change notifications.
  * 
  * @author Shalom Gibly <sgibly@appcelerator.com>
  */
-public interface IStatusCollectionListener
+public interface IStatusCollectorListener
 {
 
 	/**
@@ -25,7 +25,7 @@ public interface IStatusCollectionListener
 	 *            The old status (can be null in case a new status was added, and didn't replace any previous one that
 	 *            was assigned to the same status-key).
 	 * @param newStatus
-	 *            The new status (can be null in case a status was removed from the {@link StatusCollection}.
+	 *            The new status (can be null in case a status was removed from the {@link StatusCollector}.
 	 */
 	void statusChanged(IStatus oldStatus, IStatus newStatus);
 }
