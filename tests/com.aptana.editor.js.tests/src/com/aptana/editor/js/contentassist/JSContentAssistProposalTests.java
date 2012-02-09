@@ -430,4 +430,58 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 		);
 		// @formatter:on
 	}
+
+	public void testAPSTUD3695()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/window.js",
+			"closed",
+			"defaultStatus",
+			"document",
+			"frames",
+			"history",
+			"innerHeight",
+			"innerWidth",
+			"length",
+			"location",
+			"name",
+			"navigator",
+			"opener",
+			"outerHeight",
+			"outerWidth",
+			"pageXOffset",
+			"pageYOffset",
+			"parent",
+			"screen",
+			"screenLeft",
+			"screenTop",
+			"screenX",
+			"screenY",
+			"self",
+			"status",
+			"top",
+			"alert",
+			"blur",
+			"clearInterval",
+			"clearTimeout",
+			"close",
+			"confirm",
+			"createPopup",
+			"focus",
+			"moveBy",
+			"moveTo",
+			"open",
+			"print",
+			"prompt",
+			"resizeBy",
+			"resizeTo",
+			"scroll",
+			"scrollBy",
+			"scrollTo",
+			"setInterval",
+			"setTimeout"
+		);
+		// @formatter:on
+	}
 }
