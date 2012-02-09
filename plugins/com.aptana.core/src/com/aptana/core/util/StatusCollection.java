@@ -8,12 +8,18 @@
 package com.aptana.core.util;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.SafeRunner;
+
+import com.aptana.core.CorePlugin;
+import com.aptana.core.logging.IdeLog;
 
 /**
  * A collection of IStatus instances that may also notify changes to a list of registered listeners.
@@ -24,7 +30,7 @@ public class StatusCollection
 {
 
 	private Map<Object, IStatus> statuses;
-	private List<IStatusCollectionListener> listeners;
+	private Set<IStatusCollectionListener> listeners;
 
 	/**
 	 * Constructs a new status collection.
@@ -32,7 +38,7 @@ public class StatusCollection
 	public StatusCollection()
 	{
 		statuses = new HashMap<Object, IStatus>();
-		listeners = new ArrayList<IStatusCollectionListener>(5);
+		listeners = new HashSet<IStatusCollectionListener>(5);
 	}
 
 	/**
@@ -96,11 +102,10 @@ public class StatusCollection
 	 */
 	public IStatus[] getStatuses(int severity)
 	{
-		Collection<IStatus> values = statuses.values();
 		List<IStatus> result = new ArrayList<IStatus>();
-		for (IStatus status : values)
+		for (IStatus status : statuses.values())
 		{
-			if ((status.getSeverity() & severity) != 0)
+			if ((status.matches(severity)))
 			{
 				result.add(status);
 			}
@@ -128,7 +133,10 @@ public class StatusCollection
 	 */
 	public void addListener(IStatusCollectionListener listener)
 	{
-		listeners.add(listener);
+		if (listener != null)
+		{
+			listeners.add(listener);
+		}
 	}
 
 	/**
@@ -138,7 +146,10 @@ public class StatusCollection
 	 */
 	public void removeListener(IStatusCollectionListener listener)
 	{
-		listeners.remove(listener);
+		if (listener != null)
+		{
+			listeners.remove(listener);
+		}
 	}
 
 	/**
@@ -147,12 +158,25 @@ public class StatusCollection
 	 * @param oldStatus
 	 * @param newStatus
 	 */
-	private void notifyChange(IStatus oldStatus, IStatus newStatus)
+	private void notifyChange(final IStatus oldStatus, final IStatus newStatus)
 	{
 		IStatusCollectionListener[] notifyTo = listeners.toArray(new IStatusCollectionListener[listeners.size()]);
-		for (IStatusCollectionListener listener : notifyTo)
+		for (final IStatusCollectionListener listener : notifyTo)
 		{
-			listener.statusChanged(oldStatus, newStatus);
+			SafeRunner.run(new ISafeRunnable()
+			{
+
+				public void run() throws Exception
+				{
+					listener.statusChanged(oldStatus, newStatus);
+				}
+
+				public void handleException(Throwable exception)
+				{
+					IdeLog.logError(CorePlugin.getDefault(),
+							"StatusCollection: Error while notifying a staus change event.", exception); //$NON-NLS-1$
+				}
+			});
 		}
 	}
 }
