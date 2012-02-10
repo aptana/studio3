@@ -55,18 +55,6 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 		assertContains(items, "Missing end tag </title>");
 	}
 
-	protected void assertContains(List<IProblem> items, String message)
-	{
-		for (IProblem item : items)
-		{
-			if (message.equals(item.getMessage()))
-			{
-				return;
-			}
-		}
-		fail("Was unable to find an IValidationItem with message: " + message);
-	}
-
 	public void testHTMLNoErrors() throws CoreException
 	{
 		String text = "<html>\n<title>test</title>\n<body>\n</body>\n</html>";

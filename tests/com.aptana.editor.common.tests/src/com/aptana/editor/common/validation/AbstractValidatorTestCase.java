@@ -65,6 +65,29 @@ public abstract class AbstractValidatorTestCase extends TestCase
 		return new ArrayList<IProblem>(daProblems);
 	}
 
+	protected void assertContains(List<IProblem> items, String message)
+	{
+		for (IProblem item : items)
+		{
+			if (message.equals(item.getMessage()))
+			{
+				return;
+			}
+		}
+		fail("Was unable to find an IProblem with message: " + message);
+	}
+
+	protected void assertDoesntContain(List<IProblem> items, String message)
+	{
+		for (IProblem item : items)
+		{
+			if (message.equals(item.getMessage()))
+			{
+				fail("Found unexepcted IProblem with message: " + message);
+			}
+		}
+	}
+
 	/**
 	 * "js", "css", "txt", "rb", etc.
 	 * 
