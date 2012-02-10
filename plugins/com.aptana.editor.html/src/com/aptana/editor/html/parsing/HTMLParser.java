@@ -42,9 +42,9 @@ import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
-import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.util.ParseUtil;
 
 public class HTMLParser implements IParser
 {
@@ -494,8 +494,9 @@ public class HTMLParser implements IParser
 					String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
 					try
 					{
-						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text);
-						addOffset(node, tagSymbol.getStart() + start - (element.getName().length() + 1));
+						int startingOffset = tagSymbol.getStart() + start - (element.getName().length() + 1);
+						IParseNode node = ParserPoolFactory.parse(ICSSConstants.CONTENT_TYPE_CSS, text, startingOffset);
+
 						// should always have a rule node
 						if (node.hasChildren())
 						{
@@ -519,10 +520,10 @@ public class HTMLParser implements IParser
 				{
 					try
 					{
-						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value);
-						addOffset(node, tagSymbol.getStart() + start + 1);
-						IParseNode[] children = node.getChildren();
-						for (IParseNode child : children)
+						int startingOffset = tagSymbol.getStart() + start + 1;
+						IParseNode node = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, value, startingOffset);
+
+						for (IParseNode child : node)
 						{
 							element.addJSAttributeNode(child);
 						}
@@ -608,24 +609,7 @@ public class HTMLParser implements IParser
 
 	private void addOffset(IParseNode node, int offset)
 	{
-		if (node instanceof ParseNode)
-		{
-			ParseNode parseNode = (ParseNode) node;
-			parseNode.addOffset(offset);
-		}
-		if (node instanceof ParseRootNode)
-		{
-			ParseRootNode rootNode = (ParseRootNode) node;
-			for (IParseNode commentNode : rootNode.getCommentNodes())
-			{
-				((ParseNode) commentNode).addOffset(offset);
-			}
-		}
-		IParseNode[] children = node.getChildren();
-		for (IParseNode child : children)
-		{
-			addOffset(child, offset);
-		}
+		ParseUtil.addOffset(node, offset);
 	}
 
 	public static boolean isJavaScript(HTMLElementNode node)

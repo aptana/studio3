@@ -14,6 +14,7 @@
 %import "com.aptana.parsing.ast.IParseRootNode";
 %import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.lexer.IRange";
+%import "com.aptana.parsing.util.ParseUtil";
 
 %terminals AT_RULE, CHARSET, IMPORT, MEDIA_KEYWORD, PAGE, FONTFACE, NAMESPACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
@@ -87,9 +88,23 @@
 
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
+
+		// update node offsets
 		int start = fParseState.getStartingOffset();
-		int end = start + source.length() - 1;
-		result.setLocation(start, end);
+		int length = source.length();
+
+		if (start == 0)
+		{
+			result.setLocation(start, start + length - 1);
+		}
+		else
+		{
+			// align root with zero-based offset
+			result.setLocation(0, length - 1);
+
+			// now update shift all offsets to the correct position
+			ParseUtil.addOffset(result, start);
+		}
 
 		// store results in the parse state
 		fParseState.setParseResult(result);

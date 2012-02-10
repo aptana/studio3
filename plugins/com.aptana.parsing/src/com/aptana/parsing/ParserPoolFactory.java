@@ -191,12 +191,13 @@ public class ParserPoolFactory
 	 * 
 	 * @param contentTypeId
 	 * @param source
+	 * @param startingOffset
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
-																								// declaredExceptions
+	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset) throws Exception // $codepro.audit.disable
+	// declaredExceptions
 	{
-		return parse(contentTypeId, source, null);
+		return parse(contentTypeId, source, startingOffset, null);
 	}
 
 	/**
@@ -206,11 +207,25 @@ public class ParserPoolFactory
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String contentTypeId, String source, IProgressMonitor monitor) throws Exception // $codepro.audit.disable
+	public static IParseRootNode parse(String contentTypeId, String source) throws Exception // $codepro.audit.disable
+																								// declaredExceptions
+	{
+		return parse(contentTypeId, source, 0, null);
+	}
+
+	/**
+	 * parse
+	 * 
+	 * @param contentTypeId
+	 * @param source
+	 * @return
+	 */
+	public static IParseRootNode parse(String contentTypeId, String source, int startingOffset, IProgressMonitor monitor)
+			throws Exception // $codepro.audit.disable
 																														// declaredExceptions
 	{
 		ParseState parseState = new ParseState();
-		parseState.setEditState(source);
+		parseState.setEditState(source, startingOffset);
 		parseState.setProgressMonitor(monitor);
 
 		return parse(contentTypeId, parseState);

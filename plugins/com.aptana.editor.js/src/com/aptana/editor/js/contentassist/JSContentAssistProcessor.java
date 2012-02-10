@@ -573,13 +573,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	IParseNode getActiveASTNode(int offset)
 	{
 		IParseNode result = null;
+
 		try
 		{
+			// grab document
 			IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+
+			// grab source which is either the whole document for JS files or a subset for nested JS
+			// @formatter:off
+			String source =
+				(activeRange != null)
+					? doc.get(activeRange.getStartingOffset(), activeRange.getLength())
+					: doc.get();
+			// @formatter:on
+			int startingOffset = (activeRange != null) ? activeRange.getStartingOffset() : 0;
+
+			// create parse state and turn off all processing of comments
 			JSParseState parseState = new JSParseState();
-			parseState.setEditState(doc.get());
+			parseState.setEditState(source, startingOffset);
 			parseState.setAttachComments(false);
 			parseState.setCollectComments(false);
+
+			// parse and grab resulting AST
 			IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, parseState);
 
 			if (ast != null)

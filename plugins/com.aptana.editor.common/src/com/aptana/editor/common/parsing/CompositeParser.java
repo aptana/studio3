@@ -155,8 +155,8 @@ public class CompositeParser implements IParser
 		try
 		{
 			String text = fScanner.getSource().get(start, end - start + 1);
-			IParseRootNode node = ParserPoolFactory.parse(language, text);
-			addOffset(node, start);
+			IParseRootNode node = ParserPoolFactory.parse(language, text, start);
+
 			return node;
 		}
 		catch (java.lang.Exception e)
@@ -186,19 +186,5 @@ public class CompositeParser implements IParser
 			}
 		}
 		return null;
-	}
-
-	protected static void addOffset(IParseNode node, int offset)
-	{
-		if (node instanceof ParseNode)
-		{
-			ParseNode parseNode = (ParseNode) node;
-			parseNode.addOffset(offset);
-		}
-		IParseNode[] children = node.getChildren();
-		for (IParseNode child : children)
-		{
-			addOffset(child, offset);
-		}
 	}
 }
