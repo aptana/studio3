@@ -2172,4 +2172,12 @@ public class GitRepository
 	{
 		return execute(GitRepository.ReadWrite.READ, "rev-parse", "--verify", ref); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	/**
+	 * Used solely for testing so we can force the subsequent command to block until we acquire the write lock.
+	 */
+	void waitForWrite()
+	{
+		monitor.writeLock().lock();
+	}
 }
