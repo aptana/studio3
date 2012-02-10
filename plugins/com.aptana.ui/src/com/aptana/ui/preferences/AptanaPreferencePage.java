@@ -1,35 +1,22 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.ui.preferences;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.osgi.service.prefs.BackingStoreException;
-
-import com.aptana.core.CorePlugin;
-import com.aptana.core.ICorePreferenceConstants;
-import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
-import com.aptana.ui.UIPlugin;
 
 public class AptanaPreferencePage extends GenericRootPreferencePage
 {
 
 	protected static String PAGE_ID = "com.aptana.ui.AptanaPreferencePage"; //$NON-NLS-1$
-
-	private Button autoRefreshButton;
 
 	@Override
 	protected String getPageId()
@@ -57,51 +44,5 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		c.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 
 		return c;
-	}
-
-	@Override
-	protected Control createContents(Composite parent)
-	{
-		Composite comp = (Composite) super.createContents(parent);
-
-		autoRefreshButton = new Button(comp, SWT.CHECK);
-		autoRefreshButton.setText(Messages.AptanaPreferencePage_Auto_Refresh_Projects);
-		autoRefreshButton.setSelection(autoRefresh());
-
-		return comp;
-	}
-
-	private static boolean autoRefresh()
-	{
-		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
-				ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS, null);
-	}
-
-	@Override
-	public boolean performOk()
-	{
-		IEclipsePreferences prefs = EclipseUtil.instanceScope().getNode(CorePlugin.PLUGIN_ID);
-		prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-			IdeLog.logError(UIPlugin.getDefault(), e);
-		}
-
-		return super.performOk();
-	}
-
-	@Override
-	protected void performDefaults()
-	{
-		autoRefreshButton.setSelection(Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS,
-				ICorePreferenceConstants.DEFAULT_AUTO_REFRESH_PROJECTS, null));
-
-		super.performDefaults();
 	}
 }
