@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -38,8 +38,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -78,11 +76,11 @@ import com.aptana.core.projects.templates.IProjectTemplate;
 import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessStatus;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
+import com.aptana.projects.util.ProjectUtil;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.usage.FeatureEvent;
 import com.aptana.usage.StudioAnalytics;
@@ -188,7 +186,7 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		{
 			stepPages.add((IStepIndicatorWizardPage) mainPage);
 			steps.add(((IStepIndicatorWizardPage) mainPage).getStepName());
-			}
+		}
 
 		List<IProjectTemplate> templates = ProjectsPlugin.getDefault().getTemplatesManager()
 				.getTemplates(getProjectTemplateTypes());
@@ -405,21 +403,15 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		// Project description creation
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProjectDescription description = workspace.newProjectDescription(newProject.getName());
+		IProjectDescription description = ProjectUtil.getProjectDescription(destPath, getProjectNatures(),
+				getProjectBuilders());
+		description.setName(newProject.getName());
 		description.setLocationURI(location);
-		// Set the natures
-		description.setNatureIds(getProjectNatures());
-		// Set the builders
-		for (String builder : getProjectBuilders())
-		{
-			ResourceUtil.addBuilder(description, builder);
-		}
 		// Update the referenced project in case it was initialized.
 		if (refProjects != null && refProjects.length > 0)
 		{
-				description.setReferencedProjects(refProjects);
-			}
+			description.setReferencedProjects(refProjects);
+		}
 		sub.worked(10);
 
 		if (!applySourcedProjectFilesAfterProjectCreated() && isCloneFromGit())
@@ -491,9 +483,9 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 
 		IFileStore dotProject = tmpClone.getChild(IProjectDescription.DESCRIPTION_FILE_NAME);
 		if (dotProject.fetchInfo().exists())
-	{
+		{
 			dotProject.delete(EFS.NONE, sub.newChild(1));
-	}
+		}
 		// OK, copy the cloned template's contents over
 		IFileStore projectStore = EFS.getStore(newProject.getLocationURI());
 		tmpClone.copy(projectStore, EFS.OVERWRITE, sub.newChild(9));
@@ -513,20 +505,20 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	private void doBasicCreateProject(IProject project, final IProjectDescription description, IProgressMonitor monitor)
 			throws InvocationTargetException
 	{
-				CreateProjectOperation op = new CreateProjectOperation(description, getProjectCreationDescription());
-				try
-				{
-					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-					// directly execute the operation so that the undo state is
-					// not preserved. Making this undoable resulted in too many
-					// accidental file deletions.
-					op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
-				}
-				catch (ExecutionException e)
-				{
-					throw new InvocationTargetException(e);
-				}
-			}
+		CreateProjectOperation op = new CreateProjectOperation(description, getProjectCreationDescription());
+		try
+		{
+			// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+			// directly execute the operation so that the undo state is
+			// not preserved. Making this undoable resulted in too many
+			// accidental file deletions.
+			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
+		}
+		catch (ExecutionException e)
+		{
+			throw new InvocationTargetException(e);
+		}
+	}
 
 	/**
 	 * @param template
@@ -568,53 +560,46 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			return;
 		}
 
-			ZipFile zipFile = null;
-			try
-			{
+		ZipFile zipFile = null;
+		try
+		{
 			final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
-				zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
-				Enumeration<? extends ZipEntry> entries = zipFile.entries();
-				ZipEntry entry;
-				while (entries.hasMoreElements())
-				{
-					entry = entries.nextElement();
+			zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			ZipEntry entry;
+			while (entries.hasMoreElements())
+			{
+				entry = entries.nextElement();
 
-					if (entry.isDirectory())
+				if (entry.isDirectory())
+				{
+					IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
+					if (!newFolder.exists())
 					{
-						IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
-						if (!newFolder.exists())
-						{
-							newFolder.create(true, true, null);
-						}
+						newFolder.create(true, true, null);
 					}
-					else
+				}
+				else
+				{
+					IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
+					if (newFile.exists())
 					{
-						IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
-						if (newFile.exists())
+						if (promptForOverwrite)
 						{
-							if (promptForOverwrite)
+							// Add to the list of conflicts only when we didn't get any pre-existing list of
+							// possible conflicting files, or when the pre-existing list of paths contains the
+							// current file path.
+							if (preExistingResources == null || preExistingResources.isEmpty()
+									|| preExistingResources.contains(newFile.getLocation()))
 							{
-								// Add to the list of conflicts only when we didn't get any pre-existing list of
-								// possible conflicting files, or when the pre-existing list of paths contains the
-								// current file path.
-								if (preExistingResources == null || preExistingResources.isEmpty()
-										|| preExistingResources.contains(newFile.getLocation()))
-								{
-									conflicts.put(newFile, entry);
-									// Remove the file for now. We will add it again if the user agrees the
-									// overwrite it.
-								}
-								else
-								{
-									// The file exists right now, but was not in the pre-existing resources we check
-									// against, so we just need to set it with the new content.
-									newFile.setContents(
-										getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
-										true, null);
-								}
+								conflicts.put(newFile, entry);
+								// Remove the file for now. We will add it again if the user agrees the
+								// overwrite it.
 							}
 							else
 							{
+								// The file exists right now, but was not in the pre-existing resources we check
+								// against, so we just need to set it with the new content.
 								newFile.setContents(
 										getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
 										true, null);
@@ -622,95 +607,102 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 						}
 						else
 						{
-							try
+							newFile.setContents(
+									getInputStream(zipFile, entry, newFile, project, isReplacingParameters), true,
+									true, null);
+						}
+					}
+					else
+					{
+						try
+						{
+							// makes sure the parent path is created
+							(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
+							newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
+									true, null);
+						}
+						catch (CoreException re)
+						{
+							if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
+									&& re.getStatus() instanceof IResourceStatus)
 							{
-								// makes sure the parent path is created
-								(new ContainerGenerator(newFile.getParent().getFullPath())).generateContainer(null);
-								newFile.create(getInputStream(zipFile, entry, newFile, project, isReplacingParameters),
-										true, null);
-							}
-							catch (CoreException re)
-							{
-								if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
-										&& re.getStatus() instanceof IResourceStatus)
-								{
-									IResourceStatus rs = (IResourceStatus) re.getStatus();
-									IFile newVariantFile = project.getParent().getFile(rs.getPath());
-									newVariantFile.setContents(
+								IResourceStatus rs = (IResourceStatus) re.getStatus();
+								IFile newVariantFile = project.getParent().getFile(rs.getPath());
+								newVariantFile.setContents(
 										getInputStream(zipFile, entry, newVariantFile, project, isReplacingParameters),
 										true, true, null);
-								}
-								else
-								{
-								IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ZipFailure, re);
-								}
 							}
-						}
-					}
-				}
-				// Check if we had any conflicts. If so, display a dialog to let the user mark which
-				// files he/she wishes to keep, and which would be overwritten by the Zip's content.
-				if (!conflicts.isEmpty())
-				{
-					final ZipFile finalZipFile = zipFile;
-					UIJob openDialogJob = new UIJob(Messages.OverwriteFilesSelectionDialog_overwriteFilesTitle)
-					{
-						public IStatus runInUIThread(IProgressMonitor monitor)
-						{
-							OverwriteFilesSelectionDialog overwriteFilesSelectionDialog = new OverwriteFilesSelectionDialog(
-									conflicts.keySet(), Messages.NewProjectWizard_filesOverwriteMessage);
-							if (overwriteFilesSelectionDialog.open() == Window.OK)
+							else
 							{
-								try
-								{
-									Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
-									// Overwrite the selected files only.
-									for (Object file : overwrittenFiles)
-									{
-										IFile iFile = (IFile) file;
-										iFile.setContents(
-												getInputStream(finalZipFile, conflicts.get(file), iFile, project,
-														isReplacingParameters), true, true, null);
-									}
-								}
-								catch (Exception e)
-								{
-									IdeLog.logError(ProjectsPlugin.getDefault(),
-											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
-								}
+								IdeLog.logError(ProjectsPlugin.getDefault(), Messages.NewProjectWizard_ZipFailure, re);
 							}
-							return Status.OK_STATUS;
 						}
-					};
-					openDialogJob.setSystem(true);
-					openDialogJob.schedule();
-					openDialogJob.join();
+					}
 				}
 			}
-			catch (CoreException e)
+			// Check if we had any conflicts. If so, display a dialog to let the user mark which
+			// files he/she wishes to keep, and which would be overwritten by the Zip's content.
+			if (!conflicts.isEmpty())
 			{
-				IdeLog.logError(ProjectsPlugin.getDefault(), e);
-			}
-			catch (Exception e)
-			{
-				IdeLog.logError(ProjectsPlugin.getDefault(),
-						MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
-			}
-			finally
-			{
-				if (zipFile != null)
+				final ZipFile finalZipFile = zipFile;
+				UIJob openDialogJob = new UIJob(Messages.OverwriteFilesSelectionDialog_overwriteFilesTitle)
 				{
-					try
+					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
-						zipFile.close();
+						OverwriteFilesSelectionDialog overwriteFilesSelectionDialog = new OverwriteFilesSelectionDialog(
+								conflicts.keySet(), Messages.NewProjectWizard_filesOverwriteMessage);
+						if (overwriteFilesSelectionDialog.open() == Window.OK)
+						{
+							try
+							{
+								Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
+								// Overwrite the selected files only.
+								for (Object file : overwrittenFiles)
+								{
+									IFile iFile = (IFile) file;
+									iFile.setContents(
+											getInputStream(finalZipFile, conflicts.get(file), iFile, project,
+													isReplacingParameters), true, true, null);
+								}
+							}
+							catch (Exception e)
+							{
+								IdeLog.logError(ProjectsPlugin.getDefault(),
+										MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
+							}
+						}
+						return Status.OK_STATUS;
 					}
-					catch (IOException e)
-					{
-						// ignores
-					}
+				};
+				openDialogJob.setSystem(true);
+				openDialogJob.schedule();
+				openDialogJob.join();
+			}
+		}
+		catch (CoreException e)
+		{
+			IdeLog.logError(ProjectsPlugin.getDefault(), e);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(ProjectsPlugin.getDefault(),
+					MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
+		}
+		finally
+		{
+			if (zipFile != null)
+			{
+				try
+				{
+					zipFile.close();
+				}
+				catch (IOException e)
+				{
+					// ignores
 				}
 			}
 		}
+	}
 
 	/**
 	 * Returns an input stream for a zip entry. The returned input stream may be a stream that was generated after
@@ -850,35 +842,35 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 		if (!status.isOK())
 		{
 			if (status instanceof ProcessStatus)
-		{
+			{
 				ProcessStatus ps = (ProcessStatus) status;
 				String stderr = ps.getStdErr();
 				throw new InvocationTargetException(new CoreException(new Status(status.getSeverity(),
 						status.getPlugin(), stderr)));
-				}
+			}
 			throw new InvocationTargetException(new CoreException(status));
-				}
+		}
 		else
-				{
+		{
 			try
-					{
+			{
 				projectHandle.setDescription(projectDescription, sub.newChild(2));
 				// Ensure that we disconnect our git support in case it auto-attached
 				RepositoryProvider.unmap(projectHandle);
 				GitPlugin.getDefault().getGitRepositoryManager().removeRepository(projectHandle);
-						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
-						if (gitFolder.exists())
-						{
+				IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
+				if (gitFolder.exists())
+				{
 					gitFolder.delete(true, sub.newChild(3));
-							}
+				}
 			}
-							catch (CoreException e)
-							{
+			catch (CoreException e)
+			{
 				throw new InvocationTargetException(e);
-							}
-						}
+			}
+		}
 		sub.done();
-					}
+	}
 
 	protected void openIndexFile()
 	{
@@ -899,4 +891,4 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 			}
 		}
 	}
-	}
+}

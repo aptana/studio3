@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -20,8 +20,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -49,9 +47,11 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.util.GitUtil;
 import com.aptana.projects.internal.wizards.AbstractNewProjectWizard;
+import com.aptana.projects.util.ProjectUtil;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.IProjectSample;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -165,10 +165,10 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			location = mainPage.getLocationURI();
 		}
 
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
+		IProjectDescription description = ProjectUtil.getProjectDescription(mainPage.getLocationPath(),
+				sample.getNatures(), ArrayUtil.NO_STRINGS);
+		description.setName(newProjectHandle.getName());
 		description.setLocationURI(location);
-		description.setNatureIds(sample.getNatures());
 
 		try
 		{
