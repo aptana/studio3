@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 
-import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.ObjectUtil;
 
 public class Problem implements IProblem
 {
@@ -111,8 +111,8 @@ public class Problem implements IProblem
 		}
 		Problem other = (Problem) obj;
 		return severity == other.severity && priority == other.priority && offset == other.offset
-				&& length == other.length && StringUtil.areEqual(message, other.message)
-				&& StringUtil.areEqual(sourcePath, other.sourcePath);
+				&& length == other.length && ObjectUtil.areEqual(message, other.message)
+				&& ObjectUtil.areEqual(sourcePath, other.sourcePath);
 	}
 
 	@Override
@@ -141,5 +141,40 @@ public class Problem implements IProblem
 	{
 		// FIXME This is wrong! We can have "problems" that are info, and tasks are separate!
 		return severity == IMarker.SEVERITY_INFO;
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append("problem "); //$NON-NLS-1$
+		if (isError())
+		{
+			buf.append("ERROR"); //$NON-NLS-1$
+		}
+		else if (isWarning())
+		{
+			buf.append("WARNING"); //$NON-NLS-1$
+		}
+		else if (severity == IMarker.SEVERITY_INFO)
+		{
+			buf.append("INFO"); //$NON-NLS-1$
+		}
+		else
+		{
+			buf.append("severity="); //$NON-NLS-1$
+			buf.append(severity);
+		}
+		buf.append(": "); //$NON-NLS-1$
+		buf.append(getSourcePath());
+		buf.append(" line="); //$NON-NLS-1$
+		buf.append(getLineNumber());
+		buf.append(" offset="); //$NON-NLS-1$
+		buf.append(getOffset());
+		buf.append(" length="); //$NON-NLS-1$
+		buf.append(getLength());
+		buf.append(' ');
+		buf.append(message);
+		return buf.toString();
 	}
 }

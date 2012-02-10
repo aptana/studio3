@@ -46,38 +46,12 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		return "html";
 	}
 
-	public void testHTMLSelfClosingTagOnNonVoidElement() throws CoreException
-	{
-		String text = "<html>\n<title>test</title>\n<body>\n<video />\n</body>\n</html>\n";
-
-		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
-		IProblem item = items.get(0);
-
-		assertEquals("Error was not found on expected line", 4, item.getLineNumber());
-		assertEquals("Error message did not match expected error message",
-				"Self-closing syntax (/>) used on a non-void HTML element", item.getMessage());
-	}
-
 	public void testHTMLMissingEndTag() throws CoreException
 	{
 		String text = "<html>\n<title>test\n<body>\n</body>\n</html>";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
 		assertContains(items, "missing </title> before <body>");
-	}
-
-	protected void assertContains(List<IProblem> items, String message)
-	{
-		for (IProblem item : items)
-		{
-			if (message.equals(item.getMessage()))
-			{
-				return;
-			}
-		}
-		fail("Was unable to find an IValidationItem with message: " + message);
 	}
 
 	public void testHTMLNoErrors() throws CoreException
@@ -93,7 +67,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		String text = "<script src=\"\"></script>";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
+		assertDoesntContain(items, "<script> lacks \"type\" attribute");
 	}
 
 	public void testHTML5HeaderTag() throws CoreException
@@ -101,7 +75,7 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		String text = "<header><h1></h1></header>";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
+		assertDoesntContain(items, "<header> is not recognized!");
 	}
 
 	public void testHTML5NavTag() throws CoreException
@@ -109,7 +83,15 @@ public class HTMLTidyValidatorTest extends AbstractValidatorTestCase
 		String text = "<nav></nav>";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
+		assertDoesntContain(items, "<nav> is not recognized!");
+	}
+
+	public void testHTML5VideoTag() throws CoreException
+	{
+		String text = "<video width=\"320\" height=\"240\" controls=\"controls\">\n  <source src=\"movie.mp4\" type=\"video/mp4\" />\n  <source src=\"movie.ogg\" type=\"video/ogg\" />\n  Your browser does not support the video tag.\n</video>";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "<video> is not recognized!");
 	}
 
 	protected List<IProblem> getParseErrors(String source) throws CoreException

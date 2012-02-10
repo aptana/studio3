@@ -13,7 +13,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.IMap;
 import com.aptana.core.util.ArrayUtil;
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
 
 public class AssertUtil
 {
@@ -61,7 +64,23 @@ public class AssertUtil
 		if (proposal != null)
 		{
 			ICompletionProposal p = findProposal(proposal, proposals);
-			TestCase.assertNotNull(MessageFormat.format("Unable to find expected proposal {0} in proposals {1}", proposal, proposals), p);
+			if (p == null)
+			{
+				String proposalsAsString = "(empty list)";
+				if (!ArrayUtil.isEmpty(proposals))
+				{
+					proposalsAsString = StringUtil.join(",", CollectionsUtil.map(CollectionsUtil.newList(proposals),
+							new IMap<ICompletionProposal, String>()
+							{
+								public String map(ICompletionProposal item)
+								{
+									return item.getDisplayString();
+								}
+							}));
+				}
+				TestCase.fail(MessageFormat.format("Unable to find expected proposal {0} in proposals {1}", proposal,
+						proposalsAsString));
+			}
 			ITextViewer viewer = createTextViewer(document);
 			TestCase.assertTrue("Selected proposal doesn't validate against document",
 					((ICompletionProposalExtension2) p).validate(document, offset, null));

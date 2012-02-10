@@ -96,23 +96,50 @@ public abstract class GitTestCase extends TestCase
 		assertEquals("Current branch is incorrect", branchName, fRepo.currentBranch());
 	}
 
-	protected void assertCommit(GitIndex index, String commitMessage)
+	protected void assertCommit(GitIndex index, String commitMessage) throws Exception
 	{
-		assertTrue("Failed to commit", index.commit(commitMessage));
-		assertTrue("After a commit, the repository changed file listing should be empty but is not", index
-				.changedFiles().isEmpty());
+		GitRepository repo = getRepo();
+		try
+		{
+			repo.waitForWrite();
+			assertTrue("Failed to commit", index.commit(commitMessage));
+			assertTrue("After a commit, the repository changed file listing should be empty but is not", index
+					.changedFiles().isEmpty());
+		}
+		finally
+		{
+			repo.exitWriteProcess();
+		}
 	}
 
-	protected void assertUnstageFiles(GitIndex index, List<ChangedFile> changed)
+	protected void assertUnstageFiles(GitIndex index, List<ChangedFile> changed) throws Exception
 	{
-		IStatus status = index.unstageFiles(changed);
-		assertTrue(MessageFormat.format("Failed to unstage changes: {0}", status.getMessage()), status.isOK());
+		GitRepository repo = getRepo();
+		try
+		{
+			repo.waitForWrite();
+			IStatus status = index.unstageFiles(changed);
+			assertTrue(MessageFormat.format("Failed to unstage changes: {0}", status.getMessage()), status.isOK());
+		}
+		finally
+		{
+			repo.exitWriteProcess();
+		}
 	}
 
-	protected void assertStageFiles(GitIndex index, List<ChangedFile> changed)
+	protected void assertStageFiles(GitIndex index, List<ChangedFile> changed) throws Exception
 	{
-		IStatus status = index.stageFiles(changed);
-		assertTrue(MessageFormat.format("Failed to stage changes: {0}", status.getMessage()), status.isOK());
+		GitRepository repo = getRepo();
+		try
+		{
+			repo.waitForWrite();
+			IStatus status = index.stageFiles(changed);
+			assertTrue(MessageFormat.format("Failed to stage changes: {0}", status.getMessage()), status.isOK());
+		}
+		finally
+		{
+			repo.exitWriteProcess();
+		}
 	}
 
 	protected void assertModifiedUnstagedFile(ChangedFile changed)

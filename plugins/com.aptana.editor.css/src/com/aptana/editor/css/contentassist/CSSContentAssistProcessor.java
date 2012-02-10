@@ -72,7 +72,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		"border-right", //$NON-NLS-1$
 		"border-top", //$NON-NLS-1$
 		"border", //$NON-NLS-1$
-		"column-rule", //$NON-NLS-1$
+		"color", //$NON-NLS-1$
 		"background-color", //$NON-NLS-1$
 		"border-color", //$NON-NLS-1$
 		"border-top-color", //$NON-NLS-1$

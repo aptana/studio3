@@ -293,14 +293,27 @@ public class UIPlugin extends AbstractUIPlugin
 		 * org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse
 		 * .core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
 		 */
+		@SuppressWarnings("restriction")
 		public void preferenceChange(PreferenceChangeEvent event)
 		{
 			if (ResourcesPlugin.PREF_AUTO_BUILDING.equals(event.getKey()))
 			{
 				if ((Boolean.FALSE.toString().equals(event.getNewValue())))
 				{
-					MessageDialog.openWarning(UIUtils.getActiveShell(), Messages.UIPlugin_automaticBuildsWarningTitle,
-							Messages.UIPlugin_automaticBuildsWarningMessage);
+					// APSTUD-4350 - We make sure that the preference change was done through the ToggleAutoBuildAction
+					// (e.g. the menu action). Any other trigger for that preference change will not show the dialog.
+					String buildActionClassName = org.eclipse.ui.internal.ide.actions.ToggleAutoBuildAction.class
+							.getCanonicalName();
+					StackTraceElement[] stackTrace = new Exception().getStackTrace();
+					for (StackTraceElement element : stackTrace)
+					{
+						if (element.getClassName().equals(buildActionClassName))
+						{
+							MessageDialog.openWarning(UIUtils.getActiveShell(),
+									Messages.UIPlugin_automaticBuildsWarningTitle,
+									Messages.UIPlugin_automaticBuildsWarningMessage);
+						}
+					}
 				}
 			}
 		}

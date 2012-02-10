@@ -50,11 +50,11 @@ public class HTMLTidyValidator extends AbstractBuildParticipant
 	private static final String[] HTML5_ELEMENTS = { "article>", "aside>", "audio>", "canvas>", "command>",
 			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
 			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
-			"source>", "summary>", "time>", "video>", "wbr>" };
+			"source>", "summary>", "time>", "video", "wbr>" };
 
 	@SuppressWarnings("nls")
 	private static final String[] FILTERED = { "lacks \"type\" attribute", "lacks \"summary\" attribute",
-			"replacing illegal character code", "video is not recognized!" };
+			"replacing illegal character code" };
 
 	public void buildFile(BuildContext context, IProgressMonitor monitor)
 	{
