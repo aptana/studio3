@@ -1,4 +1,4 @@
-#Fri Oct 07 10:40:34 EDT 2011
+#Mon Feb 13 16:11:32 PST 2012
 eclipse.preferences.version=1
 org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_allocation_expression=16
@@ -86,7 +86,7 @@ org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_local_variabl
 org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_member=insert
 org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_method=insert
 org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_package=insert
-org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_parameter=insert
+org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_parameter=do not insert
 org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_type=insert
 org.eclipse.jdt.core.formatter.insert_new_line_after_label=do not insert
 org.eclipse.jdt.core.formatter.insert_new_line_after_opening_brace_in_array_initializer=do not insert
