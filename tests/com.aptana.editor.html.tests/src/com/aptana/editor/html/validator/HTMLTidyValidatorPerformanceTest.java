@@ -18,15 +18,46 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
 
 public class HTMLTidyValidatorPerformanceTest extends PerformanceTestCase
 {
 
+	private HTMLTidyValidator validator;
+
+	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+
+		validator = new HTMLTidyValidator()
+		{
+
+			@Override
+			protected String getPreferenceNode()
+			{
+				return HTMLPlugin.PLUGIN_ID;
+			}
+
+			@Override
+			public String getId()
+			{
+				return ID;
+			}
+		};
+	}
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		validator = null;
+		super.tearDown();
+	}
+
 	public void testValidate() throws Exception
 	{
-		HTMLTidyValidator validator = new HTMLTidyValidator();
 		// read in the file
 		URL url = FileLocator.find(Platform.getBundle("com.aptana.editor.html.tests"),
 				Path.fromPortableString("performance/amazon.html"), null);
