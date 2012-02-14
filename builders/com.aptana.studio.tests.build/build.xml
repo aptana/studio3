@@ -211,12 +211,19 @@
 	</target>
 
 	<target name="performance">
+		<antcall target="-pre-test" />
+
 		<!-- Don't build, assume unit test built already ran and we can just re-use it! -->
 		<!-- Grab the version number of build we're testing -->
-		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
-		<propertycopy name="studio.version" from="com.aptana.feature" />
-
-		<antcall target="-pre-test" />
+		<pathconvert property="studio.version">
+			<fileset dir="${baseLocation}/features">
+				<include name="com.aptana.feature_*" />
+			</fileset>
+			<chainedmapper>
+				<flattenmapper />
+				<regexpmapper from="^com\.aptana\.feature_([\d\.]+)\-.*$$" to="\1" />
+			</chainedmapper>
+		</pathconvert>
 
 		<!-- Run the tests. -->
 		<antcall target="run-perf-test">
