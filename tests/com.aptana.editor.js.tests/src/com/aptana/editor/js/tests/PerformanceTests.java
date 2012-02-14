@@ -11,8 +11,11 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.js.JSCodeScannerPerformanceTest;
+import com.aptana.editor.js.contentassist.JSBuildPerformanceTest;
 import com.aptana.editor.js.contentassist.JSIndexingPerformanceTest;
 import com.aptana.editor.js.parsing.JSParserPerformanceTest;
+import com.aptana.editor.js.parsing.JSScannerPerformanceTest;
+import com.aptana.editor.js.sdoc.parsing.SDocParserPerformanceTest;
 
 public class PerformanceTests
 {
@@ -21,9 +24,12 @@ public class PerformanceTests
 	{
 		TestSuite suite = new TestSuite("Performance tests for com.aptana.editor.js plugin");
 		// $JUnit-BEGIN$
+		suite.addTestSuite(JSBuildPerformanceTest.class);
 		suite.addTestSuite(JSCodeScannerPerformanceTest.class);
 		suite.addTestSuite(JSIndexingPerformanceTest.class);
 		suite.addTestSuite(JSParserPerformanceTest.class);
+		suite.addTestSuite(JSScannerPerformanceTest.class);
+		suite.addTestSuite(SDocParserPerformanceTest.class);
 		// $JUnit-END$
 		return suite;
 	}

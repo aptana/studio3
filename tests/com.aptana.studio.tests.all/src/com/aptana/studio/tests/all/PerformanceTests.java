@@ -18,10 +18,13 @@ public class PerformanceTests
 		TestSuite suite = new TestSuite(PerformanceTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.studio.tests.startup.AllTests.suite());
+		suite.addTest(com.aptana.scripting.tests.PerformanceTests.suite());
+		suite.addTest(com.aptana.editor.coffee.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.common.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.PerformanceTests.suite());
-		suite.addTest(com.aptana.editor.js.tests.PerformanceTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.PerformanceTests.suite());
+		suite.addTest(com.aptana.editor.js.tests.PerformanceTests.suite());
+		suite.addTest(com.aptana.editor.json.tests.PerformanceTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

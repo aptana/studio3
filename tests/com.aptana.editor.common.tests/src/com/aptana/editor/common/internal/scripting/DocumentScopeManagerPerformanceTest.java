@@ -1,4 +1,4 @@
-package com.aptana.editor.js;
+package com.aptana.editor.common.internal.scripting;
 
 import java.io.File;
 import java.net.URL;
