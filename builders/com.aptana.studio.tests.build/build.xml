@@ -9,7 +9,7 @@
      ====================================================================== -->
 <project name="Studio" default="test">
 	<description>
-            Tests the RED_Core feature
+            Tests the Studio3 core feature
     </description>
 
 	<property file="build_local.properties" />
@@ -45,7 +45,7 @@
           target: generate.build.properties              
          ================================= -->
 	<target name="generate.build.properties" description="Takes in properties from build_local.properties and the command line overrides and generates a combined build.properties to use for the build">
-		<exec executable="hostname" outputproperty="computer.hostname"/>
+		<exec executable="hostname" outputproperty="computer.hostname" />
 		<echoproperties destfile="build.properties">
 			<propertyset negate="true">
 				<propertyref prefix="java." />
@@ -206,6 +206,10 @@
 	</target>
 
 	<target name="performance" depends="build">
+		<!-- Grab the version number of build we're testing -->
+		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
+		<propertycopy name="studio.version" from="com.aptana.feature" />
+
 		<antcall target="-pre-test" />
 
 		<!-- Run the tests. -->
@@ -249,20 +253,18 @@
 			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
-	
+
 	<target name="run-perf-test">
-    <ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
-      <reference refid="emma.lib" />
-      <property name="extra.java-test.classpath" value="emma.lib" />
-      <property name="timeout" value="${test.timeout}" />
-      <property name="os" value="${baseos}" />
-      <property name="ws" value="${basews}" />
-      <property name="arch" value="${basearch}" />
-      <property name="eclipse-home" value="${baseLocation}" />
-      <property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
-      <property name="plugin-name" value="${test.plugin}" />
-      <property name="classname" value="${test.classname}" />
-      <property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
-    </ant>
-  </target>
+		<ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
+			<property name="timeout" value="${test.timeout}" />
+			<property name="os" value="${baseos}" />
+			<property name="ws" value="${basews}" />
+			<property name="arch" value="${basearch}" />
+			<property name="eclipse-home" value="${baseLocation}" />
+			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
+			<property name="plugin-name" value="${test.plugin}" />
+			<property name="classname" value="${test.classname}" />
+			<property name="extraVMargs" value="-Djunit.properties=${basedir}/build.properties ${perf.properties} -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
+		</ant>
+	</target>
 </project>
