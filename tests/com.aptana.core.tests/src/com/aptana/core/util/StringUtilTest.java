@@ -18,6 +18,54 @@ import junit.framework.TestCase;
 
 public class StringUtilTest extends TestCase
 {
+	/**
+	 * Create a string by concatenating the elements of a string array using a delimited between each item
+	 * 
+	 * @param delimiter
+	 *            The text to place between each element in the array
+	 * @param items
+	 *            The array of items to join
+	 * @return The resulting string
+	 */
+	private static String oldJoin(String delimiter, String... items)
+	{
+		if (items == null)
+		{
+			return null;
+		}
+
+		int length = items.length;
+		String result = StringUtil.EMPTY;
+
+		if (length > 0)
+		{
+			StringBuilder sb = new StringBuilder();
+			String item;
+
+			for (int i = 0; i < length - 1; i++)
+			{
+				item = items[i];
+
+				if (item != null)
+				{
+					sb.append(item);
+				}
+
+				sb.append(delimiter);
+			}
+
+			item = items[length - 1];
+
+			if (item != null)
+			{
+				sb.append(item);
+			}
+
+			result = sb.toString();
+		}
+
+		return result;
+	}
 
 	public void testMd5()
 	{
@@ -445,4 +493,125 @@ public class StringUtilTest extends TestCase
 		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b c", 4));
 	}
 
+	public void testJoinSpeed()
+	{
+		// @formatter:off
+		timeBothJoins(
+			"(with delim)",
+			"~~|~~",
+			new String[] { "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz" }
+		);
+		// @formatter:on
+	}
+
+	public void testEmptyDelimiterJoinSpeed()
+	{
+		// @formatter:off
+		timeBothJoins(
+			"(no delim)",
+			null,
+			new String[] { "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz" }
+		);
+		// @formatter:on
+	}
+
+	protected void timeBothJoins(String title, String delimiter, String... items)
+	{
+		timeOldJoin(title, delimiter, items);
+		timeNewJoin(title, delimiter, items);
+	}
+
+	protected void timeNewJoin(String title, String delimiter, String... items)
+	{
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < 1000000; i++)
+		{
+			StringUtil.join(delimiter, items);
+		}
+
+		long diff = System.currentTimeMillis() - start;
+		System.out.println("new join " + title + ": " + diff + "ms");
+	}
+
+	protected void timeOldJoin(String title, String delimiter, String... items)
+	{
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < 1000000; i++)
+		{
+			oldJoin(delimiter, items);
+		}
+
+		long diff = System.currentTimeMillis() - start;
+		System.out.println("old join " + title + ": " + diff + "ms");
+	}
+
+	public void testConcatVersusStringBuilder()
+	{
+		timeConcatArray();
+		timeConcatList();
+		timeStringBuilder();
+	}
+
+	protected void timeConcatList()
+	{
+		List<String> items = CollectionsUtil.newList("abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz");
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < 1000000; i++)
+		{
+			String result = StringUtil.concat(items);
+
+			assertTrue(!result.isEmpty());
+		}
+
+		long diff = System.currentTimeMillis() - start;
+
+		System.out.println("concat list: " + diff + "ms");
+	}
+
+	protected void timeConcatArray()
+	{
+		String[] items = new String[] { "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz" };
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < 1000000; i++)
+		{
+			String result = StringUtil.concat(items);
+
+			assertTrue(!result.isEmpty());
+		}
+
+		long diff = System.currentTimeMillis() - start;
+
+		System.out.println("concat array: " + diff + "ms");
+	}
+
+	protected void timeStringBuilder()
+	{
+		List<String> items = CollectionsUtil.newList("abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz");
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < 1000000; i++)
+		{
+			StringBuilder builder = new StringBuilder();
+
+			for (String item : items)
+			{
+				builder.append(item);
+
+			}
+
+			String result = builder.toString();
+			assertTrue(!result.isEmpty());
+		}
+
+		long diff = System.currentTimeMillis() - start;
+
+		System.out.println("string builder: " + diff + "ms");
+	}
 }
