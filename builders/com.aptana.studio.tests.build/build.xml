@@ -210,7 +210,7 @@
 		<antcall target="clean.after" />
 	</target>
 
-	<target name="performance">
+	<target name="performance" depends="generate.build.properties,generate.base">
 		<antcall target="-pre-test" />
 
 		<!-- Don't build, assume unit test built already ran and we can just re-use it! -->
