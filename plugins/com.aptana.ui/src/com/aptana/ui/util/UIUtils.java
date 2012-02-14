@@ -12,6 +12,7 @@ import java.net.URI;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -203,6 +204,18 @@ public final class UIUtils
 			}
 		}
 		return null;
+	}
+
+	public static IProject getSelectedProject()
+	{
+		IProject project = null;
+		IResource selectedResource = getSelectedResource();
+		if (selectedResource != null)
+		{
+			project = selectedResource.getProject();
+		}
+
+		return project;
 	}
 
 	/**
