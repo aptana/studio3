@@ -225,6 +225,8 @@
 			</chainedmapper>
 		</pathconvert>
 
+		<echo message="Running performance tests on Studio ${studio.version}, on host: ${computer.hostname}, java version: ${java.version}" />
+
 		<!-- Run the tests. -->
 		<antcall target="run-perf-test">
 			<param name="test.plugin" value="com.aptana.studio.tests.all" />
@@ -277,7 +279,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Djunit.properties=${basedir}/build.properties ${perf.properties} -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
+			<property name="extraVMargs" value="-Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc=${perf.db} -Declipse.perf.config=build=${studio.version};host=${computer.hostname};jvm=${java.version} -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
 		</ant>
 	</target>
 </project>
