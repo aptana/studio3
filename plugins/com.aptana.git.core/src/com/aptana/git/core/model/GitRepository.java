@@ -309,7 +309,11 @@ public class GitRepository
 						// Do long running work in another thread/job so we don't tie up the jnotify locks!
 						private void refreshIndex()
 						{
-							index().refreshAsync();
+							// FIXME We get this when the index file changes, which can happen on stage/unstage/rm/add.
+							// Can we temporarily disable it if the operation causing it is us and we're already up to
+							// date? Maybe if we know that the filewatcher is going to pick it up, we just don't refresh
+							// in our own code?
+							index().scheduleBatchRefresh();
 						}
 
 						protected void checkForBranchChange()
@@ -1412,7 +1416,6 @@ public class GitRepository
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
-		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
 
@@ -1524,7 +1527,6 @@ public class GitRepository
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
-		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
 
@@ -1536,7 +1538,6 @@ public class GitRepository
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), (result == null) ? 0 : result.getCode(),
 					(result == null) ? null : result.getMessage(), null);
 		}
-		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
 

@@ -85,7 +85,6 @@ public class PushHandler extends AbstractSimpleGitCommandHandler
 	protected void postLaunch(GitRepository repo)
 	{
 		repo.firePushEvent();
-		refreshRepoIndex(repo);
 	}
 
 	@Override

@@ -22,8 +22,6 @@ public class PullHandler extends AbstractSimpleGitCommandHandler
 	protected void postLaunch(GitRepository repo)
 	{
 		repo.firePullEvent();
-		// Refresh the in-memory index of the repo!
-		refreshRepoIndex(repo);
 	}
 
 	@Override

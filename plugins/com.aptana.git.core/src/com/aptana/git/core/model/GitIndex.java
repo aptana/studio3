@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -57,22 +59,16 @@ public class GitIndex
 	private boolean amend;
 
 	/**
-	 * Temporary list of changed files that we build up on refreshes. TODO Don't make this a field here that is
-	 * redundant with the next list, instead make it a local var to refresh and pass it along to the jobs/methods that
-	 * need it.
-	 */
-	private List<ChangedFile> files;
-
-	/**
 	 * The list of changed files that is a copy of the above list. Only copied at the very end of the refresh, so it
 	 * always contains the full listing from last finished refresh call.
 	 */
 	List<ChangedFile> changedFiles;
 	private Object changedFilesLock = new Object();
 
+	private Job indexRefreshJob;
 	private boolean notify;
 
-	private Job indexRefreshJob;
+	private Vector<ChangedFile> files;
 
 	GitIndex(GitRepository repository, IPath workingDirectory)
 	{
@@ -86,8 +82,10 @@ public class GitIndex
 	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come
 	 * rapid-fire.
 	 */
-	public synchronized void refreshAsync()
+	synchronized void scheduleBatchRefresh()
 	{
+		// FIXME Use a smarter mechanism, like a daemon thread that blocks on a queue of requests? once we get one from
+		// queue we sleep for 250ms to batch all requests, then wipe the queue and run?
 		if (indexRefreshJob == null)
 		{
 			indexRefreshJob = new Job("Refreshing git index") //$NON-NLS-1$
@@ -113,7 +111,8 @@ public class GitIndex
 	}
 
 	/**
-	 * Run a refresh synchronously.
+	 * Run a refresh synchronously. FIXME Should this even be visible to callers? We should pick up file events via
+	 * watcher to refresh whenever we really need to. This should become default visibility.
 	 * 
 	 * @param monitor
 	 * @return
@@ -123,7 +122,7 @@ public class GitIndex
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		try
 		{
-			return refresh(true, sub.newChild(100));
+			return refresh(true, null, sub.newChild(100));
 		}
 		finally
 		{
@@ -131,29 +130,31 @@ public class GitIndex
 		}
 	}
 
-	// FIXME this is a very ugly way of generating our index of files. Can we do less commands? Or possibly even read
-	// the index itself?
-	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
+	/**
+	 * If the filePaths is empty, do batch operations!
+	 * 
+	 * @param notify
+	 * @param filePaths
+	 * @param monitor
+	 * @return
+	 */
+	synchronized IStatus refresh(boolean notify, Collection<IPath> filePaths, IProgressMonitor monitor)
 	{
-		if (monitor != null && monitor.isCanceled())
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+
+		final List<String> filePathStrings = CollectionsUtil.map(filePaths, new IMap<IPath, String>()
+		{
+			public String map(IPath location)
+			{
+				return location.toPortableString();
+			}
+		});
+
+		if (sub.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
 		}
 		this.notify = notify;
-
-		// TODO Is this command really necessary? I don't think it is anymore... Can we avoid calling sync refresh from
-		// commands like merge/rebase? Also can we have them hook launch terminate listeners and exit write of repo
-		// then, rather than loop checking launch terminate status?
-		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
-				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		if (result == null) // couldn't even execute!
-		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
-		}
-		if (!result.isOK())
-		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getMessage());
-		}
 
 		// FIXME Can we just do something like a "git status --porcelain" to grab all three at once and parse the
 		// changed files out? It doesn't include sha/blob mode in that output, so I think we'd need to lazily get that
@@ -163,31 +164,14 @@ public class GitIndex
 		jobs.add(new UnstagedFilesRefreshJob(this));
 		jobs.add(new StagedFilesRefreshJob(this));
 
-		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
-		Collection<ChangedFile> preRefreshFiles;
-		synchronized (this.changedFilesLock)
-		{
-			if (this.changedFiles != null)
-			{
-				preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
-				for (ChangedFile file : this.changedFiles)
-				{
-					preRefreshFiles.add(new ChangedFile(file));
-				}
-			}
-			else
-			{
-				preRefreshFiles = new ArrayList<ChangedFile>(0);
-			}
-		}
-		// Now create a new temporary list so we can build it up...
-		this.files = new Vector<ChangedFile>(preRefreshFiles.size());
-
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
 		}
+
+		// Now create a new temporary list so we can build it up...
+		this.files = new Vector<ChangedFile>();
 
 		// Schedule all the jobs
 		boolean setSystem = !EclipseUtil.showSystemJobs();
@@ -210,41 +194,47 @@ public class GitIndex
 			}
 		}
 
-		// At this point, all index operations have finished.
-		// We need to find all files that don't have either
-		// staged or unstaged files, and delete them
-		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
-		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
-		for (ChangedFile file : this.files)
-		{
-			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
-			{
-				deleteFiles.add(file);
-			}
-		}
-
-		if (!deleteFiles.isEmpty())
-		{
-			for (ChangedFile file : deleteFiles)
-			{
-				this.files.remove(file);
-			}
-		}
-
-		// Now make the "final" list a copy of the temporary one we were just building up
+		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
+		Collection<ChangedFile> preRefresh;
 		synchronized (this.changedFilesLock)
 		{
-			this.changedFiles = new ArrayList<ChangedFile>(this.files.size());
-
-			for (ChangedFile file : this.files)
+			if (this.changedFiles != null)
 			{
-				this.changedFiles.add(new ChangedFile(file));
+				preRefresh = new ArrayList<ChangedFile>(this.changedFiles.size());
+				for (ChangedFile file : this.changedFiles)
+				{
+					preRefresh.add(new ChangedFile(file));
+				}
 			}
+			else
+			{
+				preRefresh = new ArrayList<ChangedFile>(0);
+			}
+
+			// Now wipe any existing ChangedFile entries for any of the filePaths and add the ones we generated in
+			// dictionary
+			if (CollectionsUtil.isEmpty(filePaths))
+			{
+				this.changedFiles = new ArrayList<ChangedFile>(this.files.size());
+			}
+			else
+			{
+				this.changedFiles = CollectionsUtil.filter(this.changedFiles, new IFilter<ChangedFile>()
+				{
+					public boolean include(ChangedFile item)
+					{
+						return !filePathStrings.contains(item.path);
+					}
+				});
+			}
+			this.changedFiles.addAll(this.files);
 		}
+
 		// Don't hold onto temp list in memory!
 		this.files = null;
 
-		postIndexChange(preRefreshFiles, toRefresh);
+		postIndexChange(preRefresh, this.changedFiles);
+		sub.done();
 		return Status.OK_STATUS;
 	}
 
@@ -278,7 +268,7 @@ public class GitIndex
 		if (isNull)
 		{
 			// Don't want to call back to fireIndexChangeEvent yet!
-			IStatus status = refresh(false, new NullProgressMonitor());
+			IStatus status = refresh(false, null, new NullProgressMonitor());
 			if (!status.isOK())
 			{
 				IdeLog.logError(GitPlugin.getDefault(), status.getMessage());
@@ -465,6 +455,7 @@ public class GitIndex
 		}
 		else
 		{
+			// FIXME Can we eliminate this? We should get a file event via the watcher which will cause a refresh!
 			refresh(new NullProgressMonitor()); // TODO Run async if we can!
 		}
 		return true;
@@ -722,6 +713,25 @@ public class GitIndex
 		}
 
 		return filtered;
+	}
+
+	public void refreshAsync(final Collection<IPath> paths)
+	{
+		Job job = new Job("Refreshing git index") //$NON-NLS-1$
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				if (monitor != null && monitor.isCanceled())
+				{
+					return Status.CANCEL_STATUS;
+				}
+				refresh(true, paths, monitor);
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(!EclipseUtil.showSystemJobs());
+		job.schedule();
 	}
 
 	private abstract static class FilesRefreshJob extends Job

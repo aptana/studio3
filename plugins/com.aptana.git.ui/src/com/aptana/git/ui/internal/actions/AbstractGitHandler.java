@@ -200,13 +200,4 @@ abstract class AbstractGitHandler extends AbstractHandler
 		}
 		return repos.iterator().next();
 	}
-
-	protected void refreshRepoIndex(GitRepository repo)
-	{
-		if (repo != null)
-		{
-			repo.index().refreshAsync(); // queue up a refresh
-		}
-	}
-
 }

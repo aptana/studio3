@@ -10,6 +10,7 @@ package com.aptana.git.core;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -30,7 +32,9 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
+import com.aptana.core.IMap;
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
@@ -66,7 +70,7 @@ class GitResourceListener implements IResourceChangeListener
 			return;
 		}
 
-		Map<GitRepository, IProject> reposToRefresh = Collections.emptyMap();
+		Map<GitRepository, Set<IResource>> reposToRefresh = Collections.emptyMap();
 		Set<IProject> projectsToAttach = Collections.emptySet();
 		ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
 		try
@@ -91,20 +95,39 @@ class GitResourceListener implements IResourceChangeListener
 			return;
 		}
 
-		for (Map.Entry<GitRepository, IProject> entry : reposToRefresh.entrySet())
+		for (Map.Entry<GitRepository, Set<IResource>> entry : reposToRefresh.entrySet())
 		{
-			if (entry.getKey() == null || dontRefresh(entry.getValue()))
+			final GitRepository repo = entry.getKey();
+			if (repo == null)
 			{
 				continue;
 			}
-			GitIndex index = entry.getKey().index();
+
+			Set<IResource> resources = entry.getValue();
+			if (CollectionsUtil.isEmpty(resources) || dontRefresh(resources.iterator().next().getProject()))
+			{
+				continue;
+			}
+			GitIndex index = repo.index();
 			if (index != null)
 			{
-				// FIXME This causes the whole index to refresh whenever any file/dir is changed in the workspace
-				// attached to the repo.
-				// We already listen to changes to the git index file, so when do we need to refresh here? Can we do a
-				// refresh of only the diff?
-				index.refreshAsync(); // queue up a refresh
+				if (!CollectionsUtil.isEmpty(resources))
+				{
+					final List<IPath> filePaths = CollectionsUtil.map(resources, new IMap<IResource, IPath>()
+					{
+						public IPath map(IResource item)
+						{
+							IPath location = item.getLocation();
+							IPath wd = repo.workingDirectory();
+							if (wd.isPrefixOf(location))
+							{
+								location = location.removeFirstSegments(wd.segmentCount());
+							}
+							return location;
+						}
+					});
+					index.refreshAsync(filePaths); // queue up a refresh
+				}
 			}
 		}
 	}
@@ -193,12 +216,12 @@ class GitResourceListener implements IResourceChangeListener
 	 */
 	private final class ResourceDeltaVisitor implements IResourceDeltaVisitor
 	{
-		private Map<GitRepository, IProject> reposToRefresh;
+		private Map<GitRepository, Set<IResource>> reposToRefresh;
 		private Set<IProject> projectsToAttach;
 
 		private ResourceDeltaVisitor()
 		{
-			reposToRefresh = new HashMap<GitRepository, IProject>();
+			reposToRefresh = new HashMap<GitRepository, Set<IResource>>();
 			projectsToAttach = new HashSet<IProject>();
 		}
 
@@ -207,7 +230,7 @@ class GitResourceListener implements IResourceChangeListener
 			return projectsToAttach;
 		}
 
-		public Map<GitRepository, IProject> getRepositoriestoRefresh()
+		public Map<GitRepository, Set<IResource>> getRepositoriestoRefresh()
 		{
 			return reposToRefresh;
 		}
@@ -224,7 +247,7 @@ class GitResourceListener implements IResourceChangeListener
 
 			// Auto-attach to git if it's a new project being added and there's a repo and it's not already
 			// attached
-			final IResource resource = delta.getResource();
+			IResource resource = delta.getResource();
 			if (resource != null && resource instanceof IProject && delta.getKind() == IResourceDelta.ADDED)
 			{
 				final GitRepository mapping = getRepo(resource);
@@ -234,15 +257,6 @@ class GitResourceListener implements IResourceChangeListener
 					projectsToAttach.add(project);
 					return false;
 				}
-			}
-
-			// If the resource is not part of a project under Git
-			// revision control
-			final GitRepository mapping = getRepo(resource);
-			if (mapping == null)
-			{
-				// Ignore the change
-				return true;
 			}
 
 			if (resource.getType() == IResource.ROOT)
@@ -260,10 +274,30 @@ class GitResourceListener implements IResourceChangeListener
 				}
 			}
 
+			// If the resource is not part of a project under Git
+			// revision control
+			GitRepository mapping = getRepo(resource);
+			if (mapping == null)
+			{
+				// Ignore the change
+				return true;
+			}
+
+			if (resource.isTeamPrivateMember())
+			{
+				return false;
+			}
+
 			// All seems good, schedule the repo for update.
 			// TODO We force a refresh of the whole index for this repo. Maybe we should see if there's a way to
 			// refresh the status of just this file?
-			reposToRefresh.put(mapping, resource.getProject());
+			Set<IResource> resources = reposToRefresh.get(mapping);
+			if (resources == null)
+			{
+				resources = new HashSet<IResource>();
+			}
+			resources.add(resource);
+			reposToRefresh.put(mapping, resources);
 
 			if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) > 1)
 			{

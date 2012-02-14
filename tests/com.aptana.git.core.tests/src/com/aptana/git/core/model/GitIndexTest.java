@@ -137,7 +137,7 @@ public class GitIndexTest extends GitTestCase
 				{
 					notifier.notify();
 				}
-				index.refresh(true, monitor);
+				index.refresh(true, null, monitor);
 				finished[0] = true;
 			}
 		});

@@ -52,7 +52,7 @@ public class GitRepositoryTest extends GitTestCase
 		writer.write("Hello World!");
 		writer.close();
 		// refresh the index
-		index.refresh(new NullProgressMonitor());
+		assertRefresh();
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
@@ -175,7 +175,7 @@ public class GitRepositoryTest extends GitTestCase
 		writer.write("\nHello second line!");
 		writer.close();
 		// refresh the index
-		index.refresh(new NullProgressMonitor());
+		assertRefresh();
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
