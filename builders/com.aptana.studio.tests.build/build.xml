@@ -13,6 +13,11 @@
     </description>
 
 	<property file="build_local.properties" />
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${basedir}/ant-contrib/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
 
 	<!-- Set up EMMA location and instrumentation path -->
 	<path id="emma.lib">
@@ -205,7 +210,8 @@
 		<antcall target="clean.after" />
 	</target>
 
-	<target name="performance" depends="build">
+	<target name="performance">
+		<!-- Don't build, assume unit test built already ran and we can just re-use it! -->
 		<!-- Grab the version number of build we're testing -->
 		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
 		<propertycopy name="studio.version" from="com.aptana.feature" />
