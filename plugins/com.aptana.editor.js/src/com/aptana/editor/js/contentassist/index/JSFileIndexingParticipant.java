@@ -159,7 +159,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		// build symbol tables
 		URI location = context.getURI();
 
-		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+		if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
@@ -169,7 +169,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			);
 			// @formatter:on
 
-			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+			IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 		}
 
 		JSScope globals = this.getGlobals(ast);
@@ -183,7 +183,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			type.addParentType(JSTypeConstants.GLOBAL_TYPE);
 
 			// add declared variables and functions from the global scope
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -193,7 +193,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
@@ -204,7 +204,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 
 			// include any assignments to Window
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -214,7 +214,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			for (PropertyElement property : this.processWindowAssignments(index, globals, location))
@@ -223,7 +223,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 
 			// process window assignments in lambdas (self-invoking functions)
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -233,7 +233,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			for (PropertyElement property : this.processLambdas(index, globals, ast, location))
@@ -242,7 +242,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 
 			// associate all user agents with these properties
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -252,7 +252,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			for (PropertyElement property : type.getProperties())
@@ -261,7 +261,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			}
 
 			// write new Window type to index
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEXING_STEPS))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -271,7 +271,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEXING_STEPS);
 			}
 
 			this._indexWriter.writeType(index, type, location);

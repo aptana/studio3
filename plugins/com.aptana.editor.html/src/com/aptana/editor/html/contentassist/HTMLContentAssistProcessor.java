@@ -301,9 +301,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			String[] userAgents = userAgentList.toArray(new String[userAgentList.size()]);
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(getNatureIds(), userAgents);
 
-			if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 			{
-				IdeLog.logInfo(
+				IdeLog.logTrace(
 						HTMLPlugin.getDefault(),
 						MessageFormat
 								.format("Current element: {0}, Current lexeme: {1}, Replace offset: {2}. Replace length: {3}", elementName, _currentLexeme, offset, replaceLength), //$NON-NLS-1$
@@ -1381,9 +1381,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		ICompletionProposal[] proposals = result.toArray(new ICompletionProposal[result.size()]);
 
-		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 		{
-			IdeLog.logInfo(HTMLPlugin.getDefault(), MessageFormat.format("Generated {0} proposals", proposals.length), //$NON-NLS-1$
+			IdeLog.logTrace(HTMLPlugin.getDefault(), MessageFormat.format("Generated {0} proposals", proposals.length), //$NON-NLS-1$
 					IDebugScopes.CONTENT_ASSIST);
 		}
 
@@ -1671,9 +1671,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					IHTMLEditorDebugScopes.CONTENT_ASSIST);
 		}
 
-		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 		{
-			IdeLog.logInfo(HTMLPlugin.getDefault(), MessageFormat.format("Coarse location: {0}", result), //$NON-NLS-1$
+			IdeLog.logTrace(HTMLPlugin.getDefault(), MessageFormat.format("Coarse location: {0}", result), //$NON-NLS-1$
 					IDebugScopes.CONTENT_ASSIST);
 		}
 
@@ -1819,10 +1819,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		if (IdeLog.isInfoEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+		if (IdeLog.isTraceEnabled(HTMLPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 		{
-			IdeLog.logInfo(HTMLPlugin.getDefault(),
-					MessageFormat.format("Fine location: {0}", result), IDebugScopes.CONTENT_ASSIST); //$NON-NLS-1$
+			IdeLog.logTrace(HTMLPlugin.getDefault(),
+					MessageFormat.format("Find location: {0}", result), IDebugScopes.CONTENT_ASSIST); //$NON-NLS-1$
 		}
 
 		return result;

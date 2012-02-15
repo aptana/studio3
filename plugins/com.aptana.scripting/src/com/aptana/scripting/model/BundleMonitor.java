@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -36,13 +36,18 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 {
 	// @formatter:off
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
-	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates|samples)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(
+			".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_FILE_PATTERN = Pattern.compile(
+			".+?[/\\\\](?:commands|snippets|templates|samples)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN = Pattern.compile(
+			"/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 
-	private static final Pattern BUNDLE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN_DEPRECATED = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern BUNDLE_PATTERN_DEPRECATED = Pattern.compile(
+			"/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN_DEPRECATED = Pattern.compile(
+			"/.+?/bundles/.+?/(?:commands|snippets|templates|samples)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	// @formatter:on
 
 	private static BundleMonitor INSTANCE;
@@ -106,7 +111,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				{
 					this._watchId = FileWatcher.addWatch(userBundlesPath, IJNotify.FILE_ANY, true, this);
 
-					if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(),
+					if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(),
 							IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 					{
 						this.showFileEvent("Begin file system monitoring"); //$NON-NLS-1$
@@ -144,7 +149,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				FileWatcher.removeWatch(this._watchId);
 				this._watchId = -1;
 
-				if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+				if (IdeLog
+						.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 				{
 					this.showFileEvent("End file system monitoring"); //$NON-NLS-1$
 				}
@@ -179,9 +185,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
-			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 			{
-				this.showFileEvent("File created: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+				this.showFileEvent(MessageFormat.format("File created: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
 
 			BundleManager manager = BundleManager.getInstance();
@@ -202,7 +208,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		else
 		{
-			this.showFileEvent("Skipped file created: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+			this.showFileEvent(MessageFormat.format("Skipped file created: {0},{1}", rootPath, name)); //$NON-NLS-1$
 		}
 	}
 
@@ -231,9 +237,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
-			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 			{
-				this.showFileEvent("File deleted: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+				this.showFileEvent(MessageFormat.format("File deleted: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
 			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
@@ -251,9 +257,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		else
 		{
-			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 			{
-				this.showFileEvent("Skipped file deleted: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+				this.showFileEvent(MessageFormat.format("Skipped file deleted: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
 			reloadDependentScripts(new File(rootPath, name));
 		}
@@ -270,9 +276,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
-			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 			{
-				this.showFileEvent("File modified: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+				this.showFileEvent(MessageFormat.format("File modified: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
 			File file = new File(rootPath, name);
 
@@ -280,9 +286,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		else
 		{
-			if (IdeLog.isInfoEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
+			if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS))
 			{
-				this.showFileEvent("Skipped file modified: " + rootPath + "," + name); //$NON-NLS-1$ //$NON-NLS-2$
+				this.showFileEvent(MessageFormat.format("Skipped file modified: {0},{1}", rootPath, name)); //$NON-NLS-1$
 			}
 			reloadDependentScripts(new File(rootPath, name));
 		}
@@ -301,7 +307,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	synchronized public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
-		this.showFileEvent("File renamed: " + rootPath + "," + oldName + "=>" + newName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		this.showFileEvent(MessageFormat.format("File renamed: {0},{1}=>{2}", rootPath, oldName, newName)); //$NON-NLS-1$
 
 		this.fileDeletedHelper(rootPath, oldName);
 		this.fileCreatedHelper(rootPath, newName);
@@ -404,7 +410,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			// only return true if the script is part of an existing bundle.
 			File script = new File(rootPath, name);
 
-			result = this.isScriptInExistingBundle(script);
+			result = isScriptInExistingBundle(script);
 		}
 
 		return result;
@@ -470,7 +476,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 							if (movedFrom != null && movedFrom instanceof IFile)
 							{
-								this.showResourceEvent("Added: " + movedFrom.getLocation().toFile() + "=>" + file); //$NON-NLS-1$ //$NON-NLS-2$
+								this.showResourceEvent(MessageFormat.format("Added: {0}=>{1}", movedFrom.getLocation() //$NON-NLS-1$
+										.toFile(), file));
 
 								manager.unloadScript(movedFrom.getLocation().toFile());
 								manager.loadScript(file);
@@ -484,7 +491,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 							if (movedTo != null && movedTo instanceof IFile)
 							{
-								this.showResourceEvent("Added: " + file + "=>" + movedTo.getLocation().toFile()); //$NON-NLS-1$ //$NON-NLS-2$
+								this.showResourceEvent(MessageFormat.format("Added: {0}=>{1}", file, movedTo //$NON-NLS-1$
+										.getLocation().toFile()));
 
 								manager.unloadScript(file);
 								manager.loadScript(movedTo.getLocation().toFile());
@@ -602,7 +610,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	protected void showFileEvent(String message)
 	{
-		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS);
+		IdeLog.logTrace(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_FILE_EVENTS);
 	}
 
 	/**
@@ -612,7 +620,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	protected void showResourceEvent(String message)
 	{
-		IdeLog.logInfo(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_RESOURCE_EVENTS);
+		IdeLog.logTrace(ScriptingActivator.getDefault(), message, IDebugScopes.SHOW_BUNDLE_MONITOR_RESOURCE_EVENTS);
 	}
 
 	/*

@@ -427,9 +427,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				others = new ICompletionProposal[0];
 			}
 
-			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			if (IdeLog.isTraceEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 			{
-				IdeLog.logInfo(CommonEditorPlugin.getDefault(), MessageFormat.format(
+				IdeLog.logTrace(CommonEditorPlugin.getDefault(), MessageFormat.format(
 						"Generated {0} ruble proposals, {0} snippet proposals, and {0} language proposals", //$NON-NLS-1$
 						rubleProposals.size(), snippetProposals.size(), others.length), IDebugScopes.CONTENT_ASSIST);
 			}
@@ -439,9 +439,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			proposals.toArray(combined);
 			System.arraycopy(others, 0, combined, proposals.size(), others.length);
 
-			if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
+			if (IdeLog.isTraceEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.CONTENT_ASSIST))
 			{
-				IdeLog.logInfo(CommonEditorPlugin.getDefault(),
+				IdeLog.logTrace(CommonEditorPlugin.getDefault(),
 						MessageFormat.format("Combined {0} total proposals", combined.length), //$NON-NLS-1$
 						IDebugScopes.CONTENT_ASSIST);
 			}

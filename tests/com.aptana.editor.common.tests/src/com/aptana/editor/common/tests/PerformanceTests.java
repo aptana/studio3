@@ -7,9 +7,14 @@
  */
 package com.aptana.editor.common.tests;
 
+import java.text.MessageFormat;
+
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcherPerfTest;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloserPerfTest;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManagerPerformanceTest;
@@ -21,7 +26,17 @@ public class PerformanceTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(PerformanceTests.class.getName());
+		TestSuite suite = new TestSuite(PerformanceTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				String msg = MessageFormat.format("Running test: {0}", test.toString());
+				IdeLog.logError(CommonEditorPlugin.getDefault(), msg);
+				System.out.println(msg);
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CharacterPairMatcherPerfTest.class);
 		suite.addTestSuite(DocumentScopeManagerPerformanceTest.class);
@@ -31,5 +46,4 @@ public class PerformanceTests
 		// $JUnit-END$
 		return suite;
 	}
-
 }

@@ -177,7 +177,7 @@ public class UnifiedBuilderTest extends TestCase
 			}
 
 			@Override
-			protected boolean infoLoggingEnabled()
+			protected boolean traceLoggingEnabled()
 			{
 				return true;
 			}
