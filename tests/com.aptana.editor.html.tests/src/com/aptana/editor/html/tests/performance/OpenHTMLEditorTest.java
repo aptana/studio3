@@ -46,11 +46,10 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 		// ensure sequence
 		TestSuite suite = new TestSuite(OpenHTMLEditorTest.class.getName());
 		suite.addTest(new OpenHTMLEditorTest("testOpenHTMLEditor1"));
-		suite.addTest(new OpenHTMLEditorTest("testOpenHTMLEditor2"));
 		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
 		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOff"));
-		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
+		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
 		return new Setup(suite);
 	}
 
@@ -70,25 +69,17 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 	 */
 	protected void tearDown() throws Exception
 	{
-		super.tearDown();
 		EditorTestHelper.closeAllEditors();
+		super.tearDown();
 	}
 
 	public void testOpenHTMLEditor1() throws Exception
 	{
 		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, 0, getWarmUpRuns()), Performance
 				.getDefault().getNullPerformanceMeter(), false);
+		EditorTestHelper.closeAllEditors();
 		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, getWarmUpRuns(), getMeasuredRuns()),
 				createPerformanceMeter(), false);
-	}
-
-	public void testOpenHTMLEditor2() throws Exception
-	{
-		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, 0, getWarmUpRuns()), Performance
-				.getDefault().getNullPerformanceMeter(), false);
-		PerformanceMeter performanceMeter = createPerformanceMeter();
-		measureOpenInEditor(ResourceTestHelper.findFiles(PREFIX, FILE_SUFFIX, getWarmUpRuns(), getMeasuredRuns()),
-				performanceMeter, false);
 	}
 
 	public void testOpenLargeFileFoldingOnOutlineOn() throws Exception
