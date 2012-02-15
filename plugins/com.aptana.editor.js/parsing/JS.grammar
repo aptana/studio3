@@ -253,16 +253,12 @@
 			int start = fParseState.getStartingOffset();
 			int length = source.length();
 
-			if (start == 0)
-			{
-				result.setLocation(start, start + length - 1);
-			}
-			else
-			{
-				// align root with zero-based offset
-				result.setLocation(0, length - 1);
+			// align root with zero-based offset
+			result.setLocation(0, length - 1);
 
-				// now update shift all offsets to the correct position
+			if (start != 0)
+			{
+				// shift all offsets to the correct position
 				ParseUtil.addOffset(result, start);
 			}
 

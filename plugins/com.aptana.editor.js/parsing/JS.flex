@@ -162,7 +162,10 @@ import com.aptana.editor.js.parsing.lexer.JSTokenType;
 %}
 
 LineTerminator = \r|\n|\r\n
-Whitespace = {LineTerminator} | [ \t\f]
+RubyBlock = "<%" ~"%>"
+PHPBlock = "<?" ~"?>"
+DjangoBlock = "{%" ~"%}"
+Whitespace = {LineTerminator} | [ \t\f] | {RubyBlock} | {PHPBlock} | {DjangoBlock}
 
 //Identifier = [a-zA-Z_$][a-zA-Z0-9_$]*
 Identifier = ([:jletter:]|\$)([:jletterdigit:]|\$)*

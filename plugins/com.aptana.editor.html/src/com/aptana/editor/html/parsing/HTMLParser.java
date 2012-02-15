@@ -311,11 +311,6 @@ public class HTMLParser implements IParser
 				{
 					node = new HTMLTextNode(text, start, end);
 				}
-				else
-				{
-					// FIXME Do we need to shift this here, if we passed in offset in setEditState?
-					addOffset(node, start);
-				}
 				return new IParseNode[] { node };
 			}
 			catch (java.lang.Exception e)
