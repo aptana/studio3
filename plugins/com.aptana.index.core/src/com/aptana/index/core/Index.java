@@ -351,9 +351,9 @@ public class Index
 	 */
 	void deleteIndexFile()
 	{
-		if (isInfoEnabled())
+		if (isTraceEnabled())
 		{
-			logInfo(MessageFormat.format("Deleting index ''{0}''", this)); //$NON-NLS-1$
+			logTrace(MessageFormat.format("Deleting index ''{0}''", this)); //$NON-NLS-1$
 		}
 
 		// TODO Enter write?
@@ -365,14 +365,14 @@ public class Index
 		}
 	}
 
-	protected void logInfo(String msg)
+	protected static void logTrace(String msg)
 	{
-		IdeLog.logInfo(IndexPlugin.getDefault(), msg, IDebugScopes.INDEXER);
+		IdeLog.logTrace(IndexPlugin.getDefault(), msg, IDebugScopes.INDEXER);
 	}
 
-	protected boolean isInfoEnabled()
+	protected static boolean isTraceEnabled()
 	{
-		return IdeLog.isInfoEnabled(IndexPlugin.getDefault(), IDebugScopes.INDEXER);
+		return IdeLog.isTraceEnabled(IndexPlugin.getDefault(), IDebugScopes.INDEXER);
 	}
 
 	/**
@@ -596,16 +596,13 @@ public class Index
 		this.enterRead();
 		try
 		{
-			if (isInfoEnabled() && memoryIndex.hasDocument(documentName))
+			if (isTraceEnabled() && memoryIndex.hasDocument(documentName))
 			{
 				// @formatter:off
-				String message = MessageFormat.format(
-					"Removing URI ''{0}'' from index ''{1}''", //$NON-NLS-1$
-					containerRelativeURI,
-					this
-				);
+				String message = MessageFormat.format("Removing URI ''{0}'' from index ''{1}''", //$NON-NLS-1$
+						containerRelativeURI, this);
 				// @formatter:on
-				logInfo(message);
+				logTrace(message);
 			}
 		}
 		finally
@@ -653,9 +650,9 @@ public class Index
 	 */
 	public void save() throws IOException
 	{
-		if (isInfoEnabled())
+		if (isTraceEnabled())
 		{
-			logInfo(MessageFormat.format("Saving index ''{0}''", this)); //$NON-NLS-1$
+			logTrace(MessageFormat.format("Saving index ''{0}''", this)); //$NON-NLS-1$
 		}
 
 		this.save(true);

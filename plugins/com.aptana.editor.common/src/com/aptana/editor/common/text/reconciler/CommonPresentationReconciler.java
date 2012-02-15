@@ -66,8 +66,8 @@ public class CommonPresentationReconciler extends PresentationReconciler {
 		iterationDelay = Integer.getInteger(ICommonEditorSystemProperties.RECONCILER_ITERATION_DELAY, iterationDelay);
 		minimalVisibleLength = Integer.getInteger(ICommonEditorSystemProperties.RECONCILER_MINIMAL_VISIBLE_LENGTH,
 				minimalVisibleLength);
-		if (IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PRESENTATION)) {
-			IdeLog.logInfo(
+		if (IdeLog.isTraceEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PRESENTATION)) {
+			IdeLog.logTrace(
 					CommonEditorPlugin.getDefault(),
 					MessageFormat
 							.format("Reconciling process set for partition limit of {0} partitions, background delay of {1}ms, iteration delay of {2}ms, and minimal visible length of {3} lines", //$NON-NLS-1$

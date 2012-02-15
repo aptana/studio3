@@ -53,7 +53,7 @@ public class JSIndexWriter extends IndexWriter
 		);
 		// @formatter:on
 
-		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+		if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
@@ -65,7 +65,7 @@ public class JSIndexWriter extends IndexWriter
 			);
 			// @formatter:on
 
-			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+			IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
 		}
 
 		index.addEntry(IJSIndexConstants.EVENT, value, location);
@@ -89,7 +89,7 @@ public class JSIndexWriter extends IndexWriter
 		);
 		// @formatter:on
 
-		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+		if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
@@ -101,7 +101,7 @@ public class JSIndexWriter extends IndexWriter
 			);
 			// @formatter:on
 
-			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+			IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
 		}
 
 		index.addEntry(IJSIndexConstants.FUNCTION, value, location);
@@ -125,7 +125,7 @@ public class JSIndexWriter extends IndexWriter
 		);
 		// @formatter:on
 
-		if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+		if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
 		{
 			// @formatter:off
 			String message = MessageFormat.format(
@@ -137,7 +137,7 @@ public class JSIndexWriter extends IndexWriter
 			);
 			// @formatter:on
 
-			IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+			IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
 		}
 
 		index.addEntry(IJSIndexConstants.PROPERTY, value, location);
@@ -192,7 +192,7 @@ public class JSIndexWriter extends IndexWriter
 			);
 			// @formatter:on
 
-			if (IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
+			if (IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.INDEX_WRITES))
 			{
 				// @formatter:off
 				String message = MessageFormat.format(
@@ -203,7 +203,7 @@ public class JSIndexWriter extends IndexWriter
 				);
 				// @formatter:on
 
-				IdeLog.logInfo(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
+				IdeLog.logTrace(JSPlugin.getDefault(), message, IDebugScopes.INDEX_WRITES);
 			}
 
 			index.addEntry(IJSIndexConstants.TYPE, value, location);

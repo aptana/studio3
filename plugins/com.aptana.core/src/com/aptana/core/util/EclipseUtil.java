@@ -509,9 +509,9 @@ public class EclipseUtil
 								if (element.getName().equals(elementName))
 								{
 									processor.processElement(element);
-									if (IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
+									if (IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.EXTENSION_POINTS))
 									{
-										IdeLog.logInfo(
+										IdeLog.logTrace(
 												CorePlugin.getDefault(),
 												MessageFormat
 														.format("Processing extension element {0} with attributes {1}", element.getName(), //$NON-NLS-1$

@@ -457,14 +457,14 @@ public class JSHyperlinkCollector extends JSTreeWalker
 		URI projectURI = EditorUtil.getProjectURI(editor);
 		IRegion region = getNodeRegion(node);
 		String linkType = getLinkType(node);
-		boolean isLoggingEnabled = IdeLog.isInfoEnabled(JSPlugin.getDefault(), IDebugScopes.OPEN_DECLARATION_TYPES);
+		boolean isLoggingEnabled = IdeLog.isTraceEnabled(JSPlugin.getDefault(), IDebugScopes.OPEN_DECLARATION_TYPES);
 
 		for (PropertyElement element : elements)
 		{
 			// @formatter:off
 			if (isLoggingEnabled)
 			{
-				IdeLog.logInfo(
+				IdeLog.logTrace(
 					JSPlugin.getDefault(),
 					"Hyperlink type model element: " + element.toSource(), //$NON-NLS-1$
 					IDebugScopes.OPEN_DECLARATION_TYPES
@@ -479,7 +479,7 @@ public class JSHyperlinkCollector extends JSTreeWalker
 				// @formatter:off
 				if (isLoggingEnabled)
 				{
-					IdeLog.logInfo(
+					IdeLog.logTrace(
 						JSPlugin.getDefault(),
 						"Hyperlink type model documents: " + StringUtil.join(", ", documents), //$NON-NLS-1$ //$NON-NLS-2$
 						IDebugScopes.OPEN_DECLARATION_TYPES

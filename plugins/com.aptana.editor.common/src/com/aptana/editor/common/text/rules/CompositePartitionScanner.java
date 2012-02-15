@@ -33,7 +33,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	public final static String[] SWITCHING_CONTENT_TYPES = new String[] { START_SWITCH_TAG, END_SWITCH_TAG };
 
-	private final boolean traceEnabled = IdeLog.isInfoEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PARTITIONER);
+	private final boolean traceEnabled = IdeLog.isTraceEnabled(CommonEditorPlugin.getDefault(), IDebugScopes.PARTITIONER);
 
 	private ISubPartitionScanner defaultPartitionScanner;
 	private ISubPartitionScanner primaryPartitionScanner;
@@ -328,7 +328,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	}
 
 	private void trace(String string) {
-		IdeLog.logInfo(CommonEditorPlugin.getDefault(), string);
+		IdeLog.logTrace(CommonEditorPlugin.getDefault(), string);
 	}
 
 	private boolean hasSwitchingSequence() {

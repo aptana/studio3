@@ -680,8 +680,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		TableItem item = (TableItem) event.item;
 		int index = fProposalTable.indexOf(item);
 
-		boolean outputRelevance = IdeLog.isOutputEnabled(UIEplPlugin.getDefault(), IdeLog.StatusLevel.INFO,
-				IUiEplScopes.RELEVANCE);
+		boolean outputRelevance = IdeLog.isInfoEnabled(UIEplPlugin.getDefault(), IUiEplScopes.RELEVANCE);
 
 		if (0 <= index && index < fFilteredProposals.length)
 		{

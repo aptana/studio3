@@ -27,9 +27,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -37,7 +37,6 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.ICorePreferenceConstants;
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.logging.IdeLog.StatusLevel;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.EclipseUtil;
@@ -51,7 +50,7 @@ import com.aptana.ui.util.SWTUtils;
 public class TroubleshootingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 
-	private Scale debugSlider;
+	private Combo debugCombo;
 	private BooleanFieldEditor toggleComponents;
 	private CheckboxTableViewer categoryViewer;
 
@@ -74,51 +73,49 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	 */
 	public void createFieldEditors()
 	{
-
 		Composite appearanceComposite = getFieldEditorParent();
 
 		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.TroubleshootingPreferencePage_LBL_DebuggingOutputLevel);
 
 		Composite debugComp = new Composite(group, SWT.NONE);
-		debugComp.setLayout(GridLayoutFactory.fillDefaults().margins(0, 5).numColumns(3).create());
+		debugComp.setLayout(GridLayoutFactory.fillDefaults().margins(0, 5).numColumns(2).create());
 		debugComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-		Label less = new Label(debugComp, SWT.LEFT);
-		less.setText(Messages.TroubleshootingPreferencePage_LBL_Errors);
-		debugSlider = new Scale(debugComp, SWT.HORIZONTAL);
-		debugSlider.setIncrement(1);
-		debugSlider.setMinimum(1);
-		debugSlider.setMaximum(3);
-		debugSlider.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
-		debugSlider.setSelection(parseStatusLevel(getPreferenceStore().getString(
-				ICorePreferenceConstants.PREF_DEBUG_LEVEL)));
+		Label levelLabel = new Label(debugComp, SWT.NONE);
+		levelLabel.setText(Messages.TroubleshootingPreferencePage_LBL_DebugLevel);
+		levelLabel.setLayoutData(GridDataFactory.swtDefaults().create());
 
-		Label more = new Label(debugComp, SWT.LEFT);
-		more.setText(Messages.TroubleshootingPreferencePage_LBL_All);
+		debugCombo = new Combo(debugComp, SWT.READ_ONLY);
+		debugCombo
+				.setItems(new String[] { Messages.TroubleshootingPreferencePage_Level_Errors,
+						Messages.TroubleshootingPreferencePage_Level_Warnings,
+						Messages.TroubleshootingPreferencePage_Level_All });
+		debugCombo.select(StatusLevel
+				.valueOf(getPreferenceStore().getString(ICorePreferenceConstants.PREF_DEBUG_LEVEL)).ordinal());
 
 		final Label currentValue = new Label(debugComp, SWT.LEFT);
-		currentValue.setText(getValueLabel(debugSlider.getSelection()));
+		currentValue.setText(getValueLabel(debugCombo.getSelectionIndex()));
 		currentValue.setFont(SWTUtils.getDefaultSmallFont());
-		currentValue.setLayoutData(GridDataFactory.fillDefaults().span(3, 0).grab(true, true).create());
+		currentValue.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).grab(true, true).create());
 
-		debugSlider.addSelectionListener(new SelectionListener()
+		debugCombo.addSelectionListener(new SelectionListener()
 		{
 
-			public void widgetDefaultSelected(SelectionEvent selectionevent)
+			public void widgetDefaultSelected(SelectionEvent e)
 			{
-				currentValue.setText(getValueLabel(debugSlider.getSelection()));
+				widgetSelected(e);
 			}
 
-			public void widgetSelected(SelectionEvent selectionevent)
+			public void widgetSelected(SelectionEvent e)
 			{
-				currentValue.setText(getValueLabel(debugSlider.getSelection()));
+				currentValue.setText(getValueLabel(debugCombo.getSelectionIndex()));
 			}
 		});
 
-		toggleComponents = new BooleanFieldEditor(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS,
+		BooleanFieldEditor showHiddenProcesses = new BooleanFieldEditor(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS,
 				Messages.TroubleshootingPreferencePage_ShowHiddenProcesses, SWT.DEFAULT, group);
-		addField(toggleComponents);
+		addField(showHiddenProcesses);
 
 		toggleComponents = new BooleanFieldEditor(ICorePreferenceConstants.PREF_ENABLE_COMPONENT_DEBUGGING,
 				Messages.TroubleshootingPreferencePage_DebugSpecificComponents, SWT.DEFAULT, group);
@@ -177,12 +174,10 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		switch (selection)
 		{
 			case 0:
-				return Messages.TroubleshootingPreferencePage_LBL_NoDebuggingOutput;
-			case 1:
 				return Messages.TroubleshootingPreferencePage_LBL_OnlyError;
-			case 2:
+			case 1:
 				return Messages.TroubleshootingPreferencePage_LBL_ErrorsAndImportant;
-			case 3:
+			case 2:
 				return Messages.TroubleshootingPreferencePage_LBL_AllDebuggingInformation;
 			default:
 				return Messages.TroubleshootingPreferencePage_LBL_UnknownLoggingLevel;
@@ -201,7 +196,7 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	 */
 	protected void performDefaults()
 	{
-		debugSlider.setSelection(getPreferenceStore().getDefaultInt(ICorePreferenceConstants.PREF_DEBUG_LEVEL));
+		debugCombo.select(getPreferenceStore().getDefaultInt(ICorePreferenceConstants.PREF_DEBUG_LEVEL));
 		categoryViewer.setCheckedElements(ArrayUtil.NO_OBJECTS);
 		super.performDefaults();
 	}
@@ -214,7 +209,8 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 	public boolean performOk()
 	{
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(ICorePreferenceConstants.PREF_DEBUG_LEVEL, getStatusLevel(debugSlider.getSelection()).toString());
+		store.setValue(ICorePreferenceConstants.PREF_DEBUG_LEVEL,
+				StatusLevel.values()[debugCombo.getSelectionIndex()].toString());
 
 		String[] currentOptions = EclipseUtil.getCurrentDebuggableComponents();
 		EclipseUtil.setBundleDebugOptions(currentOptions, false);
@@ -234,73 +230,5 @@ public class TroubleshootingPreferencePage extends FieldEditorPreferencePage imp
 		EclipseUtil.setPlatformDebugging(toggleComponents.getBooleanValue());
 
 		return super.performOk();
-	}
-
-	/**
-	 * Converts the IStatus level into something we get.
-	 * 
-	 * @param status
-	 * @return
-	 */
-	private static StatusLevel getStatusLevel(int status)
-	{
-		switch (status)
-		{
-			case 3:
-			{
-				return StatusLevel.INFO;
-			}
-			case 2:
-			{
-				return StatusLevel.WARNING;
-			}
-			case 1:
-			{
-				return StatusLevel.ERROR;
-			}
-			default:
-			{
-				return StatusLevel.OFF;
-			}
-		}
-	}
-
-	/**
-	 * Converts the String level into something we get.
-	 * 
-	 * @param status
-	 * @return
-	 */
-	private static int parseStatusLevel(String status)
-	{
-		IdeLog.StatusLevel newStatus = IdeLog.StatusLevel.ERROR;
-		try
-		{
-			newStatus = Enum.valueOf(IdeLog.StatusLevel.class, status);
-		}
-		catch (IllegalArgumentException e)
-		{
-			// can safely ignore
-		}
-
-		switch (newStatus)
-		{
-			case INFO:
-			{
-				return 3;
-			}
-			case WARNING:
-			{
-				return 2;
-			}
-			case ERROR:
-			{
-				return 1;
-			}
-			default:
-			{
-				return 0;
-			}
-		}
 	}
 }

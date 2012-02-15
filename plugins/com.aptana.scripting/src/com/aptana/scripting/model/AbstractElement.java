@@ -8,6 +8,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -183,8 +184,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 */
 	private static void showRegistration(String message, AbstractElement element)
 	{
-		if (IdeLog.isOutputEnabled(ScriptingActivator.getDefault(), IdeLog.StatusLevel.INFO,
-				IDebugScopes.SHOW_ELEMENT_REGISTRATION))
+		if (IdeLog.isTraceEnabled(ScriptingActivator.getDefault(), IDebugScopes.SHOW_ELEMENT_REGISTRATION))
 		{
 			String name = element.getDisplayName();
 			String path = element.getPath();
@@ -192,8 +192,9 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			String[] classParts = fullClassName.split("\\."); //$NON-NLS-1$
 			String className = classParts[classParts.length - 1];
 
-			IdeLog.logInfo(ScriptingActivator.getDefault(),
-					message + ": " + className + ", " + name + ", " + path, IDebugScopes.SHOW_ELEMENT_REGISTRATION); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			IdeLog.logTrace(ScriptingActivator.getDefault(),
+					MessageFormat.format("{0}: {1}, {2}, {3}", message, className, name, path), //$NON-NLS-1$
+					IDebugScopes.SHOW_ELEMENT_REGISTRATION);
 		}
 	}
 

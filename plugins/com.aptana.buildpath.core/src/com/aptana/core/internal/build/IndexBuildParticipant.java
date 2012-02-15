@@ -38,9 +38,9 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		URI uri = getURI(project);
 		if (uri != null)
 		{
-			if (isInfoEnabled())
+			if (isTraceEnabled())
 			{
-				logInfo(MessageFormat.format("Cleaning index for project {0} ({1})", project.getName(), uri)); //$NON-NLS-1$
+				logTrace(MessageFormat.format("Cleaning index for project {0} ({1})", project.getName(), uri)); //$NON-NLS-1$
 			}
 			getIndexManager().removeIndex(uri);
 		}
@@ -128,14 +128,14 @@ public class IndexBuildParticipant extends RequiredBuildParticipant
 		return IndexManager.getInstance();
 	}
 
-	protected void logInfo(String message)
+	protected static void logTrace(String message)
 	{
 		IdeLog.logInfo(BuildPathCorePlugin.getDefault(), message, IDebugScopes.BUILDER);
 	}
 
-	protected boolean isInfoEnabled()
+	protected static boolean isTraceEnabled()
 	{
-		return IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
+		return IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
 	}
 
 }

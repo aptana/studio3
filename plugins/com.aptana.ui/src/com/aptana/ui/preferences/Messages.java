@@ -23,13 +23,14 @@ public class Messages extends NLS
 
 	public static String TroubleshootingPreferencePage_DebugSpecificComponents;
 	public static String TroubleshootingPreferencePage_LBL_DebuggingOutputLevel;
-	public static String TroubleshootingPreferencePage_LBL_Errors;
-	public static String TroubleshootingPreferencePage_LBL_All;
+	public static String TroubleshootingPreferencePage_LBL_DebugLevel;
 	public static String TroubleshootingPreferencePage_LBL_UnknownLoggingLevel;
 	public static String TroubleshootingPreferencePage_LBL_AllDebuggingInformation;
 	public static String TroubleshootingPreferencePage_LBL_ErrorsAndImportant;
 	public static String TroubleshootingPreferencePage_LBL_OnlyError;
-	public static String TroubleshootingPreferencePage_LBL_NoDebuggingOutput;
+	public static String TroubleshootingPreferencePage_Level_All;
+	public static String TroubleshootingPreferencePage_Level_Errors;
+	public static String TroubleshootingPreferencePage_Level_Warnings;
 	public static String TroubleshootingPreferencePage_ShowHiddenProcesses;
 	public static String TroubleshootingPreferencePage_TroubleshootingPageHeader;
 

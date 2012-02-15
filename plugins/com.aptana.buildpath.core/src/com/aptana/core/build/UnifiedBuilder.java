@@ -100,7 +100,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
 	{
-		boolean logInfoEnabled = infoLoggingEnabled();
+		boolean logTraceEnabled = traceLoggingEnabled();
 
 		String projectName = getProjectHandle().getName();
 		long startTime = System.nanoTime();
@@ -115,9 +115,9 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		if (kind == IncrementalProjectBuilder.FULL_BUILD)
 		{
-			if (logInfoEnabled)
+			if (logTraceEnabled)
 			{
-				logInfo(MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName));
+				logTrace(MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuld, projectName));
 			}
 			fullBuild(participants, sub.newChild(80));
 		}
@@ -126,17 +126,17 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			IResourceDelta delta = getResourceDelta();
 			if (delta == null)
 			{
-				if (logInfoEnabled)
+				if (logTraceEnabled)
 				{
-					logInfo(MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName));
+					logTrace(MessageFormat.format(Messages.UnifiedBuilder_PerformingFullBuildNullDelta, projectName));
 				}
 				fullBuild(participants, sub.newChild(80));
 			}
 			else
 			{
-				if (logInfoEnabled)
+				if (logTraceEnabled)
 				{
-					logInfo(MessageFormat.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName));
+					logTrace(MessageFormat.format(Messages.UnifiedBuilder_PerformingIncrementalBuild, projectName));
 				}
 				incrementalBuild(participants, delta, sub.newChild(80));
 			}
@@ -144,20 +144,20 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 		buildEnding(participants, sub.newChild(10));
 
-		if (logInfoEnabled)
+		if (logTraceEnabled)
 		{
 			double endTime = ((double) System.nanoTime() - startTime) / 1000000;
-			logInfo(MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime));
+			logTrace(MessageFormat.format(Messages.UnifiedBuilder_FinishedBuild, projectName, endTime));
 		}
 		return null;
 	}
 
-	protected boolean infoLoggingEnabled()
+	protected static boolean traceLoggingEnabled()
 	{
-		return IdeLog.isInfoEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
+		return IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
 	}
 
-	private void logInfo(String msg)
+	private static void logTrace(String msg)
 	{
 		IdeLog.logInfo(CorePlugin.getDefault(), msg, IDebugScopes.BUILDER);
 	}
