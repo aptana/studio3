@@ -147,13 +147,19 @@ public class GitIndex
 		}
 		this.notify = notify;
 
-		// FIXME Can we just do something like a "git status --porcelain" to grab all three at once and parse the
-		// changed files out? It doesn't include sha/blob mode in that output, so I think we'd need to lazily get that
-		// info later when it's needed in indexInfo() for unstageFiles
+		final Set<String> filePathStrings = new HashSet<String>(CollectionsUtil.map(filePaths,
+				new IMap<IPath, String>()
+				{
+					public String map(IPath location)
+					{
+						return location.toPortableString();
+					}
+				}));
+
 		Set<Job> jobs = new HashSet<Job>();
-		jobs.add(new UntrackedFilesRefreshJob(this));
-		jobs.add(new UnstagedFilesRefreshJob(this));
-		jobs.add(new StagedFilesRefreshJob(this));
+		jobs.add(new UntrackedFilesRefreshJob(this, filePathStrings));
+		jobs.add(new UnstagedFilesRefreshJob(this, filePathStrings));
+		jobs.add(new StagedFilesRefreshJob(this, filePathStrings));
 
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
@@ -202,7 +208,23 @@ public class GitIndex
 				preRefresh = new ArrayList<ChangedFile>(0);
 			}
 
-			this.changedFiles = new ArrayList<ChangedFile>(this.files);
+			// Now wipe any existing ChangedFile entries for any of the filePaths and add the ones we generated in
+			// dictionary
+			if (CollectionsUtil.isEmpty(filePathStrings))
+			{
+				this.changedFiles = new ArrayList<ChangedFile>(this.files.size());
+			}
+			else
+			{
+				this.changedFiles = CollectionsUtil.filter(this.changedFiles, new IFilter<ChangedFile>()
+				{
+					public boolean include(ChangedFile item)
+					{
+						return !filePathStrings.contains(item.path);
+					}
+				});
+			}
+			this.changedFiles.addAll(this.files);
 		}
 
 		// Don't hold onto temp list in memory!
@@ -713,12 +735,14 @@ public class GitIndex
 	{
 		protected GitRepository repo;
 		protected GitIndex index;
+		protected Set<String> filePaths;
 
-		private FilesRefreshJob(String name, GitIndex index)
+		private FilesRefreshJob(String name, GitIndex index, Set<String> filePaths)
 		{
 			super(name);
 			this.index = index;
 			this.repo = index.repository;
+			this.filePaths = filePaths;
 		}
 
 		protected List<String> linesFromNotification(String string)
@@ -895,17 +919,23 @@ public class GitIndex
 
 	private static final class StagedFilesRefreshJob extends FilesRefreshJob
 	{
-		private StagedFilesRefreshJob(GitIndex index)
+		private StagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super("staged files", index); //$NON-NLS-1$
+			super("staged files", index, filePaths); //$NON-NLS-1$
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor)
 		{
 			// HEAD vs filesystem
-			IStatus result = repo.execute(GitRepository.ReadWrite.READ, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+			List<String> args = CollectionsUtil.newList("diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
 					"-z", GitRepository.HEAD); //$NON-NLS-1$
+			if (!CollectionsUtil.isEmpty(filePaths))
+			{
+				args.add("--"); //$NON-NLS-1$
+				args.addAll(filePaths);
+			}
+			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
 			if (result != null && result.isOK())
 			{
 				readStagedFiles(result.getMessage());
@@ -923,16 +953,22 @@ public class GitIndex
 
 	private static final class UnstagedFilesRefreshJob extends FilesRefreshJob
 	{
-		private UnstagedFilesRefreshJob(GitIndex index)
+		private UnstagedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super("unstaged files", index); //$NON-NLS-1$
+			super("unstaged files", index, filePaths); //$NON-NLS-1$
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor)
 		{
 			// index vs filesystem
-			IStatus result = repo.execute(GitRepository.ReadWrite.READ, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+			List<String> args = CollectionsUtil.newList("diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!CollectionsUtil.isEmpty(filePaths))
+			{
+				args.add("--"); //$NON-NLS-1$
+				args.addAll(filePaths);
+			}
+			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
 			if (result != null && result.isOK())
 			{
 				readUnstagedFiles(result.getMessage());
@@ -950,17 +986,23 @@ public class GitIndex
 
 	private static final class UntrackedFilesRefreshJob extends FilesRefreshJob
 	{
-		private UntrackedFilesRefreshJob(GitIndex index)
+		private UntrackedFilesRefreshJob(GitIndex index, Set<String> filePaths)
 		{
-			super("untracked files", index); //$NON-NLS-1$
+			super("untracked files", index, filePaths); //$NON-NLS-1$
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor)
 		{
 			// index vs working tree (HEAD?)
-			IStatus result = repo.execute(GitRepository.ReadWrite.READ, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+			List<String> args = CollectionsUtil.newList("ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
 					"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!CollectionsUtil.isEmpty(filePaths))
+			{
+				args.add("--"); //$NON-NLS-1$
+				args.addAll(filePaths);
+			}
+			IStatus result = repo.execute(GitRepository.ReadWrite.READ, args.toArray(new String[args.size()]));
 			if (result != null && result.isOK())
 			{
 				readOtherFiles(result.getMessage());
