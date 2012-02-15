@@ -42,6 +42,8 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
 
+	private static final String DOUBLE_NEW_LINE = "\n\n"; //$NON-NLS-1$
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
@@ -103,7 +105,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 							descriptions.add(property.getDescription());
 						}
 
-						return StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
+						return StringUtil.join(DOUBLE_NEW_LINE, descriptions);
 					}
 					break;
 				}
@@ -142,7 +144,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 								}
 							}
 
-							return StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
+							return StringUtil.join(DOUBLE_NEW_LINE, descriptions);
 						}
 					}
 					break;

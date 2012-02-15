@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
@@ -49,18 +50,26 @@ import com.aptana.ui.epl.UIEplPlugin;
 @SuppressWarnings({ "restriction", "nls" })
 public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 {
-	private static final String DOCUMENTATION_STYLE_CSS = "/documentationStyle.css"; //$NON-NLS-1$
+	private static final String DOCUMENTATION_STYLE_CSS = "/documentationStyle.css";
+	private static final String DEFAULT_BORDER_COLOR = "#BEBEBE";
+	/** The string we are replacing in the css file with the real border color */
+	protected static final String BORDER_COLOR_CSS_TEXT = "BorderColor";
+
 	private static String styleSheet;
 	// Patterns used for stripping HTML in case there is no support for a CustomBrowserInformationControl on the system
-	private static final Map<Pattern, String> htmlStrippingMap;
+	private static final Pattern HTML_TAGS = Pattern.compile("<b>|</b>|<p>|</p>|<br>|</br>|&lt|&gt");
+	private static final Map<String, String> HTML_REPLACEMENTS_MAP;
 	static
 	{
-		htmlStrippingMap = new HashMap<Pattern, String>();
-		htmlStrippingMap.put(Pattern.compile("<b>|</b>"), StringUtil.EMPTY);
-		htmlStrippingMap.put(Pattern.compile("<p>|</p>"), "\n");
-		htmlStrippingMap.put(Pattern.compile("<br>|</br>"), "\n");
-		htmlStrippingMap.put(Pattern.compile("&lt"), "<");
-		htmlStrippingMap.put(Pattern.compile("&gt"), ">");
+		HTML_REPLACEMENTS_MAP = new HashMap<String, String>();
+		HTML_REPLACEMENTS_MAP.put("<b>", StringUtil.EMPTY);
+		HTML_REPLACEMENTS_MAP.put("</b>", StringUtil.EMPTY);
+		HTML_REPLACEMENTS_MAP.put("<p>", "\n");
+		HTML_REPLACEMENTS_MAP.put("</p>", "\n");
+		HTML_REPLACEMENTS_MAP.put("<br>", "\n");
+		HTML_REPLACEMENTS_MAP.put("</br>", "\n");
+		HTML_REPLACEMENTS_MAP.put("&lt", "<");
+		HTML_REPLACEMENTS_MAP.put("&gt", ">");
 	}
 
 	/**
@@ -72,6 +81,9 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	 */
 	protected IInformationControlCreator fPresenterControlCreator;
 
+	// An alternative path for the CSS file.
+	private String cssPath;
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.php.internal.ui.hover.AbstractPHPTextHover#getInformationPresenterControlCreator()
@@ -79,7 +91,9 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	public IInformationControlCreator getInformationPresenterControlCreator()
 	{
 		if (fPresenterControlCreator == null)
+		{
 			fPresenterControlCreator = new PresenterControlCreator(this);
+		}
 		return fPresenterControlCreator;
 	}
 
@@ -90,7 +104,9 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	public IInformationControlCreator getHoverControlCreator()
 	{
 		if (fHoverControlCreator == null)
+		{
 			fHoverControlCreator = new HoverControlCreator(getInformationPresenterControlCreator());
+		}
 		return fHoverControlCreator;
 	}
 
@@ -102,10 +118,14 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	 */
 	public static String stripBasicHTML(String content)
 	{
-		for (Pattern strippingPattern : htmlStrippingMap.keySet())
+		Matcher matcher = HTML_TAGS.matcher(content);
+		StringBuffer sb = new StringBuffer();
+		while (matcher.find())
 		{
-			content = strippingPattern.matcher(content).replaceAll(htmlStrippingMap.get(strippingPattern));
+			matcher.appendReplacement(sb, HTML_REPLACEMENTS_MAP.get(matcher.toMatchResult().group()));
 		}
+		matcher.appendTail(sb);
+		content = sb.toString();
 		return content;
 	}
 
@@ -162,11 +182,21 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	}
 
 	/**
-	 * Returns the foreground color in
+	 * Returns the foreground color
 	 * 
 	 * @return A foreground color (may be <code>null</code>)
 	 */
 	protected Color getForegroundColor()
+	{
+		return null;
+	}
+
+	/**
+	 * Returns a border color. Note that this color will be used for internal HTML content borders.
+	 * 
+	 * @return A border color (may be <code>null</code>)
+	 */
+	protected Color getBorderColor()
 	{
 		return null;
 	}
@@ -209,11 +239,19 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 		{
 			if (useHTMLTags)
 			{
+				Color borderColor = getBorderColor();
 				Color bgColor = getBackgroundColor();
 				Color fgColor = getForegroundColor();
+
+				String borderColorHex = (borderColor != null) ? getHexColor(borderColor.getRGB())
+						: DEFAULT_BORDER_COLOR;
 				RGB bgRGB = (bgColor != null) ? bgColor.getRGB() : null;
 				RGB fgRGB = (fgColor != null) ? fgColor.getRGB() : null;
-				HTMLPrinter.insertPageProlog(buffer, 0, fgRGB, bgRGB, getStyleSheet());
+
+				// We need to set the border color before we call insertPageProlog on the style-sheet
+				String styleSheet = getStyleSheet();
+				styleSheet = styleSheet.replaceAll(BORDER_COLOR_CSS_TEXT, borderColorHex);
+				HTMLPrinter.insertPageProlog(buffer, 0, fgRGB, bgRGB, styleSheet);
 				if (base != null)
 				{
 					int endHeadIdx = buffer.indexOf("</head>"); //$NON-NLS-1$
@@ -293,13 +331,11 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 		{
 			return;
 		}
+		if (!useHTMLTags)
 		{
-			if (!useHTMLTags)
-			{
-				documentation = stripBasicHTML(documentation);
-			}
-			buffer.append(documentation);
+			documentation = stripBasicHTML(documentation);
 		}
+		buffer.append(documentation);
 	}
 
 	/**
@@ -309,25 +345,53 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	{
 		if (styleSheet == null)
 		{
-			styleSheet = loadStyleSheet();
+			styleSheet = loadStyleSheet(getCSSPath());
 		}
-		String css = styleSheet;
-		if (css != null)
+		if (styleSheet != null)
 		{
 			FontData fontData = JFaceResources.getFontRegistry().getFontData("Dialog")[0]; //$NON-NLS-1$
-			css = HTMLPrinter.convertTopLevelFont(css, fontData);
+			return HTMLPrinter.convertTopLevelFont(styleSheet, fontData);
 		}
 
-		return css;
+		return null;
+	}
+
+	/**
+	 * Sets the path to a CSS file.
+	 * 
+	 * @param path
+	 *            A CSS file path.
+	 */
+	protected void setCSSPath(String path)
+	{
+		this.cssPath = path;
+	}
+
+	/**
+	 * Returns the path to the CSS file.
+	 * 
+	 * @return A CSS file path.
+	 */
+	protected String getCSSPath()
+	{
+		if (!StringUtil.isEmpty(cssPath))
+		{
+			return cssPath;
+		}
+		return DOCUMENTATION_STYLE_CSS;
 	}
 
 	/**
 	 * Loads the hover style sheet.
 	 */
-	private static String loadStyleSheet()
+	protected static String loadStyleSheet(String cssPath)
 	{
 		Bundle bundle = Platform.getBundle(UIEplPlugin.PLUGIN_ID);
-		URL styleSheetURL = bundle.getEntry(DOCUMENTATION_STYLE_CSS);
+		if (bundle == null)
+		{
+			return StringUtil.EMPTY;
+		}
+		URL styleSheetURL = bundle.getEntry(cssPath);
 		if (styleSheetURL != null)
 		{
 			try
@@ -340,7 +404,27 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 				return StringUtil.EMPTY;
 			}
 		}
-		return null;
+		return StringUtil.EMPTY;
+	}
+
+	protected static String getHexColor(RGB rgb)
+	{
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('#');
+		appendAsHexString(buffer, rgb.red);
+		appendAsHexString(buffer, rgb.green);
+		appendAsHexString(buffer, rgb.blue);
+		return buffer.toString();
+	}
+
+	protected static void appendAsHexString(StringBuilder buffer, int intValue)
+	{
+		String hexValue = Integer.toHexString(intValue);
+		if (hexValue.length() == 1)
+		{
+			buffer.append('0');
+		}
+		buffer.append(hexValue);
 	}
 
 	public static void addImageAndLabel(StringBuffer buf, String imageName, int imageWidth, int imageHeight,
@@ -512,7 +596,9 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 		public boolean canReuse(IInformationControl control)
 		{
 			if (!super.canReuse(control))
+			{
 				return false;
+			}
 
 			if (control instanceof IInformationControlExtension4)
 			{

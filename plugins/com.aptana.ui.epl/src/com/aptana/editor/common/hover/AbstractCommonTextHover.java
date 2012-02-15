@@ -71,19 +71,4 @@ public abstract class AbstractCommonTextHover implements ITextHover, ITextHoverE
 			}
 		};
 	}
-
-	/*
-	 * TODO (Shalom) - Check if this is called (non-Javadoc)
-	 * @see org.eclipse.jface.text.IInformationControlExtension5#getInformationPresenterControlCreator()
-	 */
-	public IInformationControlCreator getInformationPresenterControlCreator()
-	{
-		return new IInformationControlCreator()
-		{
-			public IInformationControl createInformationControl(Shell shell)
-			{
-				return new DefaultInformationControl(shell, true);
-			}
-		};
-	}
 }

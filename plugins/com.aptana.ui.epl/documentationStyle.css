@@ -26,7 +26,7 @@ a.header:visited { text-decoration: none; color: InfoText }
 a.header:hover   { text-decoration: underline; color: #000080; }
 h4           { font-style: italic; }
 h5           { font-style: italic;}
-div.header   { margin-bottom: 0.3em; border-bottom: 1px; border-bottom-style:solid; border-bottom-color:#ff99AA; color: #7A7A7A; font-style: italic; }
+div.header   { margin-bottom: 0.3em; border-bottom: 1px; border-bottom-style:solid; border-bottom-color:BorderColor; color: #7A7A7A; font-style: italic; }
 strong	     { font-weight: bold; }
 em	         { font-style: italic; }
 var	         { font-style: italic; }

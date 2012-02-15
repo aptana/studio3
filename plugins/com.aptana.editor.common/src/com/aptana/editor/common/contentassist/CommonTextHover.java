@@ -58,14 +58,25 @@ public abstract class CommonTextHover extends AbstractDocumentationHover
 		return themeListener.bgColor;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getBorderColor()
+	 */
+	@Override
+	protected Color getBorderColor()
+	{
+		return themeListener.borderColor;
+	}
+
 	// Theme listener that caches the colors.
 	// This listener is defined as static, and never disposed, as hovers popup are very common.
-	public static class ThemeListener implements IPreferenceChangeListener
+	private static class ThemeListener implements IPreferenceChangeListener
 	{
+		protected Color borderColor;
 		protected Color bgColor;
 		protected Color fgColor;
 
-		/**/ThemeListener()
+		ThemeListener()
 		{
 			getThemeColors();
 			EclipseUtil.instanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
@@ -87,11 +98,13 @@ public abstract class CommonTextHover extends AbstractDocumentationHover
 
 		protected void getThemeColors()
 		{
-			ColorManager colorManager = ThemePlugin.getDefault().getColorManager();
-			IThemeManager themeManager = ThemePlugin.getDefault().getThemeManager();
+			ThemePlugin themePlugin = ThemePlugin.getDefault();
+			ColorManager colorManager = themePlugin.getColorManager();
+			IThemeManager themeManager = themePlugin.getThemeManager();
 			Theme currentTheme = themeManager.getCurrentTheme();
 			bgColor = colorManager.getColor(currentTheme.getBackground());
 			fgColor = colorManager.getColor(currentTheme.getForeground());
+			borderColor = colorManager.getColor(currentTheme.getSelectionAgainstBG());
 		}
 	}
 }
