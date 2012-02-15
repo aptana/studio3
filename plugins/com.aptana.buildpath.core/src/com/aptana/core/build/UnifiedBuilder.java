@@ -152,7 +152,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		return null;
 	}
 
-	protected static boolean traceLoggingEnabled()
+	protected boolean traceLoggingEnabled()
 	{
 		return IdeLog.isTraceEnabled(CorePlugin.getDefault(), IDebugScopes.BUILDER);
 	}
