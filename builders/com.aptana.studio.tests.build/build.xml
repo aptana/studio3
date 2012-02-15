@@ -271,7 +271,7 @@
 
 	<target name="run-perf-test">
 		<ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
-			<property name="timeout" value="${test.timeout}" />
+			<property name="timeout" value="${perf.test.timeout}" />
 			<property name="os" value="${baseos}" />
 			<property name="ws" value="${basews}" />
 			<property name="arch" value="${basearch}" />
