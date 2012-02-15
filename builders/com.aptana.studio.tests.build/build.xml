@@ -216,9 +216,9 @@
 		<!-- Don't build, assume unit test built already ran and we can just re-use it! -->
 		<!-- Grab the version number of build we're testing -->
 		<pathconvert property="studio.version">
-			<fileset dir="${baseLocation}/features">
+			<dirset dir="${baseLocation}/features">
 				<include name="com.aptana.feature_*" />
-			</fileset>
+			</dirset>
 			<chainedmapper>
 				<flattenmapper />
 				<regexpmapper from="^com\.aptana\.feature_([\d\.]+)\-.*$$" to="\1" />
