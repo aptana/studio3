@@ -14,12 +14,14 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 
@@ -39,6 +41,128 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
+	 * ToolBarManager)
+	 */
+	@Override
+	public void populateToolbarActions(ToolBarManager tbm)
+	{
+		// TODO Attach actions for open-declaration etc.
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		// No header for now
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getDocumentation(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		if (!(element instanceof IParseNode))
+		{
+			return null;
+		}
+		IParseNode activeNode = (IParseNode) element;
+
+		if (activeNode != null)
+		{
+			JSLocationIdentifier identifier = new JSLocationIdentifier(hoverRegion.getOffset(), activeNode);
+			LocationType type = identifier.getType();
+
+			switch (type)
+			{
+				case IN_CONSTRUCTOR:
+				case IN_GLOBAL:
+				case IN_VARIABLE_NAME:
+				{
+					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+					Index index = this.getIndex(editorPart);
+					List<PropertyElement> properties = queryHelper.getGlobals(index, activeNode.getText());
+
+					if (properties != null)
+					{
+						List<String> descriptions = new ArrayList<String>();
+
+						for (PropertyElement property : properties)
+						{
+							descriptions.add(property.getDescription());
+						}
+
+						return StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
+					}
+					break;
+				}
+
+				case IN_PROPERTY_NAME:
+					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+					Index index = this.getIndex(editorPart);
+					// @formatter:off
+					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(identifier.getTargetNode(),
+							identifier.getStatementNode());
+					// @formatter:on
+					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(editorPart),
+							identifier.getTargetNode(), propertyNode, hoverRegion.getOffset());
+					String typeName = null;
+					String methodName = null;
+
+					if (types.size() > 0)
+					{
+						typeName = types.get(0);
+						methodName = propertyNode.getLastChild().getText();
+					}
+
+					if (typeName != null && methodName != null)
+					{
+						List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
+
+						if (properties != null)
+						{
+							List<String> descriptions = new ArrayList<String>();
+
+							for (PropertyElement property : properties)
+							{
+								if (property instanceof FunctionElement)
+								{
+									descriptions.add(((FunctionElement) property).getDescription());
+								}
+							}
+
+							return StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
+						}
+					}
+					break;
+
+				case IN_OBJECT_LITERAL_PROPERTY:
+					break;
+
+				case IN_PARAMETERS:
+					break;
+
+				case IN_LABEL:
+				case UNKNOWN:
+				case NONE:
+				default:
+					break;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * getActiveNode
 	 * 
@@ -98,112 +222,13 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer,
-	 * org.eclipse.jface.text.IRegion)
-	 */
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
-	{
-		// Not called
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer,
 	 * org.eclipse.jface.text.IRegion)
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		int offset = hoverRegion.getOffset();
-		Object result = null;
-
-		IParseNode activeNode = this.getActiveNode(textViewer, offset);
-
-		if (activeNode != null)
-		{
-			JSLocationIdentifier identifier = new JSLocationIdentifier(offset, activeNode);
-			LocationType type = identifier.getType();
-
-			switch (type)
-			{
-				case IN_CONSTRUCTOR:
-				case IN_GLOBAL:
-				case IN_VARIABLE_NAME:
-				{
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					Index index = this.getIndex(textViewer);
-					List<PropertyElement> properties = queryHelper.getGlobals(index, activeNode.getText());
-
-					if (properties != null)
-					{
-						List<String> descriptions = new ArrayList<String>();
-
-						for (PropertyElement property : properties)
-						{
-							descriptions.add(property.getDescription());
-						}
-
-						result = StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
-					}
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					Index index = this.getIndex(textViewer);
-					// @formatter:off
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(
-						identifier.getTargetNode(),
-						identifier.getStatementNode()
-					);
-					// @formatter:on
-					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(textViewer),
-							identifier.getTargetNode(), propertyNode, offset);
-					String typeName = null;
-					String methodName = null;
-
-					if (types.size() > 0)
-					{
-						typeName = types.get(0);
-						methodName = propertyNode.getLastChild().getText();
-					}
-
-					if (typeName != null && methodName != null)
-					{
-						List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
-
-						if (properties != null)
-						{
-							List<String> descriptions = new ArrayList<String>();
-
-							for (PropertyElement property : properties)
-							{
-								if (property instanceof FunctionElement)
-								{
-									descriptions.add(((FunctionElement) property).getDescription());
-								}
-							}
-
-							result = StringUtil.join("\n\n", descriptions); //$NON-NLS-1$
-						}
-					}
-					break;
-
-				case IN_OBJECT_LITERAL_PROPERTY:
-					break;
-
-				case IN_PARAMETERS:
-					break;
-
-				case IN_LABEL:
-				case UNKNOWN:
-				case NONE:
-				default:
-					break;
-			}
-		}
-
-		return result;
+		IParseNode activeNode = this.getActiveNode(textViewer, hoverRegion.getOffset());
+		return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, getEditor(), hoverRegion);
 	}
 
 	/*
@@ -250,9 +275,9 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	 * @param textViewer
 	 * @return
 	 */
-	protected URI getEditorURI(ITextViewer textViewer)
+	protected URI getEditorURI(IEditorPart editorPart)
 	{
-		AbstractThemeableEditor editor = this.getEditor(textViewer);
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
 		URI result = null;
 
 		if (editor != null)
@@ -273,12 +298,12 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	/**
 	 * getIndex
 	 * 
-	 * @param textViewer
+	 * @param editorPart
 	 * @return
 	 */
-	protected Index getIndex(ITextViewer textViewer)
+	protected Index getIndex(IEditorPart editorPart)
 	{
-		AbstractThemeableEditor editor = this.getEditor(textViewer);
+		AbstractThemeableEditor editor = (AbstractThemeableEditor) editorPart;
 		Index result = null;
 
 		if (editor != null)

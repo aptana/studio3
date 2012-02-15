@@ -64,6 +64,7 @@ import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
+import com.aptana.editor.common.hover.AbstractCommonTextHover;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
@@ -658,18 +659,39 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		@SuppressWarnings("deprecation")
 		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 		{
-			Object info = null;
-			if (activeTextHover instanceof ITextHoverExtension2)
+			if (activeTextHover != null)
 			{
-				info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
-			}
-			else if (activeTextHover != null)
-			{
-				info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
-			}
-			if (info != null)
-			{
-				return info;
+				Object info = null;
+				AbstractCommonTextHover commonHover = null;
+				if (activeTextHover instanceof AbstractCommonTextHover)
+				{
+					commonHover = (AbstractCommonTextHover) activeTextHover;
+					commonHover.setEditor(getEditor());
+				}
+				try
+				{
+					if (activeTextHover instanceof ITextHoverExtension2)
+					{
+						info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
+					}
+					else
+					{
+						info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
+					}
+					if (info != null)
+					{
+						return info;
+					}
+				}
+				finally
+				{
+					// un-set the editor from the activeTextHover to avoid holding an editor reference after the
+					// hover-info computation.
+					if (commonHover != null)
+					{
+						commonHover.setEditor(null);
+					}
+				}
 			}
 			return super.getHoverInfo(textViewer, hoverRegion);
 		}

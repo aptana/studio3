@@ -7,12 +7,12 @@
  */
 package com.aptana.editor.css.text;
 
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
@@ -20,12 +20,11 @@ import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
-import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
@@ -39,6 +38,9 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
+	// A table that displays the CSS color in its background
+	private static final String COLORED_TABLE = "<table style=\"background-color:{0}; width:100%; height:100%;\"><tr><td> </td></tr></table>"; //$NON-NLS-1$
+
 	private static class RegionInfo
 	{
 		public final IRegion region;
@@ -55,6 +57,49 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 			.compile("rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)"); //$NON-NLS-1$
 
 	private Object info;
+	// has to be static, since the hover instance is reused.
+	private static boolean displayingColor;
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
+	 * ToolBarManager)
+	 */
+	@Override
+	public void populateToolbarActions(ToolBarManager tbm)
+	{
+		// TODO Attach actions for open-declaration, documentation, etc.
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		if (displayingColor)
+		{
+			return Messages.CSSTextHover_cssColorHeaderText;
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getDocumentation(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		if (info instanceof String)
+		{
+			return info.toString();
+		}
+		return null;
+	}
 
 	/**
 	 * getAST
@@ -100,39 +145,11 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 			int blue = Integer.parseInt(m.group(3));
 
 			// @formatter:off
-			result = new RegionInfo(
-				new Region(node.getStartingOffset(), node.getLength()),
-				new RGB(red, green, blue)
-			);
+			result = new RegionInfo(new Region(node.getStartingOffset(), node.getLength()), new RGB(red, green, blue));
 			// @formatter:on
 		}
 
 		return result;
-	}
-
-	/*
-	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
-	 */
-	public IInformationControlCreator getHoverControlCreator()
-	{
-		return new IInformationControlCreator()
-		{
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new CSSTextHoverInformationControl(parent);
-			}
-		};
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer,
-	 * org.eclipse.jface.text.IRegion)
-	 */
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion)
-	{
-		// Not called
-		return null;
 	}
 
 	/*
@@ -142,7 +159,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		return (this.isHoverEnabled()) ? info : null;
+		return getHoverInfo(info, isBrowserControlAvailable(textViewer), null, getEditor(), hoverRegion);
 	}
 
 	/*
@@ -156,7 +173,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 		// grab document's parse model
 		IParseNode ast = getAST(textViewer, offset);
-
+		displayingColor = false;
 		if (ast != null)
 		{
 			IParseNode node = ast.getNodeAtOffset(offset);
@@ -177,16 +194,9 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 							if (!StringUtil.isEmpty(text))
 							{
-								if (text.charAt(0) == '#')
-								{
-									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
-									info = CSSColors.hexToRGB(text);
-								}
-								else if (CSSColors.namedColorExists(text))
-								{
-									result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
-									info = CSSColors.namedColorToRGB(text);
-								}
+								result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
+								info = text;
+								displayingColor = true;
 								break;
 							}
 						}
@@ -272,9 +282,14 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		if (result == null)
 		{
 			info = null;
+			displayingColor = false;
 			result = new Region(offset, 0);
 		}
-
+		else if (displayingColor)
+		{
+			// Wrap the info color in a HTML table that is set with this background color.
+			info = MessageFormat.format(COLORED_TABLE, info);
+		}
 		return result;
 	}
 }
