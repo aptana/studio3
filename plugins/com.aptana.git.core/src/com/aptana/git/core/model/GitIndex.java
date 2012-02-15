@@ -141,15 +141,6 @@ public class GitIndex
 	synchronized IStatus refresh(boolean notify, Collection<IPath> filePaths, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-
-		final List<String> filePathStrings = CollectionsUtil.map(filePaths, new IMap<IPath, String>()
-		{
-			public String map(IPath location)
-			{
-				return location.toPortableString();
-			}
-		});
-
 		if (sub.isCanceled())
 		{
 			return Status.CANCEL_STATUS;
@@ -211,23 +202,7 @@ public class GitIndex
 				preRefresh = new ArrayList<ChangedFile>(0);
 			}
 
-			// Now wipe any existing ChangedFile entries for any of the filePaths and add the ones we generated in
-			// dictionary
-			if (CollectionsUtil.isEmpty(filePaths))
-			{
-				this.changedFiles = new ArrayList<ChangedFile>(this.files.size());
-			}
-			else
-			{
-				this.changedFiles = CollectionsUtil.filter(this.changedFiles, new IFilter<ChangedFile>()
-				{
-					public boolean include(ChangedFile item)
-					{
-						return !filePathStrings.contains(item.path);
-					}
-				});
-			}
-			this.changedFiles.addAll(this.files);
+			this.changedFiles = new ArrayList<ChangedFile>(this.files);
 		}
 
 		// Don't hold onto temp list in memory!
