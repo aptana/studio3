@@ -22,7 +22,7 @@ public class AllTests extends TestCase
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllTests.class.getName());
+		TestSuite suite = new TestSuite("Startup Performance Tests");
 
 		// make sure that the first run of the startup test is not recorded - it is heavily
 		// influenced by the presence and validity of the cached information
