@@ -7,7 +7,10 @@
  */
 package com.aptana.editor.common.hover;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,12 +31,17 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.osgi.framework.Bundle;
 
@@ -202,11 +210,23 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 	}
 
 	/**
-	 * Attach actions in the tool-bar that will be displayed when the hover gets the focus.
+	 * Attach actions in the tool-bar that will be displayed when the hover gets the focus. <br>
+	 * Note that a {@link ToolBarManager#update(boolean)} will be called after.
 	 * 
 	 * @param tbm
+	 * @param iControl
 	 */
-	public abstract void populateToolbarActions(ToolBarManager tbm);
+	protected abstract void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl);
+
+	/**
+	 * Install a link listener that should handle links inside the hover popup.
+	 * 
+	 * @param iControl
+	 */
+	protected void installLinkListener(CustomBrowserInformationControl control)
+	{
+		control.addLocationListener(new CommonLocationListener(control));
+	}
 
 	/**
 	 * Computes the hover info and returns a {@link DocumentationBrowserInformationControlInput} for it.
@@ -260,7 +280,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 				HTMLPrinter.addPageEpilog(buffer);
 			}
 			return new DocumentationBrowserInformationControlInput(previousInput, element, buffer.toString(),
-					leadingImageWidth);
+					leadingImageWidth, hoverRegion);
 		}
 		return null;
 	}
@@ -508,10 +528,12 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 			if (BrowserInformationControl.isAvailable(parent))
 			{
 				ToolBarManager tbm = new ToolBarManager(SWT.FLAT);
-				documentationHover.populateToolbarActions(tbm);
 				CustomBrowserInformationControl iControl = new CustomBrowserInformationControl(parent, null, tbm);
 				iControl.setBackgroundColor(documentationHover.getBackgroundColor());
 				iControl.setForegroundColor(documentationHover.getForegroundColor());
+				documentationHover.populateToolbarActions(tbm, iControl);
+				tbm.update(true);
+				documentationHover.installLinkListener(iControl);
 				return iControl;
 			}
 			else
@@ -606,6 +628,85 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 			}
 
 			return true;
+		}
+	}
+
+	/**
+	 * Links listener.
+	 */
+	private static class CommonLocationListener extends LocationAdapter
+	{
+
+		private CustomBrowserInformationControl control;
+
+		/**
+		 * @param control
+		 */
+		public CommonLocationListener(CustomBrowserInformationControl control)
+		{
+			this.control = control;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.swt.browser.LocationListener#changing(org.eclipse.swt.browser.LocationEvent)
+		 */
+		public void changing(LocationEvent event)
+		{
+			String loc = event.location;
+
+			if ("about:blank".equals(loc)) { //$NON-NLS-1$
+				/*
+				 * Using the Browser.setText API triggers a location change to "about:blank". We just return.
+				 */
+				return;
+			}
+
+			event.doit = false;
+
+			if (loc.startsWith("about:")) { //$NON-NLS-1$
+				// Relative links should be handled via head > base tag.
+				// If no base is available, links just won't work.
+				return;
+			}
+
+			URI uri;
+			try
+			{
+				uri = new URI(loc);
+			}
+			catch (URISyntaxException e)
+			{
+				File file = new File(loc);
+				if (!file.exists())
+				{
+					IdeLog.logError(UIEplPlugin.getDefault(), e);
+					return;
+				}
+				uri = file.toURI();
+				loc = uri.toASCIIString();
+			}
+			control.notifyDelayedInputChange(null);
+			control.dispose(); // FIXME: should have protocol to hide, rather than dispose
+
+			// Open the link in an internal browser.
+			try
+			{
+				IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+				IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(null);
+				if (webBrowser != null)
+				{
+					webBrowser.openURL(new URL(loc));
+				}
+				return;
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(UIEplPlugin.getDefault(), e);
+			}
+
+			event.doit = true;
+
 		}
 	}
 }

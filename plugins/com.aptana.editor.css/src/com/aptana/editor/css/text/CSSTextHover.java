@@ -25,6 +25,7 @@ import org.eclipse.ui.IEditorPart;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
+import com.aptana.editor.common.hover.CustomBrowserInformationControl;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
@@ -63,17 +64,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
-	 * ToolBarManager)
-	 */
-	@Override
-	public void populateToolbarActions(ToolBarManager tbm)
-	{
-		// TODO Attach actions for open-declaration, documentation, etc.
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
 	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
 	 */
@@ -100,6 +90,18 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 			return info.toString();
 		}
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
+	 * ToolBarManager, com.aptana.editor.common.hover.CustomBrowserInformationControl)
+	 */
+	@Override
+	protected void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
+	{
+		// No toolbar actions for CSS (yet)
+
 	}
 
 	/**

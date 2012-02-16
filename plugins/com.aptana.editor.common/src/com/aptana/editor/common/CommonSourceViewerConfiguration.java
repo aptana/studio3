@@ -662,35 +662,22 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			if (activeTextHover != null)
 			{
 				Object info = null;
-				AbstractCommonTextHover commonHover = null;
 				if (activeTextHover instanceof AbstractCommonTextHover)
 				{
-					commonHover = (AbstractCommonTextHover) activeTextHover;
+					AbstractCommonTextHover commonHover = (AbstractCommonTextHover) activeTextHover;
 					commonHover.setEditor(getEditor());
 				}
-				try
+				if (activeTextHover instanceof ITextHoverExtension2)
 				{
-					if (activeTextHover instanceof ITextHoverExtension2)
-					{
-						info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
-					}
-					else
-					{
-						info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
-					}
-					if (info != null)
-					{
-						return info;
-					}
+					info = ((ITextHoverExtension2) activeTextHover).getHoverInfo2(textViewer, hoverRegion);
 				}
-				finally
+				else
 				{
-					// un-set the editor from the activeTextHover to avoid holding an editor reference after the
-					// hover-info computation.
-					if (commonHover != null)
-					{
-						commonHover.setEditor(null);
-					}
+					info = activeTextHover.getHoverInfo(textViewer, hoverRegion);
+				}
+				if (info != null)
+				{
+					return info;
 				}
 			}
 			return super.getHoverInfo(textViewer, hoverRegion);

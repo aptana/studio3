@@ -18,12 +18,16 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.internal.text.html.BrowserInformationControlInput;
+import org.eclipse.jface.text.IInputChangedListener;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -35,6 +39,8 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
+import com.aptana.editor.common.hover.CustomBrowserInformationControl;
+import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.LocationType;
@@ -44,11 +50,14 @@ import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.editor.js.hyperlink.JSHyperlinkDetector;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.ui.epl.UIEplPlugin;
 
+@SuppressWarnings("restriction")
 public class JSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
 
@@ -57,17 +66,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 
 	private String fDocs;
 	private String fHeader;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
-	 * ToolBarManager)
-	 */
-	@Override
-	public void populateToolbarActions(ToolBarManager tbm)
-	{
-		// TODO Attach actions for open-declaration etc.
-	}
 
 	/**
 	 * getActiveNode
@@ -244,6 +242,29 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
 		return fDocs;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#populateToolbarActions(org.eclipse.jface.action.
+	 * ToolBarManager, com.aptana.editor.common.hover.CustomBrowserInformationControl)
+	 */
+	@Override
+	public void populateToolbarActions(ToolBarManager tbm, CustomBrowserInformationControl iControl)
+	{
+		final OpenDeclarationAction openDeclarationAction = new OpenDeclarationAction(iControl);
+		tbm.add(openDeclarationAction);
+		IInputChangedListener inputChangeListener = new IInputChangedListener()
+		{
+			public void inputChanged(Object newInput)
+			{
+				if (newInput instanceof BrowserInformationControlInput)
+				{
+					openDeclarationAction.update();
+				}
+			}
+		};
+		iControl.addInputChangeListener(inputChangeListener);
 	}
 
 	private String getDocumentation(List<PropertyElement> properties)
@@ -470,5 +491,61 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		}
 
 		return result;
+	}
+
+	/**
+	 * Open declaration action.
+	 */
+	public class OpenDeclarationAction extends Action
+	{
+		private static final String IMG_OPEN_DECLARATION = "icons/full/elcl16/goto_input.gif"; //$NON-NLS-1$
+		private static final String IMG_OPEN_DECLARATION_DISABLED = "icons/full/dlcl16/goto_input.gif"; //$NON-NLS-1$
+		private CustomBrowserInformationControl iControl;
+		private IHyperlink[] hyperlinks;
+
+		/**
+		 * @param iControl
+		 */
+		public OpenDeclarationAction(CustomBrowserInformationControl iControl)
+		{
+			setText("Open Declaration");
+			setImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID, IMG_OPEN_DECLARATION));
+			setDisabledImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID,
+					IMG_OPEN_DECLARATION_DISABLED));
+			this.iControl = iControl;
+		}
+
+		/**
+		 * Update the action
+		 */
+		void update()
+		{
+			BrowserInformationControlInput input = iControl.getInput();
+			if (input instanceof DocumentationBrowserInformationControlInput)
+			{
+				JSHyperlinkDetector detector = new JSHyperlinkDetector();
+				IRegion hoverRegion = ((DocumentationBrowserInformationControlInput) input).getHoverRegion();
+				if (hoverRegion != null)
+				{
+					hyperlinks = detector.detectHyperlinks((AbstractThemeableEditor) getEditor(), hoverRegion, false);
+					setEnabled(hyperlinks != null && hyperlinks.length > 0 && hyperlinks[0] != null);
+					return;
+				}
+
+			}
+			setEnabled(false);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
+		@Override
+		public void run()
+		{
+			// We already know that this hyperlink is valid. A check was made at the update call.
+			iControl.dispose();
+			hyperlinks[0].open();
+		}
 	}
 }
