@@ -21,7 +21,6 @@
 %import "com.aptana.parsing.ast.IParseRootNode";
 %import "com.aptana.parsing.ast.IParseError";
 %import "com.aptana.parsing.ast.ParseError";
-%import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.util.ParseUtil";
 
 %implements "IParser";
@@ -247,31 +246,13 @@
 		try
 		{
 			// parse
-			ParseRootNode result = (ParseRootNode) parse(fScanner);
-
-			// update node offsets
-			int start = fParseState.getStartingOffset();
-			int length = source.length();
-
-			// align root with zero-based offset
-			result.setLocation(0, length - 1);
-
-			if (start != 0)
-			{
-				// shift all offsets to the correct position
-				ParseUtil.addOffset(result, start);
-			}
-
-			// store results in the parse state
-			fParseState.setParseResult(result);
-
-			JSParseRootNode root = (JSParseRootNode) result;
+			JSParseRootNode result = (JSParseRootNode) parse(fScanner);
 
 			if (attachComments)
 			{
 				// attach documentation
-				attachPreDocumentationBlocks(root, source);
-				attachPostDocumentationBlocks(root, source);
+				attachPreDocumentationBlocks(result, source);
+				attachPostDocumentationBlocks(result, source);
 			}
 
 			if (collectComments)
@@ -299,8 +280,24 @@
 					comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
 				}
 
-				root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
+				result.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
 			}
+
+			// update node offsets
+			int start = fParseState.getStartingOffset();
+			int length = source.length();
+
+			// align root with zero-based offset
+			result.setLocation(0, length - 1);
+
+			if (start != 0)
+			{
+				// shift all offsets to the correct position
+				ParseUtil.addOffset(result, start);
+			}
+
+			// store results in the parse state
+			fParseState.setParseResult(result);
 
 			return result;
 		}

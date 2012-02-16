@@ -1,4 +1,11 @@
 // $codepro.audit.disable
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.parsing;
 
 import java.util.ArrayList;
@@ -130,6 +137,21 @@ public class CSSParser extends Parser implements IParser
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 
+		// attach comments to parse root node
+		IRange[] comments = scanner.getComments();
+		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
+
+		for (int i = 0; i < comments.length; i++)
+		{
+			IRange comment = comments[i];
+			CSSCommentNode commentNode = new CSSCommentNode( //
+					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
+
+			commentNodes[i] = commentNode;
+		}
+
+		result.setCommentNodes(commentNodes);
+
 		// update node offsets
 		int start = fParseState.getStartingOffset();
 		int length = source.length();
@@ -146,20 +168,6 @@ public class CSSParser extends Parser implements IParser
 		// store results in the parse state
 		fParseState.setParseResult(result);
 
-		// attach comments to parse root node
-		IRange[] comments = scanner.getComments();
-		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
-
-		for (int i = 0; i < comments.length; i++)
-		{
-			IRange comment = comments[i];
-			CSSCommentNode commentNode = new CSSCommentNode( //
-					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
-
-			commentNodes[i] = commentNode;
-		}
-
-		result.setCommentNodes(commentNodes);
 		fParseState = null;
 
 		return result;

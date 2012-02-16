@@ -1,7 +1,7 @@
 // $codepro.audit.disable
 /**
  * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -84,7 +84,6 @@ import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
-import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.util.ParseUtil;
 
 /**
@@ -426,31 +425,13 @@ public class JSParser extends Parser implements IParser
 		try
 		{
 			// parse
-			ParseRootNode result = (ParseRootNode) parse(fScanner);
-
-			// update node offsets
-			int start = fParseState.getStartingOffset();
-			int length = source.length();
-
-			// align root with zero-based offset
-			result.setLocation(0, length - 1);
-
-			if (start != 0)
-			{
-				// shift all offsets to the correct position
-				ParseUtil.addOffset(result, start);
-			}
-
-			// store results in the parse state
-			fParseState.setParseResult(result);
-
-			JSParseRootNode root = (JSParseRootNode) result;
+			JSParseRootNode result = (JSParseRootNode) parse(fScanner);
 
 			if (attachComments)
 			{
 				// attach documentation
-				attachPreDocumentationBlocks(root, source);
-				attachPostDocumentationBlocks(root, source);
+				attachPreDocumentationBlocks(result, source);
+				attachPostDocumentationBlocks(result, source);
 			}
 
 			if (collectComments)
@@ -478,8 +459,24 @@ public class JSParser extends Parser implements IParser
 					comments.add(new JSCommentNode(IJSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
 				}
 
-				root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
+				result.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
 			}
+
+			// update node offsets
+			int start = fParseState.getStartingOffset();
+			int length = source.length();
+
+			// align root with zero-based offset
+			result.setLocation(0, length - 1);
+
+			if (start != 0)
+			{
+				// shift all offsets to the correct position
+				ParseUtil.addOffset(result, start);
+			}
+
+			// store results in the parse state
+			fParseState.setParseResult(result);
 
 			return result;
 		}

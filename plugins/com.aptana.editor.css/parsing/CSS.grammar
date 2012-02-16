@@ -89,6 +89,21 @@
 		// parse
 		ParseRootNode result = (ParseRootNode) parse(scanner);
 
+		// attach comments to parse root node
+		IRange[] comments = scanner.getComments();
+		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
+
+		for (int i = 0; i < comments.length; i++)
+		{
+			IRange comment = comments[i];
+			CSSCommentNode commentNode = new CSSCommentNode( //
+					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
+
+			commentNodes[i] = commentNode;
+		}
+
+		result.setCommentNodes(commentNodes);
+
 		// update node offsets
 		int start = fParseState.getStartingOffset();
 		int length = source.length();
@@ -105,20 +120,6 @@
 		// store results in the parse state
 		fParseState.setParseResult(result);
 
-		// attach comments to parse root node
-		IRange[] comments = scanner.getComments();
-		CSSCommentNode[] commentNodes = new CSSCommentNode[comments.length];
-
-		for (int i = 0; i < comments.length; i++)
-		{
-			IRange comment = comments[i];
-			CSSCommentNode commentNode = new CSSCommentNode( //
-					this.getSource(fParseState, comment), comment.getStartingOffset(), comment.getEndingOffset());
-
-			commentNodes[i] = commentNode;
-		}
-
-		result.setCommentNodes(commentNodes);
 		fParseState = null;
 
 		return result;
