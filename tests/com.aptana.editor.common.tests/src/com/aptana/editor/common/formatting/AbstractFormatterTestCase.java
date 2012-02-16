@@ -157,46 +157,37 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		return (String[]) filePaths.toArray(new String[filePaths.size()]);
 	}
 
-	/**
-	 * Do a basic string comparison.
-	 * 
-	 * @deprecated Please use {@link #assertEqualsWithWhiteSpace(String, String, String)}
-	 * @param formattedText
-	 * @param expectedResult
-	 * @return True, if the formattedText and the expectedResults are equal.
-	 */
-	protected boolean compareWithWhiteSpace(String formattedText, String expectedResult)
-	{
-		// This is a temporary hack for cases where there is a difference when running on Windows vs. Linux.
-		// In some cases, we get an extra ending line terminator, probably because we don't run the formatting in a
-		// 'standard' way through the ScriptFormattingStrategy and the IContentFormatter.
-		// The hack check for an extra new-line and the end of one of the strings we compare.
-		if (formattedText.endsWith("\n") && !expectedResult.endsWith("\n"))
-		{
-			formattedText = formattedText.substring(0, formattedText.length() - 1);
-		}
-		else if (!formattedText.endsWith("\n") && expectedResult.endsWith("\n"))
-		{
-			expectedResult = expectedResult.substring(0, expectedResult.length() - 1);
-		}
-		return expectedResult.equals(formattedText);
-	}
-
 	protected void assertEqualsWithWhiteSpace(String message, String expected, String actual)
 	{
 		// This is a temporary hack for cases where there is a difference when running on Windows vs. Linux.
 		// In some cases, we get an extra ending line terminator, probably because we don't run the formatting in a
 		// 'standard' way through the ScriptFormattingStrategy and the IContentFormatter.
 		// The hack check for an extra new-line and the end of one of the strings we compare.
-		if (actual.endsWith("\n") && !expected.endsWith("\n"))
-		{
-			actual = actual.substring(0, actual.length() - 1);
-		}
-		else if (!actual.endsWith("\n") && expected.endsWith("\n"))
-		{
-			expected = expected.substring(0, expected.length() - 1);
-		}
+		actual = trimTrailingNewLines(actual);
+		expected = trimTrailingNewLines(expected);
 		assertEquals(message, expected, actual);
+	}
+
+	/**
+	 * Returns the given string trimmed from any trailing new-line characters.
+	 */
+	private String trimTrailingNewLines(String expected)
+	{
+		int newLineChars = 0;
+		int originalLength = expected.length();
+		for (int i = originalLength - 1; i >= 0; i--)
+		{
+			char c = expected.charAt(i);
+			if (c == '\n' || c == '\r')
+			{
+				newLineChars++;
+			}
+		}
+		if (newLineChars > 0)
+		{
+			return expected.substring(0, originalLength - newLineChars);
+		}
+		return expected;
 	}
 
 	/**
