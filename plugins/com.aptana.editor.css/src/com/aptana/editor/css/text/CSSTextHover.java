@@ -25,6 +25,7 @@ import org.eclipse.ui.IEditorPart;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
+import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
@@ -196,7 +197,10 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 							{
 								result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
 								info = text;
-								displayingColor = true;
+								if (text.charAt(0) == '#' || CSSColors.namedColorExists(text))
+								{
+									displayingColor = true;
+								}
 								break;
 							}
 						}
