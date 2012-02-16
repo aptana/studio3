@@ -47,7 +47,7 @@ public class DocumentScopeManagerPerformanceTest extends PerformanceTestCase
 			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
 			IDocument doc = viewer.getDocument();
 			int length = doc.getLength();
-			EditorTestHelper.closeEditor(editor);
+			EditorTestHelper.closeAllEditors();
 			
 			IEditorReference[] refs = page.getEditorReferences();
 			assertEquals(0, refs.length);
