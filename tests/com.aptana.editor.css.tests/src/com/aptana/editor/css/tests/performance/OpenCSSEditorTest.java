@@ -8,7 +8,10 @@
 package com.aptana.editor.css.tests.performance;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
@@ -16,13 +19,13 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
+import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
@@ -200,26 +203,32 @@ public class OpenCSSEditorTest extends OpenEditorTest
 		private void setUpProject() throws Exception
 		{
 			IProject project = ResourceTestHelper.createExistingProject(PROJECT);
+			assertTrue("Failed to create an open project", project.isAccessible());
+
 			// Copy all project contents from under "performance"
-			URL perfFolderURL = FileLocator.find(Platform.getBundle("com.aptana.editor.css.tests"),
-					Path.fromPortableString("performance"), null);
-			perfFolderURL = FileLocator.toFileURL(perfFolderURL);
-			File perFolder = new File(perfFolderURL.toURI());
-			File[] children = perFolder.listFiles();
-			for (File child : children)
+			Bundle bundle = Platform.getBundle("com.aptana.editor.css.tests");
+			Enumeration<URL> urls = bundle.findEntries("performance", "*.css", true);
+			assertTrue("Got no performance files to copy", urls.hasMoreElements());
+			while (urls.hasMoreElements())
 			{
-				IFile file = project.getFile(child.getName());
-				file.create(
-						FileLocator.openStream(Platform.getBundle("com.aptana.editor.css.tests"),
-								Path.fromPortableString("performance/" + child.getName()), false), true, null);
+				// Extract performance file to filesystem
+				File file = ResourceUtil.resourcePathToFile(urls.nextElement());
+				// create a file in the new project with the extracted contents.
+				IFile iFile = project.getFile(file.getName());
+				InputStream stream = new FileInputStream(file);
+				iFile.create(stream, true, null);
+				stream.close();
+				// verify we created the file.
+				assertTrue("Failed to copy performance file into project", iFile.exists());
 			}
-			assertTrue(project.exists());
 		}
 
 		protected void tearDown() throws Exception
 		{
 			if (fTearDown)
+			{
 				ResourceTestHelper.delete(PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+			}
 		}
 	}
 }

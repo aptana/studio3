@@ -153,7 +153,9 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 			EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
 
 			if (fSetPerspective)
+			{
 				EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
+			}
 
 			if (!ResourceTestHelper.projectExists(PROJECT))
 			{
@@ -172,18 +174,23 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 		private void setUpProject() throws Exception
 		{
 			IProject project = ResourceTestHelper.createExistingProject(PROJECT);
+			assertTrue("Failed to create an open project", project.isAccessible());
+			
 			// Copy project contents from under "performance"
 			IFile file = project.getFile("amazon.html");
 			file.create(
 					FileLocator.openStream(Platform.getBundle("com.aptana.editor.html.tests"),
 							Path.fromPortableString("performance/amazon.html"), false), true, null);
-			assertTrue(project.exists());
+			// verify we created the file.
+			assertTrue("Failed to copy performance file into project", file.exists());
 		}
 
 		protected void tearDown() throws Exception
 		{
 			if (fTearDown)
+			{
 				ResourceTestHelper.delete(PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+			}
 		}
 	}
 }
