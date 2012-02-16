@@ -563,8 +563,8 @@ public class StringUtilTest extends TestCase
 		for (int i = 0; i < 1000000; i++)
 		{
 			String result = StringUtil.concat(items);
-
-			assertTrue(!result.isEmpty());
+			assertNotNull(result);
+			assertTrue(result.length() != 0);
 		}
 
 		long diff = System.currentTimeMillis() - start;
@@ -581,8 +581,8 @@ public class StringUtilTest extends TestCase
 		for (int i = 0; i < 1000000; i++)
 		{
 			String result = StringUtil.concat(items);
-
-			assertTrue(!result.isEmpty());
+			assertNotNull(result);
+			assertTrue(result.length() != 0);
 		}
 
 		long diff = System.currentTimeMillis() - start;
@@ -607,7 +607,7 @@ public class StringUtilTest extends TestCase
 			}
 
 			String result = builder.toString();
-			assertTrue(!result.isEmpty());
+			assertTrue(result.length() != 0);
 		}
 
 		long diff = System.currentTimeMillis() - start;
