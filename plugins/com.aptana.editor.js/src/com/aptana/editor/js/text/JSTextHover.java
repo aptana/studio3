@@ -8,8 +8,12 @@
 package com.aptana.editor.js.text;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -25,6 +29,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 
+import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonTextHover;
@@ -33,7 +40,10 @@ import com.aptana.editor.js.contentassist.JSLocationIdentifier;
 import com.aptana.editor.js.contentassist.LocationType;
 import com.aptana.editor.js.contentassist.ParseUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.SinceElement;
+import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -42,7 +52,11 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension2
 {
 
-	private static final String DOUBLE_NEW_LINE = "\n\n"; //$NON-NLS-1$
+	private static final String PROPERTY_HEADER_TEMPLATE = "<b>{0}: {1} - {2}</b>"; //$NON-NLS-1$
+	private static final String FUNCTION_HEADER_TEMPLATE = "<b>{0}({1}): {2} - {3}</b>"; //$NON-NLS-1$
+
+	private String fDocs;
+	private String fHeader;
 
 	/*
 	 * (non-Javadoc)
@@ -53,116 +67,6 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	public void populateToolbarActions(ToolBarManager tbm)
 	{
 		// TODO Attach actions for open-declaration etc.
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
-	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
-	 */
-	@Override
-	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
-	{
-		// No header for now
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getDocumentation(java.lang.Object,
-	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
-	 */
-	@Override
-	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
-	{
-		if (!(element instanceof IParseNode))
-		{
-			return null;
-		}
-		IParseNode activeNode = (IParseNode) element;
-
-		if (activeNode != null)
-		{
-			JSLocationIdentifier identifier = new JSLocationIdentifier(hoverRegion.getOffset(), activeNode);
-			LocationType type = identifier.getType();
-
-			switch (type)
-			{
-				case IN_CONSTRUCTOR:
-				case IN_GLOBAL:
-				case IN_VARIABLE_NAME:
-				{
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					Index index = this.getIndex(editorPart);
-					List<PropertyElement> properties = queryHelper.getGlobals(index, activeNode.getText());
-
-					if (properties != null)
-					{
-						List<String> descriptions = new ArrayList<String>();
-
-						for (PropertyElement property : properties)
-						{
-							descriptions.add(property.getDescription());
-						}
-
-						return StringUtil.join(DOUBLE_NEW_LINE, descriptions);
-					}
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
-					Index index = this.getIndex(editorPart);
-					// @formatter:off
-					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(identifier.getTargetNode(),
-							identifier.getStatementNode());
-					// @formatter:on
-					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(editorPart),
-							identifier.getTargetNode(), propertyNode, hoverRegion.getOffset());
-					String typeName = null;
-					String methodName = null;
-
-					if (types.size() > 0)
-					{
-						typeName = types.get(0);
-						methodName = propertyNode.getLastChild().getText();
-					}
-
-					if (typeName != null && methodName != null)
-					{
-						List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
-
-						if (properties != null)
-						{
-							List<String> descriptions = new ArrayList<String>();
-
-							for (PropertyElement property : properties)
-							{
-								if (property instanceof FunctionElement)
-								{
-									descriptions.add(((FunctionElement) property).getDescription());
-								}
-							}
-
-							return StringUtil.join(DOUBLE_NEW_LINE, descriptions);
-						}
-					}
-					break;
-
-				case IN_OBJECT_LITERAL_PROPERTY:
-					break;
-
-				case IN_PARAMETERS:
-					break;
-
-				case IN_LABEL:
-				case UNKNOWN:
-				case NONE:
-				default:
-					break;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -229,8 +133,252 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
-		IParseNode activeNode = this.getActiveNode(textViewer, hoverRegion.getOffset());
-		return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, getEditor(), hoverRegion);
+		try
+		{
+			IParseNode activeNode = getActiveNode(textViewer, hoverRegion.getOffset());
+			if (activeNode == null)
+			{
+				return null;
+			}
+
+			// To avoid duplicating work, we generate the header and documentation together here
+			// and then getHeader and getDocumentation just return the values.
+			JSLocationIdentifier identifier = new JSLocationIdentifier(hoverRegion.getOffset(), activeNode);
+			LocationType type = identifier.getType();
+			IEditorPart editorPart = getEditor();
+
+			switch (type)
+			{
+				case IN_CONSTRUCTOR:
+				case IN_GLOBAL:
+				case IN_VARIABLE_NAME:
+				{
+					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+					final Index index = getIndex(editorPart);
+					List<PropertyElement> properties = queryHelper.getGlobals(index, activeNode.getText());
+					if (!CollectionsUtil.isEmpty(properties))
+					{
+						PropertyElement first = properties.get(0);
+						fHeader = MessageFormat.format(PROPERTY_HEADER_TEMPLATE, first.getName(),
+								first.getOwningType(), getIndexRelativePaths(index, properties));
+						fDocs = getDocumentation(properties);
+					}
+					break;
+				}
+
+				case IN_PROPERTY_NAME:
+					JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
+					final Index index = this.getIndex(editorPart);
+					JSGetPropertyNode propertyNode = ParseUtil.getGetPropertyNode(identifier.getTargetNode(),
+							identifier.getStatementNode());
+
+					List<String> types = ParseUtil.getParentObjectTypes(index, this.getEditorURI(editorPart),
+							identifier.getTargetNode(), propertyNode, hoverRegion.getOffset());
+					String typeName = null;
+					String methodName = null;
+
+					if (!CollectionsUtil.isEmpty(types))
+					{
+						typeName = types.get(0);
+						methodName = propertyNode.getLastChild().getText();
+					}
+
+					if (typeName != null && methodName != null)
+					{
+						List<PropertyElement> properties = queryHelper.getTypeMembers(index, typeName, methodName);
+						// filter to only functions
+						properties = CollectionsUtil.filter(properties, new IFilter<PropertyElement>()
+						{
+							public boolean include(PropertyElement item)
+							{
+								return (item instanceof FunctionElement);
+							}
+						});
+
+						if (!CollectionsUtil.isEmpty(properties))
+						{
+							FunctionElement first = (FunctionElement) properties.get(0);
+
+							fHeader = MessageFormat.format(FUNCTION_HEADER_TEMPLATE, methodName,
+									parameters(first.getParameters()), typeName,
+									getIndexRelativePaths(index, properties));
+							fDocs = getDocumentation(properties);
+						}
+					}
+					break;
+
+				case IN_OBJECT_LITERAL_PROPERTY:
+				case IN_PARAMETERS:
+				case IN_LABEL:
+				case UNKNOWN:
+				case NONE:
+				default:
+					return null;
+			}
+			return getHoverInfo(activeNode, isBrowserControlAvailable(textViewer), null, editorPart, hoverRegion);
+		}
+		finally
+		{
+			fHeader = null;
+			fDocs = null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getHeader(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		return fHeader;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.hover.AbstractDocumentationHover#getDocumentation(java.lang.Object,
+	 * org.eclipse.ui.IEditorPart, org.eclipse.jface.text.IRegion)
+	 */
+	@Override
+	protected String getDocumentation(Object element, IEditorPart editorPart, IRegion hoverRegion)
+	{
+		return fDocs;
+	}
+
+	private String getDocumentation(List<PropertyElement> properties)
+	{
+		Set<UserAgentElement> userAgents = new HashSet<UserAgentElement>();
+		Set<SinceElement> sinceElements = new HashSet<SinceElement>();
+		Set<String> descriptions = new HashSet<String>();
+		String example = StringUtil.EMPTY;
+
+		for (PropertyElement property : properties)
+		{
+			userAgents.addAll(property.getUserAgents());
+			String desc = property.getDescription();
+			if (!StringUtil.isEmpty(desc))
+			{
+				descriptions.add(desc);
+			}
+			sinceElements.addAll(property.getSinceList());
+			if (StringUtil.isEmpty(example) && !CollectionsUtil.isEmpty(property.getExamples()))
+			{
+				example = property.getExamples().get(0);
+			}
+		}
+
+		StringBuilder builder = new StringBuilder();
+		String description = Messages.JSTextHover_NoDescription;
+		if (!CollectionsUtil.isEmpty(descriptions))
+		{
+			description = StringUtil.join(", ", descriptions); //$NON-NLS-1$
+		}
+		builder.append(description);
+		addSection(builder, Messages.JSTextHover_SupportedPlatforms, getPlatforms(userAgents));
+		addSection(builder, Messages.JSTextHover_Example, example);
+		addSection(builder, Messages.JSTextHover_Specification, getSpecificationsString(sinceElements));
+		return builder.toString();
+	}
+
+	private void addSection(StringBuilder builder, String title, String value)
+	{
+		if (!StringUtil.isEmpty(value))
+		{
+			builder.append("<br /><br />"); //$NON-NLS-1$
+			builder.append("<b>").append(title).append("</b><br />"); //$NON-NLS-1$ //$NON-NLS-2$
+			builder.append(value);
+		}
+	}
+
+	private String parameters(List<ParameterElement> parameters)
+	{
+		List<String> strings = CollectionsUtil.map(parameters, new IMap<ParameterElement, String>()
+		{
+			public String map(ParameterElement item)
+			{
+				StringBuilder b = new StringBuilder();
+				b.append(item.getName());
+				List<String> types = item.getTypes();
+				if (!CollectionsUtil.isEmpty(types))
+				{
+					b.append(": ").append(StringUtil.join("|", types)); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				return b.toString();
+			}
+		});
+		return StringUtil.join(", ", strings); //$NON-NLS-1$
+	}
+
+	private String getSpecificationsString(Collection<SinceElement> sinceElements)
+	{
+		List<String> strings = CollectionsUtil.map(sinceElements, new IMap<SinceElement, String>()
+		{
+			public String map(SinceElement item)
+			{
+				StringBuilder b = new StringBuilder();
+				b.append(item.getName());
+				String version = item.getVersion();
+				if (!StringUtil.isEmpty(version))
+				{
+					b.append(": ").append(version); //$NON-NLS-1$
+				}
+				return b.toString();
+			}
+		});
+		return StringUtil.join(", ", strings); //$NON-NLS-1$
+	}
+
+	private String getPlatforms(Collection<UserAgentElement> userAgents)
+	{
+		List<String> strings = CollectionsUtil.map(userAgents, new IMap<UserAgentElement, String>()
+		{
+			public String map(UserAgentElement item)
+			{
+				StringBuilder b = new StringBuilder();
+				b.append(item.getPlatform());
+				String version = item.getVersion();
+				if (!StringUtil.isEmpty(version))
+				{
+					b.append(": ").append(version); //$NON-NLS-1$
+				}
+				return b.toString();
+			}
+		});
+		return StringUtil.join(", ", strings); //$NON-NLS-1$
+	}
+
+	/**
+	 * Given a Collection of propertyElements, we generate the unique set of documents and truncate the paths to use the
+	 * relative path to the index.
+	 * 
+	 * @param index
+	 * @param properties
+	 * @return
+	 */
+	private String getIndexRelativePaths(final Index index, Collection<PropertyElement> properties)
+	{
+		Collection<String> documents = new HashSet<String>();
+		for (PropertyElement property : properties)
+		{
+			documents.addAll(property.getDocuments());
+		}
+		documents = CollectionsUtil.map(documents, new IMap<String, String>()
+		{
+			public String map(String item)
+			{
+				try
+				{
+					return index.getRelativeDocumentPath(new URI(item)).getPath();
+				}
+				catch (URISyntaxException e)
+				{
+					return item;
+				}
+			}
+		});
+
+		return StringUtil.join(", ", documents); //$NON-NLS-1$
 	}
 
 	/*
