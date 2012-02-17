@@ -35,6 +35,7 @@ import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.IFilter;
 import com.aptana.core.IMap;
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -528,7 +529,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 				if (hoverRegion != null)
 				{
 					hyperlinks = detector.detectHyperlinks((AbstractThemeableEditor) getEditor(), hoverRegion, false);
-					setEnabled(hyperlinks != null && hyperlinks.length > 0 && hyperlinks[0] != null);
+					setEnabled(!ArrayUtil.isEmpty(hyperlinks) && hyperlinks[0] != null);
 					return;
 				}
 
