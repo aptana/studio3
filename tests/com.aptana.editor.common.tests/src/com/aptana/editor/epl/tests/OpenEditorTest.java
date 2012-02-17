@@ -14,6 +14,7 @@ package com.aptana.editor.epl.tests;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
@@ -46,13 +47,13 @@ public abstract class OpenEditorTest extends TextPerformanceTestCase
 		assertPerformance(performanceMeter);
 	}
 
-	protected void measureOpenInEditor(String file, PerformanceMeter performanceMeter) throws PartInitException
+	protected void measureOpenInEditor(IPath file, PerformanceMeter performanceMeter) throws PartInitException
 	{
 		measureOpenInEditor(arrayOf(file, getWarmUpRuns()), Performance.getDefault().getNullPerformanceMeter(), true);
 		measureOpenInEditor(arrayOf(file, getMeasuredRuns()), performanceMeter, true);
 	}
 
-	private IFile[] arrayOf(String file, int n)
+	private IFile[] arrayOf(IPath file, int n)
 	{
 		IFile[] files = new IFile[n];
 		Arrays.fill(files, ResourceTestHelper.findFile(file));
