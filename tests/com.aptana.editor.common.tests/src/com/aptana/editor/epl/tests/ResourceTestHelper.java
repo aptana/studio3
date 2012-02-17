@@ -27,6 +27,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.logging.IdeLog;
+import com.aptana.editor.common.CommonEditorPlugin;
+
 public class ResourceTestHelper
 {
 
@@ -41,6 +44,8 @@ public class ResourceTestHelper
 	public static void replicate(IPath srcFilePath, String destPrefix, String destSuffix, int copies, IfExists ifExists)
 			throws CoreException
 	{
+		IdeLog.logError(CommonEditorPlugin.getDefault(),
+				MessageFormat.format("Copying {0} {1} times", srcFilePath.toPortableString(), copies));
 		for (int i = 0; i < copies; i++)
 		{
 			copy(srcFilePath, Path.fromPortableString(destPrefix + i + destSuffix), ifExists);
@@ -51,13 +56,21 @@ public class ResourceTestHelper
 	{
 		if (handleExisting(destFilePath, ifExists))
 		{
-			IFile src = getFile(srcFilePath);
-			Assert.assertTrue(MessageFormat.format("src file doesn't exist: {0}", srcFilePath.toPortableString()),
-					src.exists());
+			IFile src = findFile(srcFilePath);
 			src.copy(destFilePath, true, null);
-			Assert.assertTrue(
-					MessageFormat.format("src file didn'get copied to destination: {0}",
-							destFilePath.toPortableString()), getFile(destFilePath).exists());
+			Assert.assertTrue(MessageFormat.format("src file {0} didn'get copied to destination: {1}",
+					srcFilePath.toPortableString(), destFilePath.toPortableString()), getFile(destFilePath).exists());
+			IdeLog.logError(
+					CommonEditorPlugin.getDefault(),
+					MessageFormat.format("Copied {0} to {1}", srcFilePath.toPortableString(),
+							destFilePath.toPortableString()));
+		}
+		else
+		{
+			IdeLog.logError(
+					CommonEditorPlugin.getDefault(),
+					MessageFormat.format("Skipping copy of {0} to {1}, since dest already exists",
+							srcFilePath.toPortableString(), destFilePath.toPortableString()));
 		}
 	}
 
