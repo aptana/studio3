@@ -687,7 +687,7 @@ public abstract class AbstractDocumentationHover extends AbstractCommonTextHover
 				loc = uri.toASCIIString();
 			}
 			control.notifyDelayedInputChange(null);
-			control.dispose(); // FIXME: should have protocol to hide, rather than dispose
+			control.dispose();
 
 			// Open the link in an internal browser.
 			try
