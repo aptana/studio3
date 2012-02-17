@@ -21,6 +21,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.hover.DocumentationBrowserInformationControlInput;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.text.CSSTextHover;
 import com.aptana.editor.epl.tests.EditorTestHelper;
@@ -129,7 +130,7 @@ public class CSSTextHoverTests extends TestCase
 	}
 
 	protected void assertRegionAndInfoType(String source, int hoverOffset, int regionOffset, int regionLength,
-			Class<?> infoType) throws Exception
+			Class<?> infoElementType) throws Exception
 	{
 		ITextViewer textViewer = getTextViewer(source);
 
@@ -139,8 +140,11 @@ public class CSSTextHoverTests extends TestCase
 		assertEquals(regionOffset, hoverRegion.getOffset());
 		assertEquals(regionLength, hoverRegion.getLength());
 
-		Object info = fHover.getHoverInfo2(textViewer, hoverRegion);
-		assertTrue("info was not " + infoType.getName(), infoType.isAssignableFrom(info.getClass()));
+		DocumentationBrowserInformationControlInput info = (DocumentationBrowserInformationControlInput) fHover
+				.getHoverInfo2(textViewer, hoverRegion);
+		assertNotNull("Info was null", info);
+		assertNotNull("Info Element was null", info.getElement());
+		assertTrue("info's element was not " + infoElementType.getName(), infoElementType.isAssignableFrom(info.getElement().getClass()));
 	}
 
 	/**

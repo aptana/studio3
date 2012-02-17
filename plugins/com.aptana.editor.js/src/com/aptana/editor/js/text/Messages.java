@@ -7,6 +7,7 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.text.messages"; //$NON-NLS-1$
 	public static String JSTextHover_Example;
 	public static String JSTextHover_NoDescription;
+	public static String JSTextHover_openDeclarationTooltip;
 	public static String JSTextHover_Specification;
 	public static String JSTextHover_SupportedPlatforms;
 	static

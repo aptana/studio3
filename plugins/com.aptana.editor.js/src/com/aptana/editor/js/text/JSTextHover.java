@@ -508,7 +508,7 @@ public class JSTextHover extends CommonTextHover implements ITextHover, ITextHov
 		 */
 		public OpenDeclarationAction(CustomBrowserInformationControl iControl)
 		{
-			setText("Open Declaration");
+			setText(Messages.JSTextHover_openDeclarationTooltip);
 			setImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID, IMG_OPEN_DECLARATION));
 			setDisabledImageDescriptor(UIEplPlugin.imageDescriptorFromPlugin(UIEplPlugin.PLUGIN_ID,
 					IMG_OPEN_DECLARATION_DISABLED));

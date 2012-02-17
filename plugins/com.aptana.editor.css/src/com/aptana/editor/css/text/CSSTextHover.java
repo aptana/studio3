@@ -59,8 +59,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 			.compile("rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)"); //$NON-NLS-1$
 
 	private Object info;
-	// has to be static, since the hover instance is reused.
-	private static boolean displayingColor;
 
 	/*
 	 * (non-Javadoc)
@@ -70,7 +68,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 	@Override
 	protected String getHeader(Object element, IEditorPart editorPart, IRegion hoverRegion)
 	{
-		if (displayingColor)
+		if (element instanceof RGB)
 		{
 			return Messages.CSSTextHover_cssColorHeaderText;
 		}
@@ -88,6 +86,11 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		if (info instanceof String)
 		{
 			return info.toString();
+		}
+		else if (info instanceof RGB)
+		{
+			// Wrap the info color in a HTML table that is set with this background color.
+			return MessageFormat.format(COLORED_TABLE, getHexColor((RGB) info));
 		}
 		return null;
 	}
@@ -176,7 +179,6 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 
 		// grab document's parse model
 		IParseNode ast = getAST(textViewer, offset);
-		displayingColor = false;
 		if (ast != null)
 		{
 			IParseNode node = ast.getNodeAtOffset(offset);
@@ -190,39 +192,44 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 					case ICSSNodeTypes.TERM:
 					{
 						IParseNode parent = cssNode.getParent();
-
-						if (parent instanceof CSSDeclarationNode)
-						{
-							String text = cssNode.getText();
-
-							if (!StringUtil.isEmpty(text))
-							{
-								result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
-								info = text;
-								if (text.charAt(0) == '#' || CSSColors.namedColorExists(text))
-								{
-									displayingColor = true;
-								}
-								break;
-							}
-						}
-						else if (parent instanceof CSSTermListNode)
+						if (parent instanceof CSSTermListNode)
 						{
 							// find owning statement for this expression
 							while (parent instanceof CSSTermListNode)
 							{
 								parent = parent.getParent();
 							}
+						}
+						if (parent instanceof CSSDeclarationNode)
+						{
+							String text = cssNode.getText();
 
-							if (parent instanceof CSSFunctionNode)
+							if (!StringUtil.isEmpty(text))
 							{
-								RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
-
-								if (ri != null)
+								if (text.charAt(0) == '#')
 								{
-									result = ri.region;
-									info = ri.info;
+									info = CSSColors.hexToRGB(text);
 								}
+								else if (CSSColors.namedColorExists(text))
+								{
+									info = CSSColors.namedColorToRGB(text);
+								}
+								else
+								{
+									info = text;
+								}
+								result = new Region(cssNode.getStartingOffset(), cssNode.getLength());
+								break;
+							}
+						}
+						else if (parent instanceof CSSFunctionNode)
+						{
+							RegionInfo ri = this.getFunctionRegionInfo((CSSFunctionNode) parent);
+
+							if (ri != null)
+							{
+								result = ri.region;
+								info = ri.info;
 							}
 						}
 						break;
@@ -288,13 +295,7 @@ public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHo
 		if (result == null)
 		{
 			info = null;
-			displayingColor = false;
-			result = new Region(offset, 0);
-		}
-		else if (displayingColor)
-		{
-			// Wrap the info color in a HTML table that is set with this background color.
-			info = MessageFormat.format(COLORED_TABLE, info);
+			return new Region(offset, 0);
 		}
 		return result;
 	}
