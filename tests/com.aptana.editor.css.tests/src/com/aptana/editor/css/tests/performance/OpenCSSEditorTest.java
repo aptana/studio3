@@ -19,6 +19,8 @@ import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
@@ -36,11 +38,11 @@ public class OpenCSSEditorTest extends OpenEditorTest
 	private static final String PROJECT = "css_perf";
 	private static final int WARM_UP_RUNS = 10;
 	private static final int MEASURED_RUNS = 50;
-	private static final String FILE_PREFIX = "yui";
-	private static final String PREFIX = "/" + PROJECT + "/" + FILE_PREFIX;
+	private static final String PREFIX = "/" + PROJECT + "/yui";
 	private static final String FILE_SUFFIX = ".css";
-	private static final String LARGE_MINIFIED_FILE = "/" + PROJECT + "/wp-admin.css";
-	private static final String LARGE_FILE = "/" + PROJECT + "/wp-admin.dev.css";
+	private static final IPath LARGE_MINIFIED_FILE = Path.fromPortableString("/" + PROJECT + "/wp-admin.css");
+	private static final IPath LARGE_FILE = Path.fromPortableString("/" + PROJECT + "/wp-admin.dev.css");
+	private static final IPath SRC_FILE = Path.fromPortableString(PREFIX + FILE_SUFFIX);
 
 	public OpenCSSEditorTest(String name)
 	{
@@ -134,7 +136,7 @@ public class OpenCSSEditorTest extends OpenEditorTest
 	// measureOpenInEditor(LARGE_MINIFIED_FILE, false, false, createPerformanceMeter());
 	// }
 
-	protected void measureOpenInEditor(String file, boolean enableFolding, boolean showOutline,
+	protected void measureOpenInEditor(IPath file, boolean enableFolding, boolean showOutline,
 			PerformanceMeter performanceMeter) throws PartInitException
 	{
 		boolean shown = EditorTestHelper.isViewShown(EditorTestHelper.OUTLINE_VIEW_ID);
@@ -184,7 +186,9 @@ public class OpenCSSEditorTest extends OpenEditorTest
 			EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
 
 			if (fSetPerspective)
+			{
 				EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
+			}
 
 			if (!ResourceTestHelper.projectExists(PROJECT))
 			{
@@ -196,8 +200,8 @@ public class OpenCSSEditorTest extends OpenEditorTest
 
 				EditorTestHelper.joinBackgroundActivities();
 			}
-			ResourceTestHelper.replicate(PREFIX + FILE_SUFFIX, PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
-					FILE_PREFIX, FILE_PREFIX, ResourceTestHelper.SKIP_IF_EXISTS);
+			ResourceTestHelper.replicate(SRC_FILE, PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
+					ResourceTestHelper.IfExists.SKIP);
 		}
 
 		private void setUpProject() throws Exception

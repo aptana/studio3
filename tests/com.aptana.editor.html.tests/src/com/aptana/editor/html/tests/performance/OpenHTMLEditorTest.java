@@ -14,6 +14,7 @@ import junit.framework.TestSuite;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.Performance;
@@ -30,11 +31,9 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 	private static final String PROJECT = "performance_project";
 	private static final int WARM_UP_RUNS = 10;
 	private static final int MEASURED_RUNS = 50;
-	private static final String PATH = "/";
-	private static final String FILE_PREFIX = "amazon";
-	private static final String PREFIX = "/" + PROJECT + PATH + FILE_PREFIX;
+	private static final String PREFIX = "/" + PROJECT + "/amazon";
 	private static final String FILE_SUFFIX = ".html";
-	private static final String LARGE_FILE = PREFIX + FILE_SUFFIX;
+	private static final IPath LARGE_FILE = Path.fromPortableString(PREFIX + FILE_SUFFIX);
 
 	public OpenHTMLEditorTest(String name)
 	{
@@ -103,7 +102,7 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 	// measureOpenInEditor(LARGE_FILE, false, false, createPerformanceMeter());
 	// }
 
-	protected void measureOpenInEditor(String file, boolean enableFolding, boolean showOutline,
+	protected void measureOpenInEditor(IPath file, boolean enableFolding, boolean showOutline,
 			PerformanceMeter performanceMeter) throws PartInitException
 	{
 		boolean shown = EditorTestHelper.isViewShown(EditorTestHelper.OUTLINE_VIEW_ID);
@@ -167,15 +166,15 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 
 				EditorTestHelper.joinBackgroundActivities();
 			}
-			ResourceTestHelper.replicate(PREFIX + FILE_SUFFIX, PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
-					FILE_PREFIX, FILE_PREFIX, ResourceTestHelper.SKIP_IF_EXISTS);
+			ResourceTestHelper.replicate(LARGE_FILE, PREFIX, FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
+					ResourceTestHelper.IfExists.SKIP);
 		}
 
 		private void setUpProject() throws Exception
 		{
 			IProject project = ResourceTestHelper.createExistingProject(PROJECT);
 			assertTrue("Failed to create an open project", project.isAccessible());
-			
+
 			// Copy project contents from under "performance"
 			IFile file = project.getFile("amazon.html");
 			file.create(
