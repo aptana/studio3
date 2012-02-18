@@ -163,29 +163,29 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		// In some cases, we get an extra ending line terminator, probably because we don't run the formatting in a
 		// 'standard' way through the ScriptFormattingStrategy and the IContentFormatter.
 		// The hack check for an extra new-line and the end of one of the strings we compare.
-		actual = trimTrailingNewLines(actual);
-		expected = trimTrailingNewLines(expected);
+		actual = trimTrailingWhitespaces(actual);
+		expected = trimTrailingWhitespaces(expected);
 		assertEquals(message, expected, actual);
 	}
 
 	/**
 	 * Returns the given string trimmed from any trailing new-line characters.
 	 */
-	private String trimTrailingNewLines(String expected)
+	private String trimTrailingWhitespaces(String expected)
 	{
-		int newLineChars = 0;
+		int whitespaceCount = 0;
 		int originalLength = expected.length();
 		for (int i = originalLength - 1; i >= 0; i--)
 		{
 			char c = expected.charAt(i);
-			if (c == '\n' || c == '\r')
+			if (Character.isWhitespace(c))
 			{
-				newLineChars++;
+				whitespaceCount++;
 			}
 		}
-		if (newLineChars > 0)
+		if (whitespaceCount > 0)
 		{
-			return expected.substring(0, originalLength - newLineChars);
+			return expected.substring(0, originalLength - whitespaceCount);
 		}
 		return expected;
 	}
