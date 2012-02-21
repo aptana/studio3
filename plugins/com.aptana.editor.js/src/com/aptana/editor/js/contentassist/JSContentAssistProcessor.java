@@ -227,11 +227,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (!CollectionsUtil.isEmpty(projectGlobals))
 		{
+			String[] userAgentNames = getActiveUserAgentIds();
 			URI projectURI = getProjectURI();
 
 			for (PropertyElement property : CollectionsUtil.filter(projectGlobals, isVisibleFilter))
 			{
-				addProposal(proposals, property, offset, projectURI, null);
+				addProposal(proposals, property, offset, projectURI, null, userAgentNames);
 			}
 		}
 	}
@@ -377,10 +378,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
 			String overridenLocation)
 	{
-		// FIXME If possible, can we grab user agents as needed inside the proposal class?
 		List<String> userAgentNameList = property.getUserAgentNames();
 		String[] userAgentNames = userAgentNameList.toArray(new String[userAgentNameList.size()]);
+		addProposal(proposals, property, offset, projectURI, overridenLocation, userAgentNames);
+	}
 
+	private void addProposal(Set<ICompletionProposal> proposals, PropertyElement property, int offset, URI projectURI,
+			String overridenLocation, String[] userAgentNames)
+	{
 		if (isActiveByUserAgent(userAgentNames))
 		{
 			// calculate what text will be replaced
@@ -405,6 +410,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			// add the proposal to the list
 			proposals.add(proposal);
 		}
+
 	}
 
 	/*
