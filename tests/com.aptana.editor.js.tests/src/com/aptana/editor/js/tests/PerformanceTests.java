@@ -21,6 +21,7 @@ import com.aptana.editor.js.contentassist.JSIndexingPerformanceTest;
 import com.aptana.editor.js.parsing.JSParserPerformanceTest;
 import com.aptana.editor.js.parsing.JSScannerPerformanceTest;
 import com.aptana.editor.js.sdoc.parsing.SDocParserPerformanceTest;
+import com.aptana.editor.js.tests.performance.OpenJSEditorTest;
 
 public class PerformanceTests
 {
@@ -45,6 +46,7 @@ public class PerformanceTests
 		suite.addTestSuite(JSParserPerformanceTest.class);
 		suite.addTestSuite(JSScannerPerformanceTest.class);
 		suite.addTestSuite(SDocParserPerformanceTest.class);
+		suite.addTest(OpenJSEditorTest.suite());
 		// $JUnit-END$
 		return suite;
 	}
